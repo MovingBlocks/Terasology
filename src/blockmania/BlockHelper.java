@@ -37,6 +37,7 @@ public class BlockHelper {
 
     public static Vector2f getTextureOffsetFor(int type, SIDE side) {
         switch (type) {
+            // Grass block
             case 0x1:
                 if (side == SIDE.LEFT || side == SIDE.RIGHT || side == SIDE.FRONT || side == SIDE.BACK) {
                     return calcOffsetForTextureAt(3, 0);
@@ -46,8 +47,13 @@ public class BlockHelper {
                     calcOffsetForTextureAt(2, 0);
                 }
                 break;
+            // Dirt block
             case 0x2:
                 calcOffsetForTextureAt(2, 0);
+                break;
+            // Stone block
+            case 0x3:
+                calcOffsetForTextureAt(1, 0);
                 break;
         }
 

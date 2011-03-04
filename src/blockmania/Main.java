@@ -56,13 +56,16 @@ public class Main {
 
         Main main = null;
 
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        if (Configuration.displayDebug) {
+            java.awt.EventQueue.invokeLater(new Runnable() {
 
-            @Override
-            public void run() {
-                new DebugWindow().setVisible(true);
-            }
-        });
+                @Override
+                public void run() {
+                    new DebugWindow().setVisible(true);
+                }
+            });
+        }
+
 
         try {
             main = new Main();
@@ -125,8 +128,8 @@ public class Main {
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogf(GL_FOG_DENSITY, 1.0f);
         glHint(GL_FOG_HINT, GL_DONT_CARE);
-        glFogf(GL_FOG_START, 300.0f);
-        glFogf(GL_FOG_END, 400.0f);
+        glFogf(GL_FOG_START, 512.0f);
+        glFogf(GL_FOG_END, 1024.0f);
 
         try {
             Class.forName("blockmania.Chunk");

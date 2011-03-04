@@ -31,7 +31,7 @@ public class Player extends RenderObject {
     float walkingSpeed = 0.075f;
 
     public Player() {
-        position = new Vector3f(0.0f, -64.0f, 0.0f);
+        position = new Vector3f(0.0f, -100.0f, 0.0f);
     }
 
     /*

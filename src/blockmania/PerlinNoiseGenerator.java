@@ -103,8 +103,14 @@ public class PerlinNoiseGenerator {
 
     float getTerrainHeightAt(float x, float y) {
         float result = 0.0f;
-        result += noise(0.025f * x, 0.025f * y, 1.0f);
-        result += noise(0.01f * x, 0.01f * y, 1.0f);
-        return result /= 2;
+        result += noise(0.01f * x, 0.01f * y, 0.01f) * 0.75;
+        result += noise(0.04f * x, 0.04f * y, 0.02f) * 0.25;
+        return result;
+    }
+
+    float getCaveHeightAt(float x, float y) {
+        float result = 0.0f;
+        result += noise(0.025f * x, 0.025f * y, 50f);
+        return result;
     }
 }
