@@ -28,10 +28,14 @@ public class Player extends RenderObject {
     boolean playerModelHidden = false;
     float yaw = 0.0f;
     float pitch = 0.0f;
-    float walkingSpeed = 0.075f;
+    float walkingSpeed = 0.01f;
+    Vector3f acc = new Vector3f(0.0f, 0.0f, 0.0f);
+    // The parent world
+    World parent = null;
 
-    public Player() {
-        position = new Vector3f(0.0f, -100.0f, 0.0f);
+    public Player(World parent) {
+        this.parent = parent;
+        position = new Vector3f(0.0f, 64.0f, 0.0f);
     }
 
     /*
@@ -42,9 +46,10 @@ public class Player extends RenderObject {
      */
     @Override
     public void render() {
+        move();
         glRotatef(pitch, 1.0f, 0.0f, 0.0f);
         glRotatef(yaw, 0.0f, 1.0f, 0.0f);
-        glTranslatef(position.x, position.y, position.z);
+        glTranslatef(-position.x, -position.y, -position.z);
     }
 
     public void yaw(float diff) {
@@ -55,23 +60,57 @@ public class Player extends RenderObject {
         pitch += diff;
     }
 
+    void move() {
+
+        if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 4.0f, getPosition().z))) {
+            if (acc.y > -1.0f) {
+                acc.y -= 0.01f;
+            }
+        } else {
+            acc.y = 0.0f;
+        }
+
+        getPosition().x += acc.x;
+        getPosition().y += acc.y;
+        getPosition().z += acc.z;
+
+
+        if (acc.x > 0.0f) {
+            acc.x -= 0.01f;
+        } else if (acc.x < 0.0f) {
+            acc.x += 0.01f;
+        }
+
+        if (acc.y > 0.0f) {
+            acc.y -= 0.01f;
+        } else if (acc.y < 0.0f) {
+            acc.y += 0.01f;
+        }
+
+        if (acc.z > 0.0f) {
+            acc.z -= 0.01f;
+        } else if (acc.z < 0.0f) {
+            acc.z += 0.01f;
+        }
+    }
+
     public void walkForward() {
-        position.x -= walkingSpeed * (float) Math.sin(Math.toRadians(yaw));
-        position.z += walkingSpeed * (float) Math.cos(Math.toRadians(yaw));
+        acc.x += walkingSpeed * (float) Math.sin(Math.toRadians(yaw));
+        acc.z -= walkingSpeed * (float) Math.cos(Math.toRadians(yaw));
     }
 
     public void walkBackwards() {
-        position.x += walkingSpeed * (float) Math.sin(Math.toRadians(yaw));
-        position.z -= walkingSpeed * (float) Math.cos(Math.toRadians(yaw));
+        acc.x -= walkingSpeed * (float) Math.sin(Math.toRadians(yaw));
+        acc.z += walkingSpeed * (float) Math.cos(Math.toRadians(yaw));
     }
 
     public void strafeLeft() {
-        position.x -= walkingSpeed * (float)Math.sin(Math.toRadians(yaw-90));
-        position.z += walkingSpeed * (float)Math.cos(Math.toRadians(yaw-90));
+        acc.x += walkingSpeed * (float) Math.sin(Math.toRadians(yaw - 90));
+        acc.z -= walkingSpeed * (float) Math.cos(Math.toRadians(yaw - 90));
     }
 
     public void strafeRight() {
-        position.x -= walkingSpeed * (float)Math.sin(Math.toRadians(yaw+90));
-        position.z += walkingSpeed * (float)Math.cos(Math.toRadians(yaw+90));
+        acc.x += walkingSpeed * (float) Math.sin(Math.toRadians(yaw + 90));
+        acc.z -= walkingSpeed * (float) Math.cos(Math.toRadians(yaw + 90));
     }
 }

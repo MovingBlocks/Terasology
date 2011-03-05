@@ -137,8 +137,8 @@ public class Main {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        world = new World(mainChar);
-        mainChar = new Player();
+        world = new World();
+        mainChar = new Player(world);
         helper = new Helper();
 
     }
@@ -146,19 +146,27 @@ public class Main {
     public void processKeyboard() {
         if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
         {
-            mainChar.walkForward();
+            if (!Keyboard.isRepeatEvent()) {
+                mainChar.walkForward();
+            }
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_S))//move backwards
         {
-            mainChar.walkBackwards();
+            if (!Keyboard.isRepeatEvent()) {
+                mainChar.walkBackwards();
+            }
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_A))//strafe left
         {
-            mainChar.strafeLeft();
+            if (!Keyboard.isRepeatEvent()) {
+                mainChar.strafeLeft();
+            }
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_D))//strafe right
         {
-            mainChar.strafeRight();
+            if (!Keyboard.isRepeatEvent()) {
+                mainChar.strafeRight();
+            }
         }
     }
 

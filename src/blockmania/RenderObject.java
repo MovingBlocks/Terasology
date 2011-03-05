@@ -30,11 +30,11 @@ public abstract class RenderObject {
     public void render() {
     }
 
-    public final Vector3f getPosition() {
+    public Vector3f getPosition() {
         return position;
     }
 
-    public final void setPosition(Vector3f position) {
+    public void setPosition(Vector3f position) {
         this.position = position;
     }
 

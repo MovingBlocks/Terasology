@@ -17,9 +17,7 @@
 package blockmania;
 
 import java.util.Random;
-import java.util.ArrayList;
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
 /**
  *
@@ -31,7 +29,6 @@ public class World extends RenderObject {
     String title = "World 1";
     // The seed used for the terrain generation
     String seed = "BLOCKMANIA";
-    ArrayList<Vector4f> blocks = new ArrayList<Vector4f>();
     // The chunks to display
     Chunk[][][] chunks;
     // Random number generator
@@ -39,11 +36,9 @@ public class World extends RenderObject {
     PerlinNoiseGenerator pGen = new PerlinNoiseGenerator();
     public static final Vector3f worldDimensions = new Vector3f(1024, 256, 1024);
     long timeSinceLastChunkUpdate = 0;
-    Player[] players = new Player[32];
 
-    public World(Player mainChar) {
-        chunks = new Chunk[(int) Configuration.viewingDistanceInChunks.x][2][(int) Configuration.viewingDistanceInChunks.y];
-        players[0] = mainChar;
+    public World() {
+        chunks = new Chunk[(int) Configuration.viewingDistanceInChunks.x][(int) Configuration.viewingDistanceInChunks.y][(int) Configuration.viewingDistanceInChunks.z];
 
         Thread t = new Thread(new Runnable() {
 
@@ -60,8 +55,8 @@ public class World extends RenderObject {
     public void render() {
 
         for (int x = 0; x < (int) Configuration.viewingDistanceInChunks.x; x++) {
-            for (int y = 0; y < 1; y++) {
-                for (int z = 0; z < (int) Configuration.viewingDistanceInChunks.y; z++) {
+            for (int y = 0; y < (int) Configuration.viewingDistanceInChunks.y; y++) {
+                for (int z = 0; z < (int) Configuration.viewingDistanceInChunks.z; z++) {
                     if (chunks[x][y][z] != null) {
                         // Render active chunks only
                         chunks[x][y][z].render();
@@ -86,7 +81,7 @@ public class World extends RenderObject {
         for (int x = 0; x < worldDimensions.x; x++) {
             for (int z = 0; z < worldDimensions.z; z++) {
 
-                float height = pGen.getTerrainHeightAt(x/4.0f, z/4.0f);
+                float height = pGen.getTerrainHeightAt(x / 4.0f, z / 4.0f);
 
                 if (height < 0) {
                     height = 0;
@@ -98,31 +93,59 @@ public class World extends RenderObject {
                     y = 64;
                 }
 
-                int chunkX = (int) Math.floor(x / (int) Chunk.chunkDimensions.x);
-                int chunkY = (int) Math.floor(y / (int) Chunk.chunkDimensions.y);
-                int chunkZ = (int) Math.floor(z / (int) Chunk.chunkDimensions.z);
+                setBlock(new Vector3f(x, y, z), 0x1);
+                y--;
 
-                // Create a new chunk if needed
-                if (chunks[chunkX][chunkY][chunkZ] == null) {
-                    System.out.println("Generating chunk at X: " + chunkX + ", Y: " + chunkY + ", Z: " + chunkZ);
-                    chunks[chunkX][chunkY][chunkZ] = new Chunk(new Vector3f(chunkX, chunkY, chunkZ));
-                }
-
-                Vector3f blockCoord = new Vector3f(x - (chunkX * Chunk.chunkDimensions.x), y - (chunkY * Chunk.chunkDimensions.y), z - (chunkZ * Chunk.chunkDimensions.z));
-
-                // Generate or update the corresponding chunk
-                chunks[chunkX][chunkY][chunkZ].setBlock((int) blockCoord.x, (int) blockCoord.y, (int) blockCoord.z, 0x1);
-                blockCoord.y--;
-
-                // Fill with dirt
-                while (blockCoord.y >= 0) {
-                    chunks[chunkX][chunkY][chunkZ].setBlock((int) blockCoord.x, (int) blockCoord.y, (int) blockCoord.z, 0x2);
-                    blockCoord.y--;
+                while (y > 0) {
+                    setBlock(new Vector3f(x, y, z), 0x2);
+                    y--;
                 }
             }
         }
 
         System.out.println("World updated (" + (System.currentTimeMillis() - timeStart) / 1000d + "s).");
+
+    }
+
+    public final void setBlock(Vector3f pos, int type) {
+        Vector3f chunkPos = new Vector3f((float) Math.floor(pos.x / Chunk.chunkDimensions.x), (float) Math.floor(pos.y / Chunk.chunkDimensions.y), (float) Math.floor(pos.z / Chunk.chunkDimensions.z));
+        Vector3f blockCoord = new Vector3f(pos.x - (chunkPos.x * Chunk.chunkDimensions.x), pos.y - (chunkPos.y * Chunk.chunkDimensions.y), pos.z - (chunkPos.z * Chunk.chunkDimensions.z));
+
+        Chunk c = chunks[(int) chunkPos.x][(int) chunkPos.y][(int) chunkPos.z];
+
+        // Create a new chunk if needed
+        if (c == null) {
+            System.out.println("Generating chunk at X: " + chunkPos.x + ", Y: " + chunkPos.y + ", Z: " + chunkPos.z);
+            c = new Chunk(this, new Vector3f(chunkPos.x, chunkPos.y, chunkPos.z));
+            chunks[(int) chunkPos.x][(int) chunkPos.y][(int) chunkPos.z] = c;
+        }
+
+        // Generate or update the corresponding chunk
+        c.setBlock(blockCoord, type);
+    }
+
+    public final int getBlock(Vector3f pos) {
+        Vector3f chunkPos = new Vector3f((float) Math.floor(pos.x / Chunk.chunkDimensions.x), (float) Math.floor(pos.y / Chunk.chunkDimensions.y), (float) Math.floor(pos.z / Chunk.chunkDimensions.z));
+        Vector3f blockCoord = new Vector3f(pos.x - (chunkPos.x * Chunk.chunkDimensions.x), pos.y - (chunkPos.y * Chunk.chunkDimensions.y), pos.z - (chunkPos.z * Chunk.chunkDimensions.z));
+
+        try {
+            Chunk c = chunks[(int) chunkPos.x][(int) chunkPos.y][(int) chunkPos.z];
+            return c.getBlock(blockCoord);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public boolean isHitting(Vector3f pos) {
+        Vector3f chunkPos = new Vector3f((float) Math.floor(pos.x / Chunk.chunkDimensions.x), (float) Math.floor(pos.y / Chunk.chunkDimensions.y), (float) Math.floor(pos.z / Chunk.chunkDimensions.z));
+        Vector3f blockCoord = new Vector3f(pos.x - (chunkPos.x * Chunk.chunkDimensions.x), pos.y - (chunkPos.y * Chunk.chunkDimensions.y), pos.z - (chunkPos.z * Chunk.chunkDimensions.z));
+
+        try {
+            Chunk c = chunks[(int) chunkPos.x][(int) chunkPos.y][(int) chunkPos.z];
+            return (c.getBlock(blockCoord) > 0);
+        } catch (Exception e) {
+            return false;
+        }
 
     }
 }

@@ -25,8 +25,8 @@ import org.lwjgl.util.vector.Vector3f;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Configuration {
-    public static boolean displayDebug = true;
-    public static Vector2f viewingDistanceInChunks = new Vector2f(64.0f,64.0f);
+    public static boolean displayDebug = false;
+    public static Vector3f viewingDistanceInChunks = new Vector3f(64.0f,2.0f,64.0f);
 
 
     public static Vector2f calcTextureMapCoords(int x, int y) {

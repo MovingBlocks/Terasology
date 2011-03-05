@@ -42,19 +42,16 @@ public class BlockHelper {
                 if (side == SIDE.LEFT || side == SIDE.RIGHT || side == SIDE.FRONT || side == SIDE.BACK) {
                     return calcOffsetForTextureAt(3, 0);
                 } else if (side == SIDE.TOP) {
-                    calcOffsetForTextureAt(0, 0);
+                    return calcOffsetForTextureAt(0, 0);
                 } else {
-                    calcOffsetForTextureAt(2, 0);
+                    return calcOffsetForTextureAt(2, 0);
                 }
-                break;
             // Dirt block
             case 0x2:
-                calcOffsetForTextureAt(2, 0);
-                break;
+                return calcOffsetForTextureAt(2, 0);
             // Stone block
             case 0x3:
-                calcOffsetForTextureAt(1, 0);
-                break;
+                return calcOffsetForTextureAt(1, 0);
         }
 
         return calcOffsetForTextureAt(2, 0);
