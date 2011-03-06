@@ -35,14 +35,14 @@ import org.lwjgl.opengl.DisplayMode;
  */
 public class Main {
 
-    public static final float DISPLAY_HEIGHT = 864.0f;
-    public static final float DISPLAY_WIDTH = 1536.0f;
-    public static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-    public static final float MOUSE_SENS = 0.09f;
-    public static final boolean INVERT_Y_AXIS = false;
-    Player mainChar;
+    // Constant values
+    private static final float DISPLAY_HEIGHT = 864.0f;
+    private static final float DISPLAY_WIDTH = 1536.0f;
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    // Player
+    Player player;
+    // World
     World world;
-    Helper helper;
 
     static {
         try {
@@ -118,55 +118,43 @@ public class Main {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
-        glEnable(GL_FOG);
+//      glEnable(GL_FOG);
 
         glDisable(GL_LIGHTING);
 
         glDisable(GL_COLOR_MATERIAL);
 
-
-        glFogi(GL_FOG_MODE, GL_LINEAR);
-        glFogf(GL_FOG_DENSITY, 1.0f);
-        glHint(GL_FOG_HINT, GL_DONT_CARE);
-        glFogf(GL_FOG_START, 512.0f);
-        glFogf(GL_FOG_END, 1024.0f);
-
-        try {
-            Class.forName("blockmania.Chunk");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        glFogi(GL_FOG_MODE, GL_LINEAR);
+//        glFogf(GL_FOG_DENSITY, 1.0f);
+//        glHint(GL_FOG_HINT, GL_DONT_CARE);
+//        glFogf(GL_FOG_START, 512.0f);
+//        glFogf(GL_FOG_END, 1024.0f);
 
         world = new World();
-        mainChar = new Player(world);
-        helper = new Helper();
+        player = new Player(world);
+        Chunk.init();
 
     }
 
     public void processKeyboard() {
         if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
         {
-            if (!Keyboard.isRepeatEvent()) {
-                mainChar.walkForward();
-            }
+            player.walkForward();
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_S))//move backwards
         {
-            if (!Keyboard.isRepeatEvent()) {
-                mainChar.walkBackwards();
-            }
+            player.walkBackwards();
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_A))//strafe left
         {
-            if (!Keyboard.isRepeatEvent()) {
-                mainChar.strafeLeft();
-            }
+            player.strafeLeft();
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_D))//strafe right
         {
-            if (!Keyboard.isRepeatEvent()) {
-                mainChar.strafeRight();
-            }
+            player.strafeRight();
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
+            player.jump();
         }
     }
 
@@ -174,13 +162,16 @@ public class Main {
     }
 
     public void render() {
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
         glPushMatrix();
-        mainChar.render();
+        player.render();
         world.render();
 
+        // Draw coordinate axis
+        // -->
         glBegin(GL_LINES);
         glColor3f(255.0f, 0.0f, 0.0f);
         glVertex3f(0.0f, 0.0f, 0.0f);
@@ -198,8 +189,11 @@ public class Main {
         glVertex3f(0.0f, 0.0f, 0.0f);
         glVertex3f(0.0f, 0.0f, 1000.0f);
         glEnd();
+        // <--
 
         glPopMatrix();
+
+        Helper.getInstance().frameRendered();
     }
 
     public void resizeGL() {
@@ -223,15 +217,14 @@ public class Main {
 
                 processKeyboard();
                 processMouse();
+
                 update();
                 render();
 
             } else {
 
                 if (Display.isDirty()) {
-
                     render();
-
                 }
 
                 try {
@@ -248,14 +241,7 @@ public class Main {
     }
 
     public void update() {
-        mainChar.yaw(Mouse.getDX() * MOUSE_SENS);
-
-        if (!INVERT_Y_AXIS) {
-            mainChar.pitch(-1 * (Mouse.getDY() * MOUSE_SENS));
-        } else {
-            mainChar.pitch(Mouse.getDY() * MOUSE_SENS);
-        }
-
-        helper.frameRendered();
+        world.update();
+        player.update();
     }
 }

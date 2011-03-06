@@ -25,20 +25,25 @@ import org.lwjgl.opengl.Display;
  */
 public class Helper {
 
-    long timeLastFrame;
-    long timeLastUpdate;
-    int frameCounter;
-    float fps;
+    private double timeLastFrame;
+    private double timeLastUpdate;
+    private int frameCounter;
+    private static Helper instance = null;
+
+    public static Helper getInstance() {
+        if (instance == null) {
+            instance = new Helper();
+        }
+
+        return instance;
+    }
 
     public Helper() {
         updateFPSDisplay();
     }
 
-    final void updateFPSDisplay() {
-        Display.setTitle("Blockmania (FPS: " + fps + ", Quads: "+Chunk.quadCounter+")");
-
-        timeLastUpdate = getTime();
-        frameCounter = 0;
+    public double getTime() {
+        return (Sys.getTime() * 1000d) / Sys.getTimerResolution();
     }
 
     public void frameRendered() {
@@ -51,15 +56,32 @@ public class Helper {
         }
     }
 
+    public double calcInterpolation() {
+        double fps = calculateFPS();
+
+        if (fps > 0d) {
+            return 60d / fps;
+        }
+
+        return 0d;
+    }
+
     public double timeSinceLastFrame() {
-        return getTime()-timeLastFrame;
+        return getTime() - timeLastFrame;
     }
 
-    long getTime() {
-        return (Sys.getTime() * 1000) / Sys.getTimerResolution();
+    private double calculateFPS() {
+        double secondsSinceLastUpdate = ((getTime() - timeLastUpdate) / 1000d);
+        if (secondsSinceLastUpdate > 0d) {
+            return frameCounter / secondsSinceLastUpdate;
+        }
+        return 0d;
     }
 
-    void calculateFPS() {
-        fps = frameCounter / ((getTime() - timeLastUpdate) / 1000);
+    private void updateFPSDisplay() {
+        Display.setTitle("Blockmania (FPS: " + Math.round(calculateFPS()) + ", Quads: " + Chunk.quadCounter + ", Interpolation: " + calcInterpolation() + ")");
+
+        timeLastUpdate = getTime();
+        frameCounter = 0;
     }
 }

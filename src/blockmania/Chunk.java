@@ -49,15 +49,6 @@ public class Chunk extends RenderObject {
     // The parent world
     World parent = null;
 
-    static {
-        try {
-            textureMap = TextureLoader.getTexture("PNG", new FileInputStream(Chunk.class.getResource("Terrain.png").getPath()), GL_NEAREST);
-        } catch (IOException ex) {
-            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-
     public Chunk(World parent, Vector3f position) {
         this.position = position;
         this.parent = parent;
@@ -387,6 +378,14 @@ public class Chunk extends RenderObject {
             }
 
             glPopMatrix();
+        }
+    }
+
+    public static void init() {
+        try {
+            textureMap = TextureLoader.getTexture("PNG", new FileInputStream(Chunk.class.getResource("Terrain.png").getPath()), GL_NEAREST);
+        } catch (IOException ex) {
+            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

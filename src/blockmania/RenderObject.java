@@ -30,6 +30,10 @@ public abstract class RenderObject {
     public void render() {
     }
 
+    public void update() {
+        
+    }
+
     public Vector3f getPosition() {
         return position;
     }

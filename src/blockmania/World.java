@@ -34,7 +34,7 @@ public class World extends RenderObject {
     // Random number generator
     Random rand = new Random();
     PerlinNoiseGenerator pGen = new PerlinNoiseGenerator();
-    public static final Vector3f worldDimensions = new Vector3f(1024, 256, 1024);
+    public static final Vector3f worldDimensions = new Vector3f(1024, 128, 1024);
     long timeSinceLastChunkUpdate = 0;
 
     public World() {
@@ -61,7 +61,7 @@ public class World extends RenderObject {
                         // Render active chunks only
                         chunks[x][y][z].render();
 
-                        if (System.currentTimeMillis() - timeSinceLastChunkUpdate > 50) {
+                        if (System.currentTimeMillis() - timeSinceLastChunkUpdate > 15) {
                             if (chunks[x][y][z].updateDisplayList()) {
                                 timeSinceLastChunkUpdate = System.currentTimeMillis();
                             }

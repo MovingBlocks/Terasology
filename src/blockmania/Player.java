@@ -16,6 +16,7 @@
  */
 package blockmania;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -25,11 +26,14 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Player extends RenderObject {
 
-    boolean playerModelHidden = false;
-    float yaw = 0.0f;
+    // Viewing direction of the player
+    float yaw = 135.0f;
     float pitch = 0.0f;
-    float walkingSpeed = 0.01f;
+    float walkingSpeed = 1.0f;
+    // Acceleration
     Vector3f acc = new Vector3f(0.0f, 0.0f, 0.0f);
+    // Gravity
+    float gravity = 0.0f;
     // The parent world
     World parent = null;
 
@@ -42,56 +46,58 @@ public class Player extends RenderObject {
      * Positions the player within the world
      * and adjusts the players view accordingly.
      *
-     * TODO: Create and render a player mesh.
      */
     @Override
     public void render() {
-        move();
         glRotatef(pitch, 1.0f, 0.0f, 0.0f);
         glRotatef(yaw, 0.0f, 1.0f, 0.0f);
         glTranslatef(-position.x, -position.y, -position.z);
     }
 
+    @Override
+    public void update() {
+
+        yaw(Mouse.getDX());
+        pitch(-1 * Mouse.getDY());
+
+        getPosition().y += acc.y + (gravity * Helper.getInstance().calcInterpolation());
+
+        //getPosition().x += acc.x;
+        //getPosition().z += acc.z;
+
+        if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 4.0f, getPosition().z))) {
+            if (gravity > -1.0f) {
+                gravity -= 0.1f;
+            }
+        } else {
+            gravity = 0.0f;
+        }
+//
+//        if (acc.x > 0.0f) {
+//            acc.x -= 0.01f;
+//        } else if (acc.x < 0.0f) {
+//            acc.x += 0.01f;
+//        }
+//
+//        if (acc.y > 0.0f) {
+//            acc.y -= 0.01f;
+//        } else if (acc.y < 0.0f) {
+//            acc.y += 0.01f;
+//        }
+//
+//        if (acc.z > 0.0f) {
+//            acc.z -= 0.01f;
+//        } else if (acc.z < 0.0f) {
+//            acc.z += 0.01f;
+//        }
+    }
+
     public void yaw(float diff) {
-        yaw += diff;
+        yaw += diff * Helper.getInstance().calcInterpolation();
     }
 
     public void pitch(float diff) {
-        pitch += diff;
-    }
-
-    void move() {
-
-        if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 4.0f, getPosition().z))) {
-            if (acc.y > -1.0f) {
-                acc.y -= 0.01f;
-            }
-        } else {
-            acc.y = 0.0f;
-        }
-
-        getPosition().x += acc.x;
-        getPosition().y += acc.y;
-        getPosition().z += acc.z;
-
-
-        if (acc.x > 0.0f) {
-            acc.x -= 0.01f;
-        } else if (acc.x < 0.0f) {
-            acc.x += 0.01f;
-        }
-
-        if (acc.y > 0.0f) {
-            acc.y -= 0.01f;
-        } else if (acc.y < 0.0f) {
-            acc.y += 0.01f;
-        }
-
-        if (acc.z > 0.0f) {
-            acc.z -= 0.01f;
-        } else if (acc.z < 0.0f) {
-            acc.z += 0.01f;
-        }
+        pitch += diff * Helper.getInstance().calcInterpolation();
     }
 
     public void walkForward() {
@@ -112,5 +118,13 @@ public class Player extends RenderObject {
     public void strafeRight() {
         acc.x += walkingSpeed * (float) Math.sin(Math.toRadians(yaw + 90));
         acc.z -= walkingSpeed * (float) Math.cos(Math.toRadians(yaw + 90));
+    }
+
+    public void jump() {
+        if (parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 4.0f, getPosition().z))) {
+            if (gravity >= 0) {
+                gravity += 1.0f;
+            }
+        }
     }
 }
