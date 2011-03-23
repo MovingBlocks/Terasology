@@ -24,6 +24,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -35,6 +36,12 @@ import org.lwjgl.opengl.DisplayMode;
  */
 public class Main {
 
+    /** time at last frame */
+    long lastFrame;
+    /** frames per second */
+    int fps;
+    /** last fps time */
+    long lastFPS;
     // Constant values
     private static final float DISPLAY_HEIGHT = 864.0f;
     private static final float DISPLAY_WIDTH = 1536.0f;
@@ -71,7 +78,7 @@ public class Main {
             main = new Main();
 
             main.create();
-            main.run();
+            main.start();
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.toString(), ex);
         } finally {
@@ -83,7 +90,33 @@ public class Main {
         System.exit(0);
     }
 
-    public Main() {
+    /**
+     * Get the time in milliseconds
+     * 
+     * @return The system time in milliseconds
+     */
+    public long getTime() {
+        return (Sys.getTime() * 1000) / Sys.getTimerResolution();
+    }
+
+    public int getDelta() {
+        long time = getTime();
+        int delta = (int) (time - lastFrame);
+        lastFrame = time;
+
+        return delta;
+    }
+
+    /**
+     * Calculate the FPS and set it in the title bar
+     */
+    public void updateFPS() {
+        if (getTime() - lastFPS > 1000) {
+            Display.setTitle("FPS: " + fps);
+            fps = 0;
+            lastFPS += 1000;
+        }
+        fps++;
     }
 
     public void create() throws LWJGLException {
@@ -192,8 +225,6 @@ public class Main {
         // <--
 
         glPopMatrix();
-
-        Helper.getInstance().frameRendered();
     }
 
     public void resizeGL() {
@@ -201,7 +232,7 @@ public class Main {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(64.0f, DISPLAY_WIDTH / DISPLAY_HEIGHT, 1f, 1024f);
+        gluPerspective(64.0f, DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.1f, 1024f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
@@ -209,39 +240,29 @@ public class Main {
         glPushMatrix();
     }
 
-    public void run() {
+    public void start() {
+        initGL();
+        getDelta();
+        lastFPS = getTime();
 
-        while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+        while (!Display.isCloseRequested()) {
+            int delta = getDelta();
 
-            if (Display.isVisible()) {
+            processKeyboard();
+            processMouse();
 
-                processKeyboard();
-                processMouse();
-
-                update();
-                render();
-
-            } else {
-
-                if (Display.isDirty()) {
-                    render();
-                }
-
-                try {
-
-                    Thread.sleep(100);
-
-                } catch (InterruptedException ex) {
-                }
-            }
+            update(delta);
+            render();
 
             Display.update();
-            //Display.sync(60);
+            Display.sync(60);
         }
+
+        Display.destroy();
     }
 
-    public void update() {
-        world.update();
-        player.update();
+    public void update(int delta) {
+        world.update(delta);
+        player.update(delta);
     }
 }

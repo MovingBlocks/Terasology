@@ -16,12 +16,16 @@
  */
 package blockmania;
 
+import org.lwjgl.util.glu.MipMap;
+import org.lwjgl.opengl.GL11;
+import java.nio.ByteBuffer;
 import org.lwjgl.util.vector.Vector3f;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.opengl.Texture;
 import java.io.FileInputStream;
+import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import org.newdawn.slick.opengl.TextureLoader;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -45,7 +49,7 @@ public class Chunk extends RenderObject {
     // Texture map
     static Texture textureMap;
     // Size of one single chunk
-    public static final Vector3f chunkDimensions = new Vector3f(64, 128, 64);
+    public static final Vector3f chunkDimensions = new Vector3f(32, 128, 32);
     // The parent world
     World parent = null;
 
@@ -59,7 +63,7 @@ public class Chunk extends RenderObject {
 
         blocks = new int[(int) chunkDimensions.x][(int) chunkDimensions.y][(int) chunkDimensions.z];
 
-        System.out.println("Chunk created. ID = " + chunkID);
+        //System.out.println("Chunk created. ID = " + chunkID);
     }
 
     @Override
@@ -123,8 +127,6 @@ public class Chunk extends RenderObject {
         // If the chunk changed, recreate the display list
         if (dirty) {
             displayListID = glGenLists(1);
-
-            textureMap.bind();
 
             glNewList(displayListID, GL_COMPILE);
             glBegin(GL_QUADS);
@@ -384,9 +386,16 @@ public class Chunk extends RenderObject {
     public static void init() {
         try {
             textureMap = TextureLoader.getTexture("PNG", new FileInputStream(Chunk.class.getResource("Terrain.png").getPath()), GL_NEAREST);
+            textureMap.bind();
+
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
         } catch (IOException ex) {
             Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+
     }
 
     public int getBlock(Vector3f pos) {

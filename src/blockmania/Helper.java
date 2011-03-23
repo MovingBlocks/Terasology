@@ -16,18 +16,12 @@
  */
 package blockmania;
 
-import org.lwjgl.Sys;
-import org.lwjgl.opengl.Display;
-
 /**
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Helper {
 
-    private double timeLastFrame;
-    private double timeLastUpdate;
-    private int frameCounter;
     private static Helper instance = null;
 
     public static Helper getInstance() {
@@ -39,49 +33,6 @@ public class Helper {
     }
 
     public Helper() {
-        updateFPSDisplay();
     }
 
-    public double getTime() {
-        return (Sys.getTime() * 1000d) / Sys.getTimerResolution();
-    }
-
-    public void frameRendered() {
-        frameCounter++;
-        timeLastFrame = getTime();
-
-        if (getTime() - timeLastUpdate > 1000) {
-            calculateFPS();
-            updateFPSDisplay();
-        }
-    }
-
-    public double calcInterpolation() {
-        double fps = calculateFPS();
-
-        if (fps > 0d) {
-            return 60d / fps;
-        }
-
-        return 0d;
-    }
-
-    public double timeSinceLastFrame() {
-        return getTime() - timeLastFrame;
-    }
-
-    private double calculateFPS() {
-        double secondsSinceLastUpdate = ((getTime() - timeLastUpdate) / 1000d);
-        if (secondsSinceLastUpdate > 0d) {
-            return frameCounter / secondsSinceLastUpdate;
-        }
-        return 0d;
-    }
-
-    private void updateFPSDisplay() {
-        Display.setTitle("Blockmania (FPS: " + Math.round(calculateFPS()) + ", Quads: " + Chunk.quadCounter + ", Interpolation: " + calcInterpolation() + ")");
-
-        timeLastUpdate = getTime();
-        frameCounter = 0;
-    }
 }

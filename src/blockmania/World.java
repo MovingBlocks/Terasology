@@ -40,15 +40,17 @@ public class World extends RenderObject {
     public World() {
         chunks = new Chunk[(int) Configuration.viewingDistanceInChunks.x][(int) Configuration.viewingDistanceInChunks.y][(int) Configuration.viewingDistanceInChunks.z];
 
-        Thread t = new Thread(new Runnable() {
+        updateWorld();
 
-            @Override
-            public void run() {
-                updateWorld();
-            }
-        });
-
-        t.start();
+//        for (int x = 0; x < (int) Configuration.viewingDistanceInChunks.x; x++) {
+//            for (int y = 0; y < (int) Configuration.viewingDistanceInChunks.y; y++) {
+//                for (int z = 0; z < (int) Configuration.viewingDistanceInChunks.z; z++) {
+//                    if (chunks[x][y][z] != null) {
+//                        chunks[x][y][z].updateDisplayList();
+//                    }
+//                }
+//            }
+//        }
     }
 
     @Override
@@ -58,17 +60,16 @@ public class World extends RenderObject {
             for (int y = 0; y < (int) Configuration.viewingDistanceInChunks.y; y++) {
                 for (int z = 0; z < (int) Configuration.viewingDistanceInChunks.z; z++) {
                     if (chunks[x][y][z] != null) {
-                        // Render active chunks only
-                        chunks[x][y][z].render();
 
-                        if (System.currentTimeMillis() - timeSinceLastChunkUpdate > 15) {
+                        if (System.currentTimeMillis() - timeSinceLastChunkUpdate > 0) {
                             if (chunks[x][y][z].updateDisplayList()) {
                                 timeSinceLastChunkUpdate = System.currentTimeMillis();
                             }
                         }
+
+                        // Render active chunks only
+                        chunks[x][y][z].render();
                     }
-
-
                 }
             }
         }
@@ -103,7 +104,7 @@ public class World extends RenderObject {
             }
         }
 
-        System.out.println("World updated (" + (System.currentTimeMillis() - timeStart) / 1000d + "s).");
+        //System.out.println("World updated (" + (System.currentTimeMillis() - timeStart) / 1000d + "s).");
 
     }
 
@@ -115,7 +116,7 @@ public class World extends RenderObject {
 
         // Create a new chunk if needed
         if (c == null) {
-            System.out.println("Generating chunk at X: " + chunkPos.x + ", Y: " + chunkPos.y + ", Z: " + chunkPos.z);
+            //System.out.println("Generating chunk at X: " + chunkPos.x + ", Y: " + chunkPos.y + ", Z: " + chunkPos.z);
             c = new Chunk(this, new Vector3f(chunkPos.x, chunkPos.y, chunkPos.z));
             chunks[(int) chunkPos.x][(int) chunkPos.y][(int) chunkPos.z] = c;
         }

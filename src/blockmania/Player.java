@@ -39,7 +39,7 @@ public class Player extends RenderObject {
 
     public Player(World parent) {
         this.parent = parent;
-        position = new Vector3f(0.0f, 64.0f, 0.0f);
+        position = new Vector3f(512.0f, 128.0f, 512.0f);
     }
 
     /*
@@ -55,49 +55,51 @@ public class Player extends RenderObject {
     }
 
     @Override
-    public void update() {
+    public void update(int delta) {
 
-        yaw(Mouse.getDX());
-        pitch(-1 * Mouse.getDY());
+        Vector3f direction = new Vector3f();
 
-        getPosition().y += acc.y + (gravity * Helper.getInstance().calcInterpolation());
+        if (acc.x >= 0) {
+            direction.x = 1;
+        } else {
+            direction.x = -1;
+        }
 
-        //getPosition().x += acc.x;
-        //getPosition().z += acc.z;
+        if (acc.z >= 0) {
+            direction.z = 1;
+        } else {
+            direction.z = -1;
+        }
 
-        if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 4.0f, getPosition().z))) {
+        if (parent.isHitting(new Vector3f(getPosition().x + direction.x * 2, getPosition().y - 1.0f, getPosition().z + direction.z * 2))) {
+            acc.x = 0.0f;
+            acc.z = 0.0f;
+        }
+
+        if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 2.0f, getPosition().z))) {
             if (gravity > -1.0f) {
                 gravity -= 0.1f;
             }
-        } else {
+        }
+
+        yaw(Mouse.getDX() * 0.1f);
+        pitch(-1 * Mouse.getDY() * 0.1f);
+
+        getPosition().y += acc.y + (gravity * 0.1f * delta);
+        getPosition().x += acc.x * 0.001f * delta;
+        getPosition().z += acc.z * 0.001f * delta;
+
+        if (parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 2.0f, getPosition().z))) {
             gravity = 0.0f;
         }
-//
-//        if (acc.x > 0.0f) {
-//            acc.x -= 0.01f;
-//        } else if (acc.x < 0.0f) {
-//            acc.x += 0.01f;
-//        }
-//
-//        if (acc.y > 0.0f) {
-//            acc.y -= 0.01f;
-//        } else if (acc.y < 0.0f) {
-//            acc.y += 0.01f;
-//        }
-//
-//        if (acc.z > 0.0f) {
-//            acc.z -= 0.01f;
-//        } else if (acc.z < 0.0f) {
-//            acc.z += 0.01f;
-//        }
     }
 
     public void yaw(float diff) {
-        yaw += diff * Helper.getInstance().calcInterpolation();
+        yaw += diff;
     }
 
     public void pitch(float diff) {
-        pitch += diff * Helper.getInstance().calcInterpolation();
+        pitch += diff;
     }
 
     public void walkForward() {
@@ -121,10 +123,8 @@ public class Player extends RenderObject {
     }
 
     public void jump() {
-        if (parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 4.0f, getPosition().z))) {
-            if (gravity >= 0) {
-                gravity += 1.0f;
-            }
+        if (parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 2.0f, getPosition().z))) {
+            gravity += 5.0f;
         }
     }
 }
