@@ -165,6 +165,7 @@ public class Main {
 
         world = new World();
         player = new Player(world);
+        world.setPlayer(player);
         Chunk.init();
 
     }
@@ -241,7 +242,6 @@ public class Main {
     }
 
     public void start() {
-        initGL();
         getDelta();
         lastFPS = getTime();
 

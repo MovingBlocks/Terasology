@@ -18,6 +18,7 @@ package blockmania;
 
 import java.util.Random;
 import org.lwjgl.util.vector.Vector3f;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  *
@@ -34,27 +35,29 @@ public class World extends RenderObject {
     // Random number generator
     Random rand = new Random();
     PerlinNoiseGenerator pGen = new PerlinNoiseGenerator();
-    public static final Vector3f worldDimensions = new Vector3f(1024, 128, 1024);
+    public static final Vector3f worldDimensions = new Vector3f(1024, 256, 1024);
     long timeSinceLastChunkUpdate = 0;
+    private Player player = null;
 
     public World() {
         chunks = new Chunk[(int) Configuration.viewingDistanceInChunks.x][(int) Configuration.viewingDistanceInChunks.y][(int) Configuration.viewingDistanceInChunks.z];
 
-        updateWorld();
+        Thread t = new Thread(new Runnable() {
 
-//        for (int x = 0; x < (int) Configuration.viewingDistanceInChunks.x; x++) {
-//            for (int y = 0; y < (int) Configuration.viewingDistanceInChunks.y; y++) {
-//                for (int z = 0; z < (int) Configuration.viewingDistanceInChunks.z; z++) {
-//                    if (chunks[x][y][z] != null) {
-//                        chunks[x][y][z].updateDisplayList();
-//                    }
-//                }
-//            }
-//        }
+            @Override
+            public void run() {
+                updateWorld();
+            }
+        });
+
+        t.start();
     }
 
     @Override
     public void render() {
+
+        glPushMatrix();
+        glTranslatef(-512f, 0.0f, -512f);
 
         for (int x = 0; x < (int) Configuration.viewingDistanceInChunks.x; x++) {
             for (int y = 0; y < (int) Configuration.viewingDistanceInChunks.y; y++) {
@@ -73,6 +76,8 @@ public class World extends RenderObject {
                 }
             }
         }
+
+        glPopMatrix();
     }
 
     public final void updateWorld() {
@@ -81,30 +86,35 @@ public class World extends RenderObject {
 
         for (int x = 0; x < worldDimensions.x; x++) {
             for (int z = 0; z < worldDimensions.z; z++) {
-
-                float height = pGen.getTerrainHeightAt(x / 4.0f, z / 4.0f);
-
-                if (height < 0) {
-                    height = 0;
+                for (int y = 0; y < 32; y++) {
+                    if (pGen.getCaveDensityAt(x, y, z) < 0.25) {
+                        setBlock(new Vector3f(x, y, z), 0x3);
+                    }
                 }
+            }
+        }
 
-                float y = height * 256 + 32.0f;
+        for (int x = 0; x < worldDimensions.x; x++) {
+            for (int z = 0; z < worldDimensions.z; z++) {
 
-                if (y > 64) {
-                    y = 64;
-                }
+                float height = Math.abs(pGen.getTerrainHeightAt(x / 2.0f, z / 2.0f) * 256.0f + 64.0f);
 
-                setBlock(new Vector3f(x, y, z), 0x1);
-                y--;
+                float y = height;
 
                 while (y > 0) {
-                    setBlock(new Vector3f(x, y, z), 0x2);
+                    if (pGen.getCaveDensityAt(x, y, z) < 0.5) {
+                        if (height == y) {
+                            setBlock(new Vector3f(x, y, z), 0x1);
+                        } else {
+                            setBlock(new Vector3f(x, y, z), 0x2);
+                        }
+                    }
                     y--;
                 }
             }
         }
 
-        //System.out.println("World updated (" + (System.currentTimeMillis() - timeStart) / 1000d + "s).");
+        System.out.println("World updated (" + (System.currentTimeMillis() - timeStart) / 1000d + "s).");
 
     }
 
@@ -138,6 +148,9 @@ public class World extends RenderObject {
     }
 
     public boolean isHitting(Vector3f pos) {
+        pos.x += 512;
+        pos.z += 512;
+
         Vector3f chunkPos = new Vector3f((float) Math.floor(pos.x / Chunk.chunkDimensions.x), (float) Math.floor(pos.y / Chunk.chunkDimensions.y), (float) Math.floor(pos.z / Chunk.chunkDimensions.z));
         Vector3f blockCoord = new Vector3f(pos.x - (chunkPos.x * Chunk.chunkDimensions.x), pos.y - (chunkPos.y * Chunk.chunkDimensions.y), pos.z - (chunkPos.z * Chunk.chunkDimensions.z));
 
@@ -148,5 +161,12 @@ public class World extends RenderObject {
             return false;
         }
 
+    }
+
+    /**
+     * @param player the player to set
+     */
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 }
