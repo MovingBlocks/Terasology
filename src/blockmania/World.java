@@ -86,8 +86,8 @@ public class World extends RenderObject {
 
         for (int x = 0; x < worldDimensions.x; x++) {
             for (int z = 0; z < worldDimensions.z; z++) {
-                for (int y = 0; y < 32; y++) {
-                    if (pGen.getCaveDensityAt(x, y, z) < 0.25) {
+                for (int y = 0; y < 128; y++) {
+                    if (pGen.getCaveDensityAt(x, y, z) < 0.1) {
                         setBlock(new Vector3f(x, y, z), 0x3);
                     }
                 }
@@ -97,7 +97,9 @@ public class World extends RenderObject {
         for (int x = 0; x < worldDimensions.x; x++) {
             for (int z = 0; z < worldDimensions.z; z++) {
 
-                float height = Math.abs(pGen.getTerrainHeightAt(x / 2.0f, z / 2.0f) * 256.0f + 64.0f);
+                float h1 = Math.abs(pGen.getTerrainHeightAt(x / 1.0f, z / 1.0f) * 256.0f + 128.0f);
+
+                float height = h1;
 
                 float y = height;
 
@@ -122,17 +124,21 @@ public class World extends RenderObject {
         Vector3f chunkPos = new Vector3f((float) Math.floor(pos.x / Chunk.chunkDimensions.x), (float) Math.floor(pos.y / Chunk.chunkDimensions.y), (float) Math.floor(pos.z / Chunk.chunkDimensions.z));
         Vector3f blockCoord = new Vector3f(pos.x - (chunkPos.x * Chunk.chunkDimensions.x), pos.y - (chunkPos.y * Chunk.chunkDimensions.y), pos.z - (chunkPos.z * Chunk.chunkDimensions.z));
 
-        Chunk c = chunks[(int) chunkPos.x][(int) chunkPos.y][(int) chunkPos.z];
+        try {
+            Chunk c = chunks[(int) chunkPos.x][(int) chunkPos.y][(int) chunkPos.z];
 
-        // Create a new chunk if needed
-        if (c == null) {
-            //System.out.println("Generating chunk at X: " + chunkPos.x + ", Y: " + chunkPos.y + ", Z: " + chunkPos.z);
-            c = new Chunk(this, new Vector3f(chunkPos.x, chunkPos.y, chunkPos.z));
-            chunks[(int) chunkPos.x][(int) chunkPos.y][(int) chunkPos.z] = c;
+            // Create a new chunk if needed
+            if (c == null) {
+                //System.out.println("Generating chunk at X: " + chunkPos.x + ", Y: " + chunkPos.y + ", Z: " + chunkPos.z);
+                c = new Chunk(this, new Vector3f(chunkPos.x, chunkPos.y, chunkPos.z));
+                chunks[(int) chunkPos.x][(int) chunkPos.y][(int) chunkPos.z] = c;
+            }
+
+            // Generate or update the corresponding chunk
+            c.setBlock(blockCoord, type);
+        } catch (Exception e) {
+            return;
         }
-
-        // Generate or update the corresponding chunk
-        c.setBlock(blockCoord, type);
     }
 
     public final int getBlock(Vector3f pos) {

@@ -17,6 +17,7 @@
 package blockmania;
 
 import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
 
 /**
  *
@@ -55,5 +56,17 @@ public class BlockHelper {
         }
 
         return calcOffsetForTextureAt(2, 0);
+    }
+
+    public static Vector3f getColorOffsetFor(int type, SIDE side) {
+        switch (type) {
+            // Grass block
+            case 0x1:
+                if (side == SIDE.TOP) {
+                    return new Vector3f(0.1f, 0.75f, 0.1f);
+                }
+                break;
+        }
+        return new Vector3f(1.0f, 1.0f, 1.0f);
     }
 }

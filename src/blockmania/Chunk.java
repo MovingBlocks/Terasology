@@ -32,6 +32,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Chunk extends RenderObject {
 
+    // Daylight
+    float daylight = 0.75f;
     // The actual block ids for the chunk
     int[][][] blocks;
     // Create an unique id for each chunk
@@ -167,11 +169,11 @@ public class Chunk extends RenderObject {
                                 drawBottom = false;
                             }
 
-                            float shadowIntensTop = castRay(x, y, z, SIDE.TOP);
-
-                            glColor3f(1.0f - shadowIntensTop, 1.0f - shadowIntensTop, 1.0f - shadowIntensTop);
-
                             if (drawTop) {
+                                Vector3f colorOffset = BlockHelper.getColorOffsetFor(blocks[x][y][z], BlockHelper.SIDE.TOP);
+                                float shadowIntens = castRay(x, y, z, SIDE.TOP);
+                                glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
+
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.TOP).x;
                                 float texOffsetY = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.TOP).y;
 
@@ -190,11 +192,11 @@ public class Chunk extends RenderObject {
                                 glVertex3f(-0.5f + x, 0.5f + y, -0.5f + z);
                             }
 
-                            float shadowIntens = castRay(x, y, z, SIDE.FRONT);
-
-                            glColor3f(1.0f - shadowIntens, 1.0f - shadowIntens, 1.0f - shadowIntens);
-
                             if (drawFront) {
+                                Vector3f colorOffset = BlockHelper.getColorOffsetFor(blocks[x][y][z], BlockHelper.SIDE.FRONT);
+                                float shadowIntens = castRay(x, y, z, SIDE.FRONT);
+                                glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
+
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.FRONT).x;
                                 float texOffsetY = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.FRONT).y;
 
@@ -213,9 +215,10 @@ public class Chunk extends RenderObject {
 
                             }
 
-                            glColor3f(1.0f - shadowIntens, 1.0f - shadowIntens, 1.0f - shadowIntens);
-
                             if (drawBack) {
+                                Vector3f colorOffset = BlockHelper.getColorOffsetFor(blocks[x][y][z], BlockHelper.SIDE.BACK);
+                                float shadowIntens = castRay(x, y, z, SIDE.BACK);
+                                glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.BACK).x;
                                 float texOffsetY = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.BACK).y;
 
@@ -234,9 +237,12 @@ public class Chunk extends RenderObject {
                                 glVertex3f(-0.5f + x, 0.5f + y, 0.5f + z);
                             }
 
-                            glColor3f(1.0f - shadowIntens, 1.0f - shadowIntens, 1.0f - shadowIntens);
+
 
                             if (drawLeft) {
+                                Vector3f colorOffset = BlockHelper.getColorOffsetFor(blocks[x][y][z], BlockHelper.SIDE.LEFT);
+                                float shadowIntens = castRay(x, y, z, SIDE.LEFT);
+                                glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.LEFT).x;
                                 float texOffsetY = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.LEFT).y;
 
@@ -255,9 +261,10 @@ public class Chunk extends RenderObject {
                                 glVertex3f(-0.5f + x, 0.5f + y, -0.5f + z);
                             }
 
-                            glColor3f(1.0f - shadowIntens, 1.0f - shadowIntens, 1.0f - shadowIntens);
-
                             if (drawRight) {
+                                Vector3f colorOffset = BlockHelper.getColorOffsetFor(blocks[x][y][z], BlockHelper.SIDE.RIGHT);
+                                float shadowIntens = castRay(x, y, z, SIDE.RIGHT);
+                                glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.RIGHT).x;
                                 float texOffsetY = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.RIGHT).y;
 
@@ -277,9 +284,10 @@ public class Chunk extends RenderObject {
                                 glVertex3f(0.5f + x, -0.5f + y, -0.5f + z);
                             }
 
-                            glColor3f(1.0f - shadowIntens, 1.0f - shadowIntens, 1.0f - shadowIntens);
-
                             if (drawBottom) {
+                                Vector3f colorOffset = BlockHelper.getColorOffsetFor(blocks[x][y][z], BlockHelper.SIDE.BOTTOM);
+                                float shadowIntens = castRay(x, y, z, SIDE.BOTTOM);
+                                glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.BOTTOM).x;
                                 float texOffsetY = BlockHelper.getTextureOffsetFor(blocks[x][y][z], BlockHelper.SIDE.BOTTOM).y;
 
@@ -336,9 +344,6 @@ public class Chunk extends RenderObject {
             textureMap = TextureLoader.getTexture("PNG", new FileInputStream(Chunk.class.getResource("Terrain.png").getPath()), GL_NEAREST);
             textureMap.bind();
 
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
         } catch (IOException ex) {
             Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -362,59 +367,57 @@ public class Chunk extends RenderObject {
 
     private float castRay(int x, int y, int z, SIDE side) {
 
-        float result = 0.0f;
+        float result = 1.0f;
 
         if (side == SIDE.TOP) {
-            for (int i = y + 1; i < chunkDimensions.y; i++) {
-                if (blocks[x][i][z] > 0) {
-                    result = 0.25f;
-                    break;
-                }
-            }
-
-            try {
-                if (blocks[x + 1][y + 1][z] > 0) {
-                    result += 0.15;
-                }
-            } catch (Exception e) {
-            }
-
-            try {
-                if (blocks[x - 1][y + 1][z] > 0) {
-                    result += 0.15;
-                }
-            } catch (Exception e) {
-            }
-
-            try {
-                if (blocks[x][y + 1][z + 1] > 0) {
-                    result += 0.15;
-                }
-            } catch (Exception e) {
-            }
-
-            try {
-                if (blocks[x][y + 1][z - 1] > 0) {
-                    result += 0.15;
-                }
-            } catch (Exception e) {
-            }
-
+        } else if (side == SIDE.LEFT) {
+            x -= 1;
+        } else if (side == SIDE.RIGHT) {
+            x += 1;
+        } else if (side == SIDE.BOTTOM) {
+            return 0.25f;
+        } else if (side == SIDE.FRONT) {
+            z -= 1;
+        } else if (side == SIDE.BACK) {
+            z += 1;
         }
 
-        if (side == SIDE.FRONT || side == SIDE.LEFT || side == SIDE.RIGHT || side == SIDE.BACK) {
-
-            for (int i = y + 1; i < chunkDimensions.y; i++) {
+        for (int i = y + 1; i < chunkDimensions.y; i++) {
+            try {
                 if (blocks[x][i][z] > 0) {
-                    result = 0.25f;
+                    result = 0.5f;
                     break;
                 }
+            } catch (Exception e) {
             }
-
         }
 
-        if (side == SIDE.BOTTOM) {
-            result = 0.25f;
+        try {
+            if (blocks[x + 1][y + 1][z] > 0) {
+                result -= 0.15f;
+            }
+        } catch (Exception e) {
+        }
+
+        try {
+            if (blocks[x - 1][y + 1][z] > 0) {
+                result -= 0.15f;
+            }
+        } catch (Exception e) {
+        }
+
+        try {
+            if (blocks[x][y + 1][z + 1] > 0) {
+                result -= 0.15f;
+            }
+        } catch (Exception e) {
+        }
+
+        try {
+            if (blocks[x][y + 1][z - 1] > 0) {
+                result -= 0.15f;
+            }
+        } catch (Exception e) {
         }
 
         return result;

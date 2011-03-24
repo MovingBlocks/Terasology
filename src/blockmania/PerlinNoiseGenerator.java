@@ -109,7 +109,7 @@ public class PerlinNoiseGenerator {
 
     float getCaveDensityAt(float x, float y, float z) {
         float result = 0.0f;
-        result += noise(0.05f * x, 0.05f * y, 0.05f * z);
+        result += noise(0.01f * x, 0.01f * y, 0.01f * z);
         return result;
     }
 }
