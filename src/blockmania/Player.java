@@ -78,7 +78,7 @@ public class Player extends RenderObject {
 
         if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 2.0f, getPosition().z))) {
             if (gravity > -1.0f) {
-                //gravity -= 0.1f;
+                gravity -= 0.1f;
             }
         }
 
@@ -124,7 +124,7 @@ public class Player extends RenderObject {
 
     public void jump() {
         if (parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 2.0f, getPosition().z))) {
-            gravity += 2.0f;
+            gravity += 1.0f;
         }
     }
 }
