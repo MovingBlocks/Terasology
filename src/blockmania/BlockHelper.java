@@ -53,6 +53,9 @@ public class BlockHelper {
             // Stone block
             case 0x3:
                 return calcOffsetForTextureAt(1, 0);
+            // Water block
+            case 0x4:
+                return calcOffsetForTextureAt(15, 13);
         }
 
         return calcOffsetForTextureAt(2, 0);

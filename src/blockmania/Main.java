@@ -150,14 +150,15 @@ public class Main {
         glClearColor(0.5f, 0.75f, 1.0f, 1.0f);
         glLineWidth(2.0f);
 
+        glShadeModel(GL_FLAT);
+
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_TEXTURE_2D);
         glEnable(GL_FOG);
 
         glDisable(GL_LIGHTING);
-
-        //glDisable(GL_COLOR_MATERIAL);
+        glDisable(GL_NORMALIZE);
+        glDisable(GL_LIGHTING);
 
         float[] fogColor = {0.75f, 0.75f, 0.75f, 1.0f};
         FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
@@ -174,7 +175,6 @@ public class Main {
 
         world = new World();
         player = new Player(world);
-        world.setPlayer(player);
         Chunk.init();
 
     }
@@ -256,6 +256,8 @@ public class Main {
 
         while (!Display.isCloseRequested()) {
             int delta = getDelta();
+
+            updateFPS();
 
             processKeyboard();
             processMouse();

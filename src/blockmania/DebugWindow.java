@@ -41,11 +41,11 @@ public class DebugWindow extends javax.swing.JFrame {
         noise = new float[512][512];
 
 
-        for (int x=0; x<512; x++) {
-            for (int y=0; y<512; y++) {
-                noise[x][y] = pGen.getTerrainHeightAt(x, y);
-            }
-        }
+//        for (int x=0; x<512; x++) {
+//            for (int y=0; y<512; y++) {
+//                noise[x][y] = pGen.getTerrainHeightAt(x, y);
+//            }
+//        }
     }
 
     /** This method is called from within the constructor to

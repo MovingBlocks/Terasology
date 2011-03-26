@@ -17,7 +17,7 @@
 package blockmania;
 
 /**
- * Perlin noise function as shown in "Physically Based Rendering".
+ * 3D perlin noise function as shown in the book "Physically Based Rendering".
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class PerlinNoiseGenerator {
@@ -99,17 +99,5 @@ public class PerlinNoiseGenerator {
         float t3 = t * t * t;
         float t4 = t3 * t;
         return 6.f * t4 * t - 15.f * t4 + 10.f * t3;
-    }
-
-    float getTerrainHeightAt(float x, float y) {
-        float result = 0.0f;
-        result += noise(0.01f * x, 0.01f * y, 0.01f);
-        return result;
-    }
-
-    float getCaveDensityAt(float x, float y, float z) {
-        float result = 0.0f;
-        result += noise(0.01f * x, 0.01f * y, 0.01f * z);
-        return result;
     }
 }
