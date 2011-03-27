@@ -21,7 +21,6 @@ import java.nio.IntBuffer;
 import org.lwjgl.opengl.GL15;
 import java.util.Random;
 import org.lwjgl.util.vector.Vector3f;
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  *
@@ -29,29 +28,28 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class World extends RenderObject {
 
-    // Chunk bounding box for the occlusion queries
-    private int chunkBoundingBoxID;
-    // Used to determine occluded chunks
-    private IntBuffer occlusionQueries;
+    Random rand;
+    // Title of the world
+    String title = "WORLD1";
+    // Seed
+    String seed = "SEED1";
     // Used for updating/generating the world
     Thread updateThread;
     // The chunks to display
     Chunk[][][] chunks;
-    // Random number generator
-    Random rand = new Random();
     /**
      * The perlin noise generator used
      * for creating the procedural terrain.
      */
-    PerlinNoiseGenerator pGen = new PerlinNoiseGenerator();
+    PerlinNoiseGenerator pGen;
     // Dimensions of the finite world
-    public static final Vector3f worldDimensions = new Vector3f(1024, 256, 1024);
+    public static final Vector3f worldDimensions = new Vector3f(128, 256, 128);
 
-    public World() {
+    public World(String title, String seed) {
+        rand = new Random(seed.hashCode());
+        pGen = new PerlinNoiseGenerator(seed);
+
         chunks = new Chunk[(int) Configuration.viewingDistanceInChunks.x][(int) Configuration.viewingDistanceInChunks.y][(int) Configuration.viewingDistanceInChunks.z];
-
-        occlusionQueries = BufferUtils.createIntBuffer(8192);
-        GL15.glGenQueries(occlusionQueries);
 
         updateThread = new Thread(new Runnable() {
 
@@ -62,103 +60,35 @@ public class World extends RenderObject {
         });
 
         updateThread.start();
-
-        chunkBoundingBoxID = glGenLists(1);
-
-        glNewList(chunkBoundingBoxID, GL_COMPILE);
-            glColor3f(255.0f, 0.0f, 0.0f);
-            glBegin(GL_LINE_LOOP);
-            glVertex3f(0.0f, 0.0f, 0.0f);
-            glVertex3f(Chunk.chunkDimensions.x, 0.0f, 0.0f);
-            glVertex3f(Chunk.chunkDimensions.x, Chunk.chunkDimensions.y, 0.0f);
-            glVertex3f(0.0f, Chunk.chunkDimensions.y, 0.0f);
-            glEnd();
-
-            glBegin(GL_LINE_LOOP);
-            glVertex3f(0.0f, 0.0f, 0.0f);
-            glVertex3f(0.0f, 0.0f, Chunk.chunkDimensions.z);
-            glVertex3f(0.0f, Chunk.chunkDimensions.y, Chunk.chunkDimensions.z);
-            glVertex3f(0.0f, Chunk.chunkDimensions.y, 0.0f);
-            glVertex3f(0.0f, 0.0f, 0.0f);
-            glEnd();
-
-            glBegin(GL_LINE_LOOP);
-            glVertex3f(0.0f, 0.0f, Chunk.chunkDimensions.z);
-            glVertex3f(Chunk.chunkDimensions.x, 0.0f, Chunk.chunkDimensions.z);
-            glVertex3f(Chunk.chunkDimensions.x, Chunk.chunkDimensions.y, Chunk.chunkDimensions.z);
-            glVertex3f(0.0f, Chunk.chunkDimensions.y, Chunk.chunkDimensions.z);
-            glVertex3f(0.0f, 0.0f, Chunk.chunkDimensions.z);
-            glEnd();
-
-            glBegin(GL_LINE_LOOP);
-            glVertex3f(Chunk.chunkDimensions.x, 0.0f, 0.0f);
-            glVertex3f(Chunk.chunkDimensions.x, 0.0f, Chunk.chunkDimensions.z);
-            glVertex3f(Chunk.chunkDimensions.x, Chunk.chunkDimensions.y, Chunk.chunkDimensions.z);
-            glVertex3f(Chunk.chunkDimensions.x, Chunk.chunkDimensions.y, 0.0f);
-            glVertex3f(Chunk.chunkDimensions.x, 0.0f, 0.0f);
-            glEnd();
-            glEndList();
-
-        glEndList();
     }
 
     /*
-     * Renders the world.
+     * Update the world.
      */
     @Override
-    public void render() {
-
-        glPushMatrix();
-
-        glDisable(GL_COLOR_MATERIAL);
-        //glDepthMask(false);
-        //glColorMask(false, false, false, false);
-
-//        for (int x = 0; x < (int) Configuration.viewingDistanceInChunks.x; x++) {
-//            for (int y = 0; y < (int) Configuration.viewingDistanceInChunks.y; y++) {
-//                for (int z = 0; z < (int) Configuration.viewingDistanceInChunks.z; z++) {
-//
-//                    glPushMatrix();
-//                    glTranslatef(x * 16.0f, y * 128.0f, z * 16.0f);
-//
-//                    GL15.glBeginQuery(GL15.GL_SAMPLES_PASSED, occlusionQueries.get(64 * x + 2 * y + 64 * z));
-//                    glCallList(chunkBoundingBoxID);
-//                    GL15.glEndQuery(GL15.GL_SAMPLES_PASSED);
-//
-//                    glPopMatrix();
-//                }
-//
-//            }
-//        }
-
-        glEnable(GL_COLOR_MATERIAL);
-        glColorMask(true, true, true, true);
-        glDepthMask(true);
-
+    public void update(long delta) {
         int chunkUpdates = 0;
 
         for (int x = 0; x < (int) Configuration.viewingDistanceInChunks.x; x++) {
             for (int y = 0; y < (int) Configuration.viewingDistanceInChunks.y; y++) {
                 for (int z = 0; z < (int) Configuration.viewingDistanceInChunks.z; z++) {
+
                     if (chunks[x][y][z] != null) {
-
                         if (!updateThread.isAlive()) {
+                            if (chunkUpdates < 15) {
 
-                            if (chunkUpdates < 5) {
-                                if (chunks[x][y][z].updateDisplayList()) {
+                                boolean updated1 = chunks[x][y][z].updateDisplayList(true);
+                                boolean updated2 = chunks[x][y][z].updateDisplayList(false);
+
+                                if (updated1 || updated2) {
                                     chunkUpdates++;
                                 }
                             }
-
-                            chunks[x][y][z].render();
                         }
                     }
                 }
             }
         }
-
-
-        glPopMatrix();
     }
 
     /**
@@ -187,6 +117,10 @@ public class World extends RenderObject {
                     if (getCaveDensityAt(x, y, z) > 0) {
                         if (height == y) {
                             setBlock(new Vector3f(x, y, z), 0x1);
+
+                            if (rand.nextFloat() < 0.01f) {
+                                generateTree(new Vector3f(x, y, z));
+                            }
                         } else {
                             setBlock(new Vector3f(x, y, z), 0x2);
                         }
@@ -203,29 +137,28 @@ public class World extends RenderObject {
             }
         }
 
-//        for (int x = 0; x < worldDimensions.x; x++) {
-//            for (int z = 0; z < worldDimensions.z; z++) {
-//                for (int y = 0; y < 128; y++) {
-//                    if (getCaveDensityAt(x, y, z) < 0.5) {
-//                        setBlock(new Vector3f(x, y, z), 0x3);
-//                    }
-//                }
-//            }
-//        }
-//
-//                for (int x = 0; x < worldDimensions.x; x++) {
-//            for (int z = 0; z < worldDimensions.z; z++) {
-//                for (int y = 128; y >= 128 && y < 140; y++) {
-//                    if (getCaveDensityAt(x, y, z) < 0.8) {
-//                        setBlock(new Vector3f(x, y, z), 0x2);
-//                    }
-//                }
-//            }
-//        }
-
-
-
         System.out.println("World updated (" + (System.currentTimeMillis() - timeStart) / 1000d + "s).");
+    }
+
+    private void generateTree(Vector3f pos) {
+
+        int height = rand.nextInt() % 5 + 6;
+
+        // Generate tree trunk
+        for (int i = 0; i < height; i++) {
+            setBlock(new Vector3f(pos.x, pos.y + i, pos.z), 0x5);
+        }
+
+        // Generate the treetop
+        for (int y = height / 2; y < height+2; y++) {
+            for (int x = -3; x < 3; x++) {
+                for (int z = -3; z < 3; z++) {
+                    if (rand.nextFloat() < 0.6 && x != 0 && z != 0) {
+                        setBlock(new Vector3f(pos.x + x, pos.y + y, pos.z + z), 0x6);
+                    }
+                }
+            }
+        }
 
     }
 
@@ -303,34 +236,34 @@ public class World extends RenderObject {
     /**
      * Returns the base elevation for the terrain.
      */
-    float calcTerrainElevation(float x, float y) {
+    private float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += pGen.noise(0.2f * x, 0.2f * y, 0.2f);
+        result += pGen.noise(0.2f * x, 0.2f, 0.2f * z);
         return result;
     }
 
     /**
      * Returns the roughness for the base terrain.
      */
-    float calcTerrainRoughness(float x, float y) {
+    private float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += pGen.noise(0.01f * x, 0.01f * y, 0.01f);
+        result += pGen.noise(0.01f * x, 0.01f, 0.01f * z);
         return result;
     }
 
     /**
      * Returns the detail level for the base terrain.
      */
-    float calcTerrainDetail(float x, float y) {
+    private float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += pGen.noise(0.1f * x, 0.1f * y, 1.318293f);
+        result += pGen.noise(0.1f * x, 0.1f, 0.1f * z);
         return result;
     }
 
     /**
      * Returns the cave density for the base terrain.
      */
-    float getCaveDensityAt(float x, float y, float z) {
+    private float getCaveDensityAt(float x, float y, float z) {
         float result = 0.0f;
         result += pGen.noise(0.005f * x, 0.005f * y, 0.005f * z);
         return result;

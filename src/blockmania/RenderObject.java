@@ -30,7 +30,7 @@ public abstract class RenderObject {
     public void render() {
     }
 
-    public void update(int delta) {
+    public void update(long delta) {
         
     }
 

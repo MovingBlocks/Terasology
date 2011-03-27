@@ -38,16 +38,18 @@ import org.lwjgl.opengl.DisplayMode;
  */
 public class Main {
 
-    /** time at last frame */
-    long lastFrame;
-    /** frames per second */
-    int fps;
-    /** last fps time */
-    long lastFPS;
     // Constant values
-    private static final float DISPLAY_HEIGHT = 864.0f;
-    private static final float DISPLAY_WIDTH = 1536.0f;
+    private String GAME_TITLE = "Blockmania (Pre) Alpha";
+    private static long timerTicksPerSecond = Sys.getTimerResolution();
+    private static final float DISPLAY_HEIGHT = 600.0f;
+    private static final float DISPLAY_WIDTH = 800.0f;
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    // Time at the start of the last render loop
+    private long lastLoopTime = getTime();
+    // Time at last fps measurement.
+    private long lastFpsTime;
+    // Measured rames per second.
+    private int fps;
     // Player
     Player player;
     // World
@@ -82,32 +84,12 @@ public class Main {
     }
 
     /**
-     * Get the time in milliseconds
+     * Gets the current time in milliseconds.
      * 
      * @return The system time in milliseconds
      */
     public long getTime() {
-        return (Sys.getTime() * 1000) / Sys.getTimerResolution();
-    }
-
-    public int getDelta() {
-        long time = getTime();
-        int delta = (int) (time - lastFrame);
-        lastFrame = time;
-
-        return delta;
-    }
-
-    /**
-     * Calculate the FPS and set it in the title bar
-     */
-    public void updateFPS() {
-        if (getTime() - lastFPS > 1000) {
-            Display.setTitle("FPS: " + fps);
-            fps = 0;
-            lastFPS += 1000;
-        }
-        fps++;
+        return (Sys.getTime() * 1000) / timerTicksPerSecond;
     }
 
     public void create() throws LWJGLException {
@@ -154,7 +136,6 @@ public class Main {
         fogColorBuffer.put(fogColor);
         fogColorBuffer.rewind();
 
-
         glFog(GL_FOG_COLOR, fogColorBuffer);
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogf(GL_FOG_DENSITY, 1.0f);
@@ -162,32 +143,13 @@ public class Main {
         glFogf(GL_FOG_START, 256.0f);
         glFogf(GL_FOG_END, 512.0f);
 
-        world = new World();
+        world = new World("WORLD1", "YEY");
         player = new Player(world);
         Chunk.init();
 
     }
 
     public void processKeyboard() {
-        if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
-        {
-            player.walkForward();
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_S))//move backwards
-        {
-            player.walkBackwards();
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_A))//strafe left
-        {
-            player.strafeLeft();
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_D))//strafe right
-        {
-            player.strafeRight();
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
-            player.jump();
-        }
     }
 
     public void processMouse() {
@@ -200,29 +162,7 @@ public class Main {
 
         glPushMatrix();
         player.render();
-        world.render();
-
-        // Draw coordinate axis
-        // -->
-        glBegin(GL_LINES);
-        glColor3f(255.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(1000.0f, 0.0f, 0.0f);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glColor3f(0.0f, 255.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 1000.0f, 0.0f);
-        glEnd();
-
-        glBegin(GL_LINES);
-        glColor3f(0.0f, 0.0f, 255.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 1000.0f);
-        glEnd();
-        // <--
-
+        Chunk.renderAllChunks();
         glPopMatrix();
     }
 
@@ -240,28 +180,43 @@ public class Main {
     }
 
     public void start() {
-        getDelta();
-        lastFPS = getTime();
 
         while (!Display.isCloseRequested()) {
-            int delta = getDelta();
+            // Sync. at 60 FPS.
+            Display.sync(60);
 
-            updateFPS();
+            long delta = getTime() - lastLoopTime;
+            lastLoopTime = getTime();
+            lastFpsTime += delta;
+            fps++;
 
-            processKeyboard();
-            processMouse();
+            // Update the FPS display in the title bar (only) at every second passed.
+            if (lastFpsTime >= 1000) {
+                Display.setTitle(GAME_TITLE + " (FPS: " + fps + ")");
+                lastFpsTime = 0;
+                fps = 0;
+            }
 
+            // Update the scene.
             update(delta);
+            // Render the scene.
             render();
 
+            // Update the display.
             Display.update();
-            Display.sync(60);
+
+            // Process the keyboard and mouse input.
+            processKeyboard();
+            processMouse();
         }
 
         Display.destroy();
     }
 
-    public void update(int delta) {
+    /**
+     * Updates the player and the world.
+     */
+    public void update(long delta) {
         world.update(delta);
         player.update(delta);
     }
