@@ -133,7 +133,7 @@ public class Main {
         glFogf(GL_FOG_START, 256.0f);
         glFogf(GL_FOG_END, 512.0f);
 
-        world = new World("WORLD1", "...,,asdasd");
+        world = new World("WORLD1", "XXX");
         player = new Player(world);
         Chunk.init();
         world.init();

@@ -97,7 +97,7 @@ public class World extends RenderObject {
                     }
                 }
             }
-        }, 15000, 15000);
+        }, 30000, 30000);
 
         updateThread.start();
     }
@@ -152,7 +152,12 @@ public class World extends RenderObject {
 
                 while (y > 0) {
                     if (getCaveDensityAt(x, y, z) < 0.25) {
+
                         if (height == y) {
+                            if (rand.nextFloat() < 150f / 100000f && height > 32) {
+                                generateTree(new Vector3f(x, height, z));
+                            }
+
                             setBlock(new Vector3f(x, y, z), 0x1, false);
                         } else {
                             setBlock(new Vector3f(x, y, z), 0x2, false);
@@ -160,11 +165,6 @@ public class World extends RenderObject {
                     }
 
                     y--;
-                }
-
-
-                if (rand.nextFloat() < 150f / 100000f && height > 32) {
-                    generateTree(new Vector3f(x, height, z));
                 }
 
                 // Generate water
@@ -290,7 +290,7 @@ public class World extends RenderObject {
      */
     private float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += pGen.noise(0.09f * x, 0.09f, 0.09f * z);
+        result += pGen.noise(0.001f * x, 0.001f, 0.001f * z);
         return result;
     }
 
@@ -299,7 +299,7 @@ public class World extends RenderObject {
      */
     private float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += pGen.noise(0.2f * x, 0.2f, 0.2f * z);
+        result += pGen.noise(0.09f * x, 0.09f, 0.09f * z);
         return result;
     }
 
