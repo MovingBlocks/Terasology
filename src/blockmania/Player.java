@@ -29,7 +29,7 @@ public class Player extends RenderObject {
     // Viewing direction of the player
     float yaw = 135.0f;
     float pitch = 0.0f;
-    float walkingSpeed = 1.0f;
+    float walkingSpeed = 0.2f;
     // Acceleration
     Vector3f acc = new Vector3f(0.0f, 0.0f, 0.0f);
     // Gravity
@@ -39,12 +39,12 @@ public class Player extends RenderObject {
 
     public Player(World parent) {
         this.parent = parent;
-        position = new Vector3f(0f, 128.0f,0f);
+        position = new Vector3f(512f, 512.0f, 512f);
     }
 
     /*
      * Positions the player within the world
-     * and adjusts the players view accordingly.
+     * and adjusts the player's view accordingly.
      *
      */
     @Override
@@ -56,6 +56,9 @@ public class Player extends RenderObject {
 
     @Override
     public void update(int delta) {
+
+        yaw(Mouse.getDX() * 0.1f);
+        pitch(Mouse.getDY() * 0.1f);
 
         Vector3f direction = new Vector3f();
 
@@ -71,27 +74,28 @@ public class Player extends RenderObject {
             direction.z = -1;
         }
 
+        // Check for obstacles in the player's viewing direction
         if (parent.isHitting(new Vector3f(getPosition().x + direction.x * 2, getPosition().y - 1.0f, getPosition().z + direction.z * 2))) {
             acc.x = 0.0f;
             acc.z = 0.0f;
         }
 
-        if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 2.0f, getPosition().z))) {
+        /*
+         * If the player is not hitting ground, decrease gravitation with every update and set the y-position accordingly.
+         * If the player is hitting ground, negative gravitation HAS TO BE be ignored.
+         * Only let positive gravitation (jumping) be possible if the ground is being hit.
+         */
+        if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 3.0f, getPosition().z))) {
             if (gravity > -1.0f) {
                 gravity -= 0.1f;
             }
+            getPosition().y += acc.y + (gravity * 0.1f * delta);
+        } else if (gravity > 0.0f) {
+            getPosition().y += acc.y + (gravity * 0.1f * delta);
         }
 
-        yaw(Mouse.getDX() * 0.1f);
-        pitch(-1 * Mouse.getDY() * 0.1f);
-
-        getPosition().y += acc.y + (gravity * 0.1f * delta);
         getPosition().x += acc.x * 0.001f * delta;
         getPosition().z += acc.z * 0.001f * delta;
-
-        if (parent.isHitting(new Vector3f(getPosition().x, getPosition().y - 2.0f, getPosition().z))) {
-            gravity = 0.0f;
-        }
     }
 
     public void yaw(float diff) {
@@ -99,7 +103,7 @@ public class Player extends RenderObject {
     }
 
     public void pitch(float diff) {
-        pitch += diff;
+        pitch -= diff;
     }
 
     public void walkForward() {
