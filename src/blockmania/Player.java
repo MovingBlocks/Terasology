@@ -33,7 +33,7 @@ public class Player extends RenderObject {
     // How high the player can jump
     private static int JUMP_INTENSITY = 20;
     // Max. gravity
-    private static int MAX_GRAVITY = 50;
+    private static int MAX_GRAVITY = 80;
     // Max. speed of the playering while walking
     private static int WALKING_SPEED = 4;
     // Height of the player in "blocks"
@@ -54,7 +54,7 @@ public class Player extends RenderObject {
      */
     public Player(World parent) {
         this.parent = parent;
-        position = new Vector3f(0f, 128.0f, 0f);
+        position = new Vector3f(256f, 256.0f, 256f);
     }
 
     /*
@@ -142,7 +142,7 @@ public class Player extends RenderObject {
         } catch (Exception e) {
         }
 
-        return parent.isHitting(new Vector3f(getPosition().x + direction.x * 2.0f, getPosition().y - 1.0f, getPosition().z + direction.y * 2.0f));
+        return parent.isHitting(new Vector3f(getPosition().x + direction.x * 1.0f, getPosition().y - 1.0f, getPosition().z + direction.y * 1.0f));
     }
 
     /**
@@ -167,7 +167,7 @@ public class Player extends RenderObject {
         blockPosition.y += -1f;
         blockPosition.z += 4f * viewingDirection.y;
 
-        parent.setBlock(blockPosition, 0x1);
+        parent.setBlock(blockPosition, 0x1, true);
     }
 
     /**
@@ -182,7 +182,7 @@ public class Player extends RenderObject {
         blockPosition.y += -1f;
         blockPosition.z += 2f * viewingDirection.y;
 
-        parent.setBlock(blockPosition, 0x0);
+        parent.setBlock(blockPosition, 0x0, true);
     }
 
     private void processPlayerInteraction() {
@@ -223,9 +223,9 @@ public class Player extends RenderObject {
             if (gravity > -MAX_GRAVITY) {
                 gravity -= 1;
             }
-            getPosition().y += (gravity * delta) / 1000.0f;
+            getPosition().y += (gravity / 1000.0f) * delta;
         } else if (gravity > 0.0f) {
-            getPosition().y += (gravity * delta) / 1000.0f;
+            getPosition().y += (gravity / 1000.0f) * delta;
         }
 
         /**
@@ -236,8 +236,8 @@ public class Player extends RenderObject {
             accZ = 0;
         }
 
-        getPosition().x += (accX * (float) delta) / 1000.0f;
-        getPosition().z += (accZ * (float) delta) / 1000.0f;
+        getPosition().x += (accX / 1000.0f ) * delta;
+        getPosition().z += (accZ / 1000.0f) * delta;
 
         accX = 0;
         accZ = 0;

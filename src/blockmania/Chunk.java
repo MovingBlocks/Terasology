@@ -16,7 +16,6 @@
  */
 package blockmania;
 
-import java.util.Vector;
 import java.util.List;
 import java.util.ArrayList;
 import org.lwjgl.BufferUtils;
@@ -36,8 +35,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Chunk extends RenderObject {
 
-    // Daylight
-    float daylight = 0.75f;
+    boolean isEmpty = true;
     // The actual block ids for the chunk
     int[][][] blocks;
     // Create an unique id for each chunk
@@ -88,9 +86,6 @@ public class Chunk extends RenderObject {
     }
 
     public boolean updateDisplayList(boolean translucent) {
-
-        //glPushMatrix();
-        //glTranslatef(, , );
 
         Vector3f offset = new Vector3f(position.x * chunkDimensions.x, position.y * chunkDimensions.y, position.z * chunkDimensions.z);
 
@@ -147,7 +142,7 @@ public class Chunk extends RenderObject {
                                 if (drawTop) {
                                     Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.TOP);
                                     float shadowIntens = castRay(x, y, z, SIDE.TOP);
-                                    glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
+                                    glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
 
                                     float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.TOP).x;
                                     float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.TOP).y;
@@ -167,7 +162,7 @@ public class Chunk extends RenderObject {
                                 if (drawFront) {
                                     Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.FRONT);
                                     float shadowIntens = castRay(x, y, z, SIDE.FRONT);
-                                    glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
+                                    glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
 
                                     float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.FRONT).x;
                                     float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.FRONT).y;
@@ -189,7 +184,7 @@ public class Chunk extends RenderObject {
                                 if (drawBack) {
                                     Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.BACK);
                                     float shadowIntens = castRay(x, y, z, SIDE.BACK);
-                                    glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
+                                    glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
                                     float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BACK).x;
                                     float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BACK).y;
 
@@ -211,7 +206,7 @@ public class Chunk extends RenderObject {
                                 if (drawLeft) {
                                     Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.LEFT);
                                     float shadowIntens = castRay(x, y, z, SIDE.LEFT);
-                                    glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
+                                    glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
                                     float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.LEFT).x;
                                     float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.LEFT).y;
 
@@ -231,7 +226,7 @@ public class Chunk extends RenderObject {
                                 if (drawRight) {
                                     Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.RIGHT);
                                     float shadowIntens = castRay(x, y, z, SIDE.RIGHT);
-                                    glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
+                                    glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
                                     float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.RIGHT).x;
                                     float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.RIGHT).y;
 
@@ -252,7 +247,7 @@ public class Chunk extends RenderObject {
                                 if (drawBottom) {
                                     Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.BOTTOM);
                                     float shadowIntens = castRay(x, y, z, SIDE.BOTTOM);
-                                    glColor3f(colorOffset.x * shadowIntens * daylight, colorOffset.y * shadowIntens * daylight, colorOffset.z * shadowIntens * daylight);
+                                    glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
                                     float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BOTTOM).x;
                                     float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BOTTOM).y;
 
@@ -287,35 +282,32 @@ public class Chunk extends RenderObject {
             return true;
 
         }
+
         return false;
     }
 
     public static void renderAllChunks() {
 
-        if (bufferDisplayListsT.position() < displayListsTranslucent.size()) {
-            for (int i=displayListsTranslucent.size()-1; i>=0; i--) {
-                bufferDisplayListsT.put(displayListsTranslucent.get(i));
-            }
-
-            if (bufferDisplayListsO.position() < displayListsOpaque.size()) {
-                for (Integer i : displayListsOpaque) {
-                    bufferDisplayListsO.put(i);
-                }
-            }
-
-            bufferDisplayListsO.rewind();
-            bufferDisplayListsT.rewind();
-
-            glEnable(GL_TEXTURE_2D);
-            // Draw the opaque elements first
-            glCallLists(bufferDisplayListsO);
-            // And then the translucent elements
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glCallLists(bufferDisplayListsT);
-            glDisable(GL_BLEND);
-            glDisable(GL_TEXTURE_2D);
+        for (int i = displayListsTranslucent.size() - 1; i >= 0; i--) {
+            bufferDisplayListsT.put(displayListsTranslucent.get(i));
         }
+
+        for (Integer i : displayListsOpaque) {
+            bufferDisplayListsO.put(i);
+        }
+
+        bufferDisplayListsO.rewind();
+        bufferDisplayListsT.rewind();
+
+        glEnable(GL_TEXTURE_2D);
+        // Draw the opaque elements first
+        glCallLists(bufferDisplayListsO);
+        // And then the translucent elements
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glCallLists(bufferDisplayListsT);
+        glDisable(GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
     }
 
     public static void init() {
@@ -334,13 +326,18 @@ public class Chunk extends RenderObject {
         return blocks[x][y][z];
     }
 
-    public void setBlock(Vector3f pos, int type) {
+    public void setBlock(Vector3f pos, int type, boolean dirty) {
         blocks[(int) pos.x][(int) pos.y][(int) pos.z] = type;
-        if (BlockHelper.isBlockTypeTranslucent(type)) {
-            translucentDirty = true;
-        } else {
-            opqaueDirty = true;
+
+        if (dirty) {
+            if (BlockHelper.isBlockTypeTranslucent(type)) {
+                translucentDirty = true;
+            } else {
+                opqaueDirty = true;
+            }
         }
+
+        isEmpty = false;
     }
 
     public Vector3f getBlockWorldPos(Vector3f pos) {
@@ -408,5 +405,10 @@ public class Chunk extends RenderObject {
 
     private boolean shouldSideBeDrawn(int blockToCheck) {
         return (blockToCheck == 0 || BlockHelper.isBlockTypeTranslucent(blockToCheck));
+    }
+
+    public void markAsDirty() {
+        opqaueDirty = true;
+        translucentDirty = true;
     }
 }

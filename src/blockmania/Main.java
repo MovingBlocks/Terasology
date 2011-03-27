@@ -41,8 +41,8 @@ public class Main {
     // Constant values
     private String GAME_TITLE = "Blockmania (Pre) Alpha";
     private static long timerTicksPerSecond = Sys.getTimerResolution();
-    private static final float DISPLAY_HEIGHT = 600.0f;
-    private static final float DISPLAY_WIDTH = 800.0f;
+    private static final float DISPLAY_HEIGHT = 768.0f;
+    private static final float DISPLAY_WIDTH = 1024.0f;
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     // Time at the start of the last render loop
     private long lastLoopTime = getTime();
@@ -118,18 +118,9 @@ public class Main {
     }
 
     public void initGL() {
-        glClearColor(0.5f, 0.75f, 1.0f, 1.0f);
-        glLineWidth(2.0f);
-
-        glShadeModel(GL_FLAT);
-
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FOG);
-
-        glDisable(GL_LIGHTING);
-        glDisable(GL_NORMALIZE);
-        glDisable(GL_LIGHTING);
 
         float[] fogColor = {0.75f, 0.75f, 0.75f, 1.0f};
         FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
@@ -139,13 +130,13 @@ public class Main {
         glFog(GL_FOG_COLOR, fogColorBuffer);
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogf(GL_FOG_DENSITY, 1.0f);
-        glHint(GL_FOG_HINT, GL_DONT_CARE);
         glFogf(GL_FOG_START, 256.0f);
         glFogf(GL_FOG_END, 512.0f);
 
-        world = new World("WORLD1", "YEY");
+        world = new World("WORLD1", "...,,asdasd");
         player = new Player(world);
         Chunk.init();
+        world.init();
 
     }
 
@@ -156,14 +147,12 @@ public class Main {
     }
 
     public void render() {
-
+        glClearColor(world.getDaylight()-0.25f, world.getDaylight(), world.getDaylight()+0.25f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
-
-        glPushMatrix();
+        
         player.render();
         Chunk.renderAllChunks();
-        glPopMatrix();
     }
 
     public void resizeGL() {

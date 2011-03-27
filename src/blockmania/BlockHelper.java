@@ -78,11 +78,11 @@ public class BlockHelper {
             // Grass block
             case 0x1:
                 if (side == SIDE.TOP) {
-                    return new Vector3f(0.25f, 1.0f, 0.25f);
+                    return new Vector3f(0.50f, 1.0f, 0.55f);
                 }
                 break;
             case 0x6:
-                return new Vector3f(0.25f, 1.0f, 0.25f);
+                return new Vector3f(0.25f, 0.8f, 0.25f);
         }
         return new Vector3f(1.0f, 1.0f, 1.0f);
     }
