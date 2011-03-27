@@ -43,7 +43,7 @@ public class World extends RenderObject {
      */
     PerlinNoiseGenerator pGen;
     // Dimensions of the finite world
-    public static final Vector3f worldDimensions = new Vector3f(128, 256, 128);
+    public static final Vector3f worldDimensions = new Vector3f(512, 256, 512);
 
     public World(String title, String seed) {
         rand = new Random(seed.hashCode());
