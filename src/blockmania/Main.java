@@ -65,17 +65,6 @@ public class Main {
 
         Main main = null;
 
-        if (Configuration.displayDebug) {
-            java.awt.EventQueue.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    new DebugWindow().setVisible(true);
-                }
-            });
-        }
-
-
         try {
             main = new Main();
 
