@@ -74,30 +74,30 @@ public class World extends RenderObject {
     }
 
     public void init() {
-        dayNight.schedule(new TimerTask() {
-
-            @Override
-            public void run() {
-                daylight -= 0.15;
-
-                if (daylight < 0.25f) {
-                    daylight = 0.75f;
-                }
-
-                for (int x = 0; x < Configuration.viewingDistanceInChunks.x; x++) {
-                    for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
-                        for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
-                            Chunk c = chunks[x][y][z];
-
-                            if (c != null) {
-                                LOGGER.log(Level.INFO, "Updating daylight.");
-                                c.markAsDirty();
-                            }
-                        }
-                    }
-                }
-            }
-        }, 30000, 30000);
+//        dayNight.schedule(new TimerTask() {
+//
+//            @Override
+//            public void run() {
+//                daylight -= 0.15;
+//
+//                if (daylight < 0.25f) {
+//                    daylight = 0.75f;
+//                }
+//
+//                for (int x = 0; x < Configuration.viewingDistanceInChunks.x; x++) {
+//                    for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
+//                        for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
+//                            Chunk c = chunks[x][y][z];
+//
+//                            if (c != null) {
+//                                LOGGER.log(Level.INFO, "Updating daylight.");
+//                                c.markAsDirty();
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }, 30000, 30000);
 
         updateThread.start();
     }
@@ -242,7 +242,7 @@ public class World extends RenderObject {
             Chunk c = chunks[(int) chunkPos.x][(int) chunkPos.y][(int) chunkPos.z];
             return c.getBlock((int) blockCoord.x, (int) blockCoord.y, (int) blockCoord.z);
         } catch (Exception e) {
-            return 0;
+            return -1;
         }
     }
 

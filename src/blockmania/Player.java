@@ -54,7 +54,7 @@ public class Player extends RenderObject {
      */
     public Player(World parent) {
         this.parent = parent;
-        position = new Vector3f(256f, 256.0f, 256f);
+        position = new Vector3f(128, 256.0f, 128f);
     }
 
     /*

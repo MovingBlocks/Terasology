@@ -31,6 +31,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.PixelFormat;
 
 /**
  *
@@ -97,7 +98,7 @@ public class Main {
         Display.setDisplayMode(new DisplayMode((int) DISPLAY_WIDTH, (int) DISPLAY_HEIGHT));
         Display.setFullscreen(false);
         Display.setTitle("Blockmania");
-        Display.create();
+        Display.create(new PixelFormat().withDepthBits(24).withSamples(0).withSRGB(true));
 
         // Keyboard
         Keyboard.create();
@@ -119,8 +120,12 @@ public class Main {
 
     public void initGL() {
         glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FOG);
+        glEnable(GL_TEXTURE_2D);
+        glDepthFunc(GL_LEQUAL);
+
 
         float[] fogColor = {0.75f, 0.75f, 0.75f, 1.0f};
         FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
@@ -130,10 +135,10 @@ public class Main {
         glFog(GL_FOG_COLOR, fogColorBuffer);
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogf(GL_FOG_DENSITY, 1.0f);
-        glFogf(GL_FOG_START, 256.0f);
-        glFogf(GL_FOG_END, 512.0f);
+        glFogf(GL_FOG_START, 600.0f);
+        glFogf(GL_FOG_END, 800.0f);
 
-        world = new World("WORLD1", "XXX");
+        world = new World("WORLD1", "XYZ");
         player = new Player(world);
         Chunk.init();
         world.init();
@@ -147,10 +152,9 @@ public class Main {
     }
 
     public void render() {
-        glClearColor(world.getDaylight()-0.25f, world.getDaylight(), world.getDaylight()+0.25f, 1.0f);
+        glClearColor(world.getDaylight() - 0.25f, world.getDaylight(), world.getDaylight() + 0.25f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
-        
         player.render();
         Chunk.renderAllChunks();
     }
@@ -179,22 +183,18 @@ public class Main {
             lastFpsTime += delta;
             fps++;
 
-            // Update the FPS display in the title bar (only) at every second passed.
+            // Update the FPS display in the title bar each second passed.
             if (lastFpsTime >= 1000) {
                 Display.setTitle(GAME_TITLE + " (FPS: " + fps + ")");
                 lastFpsTime = 0;
                 fps = 0;
             }
 
-            // Update the scene.
             update(delta);
-            // Render the scene.
             render();
 
-            // Update the display.
             Display.update();
 
-            // Process the keyboard and mouse input.
             processKeyboard();
             processMouse();
         }
