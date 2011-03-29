@@ -125,6 +125,8 @@ public class Main {
         glEnable(GL_FOG);
         glEnable(GL_TEXTURE_2D);
         glDepthFunc(GL_LEQUAL);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
         float[] fogColor = {0.75f, 0.75f, 0.75f, 1.0f};
@@ -138,8 +140,9 @@ public class Main {
         glFogf(GL_FOG_START, 600.0f);
         glFogf(GL_FOG_END, 800.0f);
 
-        world = new World("WORLD1", "XYZ");
-        player = new Player(world);
+        player = new Player();
+        world = new World("WORLD1", "XYZ",player);
+        player.setParent(world);
         Chunk.init();
         world.init();
 
@@ -175,6 +178,10 @@ public class Main {
     public void start() {
 
         while (!Display.isCloseRequested()) {
+
+            processKeyboard();
+            processMouse();
+
             // Sync. at 60 FPS.
             Display.sync(60);
 
@@ -194,9 +201,6 @@ public class Main {
             render();
 
             Display.update();
-
-            processKeyboard();
-            processMouse();
         }
 
         Display.destroy();

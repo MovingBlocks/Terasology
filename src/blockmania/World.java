@@ -16,7 +16,11 @@
  */
 package blockmania;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -29,12 +33,14 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class World extends RenderObject {
 
+    private Player player;
     private float daylight = 0.75f;
     private Random rand;
     // Used for updating/generating the world
     private Thread updateThread;
     // The chunks to display
     private Chunk[][][] chunks;
+    private Set<Chunk> chunkUpdateQueue = new HashSet<Chunk>();
     // Logger
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     // Day & Night
@@ -45,7 +51,8 @@ public class World extends RenderObject {
      */
     PerlinNoiseGenerator pGen;
 
-    public World(String title, String seed) {
+    public World(String title, String seed, Player p) {
+        this.player = p;
         rand = new Random(seed.hashCode());
         pGen = new PerlinNoiseGenerator(seed);
 
@@ -78,7 +85,9 @@ public class World extends RenderObject {
 //
 //            @Override
 //            public void run() {
+//
 //                daylight -= 0.15;
+//                LOGGER.log(Level.INFO, "Updating daylight to {0}.", daylight);
 //
 //                if (daylight < 0.25f) {
 //                    daylight = 0.75f;
@@ -90,8 +99,7 @@ public class World extends RenderObject {
 //                            Chunk c = chunks[x][y][z];
 //
 //                            if (c != null) {
-//                                LOGGER.log(Level.INFO, "Updating daylight.");
-//                                c.markAsDirty();
+//                                chunkUpdateQueue.add(c);
 //                            }
 //                        }
 //                    }
@@ -107,30 +115,39 @@ public class World extends RenderObject {
      */
     @Override
     public void update(long delta) {
+
         int chunkUpdates = 0;
 
-        for (int x = 0; x < (int) Configuration.viewingDistanceInChunks.x; x++) {
-            for (int y = 0; y < (int) Configuration.viewingDistanceInChunks.y; y++) {
-                for (int z = 0; z < (int) Configuration.viewingDistanceInChunks.z; z++) {
-                    if (chunks[x][y][z] != null) {
-                        if (chunkUpdates < 3) {
+        if (!updateThread.isAlive()) {
 
-                            boolean updated1 = chunks[x][y][z].updateDisplayList(true);
-                            boolean updated2 = chunks[x][y][z].updateDisplayList(false);
 
-                            if (updated1 || updated2) {
-                                chunkUpdates++;
-                            }
-                        }
-                    }
+
+            LOGGER.log(Level.INFO, "Updating {0} chunks.", chunkUpdateQueue.size());
+
+            List<Chunk> deletedElements = new ArrayList<Chunk>();
+
+            for (Chunk c : chunkUpdateQueue) {
+                if (chunkUpdates < 3) {
+                    c.updateDisplayList();
+                    deletedElements.add(c);
+                    chunkUpdates++;
+                } else {
+                    break;
                 }
             }
+
+
+            for (Chunk c : deletedElements) {
+                chunkUpdateQueue.remove(c);
+            }
+
+
+
         }
     }
 
     /**
-     * Generates the world.
-     * NOTE: Will be replaced with a per-chunk-system later.
+     * Generates the world on a per chunk basis.
      */
     public final void generateChunk(Vector3f chunkPosition) {
 
@@ -138,7 +155,7 @@ public class World extends RenderObject {
 
         for (int x = (int) chunkOrigin.x; x < (int) chunkOrigin.x + Chunk.chunkDimensions.x; x++) {
             for (int z = (int) chunkOrigin.z; z < (int) chunkOrigin.z + Chunk.chunkDimensions.z; z++) {
-                setBlock(new Vector3f(x, 0, z), 0x3, false);
+                setBlock(new Vector3f(x, 0, z), 0x3);
             }
 
         }
@@ -158,9 +175,9 @@ public class World extends RenderObject {
                                 generateTree(new Vector3f(x, height, z));
                             }
 
-                            setBlock(new Vector3f(x, y, z), 0x1, false);
+                            setBlock(new Vector3f(x, y, z), 0x1);
                         } else {
-                            setBlock(new Vector3f(x, y, z), 0x2, false);
+                            setBlock(new Vector3f(x, y, z), 0x2);
                         }
                     }
 
@@ -170,16 +187,10 @@ public class World extends RenderObject {
                 // Generate water
                 for (int i = 32; i > 0; i--) {
                     if (getBlock(new Vector3f(x, i, z)) == 0) {
-                        setBlock(new Vector3f(x, i, z), 0x4, false);
+                        setBlock(new Vector3f(x, i, z), 0x4);
                     }
                 }
             }
-        }
-
-        Chunk c = chunks[(int) chunkPosition.x][(int) chunkPosition.y][(int) chunkPosition.z];
-
-        if (c != null) {
-            c.markAsDirty();
         }
     }
 
@@ -189,7 +200,7 @@ public class World extends RenderObject {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            setBlock(new Vector3f(pos.x, pos.y + i, pos.z), 0x5, true);
+            setBlock(new Vector3f(pos.x, pos.y + i, pos.z), 0x5);
         }
 
         // Generate the treetop
@@ -197,7 +208,7 @@ public class World extends RenderObject {
             for (int x = -4; x < 4; x++) {
                 for (int z = -4; z < 4; z++) {
                     if (rand.nextFloat() < 0.75 && !(x == 0 && z == 0)) {
-                        setBlock(new Vector3f(pos.x + x, pos.y + y, pos.z + z), 0x6, true);
+                        setBlock(new Vector3f(pos.x + x, pos.y + y, pos.z + z), 0x6);
                     }
                 }
             }
@@ -210,7 +221,7 @@ public class World extends RenderObject {
      * @param pos
      * @param type
      */
-    public final void setBlock(Vector3f pos, int type, boolean dirty) {
+    public final void setBlock(Vector3f pos, int type) {
         Vector3f chunkPos = calcChunkPos(pos);
         Vector3f blockCoord = calcBlockPos(pos, chunkPos);
 
@@ -225,7 +236,8 @@ public class World extends RenderObject {
             }
 
             // Generate or update the corresponding chunk
-            c.setBlock(blockCoord, type, dirty);
+            c.setBlock(blockCoord, type);
+            chunkUpdateQueue.add(c);
         } catch (Exception e) {
             return;
         }
@@ -314,5 +326,12 @@ public class World extends RenderObject {
 
     public float getDaylight() {
         return daylight;
+    }
+
+    /**
+     * @return the player
+     */
+    public Player getPlayer() {
+        return player;
     }
 }

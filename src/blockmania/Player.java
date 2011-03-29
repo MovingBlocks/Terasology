@@ -52,8 +52,7 @@ public class Player extends RenderObject {
     /**
      * Init. the player.
      */
-    public Player(World parent) {
-        this.parent = parent;
+    public Player() {
         position = new Vector3f(128, 256.0f, 128f);
     }
 
@@ -131,18 +130,28 @@ public class Player extends RenderObject {
     }
 
     private boolean isPlayerStandingOnGround() {
-        return parent.isHitting(new Vector3f(getPosition().x, getPosition().y - PLAYER_HEIGHT, getPosition().z));
+        if (getParent() != null) {
+            return getParent().isHitting(new Vector3f(getPosition().x, getPosition().y - PLAYER_HEIGHT, getPosition().z));
+        } else {
+            return false;
+        }
     }
 
     private boolean isObjectInFrontOfPlayer() {
-        Vector2f direction = new Vector2f((float) accX, (float) accZ);
 
-        try {
-            direction.normalise();
-        } catch (Exception e) {
+        if (getParent() != null) {
+            Vector2f direction = new Vector2f((float) accX, (float) accZ);
+
+            try {
+                direction.normalise();
+            } catch (Exception e) {
+            }
+
+            return getParent().isHitting(new Vector3f(getPosition().x + direction.x * 1.0f, getPosition().y - 1.0f, getPosition().z + direction.y * 1.0f));
+
+        } else {
+            return false;
         }
-
-        return parent.isHitting(new Vector3f(getPosition().x + direction.x * 1.0f, getPosition().y - 1.0f, getPosition().z + direction.y * 1.0f));
     }
 
     /**
@@ -160,14 +169,16 @@ public class Player extends RenderObject {
      * TODO: Yeah... Should do more than that. :-)
      */
     public void placeBlock() {
-        Vector3f blockPosition = new Vector3f(position);
-        Vector2f viewingDirection = new Vector2f((float) Math.sin(Math.toRadians(yaw)), -1f * (float) Math.cos(Math.toRadians(yaw)));
+        if (getParent() != null) {
+            Vector3f blockPosition = new Vector3f(position);
+            Vector2f viewingDirection = new Vector2f((float) Math.sin(Math.toRadians(yaw)), -1f * (float) Math.cos(Math.toRadians(yaw)));
 
-        blockPosition.x += 4f * viewingDirection.x;
-        blockPosition.y += -1f;
-        blockPosition.z += 4f * viewingDirection.y;
+            blockPosition.x += 4f * viewingDirection.x;
+            blockPosition.y += -1f;
+            blockPosition.z += 4f * viewingDirection.y;
 
-        parent.setBlock(blockPosition, 0x1, true);
+            getParent().setBlock(blockPosition, 0x1);
+        }
     }
 
     /**
@@ -175,14 +186,16 @@ public class Player extends RenderObject {
      * TODO: Yeah... Should do more than that. :-)
      */
     public void removeBlock() {
-        Vector3f blockPosition = new Vector3f(position);
-        Vector2f viewingDirection = new Vector2f((float) Math.sin(Math.toRadians(yaw)), -1f * (float) Math.cos(Math.toRadians(yaw)));
+        if (getParent() != null) {
+            Vector3f blockPosition = new Vector3f(position);
+            Vector2f viewingDirection = new Vector2f((float) Math.sin(Math.toRadians(yaw)), -1f * (float) Math.cos(Math.toRadians(yaw)));
 
-        blockPosition.x += 2f * viewingDirection.x;
-        blockPosition.y += -1f;
-        blockPosition.z += 2f * viewingDirection.y;
+            blockPosition.x += 2f * viewingDirection.x;
+            blockPosition.y += -1f;
+            blockPosition.z += 2f * viewingDirection.y;
 
-        parent.setBlock(blockPosition, 0x0, true);
+            getParent().setBlock(blockPosition, 0x0);
+        }
     }
 
     private void processPlayerInteraction() {
@@ -196,50 +209,68 @@ public class Player extends RenderObject {
 
     private void processMovement(long delta) {
 
-        if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
-        {
-            walkForward();
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_S))//move backwards
-        {
-            walkBackwards();
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_A))//strafe left
-        {
-            strafeLeft();
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_D))//strafe right
-        {
-            strafeRight();
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-            jump();
-        }
+        if (getParent() != null) {
 
-        /*
-         * Apply gravity.
-         */
-        if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - PLAYER_HEIGHT, getPosition().z))) {
-            if (gravity > -MAX_GRAVITY) {
-                gravity -= 1;
+            if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
+            {
+                walkForward();
             }
-            getPosition().y += (gravity / 1000.0f) * delta;
-        } else if (gravity > 0.0f) {
-            getPosition().y += (gravity / 1000.0f) * delta;
-        }
+            if (Keyboard.isKeyDown(Keyboard.KEY_S))//move backwards
+            {
+                walkBackwards();
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_A))//strafe left
+            {
+                strafeLeft();
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_D))//strafe right
+            {
+                strafeRight();
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+                jump();
+            }
 
-        /**
-         * Collision detection with objects along the x/z-plane.
-         */
-        if (isObjectInFrontOfPlayer()) {
+            /*
+             * Apply gravity.
+             */
+            if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - PLAYER_HEIGHT, getPosition().z))) {
+                if (gravity > -MAX_GRAVITY) {
+                    gravity -= 1;
+                }
+                getPosition().y += (gravity / 1000.0f) * delta;
+            } else if (gravity > 0.0f) {
+                getPosition().y += (gravity / 1000.0f) * delta;
+            }
+
+            /**
+             * Collision detection with objects along the x/z-plane.
+             */
+            if (isObjectInFrontOfPlayer()) {
+                accX = 0;
+                accZ = 0;
+            }
+
+            getPosition().x += (accX / 1000.0f) * delta;
+            getPosition().z += (accZ / 1000.0f) * delta;
+
             accX = 0;
             accZ = 0;
+
         }
+    }
 
-        getPosition().x += (accX / 1000.0f ) * delta;
-        getPosition().z += (accZ / 1000.0f) * delta;
+    /**
+     * @return the parent
+     */
+    public World getParent() {
+        return parent;
+    }
 
-        accX = 0;
-        accZ = 0;
+    /**
+     * @param parent the parent to set
+     */
+    public void setParent(World parent) {
+        this.parent = parent;
     }
 }
