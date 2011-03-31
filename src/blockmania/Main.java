@@ -32,6 +32,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
+import org.lwjgl.util.vector.Vector3f;
 
 /**
  *
@@ -98,7 +99,7 @@ public class Main {
         Display.setDisplayMode(new DisplayMode((int) DISPLAY_WIDTH, (int) DISPLAY_HEIGHT));
         Display.setFullscreen(false);
         Display.setTitle("Blockmania");
-        Display.create(new PixelFormat().withDepthBits(24).withSamples(0).withSRGB(true));
+        Display.create(new PixelFormat().withDepthBits(24).withSamples(4));
 
         // Keyboard
         Keyboard.create();
@@ -123,25 +124,25 @@ public class Main {
         glCullFace(GL_BACK);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FOG);
-        glEnable(GL_TEXTURE_2D);
         glDepthFunc(GL_LEQUAL);
         //glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-        float[] fogColor = {0.75f, 0.75f, 0.75f, 1.0f};
+        float[] fogColor = {0.65f, 0.65f, 0.8f, 1.0f};
         FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
         fogColorBuffer.put(fogColor);
         fogColorBuffer.rewind();
 
+        glHint(GL_FOG_HINT, GL_NICEST);
         glFog(GL_FOG_COLOR, fogColorBuffer);
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogf(GL_FOG_DENSITY, 1.0f);
-        glFogf(GL_FOG_START, Configuration.viewingDistance-16);
-        glFogf(GL_FOG_END, Configuration.viewingDistance);
+        glFogf(GL_FOG_START, 64);
+        glFogf(GL_FOG_END, 256);
 
         player = new Player();
-        world = new World("WORLD1", "123892",player);
+        world = new World("WORLD1", "123892", player);
         player.setParent(world);
         Chunk.init();
         world.init();
@@ -155,11 +156,60 @@ public class Main {
     }
 
     public void render() {
-        glClearColor(world.getDaylight() - 0.25f, world.getDaylight(), world.getDaylight() + 0.25f, 1.0f);
+        glClearColor(world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
         player.render();
         world.render();
+
+        // Display the currently looked at block
+        Vector3f blockPosition = player.calcViewBlockPosition();
+        int bpX = (int) blockPosition.x;
+        int bpY = (int) blockPosition.y;
+        int bpZ = (int) blockPosition.z;
+
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glLineWidth(4.0f);
+
+        glBegin(GL_LINES);
+        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
+        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
+
+        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
+        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
+
+        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
+        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
+
+        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
+        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
+
+        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
+        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
+
+        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
+        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
+
+        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
+        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
+
+        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
+        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
+
+        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
+        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
+
+        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
+        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
+
+        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
+        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
+
+        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
+        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
+
+        glEnd();
+
     }
 
     public void resizeGL() {
