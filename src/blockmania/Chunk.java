@@ -241,9 +241,9 @@ public class Chunk extends RenderObject {
                         }
 
                         if (darken) {
-                            setLight(x, y, z, 0.4f  + (float) y / 100f);
+                            setLight(x, y, z, 0.6f);
                         } else {
-                            setLight(x, y, z, 0.6f  + (float) y / 100f);
+                            setLight(x, y, z, 0.9f);
                         }
                     } else if (blocks[x][y][z] == 0 && covered) {
                         setLight(x, y, z, 0.2f + (float) y / 200f);
