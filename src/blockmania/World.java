@@ -158,6 +158,8 @@ public class World extends RenderObject {
                         } else {
                             setBlock(new Vector3f(x, y, z), 0x2);
                         }
+                    } else if (getCaveDensityAt(x, y, z) < 0.30) {
+                        setBlock(new Vector3f(x, y, z), 0x3);
                     }
 
                     y--;
@@ -177,7 +179,7 @@ public class World extends RenderObject {
 
     private void generateTree(Vector3f pos) {
 
-        int height = rand.nextInt() % 5 + 3;
+        int height = rand.nextInt() % 4 + 6;
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
@@ -185,10 +187,10 @@ public class World extends RenderObject {
         }
 
         // Generate the treetop
-        for (int y = height / 2; y < height + 6; y++) {
-            for (int x = -4; x < 4; x++) {
-                for (int z = -4; z < 4; z++) {
-                    if (rand.nextFloat() < 0.75 && !(x == 0 && z == 0)) {
+        for (int y = height - 2; y < height + 2; y++) {
+            for (int x = -2; x <= 2; x++) {
+                for (int z = -2; z <= 2; z++) {
+                    if (rand.nextFloat() < 0.95 && !(x == 0 && z == 0)) {
                         setBlock(new Vector3f(pos.x + x, pos.y + y, pos.z + z), 0x6);
                     }
                 }
