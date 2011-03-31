@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ *  Copyright 2011 Benjamin Glatzel.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,31 +14,17 @@
  *  limitations under the License.
  *  under the License.
  */
-package blockmania;
 
-import org.lwjgl.util.vector.Vector3f;
+package octree;
+
+import blockmania.Chunk;
 
 /**
- *
+ * Octree as shown in the book "Physically Based Rendering".
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Helper {
+public abstract class OctLookup {
 
-    private static Helper instance = null;
-
-    public static Helper getInstance() {
-        if (instance == null) {
-            instance = new Helper();
-        }
-
-        return instance;
-    }
-
-    public Helper() {
-    }
-
-    public Vector3f calcPlayerOrigin() {
-        return new Vector3f(Chunk.chunkDimensions.x*Configuration.viewingDistanceInChunks.x/2,128,(Chunk.chunkDimensions.z*Configuration.viewingDistanceInChunks.z)/2);
-    }
+    public abstract boolean lookup(Chunk c);
 
 }
