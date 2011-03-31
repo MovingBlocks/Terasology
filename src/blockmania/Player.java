@@ -210,9 +210,11 @@ public class Player extends RenderObject {
 
         if (getParent() != null) {
 
-            if (Keyboard.isKeyDown(Keyboard.KEY_R))//move forward
-            {
+            if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
                 resetPlayer();
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_T)) {
+                parent.generateTrees();
             }
             if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
             {
