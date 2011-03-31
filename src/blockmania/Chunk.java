@@ -19,10 +19,6 @@ package blockmania;
 import java.util.Random;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.List;
-import java.util.ArrayList;
-import org.lwjgl.BufferUtils;
-import java.nio.IntBuffer;
 import org.lwjgl.util.vector.Vector3f;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -37,14 +33,14 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Chunk extends RenderObject {
-
-    static IntBuffer renderBuffer = BufferUtils.createIntBuffer(49152);
     //
+
     Random rand = new Random();
     //
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     // The actual block ids for the chunk
     int[][][] blocks;
+    private float[][][] light;
     // Chunk
     int chunkID = -1;
     // Create an unique id for each chunk
@@ -60,18 +56,48 @@ public class Chunk extends RenderObject {
     // Size of one single chunk
     public static final Vector3f chunkDimensions = new Vector3f(16, 128, 16);
     // The parent world
-    World parent = null;
+    static World parent = null;
+
+    /**
+     * @return the light
+     */
+    public float getLight(int x, int y, int z) {
+        float result;
+        try {
+            result = light[x][y][z];
+        } catch (Exception e) {
+            return 0.0f;
+        }
+
+        return result;
+    }
+
+    /**
+     * @param light the light to set
+     */
+    public void setLight(int x, int y, int z, float intens) {
+        try {
+            light[x][y][z] = intens;
+            return;
+        } catch (Exception e) {
+            return;
+        }
+    }
 
     enum SIDE {
 
         LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK;
     };
 
-    public Chunk(World parent, Vector3f position) {
+    public Chunk(World p, Vector3f position) {
         this.position = position;
-        this.parent = parent;
+
+        if (Chunk.parent == null) {
+            Chunk.parent = p;
+        }
 
         blocks = new int[(int) chunkDimensions.x][(int) chunkDimensions.y][(int) chunkDimensions.z];
+        light = new float[(int) chunkDimensions.x][(int) chunkDimensions.y][(int) chunkDimensions.z];
     }
 
     @Override
@@ -92,8 +118,6 @@ public class Chunk extends RenderObject {
     }
 
     public boolean updateDisplayList() {
-
-        long timeStart = System.currentTimeMillis();
 
         if (chunkID == -1) {
             chunkID = rand.nextInt();
@@ -162,41 +186,19 @@ public class Chunk extends RenderObject {
     }
 
     public static void renderAllChunks() {
-
-        long timeStart = System.currentTimeMillis();
-
-
         for (Chunk c : chunks) {
-            Vector3f pPos = c.parent.getPlayer().getPosition();
-            Vector3f offset = new Vector3f(c.position.x * chunkDimensions.x, c.position.y * chunkDimensions.y, c.position.z * chunkDimensions.z);
-            Vector3f distance = new Vector3f(offset.x - pPos.y, offset.y - pPos.x, offset.z - pPos.z);
-
-            if (distance.x + distance.y + distance.z < 128) {
-                renderBuffer.put(c.displayListOpaqueTop);
-                renderBuffer.put(c.displayListOpaqueFront);
-                renderBuffer.put(c.displayListOpaqueBack);
-                renderBuffer.put(c.displayListOpaqueLeft);
-                renderBuffer.put(c.displayListOpaqueRight);
-                renderBuffer.put(c.displayListOpaqueBottom);
-            }
-            
+            glCallList(c.displayListOpaqueTop);
+            glCallList(c.displayListOpaqueFront);
+            glCallList(c.displayListOpaqueBack);
+            glCallList(c.displayListOpaqueLeft);
+            glCallList(c.displayListOpaqueRight);
+            glCallList(c.displayListOpaqueBottom);
         }
-
-        renderBuffer.rewind();
-
-        // And then the translucent elements
-        //glEnable(GL_BLEND);
-
-        glCallLists(renderBuffer);
-        //glDisable(GL_BLEND);
-
-        //LOGGER.log(Level.INFO, "Rendered chunks in {0} ms", System.currentTimeMillis() - timeStart);
-
     }
 
     public static void init() {
         try {
-            textureMap = TextureLoader.getTexture("PNG", new FileInputStream(Chunk.class.getResource("Terrain.png").getPath()), GL_NEAREST);
+            textureMap = TextureLoader.getTexture("PNG", new FileInputStream(Chunk.class.getResource("/images/Terrain.png").getPath()), GL_NEAREST);
             textureMap.bind();
 
         } catch (IOException ex) {
@@ -219,62 +221,40 @@ public class Chunk extends RenderObject {
         return v;
     }
 
-    private float castRay(int x, int y, int z, SIDE side) {
+    public void calcSunlight() {
 
-        float result = 1.0f;
+        for (int x = 0; x < (int) chunkDimensions.x; x++) {
+            for (int z = 0; z < (int) chunkDimensions.z; z++) {
+                boolean covered = false;
+                for (int y = (int) chunkDimensions.y - 1; y >= 0; y--) {
 
-        if (side == SIDE.TOP) {
-        } else if (side == SIDE.LEFT) {
-            x -= 1;
-        } else if (side == SIDE.RIGHT) {
-            x += 1;
-        } else if (side == SIDE.BOTTOM) {
-            return 0.25f;
-        } else if (side == SIDE.FRONT) {
-            z -= 1;
-        } else if (side == SIDE.BACK) {
-            z += 1;
-        }
+                    if (blocks[x][y][z] == 0 && !covered) {
+                        boolean darken = false;
+                        if (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x + 1, y, z)))) > 0) {
+                            darken = true;
+                        } else if (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x - 1, y, z)))) > 0) {
+                            darken = true;
+                        } else if (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x, y, z + 1)))) > 0) {
+                            darken = true;
+                        } else if (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x , y, z - 1)))) > 0) {
+                            darken = true;
+                        }
 
-        for (int i = y + 1; i < chunkDimensions.y; i++) {
-            try {
-                if (parent.getBlock(getBlockWorldPos(new Vector3f(x, i, z))) > 0) {
-                    result = 0.25f;
-                    break;
+                        if (darken) {
+                            setLight(x, y, z, 0.4f  + (float) y / 100f);
+                        } else {
+                            setLight(x, y, z, 0.6f  + (float) y / 100f);
+                        }
+                    } else if (blocks[x][y][z] == 0 && covered) {
+                        setLight(x, y, z, 0.2f + (float) y / 200f);
+                    } else {
+                        covered = true;
+                    }
                 }
-            } catch (Exception e) {
             }
         }
 
-        try {
-            if (parent.getBlock(getBlockWorldPos(new Vector3f(x + 1, y + 1, z))) > 0) {
-                result -= 0.33f;
-            }
-        } catch (Exception e) {
-        }
 
-        try {
-            if (parent.getBlock(getBlockWorldPos(new Vector3f(x - 1, y + 1, z))) > 0) {
-                result -= 0.33f;
-            }
-        } catch (Exception e) {
-        }
-
-        try {
-            if (parent.getBlock(getBlockWorldPos(new Vector3f(x, y + 1, z + 1))) > 0) {
-                result -= 0.33f;
-            }
-        } catch (Exception e) {
-        }
-
-        try {
-            if (parent.getBlock(getBlockWorldPos(new Vector3f(x, y + 1, z - 1))) > 0) {
-                result -= 0.33f;
-            }
-        } catch (Exception e) {
-        }
-
-        return result;
     }
 
     private boolean checkBlockTypeToDraw(int blockToCheck, int currentBlock) {
@@ -303,7 +283,7 @@ public class Chunk extends RenderObject {
 
                             if (drawTop) {
                                 Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.TOP);
-                                float shadowIntens = castRay(x, y, z, SIDE.TOP);
+                                float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x, y + 1, z))));
                                 glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
 
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.TOP).x;
@@ -330,7 +310,7 @@ public class Chunk extends RenderObject {
 
                             if (drawFront) {
                                 Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.FRONT);
-                                float shadowIntens = castRay(x, y, z, SIDE.FRONT);
+                                float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x, y, z - 1))));
                                 glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
 
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.FRONT).x;
@@ -359,7 +339,7 @@ public class Chunk extends RenderObject {
 
                             if (drawBack) {
                                 Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.BACK);
-                                float shadowIntens = castRay(x, y, z, SIDE.BACK);
+                                float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x, y, z + 1))));
                                 glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BACK).x;
                                 float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BACK).y;
@@ -386,7 +366,7 @@ public class Chunk extends RenderObject {
 
                             if (drawLeft) {
                                 Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.LEFT);
-                                float shadowIntens = castRay(x, y, z, SIDE.LEFT);
+                                float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x - 1, y, z))));
                                 glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.LEFT).x;
                                 float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.LEFT).y;
@@ -412,7 +392,7 @@ public class Chunk extends RenderObject {
 
                             if (drawRight) {
                                 Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.RIGHT);
-                                float shadowIntens = castRay(x, y, z, SIDE.RIGHT);
+                                float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x + 1, y, z))));
                                 glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.RIGHT).x;
                                 float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.RIGHT).y;
@@ -440,7 +420,7 @@ public class Chunk extends RenderObject {
 
                             if (drawBottom) {
                                 Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.BOTTOM);
-                                float shadowIntens = castRay(x, y, z, SIDE.BOTTOM);
+                                float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x, y - 1, z))));
                                 glColor3f(colorOffset.x * shadowIntens * parent.getDaylight(), colorOffset.y * shadowIntens * parent.getDaylight(), colorOffset.z * shadowIntens * parent.getDaylight());
                                 float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BOTTOM).x;
                                 float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BOTTOM).y;
@@ -462,6 +442,16 @@ public class Chunk extends RenderObject {
 
                     }
 
+                }
+            }
+        }
+    }
+
+    public void clear() {
+        for (int x = 0; x < chunkDimensions.x; x++) {
+            for (int y = 0; y < chunkDimensions.y; y++) {
+                for (int z = 0; z < chunkDimensions.z; z++) {
+                    setBlock(new Vector3f(x, y, z), 0x0);
                 }
             }
         }

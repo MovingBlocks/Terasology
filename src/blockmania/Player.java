@@ -35,7 +35,7 @@ public class Player extends RenderObject {
     // Max. gravity
     private static int MAX_GRAVITY = 80;
     // Max. speed of the playering while walking
-    private static int WALKING_SPEED = 4;
+    private static int WALKING_SPEED = 8;
     // Height of the player in "blocks"
     private int PLAYER_HEIGHT = 2;
     // Viewing direction of the player
@@ -53,7 +53,6 @@ public class Player extends RenderObject {
      * Init. the player.
      */
     public Player() {
-        position = new Vector3f(128, 256.0f, 128f);
     }
 
     /*
@@ -211,6 +210,10 @@ public class Player extends RenderObject {
 
         if (getParent() != null) {
 
+            if (Keyboard.isKeyDown(Keyboard.KEY_R))//move forward
+            {
+                resetPlayer();
+            }
             if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
             {
                 walkForward();
@@ -272,5 +275,10 @@ public class Player extends RenderObject {
      */
     public void setParent(World parent) {
         this.parent = parent;
+        resetPlayer();
+    }
+
+    public void resetPlayer() {
+        position = Helper.getInstance().calcPlayerOrigin();
     }
 }
