@@ -38,8 +38,8 @@ import static org.lwjgl.opengl.GL11.*;
 public class Chunk extends RenderObject {
 
     private static final float DIMMING_INTENS = 0.1f;
-    private static final float LUMINANCE_INTENS = 0.05f;
-    private static final float DIM_BLOCK_SIDES = 0.2f;
+    private static final float LUMINANCE_INTENS = 0.1f;
+    private static final float DIM_BLOCK_SIDES = 0.0f;
     boolean dirty = false;
     // TODO
     private List<Float> quads = new ArrayList<Float>();
@@ -105,7 +105,9 @@ public class Chunk extends RenderObject {
         blocks = new int[(int) chunkDimensions.x][(int) chunkDimensions.y][(int) chunkDimensions.z];
         light = new float[(int) chunkDimensions.x][(int) chunkDimensions.y][(int) chunkDimensions.z];
 
-        generate();
+        if (position.y == 0) {
+            generate();
+        }
     }
 
     private void generate() {
@@ -237,7 +239,7 @@ public class Chunk extends RenderObject {
                         luminance += getLight(x + 1, y, z - 1) * LUMINANCE_INTENS;
 
 
-                        setLight(x, y, z, 0.05f + (float) Math.min(luminance, 1.0f));
+                        setLight(x, y, z, 0.1f + (float) Math.min(luminance, 1.0f));
                     } else {
                         covered = true;
                     }
@@ -634,7 +636,7 @@ public class Chunk extends RenderObject {
      */
     private float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += pGen1.noise(0.0009f * x, 0.0009f, 0.00009f * z) * 64.0f;
+        result += pGen1.noise(0.002f * x, 0.002f, 0.002f * z) * 90.0f;
         return Math.abs(result);
     }
 

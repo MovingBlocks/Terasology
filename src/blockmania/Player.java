@@ -31,11 +31,13 @@ import static org.lwjgl.opengl.GL11.*;
 public class Player extends RenderObject {
 
     // How high the player can jump
-    private static int JUMP_INTENSITY = 20;
+    private static int JUMP_INTENSITY = 10;
     // Max. gravity
-    private static int MAX_GRAVITY = 80;
+    private static int MAX_GRAVITY = 40;
     // Max. speed of the playering while walking
-    private static int WALKING_SPEED = 8;
+    private static int WALKING_SPEED = 4;
+    // Max. speed of the playering while walking
+    private static int RUNNING_SPEED = 8;
     // Height of the player in "blocks"
     private int PLAYER_HEIGHT = 1;
     // Viewing direction of the player
@@ -130,23 +132,16 @@ public class Player extends RenderObject {
 
     private boolean isPlayerStandingOnGround() {
         if (getParent() != null) {
-            return getParent().isHitting(new Vector3f(getPosition().x, getPosition().y - PLAYER_HEIGHT, getPosition().z));
+            return getParent().isHitting(new Vector3f(getPosition().x + 0.5f, getPosition().y - PLAYER_HEIGHT, getPosition().z + 0.5f));
         } else {
             return false;
         }
     }
 
-    private boolean isObjectInFrontOfPlayer() {
+    private boolean checkForCollision(Vector3f position) {
 
         if (getParent() != null) {
-            Vector2f direction = new Vector2f((float) accX, (float) accZ);
-            try {
-                direction.normalise();
-            } catch (Exception e) {
-            }
-
-
-            return getParent().isHitting(new Vector3f(getPosition().x + direction.x, getPosition().y - PLAYER_HEIGHT + 1, getPosition().z + direction.y));
+            return getParent().isHitting(new Vector3f(position.x + 0.5f, position.y, position.z + 0.5f));
 
         } else {
             return false;
@@ -168,11 +163,19 @@ public class Player extends RenderObject {
         Vector2f viewingDirectionHorizontal = new Vector2f((float) Math.sin(Math.toRadians(yaw)), -1f * (float) Math.cos(Math.toRadians(yaw)));
         Vector2f viewingDirectionVertical = new Vector2f(-1f * (float) Math.sin(Math.toRadians(pitch)), (float) Math.cos(Math.toRadians(pitch)));
 
-        blockPosition.x += 4f * viewingDirectionHorizontal.x;
-        blockPosition.y += 4f * viewingDirectionVertical.x;
-        blockPosition.z += 4f * viewingDirectionHorizontal.y;
+        // Maximum distance the player can reach
+        for (int z = 0; z < 4; z++) {
 
-        return blockPosition;
+            blockPosition.x += viewingDirectionHorizontal.x * viewingDirectionVertical.y;
+            blockPosition.y += viewingDirectionVertical.x;
+            blockPosition.z += viewingDirectionHorizontal.y * viewingDirectionVertical.y;
+
+            if (parent.getBlock(blockPosition) != 0) {
+                return blockPosition;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -218,42 +221,48 @@ public class Player extends RenderObject {
             if (Keyboard.isKeyDown(Keyboard.KEY_T)) {
                 parent.generateTrees();
             }
-            if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
-            {
+            if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
                 walkForward();
             }
-            if (Keyboard.isKeyDown(Keyboard.KEY_S))//move backwards
-            {
+            if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
                 walkBackwards();
             }
-            if (Keyboard.isKeyDown(Keyboard.KEY_A))//strafe left
-            {
+            if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
                 strafeLeft();
             }
-            if (Keyboard.isKeyDown(Keyboard.KEY_D))//strafe right
-            {
+            if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
                 strafeRight();
             }
             if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
                 jump();
             }
 
+            boolean hitting = parent.isHitting(new Vector3f(getPosition().x + 0.5f, getPosition().y - PLAYER_HEIGHT, getPosition().z + 0.5f));
+
             /*
              * Apply gravity.
              */
-            if (!parent.isHitting(new Vector3f(getPosition().x, getPosition().y - PLAYER_HEIGHT, getPosition().z))) {
+            if (!hitting) {
                 if (gravity > -MAX_GRAVITY) {
-                    gravity -= 1;
+                    gravity -= 0.5f;
                 }
                 getPosition().y += (gravity / 1000.0f) * delta;
             } else if (gravity > 0.0f) {
                 getPosition().y += (gravity / 1000.0f) * delta;
+            } else {
+                gravity = 0.0f;
+            }
+
+            Vector2f dir = new Vector2f((float) accX, (float) accZ);
+            try {
+                dir.normalise();
+            } catch (Exception e) {
             }
 
             /**
              * Collision detection with objects along the x/z-plane.
              */
-            if (isObjectInFrontOfPlayer()) {
+            if (checkForCollision(new Vector3f(getPosition().x + dir.x * 0.1f, getPosition().y - PLAYER_HEIGHT + 1, getPosition().z + dir.y * 0.1f))) {
                 accX = 0;
                 accZ = 0;
             }
