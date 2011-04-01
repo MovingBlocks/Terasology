@@ -164,51 +164,56 @@ public class Main {
 
         // Display the currently looked at block
         Vector3f blockPosition = player.calcViewBlockPosition();
-        int bpX = (int) blockPosition.x;
-        int bpY = (int) blockPosition.y;
-        int bpZ = (int) blockPosition.z;
 
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glLineWidth(4.0f);
+        if (blockPosition != null) {
 
-        glBegin(GL_LINES);
-        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
+            int bpX = (int) blockPosition.x;
+            int bpY = (int) blockPosition.y;
+            int bpZ = (int) blockPosition.z;
 
-        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
-        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
+            glColor3f(1.0f, 0.0f, 0.0f);
+            glLineWidth(4.0f);
 
-        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
-        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
+            glBegin(GL_LINES);
+            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
 
-        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
-        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
+            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
 
-        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
+            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
+            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
 
-        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
-        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
+            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
 
-        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
-        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
+            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
 
-        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
-        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
+            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
 
-        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
 
-        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
-        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
 
-        glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
-        glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
+            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
 
-        glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
-        glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
+            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
+            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
 
-        glEnd();
+            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
+            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
+
+            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
+            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
+
+            glEnd();
+
+        }
 
     }
 
@@ -217,7 +222,7 @@ public class Main {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(64.0f, DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.1f, 1000f);
+        gluPerspective(64.0f, DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.01f, 1000f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
