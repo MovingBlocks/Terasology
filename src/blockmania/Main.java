@@ -124,14 +124,7 @@ public class Main {
         //glEnable(GL_BLEND);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-        float[] fogColor = {0.65f, 0.65f, 0.8f, 1.0f};
-        FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
-        fogColorBuffer.put(fogColor);
-        fogColorBuffer.rewind();
-
         glHint(GL_FOG_HINT, GL_NICEST);
-        glFog(GL_FOG_COLOR, fogColorBuffer);
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogf(GL_FOG_DENSITY, 1.0f);
         glFogf(GL_FOG_START, 64);
@@ -154,7 +147,16 @@ public class Main {
     public void render() {
         if (world.isWorldGenerated()) {
             glClearColor(world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f);
+
+            // Color the fog like the sky
+            float[] fogColor = {world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f};
+            FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
+            fogColorBuffer.put(fogColor);
+            fogColorBuffer.rewind();
+            glFog(GL_FOG_COLOR, fogColorBuffer);
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             glLoadIdentity();
 
             player.render();
