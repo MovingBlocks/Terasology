@@ -30,6 +30,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Player extends RenderObject {
 
+    private boolean repeatedInteraction;
     // How high the player can jump
     private static int JUMP_INTENSITY = 10;
     // Max. gravity
@@ -74,7 +75,6 @@ public class Player extends RenderObject {
      */
     @Override
     public void update(long delta) {
-
         yaw(Mouse.getDX() * 0.1f);
         pitch(Mouse.getDY() * 0.1f);
 
@@ -132,7 +132,7 @@ public class Player extends RenderObject {
 
     private boolean isPlayerStandingOnGround() {
         if (getParent() != null) {
-            return getParent().isHitting(new Vector3f(getPosition().x + 0.5f, getPosition().y - PLAYER_HEIGHT, getPosition().z + 0.5f));
+            return getParent().isHitting((int) (getPosition().x + 0.5f), (int) (getPosition().y - PLAYER_HEIGHT), (int) (getPosition().z + 0.5f));
         } else {
             return false;
         }
@@ -141,7 +141,7 @@ public class Player extends RenderObject {
     private boolean checkForCollision(Vector3f position) {
 
         if (getParent() != null) {
-            return getParent().isHitting(new Vector3f(position.x + 0.5f, position.y, position.z + 0.5f));
+            return getParent().isHitting((int) (position.x + 0.5f), (int) position.y, (int) (position.z + 0.5f));
 
         } else {
             return false;
@@ -159,20 +159,17 @@ public class Player extends RenderObject {
     }
 
     public Vector3f calcViewBlockPosition() {
-        Vector3f blockPosition = new Vector3f(position);
-        Vector2f viewingDirectionHorizontal = new Vector2f((float) Math.sin(Math.toRadians(yaw)), -1f * (float) Math.cos(Math.toRadians(yaw)));
-        Vector2f viewingDirectionVertical = new Vector2f(-1f * (float) Math.sin(Math.toRadians(pitch)), (float) Math.cos(Math.toRadians(pitch)));
+        Vector3f blockPosition = new Vector3f((int) position.x + 0.5f, (int) position.y + 0.5f, (int) position.z + 0.5f);
+        Vector3f vD = new Vector3f((float) Math.sin(Math.toRadians(yaw)), -1f * (float) Math.sin(Math.toRadians(pitch)), -1f * (float) Math.cos(Math.toRadians(yaw)));
+        vD.normalise();
 
         // Maximum distance the player can reach
-        for (int z = 0; z < 4; z++) {
+        for (int z = 0; z < 16; z++) {
+            blockPosition.x += vD.x;
+            blockPosition.y += vD.y;
+            blockPosition.z += vD.z;
 
-            blockPosition.x += viewingDirectionHorizontal.x * viewingDirectionVertical.y;
-            blockPosition.y += viewingDirectionVertical.x;
-            blockPosition.z += viewingDirectionHorizontal.y * viewingDirectionVertical.y;
-
-            if (parent.getBlock(blockPosition) != 0) {
-                return blockPosition;
-            }
+            return blockPosition;
         }
 
         return null;
@@ -185,8 +182,7 @@ public class Player extends RenderObject {
     public void placeBlock() {
         if (getParent() != null) {
             Vector3f blockPosition = calcViewBlockPosition();
-
-            getParent().setBlock(blockPosition, 0x2);
+            getParent().setBlock((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z, 0x2);
         }
     }
 
@@ -197,30 +193,34 @@ public class Player extends RenderObject {
     public void removeBlock() {
         if (getParent() != null) {
             Vector3f blockPosition = calcViewBlockPosition();
-
-            getParent().setBlock(blockPosition, 0x0);
+            getParent().setBlock((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z, 0x0);
         }
     }
 
     private void processPlayerInteraction() {
-        if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_E) && !repeatedInteraction) {
             placeBlock();
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
+            repeatedInteraction = true;
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_Q) && !repeatedInteraction) {
             removeBlock();
+            repeatedInteraction = true;
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_R) && !repeatedInteraction) {
+            resetPlayer();
+            repeatedInteraction = true;
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_T) && !repeatedInteraction) {
+            parent.generateForest();
+            repeatedInteraction = true;
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_Z) && !repeatedInteraction) {
+            parent.generateTree((int) calcViewBlockPosition().x, (int) calcViewBlockPosition().y, (int) calcViewBlockPosition().z);
+            repeatedInteraction = true;
+        } else {
+            repeatedInteraction = false;
         }
     }
 
     private void processMovement(long delta) {
 
         if (getParent() != null) {
-
-            if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
-                resetPlayer();
-            }
-            if (Keyboard.isKeyDown(Keyboard.KEY_T)) {
-                parent.generateTrees();
-            }
             if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
                 walkForward();
             }
@@ -237,7 +237,7 @@ public class Player extends RenderObject {
                 jump();
             }
 
-            boolean hitting = parent.isHitting(new Vector3f(getPosition().x + 0.5f, getPosition().y - PLAYER_HEIGHT, getPosition().z + 0.5f));
+            boolean hitting = parent.isHitting((int) (getPosition().x + 0.5f), (int) (getPosition().y - PLAYER_HEIGHT), (int) (getPosition().z + 0.5f));
 
             /*
              * Apply gravity.
@@ -276,16 +276,27 @@ public class Player extends RenderObject {
         }
     }
 
+    /**
+     * Resets the player's position.
+     */
+    public void resetPlayer() {
+        position = Helper.getInstance().calcPlayerOrigin();
+    }
+
+    /**
+     * Returns the parent world.
+     * @return the parent world
+     */
     public World getParent() {
         return parent;
     }
 
+    /**
+     * Sets the parent world an resets the player.
+     * @param parent the parent world
+     */
     public void setParent(World parent) {
         this.parent = parent;
         resetPlayer();
-    }
-
-    public void resetPlayer() {
-        position = Helper.getInstance().calcPlayerOrigin();
     }
 }

@@ -42,12 +42,11 @@ public class Main {
 
     // Constant values
     private String GAME_TITLE = "Blockmania (Pre) Alpha";
-    private static long timerTicksPerSecond = Sys.getTimerResolution();
     private static final float DISPLAY_HEIGHT = 768.0f;
     private static final float DISPLAY_WIDTH = 1024.0f;
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     // Time at the start of the last render loop
-    private long lastLoopTime = getTime();
+    private long lastLoopTime = Helper.getInstance().getTime();
     // Time at last fps measurement.
     private long lastFpsTime;
     // Measured rames per second.
@@ -90,10 +89,6 @@ public class Main {
      * 
      * @return The system time in milliseconds
      */
-    public long getTime() {
-        return (Sys.getTime() * 1000) / timerTicksPerSecond;
-    }
-
     public void create() throws LWJGLException {
         // Display
         Display.setDisplayMode(new DisplayMode((int) DISPLAY_WIDTH, (int) DISPLAY_HEIGHT));
@@ -103,6 +98,7 @@ public class Main {
 
         // Keyboard
         Keyboard.create();
+        Keyboard.enableRepeatEvents(true);
 
         // Mouse
         Mouse.setGrabbed(true);
@@ -156,63 +152,70 @@ public class Main {
     }
 
     public void render() {
-        glClearColor(world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glLoadIdentity();
-        player.render();
-        world.render();
+        if (world.isWorldGenerated()) {
+            glClearColor(world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glLoadIdentity();
 
-        // Display the currently looked at block
-        Vector3f blockPosition = player.calcViewBlockPosition();
+            player.render();
+            world.render();
 
-        if (blockPosition != null) {
+            // Display the currently looked at block
+            Vector3f blockPosition = player.calcViewBlockPosition();
 
-            int bpX = (int) blockPosition.x;
-            int bpY = (int) blockPosition.y;
-            int bpZ = (int) blockPosition.z;
+            if (blockPosition != null) {
 
-            glColor3f(1.0f, 0.0f, 0.0f);
-            glLineWidth(4.0f);
+                int bpX = (int) blockPosition.x;
+                int bpY = (int) blockPosition.y;
+                int bpZ = (int) blockPosition.z;
 
-            glBegin(GL_LINES);
-            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
+                glColor3f(1.0f, 0.0f, 0.0f);
+                glLineWidth(4.0f);
 
-            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
-            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
+                glBegin(GL_LINES);
+                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
 
-            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
-            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
 
-            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
-            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
 
-            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
 
-            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
-            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
 
-            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
-            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
 
-            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
-            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
 
-            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
 
-            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
-            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
 
-            glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
-            glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
+                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
 
-            glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
-            glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
 
-            glEnd();
+                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
+                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
 
+                glEnd();
+
+            }
+
+        } else {
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
     }
@@ -240,14 +243,14 @@ public class Main {
             // Sync. at 60 FPS.
             Display.sync(60);
 
-            long delta = getTime() - lastLoopTime;
-            lastLoopTime = getTime();
+            long delta = Helper.getInstance().getTime() - lastLoopTime;
+            lastLoopTime = Helper.getInstance().getTime();
             lastFpsTime += delta;
             fps++;
 
             // Update the FPS display in the title bar each second passed.
             if (lastFpsTime >= 1000) {
-                Display.setTitle(GAME_TITLE + " (FPS: " + fps + ")");
+                Display.setTitle(String.format("%s (FPS: %d, MEM: %d MB)", GAME_TITLE, fps, Runtime.getRuntime().freeMemory() / 1024 / 1024));
                 lastFpsTime = 0;
                 fps = 0;
             }
@@ -265,7 +268,9 @@ public class Main {
      * Updates the player and the world.
      */
     public void update(long delta) {
-        world.update(delta);
-        player.update(delta);
+        if (world.isWorldGenerated()) {
+            world.update(delta);
+            player.update(delta);
+        }
     }
 }
