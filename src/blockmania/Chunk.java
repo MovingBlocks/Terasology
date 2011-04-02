@@ -45,9 +45,9 @@ public class Chunk extends RenderObject {
     private static final float LUMINANCE_INTENS = 0.25f;
     private static final float DIM_BLOCK_SIDES = 0.0f;
     // TODO
-    private List<Float> quads;
-    private List<Float> tex;
-    private List<Float> color;
+    private final List<Float> quads = new ArrayList<Float>();
+    private final List<Float> tex = new ArrayList<Float>();
+    private final List<Float> color = new ArrayList<Float>();
     // TODO
     Random rand = new Random();
     // The actual block ids for the chunk
@@ -252,9 +252,9 @@ public class Chunk extends RenderObject {
     }
 
     public void generateVertexArray() {
-        color = new ArrayList<Float>();
-        quads = new ArrayList<Float>();
-        tex = new ArrayList<Float>();
+        color.clear();
+        quads.clear();
+        tex.clear();
 
         Vector3f offset = new Vector3f(position.x * chunkDimensions.x, position.y * chunkDimensions.y, position.z * chunkDimensions.z);
 
@@ -574,33 +574,32 @@ public class Chunk extends RenderObject {
             displayList = glGenLists(1);
         }
 
-        int qSize = quads.size();
-        int tSize = tex.size();
-        int cSize = color.size();
+        FloatBuffer cb = null;
+        FloatBuffer tb = null;
+        FloatBuffer vb = null;
 
-        FloatBuffer vb = BufferUtils.createFloatBuffer(qSize);
+        vb = BufferUtils.createFloatBuffer(quads.size());
 
         for (Float f : quads) {
             vb.put(f);
         }
 
-        quads = null;
-
-        FloatBuffer tb = BufferUtils.createFloatBuffer(tSize);
+        tb = BufferUtils.createFloatBuffer(tex.size());
 
         for (Float f : tex) {
             tb.put(f);
         }
 
-        tex = null;
+        tex.clear();
 
-        FloatBuffer cb = BufferUtils.createFloatBuffer(cSize);
+
+        cb = BufferUtils.createFloatBuffer(color.size());
 
         for (Float f : color) {
             cb.put(f);
         }
 
-        color = null;
+        color.clear();
 
         vb.flip();
         tb.flip();
@@ -613,11 +612,13 @@ public class Chunk extends RenderObject {
         glTexCoordPointer(2, 0, tb);
         glColorPointer(3, 0, cb);
         glVertexPointer(3, 0, vb);
-        glDrawArrays(GL_QUADS, 0, qSize / 3);
+        glDrawArrays(GL_QUADS, 0, quads.size() / 3);
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
         glEndList();
+
+        quads.clear();
 
     }
 

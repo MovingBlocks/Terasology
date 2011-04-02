@@ -20,6 +20,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,9 +46,9 @@ public class World extends RenderObject {
     // The chunks to display
     private Chunk[][][] chunks;
     // Update queue for generating the light and vertex arrays
-    private final Queue<Chunk> chunkUpdateQueue = new LinkedBlockingQueue<Chunk>();
+    private final LinkedBlockingDeque<Chunk> chunkUpdateQueue = new LinkedBlockingDeque<Chunk>();
     // Update queue for generating the display lists
-    private final Queue<Chunk> chunkUpdateQueueDL = new LinkedBlockingQueue<Chunk>();
+    private final LinkedBlockingDeque<Chunk> chunkUpdateQueueDL = new LinkedBlockingDeque<Chunk>();
 
     public World(String title, String seed, Player p) {
         this.player = p;
@@ -95,21 +96,34 @@ public class World extends RenderObject {
                         for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
                             Chunk c = chunks[x][y][z];
                             c.generateVertexArray();
-                            chunkUpdateQueueDL.add(c);
+
+                            if (!chunkUpdateQueueDL.contains(c)) {
+                                chunkUpdateQueueDL.add(c);
+                            }
                         }
                     }
                 }
 
                 while (true) {
                     while (chunkUpdateQueue.size() > 0 && !disableChunkUpdates) {
-                        Chunk c = chunkUpdateQueue.remove();
+
+                        Chunk c = null;
+
+                        synchronized (chunkUpdateQueue) {
+                            c = chunkUpdateQueue.getLast();
+                        }
+
                         c.calcSunlight();
                         c.generateVertexArray();
 
-                        if (!chunkUpdateQueueDL.contains(c)) {
-                            chunkUpdateQueueDL.add(c);
+                        synchronized (chunkUpdateQueueDL) {
+                            if (!chunkUpdateQueueDL.contains(c)) {
+                                chunkUpdateQueueDL.add(c);
+                                chunkUpdateQueue.remove(c);
+                            }
                         }
                     }
+
 
                     if (Helper.getInstance().getTime() - daytime > 20000) {
 
@@ -124,7 +138,12 @@ public class World extends RenderObject {
                                 for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
                                     for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
                                         Chunk c = chunks[x][y][z];
-                                        chunkUpdateQueue.add(c);
+
+                                        synchronized (chunkUpdateQueue) {
+                                            if (!chunkUpdateQueue.contains(c)) {
+                                                chunkUpdateQueue.add(c);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -187,12 +206,23 @@ public class World extends RenderObject {
     @Override
     public void update(long delta) {
 
+        System.out.printf("1:%d 2:%d\n", chunkUpdateQueue.size(), chunkUpdateQueueDL.size());
+
         int chunkUpdates = 0;
 
         while (chunkUpdateQueueDL.size() > 0) {
             if (chunkUpdates < 4) {
-                Chunk c = chunkUpdateQueueDL.remove();
+                Chunk c = null;
+
+                synchronized (chunkUpdateQueueDL) {
+                    c = chunkUpdateQueueDL.getLast();
+                }
+
                 c.generateDisplayList();
+
+                synchronized (chunkUpdateQueueDL) {
+                    chunkUpdateQueueDL.remove(c);
+                }
                 chunkUpdates++;
             } else {
                 break;
@@ -335,8 +365,10 @@ public class World extends RenderObject {
             // Generate or update the corresponding chunk
             c.setBlock(blockPosX, blockPosY, blockPosZ, type);
 
-            if (!chunkUpdateQueue.contains(c)) {
-                chunkUpdateQueue.add(c);
+            synchronized (chunkUpdateQueue) {
+                if (!chunkUpdateQueue.contains(c)) {
+                    chunkUpdateQueue.add(c);
+                }
             }
         } catch (Exception e) {
             return;
