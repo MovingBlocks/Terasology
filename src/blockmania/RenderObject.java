@@ -18,20 +18,18 @@ package blockmania;
 
 import org.lwjgl.util.vector.Vector3f;
 
-
 /**
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class RenderObject {
 
-    protected Vector3f position = new Vector3f(0.0f,0.0f,0.0f);
+    protected Vector3f position = new Vector3f(0.0f, 0.0f, 0.0f);
 
     public void render() {
     }
 
     public void update(long delta) {
-        
     }
 
     public Vector3f getPosition() {
@@ -41,5 +39,4 @@ public abstract class RenderObject {
     public void setPosition(Vector3f position) {
         this.position = position;
     }
-
 }

@@ -37,14 +37,17 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Chunk extends RenderObject {
 
-    private static final float DIMMING_INTENS = 0.1f;
-    private static final float LUMINANCE_INTENS = 0.1f;
+    public static int maxChunkID = 0;
+    private static final float MAX_LIGHT = 0.7f;
+    private static final float MAX_LUMINANCE = 0.2f;
+    private static final float MIN_LIGHT = 0.1f;
+    private static final float DIMMING_INTENS = 0.075f;
+    private static final float LUMINANCE_INTENS = 0.25f;
     private static final float DIM_BLOCK_SIDES = 0.0f;
-    boolean dirty = false;
     // TODO
-    private List<Float> quads = new ArrayList<Float>();
-    private List<Float> tex = new ArrayList<Float>();
-    private List<Float> color = new ArrayList<Float>();
+    private List<Float> quads;
+    private List<Float> tex;
+    private List<Float> color;
     // TODO
     Random rand = new Random();
     // The actual block ids for the chunk
@@ -69,6 +72,7 @@ public class Chunk extends RenderObject {
      */
     public float getLight(int x, int y, int z) {
         float result;
+
         try {
             result = light[x][y][z];
         } catch (Exception e) {
@@ -84,9 +88,7 @@ public class Chunk extends RenderObject {
     public void setLight(int x, int y, int z, float intens) {
         try {
             light[x][y][z] = intens;
-            return;
         } catch (Exception e) {
-            return;
         }
     }
 
@@ -113,13 +115,13 @@ public class Chunk extends RenderObject {
     private void generate() {
 
         int xOffset = (int) position.x * (int) chunkDimensions.x;
+        int yOffset = (int) position.y * (int) chunkDimensions.y;
         int zOffset = (int) position.z * (int) chunkDimensions.z;
 
         for (int x = 0; x < Chunk.chunkDimensions.x; x++) {
             for (int z = 0; z < Chunk.chunkDimensions.z; z++) {
-                setBlock(new Vector3f(x, 0, z), 0x3, false);
+                setBlock(x, 0, z, 0x3);
             }
-
         }
 
         for (int x = 0; x < Chunk.chunkDimensions.x; x++) {
@@ -129,19 +131,16 @@ public class Chunk extends RenderObject {
                 float y = height;
 
                 while (y > 0) {
-                    if (getCaveDensityAt(x + xOffset, y, z + zOffset) < 0.45) {
-
+                    if (getCaveDensityAt(x + xOffset, y + yOffset, z + zOffset) < 0.45 && getHillCaves(x + xOffset, y + yOffset, z + zOffset) < 0.5) {
                         if (height == y) {
-                            setBlock(new Vector3f(x, y, z), 0x1, false);
+                            setBlock(x, (int) y, z, 0x1);
                         } else {
-                            setBlock(new Vector3f(x, y, z), 0x2, false);
+                            setBlock(x, (int) y, z, 0x2);
                         }
-                    } else if (getCaveDensityAt(x + xOffset, y, z + zOffset) < 0.46) {
-                        setBlock(new Vector3f(x, y, z), 0x3, false);
                     }
 
-                    if (getStoneDensity(x + xOffset, y, z + zOffset) > 0.46) {
-                        setBlock(new Vector3f(x, y, z), 0x3, false);
+                    if (getBlock(x, (int) y, z) != 0 && getStoneDensity(x + xOffset, y + yOffset, z + zOffset) > 0.3) {
+                        setBlock(x, (int) y, z, 0x3);
                     }
 
                     y--;
@@ -150,7 +149,7 @@ public class Chunk extends RenderObject {
                 // Generate water
                 for (int i = 32; i > 0; i--) {
                     if (getBlock(x, i, z) == 0) {
-                        setBlock(new Vector3f(x, i, z), 0x4, false);
+                        setBlock(x, i, z, 0x4);
                     }
                 }
             }
@@ -159,19 +158,7 @@ public class Chunk extends RenderObject {
 
     @Override
     public String toString() {
-        int counter = 0;
-
-        for (int x = 0; x < chunkDimensions.x; x++) {
-            for (int y = 0; y < chunkDimensions.y; y++) {
-                for (int z = 0; z < chunkDimensions.z; z++) {
-                    if (blocks[x][y][z] > 0) {
-                        counter++;
-                    }
-                }
-            }
-        }
-
-        return counter + " Blocks in this chunk.";
+        return String.format("Chunk (%d) cotaining %d Blocks.", chunkID, blockCount());
     }
 
     @Override
@@ -192,72 +179,82 @@ public class Chunk extends RenderObject {
     }
 
     public int getBlock(int x, int y, int z) {
-        return blocks[x][y][z];
+        try {
+            return blocks[x][y][z];
+        } catch (Exception e) {
+            return 0;
+        }
+
     }
 
-    public void setBlock(Vector3f pos, int type, boolean dirty) {
-        blocks[(int) pos.x][(int) pos.y][(int) pos.z] = type;
-        this.dirty = dirty;
+    public void setBlock(int x, int y, int z, int type) {
+        blocks[x][y][z] = type;
     }
 
-    public Vector3f getBlockWorldPos(Vector3f pos) {
-        Vector3f v = new Vector3f(pos.x + position.x * chunkDimensions.x, pos.y + position.y * chunkDimensions.y, pos.z + position.z * chunkDimensions.z);
-        return v;
+    public int getBlockWorldPosX(int x) {
+        return x + (int) position.x * (int) chunkDimensions.x;
+    }
+
+    public int getBlockWorldPosY(int y) {
+        return y + (int) position.y * (int) chunkDimensions.y;
+    }
+
+    public int getBlockWorldPosZ(int z) {
+        return z + (int) position.z * (int) chunkDimensions.z;
     }
 
     public void calcSunlight() {
 
+        light = new float[(int) chunkDimensions.x][(int) chunkDimensions.y][(int) chunkDimensions.z];
+
         for (int x = 0; x < (int) chunkDimensions.x; x++) {
             for (int z = 0; z < (int) chunkDimensions.z; z++) {
                 boolean covered = false;
-                for (int y = (int) chunkDimensions.y - 1; y >= 0; y--) {
+                for (int y = (int) chunkDimensions.y - 1; y > 0; y--) {
 
                     if (blocks[x][y][z] == 0 && !covered) {
                         float dimming = 0.0f;
-                        dimming += (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x + 1, y, z)))) > 0) ? DIMMING_INTENS : 0.0f;
-                        dimming += (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x - 1, y, z)))) > 0) ? DIMMING_INTENS : 0.0f;
-                        dimming += (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x, y, z + 1)))) > 0) ? DIMMING_INTENS : 0.0f;
-                        dimming += (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x, y, z - 1)))) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) > 0) ? DIMMING_INTENS : 0.0f;
 
-                        dimming += (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x + 1, y, z + 1)))) > 0) ? DIMMING_INTENS : 0.0f;
-                        dimming += (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x - 1, y, z - 1)))) > 0) ? DIMMING_INTENS : 0.0f;
-                        dimming += (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x + 1, y, z - 1)))) > 0) ? DIMMING_INTENS : 0.0f;
-                        dimming += (parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x - 1, y, z + 1)))) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) > 0) ? DIMMING_INTENS : 0.0f;
 
+                        setLight(x, y, z, Math.max(MAX_LIGHT - dimming, MIN_LIGHT));
 
-                        setLight(x, y, z, 1.0f - dimming);
                     } else if (blocks[x][y][z] == 0 && covered) {
 
-                        float luminance = getLight(x - 1, y, z) * LUMINANCE_INTENS;
-                        luminance += getLight(x + 1, y, z) * LUMINANCE_INTENS;
-                        luminance += getLight(x, y, z + 1) * LUMINANCE_INTENS;
-                        luminance += getLight(x, y, z - 1) * LUMINANCE_INTENS;
+                        float luminance = parent.getLight(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * LUMINANCE_INTENS;
+                        luminance += parent.getLight(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * LUMINANCE_INTENS;
+                        luminance += parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) * LUMINANCE_INTENS;
+                        luminance += parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) * LUMINANCE_INTENS;
 
-                        luminance += getLight(x + 1, y, z + 1) * LUMINANCE_INTENS;
-                        luminance += getLight(x - 1, y, z - 1) * LUMINANCE_INTENS;
-                        luminance += getLight(x + 1, y, z + 1) * LUMINANCE_INTENS;
-                        luminance += getLight(x + 1, y, z - 1) * LUMINANCE_INTENS;
+                        luminance += parent.getLight(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) * LUMINANCE_INTENS;
+                        luminance += parent.getLight(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) * LUMINANCE_INTENS;
+                        luminance += parent.getLight(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) * LUMINANCE_INTENS;
+                        luminance += parent.getLight(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) * LUMINANCE_INTENS;
 
-
-                        setLight(x, y, z, 0.1f + (float) Math.min(luminance, 1.0f));
+                        setLight(x, y, z, (float) Math.min(luminance, MAX_LUMINANCE));
                     } else {
                         covered = true;
                     }
                 }
             }
         }
-
-
     }
 
     private boolean checkBlockTypeToDraw(int blockToCheck, int currentBlock) {
-        return (blockToCheck == 0 || (BlockHelper.isBlockTypeTranslucent(blockToCheck) && !BlockHelper.isBlockTypeTranslucent(currentBlock)));
+        return (blockToCheck == 0 || (Helper.getInstance().isBlockTypeTranslucent(blockToCheck) && !Helper.getInstance().isBlockTypeTranslucent(currentBlock)));
     }
 
     public void generateVertexArray() {
-        color.clear();
-        quads.clear();
-        tex.clear();
+        color = new ArrayList<Float>();
+        quads = new ArrayList<Float>();
+        tex = new ArrayList<Float>();
 
         Vector3f offset = new Vector3f(position.x * chunkDimensions.x, position.y * chunkDimensions.y, position.z * chunkDimensions.z);
 
@@ -272,16 +269,16 @@ public class Chunk extends RenderObject {
                         boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
                         int blockToCheck = 0;
 
-                        blockToCheck = parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x, y + 1, z))));
+                        blockToCheck = parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z));
                         drawTop = checkBlockTypeToDraw(blockToCheck, block);
 
                         if (drawTop) {
-                            Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.TOP);
-                            float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x, y + 1, z))));
+                            Vector3f colorOffset = Helper.getInstance().getColorOffsetFor(block, Helper.SIDE.TOP);
+                            float shadowIntens = parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z));
 
 
-                            float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.TOP).x;
-                            float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.TOP).y;
+                            float texOffsetX = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.TOP).x;
+                            float texOffsetY = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.TOP).y;
 
                             color.add(colorOffset.x * shadowIntens * parent.getDaylight());
                             color.add(colorOffset.y * shadowIntens * parent.getDaylight());
@@ -320,16 +317,16 @@ public class Chunk extends RenderObject {
                             quads.add(-0.5f + z + offset.z);
                         }
 
-                        blockToCheck = parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x, y, z - 1))));
+                        blockToCheck = parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1));
                         drawFront = checkBlockTypeToDraw(blockToCheck, block);
 
                         if (drawFront) {
-                            Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.FRONT);
-                            float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x, y, z - 1))));
+                            Vector3f colorOffset = Helper.getInstance().getColorOffsetFor(block, Helper.SIDE.FRONT);
+                            float shadowIntens = parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1));
 
 
-                            float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.FRONT).x;
-                            float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.FRONT).y;
+                            float texOffsetX = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.FRONT).x;
+                            float texOffsetY = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.FRONT).y;
 
                             color.add(colorOffset.x * shadowIntens * parent.getDaylight() - DIM_BLOCK_SIDES);
                             color.add(colorOffset.y * shadowIntens * parent.getDaylight() - DIM_BLOCK_SIDES);
@@ -368,16 +365,16 @@ public class Chunk extends RenderObject {
                             quads.add(-0.5f + z + offset.z);
                         }
 
-                        blockToCheck = parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x, y, z + 1))));
+                        blockToCheck = parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1));
                         drawBack = checkBlockTypeToDraw(blockToCheck, block);
 
                         if (drawBack) {
-                            Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.BACK);
-                            float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x, y, z + 1))));
+                            Vector3f colorOffset = Helper.getInstance().getColorOffsetFor(block, Helper.SIDE.BACK);
+                            float shadowIntens = parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1));
 
 
-                            float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BACK).x;
-                            float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BACK).y;
+                            float texOffsetX = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.BACK).x;
+                            float texOffsetY = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.BACK).y;
 
                             color.add(colorOffset.x * shadowIntens * parent.getDaylight() - DIM_BLOCK_SIDES);
                             color.add(colorOffset.y * shadowIntens * parent.getDaylight() - DIM_BLOCK_SIDES);
@@ -418,16 +415,15 @@ public class Chunk extends RenderObject {
                             quads.add(0.5f + z + offset.z);
                         }
 
-
-                        blockToCheck = parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x - 1, y, z))));
+                        blockToCheck = parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z));
                         drawLeft = checkBlockTypeToDraw(blockToCheck, block);
 
                         if (drawLeft) {
-                            Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.LEFT);
-                            float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x - 1, y, z))));
+                            Vector3f colorOffset = Helper.getInstance().getColorOffsetFor(block, Helper.SIDE.LEFT);
+                            float shadowIntens = parent.getLight(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z));
 
-                            float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.LEFT).x;
-                            float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.LEFT).y;
+                            float texOffsetX = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.LEFT).x;
+                            float texOffsetY = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.LEFT).y;
 
                             color.add(colorOffset.x * shadowIntens * parent.getDaylight() - DIM_BLOCK_SIDES);
                             color.add(colorOffset.y * shadowIntens * parent.getDaylight() - DIM_BLOCK_SIDES);
@@ -468,15 +464,15 @@ public class Chunk extends RenderObject {
                             quads.add(-0.5f + z + offset.z);
                         }
 
-                        blockToCheck = parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x + 1, y, z))));
+                        blockToCheck = parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z));
                         drawRight = checkBlockTypeToDraw(blockToCheck, block);
 
                         if (drawRight) {
-                            Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.RIGHT);
-                            float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x + 1, y, z))));
+                            Vector3f colorOffset = Helper.getInstance().getColorOffsetFor(block, Helper.SIDE.RIGHT);
+                            float shadowIntens = parent.getLight(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z));
 
-                            float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.RIGHT).x;
-                            float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.RIGHT).y;
+                            float texOffsetX = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.RIGHT).x;
+                            float texOffsetY = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.RIGHT).y;
 
                             color.add(colorOffset.x * shadowIntens * parent.getDaylight() - DIM_BLOCK_SIDES);
                             color.add(colorOffset.y * shadowIntens * parent.getDaylight() - DIM_BLOCK_SIDES);
@@ -515,16 +511,16 @@ public class Chunk extends RenderObject {
                             quads.add(-0.5f + z + offset.z);
                         }
 
-                        blockToCheck = parent.getBlock(new Vector3f(getBlockWorldPos(new Vector3f(x, y - 1, z))));
+                        blockToCheck = parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z));
                         drawBottom = checkBlockTypeToDraw(blockToCheck, block);
 
                         if (drawBottom) {
-                            Vector3f colorOffset = BlockHelper.getColorOffsetFor(block, BlockHelper.SIDE.BOTTOM);
-                            float shadowIntens = parent.getLight(new Vector3f(getBlockWorldPos(new Vector3f(x, y - 1, z))));
+                            Vector3f colorOffset = Helper.getInstance().getColorOffsetFor(block, Helper.SIDE.BOTTOM);
+                            float shadowIntens = parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z));
 
 
-                            float texOffsetX = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BOTTOM).x;
-                            float texOffsetY = BlockHelper.getTextureOffsetFor(block, BlockHelper.SIDE.BOTTOM).y;
+                            float texOffsetX = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.BOTTOM).x;
+                            float texOffsetY = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.BOTTOM).y;
 
                             color.add(colorOffset.x * shadowIntens * parent.getDaylight());
                             color.add(colorOffset.y * shadowIntens * parent.getDaylight());
@@ -568,14 +564,13 @@ public class Chunk extends RenderObject {
                 }
             }
         }
-
-        dirty = false;
     }
 
     public void generateDisplayList() {
 
         if (chunkID == -1) {
-            chunkID = rand.nextInt();
+            chunkID = maxChunkID + 1;
+            maxChunkID++;
             displayList = glGenLists(1);
         }
 
@@ -583,12 +578,13 @@ public class Chunk extends RenderObject {
         int tSize = tex.size();
         int cSize = color.size();
 
-
         FloatBuffer vb = BufferUtils.createFloatBuffer(qSize);
 
         for (Float f : quads) {
             vb.put(f);
         }
+
+        quads = null;
 
         FloatBuffer tb = BufferUtils.createFloatBuffer(tSize);
 
@@ -596,11 +592,15 @@ public class Chunk extends RenderObject {
             tb.put(f);
         }
 
+        tex = null;
+
         FloatBuffer cb = BufferUtils.createFloatBuffer(cSize);
 
         for (Float f : color) {
             cb.put(f);
         }
+
+        color = null;
 
         vb.flip();
         tb.flip();
@@ -625,7 +625,7 @@ public class Chunk extends RenderObject {
         for (int x = 0; x < chunkDimensions.x; x++) {
             for (int y = 0; y < chunkDimensions.y; y++) {
                 for (int z = 0; z < chunkDimensions.z; z++) {
-                    setBlock(new Vector3f(x, y, z), 0x0, true);
+                    setBlock(x, y, z, 0x0);
                 }
             }
         }
@@ -663,7 +663,7 @@ public class Chunk extends RenderObject {
      */
     private float getCaveDensityAt(float x, float y, float z) {
         float result = 0.0f;
-        result += pGen2.noise(0.01f * x, 0.01f * y, 0.01f * z);
+        result += pGen1.noise(0.01f * x, 0.01f * y, 0.01f * z);
         return result;
     }
 
@@ -672,7 +672,33 @@ public class Chunk extends RenderObject {
      */
     private float getStoneDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += pGen2.noise(0.1f * x, 0.1f * y, 0.1f * z);
+        result += pGen2.noise(0.08f * x, 0.8f * y, 0.08f * z);
         return result;
+    }
+
+    /**
+     * TODO
+     */
+    private float getHillCaves(float x, float y, float z) {
+        float result = 0.0f;
+        result += pGen2.noise(0.03f * x, 0.03f * y, 0.03f * z);
+
+
+        return result;
+    }
+
+    public int blockCount() {
+        int counter = 0;
+
+        for (int x = 0; x < (int) chunkDimensions.x; x++) {
+            for (int z = 0; z < (int) chunkDimensions.z; z++) {
+                for (int y = 0; y < (int) chunkDimensions.y; y++) {
+                    if (blocks[x][y][z] > 0) {
+                        counter++;
+                    }
+                }
+            }
+        }
+        return counter;
     }
 }
