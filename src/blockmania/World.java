@@ -18,9 +18,7 @@ package blockmania;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import java.util.Queue;
 import java.util.Random;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,12 +41,13 @@ public class World extends RenderObject {
     private Random rand;
     // Used for updating/generating the world
     private Thread updateThread;
+    private Thread worldThread;
     // The chunks to display
     private Chunk[][][] chunks;
     // Update queue for generating the light and vertex arrays
-    private final LinkedBlockingDeque<Chunk> chunkUpdateQueue = new LinkedBlockingDeque<Chunk>();
+    private final LinkedBlockingQueue<Chunk> chunkUpdateQueue = new LinkedBlockingQueue<Chunk>();
     // Update queue for generating the display lists
-    private final LinkedBlockingDeque<Chunk> chunkUpdateQueueDL = new LinkedBlockingDeque<Chunk>();
+    private final LinkedBlockingQueue<Chunk> chunkUpdateQueueDL = new LinkedBlockingQueue<Chunk>();
 
     public World(String title, String seed, Player p) {
         this.player = p;
@@ -110,7 +109,7 @@ public class World extends RenderObject {
                         Chunk c = null;
 
                         synchronized (chunkUpdateQueue) {
-                            c = chunkUpdateQueue.getLast();
+                            c = chunkUpdateQueue.element();
                         }
 
                         c.calcSunlight();
@@ -124,32 +123,26 @@ public class World extends RenderObject {
                         }
                     }
 
-
-                    if (Helper.getInstance().getTime() - daytime > 20000) {
-
+                    if (Helper.getInstance().getTime() - daytime > 120000) {
                         if (chunkUpdateQueue.size() == 0) {
                             daylight -= 0.1f;
-
                             if (daylight < 0.3f) {
                                 daylight = 0.8f;
                             }
-
-                            for (int x = 0; x < Configuration.viewingDistanceInChunks.x; x++) {
-                                for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
-                                    for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
-                                        Chunk c = chunks[x][y][z];
-
-                                        synchronized (chunkUpdateQueue) {
-                                            if (!chunkUpdateQueue.contains(c)) {
-                                                chunkUpdateQueue.add(c);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
+                            updateAllChunks();
+                            daytime = Helper.getInstance().getTime();
                         }
                     }
+                }
+            }
+        });
+
+        worldThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (true) {
+                    updateInfWorld();
                 }
             }
         });
@@ -157,6 +150,7 @@ public class World extends RenderObject {
 
     public void init() {
         updateThread.start();
+        worldThread.start();
 
         /**
          * Generates the display list used for displaying the sun.
@@ -179,7 +173,7 @@ public class World extends RenderObject {
          */
         glPushMatrix();
         glDisable(GL_FOG);
-        glTranslatef(Configuration.viewingDistanceInChunks.x * Chunk.chunkDimensions.x * 1.5f, Configuration.viewingDistanceInChunks.y * Chunk.chunkDimensions.y, Configuration.viewingDistanceInChunks.z * Chunk.chunkDimensions.z * 1.5f);
+        glTranslatef(Configuration.viewingDistanceInChunks.x * Chunk.chunkDimensions.x * 1.5f + player.getPosition().x, Configuration.viewingDistanceInChunks.y * Chunk.chunkDimensions.y + player.getPosition().y, Configuration.viewingDistanceInChunks.z * Chunk.chunkDimensions.z * 1.5f + player.getPosition().z);
         glCallList(displayListSun);
         glEnable(GL_FOG);
         glPopMatrix();
@@ -205,9 +199,6 @@ public class World extends RenderObject {
      */
     @Override
     public void update(long delta) {
-
-        System.out.printf("1:%d 2:%d\n", chunkUpdateQueue.size(), chunkUpdateQueueDL.size());
-
         int chunkUpdates = 0;
 
         while (chunkUpdateQueueDL.size() > 0) {
@@ -215,7 +206,7 @@ public class World extends RenderObject {
                 Chunk c = null;
 
                 synchronized (chunkUpdateQueueDL) {
-                    c = chunkUpdateQueueDL.getLast();
+                    c = chunkUpdateQueueDL.element();
                 }
 
                 c.generateDisplayList();
@@ -296,26 +287,29 @@ public class World extends RenderObject {
     }
 
     private int calcChunkPosX(int x) {
-        return (x / (int) Chunk.chunkDimensions.x);
+        return (x / (int) Chunk.chunkDimensions.x) % (int) Configuration.viewingDistanceInChunks.x;
     }
 
     private int calcChunkPosY(int y) {
-        return (y / (int) Chunk.chunkDimensions.y);
+        return (y / (int) Chunk.chunkDimensions.y) % (int) Configuration.viewingDistanceInChunks.y;
     }
 
     private int calcChunkPosZ(int z) {
-        return (z / (int) Chunk.chunkDimensions.z);
+        return (z / (int) Chunk.chunkDimensions.z) % (int) Configuration.viewingDistanceInChunks.z;
     }
 
     private int calcBlockPosX(int x1, int x2) {
+        x1 = x1 % ((int) Configuration.viewingDistanceInChunks.x * (int) Chunk.chunkDimensions.x);
         return (x1 - (x2 * (int) Chunk.chunkDimensions.x));
     }
 
     private int calcBlockPosY(int y1, int y2) {
+        y1 = y1 % ((int) Configuration.viewingDistanceInChunks.y * (int) Chunk.chunkDimensions.y);
         return (y1 - (y2 * (int) Chunk.chunkDimensions.y));
     }
 
     private int calcBlockPosZ(int z1, int z2) {
+        z1 = z1 % ((int) Configuration.viewingDistanceInChunks.z * (int) Chunk.chunkDimensions.z);
         return (z1 - (z2 * (int) Chunk.chunkDimensions.z));
     }
 
@@ -412,6 +406,81 @@ public class World extends RenderObject {
             return c.getLight(blockPosX, blockPosY, blockPosZ);
         } catch (Exception e) {
             return 0.0f;
+        }
+    }
+
+    private int calcPlayerChunkOffsetX() {
+        return (int) ((player.getPosition().x - Helper.getInstance().calcPlayerOrigin().x) / Chunk.chunkDimensions.x);
+    }
+
+    private int calcPlayerChunkOffsetY() {
+        return (int) ((player.getPosition().y - Helper.getInstance().calcPlayerOrigin().y) / Chunk.chunkDimensions.y);
+    }
+
+    private int calcPlayerChunkOffsetZ() {
+        return (int) ((player.getPosition().z - Helper.getInstance().calcPlayerOrigin().z) / Chunk.chunkDimensions.z);
+    }
+
+    private void debugOutput() {
+//        System.out.printf("1:%d 2:%d\n", chunkUpdateQueue.size(), chunkUpdateQueueDL.size());
+//        System.out.println(String.format("OffsetX: %d, MultX: %d", calcPlayerChunkOffsetX(), calcPlayerChunkMultX()));
+    }
+
+    private void updateInfWorld() {
+
+        for (int x = 0; x < Configuration.viewingDistanceInChunks.x; x++) {
+            for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
+                for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
+                    Chunk c = chunks[x][y][z];
+
+                    if (c != null) {
+                        Vector3f pos = new Vector3f(x, y, z);
+
+                        int multZ = (int) calcPlayerChunkOffsetZ() / (int) Configuration.viewingDistanceInChunks.z + 1;
+
+                        if (z < calcPlayerChunkOffsetZ() % Configuration.viewingDistanceInChunks.z) {
+                            pos.z += Configuration.viewingDistanceInChunks.z * multZ;
+                        } else {
+                            pos.z += Configuration.viewingDistanceInChunks.z * (multZ - 1);
+                        }
+
+                        int multX = (int) calcPlayerChunkOffsetX() / (int) Configuration.viewingDistanceInChunks.x + 1;
+
+                        if (x < calcPlayerChunkOffsetX() % Configuration.viewingDistanceInChunks.x) {
+                            pos.x += Configuration.viewingDistanceInChunks.x * multX;
+                        } else {
+                            pos.x += Configuration.viewingDistanceInChunks.x * (multX - 1);
+                        }
+
+                        if (c.getPosition().x != pos.x || c.getPosition().z != pos.z) {
+                            c.setPosition(pos);
+                            c.generate();
+                            synchronized (chunkUpdateQueue) {
+                                if (!chunkUpdateQueue.contains(c)) {
+                                    chunkUpdateQueue.add(c);
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    public void updateAllChunks() {
+        for (int x = 0; x < Configuration.viewingDistanceInChunks.x; x++) {
+            for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
+                for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
+                    Chunk c = chunks[x][y][z];
+
+                    synchronized (chunkUpdateQueue) {
+                        if (!chunkUpdateQueue.contains(c)) {
+                            chunkUpdateQueue.add(c);
+                        }
+                    }
+                }
+            }
         }
     }
 }

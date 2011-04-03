@@ -26,21 +26,21 @@ import static org.lwjgl.opengl.GL11.*;
  * The player class encapsulates all functionality regarding the player.
  * E.g. moving, gravity, placing blocks and so on.
  * 
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Benjamin Glatzel <benjamin.glawwtzel@me.com>
  */
 public class Player extends RenderObject {
 
-    private boolean repeatedInteraction;
     // How high the player can jump
     private static int JUMP_INTENSITY = 10;
     // Max. gravity
-    private static int MAX_GRAVITY = 40;
+    private static int MAX_GRAVITY = 32;
     // Max. speed of the playering while walking
     private static int WALKING_SPEED = 4;
     // Max. speed of the playering while walking
-    private static int RUNNING_SPEED = 8;
+    private static int RUNNING_SPEED = 32;
     // Height of the player in "blocks"
     private int PLAYER_HEIGHT = 1;
+    private int wSpeed = WALKING_SPEED;
     // Viewing direction of the player
     private double yaw = 135d;
     private double pitch;
@@ -102,32 +102,32 @@ public class Player extends RenderObject {
      * Moves the player forward.
      */
     public void walkForward() {
-        accX += (double) WALKING_SPEED * Math.sin(Math.toRadians(yaw));
-        accZ -= WALKING_SPEED * Math.cos(Math.toRadians(yaw));
+        accX += (double) wSpeed * Math.sin(Math.toRadians(yaw));
+        accZ -= wSpeed * Math.cos(Math.toRadians(yaw));
     }
 
     /*
      * Moves the player backward.
      */
     public void walkBackwards() {
-        accX -= (double) WALKING_SPEED * Math.sin(Math.toRadians(yaw));
-        accZ += (double) WALKING_SPEED * Math.cos(Math.toRadians(yaw));
+        accX -= (double) wSpeed * Math.sin(Math.toRadians(yaw));
+        accZ += (double) wSpeed * Math.cos(Math.toRadians(yaw));
     }
 
     /*
      * Lets the player strafe left.
      */
     public void strafeLeft() {
-        accX += (double) WALKING_SPEED * Math.sin(Math.toRadians(yaw - 90));
-        accZ -= (double) WALKING_SPEED * Math.cos(Math.toRadians(yaw - 90));
+        accX += (double) wSpeed * Math.sin(Math.toRadians(yaw - 90));
+        accZ -= (double) wSpeed * Math.cos(Math.toRadians(yaw - 90));
     }
 
     /*
      * Lets the player strafe right.
      */
     public void strafeRight() {
-        accX += (double) WALKING_SPEED * Math.sin(Math.toRadians(yaw + 90));
-        accZ -= (double) WALKING_SPEED * Math.cos(Math.toRadians(yaw + 90));
+        accX += (double) wSpeed * Math.sin(Math.toRadians(yaw + 90));
+        accZ -= (double) wSpeed * Math.cos(Math.toRadians(yaw + 90));
     }
 
     private boolean isPlayerStandingOnGround() {
@@ -198,23 +198,18 @@ public class Player extends RenderObject {
     }
 
     private void processPlayerInteraction() {
-        if (Keyboard.isKeyDown(Keyboard.KEY_E) && !repeatedInteraction) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
             placeBlock();
-            repeatedInteraction = true;
-        } else if (Keyboard.isKeyDown(Keyboard.KEY_Q) && !repeatedInteraction) {
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
             removeBlock();
-            repeatedInteraction = true;
-        } else if (Keyboard.isKeyDown(Keyboard.KEY_R) && !repeatedInteraction) {
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
             resetPlayer();
-            repeatedInteraction = true;
-        } else if (Keyboard.isKeyDown(Keyboard.KEY_T) && !repeatedInteraction) {
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_T)) {
             parent.generateForest();
-            repeatedInteraction = true;
-        } else if (Keyboard.isKeyDown(Keyboard.KEY_Z) && !repeatedInteraction) {
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_Z)) {
             parent.generateTree((int) calcViewBlockPosition().x, (int) calcViewBlockPosition().y, (int) calcViewBlockPosition().z);
-            repeatedInteraction = true;
-        } else {
-            repeatedInteraction = false;
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_U)) {
+            parent.updateAllChunks();
         }
     }
 
@@ -235,6 +230,11 @@ public class Player extends RenderObject {
             }
             if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
                 jump();
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+                wSpeed = RUNNING_SPEED;
+            } else {
+                wSpeed = WALKING_SPEED;
             }
 
             boolean hitting = parent.isHitting((int) (getPosition().x + 0.5f), (int) (getPosition().y - PLAYER_HEIGHT), (int) (getPosition().z + 0.5f));
