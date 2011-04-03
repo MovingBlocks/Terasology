@@ -11,4 +11,4 @@ If you'd like to test/use/refactor Blockmania, you'll have to use a "terrain.png
 Screenshots
 -----------
 
-![Blockmania](https://github.com/begla/Blockmania/raw/master/screenshots/screen6.jpg)
+![Blockmania](https://github.com/begla/Blockmania/raw/master/screenshots/screen6.png)
