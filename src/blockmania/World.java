@@ -22,6 +22,7 @@ import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import noise.PerlinNoise;
 
 import org.lwjgl.util.glu.*;
 import org.lwjgl.util.vector.Vector3f;
@@ -48,10 +49,16 @@ public class World extends RenderObject {
     private final LinkedBlockingQueue<Chunk> chunkUpdateQueue = new LinkedBlockingQueue<Chunk>();
     // Update queue for generating the display lists
     private final LinkedBlockingQueue<Chunk> chunkUpdateQueueDL = new LinkedBlockingQueue<Chunk>();
+    private PerlinNoise pGen1;
+    private PerlinNoise pGen2;
+    private PerlinNoise pGen3;
 
     public World(String title, String seed, Player p) {
         this.player = p;
         rand = new Random(seed.hashCode());
+        pGen1 = new PerlinNoise(rand.nextInt());
+        pGen2 = new PerlinNoise(rand.nextInt());
+        pGen3 = new PerlinNoise(rand.nextInt());
         final World currentWorld = this;
 
         chunks = new Chunk[(int) Configuration.viewingDistanceInChunks.x][(int) Configuration.viewingDistanceInChunks.y][(int) Configuration.viewingDistanceInChunks.z];
@@ -123,7 +130,7 @@ public class World extends RenderObject {
                         }
                     }
 
-                    if (Helper.getInstance().getTime() - daytime > 120000) {
+                    if (Helper.getInstance().getTime() - daytime > 30000) {
                         if (chunkUpdateQueue.size() == 0) {
                             daylight -= 0.1f;
                             if (daylight < 0.3f) {
@@ -482,5 +489,26 @@ public class World extends RenderObject {
                 }
             }
         }
+    }
+
+    /**
+     * @return the pGen1
+     */
+    public PerlinNoise getpGen1() {
+        return pGen1;
+    }
+
+    /**
+     * @return the pGen2
+     */
+    public PerlinNoise getpGen2() {
+        return pGen2;
+    }
+
+    /**
+     * @return the pGen3
+     */
+    public PerlinNoise getpGen3() {
+        return pGen3;
     }
 }
