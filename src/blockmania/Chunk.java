@@ -26,7 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.opengl.Texture;
 import java.io.FileInputStream;
-import noise.PerlinNoise;
 import org.lwjgl.BufferUtils;
 import org.newdawn.slick.opengl.TextureLoader;
 import static org.lwjgl.opengl.GL11.*;
@@ -63,9 +62,6 @@ public class Chunk extends RenderObject {
     public static final Vector3f chunkDimensions = new Vector3f(16, 128, 16);
     // The parent world
     static World parent = null;
-    // Perlin noise generator
-    static PerlinNoise pGen1 = new PerlinNoise("WALTER");
-    static PerlinNoise pGen2 = new PerlinNoise("OTTO");
 
     /**
      * @return the light
@@ -240,7 +236,7 @@ public class Chunk extends RenderObject {
                         luminance += parent.getLight(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) * LUMINANCE_INTENS;
                         luminance += parent.getLight(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) * LUMINANCE_INTENS;
 
-                        setLight(x, y, z, (float) Math.min(luminance, MAX_LUMINANCE) + MIN_LIGHT);
+                        setLight(x, y, z, (float) Math.min(luminance, MAX_LUMINANCE));
                     } else {
                         covered = true;
                     }
@@ -639,7 +635,7 @@ public class Chunk extends RenderObject {
      */
     private float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += pGen1.noise(0.001f * x + 0.5f, 0.001f + 0.5f, 0.001f * z + 0.5f) * 128.0f;
+        result += parent.getpGen1().noise(0.0001f * x, 0.0001f, 0.0001f * z) * 64.0f;
         return result;
     }
 
@@ -648,7 +644,7 @@ public class Chunk extends RenderObject {
      */
     private float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += pGen1.noise(0.009f * x + 0.5f, 0.009f + 0.5f, 0.009f * z + 0.5f);
+        result += parent.getpGen1().noise(0.009f * x, 0.009f, 0.009f * z);
         return result;
     }
 
@@ -657,7 +653,7 @@ public class Chunk extends RenderObject {
      */
     private float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += pGen1.noise(0.05f * x + 0.5f, 0.05f + 0.5f, 0.05f * z + 0.5f);
+        result += parent.getpGen1().noise(0.05f * x, 0.05f, 0.05f * z);
         return result;
     }
 
@@ -666,7 +662,7 @@ public class Chunk extends RenderObject {
      */
     private float getCaveDensityAt(float x, float y, float z) {
         float result = 0.0f;
-        result += pGen1.noise(0.01f * x + 0.5f, 0.01f * y + 0.5f, 0.01f * z + 0.5f);
+        result += parent.getpGen2().noise(0.01f * x, 0.01f * y, 0.01f * z);
         return result;
     }
 
@@ -675,7 +671,7 @@ public class Chunk extends RenderObject {
      */
     private float getStoneDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += pGen2.noise(0.08f * x + 0.5f, 0.8f * y + 0.5f, 0.08f * z + 0.5f);
+        result += parent.getpGen2().noise(0.08f * x, 0.8f * y, 0.08f * z);
         return result;
     }
 
@@ -684,9 +680,7 @@ public class Chunk extends RenderObject {
      */
     private float getHillCaves(float x, float y, float z) {
         float result = 0.0f;
-        result += pGen2.noise(0.03f * x + 0.5f, 0.03f * y + 0.5f, 0.03f * z + 0.5f);
-
-
+        result += parent.getpGen3().noise(0.03f * x, 0.03f * y, 0.03f * z);
         return result;
     }
 
