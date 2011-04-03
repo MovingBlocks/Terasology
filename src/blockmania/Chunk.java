@@ -124,12 +124,12 @@ public class Chunk extends RenderObject {
 
         for (int x = 0; x < Chunk.chunkDimensions.x; x++) {
             for (int z = 0; z < Chunk.chunkDimensions.z; z++) {
-                float height = calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64 + 64;
+                float height = (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64) + 64f;
 
                 float y = height;
 
                 while (y > 0) {
-                    if (getCaveDensityAt(x + xOffset, y + yOffset, z + zOffset) < 0.45 && getHillCaves(x + xOffset, y + yOffset, z + zOffset) < 0.5) {
+                    if (getCaveDensityAt(x + xOffset, y + yOffset, z + zOffset) < 0.45 && getCanyonDensityAt(x + xOffset, y + yOffset, z + zOffset) < 0.2) {
                         if (height == y) {
                             setBlock(x, (int) y, z, 0x1);
                         } else {
@@ -137,15 +137,11 @@ public class Chunk extends RenderObject {
                         }
                     }
 
-                    if (getBlock(x, (int) y, z) != 0 && getStoneDensity(x + xOffset, y + yOffset, z + zOffset) > 0.3) {
-                        setBlock(x, (int) y, z, 0x3);
-                    }
-
                     y--;
                 }
 
                 // Generate water
-                for (int i = 32; i > 0; i--) {
+                for (int i = 64; i > 0; i--) {
                     if (getBlock(x, i, z) == 0) {
                         setBlock(x, i, z, 0x4);
                     }
@@ -635,7 +631,7 @@ public class Chunk extends RenderObject {
      */
     private float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += parent.getpGen1().noise(0.0001f * x, 0.0001f, 0.0001f * z) * 64.0f;
+        result += parent.getpGen1().noise(0.002f * x, 0.002f, 0.002f * z) * 64;
         return result;
     }
 
@@ -644,8 +640,8 @@ public class Chunk extends RenderObject {
      */
     private float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += parent.getpGen1().noise(0.009f * x, 0.009f, 0.009f * z);
-        return result;
+        result += parent.getpGen1().noise(0.01f * x, 0.01f, 0.01f * z);
+        return Math.abs(result);
     }
 
     /**
@@ -653,8 +649,8 @@ public class Chunk extends RenderObject {
      */
     private float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += parent.getpGen1().noise(0.05f * x, 0.05f, 0.05f * z);
-        return result;
+        result += parent.getpGen1().noise(0.04f * x, 0.04f, 0.04f * z);
+        return Math.abs(result);
     }
 
     /**
@@ -666,21 +662,12 @@ public class Chunk extends RenderObject {
         return result;
     }
 
-    /**
-     * TODO
+        /**
+     * Returns the cave density for the base terrain.
      */
-    private float getStoneDensity(float x, float y, float z) {
+    private float getCanyonDensityAt(float x, float y, float z) {
         float result = 0.0f;
-        result += parent.getpGen2().noise(0.08f * x, 0.8f * y, 0.08f * z);
-        return result;
-    }
-
-    /**
-     * TODO
-     */
-    private float getHillCaves(float x, float y, float z) {
-        float result = 0.0f;
-        result += parent.getpGen3().noise(0.03f * x, 0.03f * y, 0.03f * z);
+        result += parent.getpGen3().noise(0.006f * x, 0.006f * y, 0.006f * z);
         return result;
     }
 
