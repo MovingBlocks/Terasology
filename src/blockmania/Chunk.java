@@ -112,7 +112,9 @@ public class Chunk extends RenderObject {
         }
     }
 
-    private void generate() {
+    public void generate() {
+
+        clear();
 
         int xOffset = (int) position.x * (int) chunkDimensions.x;
         int yOffset = (int) position.y * (int) chunkDimensions.y;
@@ -238,7 +240,7 @@ public class Chunk extends RenderObject {
                         luminance += parent.getLight(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) * LUMINANCE_INTENS;
                         luminance += parent.getLight(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) * LUMINANCE_INTENS;
 
-                        setLight(x, y, z, (float) Math.min(luminance, MAX_LUMINANCE));
+                        setLight(x, y, z, (float) Math.min(luminance, MAX_LUMINANCE) + MIN_LIGHT);
                     } else {
                         covered = true;
                     }
@@ -637,8 +639,8 @@ public class Chunk extends RenderObject {
      */
     private float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += pGen1.noise(0.002f * x, 0.002f, 0.002f * z) * 90.0f;
-        return Math.abs(result);
+        result += pGen1.noise(0.001f * x + 0.5f, 0.001f + 0.5f, 0.001f * z + 0.5f) * 128.0f;
+        return result;
     }
 
     /**
@@ -646,8 +648,8 @@ public class Chunk extends RenderObject {
      */
     private float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += pGen1.noise(0.009f * x, 0.009f, 0.009f * z);
-        return Math.abs(result);
+        result += pGen1.noise(0.009f * x + 0.5f, 0.009f + 0.5f, 0.009f * z + 0.5f);
+        return result;
     }
 
     /**
@@ -655,8 +657,8 @@ public class Chunk extends RenderObject {
      */
     private float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += pGen1.noise(0.05f * x, 0.05f, 0.05f * z);
-        return Math.abs(result);
+        result += pGen1.noise(0.05f * x + 0.5f, 0.05f + 0.5f, 0.05f * z + 0.5f);
+        return result;
     }
 
     /**
@@ -664,7 +666,7 @@ public class Chunk extends RenderObject {
      */
     private float getCaveDensityAt(float x, float y, float z) {
         float result = 0.0f;
-        result += pGen1.noise(0.01f * x, 0.01f * y, 0.01f * z);
+        result += pGen1.noise(0.01f * x + 0.5f, 0.01f * y + 0.5f, 0.01f * z + 0.5f);
         return result;
     }
 
@@ -673,7 +675,7 @@ public class Chunk extends RenderObject {
      */
     private float getStoneDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += pGen2.noise(0.08f * x, 0.8f * y, 0.08f * z);
+        result += pGen2.noise(0.08f * x + 0.5f, 0.8f * y + 0.5f, 0.08f * z + 0.5f);
         return result;
     }
 
@@ -682,7 +684,7 @@ public class Chunk extends RenderObject {
      */
     private float getHillCaves(float x, float y, float z) {
         float result = 0.0f;
-        result += pGen2.noise(0.03f * x, 0.03f * y, 0.03f * z);
+        result += pGen2.noise(0.03f * x + 0.5f, 0.03f * y + 0.5f, 0.03f * z + 0.5f);
 
 
         return result;
@@ -701,5 +703,11 @@ public class Chunk extends RenderObject {
             }
         }
         return counter;
+    }
+
+    public void destroy() {
+        chunkID = -1;
+        glDeleteLists(displayList, -1);
+        displayList = -1;
     }
 }
