@@ -80,6 +80,9 @@ public class Helper {
             // Leaf block
             case 0x6:
                 return calcOffsetForTextureAt(4, 3);
+            // Sand block
+            case 0x7:
+                return calcOffsetForTextureAt(2, 1);
             default:
                 return calcOffsetForTextureAt(2, 0);
         }
