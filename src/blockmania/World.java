@@ -203,7 +203,11 @@ public class World extends RenderObject {
                 for (int z = 0; z < Configuration.viewingDistanceInChunks.z * Chunk.chunkDimensions.z; z++) {
                     if (getBlock(x, y, z) == 0x1) {
                         if (rand.nextFloat() > 0.9984f) {
-                            generateTree(x, y + 1, z);
+                            if (rand.nextBoolean()) {
+                                generateTree(x, y + 1, z);
+                            } else {
+                                generatePineTree(x, y + 1, z);
+                            }
                         }
                     }
                 }
@@ -215,7 +219,7 @@ public class World extends RenderObject {
 
     public void generateTree(int posX, int posY, int posZ) {
 
-        int height = rand.nextInt() % 6 + 12;
+        int height = rand.nextInt() % 2 + 6;
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
@@ -223,12 +227,28 @@ public class World extends RenderObject {
         }
 
         // Generate the treetop
-        for (int y = height / 4; y
-                < height + 2; y += 2) {
-            for (int x = -(height / 2 - y / 2); x
-                    <= (height / 2 - y / 2); x++) {
-                for (int z = -(height / 2 - y / 2); z
-                        <= (height / 2 - y / 2); z++) {
+        for (int y = height - 2; y < height + 2; y += 1) {
+            for (int x = -2; x < 3; x++) {
+                for (int z = -2; z < 3; z++) {
+                    setBlock(posX + x, posY + y, posZ + z, 0x6);
+                }
+            }
+        }
+    }
+
+    public void generatePineTree(int posX, int posY, int posZ) {
+
+        int height = rand.nextInt() % 2 + 12;
+
+        // Generate tree trunk
+        for (int i = 0; i < height; i++) {
+            setBlock(posX, posY + i, posZ, 0x5);
+        }
+
+        // Generate the treetop
+        for (int y = height / 4; y < height; y += 2) {
+            for (int x = -(height / 2 - y / 2); x <= (height / 2 - y / 2); x++) {
+                for (int z = -(height / 2 - y / 2); z <= (height / 2 - y / 2); z++) {
                     if (rand.nextFloat() < 0.95 && !(x == 0 && z == 0)) {
                         setBlock(posX + x, posY + y, posZ + z, 0x6);
                     }
