@@ -250,7 +250,7 @@ public class Main {
 
             // Update the FPS display in the title bar each second passed.
             if (lastFpsTime >= 1000) {
-                Display.setTitle(String.format("%s (FPS: %d, MEM: %d MB)", GAME_TITLE, fps, Runtime.getRuntime().freeMemory() / 1024 / 1024));
+                Display.setTitle(String.format("%s (FPS: %d, MEM: %d MB, Chunks: %d)", GAME_TITLE, fps, Runtime.getRuntime().freeMemory() / 1024 / 1024, world.getCurrentChunkUpdates()));
                 lastFpsTime = 0;
                 fps = 0;
             }
