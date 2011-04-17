@@ -115,7 +115,7 @@ public class Helper {
     }
 
     public Vector3f calcPlayerOrigin() {
-        return new Vector3f(Chunk.chunkDimensions.x * Configuration.viewingDistanceInChunks.x / 2, 90, (Chunk.chunkDimensions.z * Configuration.viewingDistanceInChunks.z) / 2);
+        return new Vector3f(Chunk.chunkDimensions.x * Configuration.viewingDistanceInChunks.x / 2, 127, (Chunk.chunkDimensions.z * Configuration.viewingDistanceInChunks.z) / 2);
     }
 
     public long getTime() {
