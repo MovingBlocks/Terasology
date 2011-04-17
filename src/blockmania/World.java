@@ -17,6 +17,7 @@
 package blockmania;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import static org.lwjgl.opengl.GL11.*;
 
 import java.util.Random;
@@ -34,7 +35,6 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class World extends RenderObject {
 
-    private boolean disableChunkUpdates = false;
     private boolean worldGenerated;
     private int displayListSun = -1;
     private Player player;
@@ -80,11 +80,7 @@ public class World extends RenderObject {
                             c.generate();
                             c.populate();
 
-                            synchronized (chunkUpdateQueue) {
-                                if (!chunkUpdateQueue.contains(c)) {
-                                    chunkUpdateQueue.add(c);
-                                }
-                            }
+                            queueChunkForUpdate(c);
                         }
                     }
                 }
@@ -95,19 +91,22 @@ public class World extends RenderObject {
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "World updated ({0}s).", (System.currentTimeMillis() - timeStart) / 1000d);
 
                 while (true) {
-                    if (!disableChunkUpdates) {
-                        Chunk c = null;
-                        synchronized (chunkUpdateQueue) {
-                            c = chunkUpdateQueue.poll();
+                    Chunk c = null;
+                    synchronized (chunkUpdateQueueDL) {
+                        c = chunkUpdateQueue.peek();
+                        // Do not add a chunk which is beeing generated at the moment
+                        if (chunkUpdateQueueDL.contains(c)) {
+                            c = null;
+                        } else {
+                            chunkUpdateQueue.poll();
                         }
-                        if (c != null) {
-                            c.calcSunlight();
-                            c.generateVertexArray();
-                            synchronized (chunkUpdateQueueDL) {
-                                if (!chunkUpdateQueueDL.contains(c)) {
-                                    chunkUpdateQueueDL.add(c);
-                                }
-                            }
+                    }
+
+                    if (c != null) {
+                        c.calcSunlight();
+                        c.generateVertexArray();
+                        synchronized (chunkUpdateQueueDL) {
+                            chunkUpdateQueueDL.add(c);
                         }
                     }
                 }
@@ -180,12 +179,18 @@ public class World extends RenderObject {
 
         for (int i = 0; i < 4; i++) {
             synchronized (chunkUpdateQueueDL) {
-                c = chunkUpdateQueueDL.poll();
+                c = chunkUpdateQueueDL.peek();
             }
 
             if (c != null) {
                 c.generateDisplayList();
+
+                synchronized (chunkUpdateQueueDL) {
+                    chunkUpdateQueueDL.remove(c);
+                }
             }
+
+
         }
     }
 
@@ -193,7 +198,6 @@ public class World extends RenderObject {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Generating a forest. Please stand by.");
 
-        disableChunkUpdates = true;
         for (int x = 0; x < Configuration.viewingDistanceInChunks.x * Chunk.chunkDimensions.x; x++) {
             for (int y = 0; y < Configuration.viewingDistanceInChunks.y * Chunk.chunkDimensions.y; y++) {
                 for (int z = 0; z < Configuration.viewingDistanceInChunks.z * Chunk.chunkDimensions.z; z++) {
@@ -205,7 +209,6 @@ public class World extends RenderObject {
                 }
             }
         }
-        disableChunkUpdates = false;
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished generating forest.");
     }
@@ -333,11 +336,7 @@ public class World extends RenderObject {
             // Generate or update the corresponding chunk
             c.setBlock(blockPosX, blockPosY, blockPosZ, type);
 
-            synchronized (chunkUpdateQueue) {
-                if (!chunkUpdateQueue.contains(c)) {
-                    chunkUpdateQueue.add(c);
-                }
-            }
+            queueChunkForUpdate(c);
         } catch (Exception e) {
             return;
         }
@@ -364,7 +363,7 @@ public class World extends RenderObject {
         } catch (Exception e) {
         }
 
-        return 0;
+        return -1;
     }
 
     /**
@@ -387,7 +386,7 @@ public class World extends RenderObject {
         } catch (Exception e) {
         }
 
-        return 0.0f;
+        return -1f;
     }
 
     private int calcPlayerChunkOffsetX() {
@@ -433,11 +432,7 @@ public class World extends RenderObject {
                             c.generate();
                             c.populate();
 
-                            synchronized (chunkUpdateQueue) {
-                                if (!chunkUpdateQueue.contains(c)) {
-                                    chunkUpdateQueue.add(c);
-                                }
-                            }
+                            queueChunkForUpdate(c);
                         }
 
                     }
@@ -452,11 +447,7 @@ public class World extends RenderObject {
                 for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
                     Chunk c = chunks[x][y][z];
 
-                    synchronized (chunkUpdateQueue) {
-                        if (!chunkUpdateQueue.contains(c)) {
-                            chunkUpdateQueue.add(c);
-                        }
-                    }
+                    queueChunkForUpdate(c);
                 }
             }
         }
@@ -485,5 +476,13 @@ public class World extends RenderObject {
 
     public String chunkUpdateStatus() {
         return String.format("U: %d UDL: %d", chunkUpdateQueue.size(), chunkUpdateQueueDL.size());
+    }
+
+    private void queueChunkForUpdate(Chunk c) {
+        synchronized (chunkUpdateQueueDL) {
+            if (!chunkUpdateQueue.contains(c)) {
+                chunkUpdateQueue.add(c);
+            }
+        }
     }
 }
