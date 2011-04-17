@@ -40,8 +40,8 @@ public class Main {
 
     // Constant values
     private String GAME_TITLE = "Blockmania (Pre) Alpha";
-    private static final float DISPLAY_HEIGHT = 768.0f;
-    private static final float DISPLAY_WIDTH = 1024.0f;
+    private static final float DISPLAY_HEIGHT = 800.0f;
+    private static final float DISPLAY_WIDTH = 1280.0f;
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     // Time at the start of the last render loop
     private long lastLoopTime = Helper.getInstance().getTime();
@@ -92,7 +92,7 @@ public class Main {
         Display.setDisplayMode(new DisplayMode((int) DISPLAY_WIDTH, (int) DISPLAY_HEIGHT));
         Display.setFullscreen(false);
         Display.setTitle("Blockmania");
-        Display.create(new PixelFormat().withDepthBits(24));
+        Display.create(new PixelFormat().withDepthBits(32));
 
         // Keyboard
         Keyboard.create();

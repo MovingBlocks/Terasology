@@ -107,6 +107,8 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
 
         blocks = new int[(int) chunkDimensions.x][(int) chunkDimensions.y][(int) chunkDimensions.z];
         light = new float[(int) chunkDimensions.x][(int) chunkDimensions.y][(int) chunkDimensions.z];
+
+        System.out.println("NEW CHUNK CREATED");
     }
 
     public void generate() {
@@ -125,32 +127,32 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
 
         for (int x = 0; x < Chunk.chunkDimensions.x; x++) {
             for (int z = 0; z < Chunk.chunkDimensions.z; z++) {
-                float height = (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64) + 64f;
 
-                float y = height;
+                int height = (int) (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64) + 64;
 
-                // Block has air "on top" => Dirt!
-                setBlock(x, (int) y, z, 0x1);
+                for (int i = (int) chunkDimensions.y; i > 0; i--) {
+                    if (getCaveDensityAt(x + xOffset, i, z + zOffset) < 0.5 && getDetailDensity(x + xOffset, i + yOffset, z + zOffset) < 0.5) {
+                        if (i == height) {
+                            // Block has air "on top" => Dirt!
+                            setBlock(x, i, z, 0x1);
+                        } else if (i < height) {
+                            setBlock(x, i, z, 0x2);
 
-                y--;
-
-                while (y > 0) {
-                    setBlock(x, (int) y, z, 0x2);
-
-                    if (height - y < height * 0.75f) {
-                        setBlock(x, (int) y, z, 0x3);
+                            if (height - i < height * 0.75f) {
+                                setBlock(x, i, z, 0x3);
+                            }
+                        }
                     }
-                    y--;
-                }
 
-                if (height < 64) {
-                    // Generate water
-                    for (int i = 64; i > 0; i--) {
+                    if (i < 32) {
                         if (getBlock(x, i, z) == 0) {
                             setBlock(x, i, z, 0x4);
                         }
+
                     }
                 }
+
+
             }
         }
     }
@@ -158,9 +160,14 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
     public void populate() {
         for (int x = 0; x < Chunk.chunkDimensions.x; x++) {
             for (int z = 0; z < Chunk.chunkDimensions.z; z++) {
-                for (int y = 64; y < Chunk.chunkDimensions.y; y++) {
-                    if (parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z)) == 0x1 && rand.nextFloat() < 0.002f) {
-                        parent.generateTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z));
+                for (int y = 32; y < Chunk.chunkDimensions.y; y++) {
+                    if (parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z)) == 0x1 && rand.nextFloat() < 0.009f) {
+                        if (rand.nextBoolean()) {
+                            parent.generateTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z));
+                        } else {
+                            parent.generatePineTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z));
+                        }
+                        return;
                     }
                 }
             }
@@ -199,7 +206,10 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
     }
 
     public void setBlock(int x, int y, int z, int type) {
-        blocks[x][y][z] = type;
+        try {
+            blocks[x][y][z] = type;
+        } catch (Exception e) {
+        }
     }
 
     public int getChunkWorldPosX() {
@@ -642,6 +652,10 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
 
         quads.clear();
 
+        vb = null;
+        tb = null;
+        cb = null;
+
     }
 
     public void clear() {
@@ -659,7 +673,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
      */
     private float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += parent.getpGen1().noise(0.002f * x, 0.002f, 0.002f * z) * 64;
+        result += parent.getpGen1().noise(0.002f * x, 0.002f, 0.002f * z) * 80;
         return result;
     }
 
@@ -677,14 +691,14 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
      */
     private float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += parent.getpGen1().noise(0.04f * x, 0.04f, 0.04f * z);
+        result += parent.getpGen1().noise(0.08f * x, 0.08f, 0.08f * z);
         return Math.abs(result);
     }
 
     /**
      * Returns the cave density for the base terrain.
      */
-    private float getCaveDensityAt(float x, float y, float z) {
+    private float getDetailDensity(float x, float y, float z) {
         float result = 0.0f;
         result += parent.getpGen2().noise(0.01f * x, 0.01f * y, 0.01f * z);
         return result;
@@ -693,9 +707,9 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
     /**
      * Returns the cave density for the base terrain.
      */
-    private float getCanyonDensityAt(float x, float y, float z) {
+    private float getCaveDensityAt(float x, float y, float z) {
         float result = 0.0f;
-        result += parent.getpGen3().noise(0.006f * x, 0.006f * y, 0.006f * z);
+        result += parent.getpGen3().noise(0.06f * x, 0.06f * y, 0.06f * z);
         return result;
     }
 
