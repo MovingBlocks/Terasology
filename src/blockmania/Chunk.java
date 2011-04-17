@@ -34,7 +34,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Chunk extends RenderObject {
+public class Chunk extends RenderObject implements Comparable<Chunk> {
 
     public static int maxChunkID = 0;
     private static final float MAX_LIGHT = 0.9f;
@@ -88,6 +88,11 @@ public class Chunk extends RenderObject {
         }
     }
 
+    @Override
+    public int compareTo(Chunk o) {
+        return new Double(calcDistanceToOrigin()).compareTo(o.calcDistanceToOrigin())*-1;
+    }
+
     enum SIDE {
 
         LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK;
@@ -132,7 +137,7 @@ public class Chunk extends RenderObject {
                 while (y > 0) {
                     setBlock(x, (int) y, z, 0x2);
 
-                    if (height-y < height * 0.75f) {
+                    if (height - y < height * 0.75f) {
                         setBlock(x, (int) y, z, 0x3);
                     }
                     y--;
@@ -701,5 +706,10 @@ public class Chunk extends RenderObject {
         chunkID = -1;
         glDeleteLists(displayList, -1);
         displayList = -1;
+    }
+
+    public double calcDistanceToOrigin() {
+        Vector3f pcv = Vector3f.sub(position, parent.getPlayer().getPosition(), null);
+        return Math.sqrt(Math.pow(pcv.x, 2) + Math.pow(pcv.z, 2));
     }
 }
