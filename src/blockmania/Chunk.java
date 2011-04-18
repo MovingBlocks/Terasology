@@ -37,12 +37,12 @@ import static org.lwjgl.opengl.GL11.*;
 public class Chunk extends RenderObject implements Comparable<Chunk> {
 
     public static int maxChunkID = 0;
-    private static final float MAX_LIGHT = 0.9f;
+    private static final float MAX_LIGHT = 1.0f;
     private static final float MAX_LUMINANCE = 1.0f;
-    private static final float MIN_LIGHT = 0.1f;
+    private static final float MIN_LIGHT = 0.2f;
     private static final float DIMMING_INTENS = 0.1f;
-    private static final float LUMINANCE_INTENS = 0.075f;
-    private static final float DIM_BLOCK_SIDES = 0.15f;
+    private static final float LUMINANCE_INTENS = 0.1f;
+    private static final float DIM_BLOCK_SIDES = 0.2f;
     // TODO
     private final List<Float> quads = new ArrayList<Float>();
     private final List<Float> tex = new ArrayList<Float>();

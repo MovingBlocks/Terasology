@@ -35,10 +35,11 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class World extends RenderObject {
 
+    private long daylightTimer = Helper.getInstance().getTime();
     private boolean worldGenerated;
     private int displayListSun = -1;
     private Player player;
-    private float daylight = 0.8f;
+    private float daylight = 0.9f;
     private Random rand;
     // Used for updating/generating the world
     private Thread updateThread;
@@ -119,6 +120,17 @@ public class World extends RenderObject {
             public void run() {
                 while (true) {
                     updateInfWorld();
+
+                    if (Helper.getInstance().getTime() - daylightTimer > 20000) {
+                        daylight -= 0.2;
+
+                        if (daylight <= 0.1f) {
+                            daylight = 0.9f;
+                        }
+
+                        daylightTimer = Helper.getInstance().getTime();
+                        updateAllChunks();
+                    }
                 }
             }
         });
@@ -466,7 +478,6 @@ public class World extends RenderObject {
             for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
                 for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
                     Chunk c = chunks[x][y][z];
-
                     queueChunkForUpdate(c);
                 }
             }
