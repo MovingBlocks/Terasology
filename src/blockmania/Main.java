@@ -129,7 +129,7 @@ public class Main {
         glFogf(GL_FOG_END, 256);
 
         player = new Player();
-        world = new World("WORLD1", "123892", player);
+        world = new World("WORLD1", "0+hz9r59ßhtwpnfgsnoppoßß", player);
         player.setParent(world);
         Chunk.init();
         world.init();

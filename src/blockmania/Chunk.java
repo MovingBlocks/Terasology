@@ -107,8 +107,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
 
         blocks = new int[(int) chunkDimensions.x][(int) chunkDimensions.y][(int) chunkDimensions.z];
         light = new float[(int) chunkDimensions.x][(int) chunkDimensions.y][(int) chunkDimensions.z];
-
-        System.out.println("NEW CHUNK CREATED");
     }
 
     public void generate() {
