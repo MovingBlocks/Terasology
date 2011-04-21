@@ -14,9 +14,9 @@
  *  limitations under the License.
  *  under the License.
  */
-package octree;
+package com.github.begla.blockmania.octree;
 
-import blockmania.Chunk;
+import com.github.begla.blockmania.Chunk;
 import org.lwjgl.util.vector.Vector3f;
 
 /**

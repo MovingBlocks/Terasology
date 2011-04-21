@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package blockmania;
+package com.github.begla.blockmania;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -196,7 +196,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
 
     public static void init() {
         try {
-            textureMap = TextureLoader.getTexture("PNG", new FileInputStream(Chunk.class.getResource("/images/Terrain.png").getPath()), GL_NEAREST);
+            textureMap = TextureLoader.getTexture("PNG", new FileInputStream(Chunk.class.getResource("/com/github/begla/blockmania/images/Terrain.png").getPath()), GL_NEAREST);
             textureMap.bind();
 
         } catch (IOException ex) {

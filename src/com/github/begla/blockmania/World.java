@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package blockmania;
+package com.github.begla.blockmania;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +24,7 @@ import java.util.Random;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import noise.PerlinNoise;
+import com.github.begla.blockmania.noise.PerlinNoise;
 
 import org.lwjgl.util.glu.*;
 import org.lwjgl.util.vector.Vector3f;

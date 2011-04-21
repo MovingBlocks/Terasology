@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package blockmania;
+package com.github.begla.blockmania;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;

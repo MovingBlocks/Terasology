@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package noise;
+package com.github.begla.blockmania.noise;
 
 import java.util.Random;
 

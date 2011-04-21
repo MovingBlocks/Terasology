@@ -2,5 +2,5 @@
 /build
 errors.*
 /dist
-/src/images
+/src/com/github/begla/blockmania/images/*
 /nbproject/private/*

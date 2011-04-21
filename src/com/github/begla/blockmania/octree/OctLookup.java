@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ *  Copyright 2011 Benjamin Glatzel.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,21 +14,17 @@
  *  limitations under the License.
  *  under the License.
  */
-package blockmania;
 
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
+package com.github.begla.blockmania.octree;
+
+import com.github.begla.blockmania.Chunk;
 
 /**
- *
+ * Octree as shown in the book "Physically Based Rendering".
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Configuration {
+public abstract class OctLookup {
 
-    public static Vector3f viewingDistanceInChunks = new Vector3f(32.0f, 1.0f, 32.0f);
-    public static boolean showPlacingBox = false;
+    public abstract boolean lookup(Chunk c);
 
-    public static Vector2f calcTextureMapCoords(int x, int y) {
-        return new Vector2f(1.0f / (float) x, 1.0f / (float) y);
-    }
 }

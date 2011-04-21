@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ *  Copyright 2011 Benjamin Glatzel.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,29 +14,23 @@
  *  limitations under the License.
  *  under the License.
  */
-package blockmania;
+package com.github.begla.blockmania.octree;
 
-import org.lwjgl.util.vector.Vector3f;
+import com.github.begla.blockmania.Chunk;
+import java.util.HashSet;
 
 /**
- *
+ * Octree as shown in the book "Physically Based Rendering".
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class RenderObject {
+public class OctNode {
 
-    protected Vector3f position = new Vector3f(0.0f, 0.0f, 0.0f);
+    OctNode children[] = new OctNode[8];
+    HashSet<Chunk> data = new HashSet<Chunk>();
 
-    public void render() {
-    }
-
-    public void update(long delta) {
-    }
-
-    public Vector3f getPosition() {
-        return position;
-    }
-
-    public void setPosition(Vector3f position) {
-        this.position = position;
+    OctNode() {
+        for (int i = 0; i < 8; ++i) {
+            children[i] = null;
+        }
     }
 }

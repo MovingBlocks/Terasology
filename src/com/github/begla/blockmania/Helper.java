@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package blockmania;
+package com.github.begla.blockmania;
 
 import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;

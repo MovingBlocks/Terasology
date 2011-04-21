@@ -1,5 +1,5 @@
 /*
- *  Copyright 2011 Benjamin Glatzel.
+ *  Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,17 +14,29 @@
  *  limitations under the License.
  *  under the License.
  */
+package com.github.begla.blockmania;
 
-package octree;
-
-import blockmania.Chunk;
+import org.lwjgl.util.vector.Vector3f;
 
 /**
- * Octree as shown in the book "Physically Based Rendering".
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class OctLookup {
+public abstract class RenderObject {
 
-    public abstract boolean lookup(Chunk c);
+    protected Vector3f position = new Vector3f(0.0f, 0.0f, 0.0f);
 
+    public void render() {
+    }
+
+    public void update(long delta) {
+    }
+
+    public Vector3f getPosition() {
+        return position;
+    }
+
+    public void setPosition(Vector3f position) {
+        this.position = position;
+    }
 }
