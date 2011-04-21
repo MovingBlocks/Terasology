@@ -2,3 +2,5 @@
 /build
 errors.*
 /dist
+/src/images
+/nbproject/private/*
