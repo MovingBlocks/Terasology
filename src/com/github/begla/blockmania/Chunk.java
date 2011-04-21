@@ -37,9 +37,10 @@ import static org.lwjgl.opengl.GL11.*;
 public class Chunk extends RenderObject implements Comparable<Chunk> {
 
     public static int maxChunkID = 0;
-    private static final float MAX_LIGHT = 1.0f;
-    private static final float DIM_BLOCK_SIDES = 0.2f;
-    private static final float MIN_LIGHT = 0.2f;
+    private static final float MAX_LIGHT = 0.85f;
+    private static final float DIM_BLOCK_SIDES = 0.075f;
+    private static final float MIN_LIGHT = 0.1f;
+    private static final float DIMMING_INTENS = 0.05f;
     // TODO
     private final List<Float> quads = new ArrayList<Float>();
     private final List<Float> tex = new ArrayList<Float>();
@@ -92,7 +93,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         } catch (Exception e) {
         }
 
-        if (result == 0f) {
+        if (result < 0.2f) {
             result = MIN_LIGHT;
         }
 
@@ -252,7 +253,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
                     if (blocks[x][y][z] == 0) {
                         setSunlight(x, y, z, MAX_LIGHT);
                     } else {
-                        setSunlight(x, y, z, MAX_LIGHT);
                         break;
                     }
                 }
@@ -266,7 +266,21 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
             for (int z = 0; z < (int) chunkDimensions.z; z++) {
                 for (int y = 0; y < (int) chunkDimensions.y; y++) {
                     if (blocks[x][y][z] == 0 && sunlight[x][y][z] == 0) {
-                        setLight(x, y, z, maxLightFromNeighbors(x, y, z));
+                        float sunl = maxLightFromNeighbors(x, y, z);
+                        setLight(x, y, z, sunl);
+                    } else if (blocks[x][y][z] == 0 && sunlight[x][y][z] > 0f) {
+                        float dimming = 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) > 0) ? DIMMING_INTENS : 0.0f;
+
+                        dimming += (parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) > 0) ? DIMMING_INTENS : 0.0f;
+                        dimming += (parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) > 0) ? DIMMING_INTENS : 0.0f;
+
+                        setLight(x, y, z, Math.max(sunlight[x][y][z] - dimming, 0f));
                     }
                 }
             }
@@ -276,7 +290,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
     private float maxLightFromNeighbors(int x, int y, int z) {
         float intens = 0.0f;
         for (int x1 = 0; x1 <= 16; ++x1) {
-            float tempInt = parent.getSunlight(getBlockWorldPosX(x + x1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) / Math.abs(x1);
+            float tempInt = parent.getSunlight(getBlockWorldPosX(x + x1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) / (Math.abs(x1) + 1);
 
             if (tempInt > intens) {
                 intens = tempInt;
@@ -288,7 +302,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         }
 
         for (int x1 = 0; x1 >= -16; --x1) {
-            float tempInt = parent.getSunlight(getBlockWorldPosX(x + x1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) / Math.abs(x1);
+            float tempInt = parent.getSunlight(getBlockWorldPosX(x + x1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) / (Math.abs(x1) + 1);
 
             if (tempInt > intens) {
                 intens = tempInt;
@@ -300,7 +314,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         }
 
         for (int z1 = 0; z1 <= 16; ++z1) {
-            float tempInt = parent.getSunlight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + z1)) / Math.abs(z1);
+            float tempInt = parent.getSunlight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + z1)) / (Math.abs(z1) + 1);
             if (tempInt > intens) {
                 intens = tempInt;
             }
@@ -311,7 +325,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         }
 
         for (int z1 = 0; z1 >= -16; --z1) {
-            float tempInt = parent.getSunlight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + z1)) / Math.abs(z1);
+            float tempInt = parent.getSunlight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + z1)) / (Math.abs(z1) + 1);
             if (tempInt > intens) {
                 intens = tempInt;
             }
