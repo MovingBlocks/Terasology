@@ -93,7 +93,7 @@ public class Main {
         Display.setDisplayMode(new DisplayMode((int) DISPLAY_WIDTH, (int) DISPLAY_HEIGHT));
         Display.setFullscreen(false);
         Display.setTitle("Blockmania");
-        Display.create(new PixelFormat().withDepthBits(32));
+        Display.create(new PixelFormat().withDepthBits(32).withSamples(4));
 
         // Keyboard
         Keyboard.create();

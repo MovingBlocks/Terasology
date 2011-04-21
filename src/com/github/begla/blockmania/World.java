@@ -79,7 +79,7 @@ public class World extends RenderObject {
                             chunks[x][y][z] = c;
                             c.generate();
                             c.populate();
-                            c.calcSunlight();
+                            c.updateLighting();
 
                             queueChunkForUpdate(c);
                         }
@@ -104,7 +104,7 @@ public class World extends RenderObject {
                     }
 
                     if (c != null) {
-                        c.calcLight();
+                        c.updateLighting();
                         c.generateVertexArray();
                         synchronized (chunkUpdateQueueDL) {
                             chunkUpdateQueueDL.add(c);
@@ -495,7 +495,7 @@ public class World extends RenderObject {
                             c.setPosition(pos);
                             c.generate();
                             c.populate();
-                            c.calcSunlight();
+                            c.updateLighting();
 
                             chunksToUpdate.add(c);
                         }
