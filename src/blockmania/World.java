@@ -80,7 +80,10 @@ public class World extends RenderObject {
                             chunks[x][y][z] = c;
                             c.generate();
                             c.populate();
+<<<<<<< HEAD
                             c.calcSunlight();
+=======
+>>>>>>> 0e9889760be50faada1af2b9337c2e5f395de758
 
                             queueChunkForUpdate(c);
                         }
@@ -105,7 +108,11 @@ public class World extends RenderObject {
                     }
 
                     if (c != null) {
+<<<<<<< HEAD
                         c.calcLight();
+=======
+                        c.calcSunlight();
+>>>>>>> 0e9889760be50faada1af2b9337c2e5f395de758
                         c.generateVertexArray();
                         synchronized (chunkUpdateQueueDL) {
                             chunkUpdateQueueDL.add(c);
@@ -291,6 +298,7 @@ public class World extends RenderObject {
     private int calcChunkPosX(int x) {
         return (x / (int) Chunk.chunkDimensions.x);
     }
+<<<<<<< HEAD
 
     private int calcChunkPosY(int y) {
         return (y / (int) Chunk.chunkDimensions.y);
@@ -326,6 +334,43 @@ public class World extends RenderObject {
         return player;
     }
 
+=======
+
+    private int calcChunkPosY(int y) {
+        return (y / (int) Chunk.chunkDimensions.y);
+    }
+
+    private int calcChunkPosZ(int z) {
+        return (z / (int) Chunk.chunkDimensions.z);
+    }
+
+    private int calcBlockPosX(int x1, int x2) {
+        x1 = x1 % ((int) Configuration.viewingDistanceInChunks.x * (int) Chunk.chunkDimensions.x);
+        return (x1 - (x2 * (int) Chunk.chunkDimensions.x));
+    }
+
+    private int calcBlockPosY(int y1, int y2) {
+        y1 = y1 % ((int) Configuration.viewingDistanceInChunks.y * (int) Chunk.chunkDimensions.y);
+        return (y1 - (y2 * (int) Chunk.chunkDimensions.y));
+    }
+
+    private int calcBlockPosZ(int z1, int z2) {
+        z1 = z1 % ((int) Configuration.viewingDistanceInChunks.z * (int) Chunk.chunkDimensions.z);
+        return (z1 - (z2 * (int) Chunk.chunkDimensions.z));
+    }
+
+    public float getDaylight() {
+        return daylight;
+    }
+
+    /**
+     * TODO
+     */
+    public Player getPlayer() {
+        return player;
+    }
+
+>>>>>>> 0e9889760be50faada1af2b9337c2e5f395de758
     public Vector3f getDaylightColor() {
         return new Vector3f((getDaylight() - 0.5f), getDaylight() - 0.25f, getDaylight());
     }
@@ -420,6 +465,7 @@ public class World extends RenderObject {
         return -1f;
     }
 
+<<<<<<< HEAD
     public final float getSunlight(int x, int y, int z) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.viewingDistanceInChunks.x;
         int chunkPosY = calcChunkPosY(y) % (int) Configuration.viewingDistanceInChunks.y;
@@ -448,6 +494,16 @@ public class World extends RenderObject {
         return (int) ((player.getPosition().y - Helper.getInstance().calcPlayerOrigin().y) / Chunk.chunkDimensions.y);
     }
 
+=======
+    private int calcPlayerChunkOffsetX() {
+        return (int) ((player.getPosition().x - Helper.getInstance().calcPlayerOrigin().x) / Chunk.chunkDimensions.x);
+    }
+
+    private int calcPlayerChunkOffsetY() {
+        return (int) ((player.getPosition().y - Helper.getInstance().calcPlayerOrigin().y) / Chunk.chunkDimensions.y);
+    }
+
+>>>>>>> 0e9889760be50faada1af2b9337c2e5f395de758
     private int calcPlayerChunkOffsetZ() {
         return (int) ((player.getPosition().z - Helper.getInstance().calcPlayerOrigin().z) / Chunk.chunkDimensions.z);
     }
