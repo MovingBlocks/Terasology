@@ -161,7 +161,7 @@ public class Main {
             player.render();
             world.render();
 
-            if (Configuration.showPlacingBox) {
+            if (Configuration._showPlacingBox) {
                 // Display the currently looked at block
                 Vector3f blockPosition = player.calcViewBlockPosition();
 

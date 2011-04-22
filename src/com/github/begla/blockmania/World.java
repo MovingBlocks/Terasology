@@ -34,36 +34,36 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class World extends RenderObject {
 
-    private long daylightTimer = Helper.getInstance().getTime();
-    private boolean worldGenerated;
-    private int displayListSun = -1;
-    private Player player;
-    private float daylight = 1.0f;
-    private Random rand;
+    private long _daylightTimer = Helper.getInstance().getTime();
+    private boolean _worldGenerated;
+    private int _displayListSun = -1;
+    private Player _player;
+    private float _daylight = 1.0f;
+    private Random _rand;
     // Used for updating/generating the world
-    private Thread updateThread;
-    private Thread worldThread;
+    private Thread _updateThread;
+    private Thread _worldThread;
     // The chunks to display
-    private Chunk[][][] chunks;
+    private Chunk[][][] _chunks;
     // Update queue for generating the light and vertex arrays
-    private final PriorityBlockingQueue<Chunk> chunkUpdateQueue = new PriorityBlockingQueue<Chunk>(2048);
+    private final PriorityBlockingQueue<Chunk> _chunkUpdateQueue = new PriorityBlockingQueue<Chunk>();
     // Update queue for generating the display lists
-    private final PriorityBlockingQueue<Chunk> chunkUpdateQueueDL = new PriorityBlockingQueue<Chunk>(2048);
-    private PerlinNoise pGen1;
-    private PerlinNoise pGen2;
-    private PerlinNoise pGen3;
+    private final PriorityBlockingQueue<Chunk> _chunkUpdateQueueDL = new PriorityBlockingQueue<Chunk>();
+    private PerlinNoise _pGen1;
+    private PerlinNoise _pGen2;
+    private PerlinNoise _pGen3;
 
     public World(String title, String seed, Player p) {
-        this.player = p;
-        rand = new Random(seed.hashCode());
-        pGen1 = new PerlinNoise(rand.nextInt());
-        pGen2 = new PerlinNoise(rand.nextInt());
-        pGen3 = new PerlinNoise(rand.nextInt());
+        this._player = p;
+        _rand = new Random(seed.hashCode());
+        _pGen1 = new PerlinNoise(_rand.nextInt());
+        _pGen2 = new PerlinNoise(_rand.nextInt());
+        _pGen3 = new PerlinNoise(_rand.nextInt());
         final World currentWorld = this;
 
-        chunks = new Chunk[(int) Configuration.viewingDistanceInChunks.x][(int) Configuration.viewingDistanceInChunks.y][(int) Configuration.viewingDistanceInChunks.z];
+        _chunks = new Chunk[(int) Configuration._viewingDistanceInChunks.x][(int) Configuration._viewingDistanceInChunks.y][(int) Configuration._viewingDistanceInChunks.z];
 
-        updateThread = new Thread(new Runnable() {
+        _updateThread = new Thread(new Runnable() {
 
             @Override
             public void run() {
@@ -72,63 +72,63 @@ public class World extends RenderObject {
 
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Generating chunks. Please wait.");
 
-                for (int x = 0; x < Configuration.viewingDistanceInChunks.x; x++) {
-                    for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
-                        for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
+                for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
+                    for (int y = 0; y < Configuration._viewingDistanceInChunks.y; y++) {
+                        for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
                             Chunk c = new Chunk(currentWorld, new Vector3f(x, y, z));
-                            chunks[x][y][z] = c;
+                            _chunks[x][y][z] = c;
                             c.generate();
                             c.populate();
-                            c.updateLighting();
+                            c.calcSunlight();
 
                             queueChunkForUpdate(c);
                         }
                     }
                 }
 
-                setWorldGenerated(true);
-                player.resetPlayer();
+                _worldGenerated = true;
+                _player.resetPlayer();
 
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "World updated ({0}s).", (System.currentTimeMillis() - timeStart) / 1000d);
 
                 while (true) {
                     Chunk c = null;
-                    synchronized (chunkUpdateQueueDL) {
-                        c = chunkUpdateQueue.peek();
+                    synchronized (_chunkUpdateQueueDL) {
+                        c = _chunkUpdateQueue.peek();
                         // Do not add a chunk which is beeing generated at the moment
-                        if (chunkUpdateQueueDL.contains(c)) {
+                        if (_chunkUpdateQueueDL.contains(c)) {
                             c = null;
                         } else {
-                            chunkUpdateQueue.poll();
+                            _chunkUpdateQueue.poll();
                         }
                     }
 
                     if (c != null) {
-                        c.updateLighting();
+                        c.calcLight();
                         c.generateVertexArray();
-                        synchronized (chunkUpdateQueueDL) {
-                            chunkUpdateQueueDL.add(c);
+                        synchronized (_chunkUpdateQueueDL) {
+                            _chunkUpdateQueueDL.add(c);
                         }
                     }
                 }
             }
         });
 
-        worldThread = new Thread(new Runnable() {
+        _worldThread = new Thread(new Runnable() {
 
             @Override
             public void run() {
                 while (true) {
                     updateInfWorld();
 
-                    if (Helper.getInstance().getTime() - daylightTimer > 120000) {
-                        daylight -= 0.2;
+                    if (Helper.getInstance().getTime() - _daylightTimer > 120000) {
+                        _daylight -= 0.2;
 
-                        if (daylight <= 0.4f) {
-                            daylight = 1.0f;
+                        if (_daylight <= 0.4f) {
+                            _daylight = 1.0f;
                         }
 
-                        daylightTimer = Helper.getInstance().getTime();
+                        _daylightTimer = Helper.getInstance().getTime();
                         updateAllChunks();
                     }
                 }
@@ -137,15 +137,15 @@ public class World extends RenderObject {
     }
 
     public void init() {
-        updateThread.start();
-        worldThread.start();
+        _updateThread.start();
+        _worldThread.start();
 
         /**
          * Generates the display list used for displaying the sun.
          */
         Sphere s = new Sphere();
-        displayListSun = glGenLists(1);
-        glNewList(displayListSun, GL_COMPILE);
+        _displayListSun = glGenLists(1);
+        glNewList(_displayListSun, GL_COMPILE);
         glColor4f(1.0f, 0.8f, 0.0f, 1.0f);
         s.draw(256.0f, 16, 32);
         glEndList();
@@ -161,17 +161,17 @@ public class World extends RenderObject {
          */
         glPushMatrix();
         glDisable(GL_FOG);
-        glTranslatef(Configuration.viewingDistanceInChunks.x * Chunk.chunkDimensions.x * 1.5f + player.getPosition().x, Configuration.viewingDistanceInChunks.y * Chunk.chunkDimensions.y + player.getPosition().y, Configuration.viewingDistanceInChunks.z * Chunk.chunkDimensions.z * 1.5f + player.getPosition().z);
-        glCallList(displayListSun);
+        glTranslatef(Configuration._viewingDistanceInChunks.x * Chunk.CHUNK_DIMENSIONS.x * 1.5f + _player.getPosition().x, Configuration._viewingDistanceInChunks.y * Chunk.CHUNK_DIMENSIONS.y + _player.getPosition().y, Configuration._viewingDistanceInChunks.z * Chunk.CHUNK_DIMENSIONS.z * 1.5f + _player.getPosition().z);
+        glCallList(_displayListSun);
         glEnable(GL_FOG);
         glPopMatrix();
 
         /**
          * Render all active chunks.
          */
-        for (int x = 0; x < Configuration.viewingDistanceInChunks.x; x++) {
-            for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
-                for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
+        for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
+            for (int y = 0; y < Configuration._viewingDistanceInChunks.y; y++) {
+                for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
                     Chunk c = getChunk(x, y, z);
 
                     if (c != null) {
@@ -190,15 +190,15 @@ public class World extends RenderObject {
         Chunk c = null;
 
         for (int i = 0; i < 32; i++) {
-            synchronized (chunkUpdateQueueDL) {
-                c = chunkUpdateQueueDL.peek();
+            synchronized (_chunkUpdateQueueDL) {
+                c = _chunkUpdateQueueDL.peek();
             }
 
             if (c != null) {
                 c.generateDisplayList();
 
-                synchronized (chunkUpdateQueueDL) {
-                    chunkUpdateQueueDL.remove(c);
+                synchronized (_chunkUpdateQueueDL) {
+                    _chunkUpdateQueueDL.remove(c);
                 }
             }
         }
@@ -208,12 +208,12 @@ public class World extends RenderObject {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Generating a forest. Please stand by.");
 
-        for (int x = 0; x < Configuration.viewingDistanceInChunks.x * Chunk.chunkDimensions.x; x++) {
-            for (int y = 0; y < Configuration.viewingDistanceInChunks.y * Chunk.chunkDimensions.y; y++) {
-                for (int z = 0; z < Configuration.viewingDistanceInChunks.z * Chunk.chunkDimensions.z; z++) {
+        for (int x = 0; x < Configuration._viewingDistanceInChunks.x * Chunk.CHUNK_DIMENSIONS.x; x++) {
+            for (int y = 0; y < Configuration._viewingDistanceInChunks.y * Chunk.CHUNK_DIMENSIONS.y; y++) {
+                for (int z = 0; z < Configuration._viewingDistanceInChunks.z * Chunk.CHUNK_DIMENSIONS.z; z++) {
                     if (getBlock(x, y, z) == 0x1) {
-                        if (rand.nextFloat() > 0.9984f) {
-                            if (rand.nextBoolean()) {
+                        if (_rand.nextFloat() > 0.9984f) {
+                            if (_rand.nextBoolean()) {
                                 generateTree(x, y + 1, z);
                             } else {
                                 generatePineTree(x, y + 1, z);
@@ -229,7 +229,7 @@ public class World extends RenderObject {
 
     public void generateTree(int posX, int posY, int posZ) {
 
-        int height = rand.nextInt() % 2 + 6;
+        int height = _rand.nextInt() % 2 + 6;
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
@@ -248,7 +248,7 @@ public class World extends RenderObject {
 
     public void generatePineTree(int posX, int posY, int posZ) {
 
-        int height = rand.nextInt() % 2 + 12;
+        int height = _rand.nextInt() % 2 + 12;
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
@@ -259,7 +259,7 @@ public class World extends RenderObject {
         for (int y = height / 4; y < height; y += 2) {
             for (int x = -(height / 2 - y / 2); x <= (height / 2 - y / 2); x++) {
                 for (int z = -(height / 2 - y / 2); z <= (height / 2 - y / 2); z++) {
-                    if (rand.nextFloat() < 0.95 && !(x == 0 && z == 0)) {
+                    if (_rand.nextFloat() < 0.95 && !(x == 0 && z == 0)) {
                         setBlock(posX + x, posY + y, posZ + z, 0x6);
                     }
                 }
@@ -271,9 +271,9 @@ public class World extends RenderObject {
      * Returns true if the given position is filled with a block.
      */
     public boolean isHitting(int x, int y, int z) {
-        int chunkPosX = calcChunkPosX(x) % (int) Configuration.viewingDistanceInChunks.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.viewingDistanceInChunks.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.viewingDistanceInChunks.z;
+        int chunkPosX = calcChunkPosX(x) % (int) Configuration._viewingDistanceInChunks.x;
+        int chunkPosY = calcChunkPosY(y) % (int) Configuration._viewingDistanceInChunks.y;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration._viewingDistanceInChunks.z;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosY = calcBlockPosY(y, chunkPosY);
@@ -288,41 +288,41 @@ public class World extends RenderObject {
     }
 
     private int calcChunkPosX(int x) {
-        return (x / (int) Chunk.chunkDimensions.x);
+        return (x / (int) Chunk.CHUNK_DIMENSIONS.x);
     }
 
     private int calcChunkPosY(int y) {
-        return (y / (int) Chunk.chunkDimensions.y);
+        return (y / (int) Chunk.CHUNK_DIMENSIONS.y);
     }
 
     private int calcChunkPosZ(int z) {
-        return (z / (int) Chunk.chunkDimensions.z);
+        return (z / (int) Chunk.CHUNK_DIMENSIONS.z);
     }
 
     private int calcBlockPosX(int x1, int x2) {
-        x1 = x1 % ((int) Configuration.viewingDistanceInChunks.x * (int) Chunk.chunkDimensions.x);
-        return (x1 - (x2 * (int) Chunk.chunkDimensions.x));
+        x1 = x1 % ((int) Configuration._viewingDistanceInChunks.x * (int) Chunk.CHUNK_DIMENSIONS.x);
+        return (x1 - (x2 * (int) Chunk.CHUNK_DIMENSIONS.x));
     }
 
     private int calcBlockPosY(int y1, int y2) {
-        y1 = y1 % ((int) Configuration.viewingDistanceInChunks.y * (int) Chunk.chunkDimensions.y);
-        return (y1 - (y2 * (int) Chunk.chunkDimensions.y));
+        y1 = y1 % ((int) Configuration._viewingDistanceInChunks.y * (int) Chunk.CHUNK_DIMENSIONS.y);
+        return (y1 - (y2 * (int) Chunk.CHUNK_DIMENSIONS.y));
     }
 
     private int calcBlockPosZ(int z1, int z2) {
-        z1 = z1 % ((int) Configuration.viewingDistanceInChunks.z * (int) Chunk.chunkDimensions.z);
-        return (z1 - (z2 * (int) Chunk.chunkDimensions.z));
+        z1 = z1 % ((int) Configuration._viewingDistanceInChunks.z * (int) Chunk.CHUNK_DIMENSIONS.z);
+        return (z1 - (z2 * (int) Chunk.CHUNK_DIMENSIONS.z));
     }
 
     public float getDaylight() {
-        return daylight;
+        return _daylight;
     }
 
     /**
      * TODO
      */
     public Player getPlayer() {
-        return player;
+        return _player;
     }
 
     public Vector3f getDaylightColor() {
@@ -333,23 +333,16 @@ public class World extends RenderObject {
      * @return the worldGenerated
      */
     public boolean isWorldGenerated() {
-        return worldGenerated;
-    }
-
-    /**
-     * @param worldGenerated the worldGenerated to set
-     */
-    public void setWorldGenerated(boolean worldGenerated) {
-        this.worldGenerated = worldGenerated;
+        return _worldGenerated;
     }
 
     /**
      * Sets the type of a block at a given position.
      */
     public final void setBlock(int x, int y, int z, int type) {
-        int chunkPosX = calcChunkPosX(x) % (int) Configuration.viewingDistanceInChunks.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.viewingDistanceInChunks.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.viewingDistanceInChunks.z;
+        int chunkPosX = calcChunkPosX(x) % (int) Configuration._viewingDistanceInChunks.x;
+        int chunkPosY = calcChunkPosY(y) % (int) Configuration._viewingDistanceInChunks.y;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration._viewingDistanceInChunks.z;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosY = calcBlockPosY(y, chunkPosY);
@@ -376,7 +369,7 @@ public class World extends RenderObject {
         Chunk c = null;
 
         try {
-            c = chunks[x % (int) Configuration.viewingDistanceInChunks.x][y % (int) Configuration.viewingDistanceInChunks.y][z % (int) Configuration.viewingDistanceInChunks.z];
+            c = _chunks[x % (int) Configuration._viewingDistanceInChunks.x][y % (int) Configuration._viewingDistanceInChunks.y][z % (int) Configuration._viewingDistanceInChunks.z];
 
         } catch (Exception e) {
         }
@@ -388,9 +381,9 @@ public class World extends RenderObject {
      * Returns a block at a position by looking up the containing chunk.
      */
     public final int getBlock(int x, int y, int z) {
-        int chunkPosX = calcChunkPosX(x) % (int) Configuration.viewingDistanceInChunks.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.viewingDistanceInChunks.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.viewingDistanceInChunks.z;
+        int chunkPosX = calcChunkPosX(x) % (int) Configuration._viewingDistanceInChunks.x;
+        int chunkPosY = calcChunkPosY(y) % (int) Configuration._viewingDistanceInChunks.y;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration._viewingDistanceInChunks.z;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosY = calcBlockPosY(y, chunkPosY);
@@ -398,10 +391,7 @@ public class World extends RenderObject {
 
         try {
             Chunk c = getChunk(chunkPosX, chunkPosY, chunkPosZ);
-
-            if (c.getPosition().x == calcChunkPosX(x) && c.getPosition().y == calcChunkPosY(y) && c.getPosition().z == calcChunkPosZ(z)) {
-                return c.getBlock(blockPosX, blockPosY, blockPosZ);
-            }
+            return c.getBlock(blockPosX, blockPosY, blockPosZ);
         } catch (Exception e) {
         }
 
@@ -412,9 +402,9 @@ public class World extends RenderObject {
      * TODO.
      */
     public final float getLight(int x, int y, int z) {
-        int chunkPosX = calcChunkPosX(x) % (int) Configuration.viewingDistanceInChunks.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.viewingDistanceInChunks.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.viewingDistanceInChunks.z;
+        int chunkPosX = calcChunkPosX(x) % (int) Configuration._viewingDistanceInChunks.x;
+        int chunkPosY = calcChunkPosY(y) % (int) Configuration._viewingDistanceInChunks.y;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration._viewingDistanceInChunks.z;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosY = calcBlockPosY(y, chunkPosY);
@@ -422,19 +412,20 @@ public class World extends RenderObject {
 
         try {
             Chunk c = getChunk(chunkPosX, chunkPosY, chunkPosZ);
-            if (c.getPosition().x == calcChunkPosX(x) && c.getPosition().y == calcChunkPosY(y) && c.getPosition().z == calcChunkPosZ(z)) {
-                return c.getLight(blockPosX, blockPosY, blockPosZ);
-            }
+            return c.getLight(blockPosX, blockPosY, blockPosZ);
         } catch (Exception e) {
         }
 
         return -1f;
     }
 
-    public final float getSunlight(int x, int y, int z) {
-        int chunkPosX = calcChunkPosX(x) % (int) Configuration.viewingDistanceInChunks.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.viewingDistanceInChunks.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.viewingDistanceInChunks.z;
+    /**
+     * TODO.
+     */
+    public void setLight(int x, int y, int z, float intens) {
+        int chunkPosX = calcChunkPosX(x) % (int) Configuration._viewingDistanceInChunks.x;
+        int chunkPosY = calcChunkPosY(y) % (int) Configuration._viewingDistanceInChunks.y;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration._viewingDistanceInChunks.z;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosY = calcBlockPosY(y, chunkPosY);
@@ -442,60 +433,55 @@ public class World extends RenderObject {
 
         try {
             Chunk c = getChunk(chunkPosX, chunkPosY, chunkPosZ);
-            if (c.getPosition().x == calcChunkPosX(x) && c.getPosition().y == calcChunkPosY(y) && c.getPosition().z == calcChunkPosZ(z)) {
-                return c.getSunlight(blockPosX, blockPosY, blockPosZ);
-            }
+            c.setLight(blockPosX, blockPosY, blockPosZ, intens);
         } catch (Exception e) {
         }
-
-        return -1f;
     }
 
     private int calcPlayerChunkOffsetX() {
-        return (int) ((player.getPosition().x - Helper.getInstance().calcPlayerOrigin().x) / Chunk.chunkDimensions.x);
+        return (int) ((_player.getPosition().x - Helper.getInstance().calcPlayerOrigin().x) / Chunk.CHUNK_DIMENSIONS.x);
     }
 
     private int calcPlayerChunkOffsetY() {
-        return (int) ((player.getPosition().y - Helper.getInstance().calcPlayerOrigin().y) / Chunk.chunkDimensions.y);
+        return (int) ((_player.getPosition().y - Helper.getInstance().calcPlayerOrigin().y) / Chunk.CHUNK_DIMENSIONS.y);
     }
 
     private int calcPlayerChunkOffsetZ() {
-        return (int) ((player.getPosition().z - Helper.getInstance().calcPlayerOrigin().z) / Chunk.chunkDimensions.z);
+        return (int) ((_player.getPosition().z - Helper.getInstance().calcPlayerOrigin().z) / Chunk.CHUNK_DIMENSIONS.z);
     }
 
     private void updateInfWorld() {
 
         ArrayList<Chunk> chunksToUpdate = new ArrayList<Chunk>();
 
-        for (int x = 0; x < Configuration.viewingDistanceInChunks.x; x++) {
-            for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
-                for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
+        for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
+            for (int y = 0; y < Configuration._viewingDistanceInChunks.y; y++) {
+                for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
                     Chunk c = getChunk(x, y, z);
 
                     if (c != null) {
                         Vector3f pos = new Vector3f(x, y, z);
 
-                        int multZ = (int) calcPlayerChunkOffsetZ() / (int) Configuration.viewingDistanceInChunks.z + 1;
+                        int multZ = (int) calcPlayerChunkOffsetZ() / (int) Configuration._viewingDistanceInChunks.z + 1;
 
-                        if (z < calcPlayerChunkOffsetZ() % Configuration.viewingDistanceInChunks.z) {
-                            pos.z += Configuration.viewingDistanceInChunks.z * multZ;
+                        if (z < calcPlayerChunkOffsetZ() % Configuration._viewingDistanceInChunks.z) {
+                            pos.z += Configuration._viewingDistanceInChunks.z * multZ;
                         } else {
-                            pos.z += Configuration.viewingDistanceInChunks.z * (multZ - 1);
+                            pos.z += Configuration._viewingDistanceInChunks.z * (multZ - 1);
                         }
 
-                        int multX = (int) calcPlayerChunkOffsetX() / (int) Configuration.viewingDistanceInChunks.x + 1;
+                        int multX = (int) calcPlayerChunkOffsetX() / (int) Configuration._viewingDistanceInChunks.x + 1;
 
-                        if (x < calcPlayerChunkOffsetX() % Configuration.viewingDistanceInChunks.x) {
-                            pos.x += Configuration.viewingDistanceInChunks.x * multX;
+                        if (x < calcPlayerChunkOffsetX() % Configuration._viewingDistanceInChunks.x) {
+                            pos.x += Configuration._viewingDistanceInChunks.x * multX;
                         } else {
-                            pos.x += Configuration.viewingDistanceInChunks.x * (multX - 1);
+                            pos.x += Configuration._viewingDistanceInChunks.x * (multX - 1);
                         }
 
                         if (c.getPosition().x != pos.x || c.getPosition().z != pos.z) {
                             c.setPosition(pos);
                             c.generate();
                             c.populate();
-                            c.updateLighting();
 
                             chunksToUpdate.add(c);
                         }
@@ -511,9 +497,9 @@ public class World extends RenderObject {
     }
 
     public void updateAllChunks() {
-        for (int x = 0; x < Configuration.viewingDistanceInChunks.x; x++) {
-            for (int y = 0; y < Configuration.viewingDistanceInChunks.y; y++) {
-                for (int z = 0; z < Configuration.viewingDistanceInChunks.z; z++) {
+        for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
+            for (int y = 0; y < Configuration._viewingDistanceInChunks.y; y++) {
+                for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
                     Chunk c = getChunk(x, y, z);
                     queueChunkForUpdate(c);
                 }
@@ -525,25 +511,25 @@ public class World extends RenderObject {
      * @return the pGen1
      */
     public PerlinNoise getpGen1() {
-        return pGen1;
+        return _pGen1;
     }
 
     /**
      * @return the pGen2
      */
     public PerlinNoise getpGen2() {
-        return pGen2;
+        return _pGen2;
     }
 
     /**
      * @return the pGen3
      */
     public PerlinNoise getpGen3() {
-        return pGen3;
+        return _pGen3;
     }
 
     public String chunkUpdateStatus() {
-        return String.format("U: %d UDL: %d", chunkUpdateQueue.size(), chunkUpdateQueueDL.size());
+        return String.format("U: %d UDL: %d", _chunkUpdateQueue.size(), _chunkUpdateQueueDL.size());
     }
 
     private void queueChunkForUpdate(Chunk c) {
@@ -572,10 +558,10 @@ public class World extends RenderObject {
             } catch (Exception e) {
             }
 
-            synchronized (chunkUpdateQueueDL) {
+            synchronized (_chunkUpdateQueueDL) {
                 for (Chunk cc : cs) {
-                    if (!chunkUpdateQueue.contains(cc) && cc != null) {
-                        chunkUpdateQueue.add(cc);
+                    if (!_chunkUpdateQueue.contains(cc) && cc != null) {
+                        _chunkUpdateQueue.add(cc);
                     }
                 }
             }

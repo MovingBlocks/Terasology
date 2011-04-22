@@ -70,7 +70,7 @@ public class Player extends RenderObject {
     public void render() {
         glRotatef((float) pitch, 1f, 0f, 0f);
         glRotatef((float) yaw, 0f, 1f, 0f);
-        glTranslatef(-position.x, -position.y, -position.z);
+        glTranslatef(-_position.x, -_position.y, -_position.z);
     }
 
     /**
@@ -168,7 +168,7 @@ public class Player extends RenderObject {
     }
 
     public Vector3f calcViewBlockPosition() {
-        Vector3f blockPosition = new Vector3f((int) position.x + 0.5f, (int) position.y + 0.5f, (int) position.z + 0.5f);
+        Vector3f blockPosition = new Vector3f((int) _position.x + 0.5f, (int) _position.y + 0.5f, (int) _position.z + 0.5f);
         Vector3f vD = new Vector3f((float) Math.sin(Math.toRadians(yaw)), -1f * (float) Math.sin(Math.toRadians(pitch)), -1f * (float) Math.cos(Math.toRadians(yaw)));
         vD.normalise();
 
@@ -227,7 +227,7 @@ public class Player extends RenderObject {
             } else if (Keyboard.isKeyDown(Keyboard.KEY_H)) {
                 this.demoAutoFlyMode = !demoAutoFlyMode;
             } else if (Keyboard.isKeyDown(Keyboard.KEY_P)) {
-                Configuration.showPlacingBox = !Configuration.showPlacingBox;
+                Configuration._showPlacingBox = !Configuration._showPlacingBox;
             }
 
             lastAction = Helper.getInstance().getTime();
@@ -311,7 +311,7 @@ public class Player extends RenderObject {
      * Resets the player's position.
      */
     public void resetPlayer() {
-        position = Helper.getInstance().calcPlayerOrigin();
+        _position = Helper.getInstance().calcPlayerOrigin();
     }
 
     /**

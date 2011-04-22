@@ -99,7 +99,7 @@ public class Helper {
                 }
                 break;
             case 0x6:
-                return new Vector3f(71f/255f, 214f/255f, 0f/255f);
+                return new Vector3f(186f/255f, 235f/255f, 100f/255f);
         }
         return new Vector3f(1.0f, 1.0f, 1.0f);
     }
@@ -115,7 +115,7 @@ public class Helper {
     }
 
     public Vector3f calcPlayerOrigin() {
-        return new Vector3f(Chunk.chunkDimensions.x * Configuration.viewingDistanceInChunks.x / 2, 127, (Chunk.chunkDimensions.z * Configuration.viewingDistanceInChunks.z) / 2);
+        return new Vector3f(Chunk.CHUNK_DIMENSIONS.x * Configuration._viewingDistanceInChunks.x / 2, 127, (Chunk.CHUNK_DIMENSIONS.z * Configuration._viewingDistanceInChunks.z) / 2);
     }
 
     public long getTime() {

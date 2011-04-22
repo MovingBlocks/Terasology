@@ -24,7 +24,7 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public abstract class RenderObject {
 
-    protected Vector3f position = new Vector3f(0.0f, 0.0f, 0.0f);
+    protected Vector3f _position = new Vector3f(0.0f, 0.0f, 0.0f);
 
     public void render() {
     }
@@ -33,10 +33,10 @@ public abstract class RenderObject {
     }
 
     public Vector3f getPosition() {
-        return position;
+        return _position;
     }
 
     public void setPosition(Vector3f position) {
-        this.position = position;
+        this._position = position;
     }
 }
