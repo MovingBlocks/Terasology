@@ -38,7 +38,7 @@ public class World extends RenderObject {
     private boolean _worldGenerated;
     private int _displayListSun = -1;
     private Player _player;
-    private float _daylight = 1.0f;
+    private float _daylight = 0.95f;
     private Random _rand;
     // Used for updating/generating the world
     private Thread _updateThread;
@@ -248,7 +248,7 @@ public class World extends RenderObject {
 
     public void generatePineTree(int posX, int posY, int posZ) {
 
-        int height = _rand.nextInt() % 2 + 12;
+        int height = _rand.nextInt() % 4 + 12;
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
@@ -256,10 +256,10 @@ public class World extends RenderObject {
         }
 
         // Generate the treetop
-        for (int y = height / 4; y < height; y += 2) {
-            for (int x = -(height / 2 - y / 2); x <= (height / 2 - y / 2); x++) {
-                for (int z = -(height / 2 - y / 2); z <= (height / 2 - y / 2); z++) {
-                    if (_rand.nextFloat() < 0.95 && !(x == 0 && z == 0)) {
+        for (int y = height / 3; y < height; y += 2) {
+            for (int x = -(height / 3 - y / 4); x <= (height / 3 - y / 4); x++) {
+                for (int z = -(height / 3 - y / 4); z <= (height / 3 - y / 4); z++) {
+                    if (!(x == 0 && z == 0)) {
                         setBlock(posX + x, posY + y, posZ + z, 0x6);
                     }
                 }
@@ -482,6 +482,7 @@ public class World extends RenderObject {
                             c.setPosition(pos);
                             c.generate();
                             c.populate();
+                            c.calcSunlight();
 
                             chunksToUpdate.add(c);
                         }
