@@ -120,6 +120,7 @@ public class Main {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FOG);
         glDepthFunc(GL_LEQUAL);
+        glLineWidth(4.0f);
         //glEnable(GL_BLEND);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -172,7 +173,6 @@ public class Main {
                     int bpZ = (int) blockPosition.z;
 
                     glColor3f(1.0f, 0.0f, 0.0f);
-                    glLineWidth(4.0f);
 
                     glBegin(GL_LINES);
                     glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
@@ -253,7 +253,7 @@ public class Main {
 
             // Update the FPS display in the title bar each second passed.
             if (lastFpsTime >= 1000) {
-                Display.setTitle(String.format("%s (FPS: %d, MEM: %d MB, %s, %s)", GAME_TITLE, fps, Runtime.getRuntime().freeMemory() / 1024 / 1024, world.chunkUpdateStatus(),player.getPosition()));
+                Display.setTitle(String.format("%s (FPS: %d, MEM: %d MB, %s, %s)", GAME_TITLE, fps, Runtime.getRuntime().freeMemory() / 1024 / 1024, world.chunkUpdateStatus(), player.getPosition()));
                 lastFpsTime = 0;
                 fps = 0;
             }

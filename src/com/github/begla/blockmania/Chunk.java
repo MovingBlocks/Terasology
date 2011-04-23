@@ -128,43 +128,46 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
      */
     @Override
     public void render() {
+
         /*
          * Draws the outline of each chunk.
          */
-        glPushMatrix();
-        glTranslatef(_position.x * (int) CHUNK_DIMENSIONS.x, _position.y * (int) CHUNK_DIMENSIONS.y, _position.z * (int) CHUNK_DIMENSIONS.z);
-        glColor3f(255.0f, 0.0f, 0.0f);
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
-        glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, 0.0f);
-        glVertex3f(0.0f, CHUNK_DIMENSIONS.y, 0.0f);
-        glEnd();
+        if (Configuration._showChunkOutlines) {
+            glPushMatrix();
+            glTranslatef(_position.x * (int) CHUNK_DIMENSIONS.x, _position.y * (int) CHUNK_DIMENSIONS.y, _position.z * (int) CHUNK_DIMENSIONS.z);
+            glColor3f(255.0f, 0.0f, 0.0f);
+            glBegin(GL_LINE_LOOP);
+            glVertex3f(0.0f, 0.0f, 0.0f);
+            glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
+            glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, 0.0f);
+            glVertex3f(0.0f, CHUNK_DIMENSIONS.y, 0.0f);
+            glEnd();
 
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, CHUNK_DIMENSIONS.z);
-        glVertex3f(0.0f, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
-        glVertex3f(0.0f, CHUNK_DIMENSIONS.y, 0.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glEnd();
+            glBegin(GL_LINE_LOOP);
+            glVertex3f(0.0f, 0.0f, 0.0f);
+            glVertex3f(0.0f, 0.0f, CHUNK_DIMENSIONS.z);
+            glVertex3f(0.0f, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
+            glVertex3f(0.0f, CHUNK_DIMENSIONS.y, 0.0f);
+            glVertex3f(0.0f, 0.0f, 0.0f);
+            glEnd();
 
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(0.0f, 0.0f, CHUNK_DIMENSIONS.z);
-        glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, CHUNK_DIMENSIONS.z);
-        glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
-        glVertex3f(0.0f, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
-        glVertex3f(0.0f, 0.0f, CHUNK_DIMENSIONS.z);
-        glEnd();
+            glBegin(GL_LINE_LOOP);
+            glVertex3f(0.0f, 0.0f, CHUNK_DIMENSIONS.z);
+            glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, CHUNK_DIMENSIONS.z);
+            glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
+            glVertex3f(0.0f, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
+            glVertex3f(0.0f, 0.0f, CHUNK_DIMENSIONS.z);
+            glEnd();
 
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
-        glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, CHUNK_DIMENSIONS.z);
-        glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
-        glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, 0.0f);
-        glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
-        glEnd();
-        glPopMatrix();
+            glBegin(GL_LINE_LOOP);
+            glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
+            glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, CHUNK_DIMENSIONS.z);
+            glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
+            glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, 0.0f);
+            glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
+            glEnd();
+            glPopMatrix();
+        }
 
         glEnable(GL_TEXTURE_2D);
         glCallList(_displayList);
@@ -783,16 +786,22 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
      * Calculates the sunlight.
      */
     public void calcSunlight() {
-        _light = new float[(int) CHUNK_DIMENSIONS.x][(int) CHUNK_DIMENSIONS.y][(int) CHUNK_DIMENSIONS.z];
         for (int x = 0; x < (int) CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < (int) CHUNK_DIMENSIONS.z; z++) {
-                for (int y = (int) CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
-                    if (_blocks[x][y][z] == 0) {
-                        _light[x][y][z] = MAX_LIGHT;
-                    } else {
-                        break;
-                    }
-                }
+                calcSunlightAtLocalPos(x, z);
+            }
+        }
+    }
+
+    public void calcSunlightAtLocalPos(int x, int z) {
+        boolean covered = false;
+        for (int y = (int) CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
+            if (_blocks[x][y][z] == 0 && !covered) {
+                _light[x][y][z] = MAX_LIGHT;
+            } else if (_blocks[x][y][z] == 0 && covered) {
+                _light[x][y][z] = 0.0f;
+            } else {
+                covered = true;
             }
         }
     }
