@@ -47,8 +47,6 @@ public class World extends RenderObject {
     private Chunk[][][] _chunks;
     // Update queue for generating the light and vertex arrays
     private final PriorityBlockingQueue<Chunk> _chunkUpdateQueue = new PriorityBlockingQueue<Chunk>();
-    // TODO
-    private final PriorityBlockingQueue<Chunk> _chunkUpdateQueueLight = new PriorityBlockingQueue<Chunk>();
     // Update queue for generating the display lists
     private final PriorityBlockingQueue<Chunk> _chunkUpdateQueueDL = new PriorityBlockingQueue<Chunk>();
     private PerlinNoise _pGen1;
@@ -82,8 +80,6 @@ public class World extends RenderObject {
                             c.generate();
                             c.populate();
                             c.calcSunlight();
-
-                            queueChunkForUpdate(c);
                         }
                     }
                 }
@@ -94,37 +90,36 @@ public class World extends RenderObject {
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "World updated ({0}s).", (System.currentTimeMillis() - timeStart) / 1000d);
 
                 while (true) {
-                    Chunk c = null;
-                    if (_chunkUpdateQueueLight.size() == 0) {
+
+                    _chunkUpdateQueue.clear();
+
+                    for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
+                        for (int y = 0; y < Configuration._viewingDistanceInChunks.y; y++) {
+                            for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
+                                synchronized (_chunkUpdateQueueDL) {
+                                    if (_chunks[x][y][z].isDirty()) {
+                                        _chunkUpdateQueue.add(_chunks[x][y][z]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    int updateCounter = 0;
+
+                    while (_chunkUpdateQueue.size() > 0 && updateCounter < 10) {
+                        Chunk c = _chunkUpdateQueue.poll();
+
                         synchronized (_chunkUpdateQueueDL) {
-                            c = _chunkUpdateQueue.peek();
-                            // Do not add a chunk which is beeing generated at the moment
                             if (_chunkUpdateQueueDL.contains(c)) {
-                                c = null;
-                            } else {
-                                _chunkUpdateQueue.poll();
+                                continue;
                             }
                         }
 
-                        if (c != null) {
-                            c.generateVertexArray();
-                            synchronized (_chunkUpdateQueueDL) {
-                                _chunkUpdateQueueDL.add(c);
-                            }
-                        }
-
-                    } else {
-                        synchronized (_chunkUpdateQueueDL) {
-                            c = _chunkUpdateQueueLight.poll();
-                        }
-
-                        if (c != null) {
-                            c.calcLight();
-                            synchronized (_chunkUpdateQueueDL) {
-                                _chunkUpdateQueue.add(c);
-                            }
-                        }
-
+                        c.calcLight();
+                        c.generateVertexArray();
+                        updateCounter++;
+                        _chunkUpdateQueueDL.add(c);
                     }
                 }
             }
@@ -249,14 +244,14 @@ public class World extends RenderObject {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            setBlock(posX, posY + i, posZ, 0x5, true);
+            setBlock(posX, posY + i, posZ, 0x5);
         }
 
         // Generate the treetop
         for (int y = height - 2; y < height + 2; y += 1) {
             for (int x = -2; x < 3; x++) {
                 for (int z = -2; z < 3; z++) {
-                    setBlock(posX + x, posY + y, posZ + z, 0x6, true);
+                    setBlock(posX + x, posY + y, posZ + z, 0x6);
                 }
             }
         }
@@ -268,7 +263,7 @@ public class World extends RenderObject {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            setBlock(posX, posY + i, posZ, 0x5, true);
+            setBlock(posX, posY + i, posZ, 0x5);
         }
 
         // Generate the treetop
@@ -276,7 +271,7 @@ public class World extends RenderObject {
             for (int x = -(height / 3 - y / 4); x <= (height / 3 - y / 4); x++) {
                 for (int z = -(height / 3 - y / 4); z <= (height / 3 - y / 4); z++) {
                     if (!(x == 0 && z == 0)) {
-                        setBlock(posX + x, posY + y, posZ + z, 0x6, true);
+                        setBlock(posX + x, posY + y, posZ + z, 0x6);
                     }
                 }
             }
@@ -355,7 +350,7 @@ public class World extends RenderObject {
     /**
      * Sets the type of a block at a given position.
      */
-    public final void setBlock(int x, int y, int z, int type, boolean update) {
+    public final void setBlock(int x, int y, int z, int type) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration._viewingDistanceInChunks.x;
         int chunkPosY = calcChunkPosY(y) % (int) Configuration._viewingDistanceInChunks.y;
         int chunkPosZ = calcChunkPosZ(z) % (int) Configuration._viewingDistanceInChunks.z;
@@ -374,13 +369,10 @@ public class World extends RenderObject {
 
             // Generate or update the corresponding chunk
             c.setBlock(blockPosX, blockPosY, blockPosZ, type);
+            c.calcSunlightAtLocalPos(blockPosX, blockPosZ);
+            markChunksAsDirty(chunkPosX, chunkPosY, chunkPosZ);
 
-            if (update) {
-                c.calcSunlightAtLocalPos(blockPosX, blockPosZ);
-                queueChunkForUpdate(c);
-            }
         } catch (Exception e) {
-            return;
         }
     }
 
@@ -510,10 +502,6 @@ public class World extends RenderObject {
                 }
             }
         }
-
-        for (Chunk c : chunksToUpdate) {
-            queueChunkForUpdate(c);
-        }
     }
 
     public void updateAllChunks() {
@@ -521,7 +509,7 @@ public class World extends RenderObject {
             for (int y = 0; y < Configuration._viewingDistanceInChunks.y; y++) {
                 for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
                     Chunk c = getChunk(x, y, z);
-                    queueChunkForUpdate(c);
+                    c.markDirty();
                 }
             }
         }
@@ -549,42 +537,33 @@ public class World extends RenderObject {
     }
 
     public String chunkUpdateStatus() {
-        return String.format("U: %d UDL: %d UL: %d", _chunkUpdateQueue.size(), _chunkUpdateQueueDL.size(), _chunkUpdateQueueLight.size());
+        return String.format("U: %d UDL: %d", _chunkUpdateQueue.size(), _chunkUpdateQueueDL.size());
     }
 
-    private void queueChunkForUpdate(Chunk c) {
-        if (c != null) {
-            // Add all neighbors
-            ArrayList<Chunk> cs = new ArrayList<Chunk>();
-            cs.add(c);
+    public void markChunksAsDirty(int x, int y, int z) {
+        try {
+            _chunks[x][y][z].markDirty();
+        } catch (Exception e) {
+        }
 
-            try {
-                cs.add(getChunk((int) c.getPosition().x + 1, (int) c.getPosition().y, (int) c.getPosition().z));
-            } catch (Exception e) {
-            }
+        try {
+            _chunks[x + 1][y][z].markDirty();
+        } catch (Exception e) {
+        }
 
-            try {
-                cs.add(getChunk((int) c.getPosition().x - 1, (int) c.getPosition().y, (int) c.getPosition().z));
-            } catch (Exception e) {
-            }
+        try {
+            _chunks[x - 1][y][z].markDirty();
+        } catch (Exception e) {
+        }
 
-            try {
-                cs.add(getChunk((int) c.getPosition().x, (int) c.getPosition().y, (int) c.getPosition().z + 1));
-            } catch (Exception e) {
-            }
+        try {
+            _chunks[x][y][z + 1].markDirty();
+        } catch (Exception e) {
+        }
 
-            try {
-                cs.add(getChunk((int) c.getPosition().x, (int) c.getPosition().y, (int) c.getPosition().z - 1));
-            } catch (Exception e) {
-            }
-
-            synchronized (_chunkUpdateQueueDL) {
-                for (Chunk cc : cs) {
-                    if (!_chunkUpdateQueueLight.contains(cc) && cc != null) {
-                        _chunkUpdateQueueLight.add(cc);
-                    }
-                }
-            }
+        try {
+            _chunks[x][y][z - 1].markDirty();
+        } catch (Exception e) {
         }
     }
 }

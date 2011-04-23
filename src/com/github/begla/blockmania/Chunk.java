@@ -45,6 +45,11 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
     private static final float BLOCK_SIDE_DIMMING = 0.075f;
 
     /*
+     * TODO
+     */
+    private boolean _dirty;
+
+    /*
      * Global parameters for the chunks.
      */
     public static final Vector3f CHUNK_DIMENSIONS = new Vector3f(16, 128, 16);
@@ -90,11 +95,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
      * The display list used for displaying the chunk.
      */
     private int _displayList = -1;
-
-    /*
-     * This is set if the chunk has changed (e.g. just generated, a block was removed or placed etc.).
-     */
-    private boolean _changed = false;
 
     enum SIDE {
 
@@ -229,7 +229,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
             }
         }
 
-        _changed = true;
+        _dirty = true;
     }
 
     /**
@@ -251,7 +251,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
             }
         }
 
-        _changed = true;
+        _dirty = true;
     }
 
     /**
@@ -563,7 +563,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
                             _quads.add(-0.5f + y + offset.y);
                             _quads.add(0.5f + z + offset.z);
                         }
-
                     }
 
                 }
@@ -630,6 +629,8 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         vb = null;
         tb = null;
         cb = null;
+
+        _dirty = false;
 
     }
 
@@ -871,6 +872,8 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
             _light[x][y][z] = intens;
         } catch (Exception e) {
         }
+
+        _dirty = true;
     }
 
     /*
@@ -882,7 +885,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         } catch (Exception e) {
             return 0;
         }
-
     }
 
     /*
@@ -891,7 +893,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
     public void setBlock(int x, int y, int z, int type) {
         try {
             _blocks[x][y][z] = type;
-            _changed = true;
         } catch (Exception e) {
         }
     }
@@ -901,5 +902,13 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
             return true;
         }
         return false;
+    }
+
+    public void markDirty() {
+        _dirty = true;
+    }
+
+    public boolean isDirty() {
+        return _dirty;
     }
 }

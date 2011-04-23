@@ -193,7 +193,7 @@ public class Player extends RenderObject {
     public void placeBlock() {
         if (getParent() != null) {
             Vector3f blockPosition = calcViewBlockPosition();
-            getParent().setBlock((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z, 0x2, true);
+            getParent().setBlock((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z, 0x2);
         }
     }
 
@@ -204,7 +204,7 @@ public class Player extends RenderObject {
     public void removeBlock() {
         if (getParent() != null) {
             Vector3f blockPosition = calcViewBlockPosition();
-            getParent().setBlock((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z, 0x0, true);
+            getParent().setBlock((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z, 0x0);
         }
     }
 
