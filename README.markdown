@@ -1,5 +1,4 @@
 Blockmania
 ==========
 
-* TODO: Write some thingys about Blockmania...
-* **More information about the project:** [Moving Blocks](http://movingblocks.tumblr.com/)!
+ **Interested in the development of Blockmania? Follow my personal blog:** [Moving Blocks!](http://movingblocks.tumblr.com/)
