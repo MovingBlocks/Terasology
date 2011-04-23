@@ -294,8 +294,8 @@ public class Player extends RenderObject {
             }
 
             if (demoAutoFlyMode) {
-                accX = 8.f;
-                accZ = 8.f;
+                accX = 32.f;
+                accZ = 32.f;
             }
 
             getPosition().x += (accX / 1000.0f) * delta;

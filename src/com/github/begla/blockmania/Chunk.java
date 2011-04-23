@@ -229,7 +229,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
             }
         }
 
-        _dirty = true;
+        markDirty();
     }
 
     /**
@@ -251,7 +251,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
             }
         }
 
-        _dirty = true;
+        markDirty();
     }
 
     /**
@@ -280,7 +280,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
 
                         if (drawTop) {
                             Vector3f colorOffset = Helper.getInstance().getColorOffsetFor(block, Helper.SIDE.TOP);
-                            ;
                             float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z)) - (dimBlockAtLocalPos(x, y + 1, z) ? DIMMING_INTENS : 0.0f), MIN_LIGHT);
 
                             float texOffsetX = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.TOP).x;
@@ -568,6 +567,8 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
                 }
             }
         }
+
+        markClean();
     }
 
     /**
@@ -629,9 +630,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         vb = null;
         tb = null;
         cb = null;
-
-        _dirty = false;
-
     }
 
     /**
@@ -795,6 +793,10 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
     }
 
     public void calcSunlightAtLocalPos(int x, int z) {
+        if (x < 0 || z < 0 || x >= CHUNK_DIMENSIONS.x || z >= CHUNK_DIMENSIONS.z) {
+            return;
+        }
+
         boolean covered = false;
         for (int y = (int) CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
             if (_blocks[x][y][z] == 0 && !covered) {
@@ -873,7 +875,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         } catch (Exception e) {
         }
 
-        _dirty = true;
+        markDirty();
     }
 
     /*
@@ -906,6 +908,10 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
 
     public void markDirty() {
         _dirty = true;
+    }
+
+    public void markClean() {
+        _dirty = false;
     }
 
     public boolean isDirty() {
