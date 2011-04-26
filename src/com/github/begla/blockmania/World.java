@@ -23,6 +23,12 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.github.begla.blockmania.noise.PerlinNoise;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
 import org.lwjgl.util.glu.*;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -32,6 +38,7 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class World extends RenderObject {
 
+    private int debug = 0;
     private long _daylightTimer = Helper.getInstance().getTime();
     private boolean _worldGenerated;
     private int _displayListSun = -1;
@@ -44,10 +51,11 @@ public class World extends RenderObject {
     // The chunks to display
     private Chunk[][][] _chunks;
     // Update queue for generating the display lists
-    private final PriorityBlockingQueue<Chunk> _chunkUpdateQueueDL = new PriorityBlockingQueue<Chunk>();
+    private final ArrayBlockingQueue<Chunk> _chunkUpdateQueueDL = new ArrayBlockingQueue<Chunk>(256);
     private PerlinNoise _pGen1;
     private PerlinNoise _pGen2;
     private PerlinNoise _pGen3;
+    private TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
 
     public World(String title, String seed, Player p) {
         this._player = p;
@@ -55,7 +63,6 @@ public class World extends RenderObject {
         _pGen1 = new PerlinNoise(_rand.nextInt());
         _pGen2 = new PerlinNoise(_rand.nextInt());
         _pGen3 = new PerlinNoise(_rand.nextInt());
-        final World currentWorld = this;
 
         _chunks = new Chunk[(int) Configuration._viewingDistanceInChunks.x][(int) Configuration._viewingDistanceInChunks.y][(int) Configuration._viewingDistanceInChunks.z];
 
@@ -69,14 +76,19 @@ public class World extends RenderObject {
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Generating chunks. Please wait.");
 
                 for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
-                    for (int y = 0; y < Configuration._viewingDistanceInChunks.y; y++) {
-                        for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
-                            Chunk c = new Chunk(currentWorld, new Vector3f(x, y, z));
-                            _chunks[x][y][z] = c;
-                            c.generate();
-                            c.populate();
-                            c.calcSunlight();
-                        }
+                    for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
+                        Chunk c = loadOrCreateChunk(x, z);
+                        _chunks[x][0][z] = c;
+                    }
+                }
+
+                for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
+                    for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
+                        Chunk c = _chunks[x][0][z];
+                        c.populate();
+                        c.calcSunlight();
+                        c.fresh = false;
+                        c.markDirty();
                     }
                 }
 
@@ -86,35 +98,49 @@ public class World extends RenderObject {
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "World updated ({0}s).", (System.currentTimeMillis() - timeStart) / 1000d);
 
                 // Update queue for generating the light and vertex arrays
-                PriorityBlockingQueue<Chunk> _chunkUpdateQueue = null;
+                PriorityBlockingQueue<Chunk> updates = null;
 
                 while (true) {
-                    _chunkUpdateQueue = new PriorityBlockingQueue<Chunk>();
 
-                    for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
-                        for (int y = 0; y < Configuration._viewingDistanceInChunks.y; y++) {
-                            for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
+                    /**
+                     * Create a sorted priority queue to update the chunks first,
+                     * which are nearest to the player.
+                     */
+                    updates = new PriorityBlockingQueue<Chunk>();
+
+                    /**
+                     * Put all dirty blocks into the priority queue according to their position relatively to the player.
+                     */
+                    int updateCounter = 0;
+
+                    for (int x = 0; x < (int) Configuration._viewingDistanceInChunks.x; x++) {
+                        for (int z = 0; z < (int) Configuration._viewingDistanceInChunks.z; z++) {
+                            for (int y = 0; y < (int) Configuration._viewingDistanceInChunks.y; y++) {
                                 synchronized (_chunkUpdateQueueDL) {
-                                    if (_chunks[x][y][z].isDirty()) {
-                                        _chunkUpdateQueue.add(_chunks[x][y][z]);
+                                    Chunk c = _chunks[x][y][z];
+                                    if (!_chunkUpdateQueueDL.contains(c)) {
+                                        if (c.isDirty()) {
+                                            updates.add(c);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
 
-                    int updateCounter = 0;
+                    while (updates.size() > 0 && updateCounter < 4) {
+                        Chunk c = updates.poll();
 
-                    while (_chunkUpdateQueue.size() > 0 && updateCounter < 10) {
-                        Chunk c = _chunkUpdateQueue.poll();
-
-                        synchronized (_chunkUpdateQueueDL) {
-                            if (_chunkUpdateQueueDL.contains(c)) {
-                                continue;
-                            }
+                        if (c.fresh) {
+                            c.populate();
+                            c.calcSunlight();
+                            c.fresh = false;
                         }
+
                         c.calcLight();
                         c.generateVertexArray();
+                        c.markClean();
+
                         updateCounter++;
 
                         synchronized (_chunkUpdateQueueDL) {
@@ -132,16 +158,16 @@ public class World extends RenderObject {
                 while (true) {
                     updateInfWorld();
 
-                    if (Helper.getInstance().getTime() - _daylightTimer > 120000) {
-                        _daylight -= 0.2;
-
-                        if (_daylight <= 0.4f) {
-                            _daylight = 1.0f;
-                        }
-
-                        _daylightTimer = Helper.getInstance().getTime();
-                        updateAllChunks();
-                    }
+//                    if (Helper.getInstance().getTime() - _daylightTimer > 120000) {
+//                        _daylight -= 0.2;
+//
+//                        if (_daylight <= 0.4f) {
+//                            _daylight = 1.0f;
+//                        }
+//
+//                        _daylightTimer = Helper.getInstance().getTime();
+//                        updateAllChunks();
+//                    }
                 }
             }
         });
@@ -157,7 +183,7 @@ public class World extends RenderObject {
         Sphere s = new Sphere();
         _displayListSun = glGenLists(1);
         glNewList(_displayListSun, GL_COMPILE);
-        glColor4f(1.0f, 0.8f, 0.0f, 1.0f);
+        glColor4f(1.0f, 0.7f, 0.0f, 1.0f);
         s.draw(256.0f, 16, 32);
         glEndList();
 
@@ -181,13 +207,11 @@ public class World extends RenderObject {
          * Render all active chunks.
          */
         for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
-            for (int y = 0; y < Configuration._viewingDistanceInChunks.y; y++) {
-                for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
-                    Chunk c = getChunk(x, y, z);
+            for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
+                Chunk c = getChunk(x, 0, z);
 
-                    if (c != null) {
-                        c.render();
-                    }
+                if (c != null) {
+                    c.render();
                 }
             }
         }
@@ -200,7 +224,7 @@ public class World extends RenderObject {
     public void update(long delta) {
         Chunk c = null;
 
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < 8; i++) {
             synchronized (_chunkUpdateQueueDL) {
                 c = _chunkUpdateQueueDL.peek();
             }
@@ -212,12 +236,11 @@ public class World extends RenderObject {
                     _chunkUpdateQueueDL.remove(c);
                 }
             }
+
         }
     }
 
     public void generateForest() {
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Generating a forest. Please stand by.");
 
         for (int x = 0; x < Configuration._viewingDistanceInChunks.x * Chunk.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration._viewingDistanceInChunks.y * Chunk.CHUNK_DIMENSIONS.y; y++) {
@@ -234,8 +257,6 @@ public class World extends RenderObject {
                 }
             }
         }
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished generating forest.");
     }
 
     public void generateTree(int posX, int posY, int posZ) {
@@ -251,7 +272,9 @@ public class World extends RenderObject {
         for (int y = height - 2; y < height + 2; y += 1) {
             for (int x = -2; x < 3; x++) {
                 for (int z = -2; z < 3; z++) {
-                    setBlock(posX + x, posY + y, posZ + z, 0x6);
+                    if (!(x == -2 && z == -2) && !(x == 2 && z == 2) && !(x == -2 && z == 2) && !(x == 2 && z == -2)) {
+                        setBlock(posX + x, posY + y, posZ + z, 0x6);
+                    }
                 }
             }
         }
@@ -267,11 +290,11 @@ public class World extends RenderObject {
         }
 
         // Generate the treetop
-        for (int y = height / 3; y < height; y += 2) {
-            for (int x = -(height / 3 - y / 4); x <= (height / 3 - y / 4); x++) {
-                for (int z = -(height / 3 - y / 4); z <= (height / 3 - y / 4); z++) {
+        for (int y = 0; y < 10; y += 2) {
+            for (int x = -5 + y / 2; x <= 5 - y / 2; x++) {
+                for (int z = -5 + y / 2; z <= 5 - y / 2; z++) {
                     if (!(x == 0 && z == 0)) {
-                        setBlock(posX + x, posY + y, posZ + z, 0x6);
+                        setBlock(posX + x, posY + y + (height - 10), posZ + z, 0x6);
                     }
                 }
             }
@@ -364,13 +387,12 @@ public class World extends RenderObject {
 
             // Check if the chunk is valid
             if (c.getPosition().x != calcChunkPosX(x) || c.getPosition().y != calcChunkPosY(y) || c.getPosition().z != calcChunkPosZ(z)) {
-                return;
+                c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
             }
 
             // Generate or update the corresponding chunk
             c.setBlock(blockPosX, blockPosY, blockPosZ, type);
-            c.calcSunlightAtLocalPos(blockPosX, blockPosZ);
-            markChunksAsDirty(c);
+            c.markChunkAndNeighborsDirty();
 
         } catch (Exception e) {
         }
@@ -381,7 +403,6 @@ public class World extends RenderObject {
 
         try {
             c = _chunks[x % (int) Configuration._viewingDistanceInChunks.x][y % (int) Configuration._viewingDistanceInChunks.y][z % (int) Configuration._viewingDistanceInChunks.z];
-
         } catch (Exception e) {
         }
 
@@ -402,6 +423,12 @@ public class World extends RenderObject {
 
         try {
             Chunk c = getChunk(chunkPosX, chunkPosY, chunkPosZ);
+
+            // Check if the chunk is valid
+            if (c.getPosition().x != calcChunkPosX(x) || c.getPosition().y != calcChunkPosY(y) || c.getPosition().z != calcChunkPosZ(z)) {
+                c = loadChunk(calcChunkPosX(x), calcChunkPosZ(z));
+            }
+
             return c.getBlock(blockPosX, blockPosY, blockPosZ);
         } catch (Exception e) {
         }
@@ -423,6 +450,12 @@ public class World extends RenderObject {
 
         try {
             Chunk c = getChunk(chunkPosX, chunkPosY, chunkPosZ);
+
+            // Check if the chunk is valid
+            if (c.getPosition().x != calcChunkPosX(x) || c.getPosition().y != calcChunkPosY(y) || c.getPosition().z != calcChunkPosZ(z)) {
+                c = loadChunk(calcChunkPosX(x), calcChunkPosZ(z));
+            }
+
             return c.getLight(blockPosX, blockPosY, blockPosZ);
         } catch (Exception e) {
         }
@@ -444,7 +477,15 @@ public class World extends RenderObject {
 
         try {
             Chunk c = getChunk(chunkPosX, chunkPosY, chunkPosZ);
+
+            // Check if the chunk is valid
+            if (c.getPosition().x != calcChunkPosX(x) || c.getPosition().y != calcChunkPosY(y) || c.getPosition().z != calcChunkPosZ(z)) {
+                c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+            }
+
             c.setLight(blockPosX, blockPosY, blockPosZ, intens);
+
+
         } catch (Exception e) {
         }
     }
@@ -462,41 +503,38 @@ public class World extends RenderObject {
     }
 
     private void updateInfWorld() {
-
         for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
-            for (int y = 0; y < Configuration._viewingDistanceInChunks.y; y++) {
-                for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
-                    Chunk c = getChunk(x, y, z);
+            for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
+                Chunk c = getChunk(x, 0, z);
 
-                    if (c != null) {
-                        Vector3f pos = new Vector3f(x, y, z);
+                if (c != null) {
+                    Vector3f pos = new Vector3f(x, 0, z);
 
-                        int multZ = (int) calcPlayerChunkOffsetZ() / (int) Configuration._viewingDistanceInChunks.z + 1;
+                    int multZ = (int) calcPlayerChunkOffsetZ() / (int) Configuration._viewingDistanceInChunks.z + 1;
 
-                        if (z < calcPlayerChunkOffsetZ() % Configuration._viewingDistanceInChunks.z) {
-                            pos.z += Configuration._viewingDistanceInChunks.z * multZ;
-                        } else {
-                            pos.z += Configuration._viewingDistanceInChunks.z * (multZ - 1);
-                        }
-
-                        int multX = (int) calcPlayerChunkOffsetX() / (int) Configuration._viewingDistanceInChunks.x + 1;
-
-                        if (x < calcPlayerChunkOffsetX() % Configuration._viewingDistanceInChunks.x) {
-                            pos.x += Configuration._viewingDistanceInChunks.x * multX;
-                        } else {
-                            pos.x += Configuration._viewingDistanceInChunks.x * (multX - 1);
-                        }
-
-                        if (c.getPosition().x != pos.x || c.getPosition().z != pos.z) {
-                            c.setPosition(pos);
-                            c.generate();
-                            c.populate();
-                            c.calcSunlight();
-
-                            markChunksAsDirty(c);
-                        }
-
+                    if (z < calcPlayerChunkOffsetZ() % Configuration._viewingDistanceInChunks.z) {
+                        pos.z += Configuration._viewingDistanceInChunks.z * multZ;
+                    } else {
+                        pos.z += Configuration._viewingDistanceInChunks.z * (multZ - 1);
                     }
+
+                    int multX = (int) calcPlayerChunkOffsetX() / (int) Configuration._viewingDistanceInChunks.x + 1;
+
+                    if (x < calcPlayerChunkOffsetX() % Configuration._viewingDistanceInChunks.x) {
+                        pos.x += Configuration._viewingDistanceInChunks.x * multX;
+                    } else {
+                        pos.x += Configuration._viewingDistanceInChunks.x * (multX - 1);
+                    }
+
+                    if (c.getPosition().x != pos.x || c.getPosition().z != pos.z) {
+
+                        // Try to load a cached version of the chunk
+                        c = loadOrCreateChunk((int) pos.x, (int) pos.z);
+                        // Replace the old chunk
+                        _chunks[x][0][z] = c;
+                        c.markChunkAndNeighborsDirty();
+                    }
+
                 }
             }
         }
@@ -538,34 +576,142 @@ public class World extends RenderObject {
         return String.format("Chunkupdates: %d", _chunkUpdateQueueDL.size());
     }
 
-    public void markChunksAsDirty(Chunk c) {
-        int x = (int) c.getPosition().x % (int) Configuration._viewingDistanceInChunks.x;
-        int y = (int) c.getPosition().y % (int) Configuration._viewingDistanceInChunks.y;
-        int z = (int) c.getPosition().z % (int) Configuration._viewingDistanceInChunks.z;
+    /*
+     * Returns the vertices of a block at the given position.
+     */
+    public Vector3f[] verticesForBlockAt(int x, int y, int z) {
+        Vector3f[] vertices = new Vector3f[8];
 
-        try {
-            _chunks[x][y][z].markDirty();
-        } catch (Exception e) {
+        vertices[0] = new Vector3f(x - .5f, y - .5f, z - .5f);
+        vertices[1] = new Vector3f(x + .5f, y - .5f, z - .5f);
+        vertices[2] = new Vector3f(x + .5f, y + .5f, z - .5f);
+        vertices[3] = new Vector3f(x - .5f, y + .5f, z - .5f);
+
+        vertices[4] = new Vector3f(x - .5f, y - .5f, z + .5f);
+        vertices[5] = new Vector3f(x + .5f, y - .5f, z + .5f);
+        vertices[6] = new Vector3f(x + .5f, y + .5f, z + .5f);
+        vertices[7] = new Vector3f(x - .5f, y + .5f, z + .5f);
+
+        return vertices;
+    }
+
+    /**
+     * Calculates the intersection of a given ray originating from a specified point with
+     * a block. Returns a list of intersections ordered by distance.
+     */
+    public ArrayList<RayFaceIntersection> rayBlockIntersection(int x, int y, int z, Vector3f origin, Vector3f ray) {
+        /*
+         * If the block is made out of air... panic and get out of here. Fast.
+         */
+        if (getBlock(x, y, z) == 0) {
+            return null;
         }
 
-        try {
-            _chunks[x + 1][y][z].markDirty();
-        } catch (Exception e) {
+        ArrayList<RayFaceIntersection> result = new ArrayList<RayFaceIntersection>();
+
+        /**
+         * Fetch all vertices of the specified block.
+         */
+        Vector3f[] vertices = verticesForBlockAt(x, y, z);
+        Vector3f blockPos = new Vector3f(x, y, z);
+
+        /*
+         * Generate a new intersection for each side of the block.
+         */
+
+        // Front
+        RayFaceIntersection is = rayFaceIntersection(blockPos, vertices[0], vertices[3], vertices[2], origin, ray);
+        if (is != null) {
+            result.add(is);
         }
 
-        try {
-            _chunks[x - 1][y][z].markDirty();
-        } catch (Exception e) {
+        // Back
+        is = rayFaceIntersection(blockPos, vertices[4], vertices[5], vertices[6], origin, ray);
+        if (is != null) {
+            result.add(is);
         }
 
-        try {
-            _chunks[x][y][z + 1].markDirty();
-        } catch (Exception e) {
+        // Left
+        is = rayFaceIntersection(blockPos, vertices[0], vertices[4], vertices[7], origin, ray);
+        if (is != null) {
+            result.add(is);
         }
 
-        try {
-            _chunks[x][y][z - 1].markDirty();
-        } catch (Exception e) {
+        // Right
+        is = rayFaceIntersection(blockPos, vertices[1], vertices[2], vertices[6], origin, ray);
+        if (is != null) {
+            result.add(is);
         }
+
+        // Top
+        is = rayFaceIntersection(blockPos, vertices[3], vertices[7], vertices[6], origin, ray);
+        if (is != null) {
+            result.add(is);
+        }
+
+        // Bottom
+        is = rayFaceIntersection(blockPos, vertices[0], vertices[1], vertices[5], origin, ray);
+        if (is != null) {
+            result.add(is);
+        }
+
+        /*
+         * Sort the intersections by distance.
+         */
+        Collections.sort(result);
+        return result;
+    }
+
+    private RayFaceIntersection rayFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
+        /**
+         * Calculate the plane to intersect with.
+         */
+        Vector3f a = Vector3f.sub(v1, v0, null);
+        Vector3f b = Vector3f.sub(v2, v0, null);
+        Vector3f norm = Vector3f.cross(a, b, null);
+
+
+        float d = -(norm.x * v0.x + norm.y * v0.y + norm.z * v0.z);
+
+        /**
+         * Calculate the distance on the ray, where the intersection occurs.
+         */
+        float t = -(norm.x * origin.x + norm.y * origin.y + norm.z * origin.z + d) / (Vector3f.dot(ray, norm));
+
+        /**
+         * Calc. the point of intersection.
+         */
+        Vector3f intersectPoint = new Vector3f(ray.x * t, ray.y * t, ray.z * t);
+        Vector3f.add(intersectPoint, origin, intersectPoint);
+
+        if (intersectPoint.x >= v0.x && intersectPoint.x <= v2.x && intersectPoint.y >= v0.y && intersectPoint.y <= v2.y && intersectPoint.z >= v0.z && intersectPoint.z <= v2.z) {
+            return new RayFaceIntersection(blockPos, v0, v1, v2, d, t, origin, ray, intersectPoint);
+        }
+
+        return null;
+    }
+
+    private Chunk loadOrCreateChunk(int x, int z) {
+        Chunk c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
+
+        if (c != null) {
+            return c;
+        }
+
+        // Remove 128 chunks if the cache is filled.
+        if (_chunkCache.size() == 1024) {
+            for (int i = 0; i < 16; i++) {
+                _chunkCache.pollFirstEntry();
+            }
+        }
+
+        // Generate a new chunk, cache it and return it!
+        c = new Chunk(this, new Vector3f(x, 0, z));
+        _chunkCache.put(Helper.getInstance().cantorize(x, z), c);
+        return c;
+    }
+
+    private Chunk loadChunk(int x, int z) {
+        return _chunkCache.get(Helper.getInstance().cantorize(x, z));
     }
 }

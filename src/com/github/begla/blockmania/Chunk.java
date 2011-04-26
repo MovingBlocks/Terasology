@@ -43,12 +43,17 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
     private static final float MIN_LIGHT = 0.1f;
     private static final float DIMMING_INTENS = 0.075f;
     private static final float BLOCK_SIDE_DIMMING = 0.075f;
+    public boolean fresh = true;
+
+    public static enum UPDATE_TYPE {
+
+        LIGHT, BLOCK
+    }
 
     /*
      * TODO
      */
     private boolean _dirty;
-
     /*
      * Global parameters for the chunks.
      */
@@ -121,6 +126,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         this._position = position;
         _parent = p;
         clear();
+        generate();
     }
 
     /**
@@ -136,6 +142,7 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
             glPushMatrix();
             glTranslatef(_position.x * (int) CHUNK_DIMENSIONS.x, _position.y * (int) CHUNK_DIMENSIONS.y, _position.z * (int) CHUNK_DIMENSIONS.z);
             glColor3f(255.0f, 0.0f, 0.0f);
+
             glBegin(GL_LINE_LOOP);
             glVertex3f(0.0f, 0.0f, 0.0f);
             glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
@@ -205,21 +212,40 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
             for (int z = 0; z < Chunk.CHUNK_DIMENSIONS.z; z++) {
                 int height = (int) (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64) + 64;
 
-                for (int i = (int) CHUNK_DIMENSIONS.y; i >= 0; i--) {
+                for (int i = (int) CHUNK_DIMENSIONS.y; i > 0; i--) {
                     if (calcCaveDensityAt(x + xOffset, i, z + zOffset) < 0.5 && calcCanyonDensity(x + xOffset, i + yOffset, z + zOffset) < 0.5) {
                         if (i == height) {
-                            // Block has air "on top" => Dirt!
-                            setBlock(x, i, z, 0x1);
+                            /*
+                             * Grass covers the terrain.
+                             */
+                            if (i != 36) {
+                                setBlock(x, i, z, 0x1);
+                            } else {
+                                setBlock(x, i, z, 0x7);
+                            }
                         } else if (i < height) {
-                            setBlock(x, i, z, 0x2);
-
-                            if (height - i < height * 0.75f) {
+                            if (i < height * 0.75f) {
+                                /*
+                                 * Generate stone within the terrain
+                                 */
                                 setBlock(x, i, z, 0x3);
+                            } else {
+                                /*
+                                 * The upper layer is filled with dirt.
+                                 */
+                                setBlock(x, i, z, 0x2);
+                            }
+
+                            if (i <= 36 && i >= 32) {
+                                /**
+                                 * Generate "beach".
+                                 */
+                                setBlock(x, i, z, 0x7);
                             }
                         }
                     }
 
-                    if (i < 32) {
+                    if (i <= 32) {
                         if (getBlock(x, i, z) == 0) {
                             setBlock(x, i, z, 0x4);
                         }
@@ -228,8 +254,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
                 }
             }
         }
-
-        markDirty();
     }
 
     /**
@@ -250,8 +274,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
                 }
             }
         }
-
-        markDirty();
     }
 
     /**
@@ -328,7 +350,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
                         if (drawFront) {
                             Vector3f colorOffset = Helper.getInstance().getColorOffsetFor(block, Helper.SIDE.FRONT);
                             float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) - BLOCK_SIDE_DIMMING - (dimBlockAtLocalPos(x, y, z - 1) ? DIMMING_INTENS : 0.0f), MIN_LIGHT);
-
 
                             float texOffsetX = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.FRONT).x;
                             float texOffsetY = Helper.getInstance().getTextureOffsetFor(block, Helper.SIDE.FRONT).y;
@@ -567,8 +588,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
                 }
             }
         }
-
-        markClean();
     }
 
     /**
@@ -647,49 +666,43 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         return (blockToCheck == 0 || (Helper.getInstance().isBlockTypeTranslucent(blockToCheck) && !Helper.getInstance().isBlockTypeTranslucent(currentBlock)));
     }
 
-    private void floodLightAtWorldPos(int x, int y, int z) {
+    private void floodLight(int x, int y, int z) {
 
-        /*
-         * Check which neighbors have a lower light value than the current light value minus one light step.
-         */
-        float val_n1 = _parent.getLight(x + 1, y, z);
-        float val_n2 = _parent.getLight(x - 1, y, z);
-        float val_n3 = _parent.getLight(x, y, z + 1);
-        float val_n4 = _parent.getLight(x, y, z - 1);
-        float val_n5 = _parent.getLight(x, y + 1, z);
-        float val_n6 = _parent.getLight(x, y - 1, z);
-        /*
-         * Get light value for the current block.
-         */
-        float val_light = Math.max(0f, _parent.getLight(x, y, z));
+        x = getBlockWorldPosX(x);
+        y = getBlockWorldPosY(y);
+        z = getBlockWorldPosZ(z);
+
+        float val_n1 = _parent.getBlock(x + 1, y, z) == 0 ? _parent.getLight(x + 1, y, z) : -1f;
+        float val_n2 = _parent.getBlock(x - 1, y, z) == 0 ? _parent.getLight(x - 1, y, z) : -1f;
+        float val_n3 = _parent.getBlock(x, y, z + 1) == 0 ? _parent.getLight(x, y, z + 1) : -1f;
+        float val_n4 = _parent.getBlock(x, y, z - 1) == 0 ? _parent.getLight(x, y, z - 1) : -1f;
+        float val_n5 = _parent.getBlock(x, y + 1, z) == 0 ? _parent.getLight(x, y + 1, z) : -1f;
+        float val_n6 = _parent.getBlock(x, y - 1, z) == 0 ? _parent.getLight(x, y - 1, z) : -1f;
+
+        float val_light = _parent.getLight(x, y, z);
         float val_light_next = Math.max(val_light - 0.0625f, 0f);
-        /*
-         * Check the neighbors and recursively flood those.
-         */
-        if (val_n1 < val_light_next && _parent.getBlock(x + 1, y, z) == 0) {
+
+        if (val_n1 < val_light_next && val_n1 != -1) {
             _parent.setLight(x + 1, y, z, val_light_next);
         }
 
-
-        if (val_n2 < val_light_next && _parent.getBlock(x - 1, y, z) == 0) {
+        if (val_n2 < val_light_next && val_n2 != -1) {
             _parent.setLight(x - 1, y, z, val_light_next);
         }
 
-
-        if (val_n3 < val_light_next && _parent.getBlock(x, y, z + 1) == 0) {
+        if (val_n3 < val_light_next && val_n3 != -1) {
             _parent.setLight(x, y, z + 1, val_light_next);
         }
 
-        if (val_n4 < val_light_next && _parent.getBlock(x, y, z - 1) == 0) {
+        if (val_n4 < val_light_next && val_n4 != -1) {
             _parent.setLight(x, y, z - 1, val_light_next);
         }
 
-
-        if (val_n5 < val_light_next && _parent.getBlock(x, y + 1, z) == 0) {
+        if (val_n5 < val_light_next && val_n5 != -1) {
             _parent.setLight(x, y + 1, z, val_light_next);
         }
 
-        if (val_n6 < val_light_next && _parent.getBlock(x, y - 1, z) == 0) {
+        if (val_n6 < val_light_next && val_n6 != -1) {
             _parent.setLight(x, y - 1, z, val_light_next);
         }
     }
@@ -787,38 +800,24 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
     public void calcSunlight() {
         for (int x = 0; x < (int) CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < (int) CHUNK_DIMENSIONS.z; z++) {
-                calcSunlightAtLocalPos(x, z);
+                for (int y = (int) CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
+                    if (_blocks[x][y][z] == 0) {
+                        _light[x][y][z] = MAX_LIGHT;
+                    } else {
+                        break;
+                    }
+                }
             }
         }
     }
 
-    public void calcSunlightAtLocalPos(int x, int z) {
-        if (x < 0 || z < 0 || x >= CHUNK_DIMENSIONS.x || z >= CHUNK_DIMENSIONS.z) {
-            return;
-        }
-
-        boolean covered = false;
-        for (int y = (int) CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
-            if (_blocks[x][y][z] == 0 && !covered) {
-                _light[x][y][z] = MAX_LIGHT;
-            } else if (_blocks[x][y][z] == 0 && covered) {
-                _light[x][y][z] = 0.0f;
-            } else {
-                covered = true;
-            }
-        }
-    }
-
-    /**
-     * Calculates the flooded lighting based on the precalculated sunlight.
-     */
-    public void calcLight() {
+    void calcLight() {
         for (int ite = 0; ite < 16; ite++) {
             for (int x = 0; x < (int) CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < (int) CHUNK_DIMENSIONS.z; z++) {
                     for (int y = (int) CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
-                        if (_blocks[x][y][z] == 0 && _light[x][y][z] == MAX_LIGHT - ite * 0.0625f) {
-                            floodLightAtWorldPos(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z));
+                        if (getLight(x, y, z) == MAX_LIGHT - ite * 0.0625f && getBlock(x, y, z) == 0) {
+                            floodLight(x, y, z);
                         }
                     }
                 }
@@ -874,8 +873,6 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
             _light[x][y][z] = intens;
         } catch (Exception e) {
         }
-
-        markDirty();
     }
 
     /*
@@ -906,15 +903,34 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
         return false;
     }
 
-    public void markDirty() {
+    public synchronized void markDirty() {
         _dirty = true;
     }
 
-    public void markClean() {
+    public synchronized void markClean() {
         _dirty = false;
     }
 
-    public boolean isDirty() {
+    public synchronized boolean isDirty() {
         return _dirty;
+    }
+
+    public void markChunkAndNeighborsDirty() {
+        markDirty();
+        markNeighborsDirty();
+    }
+
+    public void markNeighborsDirty() {
+        Chunk[] chunks = new Chunk[4];
+        chunks[0] = _parent.getChunk((int) _position.x + 1, (int) _position.y, (int) _position.z);
+        chunks[1] = _parent.getChunk((int) _position.x - 1, (int) _position.y, (int) _position.z);
+        chunks[2] = _parent.getChunk((int) _position.x, (int) _position.y, (int) _position.z + 1);
+        chunks[3] = _parent.getChunk((int) _position.x, (int) _position.y, (int) _position.z - 1);
+
+        for (Chunk c : chunks) {
+            if (c != null) {
+                c.markDirty();
+            }
+        }
     }
 }

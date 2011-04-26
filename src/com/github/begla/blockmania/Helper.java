@@ -73,7 +73,7 @@ public class Helper {
             case 0x5:
                 if (side == SIDE.LEFT || side == SIDE.RIGHT || side == SIDE.FRONT || side == SIDE.BACK) {
                     return calcOffsetForTextureAt(4, 1);
-                } else if (side == SIDE.TOP) {
+                } else if (side == SIDE.TOP || side == SIDE.BOTTOM) {
                     return calcOffsetForTextureAt(5, 1);
                 }
                 break;
@@ -95,11 +95,11 @@ public class Helper {
             // Grass block
             case 0x1:
                 if (side == SIDE.TOP) {
-                    return new Vector3f(204f/255f, 255f/255f, 25f/255f);
+                    return new Vector3f(204f / 255f, 255f / 255f, 25f / 255f);
                 }
                 break;
             case 0x6:
-                return new Vector3f(80f/255f, 176f/255f, 7f/255f);
+                return new Vector3f(80f / 255f, 176f / 255f, 7f / 255f);
         }
         return new Vector3f(1.0f, 1.0f, 1.0f);
     }
@@ -120,5 +120,9 @@ public class Helper {
 
     public long getTime() {
         return (Sys.getTime() * 1000) / timerTicksPerSecond;
+    }
+
+    public int cantorize(int k1, int k2) {
+        return ((k1 + k2) * (k1 + k2 + 1) / 2) + k2;
     }
 }

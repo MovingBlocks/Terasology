@@ -131,7 +131,7 @@ public class Main {
         glFogf(GL_FOG_END, 256);
 
         player = new Player();
-        world = new World("WORLD1", "0+hz9r59ßhtwpnfgsnoppoßß", player);
+        world = new World("WORLD1", "ABCDEF", player);
         player.setParent(world);
         Chunk.init();
         world.init();
@@ -162,59 +162,7 @@ public class Main {
             player.render();
             world.render();
 
-            if (Configuration._showPlacingBox) {
-                // Display the currently looked at block
-                Vector3f blockPosition = player.calcViewBlockPosition();
-
-                if (blockPosition != null) {
-
-                    int bpX = (int) blockPosition.x;
-                    int bpY = (int) blockPosition.y;
-                    int bpZ = (int) blockPosition.z;
-
-                    glColor3f(1.0f, 0.0f, 0.0f);
-
-                    glBegin(GL_LINES);
-                    glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-                    glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
-
-                    glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
-                    glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
-
-                    glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
-                    glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
-
-                    glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
-                    glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
-
-                    glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-                    glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
-
-                    glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
-                    glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
-
-                    glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
-                    glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
-
-                    glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
-                    glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
-
-                    glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-                    glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
-
-                    glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
-                    glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
-
-                    glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
-                    glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
-
-                    glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
-                    glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
-
-                    glEnd();
-
-                }
-            }
+          
 
         } else {
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -253,7 +201,7 @@ public class Main {
 
             // Update the FPS display in the title bar each second passed.
             if (lastFpsTime >= 1000) {
-                Display.setTitle(String.format("%s (FPS: %d, MEM: %d MB, %s, %s)", GAME_TITLE, fps, Runtime.getRuntime().freeMemory() / 1024 / 1024, world.chunkUpdateStatus(), player.getPosition()));
+                Display.setTitle(String.format("%s (FPS: %d, MEM: %d MB, %s, %s)", GAME_TITLE, fps, Runtime.getRuntime().freeMemory() / 1024 / 1024, world.chunkUpdateStatus(), player));
                 lastFpsTime = 0;
                 fps = 0;
             }
