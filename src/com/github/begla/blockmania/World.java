@@ -128,7 +128,7 @@ public class World extends RenderObject {
                         }
                     }
 
-                    while (updates.size() > 0 && updateCounter < 4) {
+                    while (updates.size() > 0 && updateCounter < 16) {
                         Chunk c = updates.poll();
 
                         if (c.fresh) {
@@ -701,7 +701,7 @@ public class World extends RenderObject {
         // Remove 128 chunks if the cache is filled.
         if (_chunkCache.size() == 1024) {
             for (int i = 0; i < 16; i++) {
-                _chunkCache.pollFirstEntry();
+                _chunkCache.pollFirstEntry().getValue().clear();
             }
         }
 

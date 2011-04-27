@@ -655,6 +655,10 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
      * Clears all chunk values.
      */
     public void clear() {
+        _quads.clear();
+        _tex.clear();
+        _color.clear();
+
         _blocks = new int[(int) CHUNK_DIMENSIONS.x][(int) CHUNK_DIMENSIONS.y][(int) CHUNK_DIMENSIONS.z];
         _light = new float[(int) CHUNK_DIMENSIONS.x][(int) CHUNK_DIMENSIONS.y][(int) CHUNK_DIMENSIONS.z];
     }
