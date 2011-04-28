@@ -19,13 +19,13 @@ package com.github.begla.blockmania;
 import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Random;
 import org.lwjgl.util.vector.Vector3f;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.opengl.Texture;
 import java.io.FileInputStream;
+import java.util.concurrent.locks.ReentrantLock;
 import org.lwjgl.BufferUtils;
 import org.newdawn.slick.opengl.TextureLoader;
 import static org.lwjgl.opengl.GL11.*;
@@ -36,6 +36,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Chunk extends RenderObject implements Comparable<Chunk> {
 
+    public ReentrantLock _lock = new ReentrantLock();
+    
     /*
      * Paramters for the world illumination.
      */
@@ -221,10 +223,10 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
 
         for (int x = 0; x < Chunk.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Chunk.CHUNK_DIMENSIONS.z; z++) {
-                int height = (int) (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64) + 64;
+                int height = (int) (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64);
 
                 for (int i = (int) CHUNK_DIMENSIONS.y; i > 0; i--) {
-                    if (calcCaveDensityAt(x + xOffset, i, z + zOffset) < 0.5 && calcCanyonDensity(x + xOffset, i + yOffset, z + zOffset) < 0.5) {
+                    if (calcCaveDensityAt(x + xOffset, i, z + zOffset) < 0.5 && calcCanyonDensity(x + xOffset, i + yOffset, z + zOffset) < 0.5f) {
                         if (i == height) {
                             /*
                              * Grass covers the terrain.
@@ -713,8 +715,8 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
      */
     private float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _parent.getpGen1().noise(0.003f * x, 0.003f, 0.003f * z) * 80;
-        return result;
+        result += _parent.getpGen1().noise(0.007f * x, 0.007f, 0.007f * z) * 128f;
+        return Math.abs(result);
     }
 
     /**
@@ -722,8 +724,8 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
      */
     private float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _parent.getpGen1().noise(0.01f * x, 0.01f, 0.01f * z);
-        return Math.abs(result);
+        result += _parent.getpGen1().noise(0.06f * x, 0.06f, 0.06f * z);
+        return result;
     }
 
     /**
@@ -731,8 +733,8 @@ public class Chunk extends RenderObject implements Comparable<Chunk> {
      */
     private float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _parent.getpGen1().noise(0.08f * x, 0.08f, 0.08f * z);
-        return Math.abs(result);
+        result += _parent.getpGen2().noise(0.02f * x, 0.02f, 0.02f * z);
+        return result;
     }
 
     /**

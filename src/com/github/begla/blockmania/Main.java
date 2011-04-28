@@ -138,7 +138,7 @@ public class Main {
         glFogf(GL_FOG_DENSITY, 1.0f);
         float viewingDistance = (Configuration._viewingDistanceInChunks.x * Chunk.CHUNK_DIMENSIONS.x) / 2f;
         glFogf(GL_FOG_START, viewingDistance - 64f);
-        glFogf(GL_FOG_END, viewingDistance);
+        glFogf(GL_FOG_END, viewingDistance - 32f);
 
         player = new Player();
         world = new World("WORLD1", "ABCDEF", player);

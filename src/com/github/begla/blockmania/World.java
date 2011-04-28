@@ -84,6 +84,7 @@ public class World extends RenderObject {
                     for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
                         Chunk c = loadOrCreateChunk(x, z);
                         _chunks[x][0][z] = c;
+                        c.generate();
                         queueChunkForUpdate(c, 0);
                     }
                 }
@@ -108,7 +109,6 @@ public class World extends RenderObject {
                         sortedUpdates.add(c);
                     }
 
-                    for (int i = 0; i < 4; i++) {
                         Chunk c = null;
 
                         if (_chunkUpdateImportant.size() > 0) {
@@ -120,19 +120,10 @@ public class World extends RenderObject {
 
                         if (c != null) {
 
-                            c.generate();
+
                             c.calcLight();
 
-                            // Update the light of the neighbors
                             Chunk[] neighbors = c.getNeighbors();
-
-                            for (Chunk nc : neighbors) {
-                                if (nc != null) {
-                                    nc.generate();
-                                    nc.calcLight();
-                                }
-                            }
-
                             for (Chunk nc : neighbors) {
                                 if (nc != null) {
                                     nc.generateVertexArray();
@@ -142,10 +133,11 @@ public class World extends RenderObject {
 
                             c.generateVertexArray();
                             _chunkUpdateQueueDL.add(c);
+
+
                         }
                     }
                 }
-            }
         });
 
         _worldThread = new Thread(new Runnable() {
@@ -224,11 +216,14 @@ public class World extends RenderObject {
      */
     @Override
     public void update(long delta) {
-        Chunk c = _chunkUpdateQueueDL.poll();
+        for (int i = 0; i < 8 && !_chunkUpdateQueueDL.isEmpty(); i++) {
+            Chunk c = _chunkUpdateQueueDL.poll();
 
-        if (c != null) {
-            c.generateDisplayList();
+            if (c != null) {
+                c.generateDisplayList();
+            }
         }
+
     }
 
     public void generateForest() {
@@ -498,29 +493,24 @@ public class World extends RenderObject {
     }
 
     private void updateInfWorld() {
+
         for (int x = 0; x < Configuration._viewingDistanceInChunks.x; x++) {
             for (int z = 0; z < Configuration._viewingDistanceInChunks.z; z++) {
                 Chunk c = getChunk(x, 0, z);
-
                 if (c != null) {
                     Vector3f pos = new Vector3f(x, 0, z);
-
                     int multZ = (int) calcPlayerChunkOffsetZ() / (int) Configuration._viewingDistanceInChunks.z + 1;
-
                     if (z < calcPlayerChunkOffsetZ() % Configuration._viewingDistanceInChunks.z) {
                         pos.z += Configuration._viewingDistanceInChunks.z * multZ;
                     } else {
                         pos.z += Configuration._viewingDistanceInChunks.z * (multZ - 1);
                     }
-
                     int multX = (int) calcPlayerChunkOffsetX() / (int) Configuration._viewingDistanceInChunks.x + 1;
-
                     if (x < calcPlayerChunkOffsetX() % Configuration._viewingDistanceInChunks.x) {
                         pos.x += Configuration._viewingDistanceInChunks.x * multX;
                     } else {
                         pos.x += Configuration._viewingDistanceInChunks.x * (multX - 1);
                     }
-
                     if (c.getPosition().x != pos.x || c.getPosition().z != pos.z) {
                         // Remove this chunk from further updates
                         _chunkUpdateNormal.remove(c);
@@ -528,11 +518,17 @@ public class World extends RenderObject {
                         c = loadOrCreateChunk((int) pos.x, (int) pos.z);
                         // Replace the old chunk
                         _chunks[x][0][z] = c;
+                        c.generate();
                         queueChunkForUpdate(c, 0);
                     }
-
                 }
             }
+        }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
