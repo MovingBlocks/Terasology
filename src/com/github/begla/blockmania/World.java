@@ -41,7 +41,7 @@ public class World extends RenderObject {
     private static Texture _textureSun;
     private boolean _worldGenerated;
     private Player _player;
-    private float _daylight = 0.95f;
+    private float _daylight = 0.85f;
     private Random _rand;
     // Used for updating/generating the world
     private Thread _updateThread;
@@ -49,9 +49,9 @@ public class World extends RenderObject {
     // The chunks to display
     private Chunk[][][] _chunks;
     // Update queue for generating the display lists
-    private final ArrayBlockingQueue<Chunk> _chunkUpdateQueueDL = new ArrayBlockingQueue<Chunk>(512);
-    private final ArrayBlockingQueue<Chunk> _chunkUpdateImportant = new ArrayBlockingQueue<Chunk>(512);
-    private final ArrayBlockingQueue<Chunk> _chunkUpdateNormal = new ArrayBlockingQueue<Chunk>(512);
+    private final ArrayBlockingQueue<Chunk> _chunkUpdateQueueDL = new ArrayBlockingQueue<Chunk>(1024);
+    private final ArrayBlockingQueue<Chunk> _chunkUpdateImportant = new ArrayBlockingQueue<Chunk>(1024);
+    private final ArrayBlockingQueue<Chunk> _chunkUpdateNormal = new ArrayBlockingQueue<Chunk>(1024);
     private TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     private static final float SUN_SIZE = 60f;
 
@@ -686,7 +686,7 @@ public class World extends RenderObject {
         _chunkCache.put(Helper.getInstance().cantorize(x, z), c);
 
         // Free some space
-        while (_chunkCache.size() >= 512) {
+        while (_chunkCache.size() >= 1024) {
             _chunkCache.pollFirstEntry();
         }
 
