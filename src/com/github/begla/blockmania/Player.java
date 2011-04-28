@@ -323,8 +323,6 @@ public class Player extends RenderObject {
                 } else if (Keyboard.getEventKey() == Keyboard.KEY_R) {
                     resetPlayer();
                 } else if (Keyboard.getEventKey() == Keyboard.KEY_T) {
-                    _parent.generateForest();
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_Z) {
                     RayFaceIntersection is = calcSelectedBlock();
                     if (is != null) {
                         Vector3f blockPos = is.getBlockPos();

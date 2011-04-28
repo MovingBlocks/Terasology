@@ -34,7 +34,6 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
-import org.newdawn.slick.opengl.Texture;
 
 /**
  *
@@ -74,7 +73,6 @@ public class Main {
 
         try {
             main = new Main();
-
             main.create();
             main.start();
         } catch (Exception ex) {
@@ -98,11 +96,10 @@ public class Main {
         Display.setDisplayMode(new DisplayMode((int) DISPLAY_WIDTH, (int) DISPLAY_HEIGHT));
         Display.setFullscreen(false);
         Display.setTitle(GAME_TITLE);
-        Display.create(new PixelFormat().withDepthBits(32));
+        Display.create(new PixelFormat());
 
         // Keyboard
         Keyboard.create();
-        Keyboard.enableRepeatEvents(true);
 
         // Mouse
         Mouse.setGrabbed(true);
@@ -122,17 +119,12 @@ public class Main {
     }
 
     public void initGL() {
-        glShadeModel(GL_SMOOTH);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FOG);
         glDepthFunc(GL_LEQUAL);
-        glLineWidth(4.0f);
-        //glEnable(GL_BLEND);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         glHint(GL_FOG_HINT, GL_NICEST);
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogf(GL_FOG_DENSITY, 1.0f);
@@ -145,7 +137,6 @@ public class Main {
         player.setParent(world);
         Chunk.init();
         world.init();
-
     }
 
     public void processKeyboard() {
@@ -155,31 +146,21 @@ public class Main {
     }
 
     public void render() {
+        glClearColor(world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f);
 
+        // Color the fog like the sky
+        float[] fogColor = {world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f};
+        FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
+        fogColorBuffer.put(fogColor);
+        fogColorBuffer.rewind();
+        glFog(GL_FOG_COLOR, fogColorBuffer);
 
-        if (world.isWorldGenerated()) {
-            glClearColor(world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // Color the fog like the sky
-            float[] fogColor = {world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f};
-            FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
-            fogColorBuffer.put(fogColor);
-            fogColorBuffer.rewind();
-            glFog(GL_FOG_COLOR, fogColorBuffer);
-
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            glLoadIdentity();
-            player.render();
-            world.render();
-
-            renderHUD();
-
-        } else {
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        }
-
+        glLoadIdentity();
+        player.render();
+        world.render();
+        renderHUD();
     }
 
     public void resizeGL() {
@@ -197,7 +178,10 @@ public class Main {
 
     public void start() {
 
-        while (!Display.isCloseRequested()) {
+        while (!Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+
+            processKeyboard();
+            processMouse();
 
             // Sync. at 60 FPS.
             Display.sync(60);
@@ -219,11 +203,7 @@ public class Main {
 
             update(delta);
             render();
-
             Display.update();
-
-            processKeyboard();
-            processMouse();
         }
 
         Display.destroy();
