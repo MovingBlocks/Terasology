@@ -31,7 +31,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.PixelFormat;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 
@@ -42,7 +41,7 @@ import org.newdawn.slick.TrueTypeFont;
  */
 public final class Main {
 
-    private static final String GAME_TITLE = "Blockmania v0.01a";
+    private static final String GAME_TITLE = "Blockmania Alpha v0.02";
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     /* ------- */
     private static TrueTypeFont _font1;
@@ -100,7 +99,7 @@ public final class Main {
         Display.setDisplayMode(new DisplayMode(Configuration.DISPLAY_WIDTH, Configuration.DISPLAY_HEIGHT));
         Display.setFullscreen(Configuration.FULLSCREEN);
         Display.setTitle(GAME_TITLE);
-        Display.create(new PixelFormat().withDepthBits(32));
+        Display.create(Configuration.PIXEL_FORMAT);
 
         // Keyboard
         Keyboard.create();
@@ -158,7 +157,7 @@ public final class Main {
     }
 
     /**
-     * Renders the scene, place and HUD.
+     * Renders the scene, player and HUD.
      */
     private void render() {
         // Use the color of the sky for clearing

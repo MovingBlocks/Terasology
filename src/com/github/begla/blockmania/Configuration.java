@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -47,4 +48,6 @@ public class Configuration {
     public static int WALKING_SPEED = 4;
     public static int RUNNING_SPEED = 32;
     public static int PLAYER_HEIGHT = 1;
+    // Graphics
+    public static final PixelFormat PIXEL_FORMAT = new PixelFormat();
 }
