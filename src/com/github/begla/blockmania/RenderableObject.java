@@ -19,23 +19,44 @@ package com.github.begla.blockmania;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
- *
+ * The base class of all rendereable objects.
+ * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class RenderObject {
+public abstract class RenderableObject {
 
     protected Vector3f _position = new Vector3f(0.0f, 0.0f, 0.0f);
 
+    /**
+     * Rendering operations have to be place here.
+     */
     public void render() {
     }
 
+    /**
+     * Updating operations have to placed here. The delta
+     * value can be used to determine how much time has passed
+     * since the last update.
+     *
+     * @param delta Time since the last update
+     */
     public void update(long delta) {
     }
 
+    /**
+     * Returns the position of the object.
+     *
+     * @return The position
+     */
     public Vector3f getPosition() {
         return _position;
     }
 
+    /**
+     * Sets the position of the object.
+     *
+     * @param position The position
+     */
     public void setPosition(Vector3f position) {
         this._position = position;
     }

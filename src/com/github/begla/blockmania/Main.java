@@ -36,37 +36,41 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 
 /**
+ * The heart and soul of Blockmania.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Main {
+public final class Main {
 
-    private static TrueTypeFont font1;
-    // Constant values
-    private String GAME_TITLE = "Blockmania v0.01a";
-    private static final float DISPLAY_HEIGHT = 800.0f;
-    private static final float DISPLAY_WIDTH = 1280.0f;
+    private static final String GAME_TITLE = "Blockmania v0.01a";
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-    // Time at the start of the last render loop
-    private long lastLoopTime = Helper.getInstance().getTime();
-    // Time at last fps measurement.
-    private long lastFpsTime;
-    // Measured frames per second.
-    private int fps;
-    private int meanFps;
-    // Player
+    /* ------- */
+    private static TrueTypeFont _font1;
+    private long _lastLoopTime = Helper.getInstance().getTime();
+    private long _lastFpsTime;
+    private int _fps;
+    /* ------- */
+    private float _meanFps;
+    /* ------- */
     Player player;
-    // World
     World world;
 
+    /**
+     * Init. the logger.
+     */
     static {
         try {
-            LOGGER.addHandler(new FileHandler("errors.log", true));
+            LOGGER.addHandler(new FileHandler("blockmania.log", true));
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.toString(), ex);
         }
     }
 
+    /**
+     * Entry point of the application.
+     * 
+     * @param args Arguments
+     */
     public static void main(String[] args) {
 
         Main main = null;
@@ -87,16 +91,16 @@ public class Main {
     }
 
     /**
-     * Gets the current time in milliseconds.
-     * 
-     * @return The system time in milliseconds
+     * Init. the display and mouse/keyboard input.
+     *
+     * @throws LWJGLException
      */
-    public void create() throws LWJGLException {
+    private void create() throws LWJGLException {
         // Display
-        Display.setDisplayMode(new DisplayMode((int) DISPLAY_WIDTH, (int) DISPLAY_HEIGHT));
-        Display.setFullscreen(false);
+        Display.setDisplayMode(new DisplayMode(Configuration.DISPLAY_WIDTH, Configuration.DISPLAY_HEIGHT));
+        Display.setFullscreen(Configuration.FULLSCREEN);
         Display.setTitle(GAME_TITLE);
-        Display.create(new PixelFormat());
+        Display.create(new PixelFormat().withDepthBits(32));
 
         // Keyboard
         Keyboard.create();
@@ -108,44 +112,56 @@ public class Main {
         // OpenGL
         initGL();
         resizeGL();
-
-        font1 = new TrueTypeFont(new Font("Arial", Font.PLAIN, 12), true);
     }
 
-    public void destroy() {
+    /**
+     * Clean up before exiting the application.
+     */
+    private void destroy() {
         Mouse.destroy();
         Keyboard.destroy();
         Display.destroy();
     }
 
-    public void initGL() {
+    /**
+     * Initializes OpenGL.
+     */
+    private void initGL() {
+        // Init. the fonts
+        _font1 = new TrueTypeFont(new Font("Arial", Font.PLAIN, 12), true);
+
+        // Init. OpenGL
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FOG);
         glDepthFunc(GL_LEQUAL);
 
+        // Enable fog
         glHint(GL_FOG_HINT, GL_NICEST);
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogf(GL_FOG_DENSITY, 1.0f);
-        float viewingDistance = (Configuration._viewingDistanceInChunks.x * Chunk.CHUNK_DIMENSIONS.x) / 2f;
+        float viewingDistance = (Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * Chunk.CHUNK_DIMENSIONS.x) / 2f;
         glFogf(GL_FOG_START, viewingDistance - 64f);
         glFogf(GL_FOG_END, viewingDistance - 32f);
 
-        player = new Player();
-        world = new World("WORLD1", "ABCDEF", player);
-        player.setParent(world);
+        // Init. textures and more
         Chunk.init();
-        world.init();
+        World.init();
+
+        // Init. the player and a world
+        player = new Player();
+        // Generate a world with a "random" seed value
+        world = new World("WORLD1", String.valueOf(Math.random()), player);
+        // Link the player to the world
+        player.setParent(world);
     }
 
-    public void processKeyboard() {
-    }
-
-    public void processMouse() {
-    }
-
-    public void render() {
+    /**
+     * Renders the scene, place and HUD.
+     */
+    private void render() {
+        // Use the color of the sky for clearing
         glClearColor(world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f);
 
         // Color the fog like the sky
@@ -155,20 +171,26 @@ public class Main {
         fogColorBuffer.rewind();
         glFog(GL_FOG_COLOR, fogColorBuffer);
 
+        /*
+         * Render the player, world and HUD.
+         */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         glLoadIdentity();
+
         player.render();
         world.render();
         renderHUD();
     }
 
-    public void resizeGL() {
-        glViewport(0, 0, (int) DISPLAY_WIDTH, (int) DISPLAY_HEIGHT);
+    /**
+     * Resizes the viewport according to the chosen display with and height.
+     */
+    private void resizeGL() {
+        glViewport(0, 0, Configuration.DISPLAY_WIDTH, Configuration.DISPLAY_HEIGHT);
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(64.0f, DISPLAY_WIDTH / DISPLAY_HEIGHT, 0.01f, 2000f);
+        gluPerspective(84.0f, (float) Configuration.DISPLAY_WIDTH / (float) Configuration.DISPLAY_HEIGHT, 0.01f, 2000f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
@@ -176,33 +198,40 @@ public class Main {
         glPushMatrix();
     }
 
-    public void start() {
-
+    /**
+     * Starts the render loop. The application can be terminated by pressing
+     * the ESCAPE key.
+     */
+    private void start() {
         while (!Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
 
-            processKeyboard();
-            processMouse();
-
-            // Sync. at 60 FPS.
+            // Sync. at 60 FPS
             Display.sync(60);
 
-            long delta = Helper.getInstance().getTime() - lastLoopTime;
-            lastLoopTime = Helper.getInstance().getTime();
-            lastFpsTime += delta;
-            fps++;
+            // Measure a delta value and the frames per second
+            long delta = Helper.getInstance().getTime() - _lastLoopTime;
+            _lastLoopTime = Helper.getInstance().getTime();
+            _lastFpsTime += delta;
+            _fps++;
 
-            // Update the FPS display in the title bar each second passed.
-            if (lastFpsTime >= 1000) {
-                lastFpsTime = 0;
+            // Updates the FPS and calculate the mean for display
+            if (_lastFpsTime >= 1000) {
+                _lastFpsTime = 0;
 
-                meanFps += fps;
-                meanFps /= 2;
+                _meanFps += _fps;
+                _meanFps /= 2;
 
-                fps = 0;
+                _fps = 0;
             }
 
+            /*
+             * Updating and rendering of the scene. The delta
+             * value is used within the updating process.
+             */
             update(delta);
             render();
+
+            // Clear dirty flag and swap buffer
             Display.update();
         }
 
@@ -212,13 +241,16 @@ public class Main {
     /**
      * Updates the player and the world.
      */
-    public void update(long delta) {
+    private void update(long delta) {
         if (world.isWorldGenerated()) {
             world.update(delta);
             player.update(delta);
         }
     }
 
+    /**
+     * Renders the HUD on the screen.
+     */
     private void renderHUD() {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
@@ -235,9 +267,9 @@ public class Main {
         glEnable(GL_TEXTURE_2D);
 
         // Draw debugging information
-        font1.drawString(4, 4, String.format("%s (fps: %d, free heap space: %d MB)", GAME_TITLE, meanFps, Runtime.getRuntime().freeMemory() / 1048576), Color.white);
-        font1.drawString(4, 22, String.format("%s", player, Color.white));
-        font1.drawString(4, 38, String.format("%s", world, Color.white));
+        _font1.drawString(4, 4, String.format("%s (fps: %.2f, free heap space: %d MB)", GAME_TITLE, _meanFps, Runtime.getRuntime().freeMemory() / 1048576), Color.white);
+        _font1.drawString(4, 22, String.format("%s", player, Color.white));
+        _font1.drawString(4, 38, String.format("%s", world, Color.white));
 
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);

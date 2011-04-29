@@ -19,7 +19,8 @@ package com.github.begla.blockmania;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
- *
+ * Represents a intersection of a ray with the face of a block.
+ * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class RayFaceIntersection implements Comparable<RayFaceIntersection> {

@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.ArrayList;
 import org.lwjgl.input.Keyboard;
@@ -25,48 +26,26 @@ import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * The player class encapsulates all functionality regarding the player.
- * E.g. moving, gravity, placing blocks and so on.
+ * This class contains all functions regarding the player's actions,
+ * movement and persective rendering.
  * 
  * @author Benjamin Glatzel <benjamin.glawwtzel@me.com>
  */
-public class Player extends RenderObject {
+public class Player extends RenderableObject {
 
+    private int _selectedBlockType = 0;
     private boolean demoAutoFlyMode = false;
     private boolean godMode = false;
-    // How high the player can jump
-    private static int JUMP_INTENSITY = 10;
-    // Max. gravity
-    private static int MAX_GRAVITY = 32;
-    // Max. speed of the playering while walking
-    private static int WALKING_SPEED = 4;
-    // Max. speed of the playering while walking
-    private static int RUNNING_SPEED = 32;
-    // Height of the player in "blocks"
-    private int PLAYER_HEIGHT = 1;
-    // TODO
-    private int _wSpeed = WALKING_SPEED;
-    // Viewing direction of the player
+    private int _wSpeed = Configuration.WALKING_SPEED;
     private double _yaw = 135d;
     private double _pitch;
-    // Acceleration
     private double _accX, _accY, _accZ;
-    // Gravity (aka acceleration y)
     private double _gravity;
-    // The parent world
     private World _parent = null;
     private boolean _keyPressed = false;
 
     /**
-     * Init. the player.
-     */
-    public Player() {
-    }
-
-    /*
-     * Positions the player within the world
-     * and adjusts the player's view accordingly.
-     *
+     * Positions the player within the world adjusts the player's view accordingly.
      */
     @Override
     public void render() {
@@ -76,15 +55,15 @@ public class Player extends RenderObject {
 
         RayFaceIntersection is = calcSelectedBlock();
 
-        if (Configuration._showPlacingBox) {
+        if (Configuration.SHOW_PLACING_BOX) {
             // Display the currently looked at block
 
             if (is != null) {
 
-//            glPointSize(5f);
-//            glBegin(GL_POINTS);
-//            glVertex3f(is.getIntersectPoint().x, is.getIntersectPoint().y, is.getIntersectPoint().z);
-//            glEnd();
+//                glPointSize(5f);
+//                glBegin(GL_POINTS);
+//                glVertex3f(is.getIntersectPoint().x, is.getIntersectPoint().y, is.getIntersectPoint().z);
+//                glEnd();
 
                 int bpX = (int) is.getBlockPos().x;
                 int bpY = (int) is.getBlockPos().y;
@@ -222,7 +201,7 @@ public class Player extends RenderObject {
 
     private boolean isPlayerStandingOnGround() {
         if (getParent() != null) {
-            return getParent().isHitting((int) (getPosition().x + 0.5f), (int) (getPosition().y - PLAYER_HEIGHT), (int) (getPosition().z + 0.5f));
+            return getParent().isHitting((int) (getPosition().x + 0.5f), (int) (getPosition().y - Configuration.PLAYER_HEIGHT), (int) (getPosition().z + 0.5f));
         } else {
             return false;
         }
@@ -244,14 +223,14 @@ public class Player extends RenderObject {
     public void jump() {
         // Jumps are only possible, if the player is hitting the ground.
         if (isPlayerStandingOnGround()) {
-            _gravity = JUMP_INTENSITY;
+            _gravity = Configuration.JUMP_INTENSITY;
         }
     }
 
     @Override
     public String toString() {
         Vector3f vD = viewDirection();
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f)", _position.x, _position.y, _position.z, vD.x, vD.y, vD.z);
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d)", _position.x, _position.y, _position.z, vD.x, vD.y, vD.z, _selectedBlockType);
     }
 
     public Vector3f viewDirection() {
@@ -295,7 +274,7 @@ public class Player extends RenderObject {
             RayFaceIntersection is = calcSelectedBlock();
             if (is != null) {
                 Vector3f blockPos = is.calcAdjacentBlockPos();
-                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, 0x2, true);
+                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, _selectedBlockType, true);
             }
         }
     }
@@ -335,9 +314,14 @@ public class Player extends RenderObject {
                 } else if (Keyboard.getEventKey() == Keyboard.KEY_H) {
                     this.demoAutoFlyMode = !demoAutoFlyMode;
                 } else if (Keyboard.getEventKey() == Keyboard.KEY_P) {
-                    Configuration._showPlacingBox = !Configuration._showPlacingBox;
+                    Configuration.SHOW_PLACING_BOX = !Configuration.SHOW_PLACING_BOX;
                 } else if (Keyboard.getEventKey() == Keyboard.KEY_I) {
-                    Configuration._showChunkOutlines = !Configuration._showChunkOutlines;
+                    Configuration.SHOW_CHUNK_OUTLINES = !Configuration.SHOW_CHUNK_OUTLINES;
+                } else if (Keyboard.getEventKey() == Keyboard.KEY_UP) {
+                    cycleBlockTypes(1);
+                } else if (Keyboard.getEventKey() == Keyboard.KEY_DOWN) {
+                    cycleBlockTypes(-1);
+                } else {
                 }
             }
 
@@ -346,6 +330,23 @@ public class Player extends RenderObject {
             } else {
                 _keyPressed = false;
             }
+        }
+
+        while (Mouse.next()) {
+            if (!_keyPressed) {
+                if (Mouse.getEventButton() == 0 && Mouse.getEventButtonState() == true) {
+                    placeBlock();
+                } else if (Mouse.getEventButton() == 1 && Mouse.getEventButtonState() == true) {
+                    removeBlock();
+                }
+            }
+
+            if (Mouse.getEventButtonState()) {
+                _keyPressed = true;
+            } else {
+                _keyPressed = false;
+            }
+
         }
     }
 
@@ -368,17 +369,17 @@ public class Player extends RenderObject {
                 jump();
             }
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-                _wSpeed = RUNNING_SPEED;
+                _wSpeed = Configuration.RUNNING_SPEED;
             } else {
-                _wSpeed = WALKING_SPEED;
+                _wSpeed = Configuration.WALKING_SPEED;
             }
 
-            boolean hitting = _parent.isHitting((int) (getPosition().x + 0.5f), (int) (getPosition().y - PLAYER_HEIGHT), (int) (getPosition().z + 0.5f));
+            boolean hitting = _parent.isHitting((int) (getPosition().x + 0.5f), (int) (getPosition().y - Configuration.PLAYER_HEIGHT), (int) (getPosition().z + 0.5f));
 
             if (!godMode) {
 
                 if (!hitting) {
-                    if (_gravity > -MAX_GRAVITY) {
+                    if (_gravity > -Configuration.MAX_GRAVITY) {
                         _gravity -= 0.5f;
                     }
                     getPosition().y += (_gravity / 1000.0f) * delta;
@@ -398,7 +399,7 @@ public class Player extends RenderObject {
                 /**
                  * Collision detection with objects along the x/z-plane.
                  */
-                if (checkForCollision(new Vector3f(getPosition().x + dir.x * 0.5f, getPosition().y - PLAYER_HEIGHT + 1, getPosition().z + dir.y * 0.5f))) {
+                if (checkForCollision(new Vector3f(getPosition().x + dir.x * 0.5f, getPosition().y - Configuration.PLAYER_HEIGHT + 1, getPosition().z + dir.y * 0.5f))) {
                     _accX = 0;
                     _accZ = 0;
                 } else if (checkForCollision(new Vector3f(getPosition().x + dir.x * 0.5f, getPosition().y + 1, getPosition().z + dir.y * 0.5f))) {
@@ -446,5 +447,13 @@ public class Player extends RenderObject {
     public void setParent(World parent) {
         this._parent = parent;
         resetPlayer();
+    }
+
+    public void cycleBlockTypes(int upDown) {
+        _selectedBlockType += upDown;
+
+        if (_selectedBlockType < 0) {
+            _selectedBlockType = 0;
+        }
     }
 }

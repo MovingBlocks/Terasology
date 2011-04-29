@@ -21,35 +21,54 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
- *
+ * This is a simple helper class for various tasks.
+ * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Helper {
 
-    private static long timerTicksPerSecond = Sys.getTimerResolution();
-    private static Helper instance = null;
-    public static final float div = 1.0f / 16.0f;
+    private static long _timerTicksPerSecond = Sys.getTimerResolution();
+    private static Helper _instance = null;
+    private static final float _div = 1.0f / 16.0f;
 
     public static enum SIDE {
 
         LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK;
     };
 
+    /**
+     * Returns the static instance of this helper class.
+     *
+     * @return The instance
+     */
     public static Helper getInstance() {
-        if (instance == null) {
-            instance = new Helper();
+        if (_instance == null) {
+            _instance = new Helper();
         }
 
-        return instance;
+        return _instance;
     }
 
-    public Helper() {
+    /**
+     * Calculates the texture offset for a given position within
+     * the texture atlas.
+     * 
+     * @param x X-coordinate
+     * @param y Y-coordinate
+     * @return The texture offset
+     */
+    private Vector2f calcOffsetForTextureAt(int x, int y) {
+        return new Vector2f(x * _div, y * _div);
     }
 
-    public Vector2f calcOffsetForTextureAt(int x, int y) {
-        return new Vector2f(x * div, y * div);
-    }
-
+    /**
+     * Calculates the texture offset for a given block type and a specific
+     * side of the block.
+     * 
+     * @param type The type of the block
+     * @param side The side of the block
+     * @return The texture offset
+     */
     public Vector2f getTextureOffsetFor(int type, SIDE side) {
         switch (type) {
             // Grass block
@@ -90,6 +109,14 @@ public class Helper {
         return calcOffsetForTextureAt(2, 0);
     }
 
+    /**
+     * Calculates the color offset for a given block type and a speific
+     * side of the block.
+     * 
+     * @param type The block type
+     * @param side The block side
+     * @return The color offset
+     */
     public Vector3f getColorOffsetFor(int type, SIDE side) {
         switch (type) {
             // Grass block
@@ -99,11 +126,17 @@ public class Helper {
                 }
                 break;
             case 0x6:
-                return new Vector3f(159f / 255f, 235f / 255f, 89f / 255f);
+                return new Vector3f(90f / 255f, 190f / 255f, 89f / 255f);
         }
         return new Vector3f(1.0f, 1.0f, 1.0f);
     }
 
+    /**
+     * Returns true if a given block type is translucent.
+     * 
+     * @param type The block type
+     * @return True if the block type is translucent
+     */
     public boolean isBlockTypeTranslucent(int type) {
         switch (type) {
             // Grass block
@@ -114,14 +147,32 @@ public class Helper {
         }
     }
 
+    /**
+     * Returns the spawning point of the player.
+     * TODO: Should not determine the spawning point randomly
+     * 
+     * @return The coordinates of the spawning point
+     */
     public Vector3f calcPlayerOrigin() {
-        return new Vector3f(Chunk.CHUNK_DIMENSIONS.x * Configuration._viewingDistanceInChunks.x / 2, 127, (Chunk.CHUNK_DIMENSIONS.z * Configuration._viewingDistanceInChunks.z) / 2);
+        return new Vector3f(Chunk.CHUNK_DIMENSIONS.x * Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2, 127, (Chunk.CHUNK_DIMENSIONS.z * Configuration.VIEWING_DISTANCE_IN_CHUNKS.z) / 2);
     }
 
+    /**
+     * Returns the system time.
+     * 
+     * @return The system time
+     */
     public long getTime() {
-        return (Sys.getTime() * 1000) / timerTicksPerSecond;
+        return (Sys.getTime() * 1000) / _timerTicksPerSecond;
     }
 
+    /**
+     * Applies Cantor's pairing function on 2D coordinates.
+     *
+     * @param k1 X-Coordinate
+     * @param k2 Y-Coordinate
+     * @return Unique 1D value
+     */
     public int cantorize(int k1, int k2) {
         return ((k1 + k2) * (k1 + k2 + 1) / 2) + k2;
     }
