@@ -140,7 +140,7 @@ public final class Main {
         glHint(GL_FOG_HINT, GL_NICEST);
         glFogi(GL_FOG_MODE, GL_LINEAR);
         glFogf(GL_FOG_DENSITY, 1.0f);
-        float viewingDistance = (Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * Chunk.CHUNK_DIMENSIONS.x) / 2f;
+        float viewingDistance = (Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * Configuration.CHUNK_DIMENSIONS.x) / 2f;
         glFogf(GL_FOG_START, viewingDistance - 64f);
         glFogf(GL_FOG_END, viewingDistance - 32f);
 

@@ -154,7 +154,7 @@ public class Helper {
      * @return The coordinates of the spawning point
      */
     public Vector3f calcPlayerOrigin() {
-        return new Vector3f(Chunk.CHUNK_DIMENSIONS.x * Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2, 127, (Chunk.CHUNK_DIMENSIONS.z * Configuration.VIEWING_DISTANCE_IN_CHUNKS.z) / 2);
+        return new Vector3f(Configuration.CHUNK_DIMENSIONS.x * Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2, 127, (Configuration.CHUNK_DIMENSIONS.z * Configuration.VIEWING_DISTANCE_IN_CHUNKS.z) / 2);
     }
 
     /**

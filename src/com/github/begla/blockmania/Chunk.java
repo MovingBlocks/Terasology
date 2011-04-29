@@ -31,10 +31,13 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
- * determined by the dimensions. Chunks a used to manage the world efficiently and to
- * reduce the batch count.
+ * determined by their dimensions. Chunks a used to manage the world efficiently and
+ * reduce the batch count within the render loop.
  *
- * The default size of chunk is 16x128x16 (32768).
+ * Chunks are tessellated on creation and saved to vertex arrays. From those a display list is generated
+ * which is then used for the actual rendering process.
+ *
+ * The default size of chunk is 16x128x16 (32768) blocks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -42,52 +45,21 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     public boolean _dirty = true;
     private boolean _fresh = true;
-
-
-    public static enum UPDATE_TYPE {
-
-        LIGHT, BLOCK
-    }
-    /*
-     * Global parameters for the chunks.
-     */
-    public static final Vector3f CHUNK_DIMENSIONS = new Vector3f(16, 128, 16);
-
-    /*
-     * Used to generate the ID of the chunks.
-     */
-    public static int maxChunkID = 0;
-
-    /*
-     * The texture atlas.
-     */
+    /* ------ */
+    private static int _maxChunkID = 0;
+    private int _chunkID = -1;
+    /* ------ */
     private static Texture _textureMap;
-
-    /*
-     * The ID of this chunk.
-     */
-    int _chunkID = -1;
-
-    /*
-     * Vertex, texture and color arrays used to generate the display list.
-     */
+    /* ------ */
     private final List<Float> _quads = new ArrayList<Float>();
     private final List<Float> _tex = new ArrayList<Float>();
     private final List<Float> _color = new ArrayList<Float>();
-
-    /*
-     * The parent world.
-     */
+    /* ------ */
     private World _parent = null;
-
-    /*
-     * The actual block-, sunlight- and light-values.
-     */
+    /* ------ */
     private int[][][] _blocks;
     private float[][][] _light;
-    /*
-     * The display list used for displaying the chunk.
-     */
+    /* ------ */
     private int _displayList = -1;
 
     enum SIDE {
@@ -112,11 +84,11 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     public Chunk(World p, Vector3f position) {
         this._position = position;
         _parent = p;
-        _blocks = new int[(int) CHUNK_DIMENSIONS.x][(int) CHUNK_DIMENSIONS.y][(int) CHUNK_DIMENSIONS.z];
-        _light = new float[(int) CHUNK_DIMENSIONS.x][(int) CHUNK_DIMENSIONS.y][(int) CHUNK_DIMENSIONS.z];
+        _blocks = new int[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
+        _light = new float[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
 
-        _chunkID = maxChunkID + 1;
-        maxChunkID++;
+        _chunkID = _maxChunkID + 1;
+        _maxChunkID++;
     }
 
     /**
@@ -133,37 +105,37 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             glColor3f(255.0f, 255.0f, 255.0f);
 
             glPushMatrix();
-            glTranslatef(_position.x * (int) CHUNK_DIMENSIONS.x, _position.y * (int) CHUNK_DIMENSIONS.y, _position.z * (int) CHUNK_DIMENSIONS.z);
+            glTranslatef(_position.x * (int) Configuration.CHUNK_DIMENSIONS.x, _position.y * (int) Configuration.CHUNK_DIMENSIONS.y, _position.z * (int) Configuration.CHUNK_DIMENSIONS.z);
 
             glBegin(GL_LINE_LOOP);
             glVertex3f(0.0f, 0.0f, 0.0f);
-            glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
-            glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, 0.0f);
-            glVertex3f(0.0f, CHUNK_DIMENSIONS.y, 0.0f);
+            glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
+            glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
+            glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
             glEnd();
 
             glBegin(GL_LINE_LOOP);
             glVertex3f(0.0f, 0.0f, 0.0f);
-            glVertex3f(0.0f, 0.0f, CHUNK_DIMENSIONS.z);
-            glVertex3f(0.0f, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
-            glVertex3f(0.0f, CHUNK_DIMENSIONS.y, 0.0f);
+            glVertex3f(0.0f, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
+            glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
+            glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
             glVertex3f(0.0f, 0.0f, 0.0f);
             glEnd();
 
             glBegin(GL_LINE_LOOP);
-            glVertex3f(0.0f, 0.0f, CHUNK_DIMENSIONS.z);
-            glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, CHUNK_DIMENSIONS.z);
-            glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
-            glVertex3f(0.0f, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
-            glVertex3f(0.0f, 0.0f, CHUNK_DIMENSIONS.z);
+            glVertex3f(0.0f, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
+            glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
+            glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
+            glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
+            glVertex3f(0.0f, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
             glEnd();
 
             glBegin(GL_LINE_LOOP);
-            glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
-            glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, CHUNK_DIMENSIONS.z);
-            glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, CHUNK_DIMENSIONS.z);
-            glVertex3f(CHUNK_DIMENSIONS.x, CHUNK_DIMENSIONS.y, 0.0f);
-            glVertex3f(CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
+            glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
+            glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
+            glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
+            glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
+            glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
             glEnd();
             glPopMatrix();
         }
@@ -208,15 +180,15 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      * TODO: Much to simple and boring
      */
     public void generateTerrain() {
-        int xOffset = (int) _position.x * (int) CHUNK_DIMENSIONS.x;
-        int yOffset = (int) _position.y * (int) CHUNK_DIMENSIONS.y;
-        int zOffset = (int) _position.z * (int) CHUNK_DIMENSIONS.z;
+        int xOffset = (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
+        int yOffset = (int) _position.y * (int) Configuration.CHUNK_DIMENSIONS.y;
+        int zOffset = (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
 
-        for (int x = 0; x < Chunk.CHUNK_DIMENSIONS.x; x++) {
-            for (int z = 0; z < Chunk.CHUNK_DIMENSIONS.z; z++) {
+        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
                 int height = (int) (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64);
 
-                for (int i = (int) CHUNK_DIMENSIONS.y; i > 0; i--) {
+                for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i > 0; i--) {
                     if (calcCaveDensityAt(x + xOffset, i, z + zOffset) < 0.5 && calcCanyonDensity(x + xOffset, i + yOffset, z + zOffset) < 0.5f) {
                         if (i == height) {
                             /*
@@ -266,9 +238,9 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      * TODO: Much to simple and boring
      */
     public void populate() {
-        for (int y = 0; y < Chunk.CHUNK_DIMENSIONS.y; y++) {
-            for (int x = 0; x < Chunk.CHUNK_DIMENSIONS.x; x++) {
-                for (int z = 0; z < Chunk.CHUNK_DIMENSIONS.z; z++) {
+        for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
+            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
                     float dens = calcForestDensity(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z));
                     if (dens > 0.55 && dens < 0.7f && getBlock(x, y, z) == 0x1 && y > 32) {
                         _parent.generateTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z), false);
@@ -290,11 +262,11 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         _quads.clear();
         _tex.clear();
 
-        Vector3f offset = new Vector3f(_position.x * CHUNK_DIMENSIONS.x, _position.y * CHUNK_DIMENSIONS.y, _position.z * CHUNK_DIMENSIONS.z);
+        Vector3f offset = new Vector3f(_position.x * Configuration.CHUNK_DIMENSIONS.x, _position.y * Configuration.CHUNK_DIMENSIONS.y, _position.z * Configuration.CHUNK_DIMENSIONS.z);
 
-        for (int x = 0; x < CHUNK_DIMENSIONS.x; x++) {
-            for (int y = 0; y < CHUNK_DIMENSIONS.y; y++) {
-                for (int z = 0; z < CHUNK_DIMENSIONS.z; z++) {
+        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
+                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
 
                     int block = _blocks[x][y][z];
 
@@ -648,7 +620,9 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         glDisableClientState(GL_VERTEX_ARRAY);
         glEndList();
 
-        _quads.clear(); _tex.clear(); _color.clear();
+        _quads.clear();
+        _tex.clear();
+        _color.clear();
     }
 
     /**
@@ -757,21 +731,21 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Returns the position of the chunk within the world.
      */
     private int getChunkWorldPosX() {
-        return (int) _position.x * (int) CHUNK_DIMENSIONS.x;
+        return (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
     }
 
     /**
      * Returns the position of the chunk within the world.
      */
     private int getChunkWorldPosY() {
-        return (int) _position.y * (int) CHUNK_DIMENSIONS.y;
+        return (int) _position.y * (int) Configuration.CHUNK_DIMENSIONS.y;
     }
 
     /**
      * Returns the position of the chunk within the world.
      */
     private int getChunkWorldPosZ() {
-        return (int) _position.z * (int) CHUNK_DIMENSIONS.z;
+        return (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
     }
 
     /**
@@ -799,9 +773,9 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Calculates the sunlight.
      */
     public void calcSunlight() {
-        for (int x = 0; x < (int) CHUNK_DIMENSIONS.x; x++) {
-            for (int z = 0; z < (int) CHUNK_DIMENSIONS.z; z++) {
-                for (int y = (int) CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
+        for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
+                for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
                     if (_blocks[x][y][z] == 0) {
                         _light[x][y][z] = Configuration.MAX_LIGHT;
                     } else {
@@ -814,9 +788,9 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     public void calcLight() {
         for (int ite = 0; ite < 16; ite++) {
-            for (int x = 0; x < (int) CHUNK_DIMENSIONS.x; x++) {
-                for (int z = 0; z < (int) CHUNK_DIMENSIONS.z; z++) {
-                    for (int y = (int) CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
+            for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
+                for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
+                    for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
                         if (getLight(x, y, z) == Configuration.MAX_LIGHT - ite * 0.0625f && getBlock(x, y, z) == 0) {
                             floodLight(x, y, z);
                         }
@@ -832,9 +806,9 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     public int blockCount() {
         int counter = 0;
 
-        for (int x = 0; x < (int) CHUNK_DIMENSIONS.x; x++) {
-            for (int z = 0; z < (int) CHUNK_DIMENSIONS.z; z++) {
-                for (int y = 0; y < (int) CHUNK_DIMENSIONS.y; y++) {
+        for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
+                for (int y = 0; y < (int) Configuration.CHUNK_DIMENSIONS.y; y++) {
                     if (_blocks[x][y][z] > 0) {
                         counter++;
                     }
@@ -938,7 +912,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             neighbors[1]._dirty = true;
         }
 
-        if (x == CHUNK_DIMENSIONS.x - 1) {
+        if (x == Configuration.CHUNK_DIMENSIONS.x - 1) {
             neighbors[0]._dirty = true;
         }
 
@@ -946,7 +920,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             neighbors[3]._dirty = true;
         }
 
-        if (z == CHUNK_DIMENSIONS.z - 1) {
+        if (z == Configuration.CHUNK_DIMENSIONS.z - 1) {
             neighbors[2]._dirty = true;
         }
     }
