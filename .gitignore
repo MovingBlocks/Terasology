@@ -4,3 +4,4 @@ errors.*
 /dist
 /src/com/github/begla/blockmania/images/*
 /nbproject/private/*
+*.log*

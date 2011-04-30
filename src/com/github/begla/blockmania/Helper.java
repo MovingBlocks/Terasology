@@ -19,6 +19,7 @@ package com.github.begla.blockmania;
 import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 /**
  * This is a simple helper class for various tasks.
@@ -102,6 +103,8 @@ public class Helper {
             // Sand block
             case 0x7:
                 return calcOffsetForTextureAt(2, 1);
+            case 0x8:
+                return calcOffsetForTextureAt(1, 1);
             default:
                 return calcOffsetForTextureAt(2, 0);
         }
@@ -117,18 +120,19 @@ public class Helper {
      * @param side The block side
      * @return The color offset
      */
-    public Vector3f getColorOffsetFor(int type, SIDE side) {
+    public Vector4f getColorOffsetFor(int type, SIDE side) {
         switch (type) {
             // Grass block
             case 0x1:
                 if (side == SIDE.TOP) {
-                    return new Vector3f(204f / 255f, 255f / 255f, 25f / 255f);
+                    return new Vector4f(204f / 255f, 255f / 255f, 25f / 255f, 1.0f);
                 }
                 break;
             case 0x6:
-                return new Vector3f(90f / 255f, 190f / 255f, 89f / 255f);
+                return new Vector4f(90f / 255f, 160f / 255f, 89f / 255f, 1.0f);
         }
-        return new Vector3f(1.0f, 1.0f, 1.0f);
+
+        return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     /**
@@ -139,7 +143,11 @@ public class Helper {
      */
     public boolean isBlockTypeTranslucent(int type) {
         switch (type) {
-            // Grass block
+            case 0x0:
+                return true;
+            // Water block
+            case 0x4:
+                return true;
             case 0x6:
                 return true;
             default:

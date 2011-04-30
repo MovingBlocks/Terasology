@@ -43,14 +43,13 @@ public class Configuration {
     // Illumination
     public static final float MAX_LIGHT = 1.0f;
     public static final float MIN_LIGHT = 0.2f;
-    public static final float DIMMING_INTENS = 0.075f;
-    public static final float BLOCK_SIDE_DIMMING = 0.025f;
+    public static final float DIMMING_INTENS = 0.1f;
+    public static final float BLOCK_SIDE_DIMMING = 0.1f;
     // Player
-    public static int JUMP_INTENSITY = 10;
+    public static int JUMP_INTENSITY = 12;
     public static int MAX_GRAVITY = 32;
     public static int WALKING_SPEED = 4;
     public static int RUNNING_SPEED = 32;
-    public static int PLAYER_HEIGHT = 1;
     // Graphics
     public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(32);
 }

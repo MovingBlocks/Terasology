@@ -33,16 +33,16 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Player extends RenderableObject {
 
+    private boolean _jump = false;
     private int _selectedBlockType = 0;
-    private boolean demoAutoFlyMode = false;
-    private boolean godMode = false;
+    private boolean _demoAutoFlyMode = false;
+    private boolean _godMode = false;
     private int _wSpeed = Configuration.WALKING_SPEED;
     private double _yaw = 135d;
     private double _pitch;
-    private double _accX, _accY, _accZ;
-    private double _gravity;
+    private Vector3f _acc = new Vector3f();
+    private float _gravity = 0.0f;
     private World _parent = null;
-    private boolean _keyPressed = false;
 
     /**
      * Positions the player within the world adjusts the player's view accordingly.
@@ -122,8 +122,9 @@ public class Player extends RenderableObject {
         yaw(Mouse.getDX() * 0.1f);
         pitch(Mouse.getDY() * 0.1f);
 
-        processMovement(delta);
         processPlayerInteraction();
+        processMovement(delta);
+        updatePlayerPosition(delta);
     }
 
     /**
@@ -161,76 +162,55 @@ public class Player extends RenderableObject {
      * Moves the player forward.
      */
     public void walkForward() {
-        _accX += (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _acc.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
-        if (godMode) {
-            _accY -= (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
+        if (_godMode) {
+            _acc.y -= (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
-        _accZ -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _acc.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
     /*
      * Moves the player backward.
      */
     public void walkBackwards() {
-        _accX -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _acc.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
-        if (godMode) {
-            _accY += (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
+        if (_godMode) {
+            _acc.y += (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
-        _accZ += (double) _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _acc.z += (double) _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
     /*
      * Lets the player strafe left.
      */
     public void strafeLeft() {
-        _accX += (double) _wSpeed * Math.sin(Math.toRadians(_yaw - 90));
-        _accZ -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw - 90));
+        _acc.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw - 90));
+        _acc.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw - 90));
     }
 
     /*
      * Lets the player strafe right.
      */
     public void strafeRight() {
-        _accX += (double) _wSpeed * Math.sin(Math.toRadians(_yaw + 90));
-        _accZ -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw + 90));
-    }
-
-    private boolean isPlayerStandingOnGround() {
-        if (getParent() != null) {
-            return getParent().isHitting((int) (getPosition().x + 0.5f), (int) (getPosition().y - Configuration.PLAYER_HEIGHT), (int) (getPosition().z + 0.5f));
-        } else {
-            return false;
-        }
-    }
-
-    private boolean checkForCollision(Vector3f position) {
-
-        if (getParent() != null) {
-            return getParent().isHitting((int) (position.x + 0.5f), (int) position.y, (int) (position.z + 0.5f));
-
-        }
-
-        return false;
+        _acc.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw + 90));
+        _acc.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw + 90));
     }
 
     /**
      * Lets the player jump. Yey.
      */
     public void jump() {
-        // Jumps are only possible, if the player is hitting the ground.
-        if (isPlayerStandingOnGround()) {
-            _gravity = Configuration.JUMP_INTENSITY;
-        }
+        _jump = true;
     }
 
     @Override
     public String toString() {
         Vector3f vD = viewDirection();
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d)", _position.x, _position.y, _position.z, vD.x, vD.y, vD.z, _selectedBlockType);
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, vD.x, vD.y, vD.z, _selectedBlockType, _gravity, _acc.x, _acc.y, _acc.z);
     }
 
     public Vector3f viewDirection() {
@@ -247,9 +227,11 @@ public class Player extends RenderableObject {
         for (int x = -4; x < 4; x++) {
             for (int y = -4; y < 4; y++) {
                 for (int z = -4; z < 4; z++) {
-                    ArrayList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, _position, vD);
-                    if (iss != null) {
-                        inters.addAll(iss);
+                    if (x != 0 || y != 0 || z != 0) {
+                        ArrayList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, _position, vD);
+                        if (iss != null) {
+                            inters.addAll(iss);
+                        }
                     }
                 }
             }
@@ -293,136 +275,132 @@ public class Player extends RenderableObject {
     }
 
     private void processPlayerInteraction() {
-        while (Keyboard.next()) {
-            if (!_keyPressed) {
-                if (Keyboard.getEventKey() == Keyboard.KEY_E) {
-                    placeBlock();
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_Q) {
-                    removeBlock();
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_R) {
-                    resetPlayer();
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_T) {
-                    RayFaceIntersection is = calcSelectedBlock();
-                    if (is != null) {
-                        Vector3f blockPos = is.getBlockPos();
-                        _parent.generateTree((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
-                    }
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_U) {
-                    _parent.updateAllChunks();
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_G) {
-                    this.godMode = !godMode;
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_H) {
-                    this.demoAutoFlyMode = !demoAutoFlyMode;
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_P) {
-                    Configuration.SHOW_PLACING_BOX = !Configuration.SHOW_PLACING_BOX;
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_I) {
-                    Configuration.SHOW_CHUNK_OUTLINES = !Configuration.SHOW_CHUNK_OUTLINES;
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_UP) {
-                    cycleBlockTypes(1);
-                } else if (Keyboard.getEventKey() == Keyboard.KEY_DOWN) {
-                    cycleBlockTypes(-1);
-                } else {
+        while (Keyboard.next() && Keyboard.getEventKeyState()) {
+            if (Keyboard.getEventKey() == Keyboard.KEY_E) {
+                placeBlock();
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_Q) {
+                removeBlock();
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_R) {
+                resetPlayer();
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_T) {
+                RayFaceIntersection is = calcSelectedBlock();
+                if (is != null) {
+                    Vector3f blockPos = is.getBlockPos();
+                    _parent.generateTree((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
                 }
-            }
-
-            if (Keyboard.getEventKeyState()) {
-                _keyPressed = true;
-            } else {
-                _keyPressed = false;
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_U) {
+                _parent.updateAllChunks();
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_G) {
+                this._godMode = !_godMode;
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_H) {
+                this._demoAutoFlyMode = !_demoAutoFlyMode;
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_P) {
+                Configuration.SHOW_PLACING_BOX = !Configuration.SHOW_PLACING_BOX;
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_I) {
+                Configuration.SHOW_CHUNK_OUTLINES = !Configuration.SHOW_CHUNK_OUTLINES;
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_UP) {
+                cycleBlockTypes(1);
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_DOWN) {
+                cycleBlockTypes(-1);
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
+                if (!Keyboard.isRepeatEvent()) {
+                    jump();
+                }
             }
         }
 
         while (Mouse.next()) {
-            if (!_keyPressed) {
-                if (Mouse.getEventButton() == 0 && Mouse.getEventButtonState() == true) {
-                    placeBlock();
-                } else if (Mouse.getEventButton() == 1 && Mouse.getEventButtonState() == true) {
-                    removeBlock();
-                }
+            if (Mouse.getEventButton() == 0 && Mouse.getEventButtonState() == true) {
+                placeBlock();
+            } else if (Mouse.getEventButton() == 1 && Mouse.getEventButtonState() == true) {
+                removeBlock();
             }
-
-            if (Mouse.getEventButtonState()) {
-                _keyPressed = true;
-            } else {
-                _keyPressed = false;
-            }
-
         }
     }
 
     private void processMovement(long delta) {
-
-        if (getParent() != null) {
-            if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-                walkForward();
-            }
-            if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-                walkBackwards();
-            }
-            if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-                strafeLeft();
-            }
-            if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-                strafeRight();
-            }
-            if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-                jump();
-            }
-            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-                _wSpeed = Configuration.RUNNING_SPEED;
-            } else {
-                _wSpeed = Configuration.WALKING_SPEED;
-            }
-
-            boolean hitting = _parent.isHitting((int) (getPosition().x + 0.5f), (int) (getPosition().y - Configuration.PLAYER_HEIGHT), (int) (getPosition().z + 0.5f));
-
-            if (!godMode) {
-
-                if (!hitting) {
-                    if (_gravity > -Configuration.MAX_GRAVITY) {
-                        _gravity -= 0.5f;
-                    }
-                    getPosition().y += (_gravity / 1000.0f) * delta;
-                } else if (_gravity > 0.0f) {
-                    getPosition().y += (_gravity / 1000.0f) * delta;
-                } else {
-                    _gravity = 0.0f;
-                }
-
-                Vector2f dir = new Vector2f(_accX >= 0 ? 1 : -1, _accZ >= 0 ? 1 : -1);
-
-                try {
-                    dir.normalise();
-                } catch (Exception e) {
-                }
-
-                /**
-                 * Collision detection with objects along the x/z-plane.
-                 */
-                if (checkForCollision(new Vector3f(getPosition().x + dir.x * 0.5f, getPosition().y - Configuration.PLAYER_HEIGHT + 1, getPosition().z + dir.y * 0.5f))) {
-                    _accX = 0;
-                    _accZ = 0;
-                } else if (checkForCollision(new Vector3f(getPosition().x + dir.x * 0.5f, getPosition().y + 1, getPosition().z + dir.y * 0.5f))) {
-                    _accX = 0;
-                    _accZ = 0;
-                }
-
-            }
-
-            if (demoAutoFlyMode) {
-                _accX = 32.f;
-                _accZ = 32.f;
-            }
-
-            getPosition().x += (_accX / 1000.0f) * delta;
-            getPosition().y += (_accY / 1000.0f) * delta;
-            getPosition().z += (_accZ / 1000.0f) * delta;
-
-            _accX = 0;
-            _accY = 0;
-            _accZ = 0;
-
+        if (getParent() == null) {
+            return;
         }
+
+        if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+            walkForward();
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+            walkBackwards();
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+            strafeLeft();
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
+            strafeRight();
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+            _wSpeed = Configuration.RUNNING_SPEED;
+        } else {
+            _wSpeed = Configuration.WALKING_SPEED;
+        }
+    }
+
+    private boolean verticalHitTest(Vector3f oldPosition, float delta) {
+        int blockType = _parent.getBlock((int) (getPosition().x + 0.5f), (int) (getPosition().y - 1), (int) (getPosition().z + 0.5f));
+
+        if (_gravity > -Configuration.MAX_GRAVITY) {
+            _gravity -= 0.05f * delta;
+        }
+
+        if (blockType > 0 || _godMode) {
+            _gravity = 0.0f;
+
+            if (!_godMode) {
+                _position.y = oldPosition.y;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean horizontalHitTest(Vector3f oldPosition, float delta) {
+        Vector3f dir = _acc.normalise(null);
+        Vector3f blockPos = new Vector3f((int) (getPosition().x + 0.5f + dir.x * 0.1f), (int) (getPosition().y - 1), (int) (getPosition().z + 0.5f + dir.z * 0.1f));
+        int blockType = _parent.getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
+
+        getPosition().x += (_acc.x / 1000.0f) * delta;
+        getPosition().z += (_acc.z / 1000.0f) * delta;
+
+        if (blockType > 0) {
+            _position = oldPosition;
+            return true;
+        }
+
+        return false;
+    }
+
+    private void updatePlayerPosition(float delta) {
+        Vector3f oldPosition = new Vector3f(_position);
+
+        if (_demoAutoFlyMode) {
+            _acc.x = 32.f;
+            _acc.z = 32.f;
+        }
+
+        getPosition().y += (_acc.y / 1000.0f) * delta;
+        getPosition().y += (_gravity / 1000.0f) * delta;
+
+        boolean vHit = verticalHitTest(oldPosition, delta);
+
+        if (vHit && _jump) {
+            _jump = false;
+            _gravity = Configuration.JUMP_INTENSITY;
+        }
+
+        horizontalHitTest(oldPosition, delta);
+
+        _acc.x = 0;
+        _acc.y = 0;
+        _acc.z = 0;
     }
 
     /**
