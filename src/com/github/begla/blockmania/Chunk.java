@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import org.newdawn.slick.util.ResourceLoader;
 import org.lwjgl.util.vector.Vector4f;
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -77,7 +78,9 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public static void init() {
         try {
-            _textureMap = TextureLoader.getTexture("PNG", new FileInputStream(Chunk.class.getResource("/com/github/begla/blockmania/images/Terrain.png").getPath()), GL_NEAREST);
+            Logger.getLogger(Chunk.class.getName()).log(Level.INFO, "Loading chunk textures...");
+            _textureMap = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/images/terrain.png").openStream(), GL_NEAREST);
+            Logger.getLogger(Chunk.class.getName()).log(Level.INFO, "Finished loading chunk textures!");
         } catch (IOException ex) {
             Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -261,10 +264,10 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
                     float dens = calcForestDensity(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z));
-                    if (dens > 0.55 && dens < 0.7f && getBlock(x, y, z) == 0x1 && y > 32) {
+                    if (dens > 0.25 && dens < 0.6f && getBlock(x, y, z) == 0x1 && y > 32) {
                         _parent.generateTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z), false);
                         return;
-                    } else if (dens >= 0.7f && getBlock(x, y, z) == 0x1 && y > 32) {
+                    } else if (dens >= 0.6f && getBlock(x, y, z) == 0x1 && y > 32) {
                         _parent.generatePineTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z), false);
                         return;
                     }
@@ -812,7 +815,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     private float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _parent.getpGen1().noise(0.003f * x, 0.003f, 0.003f * z) * 170f;
+        result += _parent.getpGen1().noise(0.003f * x, 0.003f, 0.003f * z) * 128f;
         return Math.abs(result);
     }
 
@@ -821,7 +824,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     private float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _parent.getpGen1().noise(0.06f * x, 0.06f, 0.06f * z);
+        result += _parent.getpGen1().noise(0.04f * x, 0.04f, 0.04f * z);
         return result;
     }
 
@@ -857,7 +860,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     private float calcForestDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _parent.getpGen1().noise(0.6f * x, 0.6f * y, 0.6f * z);
+        result += _parent.getpGen3().noise(0.8f * x, 0.8f * y, 0.8f * z);
         return result;
     }
 

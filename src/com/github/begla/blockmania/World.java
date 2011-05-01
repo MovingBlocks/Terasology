@@ -18,11 +18,9 @@ package com.github.begla.blockmania;
 
 import java.io.IOException;
 import static org.lwjgl.opengl.GL11.*;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.github.begla.blockmania.noise.PerlinNoise;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TreeMap;
@@ -30,6 +28,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
+import org.newdawn.slick.util.ResourceLoader;
 
 /**
  * The world of Blockmania. At its most basic the world contains chunks (consisting of a fixed amount of blocks)
@@ -42,12 +41,16 @@ import org.newdawn.slick.opengl.TextureLoader;
  */
 public class World extends RenderableObject {
 
-    private final Random _rand;
+    /* ------ */
+    private short _daytime = 17;
+    private long lastDaytimeMeasurement = Helper.getInstance().getTime();
+    /* ------ */
+    private final FastRandom _rand;
     /* ------ */
     private static Texture _textureSun;
     /* ------ */
     private boolean _worldGenerated;
-    private float _daylight = 0.85f;
+    private float _daylight = 1.0f;
     private Player _player;
     /* ------ */
     private Thread _updateThread;
@@ -73,10 +76,10 @@ public class World extends RenderableObject {
      */
     public World(String title, String seed, Player p) {
         this._player = p;
-        _rand = new Random(seed.hashCode());
-        _pGen1 = new PerlinNoise(_rand.nextInt());
-        _pGen2 = new PerlinNoise(_rand.nextInt());
-        _pGen3 = new PerlinNoise(_rand.nextInt());
+        _rand = new FastRandom(seed.hashCode());
+        _pGen1 = new PerlinNoise(_rand.randomInt());
+        _pGen2 = new PerlinNoise(_rand.randomInt());
+        _pGen3 = new PerlinNoise(_rand.randomInt());
 
         _chunks = new Chunk[(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z];
 
@@ -87,7 +90,7 @@ public class World extends RenderableObject {
 
                 long timeStart = System.currentTimeMillis();
 
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Generating chunks. Please wait.");
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Generating chunks. Please wait...");
 
                 for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
                     for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
@@ -100,7 +103,7 @@ public class World extends RenderableObject {
                 _worldGenerated = true;
                 _player.resetPlayer();
 
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "World updated ({0}s).", (System.currentTimeMillis() - timeStart) / 1000d);
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Chunks created! ({0}s).", (System.currentTimeMillis() - timeStart) / 1000d);
 
                 while (true) {
 
@@ -126,6 +129,7 @@ public class World extends RenderableObject {
             public void run() {
                 while (true) {
                     updateInfWorld();
+                    updateDaytime();
                 }
             }
         });
@@ -168,6 +172,61 @@ public class World extends RenderableObject {
                 c.generateVertexArrays();
                 c._dirty = false;
                 _chunkUpdateQueueDL.add(c);
+            }
+        }
+    }
+
+    /**
+     * Updates the daytime of the world. A day in Blockmania has 12 minutes.
+     */
+    private void updateDaytime() {
+        if (Helper.getInstance().getTime() - lastDaytimeMeasurement >= 30000) {
+            _daytime = (short) ((_daytime + 1) % 24);
+            lastDaytimeMeasurement = Helper.getInstance().getTime();
+
+            Logger.getLogger(World.class.getName()).log(Level.INFO, "Updated daytime to {0}h.", _daytime);
+
+            switch (_daytime) {
+                case 18:
+                    _daylight = 0.8f * Configuration.MAX_LIGHT;
+                    break;
+                case 20:
+                    _daylight = 0.6f * Configuration.MAX_LIGHT;
+                    break;
+                case 21:
+                    _daylight = 0.4f * Configuration.MAX_LIGHT;
+                    break;
+                case 22:
+                    _daylight = 0.2f * Configuration.MAX_LIGHT;
+                    break;
+                case 23:
+                    _daylight = Configuration.MIN_LIGHT;
+                    break;
+                case 5:
+                    _daylight = 0.4f * Configuration.MAX_LIGHT;
+                    break;
+                case 6:
+                    _daylight = 0.6f * Configuration.MAX_LIGHT;
+                    break;
+                case 7:
+                    _daylight = 0.8f * Configuration.MAX_LIGHT;
+                    break;
+                case 8:
+                    _daylight = Configuration.MAX_LIGHT;
+                    break;
+            }
+
+            // Mark all chunks in the cache dirty
+            for (int key : _chunkCache.keySet()) {
+                _chunkCache.get(key)._dirty = true;
+            }
+
+            // But update only those chunks, which are displayed at the moment
+            for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
+                for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
+                    Chunk c = _chunks[x][0][z];
+                    queueChunkForUpdate(c, 0);
+                }
             }
         }
     }
@@ -229,7 +288,9 @@ public class World extends RenderableObject {
      */
     public static void init() {
         try {
-            _textureSun = TextureLoader.getTexture("PNG", new FileInputStream(Chunk.class.getResource("/com/github/begla/blockmania/images/sun.png").getPath()), GL_NEAREST);
+            Logger.getLogger(World.class.getName()).log(Level.INFO, "Loading worLoggerld textures...");
+            _textureSun = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/images/sun.png").openStream(), GL_NEAREST);
+            Logger.getLogger(World.class.getName()).log(Level.INFO, "Finished loading world textures!");
         } catch (IOException ex) {
             Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -319,7 +380,7 @@ public class World extends RenderableObject {
      */
     public void generateTree(int posX, int posY, int posZ, boolean update) {
 
-        int height = _rand.nextInt() % 2 + 6;
+        int height = _rand.randomInt() % 2 + 6;
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
@@ -348,7 +409,7 @@ public class World extends RenderableObject {
      */
     public void generatePineTree(int posX, int posY, int posZ, boolean update) {
 
-        int height = _rand.nextInt() % 4 + 12;
+        int height = _rand.randomInt() % 4 + 12;
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
@@ -579,7 +640,7 @@ public class World extends RenderableObject {
      * @return The daylight color
      */
     public Vector3f getDaylightColor() {
-        return new Vector3f(getDaylight()*0.55f, getDaylight()*0.85f, 0.99f*getDaylight());
+        return new Vector3f(getDaylight() * 0.55f, getDaylight() * 0.85f, 0.99f * getDaylight());
     }
 
     /**
@@ -805,7 +866,8 @@ public class World extends RenderableObject {
             ArrayList<Chunk> sortedChunks = new ArrayList<Chunk>(_chunkCache.values());
             // Sort them according to their distance to the player
             Collections.sort(sortedChunks);
-            System.out.println("Sorting...");
+
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Cache full. Removing some chunks from the chunk cache...");
 
             // Delete as many elements as needed
             for (int i = 0; i < 256; i++) {
@@ -816,6 +878,8 @@ public class World extends RenderableObject {
                     _chunkCache.remove(Helper.getInstance().cantorize((int) cc.getPosition().x, (int) cc.getPosition().z));
                 }
             }
+
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished removing chunks from chunk cache.");
         }
 
         // Generate a new chunk, cache it and return it

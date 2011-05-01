@@ -41,7 +41,6 @@ import org.newdawn.slick.TrueTypeFont;
  */
 public final class Main {
 
-    private static final String GAME_TITLE = "Blockmania Alpha v0.02";
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     /* ------- */
     private static TrueTypeFont _font1;
@@ -53,6 +52,8 @@ public final class Main {
     /* ------- */
     Player player;
     World world;
+    /* ------- */
+    FastRandom rand = new FastRandom();
 
     /**
      * Init. the logger.
@@ -71,6 +72,8 @@ public final class Main {
      * @param args Arguments
      */
     public static void main(String[] args) {
+
+        LOGGER.log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
 
         Main main = null;
 
@@ -95,10 +98,12 @@ public final class Main {
      * @throws LWJGLException
      */
     private void create() throws LWJGLException {
+        LOGGER.log(Level.INFO, "Initializing display, input devices and OpenGL.");
+
         // Display
         Display.setDisplayMode(new DisplayMode(Configuration.DISPLAY_WIDTH, Configuration.DISPLAY_HEIGHT));
         Display.setFullscreen(Configuration.FULLSCREEN);
-        Display.setTitle(GAME_TITLE);
+        Display.setTitle(Configuration.GAME_TITLE);
         Display.create(Configuration.PIXEL_FORMAT);
 
         // Keyboard
@@ -148,14 +153,27 @@ public final class Main {
         glFogf(GL_FOG_START, viewingDistance - 64f);
         glFogf(GL_FOG_END, viewingDistance);
 
-        // Init. textures and more
-        Chunk.init();
-        World.init();
+        try {
+            // Init. textures and more
+            Class.forName("com.github.begla.blockmania.Chunk");
+            Chunk.init();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            Class.forName("com.github.begla.blockmania.World");
+            World.init();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
 
         // Init. the player and a world
         player = new Player();
         // Generate a world with a "random" seed value
-        world = new World("WORLD1", String.valueOf(Math.random()), player);
+        String worldSeed = rand.randomCharacterString(16);
+        LOGGER.log(Level.INFO, "Creating new World with random seed \"{0}\"", worldSeed);
+        world = new World("WORLD1", worldSeed, player);
         // Link the player to the world
         player.setParent(world);
     }
@@ -206,6 +224,7 @@ public final class Main {
      * the ESCAPE key.
      */
     private void start() {
+        LOGGER.log(Level.INFO, "Starting the game...");
         while (!Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
 
             // Sync. at 60 FPS
@@ -269,7 +288,7 @@ public final class Main {
         glEnable(GL_TEXTURE_2D);
 
         // Draw debugging information
-        _font1.drawString(4, 4, String.format("%s (fps: %.2f, free heap space: %d MB)", GAME_TITLE, _meanFps, Runtime.getRuntime().freeMemory() / 1048576), Color.white);
+        _font1.drawString(4, 4, String.format("%s (fps: %.2f, free heap space: %d MB)", Configuration.GAME_TITLE, _meanFps, Runtime.getRuntime().freeMemory() / 1048576), Color.white);
         _font1.drawString(4, 22, String.format("%s", player, Color.white));
         _font1.drawString(4, 38, String.format("%s", world, Color.white));
 
