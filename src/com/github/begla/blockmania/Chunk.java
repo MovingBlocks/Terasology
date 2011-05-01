@@ -202,10 +202,12 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             /*
                              * Grass covers the terrain.
                              */
-                            if (i != 32) {
+                            if (i > 32) {
                                 setBlock(x, i, z, 0x1);
-                            } else {
+                            } else if (i <= 34 && i >= 28) {
                                 setBlock(x, i, z, 0x7);
+                            } else {
+                                setBlock(x, i, z, 0x2);
                             }
                         } else if (i < height) {
                             if (i < height * 0.75f) {
@@ -218,19 +220,24 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                                 /*
                                  * The upper layer is filled with dirt.
                                  */
-                                setBlock(x, i, z, 0x2);
+                                
+                                if (i <= 34 && i >= 28) {
+                                    setBlock(x, i, z, 0x7);
+                                } else {
+                                    setBlock(x, i, z, 0x2);
+                                }
                             }
 
-                            if (i <= 34 && i >= 32) {
+                            if (i <= 34 && i >= 28) {
                                 /**
-                                 * Generate "beach".
+                                 * Generate beach.
                                  */
                                 setBlock(x, i, z, 0x7);
                             }
                         }
                     }
 
-                    if (i <= 32 && i > 0) {
+                    if (i <= 30 && i > 0) {
                         if (getBlock(x, i, z) == 0) {
                             setBlock(x, i, z, 0x4);
                         }

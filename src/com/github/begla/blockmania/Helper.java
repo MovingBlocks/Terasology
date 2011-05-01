@@ -148,8 +148,6 @@ public class Helper {
             // Water block
             case 0x4:
                 return true;
-            case 0x6:
-                return true;
             default:
                 return false;
         }

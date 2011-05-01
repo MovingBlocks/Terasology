@@ -48,8 +48,10 @@ public class Configuration {
     // Player
     public static int JUMP_INTENSITY = 12;
     public static int MAX_GRAVITY = 32;
-    public static int WALKING_SPEED = 4;
-    public static int RUNNING_SPEED = 32;
+    public static int WALKING_SPEED = 3;
+    public static int RUNNING_SPEED = 6;
+    public static boolean ENABLE_BOBBING = true;
+    public static float PLAYER_HEIGHT = 1.25f;
     // Graphics
     public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(32);
 }
