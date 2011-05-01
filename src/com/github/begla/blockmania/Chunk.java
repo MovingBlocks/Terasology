@@ -223,7 +223,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                                 /*
                                  * The upper layer is filled with dirt.
                                  */
-                                
+
                                 if (i <= 34 && i >= 28) {
                                     setBlock(x, i, z, 0x7);
                                 } else {
@@ -322,7 +322,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
                             tex.add(texOffsetY);
                             quads.add(0.5f + x + offset.x);
                             quads.add(0.5f + y + offset.y);
@@ -333,8 +333,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(0.5f + x + offset.x);
                             quads.add(0.5f + y + offset.y);
                             quads.add(-0.5f + z + offset.z);
@@ -345,7 +345,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.w);
 
                             tex.add(texOffsetX);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(-0.5f + x + offset.x);
                             quads.add(0.5f + y + offset.y);
                             quads.add(-0.5f + z + offset.z);
@@ -379,7 +379,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
                             tex.add(texOffsetY);
                             quads.add(0.5f + x + offset.x);
                             quads.add(0.5f + y + offset.y);
@@ -390,8 +390,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
                             quads.add(-0.5f + z + offset.z);
@@ -402,7 +402,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.w);
 
                             tex.add(texOffsetX);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(-0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
                             quads.add(-0.5f + z + offset.z);
@@ -427,7 +427,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.w);
 
                             tex.add(texOffsetX);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(-0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
                             quads.add(0.5f + z + offset.z);
@@ -437,8 +437,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
                             quads.add(0.5f + z + offset.z);
@@ -448,7 +448,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
                             tex.add(texOffsetY);
 
                             quads.add(0.5f + x + offset.x);
@@ -486,7 +486,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.w);
 
                             tex.add(texOffsetX);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(-0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
                             quads.add(-0.5f + z + offset.z);
@@ -496,8 +496,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(-0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
                             quads.add(0.5f + z + offset.z);
@@ -507,7 +507,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
                             tex.add(texOffsetY);
 
                             quads.add(-0.5f + x + offset.x);
@@ -554,7 +554,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
                             tex.add(texOffsetY);
                             quads.add(0.5f + x + offset.x);
                             quads.add(0.5f + y + offset.y);
@@ -565,8 +565,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
                             quads.add(0.5f + z + offset.z);
@@ -577,7 +577,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.w);
 
                             tex.add(texOffsetX);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
                             quads.add(-0.5f + z + offset.z);
@@ -611,7 +611,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
                             tex.add(texOffsetY);
                             quads.add(0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
@@ -622,8 +622,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.z * shadowIntens * _parent.getDaylight());
                             color.add(colorOffset.w);
 
-                            tex.add(texOffsetX + 0.0625f);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetX + 0.0624f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
                             quads.add(0.5f + z + offset.z);
@@ -634,7 +634,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                             color.add(colorOffset.w);
 
                             tex.add(texOffsetX);
-                            tex.add(texOffsetY + 0.0625f);
+                            tex.add(texOffsetY + 0.0624f);
                             quads.add(-0.5f + x + offset.x);
                             quads.add(-0.5f + y + offset.y);
                             quads.add(0.5f + z + offset.z);
@@ -783,7 +783,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         float val_n6 = Helper.getInstance().isBlockTypeTranslucent(_parent.getBlock(x, y - 1, z)) ? _parent.getLight(x, y - 1, z) : -1f;
 
         float val_light = _parent.getLight(x, y, z);
-        float val_light_next = Math.max(val_light - 0.0625f, 0f);
+        float val_light_next = Math.max(val_light - 0.0624f, 0f);
 
         if (val_n1 < val_light_next && val_n1 != -1) {
             _parent.setLight(x + 1, y, z, val_light_next);
@@ -928,7 +928,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
                     for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
-                        if (getLight(x, y, z) == Configuration.MAX_LIGHT - ite * 0.0625f && Helper.getInstance().isBlockTypeTranslucent(getBlock(x, y, z))) {
+                        if (getLight(x, y, z) == Configuration.MAX_LIGHT - ite * 0.0624f && Helper.getInstance().isBlockTypeTranslucent(getBlock(x, y, z))) {
                             floodLight(x, y, z);
                         }
                     }
