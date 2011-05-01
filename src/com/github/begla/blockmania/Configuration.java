@@ -54,5 +54,5 @@ public class Configuration {
     public static final boolean ENABLE_BOBBING = true;
     public static final float PLAYER_HEIGHT = 1.25f;
     // Graphics
-    public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24);
+    public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24).withSRGB(true);
 }
