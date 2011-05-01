@@ -579,7 +579,7 @@ public class World extends RenderableObject {
      * @return The daylight color
      */
     public Vector3f getDaylightColor() {
-        return new Vector3f(getDaylight() - 0.3f, getDaylight() - 0.1f, getDaylight() - 0.1f);
+        return new Vector3f(getDaylight()*0.55f, getDaylight()*0.85f, 0.99f*getDaylight());
     }
 
     /**
