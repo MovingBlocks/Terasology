@@ -16,31 +16,30 @@
  */
 package com.github.begla.blockmania;
 
-import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.ArrayList;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
  * This class contains all functions regarding the player's actions,
- * movement and persective rendering.
+ * movement and the orientation of the camera.
  * 
  * @author Benjamin Glatzel <benjamin.glawwtzel@me.com>
  */
 public class Player extends RenderableObject {
 
     private boolean _jump = false;
-    private int _selectedBlockType = 0;
+    private int _selectedBlockType = 1;
     private boolean _demoAutoFlyMode = false;
     private boolean _godMode = false;
     private int _wSpeed = Configuration.WALKING_SPEED;
     private double _yaw = 135d;
     private double _pitch;
-    private Vector3f _acc = new Vector3f();
+    private Vector3f _moveVector = new Vector3f(0, 0, 0);
+    private Vector3f _accVector = new Vector3f(0, 0, 0);
     private float _gravity = 0.0f;
     private World _parent = null;
 
@@ -49,15 +48,26 @@ public class Player extends RenderableObject {
      */
     @Override
     public void render() {
+
+        if (Configuration.ENABLE_BOBBING && !_godMode) {
+            float bobbing2 = _parent.getpGen2().noise(_position.x / 1.5f, _position.z / 1.5f, 0f) * 2f;
+            glRotatef(bobbing2, 0f, 0f, 1f);
+        }
+
         glRotatef((float) _pitch, 1f, 0f, 0f);
         glRotatef((float) _yaw, 0f, 1f, 0f);
+
+        if (Configuration.ENABLE_BOBBING && !_godMode) {
+            float bobbing1 = _parent.getpGen1().noise(_position.x * 1.5f, _position.z * 1.5f, 0f) * 0.15f;
+            glTranslatef(0.0f, bobbing1, 0);
+        }
+
         glTranslatef(-_position.x, -_position.y, -_position.z);
 
         RayFaceIntersection is = calcSelectedBlock();
 
+        // Display the block the player is aiming at
         if (Configuration.SHOW_PLACING_BOX) {
-            // Display the currently looked at block
-
             if (is != null) {
 
 //                glPointSize(5f);
@@ -125,6 +135,8 @@ public class Player extends RenderableObject {
         processPlayerInteraction();
         processMovement(delta);
         updatePlayerPosition(delta);
+
+        _moveVector = new Vector3f(0, 0, 0);
     }
 
     /**
@@ -162,42 +174,42 @@ public class Player extends RenderableObject {
      * Moves the player forward.
      */
     public void walkForward() {
-        _acc.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _moveVector.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
         if (_godMode) {
-            _acc.y -= (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
+            _moveVector.y -= (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
-        _acc.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _moveVector.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
     /*
      * Moves the player backward.
      */
     public void walkBackwards() {
-        _acc.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _moveVector.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
         if (_godMode) {
-            _acc.y += (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
+            _moveVector.y += (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
-        _acc.z += (double) _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _moveVector.z += (double) _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
     /*
      * Lets the player strafe left.
      */
     public void strafeLeft() {
-        _acc.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw - 90));
-        _acc.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw - 90));
+        _moveVector.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw - 90));
+        _moveVector.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw - 90));
     }
 
     /*
      * Lets the player strafe right.
      */
     public void strafeRight() {
-        _acc.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw + 90));
-        _acc.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw + 90));
+        _moveVector.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw + 90));
+        _moveVector.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw + 90));
     }
 
     /**
@@ -210,7 +222,7 @@ public class Player extends RenderableObject {
     @Override
     public String toString() {
         Vector3f vD = viewDirection();
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, vD.x, vD.y, vD.z, _selectedBlockType, _gravity, _acc.x, _acc.y, _acc.z);
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, vD.x, vD.y, vD.z, _selectedBlockType, _gravity, _moveVector.x, _moveVector.y, _moveVector.z);
     }
 
     public Vector3f viewDirection() {
@@ -343,13 +355,9 @@ public class Player extends RenderableObject {
     }
 
     private boolean verticalHitTest(Vector3f oldPosition, float delta) {
-        int blockType = _parent.getBlock((int) (getPosition().x + 0.5f), (int) (getPosition().y - 1), (int) (getPosition().z + 0.5f));
+        int blockType = _parent.getBlock((int) (getPosition().x + 0.5f), (int) (getPosition().y + 0.5f - Configuration.PLAYER_HEIGHT), (int) (getPosition().z + 0.5f));
 
-        if (_gravity > -Configuration.MAX_GRAVITY) {
-            _gravity -= 0.05f * delta;
-        }
-
-        if (blockType > 0 || _godMode) {
+        if (blockType > 0) {
             _gravity = 0.0f;
 
             if (!_godMode) {
@@ -363,15 +371,13 @@ public class Player extends RenderableObject {
     }
 
     private boolean horizontalHitTest(Vector3f oldPosition, float delta) {
-        Vector3f dir = _acc.normalise(null);
-        Vector3f blockPos = new Vector3f((int) (getPosition().x + 0.5f + dir.x * 0.1f), (int) (getPosition().y - 1), (int) (getPosition().z + 0.5f + dir.z * 0.1f));
+        Vector3f dir = _moveVector.normalise(null);
+        Vector3f blockPos = new Vector3f((int) (getPosition().x + 0.5f + dir.x * 0.1f), (int) (getPosition().y + 0.5f - Configuration.PLAYER_HEIGHT), (int) (getPosition().z + 0.5f + dir.z * 0.1f));
         int blockType = _parent.getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
 
-        getPosition().x += (_acc.x / 1000.0f) * delta;
-        getPosition().z += (_acc.z / 1000.0f) * delta;
-
         if (blockType > 0) {
-            _position = oldPosition;
+            _position.x = oldPosition.x;
+            _position.z = oldPosition.z;
             return true;
         }
 
@@ -381,26 +387,64 @@ public class Player extends RenderableObject {
     private void updatePlayerPosition(float delta) {
         Vector3f oldPosition = new Vector3f(_position);
 
-        if (_demoAutoFlyMode) {
-            _acc.x = 32.f;
-            _acc.z = 32.f;
+        if (_godMode) {
+            getPosition().y += (_accVector.y / 1000.0f) * delta;
+        } else {
+            getPosition().y += (_gravity / 1000.0f) * delta;
         }
 
-        getPosition().y += (_acc.y / 1000.0f) * delta;
-        getPosition().y += (_gravity / 1000.0f) * delta;
+        getPosition().x += (_accVector.x / 1000.0f) * delta;
+        getPosition().z += (_accVector.z / 1000.0f) * delta;
 
-        boolean vHit = verticalHitTest(oldPosition, delta);
+        _accVector.x += _moveVector.x;
+        _accVector.y += _moveVector.y;
+        _accVector.z += _moveVector.z;
 
-        if (vHit && _jump) {
-            _jump = false;
-            _gravity = Configuration.JUMP_INTENSITY;
+        if (_gravity > -Configuration.MAX_GRAVITY) {
+            _gravity -= 0.05f * delta;
         }
 
-        horizontalHitTest(oldPosition, delta);
 
-        _acc.x = 0;
-        _acc.y = 0;
-        _acc.z = 0;
+        if (Math.abs(_accVector.y) > 0f) {
+            _accVector.y += -1f * _accVector.y * 0.05f;
+        }
+
+        if (Math.abs(_accVector.x) > 0f) {
+            _accVector.x += -1f * _accVector.x * 0.05f;
+        }
+
+        if (Math.abs(_accVector.z) > 0f) {
+            _accVector.z += -1f * _accVector.z * 0.05f;
+        }
+
+        if (Math.abs(_accVector.x) > _wSpeed || Math.abs(_accVector.z) > _wSpeed || Math.abs(_accVector.z) > _wSpeed) {
+            float max = Math.max(Math.max(Math.abs(_accVector.x), Math.abs(_accVector.z)), _accVector.y);
+            float div = max / _wSpeed;
+
+            _accVector.x /= div;
+            _accVector.z /= div;
+            _accVector.y /= div;
+        }
+
+        if (!_godMode) {
+            boolean vHit = verticalHitTest(oldPosition, delta);
+
+            if (vHit && _jump) {
+                _jump = false;
+                _gravity = Configuration.JUMP_INTENSITY;
+            }
+
+            horizontalHitTest(oldPosition, delta);
+        } else {
+            _gravity = 0f;
+
+        }
+
+
+        if (_demoAutoFlyMode && _godMode) {
+            _accVector.x = 16.f;
+            _accVector.z = 16.f;
+        }
     }
 
     /**

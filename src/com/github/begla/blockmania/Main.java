@@ -146,7 +146,7 @@ public final class Main {
         glFogf(GL_FOG_DENSITY, 1.0f);
         float viewingDistance = (Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * Configuration.CHUNK_DIMENSIONS.x) / 2f;
         glFogf(GL_FOG_START, viewingDistance - 64f);
-        glFogf(GL_FOG_END, viewingDistance - 32f);
+        glFogf(GL_FOG_END, viewingDistance - 56f);
 
         // Init. textures and more
         Chunk.init();
