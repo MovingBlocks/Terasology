@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.opengl.Texture;
-import java.io.FileInputStream;
 import org.lwjgl.BufferUtils;
 import org.newdawn.slick.opengl.TextureLoader;
 import static org.lwjgl.opengl.GL11.*;
@@ -783,7 +782,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         float val_n6 = Helper.getInstance().isBlockTypeTranslucent(_parent.getBlock(x, y - 1, z)) ? _parent.getLight(x, y - 1, z) : -1f;
 
         float val_light = _parent.getLight(x, y, z);
-        float val_light_next = Math.max(val_light - 0.0624f, 0f);
+        float val_light_next = Math.max(val_light - 0.0625f, 0f);
 
         if (val_n1 < val_light_next && val_n1 != -1) {
             _parent.setLight(x + 1, y, z, val_light_next);
@@ -912,13 +911,17 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     public void calcSunlight() {
         for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
-                for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
-                    if (Helper.getInstance().isBlockTypeTranslucent(_blocks[x][y][z])) {
-                        _light[x][y][z] = Configuration.MAX_LIGHT;
-                    } else {
-                        break;
-                    }
-                }
+                calcSunlightAtLocalPos(x, z);
+            }
+        }
+    }
+
+    public void calcSunlightAtLocalPos(int x, int z) {
+        for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
+            if (Helper.getInstance().isBlockTypeTranslucent(_blocks[x][y][z])) {
+                _light[x][y][z] = Configuration.MAX_LIGHT;
+            } else {
+                break;
             }
         }
     }
@@ -928,7 +931,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
                     for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
-                        if (getLight(x, y, z) == Configuration.MAX_LIGHT - ite * 0.0624f && Helper.getInstance().isBlockTypeTranslucent(getBlock(x, y, z))) {
+                        if (getLight(x, y, z) == Configuration.MAX_LIGHT - ite * 0.0625f && Helper.getInstance().isBlockTypeTranslucent(getBlock(x, y, z))) {
                             floodLight(x, y, z);
                         }
                     }
