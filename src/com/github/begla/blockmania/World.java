@@ -58,9 +58,9 @@ public class World extends RenderableObject {
     /* ------ */
     private Chunk[][][] _chunks;
     /* ------ */
-    private final ArrayBlockingQueue<Chunk> _chunkUpdateQueueDL = new ArrayBlockingQueue<Chunk>(1024);
-    private final ArrayBlockingQueue<Chunk> _chunkUpdateImportant = new ArrayBlockingQueue<Chunk>(1024);
-    private final ArrayBlockingQueue<Chunk> _chunkUpdateNormal = new ArrayBlockingQueue<Chunk>(1024);
+    private final ArrayBlockingQueue<Chunk> _chunkUpdateQueueDL = new ArrayBlockingQueue<Chunk>(128);
+    private final ArrayBlockingQueue<Chunk> _chunkUpdateImportant = new ArrayBlockingQueue<Chunk>(256);
+    private final ArrayBlockingQueue<Chunk> _chunkUpdateNormal = new ArrayBlockingQueue<Chunk>(2056);
     private TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     /* ------ */
     private PerlinNoise _pGen1;
@@ -186,6 +186,8 @@ public class World extends RenderableObject {
 
             Logger.getLogger(World.class.getName()).log(Level.INFO, "Updated daytime to {0}h.", _daytime);
 
+            float oldDaylight = _daylight;
+
             switch (_daytime) {
                 case 18:
                     _daylight = 0.8f * Configuration.MAX_LIGHT;
@@ -216,16 +218,19 @@ public class World extends RenderableObject {
                     break;
             }
 
-            // Mark all chunks in the cache dirty
-            for (int key : _chunkCache.keySet()) {
-                _chunkCache.get(key)._dirty = true;
-            }
+            // Only update the chunks if the daylight value has changed
+            if (_daylight != oldDaylight) {
+                // Mark all chunks in the cache dirty
+                for (int key : _chunkCache.keySet()) {
+                    _chunkCache.get(key)._dirty = true;
+                }
 
-            // But update only those chunks, which are displayed at the moment
-            for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-                for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
-                    Chunk c = _chunks[x][0][z];
-                    queueChunkForUpdate(c, 0);
+                // But update only those chunks, which are displayed at the moment
+                for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
+                    for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
+                        Chunk c = _chunks[x][0][z];
+                        queueChunkForUpdate(c, 0);
+                    }
                 }
             }
         }
@@ -256,7 +261,10 @@ public class World extends RenderableObject {
                     }
                     if (c.getPosition().x != pos.x || c.getPosition().z != pos.z) {
                         // Remove this chunk from further updates
-                        _chunkUpdateNormal.remove(c);
+                        while (_chunkUpdateNormal.contains(c)) {
+                            _chunkUpdateNormal.remove(c);
+                        }
+
                         // Try to load a cached version of the chunk
                         c = loadOrCreateChunk((int) pos.x, (int) pos.z);
                         // Replace the old chunk
