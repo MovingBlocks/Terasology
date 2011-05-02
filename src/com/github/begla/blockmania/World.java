@@ -525,6 +525,7 @@ public class World extends RenderableObject {
 
         // Queue the chunk for update
         if (update) {
+            c.calcSunlightAtLocalPos(blockPosX, blockPosZ);
             queueChunkForUpdate(c, 1);
         }
     }
