@@ -140,10 +140,6 @@ public final class Main {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FOG);
         glDepthFunc(GL_LEQUAL);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_ALPHA_TEST);
-        glAlphaFunc(GL_GREATER, 0.1f);
 
         // Enable fog
         glHint(GL_FOG_HINT, GL_NICEST);
@@ -211,7 +207,7 @@ public final class Main {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(84.0f, (float) Configuration.DISPLAY_WIDTH / (float) Configuration.DISPLAY_HEIGHT, 0.01f, 256f);
+        gluPerspective(84.0f, (float) Configuration.DISPLAY_WIDTH / (float) Configuration.DISPLAY_HEIGHT, 0.01f, 512f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
@@ -306,6 +302,7 @@ public final class Main {
         glEnd();
 
 
+        glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
 
         glMatrixMode(GL_PROJECTION);

@@ -69,7 +69,7 @@ public class FastRandom {
      * @return Random value
      */
     public double randomDouble() {
-        return randomInt() / ((double) Integer.MAX_VALUE - 1d);
+        return randomLong() / ((double) Long.MAX_VALUE - 1d);
     }
 
     /**

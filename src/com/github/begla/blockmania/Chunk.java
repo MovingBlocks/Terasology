@@ -151,7 +151,13 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (!translucent) {
             glCallList(_displayListOpaque);
         } else {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glEnable(GL_ALPHA_TEST);
+            glAlphaFunc(GL_GREATER, 0.1f);
             glCallList(_displayListTranslucent);
+            glDisable(GL_BLEND);
+            glDisable(GL_ALPHA_TEST);
         }
         glDisable(GL_TEXTURE_2D);
     }
@@ -917,9 +923,16 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     public void calcSunlightAtLocalPos(int x, int z) {
+        float light = Configuration.MAX_LIGHT;
+
         for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
             if (Helper.getInstance().isBlockTypeTranslucent(_blocks[x][y][z])) {
-                _light[x][y][z] = Configuration.MAX_LIGHT;
+                _light[x][y][z] = light;
+
+                if (_blocks[x][y][z] != 0x0) {
+                    light -= Configuration.WATER_LIGHT_ABSORPTION;
+                    light = Math.max(Configuration.MIN_LIGHT, light);
+                }
             } else {
                 break;
             }

@@ -71,11 +71,11 @@ public class Player extends RenderableObject {
         glPushMatrix();
         glTranslatef(_position.x, _position.y, _position.z);
 
-        glColor3f(1f, 0f, 0f);
-        Sphere s = new Sphere();
-        s.draw(0.1f, 64, 4);
+        
+//        glColor3f(1f, 0f, 0f);
+//        Sphere s = new Sphere();
+//        s.draw(0.1f, 64, 4);
         glPopMatrix();
-
 
         RayFaceIntersection is = calcSelectedBlock();
 
@@ -482,11 +482,15 @@ public class Player extends RenderableObject {
              * collisions.
              */
             if (horizontalHitTest()) {
-                // Determine the normal of the colliding block using the acceleration vector
-                Vector3f norm = new Vector3f(1,0,0);
+                // TODO: Calculate the normal to allow sliding alongside blocks!
+//                Vector3f norm = new Vector3f(1,0,0);
+//
+//                _position.z = oldPosition.z + (_accVector.z / 1000.0f) * delta * norm.z;
+//                _position.x = oldPosition.x + (_accVector.x / 1000.0f) * delta * norm.x;
 
-                _position.z = oldPosition.z + (_accVector.z / 1000.0f) * delta * norm.z;
-                _position.x = oldPosition.x + (_accVector.x / 1000.0f) * delta * norm.x;
+                // Simple collision handling
+                _position.z = oldPosition.z;
+                _position.x = oldPosition.x;
             }
         }
     }

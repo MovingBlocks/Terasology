@@ -125,11 +125,11 @@ public class Helper {
             // Grass block
             case 0x1:
                 if (side == SIDE.TOP) {
-                    return new Vector4f(204f / 255f, 255f / 255f, 25f / 255f, 1.0f);
+                    return new Vector4f(180f / 255f, 255f / 255f, 25f / 255f, 1.0f);
                 }
                 break;
             case 0x6:
-                return new Vector4f(90f / 255f, 160f / 255f, 89f / 255f, 1.0f);
+                return new Vector4f(40f / 255f, 190f / 255f, 40f / 255f, 1.0f);
         }
 
         return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -147,6 +147,9 @@ public class Helper {
                 return true;
             // Water block
             case 0x4:
+                return true;
+            // Water block
+            case 0x6:
                 return true;
             default:
                 return false;
