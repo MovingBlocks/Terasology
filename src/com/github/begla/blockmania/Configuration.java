@@ -47,12 +47,14 @@ public class Configuration {
     public static final float DIMMING_INTENS = 0.075f;
     public static final float BLOCK_SIDE_DIMMING = 0.05f;
     // Player
-    public static final int JUMP_INTENSITY = 12;
+    public static final int JUMP_INTENSITY = 8;
     public static final int MAX_GRAVITY = 32;
     public static final int WALKING_SPEED = 3;
     public static final int RUNNING_SPEED = 6;
     public static final boolean ENABLE_BOBBING = true;
     public static final float PLAYER_HEIGHT = 1.25f;
+    public static final float G_FORCE = 0.025f;
+    public static final float SLOWDOWN_INTENS = 0.05f;
     // Graphics
     public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24).withSRGB(true);
 }
