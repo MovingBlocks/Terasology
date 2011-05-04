@@ -825,6 +825,10 @@ public class World extends RenderableObject {
          */
         float t = -(norm.x * origin.x + norm.y * origin.y + norm.z * origin.z + d) / (Vector3f.dot(ray, norm));
 
+        if (t < 0) {
+            return null;
+        }
+
         /**
          * Calc. the point of intersection.
          */

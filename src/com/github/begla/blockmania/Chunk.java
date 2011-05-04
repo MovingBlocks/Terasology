@@ -32,7 +32,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
- * determined by their dimensions. Chunks a used to manage the world efficiently and
+ * determined by their dimensions. Chunks are used to manage the world efficiently and
  * reduce the batch count within the render loop.
  *
  * Chunks are tessellated on creation and saved to vertex arrays. From those a display list is generated
@@ -228,7 +228,6 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                                 /*
                                  * The upper layer is filled with dirt.
                                  */
-
                                 if (i <= 34 && i >= 28) {
                                     setBlock(x, i, z, 0x7);
                                 } else {
@@ -262,7 +261,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Populates the chunk (e.g. placement of trees etc.).
      *
-     * TODO: Much to simple and boring
+     * TODO: Much to simple and boring :-(
      */
     public void populate() {
         for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
@@ -1001,7 +1000,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             _light[x][y][z] = intens;
             _dirty = true;
 
-            // Make the neighbors as dirty
+            // Mark the neighbors as dirty
             markNeighborsDirty(x, z);
         } catch (Exception e) {
         }
