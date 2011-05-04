@@ -72,7 +72,7 @@ public class Player extends RenderableObject {
         glPushMatrix();
         glTranslatef(_position.x, _position.y, _position.z);
 
-        
+
 //        glColor3f(1f, 0f, 0f);
 //        Sphere s = new Sphere();
 //        s.draw(0.1f, 64, 4);
@@ -493,6 +493,9 @@ public class Player extends RenderableObject {
                 _position.z = oldPosition.z;
                 _position.x = oldPosition.x;
             }
+        } else {
+            // Disable gravity while god mode is active
+            _gravity = 0f;
         }
     }
 

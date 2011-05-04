@@ -315,7 +315,7 @@ public class World extends RenderableObject {
          */
         glPushMatrix();
         // Position the sun relatively to the player
-        glTranslatef(Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * Configuration.CHUNK_DIMENSIONS.x + _player.getPosition().x / 2f, Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * Configuration.CHUNK_DIMENSIONS.y * 0.75f, Configuration.VIEWING_DISTANCE_IN_CHUNKS.z * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z *2f);
+        glTranslatef(_player.getPosition().x, Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * Configuration.CHUNK_DIMENSIONS.y * 0.75f, Configuration.VIEWING_DISTANCE_IN_CHUNKS.z * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
 
         // Disable fog
         glDisable(GL_FOG);
