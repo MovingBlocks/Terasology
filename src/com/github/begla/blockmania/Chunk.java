@@ -1232,7 +1232,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     public float calcSimpleOcclusionAmount(int x, int y, int z) {
-        float intens = 0;
+        float intens = 0f;
         if (Block.getBlock(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z))).isCastingShadows()) {
             intens++;
         }
