@@ -467,7 +467,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         if (drawTop) {
             Vector4f colorOffset = Block.getBlock(block).getColorOffsetFor(Block.SIDE.TOP);
-            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z)) - (calcSimpleOcclusionAmount(x, y + 1, z) * Configuration.DIMMING_INTENS), Configuration.MIN_LIGHT);
+            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x, y + 1, z)), Configuration.MIN_LIGHT);
 
             float texOffsetX = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.TOP).x;
             float texOffsetY = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.TOP).y;
@@ -524,7 +524,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         if (drawFront) {
             Vector4f colorOffset = Block.getBlock(block).getColorOffsetFor(Block.SIDE.FRONT);
-            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) - Configuration.BLOCK_SIDE_DIMMING - (calcSimpleOcclusionAmount(x, y, z - 1) * Configuration.DIMMING_INTENS), Configuration.MIN_LIGHT);
+            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) * (calcSimpleOcclusionAmount(x, y, z - 1) - Configuration.BLOCK_SIDE_DIMMING), Configuration.MIN_LIGHT);
 
             float texOffsetX = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.FRONT).x;
             float texOffsetY = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.FRONT).y;
@@ -581,7 +581,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         if (drawBack) {
             Vector4f colorOffset = Block.getBlock(block).getColorOffsetFor(Block.SIDE.BACK);
-            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) - Configuration.BLOCK_SIDE_DIMMING - (calcSimpleOcclusionAmount(x, y, z + 1) * Configuration.DIMMING_INTENS), Configuration.MIN_LIGHT);
+            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) * (calcSimpleOcclusionAmount(x, y, z + 1) - Configuration.BLOCK_SIDE_DIMMING), Configuration.MIN_LIGHT);
 
 
             float texOffsetX = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.BACK).x;
@@ -641,7 +641,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         if (drawLeft) {
             Vector4f colorOffset = Block.getBlock(block).getColorOffsetFor(Block.SIDE.LEFT);
-            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) - Configuration.BLOCK_SIDE_DIMMING - (calcSimpleOcclusionAmount(x - 1, y, z) * Configuration.DIMMING_INTENS), Configuration.MIN_LIGHT);
+            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x - 1, y, z) - Configuration.BLOCK_SIDE_DIMMING), Configuration.MIN_LIGHT);
 
             float texOffsetX = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.LEFT).x;
             float texOffsetY = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.LEFT).y;
@@ -699,7 +699,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         if (drawRight) {
             Vector4f colorOffset = Block.getBlock(block).getColorOffsetFor(Block.SIDE.RIGHT);
-            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) - Configuration.BLOCK_SIDE_DIMMING - (calcSimpleOcclusionAmount(x + 1, y, z) * Configuration.DIMMING_INTENS), Configuration.MIN_LIGHT);
+            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x + 1, y, z) - Configuration.BLOCK_SIDE_DIMMING), Configuration.MIN_LIGHT);
 
             float texOffsetX = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.RIGHT).x;
             float texOffsetY = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.RIGHT).y;
@@ -756,7 +756,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         if (drawBottom) {
             Vector4f colorOffset = Block.getBlock(block).getColorOffsetFor(Block.SIDE.BOTTOM);
-            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z)) - (calcSimpleOcclusionAmount(x, y - 1, z) * Configuration.DIMMING_INTENS), Configuration.MIN_LIGHT);
+            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x, y - 1, z)), Configuration.MIN_LIGHT);
 
             float texOffsetX = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x;
             float texOffsetY = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y;
@@ -1257,7 +1257,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (Block.getBlock(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
             intens++;
         }
-        return (float) intens / 8f;
+        return 1f - (float) intens * Configuration.OCCLUSION_INTENS;
     }
 
     public Chunk[] getNeighbors() {
