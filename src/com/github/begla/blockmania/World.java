@@ -42,10 +42,11 @@ import org.newdawn.slick.util.ResourceLoader;
 public class World extends RenderableObject {
 
     /* ------ */
-    private short _daytime = 17;
+    private short _daytime = 8;
     private long lastDaytimeMeasurement = Helper.getInstance().getTime();
     /* ------ */
     private final FastRandom _rand;
+
     /* ------ */
     private static Texture _textureSun;
     /* ------ */
@@ -709,6 +710,11 @@ public class World extends RenderableObject {
      */
     public PerlinNoise getpGen3() {
         return _pGen3;
+    }
+
+
+    public FastRandom getRand() {
+        return _rand;
     }
 
     /*

@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.blocks.Block;
 import org.lwjgl.util.glu.Sphere;
 import java.util.Collections;
 import java.util.ArrayList;
@@ -389,7 +390,7 @@ public class Player extends RenderableObject {
     private boolean verticalHitTest() {
         int blockType1 = _parent.getBlock((int) (getPosition().x + 0.5f), (int) getPosition().y, (int) (getPosition().z + 0.5f));
 
-        if (blockType1 > 0) {
+        if (!Block.getBlock(blockType1).isPenetrable()) {
             return true;
         }
 
@@ -403,7 +404,7 @@ public class Player extends RenderableObject {
         int blockType1 = _parent.getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
         int blockType2 = _parent.getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
 
-        if (blockType1 > 0 || blockType2 > 0) {
+        if (!Block.getBlock(blockType1).isPenetrable() || !Block.getBlock(blockType2).isPenetrable()) {
             return true;
         }
 

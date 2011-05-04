@@ -28,14 +28,9 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public class Helper {
 
+    static final float _div = 1.0f / 16.0f;
     private static long _timerTicksPerSecond = Sys.getTimerResolution();
     private static Helper _instance = null;
-    private static final float _div = 1.0f / 16.0f;
-
-    public static enum SIDE {
-
-        LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK;
-    };
 
     /**
      * Returns the static instance of this helper class.
@@ -53,107 +48,13 @@ public class Helper {
     /**
      * Calculates the texture offset for a given position within
      * the texture atlas.
-     * 
+     *
      * @param x X-coordinate
      * @param y Y-coordinate
      * @return The texture offset
      */
-    private Vector2f calcOffsetForTextureAt(int x, int y) {
+    public Vector2f calcOffsetForTextureAt(int x, int y) {
         return new Vector2f(x * _div, y * _div);
-    }
-
-    /**
-     * Calculates the texture offset for a given block type and a specific
-     * side of the block.
-     * 
-     * @param type The type of the block
-     * @param side The side of the block
-     * @return The texture offset
-     */
-    public Vector2f getTextureOffsetFor(int type, SIDE side) {
-        switch (type) {
-            // Grass block
-            case 0x1:
-                if (side == SIDE.LEFT || side == SIDE.RIGHT || side == SIDE.FRONT || side == SIDE.BACK) {
-                    return calcOffsetForTextureAt(3, 0);
-                } else if (side == SIDE.TOP) {
-                    return calcOffsetForTextureAt(0, 0);
-                }
-                break;
-            // Dirt block
-            case 0x2:
-                return calcOffsetForTextureAt(2, 0);
-            // Stone block
-            case 0x3:
-                return calcOffsetForTextureAt(1, 0);
-            // Water block
-            case 0x4:
-                return calcOffsetForTextureAt(15, 13);
-            // Tree block
-            case 0x5:
-                if (side == SIDE.LEFT || side == SIDE.RIGHT || side == SIDE.FRONT || side == SIDE.BACK) {
-                    return calcOffsetForTextureAt(4, 1);
-                } else if (side == SIDE.TOP || side == SIDE.BOTTOM) {
-                    return calcOffsetForTextureAt(5, 1);
-                }
-                break;
-            // Leaf block
-            case 0x6:
-                return calcOffsetForTextureAt(4, 3);
-            // Sand block
-            case 0x7:
-                return calcOffsetForTextureAt(2, 1);
-            case 0x8:
-                return calcOffsetForTextureAt(1, 1);
-            default:
-                return calcOffsetForTextureAt(2, 0);
-        }
-
-        return calcOffsetForTextureAt(2, 0);
-    }
-
-    /**
-     * Calculates the color offset for a given block type and a speific
-     * side of the block.
-     * 
-     * @param type The block type
-     * @param side The block side
-     * @return The color offset
-     */
-    public Vector4f getColorOffsetFor(int type, SIDE side) {
-        switch (type) {
-            // Grass block
-            case 0x1:
-                if (side == SIDE.TOP) {
-                    return new Vector4f(180f / 255f, 255f / 255f, 25f / 255f, 1.0f);
-                }
-                break;
-            case 0x6:
-                return new Vector4f(40f / 255f, 190f / 255f, 40f / 255f, 1.0f);
-        }
-
-        return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-    }
-
-    /**
-     * Returns true if a given block type is translucent.
-     * 
-     * @param type The block type
-     * @return True if the block type is translucent
-     */
-    public boolean isBlockTypeTranslucent(int type) {
-        switch (type) {
-            case 0x0:
-                return true;
-            // Water block
-            case 0x4:
-                return true;
-            // Water block
-            case 0x6:
-                return true;
-            default:
-                return false;
-        }
     }
 
     /**
