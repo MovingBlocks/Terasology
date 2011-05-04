@@ -34,10 +34,6 @@ public class BlockWood extends Block {
 
     @Override
     public Vector4f getColorOffsetFor(Block.SIDE side) {
-        if (side == Block.SIDE.TOP) {
-            return new Vector4f(180f / 255f, 255f / 255f, 25f / 255f, 1.0f);
-        }
-
         return new Vector4f(1f, 1f, 1f, 1.0f);
     }
 

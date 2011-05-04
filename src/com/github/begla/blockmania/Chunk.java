@@ -215,41 +215,43 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                 int height = (int) (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64);
 
                 for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i >= 0; i--) {
-                    if (calcCaveDensityAt(x + xOffset, i, z + zOffset) < 0.5 && calcCanyonDensity(x + xOffset, i + yOffset, z + zOffset) < 0.5f) {
-                        if (i == height) {
-                            /*
-                             * Grass covers the terrain.
-                             */
-                            if (i > 32) {
-                                setBlock(x, i, z, 0x1);
-                            } else if (i <= 34 && i >= 28) {
-                                setBlock(x, i, z, 0x7);
-                            } else {
-                                setBlock(x, i, z, 0x2);
-                            }
-                        } else if (i < height) {
-                            if (i < height * 0.75f) {
-
+                    if (calcCaveDensityAt(x + xOffset, i + yOffset, z + zOffset) < 0.5) {
+                        if (calcCanyonDensity(x + xOffset, i + yOffset, z + zOffset) > 0.1f) {
+                            if (i == height) {
                                 /*
-                                 * Generate stone within the terrain
+                                 * Grass covers the terrain.
                                  */
-                                setBlock(x, i, z, 0x3);
-                            } else {
-                                /*
-                                 * The upper layer is filled with dirt.
-                                 */
-                                if (i <= 34 && i >= 28) {
+                                if (i > 32) {
+                                    setBlock(x, i, z, 0x1);
+                                } else if (i <= 34 && i >= 28) {
                                     setBlock(x, i, z, 0x7);
                                 } else {
                                     setBlock(x, i, z, 0x2);
                                 }
-                            }
+                            } else if (i < height) {
+                                if (i < height * 0.75f) {
 
-                            if (i <= 34 && i >= 28) {
-                                /**
-                                 * Generate beach.
-                                 */
-                                setBlock(x, i, z, 0x7);
+                                    /*
+                                     * Generate stone within the terrain
+                                     */
+                                    setBlock(x, i, z, 0x3);
+                                } else {
+                                    /*
+                                     * The upper layer is filled with dirt.
+                                     */
+                                    if (i <= 34 && i >= 28) {
+                                        setBlock(x, i, z, 0x7);
+                                    } else {
+                                        setBlock(x, i, z, 0x2);
+                                    }
+                                }
+
+                                if (i <= 34 && i >= 28) {
+                                    /**
+                                     * Generate beach.
+                                     */
+                                    setBlock(x, i, z, 0x7);
+                                }
                             }
                         }
                     }
@@ -274,8 +276,6 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      * TODO: Much to simple and boring :-(
      */
     public void populate() {
-        int treeCount = 0;
-
         for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -296,14 +296,11 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                         }
                     }
 
-                    if (treeCount < 1) {
-                        if (dens > 0.25 && dens < 0.6f && getBlock(x, y, z) == 0x1 && y > 32) {
-                            _parent.generateTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z), false);
-                            treeCount++;
-                        } else if (dens >= 0.6f && getBlock(x, y, z) == 0x1 && y > 32) {
-                            _parent.generatePineTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z), false);
-                            treeCount++;
-                        }
+                    // Check the distance to the last placed trees
+                    if (dens > 0.7 && getBlock(x, y, z) == 0x1 && y > 32) {
+                        _parent.generatePineTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z), false);
+                    } else if (dens > 0.6f && getBlock(x, y, z) == 0x1 && y > 32) {
+                        _parent.generateTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z), false);
                     }
                 }
             }
@@ -759,7 +756,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         if (drawBottom) {
             Vector4f colorOffset = Block.getBlock(block).getColorOffsetFor(Block.SIDE.BOTTOM);
-            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z)) - Configuration.BLOCK_SIDE_DIMMING - (calcSimpleOcclusionAmount(x, y - 1, z) * Configuration.DIMMING_INTENS), Configuration.MIN_LIGHT);
+            float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z)) - (calcSimpleOcclusionAmount(x, y - 1, z) * Configuration.DIMMING_INTENS), Configuration.MIN_LIGHT);
 
             float texOffsetX = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x;
             float texOffsetY = Block.getBlock(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y;
@@ -1052,7 +1049,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     private float calcCanyonDensity(float x, float y, float z) {
         float result = 0.0f;
         result += _parent.getpGen2().noise(0.01f * x, 0.01f * y, 0.01f * z);
-        return result;
+        return (float) Math.abs(result);
     }
 
     /**
@@ -1134,7 +1131,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                 _light[x][y][z] = light;
 
                 if (_blocks[x][y][z] != 0x0) {
-                    light -= Configuration.WATER_LIGHT_ABSORPTION;
+                    light -= Configuration.LIGHT_ABSORPTION;
                     light = Math.max(Configuration.MIN_LIGHT, light);
                 }
             } else {
@@ -1204,7 +1201,6 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         try {
             _light[x][y][z] = intens;
             _dirty = true;
-
             // Mark the neighbors as dirty
             markNeighborsDirty(x, z);
         } catch (Exception e) {
@@ -1229,7 +1225,6 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         try {
             _blocks[x][y][z] = type;
             _dirty = true;
-
             // Make the neighbors as dirty
             markNeighborsDirty(x, z);
         } catch (Exception e) {
@@ -1250,7 +1245,19 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (Block.getBlock(_parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
             intens++;
         }
-        return intens;
+        if (Block.getBlock(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1))).isCastingShadows()) {
+            intens++;
+        }
+        if (Block.getBlock(_parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
+            intens++;
+        }
+        if (Block.getBlock(_parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1))).isCastingShadows()) {
+            intens++;
+        }
+        if (Block.getBlock(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
+            intens++;
+        }
+        return (float) intens / 8f;
     }
 
     public Chunk[] getNeighbors() {

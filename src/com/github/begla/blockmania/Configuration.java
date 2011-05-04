@@ -44,9 +44,9 @@ public class Configuration {
     // Illumination
     public static final float MAX_LIGHT = 1.0f;
     public static final float MIN_LIGHT = 0.1f;
-    public static final float DIMMING_INTENS = 0.075f;
-    public static final float BLOCK_SIDE_DIMMING = 0.05f;
-    public static final float WATER_LIGHT_ABSORPTION = 0.075f;
+    public static final float DIMMING_INTENS = 0.6f;
+    public static final float BLOCK_SIDE_DIMMING = 0.075f;
+    public static final float LIGHT_ABSORPTION = 0.1f;
     // Player
     public static final int JUMP_INTENSITY = 8;
     public static final int MAX_GRAVITY = 32;
