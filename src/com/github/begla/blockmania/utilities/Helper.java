@@ -14,8 +14,9 @@
  *  limitations under the License.
  *  under the License.
  */
-package com.github.begla.blockmania;
+package com.github.begla.blockmania.utilities;
 
+import com.github.begla.blockmania.Configuration;
 import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -64,7 +65,7 @@ public class Helper {
      * @return The coordinates of the spawning point
      */
     public Vector3f calcPlayerOrigin() {
-        return new Vector3f(Configuration.CHUNK_DIMENSIONS.x * Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2, 127, (Configuration.CHUNK_DIMENSIONS.z * Configuration.VIEWING_DISTANCE_IN_CHUNKS.z) / 2);
+        return new Vector3f(Configuration.CHUNK_DIMENSIONS.x * Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2, 64, (Configuration.CHUNK_DIMENSIONS.z * Configuration.VIEWING_DISTANCE_IN_CHUNKS.z) / 2);
     }
 
     /**

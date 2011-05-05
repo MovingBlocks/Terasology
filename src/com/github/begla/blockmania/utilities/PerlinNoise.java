@@ -14,9 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package com.github.begla.blockmania.noise;
-
-import com.github.begla.blockmania.FastRandom;
+package com.github.begla.blockmania.utilities;
 
 /**
  * 3D perlin noise function as shown in the book "Physically Based Rendering".

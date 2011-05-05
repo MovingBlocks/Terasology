@@ -16,6 +16,8 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.utilities.Helper;
 import java.awt.Font;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;

@@ -16,11 +16,14 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.utilities.Helper;
+import com.github.begla.blockmania.utilities.RayFaceIntersection;
 import java.io.IOException;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.github.begla.blockmania.noise.PerlinNoise;
+import com.github.begla.blockmania.utilities.PerlinNoise;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TreeMap;

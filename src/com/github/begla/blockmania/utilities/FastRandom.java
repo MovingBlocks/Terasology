@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package com.github.begla.blockmania;
+package com.github.begla.blockmania.utilities;
 
 /**
  * Random number generator based on the Xorshift generator by George Marsaglia.
@@ -73,6 +73,15 @@ public class FastRandom {
     }
 
     /**
+     * Returns a random value as boolean.
+     *
+     * @return Random value
+     */
+    public boolean randomBoolean() {
+        return randomLong() > 0;
+    }
+
+    /**
      * Returns a random character string with a specified length.
      *
      * @param length The length of the generated string
@@ -81,11 +90,11 @@ public class FastRandom {
     public String randomCharacterString(int length) {
         StringBuilder s = new StringBuilder();
 
-        for (int i = 0; i < length/2; i++) {
+        for (int i = 0; i < length / 2; i++) {
             s.append((char) ('a' + Math.abs(randomDouble()) * 26d));
             s.append((char) ('A' + Math.abs(randomDouble()) * 26d));
         }
-        
+
         return s.toString();
     }
 }

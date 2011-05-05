@@ -48,7 +48,7 @@ public class Configuration {
     public static final float BLOCK_SIDE_DIMMING = 0.075f;
     public static final float LIGHT_ABSORPTION = 0.0625f;
     // Player
-    public static final int JUMP_INTENSITY = 8;
+    public static final int JUMP_INTENSITY = 12;
     public static final int MAX_GRAVITY = 32;
     public static final int WALKING_SPEED = 3;
     public static final int RUNNING_SPEED = 6;

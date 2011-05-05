@@ -283,13 +283,13 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                     float dens = calcForestDensity(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z));
 
                     // Generate grass
-                    if (getBlock(x, y, z) == 0x1 && dens > 0.25) {
+                    if (getBlock(x, y, z) == 0x1 && dens > 0.15) {
                         setBlock(x, y + 1, z, 0xB);
                     }
 
                     // Generate some flowers
                     if (getBlock(x, y, z) == 0x1 && dens > 0.5) {
-                        if (_parent.getRand().randomDouble() > 0.5f) {
+                        if (_parent.getRand().randomDouble() > 0.25f) {
                             setBlock(x, y + 1, z, 0x9);
                         } else {
                             setBlock(x, y + 1, z, 0xA);

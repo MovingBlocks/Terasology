@@ -16,7 +16,7 @@
  */
 package com.github.begla.blockmania.blocks;
 
-import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.utilities.Helper;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.lwjgl.util.vector.Vector2f;

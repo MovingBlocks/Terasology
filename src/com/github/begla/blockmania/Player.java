@@ -16,13 +16,14 @@
  */
 package com.github.begla.blockmania;
 
-import com.github.begla.blockmania.blocks.Block;
 import org.lwjgl.util.glu.Sphere;
+import com.github.begla.blockmania.utilities.Helper;
+import com.github.begla.blockmania.utilities.RayFaceIntersection;
+import com.github.begla.blockmania.blocks.Block;
 import java.util.Collections;
 import java.util.ArrayList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -34,6 +35,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Player extends RenderableObject {
 
+    private static final PlacingBox _placingBox = new PlacingBox();
     private boolean _jump = false;
     private int _selectedBlockType = 1;
     private boolean _demoAutoFlyMode = false;
@@ -41,8 +43,8 @@ public class Player extends RenderableObject {
     private int _wSpeed = Configuration.WALKING_SPEED;
     private double _yaw = 135d;
     private double _pitch;
-    private Vector3f _moveVector = new Vector3f(0, 0, 0);
-    private Vector3f _accVector = new Vector3f(0, 0, 0);
+    private final Vector3f _moveVector = new Vector3f(0, 0, 0);
+    private final Vector3f _accVector = new Vector3f(0, 0, 0);
     private float _gravity = 0.0f;
     private World _parent = null;
 
@@ -71,15 +73,15 @@ public class Player extends RenderableObject {
 
         glPushMatrix();
         glTranslatef(_position.x, _position.y, _position.z);
-
-
-//        glColor3f(1f, 0f, 0f);
-//        Sphere s = new Sphere();
-//        s.draw(0.1f, 64, 4);
-
+        glColor3f(1f, 0f, 0f);
+        Sphere s = new Sphere();
+        s.draw(0.1f, 128, 12);
         glPopMatrix();
 
         RayFaceIntersection is = calcSelectedBlock();
+        if (is != null) {
+            System.out.println(is.getBlockPos());
+        }
 
         // Display the block the player is aiming at
         if (Configuration.SHOW_PLACING_BOX) {
@@ -90,51 +92,10 @@ public class Player extends RenderableObject {
 //                glVertex3f(is.getIntersectPoint().x, is.getIntersectPoint().y, is.getIntersectPoint().z);
 //                glEnd();
 
-                int bpX = (int) is.getBlockPos().x;
-                int bpY = (int) is.getBlockPos().y;
-                int bpZ = (int) is.getBlockPos().z;
-
-                glColor3f(1.0f, 1.0f, 1.0f);
-
-                glBegin(GL_LINES);
-                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
-
-                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
-                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
-
-                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
-                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
-
-                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
-                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
-
-                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
-
-                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
-                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
-
-                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
-                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
-
-                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
-                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
-
-                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ - 0.5f);
-                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ - 0.5f);
-
-                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ - 0.5f);
-                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ - 0.5f);
-
-                glVertex3f(bpX - 0.5f, bpY - 0.5f, bpZ + 0.5f);
-                glVertex3f(bpX - 0.5f, bpY + 0.5f, bpZ + 0.5f);
-
-                glVertex3f(bpX + 0.5f, bpY - 0.5f, bpZ + 0.5f);
-                glVertex3f(bpX + 0.5f, bpY + 0.5f, bpZ + 0.5f);
-
-                glEnd();
-
+                glPushMatrix();
+                glTranslatef((int) is.getBlockPos().x, (int) is.getBlockPos().y, (int) is.getBlockPos().z);
+                _placingBox.render();
+                glPopMatrix();
             }
         }
     }
@@ -151,7 +112,7 @@ public class Player extends RenderableObject {
         processMovement(delta);
         updatePlayerPosition(delta);
 
-        _moveVector = new Vector3f(0, 0, 0);
+        _moveVector.set(0, 0, 0);
     }
 
     /**
@@ -160,11 +121,9 @@ public class Player extends RenderableObject {
      */
     public void yaw(float diff) {
         double nYaw = (_yaw + diff) % 360;
-
         if (nYaw < 0) {
             nYaw += 360;
         }
-
         _yaw = nYaw;
     }
 
@@ -174,11 +133,10 @@ public class Player extends RenderableObject {
      */
     public void pitch(float diff) {
         double nPitch = (_pitch - diff) % 360;
-
         if (nPitch < 0) {
             nPitch += 360;
         }
-
+        // Do not allow the player to "look on his back" :-)
         // TODO: Problematic if the mouse movement is very fast
         if ((nPitch > 0 && nPitch < 90) || (nPitch < 360 && nPitch > 270)) {
             _pitch = nPitch;
@@ -388,28 +346,62 @@ public class Player extends RenderableObject {
      * @param delta
      * @return
      */
-    private boolean verticalHitTest() {
-        int blockType1 = _parent.getBlock((int) (getPosition().x + 0.5f), (int) getPosition().y, (int) (getPosition().z + 0.5f));
+    private boolean verticalHitTest(Vector3f origin) {
+        boolean result = false;
+        for (int x = -1; x < 2; ++x) {
+            for (int z = -1; z < 2; ++z) {
+                for (int y = -1; y < 1; ++y) {
+                    Vector3f blockPos = new Vector3f((int) (origin.x + x + 0.5f), (int) (origin.y + y + 0.5f), (int) (origin.z + z + 0.5f));
+                    int blockType1 = _parent.getBlock((int) (blockPos.x + 0.5f), (int) (blockPos.y + 0.5f), (int) (blockPos.z + 0.5f));
 
-        if (!Block.getBlock(blockType1).isPenetrable()) {
-            return true;
+                    if (!Block.getBlock(blockType1).isPenetrable()) {
+                        if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f && _position.y + 0.1f > blockPos.y - 0.5f && _position.y - 0.1f < blockPos.y + 0.5f) {
+                            //Vector3f normal = new Vector3f(0f, y, 0f).normalise(null);
+                            result = true;
+
+                            _position.y = origin.y;
+                            _gravity = 0f;
+                        }
+                    }
+                }
+            }
         }
 
-        return false;
+        return result;
     }
 
-    private boolean horizontalHitTest() {
-        Vector3f dir = _accVector.normalise(null);
-        Vector3f blockPos = new Vector3f((int) (getPosition().x + 0.5f + dir.x * 0.1f), (int) getPosition().y, (int) (getPosition().z + 0.5f + dir.z * 0.1f));
+    private boolean horizontalHitTest(Vector3f oldPosition) {
+        boolean result = false;
 
-        int blockType1 = _parent.getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
-        int blockType2 = _parent.getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
+        for (int x = 1; x > -2; x--) {
+            for (int z = -1; z < 2; ++z) {
+                if (x != 0 || z != 0) {
+                    Vector3f blockPos = new Vector3f((int) (oldPosition.x + 0.5f) + x, (int) (oldPosition.y + 0.5f), (int) (oldPosition.z + 0.5f) + z);
+                    int blockType1 = _parent.getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
 
-        if (!Block.getBlock(blockType1).isPenetrable() || !Block.getBlock(blockType2).isPenetrable()) {
-            return true;
+                    if (!Block.getBlock(blockType1).isPenetrable()) {
+                        if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f) {
+                            Vector3f normal = new Vector3f(z, 0, x);
+
+                            result = true;
+
+//                            _position.z = origin.z;
+//                            _position.x = origin.x;
+
+                            Vector3f scratch = new Vector3f(_position.x, 0f, _position.z);
+                            scratch.x -= oldPosition.x;
+                            scratch.z -= oldPosition.z;
+
+                            float length = Vector3f.dot(scratch, normal);
+                            _position.z = oldPosition.z + length * normal.z;
+                            _position.x = oldPosition.x + length * normal.x;
+                        }
+                    }
+                }
+            }
         }
 
-        return false;
+        return result;
     }
 
     private void updatePlayerPosition(float delta) {
@@ -453,61 +445,34 @@ public class Player extends RenderableObject {
          * Update the position of the player
          * according to the acceleration vector.
          */
-        getPosition().y += (_accVector.y / 1000.0f) * delta;
-        getPosition().y += (_gravity / 1000.0f) * delta;
         getPosition().x += (_accVector.x / 1000.0f) * delta;
         getPosition().z += (_accVector.z / 1000.0f) * delta;
 
-        if (!_godMode) {
-            boolean vHit = verticalHitTest();
+        /*
+         * Check for horizontal collisions __after__ checking for vertical
+         * collisions.
+         */
+        Vector3f originalPosition = new Vector3f(_position);
+        horizontalHitTest(oldPosition);
+        horizontalHitTest(originalPosition);
 
-            if (!vHit) {
-                // If the player is not standing on ground: increase the g-force
-                if (_gravity > -Configuration.MAX_GRAVITY) {
-                    _gravity -= Configuration.G_FORCE * delta;
-                }
-            } else {
-                _position.y = oldPosition.y;
+        //getPosition().y += (_accVector.y / 1000.0f) * delta;
+        getPosition().y += (_gravity / 1000.0f) * delta;
 
-                // Jumping is only possible, if the player is standing on ground
-                if (_jump) {
-                    _jump = false;
-                    _gravity = Configuration.JUMP_INTENSITY;
-                } else {
-                    // Nullify the gravity if no jump was triggered
-                    _gravity = 0f;
-                }
-            }
+        boolean vHit = verticalHitTest(oldPosition);
 
-            /*
-             * Check for horizontal collisions __after__ checking for vertical
-             * collisions.
-             */
-            if (horizontalHitTest()) {
-                // TODO: Calculate the normal to allow sliding alongside blocks!
-//                Vector3f norm = new Vector3f(1,0,0);
-//
-//                _position.z = oldPosition.z + (_accVector.z / 1000.0f) * delta * norm.z;
-//                _position.x = oldPosition.x + (_accVector.x / 1000.0f) * delta * norm.x;
-
-                // Simple collision handling
-                _position.z = oldPosition.z;
-                _position.x = oldPosition.x;
+        if (!vHit) {
+            // If the player is not standing on ground: increase the g-force
+            if (_gravity > -Configuration.MAX_GRAVITY) {
+                _gravity -= Configuration.G_FORCE * delta;
             }
         } else {
-            // Disable gravity while god mode is active
-            _gravity = 0f;
-
-            if (_demoAutoFlyMode) {
-                Vector3f mov = viewDirection();
-                mov.x *= 16f;
-                mov.z *= 16f;
-                getPosition().x += mov.x / 1000f * delta;
-                getPosition().z += mov.z / 1000f * delta;
-
+            // Jumping is only possible, if the player is standing on ground
+            if (_jump) {
+                _jump = false;
+                _gravity = Configuration.JUMP_INTENSITY;
             }
         }
-
     }
 
     /**
