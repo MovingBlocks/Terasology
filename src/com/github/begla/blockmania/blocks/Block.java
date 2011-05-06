@@ -32,7 +32,7 @@ public abstract class Block {
 
         LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK;
     };
-    private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockWood(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockWheat()};
+    private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockWood(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockWheat(), new BlockWheatLarge()};
 
     public static Block getBlock(int type) {
         Block b = null;

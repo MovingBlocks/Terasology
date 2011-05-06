@@ -25,7 +25,7 @@ public class PerlinNoise {
 
     FastRandom rand;
     static int noisePerm[] = new int[512];
-
+    
     public PerlinNoise(int seed) {
         rand = new FastRandom(seed);
 

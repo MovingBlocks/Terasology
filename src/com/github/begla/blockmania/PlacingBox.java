@@ -16,7 +16,6 @@
  */
 package com.github.begla.blockmania;
 
-import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -28,43 +27,55 @@ public class PlacingBox extends RenderableObject {
 
     @Override
     public void render() {
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glBegin(GL_LINES);
+        glLineWidth(2f);
+        glColor4f(0.25f, 0.25f, 0.25f, 1.0f);
+
+        // FRONT
+        glBegin(GL_LINE_LOOP);
         glVertex3f(-0.5f, -0.5f, -0.5f);
         glVertex3f(+0.5f, -0.5f, -0.5f);
+        glVertex3f(+0.5f, +0.5f, -0.5f);
+        glVertex3f(-0.5f, +0.5f, -0.5f);
+        glEnd();
 
+        // BACK
+        glBegin(GL_LINE_LOOP);
         glVertex3f(-0.5f, -0.5f, +0.5f);
         glVertex3f(+0.5f, -0.5f, +0.5f);
-
-        glVertex3f(-0.5f, +0.5f, +0.5f);
         glVertex3f(+0.5f, +0.5f, +0.5f);
+        glVertex3f(-0.5f, +0.5f, +0.5f);
+        glEnd();
 
-        glVertex3f(-0.5f, +0.5f, -0.5f);
-        glVertex3f(+0.5f, +0.5f, -0.5f);
-
+        // TOP
+        glBegin(GL_LINE_LOOP);
         glVertex3f(-0.5f, -0.5f, -0.5f);
-        glVertex3f(-0.5f, -0.5f, +0.5f);
-
         glVertex3f(+0.5f, -0.5f, -0.5f);
         glVertex3f(+0.5f, -0.5f, +0.5f);
+        glVertex3f(-0.5f, -0.5f, +0.5f);
+        glEnd();
 
+        // BOTTOM
+        glBegin(GL_LINE_LOOP);
         glVertex3f(-0.5f, +0.5f, -0.5f);
-        glVertex3f(-0.5f, +0.5f, +0.5f);
-
         glVertex3f(+0.5f, +0.5f, -0.5f);
         glVertex3f(+0.5f, +0.5f, +0.5f);
+        glVertex3f(-0.5f, +0.5f, +0.5f);
+        glEnd();
 
+        // LEFT
+        glBegin(GL_LINE_LOOP);
         glVertex3f(-0.5f, -0.5f, -0.5f);
-        glVertex3f(-0.5f, +0.5f, -0.5f);
-
-        glVertex3f(+0.5f, -0.5f, -0.5f);
-        glVertex3f(+0.5f, +0.5f, -0.5f);
-
         glVertex3f(-0.5f, -0.5f, +0.5f);
         glVertex3f(-0.5f, +0.5f, +0.5f);
+        glVertex3f(-0.5f, +0.5f, -0.5f);
+        glEnd();
 
-        glVertex3f(+0.5f, -0.5f, +0.5f);
-        glVertex3f(+0.5f, +0.5f, +0.5f);
+        // RIGHT
+        glBegin(GL_LINE_LOOP);
+        glVertex3f(0.5f, -0.5f, -0.5f);
+        glVertex3f(0.5f, -0.5f, +0.5f);
+        glVertex3f(0.5f, +0.5f, +0.5f);
+        glVertex3f(0.5f, +0.5f, -0.5f);
         glEnd();
     }
 }

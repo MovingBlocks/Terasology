@@ -142,6 +142,10 @@ public final class Main {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FOG);
         glDepthFunc(GL_LEQUAL);
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        glPolygonOffset(2f, 2f);
+        glEnable(GL_POLYGON_OFFSET_FILL);
 
         // Enable fog
         glHint(GL_FOG_HINT, GL_NICEST);

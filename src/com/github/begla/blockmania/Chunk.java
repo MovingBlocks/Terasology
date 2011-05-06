@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.generators.Generator;
 import com.github.begla.blockmania.blocks.Block;
 import org.newdawn.slick.util.ResourceLoader;
 import org.lwjgl.util.vector.Vector4f;
@@ -64,6 +65,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     private final List<Float> _colorBillboard = new ArrayList<Float>();
     /* ------ */
     private World _parent = null;
+
     /* ------ */
     private int[][][] _blocks;
     private float[][][] _light;
@@ -71,6 +73,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     private int _displayListOpaque = -1;
     private int _displayListTranslucent = -1;
     private int _displayListBillboard = -1;
+    /* ------ */
+    private ArrayList<Generator> _generators = new ArrayList<Generator>();
 
     enum SIDE {
 
@@ -93,7 +97,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Init. the chunk.
      */
-    public Chunk(World p, Vector3f position) {
+    public Chunk(World p, Vector3f position, ArrayList<Generator> g) {
         this._position = position;
         _parent = p;
         _blocks = new int[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
@@ -101,6 +105,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         _chunkID = _maxChunkID + 1;
         _maxChunkID++;
+
+        _generators.addAll(g);
     }
 
     /**
@@ -190,8 +196,10 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     public boolean generate() {
         if (_fresh) {
-            generateTerrain();
-            populate();
+            // Apply all generators to this chunk
+            for (Generator g : _generators) {
+                g.generate(this, _parent);
+            }
             calcSunlight();
             calcLight();
             _fresh = false;
@@ -206,68 +214,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      * TODO: Much to simple and boring
      */
     public void generateTerrain() {
-        int xOffset = (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
-        int yOffset = (int) _position.y * (int) Configuration.CHUNK_DIMENSIONS.y;
-        int zOffset = (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
-
-        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                int height = (int) (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64);
-
-                for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i >= 0; i--) {
-                    if (calcCaveDensityAt(x + xOffset, i + yOffset, z + zOffset) < 0.5) {
-                        if (calcCanyonDensity(x + xOffset, i + yOffset, z + zOffset) > 0.1f) {
-                            if (i == height) {
-                                /*
-                                 * Grass covers the terrain.
-                                 */
-                                if (i > 32) {
-                                    setBlock(x, i, z, 0x1);
-                                } else if (i <= 34 && i >= 28) {
-                                    setBlock(x, i, z, 0x7);
-                                } else {
-                                    setBlock(x, i, z, 0x2);
-                                }
-                            } else if (i < height) {
-                                if (i < height * 0.75f) {
-
-                                    /*
-                                     * Generate stone within the terrain
-                                     */
-                                    setBlock(x, i, z, 0x3);
-                                } else {
-                                    /*
-                                     * The upper layer is filled with dirt.
-                                     */
-                                    if (i <= 34 && i >= 28) {
-                                        setBlock(x, i, z, 0x7);
-                                    } else {
-                                        setBlock(x, i, z, 0x2);
-                                    }
-                                }
-
-                                if (i <= 34 && i >= 28) {
-                                    /**
-                                     * Generate beach.
-                                     */
-                                    setBlock(x, i, z, 0x7);
-                                }
-                            }
-                        }
-                    }
-
-                    if (i <= 30 && i > 0) {
-                        if (getBlock(x, i, z) == 0) {
-                            setBlock(x, i, z, 0x4);
-                        }
-                    }
-
-                    if (i == 0) {
-                        setBlock(x, i, z, 0x8);
-                    }
-                }
-            }
-        }
+        
     }
 
     /**
@@ -276,35 +223,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      * TODO: Much to simple and boring :-(
      */
     public void populate() {
-        for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-
-                    float dens = calcForestDensity(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z));
-
-                    // Generate grass
-                    if (getBlock(x, y, z) == 0x1 && dens > 0.15) {
-                        setBlock(x, y + 1, z, 0xB);
-                    }
-
-                    // Generate some flowers
-                    if (getBlock(x, y, z) == 0x1 && dens > 0.5) {
-                        if (_parent.getRand().randomDouble() > 0.25f) {
-                            setBlock(x, y + 1, z, 0x9);
-                        } else {
-                            setBlock(x, y + 1, z, 0xA);
-                        }
-                    }
-
-                    // Check the distance to the last placed trees
-                    if (dens > 0.7 && getBlock(x, y, z) == 0x1 && y > 32) {
-                        _parent.generatePineTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z), false);
-                    } else if (dens > 0.6f && getBlock(x, y, z) == 0x1 && y > 32) {
-                        _parent.generateTree(getBlockWorldPosX(x), getBlockWorldPosY((int) y) + 1, getBlockWorldPosZ(z), false);
-                    }
-                }
-            }
-        }
+      
     }
 
     /**
@@ -1017,98 +936,44 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * Returns the base elevation for the terrain.
-     */
-    private float calcTerrainElevation(float x, float z) {
-        float result = 0.0f;
-        result += _parent.getpGen1().noise(0.003f * x, 0.003f, 0.003f * z) * 128f;
-        return Math.abs(result);
-    }
-
-    /**
-     * Returns the roughness for the base terrain.
-     */
-    private float calcTerrainRoughness(float x, float z) {
-        float result = 0.0f;
-        result += _parent.getpGen1().noise(0.04f * x, 0.04f, 0.04f * z);
-        return result;
-    }
-
-    /**
-     * Returns the detail level for the base terrain.
-     */
-    private float calcTerrainDetail(float x, float z) {
-        float result = 0.0f;
-        result += _parent.getpGen2().noise(0.02f * x, 0.02f, 0.02f * z);
-        return result;
-    }
-
-    /**
-     * Returns the canyon density for the base terrain.
-     */
-    private float calcCanyonDensity(float x, float y, float z) {
-        float result = 0.0f;
-        result += _parent.getpGen2().noise(0.01f * x, 0.01f * y, 0.01f * z);
-        return (float) Math.abs(result);
-    }
-
-    /**
-     * Returns the cave density for the base terrain.
-     */
-    private float calcCaveDensityAt(float x, float y, float z) {
-        float result = 0.0f;
-        result += _parent.getpGen3().noise(0.06f * x, 0.06f * y, 0.06f * z);
-        return result;
-    }
-
-    /**
-     * Returns the cave density for the base terrain.
-     */
-    private float calcForestDensity(float x, float y, float z) {
-        float result = 0.0f;
-        result += _parent.getpGen3().noise(0.8f * x, 0.8f * y, 0.8f * z);
-        return result;
-    }
-
-    /**
      * Returns the position of the chunk within the world.
      */
-    private int getChunkWorldPosX() {
+    public int getChunkWorldPosX() {
         return (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
     }
 
     /**
      * Returns the position of the chunk within the world.
      */
-    private int getChunkWorldPosY() {
+    public int getChunkWorldPosY() {
         return (int) _position.y * (int) Configuration.CHUNK_DIMENSIONS.y;
     }
 
     /**
      * Returns the position of the chunk within the world.
      */
-    private int getChunkWorldPosZ() {
+    public int getChunkWorldPosZ() {
         return (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
     }
 
     /**
      * Returns the position of block within the world.
      */
-    private int getBlockWorldPosX(int x) {
+    public int getBlockWorldPosX(int x) {
         return x + getChunkWorldPosX();
     }
 
     /**
      * Returns the position of block within the world.
      */
-    private int getBlockWorldPosY(int y) {
+    public int getBlockWorldPosY(int y) {
         return y + getChunkWorldPosY();
     }
 
     /**
      * Returns the position of block within the world.
      */
-    private int getBlockWorldPosZ(int z) {
+    public int getBlockWorldPosZ(int z) {
         return z + getChunkWorldPosZ();
     }
 
@@ -1287,5 +1152,10 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (z == Configuration.CHUNK_DIMENSIONS.z - 1) {
             neighbors[2]._dirty = true;
         }
+    }
+
+    
+    public World getParent() {
+        return _parent;
     }
 }

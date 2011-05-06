@@ -16,6 +16,9 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.generators.Generator;
+import com.github.begla.blockmania.generators.GeneratorForest;
+import com.github.begla.blockmania.generators.GeneratorTerrain;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.RayFaceIntersection;
@@ -67,9 +70,8 @@ public class World extends RenderableObject {
     private final ArrayBlockingQueue<Chunk> _chunkUpdateNormal = new ArrayBlockingQueue<Chunk>(2056);
     private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     /* ------ */
-    private PerlinNoise _pGen1;
-    private PerlinNoise _pGen2;
-    private PerlinNoise _pGen3;
+    private final GeneratorTerrain _generatorTerrain;
+    private final GeneratorForest _generatorForest;
 
     /**
      * Initializes a new world for the single player mode.
@@ -81,11 +83,11 @@ public class World extends RenderableObject {
     public World(String title, String seed, Player p) {
         this._player = p;
         _rand = new FastRandom(seed.hashCode());
-        _pGen1 = new PerlinNoise(_rand.randomInt());
-        _pGen2 = new PerlinNoise(_rand.randomInt());
-        _pGen3 = new PerlinNoise(_rand.randomInt());
-
         _chunks = new Chunk[(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z];
+
+        // Init. generators
+        _generatorTerrain = new GeneratorTerrain(seed);
+        _generatorForest = new GeneratorForest(seed);
 
         _updateThread = new Thread(new Runnable() {
 
@@ -697,31 +699,6 @@ public class World extends RenderableObject {
         return (int) ((_player.getPosition().z - Helper.getInstance().calcPlayerOrigin().z) / Configuration.CHUNK_DIMENSIONS.z);
     }
 
-    /**
-     * @return The first perlin noise generator
-     */
-    public PerlinNoise getpGen1() {
-        return _pGen1;
-    }
-
-    /**
-     * @return The second perlin noise generator
-     */
-    public PerlinNoise getpGen2() {
-        return _pGen2;
-    }
-
-    /**
-     * @return The third perlin noise generator
-     */
-    public PerlinNoise getpGen3() {
-        return _pGen3;
-    }
-
-    public FastRandom getRand() {
-        return _rand;
-    }
-
     /*
      * Returns the vertices of a block at the given position.
      */
@@ -912,8 +889,12 @@ public class World extends RenderableObject {
             }
         }
 
+        ArrayList<Generator> gs = new ArrayList<Generator>();
+        gs.add(_generatorTerrain);
+        gs.add(_generatorForest);
+        
         // Generate a new chunk, cache it and return it
-        c = new Chunk(this, new Vector3f(x, 0, z));
+        c = new Chunk(this, new Vector3f(x, 0, z), gs);
         synchronized (_chunkCache) {
             _chunkCache.put(Helper.getInstance().cantorize(x, z), c);
         }
