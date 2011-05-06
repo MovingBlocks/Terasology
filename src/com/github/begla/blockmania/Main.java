@@ -173,8 +173,11 @@ public final class Main {
         // Init. the player and a world
         player = new Player();
         // Generate a world with a "random" seed value
-        String worldSeed = rand.randomCharacterString(16);
-        LOGGER.log(Level.INFO, "Creating new World with random seed \"{0}\"", worldSeed);
+        String worldSeed = Configuration.DEFAULT_SEED;
+        if (worldSeed.length() == 0) {
+            worldSeed = rand.randomCharacterString(16);
+        }
+        LOGGER.log(Level.INFO, "Creating new World with seed \"{0}\"", worldSeed);
         world = new World("WORLD1", worldSeed, player);
         // Link the player to the world
         player.setParent(world);

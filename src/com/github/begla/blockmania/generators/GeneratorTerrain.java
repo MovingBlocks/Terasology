@@ -40,6 +40,7 @@ public class GeneratorTerrain implements Generator {
         _pGen3 = new PerlinNoise(_rand.randomInt());
     }
 
+    @Override
     public void generate(Chunk c, World parent) {
         int xOffset = (int) c.getPosition().x * (int) Configuration.CHUNK_DIMENSIONS.x;
         int yOffset = (int) c.getPosition().y * (int) Configuration.CHUNK_DIMENSIONS.y;
@@ -52,39 +53,34 @@ public class GeneratorTerrain implements Generator {
                 for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i >= 0; i--) {
                     if (calcCaveDensityAt(x + xOffset, i + yOffset, z + zOffset) < 0.5) {
                         if (calcCanyonDensity(x + xOffset, i + yOffset, z + zOffset) > 0.1f) {
+                            float stoneDensity = calcStoneDensity(x + xOffset, i + yOffset, z + zOffset);
+
                             if (i == height) {
-                                /*
-                                 * Grass covers the terrain.
-                                 */
+                                // Generate grass on the top layer
                                 if (i > 32) {
                                     c.setBlock(x, i, z, 0x1);
                                 } else if (i <= 34 && i >= 28) {
+                                    // Sand
                                     c.setBlock(x, i, z, 0x7);
                                 } else {
+                                    // No grass under water
                                     c.setBlock(x, i, z, 0x2);
                                 }
                             } else if (i < height) {
-                                if (i < height * 0.75f) {
 
-                                    /*
-                                     * Generate stone within the terrain
-                                     */
+                                // Fill the upper layer with dirt
+                                if (i <= 34 && i >= 28 && stoneDensity > 0f) {
+                                    c.setBlock(x, i, z, 0x7);
+                                } else if (i < height * 0.75f && stoneDensity < 0f) {
+                                    // Generate the basic stone layer
                                     c.setBlock(x, i, z, 0x3);
                                 } else {
-                                    /*
-                                     * The upper layer is filled with dirt.
-                                     */
-                                    if (i <= 34 && i >= 28) {
-                                        c.setBlock(x, i, z, 0x7);
-                                    } else {
-                                        c.setBlock(x, i, z, 0x2);
-                                    }
+                                    c.setBlock(x, i, z, 0x2);
                                 }
 
+
                                 if (i <= 34 && i >= 28) {
-                                    /**
-                                     * Generate beach.
-                                     */
+                                    // "Beach"
                                     c.setBlock(x, i, z, 0x7);
                                 }
                             }
@@ -147,6 +143,15 @@ public class GeneratorTerrain implements Generator {
     protected float calcCaveDensityAt(float x, float y, float z) {
         float result = 0.0f;
         result += _pGen3.noise(0.06f * x, 0.06f * y, 0.06f * z);
+        return result;
+    }
+
+    /**
+     * Returns the cave density for the base terrain.
+     */
+    protected float calcStoneDensity(float x, float y, float z) {
+        float result = 0.0f;
+        result += _pGen2.noise(0.1f * x, 0.1f * y, 0.1f * z);
         return result;
     }
 }

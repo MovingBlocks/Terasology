@@ -71,7 +71,7 @@ public class Player extends RenderableObject {
 
         glTranslatef(-_position.x, -_position.y, -_position.z);
         // Offset the camera by the player's hight
-        glTranslatef(0, -Configuration.PLAYER_HEIGHT, 0);
+//        glTranslatef(0, -Configuration.PLAYER_HEIGHT, 0);
 
 //        glPushMatrix();
 //        glTranslatef(_position.x, _position.y, _position.z);
@@ -209,7 +209,6 @@ public class Player extends RenderableObject {
 
         // The ray should originate from the player's eye
         Vector3f origin = new Vector3f(_position);
-        origin.y += Configuration.PLAYER_HEIGHT;
 
         Vector3f vD = viewDirection();
         for (int x = -4; x < 4; x++) {
@@ -346,19 +345,18 @@ public class Player extends RenderableObject {
      * @return
      */
     private boolean verticalHitTest(Vector3f origin) {
+        float offset = -Configuration.PLAYER_HEIGHT;
         boolean result = false;
-        for (int x = -1; x < 2; ++x) {
-            for (int z = -1; z < 2; ++z) {
-                for (int y = -1; y < 1; ++y) {
-                    Vector3f blockPos = new Vector3f((int) (origin.x + x + 0.5f), (int) (origin.y + y + 0.5f), (int) (origin.z + z + 0.5f));
-                    int blockType1 = _parent.getBlock((int) (blockPos.x + 0.5f), (int) (blockPos.y + 0.5f), (int) (blockPos.z + 0.5f));
+        for (int y = -1; y < 4; ++y) {
+            if (y != 0) {
+                Vector3f blockPos = new Vector3f((int) (origin.x + 0.5f), (int) (origin.y + 0.5f) + offset + y, (int) (origin.z + 0.5f));
+                int blockType1 = _parent.getBlock((int) blockPos.x, (int) (blockPos.y), (int) blockPos.z);
 
-                    if (!Block.getBlock(blockType1).isPenetrable()) {
-                        if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f && _position.y + 0.1f > blockPos.y - 0.5f && _position.y - 0.1f < blockPos.y + 0.5f) {
-                            result = true;
-                            _position.y = origin.y;
-                            _gravity = 0f;
-                        }
+                if (!Block.getBlock(blockType1).isPenetrable()) {
+                    if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f && _position.y + 0.1f + offset > blockPos.y - 0.5f && _position.y - 0.1f + offset < blockPos.y + 0.5f) {
+                        result = true;
+                        _position.y = origin.y;
+                        _gravity = 0f;
                     }
                 }
             }
@@ -379,17 +377,19 @@ public class Player extends RenderableObject {
     }
 
     private void localHorizontalHitTest(int x, int z, Vector3f oldPosition, Vector3f normal) {
-        Vector3f blockPos = new Vector3f((int) (oldPosition.x + 0.5f) + x, (int) (oldPosition.y + 0.5f), (int) (oldPosition.z + 0.5f) + z);
-        int blockType1 = _parent.getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
-        if (!Block.getBlock(blockType1).isPenetrable()) {
-            if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f) {
-                Vector3f scratch = new Vector3f(_position.x, 0f, _position.z);
-                scratch.x -= oldPosition.x;
-                scratch.z -= oldPosition.z;
+        for (int y = 0; y < 3; y++) {
+            Vector3f blockPos = new Vector3f((int) (oldPosition.x + 0.5f) + x, (int) (oldPosition.y + 0.5f) + y - Configuration.PLAYER_HEIGHT, (int) (oldPosition.z + 0.5f) + z);
+            int blockType1 = _parent.getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
+            if (!Block.getBlock(blockType1).isPenetrable()) {
+                if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f) {
+                    Vector3f scratch = new Vector3f(_position.x, 0f, _position.z);
+                    scratch.x -= oldPosition.x;
+                    scratch.z -= oldPosition.z;
 
-                float length = Vector3f.dot(normal, scratch);
-                _position.z = oldPosition.z + length * normal.z;
-                _position.x = oldPosition.x + length * normal.x;
+                    float length = Vector3f.dot(normal, scratch);
+                    _position.z = oldPosition.z + length * normal.z;
+                    _position.x = oldPosition.x + length * normal.x;
+                }
             }
         }
     }
