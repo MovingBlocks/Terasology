@@ -46,6 +46,9 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
+    /* ------ */
+    private static int _vertexArrayUpdateCount = 0;
+    /* ------ */
     public boolean _dirty = true;
     private boolean _fresh = true;
     /* ------ */
@@ -201,7 +204,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             for (Generator g : _generators) {
                 g.generate(this, _parent);
             }
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+            Logger.getLogger(this.getClass().getName()).log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
             calcSunlight();
             calcLight();
             _fresh = false;
@@ -222,6 +225,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
                 }
             }
         }
+
+        _vertexArrayUpdateCount++;
     }
 
     private void generateBillboardVertices(int x, int y, int z) {
@@ -1145,5 +1150,9 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     public World getParent() {
         return _parent;
+    }
+    
+    public static int getVertexArrayUpdateCount() {
+        return _vertexArrayUpdateCount;
     }
 }

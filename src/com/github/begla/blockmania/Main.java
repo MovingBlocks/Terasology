@@ -296,6 +296,7 @@ public final class Main {
         _font1.drawString(4, 4, String.format("%s (fps: %.2f, free heap space: %d MB)", Configuration.GAME_TITLE, _meanFps, Runtime.getRuntime().freeMemory() / 1048576), Color.white);
         _font1.drawString(4, 22, String.format("%s", player, Color.white));
         _font1.drawString(4, 38, String.format("%s", world, Color.white));
+        _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount(), Color.white));
 
         glDisable(GL_TEXTURE_2D);
 

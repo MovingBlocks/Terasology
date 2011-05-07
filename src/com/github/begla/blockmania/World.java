@@ -65,8 +65,8 @@ public class World extends RenderableObject {
     private Chunk[][][] _chunks;
     /* ------ */
     private final ArrayBlockingQueue<Chunk> _chunkUpdateQueueDL = new ArrayBlockingQueue<Chunk>(128);
-    private final ArrayBlockingQueue<Chunk> _chunkUpdateImportant = new ArrayBlockingQueue<Chunk>(256);
-    private final ArrayBlockingQueue<Chunk> _chunkUpdateNormal = new ArrayBlockingQueue<Chunk>(2056);
+    private final ArrayBlockingQueue<Chunk> _chunkUpdateImportant = new ArrayBlockingQueue<Chunk>(16);
+    private final ArrayBlockingQueue<Chunk> _chunkUpdateNormal = new ArrayBlockingQueue<Chunk>((int) (Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * Configuration.VIEWING_DISTANCE_IN_CHUNKS.z));
     private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     /* ------ */
     private final GeneratorTerrain _generatorTerrain;
@@ -111,16 +111,16 @@ public class World extends RenderableObject {
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Chunks created! ({0}s).", (System.currentTimeMillis() - timeStart) / 1000d);
 
                 while (true) {
+                    ArrayList<Chunk> sortedUpdates = new ArrayList<Chunk>(_chunkUpdateNormal);
+                    Collections.sort(sortedUpdates);
 
-                    if (_chunkUpdateImportant.size() > 0) {
-                        Chunk c = _chunkUpdateImportant.poll();
-                        processChunk(c);
-                    } else {
-                        ArrayList<Chunk> sortedUpdates = new ArrayList<Chunk>(_chunkUpdateNormal);
-                        Collections.sort(sortedUpdates);
-                        if (sortedUpdates.size() > 0) {
+                    for (int i = 0; i < 16; i++) {
+                        if (sortedUpdates.size() > 0 && _chunkUpdateImportant.isEmpty()) {
                             Chunk c = sortedUpdates.remove(0);
                             _chunkUpdateNormal.remove(c);
+                            processChunk(c);
+                        } else {
+                            Chunk c = _chunkUpdateImportant.poll();
                             processChunk(c);
                         }
                     }
@@ -165,15 +165,19 @@ public class World extends RenderableObject {
                         nc.calcLight();
                     }
 
-                    nc.generateVertexArrays();
-                    nc._dirty = false;
-                    _chunkUpdateQueueDL.add(nc);
+                    if (nc._dirty) {
+                        nc.generateVertexArrays();
+                        nc._dirty = false;
+                        _chunkUpdateQueueDL.add(nc);
+                    }
                 }
             }
 
-            c.generateVertexArrays();
-            c._dirty = false;
-            _chunkUpdateQueueDL.add(c);
+            if (c._dirty) {
+                c.generateVertexArrays();
+                c._dirty = false;
+                _chunkUpdateQueueDL.add(c);
+            }
         }
     }
 
@@ -372,7 +376,7 @@ public class World extends RenderableObject {
      */
     @Override
     public void update(long delta) {
-        for (int i = 0; i < 32 && !_chunkUpdateQueueDL.isEmpty(); i++) {
+        for (int i = 0; i < 128 && !_chunkUpdateQueueDL.isEmpty(); i++) {
             Chunk c = _chunkUpdateQueueDL.poll();
 
             if (c != null) {
