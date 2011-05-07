@@ -48,7 +48,7 @@ public class GeneratorTerrain implements Generator {
 
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                int height = (int) (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)) * 64);
+                int height = (int) (calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)));
 
                 for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i >= 0; i--) {
                     if (calcCaveDensityAt(x + xOffset, i + yOffset, z + zOffset) < 0.5) {
@@ -107,8 +107,8 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noiseNoiseWithOctaves(0.003f * x, 0.003f, 0.003f * z, 4) * 128f;
-        return Math.abs(result);
+        result += _pGen1.noiseNoiseWithOctaves(0.003f * x, 0.003f, 0.003f * z, 16) * 128f;
+        return result;
     }
 
     /**
@@ -116,7 +116,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noiseNoiseWithOctaves(0.04f * x, 0.04f, 0.04f * z, 8);
+        result += _pGen2.noiseNoiseWithOctaves(0.01f * x, 0.01f, 0.01f * z, 16);
         return result;
     }
 
@@ -125,7 +125,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.noiseNoiseWithOctaves(0.02f * x, 0.02f, 0.02f * z, 4);
+        result += _pGen3.noiseNoiseWithOctaves(0.02f * x, 0.02f, 0.02f * z, 12);
         return result;
     }
 
