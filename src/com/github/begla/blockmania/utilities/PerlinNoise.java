@@ -25,7 +25,7 @@ public class PerlinNoise {
 
     FastRandom rand;
     static int noisePerm[] = new int[512];
-    
+
     public PerlinNoise(int seed) {
         rand = new FastRandom(seed);
 
@@ -81,5 +81,21 @@ public class PerlinNoise {
         float t3 = t * t * t;
         float t4 = t3 * t;
         return 6.f * t4 * t - 15.f * t4 + 10.f * t3;
+    }
+
+    public float noiseNoiseWithOctaves(float x, float y, float z, int octaves) {
+        float result = 0.0f;
+        float noise;
+        float pers = 1f;
+        float scale = 1f;
+
+        for (int i = 0; i < octaves; i++) {
+            noise = noise(x*scale, y*scale, z*scale) * pers;
+            result += noise;
+            scale *= 2;
+            pers /= 2;
+        }
+
+        return result;
     }
 }

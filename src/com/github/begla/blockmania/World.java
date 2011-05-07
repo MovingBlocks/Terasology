@@ -26,7 +26,6 @@ import java.io.IOException;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.github.begla.blockmania.utilities.PerlinNoise;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TreeMap;
@@ -57,7 +56,7 @@ public class World extends RenderableObject {
     private static Texture _textureSun;
     /* ------ */
     private boolean _worldGenerated;
-    private float _daylight = 1.0f;
+    private byte _daylight = 16;
     private Player _player;
     /* ------ */
     private Thread _updateThread;
@@ -166,19 +165,15 @@ public class World extends RenderableObject {
                         nc.calcLight();
                     }
 
-                    if (nc._dirty) {
-                        nc.generateVertexArrays();
-                        nc._dirty = false;
-                        _chunkUpdateQueueDL.add(nc);
-                    }
+                    nc.generateVertexArrays();
+                    nc._dirty = false;
+                    _chunkUpdateQueueDL.add(nc);
                 }
             }
 
-            if (c._dirty) {
-                c.generateVertexArrays();
-                c._dirty = false;
-                _chunkUpdateQueueDL.add(c);
-            }
+            c.generateVertexArrays();
+            c._dirty = false;
+            _chunkUpdateQueueDL.add(c);
         }
     }
 
@@ -192,32 +187,32 @@ public class World extends RenderableObject {
 
             Logger.getLogger(World.class.getName()).log(Level.INFO, "Updated daytime to {0}h.", _daytime);
 
-            float oldDaylight = _daylight;
+            byte oldDaylight = _daylight;
 
             switch (_daytime) {
                 case 18:
-                    _daylight = 0.8f * Configuration.MAX_LIGHT;
+                    _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
                     break;
                 case 20:
-                    _daylight = 0.6f * Configuration.MAX_LIGHT;
+                    _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
                     break;
                 case 21:
-                    _daylight = 0.4f * Configuration.MAX_LIGHT;
+                    _daylight = (byte) (0.4f * Configuration.MAX_LIGHT);
                     break;
                 case 22:
-                    _daylight = 0.2f * Configuration.MAX_LIGHT;
+                    _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
                     break;
                 case 23:
-                    _daylight = Configuration.MIN_LIGHT;
+                    _daylight = (byte) (0.2f * Configuration.MAX_LIGHT);
                     break;
                 case 5:
-                    _daylight = 0.4f * Configuration.MAX_LIGHT;
+                    _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
                     break;
                 case 6:
-                    _daylight = 0.6f * Configuration.MAX_LIGHT;
+                    _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
                     break;
                 case 7:
-                    _daylight = 0.8f * Configuration.MAX_LIGHT;
+                    _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
                     break;
                 case 8:
                     _daylight = Configuration.MAX_LIGHT;
@@ -401,7 +396,7 @@ public class World extends RenderableObject {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            setBlock(posX, posY + i, posZ, 0x5, update);
+            setBlock(posX, posY + i, posZ, (byte) 0x5, update);
         }
 
         // Generate the treetop
@@ -410,7 +405,7 @@ public class World extends RenderableObject {
                 for (int z = -2; z < 3; z++) {
                     if (!(x == -2 && z == -2) && !(x == 2 && z == 2) && !(x == -2 && z == 2) && !(x == 2 && z == -2)) {
                         if (_rand.randomDouble() <= 0.8f) {
-                            setBlock(posX + x, posY + y, posZ + z, 0x6, update);
+                            setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update);
                         }
                     }
                 }
@@ -432,7 +427,7 @@ public class World extends RenderableObject {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            setBlock(posX, posY + i, posZ, 0x5, update);
+            setBlock(posX, posY + i, posZ, (byte) 0x5, update);
         }
 
         // Generate the treetop
@@ -440,7 +435,7 @@ public class World extends RenderableObject {
             for (int x = -5 + y / 2; x <= 5 - y / 2; x++) {
                 for (int z = -5 + y / 2; z <= 5 - y / 2; z++) {
                     if (!(x == 0 && z == 0)) {
-                        setBlock(posX + x, posY + y + (height - 10), posZ + z, 0x6, update);
+                        setBlock(posX + x, posY + y + (height - 10), posZ + z, (byte) 0x6, update);
                     }
                 }
             }
@@ -522,7 +517,7 @@ public class World extends RenderableObject {
      * @param type The type of the block to set
      * @param update If set the affected chunk is queued for updating
      */
-    public final void setBlock(int x, int y, int z, int type, boolean update) {
+    public final void setBlock(int x, int y, int z, byte type, boolean update) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
         int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
         int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
@@ -594,7 +589,7 @@ public class World extends RenderableObject {
      * @param z The Z-coordinate
      * @return The light value
      */
-    public final float getLight(int x, int y, int z) {
+    public final byte getLight(int x, int y, int z) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
         int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
         int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
@@ -620,7 +615,7 @@ public class World extends RenderableObject {
      * @param z The Z-coordinate
      * @param intens The light intensity value
      */
-    public void setLight(int x, int y, int z, float intens) {
+    public void setLight(int x, int y, int z, byte intens) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
         int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
         int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
@@ -641,8 +636,8 @@ public class World extends RenderableObject {
      * 
      * @return The daylight value
      */
-    public float getDaylight() {
-        return _daylight;
+    public float getDaylightAsFloat() {
+        return _daylight / 16f;
     }
 
     /**
@@ -660,7 +655,7 @@ public class World extends RenderableObject {
      * @return The daylight color
      */
     public Vector3f getDaylightColor() {
-        return new Vector3f(getDaylight() * 0.55f, getDaylight() * 0.85f, 0.99f * getDaylight());
+        return new Vector3f(getDaylightAsFloat() * 0.55f, getDaylightAsFloat() * 0.85f, 0.99f * getDaylightAsFloat());
     }
 
     /**
@@ -892,7 +887,7 @@ public class World extends RenderableObject {
         ArrayList<Generator> gs = new ArrayList<Generator>();
         gs.add(_generatorTerrain);
         gs.add(_generatorForest);
-        
+
         // Generate a new chunk, cache it and return it
         c = new Chunk(this, new Vector3f(x, 0, z), gs);
         synchronized (_chunkCache) {

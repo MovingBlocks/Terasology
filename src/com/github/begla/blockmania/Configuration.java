@@ -43,8 +43,8 @@ public class Configuration {
     public static final int DISPLAY_WIDTH = 1280;
     public static final boolean FULLSCREEN = false;
     // Illumination
-    public static final float MAX_LIGHT = 1.0f;
-    public static final float MIN_LIGHT = 0.2f;
+    public static final byte MAX_LIGHT = 16;
+    public static final byte MIN_LIGHT = 0;
     public static final float OCCLUSION_INTENS = 0.0625f;
     public static final float BLOCK_SIDE_DIMMING = 0.075f;
     public static final float LIGHT_ABSORPTION = 0.0625f;

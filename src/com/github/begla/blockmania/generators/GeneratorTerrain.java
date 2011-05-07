@@ -58,30 +58,31 @@ public class GeneratorTerrain implements Generator {
                             if (i == height) {
                                 // Generate grass on the top layer
                                 if (i > 32) {
-                                    c.setBlock(x, i, z, 0x1);
+                                    c.setBlock(x, i, z, (byte) 0x1);
                                 } else if (i <= 34 && i >= 28) {
                                     // Sand
-                                    c.setBlock(x, i, z, 0x7);
+                                    c.setBlock(x, i, z, (byte) 0x7);
                                 } else {
                                     // No grass under water
-                                    c.setBlock(x, i, z, 0x2);
+                                    c.setBlock(x, i, z, (byte) 0x2);
                                 }
                             } else if (i < height) {
 
-                                // Fill the upper layer with dirt
+                                // Generate beach
                                 if (i <= 34 && i >= 28 && stoneDensity > 0f) {
-                                    c.setBlock(x, i, z, 0x7);
+                                    c.setBlock(x, i, z, (byte) 0x7);
                                 } else if (i < height * 0.75f && stoneDensity < 0f) {
                                     // Generate the basic stone layer
-                                    c.setBlock(x, i, z, 0x3);
+                                    c.setBlock(x, i, z, (byte) 0x3);
                                 } else {
-                                    c.setBlock(x, i, z, 0x2);
+                                    // Fill the upper layer with dirt
+                                    c.setBlock(x, i, z, (byte) 0x2);
                                 }
 
 
                                 if (i <= 34 && i >= 28) {
                                     // "Beach"
-                                    c.setBlock(x, i, z, 0x7);
+                                    c.setBlock(x, i, z, (byte) 0x7);
                                 }
                             }
                         }
@@ -89,12 +90,12 @@ public class GeneratorTerrain implements Generator {
 
                     if (i <= 30 && i > 0) {
                         if (c.getBlock(x, i, z) == 0) {
-                            c.setBlock(x, i, z, 0x4);
+                            c.setBlock(x, i, z, (byte) 0x4);
                         }
                     }
 
                     if (i == 0) {
-                        c.setBlock(x, i, z, 0x8);
+                        c.setBlock(x, i, z, (byte) 0x8);
                     }
                 }
             }
@@ -106,7 +107,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noise(0.003f * x, 0.003f, 0.003f * z) * 128f;
+        result += _pGen1.noiseNoiseWithOctaves(0.003f * x, 0.003f, 0.003f * z, 4) * 128f;
         return Math.abs(result);
     }
 
@@ -115,7 +116,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noise(0.04f * x, 0.04f, 0.04f * z);
+        result += _pGen1.noiseNoiseWithOctaves(0.04f * x, 0.04f, 0.04f * z, 8);
         return result;
     }
 
@@ -124,7 +125,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.noise(0.02f * x, 0.02f, 0.02f * z);
+        result += _pGen2.noiseNoiseWithOctaves(0.02f * x, 0.02f, 0.02f * z, 4);
         return result;
     }
 
@@ -133,7 +134,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcCanyonDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen3.noise(0.01f * x, 0.01f * y, 0.01f * z);
+        result += _pGen3.noiseNoiseWithOctaves(0.01f * x, 0.01f * y, 0.01f * z, 4);
         return (float) Math.abs(result);
     }
 

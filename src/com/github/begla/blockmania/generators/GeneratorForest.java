@@ -41,18 +41,18 @@ public class GeneratorForest extends GeneratorTerrain {
                     // Generate grass
                     if (c.getBlock(x, y, z) == 0x1 && dens > 0.15) {
                         if (_rand.randomBoolean()) {
-                            c.setBlock(x, y + 1, z, 0xB);
+                            c.setBlock(x, y + 1, z, (byte) 0xB);
                         } else {
-                            c.setBlock(x, y + 1, z, 0xC);
+                            c.setBlock(x, y + 1, z, (byte) 0xC);
                         }
                     }
 
                     // Generate some flowers and wheat
                     if (c.getBlock(x, y, z) == 0x1 && dens > 0.5) {
                         if (_rand.randomDouble() > 0.25f) {
-                            c.setBlock(x, y + 1, z, 0x9);
+                            c.setBlock(x, y + 1, z, (byte) 0x9);
                         } else {
-                            c.setBlock(x, y + 1, z, 0xA);
+                            c.setBlock(x, y + 1, z, (byte) 0xA);
                         }
                     }
 

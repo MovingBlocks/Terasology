@@ -16,7 +16,6 @@
  */
 package com.github.begla.blockmania;
 
-import org.lwjgl.util.glu.Sphere;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.RayFaceIntersection;
 import com.github.begla.blockmania.blocks.Block;
@@ -38,7 +37,7 @@ public class Player extends RenderableObject {
 
     private static final PlacingBox _placingBox = new PlacingBox();
     private boolean _jump = false;
-    private int _selectedBlockType = 1;
+    private byte _selectedBlockType = 1;
     private boolean _demoAutoFlyMode = false;
     private boolean _godMode = false;
     private float _wSpeed = Configuration.WALKING_SPEED;
@@ -49,6 +48,7 @@ public class Player extends RenderableObject {
     private float _gravity = 0.0f;
     private World _parent = null;
     private final PerlinNoise _pGen = new PerlinNoise((int) Helper.getInstance().getTime());
+    private Vector3f _viewDirection = new Vector3f();
 
     /**
      * Positions the player within the world adjusts the player's view accordingly.
@@ -110,6 +110,10 @@ public class Player extends RenderableObject {
         processPlayerInteraction();
         processMovement(delta);
         updatePlayerPosition(delta);
+
+        // Update the view direction
+        _viewDirection.set((float) Math.sin(Math.toRadians(_yaw)) * (float) Math.cos(Math.toRadians(_pitch)), -1f * (float) Math.sin(Math.toRadians(_pitch)), -1 * (float) Math.cos(Math.toRadians(_pitch)) * (float) Math.cos(Math.toRadians(_yaw)));
+        _viewDirection.normalise();
 
         _moveVector.set(0, 0, 0);
     }
@@ -193,29 +197,18 @@ public class Player extends RenderableObject {
 
     @Override
     public String toString() {
-        Vector3f vD = viewDirection();
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, vD.x, vD.y, vD.z, _selectedBlockType, _gravity, _moveVector.x, _moveVector.y, _moveVector.z);
-    }
-
-    public Vector3f viewDirection() {
-        Vector3f vD = new Vector3f((float) Math.sin(Math.toRadians(_yaw)) * (float) Math.cos(Math.toRadians(_pitch)), -1f * (float) Math.sin(Math.toRadians(_pitch)), -1 * (float) Math.cos(Math.toRadians(_pitch)) * (float) Math.cos(Math.toRadians(_yaw)));
-        vD.normalise();
-
-        return vD;
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, _viewDirection.x, _viewDirection.y, _viewDirection.z, _selectedBlockType, _gravity, _moveVector.x, _moveVector.y, _moveVector.z);
     }
 
     public RayFaceIntersection calcSelectedBlock() {
         ArrayList<RayFaceIntersection> inters = new ArrayList<RayFaceIntersection>();
 
         // The ray should originate from the player's eye
-        Vector3f origin = new Vector3f(_position);
-
-        Vector3f vD = viewDirection();
         for (int x = -4; x < 4; x++) {
             for (int y = -4; y < 4; y++) {
                 for (int z = -4; z < 4; z++) {
                     if (x != 0 || y != 0 || z != 0) {
-                        ArrayList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, origin, vD);
+                        ArrayList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, _position, _viewDirection);
                         if (iss != null) {
                             inters.addAll(iss);
                         }
@@ -264,7 +257,7 @@ public class Player extends RenderableObject {
             RayFaceIntersection is = calcSelectedBlock();
             if (is != null) {
                 Vector3f blockPos = is.getBlockPos();
-                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, 0x0, true);
+                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true);
             }
         }
     }
@@ -338,7 +331,7 @@ public class Player extends RenderableObject {
     }
 
     /**
-     * TODO: Check for blocks above the player!
+     * TODO: Still not working right for blocks above the player.
      *
      * @param oldPosition
      * @param delta
