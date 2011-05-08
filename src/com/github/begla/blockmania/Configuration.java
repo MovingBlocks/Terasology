@@ -38,6 +38,7 @@ public class Configuration {
     // Debug
     public static boolean SHOW_PLACING_BOX = true;
     public static boolean SHOW_CHUNK_OUTLINES = false;
+     public static boolean SHOW_HUD = true;
     // Display
     public static final int DISPLAY_HEIGHT = 720;
     public static final int DISPLAY_WIDTH = 1280;
@@ -49,13 +50,13 @@ public class Configuration {
     public static final float BLOCK_SIDE_DIMMING = 0.075f;
     public static final float LIGHT_ABSORPTION = 0.0625f;
     // Player
-    public static final int JUMP_INTENSITY = 8;
-    public static final int MAX_GRAVITY = 32;
+    public static final int JUMP_INTENSITY = 10;
+    public static final int MAX_GRAVITY = 64;
     public static final float WALKING_SPEED = 1.5f;
     public static final float RUNNING_SPEED = 2.5f;
     public static final boolean ENABLE_BOBBING = true;
     public static final float PLAYER_HEIGHT = 1.25f;
-    public static final float G_FORCE = 0.025f;
+    public static final float G_FORCE = 0.05f;
     public static final float SLOWDOWN_INTENS = 0.05f;
     // Graphics
     public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24).withSRGB(true);

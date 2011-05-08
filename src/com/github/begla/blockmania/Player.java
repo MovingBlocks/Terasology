@@ -70,8 +70,6 @@ public class Player extends RenderableObject {
         }
 
         glTranslatef(-_position.x, -_position.y, -_position.z);
-        // Offset the camera by the player's hight
-//        glTranslatef(0, -Configuration.PLAYER_HEIGHT, 0);
 
 //        glPushMatrix();
 //        glTranslatef(_position.x, _position.y, _position.z);
@@ -280,7 +278,7 @@ public class Player extends RenderableObject {
                 _parent.updateAllChunks();
             } else if (Keyboard.getEventKey() == Keyboard.KEY_G) {
                 this._godMode = !_godMode;
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_H) {
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_J) {
                 this._demoAutoFlyMode = !_demoAutoFlyMode;
             } else if (Keyboard.getEventKey() == Keyboard.KEY_P) {
                 Configuration.SHOW_PLACING_BOX = !Configuration.SHOW_PLACING_BOX;
@@ -290,6 +288,8 @@ public class Player extends RenderableObject {
                 cycleBlockTypes(1);
             } else if (Keyboard.getEventKey() == Keyboard.KEY_DOWN) {
                 cycleBlockTypes(-1);
+            } else if (Keyboard.getEventKey() == Keyboard.KEY_H) {
+                Configuration.SHOW_HUD = !Configuration.SHOW_HUD;
             } else if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
                 if (!Keyboard.isRepeatEvent()) {
                     jump();
@@ -340,16 +340,22 @@ public class Player extends RenderableObject {
     private boolean verticalHitTest(Vector3f origin) {
         float offset = -Configuration.PLAYER_HEIGHT;
         boolean result = false;
-        for (int y = -1; y < 2; ++y) {
-            if (y != 0) {
-                Vector3f blockPos = new Vector3f((int) (origin.x + 0.5f), (int) (origin.y + 0.5f) + offset + y, (int) (origin.z + 0.5f));
-                int blockType1 = _parent.getBlock((int) blockPos.x, (int) (blockPos.y), (int) blockPos.z);
+        for (int x = -1; x < 2; ++x) {
+            for (int z = -1; z < 2; ++z) {
+                for (int y = -1; y < 2; ++y) {
+                    if (y != 0 || z != 0 || x != 0) {
+                        Vector3f blockPos = new Vector3f((int) (origin.x + 0.5f + x), (int) (origin.y + 0.5f) + offset + y, (int) (origin.z + 0.5f + z));
+                        int blockType1 = _parent.getBlock((int) blockPos.x, (int) (blockPos.y), (int) blockPos.z);
 
-                if (!Block.getBlock(blockType1).isPenetrable()) {
-                    if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f && _position.y + 0.1f + offset > blockPos.y - 0.5f && _position.y - 0.1f + offset < blockPos.y + 0.5f) {
-                        result = true;
-                        _position.y = origin.y;
-                        _gravity = 0f;
+                        if (!Block.getBlock(blockType1).isPenetrable()) {
+                            if (_position.x + 0.12f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f && _position.y + 0.1f + offset > blockPos.y - 0.5f && _position.y - 0.1f + offset < blockPos.y + 0.5f) {
+                                result = true;
+                                if (_gravity < 0f) {
+                                    _position.y = origin.y;
+                                    _gravity = 0f;
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -193,7 +193,10 @@ public final class Main {
 
         player.render();
         world.render();
-        renderHUD();
+
+        if (Configuration.SHOW_HUD) {
+            renderHUD();
+        }
     }
 
     /**

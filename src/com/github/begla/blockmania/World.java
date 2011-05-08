@@ -54,7 +54,6 @@ public class World extends RenderableObject {
     private long lastDaytimeMeasurement = Helper.getInstance().getTime();
     /* ------ */
     private final FastRandom _rand;
-
     /* ------ */
     private static Texture _textureSun;
     /* ------ */
@@ -106,35 +105,37 @@ public class World extends RenderableObject {
                     long timeStart = System.currentTimeMillis();
                     timeStart = System.currentTimeMillis();
 
-                    Object[] chunks = null;
-                    //if (itCounter % 16 == 0) {
-                    chunks = _chunkUpdateNormal.toArray();
+                    if (!_chunkUpdateNormal.isEmpty()) {
+                        Chunk[] chunks = _chunkUpdateNormal.toArray(new Chunk[0]);
 
-                    // Find the clostest chunk
-                    double dist = Float.MAX_VALUE;
-                    int index = -1;
+                        // Find the closest chunk
+                        double dist = Float.MAX_VALUE;
+                        int index = -1;
 
-                    for (int i = 0; i < chunks.length; i++) {
-                        Chunk c = (Chunk) chunks[i];
-                        double tDist = c.calcDistanceToPlayer();
+                        for (int i = 0; i < chunks.length; i++) {
+                            Chunk c = chunks[i];
+                            double tDist = c.calcDistanceToPlayer();
 
-                        if (tDist <= dist) {
-                            dist = tDist;
-                            index = i;
+                            if (tDist <= dist) {
+                                dist = tDist;
+                                index = i;
+                            }
                         }
-                    }
 
-                    if (index >= 0) {
-                        Chunk c = (Chunk) chunks[index];
-                        processChunk(c);
-                        _chunkUpdateNormal.remove(c);
+                        if (index >= 0) {
+                            Chunk c = (Chunk) chunks[index];
+                            processChunk(c);
+                            _chunkUpdateNormal.remove(c);
+                        }
+
+
+                        _statUpdateDuration += System.currentTimeMillis() - timeStart;
+                        _statUpdateDuration /= 2;
+
                     }
 
                     updateInfWorld();
                     updateDaytime();
-
-                    _statUpdateDuration += System.currentTimeMillis() - timeStart;
-                    _statUpdateDuration /= 2;
                 }
             }
         });

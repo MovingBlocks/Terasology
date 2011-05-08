@@ -1181,18 +1181,22 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         if (x == 0) {
             neighbors[1]._dirty = true;
+            neighbors[1]._lightDirty = true;
         }
 
         if (x == Configuration.CHUNK_DIMENSIONS.x - 1) {
             neighbors[0]._dirty = true;
+            neighbors[0]._lightDirty = true;
         }
 
         if (z == 0) {
             neighbors[3]._dirty = true;
+            neighbors[3]._lightDirty = true;
         }
 
         if (z == Configuration.CHUNK_DIMENSIONS.z - 1) {
             neighbors[2]._dirty = true;
+            neighbors[2]._lightDirty = true;
         }
     }
 
