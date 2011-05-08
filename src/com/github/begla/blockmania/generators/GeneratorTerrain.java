@@ -107,7 +107,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noiseNoiseWithOctaves(0.003f * x, 0.003f, 0.003f * z, 4) * 128f;
+        result += _pGen1.noiseNoiseWithOctaves(0.003f * x, 0.003f, 0.003f * z, 12) * 128f;
         return result;
     }
 
@@ -116,7 +116,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.noiseNoiseWithOctaves(0.01f * x, 0.01f, 0.01f * z, 4);
+        result += _pGen2.noiseNoiseWithOctaves(0.01f * x, 0.01f, 0.01f * z, 12);
         return result;
     }
 
@@ -125,7 +125,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.noiseNoiseWithOctaves(0.02f * x, 0.02f, 0.02f * z, 4);
+        result += _pGen3.noiseNoiseWithOctaves(0.02f * x, 0.02f, 0.02f * z, 16);
         return result;
     }
 
@@ -134,7 +134,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcCanyonDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen3.noiseNoiseWithOctaves(0.01f * x, 0.01f * y, 0.01f * z, 4);
+        result += _pGen1.noiseNoiseWithOctaves(0.01f * x, 0.01f * y, 0.01f * z, 4);
         return (float) Math.abs(result);
     }
 
@@ -152,7 +152,7 @@ public class GeneratorTerrain implements Generator {
      */
     protected float calcStoneDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen2.noise(0.1f * x, 0.1f * y, 0.1f * z);
+        result += _pGen2.noiseNoiseWithOctaves(0.1f * x, 0.1f * y, 0.1f * z, 8);
         return result;
     }
 }
