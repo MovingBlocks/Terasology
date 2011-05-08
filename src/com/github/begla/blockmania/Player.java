@@ -392,8 +392,15 @@ public class Player extends RenderableObject {
         Vector3f oldPosition = new Vector3f(_position);
 
         if (_demoAutoFlyMode && _godMode) {
-            walkForward();
-            _wSpeed = 16f;
+            for (int i = 127; i > 0; i--) {
+                int block = _parent.getBlock((int) getPosition().x, i, (int) getPosition().z);
+                if (block > 0) {
+                    _position.y = i + 16;
+                    break;
+                }
+            }
+            _position.z += 16f / 1000f * delta;
+            return;
         }
 
         /*

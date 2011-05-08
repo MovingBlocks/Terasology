@@ -50,6 +50,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     private static int _vertexArrayUpdateCount = 0;
     /* ------ */
     public boolean _dirty = true;
+    public boolean _lightDirty = true;
     private boolean _fresh = true;
     /* ------ */
     private static int _maxChunkID = 0;
@@ -207,6 +208,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             Logger.getLogger(this.getClass().getName()).log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
             calcSunlight();
             calcLight();
+            _lightDirty = false;
             _fresh = false;
             return true;
         }
@@ -1060,6 +1062,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         try {
             _light[x][y][z] = intens;
             _dirty = true;
+            _lightDirty = true;
             // Mark the neighbors as dirty
             markNeighborsDirty(x, z);
         } catch (Exception e) {
@@ -1084,6 +1087,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         try {
             _blocks[x][y][z] = type;
             _dirty = true;
+            _lightDirty = true;
             // Make the neighbors as dirty
             markNeighborsDirty(x, z);
         } catch (Exception e) {
