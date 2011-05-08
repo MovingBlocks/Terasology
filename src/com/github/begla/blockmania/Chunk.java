@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import java.util.concurrent.locks.Lock;
 import com.github.begla.blockmania.generators.Generator;
 import com.github.begla.blockmania.blocks.Block;
 import org.newdawn.slick.util.ResourceLoader;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.ArrayList;
 import org.lwjgl.util.vector.Vector3f;
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.opengl.Texture;
@@ -49,6 +51,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     /* ------ */
     private static int _vertexArrayUpdateCount = 0;
     /* ------ */
+    public Lock _lock = new ReentrantLock();
     public boolean _dirty = true;
     public boolean _lightDirty = true;
     private boolean _fresh = true;
@@ -218,7 +221,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the vertex-, texture- and color-arrays.
      */
-    public synchronized void generateVertexArrays() {
+    public void generateVertexArrays() {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -228,6 +231,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             }
         }
 
+        _dirty = false;
         _vertexArrayUpdateCount++;
     }
 
@@ -891,43 +895,41 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         return blockToCheck == 0x0 || blockToCheck == 0x6 || (Block.getBlock(blockToCheck).isBlockTypeTranslucent() && !Block.getBlock(currentBlock).isBlockTypeTranslucent());
     }
 
+    @Deprecated
     private void floodLight(int x, int y, int z) {
-        x = getBlockWorldPosX(x);
-        y = getBlockWorldPosY(y);
-        z = getBlockWorldPosZ(z);
 
-        float val_n1 = Block.getBlock(_parent.getBlock(x + 1, y, z)).isBlockTypeTranslucent() ? _parent.getLight(x + 1, y, z) : -1f;
-        float val_n2 = Block.getBlock(_parent.getBlock(x - 1, y, z)).isBlockTypeTranslucent() ? _parent.getLight(x - 1, y, z) : -1f;
-        float val_n3 = Block.getBlock(_parent.getBlock(x, y, z + 1)).isBlockTypeTranslucent() ? _parent.getLight(x, y, z + 1) : -1f;
-        float val_n4 = Block.getBlock(_parent.getBlock(x, y, z - 1)).isBlockTypeTranslucent() ? _parent.getLight(x, y, z - 1) : -1f;
-        float val_n5 = Block.getBlock(_parent.getBlock(x, y + 1, z)).isBlockTypeTranslucent() ? _parent.getLight(x, y + 1, z) : -1f;
-        float val_n6 = Block.getBlock(_parent.getBlock(x, y - 1, z)).isBlockTypeTranslucent() ? _parent.getLight(x, y - 1, z) : -1f;
+        float val_n1 = Block.getBlock(getBlock(x + 1, y, z)).isBlockTypeTranslucent() ? getLight(x + 1, y, z) : -1f;
+        float val_n2 = Block.getBlock(getBlock(x - 1, y, z)).isBlockTypeTranslucent() ? getLight(x - 1, y, z) : -1f;
+        float val_n3 = Block.getBlock(getBlock(x, y, z + 1)).isBlockTypeTranslucent() ? getLight(x, y, z + 1) : -1f;
+        float val_n4 = Block.getBlock(getBlock(x, y, z - 1)).isBlockTypeTranslucent() ? getLight(x, y, z - 1) : -1f;
+        float val_n5 = Block.getBlock(getBlock(x, y + 1, z)).isBlockTypeTranslucent() ? getLight(x, y + 1, z) : -1f;
+        float val_n6 = Block.getBlock(getBlock(x, y - 1, z)).isBlockTypeTranslucent() ? getLight(x, y - 1, z) : -1f;
 
-        byte val_light = _parent.getLight(x, y, z);
+        byte val_light = getLight(x, y, z);
         byte val_light_next = (byte) Math.max(val_light - 1, 0);
 
         if (val_n1 < val_light_next && val_n1 != -1) {
-            _parent.setLight(x + 1, y, z, val_light_next);
+            setLight(x + 1, y, z, val_light_next);
         }
 
         if (val_n2 < val_light_next && val_n2 != -1) {
-            _parent.setLight(x - 1, y, z, val_light_next);
+            setLight(x - 1, y, z, val_light_next);
         }
 
         if (val_n3 < val_light_next && val_n3 != -1) {
-            _parent.setLight(x, y, z + 1, val_light_next);
+            setLight(x, y, z + 1, val_light_next);
         }
 
         if (val_n4 < val_light_next && val_n4 != -1) {
-            _parent.setLight(x, y, z - 1, val_light_next);
+            setLight(x, y, z - 1, val_light_next);
         }
 
         if (val_n5 < val_light_next && val_n5 != -1) {
-            _parent.setLight(x, y + 1, z, val_light_next);
+            setLight(x, y + 1, z, val_light_next);
         }
 
         if (val_n6 < val_light_next && val_n6 != -1) {
-            _parent.setLight(x, y - 1, z, val_light_next);
+            setLight(x, y - 1, z, val_light_next);
         }
     }
 
@@ -976,7 +978,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Calculates the sunlight.
      */
-    public void calcSunlight() {
+    private void calcSunlight() {
         for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
                 calcSunlightAtLocalPos(x, z);
@@ -991,26 +993,66 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             if (Block.getBlock(_blocks[x][y][z]).isBlockTypeTranslucent()) {
                 _light[x][y][z] = light;
 
+                // Reduce the sunlight with each block passed
                 if (_blocks[x][y][z] != 0x0) {
                     light -= Configuration.LIGHT_ABSORPTION;
                     light = (byte) Math.max(Configuration.MIN_LIGHT, light);
                 }
             } else {
+                // Stop at opaque blocks
                 break;
             }
         }
+
+        _dirty = true;
+        _lightDirty = true;
     }
 
     public void calcLight() {
-        for (int ite = 0; ite < 16; ite++) {
-            for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
-                for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
-                    for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
-                        if (getLight(x, y, z) == Configuration.MAX_LIGHT - ite && Block.getBlock(getBlock(x, y, z)).isBlockTypeTranslucent()) {
-                            floodLight(x, y, z);
-                        }
+        for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
+                for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
+                    // Calculate the light propagationfor each translucent block in each direction
+                    // On direction for each of the six sides of the blocks
+                    if (Block.getBlock(getBlock(x, y, z)).isBlockTypeTranslucent()) {
+                        propagateLightIntoDirection(x, y, z, 1, 0, 0);
+                        propagateLightIntoDirection(x, y, z, -1, 0, 0);
+                        propagateLightIntoDirection(x, y, z, 0, 1, 0);
+                        propagateLightIntoDirection(x, y, z, 0, -1, 0);
+                        propagateLightIntoDirection(x, y, z, 0, 0, 1);
+                        propagateLightIntoDirection(x, y, z, 0, 0, -1);
                     }
+
                 }
+            }
+        }
+
+        _lightDirty = false;
+    }
+
+    private void propagateLightIntoDirection(int x, int y, int z, int dirX, int dirY, int dirZ) {
+        int blockPosX = getBlockWorldPosX(x);
+        int blockPosY = getBlockWorldPosY(y);
+        int blockPosZ = getBlockWorldPosZ(z);
+
+        byte originLightValue = getLight(x, y, z);
+
+        if (originLightValue == 0) {
+            return;
+        }
+
+        for (int i = 1; i <= originLightValue; i++) {
+            if (!Block.getBlock(_parent.getBlock(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ))).isBlockTypeTranslucent()) {
+                break;
+            }
+            byte newLightValue = (byte) (originLightValue - Math.abs(i));
+            byte lightValue = _parent.getLight(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ));
+
+            if (newLightValue > lightValue) {
+                _parent.setLight(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ), newLightValue);
+            } else {
+                // Stop if a light value is found, which is more intense than the propagating light value
+                break;
             }
         }
     }
@@ -1064,7 +1106,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             _dirty = true;
             _lightDirty = true;
             // Mark the neighbors as dirty
-            markNeighborsDirty(x, z);
+            markNeighborsDirty(x, z, true);
         } catch (Exception e) {
         }
     }
@@ -1087,9 +1129,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         try {
             _blocks[x][y][z] = type;
             _dirty = true;
-            _lightDirty = true;
-            // Make the neighbors as dirty
-            markNeighborsDirty(x, z);
+            // Mark the neighbors as dirty
+            markNeighborsDirty(x, z, false);
         } catch (Exception e) {
         }
     }
@@ -1132,7 +1173,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         return chunks;
     }
 
-    public void markNeighborsDirty(int x, int z) {
+    public void markNeighborsDirty(int x, int z, boolean lightDirty) {
         Chunk[] neighbors = getNeighbors();
 
         if (x == 0) {
@@ -1155,7 +1196,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     public World getParent() {
         return _parent;
     }
-    
+
     public static int getVertexArrayUpdateCount() {
         return _vertexArrayUpdateCount;
     }

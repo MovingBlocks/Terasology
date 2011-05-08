@@ -340,7 +340,7 @@ public class Player extends RenderableObject {
     private boolean verticalHitTest(Vector3f origin) {
         float offset = -Configuration.PLAYER_HEIGHT;
         boolean result = false;
-        for (int y = -1; y < 4; ++y) {
+        for (int y = -1; y < 2; ++y) {
             if (y != 0) {
                 Vector3f blockPos = new Vector3f((int) (origin.x + 0.5f), (int) (origin.y + 0.5f) + offset + y, (int) (origin.z + 0.5f));
                 int blockType1 = _parent.getBlock((int) blockPos.x, (int) (blockPos.y), (int) blockPos.z);

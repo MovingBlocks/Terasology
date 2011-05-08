@@ -28,10 +28,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -48,6 +48,7 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public class World extends RenderableObject {
 
+    private double _statUpdateDuration = 0.0f;
     /* ------ */
     private short _daytime = 17;
     private long lastDaytimeMeasurement = Helper.getInstance().getTime();
@@ -62,14 +63,12 @@ public class World extends RenderableObject {
     private Player _player;
     /* ------ */
     private Thread _updateThread;
-    private Thread _worldThread;
     /* ------ */
     private Chunk[][][] _chunks;
     /* ------ */
-    private final LinkedBlockingQueue<Chunk> _chunkUpdateQueueDL = new LinkedBlockingQueue<Chunk>();
-    private final LinkedBlockingQueue<Chunk> _chunkUpdateImportant = new LinkedBlockingQueue<Chunk>();
-    private final LinkedBlockingQueue<Chunk> _chunkUpdateNormal = new LinkedBlockingQueue<Chunk>();
-    private final SortedMap<Integer, Chunk> _chunkCache = Collections.synchronizedSortedMap(new TreeMap<Integer, Chunk>());
+    private final List<Chunk> _chunkUpdateQueueDL = new LinkedList<Chunk>();
+    private final List<Chunk> _chunkUpdateNormal = new LinkedList<Chunk>();
+    private final SortedMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     /* ------ */
     private final GeneratorTerrain _generatorTerrain;
     private final GeneratorForest _generatorForest;
@@ -90,70 +89,55 @@ public class World extends RenderableObject {
         _generatorTerrain = new GeneratorTerrain(seed);
         _generatorForest = new GeneratorForest(seed);
 
+        for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
+            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
+                Chunk c = loadOrCreateChunk(x, z);
+                _chunks[x][0][z] = c;
+                queueChunkForUpdate(c);
+            }
+        }
+
+        _worldGenerated = true;
+        _player.resetPlayer();
+
         _updateThread = new Thread(new Runnable() {
 
             @Override
             public void run() {
-
-                long timeStart = System.currentTimeMillis();
-
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Generating chunks. Please wait...");
-
-                for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-                    for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
-                        Chunk c = loadOrCreateChunk(x, z);
-                        _chunks[x][0][z] = c;
-                        queueChunkForUpdate(c, 0);
-                    }
-                }
-
-                _worldGenerated = true;
-                _player.resetPlayer();
-
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Chunks created! ({0}s).", (System.currentTimeMillis() - timeStart) / 1000d);
-
+                int itCounter = 0;
                 while (true) {
-                    Chunk ci = _chunkUpdateImportant.poll();
-                    if (ci != null) {
-                        processChunk(ci);
+                    long timeStart = System.currentTimeMillis();
+                    timeStart = System.currentTimeMillis();
+
+                    //if (itCounter % 16 == 0) {
+                    synchronized (_chunkUpdateNormal) {
+                        Collections.sort(_chunkUpdateNormal);
                     }
+                    //}
 
-                    ArrayList<Chunk> sortedUpdates = new ArrayList<Chunk>(_chunkUpdateNormal);
-                    Collections.sort(sortedUpdates);
-
-                    Vector3f pPos = new Vector3f(_player.getPosition());
-
-                    int updateCounter = 0;
-
-                    for (Chunk c : sortedUpdates) {
+                    if (_chunkUpdateNormal.size() > 0) {
+                        Chunk c = null;
+                        synchronized (_chunkUpdateNormal) {
+                            c = _chunkUpdateNormal.get(0);
+                        }
                         processChunk(c);
-                        updateCounter++;
-                        _chunkUpdateNormal.remove(c);
-
-                        Vector3f pDist = Vector3f.sub(pPos, _player.getPosition(), null);
-
-                        // Break out if the player is moving or an important update has been queued
-                        if (pDist.length() > 2 || !_chunkUpdateImportant.isEmpty() || updateCounter == 32) {
-                            break;
+                        synchronized (_chunkUpdateNormal) {
+                            _chunkUpdateNormal.remove(c);
                         }
                     }
-                }
-            }
-        });
 
-        _worldThread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                while (true) {
                     updateInfWorld();
                     updateDaytime();
+
+                    _statUpdateDuration += System.currentTimeMillis() - timeStart;
+                    _statUpdateDuration /= 2;
+
+                    itCounter++;
                 }
             }
         });
 
         _updateThread.start();
-        _worldThread.start();
     }
 
     /**
@@ -165,39 +149,34 @@ public class World extends RenderableObject {
      */
     private void processChunk(Chunk c) {
         if (c != null) {
-
             if (!c.generate() && c._lightDirty) {
                 c.calcLight();
-                c._lightDirty = false;
             }
-
             Chunk[] neighbors = c.getNeighbors();
-
             for (Chunk nc : neighbors) {
                 if (nc != null) {
                     if (!nc.generate() && nc._lightDirty) {
                         nc.calcLight();
-                        nc._lightDirty = false;
                     }
-
                     if (nc._dirty) {
                         nc.generateVertexArrays();
-                        nc._dirty = false;
-                        _chunkUpdateQueueDL.add(nc);
+                        synchronized (_chunkUpdateQueueDL) {
+                            _chunkUpdateQueueDL.add(nc);
+                        }
                     }
                 }
             }
-
             if (c._dirty) {
                 c.generateVertexArrays();
-                c._dirty = false;
-                _chunkUpdateQueueDL.add(c);
+                synchronized (_chunkUpdateQueueDL) {
+                    _chunkUpdateQueueDL.add(c);
+                }
             }
         }
     }
 
     /**
-     * Updates the daytime of the world. A day in Blockmania has 12 minutes.
+     * Updates the daytime of the world. A day in Blockmania takes 12 minutes.
      */
     private void updateDaytime() {
         if (Helper.getInstance().getTime() - lastDaytimeMeasurement >= 30000) {
@@ -270,11 +249,14 @@ public class World extends RenderableObject {
                         pos.x += Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * (multX - 1);
                     }
                     if (c.getPosition().x != pos.x || c.getPosition().z != pos.z) {
+                        synchronized (_chunkUpdateNormal) {
+                            _chunkUpdateNormal.remove(c);
+                        }
                         // Try to load a cached version of the chunk
                         c = loadOrCreateChunk((int) pos.x, (int) pos.z);
                         // Replace the old chunk
                         _chunks[x][0][z] = c;
-                        queueChunkForUpdate(c, 0);
+                        queueChunkForUpdate(c);
                     }
                 }
             }
@@ -282,14 +264,14 @@ public class World extends RenderableObject {
     }
 
     /**
-     * Queues all displayed chunk for updating.
+     * Queues all displayed chunks for updating.
      */
     public void updateAllChunks() {
         for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
             for (int y = 0; y < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; y++) {
                 for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
                     Chunk c = getChunk(x, y, z);
-                    queueChunkForUpdate(c, 0);
+                    queueChunkForUpdate(c);
                 }
             }
         }
@@ -373,13 +355,14 @@ public class World extends RenderableObject {
      */
     @Override
     public void update(long delta) {
-        try {
-            Chunk c = _chunkUpdateQueueDL.poll(1, TimeUnit.MILLISECONDS);
-            if (c != null) {
-                c.generateDisplayList();
+        Chunk c = null;
+        synchronized (_chunkUpdateQueueDL) {
+            if (_chunkUpdateQueueDL.size() > 0) {
+                c = _chunkUpdateQueueDL.remove(0);
             }
-        } catch (InterruptedException ex) {
-            Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (c != null) {
+            c.generateDisplayList();
         }
     }
 
@@ -528,13 +511,16 @@ public class World extends RenderableObject {
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+
         c.setBlock(blockPosX, blockPosY, blockPosZ, type);
 
         // Queue the chunk for update
         if (update) {
             c.calcSunlightAtLocalPos(blockPosX, blockPosZ);
-            queueChunkForUpdate(c, 1);
+            queueChunkForUpdate(c);
         }
+
+
     }
 
     /**
@@ -861,29 +847,35 @@ public class World extends RenderableObject {
             // Looks a like a new chunk has to be created from scratch
         }
 
-        synchronized (_chunkCache) {
-            // Okay we have a full cache here. Alert!
-            if (_chunkCache.size() >= 1024) {
-                // Fetch all chunks within the cache
-                ArrayList<Chunk> sortedChunks = new ArrayList<Chunk>(_chunkCache.values());
-                // Sort them according to their distance to the player
-                Collections.sort(sortedChunks);
 
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Cache full. Removing some chunks from the chunk cache...");
+        // Okay we have a full cache here. Alert!
+        if (_chunkCache.size() >= 1024) {
+            // Fetch all chunks within the cache
+            ArrayList<Chunk> sortedChunks = null;
+            synchronized (_chunkCache) {
+                sortedChunks = new ArrayList<Chunk>(_chunkCache.values());
+            }
+            // Sort them according to their distance to the player
+            Collections.sort(sortedChunks);
 
-                // Delete as many elements as needed
-                for (int i = 0; i < 256; i++) {
-                    int indexToDelete = sortedChunks.size() - i;
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Cache full. Removing some chunks from the chunk cache...");
 
-                    if (indexToDelete >= 0 && indexToDelete < sortedChunks.size()) {
-                        Chunk cc = sortedChunks.get(indexToDelete);
+            // Delete as many elements as needed
+            for (int i = 0; i < 256; i++) {
+                int indexToDelete = sortedChunks.size() - i;
+
+                if (indexToDelete >= 0 && indexToDelete < sortedChunks.size()) {
+                    Chunk cc = sortedChunks.get(indexToDelete);
+                    synchronized (_chunkCache) {
                         _chunkCache.remove(Helper.getInstance().cantorize((int) cc.getPosition().x, (int) cc.getPosition().z));
+                    }
+                    synchronized (_chunkUpdateNormal) {
                         _chunkUpdateNormal.remove(cc);
                     }
                 }
-
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished removing chunks from chunk cache.");
             }
+
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished removing chunks from chunk cache.");
         }
 
         ArrayList<Generator> gs = new ArrayList<Generator>();
@@ -933,16 +925,10 @@ public class World extends RenderableObject {
         }
     }
 
-    private void queueChunkForUpdate(Chunk c, int prio) {
-        LinkedBlockingQueue queue = null;
-
-        if (prio > 0) {
-            queue = _chunkUpdateImportant;
-        } else {
-            queue = _chunkUpdateNormal;
+    private void queueChunkForUpdate(Chunk c) {
+        synchronized (_chunkUpdateNormal) {
+            _chunkUpdateNormal.add(c);
         }
-
-        queue.add(c);
     }
 
     /**
@@ -952,6 +938,6 @@ public class World extends RenderableObject {
      */
     @Override
     public String toString() {
-        return String.format("world (cdl: %d, ci: %d, cn: %d, cache: %d)", _chunkUpdateQueueDL.size(), _chunkUpdateImportant.size(), _chunkUpdateNormal.size(), _chunkCache.size());
+        return String.format("world (cdl: %d, cn: %d, cache: %d, ud: %fs)", _chunkUpdateQueueDL.size(), _chunkUpdateNormal.size(), _chunkCache.size(), _statUpdateDuration / 1000d);
     }
 }
