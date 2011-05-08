@@ -150,25 +150,12 @@ public final class Main {
         // Enable fog
         glHint(GL_FOG_HINT, GL_NICEST);
         glFogi(GL_FOG_MODE, GL_LINEAR);
-        glFogf(GL_FOG_DENSITY, 0.4f);
         float viewingDistance = (Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * Configuration.CHUNK_DIMENSIONS.x) / 2f;
-        glFogf(GL_FOG_START, viewingDistance - 128f);
+        glFogf(GL_FOG_START, viewingDistance / 16f);
         glFogf(GL_FOG_END, viewingDistance);
 
-        try {
-            // Init. textures and more
-            Class.forName("com.github.begla.blockmania.Chunk");
-            Chunk.init();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            Class.forName("com.github.begla.blockmania.World");
-            World.init();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        Chunk.init();
+        World.init();
 
         // Init. the player and a world
         player = new Player();
@@ -181,6 +168,7 @@ public final class Main {
         world = new World("WORLD1", worldSeed, player);
         // Link the player to the world
         player.setParent(world);
+        world.startUpdateThread();
     }
 
     /**
@@ -269,10 +257,8 @@ public final class Main {
      * Updates the player and the world.
      */
     private void update(long delta) {
-        if (world.isWorldGenerated()) {
-            world.update(delta);
-            player.update(delta);
-        }
+        world.update(delta);
+        player.update(delta);
     }
 
     /**

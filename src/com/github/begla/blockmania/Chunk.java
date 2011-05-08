@@ -221,7 +221,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the vertex-, texture- and color-arrays.
      */
-    public void generateVertexArrays() {
+    public synchronized void generateVertexArrays() {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -744,7 +744,9 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public synchronized void generateDisplayList() {
         if (_colorOpaque.isEmpty() && _texOpaque.isEmpty() && _quadsOpaque.isEmpty() && _colorTranslucent.isEmpty() && _texTranslucent.isEmpty() && _quadsTranslucent.isEmpty()) {
-            return;
+            if (_colorBillboard.isEmpty() && _texBillboard.isEmpty() && _quadsBillboard.isEmpty()) {
+                return;
+            }
         }
 
         if (glIsList(_displayListOpaque)) {
@@ -1042,9 +1044,12 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
 
         for (int i = 1; i <= originLightValue; i++) {
-            if (!Block.getBlock(_parent.getBlock(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ))).isBlockTypeTranslucent()) {
+            byte blockType = _parent.getBlock(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ));
+
+            if (!Block.getBlock(blockType).isBlockTypeTranslucent()) {
                 break;
             }
+
             byte newLightValue = (byte) (originLightValue - Math.abs(i));
             byte lightValue = _parent.getLight(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ));
 
@@ -1087,14 +1092,11 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Return the light value at the given position.
      */
     public byte getLight(int x, int y, int z) {
-        byte result = 0;
-
         try {
-            result = _light[x][y][z];
+            return _light[x][y][z];
         } catch (Exception e) {
+            return -1;
         }
-
-        return result;
     }
 
     /*
@@ -1106,7 +1108,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
             _dirty = true;
             _lightDirty = true;
             // Mark the neighbors as dirty
-            markNeighborsDirty(x, z, true);
+            markNeighborsDirty(x, z);
         } catch (Exception e) {
         }
     }
@@ -1118,7 +1120,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         try {
             return _blocks[x][y][z];
         } catch (Exception e) {
-            return 0;
+            return -1;
         }
     }
 
@@ -1129,8 +1131,9 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         try {
             _blocks[x][y][z] = type;
             _dirty = true;
+            _lightDirty = true;
             // Mark the neighbors as dirty
-            markNeighborsDirty(x, z, false);
+            markNeighborsDirty(x, z);
         } catch (Exception e) {
         }
     }
@@ -1173,7 +1176,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         return chunks;
     }
 
-    public void markNeighborsDirty(int x, int z, boolean lightDirty) {
+    public void markNeighborsDirty(int x, int z) {
         Chunk[] neighbors = getNeighbors();
 
         if (x == 0) {

@@ -58,7 +58,6 @@ public class World extends RenderableObject {
     /* ------ */
     private static Texture _textureSun;
     /* ------ */
-    private boolean _worldGenerated;
     private byte _daylight = 16;
     private Player _player;
     /* ------ */
@@ -97,33 +96,38 @@ public class World extends RenderableObject {
             }
         }
 
-        _worldGenerated = true;
         _player.resetPlayer();
 
         _updateThread = new Thread(new Runnable() {
 
             @Override
             public void run() {
-                int itCounter = 0;
                 while (true) {
                     long timeStart = System.currentTimeMillis();
                     timeStart = System.currentTimeMillis();
 
+                    Object[] chunks = null;
                     //if (itCounter % 16 == 0) {
-                    synchronized (_chunkUpdateNormal) {
-                        Collections.sort(_chunkUpdateNormal);
-                    }
-                    //}
+                    chunks = _chunkUpdateNormal.toArray();
 
-                    if (_chunkUpdateNormal.size() > 0) {
-                        Chunk c = null;
-                        synchronized (_chunkUpdateNormal) {
-                            c = _chunkUpdateNormal.get(0);
+                    // Find the clostest chunk
+                    double dist = Float.MAX_VALUE;
+                    int index = -1;
+
+                    for (int i = 0; i < chunks.length; i++) {
+                        Chunk c = (Chunk) chunks[i];
+                        double tDist = c.calcDistanceToPlayer();
+
+                        if (tDist <= dist) {
+                            dist = tDist;
+                            index = i;
                         }
+                    }
+
+                    if (index >= 0) {
+                        Chunk c = (Chunk) chunks[index];
                         processChunk(c);
-                        synchronized (_chunkUpdateNormal) {
-                            _chunkUpdateNormal.remove(c);
-                        }
+                        _chunkUpdateNormal.remove(c);
                     }
 
                     updateInfWorld();
@@ -131,13 +135,10 @@ public class World extends RenderableObject {
 
                     _statUpdateDuration += System.currentTimeMillis() - timeStart;
                     _statUpdateDuration /= 2;
-
-                    itCounter++;
                 }
             }
         });
 
-        _updateThread.start();
     }
 
     /**
@@ -160,17 +161,13 @@ public class World extends RenderableObject {
                     }
                     if (nc._dirty) {
                         nc.generateVertexArrays();
-                        synchronized (_chunkUpdateQueueDL) {
-                            _chunkUpdateQueueDL.add(nc);
-                        }
+                        _chunkUpdateQueueDL.add(nc);
                     }
                 }
             }
             if (c._dirty) {
                 c.generateVertexArrays();
-                synchronized (_chunkUpdateQueueDL) {
-                    _chunkUpdateQueueDL.add(c);
-                }
+                _chunkUpdateQueueDL.add(c);
             }
         }
     }
@@ -249,9 +246,7 @@ public class World extends RenderableObject {
                         pos.x += Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * (multX - 1);
                     }
                     if (c.getPosition().x != pos.x || c.getPosition().z != pos.z) {
-                        synchronized (_chunkUpdateNormal) {
-                            _chunkUpdateNormal.remove(c);
-                        }
+                        _chunkUpdateNormal.remove(c);
                         // Try to load a cached version of the chunk
                         c = loadOrCreateChunk((int) pos.x, (int) pos.z);
                         // Replace the old chunk
@@ -355,14 +350,10 @@ public class World extends RenderableObject {
      */
     @Override
     public void update(long delta) {
-        Chunk c = null;
-        synchronized (_chunkUpdateQueueDL) {
-            if (_chunkUpdateQueueDL.size() > 0) {
-                c = _chunkUpdateQueueDL.remove(0);
-            }
-        }
-        if (c != null) {
+        try {
+            Chunk c = _chunkUpdateQueueDL.remove(0);
             c.generateDisplayList();
+        } catch (Exception e) {
         }
     }
 
@@ -550,7 +541,7 @@ public class World extends RenderableObject {
      * @param z The Z-coordinate
      * @return The type of the block
      */
-    public final int getBlock(int x, int y, int z) {
+    public final byte getBlock(int x, int y, int z) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
         int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
         int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
@@ -565,7 +556,7 @@ public class World extends RenderableObject {
             return c.getBlock(blockPosX, blockPosY, blockPosZ);
         }
 
-        return 0;
+        return -1;
     }
 
     /**
@@ -591,7 +582,7 @@ public class World extends RenderableObject {
             return c.getLight(blockPosX, blockPosY, blockPosZ);
         }
 
-        return 0;
+        return -1;
     }
 
     /**
@@ -643,15 +634,6 @@ public class World extends RenderableObject {
      */
     public Vector3f getDaylightColor() {
         return new Vector3f(getDaylightAsFloat() * 0.55f, getDaylightAsFloat() * 0.85f, 0.99f * getDaylightAsFloat());
-    }
-
-    /**
-     * Returns true if the world was generated.
-     * 
-     * @return True if world is generated
-     */
-    public boolean isWorldGenerated() {
-        return _worldGenerated;
     }
 
     /**
@@ -869,9 +851,7 @@ public class World extends RenderableObject {
                     synchronized (_chunkCache) {
                         _chunkCache.remove(Helper.getInstance().cantorize((int) cc.getPosition().x, (int) cc.getPosition().z));
                     }
-                    synchronized (_chunkUpdateNormal) {
-                        _chunkUpdateNormal.remove(cc);
-                    }
+                    _chunkUpdateNormal.remove(cc);
                 }
             }
 
@@ -926,9 +906,7 @@ public class World extends RenderableObject {
     }
 
     private void queueChunkForUpdate(Chunk c) {
-        synchronized (_chunkUpdateNormal) {
-            _chunkUpdateNormal.add(c);
-        }
+        _chunkUpdateNormal.add(c);
     }
 
     /**
@@ -939,5 +917,13 @@ public class World extends RenderableObject {
     @Override
     public String toString() {
         return String.format("world (cdl: %d, cn: %d, cache: %d, ud: %fs)", _chunkUpdateQueueDL.size(), _chunkUpdateNormal.size(), _chunkCache.size(), _statUpdateDuration / 1000d);
+    }
+
+    public void startUpdateThread() {
+        _updateThread.start();
+    }
+
+    public void stopUpdateThread() {
+        _updateThread.stop();
     }
 }
