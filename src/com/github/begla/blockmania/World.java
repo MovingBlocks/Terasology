@@ -60,7 +60,8 @@ public class World extends RenderableObject {
     private byte _daylight = 16;
     private Player _player;
     /* ------ */
-    private Thread _updateThread;
+    private boolean _updatingEnabled = false;
+    private final Thread _updateThread;
     /* ------ */
     private Chunk[][][] _chunks;
     /* ------ */
@@ -102,6 +103,16 @@ public class World extends RenderableObject {
             @Override
             public void run() {
                 while (true) {
+                    if (!_updatingEnabled) {
+                        synchronized (_updateThread) {
+                            try {
+                                _updateThread.wait();
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+
                     long timeStart = System.currentTimeMillis();
                     timeStart = System.currentTimeMillis();
 
@@ -127,11 +138,8 @@ public class World extends RenderableObject {
                             processChunk(c);
                             _chunkUpdateNormal.remove(c);
                         }
-
-
                         _statUpdateDuration += System.currentTimeMillis() - timeStart;
                         _statUpdateDuration /= 2;
-
                     }
 
                     updateInfWorld();
@@ -185,34 +193,22 @@ public class World extends RenderableObject {
 
             byte oldDaylight = _daylight;
 
-            switch (_daytime) {
-                case 18:
-                    _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
-                    break;
-                case 20:
-                    _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
-                    break;
-                case 21:
-                    _daylight = (byte) (0.4f * Configuration.MAX_LIGHT);
-                    break;
-                case 22:
-                    _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-                    break;
-                case 23:
-                    _daylight = (byte) (0.2f * Configuration.MAX_LIGHT);
-                    break;
-                case 5:
-                    _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-                    break;
-                case 6:
-                    _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
-                    break;
-                case 7:
-                    _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
-                    break;
-                case 8:
-                    _daylight = Configuration.MAX_LIGHT;
-                    break;
+            if (_daytime >= 18 && _daytime < 20) {
+                _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
+            } else if (_daytime == 20) {
+                _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
+            } else if (_daytime == 21) {
+                _daylight = (byte) (0.4f * Configuration.MAX_LIGHT);
+            } else if (_daytime == 22) {
+                _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
+            } else if (_daytime >= 0 && _daytime <= 5) {
+                _daylight = (byte) (0.2f * Configuration.MAX_LIGHT);
+            } else if (_daytime == 6) {
+                _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
+            } else if (_daytime == 7) {
+                _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
+            } else if (_daytime >= 8 && _daytime < 18) {
+                _daylight = (byte) Configuration.MAX_LIGHT;
             }
 
             // Only update the chunks if the daylight value has changed
@@ -503,7 +499,6 @@ public class World extends RenderableObject {
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-
         c.setBlock(blockPosX, blockPosY, blockPosZ, type);
 
         // Queue the chunk for update
@@ -511,8 +506,6 @@ public class World extends RenderableObject {
             c.calcSunlightAtLocalPos(blockPosX, blockPosZ);
             queueChunkForUpdate(c);
         }
-
-
     }
 
     /**
@@ -864,6 +857,12 @@ public class World extends RenderableObject {
         return c;
     }
 
+    /**
+     * Marks the chunks stored within the chunk cache as dirty. If a chunk is dirty,
+     * the vertex arrays are recreated the next time the chunk is queued for updating.
+     *
+     * @param markLightDirty If true the light will be recomputated
+     */
     private void markCachedChunksDirty(boolean markLightDirty) {
         for (Chunk c : _chunkCache.values()) {
             c._dirty = true;
@@ -908,11 +907,29 @@ public class World extends RenderableObject {
         return String.format("world (cdl: %d, cn: %d, cache: %d, ud: %fs)", _chunkUpdateQueueDL.size(), _chunkUpdateNormal.size(), _chunkCache.size(), _statUpdateDuration / 1000d);
     }
 
+    /**
+     * Starts the updating thread.
+     */
     public void startUpdateThread() {
+        _updatingEnabled = true;
         _updateThread.start();
     }
 
-    public void stopUpdateThread() {
-        _updateThread.stop();
+    public void resumeUpdateThread() {
+        _updatingEnabled = true;
+        synchronized (_updateThread) {
+            _updateThread.notify();
+        }
+    }
+
+    /**
+     * Safely suspends the updating thread.
+     */
+    public void suspendUpdateThread() {
+        _updatingEnabled = false;
+    }
+
+    public void setDaytime(short time) {
+        _daytime = (short) (time % 24);
     }
 }

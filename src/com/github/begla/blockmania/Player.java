@@ -38,8 +38,6 @@ public class Player extends RenderableObject {
     private static final PlacingBox _placingBox = new PlacingBox();
     private boolean _jump = false;
     private byte _selectedBlockType = 1;
-    private boolean _demoAutoFlyMode = false;
-    private boolean _godMode = false;
     private float _wSpeed = Configuration.WALKING_SPEED;
     private double _yaw = 135d;
     private double _pitch;
@@ -56,7 +54,7 @@ public class Player extends RenderableObject {
     @Override
     public void render() {
 
-        if (Configuration.ENABLE_BOBBING && !_godMode) {
+        if (Configuration.ENABLE_BOBBING && !Configuration.GOD_MODE) {
             float bobbing2 = _pGen.noise(_position.x / 1.5f, _position.z / 1.5f, 0f) * 2f;
             glRotatef(bobbing2, 0f, 0f, 1f);
         }
@@ -64,7 +62,7 @@ public class Player extends RenderableObject {
         glRotatef((float) _pitch, 1f, 0f, 0f);
         glRotatef((float) _yaw, 0f, 1f, 0f);
 
-        if (Configuration.ENABLE_BOBBING && !_godMode) {
+        if (Configuration.ENABLE_BOBBING && !Configuration.GOD_MODE) {
             float bobbing1 = _pGen.noise(_position.x * 1.5f, _position.z * 1.5f, 0f) * 0.15f;
             glTranslatef(0.0f, bobbing1, 0);
         }
@@ -105,8 +103,7 @@ public class Player extends RenderableObject {
         yaw(Mouse.getDX() * 0.1f);
         pitch(Mouse.getDY() * 0.1f);
 
-        processPlayerInteraction();
-        processMovement(delta);
+        processMovement();
         updatePlayerPosition(delta);
 
         // Update the view direction
@@ -150,7 +147,7 @@ public class Player extends RenderableObject {
     public void walkForward() {
         _moveVector.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
-        if (_godMode) {
+        if (Configuration.GOD_MODE) {
             _moveVector.y -= (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
@@ -163,7 +160,7 @@ public class Player extends RenderableObject {
     public void walkBackwards() {
         _moveVector.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
-        if (_godMode) {
+        if (Configuration.GOD_MODE) {
             _moveVector.y += (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
@@ -247,6 +244,19 @@ public class Player extends RenderableObject {
         }
     }
 
+    public void plantTree(int type) {
+        RayFaceIntersection is = calcSelectedBlock();
+        if (is != null) {
+            Vector3f blockPos = is.getBlockPos();
+
+            if (type == 0) {
+                _parent.generateTree((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
+            } else {
+                _parent.generatePineTree((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
+            }
+        }
+    }
+
     /**
      * Removes a block.
      */
@@ -260,57 +270,37 @@ public class Player extends RenderableObject {
         }
     }
 
-    private void processPlayerInteraction() {
-        while (Keyboard.next() && Keyboard.getEventKeyState()) {
-            if (Keyboard.getEventKey() == Keyboard.KEY_E) {
+    public void processKeyboardInput(int key, boolean state, boolean repeatEvent) {
+        switch (key) {
+            case Keyboard.KEY_E:
                 placeBlock();
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_Q) {
+                break;
+            case Keyboard.KEY_Q:
                 removeBlock();
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_R) {
-                resetPlayer();
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_T) {
-                RayFaceIntersection is = calcSelectedBlock();
-                if (is != null) {
-                    Vector3f blockPos = is.getBlockPos();
-                    _parent.generateTree((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
-                }
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_U) {
-                _parent.updateAllChunks();
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_G) {
-                this._godMode = !_godMode;
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_J) {
-                this._demoAutoFlyMode = !_demoAutoFlyMode;
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_P) {
-                Configuration.SHOW_PLACING_BOX = !Configuration.SHOW_PLACING_BOX;
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_I) {
-                Configuration.SHOW_CHUNK_OUTLINES = !Configuration.SHOW_CHUNK_OUTLINES;
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_UP) {
+                break;
+            case Keyboard.KEY_UP:
                 cycleBlockTypes(1);
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_DOWN) {
+                break;
+            case Keyboard.KEY_DOWN:
                 cycleBlockTypes(-1);
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_H) {
-                Configuration.SHOW_HUD = !Configuration.SHOW_HUD;
-            } else if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
-                if (!Keyboard.isRepeatEvent()) {
+                break;
+            case Keyboard.KEY_SPACE:
+                if (!repeatEvent && state) {
                     jump();
                 }
-            }
-        }
-
-        while (Mouse.next()) {
-            if (Mouse.getEventButton() == 0 && Mouse.getEventButtonState() == true) {
-                placeBlock();
-            } else if (Mouse.getEventButton() == 1 && Mouse.getEventButtonState() == true) {
-                removeBlock();
-            }
+                break;
         }
     }
 
-    private void processMovement(long delta) {
-        if (getParent() == null) {
-            return;
+    public void processMouseInput(int button, boolean state) {
+        if (button == 0 && state) {
+            placeBlock();
+        } else if (button == 1 && state) {
+            removeBlock();
         }
+    }
 
+    private void processMovement() {
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
             walkForward();
         }
@@ -324,7 +314,7 @@ public class Player extends RenderableObject {
             strafeRight();
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-            _wSpeed = Configuration.RUNNING_SPEED;
+            _wSpeed = Configuration.WALKING_SPEED * Configuration.RUNNING_FACTOR;
         } else {
             _wSpeed = Configuration.WALKING_SPEED;
         }
@@ -397,7 +387,7 @@ public class Player extends RenderableObject {
         // Save the previous position before chaning any of the values
         Vector3f oldPosition = new Vector3f(_position);
 
-        if (_demoAutoFlyMode && _godMode) {
+        if (Configuration.DEMO_FLIGHT && Configuration.GOD_MODE) {
             for (int i = 127; i > 0; i--) {
                 int block = _parent.getBlock((int) getPosition().x, i, (int) getPosition().z);
                 if (block > 0) {
@@ -445,7 +435,7 @@ public class Player extends RenderableObject {
         getPosition().y += (_accVector.y / 1000.0f) * delta;
         getPosition().y += (_gravity / 1000.0f) * delta;
 
-        if (!_godMode) {
+        if (!Configuration.GOD_MODE) {
             boolean vHit = verticalHitTest(oldPosition);
             if (!vHit) {
                 // If the player is not standing on ground: increase the g-force
@@ -474,7 +464,7 @@ public class Player extends RenderableObject {
          * Check for horizontal collisions __after__ checking for vertical
          * collisions.
          */
-        if (!_godMode) {
+        if (!Configuration.GOD_MODE) {
             horizontalHitTest(oldPosition);
         }
     }

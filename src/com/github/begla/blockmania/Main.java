@@ -24,6 +24,7 @@ import static org.lwjgl.util.glu.GLU.*;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,28 +44,31 @@ import org.newdawn.slick.TrueTypeFont;
  */
 public final class Main {
 
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    private static final Logger _logger = Logger.getLogger(Main.class.getName());
     /* ------- */
     private static TrueTypeFont _font1;
     private long _lastLoopTime = Helper.getInstance().getTime();
     private long _lastFpsTime;
     private int _fps;
+    private String _consoleString = "";
+    private boolean _showDebugConsole = false;
+    private boolean _runGame = true;
     /* ------- */
     private float _meanFps;
     /* ------- */
-    Player player;
-    World world;
+    Player _player;
+    World _world;
     /* ------- */
-    FastRandom rand = new FastRandom();
+    FastRandom _rand = new FastRandom();
 
     /**
      * Init. the logger.
      */
     static {
         try {
-            LOGGER.addHandler(new FileHandler("blockmania.log", true));
+            _logger.addHandler(new FileHandler("blockmania.log", true));
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, ex.toString(), ex);
+            _logger.log(Level.WARNING, ex.toString(), ex);
         }
     }
 
@@ -75,7 +79,7 @@ public final class Main {
      */
     public static void main(String[] args) {
 
-        LOGGER.log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
+        _logger.log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
 
         Main main = null;
 
@@ -84,7 +88,7 @@ public final class Main {
             main.create();
             main.start();
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.toString(), ex);
+            _logger.log(Level.SEVERE, ex.toString(), ex);
         } finally {
             if (main != null) {
                 main.destroy();
@@ -100,7 +104,7 @@ public final class Main {
      * @throws LWJGLException
      */
     private void create() throws LWJGLException {
-        LOGGER.log(Level.INFO, "Initializing display, input devices and OpenGL.");
+        _logger.log(Level.INFO, "Initializing display, input devices and OpenGL.");
 
         // Display
         Display.setDisplayMode(new DisplayMode(Configuration.DISPLAY_WIDTH, Configuration.DISPLAY_HEIGHT));
@@ -158,17 +162,17 @@ public final class Main {
         World.init();
 
         // Init. the player and a world
-        player = new Player();
+        _player = new Player();
         // Generate a world with a "random" seed value
         String worldSeed = Configuration.DEFAULT_SEED;
         if (worldSeed.length() == 0) {
-            worldSeed = rand.randomCharacterString(16);
+            worldSeed = _rand.randomCharacterString(16);
         }
-        LOGGER.log(Level.INFO, "Creating new World with seed \"{0}\"", worldSeed);
-        world = new World("WORLD1", worldSeed, player);
+        _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", worldSeed);
+        _world = new World("WORLD1", worldSeed, _player);
         // Link the player to the world
-        player.setParent(world);
-        world.startUpdateThread();
+        _player.setParent(_world);
+        _world.startUpdateThread();
     }
 
     /**
@@ -176,10 +180,10 @@ public final class Main {
      */
     private void render() {
         // Use the color of the sky for clearing
-        glClearColor(world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f);
+        glClearColor(_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f);
 
         // Color the fog like the sky
-        float[] fogColor = {world.getDaylightColor().x, world.getDaylightColor().y, world.getDaylightColor().z, 1.0f};
+        float[] fogColor = {_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f};
         FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
         fogColorBuffer.put(fogColor);
         fogColorBuffer.rewind();
@@ -191,8 +195,8 @@ public final class Main {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
-        player.render();
-        world.render();
+        _player.render();
+        _world.render();
 
         if (Configuration.SHOW_HUD) {
             renderHUD();
@@ -220,8 +224,8 @@ public final class Main {
      * the ESCAPE key.
      */
     private void start() {
-        LOGGER.log(Level.INFO, "Starting the game...");
-        while (!Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+        _logger.log(Level.INFO, "Starting the game...");
+        while (_runGame && !Display.isCloseRequested()) {
 
             // Sync. at 60 FPS
             Display.sync(120);
@@ -242,11 +246,17 @@ public final class Main {
                 _fps = 0;
             }
 
+            processKeyboardInput();
+            processMouseInput();
+
             /*
              * Updating and rendering of the scene. The delta
              * value is used within the updating process.
              */
-            update(delta);
+            if (!_showDebugConsole) {
+                // Pause the game while the debug console is being shown
+                update(delta);
+            }
             render();
 
             // Clear dirty flag and swap buffer
@@ -260,8 +270,8 @@ public final class Main {
      * Updates the player and the world.
      */
     private void update(long delta) {
-        world.update(delta);
-        player.update(delta);
+        _world.update(delta);
+        _player.update(delta);
     }
 
     /**
@@ -283,9 +293,14 @@ public final class Main {
 
         // Draw debugging information
         _font1.drawString(4, 4, String.format("%s (fps: %.2f, free heap space: %d MB)", Configuration.GAME_TITLE, _meanFps, Runtime.getRuntime().freeMemory() / 1048576), Color.white);
-        _font1.drawString(4, 22, String.format("%s", player, Color.white));
-        _font1.drawString(4, 38, String.format("%s", world, Color.white));
+        _font1.drawString(4, 22, String.format("%s", _player, Color.white));
+        _font1.drawString(4, 38, String.format("%s", _world, Color.white));
         _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount(), Color.white));
+
+        if (_showDebugConsole) {
+            // Display the console input text
+            _font1.drawString(4, Configuration.DISPLAY_HEIGHT - 16 - 4, String.format("%s_", _consoleString), Color.red);
+        }
 
         glDisable(GL_TEXTURE_2D);
 
@@ -309,5 +324,136 @@ public final class Main {
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
         glLoadIdentity();
+    }
+
+    private void processMouseInput() {
+        while (Mouse.next()) {
+            int button = Mouse.getEventButton();
+            _player.processMouseInput(button, Mouse.getEventButtonState());
+        }
+    }
+
+    /**
+     * TODO
+     */
+    private void processKeyboardInput() {
+        while (Keyboard.next()) {
+            int key = Keyboard.getEventKey();
+
+            if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                toggleDebugConsole();
+            }
+
+            if (_showDebugConsole) {
+                if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                    if (key == Keyboard.KEY_BACK) {
+                        try {
+                            _consoleString = _consoleString.substring(0, _consoleString.length() - 1);
+                        } catch (Exception e) {
+                        }
+                    } else if (key == Keyboard.KEY_RETURN) {
+                        processConsoleString();
+                    }
+
+                    char c = Keyboard.getEventCharacter();
+
+                    try {
+                        if (c >= 'a' && c < 'z' || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.') {
+                            _consoleString = _consoleString.concat(String.valueOf(c));
+                        }
+                    } catch (Exception e) {
+                    }
+                }
+            } else {
+                _player.processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
+            }
+        }
+    }
+
+    /**
+     * Parses the console string and executes the command.
+     */
+    private void processConsoleString() {
+        boolean success = false;
+
+        ArrayList<String> parsingResult = new ArrayList<String>();
+        String temp = "";
+
+        for (int i = 0; i < _consoleString.length(); i++) {
+            char c = _consoleString.charAt(i);
+
+            if (c != ' ') {
+                temp = temp.concat(String.valueOf(c));
+            }
+
+            if (c == ' ' || i == _consoleString.length() - 1) {
+                parsingResult.add(temp);
+                temp = "";
+            }
+        }
+
+        try {
+            if (parsingResult.get(0).equals("place")) {
+                if (parsingResult.get(1).equals("tree")) {
+                    _player.plantTree(Integer.parseInt(parsingResult.get(2)));
+                    success = true;
+                }
+            } else if (parsingResult.get(0).equals("set")) {
+                if (parsingResult.get(1).equals("time")) {
+                    _world.setDaytime(Short.parseShort(parsingResult.get(2)));
+                    success = true;
+                } else if (parsingResult.get(1).equals("god_mode")) {
+                    Configuration.GOD_MODE = Boolean.parseBoolean(parsingResult.get(2));
+                    success = true;
+                } else if (parsingResult.get(1).equals("demo_flight")) {
+                    Configuration.DEMO_FLIGHT = Boolean.parseBoolean(parsingResult.get(2));
+                    success = true;
+                } else if (parsingResult.get(1).equals("hud")) {
+                    Configuration.SHOW_HUD = Boolean.parseBoolean(parsingResult.get(2));
+                    success = true;
+                } else if (parsingResult.get(1).equals("placing_box")) {
+                    Configuration.SHOW_PLACING_BOX = Boolean.parseBoolean(parsingResult.get(2));
+                    success = true;
+                } else if (parsingResult.get(1).equals("chunk_outlines")) {
+                    Configuration.SHOW_CHUNK_OUTLINES = Boolean.parseBoolean(parsingResult.get(2));
+                    success = true;
+                } else if (parsingResult.get(1).equals("g_force")) {
+                    Configuration.G_FORCE = Float.parseFloat(parsingResult.get(2));
+                    success = true;
+                } else if (parsingResult.get(1).equals("jump_intens")) {
+                    Configuration.JUMP_INTENSITY = Float.parseFloat(parsingResult.get(2));
+                    success = true;
+                } else if (parsingResult.get(1).equals("walking_speed")) {
+                    Configuration.WALKING_SPEED = Float.parseFloat(parsingResult.get(2));
+                    success = true;
+                }
+
+            } else if (parsingResult.get(0).equals("reset_player")) {
+                _player.resetPlayer();
+            }
+        } catch (Exception e) {
+        }
+
+        if (success) {
+            _logger.log(Level.INFO, "Console command \"{0}\" accepted.", _consoleString);
+        } else {
+            _logger.log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleString);
+        }
+
+        toggleDebugConsole();
+    }
+
+    /**
+     * Disables/enables the debug console.
+     */
+    public void toggleDebugConsole() {
+        if (!_showDebugConsole) {
+            _world.suspendUpdateThread();
+            _consoleString = "";
+            _showDebugConsole = true;
+        } else {
+            _showDebugConsole = false;
+            _world.resumeUpdateThread();
+        }
     }
 }

@@ -897,44 +897,6 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         return blockToCheck == 0x0 || blockToCheck == 0x6 || (Block.getBlock(blockToCheck).isBlockTypeTranslucent() && !Block.getBlock(currentBlock).isBlockTypeTranslucent());
     }
 
-    @Deprecated
-    private void floodLight(int x, int y, int z) {
-
-        float val_n1 = Block.getBlock(getBlock(x + 1, y, z)).isBlockTypeTranslucent() ? getLight(x + 1, y, z) : -1f;
-        float val_n2 = Block.getBlock(getBlock(x - 1, y, z)).isBlockTypeTranslucent() ? getLight(x - 1, y, z) : -1f;
-        float val_n3 = Block.getBlock(getBlock(x, y, z + 1)).isBlockTypeTranslucent() ? getLight(x, y, z + 1) : -1f;
-        float val_n4 = Block.getBlock(getBlock(x, y, z - 1)).isBlockTypeTranslucent() ? getLight(x, y, z - 1) : -1f;
-        float val_n5 = Block.getBlock(getBlock(x, y + 1, z)).isBlockTypeTranslucent() ? getLight(x, y + 1, z) : -1f;
-        float val_n6 = Block.getBlock(getBlock(x, y - 1, z)).isBlockTypeTranslucent() ? getLight(x, y - 1, z) : -1f;
-
-        byte val_light = getLight(x, y, z);
-        byte val_light_next = (byte) Math.max(val_light - 1, 0);
-
-        if (val_n1 < val_light_next && val_n1 != -1) {
-            setLight(x + 1, y, z, val_light_next);
-        }
-
-        if (val_n2 < val_light_next && val_n2 != -1) {
-            setLight(x - 1, y, z, val_light_next);
-        }
-
-        if (val_n3 < val_light_next && val_n3 != -1) {
-            setLight(x, y, z + 1, val_light_next);
-        }
-
-        if (val_n4 < val_light_next && val_n4 != -1) {
-            setLight(x, y, z - 1, val_light_next);
-        }
-
-        if (val_n5 < val_light_next && val_n5 != -1) {
-            setLight(x, y + 1, z, val_light_next);
-        }
-
-        if (val_n6 < val_light_next && val_n6 != -1) {
-            setLight(x, y - 1, z, val_light_next);
-        }
-    }
-
     /**
      * Returns the position of the chunk within the world.
      */
