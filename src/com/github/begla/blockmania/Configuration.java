@@ -47,7 +47,7 @@ public class Configuration {
     public static final byte MAX_LIGHT = 16;
     public static final byte MIN_LIGHT = 0;
     public static final float OCCLUSION_INTENS = 0.0625f;
-    public static final float BLOCK_SIDE_DIMMING = 0.075f;
+    public static final float BLOCK_SIDE_DIMMING = 0.05f;
     public static final float LIGHT_ABSORPTION = 0.0625f;
     // Player
     public static final int JUMP_INTENSITY = 10;
@@ -59,5 +59,5 @@ public class Configuration {
     public static final float G_FORCE = 0.05f;
     public static final float SLOWDOWN_INTENS = 0.05f;
     // Graphics
-    public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24).withSRGB(true);
+    public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24);
 }

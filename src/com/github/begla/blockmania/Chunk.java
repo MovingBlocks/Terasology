@@ -221,7 +221,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the vertex-, texture- and color-arrays.
      */
-    public synchronized void generateVertexArrays() {
+    public void generateVertexArrays() {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -742,7 +742,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the display list from the precalculated arrays.
      */
-    public synchronized void generateDisplayList() {
+    public void generateDisplayList() {
         if (_colorOpaque.isEmpty() && _texOpaque.isEmpty() && _quadsOpaque.isEmpty() && _colorTranslucent.isEmpty() && _texTranslucent.isEmpty() && _quadsTranslucent.isEmpty()) {
             if (_colorBillboard.isEmpty() && _texBillboard.isEmpty() && _quadsBillboard.isEmpty()) {
                 return;

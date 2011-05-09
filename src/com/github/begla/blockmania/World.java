@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.SortedMap;
+import java.util.Map;
 import java.util.TreeMap;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
@@ -64,9 +64,9 @@ public class World extends RenderableObject {
     /* ------ */
     private Chunk[][][] _chunks;
     /* ------ */
-    private final List<Chunk> _chunkUpdateQueueDL = new LinkedList<Chunk>();
-    private final List<Chunk> _chunkUpdateNormal = new LinkedList<Chunk>();
-    private final SortedMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
+    private final List<Chunk> _chunkUpdateQueueDL = Collections.synchronizedList(new LinkedList<Chunk>());
+    private final List<Chunk> _chunkUpdateNormal = Collections.synchronizedList(new LinkedList<Chunk>());
+    private final Map<Integer, Chunk> _chunkCache = Collections.synchronizedMap(new TreeMap<Integer, Chunk>());
     /* ------ */
     private final GeneratorTerrain _generatorTerrain;
     private final GeneratorForest _generatorForest;
@@ -817,9 +817,7 @@ public class World extends RenderableObject {
             // Check if the chunk fits the position
             if (c.getPosition().x != x || c.getPosition().y != 0 || c.getPosition().z != z) {
                 // If not, try to load the chunk from cache
-                synchronized (_chunkCache) {
-                    c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
-                }
+                c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
             }
         }
 
@@ -835,9 +833,7 @@ public class World extends RenderableObject {
         if (_chunkCache.size() >= 1024) {
             // Fetch all chunks within the cache
             ArrayList<Chunk> sortedChunks = null;
-            synchronized (_chunkCache) {
-                sortedChunks = new ArrayList<Chunk>(_chunkCache.values());
-            }
+            sortedChunks = new ArrayList<Chunk>(_chunkCache.values());
             // Sort them according to their distance to the player
             Collections.sort(sortedChunks);
 
@@ -849,9 +845,7 @@ public class World extends RenderableObject {
 
                 if (indexToDelete >= 0 && indexToDelete < sortedChunks.size()) {
                     Chunk cc = sortedChunks.get(indexToDelete);
-                    synchronized (_chunkCache) {
-                        _chunkCache.remove(Helper.getInstance().cantorize((int) cc.getPosition().x, (int) cc.getPosition().z));
-                    }
+                    _chunkCache.remove(Helper.getInstance().cantorize((int) cc.getPosition().x, (int) cc.getPosition().z));
                     _chunkUpdateNormal.remove(cc);
                 }
             }
@@ -865,19 +859,15 @@ public class World extends RenderableObject {
 
         // Generate a new chunk, cache it and return it
         c = new Chunk(this, new Vector3f(x, 0, z), gs);
-        synchronized (_chunkCache) {
-            _chunkCache.put(Helper.getInstance().cantorize(x, z), c);
-        }
+        _chunkCache.put(Helper.getInstance().cantorize(x, z), c);
 
         return c;
     }
 
     private void markCachedChunksDirty(boolean markLightDirty) {
-        synchronized (_chunkCache) {
-            for (Chunk c : _chunkCache.values()) {
-                c._dirty = true;
-                c._lightDirty = markLightDirty;
-            }
+        for (Chunk c : _chunkCache.values()) {
+            c._dirty = true;
+            c._lightDirty = markLightDirty;
         }
     }
 
@@ -900,10 +890,8 @@ public class World extends RenderableObject {
      * @return The loaded chunk
      */
     private Chunk loadChunk(int x, int z) {
-        synchronized (_chunkCache) {
-            Chunk c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
-            return c;
-        }
+        Chunk c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
+        return c;
     }
 
     private void queueChunkForUpdate(Chunk c) {
