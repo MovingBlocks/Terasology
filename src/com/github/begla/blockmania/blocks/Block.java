@@ -77,6 +77,14 @@ public abstract class Block {
     }
 
     /**
+     * Returns the amount of blocks available.
+     * @return Amount of blocks available
+     */
+    public static int getBlockCount() {
+        return _blocks.length;
+    }
+
+    /**
      * Returns true if a given block type is translucent.
      *
      * @return True if the block type is translucent

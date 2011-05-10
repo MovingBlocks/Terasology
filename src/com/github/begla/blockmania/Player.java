@@ -563,7 +563,13 @@ public final class Player extends RenderableObject {
      * @param upDown Cycling direction
      */
     public void cycleBlockTypes(int upDown) {
-        _selectedBlockType += upDown % 12;
+        _selectedBlockType += upDown;
+
+        if (_selectedBlockType >= Block.getBlockCount()) {
+            _selectedBlockType = 0;
+        } else if (_selectedBlockType < 0) {
+            _selectedBlockType = (byte) (Block.getBlockCount() - 1);
+        }
     }
 
     /**
