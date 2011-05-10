@@ -124,7 +124,7 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         /*
          * Draws the outline of each chunk.
          */
-        if (Configuration.SHOW_CHUNK_OUTLINES) {
+        if (Configuration.getSettingBoolean("SHOW_CHUNK_OUTLINES")) {
             glLineWidth(2.0f);
             glColor3f(255.0f, 255.0f, 255.0f);
 

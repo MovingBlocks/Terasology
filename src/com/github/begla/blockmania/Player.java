@@ -38,7 +38,7 @@ public class Player extends RenderableObject {
     private static final PlacingBox _placingBox = new PlacingBox();
     private boolean _jump = false;
     private byte _selectedBlockType = 1;
-    private float _wSpeed = Configuration.WALKING_SPEED;
+    private float _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
     private double _yaw = 135d;
     private double _pitch;
     private final Vector3f _moveVector = new Vector3f(0, 0, 0);
@@ -54,7 +54,7 @@ public class Player extends RenderableObject {
     @Override
     public void render() {
 
-        if (Configuration.ENABLE_BOBBING && !Configuration.GOD_MODE) {
+        if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
             float bobbing2 = _pGen.noise(_position.x / 1.5f, _position.z / 1.5f, 0f) * 2f;
             glRotatef(bobbing2, 0f, 0f, 1f);
         }
@@ -62,7 +62,7 @@ public class Player extends RenderableObject {
         glRotatef((float) _pitch, 1f, 0f, 0f);
         glRotatef((float) _yaw, 0f, 1f, 0f);
 
-        if (Configuration.ENABLE_BOBBING && !Configuration.GOD_MODE) {
+        if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
             float bobbing1 = _pGen.noise(_position.x * 1.5f, _position.z * 1.5f, 0f) * 0.15f;
             glTranslatef(0.0f, bobbing1, 0);
         }
@@ -79,7 +79,7 @@ public class Player extends RenderableObject {
         RayFaceIntersection is = calcSelectedBlock();
 
         // Display the block the player is aiming at
-        if (Configuration.SHOW_PLACING_BOX) {
+        if (Configuration.getSettingBoolean("SHOW_PLACING_BOX")) {
             if (is != null) {
 
 //                glPointSize(5f);
@@ -147,7 +147,7 @@ public class Player extends RenderableObject {
     public void walkForward() {
         _moveVector.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
-        if (Configuration.GOD_MODE) {
+        if (Configuration.getSettingBoolean("GOD_MODE")) {
             _moveVector.y -= (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
@@ -160,7 +160,7 @@ public class Player extends RenderableObject {
     public void walkBackwards() {
         _moveVector.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
-        if (Configuration.GOD_MODE) {
+        if (Configuration.getSettingBoolean("GOD_MODE")) {
             _moveVector.y += (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
@@ -226,7 +226,7 @@ public class Player extends RenderableObject {
     /**
      * Places a block.
      */
-    public void placeBlock() {
+    public void placeBlock(byte type) {
         if (getParent() != null) {
             RayFaceIntersection is = calcSelectedBlock();
             if (is != null) {
@@ -238,7 +238,7 @@ public class Player extends RenderableObject {
                 playerBlockPos.z = (int) (playerBlockPos.z + 0.5f);
 
                 if (blockPos.x != playerBlockPos.x || (blockPos.y != playerBlockPos.y && blockPos.y != playerBlockPos.y + 1f) || blockPos.z != playerBlockPos.z) {
-                    getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, _selectedBlockType, true);
+                    getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true);
                 }
             }
         }
@@ -273,7 +273,7 @@ public class Player extends RenderableObject {
     public void processKeyboardInput(int key, boolean state, boolean repeatEvent) {
         switch (key) {
             case Keyboard.KEY_E:
-                placeBlock();
+                placeBlock(_selectedBlockType);
                 break;
             case Keyboard.KEY_Q:
                 removeBlock();
@@ -294,7 +294,7 @@ public class Player extends RenderableObject {
 
     public void processMouseInput(int button, boolean state) {
         if (button == 0 && state) {
-            placeBlock();
+            placeBlock(_selectedBlockType);
         } else if (button == 1 && state) {
             removeBlock();
         }
@@ -314,9 +314,9 @@ public class Player extends RenderableObject {
             strafeRight();
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-            _wSpeed = Configuration.WALKING_SPEED * Configuration.RUNNING_FACTOR;
+            _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED") * Configuration.getSettingNumeric("RUNNING_FACTOR");
         } else {
-            _wSpeed = Configuration.WALKING_SPEED;
+            _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
         }
     }
 
@@ -328,7 +328,7 @@ public class Player extends RenderableObject {
      * @return
      */
     private boolean verticalHitTest(Vector3f origin) {
-        float offset = -Configuration.PLAYER_HEIGHT;
+        float offset = -Configuration.getSettingNumeric("PLAYER_HEIGHT");
         boolean result = false;
         for (int x = -1; x < 2; ++x) {
             for (int z = -1; z < 2; ++z) {
@@ -367,7 +367,7 @@ public class Player extends RenderableObject {
 
     private void localHorizontalHitTest(int x, int z, Vector3f oldPosition, Vector3f normal) {
         for (int y = 0; y < 3; y++) {
-            Vector3f blockPos = new Vector3f((int) (oldPosition.x + 0.5f) + x, (int) (oldPosition.y + 0.5f) + y - Configuration.PLAYER_HEIGHT, (int) (oldPosition.z + 0.5f) + z);
+            Vector3f blockPos = new Vector3f((int) (oldPosition.x + 0.5f) + x, (int) (oldPosition.y + 0.5f) + y - Configuration.getSettingNumeric("PLAYER_HEIGHT"), (int) (oldPosition.z + 0.5f) + z);
             int blockType1 = _parent.getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
             if (!Block.getBlock(blockType1).isPenetrable()) {
                 if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f) {
@@ -387,7 +387,7 @@ public class Player extends RenderableObject {
         // Save the previous position before chaning any of the values
         Vector3f oldPosition = new Vector3f(_position);
 
-        if (Configuration.DEMO_FLIGHT && Configuration.GOD_MODE) {
+        if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
             for (int i = 127; i > 0; i--) {
                 int block = _parent.getBlock((int) getPosition().x, i, (int) getPosition().z);
                 if (block > 0) {
@@ -403,15 +403,15 @@ public class Player extends RenderableObject {
          * Slowdown the speed of the player each time this method is called.
          */
         if (Math.abs(_accVector.y) > 0f) {
-            _accVector.y += -1f * _accVector.y * Configuration.SLOWDOWN_INTENS;
+            _accVector.y += -1f * _accVector.y * Configuration.getSettingNumeric("SLOWDOWN_INTENS");
         }
 
         if (Math.abs(_accVector.x) > 0f) {
-            _accVector.x += -1f * _accVector.x * Configuration.SLOWDOWN_INTENS;
+            _accVector.x += -1f * _accVector.x * Configuration.getSettingNumeric("SLOWDOWN_INTENS");
         }
 
         if (Math.abs(_accVector.z) > 0f) {
-            _accVector.z += -1f * _accVector.z * Configuration.SLOWDOWN_INTENS;
+            _accVector.z += -1f * _accVector.z * Configuration.getSettingNumeric("SLOWDOWN_INTENS");
         }
 
         if (Math.abs(_accVector.x) > _wSpeed || Math.abs(_accVector.z) > _wSpeed || Math.abs(_accVector.z) > _wSpeed) {
@@ -435,18 +435,18 @@ public class Player extends RenderableObject {
         getPosition().y += (_accVector.y / 1000.0f) * delta;
         getPosition().y += (_gravity / 1000.0f) * delta;
 
-        if (!Configuration.GOD_MODE) {
+        if (!Configuration.getSettingBoolean("GOD_MODE")) {
             boolean vHit = verticalHitTest(oldPosition);
             if (!vHit) {
                 // If the player is not standing on ground: increase the g-force
-                if (_gravity > -Configuration.MAX_GRAVITY) {
-                    _gravity -= Configuration.G_FORCE * delta;
+                if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY")) {
+                    _gravity -= Configuration.getSettingNumeric("G_FORCE") * delta;
                 }
             } else {
                 // Jumping is only possible, if the player is standing on ground
                 if (_jump) {
                     _jump = false;
-                    _gravity = Configuration.JUMP_INTENSITY;
+                    _gravity = Configuration.getSettingNumeric("JUMP_INTENSITY");
                 }
             }
         } else {
@@ -464,7 +464,7 @@ public class Player extends RenderableObject {
          * Check for horizontal collisions __after__ checking for vertical
          * collisions.
          */
-        if (!Configuration.GOD_MODE) {
+        if (!Configuration.getSettingBoolean("GOD_MODE")) {
             horizontalHitTest(oldPosition);
         }
     }

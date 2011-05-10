@@ -34,6 +34,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 
@@ -50,7 +51,7 @@ public final class Main {
     private long _lastLoopTime = Helper.getInstance().getTime();
     private long _lastFpsTime;
     private int _fps;
-    private String _consoleString = "";
+    private final StringBuffer _consoleInput = new StringBuffer();
     private boolean _showDebugConsole = false;
     private boolean _runGame = true;
     /* ------- */
@@ -198,7 +199,7 @@ public final class Main {
         _player.render();
         _world.render();
 
-        if (Configuration.SHOW_HUD) {
+        if (Configuration.getSettingBoolean("SHOW_HUD")) {
             renderHUD();
         }
     }
@@ -299,7 +300,7 @@ public final class Main {
 
         if (_showDebugConsole) {
             // Display the console input text
-            _font1.drawString(4, Configuration.DISPLAY_HEIGHT - 16 - 4, String.format("%s_", _consoleString), Color.red);
+            _font1.drawString(4, Configuration.DISPLAY_HEIGHT - 16 - 4, String.format("%s_", _consoleInput), Color.red);
         }
 
         glDisable(GL_TEXTURE_2D);
@@ -348,7 +349,7 @@ public final class Main {
                 if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                     if (key == Keyboard.KEY_BACK) {
                         try {
-                            _consoleString = _consoleString.substring(0, _consoleString.length() - 1);
+                            _consoleInput.setLength(_consoleInput.length() - 1);
                         } catch (Exception e) {
                         }
                     } else if (key == Keyboard.KEY_RETURN) {
@@ -359,7 +360,7 @@ public final class Main {
 
                     try {
                         if (c >= 'a' && c < 'z' || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.') {
-                            _consoleString = _consoleString.concat(String.valueOf(c));
+                            _consoleInput.append(c);
                         }
                     } catch (Exception e) {
                     }
@@ -379,14 +380,14 @@ public final class Main {
         ArrayList<String> parsingResult = new ArrayList<String>();
         String temp = "";
 
-        for (int i = 0; i < _consoleString.length(); i++) {
-            char c = _consoleString.charAt(i);
+        for (int i = 0; i < _consoleInput.length(); i++) {
+            char c = _consoleInput.charAt(i);
 
             if (c != ' ') {
                 temp = temp.concat(String.valueOf(c));
             }
 
-            if (c == ' ' || i == _consoleString.length() - 1) {
+            if (c == ' ' || i == _consoleInput.length() - 1) {
                 parsingResult.add(temp);
                 temp = "";
             }
@@ -397,47 +398,47 @@ public final class Main {
                 if (parsingResult.get(1).equals("tree")) {
                     _player.plantTree(Integer.parseInt(parsingResult.get(2)));
                     success = true;
+                } else if (parsingResult.get(1).equals("block")) {
+                    _player.placeBlock(Byte.parseByte(parsingResult.get(2)));
+                    success = true;
                 }
             } else if (parsingResult.get(0).equals("set")) {
-                if (parsingResult.get(1).equals("time")) {
+                if (parsingResult.get(1).equals("TIME")) {
                     _world.setDaytime(Short.parseShort(parsingResult.get(2)));
                     success = true;
-                } else if (parsingResult.get(1).equals("god_mode")) {
-                    Configuration.GOD_MODE = Boolean.parseBoolean(parsingResult.get(2));
-                    success = true;
-                } else if (parsingResult.get(1).equals("demo_flight")) {
-                    Configuration.DEMO_FLIGHT = Boolean.parseBoolean(parsingResult.get(2));
-                    success = true;
-                } else if (parsingResult.get(1).equals("hud")) {
-                    Configuration.SHOW_HUD = Boolean.parseBoolean(parsingResult.get(2));
-                    success = true;
-                } else if (parsingResult.get(1).equals("placing_box")) {
-                    Configuration.SHOW_PLACING_BOX = Boolean.parseBoolean(parsingResult.get(2));
-                    success = true;
-                } else if (parsingResult.get(1).equals("chunk_outlines")) {
-                    Configuration.SHOW_CHUNK_OUTLINES = Boolean.parseBoolean(parsingResult.get(2));
-                    success = true;
-                } else if (parsingResult.get(1).equals("g_force")) {
-                    Configuration.G_FORCE = Float.parseFloat(parsingResult.get(2));
-                    success = true;
-                } else if (parsingResult.get(1).equals("jump_intens")) {
-                    Configuration.JUMP_INTENSITY = Float.parseFloat(parsingResult.get(2));
-                    success = true;
-                } else if (parsingResult.get(1).equals("walking_speed")) {
-                    Configuration.WALKING_SPEED = Float.parseFloat(parsingResult.get(2));
-                    success = true;
+                } else {
+                    Boolean bRes = Configuration.getSettingBoolean(parsingResult.get(1).toUpperCase());
+
+                    if (bRes != null) {
+                        Configuration.setSetting(parsingResult.get(1).toUpperCase(), Boolean.parseBoolean(parsingResult.get(2)));
+                        success = true;
+                    } else {
+                        Float fRes = Configuration.getSettingNumeric(parsingResult.get(1).toUpperCase());
+                        if (fRes != null) {
+                            Configuration.setSetting(parsingResult.get(1).toUpperCase(), Float.parseFloat(parsingResult.get(2)));
+                            success = true;
+                        }
+                    }
                 }
 
             } else if (parsingResult.get(0).equals("reset_player")) {
                 _player.resetPlayer();
+            } else if (parsingResult.get(0).equals("goto")) {
+                int x = Integer.parseInt(parsingResult.get(1));
+                int y = Integer.parseInt(parsingResult.get(2));
+                int z = Integer.parseInt(parsingResult.get(3));
+                _player.setPosition(new Vector3f(x, y, z));
+                success = true;
+            } else if (parsingResult.get(0).equals("exit")) {
+                System.exit(0);
             }
         } catch (Exception e) {
         }
 
         if (success) {
-            _logger.log(Level.INFO, "Console command \"{0}\" accepted.", _consoleString);
+            _logger.log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
         } else {
-            _logger.log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleString);
+            _logger.log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
         }
 
         toggleDebugConsole();
@@ -449,7 +450,7 @@ public final class Main {
     public void toggleDebugConsole() {
         if (!_showDebugConsole) {
             _world.suspendUpdateThread();
-            _consoleString = "";
+            _consoleInput.setLength(0);
             _showDebugConsole = true;
         } else {
             _showDebugConsole = false;

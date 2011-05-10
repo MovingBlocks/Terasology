@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import java.util.HashMap;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -28,39 +29,54 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Configuration {
 
+    // Engine settings
     public static final String GAME_TITLE = "Blockmania Alpha v0.02";
-    // World
     public static final Vector3f VIEWING_DISTANCE_IN_CHUNKS = new Vector3f(16.0f, 1.0f, 16.0f);
     public static final float SUN_SIZE = 64f;
     public static final String DEFAULT_SEED = "yMfLzKzZvHzQiWhA";
-    // Chunk
     public static final Vector3f CHUNK_DIMENSIONS = new Vector3f(16, 128, 16);
-    // Debug
-    public static boolean SHOW_PLACING_BOX = true;
-    public static boolean SHOW_CHUNK_OUTLINES = false;
-    public static boolean SHOW_HUD = true;
-    // Display
+    public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24);
     public static final int DISPLAY_HEIGHT = 720;
     public static final int DISPLAY_WIDTH = 1280;
     public static final boolean FULLSCREEN = false;
-    // Illumination
     public static final byte MAX_LIGHT = 16;
     public static final byte MIN_LIGHT = 0;
     public static final float OCCLUSION_INTENS = 0.0625f;
     public static final float BLOCK_SIDE_DIMMING = 0.05f;
     public static final float LIGHT_ABSORPTION = 0.0625f;
-    // Player
-    public static float JUMP_INTENSITY = 10f;
-    public static final int MAX_GRAVITY = 64;
-    public static float WALKING_SPEED = 1.5f;
-    public static final float RUNNING_FACTOR = 2f;
-    public static final boolean ENABLE_BOBBING = true;
-    public static final float PLAYER_HEIGHT = 1.25f;
-    public static float G_FORCE = 0.05f;
-    public static final float SLOWDOWN_INTENS = 0.05f;
-    // Cheats
-    public static boolean DEMO_FLIGHT = false;
-    public static boolean GOD_MODE = false;
-    // Graphics
-    public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24);
+    // Settings
+    public static final HashMap<String, Float> _settingsNumeric = new HashMap<String, Float>();
+    public static final HashMap<String, Boolean> _settingsBoolean = new HashMap<String, Boolean>();
+
+    public static Float getSettingNumeric(String key) {
+        return _settingsNumeric.get(key);
+    }
+
+    public static Boolean getSettingBoolean(String key) {
+        return _settingsBoolean.get(key);
+    }
+
+    public static void setSetting(String key, Boolean value) {
+        _settingsBoolean.put(key, value);
+    }
+
+    public static void setSetting(String key, Float value) {
+        _settingsNumeric.put(key, value);
+    }
+
+    static {
+        _settingsBoolean.put("SHOW_PLACING_BOX", true);
+        _settingsBoolean.put("SHOW_CHUNK_OUTLINES", false);
+        _settingsBoolean.put("SHOW_HUD", true);
+        _settingsBoolean.put("ENABLE_BOBBING", true);
+        _settingsBoolean.put("DEMO_FLIGHT", false);
+        _settingsBoolean.put("GOD_MODE", false);
+        _settingsNumeric.put("JUMP_INTENSITY", 10f);
+        _settingsNumeric.put("MAX_GRAVITY", 64f);
+        _settingsNumeric.put("WALKING_SPEED", 1.5f);
+        _settingsNumeric.put("RUNNING_FACTOR", 2f);
+        _settingsNumeric.put("PLAYER_HEIGHT", 1.0f);
+        _settingsNumeric.put("G_FORCE", 0.05f);
+        _settingsNumeric.put("SLOWDOWN_INTENS", 0.05f);
+    }
 }

@@ -50,7 +50,7 @@ public class World extends RenderableObject {
 
     private double _statUpdateDuration = 0.0f;
     /* ------ */
-    private short _daytime = 17;
+    private short _time = 17;
     private long lastDaytimeMeasurement = Helper.getInstance().getTime();
     /* ------ */
     private final FastRandom _rand;
@@ -186,28 +186,28 @@ public class World extends RenderableObject {
      */
     private void updateDaytime() {
         if (Helper.getInstance().getTime() - lastDaytimeMeasurement >= 30000) {
-            _daytime = (short) ((_daytime + 1) % 24);
+            _time = (short) ((_time + 1) % 24);
             lastDaytimeMeasurement = Helper.getInstance().getTime();
 
-            Logger.getLogger(World.class.getName()).log(Level.INFO, "Updated daytime to {0}h.", _daytime);
+            Logger.getLogger(World.class.getName()).log(Level.INFO, "Updated daytime to {0}h.", _time);
 
             byte oldDaylight = _daylight;
 
-            if (_daytime >= 18 && _daytime < 20) {
+            if (_time >= 18 && _time < 20) {
                 _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
-            } else if (_daytime == 20) {
+            } else if (_time == 20) {
                 _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
-            } else if (_daytime == 21) {
+            } else if (_time == 21) {
                 _daylight = (byte) (0.4f * Configuration.MAX_LIGHT);
-            } else if (_daytime == 22) {
+            } else if (_time == 22) {
                 _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-            } else if (_daytime >= 0 && _daytime <= 5) {
+            } else if (_time >= 0 && _time <= 5) {
                 _daylight = (byte) (0.2f * Configuration.MAX_LIGHT);
-            } else if (_daytime == 6) {
+            } else if (_time == 6) {
                 _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-            } else if (_daytime == 7) {
+            } else if (_time == 7) {
                 _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
-            } else if (_daytime >= 8 && _daytime < 18) {
+            } else if (_time >= 8 && _time < 18) {
                 _daylight = (byte) Configuration.MAX_LIGHT;
             }
 
@@ -930,6 +930,6 @@ public class World extends RenderableObject {
     }
 
     public void setDaytime(short time) {
-        _daytime = (short) (time % 24);
+        _time = (short) (time % 24);
     }
 }
