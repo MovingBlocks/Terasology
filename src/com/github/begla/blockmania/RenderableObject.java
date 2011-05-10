@@ -25,6 +25,9 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public abstract class RenderableObject {
 
+    /**
+     * The position of this renderable object.
+     */
     protected Vector3f _position = new Vector3f();
 
     /**

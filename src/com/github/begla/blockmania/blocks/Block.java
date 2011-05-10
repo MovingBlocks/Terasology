@@ -17,8 +17,6 @@
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -28,9 +26,35 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public abstract class Block {
 
+    /**
+     * The six sides a block has.
+     */
     public static enum SIDE {
 
-        LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK;
+        /**
+         * Left side.
+         */
+        LEFT,
+        /**
+         * Right side.
+         */
+        RIGHT,
+        /**
+         * Top side.
+         */
+        TOP,
+        /**
+         * Bottom side.
+         */
+        BOTTOM,
+        /**
+         * Front side.
+         */
+        FRONT,
+        /**
+         * Back side.
+         */
+        BACK;
     };
     private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockWood(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockWheat(), new BlockWheatLarge()};
     private static BlockNil nilBlock = new BlockNil();
@@ -55,7 +79,6 @@ public abstract class Block {
     /**
      * Returns true if a given block type is translucent.
      *
-     * @param type The block type
      * @return True if the block type is translucent
      */
     public boolean isBlockTypeTranslucent() {
@@ -66,7 +89,6 @@ public abstract class Block {
      * Calculates the color offset for a given block type and a speific
      * side of the block.
      *
-     * @param type The block type
      * @param side The block side
      * @return The color offset
      */
@@ -78,7 +100,6 @@ public abstract class Block {
      * Calculates the texture offset for a given block type and a specific
      * side of the block.
      *
-     * @param type The type of the block
      * @param side The side of the block
      * @return The texture offset
      */

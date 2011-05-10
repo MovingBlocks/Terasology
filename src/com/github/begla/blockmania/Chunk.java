@@ -46,15 +46,20 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
+    /**
+     * True if a block value was changed within the chunk.
+     */
+    public boolean _dirty = true;
+    /**
+     * True if a light value was changed within the chunk.
+     */
+    public boolean _lightDirty = true;
     private static int _statVertexArrayUpdateCount = 0;
     /* ------ */
-    public boolean _dirty = true;
-    public boolean _lightDirty = true;
     private boolean _fresh = true;
     /* ------ */
     private static int _maxChunkID = 0;
     private int _chunkID = 0;
-    /* ------ */
     private static Texture _textureMap;
     /* ------ */
     private final List<Float> _quadsTranslucent = new ArrayList<Float>();
@@ -899,6 +904,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the position of the chunk within the world.
+     * @return
      */
     public int getChunkWorldPosX() {
         return (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
@@ -906,6 +912,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the position of the chunk within the world.
+     * @return
      */
     public int getChunkWorldPosY() {
         return (int) _position.y * (int) Configuration.CHUNK_DIMENSIONS.y;
@@ -913,6 +920,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the position of the chunk within the world.
+     * @return
      */
     public int getChunkWorldPosZ() {
         return (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
@@ -920,6 +928,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the position of block within the world.
+     * @param x
+     * @return
      */
     public int getBlockWorldPosX(int x) {
         return x + getChunkWorldPosX();
@@ -927,6 +937,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the position of block within the world.
+     * @param y 
+     * @return
      */
     public int getBlockWorldPosY(int y) {
         return y + getChunkWorldPosY();
@@ -934,6 +946,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the position of block within the world.
+     * @param z 
+     * @return
      */
     public int getBlockWorldPosZ(int z) {
         return z + getChunkWorldPosZ();
@@ -1229,6 +1243,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public World getParent() {
         return _parent;
     }
@@ -1253,6 +1271,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         return new Double(calcDistanceToPlayer()).compareTo(o.calcDistanceToPlayer());
     }
 
+    /**
+     * Returns some information about the chunk as a string.
+     *
+     * @return
+     */
     @Override
     public String toString() {
         return String.format("Chunk (%d) at %s.", _chunkID, _position);

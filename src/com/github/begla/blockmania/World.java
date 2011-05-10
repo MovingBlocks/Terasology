@@ -659,8 +659,14 @@ public final class World extends RenderableObject {
         return (int) ((_player.getPosition().z - Helper.getInstance().calcPlayerOrigin().z) / Configuration.CHUNK_DIMENSIONS.z);
     }
 
-    /*
+
+    /**
      * Returns the vertices of a block at the given position.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @return
      */
     public Vector3f[] verticesForBlockAt(int x, int y, int z) {
         Vector3f[] vertices = new Vector3f[8];
@@ -682,6 +688,11 @@ public final class World extends RenderableObject {
      * Calculates the intersection of a given ray originating from a specified point with
      * a block. Returns a list of intersections ordered by the distance to the player.
      *
+     * @param x
+     * @param y
+     * @param z
+     * @param origin
+     * @param ray
      * @return Distance-ordered list of ray-face-intersections
      */
     public ArrayList<RayFaceIntersection> rayBlockIntersection(int x, int y, int z, Vector3f origin, Vector3f ray) {

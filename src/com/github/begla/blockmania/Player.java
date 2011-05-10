@@ -161,6 +161,9 @@ public final class Player extends RenderableObject {
     /*
      * Moves the player backward.
      */
+    /**
+     *
+     */
     public void walkBackwards() {
         _moveVector.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
@@ -171,7 +174,7 @@ public final class Player extends RenderableObject {
         _moveVector.z += (double) _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
-    /*
+    /**
      * Lets the player strafe left.
      */
     public void strafeLeft() {
@@ -179,7 +182,7 @@ public final class Player extends RenderableObject {
         _moveVector.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw - 90));
     }
 
-    /*
+    /**
      * Lets the player strafe right.
      */
     public void strafeRight() {
@@ -353,6 +356,7 @@ public final class Player extends RenderableObject {
      * Checks for blocks below and above the player.
      *
      * TODO: Not working for blocks above the player.
+     * TODO: Somehow clumsy. :-(
      *
      * @param oldPosition The position before the player's position was updated
      * @return True if a vertical collision was detected
@@ -554,6 +558,11 @@ public final class Player extends RenderableObject {
         _selectedBlockType += upDown % 12;
     }
 
+    /**
+     * Some information about the player.
+     * 
+     * @return
+     */
     @Override
     public String toString() {
         return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, _viewDirection.x, _viewDirection.y, _viewDirection.z, _selectedBlockType, _gravity, _moveVector.x, _moveVector.y, _moveVector.z);
