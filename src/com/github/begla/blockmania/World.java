@@ -116,7 +116,7 @@ public final class World extends RenderableObject {
                     long timeStart = System.currentTimeMillis();
                     timeStart = System.currentTimeMillis();
 
-                    if (!_chunkUpdateNormal.isEmpty()) {
+                    if (!_chunkUpdateNormal.isEmpty() && _chunkUpdateQueueDL.isEmpty()) {
                         Chunk[] chunks = _chunkUpdateNormal.toArray(new Chunk[0]);
 
                         // Find the closest chunk
@@ -350,7 +350,7 @@ public final class World extends RenderableObject {
     @Override
     public void update(long delta) {
         try {
-            Chunk c = _chunkUpdateQueueDL.remove(0);
+            Chunk c = _chunkUpdateQueueDL.remove(_chunkUpdateQueueDL.size() - 1);
             c.generateDisplayLists();
         } catch (Exception e) {
         }
@@ -658,7 +658,6 @@ public final class World extends RenderableObject {
     private int calcPlayerChunkOffsetZ() {
         return (int) ((_player.getPosition().z - Helper.getInstance().calcPlayerOrigin().z) / Configuration.CHUNK_DIMENSIONS.z);
     }
-
 
     /**
      * Returns the vertices of a block at the given position.

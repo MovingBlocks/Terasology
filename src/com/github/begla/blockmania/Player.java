@@ -362,22 +362,21 @@ public final class Player extends RenderableObject {
      * @return True if a vertical collision was detected
      */
     private boolean verticalHitTest(Vector3f origin) {
-        float offset = -Configuration.getSettingNumeric("PLAYER_HEIGHT");
+        float offset = Configuration.getSettingNumeric("PLAYER_HEIGHT");
         boolean result = false;
+        int y = -1;
         for (int x = -1; x < 2; ++x) {
             for (int z = -1; z < 2; ++z) {
-                for (int y = -1; y < 2; ++y) {
-                    if (y != 0 || z != 0 || x != 0) {
-                        Vector3f blockPos = new Vector3f((int) (origin.x + 0.5f + x), (int) (origin.y + 0.5f) + offset + y, (int) (origin.z + 0.5f + z));
-                        int blockType1 = _parent.getBlock((int) blockPos.x, (int) (blockPos.y), (int) blockPos.z);
+                if (y != 0 || z != 0 || x != 0) {
+                    Vector3f blockPos = new Vector3f((int) (origin.x + 0.5f + x), (int) (origin.y + 0.5f) - offset + y, (int) (origin.z + 0.5f + z));
+                    int blockType1 = _parent.getBlock((int) blockPos.x, (int) (blockPos.y), (int) blockPos.z);
 
-                        if (!Block.getBlock(blockType1).isPenetrable()) {
-                            if (_position.x + 0.12f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f && _position.y + 0.1f + offset > blockPos.y - 0.5f && _position.y - 0.1f + offset < blockPos.y + 0.5f) {
-                                result = true;
-                                if (_gravity < 0f) {
-                                    _position.y = origin.y;
-                                    _gravity = 0f;
-                                }
+                    if (!Block.getBlock(blockType1).isPenetrable()) {
+                        if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f && _position.y + 0.1f - offset > blockPos.y - 0.5f && _position.y - 0.1f - offset < blockPos.y + 0.5f) {
+                            result = true;
+                            if (_gravity < 0f) {
+                                _position.y = origin.y;
+                                _gravity = 0f;
                             }
                         }
                     }
@@ -413,8 +412,9 @@ public final class Player extends RenderableObject {
      * @param normal The normal of the surface in the given direction
      */
     private void localHorizontalHitTest(int x, int z, Vector3f oldPosition, Vector3f normal) {
-        for (int y = 0; y < 3; y++) {
-            Vector3f blockPos = new Vector3f((int) (oldPosition.x + 0.5f) + x, (int) (oldPosition.y + 0.5f) + y - Configuration.getSettingNumeric("PLAYER_HEIGHT"), (int) (oldPosition.z + 0.5f) + z);
+        float offset = Configuration.getSettingNumeric("PLAYER_HEIGHT");
+        for (int y = 0; y < Math.ceil(offset) + 1; y++) {
+            Vector3f blockPos = new Vector3f((int) (oldPosition.x + 0.5f) + x, (int) (oldPosition.y + 0.5f) + y - offset, (int) (oldPosition.z + 0.5f) + z);
             int blockType1 = _parent.getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
             if (!Block.getBlock(blockType1).isPenetrable()) {
                 if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f) {

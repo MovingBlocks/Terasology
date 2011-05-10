@@ -149,7 +149,7 @@ public final class Main {
         glDepthFunc(GL_LEQUAL);
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        glPolygonOffset(2f, 2f);
+        glPolygonOffset(0.1f, 0.1f);
         glEnable(GL_POLYGON_OFFSET_FILL);
 
         // Enable fog
@@ -423,6 +423,7 @@ public final class Main {
 
             } else if (parsingResult.get(0).equals("reset_player")) {
                 _player.resetPlayer();
+                success = true;
             } else if (parsingResult.get(0).equals("goto")) {
                 int x = Integer.parseInt(parsingResult.get(1));
                 int y = Integer.parseInt(parsingResult.get(2));
@@ -431,6 +432,7 @@ public final class Main {
                 success = true;
             } else if (parsingResult.get(0).equals("exit")) {
                 System.exit(0);
+                success = true;
             }
         } catch (Exception e) {
         }
