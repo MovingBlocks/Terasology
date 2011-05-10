@@ -28,6 +28,10 @@ import com.github.begla.blockmania.utilities.PerlinNoise;
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
+    /**
+     *
+     * @param seed
+     */
     public ChunkGeneratorTerrain(String seed) {
         super(seed);
     }
@@ -35,7 +39,6 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     /**
      *
      * @param c
-     * @param parent
      */
     @Override
     public void generate(Chunk c) {

@@ -38,7 +38,6 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
     /**
      *
      * @param c
-     * @param parent
      */
     @Override
     public void generate(Chunk c) {

@@ -27,9 +27,20 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public abstract class ObjectGenerator {
 
+    /**
+     *
+     */
     protected final FastRandom _rand;
+    /**
+     *
+     */
     protected final World _world;
 
+    /**
+     *
+     * @param w
+     * @param seed
+     */
     public ObjectGenerator(World w, String seed) {
         _rand = new FastRandom(seed.hashCode());
         _world = w;
@@ -38,7 +49,6 @@ public abstract class ObjectGenerator {
     /**
      * Generates an object at the given origin.
      *
-     * @param w The world the object should be created in
      * @param posX Origin on the x-axis
      * @param posY Origin on the y-axis
      * @param posZ Origin on the z-axis

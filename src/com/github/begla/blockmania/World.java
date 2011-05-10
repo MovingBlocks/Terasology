@@ -922,6 +922,10 @@ public final class World extends RenderableObject {
         return _generatorTree;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isDaytime() {
         if (_time > 6 && _time < 20) {
             return true;
@@ -929,6 +933,10 @@ public final class World extends RenderableObject {
         return false;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isNighttime() {
         return !isDaytime();
     }

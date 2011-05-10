@@ -27,6 +27,7 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
 
     /**
      * 
+     * @param w
      * @param seed
      */
     public ObjectGeneratorPineTree(World w, String seed) {
@@ -36,7 +37,6 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
     /**
      * Generates the tree.
      *
-     * @param w The world the object should be created in
      * @param posX Origin on the x-axis
      * @param posY Origin on the y-axis
      * @param posZ Origin on the z-axis
