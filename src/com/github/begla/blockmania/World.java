@@ -351,7 +351,7 @@ public final class World extends RenderableObject {
     public void update(long delta) {
         try {
             Chunk c = _chunkUpdateQueueDL.remove(0);
-            c.generateDisplayList();
+            c.generateDisplayLists();
         } catch (Exception e) {
         }
     }
