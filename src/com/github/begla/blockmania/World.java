@@ -58,6 +58,7 @@ public final class World extends RenderableObject {
     private final FastRandom _rand;
     /* ------ */
     private static Texture _textureSun;
+    private static Texture _textureMoon;
     /* ------ */
     private byte _daylight = 16;
     private Player _player;
@@ -205,7 +206,7 @@ public final class World extends RenderableObject {
                 _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
             } else if (_time == 21) {
                 _daylight = (byte) (0.4f * Configuration.MAX_LIGHT);
-            } else if (_time == 22) {
+            } else if (_time == 22 || _time == 23) {
                 _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
             } else if (_time >= 0 && _time <= 5) {
                 _daylight = (byte) (0.2f * Configuration.MAX_LIGHT);
@@ -285,6 +286,7 @@ public final class World extends RenderableObject {
         try {
             Logger.getLogger(World.class.getName()).log(Level.INFO, "Loading worLoggerld textures...");
             _textureSun = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/images/sun.png").openStream(), GL_NEAREST);
+            _textureMoon = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/images/moon.png").openStream(), GL_NEAREST);
             Logger.getLogger(World.class.getName()).log(Level.INFO, "Finished loading world textures!");
         } catch (IOException ex) {
             Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
@@ -297,7 +299,7 @@ public final class World extends RenderableObject {
     @Override
     public void render() {
         /**
-         * Draws the sun.
+         * Draws the sun/moon.
          */
         glPushMatrix();
         // Position the sun relatively to the player
@@ -310,7 +312,12 @@ public final class World extends RenderableObject {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_TEXTURE_2D);
-        _textureSun.bind();
+
+        if (isDaytime()) {
+            _textureSun.bind();
+        } else {
+            _textureMoon.bind();
+        }
         glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);
         glVertex3f(-Configuration.SUN_SIZE, Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
@@ -915,4 +922,14 @@ public final class World extends RenderableObject {
         return _generatorTree;
     }
 
+    public boolean isDaytime() {
+        if (_time > 6 && _time < 20) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isNighttime() {
+        return !isDaytime();
+    }
 }
