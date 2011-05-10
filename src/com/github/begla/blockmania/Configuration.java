@@ -111,8 +111,8 @@ public final class Configuration {
         _settingsNumeric.put("WALKING_SPEED", 1.5f);
         _settingsNumeric.put("RUNNING_FACTOR", 2f);
         _settingsNumeric.put("PLAYER_HEIGHT", 1.1f);
-        _settingsNumeric.put("G_FORCE", 0.05f);
-        _settingsNumeric.put("SLOWDOWN_INTENS", 0.05f);
+        _settingsNumeric.put("GRAVITY", 0.05f);
+        _settingsNumeric.put("FRICTION", 0.05f);
     }
 
     /**

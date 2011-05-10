@@ -17,8 +17,9 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.Chunk;
-import com.github.begla.blockmania.World;
-
+import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.utilities.PerlinNoise;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Generators are used to generate the terrain of chunk, to genreate caves
@@ -26,11 +27,41 @@ import com.github.begla.blockmania.World;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface Generator {
+public abstract class ChunkGenerator {
+
     /**
      *
-     * @param c
-     * @param parent
      */
-    public void generate(Chunk c, World parent);
+    protected PerlinNoise _pGen1;
+    /**
+     *
+     */
+    protected PerlinNoise _pGen2;
+    /**
+     *
+     */
+    protected PerlinNoise _pGen3;
+    /**
+     *
+     */
+    protected final FastRandom _rand;
+
+    /**
+     *
+     * @param seed
+     */
+    public ChunkGenerator(String seed) {
+        _rand = new FastRandom(seed.hashCode());
+        _pGen1 = new PerlinNoise(_rand.randomInt());
+        _pGen2 = new PerlinNoise(_rand.randomInt());
+        _pGen3 = new PerlinNoise(_rand.randomInt());
+    }
+
+    /**
+     * 
+     * @param c
+     */
+    public void generate(Chunk c) {
+        throw new NotImplementedException();
+    }
 }

@@ -18,21 +18,20 @@ package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.Chunk;
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.World;
 
 /**
  * Generates some trees, flowers and wheat.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class GeneratorForest extends GeneratorTerrain {
+public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
 
     /**
      * Init. the forest generator.
      * 
      * @param seed
      */
-    public GeneratorForest(String seed) {
+    public ChunkGeneratorForest(String seed) {
         super(seed);
     }
 
@@ -42,7 +41,7 @@ public class GeneratorForest extends GeneratorTerrain {
      * @param parent
      */
     @Override
-    public void generate(Chunk c, World parent) {
+    public void generate(Chunk c) {
         for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -69,9 +68,9 @@ public class GeneratorForest extends GeneratorTerrain {
 
                     // Check the distance to the last placed trees
                     if (dens > 0.7 && c.getBlock(x, y, z) == 0x1 && y > 32) {
-                        c.getParent().generatePineTree(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
+                        c.getParent().getGeneratorPineTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
                     } else if (dens > 0.6f && c.getBlock(x, y, z) == 0x1 && y > 32) {
-                        c.getParent().generateTree(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
+                        c.getParent().getGeneratorTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
                     }
                 }
             }

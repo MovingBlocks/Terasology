@@ -393,6 +393,7 @@ public final class Main {
             }
         }
 
+        // Try to parse the input
         try {
             if (parsingResult.get(0).equals("place")) {
                 if (parsingResult.get(1).equals("tree")) {
@@ -406,7 +407,9 @@ public final class Main {
                 if (parsingResult.get(1).equals("time")) {
                     _world.setTime(Short.parseShort(parsingResult.get(2)));
                     success = true;
+                    // Otherwise try lookup the given variable within the settings
                 } else {
+
                     Boolean bRes = Configuration.getSettingBoolean(parsingResult.get(1).toUpperCase());
 
                     if (bRes != null) {

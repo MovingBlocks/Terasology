@@ -18,7 +18,6 @@ package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.Chunk;
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.World;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.PerlinNoise;
 
@@ -27,35 +26,10 @@ import com.github.begla.blockmania.utilities.PerlinNoise;
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class GeneratorTerrain implements Generator {
+public class ChunkGeneratorTerrain extends ChunkGenerator {
 
-    /**
-     *
-     */
-    protected PerlinNoise _pGen1;
-    /**
-     *
-     */
-    protected PerlinNoise _pGen2;
-    /**
-     *
-     */
-    protected PerlinNoise _pGen3;
-    /**
-     *
-     */
-    protected final FastRandom _rand;
-
-    /**
-     * Init. the terrain generator.
-     * 
-     * @param seed
-     */
-    public GeneratorTerrain(String seed) {
-        _rand = new FastRandom(seed.hashCode());
-        _pGen1 = new PerlinNoise(_rand.randomInt());
-        _pGen2 = new PerlinNoise(_rand.randomInt());
-        _pGen3 = new PerlinNoise(_rand.randomInt());
+    public ChunkGeneratorTerrain(String seed) {
+        super(seed);
     }
 
     /**
@@ -64,7 +38,7 @@ public class GeneratorTerrain implements Generator {
      * @param parent
      */
     @Override
-    public void generate(Chunk c, World parent) {
+    public void generate(Chunk c) {
         int xOffset = (int) c.getPosition().x * (int) Configuration.CHUNK_DIMENSIONS.x;
         int yOffset = (int) c.getPosition().y * (int) Configuration.CHUNK_DIMENSIONS.y;
         int zOffset = (int) c.getPosition().z * (int) Configuration.CHUNK_DIMENSIONS.z;

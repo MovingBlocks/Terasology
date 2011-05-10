@@ -16,7 +16,7 @@
  */
 package com.github.begla.blockmania;
 
-import com.github.begla.blockmania.generators.Generator;
+import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.blocks.Block;
 import org.newdawn.slick.util.ResourceLoader;
 import org.lwjgl.util.vector.Vector4f;
@@ -82,7 +82,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private int _displayListTranslucent = -1;
     private int _displayListBillboard = -1;
     /* ------ */
-    private ArrayList<Generator> _generators = new ArrayList<Generator>();
+    private ArrayList<ChunkGenerator> _generators = new ArrayList<ChunkGenerator>();
 
     enum SIDE {
 
@@ -110,7 +110,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param position The absolute position of the chunk within the world
      * @param g A list of generators which should be applied to this chunk
      */
-    public Chunk(World p, Vector3f position, ArrayList<Generator> g) {
+    public Chunk(World p, Vector3f position, ArrayList<ChunkGenerator> g) {
         this._position = position;
         _parent = p;
         _blocks = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
@@ -203,8 +203,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (_fresh) {
             // Apply all generators to this chunk
             long timeStart = System.currentTimeMillis();
-            for (Generator g : _generators) {
-                g.generate(this, _parent);
+            for (ChunkGenerator g : _generators) {
+                g.generate(this);
             }
             Logger.getLogger(this.getClass().getName()).log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
             calcSunlight();

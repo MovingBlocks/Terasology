@@ -16,9 +16,11 @@
  */
 package com.github.begla.blockmania;
 
-import com.github.begla.blockmania.generators.Generator;
-import com.github.begla.blockmania.generators.GeneratorForest;
-import com.github.begla.blockmania.generators.GeneratorTerrain;
+import com.github.begla.blockmania.generators.ChunkGenerator;
+import com.github.begla.blockmania.generators.ChunkGeneratorForest;
+import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
+import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
+import com.github.begla.blockmania.generators.ObjectGeneratorTree;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.RayFaceIntersection;
@@ -69,8 +71,10 @@ public final class World extends RenderableObject {
     private final List<Chunk> _chunkUpdateNormal = Collections.synchronizedList(new LinkedList<Chunk>());
     private final Map<Integer, Chunk> _chunkCache = Collections.synchronizedMap(new TreeMap<Integer, Chunk>());
     /* ------ */
-    private final GeneratorTerrain _generatorTerrain;
-    private final GeneratorForest _generatorForest;
+    private final ChunkGeneratorTerrain _generatorTerrain;
+    private final ChunkGeneratorForest _generatorForest;
+    private final ObjectGeneratorTree _generatorTree;
+    private final ObjectGeneratorPineTree _generatorPineTree;
 
     /**
      * Initializes a new world for the single player mode.
@@ -85,8 +89,10 @@ public final class World extends RenderableObject {
         _chunks = new Chunk[(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z];
 
         // Init. generators
-        _generatorTerrain = new GeneratorTerrain(seed);
-        _generatorForest = new GeneratorForest(seed);
+        _generatorTerrain = new ChunkGeneratorTerrain(seed);
+        _generatorForest = new ChunkGeneratorForest(seed);
+        _generatorTree = new ObjectGeneratorTree(this, seed);
+        _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
 
         for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
             for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
@@ -182,7 +188,7 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * Updates the daytime of the world. A day in Blockmania takes 12 minutes.
+     * Updates the time of the world. A day in Blockmania takes 12 minutes.
      */
     private void updateDaytime() {
         if (Helper.getInstance().getTime() - lastDaytimeMeasurement >= 30000) {
@@ -353,66 +359,6 @@ public final class World extends RenderableObject {
             Chunk c = _chunkUpdateQueueDL.remove(_chunkUpdateQueueDL.size() - 1);
             c.generateDisplayLists();
         } catch (Exception e) {
-        }
-    }
-
-    /**
-     * Genrates a simple tree at a given position.
-     * 
-     * @param posX X-coordinate
-     * @param posY Y-coordinate
-     * @param posZ Z-coordinate
-     * @param update If set the affected chunks are queued for updating
-     */
-    public void generateTree(int posX, int posY, int posZ, boolean update) {
-
-        int height = _rand.randomInt() % 2 + 6;
-
-        // Generate tree trunk
-        for (int i = 0; i < height; i++) {
-            setBlock(posX, posY + i, posZ, (byte) 0x5, update);
-        }
-
-        // Generate the treetop
-        for (int y = height - 2; y < height + 2; y += 1) {
-            for (int x = -2; x < 3; x++) {
-                for (int z = -2; z < 3; z++) {
-                    if (!(x == -2 && z == -2) && !(x == 2 && z == 2) && !(x == -2 && z == 2) && !(x == 2 && z == -2)) {
-                        if (_rand.randomDouble() <= 0.8f) {
-                            setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Genrates a simple pine tree at a given position.
-     *
-     * @param posX X-coordinate
-     * @param posY Y-coordinate
-     * @param posZ Z-coordinate
-     * @param update If set the affected chunks are queued for updating
-     */
-    public void generatePineTree(int posX, int posY, int posZ, boolean update) {
-
-        int height = _rand.randomInt() % 4 + 12;
-
-        // Generate tree trunk
-        for (int i = 0; i < height; i++) {
-            setBlock(posX, posY + i, posZ, (byte) 0x5, update);
-        }
-
-        // Generate the treetop
-        for (int y = 0; y < 10; y += 2) {
-            for (int x = -5 + y / 2; x <= 5 - y / 2; x++) {
-                for (int z = -5 + y / 2; z <= 5 - y / 2; z++) {
-                    if (!(x == 0 && z == 0)) {
-                        setBlock(posX + x, posY + y + (height - 10), posZ + z, (byte) 0x6, update);
-                    }
-                }
-            }
         }
     }
 
@@ -858,7 +804,7 @@ public final class World extends RenderableObject {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished removing chunks from chunk cache.");
         }
 
-        ArrayList<Generator> gs = new ArrayList<Generator>();
+        ArrayList<ChunkGenerator> gs = new ArrayList<ChunkGenerator>();
         gs.add(_generatorTerrain);
         gs.add(_generatorForest);
 
@@ -952,4 +898,21 @@ public final class World extends RenderableObject {
     public void setTime(short time) {
         _time = (short) (time % 24);
     }
+
+    /**
+     *
+     * @return
+     */
+    public ObjectGeneratorPineTree getGeneratorPineTree() {
+        return _generatorPineTree;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public ObjectGeneratorTree getGeneratorTree() {
+        return _generatorTree;
+    }
+
 }

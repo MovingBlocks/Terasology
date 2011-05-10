@@ -265,9 +265,9 @@ public final class Player extends RenderableObject {
             Vector3f blockPos = is.getBlockPos();
 
             if (type == 0) {
-                _parent.generateTree((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
+                _parent.getGeneratorTree().generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
             } else {
-                _parent.generatePineTree((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
+                _parent.getGeneratorPineTree().generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
             }
         }
     }
@@ -295,16 +295,24 @@ public final class Player extends RenderableObject {
     public void processKeyboardInput(int key, boolean state, boolean repeatEvent) {
         switch (key) {
             case Keyboard.KEY_E:
-                placeBlock(_selectedBlockType);
+                if (state && !repeatEvent) {
+                    placeBlock(_selectedBlockType);
+                }
                 break;
             case Keyboard.KEY_Q:
-                removeBlock();
+                if (state && !repeatEvent) {
+                    removeBlock();
+                }
                 break;
             case Keyboard.KEY_UP:
-                cycleBlockTypes(1);
+                if (!repeatEvent && state) {
+                    cycleBlockTypes(1);
+                }
                 break;
             case Keyboard.KEY_DOWN:
-                cycleBlockTypes(-1);
+                if (!repeatEvent && state) {
+                    cycleBlockTypes(-1);
+                }
                 break;
             case Keyboard.KEY_SPACE:
                 if (!repeatEvent && state) {
@@ -455,15 +463,15 @@ public final class Player extends RenderableObject {
          * Slowdown the speed of the player each time this method is called.
          */
         if (Math.abs(_accVector.y) > 0f) {
-            _accVector.y += -1f * _accVector.y * Configuration.getSettingNumeric("SLOWDOWN_INTENS");
+            _accVector.y += -1f * _accVector.y * Configuration.getSettingNumeric("FRICTION");
         }
 
         if (Math.abs(_accVector.x) > 0f) {
-            _accVector.x += -1f * _accVector.x * Configuration.getSettingNumeric("SLOWDOWN_INTENS");
+            _accVector.x += -1f * _accVector.x * Configuration.getSettingNumeric("FRICTION");
         }
 
         if (Math.abs(_accVector.z) > 0f) {
-            _accVector.z += -1f * _accVector.z * Configuration.getSettingNumeric("SLOWDOWN_INTENS");
+            _accVector.z += -1f * _accVector.z * Configuration.getSettingNumeric("FRICTION");
         }
 
         if (Math.abs(_accVector.x) > _wSpeed || Math.abs(_accVector.z) > _wSpeed || Math.abs(_accVector.z) > _wSpeed) {
@@ -492,7 +500,7 @@ public final class Player extends RenderableObject {
             if (!vHit) {
                 // If the player is not standing on ground: increase the g-force
                 if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY")) {
-                    _gravity -= Configuration.getSettingNumeric("G_FORCE") * delta;
+                    _gravity -= Configuration.getSettingNumeric("GRAVITY") * delta;
                 }
             } else {
                 // Jumping is only possible, if the player is standing on ground
