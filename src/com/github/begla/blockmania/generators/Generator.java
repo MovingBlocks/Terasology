@@ -21,6 +21,8 @@ import com.github.begla.blockmania.World;
 
 
 /**
+ * Generators are used to generate the terrain of chunk, to genreate caves
+ * and to populate the surface.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

@@ -335,7 +335,7 @@ public final class Main {
     }
 
     /**
-     * TODO
+     * Processes the keyboard input.
      */
     private void processKeyboardInput() {
         while (Keyboard.next()) {
@@ -404,7 +404,7 @@ public final class Main {
                 }
             } else if (parsingResult.get(0).equals("set")) {
                 if (parsingResult.get(1).equals("TIME")) {
-                    _world.setDaytime(Short.parseShort(parsingResult.get(2)));
+                    _world.setTime(Short.parseShort(parsingResult.get(2)));
                     success = true;
                 } else {
                     Boolean bRes = Configuration.getSettingBoolean(parsingResult.get(1).toUpperCase());

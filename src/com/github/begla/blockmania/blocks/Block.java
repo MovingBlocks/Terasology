@@ -36,6 +36,12 @@ public abstract class Block {
     private static BlockNil nilBlock = new BlockNil();
 
 
+    /**
+     * Returns the object for the given block type ID.
+     * 
+     * @param type Block type ID
+     * @return The object for the given ID
+     */
     public static Block getBlock(int type) {
         Block b = null;
         try {
@@ -81,36 +87,38 @@ public abstract class Block {
     }
 
     /**
-     *  TODO
+     * Returns true, if the current block is a billboard.
      * 
-     * @return
+     * @return True if billboard
      */
     public boolean isBlockBillboard() {
         return false;
     }
 
     /**
-     *  TODO
+     * Returns true, if the block is invisible.
      *
-     * @return
+     * @return True if invisible
      */
     public boolean isBlockInvisible() {
         return false;
     }
 
     /**
-     *  TODO
+     * Returns true, if the block should be ignored
+     * within the collision checks.
      *
-     * @return
+     * @return True if penetrable
      */
     public boolean isPenetrable() {
         return false;
     }
 
     /**
-     *  TODO
+     * Returns true, if the block should be considered
+     * while calculating shadows.
      *
-     * @return
+     * @return True if casting shadows
      */
     public boolean isCastingShadows() {
         return true;

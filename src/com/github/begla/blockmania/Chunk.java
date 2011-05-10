@@ -16,7 +16,6 @@
  */
 package com.github.begla.blockmania;
 
-import java.util.concurrent.locks.Lock;
 import com.github.begla.blockmania.generators.Generator;
 import com.github.begla.blockmania.blocks.Block;
 import org.newdawn.slick.util.ResourceLoader;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.ArrayList;
 import org.lwjgl.util.vector.Vector3f;
 import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.opengl.Texture;
@@ -39,19 +37,17 @@ import static org.lwjgl.opengl.GL11.*;
  * determined by their dimensions. Chunks are used to manage the world efficiently and
  * reduce the batch count within the render loop.
  *
- * Chunks are tessellated on creation and saved to vertex arrays. From those a display list is generated
- * which is then used for the actual rendering process.
+ * Chunks are tessellated on creation and saved to vertex arrays. From those display lists are generated
+ * which are then used for the actual rendering process.
  *
  * The default size of chunk is 16x128x16 (32768) blocks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Chunk extends RenderableObject implements Comparable<Chunk> {
+public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
+    private static int _statVertexArrayUpdateCount = 0;
     /* ------ */
-    private static int _vertexArrayUpdateCount = 0;
-    /* ------ */
-    public Lock _lock = new ReentrantLock();
     public boolean _dirty = true;
     public boolean _lightDirty = true;
     private boolean _fresh = true;
@@ -102,7 +98,12 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * Init. the chunk.
+     * Init. the chunk with a parent world, an absolute position and a list
+     * of generators. The genrators are applied when the chunk is generated.
+     *
+     * @param p The parent world
+     * @param position The absolute position of the chunk within the world
+     * @param g A list of generators which should be applied to this chunk
      */
     public Chunk(World p, Vector3f position, ArrayList<Generator> g) {
         this._position = position;
@@ -117,7 +118,9 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * Draws the chunk.
+     * Draws the opaque or translucent elements of a chunk.
+     * 
+     * @param translucent True if the translucent elements should be rendered
      */
     public void render(boolean translucent) {
 
@@ -185,22 +188,12 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         glDisable(GL_TEXTURE_2D);
     }
 
-    /*
-     * Chunks can be compared by the relative distance to the player.
+    /**
+     * Applies the genrators and updates the light if the chunk is
+     * marked as fresh.
+     *
+     * @return True if a generation has been executes
      */
-    @Override
-    public int compareTo(Chunk o) {
-        return new Double(calcDistanceToPlayer()).compareTo(o.calcDistanceToPlayer());
-    }
-
-    /*
-     * Returns some information about a chunk as a string.
-     */
-    @Override
-    public String toString() {
-        return String.format("Chunk (%d) at %s.", _chunkID, _position);
-    }
-
     public boolean generate() {
         if (_fresh) {
             // Apply all generators to this chunk
@@ -232,9 +225,16 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
 
         _dirty = false;
-        _vertexArrayUpdateCount++;
+        _statVertexArrayUpdateCount++;
     }
 
+    /**
+     * Generates the billboard vertices for a given local block position.
+     *
+     * @param x Local block position on the x-axis
+     * @param y Local block position on the y-axis
+     * @param z Local block position on the z-axis
+     */
     private void generateBillboardVertices(int x, int y, int z) {
         byte block = _blocks[x][y][z];
 
@@ -950,6 +950,12 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
     }
 
+    /**
+     * Calculates the sunlight at a given column within the chunk.
+     * 
+     * @param x Local block position on the x-axis
+     * @param z Local block position on the z-axis
+     */
     public void calcSunlightAtLocalPos(int x, int z) {
         byte light = Configuration.MAX_LIGHT;
 
@@ -972,6 +978,12 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         _lightDirty = true;
     }
 
+    /**
+     * Update the light of this chunk.
+     *
+     * TODO: Update this entry.
+     * TODO: Not working perfectly.
+     */
     public void calcLight() {
         for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -994,6 +1006,16 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         _lightDirty = false;
     }
 
+    /**
+     * Propagates light from a given block position 16 blocks into a specific direction.
+     * 
+     * @param x Local block position on the x-axis
+     * @param y Local block position on the y-axis
+     * @param z Local block position on the z-axis
+     * @param dirX Direction on the x-axis
+     * @param dirY Direction on the y-axis
+     * @param dirZ Direction on the z-axis
+     */
     private void propagateLightIntoDirection(int x, int y, int z, int dirX, int dirY, int dirZ) {
         int blockPosX = getBlockWorldPosX(x);
         int blockPosY = getBlockWorldPosY(y);
@@ -1026,6 +1048,8 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the amount of blocks with a value greater than zero.
+     *
+     * @return The amount of blocks
      */
     public int blockCount() {
         int counter = 0;
@@ -1044,14 +1068,20 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Calculates the distance of the chunk to the player.
+     * @return The distance of the chunk to the player
      */
     public double calcDistanceToPlayer() {
         double distance = Math.sqrt(Math.pow(_parent.getPlayer().getPosition().x - getChunkWorldPosX(), 2) + Math.pow(_parent.getPlayer().getPosition().z - getChunkWorldPosZ(), 2));
         return distance;
     }
 
-    /*
-     * Return the light value at the given position.
+    /**
+     * Returns the light intensity at a given local block position.
+     *
+     * @param x Local block position on the x-axis
+     * @param y Local block position on the y-axis
+     * @param z Local block position on the z-axis
+     * @return The light intensity
      */
     public byte getLight(int x, int y, int z) {
         try {
@@ -1061,8 +1091,13 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
     }
 
-    /*
+    /**
      * Sets the light value at the given position.
+     * 
+     * @param x Local block position on the x-axis
+     * @param y Local block position on the y-axis
+     * @param z Local block position on the z-axis
+     * @param intens The light intensity to set
      */
     public void setLight(int x, int y, int z, byte intens) {
         try {
@@ -1075,8 +1110,13 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
     }
 
-    /*
-     * Returns the block value at the given position.
+    /**
+     * Returns the block type at a given local block position.
+     *
+     * @param x Local block position on the x-axis
+     * @param y Local block position on the y-axis
+     * @param z Local block position on the z-axis
+     * @return The block type
      */
     public byte getBlock(int x, int y, int z) {
         try {
@@ -1086,12 +1126,18 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
     }
 
-    /*
+    /**
      * Sets the block value at the given position.
+     * 
+     * @param x Local block position on the x-axis
+     * @param y Local block position on the y-axis
+     * @param z Local block position on the z-axis
+     * @param type The block type
      */
     public void setBlock(int x, int y, int z, byte type) {
         try {
             _blocks[x][y][z] = type;
+            // Update vertex arrays and light
             _dirty = true;
             _lightDirty = true;
             // Mark the neighbors as dirty
@@ -1100,6 +1146,15 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
     }
 
+    /**
+     * Calculates a simple occlusion value based on the amount of blocks
+     * surrounding the given block position.
+     * 
+     * @param x Local block position on the x-axis
+     * @param y Local block position on the y-axis
+     * @param z Local block position on the z-axis
+     * @return Occlusion amount
+     */
     public float calcSimpleOcclusionAmount(int x, int y, int z) {
         float intens = 0f;
         if (Block.getBlock(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z))).isCastingShadows()) {
@@ -1129,6 +1184,11 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         return 1f - (float) intens * Configuration.OCCLUSION_INTENS;
     }
 
+    /**
+     * Returns the neighbor chunks of this chunk.
+     *
+     * @return The adjacent chunks
+     */
     public Chunk[] getNeighbors() {
         Chunk[] chunks = new Chunk[4];
         chunks[0] = _parent.getChunk((int) _position.x + 1, (int) _position.y, (int) _position.z);
@@ -1138,6 +1198,13 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         return chunks;
     }
 
+    /**
+     * Marks those neighbors of a chunk dirty, that are adjacent to
+     * the given block coordinate.
+     * 
+     * @param x Local block position on the x-axis
+     * @param z Local block position on the z-axis
+     */
     public void markNeighborsDirty(int x, int z) {
         Chunk[] neighbors = getNeighbors();
 
@@ -1166,7 +1233,28 @@ public class Chunk extends RenderableObject implements Comparable<Chunk> {
         return _parent;
     }
 
+    /**
+     * Returns the amount of executed vertex array updates.
+     * 
+     * @return The amount of updates
+     */
     public static int getVertexArrayUpdateCount() {
-        return _vertexArrayUpdateCount;
+        return _statVertexArrayUpdateCount;
+    }
+
+    /**
+     * Chunks can be compared by the relative distance to the player.
+     *
+     * @param o The chunk to compare to
+     * @return
+     */
+    @Override
+    public int compareTo(Chunk o) {
+        return new Double(calcDistanceToPlayer()).compareTo(o.calcDistanceToPlayer());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Chunk (%d) at %s.", _chunkID, _position);
     }
 }

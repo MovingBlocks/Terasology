@@ -83,7 +83,7 @@ public class PerlinNoise {
         return 6.f * t4 * t - 15.f * t4 + 10.f * t3;
     }
 
-    public float noiseNoiseWithOctaves(float x, float y, float z, int octaves) {
+    public float noiseWithOctaves(float x, float y, float z, int octaves) {
         float result = 0.0f;
         float noise;
         float pers = 1f;

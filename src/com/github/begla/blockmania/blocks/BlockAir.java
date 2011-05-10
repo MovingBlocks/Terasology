@@ -20,7 +20,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
- * A dirt block.
+ * An air block.
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

@@ -25,7 +25,7 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public abstract class RenderableObject {
 
-    protected Vector3f _position = new Vector3f(0.0f, 0.0f, 0.0f);
+    protected Vector3f _position = new Vector3f();
 
     /**
      * Rendering operations have to be place here.
@@ -36,7 +36,7 @@ public abstract class RenderableObject {
     /**
      * Updating operations have to placed here. The delta
      * value can be used to determine how much time has passed
-     * since the last update.
+     * since the last updating operation.
      *
      * @param delta Time since the last update
      */

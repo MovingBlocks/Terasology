@@ -23,7 +23,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class PlacingBox extends RenderableObject {
+public final class PlacingBox extends RenderableObject {
 
     @Override
     public void render() {

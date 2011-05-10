@@ -55,7 +55,7 @@ public class FastRandom {
     }
 
     /**
-     * Returns a random value as int.
+     * Returns a random value as integer.
      *
      * @return Random value
      */

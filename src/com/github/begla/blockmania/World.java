@@ -46,7 +46,7 @@ import org.newdawn.slick.util.ResourceLoader;
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class World extends RenderableObject {
+public final class World extends RenderableObject {
 
     private double _statUpdateDuration = 0.0f;
     /* ------ */
@@ -243,11 +243,13 @@ public class World extends RenderableObject {
                         pos.x += Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * (multX - 1);
                     }
                     if (c.getPosition().x != pos.x || c.getPosition().z != pos.z) {
+                        // Remove the old chunk from the chunk update queue
                         _chunkUpdateNormal.remove(c);
                         // Try to load a cached version of the chunk
                         c = loadOrCreateChunk((int) pos.x, (int) pos.z);
                         // Replace the old chunk
                         _chunks[x][0][z] = c;
+                        // And queue it for updating
                         queueChunkForUpdate(c);
                     }
                 }
@@ -915,6 +917,9 @@ public class World extends RenderableObject {
         _updateThread.start();
     }
 
+    /**
+     * Resumes the updating thread.
+     */
     public void resumeUpdateThread() {
         _updatingEnabled = true;
         synchronized (_updateThread) {
@@ -929,7 +934,12 @@ public class World extends RenderableObject {
         _updatingEnabled = false;
     }
 
-    public void setDaytime(short time) {
+    /**
+     * Sets the time of the world.
+     *
+     * @param time The time to set
+     */
+    public void setTime(short time) {
         _time = (short) (time % 24);
     }
 }

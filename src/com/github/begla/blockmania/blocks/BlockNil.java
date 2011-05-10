@@ -16,11 +16,8 @@
  */
 package com.github.begla.blockmania.blocks;
 
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector4f;
-
 /**
- * A dirt block.
+ * A nil block.
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

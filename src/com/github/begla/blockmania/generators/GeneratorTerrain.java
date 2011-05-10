@@ -23,7 +23,8 @@ import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.PerlinNoise;
 
 /**
- *
+ * Generates the base terrain of the Blockmania world.
+ * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class GeneratorTerrain implements Generator {
@@ -33,6 +34,11 @@ public class GeneratorTerrain implements Generator {
     protected PerlinNoise _pGen3;
     protected final FastRandom _rand;
 
+    /**
+     * Init. the terrain generator.
+     * 
+     * @param seed
+     */
     public GeneratorTerrain(String seed) {
         _rand = new FastRandom(seed.hashCode());
         _pGen1 = new PerlinNoise(_rand.randomInt());
@@ -104,42 +110,64 @@ public class GeneratorTerrain implements Generator {
 
     /**
      * Returns the base elevation for the terrain.
+     * 
+     * @param x
+     * @param z
+     * @return
      */
     protected float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noiseNoiseWithOctaves(0.003f * x, 0.003f, 0.003f * z, 12) * 128f;
+        result += _pGen1.noiseWithOctaves(0.003f * x, 0.003f, 0.003f * z, 12) * 128f;
         return result;
     }
 
     /**
      * Returns the roughness for the base terrain.
+     * 
+     * @param x
+     * @param z
+     * @return
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.noiseNoiseWithOctaves(0.01f * x, 0.01f, 0.01f * z, 12);
+        result += _pGen2.noiseWithOctaves(0.01f * x, 0.01f, 0.01f * z, 12);
         return result;
     }
 
     /**
      * Returns the detail level for the base terrain.
+     * 
+     * @param x
+     * @param z
+     * @return
      */
     protected float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.noiseNoiseWithOctaves(0.02f * x, 0.02f, 0.02f * z, 16);
+        result += _pGen3.noiseWithOctaves(0.02f * x, 0.02f, 0.02f * z, 16);
         return result;
     }
 
     /**
      * Returns the canyon density for the base terrain.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @return
      */
     protected float calcCanyonDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen1.noiseNoiseWithOctaves(0.01f * x, 0.01f * y, 0.01f * z, 4);
+        result += _pGen1.noiseWithOctaves(0.01f * x, 0.01f * y, 0.01f * z, 4);
         return (float) Math.abs(result);
     }
 
     /**
      * Returns the cave density for the base terrain.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @return
      */
     protected float calcCaveDensityAt(float x, float y, float z) {
         float result = 0.0f;
@@ -149,10 +177,15 @@ public class GeneratorTerrain implements Generator {
 
     /**
      * Returns the cave density for the base terrain.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
      */
     protected float calcStoneDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen2.noiseNoiseWithOctaves(0.1f * x, 0.1f * y, 0.1f * z, 8);
+        result += _pGen2.noiseWithOctaves(0.1f * x, 0.1f * y, 0.1f * z, 8);
         return result;
     }
 }

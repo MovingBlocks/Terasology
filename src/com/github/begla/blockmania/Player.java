@@ -33,7 +33,7 @@ import static org.lwjgl.opengl.GL11.*;
  * 
  * @author Benjamin Glatzel <benjamin.glawwtzel@me.com>
  */
-public class Player extends RenderableObject {
+public final class Player extends RenderableObject {
 
     private static final PlacingBox _placingBox = new PlacingBox();
     private boolean _jump = false;
@@ -49,7 +49,7 @@ public class Player extends RenderableObject {
     private Vector3f _viewDirection = new Vector3f();
 
     /**
-     * Positions the player within the world adjusts the player's view accordingly.
+     * Positions the player within the world and adjusts the player's view accordingly.
      */
     @Override
     public void render() {
@@ -96,7 +96,9 @@ public class Player extends RenderableObject {
     }
 
     /**
-     * Updates the player's position etc.
+     * Updates the player.
+     * 
+     * @param delta Delta value since the last frame update
      */
     @Override
     public void update(long delta) {
@@ -115,6 +117,7 @@ public class Player extends RenderableObject {
 
     /**
      * Yaws the player's point of view.
+     *
      * @param diff Amount of yawing to be applied.
      */
     public void yaw(float diff) {
@@ -127,6 +130,7 @@ public class Player extends RenderableObject {
 
     /**
      * Pitches the player's point of view.
+     *
      * @param diff Amount of pitching to be applied.
      */
     public void pitch(float diff) {
@@ -190,11 +194,12 @@ public class Player extends RenderableObject {
         _jump = true;
     }
 
-    @Override
-    public String toString() {
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, _viewDirection.x, _viewDirection.y, _viewDirection.z, _selectedBlockType, _gravity, _moveVector.x, _moveVector.y, _moveVector.z);
-    }
-
+    /**
+     * Calcluates the currently looked at block in front
+     * of the player.
+     * 
+     * @return Intersection point of the looked at block
+     */
     public RayFaceIntersection calcSelectedBlock() {
         ArrayList<RayFaceIntersection> inters = new ArrayList<RayFaceIntersection>();
 
@@ -224,7 +229,9 @@ public class Player extends RenderableObject {
     }
 
     /**
-     * Places a block.
+     * Places a block of a given type in front of the player.
+     *
+     * @param type The type of the block
      */
     public void placeBlock(byte type) {
         if (getParent() != null) {
@@ -244,6 +251,11 @@ public class Player extends RenderableObject {
         }
     }
 
+    /**
+     * Plants a tree of a given type in front of the player.
+     * 
+     * @param type The type of the tree
+     */
     public void plantTree(int type) {
         RayFaceIntersection is = calcSelectedBlock();
         if (is != null) {
@@ -270,6 +282,13 @@ public class Player extends RenderableObject {
         }
     }
 
+    /**
+     * Processes the keyboard input.
+     * 
+     * @param key Pressed key on the keyboard
+     * @param state The state of the key
+     * @param repeatEvent True if repeat event
+     */
     public void processKeyboardInput(int key, boolean state, boolean repeatEvent) {
         switch (key) {
             case Keyboard.KEY_E:
@@ -292,6 +311,12 @@ public class Player extends RenderableObject {
         }
     }
 
+    /**
+     * Processes the mouse input.
+     * 
+     * @param button Pressed mouse button
+     * @param state State of the mouse button
+     */
     public void processMouseInput(int button, boolean state) {
         if (button == 0 && state) {
             placeBlock(_selectedBlockType);
@@ -300,6 +325,10 @@ public class Player extends RenderableObject {
         }
     }
 
+    /**
+     * Checks for pressed keys and exectutes the respective movement
+     * command.
+     */
     private void processMovement() {
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
             walkForward();
@@ -321,11 +350,12 @@ public class Player extends RenderableObject {
     }
 
     /**
-     * TODO: Still not working right for blocks above the player.
+     * Checks for blocks below and above the player.
      *
-     * @param oldPosition
-     * @param delta
-     * @return
+     * TODO: Not working for blocks above the player.
+     *
+     * @param oldPosition The position before the player's position was updated
+     * @return True if a vertical collision was detected
      */
     private boolean verticalHitTest(Vector3f origin) {
         float offset = -Configuration.getSettingNumeric("PLAYER_HEIGHT");
@@ -354,6 +384,11 @@ public class Player extends RenderableObject {
         return result;
     }
 
+    /**
+     * Checks for blocks around the player.
+     * 
+     * @param oldPosition The position before the player's position was updated
+     */
     private void horizontalHitTest(Vector3f oldPosition) {
         localHorizontalHitTest(0, 1, oldPosition, new Vector3f(1, 0, 0));
         localHorizontalHitTest(0, -1, oldPosition, new Vector3f(-1, 0, 0));
@@ -365,6 +400,14 @@ public class Player extends RenderableObject {
         localHorizontalHitTest(-1, 1, oldPosition, new Vector3f(1, 0, 1));
     }
 
+    /**
+     * Checks for horizontal collisiosn in one specific direction.
+     * 
+     * @param x Direction along the x-axis
+     * @param z Direction along the z-axis
+     * @param oldPosition The position before the player's position was updated
+     * @param normal The normal of the surface in the given direction
+     */
     private void localHorizontalHitTest(int x, int z, Vector3f oldPosition, Vector3f normal) {
         for (int y = 0; y < 3; y++) {
             Vector3f blockPos = new Vector3f((int) (oldPosition.x + 0.5f) + x, (int) (oldPosition.y + 0.5f) + y - Configuration.getSettingNumeric("PLAYER_HEIGHT"), (int) (oldPosition.z + 0.5f) + z);
@@ -383,6 +426,11 @@ public class Player extends RenderableObject {
         }
     }
 
+    /**
+     * Updates the position of the player.
+     * 
+     * @param delta Delta value since the last frame update
+     */
     private void updatePlayerPosition(float delta) {
         // Save the previous position before chaning any of the values
         Vector3f oldPosition = new Vector3f(_position);
@@ -478,6 +526,7 @@ public class Player extends RenderableObject {
 
     /**
      * Returns the parent world.
+     *
      * @return the parent world
      */
     public World getParent() {
@@ -486,6 +535,7 @@ public class Player extends RenderableObject {
 
     /**
      * Sets the parent world an resets the player.
+     * 
      * @param parent the parent world
      */
     public void setParent(World parent) {
@@ -493,11 +543,19 @@ public class Player extends RenderableObject {
         resetPlayer();
     }
 
+    /**
+     * Cycles the selected block type.
+     *
+     * TODO: The amount of blocks should not be hard-coded.
+     * 
+     * @param upDown Cycling direction
+     */
     public void cycleBlockTypes(int upDown) {
-        _selectedBlockType += upDown;
+        _selectedBlockType += upDown % 12;
+    }
 
-        if (_selectedBlockType < 0) {
-            _selectedBlockType = 0;
-        }
+    @Override
+    public String toString() {
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, _viewDirection.x, _viewDirection.y, _viewDirection.z, _selectedBlockType, _gravity, _moveVector.x, _moveVector.y, _moveVector.z);
     }
 }

@@ -20,7 +20,6 @@ import com.github.begla.blockmania.Configuration;
 import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
 /**
  * This is a simple helper class for various tasks.
@@ -60,7 +59,8 @@ public class Helper {
 
     /**
      * Returns the spawning point of the player.
-     * TODO: Should not determine the spawning point randomly
+     * 
+     * TODO: Should not determine the spawning point randomly.
      * 
      * @return The coordinates of the spawning point
      */

@@ -22,12 +22,10 @@ import org.lwjgl.util.vector.Vector3f;
 
 /**
  * Stores the settings of the game.
- * 
- * TODO: Replace with a single hashmap
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Configuration {
+public final class Configuration {
 
     // Engine settings
     public static final String GAME_TITLE = "Blockmania Alpha v0.02";
@@ -48,22 +46,6 @@ public class Configuration {
     public static final HashMap<String, Float> _settingsNumeric = new HashMap<String, Float>();
     public static final HashMap<String, Boolean> _settingsBoolean = new HashMap<String, Boolean>();
 
-    public static Float getSettingNumeric(String key) {
-        return _settingsNumeric.get(key);
-    }
-
-    public static Boolean getSettingBoolean(String key) {
-        return _settingsBoolean.get(key);
-    }
-
-    public static void setSetting(String key, Boolean value) {
-        _settingsBoolean.put(key, value);
-    }
-
-    public static void setSetting(String key, Float value) {
-        _settingsNumeric.put(key, value);
-    }
-
     static {
         _settingsBoolean.put("SHOW_PLACING_BOX", true);
         _settingsBoolean.put("SHOW_CHUNK_OUTLINES", false);
@@ -78,5 +60,21 @@ public class Configuration {
         _settingsNumeric.put("PLAYER_HEIGHT", 1.0f);
         _settingsNumeric.put("G_FORCE", 0.05f);
         _settingsNumeric.put("SLOWDOWN_INTENS", 0.05f);
+    }
+
+    public static Float getSettingNumeric(String key) {
+        return _settingsNumeric.get(key);
+    }
+
+    public static Boolean getSettingBoolean(String key) {
+        return _settingsBoolean.get(key);
+    }
+
+    public static void setSetting(String key, Boolean value) {
+        _settingsBoolean.put(key, value);
+    }
+
+    public static void setSetting(String key, Float value) {
+        _settingsNumeric.put(key, value);
     }
 }

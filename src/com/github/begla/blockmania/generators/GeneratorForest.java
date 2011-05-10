@@ -21,11 +21,17 @@ import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.World;
 
 /**
+ * Generates some trees, flowers and wheat.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class GeneratorForest extends GeneratorTerrain {
 
+    /**
+     * Init. the forest generator.
+     * 
+     * @param seed
+     */
     public GeneratorForest(String seed) {
         super(seed);
     }
@@ -69,6 +75,11 @@ public class GeneratorForest extends GeneratorTerrain {
 
     /**
      * Returns the cave density for the base terrain.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
      */
     protected float calcForestDensity(float x, float y, float z) {
         float result = 0.0f;
