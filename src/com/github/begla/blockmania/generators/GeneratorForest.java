@@ -36,6 +36,11 @@ public class GeneratorForest extends GeneratorTerrain {
         super(seed);
     }
 
+    /**
+     *
+     * @param c
+     * @param parent
+     */
     @Override
     public void generate(Chunk c, World parent) {
         for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {

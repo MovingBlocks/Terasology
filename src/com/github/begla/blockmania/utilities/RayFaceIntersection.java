@@ -25,9 +25,39 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
 
+    /**
+     *
+     */
     public enum SIDE {
 
-        FRONT, BACK, LEFT, RIGHT, TOP, BOTTOM, NONE
+        /**
+         *
+         */
+        FRONT,
+        /**
+         * 
+         */
+        BACK,
+        /**
+         *
+         */
+        LEFT,
+        /**
+         * 
+         */
+        RIGHT,
+        /**
+         *
+         */
+        TOP,
+        /**
+         * 
+         */
+        BOTTOM,
+        /**
+         *
+         */
+        NONE
     }
     private Vector3f v0, v1, v2;
     private float d;
@@ -37,6 +67,18 @@ public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
     private Vector3f intersectPoint;
     private Vector3f blockPos;
 
+    /**
+     *
+     * @param blockPos
+     * @param v0
+     * @param v1
+     * @param v2
+     * @param d
+     * @param t
+     * @param origin
+     * @param ray
+     * @param intersectPoint
+     */
     public RayFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, float d, float t, Vector3f origin, Vector3f ray, Vector3f intersectPoint) {
         this.d = d;
         this.t = t;
@@ -49,6 +91,11 @@ public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
         this.blockPos = blockPos;
     }
 
+    /**
+     *
+     * @param o
+     * @return
+     */
     @Override
     public int compareTo(RayFaceIntersection o) {
         return new Float(Math.abs(getT())).compareTo(Math.abs(o.getT()));
@@ -89,6 +136,10 @@ public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
         return intersectPoint;
     }
 
+    /**
+     *
+     * @return
+     */
     public SIDE calcSide() {
         Vector3f norm = calcSurfaceNormal();
 
@@ -109,6 +160,10 @@ public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
         return SIDE.NONE;
     }
 
+    /**
+     *
+     * @return
+     */
     public Vector3f calcSurfaceNormal() {
         Vector3f a = Vector3f.sub(v1, v0, null);
         Vector3f b = Vector3f.sub(v2, v0, null);
@@ -117,6 +172,10 @@ public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
         return norm;
     }
 
+    /**
+     *
+     * @return
+     */
     public Vector3f calcAdjacentBlockPos() {
         return Vector3f.add(getBlockPos(), calcSurfaceNormal(), null);
     }

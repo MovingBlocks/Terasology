@@ -29,9 +29,21 @@ import com.github.begla.blockmania.utilities.PerlinNoise;
  */
 public class GeneratorTerrain implements Generator {
 
+    /**
+     *
+     */
     protected PerlinNoise _pGen1;
+    /**
+     *
+     */
     protected PerlinNoise _pGen2;
+    /**
+     *
+     */
     protected PerlinNoise _pGen3;
+    /**
+     *
+     */
     protected final FastRandom _rand;
 
     /**
@@ -46,6 +58,11 @@ public class GeneratorTerrain implements Generator {
         _pGen3 = new PerlinNoise(_rand.randomInt());
     }
 
+    /**
+     *
+     * @param c
+     * @param parent
+     */
     @Override
     public void generate(Chunk c, World parent) {
         int xOffset = (int) c.getPosition().x * (int) Configuration.CHUNK_DIMENSIONS.x;

@@ -403,7 +403,7 @@ public final class Main {
                     success = true;
                 }
             } else if (parsingResult.get(0).equals("set")) {
-                if (parsingResult.get(1).equals("TIME")) {
+                if (parsingResult.get(1).equals("time")) {
                     _world.setTime(Short.parseShort(parsingResult.get(2)));
                     success = true;
                 } else {

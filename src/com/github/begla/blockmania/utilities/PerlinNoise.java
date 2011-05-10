@@ -26,6 +26,10 @@ public class PerlinNoise {
     FastRandom rand;
     static int noisePerm[] = new int[512];
 
+    /**
+     *
+     * @param seed
+     */
     public PerlinNoise(int seed) {
         rand = new FastRandom(seed);
 
@@ -34,6 +38,13 @@ public class PerlinNoise {
         }
     }
 
+    /**
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
     public float noise(float x, float y, float z) {
         // Compute noise cell coordinates and offsets
         int ix = (int) Math.floor(x), iy = (int) Math.floor(y), iz = (int) Math.floor(z);
@@ -83,6 +94,14 @@ public class PerlinNoise {
         return 6.f * t4 * t - 15.f * t4 + 10.f * t3;
     }
 
+    /**
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @param octaves
+     * @return
+     */
     public float noiseWithOctaves(float x, float y, float z, int octaves) {
         float result = 0.0f;
         float noise;

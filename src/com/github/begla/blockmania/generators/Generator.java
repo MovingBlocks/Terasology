@@ -27,5 +27,10 @@ import com.github.begla.blockmania.World;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public interface Generator {
+    /**
+     *
+     * @param c
+     * @param parent
+     */
     public void generate(Chunk c, World parent);
 }
