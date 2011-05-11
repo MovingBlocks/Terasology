@@ -444,7 +444,7 @@ public final class World extends RenderableObject {
      * @param type The type of the block to set
      * @param update If set the affected chunk is queued for updating
      */
-    public final void setBlock(int x, int y, int z, byte type, boolean update) {
+    public final void setBlock(int x, int y, int z, byte type, boolean update, boolean overwrite) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
         int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
         int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
@@ -454,12 +454,15 @@ public final class World extends RenderableObject {
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        c.setBlock(blockPosX, blockPosY, blockPosZ, type);
 
-        // Queue the chunk for update
-        if (update) {
-            c.calcSunlightAtLocalPos(blockPosX, blockPosZ);
-            queueChunkForUpdate(c);
+        if (overwrite || c.getBlock(blockPosX, blockPosY, blockPosZ) == 0) {
+            c.setBlock(blockPosX, blockPosY, blockPosZ, type);
+
+            // Queue the chunk for update
+            if (update) {
+                c.calcSunlightAtLocalPos(blockPosX, blockPosZ);
+                queueChunkForUpdate(c);
+            }
         }
     }
 

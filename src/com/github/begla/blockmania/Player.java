@@ -248,7 +248,7 @@ public final class Player extends RenderableObject {
                 playerBlockPos.z = (int) (playerBlockPos.z + 0.5f);
 
                 if (blockPos.x != playerBlockPos.x || (blockPos.y != playerBlockPos.y && blockPos.y != playerBlockPos.y + 1f) || blockPos.z != playerBlockPos.z) {
-                    getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true);
+                    getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
                 }
             }
         }
@@ -280,7 +280,7 @@ public final class Player extends RenderableObject {
             RayFaceIntersection is = calcSelectedBlock();
             if (is != null) {
                 Vector3f blockPos = is.getBlockPos();
-                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true);
+                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
             }
         }
     }
@@ -448,14 +448,7 @@ public final class Player extends RenderableObject {
         Vector3f oldPosition = new Vector3f(_position);
 
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-            for (int i = 127; i > 0; i--) {
-                int block = _parent.getBlock((int) getPosition().x, i, (int) getPosition().z);
-                if (block > 0) {
-                    _position.y = i + 16;
-                    break;
-                }
-            }
-            _position.z += 16f / 1000f * delta;
+            _position.z += 8f / 1000f * delta;
             return;
         }
 

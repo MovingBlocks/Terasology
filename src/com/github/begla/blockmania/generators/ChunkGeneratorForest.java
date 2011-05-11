@@ -56,7 +56,6 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
                         }
                     }
 
-                    // Generate some flowers and wheat
                     if (c.getBlock(x, y, z) == 0x1 && dens > 0.5) {
                         if (_rand.randomDouble() > 0.25f) {
                             c.setBlock(x, y + 1, z, (byte) 0x9);
@@ -67,8 +66,10 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
 
                     // Check the distance to the last placed trees
                     if (dens > 0.7 && c.getBlock(x, y, z) == 0x1 && y > 32) {
+                        c.setBlock(x, y + 1, z, (byte) 0x0);
                         c.getParent().getGeneratorPineTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
                     } else if (dens > 0.6f && c.getBlock(x, y, z) == 0x1 && y > 32) {
+                        c.setBlock(x, y + 1, z, (byte) 0x0);
                         c.getParent().getGeneratorTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
                     }
                 }
