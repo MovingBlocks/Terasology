@@ -226,7 +226,7 @@ public final class Main {
      */
     private void start() {
         _logger.log(Level.INFO, "Starting the game...");
-        while (_runGame && !Display.isCloseRequested()) {
+        while (_runGame) {
 
             // Sync. at 60 FPS
             Display.sync(120);
@@ -434,6 +434,10 @@ public final class Main {
                 _player.setPosition(new Vector3f(x, y, z));
                 success = true;
             } else if (parsingResult.get(0).equals("exit")) {
+                _world.writeAllChunksToDisk();
+                System.exit(0);
+                success = true;
+            } else if (parsingResult.get(0).equals("exit!")) {
                 System.exit(0);
                 success = true;
             }

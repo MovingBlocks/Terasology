@@ -549,9 +549,15 @@ public final class Player extends RenderableObject {
     }
 
     /**
+     * 
+     * @return 
+     */
+    public Vector3f getViewDirection() {
+        return _viewDirection;
+    }
+    
+    /**
      * Cycles the selected block type.
-     *
-     * TODO: The amount of blocks should not be hard-coded.
      * 
      * @param upDown Cycling direction
      */

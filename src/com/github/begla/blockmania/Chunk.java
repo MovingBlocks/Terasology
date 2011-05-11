@@ -16,8 +16,15 @@
  */
 package com.github.begla.blockmania;
 
+import java.nio.channels.FileChannel;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.ByteBuffer;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.utilities.Helper;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import org.newdawn.slick.util.ResourceLoader;
 import org.lwjgl.util.vector.Vector4f;
 import java.nio.FloatBuffer;
@@ -76,6 +83,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /* ------ */
     private byte[][][] _blocks;
+    private byte[][][] _sunlight;
     private byte[][][] _light;
     /* ------ */
     private int _displayListOpaque = -1;
@@ -114,6 +122,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         this._position = position;
         _parent = p;
         _blocks = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
+        _sunlight = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
         _light = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
 
         _chunkID = _maxChunkID + 1;
@@ -203,14 +212,25 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (_fresh) {
             // Apply all generators to this chunk
             long timeStart = System.currentTimeMillis();
+
+            if (loadChunkFromFile()) {
+                _lightDirty = false;
+                _fresh = false;
+                markNeighborsDirty();
+                Logger.getLogger(this.getClass().getName()).log(Level.FINEST, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+                return true;
+            }
+
             for (ChunkGenerator g : _generators) {
                 g.generate(this);
             }
-            Logger.getLogger(this.getClass().getName()).log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
             calcSunlight();
             calcLight();
             _lightDirty = false;
             _fresh = false;
+            writeChunkToDisk();
+
+            Logger.getLogger(this.getClass().getName()).log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
             return true;
         }
         return false;
@@ -972,23 +992,25 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public void calcSunlightAtLocalPos(int x, int z) {
         byte light = Configuration.MAX_LIGHT;
+        boolean covered = false;
 
         for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
-            if (Block.getBlock(_blocks[x][y][z]).isBlockTypeTranslucent()) {
-                _light[x][y][z] = light;
+            if (Block.getBlock(_blocks[x][y][z]).isBlockTypeTranslucent() && !covered) {
+                setSunlight(x, y, z, light);
 
-                // Reduce the sunlight with each block passed
+                // Reduce the sunlight with each passed block
                 if (_blocks[x][y][z] != 0x0) {
                     light -= Configuration.LIGHT_ABSORPTION;
-                    light = (byte) Math.max(Configuration.MIN_LIGHT, light);
+                    light = (byte) Math.max(0, light);
                 }
+            } else if (Block.getBlock(_blocks[x][y][z]).isBlockTypeTranslucent() && covered) {
+                setSunlight(x, y, z, (byte) 0);
             } else {
-                // Stop at opaque blocks
-                break;
+                setSunlight(x, y, z, (byte) 0);
+                covered = true;
             }
         }
 
-        _dirty = true;
         _lightDirty = true;
     }
 
@@ -1002,15 +1024,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
                 for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
-                    // Calculate the light propagationfor each translucent block in each direction
-                    // On direction for each of the six sides of the blocks
-                    if (Block.getBlock(getBlock(x, y, z)).isBlockTypeTranslucent()) {
-                        propagateLightIntoDirection(x, y, z, 1, 0, 0);
-                        propagateLightIntoDirection(x, y, z, -1, 0, 0);
-                        propagateLightIntoDirection(x, y, z, 0, 1, 0);
-                        propagateLightIntoDirection(x, y, z, 0, -1, 0);
-                        propagateLightIntoDirection(x, y, z, 0, 0, 1);
-                        propagateLightIntoDirection(x, y, z, 0, 0, -1);
+                    byte lightValue = getLight(x, y, z);
+                    if (Block.getBlock(getBlock(x, y, z)).isBlockTypeTranslucent() && lightValue > 0) {
+                        propagateLight(x, y, z, lightValue, 0);
                     }
 
                 }
@@ -1021,43 +1037,159 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * Propagates light from a given block position 16 blocks into a specific direction.
      * 
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
-     * @param dirX Direction on the x-axis
-     * @param dirY Direction on the y-axis
-     * @param dirZ Direction on the z-axis
+     * @param x
+     * @param y
+     * @param z
+     * @param oldLightValue 
      */
-    private void propagateLightIntoDirection(int x, int y, int z, int dirX, int dirY, int dirZ) {
+    public void unpropagateLight(int x, int y, int z, byte oldLightValue) {
+        unpropagateLight(x, y, z, oldLightValue, 0);
+    }
+
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param dirX
+     * @param dirY
+     * @param dirZ
+     * @param oldLightValue 
+     */
+    public void unpropagateLight(int x, int y, int z, byte oldLightValue, int depth) {
+        if (depth >= 16) {
+            return;
+        }
+        
         int blockPosX = getBlockWorldPosX(x);
         int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
 
-        byte originLightValue = getLight(x, y, z);
+        byte blockType = _parent.getBlock(blockPosX, blockPosY, blockPosZ);
 
-        if (originLightValue == 0) {
+        if ((!Block.getBlock(blockType).isBlockTypeTranslucent() && depth > 0)) {
             return;
         }
 
-        for (int i = 1; i <= originLightValue; i++) {
-            byte blockType = _parent.getBlock(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ));
-
-            if (!Block.getBlock(blockType).isBlockTypeTranslucent()) {
-                break;
-            }
-
-            byte newLightValue = (byte) (originLightValue - Math.abs(i));
-            byte lightValue = _parent.getLight(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ));
-
-            if (newLightValue > lightValue) {
-                _parent.setLight(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ), newLightValue);
-            } else {
-                // Stop if a light value is found, which is more intense than the propagating light value
-                break;
-            }
+        if (oldLightValue <= 0) {
+            return;
         }
+
+        _parent.setSunlight(blockPosX, blockPosY, blockPosZ, (byte) 0);
+
+        byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ);
+
+        if (val1 < oldLightValue && val1 > 0) {
+            _parent.unpropagateLight(blockPosX + 1, blockPosY, blockPosZ, oldLightValue, ++depth);
+        }
+
+        byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ);
+
+        if (val2 < oldLightValue && val2 > 0) {
+            _parent.unpropagateLight(blockPosX - 1, blockPosY, blockPosZ, oldLightValue, ++depth);
+        }
+
+        byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1);
+
+        if (val3 < oldLightValue && val3 > 0) {
+            _parent.unpropagateLight(blockPosX, blockPosY, blockPosZ + 1, oldLightValue, ++depth);
+        }
+
+        byte val4 = _parent.getLight(blockPosX, blockPosY, blockPosZ - 1);
+
+        if (val4 < oldLightValue && val4 > 0) {
+            _parent.unpropagateLight(blockPosX, blockPosY, blockPosZ - 1, oldLightValue, ++depth);
+        }
+
+        byte val5 = _parent.getLight(blockPosX, blockPosY + 1, blockPosZ);
+
+        if (val5 < oldLightValue && val5 > 0) {
+            _parent.unpropagateLight(blockPosX, blockPosY + 1, blockPosZ, oldLightValue, ++depth);
+        }
+
+        byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ);
+
+        if (val6 < oldLightValue && val6 > 0) {
+            _parent.unpropagateLight(blockPosX, blockPosY - 1, blockPosZ, oldLightValue, ++depth);
+        }
+
+        _lightDirty = true;
+    }
+
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param lightValue 
+     */
+    public void propagateLight(int x, int y, int z, byte lightValue) {
+        propagateLight(x, y, z, lightValue, 0);
+    }
+
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param lightValue
+     * @param depth 
+     */
+    public void propagateLight(int x, int y, int z, byte lightValue, int depth) {
+        if (depth >= 4) {
+            return;
+        }
+
+        int blockPosX = getBlockWorldPosX(x);
+        int blockPosY = getBlockWorldPosY(y);
+        int blockPosZ = getBlockWorldPosZ(z);
+
+        // Ignore solid blocks
+        byte blockType = _parent.getBlock(blockPosX, blockPosY, blockPosZ);
+        if (!Block.getBlock(blockType).isBlockTypeTranslucent()) {
+            return;
+        }
+
+        // If the new light value is less than 0 we are done!
+        byte newLightValue = (byte) (lightValue - depth);
+        if (newLightValue < 0) {
+            return;
+        }
+
+        _parent.setSunlight(blockPosX, blockPosY, blockPosZ, newLightValue);
+
+        byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ);
+        if (val1 < newLightValue - 1) {
+            _parent.propagateLight(blockPosX + 1, blockPosY, blockPosZ, lightValue, ++depth);
+        }
+
+        byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ);
+        if (val2 < newLightValue - 1) {
+            _parent.propagateLight(blockPosX - 1, blockPosY, blockPosZ, lightValue, ++depth);
+        }
+
+        byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1);
+        if (val3 < newLightValue - 1) {
+            _parent.propagateLight(blockPosX, blockPosY, blockPosZ + 1, lightValue, ++depth);
+        }
+
+        byte val4 = _parent.getLight(blockPosX, blockPosY, blockPosZ - 1);
+        if (val4 < newLightValue - 1) {
+            _parent.propagateLight(blockPosX, blockPosY, blockPosZ - 1, lightValue, ++depth);
+        }
+
+        byte val5 = _parent.getLight(blockPosX, blockPosY + 1, blockPosZ);
+        if (val5 < newLightValue - 1) {
+            _parent.propagateLight(blockPosX, blockPosY + 1, blockPosZ, lightValue, ++depth);
+        }
+
+        byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ);
+        if (val6 < newLightValue - 1) {
+            _parent.propagateLight(blockPosX, blockPosY - 1, blockPosZ, lightValue, ++depth);
+        }
+
+        _lightDirty = true;
     }
 
     /**
@@ -1086,6 +1218,16 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public double calcDistanceToPlayer() {
         double distance = Math.sqrt(Math.pow(_parent.getPlayer().getPosition().x - getChunkWorldPosX(), 2) + Math.pow(_parent.getPlayer().getPosition().z - getChunkWorldPosZ(), 2));
+
+        // Update the chunks in direction of the player first
+//        double weight = Vector3f.dot(_position.normalise(null), _parent.getPlayer().getViewDirection().normalise(null));
+//
+//        if (weight <= 0d) {
+//            distance = Double.MAX_VALUE;
+//        } else {
+//            distance /= weight;
+//        }
+
         return distance;
     }
 
@@ -1099,7 +1241,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public byte getLight(int x, int y, int z) {
         try {
-            return _light[x][y][z];
+            return (byte) Math.max(_light[x][y][z], _sunlight[x][y][z]);
         } catch (Exception e) {
             return -1;
         }
@@ -1113,9 +1255,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param z Local block position on the z-axis
      * @param intens The light intensity to set
      */
-    public void setLight(int x, int y, int z, byte intens) {
+    public void setSunlight(int x, int y, int z, byte intens) {
         try {
-            _light[x][y][z] = intens;
+            _sunlight[x][y][z] = intens;
             _dirty = true;
             _lightDirty = true;
             // Mark the neighbors as dirty
@@ -1153,7 +1295,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             _blocks[x][y][z] = type;
             // Update vertex arrays and light
             _dirty = true;
-            _lightDirty = true;
             // Mark the neighbors as dirty
             markNeighborsDirty(x, z);
         } catch (Exception e) {
@@ -1213,6 +1354,26 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
+     * 
+     */
+    public void markNeighborsDirty() {
+        Chunk[] neighbors = getNeighbors();
+
+        if (neighbors[1] != null) {
+            neighbors[1]._dirty = true;
+        }
+        if (neighbors[0] != null) {
+            neighbors[0]._dirty = true;
+        }
+        if (neighbors[3] != null) {
+            neighbors[3]._dirty = true;
+        }
+        if (neighbors[2] != null) {
+            neighbors[2]._dirty = true;
+        }
+    }
+
+    /**
      * Marks those neighbors of a chunk dirty, that are adjacent to
      * the given block coordinate.
      * 
@@ -1222,22 +1383,22 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public void markNeighborsDirty(int x, int z) {
         Chunk[] neighbors = getNeighbors();
 
-        if (x == 0) {
+        if (x == 0 && neighbors[1] != null) {
             neighbors[1]._dirty = true;
             neighbors[1]._lightDirty = true;
         }
 
-        if (x == Configuration.CHUNK_DIMENSIONS.x - 1) {
+        if (x == Configuration.CHUNK_DIMENSIONS.x - 1 && neighbors[0] != null) {
             neighbors[0]._dirty = true;
             neighbors[0]._lightDirty = true;
         }
 
-        if (z == 0) {
+        if (z == 0 && neighbors[3] != null) {
             neighbors[3]._dirty = true;
             neighbors[3]._lightDirty = true;
         }
 
-        if (z == Configuration.CHUNK_DIMENSIONS.z - 1) {
+        if (z == Configuration.CHUNK_DIMENSIONS.z - 1 && neighbors[2] != null) {
             neighbors[2]._dirty = true;
             neighbors[2]._lightDirty = true;
         }
@@ -1279,5 +1440,91 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     @Override
     public String toString() {
         return String.format("Chunk (%d) at %s.", _chunkID, _position);
+    }
+
+    /**
+     * Saves this chunk to the disk.
+     */
+    public boolean writeChunkToDisk() {
+        // Don't save fresh chunks
+        if (_fresh) {
+            return false;
+        }
+
+        ByteBuffer output = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3);
+
+        File dir = new File(String.format("%s", _parent.getTitle()));
+
+        // Create directory (if it does not exist)
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+
+        File f = new File(String.format("%s/%d.bc", _parent.getTitle(), Helper.getInstance().cantorize((int) _position.x, (int) _position.z)));
+
+        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
+                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+                    output.put(_blocks[x][y][z]);
+                    output.put(_sunlight[x][y][z]);
+                    output.put(_light[x][y][z]);
+                }
+            }
+        }
+
+        output.rewind();
+
+        try {
+            FileOutputStream oS = new FileOutputStream(f);
+            FileChannel c = oS.getChannel();
+            c.write(output);
+            oS.close();
+            return true;
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return false;
+    }
+
+    /**
+     * Loads this chunk from the disk (if present).
+     */
+    public boolean loadChunkFromFile() {
+        ByteBuffer input = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3);
+        File f = new File(String.format("%s/%d.bc", _parent.getTitle(), Helper.getInstance().cantorize((int) _position.x, (int) _position.z)));
+
+        if (!f.exists()) {
+            return false;
+        }
+
+        try {
+            FileInputStream iS = new FileInputStream(f);
+            FileChannel c = iS.getChannel();
+            c.read(input);
+            iS.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        } catch (IOException ex) {
+            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+
+        input.rewind();
+
+        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
+                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+                    _blocks[x][y][z] = input.get();
+                    _sunlight[x][y][z] = input.get();
+                    _light[x][y][z] = input.get();
+                }
+            }
+        }
+
+        return true;
     }
 }

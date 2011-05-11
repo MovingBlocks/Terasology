@@ -106,11 +106,12 @@ public final class Configuration {
         _settingsBoolean.put("ENABLE_BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);
+        _settingsBoolean.put("DISABLE_LIGHT_UPDATES", false);
         _settingsNumeric.put("JUMP_INTENSITY", 10f);
         _settingsNumeric.put("MAX_GRAVITY", 64f);
         _settingsNumeric.put("WALKING_SPEED", 1.5f);
-        _settingsNumeric.put("RUNNING_FACTOR", 2f);
-        _settingsNumeric.put("PLAYER_HEIGHT", 1.1f);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.2f);
+        _settingsNumeric.put("PLAYER_HEIGHT", 0.8f);
         _settingsNumeric.put("GRAVITY", 0.05f);
         _settingsNumeric.put("FRICTION", 0.05f);
     }
