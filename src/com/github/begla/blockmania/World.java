@@ -476,9 +476,9 @@ public final class World extends RenderableObject {
 
             // Queue the chunk for update
             if (update) {
-                byte oldValue = getLight(x, y, z);
+                //byte oldValue = getLight(x, y, z);
                 c.calcSunlightAtLocalPos(blockPosX, blockPosZ);
-//                unpropagateLight(x, y, z, oldValue, 0);
+                //unpropagateLight(x, y, z, oldValue, 0);
                 queueChunkForUpdate(c);
             }
         }
@@ -580,12 +580,16 @@ public final class World extends RenderableObject {
     }
 
     /**
+     * Recursive light calculation.
+     * 
+     * Too slow!
      * 
      * @param x
      * @param y
      * @param z
      * @param lightValue 
      */
+    @Deprecated
     public void propagateLight(int x, int y, int z, byte lightValue, int depth) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
         int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
@@ -603,12 +607,16 @@ public final class World extends RenderableObject {
     }
 
     /**
+     * Recursive light calculation.
+     * 
+     * Too weird.
      * 
      * @param x
      * @param y
      * @param z
      * @param oldValue 
      */
+    @Deprecated
     public void unpropagateLight(int x, int y, int z, byte oldValue, int depth) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
         int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;

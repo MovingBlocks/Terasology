@@ -1004,9 +1004,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
                     light = (byte) Math.max(0, light);
                 }
             } else if (Block.getBlock(_blocks[x][y][z]).isBlockTypeTranslucent() && covered) {
+                byte lightValue = getLight(x, y, z);
                 setSunlight(x, y, z, (byte) 0);
+                unpropagateLight(x, y, z, lightValue);
             } else {
+                byte lightValue = getLight(x, y, z);
                 setSunlight(x, y, z, (byte) 0);
+                unpropagateLight(x, y, z, lightValue);
                 covered = true;
             }
         }
@@ -1025,10 +1029,14 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
                 for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y > 0; y--) {
                     byte lightValue = getLight(x, y, z);
-                    if (Block.getBlock(getBlock(x, y, z)).isBlockTypeTranslucent() && lightValue > 0) {
-                        propagateLight(x, y, z, lightValue, 0);
+                    if (Block.getBlock(getBlock(x, y, z)).isBlockTypeTranslucent() && lightValue > 1) {
+                        propagateLightIntoDirection(x, y, z, 1, 0, 0);
+                        propagateLightIntoDirection(x, y, z, -1, 0, 0);
+                        propagateLightIntoDirection(x, y, z, 0, 1, 0);
+                        propagateLightIntoDirection(x, y, z, 0, -1, 0);
+                        propagateLightIntoDirection(x, y, z, 0, 0, 1);
+                        propagateLightIntoDirection(x, y, z, 0, 0, -1);
                     }
-
                 }
             }
         }
@@ -1058,10 +1066,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param oldLightValue 
      */
     public void unpropagateLight(int x, int y, int z, byte oldLightValue, int depth) {
-        if (depth >= 16) {
+        if (depth > oldLightValue) {
             return;
         }
-        
+
         int blockPosX = getBlockWorldPosX(x);
         int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
@@ -1071,11 +1079,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         if ((!Block.getBlock(blockType).isBlockTypeTranslucent() && depth > 0)) {
             return;
         }
-
-        if (oldLightValue <= 0) {
-            return;
-        }
-
+        
         _parent.setSunlight(blockPosX, blockPosY, blockPosZ, (byte) 0);
 
         byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ);
@@ -1118,17 +1122,60 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
+     * Propagates light from a given block position 16 blocks into a specific direction.
+     * 
+     * @param x Local block position on the x-axis
+     * @param y Local block position on the y-axis
+     * @param z Local block position on the z-axis
+     * @param dirX Direction on the x-axis
+     * @param dirY Direction on the y-axis
+     * @param dirZ Direction on the z-axis
+     */
+    private void propagateLightIntoDirection(int x, int y, int z, int dirX, int dirY, int dirZ) {
+        int blockPosX = getBlockWorldPosX(x);
+        int blockPosY = getBlockWorldPosY(y);
+        int blockPosZ = getBlockWorldPosZ(z);
+
+        byte originLightValue = getLight(x, y, z);
+
+        for (int i = 1; i <= originLightValue; i++) {
+            byte blockType = _parent.getBlock(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ));
+
+            if (!Block.getBlock(blockType).isBlockTypeTranslucent()) {
+                break;
+            }
+
+            byte newLightValue = (byte) (originLightValue - Math.abs(i));
+            byte lightValue = _parent.getLight(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ));
+
+            if (newLightValue > lightValue) {
+                _parent.setSunlight(blockPosX + (i * dirX), blockPosY + (i * dirY), blockPosZ + (i * dirZ), newLightValue);
+            } else {
+                // Stop if a light value is found, which is more intense than the propagating light value
+                break;
+            }
+        }
+    }
+
+    /**
+     * Recursive light calculation.
+     * 
+     * Too slow!
      * 
      * @param x
      * @param y
      * @param z
      * @param lightValue 
      */
+    @Deprecated
     public void propagateLight(int x, int y, int z, byte lightValue) {
         propagateLight(x, y, z, lightValue, 0);
     }
 
     /**
+     * Recursive light calculation.
+     * 
+     * Too slow!
      * 
      * @param x
      * @param y
@@ -1136,8 +1183,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param lightValue
      * @param depth 
      */
+    @Deprecated
     public void propagateLight(int x, int y, int z, byte lightValue, int depth) {
-        if (depth >= 4) {
+        if (depth > lightValue) {
             return;
         }
 
@@ -1145,47 +1193,61 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
 
-        // Ignore solid blocks
-        byte blockType = _parent.getBlock(blockPosX, blockPosY, blockPosZ);
-        if (!Block.getBlock(blockType).isBlockTypeTranslucent()) {
-            return;
+        byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ);
+        byte type1 = _parent.getBlock(blockPosX + 1, blockPosY, blockPosZ);
+        byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ);
+        byte type2 = _parent.getBlock(blockPosX - 1, blockPosY, blockPosZ);
+        byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1);
+        byte type3 = _parent.getBlock(blockPosX, blockPosY, blockPosZ + 1);
+        byte val4 = _parent.getLight(blockPosX, blockPosY, blockPosZ - 1);
+        byte type4 = _parent.getBlock(blockPosX, blockPosY, blockPosZ - 1);
+        byte val5 = _parent.getLight(blockPosX, blockPosY + 1, blockPosZ);
+        byte type5 = _parent.getBlock(blockPosX, blockPosY + 1, blockPosZ);
+        byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ);
+        byte type6 = _parent.getBlock(blockPosX, blockPosY - 1, blockPosZ);
+
+        byte newLightValue = 0;
+
+        if (depth == 0) {
+            // Ignore the initial step
+            newLightValue = lightValue;
+        } else {
+            newLightValue = (byte) (Math.max(Math.max(Math.max(val1, val2), Math.max(val3, val4)), Math.max(val5, val6)) - 1);
         }
 
-        // If the new light value is less than 0 we are done!
-        byte newLightValue = (byte) (lightValue - depth);
-        if (newLightValue < 0) {
+        if (newLightValue > lightValue) {
             return;
         }
+        // byte newLightValue = (byte) (lightValue - depth);
 
         _parent.setSunlight(blockPosX, blockPosY, blockPosZ, newLightValue);
 
-        byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ);
-        if (val1 < newLightValue - 1) {
+        if (val1 < newLightValue - 1 && Block.getBlock(type1).isBlockTypeTranslucent()) {
             _parent.propagateLight(blockPosX + 1, blockPosY, blockPosZ, lightValue, ++depth);
         }
 
-        byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ);
-        if (val2 < newLightValue - 1) {
+
+        if (val2 < newLightValue - 1 && Block.getBlock(type2).isBlockTypeTranslucent()) {
             _parent.propagateLight(blockPosX - 1, blockPosY, blockPosZ, lightValue, ++depth);
         }
 
-        byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1);
-        if (val3 < newLightValue - 1) {
+
+        if (val3 < newLightValue - 1 && Block.getBlock(type3).isBlockTypeTranslucent()) {
             _parent.propagateLight(blockPosX, blockPosY, blockPosZ + 1, lightValue, ++depth);
         }
 
-        byte val4 = _parent.getLight(blockPosX, blockPosY, blockPosZ - 1);
-        if (val4 < newLightValue - 1) {
+
+        if (val4 < newLightValue - 1 && Block.getBlock(type4).isBlockTypeTranslucent()) {
             _parent.propagateLight(blockPosX, blockPosY, blockPosZ - 1, lightValue, ++depth);
         }
 
-        byte val5 = _parent.getLight(blockPosX, blockPosY + 1, blockPosZ);
-        if (val5 < newLightValue - 1) {
+
+        if (val5 < newLightValue - 1 && Block.getBlock(type5).isBlockTypeTranslucent()) {
             _parent.propagateLight(blockPosX, blockPosY + 1, blockPosZ, lightValue, ++depth);
         }
 
-        byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ);
-        if (val6 < newLightValue - 1) {
+
+        if (val6 < newLightValue - 1 && Block.getBlock(type6).isBlockTypeTranslucent()) {
             _parent.propagateLight(blockPosX, blockPosY - 1, blockPosZ, lightValue, ++depth);
         }
 
