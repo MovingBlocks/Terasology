@@ -186,4 +186,9 @@ public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
     public Vector3f getBlockPos() {
         return blockPos;
     }
+
+    @Override
+    public String toString() {
+        return String.format("x: %.2f y: %.2f z: %.2f", blockPos.x, blockPos.y, blockPos.z);
+    }
 }

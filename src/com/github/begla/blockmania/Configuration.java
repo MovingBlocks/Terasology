@@ -16,7 +16,15 @@
  */
 package com.github.begla.blockmania;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -100,20 +108,7 @@ public final class Configuration {
     public static final HashMap<String, Boolean> _settingsBoolean = new HashMap<String, Boolean>();
 
     static {
-        _settingsBoolean.put("SHOW_PLACING_BOX", true);
-        _settingsBoolean.put("SHOW_CHUNK_OUTLINES", false);
-        _settingsBoolean.put("SHOW_HUD", true);
-        _settingsBoolean.put("ENABLE_BOBBING", true);
-        _settingsBoolean.put("DEMO_FLIGHT", false);
-        _settingsBoolean.put("GOD_MODE", false);
-        _settingsBoolean.put("DISABLE_LIGHT_UPDATES", false);
-        _settingsNumeric.put("JUMP_INTENSITY", 10f);
-        _settingsNumeric.put("MAX_GRAVITY", 64f);
-        _settingsNumeric.put("WALKING_SPEED", 1.5f);
-        _settingsNumeric.put("RUNNING_FACTOR", 1.2f);
-        _settingsNumeric.put("PLAYER_HEIGHT", 0.8f);
-        _settingsNumeric.put("GRAVITY", 0.05f);
-        _settingsNumeric.put("FRICTION", 0.05f);
+        loadSettings();
     }
 
     /**
@@ -146,7 +141,7 @@ public final class Configuration {
         _settingsBoolean.put(key, value);
     }
 
-     /**
+    /**
      * Sets a numeric settings value for a given key.
      *
      * @param key The key
@@ -154,5 +149,26 @@ public final class Configuration {
      */
     public static void setSetting(String key, Float value) {
         _settingsNumeric.put(key, value);
+    }
+
+    public static void loadDefaults() {
+        _settingsBoolean.put("SHOW_PLACING_BOX", true);
+        _settingsBoolean.put("SHOW_CHUNK_OUTLINES", false);
+        _settingsBoolean.put("SHOW_HUD", true);
+        _settingsBoolean.put("ENABLE_BOBBING", true);
+        _settingsBoolean.put("DEMO_FLIGHT", false);
+        _settingsBoolean.put("GOD_MODE", false);
+        _settingsBoolean.put("DISABLE_LIGHT_UPDATES", false);
+        _settingsNumeric.put("JUMP_INTENSITY", 10f);
+        _settingsNumeric.put("MAX_GRAVITY", 64f);
+        _settingsNumeric.put("WALKING_SPEED", 1.5f);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.2f);
+        _settingsNumeric.put("PLAYER_HEIGHT", 0.8f);
+        _settingsNumeric.put("GRAVITY", 0.05f);
+        _settingsNumeric.put("FRICTION", 0.05f);
+    }
+
+    public static void loadSettings() {
+        loadDefaults();
     }
 }

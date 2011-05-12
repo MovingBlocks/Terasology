@@ -231,6 +231,15 @@ public final class Player extends RenderableObject {
         return null;
     }
 
+    public String selectedBlockInformation() {
+        RayFaceIntersection r = calcSelectedBlock();
+        Vector3f bp = r.getBlockPos();
+        byte blockType =  _parent.getBlock((int) bp.x, (int) bp.y, (int) bp.z);
+        byte blockLight =  _parent.getLight((int) bp.x, (int) bp.y, (int) bp.z);
+        
+        return String.format("%s (t: %d, l: %d) ", r, blockType, blockLight);
+    }
+
     /**
      * Places a block of a given type in front of the player.
      *
@@ -555,7 +564,7 @@ public final class Player extends RenderableObject {
     public Vector3f getViewDirection() {
         return _viewDirection;
     }
-    
+
     /**
      * Cycles the selected block type.
      * 

@@ -299,9 +299,18 @@ public final class Main {
         _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount(), Color.white));
 
         if (_showDebugConsole) {
+//            glBegin(GL_QUADS);
+//            glColor4f(0f, 0f, 0f, 1f);
+//            glVertex2f(0f, 0f);
+//            glVertex2f(Display.getDisplayMode().getWidth(), 0f);
+//            glVertex2f(Display.getDisplayMode().getWidth(), -20f);
+//            glVertex2f(0f, -20f);
+//            glEnd();
+
             // Display the console input text
             _font1.drawString(4, Configuration.DISPLAY_HEIGHT - 16 - 4, String.format("%s_", _consoleInput), Color.red);
         }
+
 
         glDisable(GL_TEXTURE_2D);
 
@@ -439,6 +448,9 @@ public final class Main {
                 success = true;
             } else if (parsingResult.get(0).equals("exit!")) {
                 System.exit(0);
+                success = true;
+            } else if (parsingResult.get(0).equals("i")) {
+                _logger.log(Level.INFO, _player.selectedBlockInformation());
                 success = true;
             }
         } catch (Exception e) {

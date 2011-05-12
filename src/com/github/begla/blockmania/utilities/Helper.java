@@ -87,4 +87,14 @@ public class Helper {
     public int cantorize(int k1, int k2) {
         return ((k1 + k2) * (k1 + k2 + 1) / 2) + k2;
     }
+
+    public int cantorX(int z) {
+        int j = (int) Math.floor(Math.sqrt(0.25 + 2 * z) - 0.5);
+        return j - cantorY(z);
+    }
+
+    public int cantorY(int z) {
+        int j = (int) Math.floor(Math.sqrt(0.25 + 2 * z) - 0.5);
+        return z - j * (j + 1) / 2;
+    }
 }
