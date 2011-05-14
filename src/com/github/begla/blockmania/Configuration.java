@@ -39,7 +39,7 @@ public final class Configuration {
      * 16x1x16 seems to be a good value. With a chunk size of 16x128x16 there are 8.388.608 blocks
      * present at the same time.
      */
-    public static final Vector3f VIEWING_DISTANCE_IN_CHUNKS = new Vector3f(16.0f, 1.0f, 16.0f);
+    public static final Vector2f VIEWING_DISTANCE_IN_CHUNKS = new Vector2f(16.0f, 16.0f);
     /**
      * The dimensions of a chunk.
      */
@@ -157,7 +157,7 @@ public final class Configuration {
         _settingsNumeric.put("JUMP_INTENSITY", 10f);
         _settingsNumeric.put("MAX_GRAVITY", 64f);
         _settingsNumeric.put("WALKING_SPEED", 1.5f);
-        _settingsNumeric.put("RUNNING_FACTOR", 1.2f);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.6f);
         _settingsNumeric.put("PLAYER_HEIGHT", 0.8f);
         _settingsNumeric.put("GRAVITY", 0.05f);
         _settingsNumeric.put("FRICTION", 0.05f);

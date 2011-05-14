@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.generators.ChunkGeneratorForest;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
@@ -64,7 +65,7 @@ public final class World extends RenderableObject {
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
     /* ------ */
-    private Chunk[][][] _chunks;
+    private Chunk[][] _chunks;
     /* ------ */
     private final List<Chunk> _chunkUpdateQueueDL = Collections.synchronizedList(new LinkedList<Chunk>());
     private final List<Chunk> _chunkUpdateNormal = Collections.synchronizedList(new LinkedList<Chunk>());
@@ -88,7 +89,7 @@ public final class World extends RenderableObject {
      */
     public World(String title, String seed, Player p) {
         this._player = p;
-        _chunks = new Chunk[(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z];
+        _chunks = new Chunk[(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y];
 
         _title = title;
 
@@ -104,9 +105,9 @@ public final class World extends RenderableObject {
         _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
 
         for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
+            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
                 Chunk c = loadOrCreateChunk(x, z);
-                _chunks[x][0][z] = c;
+                _chunks[x][z] = c;
                 queueChunkForUpdate(c);
             }
         }
@@ -289,15 +290,15 @@ public final class World extends RenderableObject {
     private void updateInfWorld() {
 
         for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
-                Chunk c = getChunk(x, 0, z);
+            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
+                Chunk c = getChunk(x, z);
                 if (c != null) {
                     Vector3f pos = new Vector3f(x, 0, z);
-                    int multZ = (int) calcPlayerChunkOffsetZ() / (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z + 1;
-                    if (z < calcPlayerChunkOffsetZ() % Configuration.VIEWING_DISTANCE_IN_CHUNKS.z) {
-                        pos.z += Configuration.VIEWING_DISTANCE_IN_CHUNKS.z * multZ;
+                    int multZ = (int) calcPlayerChunkOffsetZ() / (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y + 1;
+                    if (z < calcPlayerChunkOffsetZ() % Configuration.VIEWING_DISTANCE_IN_CHUNKS.y) {
+                        pos.z += Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * multZ;
                     } else {
-                        pos.z += Configuration.VIEWING_DISTANCE_IN_CHUNKS.z * (multZ - 1);
+                        pos.z += Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * (multZ - 1);
                     }
                     int multX = (int) calcPlayerChunkOffsetX() / (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x + 1;
                     if (x < calcPlayerChunkOffsetX() % Configuration.VIEWING_DISTANCE_IN_CHUNKS.x) {
@@ -312,7 +313,7 @@ public final class World extends RenderableObject {
                         // Try to load a cached version of the chunk
                         c = loadOrCreateChunk((int) pos.x, (int) pos.z);
                         // Replace the old chunk
-                        _chunks[x][0][z] = c;
+                        _chunks[x][z] = c;
                         queueChunkForUpdate(c);
                     }
                 }
@@ -325,12 +326,10 @@ public final class World extends RenderableObject {
      */
     public void updateAllChunks() {
         for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-            for (int y = 0; y < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; y++) {
-                for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
-                    Chunk c = getChunk(x, y, z);
+                for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
+                    Chunk c = getChunk(x, z);
                     queueChunkForUpdate(c);
                 }
-            }
         }
     }
 
@@ -359,7 +358,7 @@ public final class World extends RenderableObject {
          */
         glPushMatrix();
         // Position the sun relatively to the player
-        glTranslatef(_player.getPosition().x, Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * Configuration.CHUNK_DIMENSIONS.y * 0.75f, Configuration.VIEWING_DISTANCE_IN_CHUNKS.z * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
+        glTranslatef(_player.getPosition().x, Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * Configuration.CHUNK_DIMENSIONS.y * 0.75f, Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
 
         // Disable fog
         glDisable(GL_FOG);
@@ -395,16 +394,16 @@ public final class World extends RenderableObject {
          * Render all active chunks.
          */
         for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
-                Chunk c = getChunk(x, 0, z);
+            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
+                Chunk c = getChunk(x, z);
                 if (c != null) {
                     c.render(false);
                 }
             }
         }
         for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z; z++) {
-                Chunk c = getChunk(x, 0, z);
+            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
+                Chunk c = getChunk(x, z);
                 if (c != null) {
                     c.render(true);
                 }
@@ -438,16 +437,6 @@ public final class World extends RenderableObject {
     /**
      * Returns the chunk position of a given coordinate.
      *
-     * @param y The Y-coordinate of the block
-     * @return The Y-coordinate of the vchunk
-     */
-    private int calcChunkPosY(int y) {
-        return (y / (int) Configuration.CHUNK_DIMENSIONS.y);
-    }
-
-    /**
-     * Returns the chunk position of a given coordinate.
-     *
      * @param z The Z-coordinate of the block
      * @return The Z-coordinate of the chunk
      */
@@ -470,24 +459,12 @@ public final class World extends RenderableObject {
     /**
      * Returns the internal position of a block within a chunk.
      *
-     * @param x1 The Y-coordinate of the block within the world
-     * @param x2 The Y-coordinate of the chunk within the world
-     * @return The Y-coordinate of the block within the chunk
-     */
-    private int calcBlockPosY(int y1, int y2) {
-        y1 = y1 % ((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * (int) Configuration.CHUNK_DIMENSIONS.y);
-        return (y1 - (y2 * (int) Configuration.CHUNK_DIMENSIONS.y));
-    }
-
-    /**
-     * Returns the internal position of a block within a chunk.
-     *
      * @param x1 The Z-coordinate of the block within the world
      * @param x2 The Z-coordinate of the chunk within the world
      * @return The Z-coordinate of the block within the chunk
      */
     private int calcBlockPosZ(int z1, int z2) {
-        z1 = z1 % ((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z * (int) Configuration.CHUNK_DIMENSIONS.z);
+        z1 = z1 % ((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * (int) Configuration.CHUNK_DIMENSIONS.z);
         return (z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
     }
 
@@ -503,27 +480,25 @@ public final class World extends RenderableObject {
      */
     public final void setBlock(int x, int y, int z, byte type, boolean update, boolean overwrite) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosY = calcBlockPosY(y, chunkPosY);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         try {
             Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
-            if (overwrite || c.getBlock(blockPosX, blockPosY, blockPosZ) == 0) {
-                c.setBlock(blockPosX, blockPosY, blockPosZ, type);
+            if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0) {
+                c.setBlock(blockPosX, y, blockPosZ, type);
 
                 if (update) {
                     byte oldValue = getLight(x, y, z);
                     c.calcSunlightAtLocalPos(blockPosX, blockPosZ, true);
-                    c.refreshLightAtLocalPos(blockPosX, blockPosY, blockPosZ);
+                    c.refreshLightAtLocalPos(blockPosX, y, blockPosZ);
                     byte newValue = getLight(x, y, z);
 
                     if (newValue > oldValue) {
-                        c.spreadLight(blockPosX, blockPosY, blockPosZ, newValue);
+                        c.spreadLight(blockPosX, y, blockPosZ, newValue);
                     } else if (newValue < oldValue) {
                         //c.unspreadLight(blockPosX, blockPosY, blockPosZ, oldValue);
                     }
@@ -542,11 +517,11 @@ public final class World extends RenderableObject {
      * @param z The Z-coordinate
      * @return The chunk
      */
-    public final Chunk getChunk(int x, int y, int z) {
+    public final Chunk getChunk(int x, int z) {
         Chunk c = null;
 
         try {
-            c = _chunks[x % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x][y % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y][z % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z];
+            c = _chunks[x % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x][z % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y];
         } catch (Exception e) {
         }
 
@@ -563,16 +538,14 @@ public final class World extends RenderableObject {
      */
     public final byte getBlock(int x, int y, int z) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosY = calcBlockPosY(y, chunkPosY);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         try {
             Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-            return c.getBlock(blockPosX, blockPosY, blockPosZ);
+            return c.getBlock(blockPosX, y, blockPosZ);
         } catch (Exception e) {
         }
 
@@ -589,16 +562,14 @@ public final class World extends RenderableObject {
      */
     public final byte getLight(int x, int y, int z) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosY = calcBlockPosY(y, chunkPosY);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         try {
             Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-            return c.getLight(blockPosX, blockPosY, blockPosZ);
+            return c.getLight(blockPosX, y, blockPosZ);
         } catch (Exception e) {
         }
 
@@ -615,16 +586,14 @@ public final class World extends RenderableObject {
      */
     public void setSunlight(int x, int y, int z, byte intens) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosY = calcBlockPosY(y, chunkPosY);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         try {
             Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-            c.setSunlight(blockPosX, blockPosY, blockPosZ, intens);
+            c.setSunlight(blockPosX, y, blockPosZ, intens);
         } catch (Exception e) {
         }
     }
@@ -642,16 +611,14 @@ public final class World extends RenderableObject {
      */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosY = calcBlockPosY(y, chunkPosY);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         try {
             Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-            c.spreadLight(blockPosX, blockPosY, blockPosZ, lightValue, depth);
+            c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth);
         } catch (Exception e) {
         }
     }
@@ -669,16 +636,14 @@ public final class World extends RenderableObject {
      */
     public void unspreadLight(int x, int y, int z, byte oldValue, int depth) {
         int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
-        int chunkPosY = calcChunkPosY(y) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
-        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.z;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosY = calcBlockPosY(y, chunkPosY);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         try {
             Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-            c.unspreadLight(blockPosX, blockPosY, blockPosZ, oldValue, depth);
+            c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth);
         } catch (Exception e) {
         }
     }
@@ -774,15 +739,15 @@ public final class World extends RenderableObject {
      */
     public ArrayList<RayFaceIntersection> rayBlockIntersection(int x, int y, int z, Vector3f origin, Vector3f ray) {
         /*
-         * If the block is made out of air... panic and get out of here. Fast.
+         * Ignore invisible blocks.
          */
-        if (getBlock(x, y, z) == 0) {
+        if (Block.getBlock(getBlock(x, y, z)).isBlockInvisible()) {
             return null;
         }
 
         ArrayList<RayFaceIntersection> result = new ArrayList<RayFaceIntersection>();
 
-        /**
+        /*
          * Fetch all vertices of the specified block.
          */
         Vector3f[] vertices = verticesForBlockAt(x, y, z);
@@ -897,7 +862,7 @@ public final class World extends RenderableObject {
         }
 
         // Try to load the chunk directly
-        Chunk c = getChunk(x, 0, z);
+        Chunk c = getChunk(x, z);
 
         // Okay, found a chunk
         if (c != null) {
@@ -1126,7 +1091,7 @@ public final class World extends RenderableObject {
      */
     public boolean isChunkVisible(Chunk c) {
         if (c.getPosition().x >= calcChunkPosX((int) _player.getPosition().x) - Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2 && c.getPosition().x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2 + calcChunkPosX((int) _player.getPosition().x)) {
-            if (c.getPosition().z >= calcChunkPosZ((int) _player.getPosition().z) - Configuration.VIEWING_DISTANCE_IN_CHUNKS.z / 2 && c.getPosition().z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.z / 2 + calcChunkPosZ((int) _player.getPosition().z)) {
+            if (c.getPosition().z >= calcChunkPosZ((int) _player.getPosition().z) - Configuration.VIEWING_DISTANCE_IN_CHUNKS.y / 2 && c.getPosition().z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y / 2 + calcChunkPosZ((int) _player.getPosition().z)) {
 
                 return true;
             }

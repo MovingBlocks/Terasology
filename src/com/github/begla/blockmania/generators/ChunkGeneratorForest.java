@@ -92,7 +92,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      */
     protected float calcForestDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen1.noise(0.004f * x, 0.004f * y, 0.004f * z);
+        result += _pGen3.noise(0.04f * x, 0.04f * y, 0.04f * z);
         return result;
     }
 
@@ -105,7 +105,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      */
     protected float calcGrassDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen1.noise(0.8f * x, 0.8f * y, 0.8f * z);
+        result += _pGen3.noise(0.8f * x, 0.8f * y, 0.8f * z);
         return result;
     }
 }
