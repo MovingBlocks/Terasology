@@ -160,7 +160,7 @@ public final class Configuration {
         _settingsNumeric.put("RUNNING_FACTOR", 1.6f);
         _settingsNumeric.put("PLAYER_HEIGHT", 0.8f);
         _settingsNumeric.put("GRAVITY", 0.05f);
-        _settingsNumeric.put("FRICTION", 0.05f);
+        _settingsNumeric.put("FRICTION", 0.01f);
     }
 
     /**

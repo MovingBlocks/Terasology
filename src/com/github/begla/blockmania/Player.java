@@ -473,15 +473,15 @@ public final class Player extends RenderableObject {
          * Slowdown the speed of the player each time this method is called.
          */
         if (Math.abs(_accVector.y) > 0f) {
-            _accVector.y += -1f * _accVector.y * Configuration.getSettingNumeric("FRICTION");
+            _accVector.y += -1f * _accVector.y * Configuration.getSettingNumeric("FRICTION") * delta;
         }
 
         if (Math.abs(_accVector.x) > 0f) {
-            _accVector.x += -1f * _accVector.x * Configuration.getSettingNumeric("FRICTION");
+            _accVector.x += -1f * _accVector.x * Configuration.getSettingNumeric("FRICTION") * delta;
         }
 
         if (Math.abs(_accVector.z) > 0f) {
-            _accVector.z += -1f * _accVector.z * Configuration.getSettingNumeric("FRICTION");
+            _accVector.z += -1f * _accVector.z * Configuration.getSettingNumeric("FRICTION") * delta;
         }
 
         if (Math.abs(_accVector.x) > _wSpeed || Math.abs(_accVector.z) > _wSpeed || Math.abs(_accVector.z) > _wSpeed) {
