@@ -16,16 +16,9 @@
  */
 package com.github.begla.blockmania;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.lwjgl.opengl.PixelFormat;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -39,7 +32,7 @@ public final class Configuration {
     /**
      * The title of the game.
      */
-    public static final String GAME_TITLE = "Blockmania Alpha v0.02";
+    public static final String GAME_TITLE = "Blockmania Pre Alpha";
     /**
      * The viewing distance in chunks.
      *
@@ -151,6 +144,9 @@ public final class Configuration {
         _settingsNumeric.put(key, value);
     }
 
+    /**
+     * 
+     */
     public static void loadDefaults() {
         _settingsBoolean.put("SHOW_PLACING_BOX", true);
         _settingsBoolean.put("SHOW_CHUNK_OUTLINES", false);
@@ -158,7 +154,6 @@ public final class Configuration {
         _settingsBoolean.put("ENABLE_BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);
-        _settingsBoolean.put("DISABLE_LIGHT_UPDATES", false);
         _settingsNumeric.put("JUMP_INTENSITY", 10f);
         _settingsNumeric.put("MAX_GRAVITY", 64f);
         _settingsNumeric.put("WALKING_SPEED", 1.5f);
@@ -168,6 +163,9 @@ public final class Configuration {
         _settingsNumeric.put("FRICTION", 0.05f);
     }
 
+    /**
+     * 
+     */
     public static void loadSettings() {
         loadDefaults();
     }

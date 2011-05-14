@@ -231,6 +231,10 @@ public final class Player extends RenderableObject {
         return null;
     }
 
+    /**
+     * 
+     * @return
+     */
     public String selectedBlockInformation() {
         RayFaceIntersection r = calcSelectedBlock();
         Vector3f bp = r.getBlockPos();

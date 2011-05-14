@@ -28,7 +28,7 @@ public final class PlacingBox extends RenderableObject {
     @Override
     public void render() {
         glLineWidth(2f);
-        glColor4f(0.25f, 0.25f, 0.25f, 1.0f);
+        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 
         // FRONT
         glBegin(GL_LINE_LOOP);

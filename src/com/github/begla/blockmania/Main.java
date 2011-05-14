@@ -299,14 +299,6 @@ public final class Main {
         _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount(), Color.white));
 
         if (_showDebugConsole) {
-//            glBegin(GL_QUADS);
-//            glColor4f(0f, 0f, 0f, 1f);
-//            glVertex2f(0f, 0f);
-//            glVertex2f(Display.getDisplayMode().getWidth(), 0f);
-//            glVertex2f(Display.getDisplayMode().getWidth(), -20f);
-//            glVertex2f(0f, -20f);
-//            glEnd();
-
             // Display the console input text
             _font1.drawString(4, Configuration.DISPLAY_HEIGHT - 16 - 4, String.format("%s_", _consoleInput), Color.red);
         }
@@ -368,7 +360,7 @@ public final class Main {
                     char c = Keyboard.getEventCharacter();
 
                     try {
-                        if (c >= 'a' && c < 'z' || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.') {
+                        if (c >= 'a' && c < 'z' || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.' || c == '!') {
                             _consoleInput.append(c);
                         }
                     } catch (Exception e) {
@@ -443,7 +435,7 @@ public final class Main {
                 _player.setPosition(new Vector3f(x, y, z));
                 success = true;
             } else if (parsingResult.get(0).equals("exit")) {
-                _world.writeAllChunksToDisk();
+                _world.dispose();
                 System.exit(0);
                 success = true;
             } else if (parsingResult.get(0).equals("exit!")) {
@@ -451,6 +443,28 @@ public final class Main {
                 success = true;
             } else if (parsingResult.get(0).equals("i")) {
                 _logger.log(Level.INFO, _player.selectedBlockInformation());
+                success = true;
+            } else if (parsingResult.get(0).equals("generate_new_world")) {
+                String worldSeed = _rand.randomCharacterString(16);
+                
+                if (parsingResult.size() > 1) {
+                    worldSeed = parsingResult.get(1);
+                }
+                
+                _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", worldSeed);
+                _world.dispose();
+                _world = new World("", worldSeed, _player);
+                // Link the player to the world
+                _player.setParent(_world);
+                _world.startUpdateThread();
+                success = true;
+            } else if (parsingResult.get(0).equals("chunk_information")) {
+                _world.printDirtyChunks();
+                _world.printLightDirtyChunks();
+                _world.printFreshChunks();
+                success = true;
+            } else if (parsingResult.get(0).equals("chunk_pos")) {
+                _world.printPlayerChunkPosition();
                 success = true;
             }
         } catch (Exception e) {

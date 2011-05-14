@@ -88,11 +88,21 @@ public class Helper {
         return ((k1 + k2) * (k1 + k2 + 1) / 2) + k2;
     }
 
+    /**
+     * 
+     * @param z
+     * @return
+     */
     public int cantorX(int z) {
         int j = (int) Math.floor(Math.sqrt(0.25 + 2 * z) - 0.5);
         return j - cantorY(z);
     }
 
+    /**
+     * 
+     * @param z
+     * @return
+     */
     public int cantorY(int z) {
         int j = (int) Math.floor(Math.sqrt(0.25 + 2 * z) - 0.5);
         return z - j * (j + 1) / 2;
