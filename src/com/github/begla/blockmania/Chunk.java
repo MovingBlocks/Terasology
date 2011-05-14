@@ -234,7 +234,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             if (loadChunkFromFile()) {
                 setLightDirty(false);
                 _fresh = false;
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+                Logger.getLogger(this.getClass().getName()).log(Level.FINEST, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
                 return true;
             }
 
@@ -245,7 +245,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             updateSunlight();
             _fresh = false;
 
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+            Logger.getLogger(this.getClass().getName()).log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
             return true;
         }
         return false;

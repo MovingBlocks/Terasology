@@ -169,11 +169,7 @@ public final class Main {
         if (worldSeed.length() == 0) {
             worldSeed = _rand.randomCharacterString(16);
         }
-        _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", worldSeed);
-        _world = new World("WORLD1", worldSeed, _player);
-        // Link the player to the world
-        _player.setParent(_world);
-        _world.startUpdateThread();
+        initNewWorld(worldSeed);
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
@@ -458,14 +454,7 @@ public final class Main {
                     worldSeed = parsingResult.get(1);
                 }
 
-                _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", worldSeed);
-                _world.dispose();
-                _world = new World("", worldSeed, _player);
-                // Link the player to the world
-                _player.setParent(_world);
-                _world.startUpdateThread();
-                Thread.sleep(3000);
-                _player.resetPlayer();
+                initNewWorld(worldSeed);
                 success = true;
             } else if (parsingResult.get(0).equals("chunk_information")) {
                 _world.printDirtyChunks();
@@ -500,5 +489,27 @@ public final class Main {
             _showDebugConsole = false;
             _world.resumeUpdateThread();
         }
+    }
+
+    public void initNewWorld(String seed) {
+        _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+        if (_world != null) {
+            _world.dispose();
+        }
+        _world = new World("", seed, _player);
+        // Link the player to the world
+        _player.setParent(_world);
+        _world.startUpdateThread();
+        for (int i = 0; i < 15; i++) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            System.out.printf("Waiting for some chunks to pop up... %.3f%%\n", ((i + 1) / 15f) * 100f);
+        }
+
+        _player.resetPlayer();
     }
 }
