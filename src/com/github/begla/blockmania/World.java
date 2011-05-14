@@ -164,6 +164,12 @@ public final class World extends RenderableObject {
                     updateInfWorld();
                     updateDaytime();
                     generateNewChunks();
+                    
+                    try {
+                        Thread.sleep(15);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         });
@@ -174,11 +180,12 @@ public final class World extends RenderableObject {
      * 
      */
     public void dispose() {
-        try {
-            _updateThread.interrupt();
-        } catch (Exception e) {
+        synchronized (_updateThread) {
+            _updateThreadAlive = false;    
+            _updateThread.notify();
+                
         }
-        _updateThreadAlive = false;
+
         writeAllChunksToDisk();
     }
 
