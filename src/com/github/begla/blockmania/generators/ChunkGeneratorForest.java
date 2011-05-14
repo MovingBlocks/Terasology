@@ -64,9 +64,8 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
                                 c.setBlock(x, y + 1, z, (byte) 0xC);
                             }
                         }
-                    } else {
                     }
-
+                    
                     if (forestDens > 0f && c.getBlock(x, y, z) == 0x1 && y > 32) {
                         if (Math.abs(_rand.randomDouble()) < 0.04f) {
                             if (_rand.randomBoolean()) {

@@ -169,7 +169,7 @@ public final class Main {
         if (worldSeed.length() == 0) {
             worldSeed = _rand.randomCharacterString(16);
         }
-        initNewWorld(worldSeed);
+        initNewWorld("World1", worldSeed);
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
@@ -454,7 +454,7 @@ public final class Main {
                     worldSeed = parsingResult.get(1);
                 }
 
-                initNewWorld(worldSeed);
+                initNewWorld("", worldSeed);
                 success = true;
             } else if (parsingResult.get(0).equals("chunk_information")) {
                 _world.printDirtyChunks();
@@ -491,12 +491,12 @@ public final class Main {
         }
     }
 
-    public void initNewWorld(String seed) {
+    public void initNewWorld(String title, String seed) {
         _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
         if (_world != null) {
             _world.dispose();
         }
-        _world = new World("", seed, _player);
+        _world = new World(title, seed, _player);
         // Link the player to the world
         _player.setParent(_world);
         _world.startUpdateThread();
