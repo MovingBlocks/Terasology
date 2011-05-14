@@ -39,7 +39,7 @@ public class BlockRedFlower extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(12, 0);
+        return Helper.getInstance().calcOffsetForTextureAt(13, 0);
     }
 
     @Override

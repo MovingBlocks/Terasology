@@ -39,7 +39,7 @@ public class BlockWheat extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(12, 5);
+        return Helper.getInstance().calcOffsetForTextureAt(12, 6);
     }
 
     @Override
