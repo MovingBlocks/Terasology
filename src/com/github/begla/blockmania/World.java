@@ -111,8 +111,6 @@ public final class World extends RenderableObject {
             }
         }
 
-        _player.resetPlayer();
-
         _updateThread = new Thread(new Runnable() {
 
             @Override
@@ -164,7 +162,7 @@ public final class World extends RenderableObject {
                     updateInfWorld();
                     updateDaytime();
                     generateNewChunks();
-                    
+
                     try {
                         Thread.sleep(15);
                     } catch (InterruptedException ex) {
@@ -173,7 +171,6 @@ public final class World extends RenderableObject {
                 }
             }
         });
-
     }
 
     /**
@@ -181,9 +178,9 @@ public final class World extends RenderableObject {
      */
     public void dispose() {
         synchronized (_updateThread) {
-            _updateThreadAlive = false;    
+            _updateThreadAlive = false;
             _updateThread.notify();
-                
+
         }
 
         writeAllChunksToDisk();

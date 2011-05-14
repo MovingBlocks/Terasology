@@ -48,7 +48,7 @@ public final class Main {
     private static final Logger _logger = Logger.getLogger(Main.class.getName());
     /* ------- */
     private static TrueTypeFont _font1;
-    private long _lastLoopTime = Helper.getInstance().getTime();
+    private long _lastLoopTime;
     private long _lastFpsTime;
     private int _fps;
     private final StringBuffer _consoleInput = new StringBuffer();
@@ -174,6 +174,12 @@ public final class Main {
         // Link the player to the world
         _player.setParent(_world);
         _world.startUpdateThread();
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        _player.resetPlayer();
     }
 
     /**
@@ -226,6 +232,7 @@ public final class Main {
      */
     private void start() {
         _logger.log(Level.INFO, "Starting the game...");
+        _lastLoopTime = Helper.getInstance().getTime();
         while (_runGame) {
 
             // Sync. at 60 FPS
@@ -446,17 +453,19 @@ public final class Main {
                 success = true;
             } else if (parsingResult.get(0).equals("generate_new_world")) {
                 String worldSeed = _rand.randomCharacterString(16);
-                
+
                 if (parsingResult.size() > 1) {
                     worldSeed = parsingResult.get(1);
                 }
-                
+
                 _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", worldSeed);
                 _world.dispose();
                 _world = new World("", worldSeed, _player);
                 // Link the player to the world
                 _player.setParent(_world);
                 _world.startUpdateThread();
+                Thread.sleep(3000);
+                _player.resetPlayer();
                 success = true;
             } else if (parsingResult.get(0).equals("chunk_information")) {
                 _world.printDirtyChunks();

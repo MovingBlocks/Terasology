@@ -48,6 +48,10 @@ public final class Player extends RenderableObject {
     private final PerlinNoise _pGen = new PerlinNoise((int) Helper.getInstance().getTime());
     private Vector3f _viewDirection = new Vector3f();
 
+    public Player() {
+        resetPlayer();
+    }
+
     /**
      * Positions the player within the world and adjusts the player's view accordingly.
      */
@@ -558,7 +562,6 @@ public final class Player extends RenderableObject {
      */
     public void setParent(World parent) {
         this._parent = parent;
-        resetPlayer();
     }
 
     /**
