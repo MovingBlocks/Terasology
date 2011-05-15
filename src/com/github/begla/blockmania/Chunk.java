@@ -1525,7 +1525,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public boolean writeChunkToDisk() {
         // Don't save fresh chunks
-        if (_fresh) {
+        if (_fresh || _lightDirty) {
             return false;
         }
 

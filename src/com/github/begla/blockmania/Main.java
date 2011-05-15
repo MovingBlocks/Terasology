@@ -232,7 +232,7 @@ public final class Main {
         while (_runGame) {
 
             // Sync. at 60 FPS
-            Display.sync(120);
+            Display.sync(60);
 
             // Measure a delta value and the frames per second
             long delta = Helper.getInstance().getTime() - _lastLoopTime;
