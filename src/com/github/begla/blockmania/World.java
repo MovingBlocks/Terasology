@@ -162,7 +162,6 @@ public final class World extends RenderableObject {
 
                     updateInfWorld();
                     updateDaytime();
-                    generateNewChunks();
 
                     try {
                         Thread.sleep(15);
@@ -326,10 +325,10 @@ public final class World extends RenderableObject {
      */
     public void updateAllChunks() {
         for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-                for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
-                    Chunk c = getChunk(x, z);
-                    queueChunkForUpdate(c);
-                }
+            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
+                Chunk c = getChunk(x, z);
+                queueChunkForUpdate(c);
+            }
         }
     }
 
@@ -513,7 +512,6 @@ public final class World extends RenderableObject {
      * Returns the chunk at the given position.
      * 
      * @param x The X-coordinate
-     * @param y The Y-coordinate
      * @param z The Z-coordinate
      * @return The chunk
      */
@@ -1065,7 +1063,24 @@ public final class World extends RenderableObject {
     /**
      * TODO
      */
-    private void generateNewChunks() {
+    public void generateNewChunk(int x, int z) {
+        Chunk c = loadOrCreateChunk(x, z);
+        c.generate();
+        
+        if (c == null) {
+            return;
+        }
+        
+        Chunk[] neighbors = c.loadOrCreateNeighbors();
+
+        for (Chunk nc : neighbors) {
+            if (nc != null) {
+                nc.generate();
+            }
+        }
+
+        c.updateLight();
+        c.writeChunkToDisk();
     }
 
     /**

@@ -1317,7 +1317,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public void setSunlight(int x, int y, int z, byte intens) {
         if (isFresh()) {
-            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, "Sunlight can not be changed within fresh blocks.");
+            // Sunlight may not be changed within fresh blocks
             return;
         }
 
@@ -1502,7 +1502,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     @Override
     public int compareTo(Chunk o) {
-        return new Double(calcDistanceToPlayer()).compareTo(o.calcDistanceToPlayer());
+        if (_parent.getPlayer() != null) {
+            return new Double(calcDistanceToPlayer()).compareTo(o.calcDistanceToPlayer());
+        }
+
+        return new Integer(o.getChunkID()).compareTo(new Integer(getChunkID()));
     }
 
     /**
@@ -1520,8 +1524,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return 
      */
     public boolean writeChunkToDisk() {
-        // Don't save dirty little chunks
-        if (_fresh || _lightDirty) {
+        // Don't save fresh chunks
+        if (_fresh) {
             return false;
         }
 

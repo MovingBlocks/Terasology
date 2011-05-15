@@ -30,7 +30,7 @@ public class BlockNil extends Block {
 
     @Override
     public boolean isBlockInvisible() {
-        return true;
+        return false;
     }
 
     @Override

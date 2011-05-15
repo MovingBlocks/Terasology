@@ -48,6 +48,9 @@ public final class Player extends RenderableObject {
     private final PerlinNoise _pGen = new PerlinNoise((int) Helper.getInstance().getTime());
     private Vector3f _viewDirection = new Vector3f();
 
+    /**
+     * 
+     */
     public Player() {
         resetPlayer();
     }

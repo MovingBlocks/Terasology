@@ -491,6 +491,11 @@ public final class Main {
         }
     }
 
+    /**
+     * 
+     * @param title
+     * @param seed
+     */
     public void initNewWorld(String title, String seed) {
         _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
         if (_world != null) {
