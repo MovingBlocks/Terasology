@@ -38,7 +38,7 @@ public final class Player extends RenderableObject {
     private static final PlacingBox _placingBox = new PlacingBox();
     private boolean _jump = false;
     private byte _selectedBlockType = 1;
-    private float _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
+    private double _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
     private double _yaw = 135d;
     private double _pitch;
     private final Vector3f _moveVector = new Vector3f(0, 0, 0);
@@ -242,9 +242,9 @@ public final class Player extends RenderableObject {
     public String selectedBlockInformation() {
         RayFaceIntersection r = calcSelectedBlock();
         Vector3f bp = r.getBlockPos();
-        byte blockType =  _parent.getBlock((int) bp.x, (int) bp.y, (int) bp.z);
-        byte blockLight =  _parent.getLight((int) bp.x, (int) bp.y, (int) bp.z);
-        
+        byte blockType = _parent.getBlock((int) bp.x, (int) bp.y, (int) bp.z);
+        byte blockLight = _parent.getLight((int) bp.x, (int) bp.y, (int) bp.z);
+
         return String.format("%s (t: %d, l: %d) ", r, blockType, blockLight);
     }
 
@@ -382,6 +382,7 @@ public final class Player extends RenderableObject {
      *
      * TODO: Not working for blocks above the player.
      * TODO: Somehow clumsy. :-(
+     * TODO: Critical with bad FPS
      *
      * @param oldPosition The position before the player's position was updated
      * @return True if a vertical collision was detected
@@ -485,8 +486,8 @@ public final class Player extends RenderableObject {
         }
 
         if (Math.abs(_accVector.x) > _wSpeed || Math.abs(_accVector.z) > _wSpeed || Math.abs(_accVector.z) > _wSpeed) {
-            float max = Math.max(Math.max(Math.abs(_accVector.x), Math.abs(_accVector.z)), _accVector.y);
-            float div = max / _wSpeed;
+            double max = Math.max(Math.max(Math.abs(_accVector.x), Math.abs(_accVector.z)), _accVector.y);
+            double div = max / _wSpeed;
 
             _accVector.x /= div;
             _accVector.z /= div;
@@ -544,6 +545,9 @@ public final class Player extends RenderableObject {
      */
     public void resetPlayer() {
         _position = Helper.getInstance().calcPlayerOrigin();
+        _accVector.set(0, 0, 0);
+        _moveVector.set(0, 0, 0);
+        _gravity = 0.0f;
     }
 
     /**

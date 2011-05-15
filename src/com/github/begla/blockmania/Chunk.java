@@ -1049,6 +1049,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
                     light = (byte) Math.max(0, light);
                 }
             } else if (b.isBlockTypeTranslucent() && covered) {
+                byte oldLightValue = _sunlight[x][y][z];
                 _sunlight[x][y][z] = 0;
                 if (refresh) {
                     refreshLightAtLocalPos(x, y, z);
@@ -1113,6 +1114,59 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public void unspreadLight(int x, int y, int z, byte oldLightValue, int depth) {
         throw new NotImplementedException();
+//        if (depth > oldLightValue || (getLight(x, y, z) == 0x0 && depth > 0)) {
+//            return;
+//        }
+//
+//        int blockPosX = getBlockWorldPosX(x);
+//        int blockPosY = getBlockWorldPosY(y);
+//        int blockPosZ = getBlockWorldPosZ(z);
+//
+//        byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ);
+//        byte type1 = _parent.getBlock(blockPosX + 1, blockPosY, blockPosZ);
+//        byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ);
+//        byte type2 = _parent.getBlock(blockPosX - 1, blockPosY, blockPosZ);
+//        byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1);
+//        byte type3 = _parent.getBlock(blockPosX, blockPosY, blockPosZ + 1);
+//        byte val4 = _parent.getLight(blockPosX, blockPosY, blockPosZ - 1);
+//        byte type4 = _parent.getBlock(blockPosX, blockPosY, blockPosZ - 1);
+//        byte val5 = _parent.getLight(blockPosX, blockPosY + 1, blockPosZ);
+//        byte type5 = _parent.getBlock(blockPosX, blockPosY + 1, blockPosZ);
+//        byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ);
+//        byte type6 = _parent.getBlock(blockPosX, blockPosY - 1, blockPosZ);
+//
+//
+//        _parent.setSunlight(blockPosX, blockPosY, blockPosZ, (byte) 0x0);
+//
+//
+//        if (val1 < oldLightValue - depth && Block.getBlock(type1).isBlockTypeTranslucent()) {
+//            _parent.unspreadLight(blockPosX + 1, blockPosY, blockPosZ, oldLightValue, depth + 1);
+//        }
+//
+//
+//        if (val2 < oldLightValue - depth && Block.getBlock(type2).isBlockTypeTranslucent()) {
+//            _parent.unspreadLight(blockPosX - 1, blockPosY, blockPosZ, oldLightValue, depth + 1);
+//        }
+//
+//
+//        if (val3 < oldLightValue - depth && Block.getBlock(type3).isBlockTypeTranslucent()) {
+//            _parent.unspreadLight(blockPosX, blockPosY, blockPosZ + 1, oldLightValue, depth + 1);
+//        }
+//
+//
+//        if (val4 < oldLightValue - depth && Block.getBlock(type4).isBlockTypeTranslucent()) {
+//            _parent.unspreadLight(blockPosX, blockPosY, blockPosZ - 1, oldLightValue, depth + 1);
+//        }
+//
+//
+//        if (val5 < oldLightValue - depth && Block.getBlock(type5).isBlockTypeTranslucent()) {
+//            _parent.unspreadLight(blockPosX, blockPosY + 1, blockPosZ, oldLightValue, depth + 1);
+//        }
+//
+//
+//        if (val6 < oldLightValue - depth && Block.getBlock(type6).isBlockTypeTranslucent()) {
+//            _parent.unspreadLight(blockPosX, blockPosY - 1, blockPosZ, oldLightValue, depth + 1);
+//        }
     }
 
     /**
@@ -1224,7 +1278,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public double calcDistanceToPlayer() {
         double distance = Math.sqrt(Math.pow(_parent.getPlayer().getPosition().x - getChunkWorldPosX(), 2) + Math.pow(_parent.getPlayer().getPosition().z - getChunkWorldPosZ(), 2));
 
-        // Update the chunks in direction of the player first
+        // Update the chunks in the viewing direction of the player first
 //        double weight = Vector3f.dot(_position.normalise(null), _parent.getPlayer().getViewDirection().normalise(null));
 //
 //        if (weight <= 0d) {
@@ -1478,7 +1532,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (!dir1.exists()) {
             dir1.mkdir();
         }
-        
+
         File dir2 = new File(String.format("SAVED_WORLDS/%s", _parent.getTitle()));
         if (!dir2.exists()) {
             dir2.mkdir();

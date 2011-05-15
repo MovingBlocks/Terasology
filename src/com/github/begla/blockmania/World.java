@@ -500,7 +500,7 @@ public final class World extends RenderableObject {
                     if (newValue > oldValue) {
                         c.spreadLight(blockPosX, y, blockPosZ, newValue);
                     } else if (newValue < oldValue) {
-                        //c.unspreadLight(blockPosX, blockPosY, blockPosZ, oldValue);
+                        //c.unspreadLight(blockPosX, y, blockPosZ, oldValue);
                     }
                     queueChunkForUpdate(c);
                 }
