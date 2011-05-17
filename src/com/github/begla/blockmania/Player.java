@@ -16,8 +16,7 @@
  */
 package com.github.begla.blockmania;
 
-import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.utilities.RayFaceIntersection;
+import com.github.begla.blockmania.utilities.AABB;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.utilities.PerlinNoise;
 import java.util.Collections;
@@ -35,7 +34,6 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Player extends RenderableObject {
 
-    private static final PlacingBox _placingBox = new PlacingBox();
     private boolean _jump = false;
     private byte _selectedBlockType = 1;
     private double _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
@@ -46,7 +44,7 @@ public final class Player extends RenderableObject {
     private float _gravity = 0.0f;
     private World _parent = null;
     private final PerlinNoise _pGen = new PerlinNoise((int) Helper.getInstance().getTime());
-    private Vector3f _viewDirection = new Vector3f();
+    private Vector3f _viewingDirection = new Vector3f();
 
     /**
      * 
@@ -74,14 +72,8 @@ public final class Player extends RenderableObject {
             glTranslatef(0.0f, bobbing1, 0);
         }
 
-        glTranslatef(-_position.x, -_position.y, -_position.z);
-
-//        glPushMatrix();
-//        glTranslatef(_position.x, _position.y, _position.z);
-//        glColor3f(1f, 0f, 0f);
-//        Sphere s = new Sphere();
-//        s.draw(0.1f, 128, 12);
-//        glPopMatrix();
+        // Position the camera in the upper part of the player's bounding box
+        glTranslatef(-_position.x, -_position.y - getAABB().getDimensions().y / 1.2f, -_position.z);
 
         RayFaceIntersection is = calcSelectedBlock();
 
@@ -89,17 +81,21 @@ public final class Player extends RenderableObject {
         if (Configuration.getSettingBoolean("SHOW_PLACING_BOX")) {
             if (is != null) {
 
+                // Mark the point of intersection
 //                glPointSize(5f);
 //                glBegin(GL_POINTS);
 //                glVertex3f(is.getIntersectPoint().x, is.getIntersectPoint().y, is.getIntersectPoint().z);
 //                glEnd();
 
-                glPushMatrix();
-                glTranslatef((int) is.getBlockPos().x, (int) is.getBlockPos().y, (int) is.getBlockPos().z);
-                _placingBox.render();
-                glPopMatrix();
+
+                if (Block.getBlockForType(_parent.getBlockAtPosition(is.getBlockPos())).renderBoundingBox()) {
+                    Block.AABBForBlockAt((int) is.getBlockPos().x, (int) is.getBlockPos().y, (int) is.getBlockPos().z).render();
+                }
             }
         }
+
+        // Draw the player's AABB
+        //getAABB().render();
     }
 
     /**
@@ -115,9 +111,9 @@ public final class Player extends RenderableObject {
         processMovement();
         updatePlayerPosition(delta);
 
-        // Update the view direction
-        _viewDirection.set((float) Math.sin(Math.toRadians(_yaw)) * (float) Math.cos(Math.toRadians(_pitch)), -1f * (float) Math.sin(Math.toRadians(_pitch)), -1 * (float) Math.cos(Math.toRadians(_pitch)) * (float) Math.cos(Math.toRadians(_yaw)));
-        _viewDirection.normalise();
+        // Update the viewing direction
+        _viewingDirection.set((float) Math.sin(Math.toRadians(_yaw)) * (float) Math.cos(Math.toRadians(_pitch)), -1f * (float) Math.sin(Math.toRadians(_pitch)), -1 * (float) Math.cos(Math.toRadians(_pitch)) * (float) Math.cos(Math.toRadians(_yaw)));
+        _viewingDirection.normalise();
 
         _moveVector.set(0, 0, 0);
     }
@@ -165,11 +161,8 @@ public final class Player extends RenderableObject {
         _moveVector.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
-    /*
-     * Moves the player backward.
-     */
     /**
-     *
+     * Moves the player backward.
      */
     public void walkBackwards() {
         _moveVector.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
@@ -212,13 +205,12 @@ public final class Player extends RenderableObject {
      */
     public RayFaceIntersection calcSelectedBlock() {
         ArrayList<RayFaceIntersection> inters = new ArrayList<RayFaceIntersection>();
-
-        // The ray should originate from the player's eye
         for (int x = -4; x < 4; x++) {
             for (int y = -4; y < 4; y++) {
                 for (int z = -4; z < 4; z++) {
                     if (x != 0 || y != 0 || z != 0) {
-                        ArrayList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, _position, _viewDirection);
+                        // The ray originates from the "player's eye"
+                        ArrayList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, new Vector3f(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
                         if (iss != null) {
                             inters.addAll(iss);
                         }
@@ -383,30 +375,25 @@ public final class Player extends RenderableObject {
     /**
      * Checks for blocks below and above the player.
      *
-     * TODO: Not working for blocks above the player.
-     * TODO: Somehow clumsy. :-(
-     * TODO: Critical with bad FPS
-     *
      * @param oldPosition The position before the player's position was updated
      * @return True if a vertical collision was detected
      */
     private boolean verticalHitTest(Vector3f origin) {
-        float offset = Configuration.getSettingNumeric("PLAYER_HEIGHT");
         boolean result = false;
-        int y = -1;
-        for (int x = -1; x < 2; ++x) {
-            for (int z = -1; z < 2; ++z) {
-                if (y != 0 || z != 0 || x != 0) {
-                    Vector3f blockPos = new Vector3f((int) (origin.x + 0.5f + x), (int) (origin.y + 0.5f) - offset + y, (int) (origin.z + 0.5f + z));
-                    int blockType1 = _parent.getBlock((int) blockPos.x, (int) (blockPos.y), (int) blockPos.z);
+        for (int y = -8; y <= 8; y++) {
+            for (int x = -1; x < 2; ++x) {
+                for (int z = -1; z < 2; ++z) {
+                    int blockPosX = (int) (_position.x + x + 0.5f);
+                    int blockPosY = (int) (_position.y + y + 0.5f);
+                    int blockPosZ = (int) (_position.z + z + 0.5f);
+                    int blockType1 = _parent.getBlockAtPosition(new Vector3f(blockPosX, blockPosY, blockPosZ));
 
-                    if (!Block.getBlock(blockType1).isPenetrable()) {
-                        if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f && _position.y + 0.1f - offset > blockPos.y - 0.5f && _position.y - 0.1f - offset < blockPos.y + 0.5f) {
+                    if (!Block.getBlockForType(blockType1).isPenetrable()) {
+                        if (getAABB().isIntersecting(Block.AABBForBlockAt(blockPosX, blockPosY, blockPosZ))) {
                             result = true;
-                            if (_gravity < 0f) {
-                                _position.y = origin.y;
-                                _gravity = 0f;
-                            }
+                            // If a collision was detected: reset the player's position
+                            _position.y = origin.y;
+                            _gravity = 0f;
                         }
                     }
                 }
@@ -421,39 +408,30 @@ public final class Player extends RenderableObject {
      * 
      * @param oldPosition The position before the player's position was updated
      */
-    private void horizontalHitTest(Vector3f oldPosition) {
-        localHorizontalHitTest(0, 1, oldPosition, new Vector3f(1, 0, 0));
-        localHorizontalHitTest(0, -1, oldPosition, new Vector3f(-1, 0, 0));
-        localHorizontalHitTest(1, 0, oldPosition, new Vector3f(0, 0, 1));
-        localHorizontalHitTest(-1, 0, oldPosition, new Vector3f(0, 0, -1));
-        localHorizontalHitTest(1, 1, oldPosition, new Vector3f(-1, 0, 1));
-        localHorizontalHitTest(-1, -1, oldPosition, new Vector3f(-1, 0, 1));
-        localHorizontalHitTest(1, -1, oldPosition, new Vector3f(1, 0, 1));
-        localHorizontalHitTest(-1, 1, oldPosition, new Vector3f(1, 0, 1));
-    }
+    private void horizontalHitTest(Vector3f origin) {
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                for (int y = -8; y <= 8; y++) {
+                    int blockPosX = (int) (_position.x + x + 0.5f);
+                    int blockPosY = (int) (_position.y + y + 0.5f);
+                    int blockPosZ = (int) (_position.z + z + 0.5f);
+                    int blockType1 = _parent.getBlockAtPosition(new Vector3f(blockPosX, blockPosY, blockPosZ));
 
-    /**
-     * Checks for horizontal collisiosn in one specific direction.
-     * 
-     * @param x Direction along the x-axis
-     * @param z Direction along the z-axis
-     * @param oldPosition The position before the player's position was updated
-     * @param normal The normal of the surface in the given direction
-     */
-    private void localHorizontalHitTest(int x, int z, Vector3f oldPosition, Vector3f normal) {
-        float offset = Configuration.getSettingNumeric("PLAYER_HEIGHT");
-        for (int y = 0; y < Math.ceil(offset) + 1; y++) {
-            Vector3f blockPos = new Vector3f((int) (oldPosition.x + 0.5f) + x, (int) (oldPosition.y + 0.5f) + y - offset, (int) (oldPosition.z + 0.5f) + z);
-            int blockType1 = _parent.getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
-            if (!Block.getBlock(blockType1).isPenetrable()) {
-                if (_position.x + 0.1f > blockPos.x - 0.5f && _position.x - 0.1f < blockPos.x + 0.5f && _position.z + 0.1f > blockPos.z - 0.5f && _position.z - 0.1f < blockPos.z + 0.5f) {
-                    Vector3f scratch = new Vector3f(_position.x, 0f, _position.z);
-                    scratch.x -= oldPosition.x;
-                    scratch.z -= oldPosition.z;
-
-                    float length = Vector3f.dot(normal, scratch);
-                    _position.z = oldPosition.z + length * normal.z;
-                    _position.x = oldPosition.x + length * normal.x;
+                    if (!Block.getBlockForType(blockType1).isPenetrable()) {
+                        if (getAABB().isIntersecting(Block.AABBForBlockAt(blockPosX, blockPosY, blockPosZ))) {
+                            Vector3f normal = Block.AABBForBlockAt(blockPosX, blockPosY, blockPosZ).closestNormalToPoint(origin);
+                            // Find a vector parallel to the surface normal
+                            Vector3f slideVector = Vector3f.cross(normal, new Vector3f(0, 1, 0), null);
+                            // Calculate the direction from the origin to the current position
+                            Vector3f direction = new Vector3f(_position.x, 0f, _position.z);
+                            direction.x -= origin.x;
+                            direction.z -= origin.z;
+                            // Calculate the intensity of the diversion alongside the block
+                            float length = Vector3f.dot(slideVector, direction);
+                            _position.z = origin.z + length * slideVector.z;
+                            _position.x = origin.x + length * slideVector.x;
+                        }
+                    }
                 }
             }
         }
@@ -462,10 +440,12 @@ public final class Player extends RenderableObject {
     /**
      * Updates the position of the player.
      * 
+     * TODO: Fix easing-artifact
+     * 
      * @param delta Delta value since the last frame update
      */
     private void updatePlayerPosition(float delta) {
-        // Save the previous position before chaning any of the values
+        // Save the previous position before changing any of the values
         Vector3f oldPosition = new Vector3f(_position);
 
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
@@ -547,7 +527,7 @@ public final class Player extends RenderableObject {
      * Resets the player's position.
      */
     public void resetPlayer() {
-        _position = Helper.getInstance().calcPlayerOrigin();
+        _position = Player.calcPlayerOrigin();
         _accVector.set(0, 0, 0);
         _moveVector.set(0, 0, 0);
         _gravity = 0.0f;
@@ -576,7 +556,7 @@ public final class Player extends RenderableObject {
      * @return 
      */
     public Vector3f getViewDirection() {
-        return _viewDirection;
+        return _viewingDirection;
     }
 
     /**
@@ -601,6 +581,25 @@ public final class Player extends RenderableObject {
      */
     @Override
     public String toString() {
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, _viewDirection.x, _viewDirection.y, _viewDirection.z, _selectedBlockType, _gravity, _moveVector.x, _moveVector.y, _moveVector.z);
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _selectedBlockType, _gravity, _moveVector.x, _moveVector.y, _moveVector.z);
+    }
+
+    /**
+     * 
+     * @return 
+     */
+    public AABB getAABB() {
+        return new AABB(_position, new Vector3f(.3f, 0.7f, .3f));
+    }
+
+    /**
+     * Returns the spawning point of the player.
+     * 
+     * TODO: Should not determine the spawning point randomly.
+     * 
+     * @return The coordinates of the spawning point
+     */
+    public static Vector3f calcPlayerOrigin() {
+        return new Vector3f(Configuration.CHUNK_DIMENSIONS.x * Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2, 100, (Configuration.CHUNK_DIMENSIONS.z * Configuration.VIEWING_DISTANCE_IN_CHUNKS.y) / 2);
     }
 }

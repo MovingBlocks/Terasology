@@ -22,8 +22,6 @@ import com.github.begla.blockmania.generators.ChunkGeneratorForest;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorTree;
-import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.utilities.RayFaceIntersection;
 import java.io.IOException;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
@@ -527,6 +525,15 @@ public final class World extends RenderableObject {
     }
 
     /**
+     * 
+     * @param pos
+     * @return 
+     */
+    public final byte getBlockAtPosition(Vector3f pos) {
+        return getBlock((int) (pos.x + 0.5f), (int) (pos.y + 0.5f), (int) (pos.z + 0.5f));
+    }
+
+    /**
      * Returns the block at the given position.
      *
      * @param x The X-coordinate
@@ -679,7 +686,7 @@ public final class World extends RenderableObject {
      * @return The player offset on the x-axis
      */
     private int calcPlayerChunkOffsetX() {
-        return (int) ((_player.getPosition().x - Helper.getInstance().calcPlayerOrigin().x) / Configuration.CHUNK_DIMENSIONS.x);
+        return (int) ((_player.getPosition().x - Player.calcPlayerOrigin().x) / Configuration.CHUNK_DIMENSIONS.x);
     }
 
     /**
@@ -688,7 +695,7 @@ public final class World extends RenderableObject {
      * @return The player offset on the y-axis
      */
     private int calcPlayerChunkOffsetY() {
-        return (int) ((_player.getPosition().y - Helper.getInstance().calcPlayerOrigin().y) / Configuration.CHUNK_DIMENSIONS.y);
+        return (int) ((_player.getPosition().y - Player.calcPlayerOrigin().y) / Configuration.CHUNK_DIMENSIONS.y);
     }
 
     /**
@@ -697,7 +704,7 @@ public final class World extends RenderableObject {
      * @return The player offset on the z-axis
      */
     private int calcPlayerChunkOffsetZ() {
-        return (int) ((_player.getPosition().z - Helper.getInstance().calcPlayerOrigin().z) / Configuration.CHUNK_DIMENSIONS.z);
+        return (int) ((_player.getPosition().z - Player.calcPlayerOrigin().z) / Configuration.CHUNK_DIMENSIONS.z);
     }
 
     /**
@@ -739,7 +746,7 @@ public final class World extends RenderableObject {
         /*
          * Ignore invisible blocks.
          */
-        if (Block.getBlock(getBlock(x, y, z)).isBlockInvisible()) {
+        if (Block.getBlockForType(getBlock(x, y, z)).isBlockInvisible()) {
             return null;
         }
 
@@ -1062,15 +1069,17 @@ public final class World extends RenderableObject {
 
     /**
      * TODO
+     * @param x
+     * @param z  
      */
     public void generateNewChunk(int x, int z) {
         Chunk c = loadOrCreateChunk(x, z);
         c.generate();
-        
+
         if (c == null) {
             return;
         }
-        
+
         Chunk[] neighbors = c.loadOrCreateNeighbors();
 
         for (Chunk nc : neighbors) {
@@ -1112,48 +1121,6 @@ public final class World extends RenderableObject {
             }
         }
         return false;
-    }
-
-    /**
-     * 
-     */
-    public void printDirtyChunks() {
-        System.out.println("------------");
-        System.out.println("Dirty chunks");
-        System.out.println("------------");
-        for (Chunk c : _chunkCache.values()) {
-            if (c.isDirty() && isChunkVisible(c)) {
-                System.out.println(c);
-            }
-        }
-    }
-
-    /**
-     * 
-     */
-    public void printFreshChunks() {
-        System.out.println("------------");
-        System.out.println("Fresh chunks");
-        System.out.println("------------");
-        for (Chunk c : _chunkCache.values()) {
-            if (c.isFresh() && isChunkVisible(c)) {
-                System.out.println(c);
-            }
-        }
-    }
-
-    /**
-     * 
-     */
-    public void printLightDirtyChunks() {
-        System.out.println("------------");
-        System.out.println("Light dirty chunks");
-        System.out.println("------------");
-        for (Chunk c : _chunkCache.values()) {
-            if (c.isLightDirty() && isChunkVisible(c)) {
-                System.out.println(c);
-            }
-        }
     }
 
     /**

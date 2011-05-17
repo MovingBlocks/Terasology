@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.utilities;
+package com.github.begla.blockmania.worldgenerator;
 
 import com.github.begla.blockmania.World;
 
@@ -21,13 +21,24 @@ import com.github.begla.blockmania.World;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class WorldGenerator {
+public class Main {
 
+    /**
+     * 
+     * @param args
+     */
     public static void main(String[] args) {
-        WorldGenerator gen = new WorldGenerator();
+        Main gen = new Main();
         gen.generateWorld("", "blubb", 16, 1024);
     }
 
+    /**
+     * 
+     * @param title
+     * @param seed
+     * @param sizeX
+     * @param sizeZ
+     */
     public void generateWorld(String title, String seed, int sizeX, int sizeZ) {
         int size = sizeX * sizeZ;
         World w = new World(title, seed, null);

@@ -42,4 +42,9 @@ public class BlockNil extends Block {
     public boolean isCastingShadows() {
         return false;
     }
+
+    @Override
+    public boolean renderBoundingBox() {
+        return false;
+    }
 }

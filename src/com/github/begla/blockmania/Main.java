@@ -17,7 +17,6 @@
 package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.utilities.Helper;
 import java.awt.Font;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
@@ -456,11 +455,6 @@ public final class Main {
 
                 initNewWorld("", worldSeed);
                 success = true;
-            } else if (parsingResult.get(0).equals("chunk_information")) {
-                _world.printDirtyChunks();
-                _world.printLightDirtyChunks();
-                _world.printFreshChunks();
-                success = true;
             } else if (parsingResult.get(0).equals("chunk_pos")) {
                 _world.printPlayerChunkPosition();
                 success = true;
@@ -512,7 +506,7 @@ public final class Main {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            System.out.printf("Waiting for some chunks to pop up... %.3f%%\n", ((i + 1) / 15f) * 100f);
+            System.out.printf("Waiting for some chunks to pop up... %.1f%%\n", ((i + 1) / 15f) * 100f);
         }
 
         _player.resetPlayer();

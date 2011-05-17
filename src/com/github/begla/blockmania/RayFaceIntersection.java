@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  under the License.
  */
-package com.github.begla.blockmania.utilities;
+package com.github.begla.blockmania;
 
 import org.lwjgl.util.vector.Vector3f;
 

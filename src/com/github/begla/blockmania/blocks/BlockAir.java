@@ -55,4 +55,9 @@ public class BlockAir extends Block {
     public boolean isCastingShadows() {
         return false;
     }
+
+    @Override
+    public boolean renderBoundingBox() {
+        return false;
+    }
 }

@@ -14,12 +14,10 @@
  *  limitations under the License.
  *  under the License.
  */
-package com.github.begla.blockmania.utilities;
+package com.github.begla.blockmania;
 
-import com.github.begla.blockmania.Configuration;
 import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
 
 /**
  * This is a simple helper class for various tasks.
@@ -28,8 +26,8 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Helper {
 
-    static final float _div = 1.0f / 16.0f;
-    private static long _timerTicksPerSecond = Sys.getTimerResolution();
+    private static final float _div = 1.0f / 16.0f;
+    private static final long _timerTicksPerSecond = Sys.getTimerResolution();
     private static Helper _instance = null;
 
     /**
@@ -55,17 +53,6 @@ public class Helper {
      */
     public Vector2f calcOffsetForTextureAt(int x, int y) {
         return new Vector2f(x * _div, y * _div);
-    }
-
-    /**
-     * Returns the spawning point of the player.
-     * 
-     * TODO: Should not determine the spawning point randomly.
-     * 
-     * @return The coordinates of the spawning point
-     */
-    public Vector3f calcPlayerOrigin() {
-        return new Vector3f(Configuration.CHUNK_DIMENSIONS.x * Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2, 127, (Configuration.CHUNK_DIMENSIONS.z * Configuration.VIEWING_DISTANCE_IN_CHUNKS.y) / 2);
     }
 
     /**

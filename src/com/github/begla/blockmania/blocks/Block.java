@@ -16,8 +16,10 @@
  */
 package com.github.begla.blockmania.blocks;
 
-import com.github.begla.blockmania.utilities.Helper;
+import com.github.begla.blockmania.utilities.AABB;
+import com.github.begla.blockmania.Helper;
 import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
@@ -59,14 +61,13 @@ public abstract class Block {
     private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockWood(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockWheat(), new BlockWheatLarge()};
     private static BlockNil nilBlock = new BlockNil();
 
-
     /**
      * Returns the object for the given block type ID.
      * 
      * @param type Block type ID
      * @return The object for the given ID
      */
-    public static Block getBlock(int type) {
+    public static Block getBlockForType(int type) {
         Block b = null;
         try {
             b = _blocks[type];
@@ -151,5 +152,24 @@ public abstract class Block {
      */
     public boolean isCastingShadows() {
         return true;
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public boolean renderBoundingBox() {
+        return true;
+    }
+
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public static AABB AABBForBlockAt(int x, int y, int z) {
+        return new AABB(new Vector3f(x, y, z), new Vector3f(0.5f, 0.5f, 0.5f));
     }
 }
