@@ -21,7 +21,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
- * A wheat billboard block.
+ * A high grass billboard block.
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
