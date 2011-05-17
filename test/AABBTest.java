@@ -64,30 +64,30 @@ public class AABBTest {
     @Test
     public void testSimpleIntersections() {
         // Box 2 is within box 1
-        boolean result = _box1.isIntersecting(_box2);
+        boolean result = _box1.overlaps(_box2);
         assertTrue(result);
         // Box 3 is far away from box 1
-        result = _box1.isIntersecting(_box3);
+        result = _box1.overlaps(_box3);
         assertFalse(result);
         // Box 4 is adjacent to box 1
-        result = _box1.isIntersecting(_box4);
+        result = _box1.overlaps(_box4);
         assertTrue(result);
         // Box 5 is not intersecting box 1
-        result = _box1.isIntersecting(_box5);
+        result = _box1.overlaps(_box5);
         assertFalse(result);
     }
     
     @Test
     public void testBlockIntersections() {
         // Player is standing on the block
-        boolean result = _player1.isIntersecting(_block1);
+        boolean result = _player1.overlaps(_block1);
         assertTrue(result);
-        result = _block1.isIntersecting(_player1);
+        result = _block1.overlaps(_player1);
         assertTrue(result);
         // Player is above the block
-        result = _block1.isIntersecting(_player2);
+        result = _block1.overlaps(_player2);
         assertFalse(result);
-        result = _player2.isIntersecting(_block1);
+        result = _player2.overlaps(_block1);
         assertFalse(result);
     }
 }

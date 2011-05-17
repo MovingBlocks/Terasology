@@ -20,7 +20,7 @@ import com.github.begla.blockmania.Chunk;
 import com.github.begla.blockmania.Configuration;
 
 /**
- * Generates some trees, flowers and wheat.
+ * Generates some trees, flowers and high grass.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -44,39 +44,65 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
         for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+                    generateGrassAndFlowers(c, x, y, z);
+                    generateTree(c, x, y, z);
+                }
+            }
+        }
+    }
 
-                    float forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
-                    float grassDens = calcGrassDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
-
-                    // Generate grass
-                    if (c.getBlock(x, y, z) == 0x1 && grassDens > 0.0) {
-                        if (Math.abs(_rand.randomDouble()) < 0.1f) {
-                            if (_rand.randomBoolean()) {
-                                c.setBlock(x, y + 1, z, (byte) 0x9);
-                            } else {
-                                c.setBlock(x, y + 1, z, (byte) 0xA);
-                            }
-
-                        } else if (Math.abs(_rand.randomDouble()) < 0.6f) {
-                            if (_rand.randomBoolean()) {
-                                c.setBlock(x, y + 1, z, (byte) 0xB);
-                            } else {
-                                c.setBlock(x, y + 1, z, (byte) 0xC);
-                            }
-                        }
+    /**
+     * 
+     * @param c
+     * @param x
+     * @param y
+     * @param z 
+     */
+    protected void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
+        float grassDens = calcGrassDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
+        if (c.getBlock(x, y, z) == 0x1 && grassDens > 0.0) {
+            if (Math.abs(_rand.randomDouble()) < 0.1f) {
+                if (_rand.randomBoolean()) {
+                    if (c.canBlockSeeTheSky(x, y + 1, z)) {
+                        c.setBlock(x, y + 1, z, (byte) 0x9);
                     }
-                    
-                    if (forestDens > 0f && c.getBlock(x, y, z) == 0x1 && y > 32) {
-                        if (Math.abs(_rand.randomDouble()) < 0.04f) {
-                            if (_rand.randomBoolean()) {
-                                c.setBlock(x, y + 1, z, (byte) 0x0);
-                                c.getParent().getGeneratorPineTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
-                            } else {
-                                c.setBlock(x, y + 1, z, (byte) 0x0);
-                                c.getParent().getGeneratorTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
-                            }
-                        }
+                } else {
+                    if (c.canBlockSeeTheSky(x, y + 1, z)) {
+                        c.setBlock(x, y + 1, z, (byte) 0xA);
                     }
+                }
+
+            } else if (Math.abs(_rand.randomDouble()) < 0.6f) {
+                if (_rand.randomBoolean()) {
+                    if (c.canBlockSeeTheSky(x, y + 1, z)) {
+                        c.setBlock(x, y + 1, z, (byte) 0xB);
+                    }
+                } else {
+                    if (c.canBlockSeeTheSky(x, y + 1, z)) {
+                        c.setBlock(x, y + 1, z, (byte) 0xC);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param c
+     * @param x
+     * @param y
+     * @param z 
+     */
+    protected void generateTree(Chunk c, int x, int y, int z) {
+        float forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
+        if (forestDens > 0f && c.getBlock(x, y, z) == 0x1 && y > 32) {
+            if (Math.abs(_rand.randomDouble()) < 0.04f) {
+                if (_rand.randomBoolean()) {
+                    c.setBlock(x, y + 1, z, (byte) 0x0);
+                    c.getParent().getGeneratorPineTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
+                } else {
+                    c.setBlock(x, y + 1, z, (byte) 0x0);
+                    c.getParent().getGeneratorTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
                 }
             }
         }

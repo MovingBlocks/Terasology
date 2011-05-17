@@ -19,9 +19,11 @@ package com.github.begla.blockmania;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.generators.ChunkGeneratorForest;
+import com.github.begla.blockmania.generators.ChunkGeneratorFlora;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorTree;
+import com.github.begla.blockmania.utilities.FastRandom;
 import java.io.IOException;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
@@ -48,13 +50,13 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public final class World extends RenderableObject {
 
+    private int _statGeneratedChunks = 0;
     private double _statUpdateDuration = 0.0f;
     /* ------ */
-    private short _time = 17;
+    private short _time = 8;
     private long lastDaytimeMeasurement = Helper.getInstance().getTime();
     /* ------ */
-    private static Texture _textureSun;
-    private static Texture _textureMoon;
+    private static Texture _textureSun, _textureMoon;
     /* ------ */
     private byte _daylight = 16;
     private Player _player;
@@ -71,10 +73,12 @@ public final class World extends RenderableObject {
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
     private final ChunkGeneratorForest _generatorForest;
+    private final ChunkGeneratorFlora _generatorGrass;
     private final ObjectGeneratorTree _generatorTree;
     private final ObjectGeneratorPineTree _generatorPineTree;
+    private final FastRandom _rand;
     /* ------ */
-    private String _title;
+    private String _title, _seed;
     /* ----- */
     int _lastGeneratedChunkID = 0;
 
@@ -90,6 +94,7 @@ public final class World extends RenderableObject {
         _chunks = new Chunk[(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y];
 
         _title = title;
+        _seed = seed;
 
         // Generate a random name for the world if the name is not set
         if (_title.equals("")) {
@@ -101,6 +106,10 @@ public final class World extends RenderableObject {
         _generatorForest = new ChunkGeneratorForest(seed);
         _generatorTree = new ObjectGeneratorTree(this, seed);
         _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
+        _generatorGrass = new ChunkGeneratorFlora(seed);
+
+        // Init. random generator
+        _rand = new FastRandom(seed.hashCode());
 
         for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
             for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
@@ -160,6 +169,7 @@ public final class World extends RenderableObject {
 
                     updateInfWorld();
                     updateDaytime();
+                    evolveChunks();
 
                     try {
                         Thread.sleep(15);
@@ -172,7 +182,7 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * 
+     * Stops the updating thread and writes all chunks to disk.
      */
     public void dispose() {
         synchronized (_updateThread) {
@@ -180,7 +190,6 @@ public final class World extends RenderableObject {
             _updateThread.notify();
 
         }
-
         writeAllChunksToDisk();
     }
 
@@ -236,6 +245,8 @@ public final class World extends RenderableObject {
 
             _chunkUpdateNormal.remove(c);
         }
+
+        _statGeneratedChunks++;
     }
 
     /**
@@ -276,6 +287,27 @@ public final class World extends RenderableObject {
             if (_daylight != oldDaylight) {
                 markCachedChunksDirty();
                 updateAllChunks();
+            }
+        }
+    }
+
+    /**
+     * 
+     */
+    private void evolveChunks() {
+        if (_chunkUpdateNormal.isEmpty()) {
+            for (int i = 0; i < 32; i++) {
+                int randX = _rand.randomInt() % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
+                int randZ = _rand.randomInt() % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
+
+                Chunk c = getChunk(randX, randZ);
+
+                if (c != null) {
+                    if (!c.isFresh()) {
+                        _generatorGrass.generate(c);
+                        queueChunkForUpdate(c);
+                    }
+                }
             }
         }
     }
@@ -336,7 +368,7 @@ public final class World extends RenderableObject {
      */
     public static void init() {
         try {
-            Logger.getLogger(World.class.getName()).log(Level.INFO, "Loading worLoggerld textures...");
+            Logger.getLogger(World.class.getName()).log(Level.INFO, "Loading world textures...");
             _textureSun = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/images/sun.png").openStream(), GL_NEAREST);
             _textureMoon = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/images/moon.png").openStream(), GL_NEAREST);
             Logger.getLogger(World.class.getName()).log(Level.INFO, "Finished loading world textures!");
@@ -350,12 +382,17 @@ public final class World extends RenderableObject {
      */
     @Override
     public void render() {
-        /**
-         * Draws the sun/moon.
-         */
+        renderHorizon();
+        renderChunks();
+    }
+
+    /**
+     * Renders the horizon.
+     */
+    public void renderHorizon() {
         glPushMatrix();
         // Position the sun relatively to the player
-        glTranslatef(_player.getPosition().x, Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * Configuration.CHUNK_DIMENSIONS.y * 0.75f, Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
+        glTranslatef(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 0.75f, Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
 
         // Disable fog
         glDisable(GL_FOG);
@@ -385,11 +422,13 @@ public final class World extends RenderableObject {
 
         glEnable(GL_FOG);
         glPopMatrix();
+    }
 
+    /**
+     * Renders all active chunks.
+     */
+    public void renderChunks() {
 
-        /**
-         * Render all active chunks.
-         */
         for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
             for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
                 Chunk c = getChunk(x, z);
@@ -558,6 +597,29 @@ public final class World extends RenderableObject {
     }
 
     /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return 
+     */
+    public final boolean canBlockSeeTheSky(int x, int y, int z) {
+        int chunkPosX = calcChunkPosX(x) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
+        int chunkPosZ = calcChunkPosZ(z) % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
+
+        int blockPosX = calcBlockPosX(x, chunkPosX);
+        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
+
+        try {
+            Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+            return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
+        } catch (Exception e) {
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the light value at the given position.
      *
      * @param x The X-coordinate
@@ -687,15 +749,6 @@ public final class World extends RenderableObject {
      */
     private int calcPlayerChunkOffsetX() {
         return (int) ((_player.getPosition().x - Player.calcPlayerOrigin().x) / Configuration.CHUNK_DIMENSIONS.x);
-    }
-
-    /**
-     * Calculates the offset of the player relative to the spawning point.
-     *
-     * @return The player offset on the y-axis
-     */
-    private int calcPlayerChunkOffsetY() {
-        return (int) ((_player.getPosition().y - Player.calcPlayerOrigin().y) / Configuration.CHUNK_DIMENSIONS.y);
     }
 
     /**
@@ -967,7 +1020,7 @@ public final class World extends RenderableObject {
      */
     @Override
     public String toString() {
-        return String.format("world (cdl: %d, cn: %d, cache: %d, ud: %fs)", _chunkUpdateQueueDL.size(), _chunkUpdateNormal.size(), _chunkCache.size(), _statUpdateDuration / 1000d);
+        return String.format("world (cdl: %d, cn: %d, cache: %d, ud: %fs, seed: \"%s\", title: \"%s\")", _chunkUpdateQueueDL.size(), _chunkUpdateNormal.size(), _chunkCache.size(), _statUpdateDuration / 1000d, _seed, _title);
     }
 
     /**
@@ -1130,5 +1183,12 @@ public final class World extends RenderableObject {
         int chunkPosX = calcChunkPosX((int) _player.getPosition().x);
         int chunkPosZ = calcChunkPosX((int) _player.getPosition().z);
         System.out.println(_chunkCache.get(Helper.getInstance().cantorize(chunkPosX, chunkPosZ)));
+    }
+
+    /**
+     * 
+     */
+    public int getStatGeneratedChunks() {
+        return _statGeneratedChunks;
     }
 }

@@ -21,6 +21,7 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.utilities.PerlinNoise;
 import java.util.Collections;
 import java.util.ArrayList;
+import java.util.SortedSet;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
@@ -39,8 +40,8 @@ public final class Player extends RenderableObject {
     private double _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
     private double _yaw = 135d;
     private double _pitch;
-    private final Vector3f _moveVector = new Vector3f(0, 0, 0);
-    private final Vector3f _accVector = new Vector3f(0, 0, 0);
+    private final Vector3f _movement = new Vector3f(0, 0, 0);
+    private final Vector3f _acc = new Vector3f(0, 0, 0);
     private float _gravity = 0.0f;
     private World _parent = null;
     private final PerlinNoise _pGen = new PerlinNoise((int) Helper.getInstance().getTime());
@@ -115,7 +116,7 @@ public final class Player extends RenderableObject {
         _viewingDirection.set((float) Math.sin(Math.toRadians(_yaw)) * (float) Math.cos(Math.toRadians(_pitch)), -1f * (float) Math.sin(Math.toRadians(_pitch)), -1 * (float) Math.cos(Math.toRadians(_pitch)) * (float) Math.cos(Math.toRadians(_yaw)));
         _viewingDirection.normalise();
 
-        _moveVector.set(0, 0, 0);
+        _movement.set(0, 0, 0);
     }
 
     /**
@@ -152,42 +153,42 @@ public final class Player extends RenderableObject {
      * Moves the player forward.
      */
     public void walkForward() {
-        _moveVector.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _movement.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
         if (Configuration.getSettingBoolean("GOD_MODE")) {
-            _moveVector.y -= (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
+            _movement.y -= (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
-        _moveVector.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
     /**
      * Moves the player backward.
      */
     public void walkBackwards() {
-        _moveVector.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _movement.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
         if (Configuration.getSettingBoolean("GOD_MODE")) {
-            _moveVector.y += (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
+            _movement.y += (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
-        _moveVector.z += (double) _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _movement.z += (double) _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
     /**
      * Lets the player strafe left.
      */
     public void strafeLeft() {
-        _moveVector.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw - 90));
-        _moveVector.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw - 90));
+        _movement.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw - 90));
+        _movement.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw - 90));
     }
 
     /**
      * Lets the player strafe right.
      */
     public void strafeRight() {
-        _moveVector.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw + 90));
-        _moveVector.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw + 90));
+        _movement.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw + 90));
+        _movement.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw + 90));
     }
 
     /**
@@ -380,27 +381,51 @@ public final class Player extends RenderableObject {
      */
     private boolean verticalHitTest(Vector3f origin) {
         boolean result = false;
-        for (int y = -8; y <= 8; y++) {
-            for (int x = -1; x < 2; ++x) {
-                for (int z = -1; z < 2; ++z) {
-                    int blockPosX = (int) (_position.x + x + 0.5f);
-                    int blockPosY = (int) (_position.y + y + 0.5f);
-                    int blockPosZ = (int) (_position.z + z + 0.5f);
-                    int blockType1 = _parent.getBlockAtPosition(new Vector3f(blockPosX, blockPosY, blockPosZ));
+        ArrayList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
-                    if (!Block.getBlockForType(blockType1).isPenetrable()) {
-                        if (getAABB().isIntersecting(Block.AABBForBlockAt(blockPosX, blockPosY, blockPosZ))) {
-                            result = true;
-                            // If a collision was detected: reset the player's position
-                            _position.y = origin.y;
-                            _gravity = 0f;
-                        }
-                    }
+        for (BlockPosition bp : blockPositions) {
+            int blockType1 = _parent.getBlockAtPosition(new Vector3f(bp.x, bp.y, bp.z));
+
+            if (!Block.getBlockForType(blockType1).isPenetrable()) {
+                if (getAABB().overlaps(Block.AABBForBlockAt(bp.x, bp.y, bp.z))) {
+                    result = true;
+                    // If a collision was detected: reset the player's position
+                    _position.y = origin.y;
+                    _gravity = 0f;
+                }
+            }
+
+        }
+        return result;
+    }
+
+    /**
+     * 
+     * @param origin
+     * @return 
+     */
+    private ArrayList<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
+        /*
+         * Gather the surrounding block positions
+         * and order those by the distance to the originating point.
+         */
+        ArrayList<BlockPosition> blockPositions = new ArrayList<BlockPosition>();
+
+        for (int x = -1; x < 2; x++) {
+            for (int z = -1; z < 2; z++) {
+                for (int y = -8; y <= 8; y++) {
+                    int blockPosX = (int) (origin.x + x + 0.5f);
+                    int blockPosY = (int) (origin.y + y + 0.5f);
+                    int blockPosZ = (int) (origin.z + z + 0.5f);
+
+                    blockPositions.add(new BlockPosition(blockPosX, blockPosY, blockPosZ, origin));
                 }
             }
         }
 
-        return result;
+        // Sort the block positions
+        Collections.sort(blockPositions);
+        return blockPositions;
     }
 
     /**
@@ -408,33 +433,32 @@ public final class Player extends RenderableObject {
      * 
      * @param oldPosition The position before the player's position was updated
      */
-    private void horizontalHitTest(Vector3f origin) {
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                for (int y = -8; y <= 8; y++) {
-                    int blockPosX = (int) (_position.x + x + 0.5f);
-                    int blockPosY = (int) (_position.y + y + 0.5f);
-                    int blockPosZ = (int) (_position.z + z + 0.5f);
-                    int blockType1 = _parent.getBlockAtPosition(new Vector3f(blockPosX, blockPosY, blockPosZ));
+    private boolean horizontalHitTest(Vector3f origin) {
+        boolean result = false;
+        ArrayList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
-                    if (!Block.getBlockForType(blockType1).isPenetrable()) {
-                        if (getAABB().isIntersecting(Block.AABBForBlockAt(blockPosX, blockPosY, blockPosZ))) {
-                            Vector3f normal = Block.AABBForBlockAt(blockPosX, blockPosY, blockPosZ).closestNormalToPoint(origin);
-                            // Find a vector parallel to the surface normal
-                            Vector3f slideVector = Vector3f.cross(normal, new Vector3f(0, 1, 0), null);
-                            // Calculate the direction from the origin to the current position
-                            Vector3f direction = new Vector3f(_position.x, 0f, _position.z);
-                            direction.x -= origin.x;
-                            direction.z -= origin.z;
-                            // Calculate the intensity of the diversion alongside the block
-                            float length = Vector3f.dot(slideVector, direction);
-                            _position.z = origin.z + length * slideVector.z;
-                            _position.x = origin.x + length * slideVector.x;
-                        }
-                    }
+        // Check each block positions for collisions
+        for (BlockPosition bp : blockPositions) {
+            int blockType1 = _parent.getBlockAtPosition(new Vector3f(bp.x, bp.y, bp.z));
+
+            if (!Block.getBlockForType(blockType1).isPenetrable()) {
+                if (getAABB().overlaps(Block.AABBForBlockAt(bp.x, bp.y, bp.z))) {
+                    result = true;
+                    Vector3f normal = Block.AABBForBlockAt(bp.x, bp.y, bp.z).closestNormalToPoint(origin);
+                    // Find a vector parallel to the surface normal
+                    Vector3f slideVector = Vector3f.cross(normal, new Vector3f(0, 1, 0), null);
+                    // Calculate the direction from the origin to the current position
+                    Vector3f direction = new Vector3f(_position.x, 0f, _position.z);
+                    direction.x -= origin.x;
+                    direction.z -= origin.z;
+                    // Calculate the intensity of the diversion alongside the block
+                    float length = Vector3f.dot(slideVector, direction);
+                    _position.z = origin.z + length * slideVector.z;
+                    _position.x = origin.x + length * slideVector.x;
                 }
             }
         }
+        return result;
     }
 
     /**
@@ -456,25 +480,25 @@ public final class Player extends RenderableObject {
         /*
          * Slowdown the speed of the player each time this method is called.
          */
-        if (Math.abs(_accVector.y) > 0f) {
-            _accVector.y += -1f * _accVector.y * Configuration.getSettingNumeric("FRICTION") * delta;
+        if (Math.abs(_acc.y) > 0f) {
+            _acc.y += -1f * _acc.y * Configuration.getSettingNumeric("FRICTION") * delta;
         }
 
-        if (Math.abs(_accVector.x) > 0f) {
-            _accVector.x += -1f * _accVector.x * Configuration.getSettingNumeric("FRICTION") * delta;
+        if (Math.abs(_acc.x) > 0f) {
+            _acc.x += -1f * _acc.x * Configuration.getSettingNumeric("FRICTION") * delta;
         }
 
-        if (Math.abs(_accVector.z) > 0f) {
-            _accVector.z += -1f * _accVector.z * Configuration.getSettingNumeric("FRICTION") * delta;
+        if (Math.abs(_acc.z) > 0f) {
+            _acc.z += -1f * _acc.z * Configuration.getSettingNumeric("FRICTION") * delta;
         }
 
-        if (Math.abs(_accVector.x) > _wSpeed || Math.abs(_accVector.z) > _wSpeed || Math.abs(_accVector.z) > _wSpeed) {
-            double max = Math.max(Math.max(Math.abs(_accVector.x), Math.abs(_accVector.z)), _accVector.y);
+        if (Math.abs(_acc.x) > _wSpeed || Math.abs(_acc.z) > _wSpeed || Math.abs(_acc.z) > _wSpeed) {
+            double max = Math.max(Math.max(Math.abs(_acc.x), Math.abs(_acc.z)), _acc.y);
             double div = max / _wSpeed;
 
-            _accVector.x /= div;
-            _accVector.z /= div;
-            _accVector.y /= div;
+            _acc.x /= div;
+            _acc.z /= div;
+            _acc.y /= div;
         }
 
 
@@ -482,11 +506,11 @@ public final class Player extends RenderableObject {
          * Increase the speed of the player by adding the movement
          * vector to the acceleration vector.
          */
-        _accVector.x += _moveVector.x;
-        _accVector.y += _moveVector.y;
-        _accVector.z += _moveVector.z;
+        _acc.x += _movement.x;
+        _acc.y += _movement.y;
+        _acc.z += _movement.z;
 
-        getPosition().y += (_accVector.y / 1000.0f) * delta;
+        getPosition().y += (_acc.y / 1000.0f) * delta;
         getPosition().y += (_gravity / 1000.0f) * delta;
 
         if (!Configuration.getSettingBoolean("GOD_MODE")) {
@@ -511,15 +535,17 @@ public final class Player extends RenderableObject {
          * Update the position of the player
          * according to the acceleration vector.
          */
-        getPosition().x += (_accVector.x / 1000.0f) * delta;
-        getPosition().z += (_accVector.z / 1000.0f) * delta;
+        getPosition().x += (_acc.x / 1000.0f) * delta;
+        getPosition().z += (_acc.z / 1000.0f) * delta;
 
         /*
          * Check for horizontal collisions __after__ checking for vertical
          * collisions.
          */
         if (!Configuration.getSettingBoolean("GOD_MODE")) {
-            horizontalHitTest(oldPosition);
+            if (horizontalHitTest(oldPosition)) {
+                // Do something while the player is colliding
+            }
         }
     }
 
@@ -528,8 +554,8 @@ public final class Player extends RenderableObject {
      */
     public void resetPlayer() {
         _position = Player.calcPlayerOrigin();
-        _accVector.set(0, 0, 0);
-        _moveVector.set(0, 0, 0);
+        _acc.set(0, 0, 0);
+        _movement.set(0, 0, 0);
         _gravity = 0.0f;
     }
 
@@ -581,7 +607,7 @@ public final class Player extends RenderableObject {
      */
     @Override
     public String toString() {
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _selectedBlockType, _gravity, _moveVector.x, _moveVector.y, _moveVector.z);
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _selectedBlockType, _gravity, _movement.x, _movement.y, _movement.z);
     }
 
     /**

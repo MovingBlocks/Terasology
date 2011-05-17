@@ -150,16 +150,16 @@ public final class Configuration {
     public static void loadDefaults() {
         _settingsBoolean.put("SHOW_PLACING_BOX", true);
         _settingsBoolean.put("SHOW_CHUNK_OUTLINES", false);
-        _settingsBoolean.put("SHOW_HUD", true);
+        _settingsBoolean.put("SHOW_DEBUG_INFORMATION", true);
         _settingsBoolean.put("ENABLE_BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);
-        _settingsNumeric.put("JUMP_INTENSITY", 10f);
+        _settingsNumeric.put("JUMP_INTENSITY", 8f);
         _settingsNumeric.put("MAX_GRAVITY", 64f);
         _settingsNumeric.put("WALKING_SPEED", 1.5f);
         _settingsNumeric.put("RUNNING_FACTOR", 1.6f);
         _settingsNumeric.put("PLAYER_HEIGHT", 0.8f);
-        _settingsNumeric.put("GRAVITY", 0.05f);
+        _settingsNumeric.put("GRAVITY", 0.025f);
         _settingsNumeric.put("FRICTION", 0.01f);
     }
 

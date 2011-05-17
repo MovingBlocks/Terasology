@@ -30,12 +30,12 @@ public class BlockNil extends Block {
 
     @Override
     public boolean isBlockInvisible() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isPenetrable() {
-        return false;
+        return true;
     }
 
     @Override

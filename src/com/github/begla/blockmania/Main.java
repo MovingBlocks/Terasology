@@ -169,11 +169,6 @@ public final class Main {
             worldSeed = _rand.randomCharacterString(16);
         }
         initNewWorld("World1", worldSeed);
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
         _player.resetPlayer();
     }
 
@@ -200,9 +195,7 @@ public final class Main {
         _player.render();
         _world.render();
 
-        if (Configuration.getSettingBoolean("SHOW_HUD")) {
-            renderHUD();
-        }
+        renderHUD();
     }
 
     /**
@@ -213,7 +206,7 @@ public final class Main {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(84.0f, (float) Configuration.DISPLAY_WIDTH / (float) Configuration.DISPLAY_HEIGHT, 0.01f, 256);
+        gluPerspective(84.0f, (float) Configuration.DISPLAY_WIDTH / (float) Configuration.DISPLAY_HEIGHT, 0.01f, 256f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
@@ -294,11 +287,13 @@ public final class Main {
         glEnable(GL_BLEND);
         glEnable(GL_TEXTURE_2D);
 
-        // Draw debugging information
-        _font1.drawString(4, 4, String.format("%s (fps: %.2f, free heap space: %d MB)", Configuration.GAME_TITLE, _meanFps, Runtime.getRuntime().freeMemory() / 1048576), Color.white);
-        _font1.drawString(4, 22, String.format("%s", _player, Color.white));
-        _font1.drawString(4, 38, String.format("%s", _world, Color.white));
-        _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount(), Color.white));
+        if (Configuration.getSettingBoolean("SHOW_DEBUG_INFORMATION")) {
+            // Draw debugging information
+            _font1.drawString(4, 4, String.format("%s (fps: %.2f, free heap space: %d MB)", Configuration.GAME_TITLE, _meanFps, Runtime.getRuntime().freeMemory() / 1048576), Color.white);
+            _font1.drawString(4, 22, String.format("%s", _player, Color.white));
+            _font1.drawString(4, 38, String.format("%s", _world, Color.white));
+            _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount(), Color.white));
+        }
 
         if (_showDebugConsole) {
             // Display the console input text
@@ -499,15 +494,16 @@ public final class Main {
         // Link the player to the world
         _player.setParent(_world);
         _world.startUpdateThread();
-        for (int i = 0; i < 15; i++) {
+
+        _logger.log(Level.INFO, "Waiting for some chunks to pop up...", seed);
+        while (_world.getStatGeneratedChunks() < 32) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(500);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-            System.out.printf("Waiting for some chunks to pop up... %.1f%%\n", ((i + 1) / 15f) * 100f);
         }
+        _logger.log(Level.INFO, "Enough chunks generated. Resetting player...", seed);
 
         _player.resetPlayer();
     }

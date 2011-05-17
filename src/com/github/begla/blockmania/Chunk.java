@@ -1311,6 +1311,23 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return 
+     */
+    public boolean canBlockSeeTheSky(int x, int y, int z) {
+        while (y < Configuration.CHUNK_DIMENSIONS.y) {
+            if (!Block.getBlockForType(getBlock(x, y, z)).isBlockTypeTranslucent()) {
+                return false;
+            }
+            y++;
+        }
+        return true;
+    }
+
+    /**
      * Calculates a simple occlusion value based on the amount of blocks
      * surrounding the given block position.
      * 

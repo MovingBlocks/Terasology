@@ -21,11 +21,11 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
- * A wheat billboard block.
+ * A large wheat billboard block.
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockWheat extends Block {
+public class BlockLargeHighGrass extends Block {
 
     @Override
     public boolean isBlockTypeTranslucent() {
@@ -34,12 +34,12 @@ public class BlockWheat extends Block {
 
     @Override
     public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(40f / 255f, 190f / 255f, 40f / 255f, 1.0f);
+        return new Vector4f(40f / 255f, 220f / 255f, 40f / 255f, 1.0f);
     }
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(12, 6);
+        return Helper.getInstance().calcOffsetForTextureAt(13, 6);
     }
 
     @Override
