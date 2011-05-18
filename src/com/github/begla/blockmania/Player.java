@@ -95,7 +95,7 @@ public final class Player extends RenderableObject {
         }
 
         // Draw the player's AABB
-        getAABB().render();
+        // getAABB().render();
     }
 
     /**
@@ -253,15 +253,14 @@ public final class Player extends RenderableObject {
             RayFaceIntersection is = calcSelectedBlock();
             if (is != null) {
                 Vector3f blockPos = is.calcAdjacentBlockPos();
-                // Players should not place blocks inside themselves! That would be silly!
-                Vector3f playerBlockPos = new Vector3f(_position);
-                playerBlockPos.x = (int) (playerBlockPos.x + 0.5f);
-                playerBlockPos.y = (int) (playerBlockPos.y);
-                playerBlockPos.z = (int) (playerBlockPos.z + 0.5f);
 
-                if (blockPos.x != playerBlockPos.x || (blockPos.y != playerBlockPos.y && blockPos.y != playerBlockPos.y + 1f) || blockPos.z != playerBlockPos.z) {
-                    getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
+                // Prevent players from placing blocks inside their bounding boxes
+                if (Block.AABBForBlockAt((int) blockPos.x, (int) blockPos.y, (int) blockPos.z).overlaps(getAABB())) {
+                    return;
+
                 }
+                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
+
             }
         }
     }
@@ -625,6 +624,6 @@ public final class Player extends RenderableObject {
      * @return The coordinates of the spawning point
      */
     public static Vector3f calcPlayerOrigin() {
-        return new Vector3f(Configuration.CHUNK_DIMENSIONS.x * Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2, 100, (Configuration.CHUNK_DIMENSIONS.z * Configuration.VIEWING_DISTANCE_IN_CHUNKS.y) / 2);
+        return new Vector3f(128, 100, 128);
     }
 }

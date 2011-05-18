@@ -65,8 +65,6 @@ public final class World extends RenderableObject {
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
     /* ------ */
-    private Chunk[][] _chunks;
-    /* ------ */
     private final List<Chunk> _chunkUpdateQueueDL = Collections.synchronizedList(new LinkedList<Chunk>());
     private final List<Chunk> _chunkUpdateNormal = Collections.synchronizedList(new LinkedList<Chunk>());
     private final Map<Integer, Chunk> _chunkCache = Collections.synchronizedMap(new TreeMap<Integer, Chunk>());
@@ -81,6 +79,9 @@ public final class World extends RenderableObject {
     private String _title, _seed;
     /* ----- */
     int _lastGeneratedChunkID = 0;
+    /* ----- */
+    private ArrayList<Chunk> _visibleChunks = new ArrayList<Chunk>();
+    private long _lastWorldUpdate = Helper.getInstance().getTime();
 
     /**
      * Initializes a new world for the single player mode.
@@ -91,7 +92,6 @@ public final class World extends RenderableObject {
      */
     public World(String title, String seed, Player p) {
         this._player = p;
-        _chunks = new Chunk[(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x][(int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y];
 
         _title = title;
         _seed = seed;
@@ -110,14 +110,6 @@ public final class World extends RenderableObject {
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
-
-        for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
-                Chunk c = loadOrCreateChunk(x, z);
-                _chunks[x][z] = c;
-                queueChunkForUpdate(c);
-            }
-        }
 
         _updateThread = new Thread(new Runnable() {
 
@@ -167,10 +159,16 @@ public final class World extends RenderableObject {
                         _statUpdateDuration /= 2;
                     }
 
-                    updateInfWorld();
                     updateDaytime();
                     evolveChunks();
 
+                    // Update the visible chunks each second
+                    if (Helper.getInstance().getTime() - _lastWorldUpdate > 1000) {
+                        _visibleChunks = fetchVisibleChunks();
+                        _lastWorldUpdate = Helper.getInstance().getTime();
+                    }
+                   
+                    // HACK: Reduce CPU usage a little bit
                     try {
                         Thread.sleep(15);
                     } catch (InterruptedException ex) {
@@ -202,6 +200,13 @@ public final class World extends RenderableObject {
      */
     private void processChunk(Chunk c) {
         if (c != null) {
+
+            // Only process visible chunks
+            if (!_visibleChunks.contains(c)) {
+                _chunkUpdateNormal.remove(c);
+                return;
+            }
+
             c.generate();
             Chunk[] neighbors = c.loadOrCreateNeighbors();
 
@@ -295,58 +300,15 @@ public final class World extends RenderableObject {
      * 
      */
     private void evolveChunks() {
-        if (_chunkUpdateNormal.isEmpty()) {
-            for (int i = 0; i < 32; i++) {
-                int randX = _rand.randomInt() % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x;
-                int randZ = _rand.randomInt() % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y;
-
-                Chunk c = getChunk(randX, randZ);
-
-                if (c != null) {
-                    if (!c.isFresh()) {
-                        _generatorGrass.generate(c);
-                        queueChunkForUpdate(c);
-                    }
-                }
-            }
+        if (!_chunkUpdateNormal.isEmpty() || _visibleChunks.isEmpty()) {
+            return;
         }
-    }
 
-    /**
-     * Updates the displayed chunks according to the players position and queues
-     * new chunks for updating.
-     */
-    private void updateInfWorld() {
+        Chunk c = _visibleChunks.get((int) (Math.abs(_rand.randomLong()) % _visibleChunks.size()));
 
-        for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
-                Chunk c = getChunk(x, z);
-                if (c != null) {
-                    Vector3f pos = new Vector3f(x, 0, z);
-                    int multZ = (int) calcPlayerChunkOffsetZ() / (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y + 1;
-                    if (z < calcPlayerChunkOffsetZ() % Configuration.VIEWING_DISTANCE_IN_CHUNKS.y) {
-                        pos.z += Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * multZ;
-                    } else {
-                        pos.z += Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * (multZ - 1);
-                    }
-                    int multX = (int) calcPlayerChunkOffsetX() / (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x + 1;
-                    if (x < calcPlayerChunkOffsetX() % Configuration.VIEWING_DISTANCE_IN_CHUNKS.x) {
-                        pos.x += Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * multX;
-                    } else {
-                        pos.x += Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * (multX - 1);
-                    }
-
-                    if (c.getPosition().x != pos.x || c.getPosition().z != pos.z) {
-                        // Remove the old chunk from the chunk update queue
-                        _chunkUpdateNormal.remove(c);
-                        // Try to load a cached version of the chunk
-                        c = loadOrCreateChunk((int) pos.x, (int) pos.z);
-                        // Replace the old chunk
-                        _chunks[x][z] = c;
-                        queueChunkForUpdate(c);
-                    }
-                }
-            }
+        if (!c.isFresh()) {
+            _generatorGrass.generate(c);
+            queueChunkForUpdate(c);
         }
     }
 
@@ -354,11 +316,8 @@ public final class World extends RenderableObject {
      * Queues all displayed chunks for updating.
      */
     public void updateAllChunks() {
-        for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
-                Chunk c = getChunk(x, z);
-                queueChunkForUpdate(c);
-            }
+        for (Chunk c : _visibleChunks) {
+            queueChunkForUpdate(c);
         }
     }
 
@@ -392,7 +351,7 @@ public final class World extends RenderableObject {
     public void renderHorizon() {
         glPushMatrix();
         // Position the sun relatively to the player
-        glTranslatef(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 0.75f, Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
+        glTranslatef(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 1.25f, Configuration.VIEWING_DISTANCE_IN_CHUNKS.y * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
 
         // Disable fog
         glDisable(GL_FOG);
@@ -425,25 +384,37 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * Renders all active chunks.
+     * 
+     * @return 
      */
-    public void renderChunks() {
+    public ArrayList<Chunk> fetchVisibleChunks() {
+        ArrayList<Chunk> visibleChunks = new ArrayList<Chunk>();
 
-        for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
-                Chunk c = getChunk(x, z);
+        for (int x = -((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2); x < ((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2); x++) {
+            for (int z = -((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y / 2); z < ((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y / 2); z++) {
+                Chunk c = loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
                 if (c != null) {
-                    c.render(false);
+                    // If this chunk is fresh, queue it for updates
+                    if (c.isFresh() || c.isDirty() || c.isLightDirty()) {
+                        queueChunkForUpdate(c);
+                    }
+                    visibleChunks.add(c);
                 }
             }
         }
-        for (int x = 0; x < Configuration.VIEWING_DISTANCE_IN_CHUNKS.x; x++) {
-            for (int z = 0; z < Configuration.VIEWING_DISTANCE_IN_CHUNKS.y; z++) {
-                Chunk c = getChunk(x, z);
-                if (c != null) {
-                    c.render(true);
-                }
-            }
+
+        return visibleChunks;
+    }
+
+    /**
+     * Renders all active chunks.
+     */
+    public void renderChunks() {
+        for (Chunk c : _visibleChunks) {
+            c.render(false);
+        }
+        for (Chunk c : _visibleChunks) {
+            c.render(true);
         }
     }
 
@@ -543,24 +514,6 @@ public final class World extends RenderableObject {
             }
         } catch (Exception e) {
         }
-    }
-
-    /**
-     * Returns the chunk at the given position.
-     * 
-     * @param x The X-coordinate
-     * @param z The Z-coordinate
-     * @return The chunk
-     */
-    public final Chunk getChunk(int x, int z) {
-        Chunk c = null;
-
-        try {
-            c = _chunks[x % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x][z % (int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y];
-        } catch (Exception e) {
-        }
-
-        return c;
     }
 
     /**
@@ -748,7 +701,7 @@ public final class World extends RenderableObject {
      * @return The player offset on the x-axis
      */
     private int calcPlayerChunkOffsetX() {
-        return (int) ((_player.getPosition().x - Player.calcPlayerOrigin().x) / Configuration.CHUNK_DIMENSIONS.x);
+        return (int) (_player.getPosition().x / Configuration.CHUNK_DIMENSIONS.x);
     }
 
     /**
@@ -757,7 +710,7 @@ public final class World extends RenderableObject {
      * @return The player offset on the z-axis
      */
     private int calcPlayerChunkOffsetZ() {
-        return (int) ((_player.getPosition().z - Player.calcPlayerOrigin().z) / Configuration.CHUNK_DIMENSIONS.z);
+        return (int) (_player.getPosition().z / Configuration.CHUNK_DIMENSIONS.z);
     }
 
     /**
@@ -919,17 +872,8 @@ public final class World extends RenderableObject {
             return null;
         }
 
-        // Try to load the chunk directly
-        Chunk c = getChunk(x, z);
-
-        // Okay, found a chunk
-        if (c != null) {
-            // Check if the chunk fits the position
-            if (c.getPosition().x != x || c.getPosition().y != 0 || c.getPosition().z != z) {
-                // If not, try to load the chunk from cache
-                c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
-            }
-        }
+        // Try to load the chunk from the cache
+        Chunk c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
 
         // We got a chunk! Already! Great!
         if (c != null) {
