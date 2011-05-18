@@ -21,7 +21,6 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.utilities.PerlinNoise;
 import java.util.Collections;
 import java.util.ArrayList;
-import java.util.SortedSet;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
@@ -96,7 +95,7 @@ public final class Player extends RenderableObject {
         }
 
         // Draw the player's AABB
-        //getAABB().render();
+        getAABB().render();
     }
 
     /**
@@ -384,7 +383,7 @@ public final class Player extends RenderableObject {
         ArrayList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
         for (BlockPosition bp : blockPositions) {
-            int blockType1 = _parent.getBlockAtPosition(new Vector3f(bp.x, bp.y, bp.z));
+            byte blockType1 = _parent.getBlockAtPosition(new Vector3f(bp.x, bp.y, bp.z));
 
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
                 if (getAABB().overlaps(Block.AABBForBlockAt(bp.x, bp.y, bp.z))) {
@@ -439,7 +438,7 @@ public final class Player extends RenderableObject {
 
         // Check each block positions for collisions
         for (BlockPosition bp : blockPositions) {
-            int blockType1 = _parent.getBlockAtPosition(new Vector3f(bp.x, bp.y, bp.z));
+            byte blockType1 = _parent.getBlockAtPosition(new Vector3f(bp.x, bp.y, bp.z));
 
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
                 if (getAABB().overlaps(Block.AABBForBlockAt(bp.x, bp.y, bp.z))) {

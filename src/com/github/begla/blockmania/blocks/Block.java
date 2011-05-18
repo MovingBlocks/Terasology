@@ -67,7 +67,7 @@ public abstract class Block {
      * @param type Block type ID
      * @return The object for the given ID
      */
-    public static Block getBlockForType(int type) {
+    public static Block getBlockForType(byte type) {
         Block b = null;
         try {
             b = _blocks[type];

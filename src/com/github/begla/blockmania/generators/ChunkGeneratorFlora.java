@@ -47,7 +47,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorForest {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
                 for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
-                    int type = c.getBlock(x, y, z);
+                    byte type = c.getBlock(x, y, z);
 
                     // Ignore this column if a block was found, which is opaque and no dirt
                     if (Block.getBlockForType(type).getClass() != BlockDirt.class && !Block.getBlockForType(type).isBlockTypeTranslucent()) {

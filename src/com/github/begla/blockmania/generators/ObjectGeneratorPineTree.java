@@ -50,16 +50,21 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
             _world.setBlock(posX, posY + i, posZ, (byte) 0x5, update, false);
         }
 
+        int stage = 2;
         // Generate the treetop
-        for (int y = 0; y < 6; y += 2) {
-            int div = (int) Math.ceil((double) y / 4d);
-            for (int x = -2 + div; x <= 2 - div; x++) {
-                for (int z = -2 + div; z <= 2 - div; z++) {
+        for (int y = height - 1; y >= (height * (1f / 3f)); y--) {
+            // int div = (int) Math.ceil((double) y / 4d);
+            for (int x = -(stage / 2); x <= (stage / 2); x++) {
+                for (int z = -(stage / 2); z <= (stage / 2); z++) {
                     if (!(x == 0 && z == 0)) {
-                        _world.setBlock(posX + x, posY + y + (height - 6), posZ + z, (byte) 0x6, update, false);
+                        _world.setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update, false);
                     }
                 }
             }
+
+            stage++;
         }
+
+        _world.setBlock(posX, posY + height, posZ, (byte) 0x6, update, false);
     }
 }
