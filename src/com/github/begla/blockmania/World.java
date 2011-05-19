@@ -65,9 +65,9 @@ public final class World extends RenderableObject {
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
     /* ------ */
-    private final List<Chunk> _chunkUpdateQueueDL = Collections.synchronizedList(new LinkedList<Chunk>());
-    private final List<Chunk> _chunkUpdateNormal = Collections.synchronizedList(new LinkedList<Chunk>());
-    private final Map<Integer, Chunk> _chunkCache = Collections.synchronizedMap(new TreeMap<Integer, Chunk>());
+    private final List<Chunk> _chunkUpdateQueueDL = new LinkedList<Chunk>();
+    private final List<Chunk> _chunkUpdateNormal = new LinkedList<Chunk>();
+    private final Map<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
     private final ChunkGeneratorForest _generatorForest;
