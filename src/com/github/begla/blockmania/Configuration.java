@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.utilities.VectorPool;
 import javolution.util.FastMap;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Vector2f;
@@ -34,16 +35,9 @@ public final class Configuration {
      */
     public static final String GAME_TITLE = "Blockmania Pre Alpha";
     /**
-     * The viewing distance in chunks.
-     *
-     * 16x1x16 seems to be a good value. With a chunk size of 16x128x16 there are 8.388.608 blocks
-     * present at the same time.
-     */
-    public static final Vector2f VIEWING_DISTANCE_IN_CHUNKS = new Vector2f(16.0f, 16.0f);
-    /**
      * The dimensions of a chunk.
      */
-    public static final Vector3f CHUNK_DIMENSIONS = new Vector3f(16, 128, 16);
+    public static final Vector3f CHUNK_DIMENSIONS = VectorPool.getVector(16, 128, 16);
     /**
      * The size of the sun.
      */
@@ -161,6 +155,8 @@ public final class Configuration {
         _settingsNumeric.put("PLAYER_HEIGHT", 0.8f);
         _settingsNumeric.put("GRAVITY", 0.025f);
         _settingsNumeric.put("FRICTION", 0.01f);
+        _settingsNumeric.put("V_DIST_X", 16f);
+        _settingsNumeric.put("V_DIST_Z", 16f);
     }
 
     /**

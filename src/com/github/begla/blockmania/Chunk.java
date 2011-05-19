@@ -61,15 +61,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private int _chunkID = -1;
     private static Texture _textureMap;
     /* ------ */
-    private final FastList<Float> _quadsTranslucent = new FastList<Float>();
-    private final FastList<Float> _texTranslucent = new FastList<Float>();
-    private final FastList<Float> _colorTranslucent = new FastList<Float>();
-    private final FastList<Float> _quadsOpaque = new FastList<Float>();
-    private final FastList<Float> _texOpaque = new FastList<Float>();
-    private final FastList<Float> _colorOpaque = new FastList<Float>();
-    private final FastList<Float> _quadsBillboard = new FastList<Float>();
-    private final FastList<Float> _texBillboard = new FastList<Float>();
-    private final FastList<Float> _colorBillboard = new FastList<Float>();
+    private FastList<Float> _quadsTranslucent;
+    private FastList<Float> _texTranslucent;
+    private FastList<Float> _colorTranslucent;
+    private FastList<Float> _quadsOpaque;
+    private FastList<Float> _texOpaque;
+    private FastList<Float> _colorOpaque;
+    private FastList<Float> _quadsBillboard;
+    private FastList<Float> _texBillboard;
+    private FastList<Float> _colorBillboard;
     /* ------ */
     private World _parent = null;
 
@@ -236,8 +236,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
                 return true;
             }
 
-            for (ChunkGenerator g : _generators) {
-                g.generate(this);
+            for (FastList.Node<ChunkGenerator> n = _generators.head(), end = _generators.tail(); (n = n.getNext()) != end;) {
+                n.getValue().generate(this);
             }
 
             updateSunlight();
@@ -289,6 +289,16 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Generates the vertex-, texture- and color-arrays.
      */
     public void generateVertexArrays() {
+        _quadsTranslucent = new FastList<Float>();
+        _texTranslucent = new FastList<Float>();
+        _colorTranslucent = new FastList<Float>();
+        _quadsOpaque = new FastList<Float>();
+        _texOpaque = new FastList<Float>();
+        _colorOpaque = new FastList<Float>();
+        _quadsBillboard = new FastList<Float>();
+        _texBillboard = new FastList<Float>();
+        _colorBillboard = new FastList<Float>();
+
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -817,10 +827,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Generates the display lists from the precalculated arrays.
      */
     public void generateDisplayLists() {
-        if (_colorOpaque.isEmpty() && _texOpaque.isEmpty() && _quadsOpaque.isEmpty() && _colorTranslucent.isEmpty() && _texTranslucent.isEmpty() && _quadsTranslucent.isEmpty()) {
-            if (_colorBillboard.isEmpty() && _texBillboard.isEmpty() && _quadsBillboard.isEmpty()) {
-                return;
-            }
+        // Check on of the vertex arrays
+        if (_colorOpaque == null) {
+            return;
         }
 
         if (_displayListOpaque == -1) {
@@ -841,20 +850,20 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         vb = BufferUtils.createFloatBuffer(_quadsOpaque.size());
 
-        for (Float f : _quadsOpaque) {
-            vb.put(f);
+        for (FastList.Node<Float> n = _quadsOpaque.head(), end = _quadsOpaque.tail(); (n = n.getNext()) != end;) {
+            vb.put(n.getValue());
         }
 
         tb = BufferUtils.createFloatBuffer(_texOpaque.size());
 
-        for (Float f : _texOpaque) {
-            tb.put(f);
+        for (FastList.Node<Float> n = _texOpaque.head(), end = _texOpaque.tail(); (n = n.getNext()) != end;) {
+            tb.put(n.getValue());
         }
 
         cb = BufferUtils.createFloatBuffer(_colorOpaque.size());
 
-        for (Float f : _colorOpaque) {
-            cb.put(f);
+        for (FastList.Node<Float> n = _colorOpaque.head(), end = _colorOpaque.tail(); (n = n.getNext()) != end;) {
+            cb.put(n.getValue());
         }
 
         vb.flip();
@@ -874,26 +883,22 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         glDisableClientState(GL_VERTEX_ARRAY);
         glEndList();
 
-        _quadsOpaque.clear();
-        _texOpaque.clear();
-        _colorOpaque.clear();
-
         vb = BufferUtils.createFloatBuffer(_quadsTranslucent.size());
 
-        for (Float f : _quadsTranslucent) {
-            vb.put(f);
+        for (FastList.Node<Float> n = _quadsTranslucent.head(), end = _quadsTranslucent.tail(); (n = n.getNext()) != end;) {
+            vb.put(n.getValue());
         }
 
         tb = BufferUtils.createFloatBuffer(_texTranslucent.size());
 
-        for (Float f : _texTranslucent) {
-            tb.put(f);
+        for (FastList.Node<Float> n = _texTranslucent.head(), end = _texTranslucent.tail(); (n = n.getNext()) != end;) {
+            tb.put(n.getValue());
         }
 
         cb = BufferUtils.createFloatBuffer(_colorTranslucent.size());
 
-        for (Float f : _colorTranslucent) {
-            cb.put(f);
+        for (FastList.Node<Float> n = _colorTranslucent.head(), end = _colorTranslucent.tail(); (n = n.getNext()) != end;) {
+            cb.put(n.getValue());
         }
 
         vb.flip();
@@ -913,26 +918,22 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         glDisableClientState(GL_VERTEX_ARRAY);
         glEndList();
 
-        _quadsTranslucent.clear();
-        _texTranslucent.clear();
-        _colorTranslucent.clear();
-
         vb = BufferUtils.createFloatBuffer(_quadsBillboard.size());
 
-        for (Float f : _quadsBillboard) {
-            vb.put(f);
+        for (FastList.Node<Float> n = _quadsBillboard.head(), end = _quadsBillboard.tail(); (n = n.getNext()) != end;) {
+            vb.put(n.getValue());
         }
 
         tb = BufferUtils.createFloatBuffer(_texBillboard.size());
 
-        for (Float f : _texBillboard) {
-            tb.put(f);
+        for (FastList.Node<Float> n = _texBillboard.head(), end = _texBillboard.tail(); (n = n.getNext()) != end;) {
+            tb.put(n.getValue());
         }
 
         cb = BufferUtils.createFloatBuffer(_colorBillboard.size());
 
-        for (Float f : _colorBillboard) {
-            cb.put(f);
+        for (FastList.Node<Float> n = _colorBillboard.head(), end = _colorBillboard.tail(); (n = n.getNext()) != end;) {
+            cb.put(n.getValue());
         }
 
         vb.flip();
@@ -952,9 +953,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         glDisableClientState(GL_VERTEX_ARRAY);
         glEndList();
 
-        _quadsBillboard.clear();
-        _texBillboard.clear();
-        _colorBillboard.clear();
+        _quadsTranslucent = null;
+        _texTranslucent = null;
+        _colorTranslucent = null;
+        _quadsOpaque = null;
+        _texOpaque = null;
+        _colorOpaque = null;
+        _quadsBillboard = null;
+        _texBillboard = null;
+        _colorBillboard = null;
     }
 
     /**

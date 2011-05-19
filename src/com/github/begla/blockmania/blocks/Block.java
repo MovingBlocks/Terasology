@@ -18,6 +18,7 @@ package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.AABB;
 import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.utilities.VectorPool;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -170,6 +171,6 @@ public abstract class Block {
      * @return
      */
     public static AABB AABBForBlockAt(int x, int y, int z) {
-        return new AABB(new Vector3f(x, y, z), new Vector3f(0.5f, 0.5f, 0.5f));
+        return new AABB(VectorPool.getVector(x, y, z), VectorPool.getVector(0.5f, 0.5f, 0.5f));
     }
 }

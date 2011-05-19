@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.utilities.VectorPool;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -143,19 +144,21 @@ public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
     public SIDE calcSide() {
         Vector3f norm = calcSurfaceNormal();
 
-        if (norm.equals(new Vector3f(0, 1, 0))) {
+        if (norm.equals(VectorPool.getVector(0, 1, 0))) {
             return SIDE.TOP;
-        } else if (norm.equals(new Vector3f(0, -1, 0))) {
+        } else if (norm.equals(VectorPool.getVector(0, -1, 0))) {
             return SIDE.BOTTOM;
-        } else if (norm.equals(new Vector3f(0, 0, 1))) {
+        } else if (norm.equals(VectorPool.getVector(0, 0, 1))) {
             return SIDE.BACK;
-        } else if (norm.equals(new Vector3f(0, 0, -1))) {
+        } else if (norm.equals(VectorPool.getVector(0, 0, -1))) {
             return SIDE.FRONT;
-        } else if (norm.equals(new Vector3f(1, 0, 0))) {
+        } else if (norm.equals(VectorPool.getVector(1, 0, 0))) {
             return SIDE.RIGHT;
-        } else if (norm.equals(new Vector3f(-1, 0, 0))) {
+        } else if (norm.equals(VectorPool.getVector(-1, 0, 0))) {
             return SIDE.LEFT;
         }
+        
+        VectorPool.putVector(norm);
 
         return SIDE.NONE;
     }
@@ -168,6 +171,9 @@ public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
         Vector3f a = Vector3f.sub(v1, v0, null);
         Vector3f b = Vector3f.sub(v2, v0, null);
         Vector3f norm = Vector3f.cross(a, b, null);
+        
+        VectorPool.putVector(a);
+        VectorPool.putVector(b);
 
         return norm;
     }

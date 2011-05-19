@@ -145,17 +145,17 @@ public class AABB extends RenderableObject {
 
         // Calculate the center points of each of the six sides
         // Top side
-        sides[0] = new Vector3f(_position.x, _position.y + _dimensions.y, _position.z);
+        sides[0] = VectorPool.getVector(_position.x, _position.y + _dimensions.y, _position.z);
         // Left side
-        sides[1] = new Vector3f(_position.x - _dimensions.x, _position.y, _position.z);
+        sides[1] = VectorPool.getVector(_position.x - _dimensions.x, _position.y, _position.z);
         // Right side
-        sides[2] = new Vector3f(_position.x + _dimensions.x, _position.y, _position.z);
+        sides[2] = VectorPool.getVector(_position.x + _dimensions.x, _position.y, _position.z);
         // Bottom side
-        sides[3] = new Vector3f(_position.x, _position.y - _dimensions.y, _position.z);
+        sides[3] = VectorPool.getVector(_position.x, _position.y - _dimensions.y, _position.z);
         // Front side
-        sides[4] = new Vector3f(_position.x, _position.y, _position.z + _dimensions.z);
+        sides[4] = VectorPool.getVector(_position.x, _position.y, _position.z + _dimensions.z);
         // Back side
-        sides[5] = new Vector3f(_position.x, _position.y, _position.z - _dimensions.z);
+        sides[5] = VectorPool.getVector(_position.x, _position.y, _position.z - _dimensions.z);
 
         int closestSideIndex = -1;
         float closestSideDistance = Integer.MAX_VALUE;
@@ -173,19 +173,19 @@ public class AABB extends RenderableObject {
 
         switch (closestSideIndex) {
             case 0:
-                return new Vector3f(0, 1, 0);
+                return VectorPool.getVector(0, 1, 0);
             case 1:
-                return new Vector3f(1, 0, 0);
+                return VectorPool.getVector(1, 0, 0);
             case 2:
-                return new Vector3f(-1, 0, 0);
+                return VectorPool.getVector(-1, 0, 0);
             case 3:
-                return new Vector3f(0, -1, 0);
+                return VectorPool.getVector(0, -1, 0);
             case 4:
-                return new Vector3f(0, 0, 1);
+                return VectorPool.getVector(0, 0, 1);
             case 5:
-                return new Vector3f(0, 0, -1);
+                return VectorPool.getVector(0, 0, -1);
         }
 
-        return new Vector3f();
+        return VectorPool.getVector();
     }
 }

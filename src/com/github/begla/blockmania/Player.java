@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.utilities.VectorPool;
 import javolution.util.FastList;
 import com.github.begla.blockmania.utilities.AABB;
 import com.github.begla.blockmania.blocks.Block;
@@ -34,17 +35,18 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Player extends RenderableObject {
 
+    private static final Vector3f _playerOrigin = VectorPool.getVector(128, 100, 128);
     private boolean _jump = false;
     private byte _selectedBlockType = 1;
     private double _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
     private double _yaw = 135d;
     private double _pitch;
-    private final Vector3f _movement = new Vector3f(0, 0, 0);
-    private final Vector3f _acc = new Vector3f(0, 0, 0);
+    private final Vector3f _movement = VectorPool.getVector(0, 0, 0);
+    private final Vector3f _acc = VectorPool.getVector(0, 0, 0);
     private float _gravity = 0.0f;
     private World _parent = null;
     private final PerlinNoise _pGen = new PerlinNoise((int) Helper.getInstance().getTime());
-    private Vector3f _viewingDirection = new Vector3f();
+    private Vector3f _viewingDirection = VectorPool.getVector();
 
     /**
      * 
@@ -210,7 +212,7 @@ public final class Player extends RenderableObject {
                 for (int z = -4; z < 4; z++) {
                     if (x != 0 || y != 0 || z != 0) {
                         // The ray originates from the "player's eye"
-                        FastList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, new Vector3f(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
+                        FastList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, VectorPool.getVector(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
                         if (iss != null) {
                             inters.addAll(iss);
                         }
@@ -382,7 +384,7 @@ public final class Player extends RenderableObject {
         FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
         for (BlockPosition bp : blockPositions) {
-            byte blockType1 = _parent.getBlockAtPosition(new Vector3f(bp.x, bp.y, bp.z));
+            byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(bp.x, bp.y, bp.z));
 
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
                 if (getAABB().overlaps(Block.AABBForBlockAt(bp.x, bp.y, bp.z))) {
@@ -437,22 +439,26 @@ public final class Player extends RenderableObject {
 
         // Check each block positions for collisions
         for (BlockPosition bp : blockPositions) {
-            byte blockType1 = _parent.getBlockAtPosition(new Vector3f(bp.x, bp.y, bp.z));
+            byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(bp.x, bp.y, bp.z));
 
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
                 if (getAABB().overlaps(Block.AABBForBlockAt(bp.x, bp.y, bp.z))) {
                     result = true;
                     Vector3f normal = Block.AABBForBlockAt(bp.x, bp.y, bp.z).closestNormalToPoint(origin);
                     // Find a vector parallel to the surface normal
-                    Vector3f slideVector = Vector3f.cross(normal, new Vector3f(0, 1, 0), null);
+                    Vector3f slideVector = Vector3f.cross(normal, VectorPool.getVector(0, 1, 0), null);
                     // Calculate the direction from the origin to the current position
-                    Vector3f direction = new Vector3f(_position.x, 0f, _position.z);
+                    Vector3f direction = VectorPool.getVector(_position.x, 0f, _position.z);
                     direction.x -= origin.x;
                     direction.z -= origin.z;
                     // Calculate the intensity of the diversion alongside the block
                     float length = Vector3f.dot(slideVector, direction);
                     _position.z = origin.z + length * slideVector.z;
                     _position.x = origin.x + length * slideVector.x;
+                    
+                    VectorPool.putVector(normal);
+                    VectorPool.putVector(slideVector);
+                    VectorPool.putVector(direction);
                 }
             }
         }
@@ -468,7 +474,8 @@ public final class Player extends RenderableObject {
      */
     private void updatePlayerPosition(float delta) {
         // Save the previous position before changing any of the values
-        Vector3f oldPosition = new Vector3f(_position);
+        Vector3f oldPosition = VectorPool.getVector();
+        oldPosition.set(_position);
 
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
             _position.z += 8f / 1000f * delta;
@@ -545,13 +552,15 @@ public final class Player extends RenderableObject {
                 // Do something while the player is colliding
             }
         }
+        
+        VectorPool.putVector(oldPosition);
     }
 
     /**
      * Resets the player's position.
      */
     public void resetPlayer() {
-        _position = Player.calcPlayerOrigin();
+        _position = Player.getPlayerOrigin();
         _acc.set(0, 0, 0);
         _movement.set(0, 0, 0);
         _gravity = 0.0f;
@@ -613,7 +622,7 @@ public final class Player extends RenderableObject {
      * @return 
      */
     public AABB getAABB() {
-        return new AABB(_position, new Vector3f(.3f, 0.7f, .3f));
+        return new AABB(_position, VectorPool.getVector(.3f, 0.7f, .3f));
     }
 
     /**
@@ -623,7 +632,7 @@ public final class Player extends RenderableObject {
      * 
      * @return The coordinates of the spawning point
      */
-    public static Vector3f calcPlayerOrigin() {
-        return new Vector3f(128, 100, 128);
+    public static Vector3f getPlayerOrigin() {
+        return _playerOrigin;
     }
 }

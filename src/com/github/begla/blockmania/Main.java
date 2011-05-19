@@ -17,6 +17,7 @@
 package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.utilities.VectorPool;
 import java.awt.Font;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
@@ -33,7 +34,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 
@@ -55,6 +55,7 @@ public final class Main {
     private boolean _runGame = true;
     /* ------- */
     private float _meanFps;
+    private float _memoryUsage;
     /* ------- */
     Player _player;
     World _world;
@@ -155,9 +156,6 @@ public final class Main {
         // Enable fog
         glHint(GL_FOG_HINT, GL_NICEST);
         glFogi(GL_FOG_MODE, GL_LINEAR);
-        float viewingDistance = (Configuration.VIEWING_DISTANCE_IN_CHUNKS.x * Configuration.CHUNK_DIMENSIONS.x) / 2f;
-        glFogf(GL_FOG_START, viewingDistance / 16f);
-        glFogf(GL_FOG_END, viewingDistance);
 
         Chunk.init();
         World.init();
@@ -186,6 +184,12 @@ public final class Main {
         fogColorBuffer.put(fogColor);
         fogColorBuffer.rewind();
         glFog(GL_FOG_COLOR, fogColorBuffer);
+
+        // Update by the viewing distance
+        float maxDist = Math.max(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
+        float viewingDistance = maxDist / 2f;
+        glFogf(GL_FOG_START, 16f);
+        glFogf(GL_FOG_END, viewingDistance);
 
         /*
          * Render the player, world and HUD.
@@ -240,6 +244,9 @@ public final class Main {
                 _meanFps += _fps;
                 _meanFps /= 2;
 
+                // Calculate the current memory usage in MB
+                _memoryUsage = (Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
+
                 _fps = 0;
             }
 
@@ -290,7 +297,7 @@ public final class Main {
 
         if (Configuration.getSettingBoolean("SHOW_DEBUG_INFORMATION")) {
             // Draw debugging information
-            _font1.drawString(4, 4, String.format("%s (fps: %.2f, free heap space: %d MB)", Configuration.GAME_TITLE, _meanFps, Runtime.getRuntime().freeMemory() / 1048576), Color.white);
+            _font1.drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage, Color.white));
             _font1.drawString(4, 22, String.format("%s", _player, Color.white));
             _font1.drawString(4, 38, String.format("%s", _world, Color.white));
             _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount(), Color.white));
@@ -358,7 +365,7 @@ public final class Main {
                     char c = Keyboard.getEventCharacter();
 
                     try {
-                        if (c >= 'a' && c < 'z' || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.' || c == '!') {
+                        if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.' || c == '!') {
                             _consoleInput.append(c);
                         }
                     } catch (Exception e) {
@@ -430,7 +437,7 @@ public final class Main {
                 int x = Integer.parseInt(parsingResult.get(1));
                 int y = Integer.parseInt(parsingResult.get(2));
                 int z = Integer.parseInt(parsingResult.get(3));
-                _player.setPosition(new Vector3f(x, y, z));
+                _player.setPosition(VectorPool.getVector(x, y, z));
                 success = true;
             } else if (parsingResult.get(0).equals("exit")) {
                 _world.dispose();
