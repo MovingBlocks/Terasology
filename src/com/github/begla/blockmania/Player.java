@@ -557,10 +557,9 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * Resets the player's position.
+     * Resets the player's attributes.
      */
     public void resetPlayer() {
-        _position = Player.getPlayerOrigin();
         _acc.set(0, 0, 0);
         _movement.set(0, 0, 0);
         _gravity = 0.0f;

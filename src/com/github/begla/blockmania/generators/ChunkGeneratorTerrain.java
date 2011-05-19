@@ -46,7 +46,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                int height = (int) (((calcTerrainElevation(x + xOffset, z + zOffset) + (calcTerrainRoughness(x + xOffset, z + zOffset) * calcTerrainDetail(x + xOffset, z + zOffset)))) * 128f);
+                int height = (int) (calcHeightMap(x + xOffset, z + zOffset) * 128f);
 
                 for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i >= 0; i--) {
                     if (calcCaveDensityAt(x + xOffset, i + yOffset, z + zOffset) < 0.5) {
@@ -101,6 +101,17 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return 
+     */
+    public float calcHeightMap(float x, float z) {
+        return calcTerrainElevation(x, z) + (calcTerrainRoughness(x, z) * calcTerrainDetail(x, z));
+    }
+
+    /**
      * Returns the base elevation for the terrain.
      * 
      * @param x
@@ -150,9 +161,8 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     protected float calcCanyonDensity(float x, float y, float z) {
         float result = 0.0f;
         result += _pGen1.noiseWithOctaves(0.01f * x, 0.01f * y, 0.01f * z, 16);
-        return (float) Math.tan(result*result);
+        return (float) Math.tan(result * result);
     }
-
 
     /**
      * Returns the cave density for the base terrain.

@@ -17,6 +17,7 @@
 package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.utilities.HeightMapFrame;
 import com.github.begla.blockmania.utilities.VectorPool;
 import java.awt.Font;
 import static org.lwjgl.opengl.GL11.*;
@@ -431,7 +432,7 @@ public final class Main {
                 }
 
             } else if (parsingResult.get(0).equals("reset_player")) {
-                _player.resetPlayer();
+                _world.resetPlayer();
                 success = true;
             } else if (parsingResult.get(0).equals("goto")) {
                 int x = Integer.parseInt(parsingResult.get(1));
@@ -460,6 +461,9 @@ public final class Main {
                 success = true;
             } else if (parsingResult.get(0).equals("chunk_pos")) {
                 _world.printPlayerChunkPosition();
+                success = true;
+            } else if (parsingResult.get(0).equals("show_map")) {
+                new HeightMapFrame(_world).setVisible(true);
                 success = true;
             }
         } catch (Exception e) {
@@ -513,6 +517,9 @@ public final class Main {
         }
         _logger.log(Level.INFO, "Enough chunks generated. Resetting player...", seed);
 
-        _player.resetPlayer();
+        _world.resetPlayer();
+        
+        // Reset the delta value
+        _lastLoopTime = Helper.getInstance().getTime();
     }
 }
