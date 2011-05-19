@@ -25,15 +25,12 @@ import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorTree;
 import com.github.begla.blockmania.utilities.FastRandom;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.TreeMap;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -65,9 +62,9 @@ public final class World extends RenderableObject {
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
     /* ------ */
-    private final List<Chunk> _chunkUpdateQueueDL = new LinkedList<Chunk>();
-    private final List<Chunk> _chunkUpdateNormal = new LinkedList<Chunk>();
-    private final Map<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
+    private final FastList<Chunk> _chunkUpdateQueueDL = new FastList<Chunk>();
+    private final FastList<Chunk> _chunkUpdateNormal = new FastList<Chunk>();
+    private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
     private final ChunkGeneratorForest _generatorForest;
@@ -80,7 +77,7 @@ public final class World extends RenderableObject {
     /* ----- */
     int _lastGeneratedChunkID = 0;
     /* ----- */
-    private ArrayList<Chunk> _visibleChunks = new ArrayList<Chunk>();
+    private FastList<Chunk> _visibleChunks = new FastList<Chunk>();
     private long _lastWorldUpdate = Helper.getInstance().getTime();
 
     /**
@@ -133,15 +130,13 @@ public final class World extends RenderableObject {
                     timeStart = System.currentTimeMillis();
 
                     if (!_chunkUpdateNormal.isEmpty()) {
-                        Chunk[] chunks = _chunkUpdateNormal.toArray(new Chunk[0]);
-
                         // Find the nearest chunk
                         // >>>
                         double dist = Float.MAX_VALUE;
                         int index = -1;
 
-                        for (int i = 0; i < chunks.length; i++) {
-                            Chunk c = chunks[i];
+                        for (int i = 0; i < _chunkUpdateNormal.size(); i++) {
+                            Chunk c = _chunkUpdateNormal.get(i);
                             double tDist = c.calcDistanceToPlayer();
 
                             if (tDist <= dist) {
@@ -152,7 +147,7 @@ public final class World extends RenderableObject {
                         // <<<
 
                         if (index >= 0) {
-                            Chunk c = (Chunk) chunks[index];
+                            Chunk c = (Chunk) _chunkUpdateNormal.get(index);
                             processChunk(c);
                         }
                         _statUpdateDuration += System.currentTimeMillis() - timeStart;
@@ -387,8 +382,8 @@ public final class World extends RenderableObject {
      * 
      * @return 
      */
-    public ArrayList<Chunk> fetchVisibleChunks() {
-        ArrayList<Chunk> visibleChunks = new ArrayList<Chunk>();
+    public FastList<Chunk> fetchVisibleChunks() {
+        FastList<Chunk> visibleChunks = new FastList<Chunk>();
 
         for (int x = -((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2); x < ((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.x / 2); x++) {
             for (int z = -((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y / 2); z < ((int) Configuration.VIEWING_DISTANCE_IN_CHUNKS.y / 2); z++) {
@@ -748,7 +743,7 @@ public final class World extends RenderableObject {
      * @param ray
      * @return Distance-ordered list of ray-face-intersections
      */
-    public ArrayList<RayFaceIntersection> rayBlockIntersection(int x, int y, int z, Vector3f origin, Vector3f ray) {
+    public FastList<RayFaceIntersection> rayBlockIntersection(int x, int y, int z, Vector3f origin, Vector3f ray) {
         /*
          * Ignore invisible blocks.
          */
@@ -756,7 +751,7 @@ public final class World extends RenderableObject {
             return null;
         }
 
-        ArrayList<RayFaceIntersection> result = new ArrayList<RayFaceIntersection>();
+        FastList<RayFaceIntersection> result = new FastList<RayFaceIntersection>();
 
         /*
          * Fetch all vertices of the specified block.
@@ -886,8 +881,8 @@ public final class World extends RenderableObject {
         // Okay we have a full cache here. Alert!
         if (_chunkCache.size() >= 1024) {
             // Fetch all chunks within the cache
-            ArrayList<Chunk> sortedChunks = null;
-            sortedChunks = new ArrayList<Chunk>(_chunkCache.values());
+            FastList<Chunk> sortedChunks = null;
+            sortedChunks = new FastList<Chunk>(_chunkCache.values());
             // Sort them according to their distance to the player
             Collections.sort(sortedChunks);
 
@@ -1096,7 +1091,7 @@ public final class World extends RenderableObject {
      * @return 
      */
     private Chunk prepareNewChunk(int x, int z) {
-        ArrayList<ChunkGenerator> gs = new ArrayList<ChunkGenerator>();
+        FastList<ChunkGenerator> gs = new FastList<ChunkGenerator>();
         gs.add(_generatorTerrain);
         gs.add(_generatorForest);
 

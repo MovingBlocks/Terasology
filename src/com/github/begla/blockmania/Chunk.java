@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania;
 
+import javolution.util.FastList;
 import java.nio.channels.FileChannel;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,8 +28,6 @@ import java.io.FileOutputStream;
 import org.newdawn.slick.util.ResourceLoader;
 import org.lwjgl.util.vector.Vector4f;
 import java.nio.FloatBuffer;
-import java.util.List;
-import java.util.ArrayList;
 import org.lwjgl.util.vector.Vector3f;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -62,15 +61,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private int _chunkID = -1;
     private static Texture _textureMap;
     /* ------ */
-    private final List<Float> _quadsTranslucent = new ArrayList<Float>();
-    private final List<Float> _texTranslucent = new ArrayList<Float>();
-    private final List<Float> _colorTranslucent = new ArrayList<Float>();
-    private final List<Float> _quadsOpaque = new ArrayList<Float>();
-    private final List<Float> _texOpaque = new ArrayList<Float>();
-    private final List<Float> _colorOpaque = new ArrayList<Float>();
-    private final List<Float> _quadsBillboard = new ArrayList<Float>();
-    private final List<Float> _texBillboard = new ArrayList<Float>();
-    private final List<Float> _colorBillboard = new ArrayList<Float>();
+    private final FastList<Float> _quadsTranslucent = new FastList<Float>();
+    private final FastList<Float> _texTranslucent = new FastList<Float>();
+    private final FastList<Float> _colorTranslucent = new FastList<Float>();
+    private final FastList<Float> _quadsOpaque = new FastList<Float>();
+    private final FastList<Float> _texOpaque = new FastList<Float>();
+    private final FastList<Float> _colorOpaque = new FastList<Float>();
+    private final FastList<Float> _quadsBillboard = new FastList<Float>();
+    private final FastList<Float> _texBillboard = new FastList<Float>();
+    private final FastList<Float> _colorBillboard = new FastList<Float>();
     /* ------ */
     private World _parent = null;
 
@@ -82,7 +81,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private int _displayListTranslucent = -1;
     private int _displayListBillboard = -1;
     /* ------ */
-    private ArrayList<ChunkGenerator> _generators = new ArrayList<ChunkGenerator>();
+    private FastList<ChunkGenerator> _generators = new FastList<ChunkGenerator>();
 
     enum SIDE {
 
@@ -110,7 +109,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param position The absolute position of the chunk within the world
      * @param g A list of generators which should be applied to this chunk
      */
-    public Chunk(World p, Vector3f position, ArrayList<ChunkGenerator> g) {
+    public Chunk(World p, Vector3f position, FastList<ChunkGenerator> g) {
         this._position = position;
         // Set the chunk ID
         _chunkID = Helper.getInstance().cantorize((int) _position.x, (int) _position.z);
@@ -322,9 +321,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         float offsetY = _position.y * Configuration.CHUNK_DIMENSIONS.y;
         float offsetZ = _position.z * Configuration.CHUNK_DIMENSIONS.z;
 
-        List<Float> quads = new ArrayList<Float>();
-        List<Float> tex = new ArrayList<Float>();
-        List<Float> color = new ArrayList<Float>();
+        FastList<Float> quads = new FastList<Float>();
+        FastList<Float> tex = new FastList<Float>();
+        FastList<Float> color = new FastList<Float>();
 
         /*
          * First side of the billboard
@@ -455,9 +454,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         drawTop = isSideVisibleForBlockTypes(blockToCheck, block);
 
-        List<Float> quads = new ArrayList<Float>();
-        List<Float> tex = new ArrayList<Float>();
-        List<Float> color = new ArrayList<Float>();
+        FastList<Float> quads = new FastList<Float>();
+        FastList<Float> tex = new FastList<Float>();
+        FastList<Float> color = new FastList<Float>();
 
         if (drawTop) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);

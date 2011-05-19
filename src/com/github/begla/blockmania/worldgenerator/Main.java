@@ -22,7 +22,7 @@ import com.github.begla.blockmania.World;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Main {
-
+    
     /**
      * 
      * @param args

@@ -23,10 +23,10 @@ import static org.lwjgl.util.glu.GLU.*;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
@@ -67,6 +67,7 @@ public final class Main {
     static {
         try {
             _logger.addHandler(new FileHandler("blockmania.log", true));
+            _logger.setLevel(Level.SEVERE);
         } catch (IOException ex) {
             _logger.log(Level.WARNING, ex.toString(), ex);
         }
@@ -375,7 +376,7 @@ public final class Main {
     private void processConsoleString() {
         boolean success = false;
 
-        ArrayList<String> parsingResult = new ArrayList<String>();
+        FastList<String> parsingResult = new FastList<String>();
         String temp = "";
 
         for (int i = 0; i < _consoleInput.length(); i++) {

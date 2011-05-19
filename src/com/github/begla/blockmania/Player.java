@@ -16,11 +16,11 @@
  */
 package com.github.begla.blockmania;
 
+import javolution.util.FastList;
 import com.github.begla.blockmania.utilities.AABB;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.utilities.PerlinNoise;
 import java.util.Collections;
-import java.util.ArrayList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
@@ -204,13 +204,13 @@ public final class Player extends RenderableObject {
      * @return Intersection point of the looked at block
      */
     public RayFaceIntersection calcSelectedBlock() {
-        ArrayList<RayFaceIntersection> inters = new ArrayList<RayFaceIntersection>();
+        FastList<RayFaceIntersection> inters = new FastList<RayFaceIntersection>();
         for (int x = -4; x < 4; x++) {
             for (int y = -4; y < 4; y++) {
                 for (int z = -4; z < 4; z++) {
                     if (x != 0 || y != 0 || z != 0) {
                         // The ray originates from the "player's eye"
-                        ArrayList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, new Vector3f(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
+                        FastList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, new Vector3f(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
                         if (iss != null) {
                             inters.addAll(iss);
                         }
@@ -379,7 +379,7 @@ public final class Player extends RenderableObject {
      */
     private boolean verticalHitTest(Vector3f origin) {
         boolean result = false;
-        ArrayList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
+        FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
         for (BlockPosition bp : blockPositions) {
             byte blockType1 = _parent.getBlockAtPosition(new Vector3f(bp.x, bp.y, bp.z));
@@ -402,12 +402,12 @@ public final class Player extends RenderableObject {
      * @param origin
      * @return 
      */
-    private ArrayList<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
+    private FastList<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
         /*
          * Gather the surrounding block positions
          * and order those by the distance to the originating point.
          */
-        ArrayList<BlockPosition> blockPositions = new ArrayList<BlockPosition>();
+        FastList<BlockPosition> blockPositions = new FastList<BlockPosition>();
 
         for (int x = -1; x < 2; x++) {
             for (int z = -1; z < 2; z++) {
@@ -433,7 +433,7 @@ public final class Player extends RenderableObject {
      */
     private boolean horizontalHitTest(Vector3f origin) {
         boolean result = false;
-        ArrayList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
+        FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
         // Check each block positions for collisions
         for (BlockPosition bp : blockPositions) {

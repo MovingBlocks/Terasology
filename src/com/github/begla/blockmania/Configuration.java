@@ -16,7 +16,7 @@
  */
 package com.github.begla.blockmania;
 
-import java.util.HashMap;
+import javolution.util.FastMap;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -94,11 +94,11 @@ public final class Configuration {
     /**
      * The hash map storing numeric settings.
      */
-    public static final HashMap<String, Float> _settingsNumeric = new HashMap<String, Float>();
+    public static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
     /**
      * The hash map storing boolean settings.
      */
-    public static final HashMap<String, Boolean> _settingsBoolean = new HashMap<String, Boolean>();
+    public static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
 
     static {
         loadSettings();
