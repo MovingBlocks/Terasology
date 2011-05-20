@@ -32,6 +32,7 @@ import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javolution.util.FastList;
+import javolution.util.FastSet;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -47,7 +48,7 @@ import org.newdawn.slick.util.ResourceLoader;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class World extends RenderableObject {
-    
+
     private int _statGeneratedChunks = 0;
     private double _statUpdateDuration = 0.0f;
     /* ------ */
@@ -64,8 +65,8 @@ public final class World extends RenderableObject {
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
     /* ------ */
-    private final FastList<Chunk> _chunkUpdateQueueDL = new FastList<Chunk>(64);
-    private final FastList<Chunk> _chunkUpdateNormal = new FastList<Chunk>(1024);
+    private final FastSet<Chunk> _chunkUpdateQueueDL = new FastSet<Chunk>(128);
+    private final FastSet<Chunk> _chunkUpdateNormal = new FastSet<Chunk>(2048);
     private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
@@ -80,7 +81,6 @@ public final class World extends RenderableObject {
     int _lastGeneratedChunkID = 0;
     /* ----- */
     private FastList<Chunk> _visibleChunks = new FastList<Chunk>(256);
-    private long _lastWorldUpdate = Helper.getInstance().getTime();
 
     /**
      * Initializes a new world for the single player mode.
@@ -91,7 +91,7 @@ public final class World extends RenderableObject {
      */
     public World(String title, String seed, Player p) {
         this._player = p;
-        
+
         _title = title;
         _seed = seed;
 
@@ -109,16 +109,16 @@ public final class World extends RenderableObject {
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
-        
+
         _updateThread = new Thread(new Runnable() {
-            
+
             @Override
             public void run() {
                 while (true) {
                     if (!_updateThreadAlive) {
                         return;
                     }
-                    
+
                     if (!_updatingEnabled) {
                         synchronized (_updateThread) {
                             try {
@@ -129,55 +129,53 @@ public final class World extends RenderableObject {
                         }
                     }
                     
+                    // Skip this update if there are too many vertex arrays
+                    // prepared for generation
+                    if (_chunkUpdateQueueDL.size() > 32) {
+                        continue;
+                    }
+
                     long timeStart = System.currentTimeMillis();
                     timeStart = System.currentTimeMillis();
-                    
-                    if (!_chunkUpdateNormal.isEmpty()) {
-                        // Find the nearest chunk
-                        double dist = Float.MAX_VALUE;
-                        Chunk nearestChunk = null;
-                        
-                        for (FastList.Node<Chunk> n = _chunkUpdateNormal.head(), end = _chunkUpdateNormal.tail(); (n = n.getNext()) != end;) {
-                            Chunk c = n.getValue();
-                            double tDist = c.calcDistanceToPlayer();
-                            
-                            if (tDist <= dist) {
-                                dist = tDist;
-                                nearestChunk = c;
-                            }
+
+                    // Find the nearest chunk
+                    double dist = Float.MAX_VALUE;
+                    Chunk nearestChunk = null;
+
+                    for (FastSet.Record n = _chunkUpdateNormal.head(), end = _chunkUpdateNormal.tail(); (n = n.getNext()) != end;) {
+                        Chunk c = _chunkUpdateNormal.valueOf(n);
+                        double tDist = c.calcDistanceToPlayer();
+
+                        if (tDist <= dist) {
+                            dist = tDist;
+                            nearestChunk = c;
                         }
-                        
-                        if (nearestChunk != null) {
-                            processChunk(nearestChunk);
-                        }
-                        
+                    }
+
+                    if (nearestChunk != null) {
+                        processChunk(nearestChunk);
                         _statUpdateDuration += System.currentTimeMillis() - timeStart;
                         _statUpdateDuration /= 2;
                     }
-                    
+
                     updateDaytime();
                     evolveChunks();
 
-                    // Update the visible chunks each second
-                    if (Helper.getInstance().getTime() - _lastWorldUpdate > 1000) {
-                        _visibleChunks = fetchVisibleChunks();
-                        _lastWorldUpdate = Helper.getInstance().getTime();
-                        
-                        FastList<Chunk> chunksToDelete = new FastList<Chunk>();
+                    _visibleChunks = fetchVisibleChunks();
 
-                        // Periodically check for invisible chunks
-                        for (FastList.Node<Chunk> n = _chunkUpdateNormal.head(), end = _chunkUpdateNormal.tail(); (n = n.getNext()) != end;) {
-                            Chunk c = n.getValue();
-                            if (!_visibleChunks.contains(c)) {
-                                chunksToDelete.add(c);
-                            }
+                    FastList<Chunk> chunksToDelete = new FastList<Chunk>();
+
+                    // Periodically check for invisible chunks
+                    for (FastSet.Record n = _chunkUpdateNormal.head(), end = _chunkUpdateNormal.tail(); (n = n.getNext()) != end;) {
+                        Chunk c = _chunkUpdateNormal.valueOf(n);
+
+                        if (!_visibleChunks.contains(c)) {
+                            chunksToDelete.add(c);
                         }
-                        
-                        for (FastList.Node<Chunk> n = chunksToDelete.head(), end = chunksToDelete.tail(); (n = n.getNext()) != end;) {
-                            _chunkUpdateNormal.remove(n.getValue());
-                        }
-                        
-                        chunksToDelete = null;
+                    }
+
+                    for (FastList.Node<Chunk> n = chunksToDelete.head(), end = chunksToDelete.tail(); (n = n.getNext()) != end;) {
+                        _chunkUpdateNormal.remove(n.getValue());
                     }
                 }
             }
@@ -191,7 +189,7 @@ public final class World extends RenderableObject {
         synchronized (_updateThread) {
             _updateThreadAlive = false;
             _updateThread.notify();
-            
+
         }
         writeAllChunksToDisk();
     }
@@ -206,12 +204,6 @@ public final class World extends RenderableObject {
     private void processChunk(Chunk c) {
         if (c != null) {
 
-            // Only process visible chunks
-            if (!_visibleChunks.contains(c)) {
-                _chunkUpdateNormal.remove(c);
-                return;
-            }
-            
             c.generate();
             Chunk[] neighbors = c.loadOrCreateNeighbors();
 
@@ -231,7 +223,7 @@ public final class World extends RenderableObject {
             if (c.isLightDirty()) {
                 c.updateLight();
             }
-            
+
             for (int i = 0; i < neighbors.length; i++) {
                 if (neighbors[i] != null) {
                     /*
@@ -243,7 +235,7 @@ public final class World extends RenderableObject {
                     }
                 }
             }
-            
+
             if (c.isDirty()) {
                 // Only generate the vertex arrays and display lists of visible chunks
                 if (isChunkVisible(c)) {
@@ -251,10 +243,10 @@ public final class World extends RenderableObject {
                     _chunkUpdateQueueDL.add(c);
                 }
             }
-            
+
             _chunkUpdateNormal.remove(c);
         }
-        
+
         _statGeneratedChunks++;
     }
 
@@ -269,11 +261,11 @@ public final class World extends RenderableObject {
                 return;
             }
             lastDaytimeMeasurement = Helper.getInstance().getTime();
-            
+
             Logger.getLogger(World.class.getName()).log(Level.INFO, "Updated daytime to {0}h.", _time);
-            
+
             byte oldDaylight = _daylight;
-            
+
             if (_time >= 18 && _time < 20) {
                 _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
             } else if (_time == 20) {
@@ -307,9 +299,9 @@ public final class World extends RenderableObject {
         if (!_chunkUpdateNormal.isEmpty() || _visibleChunks.isEmpty()) {
             return;
         }
-        
+
         Chunk c = _visibleChunks.get((int) (Math.abs(_rand.randomLong()) % _visibleChunks.size()));
-        
+
         if (!c.isFresh()) {
             _generatorGrass.generate(c);
             queueChunkForUpdate(c);
@@ -359,12 +351,12 @@ public final class World extends RenderableObject {
 
         // Disable fog
         glDisable(GL_FOG);
-        
+
         glColor4f(1f, 1f, 1f, 1.0f);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_TEXTURE_2D);
-        
+
         if (isDaytime()) {
             _textureSun.bind();
         } else {
@@ -382,7 +374,7 @@ public final class World extends RenderableObject {
         glEnd();
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);
-        
+
         glEnable(GL_FOG);
         glPopMatrix();
     }
@@ -398,14 +390,14 @@ public final class World extends RenderableObject {
                 Chunk c = loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
                 if (c != null) {
                     // If this chunk is fresh, queue it for updates
-                    if (c.isFresh() || c.isDirty() || c.isLightDirty()) {
+                    if (c.isDirty() || c.isLightDirty()) {
                         queueChunkForUpdate(c);
                     }
                     visibleChunks.add(c);
                 }
             }
         }
-        
+
         return visibleChunks;
     }
 
@@ -427,12 +419,12 @@ public final class World extends RenderableObject {
      */
     @Override
     public void update(long delta) {
-        if (_chunkUpdateQueueDL.isEmpty()) {
-            return;
+        Chunk c = _chunkUpdateQueueDL.valueOf(_chunkUpdateQueueDL.head().getNext());
+
+        if (c != null) {
+            _chunkUpdateQueueDL.remove(c);
+            c.generateDisplayLists();
         }
-        
-        Chunk c = _chunkUpdateQueueDL.removeFirst();
-        c.generateDisplayLists();
     }
 
     /**
@@ -492,27 +484,26 @@ public final class World extends RenderableObject {
     public final void setBlock(int x, int y, int z, byte type, boolean update, boolean overwrite) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
-        
+
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-        
+
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        
+
         if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0) {
             c.setBlock(blockPosX, y, blockPosZ, type);
-            
+
             if (update) {
                 byte oldValue = getLight(x, y, z);
                 c.calcSunlightAtLocalPos(blockPosX, blockPosZ, true);
                 c.refreshLightAtLocalPos(blockPosX, y, blockPosZ);
                 byte newValue = getLight(x, y, z);
-                
+
                 if (newValue > oldValue) {
                     c.spreadLight(blockPosX, y, blockPosZ, newValue);
                 } else if (newValue < oldValue) {
                     //c.unspreadLight(blockPosX, y, blockPosZ, oldValue);
                 }
-                queueChunkForUpdate(c);
             }
         }
     }
@@ -537,10 +528,10 @@ public final class World extends RenderableObject {
     public final byte getBlock(int x, int y, int z) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
-        
+
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-        
+
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
         return c.getBlock(blockPosX, y, blockPosZ);
     }
@@ -555,10 +546,10 @@ public final class World extends RenderableObject {
     public final boolean canBlockSeeTheSky(int x, int y, int z) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
-        
+
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-        
+
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
         return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
     }
@@ -574,10 +565,10 @@ public final class World extends RenderableObject {
     public final byte getLight(int x, int y, int z) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
-        
+
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-        
+
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
         return c.getLight(blockPosX, y, blockPosZ);
     }
@@ -593,10 +584,10 @@ public final class World extends RenderableObject {
     public void setSunlight(int x, int y, int z, byte intens) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
-        
+
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-        
+
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
         c.setSunlight(blockPosX, y, blockPosZ, intens);
     }
@@ -615,10 +606,10 @@ public final class World extends RenderableObject {
     public void spreadLight(int x, int y, int z, byte lightValue, int depth) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
-        
+
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-        
+
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
         c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth);
     }
@@ -637,10 +628,10 @@ public final class World extends RenderableObject {
     public void unspreadLight(int x, int y, int z, byte oldValue, int depth) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
-        
+
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-        
+
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
         c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth);
     }
@@ -700,17 +691,17 @@ public final class World extends RenderableObject {
      */
     public Vector3f[] verticesForBlockAt(int x, int y, int z) {
         Vector3f[] vertices = new Vector3f[8];
-        
+
         vertices[0] = VectorPool.getVector(x - .5f, y - .5f, z - .5f);
         vertices[1] = VectorPool.getVector(x + .5f, y - .5f, z - .5f);
         vertices[2] = VectorPool.getVector(x + .5f, y + .5f, z - .5f);
         vertices[3] = VectorPool.getVector(x - .5f, y + .5f, z - .5f);
-        
+
         vertices[4] = VectorPool.getVector(x - .5f, y - .5f, z + .5f);
         vertices[5] = VectorPool.getVector(x + .5f, y - .5f, z + .5f);
         vertices[6] = VectorPool.getVector(x + .5f, y + .5f, z + .5f);
         vertices[7] = VectorPool.getVector(x - .5f, y + .5f, z + .5f);
-        
+
         return vertices;
     }
 
@@ -732,7 +723,7 @@ public final class World extends RenderableObject {
         if (Block.getBlockForType(getBlock(x, y, z)).isBlockInvisible()) {
             return null;
         }
-        
+
         FastList<RayFaceIntersection> result = new FastList<RayFaceIntersection>();
 
         /*
@@ -805,15 +796,15 @@ public final class World extends RenderableObject {
         Vector3f a = Vector3f.sub(v1, v0, null);
         Vector3f b = Vector3f.sub(v2, v0, null);
         Vector3f norm = Vector3f.cross(a, b, null);
-        
-        
+
+
         float d = -(norm.x * v0.x + norm.y * v0.y + norm.z * v0.z);
 
         /**
          * Calculate the distance on the ray, where the intersection occurs.
          */
         float t = -(norm.x * origin.x + norm.y * origin.y + norm.z * origin.z + d) / (Vector3f.dot(ray, norm));
-        
+
         if (t < 0) {
             return null;
         }
@@ -823,11 +814,11 @@ public final class World extends RenderableObject {
          */
         Vector3f intersectPoint = VectorPool.getVector(ray.x * t, ray.y * t, ray.z * t);
         Vector3f.add(intersectPoint, origin, intersectPoint);
-        
+
         if (intersectPoint.x >= v0.x && intersectPoint.x <= v2.x && intersectPoint.y >= v0.y && intersectPoint.y <= v2.y && intersectPoint.z >= v0.z && intersectPoint.z <= v2.z) {
             return new RayFaceIntersection(blockPos, v0, v1, v2, d, t, origin, ray, intersectPoint);
         }
-        
+
         return null;
     }
 
@@ -861,19 +852,19 @@ public final class World extends RenderableObject {
 
 
         // Okay we have a full cache here. Alert!
-        if (_chunkCache.size() >= 2048) {
+        if (_chunkCache.size() > 2048) {
             // Fetch all chunks within the cache
             FastList<Chunk> sortedChunks = null;
             sortedChunks = new FastList<Chunk>(_chunkCache.values());
             // Sort them according to their distance to the player
             Collections.sort(sortedChunks);
-            
+
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Cache full. Removing some chunks from the chunk cache...");
 
             // Free some space
             for (int i = 0; i < 32; i++) {
                 int indexToDelete = sortedChunks.size() - i;
-                
+
                 if (indexToDelete >= 0 && indexToDelete < sortedChunks.size()) {
                     Chunk cc = sortedChunks.get(indexToDelete);
                     // Save the chunk before removing it from the cache
@@ -882,14 +873,14 @@ public final class World extends RenderableObject {
                     cc.dispose();
                 }
             }
-            
+
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished removing chunks from chunk cache.");
         }
 
         // Init a new chunk
         c = prepareNewChunk(x, z);
         _chunkCache.put(Helper.getInstance().cantorize(x, z), c);
-        
+
         return c;
     }
 
@@ -927,11 +918,9 @@ public final class World extends RenderableObject {
         Chunk c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
         return c;
     }
-    
+
     private void queueChunkForUpdate(Chunk c) {
-        if (!_chunkUpdateNormal.contains(c)) {
-            _chunkUpdateNormal.add(c);
-        }
+        _chunkUpdateNormal.add(c);
     }
 
     /**
@@ -1049,19 +1038,19 @@ public final class World extends RenderableObject {
     public void generateNewChunk(int x, int z) {
         Chunk c = loadOrCreateChunk(x, z);
         c.generate();
-        
+
         if (c == null) {
             return;
         }
-        
+
         Chunk[] neighbors = c.loadOrCreateNeighbors();
-        
+
         for (int i = 0; i < neighbors.length; i++) {
             if (neighbors[i] != null) {
                 neighbors[i].generate();
             }
         }
-        
+
         c.updateLight();
         c.writeChunkToDisk();
     }
@@ -1090,7 +1079,7 @@ public final class World extends RenderableObject {
     public boolean isChunkVisible(Chunk c) {
         if (c.getPosition().x >= calcChunkPosX((int) _player.getPosition().x) - Configuration.getSettingNumeric("V_DIST_X") / 2 && c.getPosition().x < Configuration.getSettingNumeric("V_DIST_X") / 2 + calcChunkPosX((int) _player.getPosition().x)) {
             if (c.getPosition().z >= calcChunkPosZ((int) _player.getPosition().z) - Configuration.getSettingNumeric("V_DIST_Z") / 2 && c.getPosition().z < Configuration.getSettingNumeric("V_DIST_Z") / 2 + calcChunkPosZ((int) _player.getPosition().z)) {
-                
+
                 return true;
             }
         }
@@ -1128,7 +1117,7 @@ public final class World extends RenderableObject {
     private Vector3f findSpawningPoint() {
         for (int xz = 0;; xz++) {
             float height = _generatorTerrain.calcHeightMap(xz, xz) * 128f;
-            
+
             if (height > 80) {
                 return VectorPool.getVector(xz, 512, xz);
             }

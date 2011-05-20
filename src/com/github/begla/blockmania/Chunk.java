@@ -449,6 +449,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         drawTop = isSideVisibleForBlockTypes(blockToCheck, block);
 
+        // Draw the chunk if the height map produced a too large number
+        if (y == Configuration.CHUNK_DIMENSIONS.y - 1) {
+            drawTop = true;
+        }
+
         FastList<Float> quads = new FastList<Float>();
         FastList<Float> tex = new FastList<Float>();
         FastList<Float> color = new FastList<Float>();
@@ -457,6 +462,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
             float shadowIntens = Math.max(_parent.getLight(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x, y + 1, z)), Configuration.MIN_LIGHT) / 16f;
 
+            // If this block is "is touching" the nil area: ignore light
+            if (y == Configuration.CHUNK_DIMENSIONS.y - 1) {
+                shadowIntens = 1.0f;
+            }
+            
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y;
 

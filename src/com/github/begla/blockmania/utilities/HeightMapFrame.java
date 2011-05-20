@@ -27,6 +27,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.Timer;
+import java.util.TimerTask;
+import org.lwjgl.util.vector.Vector3f;
 
 /**
  *
@@ -44,28 +47,40 @@ public class HeightMapFrame extends javax.swing.JFrame {
         _tGen = new ChunkGeneratorTerrain(w.getSeed());
         initComponents();
         updateHeightMap();
+        setAlwaysOnTop(true);
+
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                updateHeightMap();
+            }
+        }, 0, 3000);
     }
 
     private void updateHeightMap() {
         _heightMap = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics g = _heightMap.getGraphics();
+        Vector3f offset = _parent.getPlayer().getPosition();
 
         for (int x = 0; x < getWidth(); x++) {
             for (int z = 0; z < getHeight(); z++) {
-                float height = _tGen.calcHeightMap(x, z);
+                float height = _tGen.calcHeightMap(x + offset.x - getWidth() / 2, z + offset.z - getHeight() / 2);
                 height = (float) Math.min(height, 1.0);
                 height = (float) Math.max(height, 0.0);
                 g.setColor(new Color(height, height, height));
                 g.fillRect(x, z, 1, 1);
                 g.setColor(Color.red);
-                g.fillRect((int) _parent.getPlayer().getPosition().x, (int) _parent.getPlayer().getPosition().z, 5, 5);
+                g.fillRect(getWidth() / 2, getHeight() / 2, 5, 5);
             }
         }
+        
+        repaint();
     }
 
     @Override
     public void paint(Graphics g) {
-        super.paint(g);
         g.clearRect(0, 0, getWidth(), getHeight());
         if (_heightMap != null) {
             g.drawImage(_heightMap, 0, 0, this);
@@ -83,6 +98,10 @@ public class HeightMapFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Height map");
+        setMinimumSize(new java.awt.Dimension(512, 512));
+        setPreferredSize(new java.awt.Dimension(512, 512));
+        setResizable(false);
+        setSize(new java.awt.Dimension(512, 512));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
