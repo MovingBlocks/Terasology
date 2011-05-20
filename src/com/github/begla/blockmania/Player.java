@@ -455,7 +455,7 @@ public final class Player extends RenderableObject {
                     float length = Vector3f.dot(slideVector, direction);
                     _position.z = origin.z + length * slideVector.z;
                     _position.x = origin.x + length * slideVector.x;
-                    
+
                     VectorPool.putVector(normal);
                     VectorPool.putVector(slideVector);
                     VectorPool.putVector(direction);
@@ -515,22 +515,23 @@ public final class Player extends RenderableObject {
         _acc.y += _movement.y;
         _acc.z += _movement.z;
 
+        if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY") && !Configuration.getSettingBoolean("GOD_MODE")) {
+            _gravity -= Configuration.getSettingNumeric("GRAVITY") * delta;
+        }
+
         getPosition().y += (_acc.y / 1000.0f) * delta;
         getPosition().y += (_gravity / 1000.0f) * delta;
 
         if (!Configuration.getSettingBoolean("GOD_MODE")) {
             boolean vHit = verticalHitTest(oldPosition);
-            if (!vHit) {
-                // If the player is not standing on ground: increase the g-force
-                if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY")) {
-                    _gravity -= Configuration.getSettingNumeric("GRAVITY") * delta;
-                }
-            } else {
+            if (vHit) {
                 // Jumping is only possible, if the player is standing on ground
                 if (_jump) {
                     _jump = false;
                     _gravity = Configuration.getSettingNumeric("JUMP_INTENSITY");
                 }
+            } else {
+                _jump = false;
             }
         } else {
             _gravity = 0f;
@@ -552,7 +553,7 @@ public final class Player extends RenderableObject {
                 // Do something while the player is colliding
             }
         }
-        
+
         VectorPool.putVector(oldPosition);
     }
 

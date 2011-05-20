@@ -18,6 +18,7 @@ package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.utilities.VectorPool;
 import javolution.util.FastMap;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -52,18 +53,14 @@ public final class Configuration {
      */
     public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24);
     /**
-     * The height of the display area.
+     * Displlay mode for windowed mode
      */
-    public static final int DISPLAY_HEIGHT = 720;
-    /**
-     * The width of the display area.
-     */
-    public static final int DISPLAY_WIDTH = 1280;
+    public static final DisplayMode DISPLAY_MODE = new DisplayMode(1280,720);
     /**
      * If set to true, the display is rendered as a
      * fullscreen application.
      */
-    public static final boolean FULLSCREEN = false;
+    public static final boolean FULLSCREEN = true;
     /**
      * Maximum light value.
      */

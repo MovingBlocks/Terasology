@@ -660,7 +660,7 @@ public final class World extends RenderableObject {
      * @return The daylight color
      */
     public Vector3f getDaylightColor() {
-        return VectorPool.getVector(getDaylightAsFloat() * 0.55f, getDaylightAsFloat() * 0.85f, 0.99f * getDaylightAsFloat());
+        return VectorPool.getVector(getDaylightAsFloat() * 0.65f, getDaylightAsFloat() * 0.85f, 0.95f * getDaylightAsFloat());
     }
 
     /**

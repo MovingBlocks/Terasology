@@ -35,6 +35,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 
@@ -110,11 +111,17 @@ public final class Main {
         _logger.log(Level.INFO, "Initializing display, input devices and OpenGL.");
 
         // Display
-        Display.setDisplayMode(new DisplayMode(Configuration.DISPLAY_WIDTH, Configuration.DISPLAY_HEIGHT));
-        Display.setFullscreen(Configuration.FULLSCREEN);
+        if (Configuration.FULLSCREEN) {
+            Display.setDisplayMode(Display.getDesktopDisplayMode());
+            Display.setFullscreen(true);
+            
+        } else {
+            Display.setDisplayMode(Configuration.DISPLAY_MODE);
+        }
+
         Display.setTitle(Configuration.GAME_TITLE);
         Display.create(Configuration.PIXEL_FORMAT);
-
+        
         // Keyboard
         Keyboard.create();
         Keyboard.enableRepeatEvents(true);
@@ -149,14 +156,15 @@ public final class Main {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FOG);
         glDepthFunc(GL_LEQUAL);
-        glEnable(GL_LINE_SMOOTH);
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        glPolygonOffset(0.1f, 0.1f);
-        glEnable(GL_POLYGON_OFFSET_FILL);
 
-        // Enable fog
+        //glPolygonOffset(0.1f, 0.1f);
+        //glEnable(GL_POLYGON_OFFSET_FILL);
+
+        glEnable(GL_LINE_SMOOTH);
         glHint(GL_FOG_HINT, GL_NICEST);
         glFogi(GL_FOG_MODE, GL_LINEAR);
+        GL11.glEnable(GL11.GL_POLYGON_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
         Chunk.init();
         World.init();
@@ -180,7 +188,7 @@ public final class Main {
         glClearColor(_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f);
 
         // Color the fog like the sky
-        float[] fogColor = {_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f};
+        float[] fogColor = {_world.getDaylightColor().x * 0.95f, _world.getDaylightColor().y * 0.95f, _world.getDaylightColor().z * 0.95f, 1.0f};
         FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
         fogColorBuffer.put(fogColor);
         fogColorBuffer.rewind();
@@ -189,7 +197,7 @@ public final class Main {
         // Update by the viewing distance
         float maxDist = Math.max(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
         float viewingDistance = maxDist / 2f;
-        glFogf(GL_FOG_START, 16f);
+        glFogf(GL_FOG_START, 32f);
         glFogf(GL_FOG_END, viewingDistance);
 
         /*
@@ -208,11 +216,11 @@ public final class Main {
      * Resizes the viewport according to the chosen display with and height.
      */
     private void resizeGL() {
-        glViewport(0, 0, Configuration.DISPLAY_WIDTH, Configuration.DISPLAY_HEIGHT);
+        glViewport(0, 0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight());
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(84.0f, (float) Configuration.DISPLAY_WIDTH / (float) Configuration.DISPLAY_HEIGHT, 0.1f, 512f);
+        gluPerspective(84.0f,(float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 512f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
@@ -306,7 +314,7 @@ public final class Main {
 
         if (_showDebugConsole) {
             // Display the console input text
-            _font1.drawString(4, Configuration.DISPLAY_HEIGHT - 16 - 4, String.format("%s_", _consoleInput), Color.red);
+            _font1.drawString(4, Display.getDisplayMode().getHeight() - 16 - 4, String.format("%s_", _consoleInput), Color.red);
         }
 
 
