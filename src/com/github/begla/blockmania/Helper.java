@@ -94,4 +94,41 @@ public class Helper {
         int j = (int) Math.floor(Math.sqrt(0.25 + 2 * z) - 0.5);
         return z - j * (j + 1) / 2;
     }
+
+    public boolean checkBounds3D(int x, int y, int z, byte[][][] array) {
+        int length1 = array.length;
+
+        if (x < 0 || x >= length1) {
+            return false;
+        }
+
+        int length2 = array[x].length;
+
+        if (y < 0 || y >= length2) {
+            return false;
+        }
+
+        int length3 = array[x][y].length;
+
+        if (z < 0 || z >= length3) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean checkBounds2D(int x, int y, byte[][] array) {
+        int length1 = array.length;
+        int length2 = array[x].length;
+
+        if (x < 0 || x >= length1) {
+            return false;
+        }
+
+        if (y < 0 || y >= length2) {
+            return false;
+        }
+
+        return true;
+    }
 }

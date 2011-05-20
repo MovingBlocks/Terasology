@@ -69,13 +69,11 @@ public abstract class Block {
      * @return The object for the given ID
      */
     public static Block getBlockForType(byte type) {
-        Block b = null;
-        try {
-            b = _blocks[type];
-        } catch (Exception e) {
-            b = nilBlock;
+        if (type < 0 || type >= _blocks.length) {
+            return nilBlock;
         }
-        return b;
+
+        return _blocks[type];
     }
 
     /**
@@ -154,7 +152,7 @@ public abstract class Block {
     public boolean isCastingShadows() {
         return true;
     }
-    
+
     /**
      * 
      * @return 

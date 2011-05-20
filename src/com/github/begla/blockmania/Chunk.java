@@ -130,19 +130,16 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public void dispose() {
         writeChunkToDisk();
 
-        try {
+        if (_displayListOpaque >= 0) {
             glDeleteLists(_displayListOpaque, 1);
-        } catch (Exception e) {
         }
 
-        try {
+        if (_displayListTranslucent >= 0) {
             glDeleteLists(_displayListTranslucent, 1);
-        } catch (Exception e) {
         }
 
-        try {
+        if (_displayListBillboard >= 0) {
             glDeleteLists(_displayListBillboard, 1);
-        } catch (Exception e) {
         }
     }
 
@@ -288,7 +285,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the vertex-, texture- and color-arrays.
      */
-    public void generateVertexArrays() {
+    public synchronized void generateVertexArrays() {
         _quadsTranslucent = new FastList<Float>();
         _texTranslucent = new FastList<Float>();
         _colorTranslucent = new FastList<Float>();
@@ -826,7 +823,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the display lists from the precalculated arrays.
      */
-    public void generateDisplayLists() {
+    public synchronized void generateDisplayLists() {
         // Check on of the vertex arrays
         if (_colorOpaque == null) {
             return;
@@ -1241,10 +1238,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return The light intensity
      */
     public byte getLight(int x, int y, int z) {
-        try {
+        if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
             return (byte) _sunlight[x][y][z];
-            //return (byte) Math.max(_light[x][y][z], _sunlight[x][y][z]);
-        } catch (Exception e) {
+        } else {
             return -1;
         }
     }
@@ -1263,13 +1259,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             return;
         }
 
-        try {
+        if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
             Block b = Block.getBlockForType(getBlock(x, y, z));
             _sunlight[x][y][z] = intens;
             _dirty = true;
             // Mark the neighbors as dirty
             markNeighborsDirty(x, z);
-        } catch (Exception e) {
         }
     }
 
@@ -1282,9 +1277,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return The block type
      */
     public byte getBlock(int x, int y, int z) {
-        try {
+        if (Helper.getInstance().checkBounds3D(x, y, z, _blocks)) {
             return _blocks[x][y][z];
-        } catch (Exception e) {
+        } else {
             return -1;
         }
     }
@@ -1298,7 +1293,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param type The block type
      */
     public void setBlock(int x, int y, int z, byte type) {
-        try {
+        if (Helper.getInstance().checkBounds3D(x, y, z, _blocks)) {
             _blocks[x][y][z] = type;
 
             Block b = Block.getBlockForType(type);
@@ -1312,7 +1307,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             setDirty(true);
             // Mark the neighbors as dirty
             markNeighborsDirty(x, z);
-        } catch (Exception e) {
         }
     }
 

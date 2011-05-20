@@ -355,21 +355,21 @@ public final class Main {
             if (_showDebugConsole) {
                 if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                     if (key == Keyboard.KEY_BACK) {
-                        try {
-                            _consoleInput.setLength(_consoleInput.length() - 1);
-                        } catch (Exception e) {
+                        int length = _consoleInput.length() - 1;
+
+                        if (length < 0) {
+                            length = 0;
                         }
+                        _consoleInput.setLength(length);
+
                     } else if (key == Keyboard.KEY_RETURN) {
                         processConsoleString();
                     }
 
                     char c = Keyboard.getEventCharacter();
 
-                    try {
-                        if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.' || c == '!') {
-                            _consoleInput.append(c);
-                        }
-                    } catch (Exception e) {
+                    if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.' || c == '!') {
+                        _consoleInput.append(c);
                     }
                 }
             } else {
@@ -518,7 +518,7 @@ public final class Main {
         _logger.log(Level.INFO, "Enough chunks generated. Resetting player...", seed);
 
         _world.resetPlayer();
-        
+
         // Reset the delta value
         _lastLoopTime = Helper.getInstance().getTime();
     }
