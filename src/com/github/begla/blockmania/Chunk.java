@@ -129,18 +129,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public void dispose() {
         writeChunkToDisk();
-
-        if (_displayListOpaque >= 0) {
-            glDeleteLists(_displayListOpaque, 1);
-        }
-
-        if (_displayListTranslucent >= 0) {
-            glDeleteLists(_displayListTranslucent, 1);
-        }
-
-        if (_displayListBillboard >= 0) {
-            glDeleteLists(_displayListBillboard, 1);
-        }
     }
 
     /**
