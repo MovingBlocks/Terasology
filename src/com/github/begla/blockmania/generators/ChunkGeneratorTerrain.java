@@ -133,7 +133,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.noiseWithOctaves(0.009f * x, 0.009f, 0.009f * z, 4);
+        result += _pGen2.noiseWithOctaves(0.009f * x, 0.009f, 0.009f * z, 1);
         return result;
     }
 
@@ -146,7 +146,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.noiseWithOctaves(0.01f * x, 0.01f, 0.01f * z, 16);
+        result += _pGen3.noiseWithOctaves(0.01f * x, 0.01f, 0.01f * z, 8);
         return result;
     }
 
@@ -160,7 +160,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcCanyonDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen3.noiseWithOctaves(0.01f * x, 0.02f * y, 0.01f * z, 8);
+        result += _pGen3.noiseWithOctaves(0.01f * x, 0.02f * y, 0.01f * z, 4);
         return (float) Math.tan(result * result);
     }
 
@@ -174,7 +174,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcCaveDensityAt(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen2.noise(0.06f * x, 0.06f * y, 0.06f * z);
+        result += _pGen2.noiseWithOctaves(0.08f * x, 0.08f * y, 0.08f * z, 8);
         return result;
     }
 
