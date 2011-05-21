@@ -461,6 +461,7 @@ public final class Player extends RenderableObject {
      * Updates the position of the player.
      * 
      * TODO: Fix easing-artifact
+     * TODO: Jumping is "choppy"
      * 
      * @param delta Delta value since the last frame update
      */
@@ -523,7 +524,8 @@ public final class Player extends RenderableObject {
                     _gravity = Configuration.getSettingNumeric("JUMP_INTENSITY");
                 }
             } else {
-                _jump = false;
+                // TODO: Feels weird if active...
+                // _jump = false;
             }
         } else {
             _gravity = 0f;

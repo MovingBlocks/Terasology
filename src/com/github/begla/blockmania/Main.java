@@ -25,7 +25,6 @@ import static org.lwjgl.util.glu.GLU.*;
 
 import java.nio.FloatBuffer;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -99,14 +98,13 @@ public final class Main {
         if (Configuration.FULLSCREEN) {
             Display.setDisplayMode(Display.getDesktopDisplayMode());
             Display.setFullscreen(true);
-            
         } else {
             Display.setDisplayMode(Configuration.DISPLAY_MODE);
         }
 
         Display.setTitle(Configuration.GAME_TITLE);
         Display.create(Configuration.PIXEL_FORMAT);
-        
+
         // Keyboard
         Keyboard.create();
         Keyboard.enableRepeatEvents(true);
@@ -204,7 +202,7 @@ public final class Main {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(84.0f,(float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 512f);
+        gluPerspective(84.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 512f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
@@ -278,8 +276,7 @@ public final class Main {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        glOrtho(0, Display.getDisplayMode().getWidth(),
-                Display.getDisplayMode().getHeight(), 0, -1, 1);
+        glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, -1, 1);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
@@ -306,15 +303,14 @@ public final class Main {
 
         glColor3f(1f, 1f, 1f);
         glLineWidth(2f);
+
         // Draw the crosshair
         glBegin(GL_LINES);
         glVertex2d(Display.getDisplayMode().getWidth() / 2f - 8f, Display.getDisplayMode().getHeight() / 2f);
         glVertex2d(Display.getDisplayMode().getWidth() / 2f + 8f, Display.getDisplayMode().getHeight() / 2f);
-
         glVertex2d(Display.getDisplayMode().getWidth() / 2f, Display.getDisplayMode().getHeight() / 2f - 8f);
         glVertex2d(Display.getDisplayMode().getWidth() / 2f, Display.getDisplayMode().getHeight() / 2f + 8f);
         glEnd();
-
 
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
@@ -423,7 +419,7 @@ public final class Main {
                     }
                 }
 
-            } else if (parsingResult.get(0).equals("reset_player")) {
+            } else if (parsingResult.get(0).equals("respawn")) {
                 _world.resetPlayer();
                 success = true;
             } else if (parsingResult.get(0).equals("goto")) {
@@ -439,17 +435,17 @@ public final class Main {
             } else if (parsingResult.get(0).equals("exit!")) {
                 System.exit(0);
                 success = true;
-            } else if (parsingResult.get(0).equals("i")) {
+            } else if (parsingResult.get(0).equals("info")) {
                 Helper.LOGGER.log(Level.INFO, _player.selectedBlockInformation());
                 success = true;
-            } else if (parsingResult.get(0).equals("generate_new_world")) {
+            } else if (parsingResult.get(0).equals("load")) {
                 String worldSeed = _rand.randomCharacterString(16);
 
                 if (parsingResult.size() > 1) {
                     worldSeed = parsingResult.get(1);
                 }
 
-                initNewWorld("", worldSeed);
+                initNewWorld(worldSeed, worldSeed);
                 success = true;
             } else if (parsingResult.get(0).equals("chunk_pos")) {
                 _world.printPlayerChunkPosition();
@@ -460,8 +456,11 @@ public final class Main {
             } else if (parsingResult.get(0).equals("check")) {
                 _world.checkVisibleChunks();
                 success = true;
+            } else if (parsingResult.get(0).equals("update_all")) {
+                _world.updateAllChunks();
+                success = true;
             }
-        } catch (Exception e) {
+        } catch (IndexOutOfBoundsException e) {
         }
 
         if (success) {
@@ -476,7 +475,7 @@ public final class Main {
     /**
      * Disables/enables the debug console.
      */
-    public void toggleDebugConsole() {
+    private void toggleDebugConsole() {
         if (!_showDebugConsole) {
             _world.suspendUpdateThread();
             _consoleInput.setLength(0);
@@ -492,11 +491,15 @@ public final class Main {
      * @param title
      * @param seed
      */
-    public void initNewWorld(String title, String seed) {
+    private void initNewWorld(String title, String seed) {
         Helper.LOGGER.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+
+        // Get rid of the old world
         if (_world != null) {
             _world.dispose();
         }
+
+        // Init some world
         _world = new World(title, seed, _player);
         // Link the player to the world
         _player.setParent(_world);
@@ -504,14 +507,14 @@ public final class Main {
         _world.startUpdateThread();
 
         Helper.LOGGER.log(Level.INFO, "Waiting for some chunks to pop up...", seed);
-        while (_world.getStatGeneratedChunks() < 32) {
+        while (_world.getStatGeneratedChunks() < 16) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException ex) {
                 Helper.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
-        Helper.LOGGER.log(Level.INFO, "Enough chunks generated. Resetting player...", seed);
+        Helper.LOGGER.log(Level.INFO, "Finished!", seed);
 
         // Reset the delta value
         _lastLoopTime = Helper.getInstance().getTime();

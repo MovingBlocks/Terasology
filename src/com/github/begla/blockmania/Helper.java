@@ -166,4 +166,24 @@ public class Helper {
 
         return true;
     }
+
+    /**
+     * 
+     * @param value
+     * @param index
+     * @return
+     */
+    public boolean isFlagSet(byte value, short index) {
+        return (value & (1 << index)) != 0;
+    }
+
+    /**
+     * 
+     * @param value
+     * @param index
+     * @return
+     */
+    public byte setFlag(byte value, short index) {
+        return (byte) (value | (1 << index));
+    }
 }

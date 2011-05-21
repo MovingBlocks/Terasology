@@ -31,7 +31,6 @@ import java.nio.FloatBuffer;
 import org.lwjgl.util.vector.Vector3f;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.newdawn.slick.opengl.Texture;
 import org.lwjgl.BufferUtils;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -215,7 +214,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
             // Try to load the chunk from disk
             if (loadChunkFromFile()) {
-                setLightDirty(false);
                 _fresh = false;
                 Helper.LOGGER.log(Level.FINEST, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
                 return true;
@@ -1092,7 +1090,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * TODO
+     * TODO: Implement "removal" of light
      * 
      * @param x
      * @param y
@@ -1104,7 +1102,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * TODO
+     * TODO: Implement "removal" of light
      * 
      * @param x
      * @param y
@@ -1473,33 +1471,29 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Saves this chunk to disk.
      * 
-     * TODO: Uses a lot of memory... Precisely 524288 Bytes (0.5 MB) per Chunk.
+     * TODO: Chunks use a lot of memory... Precisely 65536 Bytes (0.0625 MB) per Chunk.
      * TODO: Buggy with chunks that contain light from adjacent chunks but have not been
-     * flooded yet
+     * flooded yet => Save information about chunk status
      * 
      * @return 
      */
     public boolean writeChunkToDisk() {
         // Don't save fresh chunks
-        if (_fresh || _lightDirty) {
+        if (_fresh) {
             return false;
         }
 
-        ByteBuffer output = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3);
+        ByteBuffer output = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 2 + 1);
+        File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath().toString(), Helper.getInstance().cantorize((int) _position.x, (int) _position.z)));
 
-        File dir1 = new File(String.format("SAVED_WORLDS", _parent.getTitle()));
-        // Create directory
-        if (!dir1.exists()) {
-            dir1.mkdir();
+        // Save flags...
+        byte flags = 0x0;
+        if (_lightDirty) {
+            flags = Helper.getInstance().setFlag(flags, (short) 0);
         }
 
-        // Create directory
-        File dir2 = new File(String.format("SAVED_WORLDS/%s", _parent.getTitle()));
-        if (!dir2.exists()) {
-            dir2.mkdir();
-        }
-
-        File f = new File(String.format("SAVED_WORLDS/%s/%d.bc", _parent.getTitle(), Helper.getInstance().cantorize((int) _position.x, (int) _position.z)));
+        // The flags are stored within the first byte of the file...
+        output.put(flags);
 
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
@@ -1517,14 +1511,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             FileChannel c = oS.getChannel();
             c.write(output);
             oS.close();
-            return true;
         } catch (FileNotFoundException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);
+            return false;
         } catch (IOException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -1533,8 +1528,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return 
      */
     public boolean loadChunkFromFile() {
-        ByteBuffer input = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3);
-        File f = new File(String.format("SAVED_WORLDS/%s/%d.bc", _parent.getTitle(), Helper.getInstance().cantorize((int) _position.x, (int) _position.z)));
+        ByteBuffer input = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 2 + 1);
+        File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath(), Helper.getInstance().cantorize((int) _position.x, (int) _position.z)));
 
         if (!f.exists()) {
             return false;
@@ -1554,6 +1549,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
 
         input.rewind();
+
+        // The first byte contains the flags...
+        byte flags = input.get();
+        // Parse the flags...
+        _lightDirty = Helper.getInstance().isFlagSet(flags, (short) 0);
 
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {

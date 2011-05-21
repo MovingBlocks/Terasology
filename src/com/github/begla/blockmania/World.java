@@ -25,18 +25,28 @@ import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorTree;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.VectorPool;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.TreeMap;
+import org.jdom.JDOMException;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
 import javolution.util.FastCollection.Record;
 import javolution.util.FastList;
 import javolution.util.FastSet;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
+import org.xml.sax.InputSource;
 
 /**
  * The world of Blockmania. At its most basic the world contains chunks (consisting of a fixed amount of blocks)
@@ -54,7 +64,7 @@ public final class World extends RenderableObject {
     /* ------ */
     private short _time = 8;
     private long lastDaytimeMeasurement = Helper.getInstance().getTime();
-    private long latestGrassEvolvement = Helper.getInstance().getTime();
+    private long latestDirtEvolvement = Helper.getInstance().getTime();
     /* ------ */
     private static Texture _textureSun, _textureMoon;
     /* ------ */
@@ -91,14 +101,39 @@ public final class World extends RenderableObject {
      * @param p The player
      */
     public World(String title, String seed, Player p) {
+        if (title == null) {
+            throw new IllegalArgumentException("No title provided.");
+        }
+
+        if (title.isEmpty()) {
+            throw new IllegalArgumentException("No title provided.");
+        }
+
+        if (seed == null) {
+            throw new IllegalArgumentException("No seed provided.");
+        }
+
+        if (seed.isEmpty()) {
+            throw new IllegalArgumentException("No seed provided.");
+        }
+
+        if (p == null) {
+            throw new IllegalArgumentException("No player provided.");
+        }
+
         this._player = p;
+        this._title = title;
+        this._seed = seed;
 
-        _title = title;
-        _seed = seed;
+        // If loading failed accept the given seed
+        if (!loadMetaData()) {
+            // Generate the save directory if needed
+            File dir = new File(getWorldSavePath());
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
 
-        // Generate a random name for the world if the name is not set
-        if (_title.equals("")) {
-            _title = seed;
+            saveMetaData();
         }
 
         // Init. generators
@@ -110,8 +145,9 @@ public final class World extends RenderableObject {
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
-        
+
         resetPlayer();
+        updateDaylight();
 
         _updateThread = new Thread(new Runnable() {
 
@@ -168,7 +204,7 @@ public final class World extends RenderableObject {
                     _chunkUpdateNormal.removeAll(deletableUpdates);
 
                     updateDaytime();
-                    evolveChunks();
+                    replantDirt();
 
                     _statUpdateDuration += System.currentTimeMillis() - timeStart;
                     _statUpdateDuration /= 2;
@@ -185,6 +221,7 @@ public final class World extends RenderableObject {
             _updateThreadAlive = false;
             _updateThread.notify();
         }
+        saveMetaData();
         writeAllChunksToDisk();
     }
 
@@ -252,24 +289,7 @@ public final class World extends RenderableObject {
             Helper.LOGGER.log(Level.INFO, "Updated daytime to {0}h.", _time);
 
             byte oldDaylight = _daylight;
-
-            if (_time >= 18 && _time < 20) {
-                _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
-            } else if (_time == 20) {
-                _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
-            } else if (_time == 21) {
-                _daylight = (byte) (0.4f * Configuration.MAX_LIGHT);
-            } else if (_time == 22 || _time == 23) {
-                _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-            } else if (_time >= 0 && _time <= 5) {
-                _daylight = (byte) (0.2f * Configuration.MAX_LIGHT);
-            } else if (_time == 6) {
-                _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-            } else if (_time == 7) {
-                _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
-            } else if (_time >= 8 && _time < 18) {
-                _daylight = (byte) Configuration.MAX_LIGHT;
-            }
+            updateDaylight();
 
             if (_daylight != oldDaylight) {
                 updateAllChunks();
@@ -277,12 +297,38 @@ public final class World extends RenderableObject {
         }
     }
 
+    private void updateDaylight() {
+        if (_time >= 18 && _time < 20) {
+            _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
+        } else if (_time == 20) {
+            _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
+        } else if (_time == 21) {
+            _daylight = (byte) (0.4f * Configuration.MAX_LIGHT);
+        } else if (_time == 22 || _time == 23) {
+            _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
+        } else if (_time >= 0 && _time <= 5) {
+            _daylight = (byte) (0.2f * Configuration.MAX_LIGHT);
+        } else if (_time == 6) {
+            _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
+        } else if (_time == 7) {
+            _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
+        } else if (_time >= 8 && _time < 18) {
+            _daylight = (byte) Configuration.MAX_LIGHT;
+        }
+    }
+
     /**
      * 
      */
-    private void evolveChunks() {
+    private void replantDirt() {
         // Pick on chunk for grass updates every 100 ms
-        if (Helper.getInstance().getTime() - latestGrassEvolvement > 100) {
+        if (Helper.getInstance().getTime() - latestDirtEvolvement > 100) {
+            // Do NOT replant chunks when updates are queued...
+            // And do NOT replant chunks during the night...
+            if (!_chunkUpdateNormal.isEmpty() || isNighttime()) {
+                return;
+            }
+            
             Chunk c = _visibleChunks.get((int) (Math.abs(_rand.randomLong()) % _visibleChunks.size()));
 
             if (!c.isFresh() && !c.isDirty() && !c.isLightDirty()) {
@@ -290,7 +336,7 @@ public final class World extends RenderableObject {
                 queueChunkForUpdate(c, false);
             }
 
-            latestGrassEvolvement = Helper.getInstance().getTime();
+            latestDirtEvolvement = Helper.getInstance().getTime();
         }
     }
 
@@ -1001,13 +1047,15 @@ public final class World extends RenderableObject {
      * Writes all chunks to the disk.
      */
     public void writeAllChunksToDisk() {
+        suspendUpdateThread();
         for (Chunk c : _chunkCache.values()) {
             c.writeChunkToDisk();
         }
+        resumeUpdateThread();
     }
 
     /**
-     * TODO
+     *
      * @param x
      * @param z  
      */
@@ -1118,5 +1166,100 @@ public final class World extends RenderableObject {
                 System.out.println(n.getValue());
             }
         }
+    }
+
+    /**
+     * 
+     * @return 
+     */
+    public String getWorldSavePath() {
+        return String.format("SAVED_WORLDS/%s", _title);
+
+    }
+
+    /**
+     * 
+     * @return 
+     */
+    private boolean saveMetaData() {
+        File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));
+
+        try {
+            f.createNewFile();
+        } catch (IOException ex) {
+            Helper.LOGGER.log(Level.SEVERE, null, ex);
+        }
+
+        Element root = new Element("World");
+        Document doc = new Document(root);
+
+        // Save the world metadata
+        root.setAttribute("seed", _seed);
+        root.setAttribute("title", _title);
+        root.setAttribute("time", Short.toString(_time));
+
+        // Save the player metadata
+        Element player = new Element("Player");
+        player.setAttribute("x", new Float(_player.getPosition().x).toString());
+        player.setAttribute("y", new Float(_player.getPosition().y).toString());
+        player.setAttribute("z", new Float(_player.getPosition().z).toString());
+        root.addContent(player);
+
+
+        XMLOutputter outputter = new XMLOutputter();
+        FileOutputStream output = null;
+
+        try {
+            output = new FileOutputStream(f);
+
+            try {
+                outputter.output(doc, output);
+            } catch (IOException ex) {
+                Helper.LOGGER.log(Level.SEVERE, null, ex);
+            }
+
+            return true;
+        } catch (FileNotFoundException ex) {
+            Helper.LOGGER.log(Level.SEVERE, null, ex);
+        }
+
+
+        return false;
+    }
+
+    /**
+     * 
+     * @return 
+     */
+    private boolean loadMetaData() {
+        File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));
+
+        try {
+            SAXBuilder sxbuild = new SAXBuilder();
+            InputSource is = new InputSource(new FileInputStream(f));
+            Document doc;
+            try {
+                doc = sxbuild.build(is);
+                Element root = doc.getRootElement();
+                Element player = root.getChild("Player");
+
+                _seed = root.getAttribute("seed").getValue();
+                _spawningPoint = VectorPool.getVector(Float.parseFloat(player.getAttribute("x").getValue()), Float.parseFloat(player.getAttribute("y").getValue()), Float.parseFloat(player.getAttribute("z").getValue()));
+                _title = root.getAttributeValue("title");
+                _time = Short.parseShort(root.getAttributeValue("time"));
+
+                return true;
+
+            } catch (JDOMException ex) {
+                Helper.LOGGER.log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Helper.LOGGER.log(Level.SEVERE, null, ex);
+            }
+
+        } catch (FileNotFoundException ex) {
+            // Metadata.xml not present
+        }
+
+        return false;
     }
 }
