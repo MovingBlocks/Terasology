@@ -41,7 +41,9 @@ public class HeightMapFrame extends javax.swing.JFrame {
     ChunkGeneratorTerrain _tGen;
     Image _heightMap;
 
-    /** Creates new form HeightMapFrame */
+    /** Creates new form HeightMapFrame
+     * @param w 
+     */
     public HeightMapFrame(World w) {
         _parent = w;
         _tGen = new ChunkGeneratorTerrain(w.getSeed());
@@ -79,6 +81,10 @@ public class HeightMapFrame extends javax.swing.JFrame {
         repaint();
     }
 
+    /**
+     * 
+     * @param g
+     */
     @Override
     public void paint(Graphics g) {
         g.clearRect(0, 0, getWidth(), getHeight());

@@ -93,11 +93,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public static void init() {
         try {
-            Logger.getLogger(Chunk.class.getName()).log(Level.INFO, "Loading chunk textures...");
+            Helper.LOGGER.log(Level.FINE, "Loading chunk textures...");
             _textureMap = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/images/terrain.png").openStream(), GL_NEAREST);
-            Logger.getLogger(Chunk.class.getName()).log(Level.INFO, "Finished loading chunk textures!");
+            Helper.LOGGER.log(Level.FINE, "Finished loading chunk textures!");
         } catch (IOException ex) {
-            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
+            Helper.LOGGER.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -217,7 +217,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             if (loadChunkFromFile()) {
                 setLightDirty(false);
                 _fresh = false;
-                Logger.getLogger(this.getClass().getName()).log(Level.FINEST, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+                Helper.LOGGER.log(Level.FINEST, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
                 return true;
             }
 
@@ -228,7 +228,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             updateSunlight();
             _fresh = false;
 
-            Logger.getLogger(this.getClass().getName()).log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+            Helper.LOGGER.log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
             return true;
         }
         return false;
@@ -466,7 +466,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             if (y == Configuration.CHUNK_DIMENSIONS.y - 1) {
                 shadowIntens = 1.0f;
             }
-            
+
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y;
 
@@ -822,11 +822,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Generates the display lists from the precalculated arrays.
      */
     public synchronized void generateDisplayLists() {
-        // Check on of the vertex arrays
-        if (_colorOpaque == null) {
-            return;
-        }
-
         if (_displayListOpaque == -1) {
             _displayListOpaque = glGenLists(1);
         }
@@ -1042,14 +1037,18 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             if (b.isBlockTypeTranslucent() && !covered) {
                 _sunlight[x][y][z] = light;
 
+                if (refresh) {
+                    spreadLight(x, y, z, light);
+                }
+
                 // Reduce the sunlight with each passed block
                 if (_blocks[x][y][z] != 0x0) {
                     light -= Configuration.LIGHT_ABSORPTION;
                     light = (byte) Math.max(0, light);
                 }
             } else if (b.isBlockTypeTranslucent() && covered) {
-                byte oldLightValue = _sunlight[x][y][z];
                 _sunlight[x][y][z] = 0;
+
                 if (refresh) {
                     refreshLightAtLocalPos(x, y, z);
                 }
@@ -1520,9 +1519,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             oS.close();
             return true;
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
+            Helper.LOGGER.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
+            Helper.LOGGER.log(Level.SEVERE, null, ex);
         }
 
         return false;
@@ -1547,10 +1546,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             c.read(input);
             iS.close();
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
+            Helper.LOGGER.log(Level.SEVERE, null, ex);
             return false;
         } catch (IOException ex) {
-            Logger.getLogger(Chunk.class.getName()).log(Level.SEVERE, null, ex);
+            Helper.LOGGER.log(Level.SEVERE, null, ex);
             return false;
         }
 

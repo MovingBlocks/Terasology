@@ -23,9 +23,7 @@ import java.awt.Font;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
 
-import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javolution.util.FastList;
@@ -34,7 +32,6 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
@@ -46,7 +43,7 @@ import org.newdawn.slick.TrueTypeFont;
  */
 public final class Main {
 
-    private static final Logger _logger = Logger.getLogger(Main.class.getName());
+
     /* ------- */
     private static TrueTypeFont _font1;
     private long _lastLoopTime;
@@ -65,25 +62,13 @@ public final class Main {
     FastRandom _rand = new FastRandom();
 
     /**
-     * Init. the logger.
-     */
-    static {
-        try {
-            _logger.addHandler(new FileHandler("blockmania.log", true));
-            _logger.setLevel(Level.SEVERE);
-        } catch (IOException ex) {
-            _logger.log(Level.WARNING, ex.toString(), ex);
-        }
-    }
-
-    /**
      * Entry point of the application.
      * 
      * @param args Arguments
      */
     public static void main(String[] args) {
 
-        _logger.log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
+        Helper.LOGGER.log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
 
         Main main = null;
 
@@ -92,7 +77,7 @@ public final class Main {
             main.create();
             main.start();
         } catch (Exception ex) {
-            _logger.log(Level.SEVERE, ex.toString(), ex);
+            Helper.LOGGER.log(Level.SEVERE, ex.toString(), ex);
         } finally {
             if (main != null) {
                 main.destroy();
@@ -108,7 +93,7 @@ public final class Main {
      * @throws LWJGLException
      */
     private void create() throws LWJGLException {
-        _logger.log(Level.INFO, "Initializing display, input devices and OpenGL.");
+        Helper.LOGGER.log(Level.INFO, "Initializing display, input devices and OpenGL.");
 
         // Display
         if (Configuration.FULLSCREEN) {
@@ -233,7 +218,7 @@ public final class Main {
      * the ESCAPE key.
      */
     private void start() {
-        _logger.log(Level.INFO, "Starting the game...");
+        Helper.LOGGER.log(Level.INFO, "Starting the game...");
         _lastLoopTime = Helper.getInstance().getTime();
         while (_runGame) {
 
@@ -456,7 +441,7 @@ public final class Main {
                 System.exit(0);
                 success = true;
             } else if (parsingResult.get(0).equals("i")) {
-                _logger.log(Level.INFO, _player.selectedBlockInformation());
+                Helper.LOGGER.log(Level.INFO, _player.selectedBlockInformation());
                 success = true;
             } else if (parsingResult.get(0).equals("generate_new_world")) {
                 String worldSeed = _rand.randomCharacterString(16);
@@ -473,14 +458,17 @@ public final class Main {
             } else if (parsingResult.get(0).equals("show_map")) {
                 new HeightMapFrame(_world).setVisible(true);
                 success = true;
+            } else if (parsingResult.get(0).equals("check")) {
+                _world.checkVisibleChunks();
+                success = true;
             }
         } catch (Exception e) {
         }
 
         if (success) {
-            _logger.log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
+            Helper.LOGGER.log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
         } else {
-            _logger.log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
+            Helper.LOGGER.log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
         }
 
         toggleDebugConsole();
@@ -506,26 +494,25 @@ public final class Main {
      * @param seed
      */
     public void initNewWorld(String title, String seed) {
-        _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+        Helper.LOGGER.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
         if (_world != null) {
             _world.dispose();
         }
         _world = new World(title, seed, _player);
         // Link the player to the world
         _player.setParent(_world);
+
         _world.startUpdateThread();
 
-        _logger.log(Level.INFO, "Waiting for some chunks to pop up...", seed);
+        Helper.LOGGER.log(Level.INFO, "Waiting for some chunks to pop up...", seed);
         while (_world.getStatGeneratedChunks() < 32) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                Helper.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
-        _logger.log(Level.INFO, "Enough chunks generated. Resetting player...", seed);
-
-        _world.resetPlayer();
+        Helper.LOGGER.log(Level.INFO, "Enough chunks generated. Resetting player...", seed);
 
         // Reset the delta value
         _lastLoopTime = Helper.getInstance().getTime();

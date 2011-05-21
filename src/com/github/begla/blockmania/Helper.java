@@ -16,6 +16,11 @@
  */
 package com.github.begla.blockmania;
 
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;
 
@@ -26,9 +31,23 @@ import org.lwjgl.util.vector.Vector2f;
  */
 public class Helper {
 
+    /**
+     * 
+     */
+    public static final Logger LOGGER = Logger.getLogger("blockmania");
     private static final float _div = 1.0f / 16.0f;
     private static final long _timerTicksPerSecond = Sys.getTimerResolution();
     private static Helper _instance = null;
+
+    static {
+        try {
+            FileHandler fh = new FileHandler("blockmania.log", true);
+            fh.setFormatter(new SimpleFormatter());
+            LOGGER.addHandler(fh);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, ex.toString(), ex);
+        }
+    }
 
     /**
      * Returns the static instance of this helper class.
@@ -39,6 +58,7 @@ public class Helper {
         if (_instance == null) {
             _instance = new Helper();
         }
+
 
         return _instance;
     }
@@ -95,6 +115,14 @@ public class Helper {
         return z - j * (j + 1) / 2;
     }
 
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param array
+     * @return
+     */
     public boolean checkBounds3D(int x, int y, int z, byte[][][] array) {
         int length1 = array.length;
 
@@ -117,6 +145,13 @@ public class Helper {
         return true;
     }
 
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param array
+     * @return
+     */
     public boolean checkBounds2D(int x, int y, byte[][] array) {
         int length1 = array.length;
         int length2 = array[x].length;

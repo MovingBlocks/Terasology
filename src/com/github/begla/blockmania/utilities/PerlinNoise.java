@@ -100,9 +100,10 @@ public class PerlinNoise {
      * @param y
      * @param z
      * @param octaves
+     * @param persFactor 
      * @return
      */
-    public float noiseWithOctaves(float x, float y, float z, int octaves) {
+    public float noiseWithOctaves(float x, float y, float z, int octaves, float persFactor) {
         float result = 0.0f;
         float noise;
         float pers = 1f;
@@ -112,7 +113,7 @@ public class PerlinNoise {
             noise = noise(x*scale, y*scale, z*scale) * pers;
             result += noise;
             scale *= 2;
-            pers /= 2;
+            pers *= persFactor;
         }
 
         return result;

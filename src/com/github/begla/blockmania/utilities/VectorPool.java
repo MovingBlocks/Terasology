@@ -27,6 +27,13 @@ public class VectorPool {
     static FastList<Vector3f> _pool = new FastList<Vector3f>();
     static int _reUseCounter = 0;
 
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
     public static Vector3f getVector(float x, float y, float z) {
         Vector3f v = null;
         
@@ -45,10 +52,18 @@ public class VectorPool {
         return v;
     }
 
+    /**
+     * 
+     * @return
+     */
     public static Vector3f getVector() {
         return getVector(0f, 0f, 0f);
     }
 
+    /**
+     * 
+     * @param v
+     */
     public static void putVector(Vector3f v) {
         _pool.add(v);
     }

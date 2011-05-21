@@ -76,19 +76,11 @@ public final class Player extends RenderableObject {
 
         // Position the camera in the upper part of the player's bounding box
         glTranslatef(-_position.x, -_position.y - getAABB().getDimensions().y / 1.2f, -_position.z);
-
         RayFaceIntersection is = calcSelectedBlock();
 
         // Display the block the player is aiming at
         if (Configuration.getSettingBoolean("SHOW_PLACING_BOX")) {
             if (is != null) {
-
-                // Mark the point of intersection
-//                glPointSize(5f);
-//                glBegin(GL_POINTS);
-//                glVertex3f(is.getIntersectPoint().x, is.getIntersectPoint().y, is.getIntersectPoint().z);
-//                glEnd();
-
 
                 if (Block.getBlockForType(_parent.getBlockAtPosition(is.getBlockPos())).renderBoundingBox()) {
                     Block.AABBForBlockAt((int) is.getBlockPos().x, (int) is.getBlockPos().y, (int) is.getBlockPos().z).render();
@@ -96,7 +88,7 @@ public final class Player extends RenderableObject {
             }
         }
 
-        // Draw the player's AABB
+        // Render the player's AABB
         // getAABB().render();
     }
 

@@ -20,7 +20,6 @@ import com.github.begla.blockmania.utilities.VectorPool;
 import javolution.util.FastMap;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -60,7 +59,7 @@ public final class Configuration {
      * If set to true, the display is rendered as a
      * fullscreen application.
      */
-    public static final boolean FULLSCREEN = true;
+    public static final boolean FULLSCREEN = false;
     /**
      * Maximum light value.
      */
