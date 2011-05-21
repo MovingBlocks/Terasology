@@ -162,7 +162,6 @@ public final class Main {
             worldSeed = _rand.randomCharacterString(16);
         }
         initNewWorld("World1", worldSeed);
-        _player.resetPlayer();
     }
 
     /**

@@ -62,6 +62,6 @@ public abstract class RenderableObject {
      * @param position The position
      */
     public void setPosition(Vector3f position) {
-        this._position = position;
+        _position.set(position);
     }
 }
