@@ -261,7 +261,7 @@ public final class World extends RenderableObject {
                      * queue it for updating.
                      */
                     if (isChunkVisible(neighbors[i]) && neighbors[i].isDirty() && cu.isUpdateNeighbors()) {
-                        queueChunkForUpdate(neighbors[i], false);
+                        queueChunkForUpdate(neighbors[i], false, false);
                     }
                 }
             }
@@ -280,20 +280,14 @@ public final class World extends RenderableObject {
     private void updateDaytime() {
         if (Helper.getInstance().getTime() - lastDaytimeMeasurement >= 30000) {
             if (_chunkUpdateNormal.isEmpty()) {
-                _time = (short) ((_time + 1) % 24);
+                setTime((short) (_time + 1));
             } else {
                 return;
             }
+
             lastDaytimeMeasurement = Helper.getInstance().getTime();
 
             Helper.LOGGER.log(Level.INFO, "Updated daytime to {0}h.", _time);
-
-            byte oldDaylight = _daylight;
-            updateDaylight();
-
-            if (_daylight != oldDaylight) {
-                updateAllChunks();
-            }
         }
     }
 
@@ -328,12 +322,12 @@ public final class World extends RenderableObject {
             if (!_chunkUpdateNormal.isEmpty() || isNighttime()) {
                 return;
             }
-            
+
             Chunk c = _visibleChunks.get((int) (Math.abs(_rand.randomLong()) % _visibleChunks.size()));
 
             if (!c.isFresh() && !c.isDirty() && !c.isLightDirty()) {
                 _generatorGrass.generate(c);
-                queueChunkForUpdate(c, false);
+                queueChunkForUpdate(c, false, false);
             }
 
             latestDirtEvolvement = Helper.getInstance().getTime();
@@ -345,8 +339,7 @@ public final class World extends RenderableObject {
      */
     public void updateAllChunks() {
         for (FastList.Node<Chunk> n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end;) {
-            n.getValue().setDirty(true);
-            queueChunkForUpdate(n.getValue(), false);
+            queueChunkForUpdate(n.getValue(), false, true);
         }
     }
 
@@ -424,7 +417,7 @@ public final class World extends RenderableObject {
                 if (c != null) {
                     // If this chunk was not visible before and is dirty: update it
                     if (!isChunkVisible(c)) {
-                        queueChunkForUpdate(c, true);
+                        queueChunkForUpdate(c, true, true);
                     }
                     visibleChunks.add(c);
                 }
@@ -523,6 +516,10 @@ public final class World extends RenderableObject {
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
+        if (c == null) {
+            return;
+        }
+
         if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0) {
             c.setBlock(blockPosX, y, blockPosZ, type);
 
@@ -538,7 +535,7 @@ public final class World extends RenderableObject {
                     // Do something
                 }
 
-                queueChunkForUpdate(c, true);
+                queueChunkForUpdate(c, true, false);
             }
         }
     }
@@ -568,7 +565,12 @@ public final class World extends RenderableObject {
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        return c.getBlock(blockPosX, y, blockPosZ);
+
+        if (c != null) {
+            return c.getBlock(blockPosX, y, blockPosZ);
+        }
+
+        return -1;
     }
 
     /**
@@ -585,8 +587,14 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
+
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
+
+        if (c != null) {
+            return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
+        }
+
+        return true;
     }
 
     /**
@@ -605,7 +613,12 @@ public final class World extends RenderableObject {
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        return c.getLight(blockPosX, y, blockPosZ);
+
+        if (c != null) {
+            return c.getLight(blockPosX, y, blockPosZ);
+        }
+
+        return -1;
     }
 
     /**
@@ -623,8 +636,12 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
+
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        c.setSunlight(blockPosX, y, blockPosZ, intens);
+        
+        if (c != null) {
+            c.setSunlight(blockPosX, y, blockPosZ, intens);
+        }
     }
 
     /**
@@ -646,7 +663,9 @@ public final class World extends RenderableObject {
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth);
+        if (c != null) {
+            c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth);
+        }
     }
 
     /**
@@ -668,7 +687,10 @@ public final class World extends RenderableObject {
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth);
+        
+        if (c != null) {
+            c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth);
+        }
     }
 
     /**
@@ -941,7 +963,10 @@ public final class World extends RenderableObject {
         return c;
     }
 
-    private void queueChunkForUpdate(Chunk c, boolean updateNeighbors) {
+    private void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty) {
+        if (markDirty) {
+            c.setDirty(true);
+        }
         _chunkUpdateNormal.add(new ChunkUpdate(updateNeighbors, c));
     }
 
@@ -987,6 +1012,13 @@ public final class World extends RenderableObject {
      */
     public void setTime(short time) {
         _time = (short) (time % 24);
+
+        byte oldDaylight = _daylight;
+        updateDaylight();
+
+        if (_daylight != oldDaylight) {
+            updateAllChunks();
+        }
     }
 
     /**
@@ -1061,11 +1093,12 @@ public final class World extends RenderableObject {
      */
     public void generateNewChunk(int x, int z) {
         Chunk c = loadOrCreateChunk(x, z);
-        c.generate();
 
         if (c == null) {
             return;
         }
+
+        c.generate();
 
         Chunk[] neighbors = c.loadOrCreateNeighbors();
 

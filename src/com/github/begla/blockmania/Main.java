@@ -32,6 +32,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.NVFogDistance;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 
@@ -140,6 +143,11 @@ public final class Main {
         glEnable(GL_FOG);
         glDepthFunc(GL_LEQUAL);
 
+        if (GLContext.getCapabilities().GL_NV_fog_distance) {
+            glFogi(NVFogDistance.GL_FOG_DISTANCE_MODE_NV, NVFogDistance.GL_EYE_RADIAL_NV);
+            Helper.LOGGER.log(Level.INFO, "Extension 'GL_NV_fog_distance' is supported.");
+        }
+
         //glPolygonOffset(0.1f, 0.1f);
         //glEnable(GL_POLYGON_OFFSET_FILL);
 
@@ -170,11 +178,12 @@ public final class Main {
         glClearColor(_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f);
 
         // Color the fog like the sky
-        float[] fogColor = {_world.getDaylightColor().x * 0.95f, _world.getDaylightColor().y * 0.95f, _world.getDaylightColor().z * 0.95f, 1.0f};
+        float[] fogColor = {_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f};
         FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
         fogColorBuffer.put(fogColor);
         fogColorBuffer.rewind();
         glFog(GL_FOG_COLOR, fogColorBuffer);
+
 
         // Update by the viewing distance
         float maxDist = Math.max(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
@@ -282,6 +291,7 @@ public final class Main {
         glLoadIdentity();
 
         glDisable(GL_DEPTH_TEST);
+        glDisable(GL_FOG);
         glEnable(GL_BLEND);
         glEnable(GL_TEXTURE_2D);
 
@@ -313,6 +323,7 @@ public final class Main {
         glEnd();
 
         glDisable(GL_BLEND);
+        glEnable(GL_FOG);
         glEnable(GL_DEPTH_TEST);
 
         glMatrixMode(GL_PROJECTION);

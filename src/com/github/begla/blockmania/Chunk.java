@@ -820,6 +820,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Generates the display lists from the precalculated arrays.
      */
     public synchronized void generateDisplayLists() {
+        if (_quadsOpaque == null) {
+            return;
+        }
+        
         if (_displayListOpaque == -1) {
             _displayListOpaque = glGenLists(1);
         }
