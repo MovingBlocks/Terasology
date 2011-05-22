@@ -12,7 +12,7 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  under the License.
+ *
  */
 package com.github.begla.blockmania;
 
@@ -35,9 +35,7 @@ import java.util.TreeMap;
 import org.jdom.JDOMException;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
-import javolution.util.FastCollection.Record;
 import javolution.util.FastList;
-import javolution.util.FastSet;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -76,8 +74,8 @@ public final class World extends RenderableObject {
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
     /* ------ */
-    private final FastSet<Chunk> _chunkUpdateQueueDL = new FastSet<Chunk>(128);
-    private final FastSet<ChunkUpdate> _chunkUpdateNormal = new FastSet<ChunkUpdate>(2048);
+    private final FastList<Chunk> _chunkUpdateQueueDL = new FastList<Chunk>(32);
+    private final FastList<ChunkUpdate> _chunkUpdateNormal = new FastList<ChunkUpdate>(1024);
     private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
@@ -175,33 +173,34 @@ public final class World extends RenderableObject {
                     _visibleChunks = fetchVisibleChunks();
 
                     // Find the nearest chunk
-                    double dist = Float.MAX_VALUE;
+                    double weight = Double.MAX_VALUE;
                     ChunkUpdate nearestChunkUpdate = null;
 
                     FastList<ChunkUpdate> deletableUpdates = new FastList<ChunkUpdate>();
 
-                    for (FastSet.Record n = _chunkUpdateNormal.head(), end = _chunkUpdateNormal.tail(); (n = n.getNext()) != end;) {
-                        ChunkUpdate cu = _chunkUpdateNormal.valueOf(n);
-                        double tDist = cu.getChunk().calcDistanceToPlayer();
+                    for (FastList.Node<ChunkUpdate> n = _chunkUpdateNormal.head(), end = _chunkUpdateNormal.tail(); (n = n.getNext()) != end;) {
+                        ChunkUpdate cu = n.getValue();
+                        double tWeight = cu.getWeight();
 
                         // Log deletable updates
                         if (!isChunkVisible(cu.getChunk())) {
                             deletableUpdates.add(cu);
+                            continue;
                         }
 
-                        if (tDist < dist) {
-                            dist = tDist;
+                        if (tWeight < weight) {
+                            weight = tWeight;
                             nearestChunkUpdate = cu;
                         }
                     }
+
+                    // Remove the updates from the queue
+                    _chunkUpdateNormal.removeAll(deletableUpdates);
 
                     if (nearestChunkUpdate != null) {
                         _chunkUpdateNormal.remove(nearestChunkUpdate);
                         processChunkUpdate(nearestChunkUpdate);
                     }
-
-                    // Remove the updates from the queue
-                    _chunkUpdateNormal.removeAll(deletableUpdates);
 
                     updateDaytime();
                     replantDirt();
@@ -445,11 +444,11 @@ public final class World extends RenderableObject {
      */
     @Override
     public void update(long delta) {
-        Record r = _chunkUpdateQueueDL.head().getNext();
-        Chunk c = _chunkUpdateQueueDL.valueOf(r);
-        if (c != null) {
-            c.generateDisplayLists();
-            _chunkUpdateQueueDL.remove(c);
+        if (!_chunkUpdateQueueDL.isEmpty()) {
+            Chunk c = _chunkUpdateQueueDL.removeFirst();
+            if (c != null) {
+                c.generateDisplayLists();
+            }
         }
     }
 
@@ -638,7 +637,7 @@ public final class World extends RenderableObject {
 
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        
+
         if (c != null) {
             c.setSunlight(blockPosX, y, blockPosZ, intens);
         }
@@ -687,7 +686,7 @@ public final class World extends RenderableObject {
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        
+
         if (c != null) {
             c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth);
         }
@@ -963,11 +962,19 @@ public final class World extends RenderableObject {
         return c;
     }
 
+    private void queueChunkForUpdate(Chunk c, boolean updateNeighbors) {
+        queueChunkForUpdate(c, updateNeighbors, false, (byte) 1);
+    }
+
     private void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty) {
+        queueChunkForUpdate(c, updateNeighbors, markDirty, (byte) 1);
+    }
+
+    private void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty, byte priority) {
         if (markDirty) {
             c.setDirty(true);
         }
-        _chunkUpdateNormal.add(new ChunkUpdate(updateNeighbors, c));
+        _chunkUpdateNormal.add(new ChunkUpdate(updateNeighbors, c, priority));
     }
 
     /**

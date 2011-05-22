@@ -12,6 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * 
  */
 package com.github.begla.blockmania;
 
@@ -19,19 +20,38 @@ package com.github.begla.blockmania;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ChunkUpdate {
-
+public class ChunkUpdate implements Comparable<ChunkUpdate> {
+    
     private boolean _updateNeighbors;
     private Chunk _chunk;
+    private byte _priority;
 
     /**
      * 
      * @param _updateNeighbors
      * @param _chunk
+     * @param _priority 
+     */
+    public ChunkUpdate(boolean _updateNeighbors, Chunk _chunk, byte priority) {
+        this._updateNeighbors = _updateNeighbors;
+        this._chunk = _chunk;
+        
+        if (priority <= 0) {
+            priority = 1;
+        }
+        
+        this._priority = priority;
+    }
+
+    /**
+     * 
+     * @param _updateNeighbors
+     * @param _chunk 
      */
     public ChunkUpdate(boolean _updateNeighbors, Chunk _chunk) {
         this._updateNeighbors = _updateNeighbors;
         this._chunk = _chunk;
+        this._priority = 1;
     }
 
     /**
@@ -48,5 +68,26 @@ public class ChunkUpdate {
      */
     public Chunk getChunk() {
         return _chunk;
+    }
+
+    /**
+     * 
+     * @return 
+     */
+    public byte getPriority() {
+        return _priority;
+    }
+
+    /**
+     * 
+     * @return 
+     */
+    public double getWeight() {
+        return _chunk.calcDistanceToPlayer() / (double) _priority;
+    }
+    
+    @Override
+    public int compareTo(ChunkUpdate o) {
+        return new Double(getWeight()).compareTo(o.getWeight());
     }
 }
