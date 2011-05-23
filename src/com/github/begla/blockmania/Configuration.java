@@ -141,6 +141,7 @@ public final class Configuration {
         _settingsBoolean.put("SHOW_PLACING_BOX", true);
         _settingsBoolean.put("SHOW_CHUNK_OUTLINES", false);
         _settingsBoolean.put("SHOW_DEBUG_INFORMATION", true);
+        _settingsBoolean.put("SHOW_CROSSHAIR", true);
         _settingsBoolean.put("ENABLE_BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);

@@ -30,7 +30,7 @@ public class ChunkUpdate implements Comparable<ChunkUpdate> {
      * 
      * @param _updateNeighbors
      * @param _chunk
-     * @param _priority 
+     * @param priority  
      */
     public ChunkUpdate(boolean _updateNeighbors, Chunk _chunk, byte priority) {
         this._updateNeighbors = _updateNeighbors;
@@ -86,6 +86,11 @@ public class ChunkUpdate implements Comparable<ChunkUpdate> {
         return _chunk.calcDistanceToPlayer() / (double) _priority;
     }
     
+    /**
+     * 
+     * @param o
+     * @return
+     */
     @Override
     public int compareTo(ChunkUpdate o) {
         return new Double(getWeight()).compareTo(o.getWeight());

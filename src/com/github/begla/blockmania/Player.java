@@ -375,11 +375,11 @@ public final class Player extends RenderableObject {
         boolean result = false;
         FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
-        for (BlockPosition bp : blockPositions) {
-            byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(bp.x, bp.y, bp.z));
+         for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end;) {
+            byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
 
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
-                if (getAABB().overlaps(Block.AABBForBlockAt(bp.x, bp.y, bp.z))) {
+                if (getAABB().overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z))) {
                     result = true;
                     // If a collision was detected: reset the player's position
                     _position.y = origin.y;
@@ -405,7 +405,7 @@ public final class Player extends RenderableObject {
 
         for (int x = -1; x < 2; x++) {
             for (int z = -1; z < 2; z++) {
-                for (int y = -8; y <= 8; y++) {
+                for (int y = -4; y < 4; y++) {
                     int blockPosX = (int) (origin.x + x + 0.5f);
                     int blockPosY = (int) (origin.y + y + 0.5f);
                     int blockPosZ = (int) (origin.z + z + 0.5f);
@@ -430,13 +430,13 @@ public final class Player extends RenderableObject {
         FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
         // Check each block positions for collisions
-        for (BlockPosition bp : blockPositions) {
-            byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(bp.x, bp.y, bp.z));
+        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end;) {
+            byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
 
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
-                if (getAABB().overlaps(Block.AABBForBlockAt(bp.x, bp.y, bp.z))) {
+                if (getAABB().overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z))) {
                     result = true;
-                    Vector3f normal = Block.AABBForBlockAt(bp.x, bp.y, bp.z).closestNormalToPoint(origin);
+                    Vector3f normal = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z).closestNormalToPoint(origin);
                     // Find a vector parallel to the surface normal
                     Vector3f slideVector = Vector3f.cross(normal, VectorPool.getVector(0, 1, 0), null);
                     // Calculate the direction from the origin to the current position

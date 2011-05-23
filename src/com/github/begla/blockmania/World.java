@@ -36,6 +36,7 @@ import org.jdom.JDOMException;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
 import javolution.util.FastList;
+import javolution.util.FastSet;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -74,8 +75,8 @@ public final class World extends RenderableObject {
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
     /* ------ */
-    private final FastList<Chunk> _chunkUpdateQueueDL = new FastList<Chunk>(32);
-    private final FastList<ChunkUpdate> _chunkUpdateNormal = new FastList<ChunkUpdate>(1024);
+    private final FastSet<Chunk> _chunkUpdateQueueDL = new FastSet<Chunk>(32);
+    private final FastSet<ChunkUpdate> _chunkUpdateNormal = new FastSet<ChunkUpdate>(1024);
     private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
@@ -178,8 +179,8 @@ public final class World extends RenderableObject {
 
                     FastList<ChunkUpdate> deletableUpdates = new FastList<ChunkUpdate>();
 
-                    for (FastList.Node<ChunkUpdate> n = _chunkUpdateNormal.head(), end = _chunkUpdateNormal.tail(); (n = n.getNext()) != end;) {
-                        ChunkUpdate cu = n.getValue();
+                    for (FastSet.Record n = _chunkUpdateNormal.head(), end = _chunkUpdateNormal.tail(); (n = n.getNext()) != end;) {
+                        ChunkUpdate cu = _chunkUpdateNormal.valueOf(n);
                         double tWeight = cu.getWeight();
 
                         // Log deletable updates
@@ -233,7 +234,22 @@ public final class World extends RenderableObject {
      */
     private void processChunkUpdate(ChunkUpdate cu) {
         if (cu != null) {
+
+            /*
+             * Remove this update from the queue if it is not dirty
+             */
+            if (!(cu.getChunk().isDirty() || cu.getChunk().isLightDirty())) {
+                return;
+            }
+
+            /*
+             * Generate the chunk...
+             */
             cu.getChunk().generate();
+
+            /*
+             * ...and fetch its neighbors
+             */
             Chunk[] neighbors = cu.getChunk().loadOrCreateNeighbors();
 
             /*
@@ -247,9 +263,12 @@ public final class World extends RenderableObject {
             }
 
             /*
-             * Now flood light and propagate into adjacent chunks.
+             * If the light of this chunk marked as dirty...
              */
             if (cu.getChunk().isLightDirty()) {
+                /*
+                 * ... propagate light into adjacent chunks
+                 */
                 cu.getChunk().updateLight();
             }
 
@@ -265,7 +284,14 @@ public final class World extends RenderableObject {
                 }
             }
 
+
+            /*
+             * Check if this chunk was been changed...
+             */
             if (cu.getChunk().isDirty()) {
+                /*
+                 * If yes, regenerate the vertex arrays
+                 */
                 cu.getChunk().generateVertexArrays();
                 _chunkUpdateQueueDL.add(cu.getChunk());
                 _statGeneratedChunks++;
@@ -445,10 +471,11 @@ public final class World extends RenderableObject {
     @Override
     public void update(long delta) {
         if (!_chunkUpdateQueueDL.isEmpty()) {
-            Chunk c = _chunkUpdateQueueDL.removeFirst();
+            Chunk c = _chunkUpdateQueueDL.valueOf(_chunkUpdateQueueDL.head().getNext());
             if (c != null) {
                 c.generateDisplayLists();
             }
+            _chunkUpdateQueueDL.remove(c);
         }
     }
 
