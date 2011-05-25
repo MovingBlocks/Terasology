@@ -21,7 +21,7 @@ package com.github.begla.blockmania;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ChunkUpdate implements Comparable<ChunkUpdate> {
-    
+
     private boolean _updateNeighbors;
     private Chunk _chunk;
     private byte _priority;
@@ -35,11 +35,11 @@ public class ChunkUpdate implements Comparable<ChunkUpdate> {
     public ChunkUpdate(boolean _updateNeighbors, Chunk _chunk, byte priority) {
         this._updateNeighbors = _updateNeighbors;
         this._chunk = _chunk;
-        
+
         if (priority <= 0) {
             priority = 1;
         }
-        
+
         this._priority = priority;
     }
 
@@ -83,9 +83,10 @@ public class ChunkUpdate implements Comparable<ChunkUpdate> {
      * @return 
      */
     public double getWeight() {
-        return _chunk.calcDistanceToPlayer() / (double) _priority;
+        double weight = _chunk.calcDistanceToPlayer() / (double) _priority;
+        return weight;
     }
-    
+
     /**
      * 
      * @param o
@@ -94,5 +95,21 @@ public class ChunkUpdate implements Comparable<ChunkUpdate> {
     @Override
     public int compareTo(ChunkUpdate o) {
         return new Double(getWeight()).compareTo(o.getWeight());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o.getClass() == ChunkUpdate.class) {
+            ChunkUpdate cu = (ChunkUpdate) o;
+            cu.getChunk().equals(_chunk);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 37 * hash + (this._chunk != null ? this._chunk.hashCode() : 0);
+        return hash;
     }
 }

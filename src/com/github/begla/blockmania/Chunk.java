@@ -271,7 +271,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the vertex-, texture- and color-arrays.
      */
-    public synchronized void generateVertexArrays() {
+    public void generateVertexArrays() {
         _quadsTranslucent = new FastList<Float>();
         _texTranslucent = new FastList<Float>();
         _colorTranslucent = new FastList<Float>();
@@ -819,11 +819,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the display lists from the precalculated arrays.
      */
-    public synchronized void generateDisplayLists() {
+    public void generateDisplayLists() {
         if (_quadsOpaque == null) {
             return;
         }
-        
+
         if (_displayListOpaque == -1) {
             _displayListOpaque = glGenLists(1);
         }
@@ -1254,16 +1254,20 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public void setSunlight(int x, int y, int z, byte intens) {
         if (isFresh()) {
-            // Sunlight may not be changed within fresh blocks
+            // Sunlight should not be changed within fresh blocks
             return;
         }
 
         if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
             Block b = Block.getBlockForType(getBlock(x, y, z));
+            byte oldValue = _sunlight[x][y][z];
             _sunlight[x][y][z] = intens;
-            _dirty = true;
-            // Mark the neighbors as dirty
-            markNeighborsDirty(x, z);
+
+            if (oldValue != intens) {
+                setDirty(true);
+                // Mark the neighbors as dirty
+                markNeighborsDirty(x, z);
+            }
         }
     }
 
@@ -1293,6 +1297,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public void setBlock(int x, int y, int z, byte type) {
         if (Helper.getInstance().checkBounds3D(x, y, z, _blocks)) {
+            byte oldValue = _blocks[x][y][z];
             _blocks[x][y][z] = type;
 
             Block b = Block.getBlockForType(type);
@@ -1302,10 +1307,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
                 _sunlight[x][y][z] = 0;
             }
 
-            // Update vertex arrays and light
-            setDirty(true);
-            // Mark the neighbors as dirty
-            markNeighborsDirty(x, z);
+            if (oldValue != type) {
+                // Update vertex arrays and light
+                setDirty(true);
+                // Mark the neighbors as dirty
+                markNeighborsDirty(x, z);
+            }
         }
     }
 
@@ -1514,6 +1521,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             FileOutputStream oS = new FileOutputStream(f);
             FileChannel c = oS.getChannel();
             c.write(output);
+            Helper.LOGGER.log(Level.FINE, "Wrote chunk {0} to disk.", this);
             oS.close();
         } catch (FileNotFoundException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);
@@ -1543,6 +1551,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             FileInputStream iS = new FileInputStream(f);
             FileChannel c = iS.getChannel();
             c.read(input);
+            Helper.LOGGER.log(Level.FINE, "Loaded chunk {0} from disk.", this);
             iS.close();
         } catch (FileNotFoundException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);

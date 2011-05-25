@@ -93,7 +93,7 @@ public final class Main {
      * @throws LWJGLException
      */
     private void create() throws LWJGLException {
-        Helper.LOGGER.log(Level.INFO, "Initializing display, input devices and OpenGL.");
+        Helper.LOGGER.log(Level.INFO, "Loading Blockmania. Please stand by...");
 
         // Display
         if (Configuration.FULLSCREEN) {
