@@ -94,7 +94,7 @@ public final class World extends RenderableObject {
     /* ----- */
     int _lastGeneratedChunkID = 0;
     /* ----- */
-    private FastList<Chunk> _visibleChunks = new FastList<Chunk>(256);
+    private FastList<Chunk> _visibleChunks = new FastList<Chunk>(1024);
 
     /**
      * Initializes a new world for the single player mode.

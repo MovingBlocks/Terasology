@@ -186,10 +186,10 @@ public final class Main {
         glFog(GL_FOG_COLOR, fogColorBuffer);
 
 
-        // Update by the viewing distance
-        float maxDist = Math.max(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
-        float viewingDistance = maxDist / 2f;
-        glFogf(GL_FOG_START, 32f);
+        // Update the viewing distance
+        float minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
+        float viewingDistance = minDist / 2f;
+        glFogf(GL_FOG_START, viewingDistance-16f);
         glFogf(GL_FOG_END, viewingDistance);
 
         /*
@@ -470,9 +470,6 @@ public final class Main {
                 success = true;
             } else if (parsingResult.get(0).equals("show_map")) {
                 new HeightMapFrame(_world).setVisible(true);
-                success = true;
-            } else if (parsingResult.get(0).equals("check")) {
-                _world.checkVisibleChunks();
                 success = true;
             } else if (parsingResult.get(0).equals("update_all")) {
                 _world.updateAllChunks();

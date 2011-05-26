@@ -409,7 +409,7 @@ public final class Player extends RenderableObject {
 
         for (int x = -1; x < 2; x++) {
             for (int z = -1; z < 2; z++) {
-                for (int y = -4; y < 4; y++) {
+                for (int y = -2; y < 2; y++) {
                     int blockPosX = (int) (origin.x + x + 0.5f);
                     int blockPosY = (int) (origin.y + y + 0.5f);
                     int blockPosZ = (int) (origin.z + z + 0.5f);

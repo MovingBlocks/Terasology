@@ -29,6 +29,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -77,7 +78,7 @@ public class HeightMapFrame extends javax.swing.JFrame {
                 g.fillRect(getWidth() / 2, getHeight() / 2, 5, 5);
             }
         }
-        
+
         repaint();
     }
 
@@ -105,9 +106,12 @@ public class HeightMapFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Height map");
         setMinimumSize(new java.awt.Dimension(512, 512));
-        setPreferredSize(new java.awt.Dimension(512, 512));
         setResizable(false);
-        setSize(new java.awt.Dimension(512, 512));
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                formMouseClicked(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -122,6 +126,14 @@ public class HeightMapFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+        Vector3f offset = _parent.getPlayer().getPosition();
+        Vector2f newPosition = new Vector2f(offset.x + evt.getX() - getWidth() / 2, offset.z + evt.getY() - getHeight() / 2);
+        float height = _tGen.calcHeightMap(newPosition.x, newPosition.y) * 128 + 16;
+
+        _parent.getPlayer().setPosition(new Vector3f(newPosition.x, height, newPosition.y));
+    }//GEN-LAST:event_formMouseClicked
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }

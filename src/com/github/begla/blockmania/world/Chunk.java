@@ -27,6 +27,7 @@ import java.nio.ByteBuffer;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.blocks.Block;
 import gnu.trove.iterator.TFloatIterator;
+import gnu.trove.list.TLinkable;
 import gnu.trove.list.array.TFloatArrayList;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -54,8 +55,9 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Chunk extends RenderableObject implements Comparable<Chunk> {
+public final class Chunk extends RenderableObject implements Comparable<Chunk>, TLinkable<Chunk> {
 
+    private Chunk _next, _prev;
     private boolean _dirty;
     private boolean _lightDirty;
     private static int _statVertexArrayUpdateCount = 0;
@@ -1635,5 +1637,25 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public int getChunkID() {
         return _chunkID;
+    }
+
+    @Override
+    public Chunk getNext() {
+        return _next;
+    }
+
+    @Override
+    public Chunk getPrevious() {
+        return _prev;
+    }
+
+    @Override
+    public void setNext(Chunk t) {
+        _next = t;
+    }
+
+    @Override
+    public void setPrevious(Chunk t) {
+        _prev = t;
     }
 }
