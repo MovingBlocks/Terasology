@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-/*
- * HeightMapFrame.java
- *
- * Created on 19.05.2011, 20:03:08
- */
 package com.github.begla.blockmania.utilities;
 
 import com.github.begla.blockmania.world.World;

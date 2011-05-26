@@ -12,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
  */
+
 package com.github.begla.blockmania.world;
 
 import gnu.trove.list.TLinkable;
@@ -125,21 +125,37 @@ public class ChunkUpdate implements Comparable<ChunkUpdate>, TLinkable<ChunkUpda
         return hash;
     }
 
+    /**
+     * 
+     * @return
+     */
     @Override
     public ChunkUpdate getNext() {
         return _next;
     }
 
+    /**
+     * 
+     * @return
+     */
     @Override
     public ChunkUpdate getPrevious() {
         return _prev;
     }
 
+    /**
+     * 
+     * @param t
+     */
     @Override
     public void setNext(ChunkUpdate t) {
         _next = t;
     }
 
+    /**
+     * 
+     * @param t
+     */
     @Override
     public void setPrevious(ChunkUpdate t) {
         _prev = t;
