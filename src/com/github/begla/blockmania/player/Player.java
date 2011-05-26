@@ -14,8 +14,12 @@
  *  limitations under the License.
  *
  */
-package com.github.begla.blockmania;
+package com.github.begla.blockmania.player;
 
+import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.RenderableObject;
+import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.utilities.VectorPool;
 import javolution.util.FastList;
 import com.github.begla.blockmania.utilities.AABB;
@@ -76,7 +80,7 @@ public final class Player extends RenderableObject {
 
         // Position the camera in the upper part of the player's bounding box
         glTranslatef(-_position.x, -_position.y - getAABB().getDimensions().y / 1.2f, -_position.z);
-        RayFaceIntersection is = calcSelectedBlock();
+        Intersection is = calcSelectedBlock();
 
         // Display the block the player is aiming at
         if (Configuration.getSettingBoolean("SHOW_PLACING_BOX")) {
@@ -197,14 +201,14 @@ public final class Player extends RenderableObject {
      * 
      * @return Intersection point of the looked at block
      */
-    public RayFaceIntersection calcSelectedBlock() {
-        FastList<RayFaceIntersection> inters = new FastList<RayFaceIntersection>();
+    public Intersection calcSelectedBlock() {
+        FastList<Intersection> inters = new FastList<Intersection>();
         for (int x = -4; x < 4; x++) {
             for (int y = -4; y < 4; y++) {
                 for (int z = -4; z < 4; z++) {
                     if (x != 0 || y != 0 || z != 0) {
                         // The ray originates from the "player's eye"
-                        FastList<RayFaceIntersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, VectorPool.getVector(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
+                        FastList<Intersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, VectorPool.getVector(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
                         if (iss != null) {
                             inters.addAll(iss);
                         }
@@ -229,7 +233,7 @@ public final class Player extends RenderableObject {
      * @return
      */
     public String selectedBlockInformation() {
-        RayFaceIntersection r = calcSelectedBlock();
+        Intersection r = calcSelectedBlock();
         Vector3f bp = r.getBlockPos();
         byte blockType = _parent.getBlock((int) bp.x, (int) bp.y, (int) bp.z);
         byte blockLight = _parent.getLight((int) bp.x, (int) bp.y, (int) bp.z);
@@ -244,7 +248,7 @@ public final class Player extends RenderableObject {
      */
     public void placeBlock(byte type) {
         if (getParent() != null) {
-            RayFaceIntersection is = calcSelectedBlock();
+            Intersection is = calcSelectedBlock();
             if (is != null) {
                 Vector3f blockPos = is.calcAdjacentBlockPos();
 
@@ -265,7 +269,7 @@ public final class Player extends RenderableObject {
      * @param type The type of the tree
      */
     public void plantTree(int type) {
-        RayFaceIntersection is = calcSelectedBlock();
+        Intersection is = calcSelectedBlock();
         if (is != null) {
             Vector3f blockPos = is.getBlockPos();
 
@@ -282,7 +286,7 @@ public final class Player extends RenderableObject {
      */
     public void removeBlock() {
         if (getParent() != null) {
-            RayFaceIntersection is = calcSelectedBlock();
+            Intersection is = calcSelectedBlock();
             if (is != null) {
                 Vector3f blockPos = is.getBlockPos();
                 getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
@@ -461,7 +465,7 @@ public final class Player extends RenderableObject {
      * Updates the position of the player.
      * 
      * TODO: Fix easing-artifact
-     * TODO: Jumping is "choppy"
+     * TODO: Fix double-jumping bug
      * 
      * @param delta Delta value since the last frame update
      */
@@ -621,8 +625,6 @@ public final class Player extends RenderableObject {
 
     /**
      * Returns the spawning point of the player.
-     * 
-     * TODO: Should not determine the spawning point randomly.
      * 
      * @return The coordinates of the spawning point
      */

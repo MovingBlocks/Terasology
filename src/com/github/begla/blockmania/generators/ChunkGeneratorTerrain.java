@@ -16,7 +16,7 @@
  */
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.Chunk;
+import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.Configuration;
 
 /**

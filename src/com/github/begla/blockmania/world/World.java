@@ -14,8 +14,13 @@
  *  limitations under the License.
  *
  */
-package com.github.begla.blockmania;
+package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.player.Player;
+import com.github.begla.blockmania.player.Intersection;
+import com.github.begla.blockmania.RenderableObject;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.generators.ChunkGeneratorForest;
@@ -223,7 +228,7 @@ public final class World extends RenderableObject {
     private void processChunkUpdate(ChunkUpdate cu) {
         if (cu != null) {
             /*
-             * Remove this update from the queue if it is not dirty or is not visible
+             * Remove this update from the queue if it is not dirty or if it is not visible
              */
             if (!(cu.getChunk().isDirty()) || !isChunkVisible(cu.getChunk())) {
                 return;
@@ -237,7 +242,7 @@ public final class World extends RenderableObject {
             cu.getChunk().generate();
 
             /*
-             * ...and fetch its neighbors...
+             * ... and fetch its neighbors...
              */
             Chunk[] neighbors = null;
 
@@ -268,7 +273,7 @@ public final class World extends RenderableObject {
             for (int i = 0; i < neighbors.length; i++) {
                 if (neighbors[i] != null) {
                     /*
-                     * If a neighbor chunk was changed:
+                     * If a neighbor chunk was changed
                      * queue it for updating.
                      */
                     if ((isChunkVisible(neighbors[i]) && neighbors[i].isDirty() && cu.isUpdateNeighbors()) || lightCalculated) {
@@ -792,7 +797,7 @@ public final class World extends RenderableObject {
      * @param ray
      * @return Distance-ordered list of ray-face-intersections
      */
-    public FastList<RayFaceIntersection> rayBlockIntersection(int x, int y, int z, Vector3f origin, Vector3f ray) {
+    public FastList<Intersection> rayBlockIntersection(int x, int y, int z, Vector3f origin, Vector3f ray) {
         /*
          * Ignore invisible blocks.
          */
@@ -800,7 +805,7 @@ public final class World extends RenderableObject {
             return null;
         }
 
-        FastList<RayFaceIntersection> result = new FastList<RayFaceIntersection>();
+        FastList<Intersection> result = new FastList<Intersection>();
 
         /*
          * Fetch all vertices of the specified block.
@@ -813,7 +818,7 @@ public final class World extends RenderableObject {
          */
 
         // Front
-        RayFaceIntersection is = rayFaceIntersection(blockPos, vertices[0], vertices[3], vertices[2], origin, ray);
+        Intersection is = rayFaceIntersection(blockPos, vertices[0], vertices[3], vertices[2], origin, ray);
         if (is != null) {
             result.add(is);
         }
@@ -866,9 +871,9 @@ public final class World extends RenderableObject {
      * @param ray Direction of the intersection ray
      * @return Ray-face-intersection
      */
-    private RayFaceIntersection rayFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
+    private Intersection rayFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
 
-        //Calculate the plane to intersect with.
+        // Calculate the plane to intersect with
         Vector3f a = Vector3f.sub(v1, v0, null);
         Vector3f b = Vector3f.sub(v2, v0, null);
         Vector3f norm = Vector3f.cross(a, b, null);
@@ -892,7 +897,7 @@ public final class World extends RenderableObject {
         Vector3f.add(intersectPoint, origin, intersectPoint);
 
         if (intersectPoint.x >= v0.x && intersectPoint.x <= v2.x && intersectPoint.y >= v0.y && intersectPoint.y <= v2.y && intersectPoint.z >= v0.z && intersectPoint.z <= v2.z) {
-            return new RayFaceIntersection(blockPos, v0, v1, v2, d, t, origin, ray, intersectPoint);
+            return new Intersection(blockPos, v0, v1, v2, d, t, origin, ray, intersectPoint);
         }
 
         return null;
@@ -922,12 +927,9 @@ public final class World extends RenderableObject {
         // We got a chunk! Already! Great!
         if (c != null) {
             return c;
-        } else {
-            // Looks a like a new chunk has to be created from scratch
         }
 
-
-        // Okay we have a full cache here. Alert!
+        // Delete some elements if the cache size is exceeded
         if (_chunkCache.size() > 2048) {
             // Fetch all chunks within the cache
             FastList<Chunk> sortedChunks = null;
@@ -949,7 +951,7 @@ public final class World extends RenderableObject {
                 }
             }
 
-            Helper.LOGGER.log(Level.FINE, "Finished removing chunks from chunk cache.");
+            Helper.LOGGER.log(Level.FINE, "Finished removing chunks from the chunk cache.");
         }
 
         // Init a new chunk
@@ -982,14 +984,32 @@ public final class World extends RenderableObject {
         return c;
     }
 
+    /**
+     * 
+     * @param c
+     * @param updateNeighbors 
+     */
     private void queueChunkForUpdate(Chunk c, boolean updateNeighbors) {
         queueChunkForUpdate(c, updateNeighbors, false, (byte) 1);
     }
 
+    /**
+     * 
+     * @param c
+     * @param updateNeighbors
+     * @param markDirty 
+     */
     private void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty) {
         queueChunkForUpdate(c, updateNeighbors, markDirty, (byte) 1);
     }
 
+    /**
+     * 
+     * @param c
+     * @param updateNeighbors
+     * @param markDirty
+     * @param priority 
+     */
     private void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty, byte priority) {
         if (markDirty) {
             c.setDirty(true);

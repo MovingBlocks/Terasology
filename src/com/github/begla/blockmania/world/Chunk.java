@@ -14,8 +14,11 @@
  *  limitations under the License.
  * 
  */
-package com.github.begla.blockmania;
+package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.RenderableObject;
 import javolution.util.FastList;
 import java.nio.channels.FileChannel;
 import java.io.File;
@@ -23,6 +26,8 @@ import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.blocks.Block;
+import gnu.trove.iterator.TFloatIterator;
+import gnu.trove.list.array.TFloatArrayList;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import org.newdawn.slick.util.ResourceLoader;
@@ -60,15 +65,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private int _chunkID = -1;
     private static Texture _textureMap;
     /* ------ */
-    private FastList<Float> _quadsTranslucent;
-    private FastList<Float> _texTranslucent;
-    private FastList<Float> _colorTranslucent;
-    private FastList<Float> _quadsOpaque;
-    private FastList<Float> _texOpaque;
-    private FastList<Float> _colorOpaque;
-    private FastList<Float> _quadsBillboard;
-    private FastList<Float> _texBillboard;
-    private FastList<Float> _colorBillboard;
+    private TFloatArrayList _quadsTranslucent;
+    private TFloatArrayList _texTranslucent;
+    private TFloatArrayList _colorTranslucent;
+    private TFloatArrayList _quadsOpaque;
+    private TFloatArrayList _texOpaque;
+    private TFloatArrayList _colorOpaque;
+    private TFloatArrayList _quadsBillboard;
+    private TFloatArrayList _texBillboard;
+    private TFloatArrayList _colorBillboard;
     /* ------ */
     private World _parent = null;
 
@@ -271,16 +276,16 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the vertex-, texture- and color-arrays.
      */
-    public void generateVertexArrays() {
-        _quadsTranslucent = new FastList<Float>();
-        _texTranslucent = new FastList<Float>();
-        _colorTranslucent = new FastList<Float>();
-        _quadsOpaque = new FastList<Float>();
-        _texOpaque = new FastList<Float>();
-        _colorOpaque = new FastList<Float>();
-        _quadsBillboard = new FastList<Float>();
-        _texBillboard = new FastList<Float>();
-        _colorBillboard = new FastList<Float>();
+    public synchronized void generateVertexArrays() {
+        _quadsTranslucent = new TFloatArrayList();
+        _texTranslucent = new TFloatArrayList();
+        _colorTranslucent = new TFloatArrayList();
+        _quadsOpaque = new TFloatArrayList();
+        _texOpaque = new TFloatArrayList();
+        _colorOpaque = new TFloatArrayList();
+        _quadsBillboard = new TFloatArrayList();
+        _texBillboard = new TFloatArrayList();
+        _colorBillboard = new TFloatArrayList();
 
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
@@ -819,11 +824,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the display lists from the precalculated arrays.
      */
-    public void generateDisplayLists() {
+    public synchronized void generateDisplayLists() {
+        // Check if the vertex arrays are present
         if (_quadsOpaque == null) {
             return;
         }
 
+        /*
+         * Create the display lists if necessary.
+         */
         if (_displayListOpaque == -1) {
             _displayListOpaque = glGenLists(1);
         }
@@ -842,20 +851,20 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         vb = BufferUtils.createFloatBuffer(_quadsOpaque.size());
 
-        for (FastList.Node<Float> n = _quadsOpaque.head(), end = _quadsOpaque.tail(); (n = n.getNext()) != end;) {
-            vb.put(n.getValue());
+        for (TFloatIterator it = _quadsOpaque.iterator(); it.hasNext();) {
+            vb.put(it.next());
         }
 
         tb = BufferUtils.createFloatBuffer(_texOpaque.size());
 
-        for (FastList.Node<Float> n = _texOpaque.head(), end = _texOpaque.tail(); (n = n.getNext()) != end;) {
-            tb.put(n.getValue());
+        for (TFloatIterator it = _texOpaque.iterator(); it.hasNext();) {
+            tb.put(it.next());
         }
 
         cb = BufferUtils.createFloatBuffer(_colorOpaque.size());
 
-        for (FastList.Node<Float> n = _colorOpaque.head(), end = _colorOpaque.tail(); (n = n.getNext()) != end;) {
-            cb.put(n.getValue());
+        for (TFloatIterator it = _colorOpaque.iterator(); it.hasNext();) {
+            cb.put(it.next());
         }
 
         vb.flip();
@@ -877,20 +886,20 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         vb = BufferUtils.createFloatBuffer(_quadsTranslucent.size());
 
-        for (FastList.Node<Float> n = _quadsTranslucent.head(), end = _quadsTranslucent.tail(); (n = n.getNext()) != end;) {
-            vb.put(n.getValue());
+        for (TFloatIterator it = _quadsTranslucent.iterator(); it.hasNext();) {
+            vb.put(it.next());
         }
 
         tb = BufferUtils.createFloatBuffer(_texTranslucent.size());
 
-        for (FastList.Node<Float> n = _texTranslucent.head(), end = _texTranslucent.tail(); (n = n.getNext()) != end;) {
-            tb.put(n.getValue());
+        for (TFloatIterator it = _texTranslucent.iterator(); it.hasNext();) {
+            tb.put(it.next());
         }
 
         cb = BufferUtils.createFloatBuffer(_colorTranslucent.size());
 
-        for (FastList.Node<Float> n = _colorTranslucent.head(), end = _colorTranslucent.tail(); (n = n.getNext()) != end;) {
-            cb.put(n.getValue());
+        for (TFloatIterator it = _colorTranslucent.iterator(); it.hasNext();) {
+            cb.put(it.next());
         }
 
         vb.flip();
@@ -912,20 +921,22 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         vb = BufferUtils.createFloatBuffer(_quadsBillboard.size());
 
-        for (FastList.Node<Float> n = _quadsBillboard.head(), end = _quadsBillboard.tail(); (n = n.getNext()) != end;) {
-            vb.put(n.getValue());
+        for (TFloatIterator it = _quadsBillboard.iterator(); it.hasNext();) {
+            vb.put(it.next());
         }
+
 
         tb = BufferUtils.createFloatBuffer(_texBillboard.size());
 
-        for (FastList.Node<Float> n = _texBillboard.head(), end = _texBillboard.tail(); (n = n.getNext()) != end;) {
-            tb.put(n.getValue());
+        for (TFloatIterator it = _texBillboard.iterator(); it.hasNext();) {
+            tb.put(it.next());
         }
+
 
         cb = BufferUtils.createFloatBuffer(_colorBillboard.size());
 
-        for (FastList.Node<Float> n = _colorBillboard.head(), end = _colorBillboard.tail(); (n = n.getNext()) != end;) {
-            cb.put(n.getValue());
+        for (TFloatIterator it = _colorBillboard.iterator(); it.hasNext();) {
+            cb.put(it.next());
         }
 
         vb.flip();
@@ -1483,8 +1494,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Saves this chunk to disk.
      * 
      * TODO: Chunks use a lot of memory... Precisely 65536 Bytes (0.0625 MB) per Chunk.
-     * TODO: Buggy with chunks that contain light from adjacent chunks but have not been
-     * flooded yet => Save information about chunk status
      * 
      * @return 
      */

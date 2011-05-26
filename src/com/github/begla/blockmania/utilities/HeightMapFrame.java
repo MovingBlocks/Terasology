@@ -21,7 +21,7 @@
  */
 package com.github.begla.blockmania.utilities;
 
-import com.github.begla.blockmania.World;
+import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import java.awt.Color;
 import java.awt.Graphics;

@@ -23,13 +23,12 @@ import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
- * Stores the settings of the game.
+ * Stores the game settings.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class Configuration {
 
-    // Engine settings
     /**
      * The title of the game.
      */
@@ -52,11 +51,11 @@ public final class Configuration {
      */
     public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24);
     /**
-     * Displlay mode for windowed mode
+     * Display mode for windowed mode
      */
     public static final DisplayMode DISPLAY_MODE = new DisplayMode(1280,720);
     /**
-     * If set to true, the display is rendered as a
+     * If set true, the display is rendered as a
      * fullscreen application.
      */
     public static final boolean FULLSCREEN = false;
@@ -69,15 +68,16 @@ public final class Configuration {
      */
     public static final byte MIN_LIGHT = 0;
     /**
-     * Intensity of a occlusion.
+     * The intensity a block should be dimmed
+     * when it is surrounded by one or more blocks.
      */
     public static final float OCCLUSION_INTENS = 0.0625f;
     /**
-     * Intensity of which the sides of blocks should be dimmed.
+     * The intensity the sides of blocks should be dimmed.
      */
     public static final float BLOCK_SIDE_DIMMING = 0.05f;
     /**
-     * The intensity at which light is absorbed within
+     * At which intensity the light is absorbed within
      * translucent blocks.
      */
     public static final float LIGHT_ABSORPTION = 0.0625f;

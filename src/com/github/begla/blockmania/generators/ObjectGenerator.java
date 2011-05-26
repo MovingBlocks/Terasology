@@ -16,7 +16,7 @@
  */
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.World;
+import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.utilities.FastRandom;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 

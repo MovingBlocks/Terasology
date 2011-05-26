@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package com.github.begla.blockmania;
+package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.utilities.VectorPool;
 import org.lwjgl.util.vector.Vector3f;
@@ -24,7 +24,7 @@ import org.lwjgl.util.vector.Vector3f;
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
+public class Intersection implements Comparable<Intersection> {
 
     /**
      *
@@ -80,7 +80,7 @@ public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
      * @param ray
      * @param intersectPoint
      */
-    public RayFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, float d, float t, Vector3f origin, Vector3f ray, Vector3f intersectPoint) {
+    public Intersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, float d, float t, Vector3f origin, Vector3f ray, Vector3f intersectPoint) {
         this.d = d;
         this.t = t;
         this.origin = origin;
@@ -98,7 +98,7 @@ public class RayFaceIntersection implements Comparable<RayFaceIntersection> {
      * @return
      */
     @Override
-    public int compareTo(RayFaceIntersection o) {
+    public int compareTo(Intersection o) {
         return new Float(Math.abs(getT())).compareTo(Math.abs(o.getT()));
     }
 

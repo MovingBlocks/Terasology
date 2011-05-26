@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package com.github.begla.blockmania;
+package com.github.begla.blockmania.world;
 
 /**
  *
@@ -97,6 +97,11 @@ public class ChunkUpdate implements Comparable<ChunkUpdate> {
         return new Double(getWeight()).compareTo(o.getWeight());
     }
 
+    /**
+     * 
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (o.getClass() == ChunkUpdate.class) {
@@ -106,6 +111,10 @@ public class ChunkUpdate implements Comparable<ChunkUpdate> {
         return false;
     }
 
+    /**
+     * 
+     * @return
+     */
     @Override
     public int hashCode() {
         int hash = 5;

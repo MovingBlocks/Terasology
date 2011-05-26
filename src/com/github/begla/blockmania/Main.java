@@ -15,6 +15,9 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.player.Player;
+import com.github.begla.blockmania.world.Chunk;
+import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.HeightMapFrame;
 import com.github.begla.blockmania.utilities.VectorPool;
@@ -225,8 +228,6 @@ public final class Main {
         Helper.LOGGER.log(Level.INFO, "Starting the game...");
         _lastLoopTime = Helper.getInstance().getTime();
         while (_runGame) {
-
-            // Sync. at 60 FPS
             Display.sync(60);
 
             // Measure a delta value and the frames per second
@@ -235,7 +236,7 @@ public final class Main {
             _lastFpsTime += delta;
             _fps++;
 
-            // Updates the FPS and calculate the mean for display
+            // Update the FPS and calculate the mean for displaying
             if (_lastFpsTime >= 1000) {
                 _lastFpsTime = 0;
 
@@ -251,13 +252,19 @@ public final class Main {
             processKeyboardInput();
             processMouseInput();
 
-            /*
-             * Updating and rendering of the scene. The delta
-             * value is used within the updating process.
-             */
+            // Pause the game while the debug console is being shown
             if (!_showDebugConsole) {
-                // Pause the game while the debug console is being shown
-                update(delta);
+                /*
+                 * HACK: Do not update the game if too much time has passed since the last
+                 * frame.
+                 */
+                if (delta < 64) {
+                    /*
+                     * Updating and rendering of the scene. The delta
+                     * value is used within the updating process.
+                     */
+                    update(delta);
+                }
             }
             render();
 

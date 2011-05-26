@@ -25,7 +25,7 @@ import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector2f;
 
 /**
- * This is a simple helper class for various tasks.
+ * A simple helper class for various tasks.
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
