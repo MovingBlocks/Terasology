@@ -51,7 +51,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
         }
 
         // Generate the treetop
-        for (int y = height - 2; y < height + 2; y += 1) {
+        for (int y = height - 3; y < height + 1; y++) {
             for (int x = -2; x < 3; x++) {
                 for (int z = -2; z < 3; z++) {
                     if (!(x == -2 && z == -2) && !(x == 2 && z == 2) && !(x == -2 && z == 2) && !(x == 2 && z == -2)) {
