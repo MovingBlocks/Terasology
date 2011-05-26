@@ -149,7 +149,6 @@ public final class Configuration {
         _settingsNumeric.put("MAX_GRAVITY", 64f);
         _settingsNumeric.put("WALKING_SPEED", 1.5f);
         _settingsNumeric.put("RUNNING_FACTOR", 1.6f);
-        _settingsNumeric.put("PLAYER_HEIGHT", 0.8f);
         _settingsNumeric.put("GRAVITY", 0.025f);
         _settingsNumeric.put("FRICTION", 0.01f);
         _settingsNumeric.put("V_DIST_X", 16f);
