@@ -20,7 +20,6 @@ import com.github.begla.blockmania.utilities.AABB;
 import com.github.begla.blockmania.Helper;
 import com.github.begla.blockmania.utilities.VectorPool;
 import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
@@ -59,7 +58,7 @@ public abstract class Block {
          */
         BACK;
     };
-    private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockWood(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockHighGrass(), new BlockLargeHighGrass()};
+    private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockWood(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockHighGrass(), new BlockLargeHighGrass(), new BlockTorch(), new BlockLava()};
     private static BlockNil nilBlock = new BlockNil();
 
     /**
@@ -159,6 +158,13 @@ public abstract class Block {
      */
     public boolean renderBoundingBox() {
         return true;
+    }
+    
+    /*
+     * 
+     */
+    public byte getLuminance() {
+        return 0;
     }
 
     /**

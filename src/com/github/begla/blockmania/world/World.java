@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
@@ -548,15 +547,22 @@ public final class World extends RenderableObject {
             c.setBlock(blockPosX, y, blockPosZ, type);
 
             if (update) {
-                byte oldValue = getLight(x, y, z);
+                byte oldValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
                 c.calcSunlightAtLocalPos(blockPosX, blockPosZ, true);
-                c.refreshLightAtLocalPos(blockPosX, y, blockPosZ);
-                byte newValue = getLight(x, y, z);
+                c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.SUN);
+                byte newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
 
                 if (newValue > oldValue) {
-                    c.spreadLight(blockPosX, y, blockPosZ, newValue);
+                    c.spreadLight(blockPosX, y, blockPosZ, newValue, Chunk.LIGHT_TYPE.SUN);
                 } else if (newValue < oldValue) {
                     // Do something
+                }
+
+                byte luminance = Block.getBlockForType(type).getLuminance();
+
+                if (luminance > newValue) {
+                    c.setLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
+                    c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
                 }
 
                 queueChunkForUpdate(c, true, false);
@@ -629,7 +635,7 @@ public final class World extends RenderableObject {
      * @param z The Z-coordinate
      * @return The light value
      */
-    public final byte getLight(int x, int y, int z) {
+    public final byte getLight(int x, int y, int z, Chunk.LIGHT_TYPE type) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
 
@@ -639,7 +645,30 @@ public final class World extends RenderableObject {
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
-            return c.getLight(blockPosX, y, blockPosZ);
+            return c.getLight(blockPosX, y, blockPosZ, type);
+        }
+
+        return -1;
+    }
+    
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return 
+     */
+    public final byte getMaxLight(int x, int y, int z) {
+        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
+        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+
+        int blockPosX = calcBlockPosX(x, chunkPosX);
+        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+
+        if (c != null) {
+            return c.getMaxLight(blockPosX, y, blockPosZ);
         }
 
         return -1;
@@ -653,7 +682,7 @@ public final class World extends RenderableObject {
      * @param z The Z-coordinate
      * @param intens The light intensity value
      */
-    public void setSunlight(int x, int y, int z, byte intens) {
+    public void setLight(int x, int y, int z, byte intens, Chunk.LIGHT_TYPE type) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
 
@@ -664,7 +693,7 @@ public final class World extends RenderableObject {
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
-            c.setSunlight(blockPosX, y, blockPosZ, intens);
+            c.setLight(blockPosX, y, blockPosZ, intens, type);
         }
     }
 
@@ -679,7 +708,7 @@ public final class World extends RenderableObject {
      * @param lightValue
      * @param depth  
      */
-    public void spreadLight(int x, int y, int z, byte lightValue, int depth) {
+    public void spreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
 
@@ -688,7 +717,7 @@ public final class World extends RenderableObject {
 
         Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
         if (c != null) {
-            c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth);
+            c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
         }
     }
 

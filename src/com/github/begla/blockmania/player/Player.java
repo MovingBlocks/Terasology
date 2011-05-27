@@ -236,7 +236,7 @@ public final class Player extends RenderableObject {
         Intersection r = calcSelectedBlock();
         Vector3f bp = r.getBlockPos();
         byte blockType = _parent.getBlock((int) bp.x, (int) bp.y, (int) bp.z);
-        byte blockLight = _parent.getLight((int) bp.x, (int) bp.y, (int) bp.z);
+        byte blockLight = _parent.getMaxLight((int) bp.x, (int) bp.y, (int) bp.z);
 
         return String.format("%s (t: %d, l: %d) ", r, blockType, blockLight);
     }
