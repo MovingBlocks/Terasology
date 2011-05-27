@@ -1380,32 +1380,36 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @return Occlusion amount
      */
     public float calcSimpleOcclusionAmount(int x, int y, int z) {
+        int counter = 0;
         float intens = 0f;
+        
         if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z))).isCastingShadows()) {
-            intens++;
+            counter++;
         }
         if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z))).isCastingShadows()) {
-            intens++;
+            counter++;
         }
         if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1))).isCastingShadows()) {
-            intens++;
+            counter++;
         }
         if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
-            intens++;
+            counter++;
         }
         if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1))).isCastingShadows()) {
-            intens++;
+            counter++;
         }
         if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
-            intens++;
+            counter++;
         }
         if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1))).isCastingShadows()) {
-            intens++;
+            counter++;
         }
         if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
-            intens++;
+            counter++;
         }
-        return 1f - (float) intens * Configuration.OCCLUSION_INTENS;
+        
+        intens = Configuration.OCCLUSION_INTENS * (float) Math.sqrt(counter);
+        return 1f - intens;
     }
 
     /**

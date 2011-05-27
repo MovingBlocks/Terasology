@@ -186,12 +186,16 @@ public final class World extends RenderableObject {
 
                     if (farthestChunkUpdate != null) {
                         if (!isChunkVisible(farthestChunkUpdate.getChunk()) && nearestChunkUpdate != farthestChunkUpdate) {
-                            _chunkUpdateNormal.remove(farthestChunkUpdate);
+                            synchronized (_chunkUpdateNormal) {
+                                _chunkUpdateNormal.remove(farthestChunkUpdate);
+                            }
                         }
                     }
 
                     if (nearestChunkUpdate != null) {
-                        _chunkUpdateNormal.remove(nearestChunkUpdate);
+                        synchronized (_chunkUpdateNormal) {
+                            _chunkUpdateNormal.remove(nearestChunkUpdate);
+                        }
                         processChunkUpdate(nearestChunkUpdate);
                     }
 
@@ -271,12 +275,11 @@ public final class World extends RenderableObject {
 
             for (int i = 0; i < neighbors.length; i++) {
                 if (neighbors[i] != null) {
-                    /*
-                     * If a neighbor chunk was changed
-                     * queue it for updating.
-                     */
+                    // Generate vertex arrays of neighbor chunks
                     if ((isChunkVisible(neighbors[i]) && neighbors[i].isDirty() && cu.isUpdateNeighbors()) || lightCalculated) {
-                        queueChunkForUpdate(neighbors[i], false, false);
+                        neighbors[i].generateVertexArrays();
+                        _chunkUpdateQueueDL.add(neighbors[i]);
+                        _statGeneratedChunks++;
                     }
                 }
             }
@@ -547,6 +550,9 @@ public final class World extends RenderableObject {
             c.setBlock(blockPosX, y, blockPosZ, type);
 
             if (update) {
+                /*
+                 * Update sunlight.
+                 */
                 byte oldValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
                 c.calcSunlightAtLocalPos(blockPosX, blockPosZ, true);
                 c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.SUN);
@@ -558,6 +564,14 @@ public final class World extends RenderableObject {
                     // Do something
                 }
 
+                /*
+                 * Update block light.
+                 */
+                c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.BLOCK);
+
+                /*
+                 * Spread light of block light sources.
+                 */
                 byte luminance = Block.getBlockForType(type).getLuminance();
 
                 if (luminance > newValue) {
@@ -650,7 +664,7 @@ public final class World extends RenderableObject {
 
         return -1;
     }
-    
+
     /**
      * 
      * @param x
@@ -1047,7 +1061,9 @@ public final class World extends RenderableObject {
         // Do not queue clean chunks
         if (c.isDirty()) {
             _chunkUpdateNormal.add(new ChunkUpdate(updateNeighbors, c, priority));
-            Collections.sort(_chunkUpdateNormal);
+            synchronized (_chunkUpdateNormal) {
+                Collections.sort(_chunkUpdateNormal);
+            }
         }
     }
 

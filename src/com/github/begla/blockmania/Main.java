@@ -525,7 +525,7 @@ public final class Main {
         Helper.LOGGER.log(Level.INFO, "Waiting for some chunks to pop up...", seed);
         while (_world.getStatGeneratedChunks() < 16) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(50);
             } catch (InterruptedException ex) {
                 Helper.LOGGER.log(Level.SEVERE, null, ex);
             }
