@@ -270,9 +270,10 @@ public final class World extends RenderableObject {
     private void replantDirt() {
         // Pick one chunk for grass updates every 100 ms
         if (Helper.getInstance().getTime() - _latestDirtEvolvement > 100) {
+            
             // Do NOT replant chunks when updates are queued...
             // And do NOT replant chunks during the night...
-            if (_chunkUpdateManager.updatesSize() > 0 || isNighttime()) {
+            if (_chunkUpdateManager.updatesSize() > 0 || isNighttime() || _visibleChunks.isEmpty()) {
                 return;
             }
 
@@ -603,7 +604,7 @@ public final class World extends RenderableObject {
      * @param z
      * @return 
      */
-    public final byte getMaxLight(int x, int y, int z) {
+    public final float getRenderingLightValue(int x, int y, int z) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
 
@@ -613,7 +614,7 @@ public final class World extends RenderableObject {
         Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
-            return c.getMaxLight(blockPosX, y, blockPosZ);
+            return c.getRenderingLightValue(blockPosX, y, blockPosZ);
         }
 
         return -1;
