@@ -1018,10 +1018,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * Returns true if the block side is ajdacent to a translucent block or an air
      * block.
      *
-     * NOTE: Air has to be handled separatly. Otherwise the water surface would not be displayed due to the tessellation process.
+     * NOTE: Air and leafs have to be handled separatly. Otherwise the water surface would not be displayed due to the tessellation process.
      */
     private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock) {
-        return blockToCheck == 0x0 || blockToCheck == 0x6 || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
+        return blockToCheck == 0x0 || blockToCheck == 0x6 || Block.getBlockForType(blockToCheck).isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
     }
 
     /**
