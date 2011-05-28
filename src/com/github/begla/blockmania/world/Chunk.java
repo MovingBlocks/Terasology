@@ -1478,14 +1478,14 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      */
     public Chunk[] loadOrCreateNeighbors() {
         Chunk[] chunks = new Chunk[8];
-        chunks[0] = _parent.loadOrCreateChunk((int) _position.x + 1, (int) _position.z);
-        chunks[1] = _parent.loadOrCreateChunk((int) _position.x - 1, (int) _position.z);
-        chunks[2] = _parent.loadOrCreateChunk((int) _position.x, (int) _position.z + 1);
-        chunks[3] = _parent.loadOrCreateChunk((int) _position.x, (int) _position.z - 1);
-        chunks[4] = _parent.loadOrCreateChunk((int) _position.x + 1, (int) _position.z + 1);
-        chunks[5] = _parent.loadOrCreateChunk((int) _position.x - 1, (int) _position.z - 1);
-        chunks[6] = _parent.loadOrCreateChunk((int) _position.x - 1, (int) _position.z + 1);
-        chunks[7] = _parent.loadOrCreateChunk((int) _position.x + 1, (int) _position.z - 1);
+        chunks[0] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z);
+        chunks[1] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z);
+        chunks[2] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x, (int) _position.z + 1);
+        chunks[3] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x, (int) _position.z - 1);
+        chunks[4] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z + 1);
+        chunks[5] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z - 1);
+        chunks[6] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z + 1);
+        chunks[7] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z - 1);
         return chunks;
     }
 

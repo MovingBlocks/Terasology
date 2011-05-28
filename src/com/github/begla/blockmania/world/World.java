@@ -61,16 +61,14 @@ import org.xml.sax.InputSource;
  */
 public final class World extends RenderableObject {
 
-    private int _statGeneratedChunks = 0;
-    private double _statUpdateDuration = 0.0f;
     /* ------ */
-    private short _time = 8;
     private long _lastDaytimeMeasurement = Helper.getInstance().getTime();
     private long _latestDirtEvolvement = Helper.getInstance().getTime();
     private long _lastUpdateTime = Helper.getInstance().getTime();
     /* ------ */
     private static Texture _textureSun, _textureMoon;
     /* ------ */
+    private short _time = 8;
     private byte _daylight = 16;
     private Player _player;
     private Vector3f _spawningPoint;
@@ -79,9 +77,8 @@ public final class World extends RenderableObject {
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
     /* ------ */
-    private final FastList<Chunk> _chunkUpdateQueueDL = new FastList<Chunk>(32);
-    private final FastList<ChunkUpdate> _chunkUpdateNormal = new FastList<ChunkUpdate>(1024);
-    private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
+    private final ChunkUpdateManager _chunkUpdateManager = new ChunkUpdateManager(this);
+    private final ChunkCache _chunkCache = new ChunkCache(this);
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
     private final ChunkGeneratorForest _generatorForest;
@@ -145,14 +142,14 @@ public final class World extends RenderableObject {
         _generatorTree = new ObjectGeneratorTree(this, seed);
         _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
         _generatorGrass = new ChunkGeneratorFlora(seed);
-        
+
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
 
         resetPlayer();
         _visibleChunks = fetchVisibleChunks();
-        
+
         updateDaylight();
 
         _updateThread = new Thread(new Runnable() {
@@ -160,10 +157,17 @@ public final class World extends RenderableObject {
             @Override
             public void run() {
                 while (true) {
+                    /*
+                     * Checks if the thread should be killed.
+                     */
                     if (!_updateThreadAlive) {
                         return;
                     }
 
+                    /*
+                     * Puts the thread to sleep 
+                     * if updating is disabled.
+                     */
                     if (!_updatingEnabled) {
                         synchronized (_updateThread) {
                             try {
@@ -174,55 +178,38 @@ public final class World extends RenderableObject {
                         }
                     }
 
-                    long timeStart = System.currentTimeMillis();
-                    timeStart = System.currentTimeMillis();
+                    /*
+                     * Update chunks queued for updating.
+                     */
+                    _chunkUpdateManager.updateChunks();
 
 
+                    /*
+                     * These updates do not need to be run every iteration.
+                     */
                     if (Helper.getInstance().getTime() - _lastUpdateTime > 1000) {
                         // Update the the list of visible chunks
                         _visibleChunks = fetchVisibleChunks();
-                        // Remote chunks which are out of range
-                        removeInvisibleChunkUpdates();
+                        // Remove chunks which are out of range
+                        _chunkUpdateManager.removeInvisibleChunkUpdates();
+
                         _lastUpdateTime = Helper.getInstance().getTime();
                     }
 
-                    ChunkUpdate nearestChunkUpdate = null;
 
-                    if (!_chunkUpdateNormal.isEmpty()) {
-                        nearestChunkUpdate = _chunkUpdateNormal.getFirst();
-                    }
-
-                    if (nearestChunkUpdate != null) {
-                        synchronized (_chunkUpdateNormal) {
-                            _chunkUpdateNormal.remove(nearestChunkUpdate);
-                        }
-                        processChunkUpdate(nearestChunkUpdate);
-                    }
-
+                    /*
+                     * Update the time of day.
+                     */
                     updateDaytime();
+
+                    /*
+                     * Evolve chunks.
+                     */
                     replantDirt();
 
-                    _statUpdateDuration += System.currentTimeMillis() - timeStart;
-                    _statUpdateDuration /= 2;
                 }
             }
         });
-    }
-
-    private void removeInvisibleChunkUpdates() {
-        FastList<ChunkUpdate> updatesToDelete = new FastList<ChunkUpdate>();
-
-        for (FastList.Node<ChunkUpdate> n = _chunkUpdateNormal.head(), end = _chunkUpdateNormal.tail(); (n = n.getNext()) != end;) {
-
-            if (!isChunkVisible(n.getValue().getChunk())) {
-                updatesToDelete.add(n.getValue());
-            }
-
-        }
-
-        synchronized (_chunkUpdateNormal) {
-            _chunkUpdateNormal.removeAll(updatesToDelete);
-        }
     }
 
     /**
@@ -233,82 +220,9 @@ public final class World extends RenderableObject {
             _updateThreadAlive = false;
             _updateThread.notify();
         }
+
         saveMetaData();
-        writeAllChunksToDisk();
-    }
-
-    /**
-     * Processes a chunk. This method is used within the update thread
-     * and updates the lighting and vertex arrays of a chunk and its
-     * neighbors based on their dirty flags.
-     *
-     * @param c The chunk to process
-     */
-    private void processChunkUpdate(ChunkUpdate cu) {
-        if (cu != null) {
-            boolean lightCalculated = false;
-
-            /*
-             * Generate the chunk...
-             */
-            cu.getChunk().generate();
-
-            /*
-             * ... and fetch its neighbors...
-             */
-            Chunk[] neighbors = null;
-
-            neighbors = cu.getChunk().loadOrCreateNeighbors();
-
-
-            /*
-             * Before starting the illumination process, make sure that the neighbor chunks
-             * are present and generated.
-             */
-            for (int i = 0; i < neighbors.length; i++) {
-                if (neighbors[i] != null) {
-                    neighbors[i].generate();
-                }
-            }
-
-            /*
-             * If the light of this chunk is marked as dirty...
-             */
-            if (cu.getChunk().isLightDirty()) {
-                /*
-                 * ... propagate light into adjacent chunks...
-                 */
-                cu.getChunk().updateLight();
-                lightCalculated = true;
-            }
-
-            for (int i = 0; i < neighbors.length; i++) {
-                if (neighbors[i] != null) {
-                    if (neighbors[i].isDirty() && cu.isUpdateNeighbors()) {
-                        if (neighbors[i].isLightDirty()) {
-                            queueChunkForUpdate(neighbors[i], false, false, false);
-                        } else {
-                            neighbors[i].generateVertexArrays();
-                        }
-                    } else if (lightCalculated) {
-                        queueChunkForUpdate(neighbors[i], false, false, false);
-                    }
-                }
-            }
-
-
-            /*
-             * Check if this chunk was changed...
-             */
-            if (cu.getChunk().isDirty()) {
-                /*
-                 * ... if yes, regenerate the vertex arrays
-                 */
-                cu.getChunk().generateVertexArrays();
-                _chunkUpdateQueueDL.add(cu.getChunk());
-                _statGeneratedChunks++;
-            }
-        }
+        _chunkCache.writeAllChunksToDisk();
     }
 
     /**
@@ -316,7 +230,7 @@ public final class World extends RenderableObject {
      */
     private void updateDaytime() {
         if (Helper.getInstance().getTime() - _lastDaytimeMeasurement >= 30000) {
-            if (_chunkUpdateNormal.isEmpty()) {
+            if (_chunkUpdateManager.updatesSize() == 0) {
                 setTime((short) (_time + 1));
             } else {
                 return;
@@ -328,6 +242,9 @@ public final class World extends RenderableObject {
         }
     }
 
+    /**
+     * 
+     */
     private void updateDaylight() {
         if (_time >= 18 && _time < 20) {
             _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
@@ -356,7 +273,7 @@ public final class World extends RenderableObject {
         if (Helper.getInstance().getTime() - _latestDirtEvolvement > 100) {
             // Do NOT replant chunks when updates are queued...
             // And do NOT replant chunks during the night...
-            if (!_chunkUpdateNormal.isEmpty() || isNighttime()) {
+            if (_chunkUpdateManager.updatesSize() > 0 || isNighttime()) {
                 return;
             }
 
@@ -364,7 +281,7 @@ public final class World extends RenderableObject {
 
             if (!c.isFresh() && !c.isDirty() && !c.isLightDirty()) {
                 _generatorGrass.generate(c);
-                queueChunkForUpdate(c, false, false, false);
+                _chunkUpdateManager.queueChunkForUpdate(c, false, false, false);
             }
 
             _latestDirtEvolvement = Helper.getInstance().getTime();
@@ -376,7 +293,7 @@ public final class World extends RenderableObject {
      */
     public void updateAllChunks() {
         for (FastList.Node<Chunk> n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end;) {
-            queueChunkForUpdate(n.getValue(), false, true, false);
+            _chunkUpdateManager.queueChunkForUpdate(n.getValue(), false, true, false);
         }
     }
 
@@ -450,11 +367,11 @@ public final class World extends RenderableObject {
         FastList<Chunk> visibleChunks = new FastList<Chunk>();
         for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
             for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
-                Chunk c = loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
+                Chunk c = _chunkCache.loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
                 if (c != null) {
                     // If this chunk was not visible, update it
                     if (!isChunkVisible(c)) {
-                        queueChunkForUpdate(c, false, true, true);
+                        _chunkUpdateManager.queueChunkForUpdate(c, false, true, true);
                     }
                     visibleChunks.add(c);
                 }
@@ -482,27 +399,7 @@ public final class World extends RenderableObject {
      */
     @Override
     public void update(long delta) {
-        if (!_chunkUpdateQueueDL.isEmpty()) {
-            // Take one chunk from the queue
-            Chunk c = _chunkUpdateQueueDL.valueOf(_chunkUpdateQueueDL.head().getNext());
-            if (c != null) {
-                // Generate the display list of the center chunk
-                c.generateDisplayLists();
-                // Remove the center chunk
-                _chunkUpdateQueueDL.remove(c);
-
-                Chunk[] neighbors = c.loadOrCreateNeighbors();
-
-                // Generate the display lists of the neighbor chunks
-                for (Chunk n : neighbors) {
-                    if (n != null) {
-                        n.generateDisplayLists();
-                    }
-                }
-
-            }
-
-        }
+        _chunkUpdateManager.updateDisplayLists();
     }
 
     /**
@@ -567,7 +464,7 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c == null) {
             return;
@@ -612,7 +509,7 @@ public final class World extends RenderableObject {
                 /*
                  * Finally queue the chunk and its neighbors for updating.
                  */
-                queueChunkForUpdate(c, true, false, false);
+                _chunkUpdateManager.queueChunkForUpdate(c, true, false, false);
             }
         }
     }
@@ -641,7 +538,7 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
             return c.getBlock(blockPosX, y, blockPosZ);
@@ -665,7 +562,7 @@ public final class World extends RenderableObject {
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
 
-        Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
             return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
@@ -690,7 +587,7 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
             return c.getLight(blockPosX, y, blockPosZ, type);
@@ -713,7 +610,7 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
             return c.getMaxLight(blockPosX, y, blockPosZ);
@@ -739,7 +636,7 @@ public final class World extends RenderableObject {
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
 
-        Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
             c.setLight(blockPosX, y, blockPosZ, intens, type);
@@ -765,7 +662,7 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
         if (c != null) {
             c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
         }
@@ -789,7 +686,7 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
             c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth);
@@ -983,119 +880,13 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * Loads a specified chunk from the cache or queues a new chunk for
-     * generation.
-     *
-     * NOTE: This method ALWAYS returns a valid chunk since new chunks
-     * are generated if none of the present chunks fit.
-     *
-     * 
-     * @param x X-coordinate of the chunk
-     * @param z Z-coordinate of the chunk
-     * @return The chunk
-     */
-    public Chunk loadOrCreateChunk(int x, int z) {
-        // Catch negative values
-        if (x < 0 || z < 0) {
-            return null;
-        }
-
-        // Try to load the chunk from the cache
-        Chunk c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
-
-        // We got a chunk! Already! Great!
-        if (c != null) {
-            return c;
-        }
-
-        // Delete some elements if the cache size is exceeded
-        if (_chunkCache.size() > 2048) {
-            // Fetch all chunks within the cache
-            FastList<Chunk> sortedChunks = null;
-            sortedChunks = new FastList<Chunk>(_chunkCache.values());
-            // Sort them according to their distance to the player
-            Collections.sort(sortedChunks);
-
-            Helper.LOGGER.log(Level.FINE, "Cache full. Removing some chunks from the chunk cache...");
-
-            // Free some space
-            for (int i = 0; i < 32; i++) {
-                int indexToDelete = sortedChunks.size() - i;
-
-                if (indexToDelete >= 0 && indexToDelete < sortedChunks.size()) {
-                    Chunk cc = sortedChunks.get(indexToDelete);
-                    // Save the chunk before removing it from the cache
-                    _chunkCache.remove(Helper.getInstance().cantorize((int) cc.getPosition().x, (int) cc.getPosition().z));
-                    cc.dispose();
-                }
-            }
-
-            Helper.LOGGER.log(Level.FINE, "Finished removing chunks from the chunk cache.");
-        }
-
-        // Init a new chunk
-        c = prepareNewChunk(x, z);
-        _chunkCache.put(Helper.getInstance().cantorize(x, z), c);
-
-        return c;
-    }
-
-    /**
-     * Returns true if the given chunk is present in the cache.
-     * 
-     * @param c The chunk
-     * @return True if the chunk is present in the chunk cache
-     */
-    public boolean isChunkCached(Chunk c) {
-        return loadChunk((int) c.getPosition().x, (int) c.getPosition().z) != null;
-    }
-
-    /**
-     * Tries to load a chunk from the cache. Returns null if no
-     * chunk is found.
-     * 
-     * @param x X-coordinate
-     * @param z Z-coordinate
-     * @return The loaded chunk
-     */
-    public Chunk loadChunk(int x, int z) {
-        Chunk c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
-        return c;
-    }
-
-    /**
-     * 
-     * @param c
-     * @param updateNeighbors
-     * @param markDirty
-     * @param priority 
-     */
-    private void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty, boolean forceInvisibleChunks) {
-        if (markDirty) {
-            c.setDirty(true);
-        }
-
-        // Do not queue clean chunks
-        if (c.isDirty() && (isChunkVisible(c) || forceInvisibleChunks)) {
-            ChunkUpdate cu = new ChunkUpdate(updateNeighbors, c);
-            // Ignore duplicate updates
-            if (!_chunkUpdateNormal.contains(cu)) {
-                _chunkUpdateNormal.add(cu);
-                synchronized (_chunkUpdateNormal) {
-                    Collections.sort(_chunkUpdateNormal);
-                }
-            }
-        }
-    }
-
-    /**
      * Displays some information about the world formatted as a string.
      * 
      * @return String with world information
      */
     @Override
     public String toString() {
-        return String.format("world (cdl: %d, cn: %d, cache: %d, ud: %fs, seed: \"%s\", title: \"%s\")", _chunkUpdateQueueDL.size(), _chunkUpdateNormal.size(), _chunkCache.size(), _statUpdateDuration / 1000d, _seed, _title);
+        return String.format("world (cdl: %d, cn: %d, cache: %d, ud: %fs, seed: \"%s\", title: \"%s\")", _chunkUpdateManager.updatesDLSize(), _chunkUpdateManager.updatesSize(), _chunkCache.size(), _chunkUpdateManager.getMeanUpdateDuration() / 1000d, _seed, _title);
     }
 
     /**
@@ -1194,23 +985,12 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * Writes all chunks to the disk.
-     */
-    public void writeAllChunksToDisk() {
-        suspendUpdateThread();
-        for (Chunk c : _chunkCache.values()) {
-            c.writeChunkToDisk();
-        }
-        resumeUpdateThread();
-    }
-
-    /**
      *
      * @param x
      * @param z  
      */
     public void generateNewChunk(int x, int z) {
-        Chunk c = loadOrCreateChunk(x, z);
+        Chunk c = _chunkCache.loadOrCreateChunk(x, z);
 
         if (c == null) {
             return;
@@ -1236,12 +1016,12 @@ public final class World extends RenderableObject {
      * @param z
      * @return 
      */
-    private Chunk prepareNewChunk(int x, int z) {
+    public Chunk prepareNewChunk(int x, int z) {
         FastList<ChunkGenerator> gs = new FastList<ChunkGenerator>();
         gs.add(_generatorTerrain);
         gs.add(_generatorForest);
 
-        // Generate a new chunk, cache it and return it
+        // Generate a new chunk and return it
         Chunk c = new Chunk(this, VectorPool.getVector(x, 0, z), gs);
         return c;
     }
@@ -1255,7 +1035,7 @@ public final class World extends RenderableObject {
         if (_visibleChunks == null) {
             return false;
         }
-        
+
         return _visibleChunks.contains(c);
     }
 
@@ -1265,15 +1045,15 @@ public final class World extends RenderableObject {
     public void printPlayerChunkPosition() {
         int chunkPosX = calcChunkPosX((int) _player.getPosition().x);
         int chunkPosZ = calcChunkPosX((int) _player.getPosition().z);
-        System.out.println(_chunkCache.get(Helper.getInstance().cantorize(chunkPosX, chunkPosZ)));
+        System.out.println(_chunkCache.getChunkByKey(Helper.getInstance().cantorize(chunkPosX, chunkPosZ)));
     }
 
     /**
      * 
      * @return 
      */
-    public int getStatGeneratedChunks() {
-        return _statGeneratedChunks;
+    public int getAmountGeneratedChunks() {
+        return _chunkUpdateManager.getAmountGeneratedChunks();
     }
 
     /**
@@ -1309,17 +1089,6 @@ public final class World extends RenderableObject {
         } else {
             _player.resetPlayer();
             _player.setPosition(_spawningPoint);
-        }
-    }
-
-    /**
-     * 
-     */
-    public void checkVisibleChunks() {
-        for (FastList.Node<Chunk> n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end;) {
-            if (n.getValue().isDirty() || n.getValue().isLightDirty() || n.getValue().isFresh()) {
-                System.out.println(n.getValue());
-            }
         }
     }
 
@@ -1416,5 +1185,21 @@ public final class World extends RenderableObject {
         }
 
         return false;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public ChunkCache getChunkCache() {
+        return _chunkCache;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public ChunkUpdateManager getChunkUpdateManager() {
+        return _chunkUpdateManager;
     }
 }

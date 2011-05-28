@@ -462,7 +462,7 @@ public final class Main {
             } else if (parsingResult.get(0).equals("chunk_pos")) {
                 _world.printPlayerChunkPosition();
                 success = true;
-            } else if (parsingResult.get(0).equals("show_map")) {
+            } else if (parsingResult.get(0).equals("map")) {
                 new HeightMapFrame(_world).setVisible(true);
                 success = true;
             } else if (parsingResult.get(0).equals("update_all")) {
@@ -516,7 +516,7 @@ public final class Main {
         _world.startUpdateThread();
 
         Helper.LOGGER.log(Level.INFO, "Waiting for some chunks to pop up...", seed);
-        while (_world.getStatGeneratedChunks() < 16) {
+        while (_world.getAmountGeneratedChunks() < 16) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException ex) {
