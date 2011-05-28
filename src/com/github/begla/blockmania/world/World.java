@@ -35,7 +35,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.TreeMap;
 import org.jdom.JDOMException;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
@@ -501,7 +500,8 @@ public final class World extends RenderableObject {
                  */
                 byte luminance = Block.getBlockForType(type).getLuminance();
 
-                if (luminance > newValue) {
+                byte blockLightValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+                if (luminance > blockLightValue) {
                     c.setLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
                     c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
                 }
