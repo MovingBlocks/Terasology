@@ -1272,7 +1272,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
             return (byte) Math.max(_sunlight[x][y][z] * _parent.getDaylightAsFloat(), _light[x][y][z]);
         }
-        
+
         return -1;
     }
 
@@ -1412,7 +1412,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             counter++;
         }
 
-        intens = Configuration.OCCLUSION_INTENS * (float) Math.sqrt(counter);
+        intens = Configuration.OCCLUSION_INTENS * (float) Math.sqrt(counter*4);
         return 1f - intens;
     }
 

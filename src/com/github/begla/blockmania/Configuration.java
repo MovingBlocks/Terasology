@@ -71,7 +71,7 @@ public final class Configuration {
      * The intensity a block should be dimmed
      * when it is surrounded by one or more blocks.
      */
-    public static final float OCCLUSION_INTENS = 0.1f;
+    public static final float OCCLUSION_INTENS = 0.05f;
     /**
      * The intensity the sides of blocks should be dimmed.
      */
