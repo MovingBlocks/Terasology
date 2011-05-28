@@ -160,8 +160,9 @@ public abstract class Block {
         return true;
     }
     
-    /*
+    /**
      * 
+     * @return
      */
     public byte getLuminance() {
         return 0;

@@ -62,6 +62,10 @@ public class BlockTorch extends Block {
         return false;
     }
 
+    /**
+     * 
+     * @return
+     */
     @Override
     public byte getLuminance() {
         return 16;

@@ -89,14 +89,54 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     /* ------ */
     private FastList<ChunkGenerator> _generators = new FastList<ChunkGenerator>();
 
+    /**
+     * 
+     */
     public enum SIDE {
 
-        LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK;
+        /**
+         * 
+         */
+        LEFT,
+        /**
+         * 
+         */
+        RIGHT,
+        /**
+         * 
+         */
+        TOP,
+        /**
+         * 
+         */
+        BOTTOM,
+        /**
+         * 
+         */
+        FRONT,
+        /**
+         * 
+         */
+        BACK;
     }
 
+    /**
+     * 
+     */
     public enum LIGHT_TYPE {
 
-        NONE, BLOCK, SUN
+        /**
+         * 
+         */
+        NONE,
+        /**
+         * 
+         */
+        BLOCK,
+        /**
+         * 
+         */
+        SUN
     }
 
     /**
@@ -270,8 +310,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * Updates the sunlight.
      */
     private void updateSunlight() {
-        // Sunlight should only be applied
-        // to fresh chunks
         if (_fresh) {
             for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -1063,8 +1101,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
                     spreadLight(x, y, z, light, LIGHT_TYPE.SUN);
                 }
 
-                // Reduce the sunlight with each passed block
-                if (_blocks[x][y][z] != 0x0) {
+                // Reduce the sunlight with each block passed
+                if (_blocks[x][y][z] != 0x0 && !Block.getBlockForType(_blocks[x][y][z]).isBlockBillboard()) {
                     light -= Configuration.LIGHT_ABSORPTION;
                     light = (byte) Math.max(0, light);
                 }
@@ -1082,21 +1120,23 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * 
      * @param x
      * @param y
-     * @param z 
+     * @param z
+     * @param type  
      */
     public void refreshLightAtLocalPos(int x, int y, int z, LIGHT_TYPE type) {
         int blockPosX = getBlockWorldPosX(x);
         int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
 
-        byte val = getBlock(x, y, z);
+        byte bType = getBlock(x, y, z);
 
         // If a block was placed, remove the light value at this point
-        if (!Block.getBlockForType(val).isBlockTypeTranslucent()) {
+        if (!Block.getBlockForType(bType).isBlockTypeTranslucent()) {
             setLight(x, y, z, (byte) 0, type);
         } else {
             // If the block was removed: Find the brightest neighbor and
             // set the current block to this value - 1
+            byte val = _parent.getLight(blockPosX, blockPosY, blockPosZ, type);
             byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ, type);
             byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ, type);
             byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1, type);
@@ -1105,11 +1145,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ, type);
 
             byte max = (byte) (Math.max(Math.max(Math.max(val1, val2), Math.max(val3, val4)), Math.max(val5, val6)) - 1);
+
             if (max < 0) {
                 max = 0;
             }
 
-            setLight(x, y, z, max, type);
+            // Do nothing if the current light value is brighter
+            byte res = (byte) Math.max(max, val);
+
+            setLight(x, y, z, res, type);
         }
     }
 
@@ -1144,7 +1188,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param x
      * @param y
      * @param z
-     * @param lightValue 
+     * @param lightValue
+     * @param type  
      */
     public void spreadLight(int x, int y, int z, byte lightValue, LIGHT_TYPE type) {
         spreadLight(x, y, z, lightValue, 0, type);
@@ -1157,7 +1202,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param y
      * @param z 
      * @param lightValue
-     * @param depth 
+     * @param depth
+     * @param type  
      */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type) {
         if (depth > lightValue) {
@@ -1254,6 +1300,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param x Local block position on the x-axis
      * @param y Local block position on the y-axis
      * @param z Local block position on the z-axis
+     * @param type 
      * @return The light intensity
      */
     public byte getLight(int x, int y, int z, LIGHT_TYPE type) {
@@ -1268,6 +1315,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         return -1;
     }
 
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
     public byte getMaxLight(int x, int y, int z) {
         if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
             return (byte) Math.max(_sunlight[x][y][z] * _parent.getDaylightAsFloat(), _light[x][y][z]);
@@ -1283,6 +1337,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param y Local block position on the y-axis
      * @param z Local block position on the z-axis
      * @param intens The light intensity to set
+     * @param type  
      */
     public void setLight(int x, int y, int z, byte intens, LIGHT_TYPE type) {
         if (isFresh()) {
@@ -1412,7 +1467,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             counter++;
         }
 
-        intens = Configuration.OCCLUSION_INTENS * (float) Math.sqrt(counter*4);
+        intens = Configuration.OCCLUSION_INTENS * (float) Math.sqrt(counter * 4);
         return 1f - intens;
     }
 

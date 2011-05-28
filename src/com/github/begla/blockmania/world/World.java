@@ -550,7 +550,8 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * Places a block of a specific type at a given position.
+     * Places a block of a specific type at a given position and refreshes the 
+     * corresponding light values.
      * 
      * @param x The X-coordinate
      * @param y The Y-coordinate
@@ -572,7 +573,7 @@ public final class World extends RenderableObject {
             return;
         }
 
-        if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0) {
+        if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0x0) {
             c.setBlock(blockPosX, y, blockPosZ, type);
 
             if (update) {
@@ -584,10 +585,13 @@ public final class World extends RenderableObject {
                 c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.SUN);
                 byte newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
 
+                /*
+                 * Spread sunlight.
+                 */
                 if (newValue > oldValue) {
                     c.spreadLight(blockPosX, y, blockPosZ, newValue, Chunk.LIGHT_TYPE.SUN);
                 } else if (newValue < oldValue) {
-                    // Do something
+                    // TODO: Unspread light
                 }
 
                 /*
@@ -605,6 +609,9 @@ public final class World extends RenderableObject {
                     c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
                 }
 
+                /*
+                 * Finally queue the chunk and its neighbors for updating.
+                 */
                 queueChunkForUpdate(c, true, false, false);
             }
         }
@@ -673,6 +680,7 @@ public final class World extends RenderableObject {
      * @param x The X-coordinate
      * @param y The Y-coordinate
      * @param z The Z-coordinate
+     * @param type 
      * @return The light value
      */
     public final byte getLight(int x, int y, int z, Chunk.LIGHT_TYPE type) {
@@ -721,6 +729,7 @@ public final class World extends RenderableObject {
      * @param y The Y-coordinate
      * @param z The Z-coordinate
      * @param intens The light intensity value
+     * @param type  
      */
     public void setLight(int x, int y, int z, byte intens, Chunk.LIGHT_TYPE type) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
@@ -746,7 +755,8 @@ public final class World extends RenderableObject {
      * @param y
      * @param z
      * @param lightValue
-     * @param depth  
+     * @param depth
+     * @param type  
      */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();

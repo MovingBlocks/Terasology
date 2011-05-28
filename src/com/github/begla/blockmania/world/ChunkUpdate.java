@@ -31,7 +31,6 @@ public class ChunkUpdate implements Comparable<ChunkUpdate>, TLinkable<ChunkUpda
      * 
      * @param _updateNeighbors
      * @param _chunk
-     * @param priority  
      */
     public ChunkUpdate(boolean _updateNeighbors, Chunk _chunk) {
         this._updateNeighbors = _updateNeighbors;

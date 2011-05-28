@@ -56,6 +56,10 @@ public class BlockLava extends Block {
         return false;
     }
 
+    /**
+     * 
+     * @return
+     */
     @Override
     public byte getLuminance() {
         return 8;
