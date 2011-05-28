@@ -46,14 +46,16 @@ import org.newdawn.slick.TrueTypeFont;
  */
 public final class Main {
 
-
+    private final int TICKS_PER_SECOND = 60;
+    private final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+    private final int MAX_FRAMESKIP = 10;
     /* ------- */
     private static TrueTypeFont _font1;
     private long _lastLoopTime;
     private long _lastFpsTime;
     private int _fps;
     private final StringBuffer _consoleInput = new StringBuffer();
-    private boolean _showDebugConsole = false;
+    private boolean _pauseGame = false;
     private boolean _runGame = true;
     /* ------- */
     private float _meanFps;
@@ -227,38 +229,26 @@ public final class Main {
     private void start() {
         Helper.LOGGER.log(Level.INFO, "Starting the game...");
         _lastLoopTime = Helper.getInstance().getTime();
+
+        double nextGameTick = Helper.getInstance().getTime();
+        int loopCounter = 0;
+
+        /*
+         * Main game loop.
+         */
         while (_runGame) {
-            Display.sync(60);
-
-            // Measure a delta value and the frames per second
-            long delta = Helper.getInstance().getTime() - _lastLoopTime;
-            _lastLoopTime = Helper.getInstance().getTime();
-            _lastFpsTime += delta;
-            _fps++;
-
-            // Update the FPS and calculate the mean for displaying
-            if (_lastFpsTime >= 1000) {
-                _lastFpsTime = 0;
-
-                _meanFps += _fps;
-                _meanFps /= 2;
-
-                // Calculate the current memory usage in MB
-                _memoryUsage = (Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
-
-                _fps = 0;
-            }
-
+            updateStatistics();
             processKeyboardInput();
             processMouseInput();
 
             // Pause the game while the debug console is being shown
-            if (!_showDebugConsole) {
-                /*
-                 * Updating and rendering of the scene. The delta
-                 * value is used within the updating process.
-                 */
-                update(delta);
+            loopCounter = 0;
+            while (Helper.getInstance().getTime() > nextGameTick && loopCounter < MAX_FRAMESKIP) {
+                if (!_pauseGame) {
+                    update();
+                }
+                nextGameTick += SKIP_TICKS;
+                loopCounter++;
             }
             render();
 
@@ -272,9 +262,9 @@ public final class Main {
     /**
      * Updates the player and the world.
      */
-    private void update(long delta) {
-        _world.update(delta);
-        _player.update(delta);
+    private void update() {
+        _world.update();
+        _player.update();
     }
 
     /**
@@ -302,7 +292,7 @@ public final class Main {
             _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount(), Color.white));
         }
 
-        if (_showDebugConsole) {
+        if (_pauseGame) {
             // Display the console input text
             _font1.drawString(4, Display.getDisplayMode().getHeight() - 16 - 4, String.format("%s_", _consoleInput), Color.red);
         }
@@ -352,7 +342,7 @@ public final class Main {
                 toggleDebugConsole();
             }
 
-            if (_showDebugConsole) {
+            if (_pauseGame) {
                 if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                     if (key == Keyboard.KEY_BACK) {
                         int length = _consoleInput.length() - 1;
@@ -485,12 +475,12 @@ public final class Main {
      * Disables/enables the debug console.
      */
     private void toggleDebugConsole() {
-        if (!_showDebugConsole) {
+        if (!_pauseGame) {
             _world.suspendUpdateThread();
             _consoleInput.setLength(0);
-            _showDebugConsole = true;
+            _pauseGame = true;
         } else {
-            _showDebugConsole = false;
+            _pauseGame = false;
             _world.resumeUpdateThread();
         }
     }
@@ -527,5 +517,26 @@ public final class Main {
 
         // Reset the delta value
         _lastLoopTime = Helper.getInstance().getTime();
+    }
+
+    private void updateStatistics() {
+        // Measure a delta value and the frames per second
+        long delta = Helper.getInstance().getTime() - _lastLoopTime;
+        _lastLoopTime = Helper.getInstance().getTime();
+        _lastFpsTime += delta;
+        _fps++;
+
+        // Update the FPS and calculate the mean for displaying
+        if (_lastFpsTime >= 1000) {
+            _lastFpsTime = 0;
+
+            _meanFps += _fps;
+            _meanFps /= 2;
+
+            // Calculate the current memory usage in MB
+            _memoryUsage = (Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
+
+            _fps = 0;
+        }
     }
 }

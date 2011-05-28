@@ -102,12 +102,12 @@ public final class Player extends RenderableObject {
      * @param delta Delta value since the last frame update
      */
     @Override
-    public void update(long delta) {
+    public void update() {
         yaw(Mouse.getDX() * 0.1f);
         pitch(Mouse.getDY() * 0.1f);
 
         processMovement();
-        updatePlayerPosition(delta);
+        updatePlayerPosition();
 
         // Update the viewing direction
         _viewingDirection.set((float) Math.sin(Math.toRadians(_yaw)) * (float) Math.cos(Math.toRadians(_pitch)), -1f * (float) Math.sin(Math.toRadians(_pitch)), -1 * (float) Math.cos(Math.toRadians(_pitch)) * (float) Math.cos(Math.toRadians(_yaw)));
@@ -379,7 +379,7 @@ public final class Player extends RenderableObject {
         boolean result = false;
         FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
-         for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end;) {
+        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end;) {
             byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
 
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
@@ -469,13 +469,13 @@ public final class Player extends RenderableObject {
      * 
      * @param delta Delta value since the last frame update
      */
-    private void updatePlayerPosition(float delta) {
+    private void updatePlayerPosition() {
         // Save the previous position before changing any of the values
         Vector3f oldPosition = VectorPool.getVector();
         oldPosition.set(_position);
 
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-            _position.z += 8f / 1000f * delta;
+            _position.z += 0.75f;
             return;
         }
 
@@ -483,15 +483,15 @@ public final class Player extends RenderableObject {
          * Slowdown the speed of the player each time this method is called.
          */
         if (Math.abs(_acc.y) > 0f) {
-            _acc.y += -1f * _acc.y * Configuration.getSettingNumeric("FRICTION") * delta;
+            _acc.y += -1f * _acc.y * Configuration.getSettingNumeric("FRICTION");
         }
 
         if (Math.abs(_acc.x) > 0f) {
-            _acc.x += -1f * _acc.x * Configuration.getSettingNumeric("FRICTION") * delta;
+            _acc.x += -1f * _acc.x * Configuration.getSettingNumeric("FRICTION");
         }
 
         if (Math.abs(_acc.z) > 0f) {
-            _acc.z += -1f * _acc.z * Configuration.getSettingNumeric("FRICTION") * delta;
+            _acc.z += -1f * _acc.z * Configuration.getSettingNumeric("FRICTION");
         }
 
         if (Math.abs(_acc.x) > _wSpeed || Math.abs(_acc.z) > _wSpeed || Math.abs(_acc.z) > _wSpeed) {
@@ -513,11 +513,15 @@ public final class Player extends RenderableObject {
         _acc.z += _movement.z;
 
         if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY") && !Configuration.getSettingBoolean("GOD_MODE")) {
-            _gravity -= Configuration.getSettingNumeric("GRAVITY") * delta;
+            _gravity -= Configuration.getSettingNumeric("GRAVITY");
+
+            if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY")) {
+                _gravity = -Configuration.getSettingNumeric("MAX_GRAVITY");
+            }
         }
 
-        getPosition().y += (_acc.y / 1000.0f) * delta;
-        getPosition().y += (_gravity / 1000.0f) * delta;
+        getPosition().y += _acc.y;
+        getPosition().y += _gravity;
 
         if (!Configuration.getSettingBoolean("GOD_MODE")) {
             boolean vHit = verticalHitTest(oldPosition);
@@ -539,8 +543,8 @@ public final class Player extends RenderableObject {
          * Update the position of the player
          * according to the acceleration vector.
          */
-        getPosition().x += (_acc.x / 1000.0f) * delta;
-        getPosition().z += (_acc.z / 1000.0f) * delta;
+        getPosition().x += _acc.x;
+        getPosition().z += _acc.z;
 
         /*
          * Check for horizontal collisions __after__ checking for vertical

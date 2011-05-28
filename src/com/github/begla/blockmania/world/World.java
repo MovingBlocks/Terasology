@@ -397,7 +397,7 @@ public final class World extends RenderableObject {
      * list updates and recreates the display lists accordingly.
      */
     @Override
-    public void update(long delta) {
+    public void update() {
         _chunkUpdateManager.updateDisplayLists();
     }
 

@@ -38,13 +38,9 @@ public abstract class RenderableObject {
     }
 
     /**
-     * Updating operations have to placed here. The delta
-     * value can be used to determine how much time has passed
-     * since the last updating operation.
-     *
-     * @param delta Time since the last update
+     * Updating operations have to placed here.
      */
-    public void update(long delta) {
+    public void update() {
     }
 
     /**
