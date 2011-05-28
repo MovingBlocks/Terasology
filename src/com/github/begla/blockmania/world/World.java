@@ -65,8 +65,9 @@ public final class World extends RenderableObject {
     private double _statUpdateDuration = 0.0f;
     /* ------ */
     private short _time = 8;
-    private long lastDaytimeMeasurement = Helper.getInstance().getTime();
-    private long latestDirtEvolvement = Helper.getInstance().getTime();
+    private long _lastDaytimeMeasurement = Helper.getInstance().getTime();
+    private long _latestDirtEvolvement = Helper.getInstance().getTime();
+    private long _lastUpdateTime = Helper.getInstance().getTime();
     /* ------ */
     private static Texture _textureSun, _textureMoon;
     /* ------ */
@@ -93,7 +94,7 @@ public final class World extends RenderableObject {
     /* ----- */
     int _lastGeneratedChunkID = 0;
     /* ----- */
-    private FastList<Chunk> _visibleChunks = new FastList<Chunk>(1024);
+    private FastList<Chunk> _visibleChunks;
 
     /**
      * Initializes a new world for the single player mode.
@@ -144,11 +145,14 @@ public final class World extends RenderableObject {
         _generatorTree = new ObjectGeneratorTree(this, seed);
         _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
         _generatorGrass = new ChunkGeneratorFlora(seed);
+        
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
 
         resetPlayer();
+        _visibleChunks = fetchVisibleChunks();
+        
         updateDaylight();
 
         _updateThread = new Thread(new Runnable() {
@@ -173,23 +177,19 @@ public final class World extends RenderableObject {
                     long timeStart = System.currentTimeMillis();
                     timeStart = System.currentTimeMillis();
 
-                    // Update the the list of visible chunks
-                    _visibleChunks = fetchVisibleChunks();
+
+                    if (Helper.getInstance().getTime() - _lastUpdateTime > 1000) {
+                        // Update the the list of visible chunks
+                        _visibleChunks = fetchVisibleChunks();
+                        // Remote chunks which are out of range
+                        removeInvisibleChunkUpdates();
+                        _lastUpdateTime = Helper.getInstance().getTime();
+                    }
 
                     ChunkUpdate nearestChunkUpdate = null;
-                    ChunkUpdate farthestChunkUpdate = null;
 
                     if (!_chunkUpdateNormal.isEmpty()) {
                         nearestChunkUpdate = _chunkUpdateNormal.getFirst();
-                        farthestChunkUpdate = _chunkUpdateNormal.getLast();
-                    }
-
-                    if (farthestChunkUpdate != null) {
-                        if (!isChunkVisible(farthestChunkUpdate.getChunk()) && nearestChunkUpdate != farthestChunkUpdate) {
-                            synchronized (_chunkUpdateNormal) {
-                                _chunkUpdateNormal.remove(farthestChunkUpdate);
-                            }
-                        }
                     }
 
                     if (nearestChunkUpdate != null) {
@@ -207,6 +207,22 @@ public final class World extends RenderableObject {
                 }
             }
         });
+    }
+
+    private void removeInvisibleChunkUpdates() {
+        FastList<ChunkUpdate> updatesToDelete = new FastList<ChunkUpdate>();
+
+        for (FastList.Node<ChunkUpdate> n = _chunkUpdateNormal.head(), end = _chunkUpdateNormal.tail(); (n = n.getNext()) != end;) {
+
+            if (!isChunkVisible(n.getValue().getChunk())) {
+                updatesToDelete.add(n.getValue());
+            }
+
+        }
+
+        synchronized (_chunkUpdateNormal) {
+            _chunkUpdateNormal.removeAll(updatesToDelete);
+        }
     }
 
     /**
@@ -230,13 +246,6 @@ public final class World extends RenderableObject {
      */
     private void processChunkUpdate(ChunkUpdate cu) {
         if (cu != null) {
-            /*
-             * Remove this update from the queue if it is not dirty or if it is not visible
-             */
-            if (!(cu.getChunk().isDirty()) || !isChunkVisible(cu.getChunk())) {
-                return;
-            }
-
             boolean lightCalculated = false;
 
             /*
@@ -275,11 +284,14 @@ public final class World extends RenderableObject {
 
             for (int i = 0; i < neighbors.length; i++) {
                 if (neighbors[i] != null) {
-                    // Generate vertex arrays of neighbor chunks
-                    if ((isChunkVisible(neighbors[i]) && neighbors[i].isDirty() && cu.isUpdateNeighbors()) || lightCalculated) {
-                        neighbors[i].generateVertexArrays();
-                        _chunkUpdateQueueDL.add(neighbors[i]);
-                        _statGeneratedChunks++;
+                    if (neighbors[i].isDirty() && cu.isUpdateNeighbors()) {
+                        if (neighbors[i].isLightDirty()) {
+                            queueChunkForUpdate(neighbors[i], false, false, false);
+                        } else {
+                            neighbors[i].generateVertexArrays();
+                        }
+                    } else if (lightCalculated) {
+                        queueChunkForUpdate(neighbors[i], false, false, false);
                     }
                 }
             }
@@ -303,14 +315,14 @@ public final class World extends RenderableObject {
      * Updates the time of the world. A day in Blockmania takes 12 minutes.
      */
     private void updateDaytime() {
-        if (Helper.getInstance().getTime() - lastDaytimeMeasurement >= 30000) {
+        if (Helper.getInstance().getTime() - _lastDaytimeMeasurement >= 30000) {
             if (_chunkUpdateNormal.isEmpty()) {
                 setTime((short) (_time + 1));
             } else {
                 return;
             }
 
-            lastDaytimeMeasurement = Helper.getInstance().getTime();
+            _lastDaytimeMeasurement = Helper.getInstance().getTime();
 
             Helper.LOGGER.log(Level.INFO, "Updated daytime to {0}h.", _time);
         }
@@ -341,7 +353,7 @@ public final class World extends RenderableObject {
      */
     private void replantDirt() {
         // Pick one chunk for grass updates every 100 ms
-        if (Helper.getInstance().getTime() - latestDirtEvolvement > 100) {
+        if (Helper.getInstance().getTime() - _latestDirtEvolvement > 100) {
             // Do NOT replant chunks when updates are queued...
             // And do NOT replant chunks during the night...
             if (!_chunkUpdateNormal.isEmpty() || isNighttime()) {
@@ -352,10 +364,10 @@ public final class World extends RenderableObject {
 
             if (!c.isFresh() && !c.isDirty() && !c.isLightDirty()) {
                 _generatorGrass.generate(c);
-                queueChunkForUpdate(c, false, false);
+                queueChunkForUpdate(c, false, false, false);
             }
 
-            latestDirtEvolvement = Helper.getInstance().getTime();
+            _latestDirtEvolvement = Helper.getInstance().getTime();
         }
     }
 
@@ -364,7 +376,7 @@ public final class World extends RenderableObject {
      */
     public void updateAllChunks() {
         for (FastList.Node<Chunk> n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end;) {
-            queueChunkForUpdate(n.getValue(), false, true);
+            queueChunkForUpdate(n.getValue(), false, true, false);
         }
     }
 
@@ -440,9 +452,9 @@ public final class World extends RenderableObject {
             for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
                 Chunk c = loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
                 if (c != null) {
-                    // If this chunk was not visible before and is dirty: update it
+                    // If this chunk was not visible, update it
                     if (!isChunkVisible(c)) {
-                        queueChunkForUpdate(c, false, true);
+                        queueChunkForUpdate(c, false, true, true);
                     }
                     visibleChunks.add(c);
                 }
@@ -471,11 +483,25 @@ public final class World extends RenderableObject {
     @Override
     public void update(long delta) {
         if (!_chunkUpdateQueueDL.isEmpty()) {
+            // Take one chunk from the queue
             Chunk c = _chunkUpdateQueueDL.valueOf(_chunkUpdateQueueDL.head().getNext());
             if (c != null) {
+                // Generate the display list of the center chunk
                 c.generateDisplayLists();
+                // Remove the center chunk
+                _chunkUpdateQueueDL.remove(c);
+
+                Chunk[] neighbors = c.loadOrCreateNeighbors();
+
+                // Generate the display lists of the neighbor chunks
+                for (Chunk n : neighbors) {
+                    if (n != null) {
+                        n.generateDisplayLists();
+                    }
+                }
+
             }
-            _chunkUpdateQueueDL.remove(c);
+
         }
     }
 
@@ -579,7 +605,7 @@ public final class World extends RenderableObject {
                     c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
                 }
 
-                queueChunkForUpdate(c, true, false);
+                queueChunkForUpdate(c, true, false, false);
             }
         }
     }
@@ -1030,39 +1056,24 @@ public final class World extends RenderableObject {
     /**
      * 
      * @param c
-     * @param updateNeighbors 
-     */
-    private void queueChunkForUpdate(Chunk c, boolean updateNeighbors) {
-        queueChunkForUpdate(c, updateNeighbors, false, (byte) 1);
-    }
-
-    /**
-     * 
-     * @param c
-     * @param updateNeighbors
-     * @param markDirty 
-     */
-    private void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty) {
-        queueChunkForUpdate(c, updateNeighbors, markDirty, (byte) 1);
-    }
-
-    /**
-     * 
-     * @param c
      * @param updateNeighbors
      * @param markDirty
      * @param priority 
      */
-    private void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty, byte priority) {
+    private void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty, boolean forceInvisibleChunks) {
         if (markDirty) {
             c.setDirty(true);
         }
 
         // Do not queue clean chunks
-        if (c.isDirty()) {
-            _chunkUpdateNormal.add(new ChunkUpdate(updateNeighbors, c, priority));
-            synchronized (_chunkUpdateNormal) {
-                Collections.sort(_chunkUpdateNormal);
+        if (c.isDirty() && (isChunkVisible(c) || forceInvisibleChunks)) {
+            ChunkUpdate cu = new ChunkUpdate(updateNeighbors, c);
+            // Ignore duplicate updates
+            if (!_chunkUpdateNormal.contains(cu)) {
+                _chunkUpdateNormal.add(cu);
+                synchronized (_chunkUpdateNormal) {
+                    Collections.sort(_chunkUpdateNormal);
+                }
             }
         }
     }
@@ -1231,6 +1242,10 @@ public final class World extends RenderableObject {
      * @return
      */
     public boolean isChunkVisible(Chunk c) {
+        if (_visibleChunks == null) {
+            return false;
+        }
+        
         return _visibleChunks.contains(c);
     }
 

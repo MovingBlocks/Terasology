@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.world;
 
 import gnu.trove.list.TLinkable;
@@ -27,7 +26,6 @@ public class ChunkUpdate implements Comparable<ChunkUpdate>, TLinkable<ChunkUpda
     private ChunkUpdate _next, _prev;
     private boolean _updateNeighbors;
     private Chunk _chunk;
-    private byte _priority;
 
     /**
      * 
@@ -35,26 +33,9 @@ public class ChunkUpdate implements Comparable<ChunkUpdate>, TLinkable<ChunkUpda
      * @param _chunk
      * @param priority  
      */
-    public ChunkUpdate(boolean _updateNeighbors, Chunk _chunk, byte priority) {
-        this._updateNeighbors = _updateNeighbors;
-        this._chunk = _chunk;
-
-        if (priority <= 0) {
-            priority = 1;
-        }
-
-        this._priority = priority;
-    }
-
-    /**
-     * 
-     * @param _updateNeighbors
-     * @param _chunk 
-     */
     public ChunkUpdate(boolean _updateNeighbors, Chunk _chunk) {
         this._updateNeighbors = _updateNeighbors;
         this._chunk = _chunk;
-        this._priority = 1;
     }
 
     /**
@@ -77,16 +58,8 @@ public class ChunkUpdate implements Comparable<ChunkUpdate>, TLinkable<ChunkUpda
      * 
      * @return 
      */
-    public byte getPriority() {
-        return _priority;
-    }
-
-    /**
-     * 
-     * @return 
-     */
     public double getWeight() {
-        double weight = _chunk.calcDistanceToPlayer() / (double) _priority;
+        double weight = _chunk.calcDistanceToPlayer();
         return weight;
     }
 
@@ -109,7 +82,7 @@ public class ChunkUpdate implements Comparable<ChunkUpdate>, TLinkable<ChunkUpda
     public boolean equals(Object o) {
         if (o.getClass() == ChunkUpdate.class) {
             ChunkUpdate cu = (ChunkUpdate) o;
-            cu.getChunk().equals(_chunk);
+            return cu.getChunk().equals(_chunk);
         }
         return false;
     }

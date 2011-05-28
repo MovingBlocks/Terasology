@@ -1263,13 +1263,17 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             } else {
                 return _light[x][y][z];
             }
-        } else {
-            return -1;
         }
+
+        return -1;
     }
 
     public byte getMaxLight(int x, int y, int z) {
-        return (byte) Math.max(_sunlight[x][y][z] * _parent.getDaylightAsFloat(), _light[x][y][z]);
+        if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
+            return (byte) Math.max(_sunlight[x][y][z] * _parent.getDaylightAsFloat(), _light[x][y][z]);
+        }
+        
+        return -1;
     }
 
     /**
@@ -1382,7 +1386,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     public float calcSimpleOcclusionAmount(int x, int y, int z) {
         int counter = 0;
         float intens = 0f;
-        
+
         if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z))).isCastingShadows()) {
             counter++;
         }
@@ -1407,7 +1411,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
             counter++;
         }
-        
+
         intens = Configuration.OCCLUSION_INTENS * (float) Math.sqrt(counter);
         return 1f - intens;
     }

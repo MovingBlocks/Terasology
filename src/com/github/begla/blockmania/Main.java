@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.player.Player;
@@ -190,7 +189,7 @@ public final class Main {
         // Update the viewing distance
         float minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
         float viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, viewingDistance-16f);
+        glFogf(GL_FOG_START, viewingDistance - 16f);
         glFogf(GL_FOG_END, viewingDistance);
 
         /*
@@ -256,16 +255,10 @@ public final class Main {
             // Pause the game while the debug console is being shown
             if (!_showDebugConsole) {
                 /*
-                 * HACK: Do not update the game if too much time has passed since the last
-                 * frame.
+                 * Updating and rendering of the scene. The delta
+                 * value is used within the updating process.
                  */
-                if (delta < 64) {
-                    /*
-                     * Updating and rendering of the scene. The delta
-                     * value is used within the updating process.
-                     */
-                    update(delta);
-                }
+                update(delta);
             }
             render();
 
