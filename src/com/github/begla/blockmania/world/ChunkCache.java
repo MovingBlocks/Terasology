@@ -25,7 +25,7 @@ import javolution.util.FastList;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ChunkCache {
+public final class ChunkCache {
 
     private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
     private World _parent;

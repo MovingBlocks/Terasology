@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world;
 
+import java.util.ArrayList;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.Helper;
 import com.github.begla.blockmania.RenderableObject;
@@ -25,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.utilities.VectorPool;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.list.TLinkable;
 import gnu.trove.list.array.TFloatArrayList;
@@ -286,7 +288,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Updates the light of this chunk.
+     * Updates the absorption of this chunk.
      */
     public void updateLight() {
         // Light updates are only allowed if the initial sunlight
@@ -377,9 +379,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y;
         float lightIntens = getRenderingLightValue(x, y, z) / 16f;
 
-        color.add(colorOffset.x * lightIntens);
-        color.add(colorOffset.y * lightIntens);
-        color.add(colorOffset.z * lightIntens);
+        color.add(colorOffset.x * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.y * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.z * lightIntens * Configuration.BRIGHTNESS_FACTOR);
         color.add(colorOffset.w);
 
         tex.add(texOffsetX);
@@ -388,9 +390,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         quads.add(-0.5f + y + offsetY);
         quads.add(z + offsetZ);
 
-        color.add(colorOffset.x * lightIntens);
-        color.add(colorOffset.y * lightIntens);
-        color.add(colorOffset.z * lightIntens);
+        color.add(colorOffset.x * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.y * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.z * lightIntens * Configuration.BRIGHTNESS_FACTOR);
         color.add(colorOffset.w);
 
         tex.add(texOffsetX + 0.0624f);
@@ -399,9 +401,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         quads.add(-0.5f + y + offsetY);
         quads.add(z + offsetZ);
 
-        color.add(colorOffset.x * lightIntens);
-        color.add(colorOffset.y * lightIntens);
-        color.add(colorOffset.z * lightIntens);
+        color.add(colorOffset.x * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.y * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.z * lightIntens * Configuration.BRIGHTNESS_FACTOR);
         color.add(colorOffset.w);
 
         tex.add(texOffsetX + 0.0624f);
@@ -411,9 +413,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         quads.add(0.5f + y + offsetY);
         quads.add(z + offsetZ);
 
-        color.add(colorOffset.x * lightIntens);
-        color.add(colorOffset.y * lightIntens);
-        color.add(colorOffset.z * lightIntens);
+        color.add(colorOffset.x * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.y * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.z * lightIntens * Configuration.BRIGHTNESS_FACTOR);
         color.add(colorOffset.w);
 
         tex.add(texOffsetX);
@@ -430,9 +432,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x;
         texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y;
 
-        color.add(colorOffset.x * lightIntens);
-        color.add(colorOffset.y * lightIntens);
-        color.add(colorOffset.z * lightIntens);
+        color.add(colorOffset.x * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.y * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.z * lightIntens * Configuration.BRIGHTNESS_FACTOR);
         color.add(colorOffset.w);
 
         tex.add(texOffsetX);
@@ -441,9 +443,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         quads.add(-0.5f + y + offsetY);
         quads.add(-0.5f + z + offsetZ);
 
-        color.add(colorOffset.x * lightIntens);
-        color.add(colorOffset.y * lightIntens);
-        color.add(colorOffset.z * lightIntens);
+        color.add(colorOffset.x * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.y * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.z * lightIntens * Configuration.BRIGHTNESS_FACTOR);
         color.add(colorOffset.w);
 
         tex.add(texOffsetX + 0.0624f);
@@ -452,9 +454,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         quads.add(-0.5f + y + offsetY);
         quads.add(0.5f + z + offsetZ);
 
-        color.add(colorOffset.x * lightIntens);
-        color.add(colorOffset.y * lightIntens);
-        color.add(colorOffset.z * lightIntens);
+        color.add(colorOffset.x * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.y * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.z * lightIntens * Configuration.BRIGHTNESS_FACTOR);
         color.add(colorOffset.w);
 
         tex.add(texOffsetX + 0.0624f);
@@ -464,9 +466,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         quads.add(0.5f + y + offsetY);
         quads.add(0.5f + z + offsetZ);
 
-        color.add(colorOffset.x * lightIntens);
-        color.add(colorOffset.y * lightIntens);
-        color.add(colorOffset.z * lightIntens);
+        color.add(colorOffset.x * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.y * lightIntens * Configuration.BRIGHTNESS_FACTOR);
+        color.add(colorOffset.z * lightIntens * Configuration.BRIGHTNESS_FACTOR);
         color.add(colorOffset.w);
 
         tex.add(texOffsetX);
@@ -510,9 +512,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         if (drawTop) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
-            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x, y + 1, z)), Configuration.MIN_LIGHT) / 16f;
+            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z)) * calcSimpleOcclusionAmount(x, y, z, 0, 1, 0), Configuration.MIN_LIGHT) / 16f;
 
-            // If this block is "is touching" the nil area: ignore light
+            // If this block is 'is touching' the nil area: ignore light
             if (y == Configuration.CHUNK_DIMENSIONS.y - 1) {
                 shadowIntens = 1.0f;
             }
@@ -520,9 +522,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y;
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -531,9 +533,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(0.5f + y + offsetY);
             quads.add(0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -542,9 +544,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(0.5f + y + offsetY);
             quads.add(0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -553,9 +555,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(0.5f + y + offsetY);
             quads.add(-0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -572,14 +574,14 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         if (drawFront) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
-            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) * (calcSimpleOcclusionAmount(x, y, z - 1) - Configuration.BLOCK_SIDE_DIMMING), Configuration.MIN_LIGHT) / 16f;
+            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1)) * calcSimpleOcclusionAmount(x, y, z, 0, 0, -1), Configuration.MIN_LIGHT) / 16f;
 
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y;
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -588,9 +590,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(0.5f + y + offsetY);
             quads.add(-0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -599,9 +601,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(0.5f + y + offsetY);
             quads.add(-0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -610,9 +612,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(-0.5f + y + offsetY);
             quads.add(-0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -629,15 +631,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         if (drawBack) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
-            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) * (calcSimpleOcclusionAmount(x, y, z + 1) - Configuration.BLOCK_SIDE_DIMMING), Configuration.MIN_LIGHT) / 16f;
+            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1)) * calcSimpleOcclusionAmount(x, y, z, 0, 0, 1), Configuration.MIN_LIGHT) / 16f;
 
 
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y;
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -646,9 +648,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(-0.5f + y + offsetY);
             quads.add(0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -657,9 +659,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(-0.5f + y + offsetY);
             quads.add(0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -669,9 +671,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(0.5f + y + offsetY);
             quads.add(0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -689,14 +691,14 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         if (drawLeft) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.LEFT);
-            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x - 1, y, z) - Configuration.BLOCK_SIDE_DIMMING), Configuration.MIN_LIGHT) / 16f;
+            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x, y, z, -1, 0, 0) - Configuration.BLOCK_SIDE_DIMMING), Configuration.MIN_LIGHT) / 16f;
 
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y;
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -705,9 +707,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(-0.5f + y + offsetY);
             quads.add(-0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -716,9 +718,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(-0.5f + y + offsetY);
             quads.add(0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -728,9 +730,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(0.5f + y + offsetY);
             quads.add(0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -747,14 +749,14 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         if (drawRight) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.RIGHT);
-            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x + 1, y, z) - Configuration.BLOCK_SIDE_DIMMING), Configuration.MIN_LIGHT) / 16f;
+            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x, y, z, 1, 0, 0) - Configuration.BLOCK_SIDE_DIMMING), Configuration.MIN_LIGHT) / 16f;
 
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y;
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -763,9 +765,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(0.5f + y + offsetY);
             quads.add(-0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -774,9 +776,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(0.5f + y + offsetY);
             quads.add(0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -785,9 +787,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(-0.5f + y + offsetY);
             quads.add(0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -804,14 +806,14 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         if (drawBottom) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BOTTOM);
-            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z)) * (calcSimpleOcclusionAmount(x, y - 1, z)), Configuration.MIN_LIGHT) / 16f;
+            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z)) - Configuration.BLOCK_SIDE_DIMMING, Configuration.MIN_LIGHT) / 16f;
 
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y;
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -820,9 +822,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(-0.5f + y + offsetY);
             quads.add(-0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -831,9 +833,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(-0.5f + y + offsetY);
             quads.add(-0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX + 0.0624f);
@@ -842,9 +844,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             quads.add(-0.5f + y + offsetY);
             quads.add(0.5f + z + offsetZ);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
+            color.add(colorOffset.x * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.y * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
+            color.add(colorOffset.z * shadowIntens * Configuration.BRIGHTNESS_FACTOR);
             color.add(colorOffset.w);
 
             tex.add(texOffsetX);
@@ -1083,7 +1085,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param refresh  
      */
     public void calcSunlightAtLocalPos(int x, int z, boolean refresh) {
-        byte light = Configuration.MAX_LIGHT;
+        float absorption = 0;
         boolean covered = false;
 
         for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
@@ -1095,16 +1097,24 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
             }
 
             if (b.isBlockTypeTranslucent() && !covered) {
+                byte light = (byte) ((float) Configuration.MAX_LIGHT - absorption);
+               
+                byte oldValue = _sunlight[x][y][z];
                 _sunlight[x][y][z] = light;
+                byte newValue = _sunlight[x][y][z];
 
-                if (refresh) {
+                /*
+                 * Spread the sunlight if the new light value is more intense
+                 * than the old value.
+                 */
+                if (refresh && oldValue < newValue) {
                     spreadLight(x, y, z, light, LIGHT_TYPE.SUN);
                 }
 
                 // Reduce the sunlight with each block passed
                 if (_blocks[x][y][z] != 0x0 && !Block.getBlockForType(_blocks[x][y][z]).isBlockBillboard()) {
-                    light -= Configuration.LIGHT_ABSORPTION;
-                    light = (byte) Math.max(0, light);
+                    absorption += Configuration.LIGHT_ABSORPTION;
+                    absorption = Math.min(Configuration.MAX_LIGHT, absorption);
                 }
             } else if (b.isBlockTypeTranslucent() && covered) {
                 _sunlight[x][y][z] = 0;
@@ -1130,7 +1140,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         byte bType = getBlock(x, y, z);
 
-        // If a block was placed, remove the light value at this point
+        // If a block was placed, remove the absorption value at this point
         if (!Block.getBlockForType(bType).isBlockTypeTranslucent()) {
             setLight(x, y, z, (byte) 0, type);
         } else {
@@ -1150,7 +1160,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
                 max = 0;
             }
 
-            // Do nothing if the current light value is brighter
+            // Do nothing if the current absorption value is brighter
             byte res = (byte) Math.max(max, val);
 
             setLight(x, y, z, res, type);
@@ -1158,7 +1168,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * TODO: Implement "removal" of light
+     * TODO: Implement "removal" of absorption
      * 
      * @param x
      * @param y
@@ -1170,7 +1180,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * TODO: Implement "removal" of light
+     * TODO: Implement "removal" of absorption
      * 
      * @param x
      * @param y
@@ -1179,68 +1189,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param oldLightValue 
      */
     public void unspreadLight(int x, int y, int z, byte oldLightValue, int depth, LIGHT_TYPE type) {
-        if (depth > oldLightValue) {
-            return;
-        }
-
-        int blockPosX = getBlockWorldPosX(x);
-        int blockPosY = getBlockWorldPosY(y);
-        int blockPosZ = getBlockWorldPosZ(z);
-
-        byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ, type);
-        byte type1 = _parent.getBlock(blockPosX + 1, blockPosY, blockPosZ);
-        byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ, type);
-        byte type2 = _parent.getBlock(blockPosX - 1, blockPosY, blockPosZ);
-        byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1, type);
-        byte type3 = _parent.getBlock(blockPosX, blockPosY, blockPosZ + 1);
-        byte val4 = _parent.getLight(blockPosX, blockPosY, blockPosZ - 1, type);
-        byte type4 = _parent.getBlock(blockPosX, blockPosY, blockPosZ - 1);
-        byte val5 = _parent.getLight(blockPosX, blockPosY + 1, blockPosZ, type);
-        byte type5 = _parent.getBlock(blockPosX, blockPosY + 1, blockPosZ);
-        byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ, type);
-        byte type6 = _parent.getBlock(blockPosX, blockPosY - 1, blockPosZ);
-
-        byte newLightValue = 0;
-        newLightValue = (byte) (oldLightValue - depth);
-
-        _parent.setLight(blockPosX, blockPosY, blockPosZ, (byte) 0, type);
-
-        if (oldLightValue <= 0) {
-            return;
-        }
-
-        if (val1 < newLightValue - 1 && Block.getBlockForType(type1).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX + 1, blockPosY, blockPosZ, oldLightValue, depth + 1, type);
-        }
-
-
-        if (val2 < newLightValue - 1 && Block.getBlockForType(type2).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX - 1, blockPosY, blockPosZ, oldLightValue, depth + 1, type);
-        }
-
-
-        if (val3 < newLightValue - 1 && Block.getBlockForType(type3).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX, blockPosY, blockPosZ + 1, oldLightValue, depth + 1, type);
-        }
-
-
-        if (val4 < newLightValue - 1 && Block.getBlockForType(type4).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX, blockPosY, blockPosZ - 1, oldLightValue, depth + 1, type);
-        }
-
-
-        if (val5 < newLightValue - 1 && Block.getBlockForType(type5).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX, blockPosY + 1, blockPosZ, oldLightValue, depth + 1, type);
-        }
-
-
-        if (val6 < newLightValue - 1 && Block.getBlockForType(type6).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX, blockPosY - 1, blockPosZ, oldLightValue, depth + 1, type);
-        }
+        throw new NotImplementedException();
     }
 
     /**
-     * Recursive light calculation.
+     * Recursive absorption calculation.
      * 
      * @param x
      * @param y
@@ -1253,7 +1206,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Recursive light calculation.
+     * Recursive absorption calculation.
      * 
      * @param x
      * @param y
@@ -1352,13 +1305,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Returns the light intensity at a given local block position.
+     * Returns the absorption intensity at a given local block position.
      *
      * @param x Local block position on the x-axis
      * @param y Local block position on the y-axis
      * @param z Local block position on the z-axis
      * @param type 
-     * @return The light intensity
+     * @return The absorption intensity
      */
     public byte getLight(int x, int y, int z, LIGHT_TYPE type) {
         if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
@@ -1388,12 +1341,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Sets the light value at the given position.
+     * Sets the absorption value at the given position.
      * 
      * @param x Local block position on the x-axis
      * @param y Local block position on the y-axis
      * @param z Local block position on the z-axis
-     * @param intens The light intensity to set
+     * @param result The absorption intensity to set
      * @param type  
      */
     public void setLight(int x, int y, int z, byte intens, LIGHT_TYPE type) {
@@ -1455,13 +1408,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
             Block b = Block.getBlockForType(type);
 
-            // If an opaque block was set, remove the light from this field
+            // If an opaque block was set, remove the absorption from this field
             if (!b.isBlockTypeTranslucent()) {
                 _sunlight[x][y][z] = 0;
             }
 
             if (oldValue != type) {
-                // Update vertex arrays and light
+                // Update vertex arrays and absorption
                 setDirty(true);
                 // Mark the neighbors as dirty
                 markNeighborsDirty(x, z);
@@ -1495,36 +1448,35 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param z Local block position on the z-axis
      * @return Occlusion amount
      */
-    public float calcSimpleOcclusionAmount(int x, int y, int z) {
+    public float calcSimpleOcclusionAmount(int x, int y, int z, int dirX, int dirY, int dirZ) {
         int counter = 0;
         float intens = 0f;
 
-        if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z))).isCastingShadows()) {
-            counter++;
-        }
-        if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z))).isCastingShadows()) {
-            counter++;
-        }
-        if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1))).isCastingShadows()) {
-            counter++;
-        }
-        if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
-            counter++;
-        }
-        if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1))).isCastingShadows()) {
-            counter++;
-        }
-        if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
-            counter++;
-        }
-        if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1))).isCastingShadows()) {
-            counter++;
-        }
-        if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1))).isCastingShadows()) {
-            counter++;
+        Vector3f origin = VectorPool.getVector(x, y, z);
+        ArrayList<Vector3f> positions = new ArrayList<Vector3f>();
+        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ));
+        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ));
+        positions.add(VectorPool.getVector(x + dirX, y + dirY, z + dirZ + 1));
+        positions.add(VectorPool.getVector(x + dirX, y + dirY, z + dirZ - 1));
+        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ + 1));
+        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ - 1));
+        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ - 1));
+        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ + 1));
+
+        for (Vector3f p : positions) {
+            if (!p.equals(origin)) {
+                /*
+                 * Check for blocks which 'cast shadows' and ignore the originating block.
+                 */
+                if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX((int) p.x), getBlockWorldPosY((int) p.y), getBlockWorldPosZ((int) p.z))).isCastingShadows()) {
+                    counter++;
+                }
+            }
+
+            VectorPool.putVector(p);
         }
 
-        intens = Configuration.OCCLUSION_INTENS * (float) Math.sqrt(counter * 4);
+        intens = Configuration.OCCLUSION_INTENS * (float) Math.sqrt(counter);
         return 1f - intens;
     }
 

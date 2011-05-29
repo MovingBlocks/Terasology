@@ -23,7 +23,7 @@ import org.lwjgl.util.vector.Vector3f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockPosition implements Comparable<BlockPosition> {
+public final class BlockPosition implements Comparable<BlockPosition> {
 
     /**
      * Position on the x-axis.

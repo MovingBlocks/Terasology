@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.blocks;
 
 /**
@@ -45,6 +44,11 @@ public class BlockNil extends Block {
 
     @Override
     public boolean renderBoundingBox() {
+        return false;
+    }
+
+    @Override
+    public boolean isRemovable() {
         return false;
     }
 }

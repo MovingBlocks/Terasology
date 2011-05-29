@@ -246,19 +246,19 @@ public final class World extends RenderableObject {
      */
     private void updateDaylight() {
         if (_time >= 18 && _time < 20) {
-            _daylight = (byte) (0.8f * Configuration.MAX_LIGHT);
+            _daylight = (byte) (0.7f * Configuration.MAX_LIGHT);
         } else if (_time == 20) {
-            _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
+            _daylight = (byte) (0.5f * Configuration.MAX_LIGHT);
         } else if (_time == 21) {
-            _daylight = (byte) (0.4f * Configuration.MAX_LIGHT);
-        } else if (_time == 22 || _time == 23) {
             _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-        } else if (_time >= 0 && _time <= 5) {
+        } else if (_time == 22 || _time == 23) {
             _daylight = (byte) (0.2f * Configuration.MAX_LIGHT);
+        } else if (_time >= 0 && _time <= 5) {
+            _daylight = (byte) (0.1f * Configuration.MAX_LIGHT);
         } else if (_time == 6) {
             _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
         } else if (_time == 7) {
-            _daylight = (byte) (0.6f * Configuration.MAX_LIGHT);
+            _daylight = (byte) (0.7f * Configuration.MAX_LIGHT);
         } else if (_time >= 8 && _time < 18) {
             _daylight = (byte) Configuration.MAX_LIGHT;
         }
@@ -270,7 +270,7 @@ public final class World extends RenderableObject {
     private void replantDirt() {
         // Pick one chunk for grass updates every 100 ms
         if (Helper.getInstance().getTime() - _latestDirtEvolvement > 100) {
-            
+
             // Do NOT replant chunks when updates are queued...
             // And do NOT replant chunks during the night...
             if (_chunkUpdateManager.updatesSize() > 0 || isNighttime() || _visibleChunks.isEmpty()) {
@@ -471,6 +471,8 @@ public final class World extends RenderableObject {
         }
 
         if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0x0) {
+            
+            if (Block.getBlockForType(c.getBlock(blockPosX, y, blockPosZ)).isRemovable())
             c.setBlock(blockPosX, y, blockPosZ, type);
 
             if (update) {
@@ -488,23 +490,26 @@ public final class World extends RenderableObject {
                 if (newValue > oldValue) {
                     c.spreadLight(blockPosX, y, blockPosZ, newValue, Chunk.LIGHT_TYPE.SUN);
                 } else if (newValue < oldValue) {
-                    // TODO: Unspread light
+                    // TODO: Unspread sunlight
+                    //c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.BLOCK);
                 }
 
-                /*
-                 * Update block light.
-                 */
-                c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.BLOCK);
 
                 /*
                  * Spread light of block light sources.
                  */
                 byte luminance = Block.getBlockForType(type).getLuminance();
 
-                byte blockLightValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
-                if (luminance > blockLightValue) {
-                    c.setLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
+                oldValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+                c.setLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
+                newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+
+                if (newValue > oldValue) {
                     c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
+                } else {
+                    c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.BLOCK);
+                    // TODO: Unspread block light
+                    //c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.BLOCK);
                 }
 
                 /*

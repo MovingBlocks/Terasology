@@ -15,15 +15,12 @@
  */
 package com.github.begla.blockmania.world;
 
-import gnu.trove.list.TLinkable;
-
 /**
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ChunkUpdate implements Comparable<ChunkUpdate>, TLinkable<ChunkUpdate> {
+public final class ChunkUpdate implements Comparable<ChunkUpdate> {
 
-    private ChunkUpdate _next, _prev;
     private boolean _updateNeighbors;
     private Chunk _chunk;
 
@@ -95,41 +92,5 @@ public class ChunkUpdate implements Comparable<ChunkUpdate>, TLinkable<ChunkUpda
         int hash = 5;
         hash = 37 * hash + (this._chunk != null ? this._chunk.hashCode() : 0);
         return hash;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    @Override
-    public ChunkUpdate getNext() {
-        return _next;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    @Override
-    public ChunkUpdate getPrevious() {
-        return _prev;
-    }
-
-    /**
-     * 
-     * @param t
-     */
-    @Override
-    public void setNext(ChunkUpdate t) {
-        _next = t;
-    }
-
-    /**
-     * 
-     * @param t
-     */
-    @Override
-    public void setPrevious(ChunkUpdate t) {
-        _prev = t;
     }
 }

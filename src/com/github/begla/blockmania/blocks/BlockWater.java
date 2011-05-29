@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.Helper;
@@ -54,6 +53,11 @@ public class BlockWater extends Block {
 
     @Override
     public boolean renderBoundingBox() {
+        return false;
+    }
+
+    @Override
+    public boolean isRemovable() {
         return false;
     }
 }

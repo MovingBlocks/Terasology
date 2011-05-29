@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.utilities;
 
-import javolution.util.FastList;
+import java.util.LinkedList;
+import java.util.concurrent.ArrayBlockingQueue;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -25,8 +25,7 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class VectorPool {
 
-    static FastList<Vector3f> _pool = new FastList<Vector3f>();
-    static int _reUseCounter = 0;
+    static ArrayBlockingQueue<Vector3f> _pool = new ArrayBlockingQueue<Vector3f>(512);
 
     /**
      * 
@@ -36,13 +35,7 @@ public class VectorPool {
      * @return
      */
     public static Vector3f getVector(float x, float y, float z) {
-        Vector3f v = null;
-        
-        try {
-            v = _pool.removeFirst();
-            _reUseCounter++;
-        } catch (Exception e) {
-        }
+        Vector3f v = _pool.poll();
 
         if (v == null) {
             v = new Vector3f(x, y, z);
@@ -66,6 +59,8 @@ public class VectorPool {
      * @param v
      */
     public static void putVector(Vector3f v) {
-        _pool.add(v);
+        if (_pool.size() < 512) {
+            _pool.add(v);
+        }
     }
 }

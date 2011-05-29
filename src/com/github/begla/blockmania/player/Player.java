@@ -66,8 +66,8 @@ public final class Player extends RenderableObject {
     public void render() {
 
         if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
-            float bobbing2 = _pGen.noise(_position.x / 1.5f, _position.z / 1.5f, 0f) * 2f;
-            glRotatef(bobbing2, 0f, 0f, 1f);
+            float bobbing2 = _pGen.noise(_position.x, _position.z, 0f);
+            glRotatef(bobbing2, 1f, 0f, 0f);
         }
 
         glRotatef((float) _pitch, 1f, 0f, 0f);

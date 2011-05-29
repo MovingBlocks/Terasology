@@ -29,7 +29,7 @@ import org.lwjgl.util.vector.Vector2f;
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Helper {
+public final class Helper {
 
     /**
      * 

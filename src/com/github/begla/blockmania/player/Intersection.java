@@ -24,7 +24,7 @@ import org.lwjgl.util.vector.Vector3f;
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Intersection implements Comparable<Intersection> {
+public final class Intersection implements Comparable<Intersection> {
 
     /**
      *

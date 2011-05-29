@@ -35,4 +35,9 @@ public class BlockHardStone extends Block {
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
         return Helper.getInstance().calcOffsetForTextureAt(1, 1);
     }
+
+    @Override
+    public boolean isRemovable() {
+        return false;
+    }
 }

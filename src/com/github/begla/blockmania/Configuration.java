@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.utilities.VectorPool;
@@ -53,7 +52,7 @@ public final class Configuration {
     /**
      * Display mode for windowed mode
      */
-    public static final DisplayMode DISPLAY_MODE = new DisplayMode(1280,720);
+    public static final DisplayMode DISPLAY_MODE = new DisplayMode(1280, 720);
     /**
      * If set true, the display is rendered as a
      * fullscreen application.
@@ -75,12 +74,12 @@ public final class Configuration {
     /**
      * The intensity the sides of blocks should be dimmed.
      */
-    public static final float BLOCK_SIDE_DIMMING = 0.05f;
+    public static final float BLOCK_SIDE_DIMMING = 0.1f;
     /**
      * At which intensity the light is absorbed within
      * translucent blocks.
      */
-    public static final float LIGHT_ABSORPTION = 0.0625f;
+    public static final float LIGHT_ABSORPTION = 1f;
     /**
      * The hash map storing numeric settings.
      */
@@ -89,7 +88,11 @@ public final class Configuration {
      * The hash map storing boolean settings.
      */
     public static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
-
+    /**
+     * 
+     */
+    public static final float BRIGHTNESS_FACTOR = 0.95f;
+    
     static {
         loadSettings();
     }

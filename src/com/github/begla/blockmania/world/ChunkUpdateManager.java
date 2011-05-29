@@ -23,9 +23,9 @@ import javolution.util.FastList;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ChunkUpdateManager {
+public final class ChunkUpdateManager {
 
-    private final FastList<Chunk> displayListUpdates = new FastList<Chunk>(32);
+    private final FastList<Chunk> _displayListUpdates = new FastList<Chunk>(128);
     private final FastList<ChunkUpdate> _chunkUpdates = new FastList<ChunkUpdate>(1024);
     private int _amountGeneratedChunks = 0;
     private double _meanUpdateDuration = 0.0f;
@@ -68,14 +68,14 @@ public class ChunkUpdateManager {
      * 
      */
     public void updateDisplayLists() {
-        if (!displayListUpdates.isEmpty()) {
+        if (!_displayListUpdates.isEmpty()) {
             // Take one chunk from the queue
-            Chunk c = displayListUpdates.valueOf(displayListUpdates.head().getNext());
+            Chunk c = _displayListUpdates.valueOf(_displayListUpdates.head().getNext());
             if (c != null) {
                 // Generate the display list of the center chunk
                 c.generateDisplayLists();
                 // Remove the center chunk
-                displayListUpdates.remove(c);
+                _displayListUpdates.remove(c);
 
                 Chunk[] neighbors = c.loadOrCreateNeighbors();
 
@@ -182,7 +182,7 @@ public class ChunkUpdateManager {
                  * ... if yes, regenerate the vertex arrays
                  */
                 cu.getChunk().generateVertexArrays();
-                displayListUpdates.add(cu.getChunk());
+                _displayListUpdates.add(cu.getChunk());
                 _amountGeneratedChunks++;
             }
         }
@@ -201,7 +201,7 @@ public class ChunkUpdateManager {
      * @return
      */
     public int updatesDLSize() {
-        return displayListUpdates.size();
+        return _displayListUpdates.size();
     }
 
     /**

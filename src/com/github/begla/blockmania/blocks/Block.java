@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.AABB;
@@ -159,13 +158,29 @@ public abstract class Block {
     public boolean renderBoundingBox() {
         return true;
     }
-    
+
     /**
      * 
      * @return
      */
     public byte getLuminance() {
         return 0;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public byte getHardness() {
+        return 8;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public boolean isRemovable() {
+        return true;
     }
 
     /**
