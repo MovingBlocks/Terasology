@@ -236,9 +236,9 @@ public final class Player extends RenderableObject {
         Intersection r = calcSelectedBlock();
         Vector3f bp = r.getBlockPos();
         byte blockType = _parent.getBlock((int) bp.x, (int) bp.y, (int) bp.z);
-        byte blockLight = _parent.getMaxLight((int) bp.x, (int) bp.y, (int) bp.z);
+        float light = _parent.getRenderingLightValue((int) bp.x, (int) bp.y, (int) bp.z);
 
-        return String.format("%s (t: %d, l: %d) ", r, blockType, blockLight);
+        return String.format("%s (t: %d, l: %f) ", r, blockType, light);
     }
 
     /**
@@ -407,9 +407,9 @@ public final class Player extends RenderableObject {
          */
         FastList<BlockPosition> blockPositions = new FastList<BlockPosition>();
 
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                for (int y = -1; y <= 1; y++) {
+        for (int x = -1; x < 2; x++) {
+            for (int z = -1; z < 2; z++) {
+                for (int y = -1; y < 2; y++) {
                     int blockPosX = (int) (origin.x + x + 0.5f);
                     int blockPosY = (int) (origin.y + y + 0.5f);
                     int blockPosZ = (int) (origin.z + z + 0.5f);

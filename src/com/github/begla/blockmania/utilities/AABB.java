@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.utilities;
 
 import com.github.begla.blockmania.RenderableObject;
@@ -78,6 +77,7 @@ public class AABB extends RenderableObject {
 
     @Override
     public void render() {
+        float offset = 0.001f;
 
         glPushMatrix();
         glTranslatef(_position.x, _position.y, _position.z);
@@ -87,50 +87,50 @@ public class AABB extends RenderableObject {
 
         // FRONT
         glBegin(GL_LINE_LOOP);
-        glVertex3f(-_dimensions.x, -_dimensions.y, -_dimensions.z);
-        glVertex3f(+_dimensions.x, -_dimensions.y, -_dimensions.z);
-        glVertex3f(+_dimensions.x, +_dimensions.y, -_dimensions.z);
-        glVertex3f(-_dimensions.x, +_dimensions.y, -_dimensions.z);
+        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
+        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
         glEnd();
 
         // BACK
         glBegin(GL_LINE_LOOP);
-        glVertex3f(-_dimensions.x, -_dimensions.y, +_dimensions.z);
-        glVertex3f(+_dimensions.x, -_dimensions.y, +_dimensions.z);
-        glVertex3f(+_dimensions.x, +_dimensions.y, +_dimensions.z);
-        glVertex3f(-_dimensions.x, +_dimensions.y, +_dimensions.z);
+        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
+        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
         glEnd();
 
         // TOP
         glBegin(GL_LINE_LOOP);
-        glVertex3f(-_dimensions.x, -_dimensions.y, -_dimensions.z);
-        glVertex3f(+_dimensions.x, -_dimensions.y, -_dimensions.z);
-        glVertex3f(+_dimensions.x, -_dimensions.y, +_dimensions.z);
-        glVertex3f(-_dimensions.x, -_dimensions.y, +_dimensions.z);
+        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
         glEnd();
 
         // BOTTOM
         glBegin(GL_LINE_LOOP);
-        glVertex3f(-_dimensions.x, +_dimensions.y, -_dimensions.z);
-        glVertex3f(+_dimensions.x, +_dimensions.y, -_dimensions.z);
-        glVertex3f(+_dimensions.x, +_dimensions.y, +_dimensions.z);
-        glVertex3f(-_dimensions.x, +_dimensions.y, +_dimensions.z);
+        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
+        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
+        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
+        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
         glEnd();
 
         // LEFT
         glBegin(GL_LINE_LOOP);
-        glVertex3f(-_dimensions.x, -_dimensions.y, -_dimensions.z);
-        glVertex3f(-_dimensions.x, -_dimensions.y, +_dimensions.z);
-        glVertex3f(-_dimensions.x, +_dimensions.y, +_dimensions.z);
-        glVertex3f(-_dimensions.x, +_dimensions.y, -_dimensions.z);
+        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
+        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
         glEnd();
 
         // RIGHT
         glBegin(GL_LINE_LOOP);
-        glVertex3f(_dimensions.x, -_dimensions.y, -_dimensions.z);
-        glVertex3f(_dimensions.x, -_dimensions.y, +_dimensions.z);
-        glVertex3f(_dimensions.x, +_dimensions.y, +_dimensions.z);
-        glVertex3f(_dimensions.x, +_dimensions.y, -_dimensions.z);
+        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
+        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
         glEnd();
         glPopMatrix();
     }
