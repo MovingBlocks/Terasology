@@ -223,8 +223,7 @@ public final class Main {
     }
 
     /**
-     * Starts the render loop. The application can be terminated by pressing
-     * the ESCAPE key.
+     * Starts the render loop.
      */
     private void start() {
         Helper.LOGGER.log(Level.INFO, "Starting the game...");

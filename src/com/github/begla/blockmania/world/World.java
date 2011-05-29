@@ -679,7 +679,7 @@ public final class World extends RenderableObject {
      * @param oldValue
      * @param depth  
      */
-    public void unspreadLight(int x, int y, int z, byte oldValue, int depth) {
+    public void unspreadLight(int x, int y, int z, byte oldValue, int depth, Chunk.LIGHT_TYPE type) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
 
@@ -689,7 +689,7 @@ public final class World extends RenderableObject {
         Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
-            c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth);
+            c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth, type);
         }
     }
 

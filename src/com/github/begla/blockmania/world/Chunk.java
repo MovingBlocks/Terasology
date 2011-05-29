@@ -1165,8 +1165,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param z 
      * @param oldLightValue 
      */
-    public void unspreadLight(int x, int y, int z, byte oldLightValue) {
-        unspreadLight(x, y, z, oldLightValue, 0);
+    public void unspreadLight(int x, int y, int z, byte oldLightValue, LIGHT_TYPE type) {
+        unspreadLight(x, y, z, oldLightValue, 0, type);
     }
 
     /**
@@ -1178,8 +1178,65 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param depth 
      * @param oldLightValue 
      */
-    public void unspreadLight(int x, int y, int z, byte oldLightValue, int depth) {
-        throw new NotImplementedException();
+    public void unspreadLight(int x, int y, int z, byte oldLightValue, int depth, LIGHT_TYPE type) {
+        if (depth > oldLightValue) {
+            return;
+        }
+
+        int blockPosX = getBlockWorldPosX(x);
+        int blockPosY = getBlockWorldPosY(y);
+        int blockPosZ = getBlockWorldPosZ(z);
+
+        byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ, type);
+        byte type1 = _parent.getBlock(blockPosX + 1, blockPosY, blockPosZ);
+        byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ, type);
+        byte type2 = _parent.getBlock(blockPosX - 1, blockPosY, blockPosZ);
+        byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1, type);
+        byte type3 = _parent.getBlock(blockPosX, blockPosY, blockPosZ + 1);
+        byte val4 = _parent.getLight(blockPosX, blockPosY, blockPosZ - 1, type);
+        byte type4 = _parent.getBlock(blockPosX, blockPosY, blockPosZ - 1);
+        byte val5 = _parent.getLight(blockPosX, blockPosY + 1, blockPosZ, type);
+        byte type5 = _parent.getBlock(blockPosX, blockPosY + 1, blockPosZ);
+        byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ, type);
+        byte type6 = _parent.getBlock(blockPosX, blockPosY - 1, blockPosZ);
+
+        byte newLightValue = 0;
+        newLightValue = (byte) (oldLightValue - depth);
+
+        _parent.setLight(blockPosX, blockPosY, blockPosZ, (byte) 0, type);
+
+        if (oldLightValue <= 0) {
+            return;
+        }
+
+        if (val1 < newLightValue - 1 && Block.getBlockForType(type1).isBlockTypeTranslucent()) {
+            _parent.unspreadLight(blockPosX + 1, blockPosY, blockPosZ, oldLightValue, depth + 1, type);
+        }
+
+
+        if (val2 < newLightValue - 1 && Block.getBlockForType(type2).isBlockTypeTranslucent()) {
+            _parent.unspreadLight(blockPosX - 1, blockPosY, blockPosZ, oldLightValue, depth + 1, type);
+        }
+
+
+        if (val3 < newLightValue - 1 && Block.getBlockForType(type3).isBlockTypeTranslucent()) {
+            _parent.unspreadLight(blockPosX, blockPosY, blockPosZ + 1, oldLightValue, depth + 1, type);
+        }
+
+
+        if (val4 < newLightValue - 1 && Block.getBlockForType(type4).isBlockTypeTranslucent()) {
+            _parent.unspreadLight(blockPosX, blockPosY, blockPosZ - 1, oldLightValue, depth + 1, type);
+        }
+
+
+        if (val5 < newLightValue - 1 && Block.getBlockForType(type5).isBlockTypeTranslucent()) {
+            _parent.unspreadLight(blockPosX, blockPosY + 1, blockPosZ, oldLightValue, depth + 1, type);
+        }
+
+
+        if (val6 < newLightValue - 1 && Block.getBlockForType(type6).isBlockTypeTranslucent()) {
+            _parent.unspreadLight(blockPosX, blockPosY - 1, blockPosZ, oldLightValue, depth + 1, type);
+        }
     }
 
     /**
