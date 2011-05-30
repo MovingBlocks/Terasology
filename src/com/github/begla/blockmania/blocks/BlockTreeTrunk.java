@@ -21,44 +21,17 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
- * A high grass billboard block.
+ * A tree trunk.
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockHighGrass extends Block {
-
-    @Override
-    public boolean isBlockTypeTranslucent() {
-        return true;
-    }
-
-    @Override
-    public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(100f / 255f, 163f / 255f, 22f / 255f, 1.0f);
-    }
-
+public class BlockTreeTrunk extends Block {
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(12, 6);
-    }
-
-    @Override
-    public boolean isBlockBillboard() {
-        return true;
-    }
-
-    @Override
-    public boolean isPenetrable() {
-        return true;
-    }
-
-    @Override
-    public boolean isCastingShadows() {
-        return false;
-    }
-
-    @Override
-    public boolean renderBoundingBox() {
-        return false;
+        if (side == SIDE.LEFT || side == SIDE.RIGHT || side == SIDE.FRONT || side == SIDE.BACK) {
+            return Helper.getInstance().calcOffsetForTextureAt(4, 1);
+        } else {
+            return Helper.getInstance().calcOffsetForTextureAt(5, 1);
+        }
     }
 }

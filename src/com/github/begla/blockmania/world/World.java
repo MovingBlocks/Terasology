@@ -215,6 +215,8 @@ public final class World extends RenderableObject {
      * Stops the updating thread and writes all chunks to disk.
      */
     public void dispose() {
+        Helper.LOGGER.log(Level.INFO, "Disposing world {0} and saving all chunks.", _title);
+        
         synchronized (_updateThread) {
             _updateThreadAlive = false;
             _updateThread.notify();
@@ -1081,6 +1083,13 @@ public final class World extends RenderableObject {
                 return VectorPool.getVector(xz, height + 16, xz);
             }
         }
+    }
+    
+    /**
+     * Sets the spawning point to the player's current position.
+     */
+    public void setSpawningPoint() {
+        _spawningPoint = new Vector3f(_player.getPosition());
     }
 
     /**

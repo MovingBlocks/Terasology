@@ -57,6 +57,7 @@ public final class Main {
     private final StringBuffer _consoleInput = new StringBuffer();
     private boolean _pauseGame = false;
     private boolean _runGame = true;
+    private boolean _saveWorldOnExit = true;
     /* ------- */
     private float _meanFps;
     private float _memoryUsage;
@@ -235,7 +236,7 @@ public final class Main {
         /*
          * Main game loop.
          */
-        while (_runGame) {
+        while (_runGame && !Display.isCloseRequested()) {
             updateStatistics();
             processKeyboardInput();
             processMouseInput();
@@ -255,6 +256,12 @@ public final class Main {
             Display.update();
         }
 
+        /*
+         * Save the world and exit the application.
+         */
+        if (_saveWorldOnExit) {
+            _world.dispose();
+        }
         Display.destroy();
     }
 
@@ -409,7 +416,7 @@ public final class Main {
                     success = true;
                     // Otherwise try lookup the given variable within the settings
                 } else {
-
+                    
                     Boolean bRes = Configuration.getSettingBoolean(parsingResult.get(1).toUpperCase());
 
                     if (bRes != null) {
@@ -434,11 +441,12 @@ public final class Main {
                 _player.setPosition(VectorPool.getVector(x, y, z));
                 success = true;
             } else if (parsingResult.get(0).equals("exit")) {
-                _world.dispose();
-                System.exit(0);
+                _saveWorldOnExit = true;
+                _runGame = false;
                 success = true;
             } else if (parsingResult.get(0).equals("exit!")) {
-                System.exit(0);
+                _saveWorldOnExit = false;
+                _runGame = false;
                 success = true;
             } else if (parsingResult.get(0).equals("info")) {
                 Helper.LOGGER.log(Level.INFO, _player.selectedBlockInformation());
@@ -460,6 +468,9 @@ public final class Main {
                 success = true;
             } else if (parsingResult.get(0).equals("update_all")) {
                 _world.updateAllChunks();
+                success = true;
+            } else if (parsingResult.get(0).equals("set_spawn")) {
+                _world.setSpawningPoint();
                 success = true;
             }
         } catch (IndexOutOfBoundsException e) {
@@ -517,7 +528,6 @@ public final class Main {
                 Helper.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
-        Helper.LOGGER.log(Level.INFO, "Finished!", seed);
 
         // Reset the delta value
         _lastLoopTime = Helper.getInstance().getTime();

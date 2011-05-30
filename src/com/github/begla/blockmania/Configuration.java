@@ -67,11 +67,11 @@ public final class Configuration {
     /**
      * The intensity at which surrounding blocks 'dim' each other.
      */
-    public static final float OCCLUSION_INTENS = 0.05f;
+    public static final float OCCLUSION_INTENS = 0.95f;
     /**
      * The intensity at which the front and back side of blocks are constantly 'dimmed'.
      */
-    public static final float BLOCK_SIDE_DIMMING = 0.1f;
+    public static final float BLOCK_SIDE_DIMMING = 0.125f;
     /**
      * Intensity of light absorption applied to sunlight passing through translucent blocks.
      */

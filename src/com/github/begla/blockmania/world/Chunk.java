@@ -15,6 +15,9 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.blocks.BlockLeaf;
+import com.github.begla.blockmania.blocks.BlockGlass;
+import com.github.begla.blockmania.blocks.BlockAir;
 import java.util.ArrayList;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.Helper;
@@ -1021,7 +1024,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * NOTE: Air and leafs have to be handled separately. Otherwise the water surface would not be displayed due to the tessellation process.
      */
     private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock) {
-        return blockToCheck == 0x0 || blockToCheck == 0x6 || Block.getBlockForType(blockToCheck).isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
+        Block bCheck = Block.getBlockForType(blockToCheck);
+        Block cBlock = Block.getBlockForType(currentBlock);
+        
+        return bCheck.getClass() == BlockAir.class ||  bCheck.getClass() == BlockLeaf.class ||  bCheck.getClass() == BlockGlass.class || Block.getBlockForType(blockToCheck).isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
     }
 
     /**
@@ -1453,35 +1459,27 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @return Occlusion amount
      */
     public float calcSimpleOcclusionAmount(int x, int y, int z, int dirX, int dirY, int dirZ) {
-        int counter = 0;
         float intens = 0f;
 
-        Vector3f origin = VectorPool.getVector(x, y, z);
         ArrayList<Vector3f> positions = new ArrayList<Vector3f>();
         positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ));
         positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ));
         positions.add(VectorPool.getVector(x + dirX, y + dirY, z + dirZ + 1));
         positions.add(VectorPool.getVector(x + dirX, y + dirY, z + dirZ - 1));
-        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ + 1));
-        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ - 1));
-        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ - 1));
-        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ + 1));
+//        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ + 1));
+//        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ - 1));
+//        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ - 1));
+//        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ + 1));
 
         for (Vector3f p : positions) {
-            if (!p.equals(origin)) {
-                /*
-                 * Check for blocks which 'cast shadows' and ignore the originating block.
-                 */
-                if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX((int) p.x), getBlockWorldPosY((int) p.y), getBlockWorldPosZ((int) p.z))).isCastingShadows()) {
-                    counter++;
-                }
+            if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX((int) p.x), getBlockWorldPosY((int) p.y), getBlockWorldPosZ((int) p.z))).isCastingShadows()) {
+                intens += 1f / 16f;
             }
 
             VectorPool.putVector(p);
         }
 
-        intens = Configuration.OCCLUSION_INTENS * (float) Math.sqrt(counter);
-        return 1f - intens;
+        return 1f - (intens * Configuration.OCCLUSION_INTENS);
     }
 
     /**
