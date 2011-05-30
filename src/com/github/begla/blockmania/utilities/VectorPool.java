@@ -15,7 +15,6 @@
  */
 package com.github.begla.blockmania.utilities;
 
-import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import org.lwjgl.util.vector.Vector3f;
 
