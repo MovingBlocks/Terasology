@@ -23,7 +23,7 @@ import com.github.begla.blockmania.blocks.BlockDirt;
 import com.github.begla.blockmania.blocks.BlockWater;
 
 /**
- * Generates grass (from dirt blocks), flowers and high grass.
+ * Generates grass (substitutes dirt blocks), flowers and high grass.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -39,7 +39,8 @@ public class ChunkGeneratorFlora extends ChunkGeneratorForest {
     }
 
     /**
-     *
+     * Apply the generation process to the given chunk.
+     * 
      * @param c
      */
     @Override

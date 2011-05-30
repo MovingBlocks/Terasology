@@ -47,12 +47,12 @@ public abstract class ObjectGenerator {
     }
 
     /**
-     * Generates an object at the given origin.
+     * Generates an object at the given position.
      *
-     * @param posX Origin on the x-axis
-     * @param posY Origin on the y-axis
-     * @param posZ Origin on the z-axis
-     * @param update If true the chunk will be queued for updating
+     * @param posX Position on the x-axis
+     * @param posY Position on the y-axis
+     * @param posZ Position on the z-axis
+     * @param update If true, the chunk will be queued for updating
      */
     public void generate(int posX, int posY, int posZ, boolean update) {
         throw new NotImplementedException();

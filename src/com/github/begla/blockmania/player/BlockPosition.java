@@ -20,7 +20,9 @@ import com.github.begla.blockmania.utilities.VectorPool;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
- *
+ * Represents the position of a block. This class is used within the
+ * collision detection process.
+ * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class BlockPosition implements Comparable<BlockPosition> {
@@ -29,10 +31,10 @@ public final class BlockPosition implements Comparable<BlockPosition> {
      * Position on the x-axis.
      */
     /**
-     * osition on the y-axis.
+     * Position on the y-axis.
      */
     /**
-     * osition on the z-axis.
+     * Position on the z-axis.
      */
     public int x, y, z;
     private Vector3f _origin;

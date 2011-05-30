@@ -46,7 +46,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
- * determined by the dimension of the chunk. Chunks are used to manage the world efficiently and
+ * determined its dimensions. Chunks are used to manage the world efficiently and
  * to reduce the batch count within the render loop.
  *
  * Chunks are tessellated on creation and saved to vertex arrays. From those display lists are generated
@@ -257,7 +257,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Tries to load a chunk from disk. If the chunk is not present
+     * Tries to load a chunk from disk. If the chunk is not present,
      * it is created from scratch.
      *
      * @return True if a generation has been executed
@@ -288,12 +288,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Updates the absorption of this chunk.
+     * Updates the light of this chunk.
      */
     public void updateLight() {
-        // Light updates are only allowed if the initial sunlight
-        // was calculated
-        if (!_fresh) {
+        if (!_fresh) { // Do NOT update fresh chunks
             for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
                     for (int y = 0; y < (int) Configuration.CHUNK_DIMENSIONS.y; y++) {
@@ -871,7 +869,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Generates the display lists from the precalculated arrays.
+     * Generates the display lists from the pre calculated arrays.
      */
     public synchronized void generateDisplayLists() {
         // Check if the vertex arrays are present
@@ -1017,10 +1015,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Returns true if the block side is ajdacent to a translucent block or an air
+     * Returns true if the block side is adjacent to a translucent block or an air
      * block.
      *
-     * NOTE: Air and leafs have to be handled separatly. Otherwise the water surface would not be displayed due to the tessellation process.
+     * NOTE: Air and leafs have to be handled separately. Otherwise the water surface would not be displayed due to the tessellation process.
      */
     private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock) {
         return blockToCheck == 0x0 || blockToCheck == 0x6 || Block.getBlockForType(blockToCheck).isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
@@ -1098,7 +1096,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
             if (b.isBlockTypeTranslucent() && !covered) {
                 byte light = (byte) ((float) Configuration.MAX_LIGHT - absorption);
-               
+
                 byte oldValue = _sunlight[x][y][z];
                 _sunlight[x][y][z] = light;
                 byte newValue = _sunlight[x][y][z];
@@ -1140,7 +1138,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         byte bType = getBlock(x, y, z);
 
-        // If a block was placed, remove the absorption value at this point
+        // If a block was placed, remove the light value at this point
         if (!Block.getBlockForType(bType).isBlockTypeTranslucent()) {
             setLight(x, y, z, (byte) 0, type);
         } else {
@@ -1160,7 +1158,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
                 max = 0;
             }
 
-            // Do nothing if the current absorption value is brighter
+            // Do nothing if the current light value is brighter
             byte res = (byte) Math.max(max, val);
 
             setLight(x, y, z, res, type);
@@ -1168,32 +1166,34 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * TODO: Implement "removal" of absorption
+     * TODO: Implement "removal" of light
      * 
      * @param x
      * @param y
      * @param z 
-     * @param oldLightValue 
+     * @param oldLightValue
+     * @param type  
      */
     public void unspreadLight(int x, int y, int z, byte oldLightValue, LIGHT_TYPE type) {
         unspreadLight(x, y, z, oldLightValue, 0, type);
     }
 
     /**
-     * TODO: Implement "removal" of absorption
+     * TODO: Implement "removal" of light
      * 
      * @param x
      * @param y
      * @param z 
      * @param depth 
-     * @param oldLightValue 
+     * @param oldLightValue
+     * @param type  
      */
     public void unspreadLight(int x, int y, int z, byte oldLightValue, int depth, LIGHT_TYPE type) {
         throw new NotImplementedException();
     }
 
     /**
-     * Recursive absorption calculation.
+     * Recursive light calculation.
      * 
      * @param x
      * @param y
@@ -1206,7 +1206,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Recursive absorption calculation.
+     * Recursive light calculation.
      * 
      * @param x
      * @param y
@@ -1277,7 +1277,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Returns the amount of blocks with a value greater than zero.
+     * Returns the amount of blocks within this chunk.
      *
      * @return The amount of blocks
      */
@@ -1298,6 +1298,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
     /**
      * Calculates the distance of the chunk to the player.
+     * 
      * @return The distance of the chunk to the player
      */
     public double calcDistanceToPlayer() {
@@ -1305,13 +1306,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Returns the absorption intensity at a given local block position.
+     * Returns the light intensity at a given local block position.
      *
      * @param x Local block position on the x-axis
      * @param y Local block position on the y-axis
      * @param z Local block position on the z-axis
      * @param type 
-     * @return The absorption intensity
+     * @return The light intensity
      */
     public byte getLight(int x, int y, int z, LIGHT_TYPE type) {
         if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
@@ -1341,12 +1342,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     }
 
     /**
-     * Sets the absorption value at the given position.
+     * Sets the light value at the given position.
      * 
      * @param x Local block position on the x-axis
      * @param y Local block position on the y-axis
      * @param z Local block position on the z-axis
-     * @param result The absorption intensity to set
+     * @param intens 
      * @param type  
      */
     public void setLight(int x, int y, int z, byte intens, LIGHT_TYPE type) {
@@ -1408,13 +1409,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
             Block b = Block.getBlockForType(type);
 
-            // If an opaque block was set, remove the absorption from this field
+            // If an opaque block was set, remove the light from this field
             if (!b.isBlockTypeTranslucent()) {
                 _sunlight[x][y][z] = 0;
             }
 
             if (oldValue != type) {
-                // Update vertex arrays and absorption
+                // Update vertex arrays and light
                 setDirty(true);
                 // Mark the neighbors as dirty
                 markNeighborsDirty(x, z);
@@ -1446,6 +1447,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param x Local block position on the x-axis
      * @param y Local block position on the y-axis
      * @param z Local block position on the z-axis
+     * @param dirX 
+     * @param dirY 
+     * @param dirZ 
      * @return Occlusion amount
      */
     public float calcSimpleOcclusionAmount(int x, int y, int z, int dirX, int dirY, int dirZ) {
@@ -1591,7 +1595,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     /**
      * Saves this chunk to disk.
      * 
-     * TODO: Chunks use a lot of memory... Precisely 65536 Bytes (0.0625 MB) per Chunk.
+     * TODO: Chunks use a lot of memory...
      * 
      * @return 
      */

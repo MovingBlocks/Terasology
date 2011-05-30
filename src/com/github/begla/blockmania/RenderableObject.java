@@ -32,13 +32,13 @@ public abstract class RenderableObject {
     protected Vector3f _position = VectorPool.getVector();
 
     /**
-     * Rendering operations have to be place here.
+     * Rendering operations have to be placed here.
      */
     public void render() {
     }
 
     /**
-     * Updating operations have to placed here.
+     * Updating operations have to be placed here.
      */
     public void update() {
     }

@@ -137,10 +137,12 @@ public final class Main {
      * Initializes OpenGL.
      */
     private void initGL() {
-        // Init. the fonts
+        // Init. fonts
         _font1 = new TrueTypeFont(new Font("Arial", Font.PLAIN, 12), true);
 
-        // Init. OpenGL
+        /*
+         * Init. OpenGL
+         */
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_FOG);
@@ -151,9 +153,6 @@ public final class Main {
             Helper.LOGGER.log(Level.INFO, "Extension 'GL_NV_fog_distance' is supported.");
         }
 
-        //glPolygonOffset(0.1f, 0.1f);
-        //glEnable(GL_POLYGON_OFFSET_FILL);
-
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_FOG_HINT, GL_NICEST);
         glFogi(GL_FOG_MODE, GL_LINEAR);
@@ -163,9 +162,11 @@ public final class Main {
         Chunk.init();
         World.init();
 
-        // Init. the player and a world
+        /*
+         * Init. player and world
+         */
         _player = new Player();
-        // Generate a world with a "random" seed value
+        // Generate a world with a random seed value
         String worldSeed = Configuration.DEFAULT_SEED;
         if (worldSeed.length() == 0) {
             worldSeed = _rand.randomCharacterString(16);
@@ -174,13 +175,13 @@ public final class Main {
     }
 
     /**
-     * Renders the scene, player and HUD.
+     * Renders the scene.
      */
     private void render() {
         // Use the color of the sky for clearing
         glClearColor(_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f);
 
-        // Color the fog like the sky
+        // Fog has the same color as the sky
         float[] fogColor = {_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f};
         FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
         fogColorBuffer.put(fogColor);
@@ -202,12 +203,11 @@ public final class Main {
 
         _player.render();
         _world.render();
-
         renderHUD();
     }
 
     /**
-     * Resizes the viewport according to the chosen display with and height.
+     * Resizes the viewport according to the chosen display width and height.
      */
     private void resizeGL() {
         glViewport(0, 0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight());
@@ -259,7 +259,7 @@ public final class Main {
     }
 
     /**
-     * Updates the player and the world.
+     * Updates the player and world.
      */
     private void update() {
         _world.update();
@@ -283,8 +283,10 @@ public final class Main {
         glEnable(GL_BLEND);
         glEnable(GL_TEXTURE_2D);
 
+        /*
+         * Draw debugging information.
+         */
         if (Configuration.getSettingBoolean("SHOW_DEBUG_INFORMATION")) {
-            // Draw debugging information
             _font1.drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage, Color.white));
             _font1.drawString(4, 22, String.format("%s", _player, Color.white));
             _font1.drawString(4, 38, String.format("%s", _world, Color.white));
@@ -295,7 +297,6 @@ public final class Main {
             // Display the console input text
             _font1.drawString(4, Display.getDisplayMode().getHeight() - 16 - 4, String.format("%s_", _consoleInput), Color.red);
         }
-
 
         glDisable(GL_TEXTURE_2D);
 
@@ -323,6 +324,9 @@ public final class Main {
         glLoadIdentity();
     }
 
+    /*
+     * Process mouse input.
+     */
     private void processMouseInput() {
         while (Mouse.next()) {
             int button = Mouse.getEventButton();
@@ -331,7 +335,7 @@ public final class Main {
     }
 
     /**
-     * Processes the keyboard input.
+     * Processes keyboard input.
      */
     private void processKeyboardInput() {
         while (Keyboard.next()) {
@@ -485,9 +489,10 @@ public final class Main {
     }
 
     /**
+     * Prepares a new world with a given name and seed value.
      * 
-     * @param title
-     * @param seed
+     * @param title Title of the world
+     * @param seed Seed value used for the generators
      */
     private void initNewWorld(String title, String seed) {
         Helper.LOGGER.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
@@ -518,6 +523,9 @@ public final class Main {
         _lastLoopTime = Helper.getInstance().getTime();
     }
 
+    /**
+     * Updates the game statistics like FPS and memory usage.
+     */
     private void updateStatistics() {
         // Measure a delta value and the frames per second
         long delta = Helper.getInstance().getTime() - _lastLoopTime;

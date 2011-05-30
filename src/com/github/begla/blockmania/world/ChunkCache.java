@@ -39,11 +39,10 @@ public final class ChunkCache {
     }
 
     /**
-     * Loads a specified chunk from the cache or queues a new chunk for
-     * generation.
+     * Loads a specified chunk from cache or queues a new chunk for generation.
      *
      * NOTE: This method ALWAYS returns a valid chunk (if positive x and z values are provided) 
-     * since new chunks get generated if none of the present chunks fit the request.
+     * since a new chunk is generated if none of the present chunks fit the request.
      *
      * @param x X-coordinate of the chunk
      * @param z Z-coordinate of the chunk
@@ -128,7 +127,7 @@ public final class ChunkCache {
     }
 
     /**
-     * Writes all chunks to the disk.
+     * Writes all chunks to disk.
      */
     public void writeAllChunksToDisk() {
         _parent.suspendUpdateThread();

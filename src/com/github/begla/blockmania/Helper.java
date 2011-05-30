@@ -32,11 +32,13 @@ import org.lwjgl.util.vector.Vector2f;
 public final class Helper {
 
     /**
-     * 
+     * The logger used for managing and creating the default log file.
      */
     public static final Logger LOGGER = Logger.getLogger("blockmania");
+    /* ---------- */
     private static final float _div = 1.0f / 16.0f;
     private static final long _timerTicksPerSecond = Sys.getTimerResolution();
+    /* ---------- */
     private static Helper _instance = null;
 
     static {
@@ -50,7 +52,8 @@ public final class Helper {
     }
 
     /**
-     * Returns the static instance of this helper class.
+     * Returns (and creates – if necessary) the static instance
+     * of this helper class.
      *
      * @return The instance
      */
@@ -76,19 +79,19 @@ public final class Helper {
     }
 
     /**
-     * Returns the system time.
+     * Returns the system time in milliseconds.
      * 
-     * @return The system time
+     * @return The system time in milliseconds.
      */
     public long getTime() {
         return (Sys.getTime() * 1000) / _timerTicksPerSecond;
     }
 
     /**
-     * Applies Cantor's pairing function on 2D coordinates.
+     * Applies Cantor's pairing function to 2D coordinates.
      *
-     * @param k1 X-Coordinate
-     * @param k2 Y-Coordinate
+     * @param k1 X-coordinate
+     * @param k2 Y-coordinate
      * @return Unique 1D value
      */
     public int cantorize(int k1, int k2) {
@@ -96,32 +99,35 @@ public final class Helper {
     }
 
     /**
+     * Inverse function of Cantor's pairing function.
      * 
-     * @param z
-     * @return
+     * @param c Cantor value
+     * @return Value along the x-axis
      */
-    public int cantorX(int z) {
-        int j = (int) Math.floor(Math.sqrt(0.25 + 2 * z) - 0.5);
-        return j - cantorY(z);
+    public int cantorX(int c) {
+        int j = (int) Math.floor(Math.sqrt(0.25 + 2 * c) - 0.5);
+        return j - cantorY(c);
     }
 
     /**
+     * Inverse function of Cantor's pairing function.
      * 
-     * @param z
-     * @return
+     * @param c Cantor value
+     * @return Value along the y-axis
      */
-    public int cantorY(int z) {
-        int j = (int) Math.floor(Math.sqrt(0.25 + 2 * z) - 0.5);
-        return z - j * (j + 1) / 2;
+    public int cantorY(int c) {
+        int j = (int) Math.floor(Math.sqrt(0.25 + 2 * c) - 0.5);
+        return c - j * (j + 1) / 2;
     }
 
     /**
+     * Tests if a given position is within the bounds of a given 3D array.
      * 
-     * @param x
-     * @param y
-     * @param z
-     * @param array
-     * @return
+     * @param x X-position
+     * @param y Y-position
+     * @param z Z-position
+     * @param array The array
+     * @return True if the position is within the bounds of the array
      */
     public boolean checkBounds3D(int x, int y, int z, byte[][][] array) {
         int length1 = array.length;
@@ -146,11 +152,12 @@ public final class Helper {
     }
 
     /**
+     * Tests if a given position is within the bounds of a given 2D array.
      * 
-     * @param x
-     * @param y
-     * @param array
-     * @return
+     * @param x X-position
+     * @param y Y-position
+     * @param array The array
+     * @return True if the position is within the bounds of the array
      */
     public boolean checkBounds2D(int x, int y, byte[][] array) {
         int length1 = array.length;
@@ -168,20 +175,23 @@ public final class Helper {
     }
 
     /**
+     * Returns true if the flag at given byte position
+     * is set.
      * 
-     * @param value
-     * @param index
-     * @return
+     * @param value Byte value storing the flags
+     * @param index Index position of the flag
+     * @return True if the flag is set
      */
     public boolean isFlagSet(byte value, short index) {
         return (value & (1 << index)) != 0;
     }
 
     /**
+     * Sets a flag at a given byte position.
      * 
-     * @param value
-     * @param index
-     * @return
+     * @param value Byte value storing the flags
+     * @param index Index position of the flag
+     * @return The byte value containing the modified flag
      */
     public byte setFlag(byte value, short index) {
         return (byte) (value | (1 << index));

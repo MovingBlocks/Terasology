@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.world.Chunk;
@@ -36,7 +35,8 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
     }
 
     /**
-     *
+     * Apply the generation process to the given chunk.
+     * 
      * @param c
      */
     @Override

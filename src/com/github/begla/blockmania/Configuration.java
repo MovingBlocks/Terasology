@@ -22,18 +22,18 @@ import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
- * Stores the game settings.
+ * Helper class to allow global access to properties and game settings.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class Configuration {
 
     /**
-     * The title of the game.
+     * The title string of the game.
      */
     public static final String GAME_TITLE = "Blockmania Pre Alpha";
     /**
-     * The dimensions of a chunk.
+     * The three dimensions of a chunk.
      */
     public static final Vector3f CHUNK_DIMENSIONS = VectorPool.getVector(16, 128, 16);
     /**
@@ -41,8 +41,7 @@ public final class Configuration {
      */
     public static final float SUN_SIZE = 64f;
     /**
-     * The string used to generate the default world. If not set, a random seed
-     * is used on init.
+     * The string used to generate the default world. If not set, a random seed is used.
      */
     public static final String DEFAULT_SEED = "yMfLzKzZvHzQiWhA";
     /**
@@ -50,12 +49,11 @@ public final class Configuration {
      */
     public static final PixelFormat PIXEL_FORMAT = new PixelFormat().withDepthBits(24);
     /**
-     * Display mode for windowed mode
+     * The display mode used for window mode.
      */
     public static final DisplayMode DISPLAY_MODE = new DisplayMode(1280, 720);
     /**
-     * If set true, the display is rendered as a
-     * fullscreen application.
+     * If set to true, the game is rendered as a full screen application.
      */
     public static final boolean FULLSCREEN = false;
     /**
@@ -63,42 +61,35 @@ public final class Configuration {
      */
     public static final byte MAX_LIGHT = 16;
     /**
-     * Mimimum light value.
+     * Minimum light value.
      */
     public static final byte MIN_LIGHT = 0;
     /**
-     * The intensity a block should be dimmed
-     * when it is surrounded by one or more blocks.
+     * The intensity at which surrounding blocks 'dim' each other.
      */
     public static final float OCCLUSION_INTENS = 0.05f;
     /**
-     * The intensity the sides of blocks should be dimmed.
+     * The intensity at which the front and back side of blocks are constantly 'dimmed'.
      */
     public static final float BLOCK_SIDE_DIMMING = 0.1f;
     /**
-     * At which intensity the light is absorbed within
-     * translucent blocks.
+     * Intensity of light absorption applied to sunlight passing through translucent blocks.
      */
     public static final float LIGHT_ABSORPTION = 1f;
     /**
-     * The hash map storing numeric settings.
-     */
-    public static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
-    /**
-     * The hash map storing boolean settings.
-     */
-    public static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
-    /**
-     * 
+     * Global brightness factor, which is applied to vertices on the creation of the display lists.
      */
     public static final float BRIGHTNESS_FACTOR = 0.95f;
-    
+    /* ------- */
+    private static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
+    private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
+
     static {
         loadSettings();
     }
 
     /**
-     * Returns a numeric settings value for a given key.
+     * Returns a numeric value of a setting for a given key.
      * 
      * @param key The key
      * @return The numeric value
@@ -108,7 +99,7 @@ public final class Configuration {
     }
 
     /**
-     * Returns the boolean value for a given key.
+     * Returns the boolean value of a setting for a given key.
      * 
      * @param key The key
      * @return The boolean value
@@ -118,7 +109,7 @@ public final class Configuration {
     }
 
     /**
-     * Sets a boolean settings value for a given key.
+     * Sets a boolean value of a setting for a given key.
      * 
      * @param key The key
      * @param value The boolean value
@@ -128,7 +119,7 @@ public final class Configuration {
     }
 
     /**
-     * Sets a numeric settings value for a given key.
+     * Sets a numeric value of a setting for a given key.
      *
      * @param key The key
      * @param value The numeric value
@@ -138,7 +129,7 @@ public final class Configuration {
     }
 
     /**
-     * 
+     * Loads the default values for the global settings.
      */
     public static void loadDefaults() {
         _settingsBoolean.put("SHOW_PLACING_BOX", true);
@@ -159,7 +150,9 @@ public final class Configuration {
     }
 
     /**
+     * Loads the saved settings.
      * 
+     * TODO: Should not always load the default settings.
      */
     public static void loadSettings() {
         loadDefaults();

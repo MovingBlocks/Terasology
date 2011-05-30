@@ -28,7 +28,7 @@ import org.lwjgl.util.vector.Vector4f;
 public abstract class Block {
 
     /**
-     * The six sides a block has.
+     * The six sides of a block.
      */
     public static enum SIDE {
 

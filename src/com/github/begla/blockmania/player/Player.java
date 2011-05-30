@@ -98,8 +98,6 @@ public final class Player extends RenderableObject {
 
     /**
      * Updates the player.
-     * 
-     * @param delta Delta value since the last frame update
      */
     @Override
     public void update() {
@@ -189,15 +187,14 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * Lets the player jump. Yey.
+     * Lets the player jump.
      */
     public void jump() {
         _jump = true;
     }
 
     /**
-     * Calcluates the currently looked at block in front
-     * of the player.
+     * Calculates the currently looked at block in front of the player.
      * 
      * @return Intersection point of the looked at block
      */
@@ -346,7 +343,7 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * Checks for pressed keys and exectutes the respective movement
+     * Checks for pressed keys and executes the respective movement
      * command.
      */
     private void processMovement() {
@@ -465,7 +462,7 @@ public final class Player extends RenderableObject {
      * Updates the position of the player.
      * 
      * TODO: Fix easing-artifact
-     * TODO: Fix double-jumping bug
+     * TODO: Fix "double-jumping bug"
      * 
      * @param delta Delta value since the last frame update
      */
@@ -571,7 +568,7 @@ public final class Player extends RenderableObject {
     /**
      * Returns the parent world.
      *
-     * @return the parent world
+     * @return The parent world
      */
     public World getParent() {
         return _parent;
@@ -580,7 +577,7 @@ public final class Player extends RenderableObject {
     /**
      * Sets the parent world an resets the player.
      * 
-     * @param parent the parent world
+     * @param parent The parent world
      */
     public void setParent(World parent) {
         this._parent = parent;
@@ -610,7 +607,7 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * Some information about the player.
+     * Returns some information about the player as a string.
      * 
      * @return
      */
@@ -620,6 +617,7 @@ public final class Player extends RenderableObject {
     }
 
     /**
+     * Returns player's AABB.
      * 
      * @return 
      */

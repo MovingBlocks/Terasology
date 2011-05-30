@@ -20,7 +20,7 @@ import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.Configuration;
 
 /**
- * Generates the base terrain of the Blockmania world.
+ * Generates the base terrain of the world.
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

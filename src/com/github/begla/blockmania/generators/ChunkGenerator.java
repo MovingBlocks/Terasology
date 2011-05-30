@@ -22,7 +22,7 @@ import com.github.begla.blockmania.utilities.PerlinNoise;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
- * Generators are used to generate the terrain of chunk, to genreate caves
+ * Generators are used to generate the basic terrain, to generate caves
  * and to populate the surface.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -30,24 +30,25 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public abstract class ChunkGenerator {
 
     /**
-     *
+     * First Perlin noise generator.
      */
     protected PerlinNoise _pGen1;
     /**
-     *
+     * Second Perlin noise generator.
      */
     protected PerlinNoise _pGen2;
     /**
-     *
+     * Third Perlin noise generator.
      */
     protected PerlinNoise _pGen3;
     /**
-     *
+     * Fast random number generator.
      */
     protected final FastRandom _rand;
 
     /**
-     *
+     * Init. the generator with a given seed value.
+     * 
      * @param seed
      */
     public ChunkGenerator(String seed) {
@@ -58,6 +59,7 @@ public abstract class ChunkGenerator {
     }
 
     /**
+     * Apply the generation process to the given chunk.
      * 
      * @param c
      */
