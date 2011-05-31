@@ -16,6 +16,7 @@
 
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.world.World;
 
 /**
@@ -44,6 +45,10 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
     @Override
     public void generate(int posX, int posY, int posZ, boolean update) {
         int height = _rand.randomInt() % 2 + 8;
+        
+        if (posY+height >= Configuration.CHUNK_DIMENSIONS.y) {
+            return;
+        }
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {

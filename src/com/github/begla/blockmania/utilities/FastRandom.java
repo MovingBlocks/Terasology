@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.utilities;
 
 /**
@@ -96,5 +95,36 @@ public class FastRandom {
         }
 
         return s.toString();
+    }
+
+    /**
+     * Calculates a standardized normal distributed value (using to the polar method).
+     * 
+     * @return 
+     */
+    public double standNormalDistrDouble() {
+
+        double q = Double.MAX_VALUE;
+        double u1 = 0;
+        double u2 = 0;
+
+        while (q > 1d) {
+            u1 = randomDouble();
+            u2 = randomDouble();
+
+            q = Math.pow(u1, 2) + Math.pow(u2, 2);
+        }
+
+        double p = Math.sqrt((-2d * (Math.log(q))) / q);
+        return u1 * p; // oder u2 * p
+    }
+
+    /**
+     * Calculates a normal distributed value according to the given variance and mean (using to the polar method).
+     * 
+     * @return 
+     */
+    public double normalDistrDouble(double variance, double mean) {
+        return standNormalDistrDouble() * Math.sqrt(variance) + mean;
     }
 }

@@ -67,19 +67,17 @@ public final class Configuration {
     /**
      * The intensity at which surrounding blocks 'dim' each other.
      */
-    public static final float OCCLUSION_INTENS = 0.95f;
+    public static final float OCCLUSION_INTENS = 1.25f;
     /**
      * The intensity at which the front and back side of blocks are constantly 'dimmed'.
      */
     public static final float BLOCK_SIDE_DIMMING = 0.125f;
     /**
-     * Intensity of light absorption applied to sunlight passing through translucent blocks.
-     */
-    public static final float LIGHT_ABSORPTION = 1f;
-    /**
      * Global brightness factor, which is applied to vertices on the creation of the display lists.
      */
-    public static final float BRIGHTNESS_FACTOR = 0.95f;
+    public static final float BRIGHTNESS_FACTOR = 0.9f;
+    public static final float PROB_COAL = -1.5f;
+    public static final float PROB_GOLD = -3f;
     /* ------- */
     private static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();

@@ -21,44 +21,14 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
- * A large high grass billboard block.
+ * A coal block.
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockLargeHighGrass extends Block {
-
-    @Override
-    public boolean isBlockTypeTranslucent() {
-        return true;
-    }
-
-    @Override
-    public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(120f / 255f, 183f / 255f, 44f / 255f, 1.0f);
-    }
+public class BlockCoal extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(15, 6);
-    }
-
-    @Override
-    public boolean isBlockBillboard() {
-        return true;
-    }
-
-    @Override
-    public boolean isPenetrable() {
-        return true;
-    }
-
-    @Override
-    public boolean isCastingShadows() {
-        return false;
-    }
-
-    @Override
-    public boolean renderBoundingBox() {
-        return false;
+       return Helper.getInstance().calcOffsetForTextureAt(2, 2);
     }
 }

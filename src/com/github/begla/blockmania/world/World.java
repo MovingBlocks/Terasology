@@ -24,6 +24,9 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.generators.ChunkGeneratorForest;
 import com.github.begla.blockmania.generators.ChunkGeneratorFlora;
+import com.github.begla.blockmania.generators.ChunkGeneratorLakes;
+import com.github.begla.blockmania.generators.ChunkGeneratorMountain;
+import com.github.begla.blockmania.generators.ChunkGeneratorResources;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorTree;
@@ -80,7 +83,10 @@ public final class World extends RenderableObject {
     private final ChunkCache _chunkCache = new ChunkCache(this);
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
+    private final ChunkGeneratorTerrain _generatorMountain;
     private final ChunkGeneratorForest _generatorForest;
+    private final ChunkGeneratorResources _generatorResources;
+    private final ChunkGeneratorLakes _generatorLakes;
     private final ChunkGeneratorFlora _generatorGrass;
     private final ObjectGeneratorTree _generatorTree;
     private final ObjectGeneratorPineTree _generatorPineTree;
@@ -137,7 +143,10 @@ public final class World extends RenderableObject {
 
         // Init. generators
         _generatorTerrain = new ChunkGeneratorTerrain(seed);
+        _generatorMountain = new ChunkGeneratorMountain(seed);
         _generatorForest = new ChunkGeneratorForest(seed);
+        _generatorResources = new ChunkGeneratorResources(seed);
+        _generatorLakes = new ChunkGeneratorLakes(seed);
         _generatorTree = new ObjectGeneratorTree(this, seed);
         _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
         _generatorGrass = new ChunkGeneratorFlora(seed);
@@ -216,7 +225,7 @@ public final class World extends RenderableObject {
      */
     public void dispose() {
         Helper.LOGGER.log(Level.INFO, "Disposing world {0} and saving all chunks.", _title);
-        
+
         synchronized (_updateThread) {
             _updateThreadAlive = false;
             _updateThread.notify();
@@ -471,9 +480,10 @@ public final class World extends RenderableObject {
         }
 
         if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0x0) {
-            
-            if (Block.getBlockForType(c.getBlock(blockPosX, y, blockPosZ)).isRemovable())
-            c.setBlock(blockPosX, y, blockPosZ, type);
+
+            if (Block.getBlockForType(c.getBlock(blockPosX, y, blockPosZ)).isRemovable()) {
+                c.setBlock(blockPosX, y, blockPosZ, type);
+            }
 
             if (update) {
                 /*
@@ -551,6 +561,17 @@ public final class World extends RenderableObject {
         }
 
         return -1;
+    }
+
+    /**
+     * Returns true if the block is surrounded by blocks within the N4-neighborhood on the xz-plane.
+     *
+     * @param x The X-coordinate
+     * @param y The Y-coordinate
+     * @param z The Z-coordinate
+     */
+    public final boolean isBlockSurrounded(int x, int y, int z) {
+        return (getBlock(x + 1, y, z) > 0 || getBlock(x - 1, y, z) > 0 || getBlock(x, y, z + 1) > 0 || getBlock(x, y, z - 1) > 0);
     }
 
     /**
@@ -1026,6 +1047,9 @@ public final class World extends RenderableObject {
     public Chunk prepareNewChunk(int x, int z) {
         FastList<ChunkGenerator> gs = new FastList<ChunkGenerator>();
         gs.add(_generatorTerrain);
+        gs.add(_generatorLakes);
+        gs.add(_generatorMountain);
+        gs.add(_generatorResources);
         gs.add(_generatorForest);
 
         // Generate a new chunk and return it
@@ -1076,7 +1100,7 @@ public final class World extends RenderableObject {
      * @return 
      */
     private Vector3f findSpawningPoint() {
-        for (int xz = 0;; xz++) {
+        for (int xz = 1024;; xz++) {
             float height = _generatorTerrain.calcHeightMap(xz, xz) * 128f;
 
             if (height > 64) {
@@ -1084,7 +1108,7 @@ public final class World extends RenderableObject {
             }
         }
     }
-    
+
     /**
      * Sets the spawning point to the player's current position.
      */

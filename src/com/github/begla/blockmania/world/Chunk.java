@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.blocks.BlockWater;
 import com.github.begla.blockmania.blocks.BlockLeaf;
 import com.github.begla.blockmania.blocks.BlockGlass;
 import com.github.begla.blockmania.blocks.BlockAir;
@@ -1026,8 +1027,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
     private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock) {
         Block bCheck = Block.getBlockForType(blockToCheck);
         Block cBlock = Block.getBlockForType(currentBlock);
-        
-        return bCheck.getClass() == BlockAir.class ||  bCheck.getClass() == BlockLeaf.class ||  bCheck.getClass() == BlockGlass.class || Block.getBlockForType(blockToCheck).isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
+
+        return bCheck.getClass() == BlockAir.class || bCheck.getClass() == BlockLeaf.class || bCheck.getClass() == BlockGlass.class || Block.getBlockForType(blockToCheck).isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
     }
 
     /**
@@ -1089,22 +1090,19 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @param refresh  
      */
     public void calcSunlightAtLocalPos(int x, int z, boolean refresh) {
-        float absorption = 0;
         boolean covered = false;
 
         for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
             Block b = Block.getBlockForType(_blocks[x][y][z]);
 
-            if (!b.isBlockTypeTranslucent()) {
+            if ((b.getClass() != BlockAir.class && !b.isBlockBillboard())) {
                 covered = true;
                 continue;
             }
 
-            if (b.isBlockTypeTranslucent() && !covered) {
-                byte light = (byte) ((float) Configuration.MAX_LIGHT - absorption);
-
+            if ((b.getClass() == BlockAir.class || b.isBlockBillboard()) && !covered) {
                 byte oldValue = _sunlight[x][y][z];
-                _sunlight[x][y][z] = light;
+                _sunlight[x][y][z] = Configuration.MAX_LIGHT;
                 byte newValue = _sunlight[x][y][z];
 
                 /*
@@ -1112,15 +1110,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
                  * than the old value.
                  */
                 if (refresh && oldValue < newValue) {
-                    spreadLight(x, y, z, light, LIGHT_TYPE.SUN);
+                    spreadLight(x, y, z, newValue, LIGHT_TYPE.SUN);
                 }
-
-                // Reduce the sunlight with each block passed
-                if (_blocks[x][y][z] != 0x0 && !Block.getBlockForType(_blocks[x][y][z]).isBlockBillboard()) {
-                    absorption += Configuration.LIGHT_ABSORPTION;
-                    absorption = Math.min(Configuration.MAX_LIGHT, absorption);
-                }
-            } else if (b.isBlockTypeTranslucent() && covered) {
+            } else if ((b.getClass() == BlockAir.class || b.isBlockBillboard()) && covered) {
                 _sunlight[x][y][z] = 0;
 
                 if (refresh) {
@@ -1245,6 +1237,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         byte newLightValue = 0;
         newLightValue = (byte) (lightValue - depth);
+
+        // Water absorbs light
+        if (_parent.getBlock(blockPosX, blockPosY, blockPosZ) == 0x4) {
+            newLightValue /= 2;
+        }
 
         _parent.setLight(blockPosX, blockPosY, blockPosZ, newLightValue, type);
 

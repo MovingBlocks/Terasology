@@ -57,7 +57,7 @@ public abstract class Block {
          */
         BACK;
     };
-    private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockTreeTrunk(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockHighGrass(), new BlockLargeHighGrass(), new BlockTorch(), new BlockLava(), new BlockWood(),  new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick()};
+    private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockTreeTrunk(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockHighGrass(), new BlockLargeHighGrass(), new BlockTorch(), new BlockLava(), new BlockWood(),  new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick(), new BlockCoal(), new BlockGold()};
     private static BlockNil nilBlock = new BlockNil();
 
     /**
