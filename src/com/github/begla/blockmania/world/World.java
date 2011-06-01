@@ -83,7 +83,7 @@ public final class World extends RenderableObject {
     private final ChunkCache _chunkCache = new ChunkCache(this);
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
-    private final ChunkGeneratorTerrain _generatorMountain;
+    private final ChunkGeneratorMountain _generatorMountain;
     private final ChunkGeneratorForest _generatorForest;
     private final ChunkGeneratorResources _generatorResources;
     private final ChunkGeneratorLakes _generatorLakes;
@@ -1103,8 +1103,9 @@ public final class World extends RenderableObject {
         for (int xz = 1024;; xz++) {
             float height = _generatorTerrain.calcHeightMap(xz, xz) * 128f;
 
-            if (height > 64) {
-                return VectorPool.getVector(xz, height + 16, xz);
+            if (height > 32 && height < 34 && _generatorMountain.calcMountainIntensity(xz, xz) == 0f) {
+                // Find a spawning point at the beach
+                return VectorPool.getVector(xz, height+8, xz);
             }
         }
     }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.utilities;
 
 /**
@@ -110,12 +109,22 @@ public class PerlinNoise {
         float scale = 1f;
 
         for (int i = 0; i < octaves; i++) {
-            noise = noise(x*scale, y*scale, z*scale) * pers;
+            noise = noise(x * scale, y * scale, z * scale) * pers;
             result += noise;
             scale *= 2;
             pers *= persFactor;
         }
 
         return result;
+    }
+
+    public float noiseWithOctaves2(float x, float y, float z, int octaves) {
+        float noise = 0.0f;
+
+        for (int i = 0; i < octaves; i++) {
+            noise = noise(x * (i * i), y * (i * i), z * (i * i));
+        }
+
+        return noise;
     }
 }

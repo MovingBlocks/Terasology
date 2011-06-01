@@ -39,13 +39,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     @Override
     public void generate(Chunk c) {
-        int xOffset = (int) c.getPosition().x * (int) Configuration.CHUNK_DIMENSIONS.x;
-        int yOffset = (int) c.getPosition().y * (int) Configuration.CHUNK_DIMENSIONS.y;
-        int zOffset = (int) c.getPosition().z * (int) Configuration.CHUNK_DIMENSIONS.z;
-
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                int height = (int) (calcHeightMap(x + xOffset, z + zOffset) * 128f);
+                int height = (int) (calcHeightMap(x + getOffsetX(c), z + getOffsetZ(c)) * 128f);
 
                 if (height < 0) {
                     height = 0;
@@ -53,52 +49,64 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                 boolean first = true;
                 for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i >= 0; i--) {
-                    float stoneDensity = calcStoneDensity(x + xOffset, i + yOffset, z + zOffset);
 
-                    if (first && i <= height) {
+                    if (first && i == height) {
                         first = false;
                         // Generate grass on the top layer
-                        if (i > 32) {
-                            c.setBlock(x, i, z, (byte) 0x1);
-                        } else if (i <= 34 && i >= 28) {
-                            // Sand
-                            c.setBlock(x, i, z, (byte) 0x7);
-                        } else {
-                            // No grass under water
-                            c.setBlock(x, i, z, (byte) 0x2);
-                        }
+                        c.setBlock(x, i, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, i, z, 0), i));
+
                     } else if (i < height) {
-
-                        // Generate beach
-                        if (i <= 34 && i >= 28 && stoneDensity > 0f) {
-                            c.setBlock(x, i, z, (byte) 0x7);
-                        } else if (i < height * 0.95f && stoneDensity < 0f) {
-                            // Generate the basic stone layer
-                            c.setBlock(x, i, z, (byte) 0x3);
-                        } else {
-                            // Fill the upper layer with dirt
-                            c.setBlock(x, i, z, (byte) 0x2);
-                        }
-
-
-                        if (i <= 34 && i >= 28) {
-                            // "Beach"
-                            c.setBlock(x, i, z, (byte) 0x7);
-                        }
+                        c.setBlock(x, i, z, getBlockTypeForPosition(c, x, i, z, 2));
                     }
 
+                    /*
+                     * Generate the "ocean".
+                     */
                     if (i <= 30 && i > 0) {
                         if (c.getBlock(x, i, z) == 0) {
                             c.setBlock(x, i, z, (byte) 0x4);
                         }
                     }
 
+                    /*
+                     * Generate hard stone layer.
+                     */
                     if (i == 0) {
                         c.setBlock(x, i, z, (byte) 0x8);
                     }
                 }
             }
         }
+    }
+
+    public byte getBlockTailpiece(Chunk c, byte type, int y) {
+        // Sand
+        if (type == 0x7) {
+            return 0x7;
+        } else if (type == 0x3) {
+            return 0x3;
+        }
+
+        // No grass below the water surface
+        if (y > 32) {
+            return 0x1;
+        } else {
+            return 0x2;
+        }
+    }
+
+    public byte getBlockTypeForPosition(Chunk c, int x, int y, int z, int stoneProbInterval) {
+        // Sand
+        if (y <= 33 && y >= 28) {
+            return (byte) 0x7;
+        }
+
+        double r = _rand.standNormalDistrDouble();
+        if (calcStoneDensity(x + getOffsetX(c), y, z + getOffsetZ(c)) < 0.1 && r > -stoneProbInterval && r < stoneProbInterval) {
+            return (byte) 0x3;
+        }
+
+        return 0x2;
     }
 
     /**
@@ -161,7 +169,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcStoneDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen2.noiseWithOctaves(0.01f * x, 0.01f * y, 0.01f * z, 8, 0.5f);
-        return result;
+        result += _pGen2.noiseWithOctaves2(0.05f * x, 0.05f * y, 0.05f * z, 2);
+        return Math.abs(result);
     }
 }
