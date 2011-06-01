@@ -75,7 +75,7 @@ public final class Configuration {
     /**
      * Global brightness factor, which is applied to vertices on the creation of the display lists.
      */
-    public static final float BRIGHTNESS_FACTOR = 0.9f;
+    public static final float BRIGHTNESS_FACTOR = 0.85f;
     public static final float PROB_COAL = -1.5f;
     public static final float PROB_GOLD = -3f;
     /* ------- */
@@ -139,8 +139,8 @@ public final class Configuration {
         _settingsBoolean.put("GOD_MODE", false);
         _settingsNumeric.put("JUMP_INTENSITY", 0.15f);
         _settingsNumeric.put("MAX_GRAVITY", 0.5f);
-        _settingsNumeric.put("WALKING_SPEED", 0.025f);
-        _settingsNumeric.put("RUNNING_FACTOR", 1.6f);
+        _settingsNumeric.put("WALKING_SPEED", 0.015f);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
         _settingsNumeric.put("GRAVITY", 0.0075f);
         _settingsNumeric.put("FRICTION", 0.1f);
         _settingsNumeric.put("V_DIST_X", 16f);

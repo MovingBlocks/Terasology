@@ -51,6 +51,7 @@ public final class Player extends RenderableObject {
     private World _parent = null;
     private final PerlinNoise _pGen = new PerlinNoise((int) Helper.getInstance().getTime());
     private Vector3f _viewingDirection = VectorPool.getVector();
+    private boolean _playerIsTouchingGround = false;
 
     /**
      * 
@@ -65,16 +66,18 @@ public final class Player extends RenderableObject {
     @Override
     public void render() {
 
-        if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
-            float bobbing2 = _pGen.noise(_position.x, _position.z, 0f);
-            glRotatef(bobbing2, 1f, 0f, 0f);
+        if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
+            float bobbing2 = _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 1.2f;
+            float bobbing3 = _pGen.noise(_position.x * 1.5f, _position.z * 1.5f, 0f) * 1.4f;
+            glRotatef(bobbing2, 0f, 1f, 0f);
+            glRotatef(bobbing3, 1f, 0f, 1f);
         }
 
         glRotatef((float) _pitch, 1f, 0f, 0f);
         glRotatef((float) _yaw, 0f, 1f, 0f);
 
-        if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
-            float bobbing1 = _pGen.noise(_position.x * 1.5f, _position.z * 1.5f, 0f) * 0.15f;
+        if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
+            float bobbing1 = _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.175f;
             glTranslatef(0.0f, bobbing1, 0);
         }
 
@@ -190,7 +193,9 @@ public final class Player extends RenderableObject {
      * Lets the player jump.
      */
     public void jump() {
-        _jump = true;
+        if (_playerIsTouchingGround) {
+            _jump = true;
+        }
     }
 
     /**
@@ -528,9 +533,11 @@ public final class Player extends RenderableObject {
                     _jump = false;
                     _gravity = Configuration.getSettingNumeric("JUMP_INTENSITY");
                 }
+
+                _playerIsTouchingGround = true;
             } else {
-                // TODO: Feels weird if active...
-                // _jump = false;
+
+                _playerIsTouchingGround = false;
             }
         } else {
             _gravity = 0f;

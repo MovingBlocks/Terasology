@@ -61,9 +61,6 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
                     break;
                 }
 
-                byte groundBlockType = c.getBlock(x, startY - 1, z);
-                c.setBlock(x, startY - 1, z, (byte) 0x2);
-
                 boolean blockGenerated = false;
                 for (int i = 0; i < height; i++) {
                     if (calcCanyonDensity(x + getOffsetX(c), i + getOffsetY(c) + startY, z + getOffsetZ(c)) < 0.05) {
@@ -76,8 +73,10 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
                     }
                 }
 
-                if (!blockGenerated) {
-                    c.setBlock(x, startY - 1, z, groundBlockType);
+                if (blockGenerated) {
+                    if (c.getBlock(x, startY - 1, z) == 0x1) {
+                        c.setBlock(x, startY - 1, z, (byte) 0x2);
+                    }
                 }
             }
         }
