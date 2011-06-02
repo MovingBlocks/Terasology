@@ -15,7 +15,6 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.blocks.BlockWater;
 import com.github.begla.blockmania.blocks.BlockLeaf;
 import com.github.begla.blockmania.blocks.BlockGlass;
 import com.github.begla.blockmania.blocks.BlockAir;
@@ -1237,7 +1236,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         byte type6 = _parent.getBlock(blockPosX, blockPosY - 1, blockPosZ);
 
         byte newLightValue = 0;
-        newLightValue = (byte) (lightValue - depth);
+        newLightValue = (byte) (lightValue - Math.sqrt(depth)*4);
 
         // Water absorbs light
         if (_parent.getBlock(blockPosX, blockPosY, blockPosZ) == 0x4) {
@@ -1339,7 +1338,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      */
     public float getRenderingLightValue(int x, int y, int z) {
         if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
-            return Math.max(_sunlight[x][y][z] * _parent.getDaylightAsFloat(), _light[x][y][z]);
+            float result = (float) Math.max(_sunlight[x][y][z] * _parent.getDaylightAsFloat(), _light[x][y][z]);
+            return result;
         }
 
         return -1;

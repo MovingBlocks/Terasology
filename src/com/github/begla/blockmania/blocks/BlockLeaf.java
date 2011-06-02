@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.Helper;
@@ -28,13 +27,18 @@ import org.lwjgl.util.vector.Vector4f;
 public class BlockLeaf extends Block {
 
     @Override
+    public boolean isCastingShadows() {
+        return false;
+    }
+
+    @Override
     public boolean isBlockTypeTranslucent() {
         return true;
     }
 
     @Override
     public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(144f / 255f, 200f / 255f, 64f / 255f, 1.0f);
+        return new Vector4f(188f / 255f, 240f / 255f, 104f / 255f, 1.0f);
     }
 
     @Override

@@ -67,8 +67,8 @@ public final class Player extends RenderableObject {
     public void render() {
 
         if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
-            float bobbing2 = _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 1.2f;
-            float bobbing3 = _pGen.noise(_position.x * 1.5f, _position.z * 1.5f, 0f) * 1.4f;
+            float bobbing2 = _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.75f;
+            float bobbing3 = _pGen.noise(_position.x * 1.5f, _position.z * 1.5f, 0f) * 0.75f;
             glRotatef(bobbing2, 0f, 1f, 0f);
             glRotatef(bobbing3, 1f, 0f, 1f);
         }
@@ -77,7 +77,7 @@ public final class Player extends RenderableObject {
         glRotatef((float) _yaw, 0f, 1f, 0f);
 
         if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
-            float bobbing1 = _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.175f;
+            float bobbing1 = _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.05f;
             glTranslatef(0.0f, bobbing1, 0);
         }
 
