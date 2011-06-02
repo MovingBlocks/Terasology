@@ -61,6 +61,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
                     if (!(x == -2 && z == -2) && !(x == 2 && z == 2) && !(x == -2 && z == 2) && !(x == 2 && z == -2)) {
                         if (_rand.randomDouble() <= 0.8f) {
                             _world.setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update, false);
+                            _world.refreshSunlightAt(posX + x, posZ + z, false, true);
                         }
                     }
                 }

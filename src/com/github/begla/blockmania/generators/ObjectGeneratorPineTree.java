@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.Configuration;
@@ -45,8 +44,8 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
     @Override
     public void generate(int posX, int posY, int posZ, boolean update) {
         int height = _rand.randomInt() % 2 + 8;
-        
-        if (posY+height >= Configuration.CHUNK_DIMENSIONS.y) {
+
+        if (posY + height >= Configuration.CHUNK_DIMENSIONS.y) {
             return;
         }
 
@@ -63,6 +62,7 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
                 for (int z = -(stage / 2); z <= (stage / 2); z++) {
                     if (!(x == 0 && z == 0)) {
                         _world.setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update, false);
+                        _world.refreshSunlightAt(posX + x, posZ + z, false, true);
                     }
                 }
             }

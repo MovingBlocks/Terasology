@@ -59,7 +59,7 @@ public final class Configuration {
     /**
      * Maximum light value.
      */
-    public static final byte MAX_LIGHT = 16;
+    public static final byte MAX_LIGHT = 15;
     /**
      * Minimum light value.
      */

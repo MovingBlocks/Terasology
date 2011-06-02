@@ -55,7 +55,7 @@ public final class ChunkUpdate implements Comparable<ChunkUpdate> {
      * @return 
      */
     public double getWeight() {
-        double weight = _chunk.calcDistanceToPlayer();
+        double weight = _chunk.distanceToPlayer();
         return weight;
     }
 

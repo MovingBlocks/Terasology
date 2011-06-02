@@ -70,8 +70,8 @@ public final class World extends RenderableObject {
     /* ------ */
     private static Texture _textureSun, _textureMoon;
     /* ------ */
-    private short _time = 8;
-    private byte _daylight = 16;
+    private float _time = 8.0f;
+    private float _daylight = 1.0f;
     private Player _player;
     private Vector3f _spawningPoint;
     /* ------ */
@@ -236,15 +236,16 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * Updates the time of the world. A day in Blockmania takes 12 minutes.
+     * Updates the time of the world. A day in Blockmania takes 12 minutes and the
+     * time gets updated every 15 seconds.
      */
     private void updateDaytime() {
-        if (Helper.getInstance().getTime() - _lastDaytimeMeasurement >= 30000) {
-            if (_chunkUpdateManager.updatesSize() == 0) {
-                setTime((short) (_time + 1));
-            } else {
-                return;
-            }
+        if (Helper.getInstance().getTime() - _lastDaytimeMeasurement >= 15000) {
+            //if (_chunkUpdateManager.updatesSize() == 0) {
+                setTime(_time + 0.5f);
+            //} else {
+            //    return;
+            //}
 
             _lastDaytimeMeasurement = Helper.getInstance().getTime();
 
@@ -256,22 +257,14 @@ public final class World extends RenderableObject {
      * 
      */
     private void updateDaylight() {
-        if (_time >= 18 && _time < 20) {
-            _daylight = (byte) (0.7f * Configuration.MAX_LIGHT);
-        } else if (_time == 20) {
-            _daylight = (byte) (0.5f * Configuration.MAX_LIGHT);
-        } else if (_time == 21) {
-            _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-        } else if (_time == 22 || _time == 23) {
-            _daylight = (byte) (0.2f * Configuration.MAX_LIGHT);
-        } else if (_time >= 0 && _time <= 5) {
-            _daylight = (byte) (0.1f * Configuration.MAX_LIGHT);
-        } else if (_time == 6) {
-            _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-        } else if (_time == 7) {
-            _daylight = (byte) (0.7f * Configuration.MAX_LIGHT);
-        } else if (_time >= 8 && _time < 18) {
-            _daylight = (byte) Configuration.MAX_LIGHT;
+        if (_time >= 16f && _time <= 24) {
+            _daylight = (float) Math.pow(0.8f, (_time - 16f));
+        } else if (_time >= 4 && _time <= 12) {
+            _daylight = 1f - (float) Math.pow(0.8f, (_time - 4f));
+        } else if (_time >= 0 && _time < 5) {
+            _daylight = (float) Math.pow(0.6f, 9);
+        } else {
+            _daylight = 1f;
         }
     }
 
@@ -490,7 +483,7 @@ public final class World extends RenderableObject {
                  * Update sunlight.
                  */
                 byte oldValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
-                c.calcSunlightAtLocalPos(blockPosX, blockPosZ, true);
+                c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, true, true);
                 c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.SUN);
                 byte newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
 
@@ -671,6 +664,29 @@ public final class World extends RenderableObject {
     }
 
     /**
+     * TODO
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param refreshLight 
+     */
+    public void refreshSunlightAt(int x, int z, boolean spreadLight, boolean refreshSunlight) {
+        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
+        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+
+        int blockPosX = calcBlockPosX(x, chunkPosX);
+        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
+
+
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+
+        if (c != null) {
+            c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, spreadLight, refreshSunlight);
+        }
+    }
+
+    /**
      * Recursive light calculation.
      * 
      * Too slow!
@@ -726,8 +742,8 @@ public final class World extends RenderableObject {
      * 
      * @return The daylight value
      */
-    public float getDaylightAsFloat() {
-        return _daylight / 16f;
+    public float getDaylight() {
+        return _daylight;
     }
 
     /**
@@ -745,7 +761,7 @@ public final class World extends RenderableObject {
      * @return The daylight color
      */
     public Vector3f getDaylightColor() {
-        return VectorPool.getVector(getDaylightAsFloat() * 0.666f, getDaylightAsFloat() * 0.8f, 0.85f * getDaylightAsFloat());
+        return VectorPool.getVector(getDaylight() * 0.666f, getDaylight() * 0.8f, 0.85f * getDaylight());
     }
 
     /**
@@ -947,10 +963,10 @@ public final class World extends RenderableObject {
      *
      * @param time The time to set
      */
-    public void setTime(short time) {
-        _time = (short) (time % 24);
+    public void setTime(float time) {
+        _time = time % 24;
 
-        byte oldDaylight = _daylight;
+        float oldDaylight = _daylight;
         updateDaylight();
 
         if (_daylight != oldDaylight) {
@@ -979,7 +995,7 @@ public final class World extends RenderableObject {
      * @return
      */
     public boolean isDaytime() {
-        if (_time > 6 && _time < 20) {
+        if (_daylight > 0.8f) {
             return true;
         }
         return false;
@@ -1105,7 +1121,7 @@ public final class World extends RenderableObject {
 
             if (height > 32 && height < 34 && _generatorMountain.calcMountainIntensity(xz, xz) == 0f) {
                 // Find a spawning point at the beach
-                return VectorPool.getVector(xz, height+8, xz);
+                return VectorPool.getVector(xz, height + 8, xz);
             }
         }
     }
@@ -1159,7 +1175,7 @@ public final class World extends RenderableObject {
         // Save the world metadata
         root.setAttribute("seed", _seed);
         root.setAttribute("title", _title);
-        root.setAttribute("time", Short.toString(_time));
+        root.setAttribute("time", Float.toString(_time));
 
         // Save the player metadata
         Element player = new Element("Player");
@@ -1209,7 +1225,7 @@ public final class World extends RenderableObject {
                 _seed = root.getAttribute("seed").getValue();
                 _spawningPoint = VectorPool.getVector(Float.parseFloat(player.getAttribute("x").getValue()), Float.parseFloat(player.getAttribute("y").getValue()), Float.parseFloat(player.getAttribute("z").getValue()));
                 _title = root.getAttributeValue("title");
-                _time = Short.parseShort(root.getAttributeValue("time"));
+                _time = Float.parseFloat(root.getAttributeValue("time"));
 
                 return true;
 
