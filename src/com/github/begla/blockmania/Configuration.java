@@ -143,8 +143,8 @@ public final class Configuration {
         _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
         _settingsNumeric.put("GRAVITY", 0.0075f);
         _settingsNumeric.put("FRICTION", 0.1f);
-        _settingsNumeric.put("V_DIST_X", 16f);
-        _settingsNumeric.put("V_DIST_Z", 16f);
+        _settingsNumeric.put("V_DIST_X", 24f);
+        _settingsNumeric.put("V_DIST_Z", 24f);
     }
 
     /**

@@ -381,14 +381,22 @@ public final class Player extends RenderableObject {
         boolean result = false;
         FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
+        Vector3f dir = Vector3f.sub(origin, _position, null);
+
+        if (dir.length() > 0) {
+            dir.normalise();
+        } else {
+            return false;
+        }
+
         for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end;) {
             byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
 
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
-                if (getAABB().overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z))) {
+                while (getAABB().overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z))) {
                     result = true;
                     // If a collision was detected: reset the player's position
-                    _position.y = origin.y;
+                    _position.y += dir.y * 0.0001;
                     _gravity = 0f;
                 }
             }
@@ -542,6 +550,8 @@ public final class Player extends RenderableObject {
         } else {
             _gravity = 0f;
         }
+
+        oldPosition.set(_position);
 
         /*
          * Update the position of the player

@@ -1337,7 +1337,7 @@ public final class World extends RenderableObject {
                 for (int y = 0; y < length; y++) {
                     //double r = rand.standNormalDistrDouble();
                     if (_clouds[x][y]) { // && r > -2 && r < 0) {
-                        Primitives.drawCloud(32, 2, 16, x * 64f - (length / 2 * 64f), 0, y * 32f - (length / 2 * 32f), getDaylight());
+                        Primitives.drawCloud(32, 8, 16, x * 64f - (length / 2 * 64f), 0, y * 32f - (length / 2 * 32f), getDaylight());
                     }
                 }
             }
