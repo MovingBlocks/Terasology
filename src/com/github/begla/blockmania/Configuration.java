@@ -67,7 +67,7 @@ public final class Configuration {
     /**
      * The intensity at which surrounding blocks 'dim' each other.
      */
-    public static final float OCCLUSION_INTENS = 1.0f;
+    public static final float OCCLUSION_INTENS = 0.85f;
     /**
      * The intensity at which the front and back side of blocks are constantly 'dimmed'.
      */
@@ -75,7 +75,7 @@ public final class Configuration {
     /**
      * Global brightness factor, which is applied to vertices on the creation of the display lists.
      */
-    public static final float BRIGHTNESS_FACTOR = 1.0f;
+    public static final float BRIGHTNESS_FACTOR = 0.85f;
     public static final float PROB_COAL = -1.5f;
     public static final float PROB_GOLD = -3f;
     /* ------- */

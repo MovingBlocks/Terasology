@@ -39,13 +39,18 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     @Override
     public void generate(Chunk c) {
+        float[][] heightMap = new float[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.z];
+
+        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.z; y++) {
+                float height = calcHeightMap(x + getOffsetX(c), y + getOffsetZ(c));
+                heightMap[x][y] = height;
+            }
+        }
+
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                int height = (int) (calcHeightMap(x + getOffsetX(c), z + getOffsetZ(c)) * 128f);
-
-                if (height < 0) {
-                    height = 0;
-                }
+                int height = (int) (128 * heightMap[x][z]);
 
                 boolean first = true;
                 for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i >= 0; i--) {
@@ -116,7 +121,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @return 
      */
     public float calcHeightMap(float x, float z) {
-        float heightMap = (float) Math.sqrt(Math.abs(calcTerrainElevation(x, z) + (calcTerrainRoughness(x, z) * calcTerrainDetail(x, z))) / 2);
+        float heightMap = (float) calcTerrainElevation(x, z) + (calcTerrainRoughness(x, z) * calcTerrainDetail(x, z));
         return heightMap;
     }
 
@@ -129,7 +134,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noiseWithOctaves(0.0009f * x, 0.0009f, 0.0009f * z, 4, 0.5f);
+        result += _pGen1.noise(0.0009f * x, 0.0009f, 0.0009f * z);
         return result;
     }
 
@@ -155,7 +160,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.noiseWithOctaves(0.03f * x, 0.03f, 0.03f * z, 6, 0.5f);
+        result += _pGen3.noiseWithOctaves(0.03f * x, 0.03f, 0.03f * z, 6, 0.1f);
         return result;
     }
 

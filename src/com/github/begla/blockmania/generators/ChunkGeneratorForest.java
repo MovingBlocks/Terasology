@@ -64,7 +64,8 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
             /*
              * Generate high grass.
              */
-            if (_rand.standNormalDistrDouble() > 0) {
+            double rand = _rand.standNormalDistrDouble();
+            if (rand > -1 && rand < 1) {
                 if (c.canBlockSeeTheSky(x, y + 1, z)) {
                     c.setBlock(x, y + 1, z, (byte) 0xB);
                 }
@@ -75,7 +76,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
             }
 
             /*
-             * Generate flowsers.
+             * Generate flowers.
              */
             if (_rand.standNormalDistrDouble() < -2) {
                 if (_rand.randomBoolean()) {
@@ -108,7 +109,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
         float forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
         if (forestDens > 0.1f && c.getBlock(x, y, z) == 0x1 && y > 32) {
             double r = _rand.standNormalDistrDouble();
-            if (r > -0.2 && r < 0.2) {
+            if (r > -0.1 && r < 0.1) {
                 if (_rand.randomBoolean()) {
                     c.setBlock(x, y + 1, z, (byte) 0x0);
                     c.getParent().getGeneratorPineTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);

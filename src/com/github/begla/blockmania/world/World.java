@@ -32,6 +32,7 @@ import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorTree;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.VectorPool;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,6 +42,7 @@ import java.util.Collections;
 import org.jdom.JDOMException;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
+import javax.imageio.ImageIO;
 import javolution.util.FastList;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -63,6 +65,8 @@ import org.xml.sax.InputSource;
  */
 public final class World extends RenderableObject {
 
+    private static boolean[][] _clouds;
+    private int _displayListClouds = -1;
     /* ------ */
     private long _lastDaytimeMeasurement = Helper.getInstance().getTime();
     private long _latestDirtEvolvement = Helper.getInstance().getTime();
@@ -75,6 +79,7 @@ public final class World extends RenderableObject {
     private Player _player;
     private Vector3f _spawningPoint;
     /* ------ */
+    private boolean _daytimeUpdated = true;
     private boolean _updatingEnabled = false;
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
@@ -151,6 +156,7 @@ public final class World extends RenderableObject {
         _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
         _generatorGrass = new ChunkGeneratorFlora(seed);
 
+        _displayListClouds = glGenLists(1);
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
@@ -237,16 +243,12 @@ public final class World extends RenderableObject {
 
     /**
      * Updates the time of the world. A day in Blockmania takes 12 minutes and the
-     * time gets updated every 15 seconds.
+     * time is updated every 15 seconds.
      */
     private void updateDaytime() {
         if (Helper.getInstance().getTime() - _lastDaytimeMeasurement >= 15000) {
-            //if (_chunkUpdateManager.updatesSize() == 0) {
-                setTime(_time + 0.5f);
-            //} else {
-            //    return;
-            //}
 
+            setTime(_time + 0.5f);
             _lastDaytimeMeasurement = Helper.getInstance().getTime();
 
             Helper.LOGGER.log(Level.INFO, "Updated daytime to {0}h.", _time);
@@ -313,6 +315,24 @@ public final class World extends RenderableObject {
         } catch (IOException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);
         }
+
+        /*
+         * Create cloud array.
+         */
+        try {
+            BufferedImage cloudImage = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/images/clouds.png").openStream());
+            _clouds = new boolean[cloudImage.getWidth()][cloudImage.getHeight()];
+
+            for (int x = 0; x < cloudImage.getWidth(); x++) {
+                for (int y = 0; y < cloudImage.getHeight(); y++) {
+                    if (cloudImage.getRGB(x, y) > 0) {
+                        _clouds[x][y] = true;
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            Helper.LOGGER.log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -328,6 +348,19 @@ public final class World extends RenderableObject {
      * Renders the horizon.
      */
     public void renderHorizon() {
+
+        /*
+         * Draw clouds.
+         */
+        if (_displayListClouds > 0) {
+            glPushMatrix();
+            glTranslatef(_player.getPosition().x, 100f, _player.getPosition().z);
+            glDisable(GL_FOG);
+            glCallList(_displayListClouds);
+            glEnable(GL_FOG);
+            glPopMatrix();
+        }
+
         glPushMatrix();
         // Position the sun relatively to the player
         glTranslatef(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 1.25f, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
@@ -402,6 +435,11 @@ public final class World extends RenderableObject {
     @Override
     public void update() {
         _chunkUpdateManager.updateDisplayLists();
+
+        if (_daytimeUpdated) {
+            _daytimeUpdated = false;
+            regenerateClouds();
+        }
     }
 
     /**
@@ -761,7 +799,7 @@ public final class World extends RenderableObject {
      * @return The daylight color
      */
     public Vector3f getDaylightColor() {
-        return VectorPool.getVector(getDaylight() * 0.666f, getDaylight() * 0.8f, 0.85f * getDaylight());
+        return VectorPool.getVector(getDaylight() * 0.9f, getDaylight() * 0.98f, 1f * getDaylight());
     }
 
     /**
@@ -970,6 +1008,7 @@ public final class World extends RenderableObject {
         updateDaylight();
 
         if (_daylight != oldDaylight) {
+            _daytimeUpdated = true;
             updateAllChunks();
         }
     }
@@ -1119,7 +1158,7 @@ public final class World extends RenderableObject {
         for (int xz = 1024;; xz++) {
             float height = _generatorTerrain.calcHeightMap(xz, xz) * 128f;
 
-            if (height > 32 && height < 34 && _generatorMountain.calcMountainIntensity(xz, xz) == 0f) {
+            if (height > 32 && height < 34 && _generatorMountain.calcMountainIntensity(xz, xz) <= 0f) {
                 // Find a spawning point at the beach
                 return VectorPool.getVector(xz, height + 8, xz);
             }
@@ -1256,5 +1295,35 @@ public final class World extends RenderableObject {
      */
     public ChunkUpdateManager getChunkUpdateManager() {
         return _chunkUpdateManager;
+    }
+
+    /**
+     * Regenerates the clouds display list with the current daylight value.
+     */
+    public void regenerateClouds() {
+
+        FastRandom rand = new FastRandom(getSeed().hashCode());
+
+        try {
+            glNewList(_displayListClouds, GL_COMPILE);
+            glBegin(GL_QUADS);
+
+            int length = _clouds.length;
+
+            for (int x = 0; x < length; x++) {
+                for (int y = 0; y < length; y++) {
+                    double r = rand.standNormalDistrDouble();
+                    if (_clouds[x][y] && r > -2 && r < 0) {
+                        Primitives.drawCloud(32, 2, 16, x * 64f - (length / 2 * 64f), 0, y * 32f - (length / 2 * 32f), getDaylight());
+                    }
+                }
+            }
+
+            glEnd();
+            glEndList();
+
+        } catch (Exception e) {
+        }
+
     }
 }

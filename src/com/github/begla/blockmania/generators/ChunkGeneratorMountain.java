@@ -45,7 +45,9 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
     public void generate(Chunk c) {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                int height = (int) (calcMountainIntensity(x + getOffsetX(c), z + getOffsetZ(c)) * 64f);
+                float mIntens = calcMountainIntensity(x + getOffsetX(c), z + getOffsetZ(c));
+
+                int height = (int) (mIntens * 64);
 
                 int startY = -1;
 
@@ -63,7 +65,7 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
 
                 boolean blockGenerated = false;
                 for (int i = 0; i < height; i++) {
-                    if (calcCanyonDensity(x + getOffsetX(c), i + getOffsetY(c) + startY, z + getOffsetZ(c)) < 0.05) {
+                    if (calcCanyonDensity(x + getOffsetX(c), i + getOffsetY(c) + startY, z + getOffsetZ(c)) >= 0) {
                         if (i == height - 1) {
                             c.setBlock(x, i + startY, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, i + startY, z, 8), i + startY));
                         } else if (i < height - 1) {
@@ -93,16 +95,7 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
         float result = 0.0f;
         result += _pGen3.noiseWithOctaves(0.01f * x, 0.01f, 0.01f * z, 8, 0.5f);
 
-
-        result = (float) Math.sqrt(Math.abs(result));
-
-        result -= 0.5f;
-
-        if (result < 0f) {
-            result = 0;
-        }
-
-        return result * 2f;
+        return result;
     }
 
     /**
@@ -115,7 +108,7 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
      */
     protected float calcCanyonDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen3.noiseWithOctaves2(0.02f * x, 0.02f * y, 0.02f * z, 3);
+        result += _pGen3.noiseWithOctaves2(0.06f * x, 0.06f * y, 0.06f * z, 2);
         return result;
     }
 }
