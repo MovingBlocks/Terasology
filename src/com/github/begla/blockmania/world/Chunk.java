@@ -808,7 +808,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         if (drawBottom) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BOTTOM);
-            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z)) - Configuration.BLOCK_SIDE_DIMMING, 0);
+            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z)), 0);
 
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y;

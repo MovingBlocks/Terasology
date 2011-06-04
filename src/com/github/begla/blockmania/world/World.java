@@ -1119,7 +1119,7 @@ public final class World extends RenderableObject {
         for (int xz = 1024;; xz++) {
             float height = _generatorTerrain.calcHeightMap(xz, xz) * 128f;
 
-            if (height > 32 && height < 34 && _generatorMountain.calcMountainIntensity(xz, xz) == 0f) {
+            if (height > 32 && height < 34 && _generatorMountain.calcMountainIntensity(xz, xz) <= 0f) {
                 // Find a spawning point at the beach
                 return VectorPool.getVector(xz, height + 8, xz);
             }

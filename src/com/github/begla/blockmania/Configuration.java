@@ -67,7 +67,7 @@ public final class Configuration {
     /**
      * The intensity at which surrounding blocks 'dim' each other.
      */
-    public static final float OCCLUSION_INTENS = 1.0f;
+    public static final float OCCLUSION_INTENS = 0.85f;
     /**
      * The intensity at which the front and back side of blocks are constantly 'dimmed'.
      */

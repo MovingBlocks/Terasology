@@ -193,7 +193,7 @@ public final class Main {
         // Update the viewing distance
         float minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
         float viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, viewingDistance - 16f);
+        glFogf(GL_FOG_START, 32f);
         glFogf(GL_FOG_END, viewingDistance);
 
         /*
@@ -215,7 +215,7 @@ public final class Main {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(84.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 512f);
+        gluPerspective(74.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 512f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
