@@ -25,7 +25,7 @@ public class Primitives {
 
     public static void drawCloud(float scaleX, float scaleY, float scaleZ, float x, float y, float z, float brightness) {
         // Front face
-        GL11.glColor3f(0.92f * brightness, 0.92f  * brightness, 0.92f  * brightness);
+        GL11.glColor3f(0.99f * brightness, 0.99f  * brightness, 0.99f  * brightness);
         GL11.glTexCoord2f(0.5f, 0.0f);
         GL11.glVertex3f(-1.0f * scaleX + x, -1.0f * scaleY + y, 1.0f * scaleZ + z);
         GL11.glTexCoord2f(1.0f, 0.0f);
@@ -36,7 +36,7 @@ public class Primitives {
         GL11.glVertex3f(-1.0f * scaleX + x, 1.0f * scaleY + y, 1.0f * scaleZ + z);
 
         // Back Face
-        GL11.glColor3f(0.92f  * brightness, 0.92f  * brightness, 0.92f  * brightness);
+        GL11.glColor3f(0.99f  * brightness, 0.99f  * brightness, 0.99f  * brightness);
         GL11.glTexCoord2f(1.0f, 0.0f);
         GL11.glVertex3f(-1.0f * scaleX + x, -1.0f * scaleY + y, -1.0f * scaleZ + z);
         GL11.glTexCoord2f(1.0f, 1.0f);
@@ -47,7 +47,7 @@ public class Primitives {
         GL11.glVertex3f(1.0f * scaleX + x, -1.0f * scaleY + y, -1.0f * scaleZ + z);
 
         // Top Face
-        GL11.glColor3f(0.99f  * brightness, 0.99f  * brightness, 0.99f  * brightness);
+        GL11.glColor3f(brightness, brightness, brightness);
         GL11.glTexCoord2f(0.0f, 1.0f);
         GL11.glVertex3f(-1.0f * scaleX + x, 1.0f * scaleY + y, -1.0f * scaleZ + z);
         GL11.glTexCoord2f(0.0f, 0.0f);
@@ -58,7 +58,7 @@ public class Primitives {
         GL11.glVertex3f(1.0f * scaleX + x, 1.0f * scaleY + y, -1.0f * scaleZ + z);
 
         // Bottom Face
-        GL11.glColor3f(0.99f  * brightness, 0.99f  * brightness, 0.99f  * brightness);
+        GL11.glColor3f(0.91f  * brightness, 0.91f  * brightness, 0.91f  * brightness);
         GL11.glTexCoord2f(1.0f, 1.0f);
         GL11.glVertex3f(-1.0f * scaleX + x, -1.0f * scaleY + y, -1.0f * scaleZ + z);
         GL11.glTexCoord2f(0.0f, 1.0f);
@@ -69,7 +69,7 @@ public class Primitives {
         GL11.glVertex3f(-1.0f * scaleX + x, -1.0f * scaleY + y, 1.0f * scaleZ + z);
 
         // Right face
-        GL11.glColor3f(0.92f  * brightness, 0.92f  * brightness, 0.92f  * brightness);
+        GL11.glColor3f(0.99f  * brightness, 0.99f  * brightness, 0.99f  * brightness);
         GL11.glTexCoord2f(1.0f, 0.0f);
         GL11.glVertex3f(1.0f * scaleX + x, -1.0f * scaleY + y, -1.0f * scaleZ + z);
         GL11.glTexCoord2f(1.0f, 1.0f);
@@ -80,7 +80,7 @@ public class Primitives {
         GL11.glVertex3f(1.0f * scaleX + x, -1.0f * scaleY + y, 1.0f * scaleZ + z);
 
         // Left Face
-        GL11.glColor3f(0.92f  * brightness, 0.92f  * brightness, 0.92f  * brightness);
+        GL11.glColor3f(0.99f  * brightness, 0.99f  * brightness, 0.99f  * brightness);
         GL11.glTexCoord2f(0.0f, 0.0f);
         GL11.glVertex3f(-1.0f * scaleX + x, -1.0f * scaleY + y, -1.0f * scaleZ + z);
         GL11.glTexCoord2f(1.0f, 0.0f);

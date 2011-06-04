@@ -48,6 +48,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -67,6 +68,10 @@ public final class World extends RenderableObject {
 
     private static boolean[][] _clouds;
     private int _displayListClouds = -1;
+    private Vector2f _cloudOffset = new Vector2f();
+    private Vector2f _windDirection = new Vector2f(0.25f, 0);
+    private double _lastWindUpdate = 0;
+    private short _nextWindUpdateInSeconds = 32;
     /* ------ */
     private long _lastDaytimeMeasurement = Helper.getInstance().getTime();
     private long _latestDirtEvolvement = Helper.getInstance().getTime();
@@ -264,7 +269,7 @@ public final class World extends RenderableObject {
         } else if (_time >= 4 && _time <= 12) {
             _daylight = 1f - (float) Math.pow(0.8f, (_time - 4f));
         } else if (_time >= 0 && _time < 5) {
-            _daylight = (float) Math.pow(0.6f, 9);
+            _daylight = (float) Math.pow(0.8f, 9);
         } else {
             _daylight = 1f;
         }
@@ -354,7 +359,7 @@ public final class World extends RenderableObject {
          */
         if (_displayListClouds > 0) {
             glPushMatrix();
-            glTranslatef(_player.getPosition().x, 100f, _player.getPosition().z);
+            glTranslatef(_player.getPosition().x + _cloudOffset.x, 100f, _player.getPosition().z + _cloudOffset.y);
             glDisable(GL_FOG);
             glCallList(_displayListClouds);
             glEnable(GL_FOG);
@@ -440,6 +445,24 @@ public final class World extends RenderableObject {
             _daytimeUpdated = false;
             regenerateClouds();
         }
+
+        // Move the clouds a bit each update
+        _cloudOffset.x += _windDirection.x;
+        _cloudOffset.y += _windDirection.y;
+
+        if (_cloudOffset.x >= _clouds.length * 32 / 2 || _cloudOffset.x <= -(_clouds.length * 32 / 2)) {
+            _windDirection.x = -_windDirection.x;
+        } else if (_cloudOffset.y >= _clouds.length * 32 / 2 || _cloudOffset.y <= -(_clouds.length * 32 / 2)) {
+            _windDirection.y = -_windDirection.y;
+        }
+
+        if (Helper.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
+            _windDirection.x = (float) _rand.randomDouble();
+            _windDirection.y = (float) _rand.randomDouble();
+            _nextWindUpdateInSeconds = (short) (Math.abs(_rand.randomInt()) % 32);
+            _lastWindUpdate = Helper.getInstance().getTime();
+        }
+
     }
 
     /**
@@ -1301,8 +1324,8 @@ public final class World extends RenderableObject {
      * Regenerates the clouds display list with the current daylight value.
      */
     public void regenerateClouds() {
-
-        FastRandom rand = new FastRandom(getSeed().hashCode());
+//
+//        FastRandom rand = new FastRandom(getSeed().hashCode());
 
         try {
             glNewList(_displayListClouds, GL_COMPILE);
@@ -1312,8 +1335,8 @@ public final class World extends RenderableObject {
 
             for (int x = 0; x < length; x++) {
                 for (int y = 0; y < length; y++) {
-                    double r = rand.standNormalDistrDouble();
-                    if (_clouds[x][y] && r > -2 && r < 0) {
+                    //double r = rand.standNormalDistrDouble();
+                    if (_clouds[x][y]) { // && r > -2 && r < 0) {
                         Primitives.drawCloud(32, 2, 16, x * 64f - (length / 2 * 64f), 0, y * 32f - (length / 2 * 32f), getDaylight());
                     }
                 }

@@ -1333,9 +1333,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      */
     public float getRenderingLightValue(int x, int y, int z) {
         if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
-            float sunlight = (float) Math.pow(0.8, 15 - _sunlight[x][y][z]) * _parent.getDaylight();
+            float sunlight = (float) Math.pow(0.8, 15 - _sunlight[x][y][z] * _parent.getDaylight());
             float light = (float) Math.pow(0.8, 15 - _light[x][y][z]);
-            if (sunlight > light) {
+            
+            if (sunlight >= light) {
                 return sunlight;
             } else {
                 return light;
