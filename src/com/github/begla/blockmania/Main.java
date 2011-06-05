@@ -199,16 +199,12 @@ public final class Main {
     private void render() {
         ARBShaderObjects.glUseProgramObjectARB(_gammaShader);
 
-        // Use the color of the sky for clearing
-        glClearColor(_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f);
-
         // Fog has the same color as the sky
         float[] fogColor = {_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f};
         FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
         fogColorBuffer.put(fogColor);
         fogColorBuffer.rewind();
         glFog(GL_FOG_COLOR, fogColorBuffer);
-
 
         // Update the viewing distance
         float minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
@@ -220,6 +216,33 @@ public final class Main {
          * Render the player, world and HUD.
          */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        glOrtho(-1.0, 1.0, -1.0, 1.0, 1.0, -1.0);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+        
+        /*
+         * Sky quad.
+         */
+        glDisable(GL_DEPTH_TEST);
+        glBegin(GL_QUADS);
+        glColor4f(_world.getDaylight(), _world.getDaylight(), _world.getDaylight(), 1.0f);
+        glVertex3f(-1.0f, -1.0f, -1.0f);
+        glVertex3f(1.0f, -1.0f, -1.0f);
+        glColor4f(_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f);
+        glVertex3f(1.0f, 1.0f, -1.0f);
+        glVertex3f(-1.0f, 1.0f, -1.0f);
+        glEnd();
+        glEnable(GL_DEPTH_TEST);
+
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
         glLoadIdentity();
 
         _player.render();
