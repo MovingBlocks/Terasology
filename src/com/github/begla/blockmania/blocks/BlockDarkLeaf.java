@@ -46,6 +46,10 @@ public class BlockDarkLeaf extends Block {
         return Helper.getInstance().calcOffsetForTextureAt(4, 3);
     }
 
+    /**
+     * 
+     * @return
+     */
     @Override
     public boolean doNotTessellate() {
         return true;

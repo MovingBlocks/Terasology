@@ -24,6 +24,16 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Primitives {
 
+    /**
+     * 
+     * @param scaleX
+     * @param scaleY
+     * @param scaleZ
+     * @param x
+     * @param y
+     * @param z
+     * @param brightness
+     */
     public static void drawCloud(float scaleX, float scaleY, float scaleZ, float x, float y, float z, float brightness) {
         // Front face
         GL11.glColor3f(0.99f * brightness, 0.99f * brightness, 0.99f * brightness);
@@ -92,6 +102,10 @@ public class Primitives {
         GL11.glVertex3f(-0.5f * scaleX + x, 0.5f * scaleY + y, -0.5f * scaleZ + z);
     }
 
+    /**
+     * 
+     * @param brightness
+     */
     public static void drawSkyBox(float brightness) {
         Vector3f skyColor = new Vector3f(0.80f * brightness, 0.90f * brightness, 0.98f * brightness);
 

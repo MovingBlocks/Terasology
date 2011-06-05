@@ -181,6 +181,10 @@ public abstract class Block {
         return true;
     }
     
+    /**
+     * 
+     * @return
+     */
     public boolean doNotTessellate() {
         return false;
     }

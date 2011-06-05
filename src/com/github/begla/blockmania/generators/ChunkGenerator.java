@@ -67,14 +67,29 @@ public abstract class ChunkGenerator {
         throw new NotImplementedException();
     }
 
+    /**
+     * 
+     * @param c
+     * @return
+     */
     public int getOffsetX(Chunk c) {
         return (int) c.getPosition().x * (int) Configuration.CHUNK_DIMENSIONS.x;
     }
 
+    /**
+     * 
+     * @param c
+     * @return
+     */
     public int getOffsetY(Chunk c) {
         return (int) c.getPosition().y * (int) Configuration.CHUNK_DIMENSIONS.y;
     }
 
+    /**
+     * 
+     * @param c
+     * @return
+     */
     public int getOffsetZ(Chunk c) {
         return (int) c.getPosition().z * (int) Configuration.CHUNK_DIMENSIONS.z;
     }

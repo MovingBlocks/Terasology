@@ -627,6 +627,7 @@ public final class World extends RenderableObject {
      * @param x The X-coordinate
      * @param y The Y-coordinate
      * @param z The Z-coordinate
+     * @return  
      */
     public final boolean isBlockSurrounded(int x, int y, int z) {
         return (getBlock(x + 1, y, z) > 0 || getBlock(x - 1, y, z) > 0 || getBlock(x, y, z + 1) > 0 || getBlock(x, y, z - 1) > 0);
@@ -732,9 +733,9 @@ public final class World extends RenderableObject {
      * TODO
      * 
      * @param x
-     * @param y
+     * @param spreadLight 
+     * @param refreshSunlight 
      * @param z
-     * @param refreshLight 
      */
     public void refreshSunlightAt(int x, int z, boolean spreadLight, boolean refreshSunlight) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
@@ -786,7 +787,8 @@ public final class World extends RenderableObject {
      * @param z
      * @param oldValue
      * @param depth
-     * @param type  
+     * @param type
+     * @param lightSources  
      */
     public void unspreadLight(int x, int y, int z, byte oldValue, int depth, Chunk.LIGHT_TYPE type, ArrayList<LightNode> lightSources) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();

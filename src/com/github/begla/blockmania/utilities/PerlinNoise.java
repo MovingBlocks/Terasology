@@ -118,6 +118,14 @@ public class PerlinNoise {
         return result;
     }
 
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param octaves
+     * @return
+     */
     public float noiseWithOctaves2(float x, float y, float z, int octaves) {
         float noise = 0.0f;
 

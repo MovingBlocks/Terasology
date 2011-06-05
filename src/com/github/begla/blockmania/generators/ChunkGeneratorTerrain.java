@@ -84,6 +84,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
+    /**
+     * 
+     * @param c
+     * @param type
+     * @param y
+     * @return
+     */
     public byte getBlockTailpiece(Chunk c, byte type, int y) {
         // Sand
         if (type == 0x7) {
@@ -100,6 +107,15 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
+    /**
+     * 
+     * @param c
+     * @param x
+     * @param y
+     * @param z
+     * @param height
+     * @return
+     */
     public byte getBlockTypeForPosition(Chunk c, int x, int y, int z, int height) {
         // Sand
         if (y <= 33 && y >= 28) {

@@ -1084,7 +1084,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * 
      * @param x Local block position on the x-axis
      * @param z Local block position on the z-axis
-     * @param spreadLight  
+     * @param spreadLight
+     * @param refreshSunlight  
      */
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
         boolean covered = false;
@@ -1189,7 +1190,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param z 
      * @param depth 
      * @param oldLightValue
-     * @param type  
+     * @param type
+     * @param lightSources  
      */
     public void unspreadLight(int x, int y, int z, byte oldLightValue, int depth, LIGHT_TYPE type, ArrayList<LightNode> lightSources) {
         if (depth > oldLightValue || oldLightValue <= 0) {

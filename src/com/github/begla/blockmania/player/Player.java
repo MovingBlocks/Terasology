@@ -654,10 +654,18 @@ public final class Player extends RenderableObject {
         return _playerOrigin;
     }
     
+    /**
+     * 
+     * @return
+     */
     public double getYaw() {
         return _yaw;
     }
     
+    /**
+     * 
+     * @return
+     */
     public double getPitch() {
         return _pitch;
     }

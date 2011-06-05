@@ -21,9 +21,25 @@ package com.github.begla.blockmania.player;
  */
 public class LightNode {
 
+    /**
+     * 
+     */
+    /**
+     * 
+     */
+    /**
+     * 
+     */
     public int x, y, z;
     private byte _lightIntens = 0;
 
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param lightIntens
+     */
     public LightNode(int x, int y, int z, byte lightIntens) {
         this.x = x;
         this.y = y;
@@ -31,10 +47,18 @@ public class LightNode {
         this._lightIntens = lightIntens;
     }
 
+    /**
+     * 
+     * @param lightIntens
+     */
     public void setLightIntens(byte lightIntens) {
         this._lightIntens = lightIntens;
     }
 
+    /**
+     * 
+     * @return
+     */
     public byte getLightIntens() {
         return _lightIntens;
     }

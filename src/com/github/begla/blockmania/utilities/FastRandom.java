@@ -122,6 +122,8 @@ public class FastRandom {
     /**
      * Calculates a normal distributed value according to the given variance and mean (using to the polar method).
      * 
+     * @param variance 
+     * @param mean 
      * @return 
      */
     public double normalDistrDouble(double variance, double mean) {
