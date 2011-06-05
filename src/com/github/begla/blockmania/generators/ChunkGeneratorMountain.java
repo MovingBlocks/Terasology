@@ -67,9 +67,9 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
                 for (int i = 0; i < height; i++) {
                     if (calcCanyonDensity(x + getOffsetX(c), i + getOffsetY(c) + startY, z + getOffsetZ(c)) >= 0) {
                         if (i == height - 1) {
-                            c.setBlock(x, i + startY, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, i + startY, z, 8), i + startY));
+                            c.setBlock(x, i + startY, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, i + startY, z, height + startY), i + startY));
                         } else if (i < height - 1) {
-                            c.setBlock(x, i + startY, z, getBlockTypeForPosition(c, x, i + startY, z, 8));
+                            c.setBlock(x, i + startY, z, getBlockTypeForPosition(c, x, i + startY, z, height + startY));
                         }
                         blockGenerated = true;
                     }

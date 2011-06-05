@@ -55,7 +55,7 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public final class Main {
 
-    private int _shader = 0;
+    private int _gammaShader = 0;
     HashMap<String, Integer> _fragmentShader = new HashMap<String, Integer>();
     HashMap<String, Integer> _vertexShader = new HashMap<String, Integer>();
     /* ------- */
@@ -197,7 +197,7 @@ public final class Main {
      * Renders the scene.
      */
     private void render() {
-
+        ARBShaderObjects.glUseProgramObjectARB(_gammaShader);
 
         // Use the color of the sky for clearing
         glClearColor(_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f);
@@ -223,16 +223,11 @@ public final class Main {
         glLoadIdentity();
 
         _player.render();
-
-        // Apply shader
-        ARBShaderObjects.glUseProgramObjectARB(_shader);
         _world.render();
-        // Disable shader
+
         ARBShaderObjects.glUseProgramObjectARB(0);
 
         renderHUD();
-
-
     }
 
     /**
@@ -589,27 +584,22 @@ public final class Main {
      * 
      */
     private void initShader() {
-        _shader = ARBShaderObjects.glCreateProgramObjectARB();
+        _gammaShader = ARBShaderObjects.glCreateProgramObjectARB();
 
-        if (_shader != 0) {
-            createFragShader("gamma.frag", "gamma");
-            createVertexShader("gamma.vert", "gamma");
-        }
+        if (_gammaShader != 0) {
+            int fragShader = createFragShader("gamma_frag.glsl", "gamma");
+            int vertShader = createVertexShader("gamma_vert.glsl", "gamma");
 
-        // Register and compile all fragment shader
-        for (Integer i : _fragmentShader.values()) {
-            if (i != 0) {
-                ARBShaderObjects.glAttachObjectARB(_shader, i);
-                ARBShaderObjects.glLinkProgramARB(_shader);
-                ARBShaderObjects.glValidateProgramARB(_shader);
-            }
-        }
+            if (fragShader != 0 && vertShader != 0) {
+                ARBShaderObjects.glAttachObjectARB(_gammaShader, fragShader);
+                ARBShaderObjects.glLinkProgramARB(_gammaShader);
+                ARBShaderObjects.glValidateProgramARB(_gammaShader);
 
-        for (Integer i : _vertexShader.values()) {
-            if (i != 0) {
-                ARBShaderObjects.glAttachObjectARB(_shader, i);
-                ARBShaderObjects.glLinkProgramARB(_shader);
-                ARBShaderObjects.glValidateProgramARB(_shader);
+                ARBShaderObjects.glAttachObjectARB(_gammaShader, vertShader);
+                ARBShaderObjects.glLinkProgramARB(_gammaShader);
+                ARBShaderObjects.glValidateProgramARB(_gammaShader);
+            } else {
+                Helper.LOGGER.log(Level.SEVERE, "Shader: Failed to load gamma shader.");
             }
         }
     }
@@ -660,7 +650,7 @@ public final class Main {
                 fragCode += line + "\n";
             }
         } catch (Exception e) {
-            Helper.LOGGER.log(Level.SEVERE, "Fail reading vertex shading code.");
+            Helper.LOGGER.log(Level.SEVERE, "Failed reading vertex shading code.");
             return 0;
         }
 

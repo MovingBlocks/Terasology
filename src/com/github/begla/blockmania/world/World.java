@@ -28,6 +28,7 @@ import com.github.begla.blockmania.generators.ChunkGeneratorLakes;
 import com.github.begla.blockmania.generators.ChunkGeneratorMountain;
 import com.github.begla.blockmania.generators.ChunkGeneratorResources;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
+import com.github.begla.blockmania.generators.ObjectGeneratorFirTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorTree;
 import com.github.begla.blockmania.utilities.FastRandom;
@@ -100,6 +101,7 @@ public final class World extends RenderableObject {
     private final ChunkGeneratorFlora _generatorGrass;
     private final ObjectGeneratorTree _generatorTree;
     private final ObjectGeneratorPineTree _generatorPineTree;
+    private final ObjectGeneratorFirTree _generatorFirTree;
     private final FastRandom _rand;
     /* ------ */
     private String _title, _seed;
@@ -159,6 +161,7 @@ public final class World extends RenderableObject {
         _generatorLakes = new ChunkGeneratorLakes(seed);
         _generatorTree = new ObjectGeneratorTree(this, seed);
         _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
+        _generatorFirTree = new ObjectGeneratorFirTree(this, seed);
         _generatorGrass = new ChunkGeneratorFlora(seed);
 
         _displayListClouds = glGenLists(1);
@@ -1050,6 +1053,14 @@ public final class World extends RenderableObject {
      */
     public ObjectGeneratorTree getGeneratorTree() {
         return _generatorTree;
+    }
+
+    /**
+     * 
+     * @return 
+     */
+    public ObjectGeneratorFirTree getGeneratorFirTree() {
+        return _generatorFirTree;
     }
 
     /**

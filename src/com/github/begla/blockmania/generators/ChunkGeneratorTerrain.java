@@ -58,10 +58,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     if (first && i == height) {
                         first = false;
                         // Generate grass on the top layer
-                        c.setBlock(x, i, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, i, z, 0), i));
+                        c.setBlock(x, i, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, i, z, height), i));
 
                     } else if (i < height) {
-                        c.setBlock(x, i, z, getBlockTypeForPosition(c, x, i, z, 2));
+                        c.setBlock(x, i, z, getBlockTypeForPosition(c, x, i, z, height));
                     }
 
                     /*
@@ -100,16 +100,15 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    public byte getBlockTypeForPosition(Chunk c, int x, int y, int z, int stoneProbInterval) {
+    public byte getBlockTypeForPosition(Chunk c, int x, int y, int z, int height) {
         // Sand
         if (y <= 33 && y >= 28) {
             return (byte) 0x7;
         }
 
-//        double r = _rand.standNormalDistrDouble();
-//        if (calcStoneDensity(x + getOffsetX(c), y, z + getOffsetZ(c)) < 0.1 && r > -stoneProbInterval && r < stoneProbInterval) {
-//            return (byte) 0x3;
-//        }
+        if ((float) y / (float) height < 0.85) {
+            return (byte) 0x3;
+        }
 
         return 0x2;
     }
@@ -162,19 +161,5 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         float result = 0.0f;
         result += _pGen3.noiseWithOctaves(0.03f * x, 0.03f, 0.03f * z, 6, 0.1f);
         return result;
-    }
-
-    /**
-     * Returns the cave density for the base terrain.
-     * 
-     * @param x
-     * @param y
-     * @param z
-     * @return
-     */
-    protected float calcStoneDensity(float x, float y, float z) {
-        float result = 0.0f;
-        result += _pGen2.noiseWithOctaves2(0.05f * x, 0.05f * y, 0.05f * z, 2);
-        return Math.abs(result);
     }
 }

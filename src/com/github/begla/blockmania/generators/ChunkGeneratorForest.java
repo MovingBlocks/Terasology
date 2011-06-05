@@ -110,12 +110,16 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
         if (forestDens > 0.1f && c.getBlock(x, y, z) == 0x1 && y > 32) {
             double r = _rand.standNormalDistrDouble();
             if (r > -0.1 && r < 0.1) {
-                if (_rand.randomBoolean()) {
-                    c.setBlock(x, y + 1, z, (byte) 0x0);
-                    c.getParent().getGeneratorPineTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
-                } else {
+                double r2 = _rand.standNormalDistrDouble();
+                if (r2 > -1 && r2 < 1) {
                     c.setBlock(x, y + 1, z, (byte) 0x0);
                     c.getParent().getGeneratorTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
+                } else if (r2 > -2 && r2 < -1) {
+                    c.setBlock(x, y + 1, z, (byte) 0x0);
+                    c.getParent().getGeneratorPineTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
+                } else if (r2 < -2) {
+                    c.setBlock(x, y + 1, z, (byte) 0x0);
+                    c.getParent().getGeneratorFirTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY((int) y) + 1, c.getBlockWorldPosZ(z), false);
                 }
             }
         }

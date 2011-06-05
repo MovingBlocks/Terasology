@@ -57,7 +57,7 @@ public abstract class Block {
          */
         BACK;
     };
-    private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockTreeTrunk(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockHighGrass(), new BlockLargeHighGrass(), new BlockTorch(), new BlockLava(), new BlockWood(),  new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick(), new BlockCoal(), new BlockGold()};
+    private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockTreeTrunk(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockHighGrass(), new BlockLargeHighGrass(), new BlockTorch(), new BlockLava(), new BlockWood(), new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick(), new BlockCoal(), new BlockGold(),  new BlockDarkLeaf()};
     private static BlockNil nilBlock = new BlockNil();
 
     /**
@@ -72,6 +72,36 @@ public abstract class Block {
         }
 
         return _blocks[type];
+    }
+
+    /**
+     * 
+     * @param c
+     * @return 
+     */
+    public static Block getBlockForClass(Class c) {
+        for (int i = 0; i < _blocks.length; i++) {
+            if (_blocks[i].getClass() == c) {
+                return _blocks[i];
+            }
+        }
+
+        return nilBlock;
+    }
+
+    /**
+     * 
+     * @param c
+     * @return 
+     */
+    public static int getTypeForClass(Class c) {
+        for (int i = 0; i < _blocks.length; i++) {
+            if (_blocks[i].getClass() == c) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     /**
@@ -149,6 +179,10 @@ public abstract class Block {
      */
     public boolean isCastingShadows() {
         return true;
+    }
+    
+    public boolean doNotTessellate() {
+        return false;
     }
 
     /**

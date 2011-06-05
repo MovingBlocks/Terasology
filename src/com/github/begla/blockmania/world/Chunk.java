@@ -1028,7 +1028,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         Block bCheck = Block.getBlockForType(blockToCheck);
         Block cBlock = Block.getBlockForType(currentBlock);
 
-        return bCheck.getClass() == BlockAir.class || bCheck.getClass() == BlockLeaf.class || bCheck.getClass() == BlockGlass.class || Block.getBlockForType(blockToCheck).isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
+        return bCheck.getClass() == BlockAir.class || cBlock.doNotTessellate() || bCheck.isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
     }
 
     /**
@@ -1335,7 +1335,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
         if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
             float sunlight = (float) Math.pow(0.8, 15 - _sunlight[x][y][z] * _parent.getDaylight());
             float light = (float) Math.pow(0.8, 15 - _light[x][y][z]);
-            
+
             if (sunlight >= light) {
                 return sunlight;
             } else {

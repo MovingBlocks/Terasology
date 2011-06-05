@@ -61,7 +61,7 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
             for (int x = -(stage / 2); x <= (stage / 2); x++) {
                 for (int z = -(stage / 2); z <= (stage / 2); z++) {
                     if (!(x == 0 && z == 0)) {
-                        _world.setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update, false);
+                        _world.setBlock(posX + x, posY + y, posZ + z, (byte) 0x16, update, false);
                         _world.refreshSunlightAt(posX + x, posZ + z, false, true);
                     }
                 }
