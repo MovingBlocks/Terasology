@@ -15,8 +15,6 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.blocks.BlockLeaf;
-import com.github.begla.blockmania.blocks.BlockGlass;
 import com.github.begla.blockmania.blocks.BlockAir;
 import java.util.ArrayList;
 import com.github.begla.blockmania.Configuration;
@@ -31,7 +29,6 @@ import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.utilities.VectorPool;
 import gnu.trove.iterator.TFloatIterator;
-import gnu.trove.list.TLinkable;
 import gnu.trove.list.array.TFloatArrayList;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -59,9 +56,8 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Chunk extends RenderableObject implements Comparable<Chunk>, TLinkable<Chunk> {
+public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
-    private Chunk _next, _prev;
     private boolean _dirty;
     private boolean _lightDirty;
     private static int _statVertexArrayUpdateCount = 0;
@@ -693,7 +689,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         if (drawLeft) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.LEFT);
-            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * (simpleOcclusionAmount(x, y, z, -1, 0, 0) - Configuration.BLOCK_SIDE_DIMMING), 0);
+            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * Configuration.BLOCK_SIDE_DIMMING, 0);
 
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y;
@@ -751,7 +747,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         if (drawRight) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.RIGHT);
-            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * (simpleOcclusionAmount(x, y, z, 1, 0, 0) - Configuration.BLOCK_SIDE_DIMMING), 0);
+            float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z)) * Configuration.BLOCK_SIDE_DIMMING, 0);
 
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y;
@@ -1458,7 +1454,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      * @return Occlusion amount
      */
     public float simpleOcclusionAmount(int x, int y, int z, int dirX, int dirY, int dirZ) {
-        float intens = 0f;
+        int intens = 0;
 
         ArrayList<Vector3f> positions = new ArrayList<Vector3f>();
         positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ));
@@ -1472,13 +1468,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
 
         for (Vector3f p : positions) {
             if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX((int) p.x), getBlockWorldPosY((int) p.y), getBlockWorldPosZ((int) p.z))).isCastingShadows()) {
-                intens += 1f / 15f;
+                intens++;
             }
 
             VectorPool.putVector(p);
         }
 
-        return 1f - (intens * Configuration.OCCLUSION_INTENS);
+        return (float) (Math.pow(0.9, intens));
     }
 
     /**
@@ -1736,41 +1732,5 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk>, 
      */
     public int getChunkID() {
         return _chunkID;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    @Override
-    public Chunk getNext() {
-        return _next;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    @Override
-    public Chunk getPrevious() {
-        return _prev;
-    }
-
-    /**
-     * 
-     * @param t
-     */
-    @Override
-    public void setNext(Chunk t) {
-        _next = t;
-    }
-
-    /**
-     * 
-     * @param t
-     */
-    @Override
-    public void setPrevious(Chunk t) {
-        _prev = t;
     }
 }
