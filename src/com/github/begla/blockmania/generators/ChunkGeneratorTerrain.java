@@ -106,10 +106,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             return (byte) 0x7;
         }
 
-        double r = _rand.standNormalDistrDouble();
-        if (calcStoneDensity(x + getOffsetX(c), y, z + getOffsetZ(c)) < 0.1 && r > -stoneProbInterval && r < stoneProbInterval) {
-            return (byte) 0x3;
-        }
+//        double r = _rand.standNormalDistrDouble();
+//        if (calcStoneDensity(x + getOffsetX(c), y, z + getOffsetZ(c)) < 0.1 && r > -stoneProbInterval && r < stoneProbInterval) {
+//            return (byte) 0x3;
+//        }
 
         return 0x2;
     }

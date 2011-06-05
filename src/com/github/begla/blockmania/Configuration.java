@@ -75,7 +75,7 @@ public final class Configuration {
     /**
      * Global brightness factor, which is applied to vertices on the creation of the display lists.
      */
-    public static final float BRIGHTNESS_FACTOR = 0.85f;
+    public static final float BRIGHTNESS_FACTOR = 1.0f;
     public static final float PROB_COAL = -1.5f;
     public static final float PROB_GOLD = -3f;
     /* ------- */
