@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania.player;
 
+import com.github.begla.blockmania.world.Primitives;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.Helper;
 import com.github.begla.blockmania.RenderableObject;
@@ -38,7 +39,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glawwtzel@me.com>
  */
 public final class Player extends RenderableObject {
-
+    
     private static final Vector3f _playerOrigin = VectorPool.getVector(128, 100, 128);
     private boolean _jump = false;
     private byte _selectedBlockType = 1;
@@ -65,21 +66,23 @@ public final class Player extends RenderableObject {
      */
     @Override
     public void render() {
-
+        
         if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
             float bobbing2 = _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.75f;
             float bobbing3 = _pGen.noise(_position.x * 1.5f, _position.z * 1.5f, 0f) * 0.75f;
             glRotatef(bobbing2, 0f, 1f, 0f);
             glRotatef(bobbing3, 1f, 0f, 1f);
         }
-
+        
         glRotatef((float) _pitch, 1f, 0f, 0f);
         glRotatef((float) _yaw, 0f, 1f, 0f);
-
+        
         if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
             float bobbing1 = _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.05f;
             glTranslatef(0.0f, bobbing1, 0);
         }
+
+
 
         // Position the camera in the upper part of the player's bounding box
         glTranslatef(-_position.x, -_position.y - getAABB().getDimensions().y / 1.2f, -_position.z);
@@ -88,7 +91,7 @@ public final class Player extends RenderableObject {
         // Display the block the player is aiming at
         if (Configuration.getSettingBoolean("SHOW_PLACING_BOX")) {
             if (is != null) {
-
+                
                 if (Block.getBlockForType(_parent.getBlockAtPosition(is.getBlockPos())).renderBoundingBox()) {
                     Block.AABBForBlockAt((int) is.getBlockPos().x, (int) is.getBlockPos().y, (int) is.getBlockPos().z).render();
                 }
@@ -106,14 +109,14 @@ public final class Player extends RenderableObject {
     public void update() {
         yaw(Mouse.getDX() * 0.1f);
         pitch(Mouse.getDY() * 0.1f);
-
+        
         processMovement();
         updatePlayerPosition();
 
         // Update the viewing direction
         _viewingDirection.set((float) Math.sin(Math.toRadians(_yaw)) * (float) Math.cos(Math.toRadians(_pitch)), -1f * (float) Math.sin(Math.toRadians(_pitch)), -1 * (float) Math.cos(Math.toRadians(_pitch)) * (float) Math.cos(Math.toRadians(_yaw)));
         _viewingDirection.normalise();
-
+        
         _movement.set(0, 0, 0);
     }
 
@@ -152,11 +155,11 @@ public final class Player extends RenderableObject {
      */
     public void walkForward() {
         _movement.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-
+        
         if (Configuration.getSettingBoolean("GOD_MODE")) {
             _movement.y -= (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
-
+        
         _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
@@ -165,11 +168,11 @@ public final class Player extends RenderableObject {
      */
     public void walkBackwards() {
         _movement.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-
+        
         if (Configuration.getSettingBoolean("GOD_MODE")) {
             _movement.y += (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
-
+        
         _movement.z += (double) _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
@@ -226,7 +229,7 @@ public final class Player extends RenderableObject {
             Collections.sort(inters);
             return inters.get(0);
         }
-
+        
         return null;
     }
 
@@ -239,7 +242,7 @@ public final class Player extends RenderableObject {
         Vector3f bp = r.getBlockPos();
         byte blockType = _parent.getBlock((int) bp.x, (int) bp.y, (int) bp.z);
         float light = _parent.getRenderingLightValue((int) bp.x, (int) bp.y, (int) bp.z);
-
+        
         return String.format("%s (t: %d, l: %f) ", r, blockType, light);
     }
 
@@ -257,10 +260,10 @@ public final class Player extends RenderableObject {
                 // Prevent players from placing blocks inside their bounding boxes
                 if (Block.AABBForBlockAt((int) blockPos.x, (int) blockPos.y, (int) blockPos.z).overlaps(getAABB())) {
                     return;
-
+                    
                 }
                 getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
-
+                
             }
         }
     }
@@ -274,7 +277,7 @@ public final class Player extends RenderableObject {
         Intersection is = calcSelectedBlock();
         if (is != null) {
             Vector3f blockPos = is.getBlockPos();
-
+            
             if (type == 0) {
                 _parent.getGeneratorTree().generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
             } else {
@@ -380,18 +383,18 @@ public final class Player extends RenderableObject {
     private boolean verticalHitTest(Vector3f origin) {
         boolean result = false;
         FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
-
+        
         Vector3f dir = Vector3f.sub(origin, _position, null);
-
+        
         if (dir.length() > 0) {
             dir.normalise();
         } else {
             return false;
         }
-
+        
         for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end;) {
             byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
-
+            
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
                 while (getAABB().overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z))) {
                     result = true;
@@ -400,7 +403,7 @@ public final class Player extends RenderableObject {
                     _gravity = 0f;
                 }
             }
-
+            
         }
         return result;
     }
@@ -416,14 +419,14 @@ public final class Player extends RenderableObject {
          * and order those by the distance to the originating point.
          */
         FastList<BlockPosition> blockPositions = new FastList<BlockPosition>();
-
+        
         for (int x = -1; x < 2; x++) {
             for (int z = -1; z < 2; z++) {
                 for (int y = -1; y < 2; y++) {
                     int blockPosX = (int) (origin.x + x + 0.5f);
                     int blockPosY = (int) (origin.y + y + 0.5f);
                     int blockPosZ = (int) (origin.z + z + 0.5f);
-
+                    
                     blockPositions.add(new BlockPosition(blockPosX, blockPosY, blockPosZ, origin));
                 }
             }
@@ -446,7 +449,7 @@ public final class Player extends RenderableObject {
         // Check each block positions for collisions
         for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end;) {
             byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
-
+            
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
                 if (getAABB().overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z))) {
                     result = true;
@@ -461,7 +464,7 @@ public final class Player extends RenderableObject {
                     float length = Vector3f.dot(slideVector, direction);
                     _position.z = origin.z + length * slideVector.z;
                     _position.x = origin.x + length * slideVector.x;
-
+                    
                     VectorPool.putVector(normal);
                     VectorPool.putVector(slideVector);
                     VectorPool.putVector(direction);
@@ -483,7 +486,7 @@ public final class Player extends RenderableObject {
         // Save the previous position before changing any of the values
         Vector3f oldPosition = VectorPool.getVector();
         oldPosition.set(_position);
-
+        
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
             _position.z += 0.75f;
             return;
@@ -495,19 +498,19 @@ public final class Player extends RenderableObject {
         if (Math.abs(_acc.y) > 0f) {
             _acc.y += -1f * _acc.y * Configuration.getSettingNumeric("FRICTION");
         }
-
+        
         if (Math.abs(_acc.x) > 0f) {
             _acc.x += -1f * _acc.x * Configuration.getSettingNumeric("FRICTION");
         }
-
+        
         if (Math.abs(_acc.z) > 0f) {
             _acc.z += -1f * _acc.z * Configuration.getSettingNumeric("FRICTION");
         }
-
+        
         if (Math.abs(_acc.x) > _wSpeed || Math.abs(_acc.z) > _wSpeed || Math.abs(_acc.z) > _wSpeed) {
             double max = Math.max(Math.max(Math.abs(_acc.x), Math.abs(_acc.z)), _acc.y);
             double div = max / _wSpeed;
-
+            
             _acc.x /= div;
             _acc.z /= div;
             _acc.y /= div;
@@ -521,18 +524,18 @@ public final class Player extends RenderableObject {
         _acc.x += _movement.x;
         _acc.y += _movement.y;
         _acc.z += _movement.z;
-
+        
         if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY") && !Configuration.getSettingBoolean("GOD_MODE")) {
             _gravity -= Configuration.getSettingNumeric("GRAVITY");
-
+            
             if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY")) {
                 _gravity = -Configuration.getSettingNumeric("MAX_GRAVITY");
             }
         }
-
+        
         getPosition().y += _acc.y;
         getPosition().y += _gravity;
-
+        
         if (!Configuration.getSettingBoolean("GOD_MODE")) {
             boolean vHit = verticalHitTest(oldPosition);
             if (vHit) {
@@ -541,16 +544,16 @@ public final class Player extends RenderableObject {
                     _jump = false;
                     _gravity = Configuration.getSettingNumeric("JUMP_INTENSITY");
                 }
-
+                
                 _playerIsTouchingGround = true;
             } else {
-
+                
                 _playerIsTouchingGround = false;
             }
         } else {
             _gravity = 0f;
         }
-
+        
         oldPosition.set(_position);
 
         /*
@@ -569,7 +572,7 @@ public final class Player extends RenderableObject {
                 // Do something while the player is colliding
             }
         }
-
+        
         VectorPool.putVector(oldPosition);
     }
 
@@ -615,7 +618,7 @@ public final class Player extends RenderableObject {
      */
     public void cycleBlockTypes(int upDown) {
         _selectedBlockType += upDown;
-
+        
         if (_selectedBlockType >= Block.getBlockCount()) {
             _selectedBlockType = 0;
         } else if (_selectedBlockType < 0) {
@@ -649,5 +652,13 @@ public final class Player extends RenderableObject {
      */
     public static Vector3f getPlayerOrigin() {
         return _playerOrigin;
+    }
+    
+    public double getYaw() {
+        return _yaw;
+    }
+    
+    public double getPitch() {
+        return _pitch;
     }
 }

@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.Configuration;
 import java.util.Collection;
 import java.util.Collections;
 import javolution.util.FastList;
@@ -68,26 +69,27 @@ public final class ChunkUpdateManager {
      * 
      */
     public void updateDisplayLists() {
-        if (!_displayListUpdates.isEmpty()) {
-            // Take one chunk from the queue
-            Chunk c = _displayListUpdates.valueOf(_displayListUpdates.head().getNext());
-            if (c != null) {
-                // Generate the display list of the center chunk
-                c.generateDisplayLists();
-                // Remove the center chunk
-                _displayListUpdates.remove(c);
+        for (int i = 0; i < Configuration.DL_UPDATES_PER_CYCLE; i++) {
+            if (!_displayListUpdates.isEmpty()) {
+                // Take one chunk from the queue
+                Chunk c = _displayListUpdates.getFirst();
+                if (c != null) {
+                    // Generate the display list of the center chunk
+                    c.generateDisplayLists();
+                    // Remove the center chunk
+                    _displayListUpdates.remove(c);
 
-                Chunk[] neighbors = c.loadOrCreateNeighbors();
+                    Chunk[] neighbors = c.loadOrCreateNeighbors();
 
-                // Generate the display lists of the neighbor chunks
-                for (Chunk n : neighbors) {
-                    if (n != null) {
-                        n.generateDisplayLists();
+                    // Generate the display lists of the neighbor chunks
+                    for (Chunk n : neighbors) {
+                        if (n != null) {
+                            n.generateDisplayLists();
+                        }
                     }
+
                 }
-
             }
-
         }
     }
 

@@ -31,6 +31,7 @@ import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.ObjectGeneratorFirTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorTree;
+import com.github.begla.blockmania.player.LightNode;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.VectorPool;
 import java.awt.image.BufferedImage;
@@ -39,6 +40,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import org.jdom.JDOMException;
 import static org.lwjgl.opengl.GL11.*;
@@ -371,7 +373,8 @@ public final class World extends RenderableObject {
 
         glPushMatrix();
         // Position the sun relatively to the player
-        glTranslatef(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 1.25f, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
+        glTranslatef(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 2.0f, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
+        glRotatef(-35, 1, 0, 0);
 
         // Disable fog
         glDisable(GL_FOG);
@@ -453,16 +456,16 @@ public final class World extends RenderableObject {
         _cloudOffset.x += _windDirection.x;
         _cloudOffset.y += _windDirection.y;
 
-        if (_cloudOffset.x >= _clouds.length * 32 / 2 || _cloudOffset.x <= -(_clouds.length * 32 / 2)) {
+        if (_cloudOffset.x >= _clouds.length * 16 / 2 || _cloudOffset.x <= -(_clouds.length * 16 / 2)) {
             _windDirection.x = -_windDirection.x;
         } else if (_cloudOffset.y >= _clouds.length * 32 / 2 || _cloudOffset.y <= -(_clouds.length * 32 / 2)) {
             _windDirection.y = -_windDirection.y;
         }
 
         if (Helper.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
-            _windDirection.x = (float) _rand.randomDouble();
-            _windDirection.y = (float) _rand.randomDouble();
-            _nextWindUpdateInSeconds = (short) (Math.abs(_rand.randomInt()) % 32);
+            _windDirection.x = (float) _rand.randomDouble() / 4f;
+            _windDirection.y = (float) _rand.randomDouble() / 4f;
+            _nextWindUpdateInSeconds = (short) (Math.abs(_rand.randomInt()) % 16 + 32);
             _lastWindUpdate = Helper.getInstance().getTime();
         }
 
@@ -538,6 +541,8 @@ public final class World extends RenderableObject {
 
         if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0x0) {
 
+            byte oldValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
+
             if (Block.getBlockForType(c.getBlock(blockPosX, y, blockPosZ)).isRemovable()) {
                 c.setBlock(blockPosX, y, blockPosZ, type);
             }
@@ -546,9 +551,9 @@ public final class World extends RenderableObject {
                 /*
                  * Update sunlight.
                  */
-                byte oldValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
                 c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, true, true);
                 c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.SUN);
+                
                 byte newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
 
                 /*
@@ -557,10 +562,8 @@ public final class World extends RenderableObject {
                 if (newValue > oldValue) {
                     c.spreadLight(blockPosX, y, blockPosZ, newValue, Chunk.LIGHT_TYPE.SUN);
                 } else if (newValue < oldValue) {
-                    // TODO: Unspread sunlight
-                    //c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.BLOCK);
+                    c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.SUN);
                 }
-
 
                 /*
                  * Spread light of block light sources.
@@ -574,9 +577,7 @@ public final class World extends RenderableObject {
                 if (newValue > oldValue) {
                     c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
                 } else {
-                    c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.BLOCK);
-                    // TODO: Unspread block light
-                    //c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.BLOCK);
+                    c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.BLOCK);
                 }
 
                 /*
@@ -787,7 +788,7 @@ public final class World extends RenderableObject {
      * @param depth
      * @param type  
      */
-    public void unspreadLight(int x, int y, int z, byte oldValue, int depth, Chunk.LIGHT_TYPE type) {
+    public void unspreadLight(int x, int y, int z, byte oldValue, int depth, Chunk.LIGHT_TYPE type, ArrayList<LightNode> lightSources) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
 
@@ -797,7 +798,7 @@ public final class World extends RenderableObject {
         Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
-            c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth, type);
+            c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth, type, lightSources);
         }
     }
 
@@ -817,15 +818,6 @@ public final class World extends RenderableObject {
      */
     public Player getPlayer() {
         return _player;
-    }
-
-    /**
-     * Returns the color of the daylight as a vector.
-     * 
-     * @return The daylight color
-     */
-    public Vector3f getDaylightColor() {
-        return VectorPool.getVector(getDaylight() * 0.92f, getDaylight() * 0.98f, 1f * getDaylight());
     }
 
     /**
@@ -1335,8 +1327,8 @@ public final class World extends RenderableObject {
      * Regenerates the clouds display list with the current daylight value.
      */
     public void regenerateClouds() {
-//
-//        FastRandom rand = new FastRandom(getSeed().hashCode());
+
+        FastRandom rand = new FastRandom(getSeed().hashCode());
 
         try {
             glNewList(_displayListClouds, GL_COMPILE);
@@ -1346,9 +1338,9 @@ public final class World extends RenderableObject {
 
             for (int x = 0; x < length; x++) {
                 for (int y = 0; y < length; y++) {
-                    //double r = rand.standNormalDistrDouble();
-                    if (_clouds[x][y]) { // && r > -2 && r < 0) {
-                        Primitives.drawCloud(32, 8, 16, x * 64f - (length / 2 * 64f), 0, y * 32f - (length / 2 * 32f), getDaylight());
+                    double r = rand.standNormalDistrDouble();
+                    if (_clouds[x][y] && r > -2 && r < 0) {
+                        Primitives.drawCloud(32, 8, 16, x * 32f - (length / 2 * 32f), 0, y * 16f - (length / 2 * 16f), getDaylight());
                     }
                 }
             }

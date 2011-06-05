@@ -21,6 +21,7 @@ import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.HeightMapFrame;
 import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.world.Primitives;
 import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -44,6 +45,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.NVFogDistance;
+import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.util.ResourceLoader;
@@ -200,7 +202,7 @@ public final class Main {
         ARBShaderObjects.glUseProgramObjectARB(_gammaShader);
 
         // Fog has the same color as the sky
-        float[] fogColor = {_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f};
+        float[] fogColor = {_world.getDaylight(), _world.getDaylight(), _world.getDaylight(), 1.0f};
         FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
         fogColorBuffer.put(fogColor);
         fogColorBuffer.rewind();
@@ -209,7 +211,7 @@ public final class Main {
         // Update the viewing distance
         float minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
         float viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, 32f);
+        glFogf(GL_FOG_START, 16f);
         glFogf(GL_FOG_END, viewingDistance);
 
         /*
@@ -217,32 +219,19 @@ public final class Main {
          */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
         glLoadIdentity();
-        glOrtho(-1.0, 1.0, -1.0, 1.0, 1.0, -1.0);
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-        
-        /*
-         * Sky quad.
-         */
+
+        glRotatef((float) _player.getPitch(), 1f, 0f, 0f);
+        glRotatef((float) _player.getYaw(), 0f, 1f, 0f);
+
+        glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
         glBegin(GL_QUADS);
-        glColor4f(_world.getDaylight(), _world.getDaylight(), _world.getDaylight(), 1.0f);
-        glVertex3f(-1.0f, -1.0f, -1.0f);
-        glVertex3f(1.0f, -1.0f, -1.0f);
-        glColor4f(_world.getDaylightColor().x, _world.getDaylightColor().y, _world.getDaylightColor().z, 1.0f);
-        glVertex3f(1.0f, 1.0f, -1.0f);
-        glVertex3f(-1.0f, 1.0f, -1.0f);
+        Primitives.drawSkyBox(_world.getDaylight());
         glEnd();
+        glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
 
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
         glLoadIdentity();
 
         _player.render();

@@ -72,6 +72,7 @@ public final class Configuration {
      * The intensity at which the front and back side of blocks are constantly 'dimmed'.
      */
     public static final float BLOCK_SIDE_DIMMING = 0.75f;
+    public static final int DL_UPDATES_PER_CYCLE = 2;
     /**
      * Global brightness factor, which is applied to vertices on the creation of the display lists.
      */
