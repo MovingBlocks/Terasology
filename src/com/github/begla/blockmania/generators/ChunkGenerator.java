@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.PerlinNoise;
@@ -65,5 +65,32 @@ public abstract class ChunkGenerator {
      */
     public void generate(Chunk c) {
         throw new NotImplementedException();
+    }
+
+    /**
+     * 
+     * @param c
+     * @return
+     */
+    public int getOffsetX(Chunk c) {
+        return (int) c.getPosition().x * (int) Configuration.CHUNK_DIMENSIONS.x;
+    }
+
+    /**
+     * 
+     * @param c
+     * @return
+     */
+    public int getOffsetY(Chunk c) {
+        return (int) c.getPosition().y * (int) Configuration.CHUNK_DIMENSIONS.y;
+    }
+
+    /**
+     * 
+     * @param c
+     * @return
+     */
+    public int getOffsetZ(Chunk c) {
+        return (int) c.getPosition().z * (int) Configuration.CHUNK_DIMENSIONS.z;
     }
 }

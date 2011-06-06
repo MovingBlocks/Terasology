@@ -13,45 +13,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.blocks;
-
-import com.github.begla.blockmania.Helper;
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector4f;
+package com.github.begla.blockmania.player;
 
 /**
- * A leaf block.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockLeaf extends Block {
+public class LightNode {
 
-    @Override
-    public boolean isCastingShadows() {
-        return false;
+    /**
+     * 
+     */
+    /**
+     * 
+     */
+    /**
+     * 
+     */
+    public int x, y, z;
+    private byte _lightIntens = 0;
+
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param lightIntens
+     */
+    public LightNode(int x, int y, int z, byte lightIntens) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this._lightIntens = lightIntens;
     }
 
-    @Override
-    public boolean isBlockTypeTranslucent() {
-        return true;
-    }
-
-    @Override
-    public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(188f / 255f, 240f / 255f, 104f / 255f, 1.0f);
-    }
-
-    @Override
-    public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(4, 3);
+    /**
+     * 
+     * @param lightIntens
+     */
+    public void setLightIntens(byte lightIntens) {
+        this._lightIntens = lightIntens;
     }
 
     /**
      * 
      * @return
      */
-    @Override
-    public boolean doNotTessellate() {
-        return true;
+    public byte getLightIntens() {
+        return _lightIntens;
     }
 }

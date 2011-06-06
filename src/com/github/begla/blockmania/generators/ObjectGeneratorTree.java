@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.world.World;
 
 /**
@@ -45,6 +45,10 @@ public class ObjectGeneratorTree extends ObjectGenerator {
     public void generate(int posX, int posY, int posZ, boolean update) {
         int height = _rand.randomInt() % 2 + 6;
 
+        if (posY + height >= Configuration.CHUNK_DIMENSIONS.y) {
+            return;
+        }
+
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
             _world.setBlock(posX, posY + i, posZ, (byte) 0x5, update, false);
@@ -57,6 +61,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
                     if (!(x == -2 && z == -2) && !(x == 2 && z == 2) && !(x == -2 && z == 2) && !(x == 2 && z == -2)) {
                         if (_rand.randomDouble() <= 0.8f) {
                             _world.setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update, false);
+                            _world.refreshSunlightAt(posX + x, posZ + z, false, true);
                         }
                     }
                 }

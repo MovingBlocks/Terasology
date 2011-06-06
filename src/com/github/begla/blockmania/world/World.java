@@ -24,25 +24,34 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.generators.ChunkGeneratorForest;
 import com.github.begla.blockmania.generators.ChunkGeneratorFlora;
+import com.github.begla.blockmania.generators.ChunkGeneratorLakes;
+import com.github.begla.blockmania.generators.ChunkGeneratorMountain;
+import com.github.begla.blockmania.generators.ChunkGeneratorResources;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
+import com.github.begla.blockmania.generators.ObjectGeneratorFirTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorTree;
+import com.github.begla.blockmania.player.LightNode;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.VectorPool;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import org.jdom.JDOMException;
 import static org.lwjgl.opengl.GL11.*;
 import java.util.logging.Level;
+import javax.imageio.ImageIO;
 import javolution.util.FastList;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -60,6 +69,12 @@ import org.xml.sax.InputSource;
  */
 public final class World extends RenderableObject {
 
+    private static boolean[][] _clouds;
+    private int _displayListClouds = -1;
+    private Vector2f _cloudOffset = new Vector2f();
+    private Vector2f _windDirection = new Vector2f(0.25f, 0);
+    private double _lastWindUpdate = 0;
+    private short _nextWindUpdateInSeconds = 32;
     /* ------ */
     private long _lastDaytimeMeasurement = Helper.getInstance().getTime();
     private long _latestDirtEvolvement = Helper.getInstance().getTime();
@@ -67,11 +82,12 @@ public final class World extends RenderableObject {
     /* ------ */
     private static Texture _textureSun, _textureMoon;
     /* ------ */
-    private short _time = 8;
-    private byte _daylight = 16;
+    private float _time = 8.0f;
+    private float _daylight = 1.0f;
     private Player _player;
     private Vector3f _spawningPoint;
     /* ------ */
+    private boolean _daytimeUpdated = true;
     private boolean _updatingEnabled = false;
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
@@ -80,10 +96,14 @@ public final class World extends RenderableObject {
     private final ChunkCache _chunkCache = new ChunkCache(this);
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
+    private final ChunkGeneratorMountain _generatorMountain;
     private final ChunkGeneratorForest _generatorForest;
+    private final ChunkGeneratorResources _generatorResources;
+    private final ChunkGeneratorLakes _generatorLakes;
     private final ChunkGeneratorFlora _generatorGrass;
     private final ObjectGeneratorTree _generatorTree;
     private final ObjectGeneratorPineTree _generatorPineTree;
+    private final ObjectGeneratorFirTree _generatorFirTree;
     private final FastRandom _rand;
     /* ------ */
     private String _title, _seed;
@@ -137,11 +157,16 @@ public final class World extends RenderableObject {
 
         // Init. generators
         _generatorTerrain = new ChunkGeneratorTerrain(seed);
+        _generatorMountain = new ChunkGeneratorMountain(seed);
         _generatorForest = new ChunkGeneratorForest(seed);
+        _generatorResources = new ChunkGeneratorResources(seed);
+        _generatorLakes = new ChunkGeneratorLakes(seed);
         _generatorTree = new ObjectGeneratorTree(this, seed);
         _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
+        _generatorFirTree = new ObjectGeneratorFirTree(this, seed);
         _generatorGrass = new ChunkGeneratorFlora(seed);
 
+        _displayListClouds = glGenLists(1);
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
@@ -215,6 +240,8 @@ public final class World extends RenderableObject {
      * Stops the updating thread and writes all chunks to disk.
      */
     public void dispose() {
+        Helper.LOGGER.log(Level.INFO, "Disposing world {0} and saving all chunks.", _title);
+
         synchronized (_updateThread) {
             _updateThreadAlive = false;
             _updateThread.notify();
@@ -225,16 +252,13 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * Updates the time of the world. A day in Blockmania takes 12 minutes.
+     * Updates the time of the world. A day in Blockmania takes 12 minutes and the
+     * time is updated every 15 seconds.
      */
     private void updateDaytime() {
-        if (Helper.getInstance().getTime() - _lastDaytimeMeasurement >= 30000) {
-            if (_chunkUpdateManager.updatesSize() == 0) {
-                setTime((short) (_time + 1));
-            } else {
-                return;
-            }
+        if (Helper.getInstance().getTime() - _lastDaytimeMeasurement >= 15000) {
 
+            setTime(_time + 0.5f);
             _lastDaytimeMeasurement = Helper.getInstance().getTime();
 
             Helper.LOGGER.log(Level.INFO, "Updated daytime to {0}h.", _time);
@@ -245,22 +269,14 @@ public final class World extends RenderableObject {
      * 
      */
     private void updateDaylight() {
-        if (_time >= 18 && _time < 20) {
-            _daylight = (byte) (0.7f * Configuration.MAX_LIGHT);
-        } else if (_time == 20) {
-            _daylight = (byte) (0.5f * Configuration.MAX_LIGHT);
-        } else if (_time == 21) {
-            _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-        } else if (_time == 22 || _time == 23) {
-            _daylight = (byte) (0.2f * Configuration.MAX_LIGHT);
-        } else if (_time >= 0 && _time <= 5) {
-            _daylight = (byte) (0.1f * Configuration.MAX_LIGHT);
-        } else if (_time == 6) {
-            _daylight = (byte) (0.3f * Configuration.MAX_LIGHT);
-        } else if (_time == 7) {
-            _daylight = (byte) (0.7f * Configuration.MAX_LIGHT);
-        } else if (_time >= 8 && _time < 18) {
-            _daylight = (byte) Configuration.MAX_LIGHT;
+        if (_time >= 16f && _time <= 24) {
+            _daylight = (float) Math.pow(0.8f, (_time - 16f));
+        } else if (_time >= 4 && _time <= 12) {
+            _daylight = 1f - (float) Math.pow(0.8f, (_time - 4f));
+        } else if (_time >= 0 && _time < 5) {
+            _daylight = (float) Math.pow(0.8f, 9);
+        } else {
+            _daylight = 1f;
         }
     }
 
@@ -309,6 +325,24 @@ public final class World extends RenderableObject {
         } catch (IOException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);
         }
+
+        /*
+         * Create cloud array.
+         */
+        try {
+            BufferedImage cloudImage = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/images/clouds.png").openStream());
+            _clouds = new boolean[cloudImage.getWidth()][cloudImage.getHeight()];
+
+            for (int x = 0; x < cloudImage.getWidth(); x++) {
+                for (int y = 0; y < cloudImage.getHeight(); y++) {
+                    if (cloudImage.getRGB(x, y) > 0) {
+                        _clouds[x][y] = true;
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            Helper.LOGGER.log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -324,9 +358,23 @@ public final class World extends RenderableObject {
      * Renders the horizon.
      */
     public void renderHorizon() {
+
+        /*
+         * Draw clouds.
+         */
+        if (_displayListClouds > 0) {
+            glPushMatrix();
+            glTranslatef(_player.getPosition().x + _cloudOffset.x, 100f, _player.getPosition().z + _cloudOffset.y);
+            glDisable(GL_FOG);
+            glCallList(_displayListClouds);
+            glEnable(GL_FOG);
+            glPopMatrix();
+        }
+
         glPushMatrix();
         // Position the sun relatively to the player
-        glTranslatef(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 1.25f, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
+        glTranslatef(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 2.0f, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
+        glRotatef(-35, 1, 0, 0);
 
         // Disable fog
         glDisable(GL_FOG);
@@ -398,6 +446,29 @@ public final class World extends RenderableObject {
     @Override
     public void update() {
         _chunkUpdateManager.updateDisplayLists();
+
+        if (_daytimeUpdated) {
+            _daytimeUpdated = false;
+            regenerateClouds();
+        }
+
+        // Move the clouds a bit each update
+        _cloudOffset.x += _windDirection.x;
+        _cloudOffset.y += _windDirection.y;
+
+        if (_cloudOffset.x >= _clouds.length * 16 / 2 || _cloudOffset.x <= -(_clouds.length * 16 / 2)) {
+            _windDirection.x = -_windDirection.x;
+        } else if (_cloudOffset.y >= _clouds.length * 32 / 2 || _cloudOffset.y <= -(_clouds.length * 32 / 2)) {
+            _windDirection.y = -_windDirection.y;
+        }
+
+        if (Helper.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
+            _windDirection.x = (float) _rand.randomDouble() / 4f;
+            _windDirection.y = (float) _rand.randomDouble() / 4f;
+            _nextWindUpdateInSeconds = (short) (Math.abs(_rand.randomInt()) % 16 + 32);
+            _lastWindUpdate = Helper.getInstance().getTime();
+        }
+
     }
 
     /**
@@ -469,17 +540,20 @@ public final class World extends RenderableObject {
         }
 
         if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0x0) {
-            
-            if (Block.getBlockForType(c.getBlock(blockPosX, y, blockPosZ)).isRemovable())
-            c.setBlock(blockPosX, y, blockPosZ, type);
+
+            byte oldValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
+
+            if (Block.getBlockForType(c.getBlock(blockPosX, y, blockPosZ)).isRemovable()) {
+                c.setBlock(blockPosX, y, blockPosZ, type);
+            }
 
             if (update) {
                 /*
                  * Update sunlight.
                  */
-                byte oldValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
-                c.calcSunlightAtLocalPos(blockPosX, blockPosZ, true);
+                c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, true, true);
                 c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.SUN);
+                
                 byte newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
 
                 /*
@@ -488,10 +562,8 @@ public final class World extends RenderableObject {
                 if (newValue > oldValue) {
                     c.spreadLight(blockPosX, y, blockPosZ, newValue, Chunk.LIGHT_TYPE.SUN);
                 } else if (newValue < oldValue) {
-                    // TODO: Unspread sunlight
-                    //c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.BLOCK);
+                    c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.SUN);
                 }
-
 
                 /*
                  * Spread light of block light sources.
@@ -505,9 +577,7 @@ public final class World extends RenderableObject {
                 if (newValue > oldValue) {
                     c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
                 } else {
-                    c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.BLOCK);
-                    // TODO: Unspread block light
-                    //c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.BLOCK);
+                    c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.BLOCK);
                 }
 
                 /*
@@ -549,6 +619,18 @@ public final class World extends RenderableObject {
         }
 
         return -1;
+    }
+
+    /**
+     * Returns true if the block is surrounded by blocks within the N4-neighborhood on the xz-plane.
+     *
+     * @param x The X-coordinate
+     * @param y The Y-coordinate
+     * @param z The Z-coordinate
+     * @return  
+     */
+    public final boolean isBlockSurrounded(int x, int y, int z) {
+        return (getBlock(x + 1, y, z) > 0 || getBlock(x - 1, y, z) > 0 || getBlock(x, y, z + 1) > 0 || getBlock(x, y, z - 1) > 0);
     }
 
     /**
@@ -648,6 +730,29 @@ public final class World extends RenderableObject {
     }
 
     /**
+     * TODO
+     * 
+     * @param x
+     * @param spreadLight 
+     * @param refreshSunlight 
+     * @param z
+     */
+    public void refreshSunlightAt(int x, int z, boolean spreadLight, boolean refreshSunlight) {
+        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
+        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+
+        int blockPosX = calcBlockPosX(x, chunkPosX);
+        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
+
+
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+
+        if (c != null) {
+            c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, spreadLight, refreshSunlight);
+        }
+    }
+
+    /**
      * Recursive light calculation.
      * 
      * Too slow!
@@ -682,9 +787,10 @@ public final class World extends RenderableObject {
      * @param z
      * @param oldValue
      * @param depth
-     * @param type  
+     * @param type
+     * @param lightSources  
      */
-    public void unspreadLight(int x, int y, int z, byte oldValue, int depth, Chunk.LIGHT_TYPE type) {
+    public void unspreadLight(int x, int y, int z, byte oldValue, int depth, Chunk.LIGHT_TYPE type, ArrayList<LightNode> lightSources) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
 
@@ -694,7 +800,7 @@ public final class World extends RenderableObject {
         Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
-            c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth, type);
+            c.unspreadLight(blockPosX, y, blockPosZ, oldValue, depth, type, lightSources);
         }
     }
 
@@ -703,8 +809,8 @@ public final class World extends RenderableObject {
      * 
      * @return The daylight value
      */
-    public float getDaylightAsFloat() {
-        return _daylight / 16f;
+    public float getDaylight() {
+        return _daylight;
     }
 
     /**
@@ -714,15 +820,6 @@ public final class World extends RenderableObject {
      */
     public Player getPlayer() {
         return _player;
-    }
-
-    /**
-     * Returns the color of the daylight as a vector.
-     * 
-     * @return The daylight color
-     */
-    public Vector3f getDaylightColor() {
-        return VectorPool.getVector(getDaylightAsFloat() * 0.65f, getDaylightAsFloat() * 0.85f, 0.95f * getDaylightAsFloat());
     }
 
     /**
@@ -924,13 +1021,14 @@ public final class World extends RenderableObject {
      *
      * @param time The time to set
      */
-    public void setTime(short time) {
-        _time = (short) (time % 24);
+    public void setTime(float time) {
+        _time = time % 24;
 
-        byte oldDaylight = _daylight;
+        float oldDaylight = _daylight;
         updateDaylight();
 
         if (_daylight != oldDaylight) {
+            _daytimeUpdated = true;
             updateAllChunks();
         }
     }
@@ -952,11 +1050,19 @@ public final class World extends RenderableObject {
     }
 
     /**
+     * 
+     * @return 
+     */
+    public ObjectGeneratorFirTree getGeneratorFirTree() {
+        return _generatorFirTree;
+    }
+
+    /**
      * Returns true if it is daytime.
      * @return
      */
     public boolean isDaytime() {
-        if (_time > 6 && _time < 20) {
+        if (_daylight > 0.8f) {
             return true;
         }
         return false;
@@ -1024,6 +1130,9 @@ public final class World extends RenderableObject {
     public Chunk prepareNewChunk(int x, int z) {
         FastList<ChunkGenerator> gs = new FastList<ChunkGenerator>();
         gs.add(_generatorTerrain);
+        gs.add(_generatorLakes);
+        gs.add(_generatorMountain);
+        gs.add(_generatorResources);
         gs.add(_generatorForest);
 
         // Generate a new chunk and return it
@@ -1074,13 +1183,21 @@ public final class World extends RenderableObject {
      * @return 
      */
     private Vector3f findSpawningPoint() {
-        for (int xz = 0;; xz++) {
+        for (int xz = 1024;; xz++) {
             float height = _generatorTerrain.calcHeightMap(xz, xz) * 128f;
 
-            if (height > 64) {
-                return VectorPool.getVector(xz, height + 16, xz);
+            if (height > 32 && height < 34 && _generatorMountain.calcMountainIntensity(xz, xz) <= 0f) {
+                // Find a spawning point at the beach
+                return VectorPool.getVector(xz, height + 8, xz);
             }
         }
+    }
+
+    /**
+     * Sets the spawning point to the player's current position.
+     */
+    public void setSpawningPoint() {
+        _spawningPoint = new Vector3f(_player.getPosition());
     }
 
     /**
@@ -1125,7 +1242,7 @@ public final class World extends RenderableObject {
         // Save the world metadata
         root.setAttribute("seed", _seed);
         root.setAttribute("title", _title);
-        root.setAttribute("time", Short.toString(_time));
+        root.setAttribute("time", Float.toString(_time));
 
         // Save the player metadata
         Element player = new Element("Player");
@@ -1175,7 +1292,7 @@ public final class World extends RenderableObject {
                 _seed = root.getAttribute("seed").getValue();
                 _spawningPoint = VectorPool.getVector(Float.parseFloat(player.getAttribute("x").getValue()), Float.parseFloat(player.getAttribute("y").getValue()), Float.parseFloat(player.getAttribute("z").getValue()));
                 _title = root.getAttributeValue("title");
-                _time = Short.parseShort(root.getAttributeValue("time"));
+                _time = Float.parseFloat(root.getAttributeValue("time"));
 
                 return true;
 
@@ -1206,5 +1323,35 @@ public final class World extends RenderableObject {
      */
     public ChunkUpdateManager getChunkUpdateManager() {
         return _chunkUpdateManager;
+    }
+
+    /**
+     * Regenerates the clouds display list with the current daylight value.
+     */
+    public void regenerateClouds() {
+
+        FastRandom rand = new FastRandom(getSeed().hashCode());
+
+        try {
+            glNewList(_displayListClouds, GL_COMPILE);
+            glBegin(GL_QUADS);
+
+            int length = _clouds.length;
+
+            for (int x = 0; x < length; x++) {
+                for (int y = 0; y < length; y++) {
+                    double r = rand.standNormalDistrDouble();
+                    if (_clouds[x][y] && r > -2 && r < 0) {
+                        Primitives.drawCloud(32, 8, 16, x * 32f - (length / 2 * 32f), 0, y * 16f - (length / 2 * 16f), getDaylight());
+                    }
+                }
+            }
+
+            glEnd();
+            glEndList();
+
+        } catch (Exception e) {
+        }
+
     }
 }

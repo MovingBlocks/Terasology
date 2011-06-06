@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.Helper;
@@ -21,35 +20,38 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
- * A grass block.
+ * A leaf block.
  * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockGrass extends Block {
+public class BlockDarkLeaf extends Block {
 
     @Override
-    public boolean isBlockTypeTranslucent() {
+    public boolean isCastingShadows() {
         return false;
     }
 
     @Override
-    public Vector4f getColorOffsetFor(Block.SIDE side) {
-        if (side == Block.SIDE.TOP) {
-            return new Vector4f(120f / 255f, 196f / 255f, 75f / 255f, 1.0f);
-        }
+    public boolean isBlockTypeTranslucent() {
+        return true;
+    }
 
-        return new Vector4f(1f, 1f, 1f, 1.0f);
+    @Override
+    public Vector4f getColorOffsetFor(Block.SIDE side) {
+        return new Vector4f(118f / 255f, 168f / 255f, 22f / 255f, 1.0f);
     }
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        if (side == Block.SIDE.LEFT || side == Block.SIDE.RIGHT || side == Block.SIDE.FRONT || side == Block.SIDE.BACK) {
-            return Helper.getInstance().calcOffsetForTextureAt(3, 0);
+        return Helper.getInstance().calcOffsetForTextureAt(4, 3);
+    }
 
-        } else if (side == Block.SIDE.BOTTOM) {
-            return Helper.getInstance().calcOffsetForTextureAt(2, 0);
-        } else {
-            return Helper.getInstance().calcOffsetForTextureAt(0, 0);
-        }
+    /**
+     * 
+     * @return
+     */
+    @Override
+    public boolean doNotTessellate() {
+        return true;
     }
 }

@@ -59,7 +59,7 @@ public final class Configuration {
     /**
      * Maximum light value.
      */
-    public static final byte MAX_LIGHT = 16;
+    public static final byte MAX_LIGHT = 15;
     /**
      * Minimum light value.
      */
@@ -67,19 +67,27 @@ public final class Configuration {
     /**
      * The intensity at which surrounding blocks 'dim' each other.
      */
-    public static final float OCCLUSION_INTENS = 0.05f;
+    public static final float OCCLUSION_INTENS = 0.85f;
     /**
      * The intensity at which the front and back side of blocks are constantly 'dimmed'.
      */
-    public static final float BLOCK_SIDE_DIMMING = 0.1f;
+    public static final float BLOCK_SIDE_DIMMING = 0.75f;
     /**
-     * Intensity of light absorption applied to sunlight passing through translucent blocks.
+     * 
      */
-    public static final float LIGHT_ABSORPTION = 1f;
+    public static final int DL_UPDATES_PER_CYCLE = 2;
     /**
      * Global brightness factor, which is applied to vertices on the creation of the display lists.
      */
-    public static final float BRIGHTNESS_FACTOR = 0.95f;
+    public static final float BRIGHTNESS_FACTOR = 1.0f;
+    /**
+     * 
+     */
+    public static final float PROB_COAL = -1.5f;
+    /**
+     * 
+     */
+    public static final float PROB_GOLD = -3f;
     /* ------- */
     private static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
@@ -141,12 +149,12 @@ public final class Configuration {
         _settingsBoolean.put("GOD_MODE", false);
         _settingsNumeric.put("JUMP_INTENSITY", 0.15f);
         _settingsNumeric.put("MAX_GRAVITY", 0.5f);
-        _settingsNumeric.put("WALKING_SPEED", 0.025f);
-        _settingsNumeric.put("RUNNING_FACTOR", 1.6f);
+        _settingsNumeric.put("WALKING_SPEED", 0.015f);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
         _settingsNumeric.put("GRAVITY", 0.0075f);
         _settingsNumeric.put("FRICTION", 0.1f);
-        _settingsNumeric.put("V_DIST_X", 16f);
-        _settingsNumeric.put("V_DIST_Z", 16f);
+        _settingsNumeric.put("V_DIST_X", 24f);
+        _settingsNumeric.put("V_DIST_Z", 24f);
     }
 
     /**

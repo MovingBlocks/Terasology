@@ -34,7 +34,7 @@ public class BlockNil extends Block {
 
     @Override
     public boolean isPenetrable() {
-        return false;
+        return true;
     }
 
     @Override
