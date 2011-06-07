@@ -17,6 +17,7 @@ package com.github.begla.blockmania;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -91,7 +92,7 @@ public class ShaderManager {
         String fragCode = "";
         String line;
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(ResourceLoader.getResource("com/github/begla/blockmania/shader/" + filename).getFile()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/shader/" + filename).openStream()));
             while ((line = reader.readLine()) != null) {
                 fragCode += line + "\n";
             }
@@ -121,7 +122,7 @@ public class ShaderManager {
         String fragCode = "";
         String line;
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(ResourceLoader.getResource("com/github/begla/blockmania/shader/" + filename).getFile()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/shader/" + filename).openStream()));
             while ((line = reader.readLine()) != null) {
                 fragCode += line + "\n";
             }
