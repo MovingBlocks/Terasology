@@ -67,7 +67,7 @@ public final class Player extends RenderableObject {
     @Override
     public void render() {
         
-        if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
+        if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
             float bobbing2 = _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.75f;
             float bobbing3 = _pGen.noise(_position.x * 1.5f, _position.z * 1.5f, 0f) * 0.75f;
             glRotatef(bobbing2, 0f, 1f, 0f);
@@ -77,7 +77,7 @@ public final class Player extends RenderableObject {
         glRotatef((float) _pitch, 1f, 0f, 0f);
         glRotatef((float) _yaw, 0f, 1f, 0f);
         
-        if (Configuration.getSettingBoolean("ENABLE_BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
+        if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
             float bobbing1 = _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.05f;
             glTranslatef(0.0f, bobbing1, 0);
         }
@@ -89,7 +89,7 @@ public final class Player extends RenderableObject {
         Intersection is = calcSelectedBlock();
 
         // Display the block the player is aiming at
-        if (Configuration.getSettingBoolean("SHOW_PLACING_BOX")) {
+        if (Configuration.getSettingBoolean("PLACING_BOX")) {
             if (is != null) {
                 
                 if (Block.getBlockForType(_parent.getBlockAtPosition(is.getBlockPos())).renderBoundingBox()) {

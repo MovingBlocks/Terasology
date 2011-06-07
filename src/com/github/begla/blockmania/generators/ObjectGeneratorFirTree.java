@@ -59,13 +59,13 @@ public class ObjectGeneratorFirTree extends ObjectGenerator {
         // Generate the treetop
         for (int y = height - 1; y >= (height * (1f / 3f)); y--) {
             for (int x = -(stage / 2); x <= (stage / 2); x++) {
-                if(!(x == 0)) {
+                if (!(x == 0)) {
                     _world.setBlock(posX + x, posY + y, posZ, (byte) 0x16, update, false);
                     _world.refreshSunlightAt(posX + x, 0, false, true);
                 }
             }
             for (int z = -(stage / 2); z <= (stage / 2); z++) {
-                if(!(z == 0)) {
+                if (!(z == 0)) {
                     _world.setBlock(posX, posY + y, posZ + z, (byte) 0x16, update, false);
                     _world.refreshSunlightAt(0, posZ + z, false, true);
                 }

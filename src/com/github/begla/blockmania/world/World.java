@@ -20,6 +20,7 @@ import com.github.begla.blockmania.Helper;
 import com.github.begla.blockmania.player.Player;
 import com.github.begla.blockmania.player.Intersection;
 import com.github.begla.blockmania.RenderableObject;
+import com.github.begla.blockmania.ShaderManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.generators.ChunkGeneratorForest;
@@ -351,7 +352,9 @@ public final class World extends RenderableObject {
     @Override
     public void render() {
         renderHorizon();
+        ShaderManager.getInstance().enableShader("fog");
         renderChunks();
+        ShaderManager.getInstance().enableShader(null);
     }
 
     /**
@@ -365,9 +368,7 @@ public final class World extends RenderableObject {
         if (_displayListClouds > 0) {
             glPushMatrix();
             glTranslatef(_player.getPosition().x + _cloudOffset.x, 100f, _player.getPosition().z + _cloudOffset.y);
-            glDisable(GL_FOG);
             glCallList(_displayListClouds);
-            glEnable(GL_FOG);
             glPopMatrix();
         }
 
@@ -376,13 +377,9 @@ public final class World extends RenderableObject {
         glTranslatef(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 2.0f, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
         glRotatef(-35, 1, 0, 0);
 
-        // Disable fog
-        glDisable(GL_FOG);
-
         glColor4f(1f, 1f, 1f, 1.0f);
+        
         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_TEXTURE_2D);
 
         if (isDaytime()) {
             _textureSun.bind();
@@ -399,10 +396,8 @@ public final class World extends RenderableObject {
         glTexCoord2f(0.f, 1.0f);
         glVertex3f(-Configuration.SUN_SIZE, -Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
         glEnd();
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_BLEND);
 
-        glEnable(GL_FOG);
+        glDisable(GL_BLEND);
         glPopMatrix();
     }
 
@@ -553,7 +548,7 @@ public final class World extends RenderableObject {
                  */
                 c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, true, true);
                 c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.SUN);
-                
+
                 byte newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
 
                 /*
@@ -735,6 +730,7 @@ public final class World extends RenderableObject {
      * @param x
      * @param spreadLight 
      * @param refreshSunlight 
+     * @param unspread 
      * @param z
      */
     public void refreshSunlightAt(int x, int z, boolean spreadLight, boolean refreshSunlight) {

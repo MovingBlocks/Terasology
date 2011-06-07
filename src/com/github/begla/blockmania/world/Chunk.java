@@ -41,8 +41,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import org.newdawn.slick.opengl.Texture;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.TextureLoader;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -195,7 +195,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         /*
          * Draws the outline of each chunk.
          */
-        if (Configuration.getSettingBoolean("SHOW_CHUNK_OUTLINES")) {
+        if (Configuration.getSettingBoolean("CHUNK_OUTLINES")) {
             glLineWidth(2.0f);
             glColor3f(255.0f, 255.0f, 255.0f);
 
@@ -235,8 +235,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             glPopMatrix();
         }
 
+
         _textureMap.bind();
-        glEnable(GL_TEXTURE_2D);
+        
         if (!translucent) {
             glCallList(_displayListOpaque);
         } else {
@@ -254,7 +255,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             glDisable(GL_BLEND);
             glDisable(GL_ALPHA_TEST);
         }
-        glDisable(GL_TEXTURE_2D);
     }
 
     /**
@@ -1085,6 +1085,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param x Local block position on the x-axis
      * @param z Local block position on the z-axis
      * @param spreadLight
+     * @param unspread 
      * @param refreshSunlight  
      */
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
@@ -1115,7 +1116,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
                 _sunlight[x][y][z] = 0;
 
                 if (refreshSunlight) {
-                    unspreadLight(x, y, z, oldValue, LIGHT_TYPE.SUN);
                     refreshLightAtLocalPos(x, y, z, LIGHT_TYPE.SUN);
                 }
             }
@@ -1175,10 +1175,16 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public void unspreadLight(int x, int y, int z, byte oldLightValue, LIGHT_TYPE type) {
 //        ArrayList<LightNode> lightSources = new ArrayList<LightNode>();
 //        unspreadLight(x, y, z, oldLightValue, 0, type, lightSources);
+//        
+//        System.out.println(lightSources.size());
 //
 //        // Spread light of brighter light sources
 //        for (LightNode l : lightSources) {
-//            spreadLight(l.x, l.y, l.z, l.getLightIntens(), type);
+//            if (l.getType() == LightNode.NODE_TYPE.SPREAD) {
+//                //_parent.spreadLight(l.x, l.y, l.z, l.getLightIntens(), 0, type);
+//            } else {
+//                _parent.setLight(l.x, l.y, l.z, l.getLightIntens(), type);
+//            }
 //        }
     }
 
@@ -1194,7 +1200,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param lightSources  
      */
     public void unspreadLight(int x, int y, int z, byte oldLightValue, int depth, LIGHT_TYPE type, ArrayList<LightNode> lightSources) {
-        if (depth > oldLightValue || oldLightValue <= 0) {
+        if (depth > oldLightValue) {
             return;
         }
 
@@ -1215,52 +1221,44 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ, type);
         byte type6 = _parent.getBlock(blockPosX, blockPosY - 1, blockPosZ);
 
-        byte newLightValue = (byte) (oldLightValue - depth);
+        lightSources.add(new LightNode(blockPosX, blockPosY, blockPosZ, (byte) 0, LightNode.NODE_TYPE.UNSPREAD));
+        byte currentValue = (byte) (oldLightValue - depth);
 
-        if (newLightValue <= 0) {
-            return;
-        }
 
-        _parent.setLight(blockPosX, blockPosY, blockPosZ, (byte) 0, type);
-
-        if (val1 < newLightValue && val1 > 0 && Block.getBlockForType(type1).isBlockTypeTranslucent()) {
+        if (val1 < currentValue && val1 > 0 && Block.getBlockForType(type1).isBlockTypeTranslucent()) {
             _parent.unspreadLight(blockPosX + 1, blockPosY, blockPosZ, oldLightValue, depth + 1, type, lightSources);
-        } else if (val1 >= newLightValue) {
-            lightSources.add(new LightNode(x + 1, y, z, val1));
+        } else if (val1 >= oldLightValue) {
+            //lightSources.add(new LightNode(blockPosX - 1, blockPosY, blockPosZ, oldLightValue, LightNode.NODE_TYPE.SPREAD));
         }
 
-        if (val2 < newLightValue && val2 > 0 && Block.getBlockForType(type2).isBlockTypeTranslucent()) {
+        if (val2 < currentValue && val2 > 0 && Block.getBlockForType(type2).isBlockTypeTranslucent()) {
             _parent.unspreadLight(blockPosX - 1, blockPosY, blockPosZ, oldLightValue, depth + 1, type, lightSources);
-        } else if (val2 >= newLightValue) {
-            lightSources.add(new LightNode(x - 1, y, z, val2));
+        } else if (val2 >= oldLightValue) {
+            //lightSources.add(new LightNode(blockPosX - 1, blockPosY, blockPosZ, oldLightValue, LightNode.NODE_TYPE.SPREAD));
         }
 
-
-        if (val3 < newLightValue && val3 > 0 && Block.getBlockForType(type3).isBlockTypeTranslucent()) {
+        if (val3 < currentValue && val3 > 0 && Block.getBlockForType(type3).isBlockTypeTranslucent()) {
             _parent.unspreadLight(blockPosX, blockPosY, blockPosZ + 1, oldLightValue, depth + 1, type, lightSources);
-        } else if (val3 >= newLightValue) {
-            lightSources.add(new LightNode(x, y, z + 1, val3));
+        } else if (val3 >= oldLightValue) {
+            //lightSources.add(new LightNode(blockPosX, blockPosY, blockPosZ + 1, oldLightValue, LightNode.NODE_TYPE.SPREAD));
         }
 
-
-        if (val4 < newLightValue && val4 > 0 && Block.getBlockForType(type4).isBlockTypeTranslucent()) {
+        if (val4 < currentValue && val4 > 0 && Block.getBlockForType(type4).isBlockTypeTranslucent()) {
             _parent.unspreadLight(blockPosX, blockPosY, blockPosZ - 1, oldLightValue, depth + 1, type, lightSources);
         } else if (val4 >= oldLightValue) {
-            lightSources.add(new LightNode(x, y, z - 1, val4));
+            //lightSources.add(new LightNode(blockPosX, blockPosY, blockPosZ - 1, oldLightValue, LightNode.NODE_TYPE.SPREAD));
         }
 
-
-        if (val5 < newLightValue && val5 > 0 && Block.getBlockForType(type5).isBlockTypeTranslucent()) {
+        if (val5 < currentValue && val5 > 0 && Block.getBlockForType(type5).isBlockTypeTranslucent()) {
             _parent.unspreadLight(blockPosX, blockPosY + 1, blockPosZ, oldLightValue, depth + 1, type, lightSources);
-        } else if (val5 >= newLightValue) {
-            lightSources.add(new LightNode(x, y + 1, z, val5));
+        } else if (val5 >= oldLightValue) {
+            //lightSources.add(new LightNode(blockPosX, blockPosY + 1, blockPosZ, oldLightValue, LightNode.NODE_TYPE.SPREAD));
         }
 
-
-        if (val6 < newLightValue && val6 > 0 && Block.getBlockForType(type6).isBlockTypeTranslucent()) {
+        if (val6 < currentValue && val6 > 0 && Block.getBlockForType(type6).isBlockTypeTranslucent()) {
             _parent.unspreadLight(blockPosX, blockPosY - 1, blockPosZ, oldLightValue, depth + 1, type, lightSources);
-        } else if (val6 >= newLightValue) {
-            lightSources.add(new LightNode(x, y - 1, z, val6));
+        } else if (val6 >= oldLightValue) {
+            //lightSources.add(new LightNode(blockPosX, blockPosY - 1, blockPosZ, oldLightValue, LightNode.NODE_TYPE.SPREAD));
         }
     }
 

@@ -23,32 +23,19 @@ import com.github.begla.blockmania.utilities.HeightMapFrame;
 import com.github.begla.blockmania.utilities.VectorPool;
 import com.github.begla.blockmania.world.Primitives;
 import java.awt.Font;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.*;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.HashMap;
 import java.util.logging.Level;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.ARBFragmentShader;
-import org.lwjgl.opengl.ARBShaderObjects;
-import org.lwjgl.opengl.ARBVertexShader;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.opengl.NVFogDistance;
-import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
-import org.newdawn.slick.util.ResourceLoader;
 
 /**
  * The heart and soul of Blockmania.
@@ -57,9 +44,6 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public final class Main {
 
-    private int _gammaShader = 0;
-    HashMap<String, Integer> _fragmentShader = new HashMap<String, Integer>();
-    HashMap<String, Integer> _vertexShader = new HashMap<String, Integer>();
     /* ------- */
     private final int TICKS_PER_SECOND = 60;
     private final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -161,24 +145,7 @@ public final class Main {
          */
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_FOG);
         glDepthFunc(GL_LEQUAL);
-
-        if (GLContext.getCapabilities().GL_NV_fog_distance) {
-            glFogi(NVFogDistance.GL_FOG_DISTANCE_MODE_NV, NVFogDistance.GL_EYE_RADIAL_NV);
-            Helper.LOGGER.log(Level.INFO, "Extension 'GL_NV_fog_distance' is supported.");
-        }
-
-        glEnable(GL_LINE_SMOOTH);
-        glHint(GL_FOG_HINT, GL_NICEST);
-        glFogi(GL_FOG_MODE, GL_LINEAR);
-        GL11.glEnable(GL11.GL_POLYGON_SMOOTH);
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-        /*
-         * Load shader!
-         */
-        initShader();
 
         Chunk.init();
         World.init();
@@ -199,7 +166,6 @@ public final class Main {
      * Renders the scene.
      */
     private void render() {
-        ARBShaderObjects.glUseProgramObjectARB(_gammaShader);
 
         // Fog has the same color as the sky
         float[] fogColor = {_world.getDaylight(), _world.getDaylight(), _world.getDaylight(), 1.0f};
@@ -207,6 +173,7 @@ public final class Main {
         fogColorBuffer.put(fogColor);
         fogColorBuffer.rewind();
         glFog(GL_FOG_COLOR, fogColorBuffer);
+        glFogi(GL_FOG_MODE, GL_LINEAR);
 
         // Update the viewing distance
         float minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
@@ -218,9 +185,11 @@ public final class Main {
          * Render the player, world and HUD.
          */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         glLoadIdentity();
 
+        /**
+         * Sky box.
+         */
         glRotatef((float) _player.getPitch(), 1f, 0f, 0f);
         glRotatef((float) _player.getYaw(), 0f, 1f, 0f);
 
@@ -237,9 +206,12 @@ public final class Main {
         _player.render();
         _world.render();
 
-        ARBShaderObjects.glUseProgramObjectARB(0);
-
         renderHUD();
+
+        // Unbind textures
+        glBindTexture(GL_TEXTURE_2D, 0);
+        // Disable shader
+        ShaderManager.getInstance().enableShader(null);
     }
 
     /**
@@ -321,14 +293,12 @@ public final class Main {
         glLoadIdentity();
 
         glDisable(GL_DEPTH_TEST);
-        glDisable(GL_FOG);
         glEnable(GL_BLEND);
-        glEnable(GL_TEXTURE_2D);
 
         /*
          * Draw debugging information.
          */
-        if (Configuration.getSettingBoolean("SHOW_DEBUG_INFORMATION")) {
+        if (Configuration.getSettingBoolean("DEBUG")) {
             _font1.drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage, Color.white));
             _font1.drawString(4, 22, String.format("%s", _player, Color.white));
             _font1.drawString(4, 38, String.format("%s", _world, Color.white));
@@ -340,13 +310,11 @@ public final class Main {
             _font1.drawString(4, Display.getDisplayMode().getHeight() - 16 - 4, String.format("%s_", _consoleInput), Color.red);
         }
 
-        glDisable(GL_TEXTURE_2D);
-
         glColor3f(1f, 1f, 1f);
         glLineWidth(2f);
 
         // Draw the crosshair
-        if (Configuration.getSettingBoolean("SHOW_CROSSHAIR")) {
+        if (Configuration.getSettingBoolean("CROSSHAIR")) {
             glBegin(GL_LINES);
             glVertex2d(Display.getDisplayMode().getWidth() / 2f - 8f, Display.getDisplayMode().getHeight() / 2f);
             glVertex2d(Display.getDisplayMode().getWidth() / 2f + 8f, Display.getDisplayMode().getHeight() / 2f);
@@ -356,14 +324,12 @@ public final class Main {
         }
 
         glDisable(GL_BLEND);
-        glEnable(GL_FOG);
         glEnable(GL_DEPTH_TEST);
 
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
-        glLoadIdentity();
     }
 
     /*
@@ -590,110 +556,5 @@ public final class Main {
 
             _fps = 0;
         }
-    }
-
-    /**
-     * 
-     */
-    private void initShader() {
-        _gammaShader = ARBShaderObjects.glCreateProgramObjectARB();
-
-        if (_gammaShader != 0) {
-            int fragShader = createFragShader("gamma_frag.glsl", "gamma");
-            int vertShader = createVertexShader("gamma_vert.glsl", "gamma");
-
-            if (fragShader != 0 && vertShader != 0) {
-                ARBShaderObjects.glAttachObjectARB(_gammaShader, fragShader);
-                ARBShaderObjects.glLinkProgramARB(_gammaShader);
-                ARBShaderObjects.glValidateProgramARB(_gammaShader);
-
-                ARBShaderObjects.glAttachObjectARB(_gammaShader, vertShader);
-                ARBShaderObjects.glLinkProgramARB(_gammaShader);
-                ARBShaderObjects.glValidateProgramARB(_gammaShader);
-            } else {
-                Helper.LOGGER.log(Level.SEVERE, "Shader: Failed to load gamma shader.");
-            }
-        }
-    }
-
-    private int createFragShader(String filename, String title) {
-
-        _fragmentShader.put(title, ARBShaderObjects.glCreateShaderObjectARB(ARBFragmentShader.GL_FRAGMENT_SHADER_ARB));
-
-        if (_fragmentShader.get(title) == 0) {
-            return 0;
-        }
-
-        String fragCode = "";
-        String line;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(ResourceLoader.getResource("com/github/begla/blockmania/shader/" + filename).getFile()));
-            while ((line = reader.readLine()) != null) {
-                fragCode += line + "\n";
-            }
-        } catch (Exception e) {
-            Helper.LOGGER.log(Level.SEVERE, "Failed reading fragment shading code.");
-            return 0;
-        }
-
-        ARBShaderObjects.glShaderSourceARB(_fragmentShader.get(title), fragCode);
-        ARBShaderObjects.glCompileShaderARB(_fragmentShader.get(title));
-
-        if (!printLogInfo(_fragmentShader.get(title))) {
-            _fragmentShader.put(title, 0);
-        }
-
-        return _fragmentShader.get(title);
-    }
-
-    private int createVertexShader(String filename, String title) {
-
-        _vertexShader.put(title, ARBShaderObjects.glCreateShaderObjectARB(ARBVertexShader.GL_VERTEX_SHADER_ARB));
-
-        if (_vertexShader.get(title) == 0) {
-            return 0;
-        }
-
-        String fragCode = "";
-        String line;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(ResourceLoader.getResource("com/github/begla/blockmania/shader/" + filename).getFile()));
-            while ((line = reader.readLine()) != null) {
-                fragCode += line + "\n";
-            }
-        } catch (Exception e) {
-            Helper.LOGGER.log(Level.SEVERE, "Failed reading vertex shading code.");
-            return 0;
-        }
-
-        ARBShaderObjects.glShaderSourceARB(_vertexShader.get(title), fragCode);
-        ARBShaderObjects.glCompileShaderARB(_vertexShader.get(title));
-
-        if (!printLogInfo(_vertexShader.get(title))) {
-            _vertexShader.put(title, 0);
-        }
-
-        return _vertexShader.get(title);
-    }
-
-    private static boolean printLogInfo(int obj) {
-        IntBuffer iVal = BufferUtils.createIntBuffer(1);
-        ARBShaderObjects.glGetObjectParameterARB(obj, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB, iVal);
-
-        int length = iVal.get();
-
-        if (length > 1) {
-            ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
-            iVal.flip();
-            ARBShaderObjects.glGetInfoLogARB(obj, iVal, infoLog);
-            byte[] infoBytes = new byte[length];
-            infoLog.get(infoBytes);
-            String out = new String(infoBytes);
-            Helper.LOGGER.log(Level.SEVERE, "Error while compiling shader:\n {0}", out);
-        } else {
-            return true;
-        }
-
-        return false;
     }
 }

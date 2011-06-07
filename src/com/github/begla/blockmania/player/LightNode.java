@@ -32,6 +32,22 @@ public class LightNode {
      */
     public int x, y, z;
     private byte _lightIntens = 0;
+    private NODE_TYPE _type;
+
+    /**
+     * 
+     */
+    public enum NODE_TYPE {
+
+        /**
+         * 
+         */
+        SPREAD,
+        /**
+         * 
+         */
+        UNSPREAD
+    }
 
     /**
      * 
@@ -39,12 +55,14 @@ public class LightNode {
      * @param y
      * @param z
      * @param lightIntens
+     * @param t  
      */
-    public LightNode(int x, int y, int z, byte lightIntens) {
+    public LightNode(int x, int y, int z, byte lightIntens, NODE_TYPE t) {
         this.x = x;
         this.y = y;
         this.z = z;
         this._lightIntens = lightIntens;
+        this._type = t;
     }
 
     /**
@@ -61,5 +79,21 @@ public class LightNode {
      */
     public byte getLightIntens() {
         return _lightIntens;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public NODE_TYPE getType() {
+        return _type;
+    }
+
+    /**
+     * 
+     * @param _type
+     */
+    public void setType(NODE_TYPE _type) {
+        this._type = _type;
     }
 }

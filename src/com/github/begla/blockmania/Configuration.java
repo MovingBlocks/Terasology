@@ -140,11 +140,11 @@ public final class Configuration {
      * Loads the default values for the global settings.
      */
     public static void loadDefaults() {
-        _settingsBoolean.put("SHOW_PLACING_BOX", true);
-        _settingsBoolean.put("SHOW_CHUNK_OUTLINES", false);
-        _settingsBoolean.put("SHOW_DEBUG_INFORMATION", true);
-        _settingsBoolean.put("SHOW_CROSSHAIR", true);
-        _settingsBoolean.put("ENABLE_BOBBING", true);
+        _settingsBoolean.put("PLACING_BOX", true);
+        _settingsBoolean.put("CHUNK_OUTLINES", false);
+        _settingsBoolean.put("DEBUG", false);
+        _settingsBoolean.put("CROSSHAIR", true);
+        _settingsBoolean.put("BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);
         _settingsNumeric.put("JUMP_INTENSITY", 0.15f);
