@@ -15,6 +15,8 @@
  */
 package com.github.begla.blockmania.utilities;
 
+import java.util.ArrayList;
+
 /**
  * Random number generator based on the Xorshift generator by George Marsaglia.
  * 
@@ -128,5 +130,21 @@ public class FastRandom {
      */
     public double normalDistrDouble(double variance, double mean) {
         return standNormalDistrDouble() * Math.sqrt(variance) + mean;
+    }
+
+    /**
+     * Fisher-Yates shuffling algorithm by.Donald Knuth.
+     * 
+     * @param array 
+     */
+    public void shuffle(ArrayList<Integer> array) {
+        for (int i = array.size() - 1; i >= 0; i--) {
+            int j = (int) (Math.abs(randomLong()) % array.size());
+            int jElem = array.get(j);
+            int iElem = array.get(i);
+
+            array.set(i, jElem);
+            array.set(j, iElem);
+        }
     }
 }

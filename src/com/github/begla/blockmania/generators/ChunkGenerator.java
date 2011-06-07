@@ -53,9 +53,9 @@ public abstract class ChunkGenerator {
      */
     public ChunkGenerator(String seed) {
         _rand = new FastRandom(seed.hashCode());
-        _pGen1 = new PerlinNoise(_rand.randomInt());
-        _pGen2 = new PerlinNoise(_rand.randomInt());
-        _pGen3 = new PerlinNoise(_rand.randomInt());
+        _pGen1 = new PerlinNoise(seed.hashCode());
+        _pGen2 = new PerlinNoise(seed.hashCode()+1);
+        _pGen3 = new PerlinNoise(seed.hashCode()+2);
     }
 
     /**

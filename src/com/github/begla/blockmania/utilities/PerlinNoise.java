@@ -15,6 +15,9 @@
  */
 package com.github.begla.blockmania.utilities;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 /**
  * 3D perlin noise function as shown in the book "Physically Based Rendering".
  * 
@@ -23,7 +26,7 @@ package com.github.begla.blockmania.utilities;
 public class PerlinNoise {
 
     FastRandom rand;
-    static int noisePerm[] = new int[512];
+    final int noisePerm[];
 
     /**
      *
@@ -31,9 +34,18 @@ public class PerlinNoise {
      */
     public PerlinNoise(int seed) {
         rand = new FastRandom(seed);
+        noisePerm = new int[256];
 
-        for (int i = 0; i < noisePerm.length; i++) {
-            noisePerm[i] = Math.abs((int) rand.randomLong()) % (noisePerm.length / 2);
+        ArrayList<Integer> permutations = new ArrayList<Integer>();
+
+        for (int i = 0; i < 256; i++) {
+            permutations.add(i);
+        }
+
+        rand.shuffle(permutations);
+
+        for (int i = 0; i < 256; i++) {
+            noisePerm[i] = permutations.get(i).intValue();
         }
     }
 
