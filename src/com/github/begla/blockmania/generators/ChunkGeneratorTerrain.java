@@ -149,7 +149,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noise(0.0009f * x, 0.0009f, 0.0009f * z);
+        result += _pGen1.noise(0.0009f * x, 0.0009f, 0.0009f * z) * 0.95f;
         return result;
     }
 
@@ -162,7 +162,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.noiseWithOctaves(0.009f * x, 0.009f, 0.009f * z, 6, 0.5f) * 0.25f;
+        result += _pGen2.noiseWithOctaves(0.009f * x, 0.009f, 0.009f * z, 16, 0.25f, 2f) * 0.4f;
+
+
         return result;
     }
 
@@ -175,7 +177,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.noiseWithOctaves(0.03f * x, 0.03f, 0.03f * z, 6, 0.1f);
+        result += _pGen3.ridgedMultiFractalNoise(x * 0.008f, 0.008f, z * 0.008f, 16, 1.4f, 2f) * 0.4;
         return result;
     }
 }

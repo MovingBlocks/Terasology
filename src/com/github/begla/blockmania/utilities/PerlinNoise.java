@@ -111,40 +111,93 @@ public class PerlinNoise {
      * @param y
      * @param z
      * @param octaves
-     * @param persFactor 
+     * @param lacunarity 
+     * @param gain 
      * @return
      */
-    public float noiseWithOctaves(float x, float y, float z, int octaves, float persFactor) {
-        float result = 0.0f;
-        float noise;
-        float pers = 1f;
-        float scale = 1f;
+    public float noiseWithOctaves(float x, float y, float z, int octaves, float lacunarity, float gain) {
+        float frequency = 1f;
+        float signal = 1f;
+
+        /*
+         * Fetch the first noise octave.
+         */
+        signal = noise(x, y, z);
+        float result = signal;
+        float weight = 1f;
 
         for (int i = 0; i < octaves; i++) {
-            noise = noise(x * scale, y * scale, z * scale) * pers;
-            result += noise;
-            scale *= 2;
-            pers *= persFactor;
+            x *= lacunarity;
+            y *= lacunarity;
+            z *= lacunarity;
+
+            weight = gain * signal;
+
+            if (weight > 1.0f) {
+                weight = 1.0f;
+            } else if (weight < 0.0f) {
+                weight = 0.0f;
+            }
+
+            signal = noise(x, y, z);
+
+            signal *= weight;
+            result += signal * Math.pow(frequency, -1f);
+            frequency *= lacunarity;
         }
 
         return result;
     }
 
     /**
-     * 
+     *
      * @param x
      * @param y
      * @param z
      * @param octaves
+     * @param lacunarity 
+     * @param gain 
      * @return
      */
-    public float noiseWithOctaves2(float x, float y, float z, int octaves) {
-        float noise = 0.0f;
+    public float ridgedMultiFractalNoise(float x, float y, float z, int octaves, float lacunarity, float gain) {
+        float frequency = 1f;
+        float signal = 1f;
+
+        /*
+         * Fetch the first noise octave.
+         */
+        signal = ridge(noise(x, y, z));
+        float result = signal;
+        float weight = 1f;
 
         for (int i = 0; i < octaves; i++) {
-            noise = noise(x * (i * i), y * (i * i), z * (i * i));
+            x *= lacunarity;
+            y *= lacunarity;
+            z *= lacunarity;
+
+            weight = gain * signal;
+
+            if (weight > 1.0f) {
+                weight = 1.0f;
+            } else if (weight < 0.0f) {
+                weight = 0.0f;
+            }
+
+            signal = ridge(noise(x, y, z));
+
+            signal *= weight;
+            result += signal * Math.pow(frequency, -1f);
+            frequency *= lacunarity;
         }
 
-        return noise;
+
+        return result - 1f;
+    }
+
+    private float ridge(float n) {
+        n = Math.abs(n);
+        n = 1f - n;
+        n = n * n;
+        return n;
     }
 }

@@ -126,8 +126,7 @@ public class FastRandom {
      * 
      * @param variance 
      * @param mean 
-     * @return 
-     */
+     * @return      */
     public double normalDistrDouble(double variance, double mean) {
         return standNormalDistrDouble() * Math.sqrt(variance) + mean;
     }

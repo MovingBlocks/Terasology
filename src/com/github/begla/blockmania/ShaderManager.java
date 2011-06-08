@@ -57,6 +57,9 @@ public class ShaderManager {
         return _instance;
     }
 
+    /**
+     * 
+     */
     public ShaderManager() {
         initShader();
     }
@@ -153,6 +156,10 @@ public class ShaderManager {
         return false;
     }
 
+    /**
+     * 
+     * @param s
+     */
     public void enableShader(String s) {
         if (s == null) {
             GL20.glUseProgram(0);
@@ -163,6 +170,11 @@ public class ShaderManager {
         GL20.glUseProgram(shader);
     }
 
+    /**
+     * 
+     * @param s
+     * @return
+     */
     public int getShader(String s) {
         return _shaderPrograms.get(s);
     }

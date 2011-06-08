@@ -1085,7 +1085,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param x Local block position on the x-axis
      * @param z Local block position on the z-axis
      * @param spreadLight
-     * @param unspread 
      * @param refreshSunlight  
      */
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {

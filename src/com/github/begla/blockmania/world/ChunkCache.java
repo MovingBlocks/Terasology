@@ -63,7 +63,7 @@ public final class ChunkCache {
         }
 
         // Delete some elements if the cache size is exceeded
-        if (_chunkCache.size() > 2048) {
+        if (_chunkCache.size() > 1024) {
             // Fetch all chunks within the cache
             FastList<Chunk> sortedChunks = null;
             sortedChunks = new FastList<Chunk>(_chunkCache.values());
