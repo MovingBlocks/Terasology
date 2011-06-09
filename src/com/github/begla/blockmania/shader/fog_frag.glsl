@@ -8,7 +8,6 @@ vec4 gamma(vec4 color){
 
 void main(){
     vec4 color = gl_Color*texture2D(tex, vec2(gl_TexCoord[0]));
-    vec4 fogColor = pow(gl_Fog.color, gl_Fog.color*8.0);
-    gl_FragColor = gamma(mix(color, fogColor, fog));
+    gl_FragColor = gamma(mix(color, gl_Fog.color, fog/2.0));
     gl_FragColor.w = color.w;
 }

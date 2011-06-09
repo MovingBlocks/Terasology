@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.Helper;
 import java.util.Collections;
 import java.util.TreeMap;
@@ -63,7 +64,7 @@ public final class ChunkCache {
         }
 
         // Delete some elements if the cache size is exceeded
-        if (_chunkCache.size() > 1024) {
+        if (_chunkCache.size() > chunkCapacity()) {
             // Fetch all chunks within the cache
             FastList<Chunk> sortedChunks = null;
             sortedChunks = new FastList<Chunk>(_chunkCache.values());
@@ -143,5 +144,9 @@ public final class ChunkCache {
      */
     public int size() {
         return _chunkCache.size();
+    }
+
+    public int chunkCapacity() {
+        return Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue() + 512;
     }
 }
