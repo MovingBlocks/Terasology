@@ -26,6 +26,9 @@ import com.github.begla.blockmania.Helper;
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
+    /**
+     * 
+     */
     public static int INTERPOLATION_INTERVAL = 8;
 
     /**

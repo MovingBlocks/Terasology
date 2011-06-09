@@ -157,6 +157,7 @@ public class PerlinNoise {
      * @param octaves
      * @param lacunarity 
      * @param gain 
+     * @param offset 
      * @return
      */
     public float ridgedMultiFractalNoise(float x, float y, float z, int octaves, float lacunarity, float gain, float offset) {
