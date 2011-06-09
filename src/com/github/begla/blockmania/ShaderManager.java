@@ -16,18 +16,9 @@
 package com.github.begla.blockmania;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Stack;
 import java.util.logging.Level;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.ARBFragmentShader;
-import org.lwjgl.opengl.ARBShaderObjects;
-import org.lwjgl.opengl.ARBVertexShader;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
 
@@ -107,9 +98,7 @@ public class ShaderManager {
         GL20.glShaderSource(_fragmentShader.get(title), fragCode);
         GL20.glCompileShader(_fragmentShader.get(title));
 
-        if (!printLogInfo(_fragmentShader.get(title))) {
-            _fragmentShader.put(title, 0);
-        }
+        printLogInfo(_fragmentShader.get(title));
 
         return _fragmentShader.get(title);
     }
@@ -136,24 +125,15 @@ public class ShaderManager {
 
         GL20.glShaderSource(_vertexShader.get(title), fragCode);
         GL20.glCompileShader(_vertexShader.get(title));
-
-        if (!printLogInfo(_vertexShader.get(title))) {
-            _vertexShader.put(title, 0);
-        }
+        
+        printLogInfo(_vertexShader.get(title));
 
         return _vertexShader.get(title);
     }
 
-    private static boolean printLogInfo(int obj) {
+    private static void printLogInfo(int obj) {
         String output = GL20.glGetShaderInfoLog(obj, 1024);
-
-        if (output.length() > 1) {
-            Helper.LOGGER.log(Level.SEVERE, "Error while compiling shader:\n {0}", output);
-        } else {
-            return true;
-        }
-
-        return false;
+        Helper.LOGGER.log(Level.INFO, "{0}", output);
     }
 
     /**

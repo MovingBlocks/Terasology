@@ -206,12 +206,12 @@ public final class Main {
         _player.render();
         _world.render();
 
-        renderHUD();
-
         // Unbind textures
         glBindTexture(GL_TEXTURE_2D, 0);
         // Disable shader
         ShaderManager.getInstance().enableShader(null);
+
+        renderHUD();
     }
 
     /**
@@ -522,7 +522,7 @@ public final class Main {
         _world.startUpdateThread();
 
         Helper.LOGGER.log(Level.INFO, "Waiting for some chunks to pop up...", seed);
-        while (_world.getAmountGeneratedChunks() < 16) {
+        while (_world.getAmountGeneratedChunks() < 64) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException ex) {
