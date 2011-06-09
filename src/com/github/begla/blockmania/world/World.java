@@ -150,8 +150,6 @@ public final class World extends RenderableObject {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-
-            saveMetaData();
         }
 
         // Init. generators
