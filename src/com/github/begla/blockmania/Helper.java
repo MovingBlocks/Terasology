@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania;
 
 import java.io.IOException;
@@ -195,5 +194,27 @@ public final class Helper {
      */
     public byte setFlag(byte value, short index) {
         return (byte) (value | (1 << index));
+    }
+
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param q11
+     * @param q12
+     * @param q21
+     * @param q22
+     * @param x1
+     * @param x2
+     * @param y1
+     * @param y2
+     * @return 
+     */
+    public float bilinearInterpolation(float x, float y, float q11, float q12, float q21, float q22, float x1, float x2, float y1, float y2) {
+        float r1 = ((x2 - x) / (x2 - x1)) * q11 + ((x - x1) / (x2 - x1)) * q21;
+        float r2 = ((x2 - x) / (x2 - x1)) * q12 + ((x - x1) / (x2 - x1)) * q22;
+        float p = ((y2 - y) / (y2 - y1)) * r1 + ((y - y1) / (y2 - y1)) * r2;
+        
+        return p;
     }
 }

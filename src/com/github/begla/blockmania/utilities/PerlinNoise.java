@@ -159,14 +159,14 @@ public class PerlinNoise {
      * @param gain 
      * @return
      */
-    public float ridgedMultiFractalNoise(float x, float y, float z, int octaves, float lacunarity, float gain) {
+    public float ridgedMultiFractalNoise(float x, float y, float z, int octaves, float lacunarity, float gain, float offset) {
         float frequency = 1f;
         float signal = 1f;
 
         /*
          * Fetch the first noise octave.
          */
-        signal = ridge(noise(x, y, z));
+        signal = ridge(noise(x, y, z), offset);
         float result = signal;
         float weight = 1f;
 
@@ -183,7 +183,7 @@ public class PerlinNoise {
                 weight = 0.0f;
             }
 
-            signal = ridge(noise(x, y, z));
+            signal = ridge(noise(x, y, z), offset);
 
             signal *= weight;
             result += signal * Math.pow(frequency, -1f);
@@ -191,12 +191,12 @@ public class PerlinNoise {
         }
 
 
-        return result - 1f;
+        return result;
     }
 
-    private float ridge(float n) {
+    private float ridge(float n, float offset) {
         n = Math.abs(n);
-        n = 1f - n;
+        n = offset - n;
         n = n * n;
         return n;
     }

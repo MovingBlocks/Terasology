@@ -64,7 +64,7 @@ public final class ChunkCache {
         }
 
         // Delete some elements if the cache size is exceeded
-        if (_chunkCache.size() > chunkCapacity()) {
+        if (_chunkCache.size() > capacity()) {
             // Fetch all chunks within the cache
             FastList<Chunk> sortedChunks = null;
             sortedChunks = new FastList<Chunk>(_chunkCache.values());
@@ -146,7 +146,11 @@ public final class ChunkCache {
         return _chunkCache.size();
     }
 
-    public int chunkCapacity() {
+    /**
+     * 
+     * @return
+     */
+    public int capacity() {
         return Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue() + 512;
     }
 }

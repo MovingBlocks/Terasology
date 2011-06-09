@@ -17,6 +17,7 @@ package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.Helper;
 
 /**
  * Generates the base terrain of the world.
@@ -24,6 +25,8 @@ import com.github.begla.blockmania.Configuration;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
+
+    public static int INTERPOLATION_INTERVAL = 8;
 
     /**
      *
@@ -39,12 +42,32 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     @Override
     public void generate(Chunk c) {
-        float[][] heightMap = new float[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.z];
+        float[][] heightMap = new float[(int) Configuration.CHUNK_DIMENSIONS.x + 1][(int) Configuration.CHUNK_DIMENSIONS.z + 1];
 
-        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.z; y++) {
-                float height = calcHeightMap(x + getOffsetX(c), y + getOffsetZ(c));
-                heightMap[x][y] = height;
+
+        /*
+         * Calculate the height map.
+         */
+        for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.z; y++) {
+                if (x % INTERPOLATION_INTERVAL == 0 && y % INTERPOLATION_INTERVAL == 0) {
+                    float height = calcHeightMap(x + getOffsetX(c), y + getOffsetZ(c));
+                    heightMap[x][y] = height;
+                }
+            }
+        }
+
+        /*
+         * Bilinear interpolate the missing values.
+         */
+        for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.z; y++) {
+            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+
+                if (!(x % INTERPOLATION_INTERVAL == 0 && y % INTERPOLATION_INTERVAL == 0)) {
+                    int offsetX = (x / INTERPOLATION_INTERVAL) * INTERPOLATION_INTERVAL;
+                    int offsetY = (y / INTERPOLATION_INTERVAL) * INTERPOLATION_INTERVAL;
+                    heightMap[x][y] = Helper.getInstance().bilinearInterpolation(x, y, heightMap[offsetX][offsetY], heightMap[offsetX][INTERPOLATION_INTERVAL + offsetY], heightMap[INTERPOLATION_INTERVAL + offsetX][offsetY], heightMap[INTERPOLATION_INTERVAL + offsetX][offsetY + INTERPOLATION_INTERVAL], offsetX, INTERPOLATION_INTERVAL + offsetX, offsetY, INTERPOLATION_INTERVAL + offsetY);
+                }
             }
         }
 
@@ -67,7 +90,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     /*
                      * Generate the "ocean".
                      */
-                    if (i <= 30 && i > 0) {
+                    if (i < 32 && i > 0) {
                         if (c.getBlock(x, i, z) == 0) {
                             c.setBlock(x, i, z, (byte) 0x4);
                         }
@@ -118,7 +141,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     public byte getBlockTypeForPosition(Chunk c, int x, int y, int z, int height) {
         // Sand
-        if (y <= 33 && y >= 28) {
+        if (y >= 28 && y <= 32) {
             return (byte) 0x7;
         }
 
@@ -136,7 +159,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @return 
      */
     public float calcHeightMap(float x, float z) {
-        float heightMap = (float) calcTerrainElevation(x, z) + (calcTerrainRoughness(x, z) * calcTerrainDetail(x, z));
+        float heightMap = (float) calcTerrainElevation(x, z) + (calcTerrainRoughness(x, z) * calcTerrainDetail(x, z)) + calcMountainDetail(x, z);
         return heightMap;
     }
 
@@ -162,7 +185,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.noiseWithOctaves(0.009f * x, 0.009f, 0.009f * z, 16, 0.25f, 2f) * 0.4f;
+        result += _pGen2.noiseWithOctaves(0.009f * x, 0.009f, 0.009f * z, 16, 0.25f, 2f) * 0.1f;
 
 
         return result;
@@ -177,7 +200,24 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.ridgedMultiFractalNoise(x * 0.008f, 0.008f, z * 0.008f, 16, 1.4f, 2f) * 0.4;
+        result += _pGen3.ridgedMultiFractalNoise(x * 0.008f, 0.008f, z * 0.008f, 8, 1.2f, 3f, 1f) * 0.6;
         return result;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param x
+     * @param z
+     * @return
+     */
+    protected float calcMountainDetail(float x, float z) {
+        float result = 0.0f;
+        result += _pGen1.noiseWithOctaves(x * 0.01f, 0.01f, z * 0.01f, 16, 1.2f, 2f);
+        
+        if (result < 0.5) {
+            result = 0f;
+        }
+        return result / 2f;
     }
 }

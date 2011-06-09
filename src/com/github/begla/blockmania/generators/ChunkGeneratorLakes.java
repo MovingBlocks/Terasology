@@ -18,7 +18,9 @@ package com.github.begla.blockmania.generators;
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.blocks.BlockDirt;
 import com.github.begla.blockmania.blocks.BlockGrass;
+import com.github.begla.blockmania.blocks.BlockSand;
 
 /**
  * TODO
@@ -56,13 +58,14 @@ public class ChunkGeneratorLakes extends ChunkGeneratorTerrain {
                 int startY = 0;
 
                 for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i >= 0; i--) {
-                    if (Block.getBlockForType(c.getBlock(x, i, z)).getClass() == BlockGrass.class) {
+                    Class block = Block.getBlockForType(c.getBlock(x, i, z)).getClass();
+                    if (block == BlockGrass.class || block == BlockSand.class || block == BlockDirt.class) {
                         startY = i;
                         break;
                     }
                 }
                 
-                if (startY < 32) {
+                if (startY < 32 || calcMountainDetail(x + xOffset, z + zOffset) > 0f) {
                     break;
                 }
 
