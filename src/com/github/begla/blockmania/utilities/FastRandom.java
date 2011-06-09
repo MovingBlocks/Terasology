@@ -27,8 +27,8 @@ public class FastRandom {
     long seed = System.currentTimeMillis();
 
     /**
-     * Initializes a new instance of the random number genrator using
-     * a specified seed
+     * Initializes a new instance of the random number generator using
+     * a specified seed.
      * 
      * @param seed The seed to use
      */
@@ -37,7 +37,7 @@ public class FastRandom {
     }
 
     /**
-     * Initializes a new instance of the random number genrator using
+     * Initializes a new instance of the random number generator using
      * System.currentTimeMillis() as seed.
      */
     public FastRandom() {
@@ -122,17 +122,18 @@ public class FastRandom {
     }
 
     /**
-     * Calculates a normal distributed value according to the given variance and mean (using to the polar method).
+     * Calculates a normal distributed value according to the given variance and mean.
      * 
      * @param variance 
      * @param mean 
-     * @return      */
+     * @return
+     */
     public double normalDistrDouble(double variance, double mean) {
         return standNormalDistrDouble() * Math.sqrt(variance) + mean;
     }
 
     /**
-     * Fisher-Yates shuffling algorithm by.Donald Knuth.
+     * Fisher-Yates shuffling algorithm by Donald Knuth.
      * 
      * @param array 
      */
