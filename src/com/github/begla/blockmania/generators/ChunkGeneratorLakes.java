@@ -64,8 +64,8 @@ public class ChunkGeneratorLakes extends ChunkGeneratorTerrain {
                         break;
                     }
                 }
-                
-                if (startY < 32 || calcMountainDetail(x + xOffset, z + zOffset) > 0f) {
+
+                if (startY < 32) {
                     break;
                 }
 

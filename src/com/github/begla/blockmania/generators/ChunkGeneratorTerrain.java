@@ -29,7 +29,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     /**
      * 
      */
-    public static int INTERPOLATION_INTERVAL = 8;
+    public static int INTERPOLATION_INTERVAL = 16;
 
     /**
      *
@@ -45,42 +45,14 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     @Override
     public void generate(Chunk c) {
-        float[][] heightMap = new float[(int) Configuration.CHUNK_DIMENSIONS.x + 1][(int) Configuration.CHUNK_DIMENSIONS.z + 1];
-
-
-        /*
-         * Calculate the height map.
-         */
-        for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.z; y++) {
-                if (x % INTERPOLATION_INTERVAL == 0 && y % INTERPOLATION_INTERVAL == 0) {
-                    float height = calcHeightMap(x + getOffsetX(c), y + getOffsetZ(c));
-                    heightMap[x][y] = height;
-                }
-            }
-        }
-
-        /*
-         * Bilinear interpolate the missing values.
-         */
-        for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.z; y++) {
-            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-
-                if (!(x % INTERPOLATION_INTERVAL == 0 && y % INTERPOLATION_INTERVAL == 0)) {
-                    int offsetX = (x / INTERPOLATION_INTERVAL) * INTERPOLATION_INTERVAL;
-                    int offsetY = (y / INTERPOLATION_INTERVAL) * INTERPOLATION_INTERVAL;
-                    heightMap[x][y] = Helper.getInstance().bilinearInterpolation(x, y, heightMap[offsetX][offsetY], heightMap[offsetX][INTERPOLATION_INTERVAL + offsetY], heightMap[INTERPOLATION_INTERVAL + offsetX][offsetY], heightMap[INTERPOLATION_INTERVAL + offsetX][offsetY + INTERPOLATION_INTERVAL], offsetX, INTERPOLATION_INTERVAL + offsetX, offsetY, INTERPOLATION_INTERVAL + offsetY);
-                }
-            }
-        }
+        float[][] heightMap = generateHeightMap(c);
 
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                int height = (int) (128 * heightMap[x][z]);
+                int height = (int) (128f * heightMap[x][z]);
 
                 boolean first = true;
                 for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i >= 0; i--) {
-
                     if (first && i == height) {
                         first = false;
                         // Generate grass on the top layer
@@ -105,6 +77,42 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     if (i == 0) {
                         c.setBlock(x, i, z, (byte) 0x8);
                     }
+                }
+            }
+        }
+    }
+
+    protected float[][] generateHeightMap(Chunk c) {
+
+        float[][] heightMap = new float[(int) Configuration.CHUNK_DIMENSIONS.x + 1][(int) Configuration.CHUNK_DIMENSIONS.z + 1];
+        /*
+         * Calculate the height map.
+         */
+        for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.z; y++) {
+                if (x % INTERPOLATION_INTERVAL == 0 && y % INTERPOLATION_INTERVAL == 0) {
+                    float height = calcHeightMap(x + getOffsetX(c), y + getOffsetZ(c));
+                    heightMap[x][y] = height;
+                }
+            }
+        }
+
+        bilinearInterpolateHeigthMap(heightMap);
+
+        return heightMap;
+    }
+
+    protected void bilinearInterpolateHeigthMap(float[][] heightMap) {
+        /*
+         * Bilinear interpolate the missing values.
+         */
+        for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.z; y++) {
+            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+
+                if (!(x % INTERPOLATION_INTERVAL == 0 && y % INTERPOLATION_INTERVAL == 0)) {
+                    int offsetX = (x / INTERPOLATION_INTERVAL) * INTERPOLATION_INTERVAL;
+                    int offsetY = (y / INTERPOLATION_INTERVAL) * INTERPOLATION_INTERVAL;
+                    heightMap[x][y] = Helper.getInstance().bilinearInterpolation(x, y, heightMap[offsetX][offsetY], heightMap[offsetX][INTERPOLATION_INTERVAL + offsetY], heightMap[INTERPOLATION_INTERVAL + offsetX][offsetY], heightMap[INTERPOLATION_INTERVAL + offsetX][offsetY + INTERPOLATION_INTERVAL], offsetX, INTERPOLATION_INTERVAL + offsetX, offsetY, INTERPOLATION_INTERVAL + offsetY);
                 }
             }
         }
@@ -148,7 +156,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             return (byte) 0x7;
         }
 
-        if ((float) y / (float) height < 0.85) {
+        if ((float) y / (float) height < 0.6) {
             return (byte) 0x3;
         }
 
@@ -162,7 +170,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @return 
      */
     public float calcHeightMap(float x, float z) {
-        float heightMap = (float) calcTerrainElevation(x, z) + (calcTerrainRoughness(x, z) * calcTerrainDetail(x, z)) + calcMountainDetail(x, z);
+        float heightMap = (float) calcTerrainElevation(x, z) + (calcTerrainRoughness(x, z) * calcTerrainDetail(x, z));
         return heightMap;
     }
 
@@ -206,21 +214,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         result += _pGen3.ridgedMultiFractalNoise(x * 0.008f, 0.008f, z * 0.008f, 8, 1.2f, 3f, 1f) * 0.6;
         return result;
     }
-
-    /**
-     * TODO
-     * 
-     * @param x
-     * @param z
-     * @return
-     */
-    protected float calcMountainDetail(float x, float z) {
+    
+    protected float calcCanyonDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen1.noiseWithOctaves(x * 0.01f, 0.01f, z * 0.01f, 16, 1.2f, 2f);
-        
-        if (result < 0.5) {
-            result = 0f;
-        }
-        return result / 2f;
+        result += _pGen2.noiseWithOctaves(x * 0.01f, 0.009f * y, z * 0.01f, 4, 3f, 12f);
+        return result;
     }
 }

@@ -214,7 +214,14 @@ public final class Helper {
         float r1 = ((x2 - x) / (x2 - x1)) * q11 + ((x - x1) / (x2 - x1)) * q21;
         float r2 = ((x2 - x) / (x2 - x1)) * q12 + ((x - x1) / (x2 - x1)) * q22;
         float p = ((y2 - y) / (y2 - y1)) * r1 + ((y - y1) / (y2 - y1)) * r2;
-        
+
         return p;
+    }
+
+    /*
+     * 
+     */
+    public float linearInterolation(float x, float q11, float q12, float x1, float x2, float y1, float y2) {
+        return y1 + (x - x1) * ((y2 - y1) / (x2 - x1));
     }
 }

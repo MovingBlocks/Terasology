@@ -26,6 +26,7 @@ import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.generators.ChunkGeneratorForest;
 import com.github.begla.blockmania.generators.ChunkGeneratorFlora;
 import com.github.begla.blockmania.generators.ChunkGeneratorLakes;
+import com.github.begla.blockmania.generators.ChunkGeneratorMountain;
 import com.github.begla.blockmania.generators.ChunkGeneratorResources;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.ObjectGeneratorFirTree;
@@ -96,6 +97,7 @@ public final class World extends RenderableObject {
     private final ChunkCache _chunkCache = new ChunkCache(this);
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
+    private final ChunkGeneratorMountain _generatorMountain;
     private final ChunkGeneratorForest _generatorForest;
     private final ChunkGeneratorResources _generatorResources;
     private final ChunkGeneratorLakes _generatorLakes;
@@ -154,6 +156,7 @@ public final class World extends RenderableObject {
 
         // Init. generators
         _generatorTerrain = new ChunkGeneratorTerrain(seed);
+        _generatorMountain = new ChunkGeneratorMountain(seed);
         _generatorForest = new ChunkGeneratorForest(seed);
         _generatorResources = new ChunkGeneratorResources(seed);
         _generatorLakes = new ChunkGeneratorLakes(seed);
@@ -373,7 +376,7 @@ public final class World extends RenderableObject {
         glRotatef(-35, 1, 0, 0);
 
         glColor4f(1f, 1f, 1f, 1.0f);
-        
+
         glEnable(GL_BLEND);
 
         if (isDaytime()) {
@@ -1121,6 +1124,7 @@ public final class World extends RenderableObject {
         FastList<ChunkGenerator> gs = new FastList<ChunkGenerator>();
         gs.add(_generatorTerrain);
         gs.add(_generatorLakes);
+        gs.add(_generatorMountain);
         gs.add(_generatorResources);
         gs.add(_generatorForest);
 
