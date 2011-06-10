@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania;
+package com.github.begla.blockmania.utilities;
 
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -86,38 +86,7 @@ public final class Helper {
         return (Sys.getTime() * 1000) / _timerTicksPerSecond;
     }
 
-    /**
-     * Applies Cantor's pairing function to 2D coordinates.
-     *
-     * @param k1 X-coordinate
-     * @param k2 Y-coordinate
-     * @return Unique 1D value
-     */
-    public int cantorize(int k1, int k2) {
-        return ((k1 + k2) * (k1 + k2 + 1) / 2) + k2;
-    }
-
-    /**
-     * Inverse function of Cantor's pairing function.
-     * 
-     * @param c Cantor value
-     * @return Value along the x-axis
-     */
-    public int cantorX(int c) {
-        int j = (int) Math.floor(Math.sqrt(0.25 + 2 * c) - 0.5);
-        return j - cantorY(c);
-    }
-
-    /**
-     * Inverse function of Cantor's pairing function.
-     * 
-     * @param c Cantor value
-     * @return Value along the y-axis
-     */
-    public int cantorY(int c) {
-        int j = (int) Math.floor(Math.sqrt(0.25 + 2 * c) - 0.5);
-        return c - j * (j + 1) / 2;
-    }
+   
 
     /**
      * Tests if a given position is within the bounds of a given 3D array.
@@ -196,32 +165,5 @@ public final class Helper {
         return (byte) (value | (1 << index));
     }
 
-    /**
-     * 
-     * @param x
-     * @param y
-     * @param q11
-     * @param q12
-     * @param q21
-     * @param q22
-     * @param x1
-     * @param x2
-     * @param y1
-     * @param y2
-     * @return 
-     */
-    public float bilinearInterpolation(float x, float y, float q11, float q12, float q21, float q22, float x1, float x2, float y1, float y2) {
-        float r1 = ((x2 - x) / (x2 - x1)) * q11 + ((x - x1) / (x2 - x1)) * q21;
-        float r2 = ((x2 - x) / (x2 - x1)) * q12 + ((x - x1) / (x2 - x1)) * q22;
-        float p = ((y2 - y) / (y2 - y1)) * r1 + ((y - y1) / (y2 - y1)) * r2;
-
-        return p;
-    }
-
-    /*
-     * 
-     */
-    public float linearInterolation(float x, float q11, float q12, float x1, float x2, float y1, float y2) {
-        return y1 + (x - x1) * ((y2 - y1) / (x2 - x1));
-    }
+   
 }

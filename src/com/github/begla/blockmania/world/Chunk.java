@@ -15,11 +15,12 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.player.LightNode;
 import com.github.begla.blockmania.blocks.BlockAir;
 import java.util.ArrayList;
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.RenderableObject;
 import javolution.util.FastList;
 import java.nio.channels.FileChannel;
@@ -165,7 +166,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public Chunk(World p, Vector3f position, FastList<ChunkGenerator> g) {
         this._position = position;
         // Set the chunk ID
-        _chunkID = Helper.getInstance().cantorize((int) _position.x, (int) _position.z);
+        _chunkID = BlockMath.cantorize((int) _position.x, (int) _position.z);
 
         _parent = p;
         _blocks = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
@@ -1674,7 +1675,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
 
         ByteBuffer output = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3 + 1);
-        File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath().toString(), Helper.getInstance().cantorize((int) _position.x, (int) _position.z)));
+        File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath().toString(), BlockMath.cantorize((int) _position.x, (int) _position.z)));
 
         // Save flags...
         byte flags = 0x0;
@@ -1721,7 +1722,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public boolean loadChunkFromFile() {
         ByteBuffer input = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3 + 1);
-        File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath(), Helper.getInstance().cantorize((int) _position.x, (int) _position.z)));
+        File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath(), BlockMath.cantorize((int) _position.x, (int) _position.z)));
 
         if (!f.exists()) {
             return false;

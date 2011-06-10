@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.utilities.Helper;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;

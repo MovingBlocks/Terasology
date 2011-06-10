@@ -115,7 +115,7 @@ public class PerlinNoise {
      * @param gain 
      * @return
      */
-    public float noiseWithOctaves(float x, float y, float z, int octaves, float lacunarity, float gain) {
+    public float multiFractalNoise(float x, float y, float z, int octaves, float lacunarity, float gain) {
         float frequency = 1f;
         float signal = 1f;
 

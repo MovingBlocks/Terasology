@@ -15,8 +15,9 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.utilities.Helper;
 import java.util.Collections;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -56,7 +57,7 @@ public final class ChunkCache {
         }
 
         // Try to load the chunk from the cache
-        Chunk c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
+        Chunk c = _chunkCache.get(BlockMath.cantorize(x, z));
 
         // We got a chunk! Already! Great!
         if (c != null) {
@@ -80,7 +81,7 @@ public final class ChunkCache {
                 if (indexToDelete >= 0 && indexToDelete < sortedChunks.size()) {
                     Chunk cc = sortedChunks.get(indexToDelete);
                     // Save the chunk before removing it from the cache
-                    _chunkCache.remove(Helper.getInstance().cantorize((int) cc.getPosition().x, (int) cc.getPosition().z));
+                    _chunkCache.remove(BlockMath.cantorize((int) cc.getPosition().x, (int) cc.getPosition().z));
                     cc.dispose();
                 }
             }
@@ -90,7 +91,7 @@ public final class ChunkCache {
 
         // Init a new chunk
         c = _parent.prepareNewChunk(x, z);
-        _chunkCache.put(Helper.getInstance().cantorize(x, z), c);
+        _chunkCache.put(BlockMath.cantorize(x, z), c);
 
         return c;
     }
@@ -114,7 +115,7 @@ public final class ChunkCache {
      * @return The loaded chunk
      */
     public Chunk loadChunk(int x, int z) {
-        Chunk c = _chunkCache.get(Helper.getInstance().cantorize(x, z));
+        Chunk c = _chunkCache.get(BlockMath.cantorize(x, z));
         return c;
     }
 

@@ -15,9 +15,10 @@
  */
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.utilities.Helper;
 
 /**
  * Generates the base terrain of the world.
@@ -29,7 +30,15 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     /**
      * 
      */
-    public static int INTERPOLATION_INTERVAL = 16;
+    public static int SAMPLE_RATE_2D = 16;
+    /**
+     * 
+     */
+    public static int SAMPLE_RATE_3D_HOR = 8;
+    /**
+     * 
+     */
+    public static int SAMPLE_RATE_3D_VERT = 16;
 
     /**
      *
@@ -45,8 +54,14 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     @Override
     public void generate(Chunk c) {
+        /*
+         * Fetch the bilinear interpolated height map.
+         */
         float[][] heightMap = generateHeightMap(c);
 
+        /*
+         * Generate the chunk from the values of the height map.
+         */
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
                 int height = (int) (128f * heightMap[x][z]);
@@ -82,37 +97,66 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
+    /**
+     * 
+     * @param c
+     * @return
+     */
     protected float[][] generateHeightMap(Chunk c) {
 
         float[][] heightMap = new float[(int) Configuration.CHUNK_DIMENSIONS.x + 1][(int) Configuration.CHUNK_DIMENSIONS.z + 1];
+
         /*
-         * Calculate the height map.
+         * Calculate the height map at a low sample rate.
          */
-        for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.z; y++) {
-                if (x % INTERPOLATION_INTERVAL == 0 && y % INTERPOLATION_INTERVAL == 0) {
-                    float height = calcHeightMap(x + getOffsetX(c), y + getOffsetZ(c));
-                    heightMap[x][y] = height;
-                }
+        for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x += SAMPLE_RATE_2D) {
+            for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.z; y += SAMPLE_RATE_2D) {
+                float height = calcHeightMap(x + getOffsetX(c), y + getOffsetZ(c));
+                heightMap[x][y] = height;
             }
         }
 
-        bilinearInterpolateHeigthMap(heightMap);
+        /*
+         * Binlinear interpolate the missing values.
+         */
+        biLerpHeightMap(heightMap);
 
         return heightMap;
     }
 
-    protected void bilinearInterpolateHeigthMap(float[][] heightMap) {
+    /**
+     * 
+     * @param heightMap
+     */
+    protected void biLerpHeightMap(float[][] heightMap) {
         /*
          * Bilinear interpolate the missing values.
          */
         for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.z; y++) {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+                if (!(x % SAMPLE_RATE_2D == 0 && y % SAMPLE_RATE_2D == 0)) {
+                    int offsetX = (x / SAMPLE_RATE_2D) * SAMPLE_RATE_2D;
+                    int offsetY = (y / SAMPLE_RATE_2D) * SAMPLE_RATE_2D;
+                    heightMap[x][y] = BlockMath.biLerp(x, y, heightMap[offsetX][offsetY], heightMap[offsetX][SAMPLE_RATE_2D + offsetY], heightMap[SAMPLE_RATE_2D + offsetX][offsetY], heightMap[SAMPLE_RATE_2D + offsetX][offsetY + SAMPLE_RATE_2D], offsetX, SAMPLE_RATE_2D + offsetX, offsetY, SAMPLE_RATE_2D + offsetY);
+                }
+            }
+        }
+    }
 
-                if (!(x % INTERPOLATION_INTERVAL == 0 && y % INTERPOLATION_INTERVAL == 0)) {
-                    int offsetX = (x / INTERPOLATION_INTERVAL) * INTERPOLATION_INTERVAL;
-                    int offsetY = (y / INTERPOLATION_INTERVAL) * INTERPOLATION_INTERVAL;
-                    heightMap[x][y] = Helper.getInstance().bilinearInterpolation(x, y, heightMap[offsetX][offsetY], heightMap[offsetX][INTERPOLATION_INTERVAL + offsetY], heightMap[INTERPOLATION_INTERVAL + offsetX][offsetY], heightMap[INTERPOLATION_INTERVAL + offsetX][offsetY + INTERPOLATION_INTERVAL], offsetX, INTERPOLATION_INTERVAL + offsetX, offsetY, INTERPOLATION_INTERVAL + offsetY);
+    /**
+     * 
+     * @param densityMap 
+     */
+    protected void triLerpDensityMap(float[][][] densityMap) {
+        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
+                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+                    if (!(x % SAMPLE_RATE_3D_HOR == 0 && y % SAMPLE_RATE_3D_VERT == 0 && z % SAMPLE_RATE_3D_HOR == 0)) {
+                        int offsetX = (x / SAMPLE_RATE_3D_HOR) * SAMPLE_RATE_3D_HOR;
+                        int offsetY = (y / SAMPLE_RATE_3D_VERT) * SAMPLE_RATE_3D_VERT;
+                        int offsetZ = (z / SAMPLE_RATE_3D_HOR) * SAMPLE_RATE_3D_HOR;
+                        densityMap[x][y][z] = BlockMath.triLerp(x, y, z, densityMap[offsetX][offsetY][offsetZ], densityMap[offsetX][SAMPLE_RATE_3D_VERT + offsetY][offsetZ], densityMap[offsetX][offsetY][offsetZ + SAMPLE_RATE_3D_HOR], densityMap[offsetX][offsetY + SAMPLE_RATE_3D_VERT][offsetZ + SAMPLE_RATE_3D_HOR], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY][offsetZ], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY + SAMPLE_RATE_3D_VERT][offsetZ], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY][offsetZ + SAMPLE_RATE_3D_HOR], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY + SAMPLE_RATE_3D_VERT][offsetZ + SAMPLE_RATE_3D_HOR], offsetX, SAMPLE_RATE_3D_HOR + offsetX, offsetY, SAMPLE_RATE_3D_VERT + offsetY, offsetZ, offsetZ + SAMPLE_RATE_3D_HOR);
+                    }
                 }
             }
         }
@@ -196,7 +240,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.noiseWithOctaves(0.009f * x, 0.009f, 0.009f * z, 16, 0.25f, 2f) * 0.1f;
+        result += _pGen2.multiFractalNoise(0.009f * x, 0.009f, 0.009f * z, 16, 0.25f, 2f) * 0.1f;
 
 
         return result;
@@ -214,10 +258,17 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         result += _pGen3.ridgedMultiFractalNoise(x * 0.008f, 0.008f, z * 0.008f, 8, 1.2f, 3f, 1f) * 0.6;
         return result;
     }
-    
-    protected float calcCanyonDensity(float x, float y, float z) {
+
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    protected float calcMountainDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen2.noiseWithOctaves(x * 0.01f, 0.009f * y, z * 0.01f, 4, 3f, 12f);
+        result += _pGen2.multiFractalNoise(x * 0.01f, 0.009f * y, z * 0.01f, 8, 8f, 12f);
         return result;
     }
 }

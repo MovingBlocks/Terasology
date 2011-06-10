@@ -18,7 +18,7 @@ package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.world.Primitives;
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.RenderableObject;
 import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.utilities.VectorPool;

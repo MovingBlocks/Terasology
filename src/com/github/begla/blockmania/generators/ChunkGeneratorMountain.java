@@ -17,7 +17,7 @@ package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.blocks.Block;
 
 /**
@@ -41,19 +41,39 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
      */
     @Override
     public void generate(Chunk c) {
+        float[][][] densityMap = new float[(int) Configuration.CHUNK_DIMENSIONS.x + 1][(int) Configuration.CHUNK_DIMENSIONS.y + 1][(int) Configuration.CHUNK_DIMENSIONS.z + 1];
 
+        /*
+         * Create the density map at a lower sample rate.
+         */
+        for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x += SAMPLE_RATE_3D_HOR) {
+            for (int z = 0; z <= Configuration.CHUNK_DIMENSIONS.z; z += SAMPLE_RATE_3D_HOR) {
+                for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.y; y += SAMPLE_RATE_3D_VERT) {
+                    densityMap[x][y][z] = calcMountainDensity(x + getOffsetX(c), y + getOffsetY(c), z + getOffsetZ(c));
+                }
+            }
+        }
+
+        /*
+         * Trilinear interpolate the missing values.
+         */
+        triLerpDensityMap(densityMap);
+
+        /*
+         * Generate the chunk from the density map.
+         */
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                for (int i = (int) Configuration.CHUNK_DIMENSIONS.y - 1; i >= 0; i--) {
+                for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
                     float height = (calcHeightMap(x + getOffsetX(c), z + getOffsetZ(c)) * 128f + 32f);
 
-                    if (c.getBlock(x, i, z) == 0x1 || c.getBlock(x, i, z) == 0x2) {
+                    if (c.getBlock(x, y, z) == 0x1 || c.getBlock(x, y, z) == 0x2) {
                         break;
                     }
 
-                    float dens = calcCanyonDensity(x + getOffsetX(c), i + getOffsetY(c), z + getOffsetZ(c));
+                    float dens = densityMap[x][y][z];
 
-                    float p = (float) i / height;
+                    float p = (float) y / height;
 
                     /*
                      * Reduce the density with growing height.
@@ -66,13 +86,12 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
 
                     if (dens > 0.1f) {
 
-                        if (c.canBlockSeeTheSky(x, i, z)) {
-                            c.setBlock(x, i, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, i, z, (int) height), i));
+                        if (c.canBlockSeeTheSky(x, y, z)) {
+                            c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, y, z, (int) height), y));
                         } else {
-                            c.setBlock(x, i, z, getBlockTypeForPosition(c, x, i, z, (int) height));
+                            c.setBlock(x, y, z, getBlockTypeForPosition(c, x, y, z, (int) height));
                         }
                     }
-
                 }
             }
         }

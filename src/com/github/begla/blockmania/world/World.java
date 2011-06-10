@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.Helper;
+import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.player.Player;
 import com.github.begla.blockmania.player.Intersection;
 import com.github.begla.blockmania.RenderableObject;
@@ -33,6 +33,7 @@ import com.github.begla.blockmania.generators.ObjectGeneratorFirTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorPineTree;
 import com.github.begla.blockmania.generators.ObjectGeneratorTree;
 import com.github.begla.blockmania.player.LightNode;
+import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.VectorPool;
 import java.awt.image.BufferedImage;
@@ -1152,7 +1153,7 @@ public final class World extends RenderableObject {
     public void printPlayerChunkPosition() {
         int chunkPosX = calcChunkPosX((int) _player.getPosition().x);
         int chunkPosZ = calcChunkPosX((int) _player.getPosition().z);
-        System.out.println(_chunkCache.getChunkByKey(Helper.getInstance().cantorize(chunkPosX, chunkPosZ)));
+        System.out.println(_chunkCache.getChunkByKey(BlockMath.cantorize(chunkPosX, chunkPosZ)));
     }
 
     /**
