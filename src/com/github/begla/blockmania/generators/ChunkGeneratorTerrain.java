@@ -190,7 +190,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param x
      * @param y
      * @param z
-     * @param height
+     * @param heightPerc 
      * @return
      */
     public byte getBlockTypeForPosition(Chunk c, int x, int y, int z, float heightPerc) {

@@ -1352,6 +1352,10 @@ public final class World extends RenderableObject {
     /*
      * 
      */
+    /**
+     * 
+     * @return
+     */
     public boolean isUpdateThreadRunning() {
         return !_updateThread.isInterrupted() && _updateThread.isAlive();
     }
