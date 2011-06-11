@@ -59,36 +59,40 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      * @param z 
      */
     protected void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
-        float grassDens = calcGrassDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
-        if (c.getBlock(x, y, z) == 0x1 && grassDens > 0.0) {
-            /*
-             * Generate high grass.
-             */
-            double rand = _rand.standNormalDistrDouble();
-            if (rand > -1 && rand < 1) {
-                if (c.canBlockSeeTheSky(x, y + 1, z)) {
-                    c.setBlock(x, y + 1, z, (byte) 0xB);
-                }
-            } else {
-                if (c.canBlockSeeTheSky(x, y + 1, z)) {
-                    c.setBlock(x, y + 1, z, (byte) 0xC);
-                }
-            }
 
-            /*
-             * Generate flowers.
-             */
-            if (_rand.standNormalDistrDouble() < -2) {
-                if (_rand.randomBoolean()) {
+        if (c.getBlock(x, y, z) == 0x1) {
+            float grassDens = calcGrassDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
+
+            if (grassDens > 0.0) {
+                /*
+                 * Generate high grass.
+                 */
+                double rand = _rand.standNormalDistrDouble();
+                if (rand > -1 && rand < 1) {
                     if (c.canBlockSeeTheSky(x, y + 1, z)) {
-                        c.setBlock(x, y + 1, z, (byte) 0x9);
+                        c.setBlock(x, y + 1, z, (byte) 0xB);
                     }
                 } else {
                     if (c.canBlockSeeTheSky(x, y + 1, z)) {
-                        c.setBlock(x, y + 1, z, (byte) 0xA);
+                        c.setBlock(x, y + 1, z, (byte) 0xC);
                     }
                 }
 
+                /*
+                 * Generate flowers.
+                 */
+                if (_rand.standNormalDistrDouble() < -2) {
+                    if (_rand.randomBoolean()) {
+                        if (c.canBlockSeeTheSky(x, y + 1, z)) {
+                            c.setBlock(x, y + 1, z, (byte) 0x9);
+                        }
+                    } else {
+                        if (c.canBlockSeeTheSky(x, y + 1, z)) {
+                            c.setBlock(x, y + 1, z, (byte) 0xA);
+                        }
+                    }
+
+                }
             }
         }
     }
@@ -106,16 +110,15 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
             return;
         }
 
-        float forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
-
         if (c.getBlock(x, y, z) == 0x1 && y > 32) {
+            float forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
             double r = _rand.standNormalDistrDouble();
 
             // Create some trees outside of forests
             if (forestDens < 0.01) {
                 r += 3f;
             }
-            
+
             if (r > -0.05 && r < 0.05) {
                 double r2 = _rand.standNormalDistrDouble();
                 if (r2 > -2 && r2 < -1) {

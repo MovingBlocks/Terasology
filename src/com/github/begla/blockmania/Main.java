@@ -296,6 +296,19 @@ public final class Main {
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
 
+        // Draw the crosshair
+        if (Configuration.getSettingBoolean("CROSSHAIR")) {
+            glColor3f(1f, 1f, 1f);
+            glLineWidth(2f);
+
+            glBegin(GL_LINES);
+            glVertex2d(Display.getDisplayMode().getWidth() / 2f - 8f, Display.getDisplayMode().getHeight() / 2f);
+            glVertex2d(Display.getDisplayMode().getWidth() / 2f + 8f, Display.getDisplayMode().getHeight() / 2f);
+            glVertex2d(Display.getDisplayMode().getWidth() / 2f, Display.getDisplayMode().getHeight() / 2f - 8f);
+            glVertex2d(Display.getDisplayMode().getWidth() / 2f, Display.getDisplayMode().getHeight() / 2f + 8f);
+            glEnd();
+        }
+
         /*
          * Draw debugging information.
          */
@@ -309,19 +322,6 @@ public final class Main {
         if (_pauseGame) {
             // Display the console input text
             _font1.drawString(4, Display.getDisplayMode().getHeight() - 16 - 4, String.format("%s_", _consoleInput), Color.red);
-        }
-
-        glColor3f(1f, 1f, 1f);
-        glLineWidth(2f);
-
-        // Draw the crosshair
-        if (Configuration.getSettingBoolean("CROSSHAIR")) {
-            glBegin(GL_LINES);
-            glVertex2d(Display.getDisplayMode().getWidth() / 2f - 8f, Display.getDisplayMode().getHeight() / 2f);
-            glVertex2d(Display.getDisplayMode().getWidth() / 2f + 8f, Display.getDisplayMode().getHeight() / 2f);
-            glVertex2d(Display.getDisplayMode().getWidth() / 2f, Display.getDisplayMode().getHeight() / 2f - 8f);
-            glVertex2d(Display.getDisplayMode().getWidth() / 2f, Display.getDisplayMode().getHeight() / 2f + 8f);
-            glEnd();
         }
 
         glDisable(GL_BLEND);
