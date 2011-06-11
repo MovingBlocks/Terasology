@@ -68,9 +68,10 @@ public final class ChunkUpdateManager {
      */
     public void updateDisplayLists() {
         for (int i = 0; i < Configuration.DL_UPDATES_PER_CYCLE; i++) {
-            if (!_displayListUpdates.isEmpty()) {
-                // Take one chunk from the queue
+            // Take one chunk from the queue
+            try {
                 Chunk c = _displayListUpdates.getFirst();
+
                 if (c != null) {
                     // Generate the display list of the center chunk
                     c.generateDisplayLists();
@@ -87,7 +88,9 @@ public final class ChunkUpdateManager {
                     }
 
                 }
+            } catch (Exception e) {
             }
+
         }
     }
 

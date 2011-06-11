@@ -1056,7 +1056,7 @@ public final class World extends RenderableObject {
      * @return
      */
     public boolean isDaytime() {
-        if (_daylight > 0.8f) {
+        if (_daylight >= 0.5f) {
             return true;
         }
         return false;
