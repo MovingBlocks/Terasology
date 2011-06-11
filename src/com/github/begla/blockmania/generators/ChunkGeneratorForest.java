@@ -42,8 +42,8 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
     @Override
     public void generate(Chunk c) {
         for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x+=2) {
+                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z+=2) {
                     generateGrassAndFlowers(c, x, y, z);
                     generateTree(c, x, y, z);
                 }
@@ -145,7 +145,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      */
     protected float calcForestDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.009f * x, 0.009f * y, 0.009f * z, 3, 1f, 2f);
+        result += _pGen3.multiFractalNoise(0.006f * x, 0.006f * y, 0.006f * z, 2, 8f, 12f);
         return result;
     }
 
