@@ -238,7 +238,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
 
         _textureMap.bind();
-        
+
         if (!translucent) {
             glCallList(_displayListOpaque);
         } else {
@@ -513,11 +513,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (drawTop) {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
             float shadowIntens = Math.max(_parent.getRenderingLightValue(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z)) * simpleOcclusionAmount(x, y, z, 0, 1, 0), 0);
-
-            // If this block is 'is touching' the nil area: ignore light
-            if (y == Configuration.CHUNK_DIMENSIONS.y - 1) {
-                shadowIntens = 1.0f;
-            }
 
             float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x;
             float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y;
@@ -1415,7 +1410,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             }
         }
 
-        return -1;
+        return (float) Math.pow(0.8, _parent.getDaylight());
     }
 
     /**

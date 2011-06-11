@@ -133,6 +133,12 @@ public final class ChunkCache {
      */
     public void writeAllChunksToDisk() {
         _parent.suspendUpdateThread();
+        /*
+         * Wait until the update thread is suspended.
+         */
+        while (_parent.isUpdateThreadRunning()) {
+            // Do nothing
+        }
         for (Chunk c : _chunkCache.values()) {
             c.writeChunkToDisk();
         }

@@ -64,32 +64,51 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
          */
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
+                for (int y = 100; y >= 0; y--) {
                     float height = (calcHeightMap(x + getOffsetX(c), z + getOffsetZ(c)) * 128f + 32f);
+
+                    if (height < 0) {
+                        break;
+                    }
+
+                    if (height > 100f) {
+                        height = 100f;
+                    }
+
+                    float dens = densityMap[x][y][z];
+                    float p = (float) y / height;
+
 
                     if (c.getBlock(x, y, z) == 0x1 || c.getBlock(x, y, z) == 0x2) {
                         break;
                     }
 
-                    float dens = densityMap[x][y][z];
-
-                    float p = (float) y / height;
-
                     /*
                      * Reduce the density with growing height.
                      */
                     if (p > 0.6f && p < 1.0f) {
-                        dens *= 1f - (p - 0.8f);
+                        dens *= 1f - (p - 0.6f);
                     } else if (p >= 1.0) {
                         dens = 0f;
                     }
 
-                    if (dens > 0.1f) {
-
+                    if ((dens > 0.06f && dens < 0.1f) || (dens >= 0.1f && p >= 0.95f)) {
+                        /*
+                         * The outer layer is made of dirt and grass.
+                         */
                         if (c.canBlockSeeTheSky(x, y, z)) {
-                            c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, y, z, (int) height), y));
+                            c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, y, z, 1.0f), y));
                         } else {
-                            c.setBlock(x, y, z, getBlockTypeForPosition(c, x, y, z, (int) height));
+                            c.setBlock(x, y, z, getBlockTypeForPosition(c, x, y, z, 1.0f));
+                        }
+                    } else if (dens >= 0.1f && p < 0.95f) {
+                        /*
+                         * The inner layer is made of stone. But only if the height is < 90 %.
+                         */
+                        if (c.canBlockSeeTheSky(x, y, z)) {
+                            c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, y, z, 0.2f), y));
+                        } else {
+                            c.setBlock(x, y, z, getBlockTypeForPosition(c, x, y, z, 0.2f));
                         }
                     }
                 }

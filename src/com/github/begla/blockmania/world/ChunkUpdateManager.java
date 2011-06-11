@@ -54,9 +54,7 @@ public final class ChunkUpdateManager {
         }
 
         if (nearestChunkUpdate != null) {
-            synchronized (_chunkUpdates) {
-                _chunkUpdates.remove(nearestChunkUpdate);
-            }
+            _chunkUpdates.remove(nearestChunkUpdate);
             processChunkUpdate(nearestChunkUpdate);
         }
 
@@ -211,9 +209,7 @@ public final class ChunkUpdateManager {
      * @param updates
      */
     public void removeChunkUpdates(Collection<ChunkUpdate> updates) {
-        synchronized (_chunkUpdates) {
-            _chunkUpdates.removeAll(updates);
-        }
+        _chunkUpdates.removeAll(updates);
     }
 
     /**

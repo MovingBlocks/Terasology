@@ -83,11 +83,11 @@ public final class Configuration {
     /**
      * 
      */
-    public static final float PROB_COAL = -1.5f;
+    public static final float PROB_COAL = -3f;
     /**
      * 
      */
-    public static final float PROB_GOLD = -3f;
+    public static final float PROB_GOLD = -3.5f;
     /* ------- */
     private static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();

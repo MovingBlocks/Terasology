@@ -1348,4 +1348,11 @@ public final class World extends RenderableObject {
         }
 
     }
+    
+    /*
+     * 
+     */
+    public boolean isUpdateThreadRunning() {
+        return !_updateThread.isInterrupted() && _updateThread.isAlive();
+    }
 }

@@ -18,7 +18,6 @@ package com.github.begla.blockmania.generators;
 import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.utilities.Helper;
 
 /**
  * Generates the base terrain of the world.
@@ -71,10 +70,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     if (first && i == height) {
                         first = false;
                         // Generate grass on the top layer
-                        c.setBlock(x, i, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, i, z, height), i));
+                        c.setBlock(x, i, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, i, z, (float) i / (float) height), i));
 
                     } else if (i < height) {
-                        c.setBlock(x, i, z, getBlockTypeForPosition(c, x, i, z, height));
+                        c.setBlock(x, i, z, getBlockTypeForPosition(c, x, i, z, (float) i / (float) height));
                     }
 
                     /*
@@ -194,13 +193,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param height
      * @return
      */
-    public byte getBlockTypeForPosition(Chunk c, int x, int y, int z, int height) {
+    public byte getBlockTypeForPosition(Chunk c, int x, int y, int z, float heightPerc) {
         // Sand
         if (y >= 28 && y <= 32) {
             return (byte) 0x7;
         }
 
-        if ((float) y / (float) height < 0.6) {
+        if (heightPerc <= 0.8) {
             return (byte) 0x3;
         }
 
