@@ -112,6 +112,7 @@ public final class ChunkUpdateManager {
             // Ignore duplicate updates
             if (!_chunkUpdates.contains(cu)) {
                 _chunkUpdates.add(cu);
+                
                 synchronized (_chunkUpdates) {
                     Collections.sort(_chunkUpdates);
                 }

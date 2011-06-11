@@ -53,6 +53,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
@@ -84,12 +85,11 @@ public final class World extends RenderableObject {
     /* ------ */
     private static Texture _textureSun, _textureMoon;
     /* ------ */
-    private float _time = 8.0f;
+    private float _time = 0f;
     private float _daylight = 1.0f;
     private Player _player;
     private Vector3f _spawningPoint;
     /* ------ */
-    private boolean _daytimeUpdated = true;
     private boolean _updatingEnabled = false;
     private boolean _updateThreadAlive = true;
     private final Thread _updateThread;
@@ -113,6 +113,8 @@ public final class World extends RenderableObject {
     int _lastGeneratedChunkID = 0;
     /* ----- */
     private FastList<Chunk> _visibleChunks;
+    /* ----- */
+    private int _textureLight = -1;
 
     /**
      * Initializes a new world for the single player mode.
@@ -174,6 +176,7 @@ public final class World extends RenderableObject {
         resetPlayer();
         _visibleChunks = fetchVisibleChunks();
 
+        generateClouds();
         updateDaylight();
 
         _updateThread = new Thread(new Runnable() {
@@ -206,7 +209,6 @@ public final class World extends RenderableObject {
                      * Update chunks queued for updating.
                      */
                     _chunkUpdateManager.updateChunks();
-
 
                     /*
                      * These updates do not need to be run every iteration.
@@ -256,12 +258,9 @@ public final class World extends RenderableObject {
      * time is updated every 15 seconds.
      */
     private void updateDaytime() {
-        if (Helper.getInstance().getTime() - _lastDaytimeMeasurement >= 15000) {
-
-            setTime(_time + 0.5f);
+        if (Helper.getInstance().getTime() - _lastDaytimeMeasurement >= 100) {
+            setTime(_time + 1f / ((5f * 60f * 10f)));
             _lastDaytimeMeasurement = Helper.getInstance().getTime();
-
-            Helper.LOGGER.log(Level.INFO, "Updated daytime to {0}h.", _time);
         }
     }
 
@@ -269,14 +268,18 @@ public final class World extends RenderableObject {
      * 
      */
     private void updateDaylight() {
-        if (_time >= 16f && _time <= 24) {
-            _daylight = (float) Math.pow(0.8f, (_time - 16f));
-        } else if (_time >= 4 && _time <= 12) {
-            _daylight = 1f - (float) Math.pow(0.8f, (_time - 4f));
-        } else if (_time >= 0 && _time < 5) {
-            _daylight = (float) Math.pow(0.8f, 9);
-        } else {
-            _daylight = 1f;
+        // Sunrise
+        if (_time < 0.1f && _time > 0.0f) {
+            _daylight = _time / 0.1f;
+        } else if (_time >= 0.1 && _time <= 0.5f) {
+            _daylight = 1.0f;
+        }
+
+        // Sunset
+        if (_time > 0.5f && _time < 0.6f) {
+            _daylight = 1.0f - (_time - 0.5f) / 0.1f;
+        } else if (_time >= 0.6f && _time <= 1.0f) {
+            _daylight = 0.0f;
         }
     }
 
@@ -351,15 +354,22 @@ public final class World extends RenderableObject {
     @Override
     public void render() {
         renderHorizon();
-        ShaderManager.getInstance().enableShader("fog");
         renderChunks();
-        ShaderManager.getInstance().enableShader(null);
     }
 
     /**
      * Renders the horizon.
      */
     public void renderHorizon() {
+
+
+        ShaderManager.getInstance().enableShader("cloud");
+
+        /*
+         * Transfer the daylight value to the chunk shader.
+         */
+        int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("cloud"), "daylight");
+        GL20.glUniform1f(daylight, getDaylight());
 
         /*
          * Draw clouds.
@@ -370,6 +380,7 @@ public final class World extends RenderableObject {
             glCallList(_displayListClouds);
             glPopMatrix();
         }
+        ShaderManager.getInstance().enableShader(null);
 
         glPushMatrix();
         // Position the sun relatively to the player
@@ -440,11 +451,6 @@ public final class World extends RenderableObject {
     @Override
     public void update() {
         _chunkUpdateManager.updateDisplayLists();
-
-        if (_daytimeUpdated) {
-            _daytimeUpdated = false;
-            regenerateClouds();
-        }
 
         // Move the clouds a bit each update
         _cloudOffset.x += _windDirection.x;
@@ -606,7 +612,7 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
             return c.getBlock(blockPosX, y, blockPosZ);
@@ -667,33 +673,10 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
             return c.getLight(blockPosX, y, blockPosZ, type);
-        }
-
-        return -1;
-    }
-
-    /**
-     * 
-     * @param x
-     * @param y
-     * @param z
-     * @return 
-     */
-    public final float getRenderingLightValue(int x, int y, int z) {
-        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
-        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
-
-        int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-
-        if (c != null) {
-            return c.getRenderingLightValue(blockPosX, y, blockPosZ);
         }
 
         return -1;
@@ -749,8 +732,6 @@ public final class World extends RenderableObject {
     /**
      * Recursive light calculation.
      * 
-     * Too slow!
-     * 
      * @param x
      * @param y
      * @param z
@@ -773,8 +754,6 @@ public final class World extends RenderableObject {
 
     /**
      * Recursive light calculation.
-     * 
-     * Too weird.
      * 
      * @param x
      * @param y
@@ -1016,15 +995,15 @@ public final class World extends RenderableObject {
      * @param time The time to set
      */
     public void setTime(float time) {
-        _time = time % 24;
+        _time = time;
 
-        float oldDaylight = _daylight;
-        updateDaylight();
-
-        if (_daylight != oldDaylight) {
-            _daytimeUpdated = true;
-            updateAllChunks();
+        if (_time < 0) {
+            _time = 1.0f;
+        } else if (_time > 1.0f) {
+            _time = 0.0f;
         }
+
+        updateDaylight();
     }
 
     /**
@@ -1056,7 +1035,7 @@ public final class World extends RenderableObject {
      * @return
      */
     public boolean isDaytime() {
-        if (_daylight >= 0.5f) {
+        if (_time > 0.075f && _time < 0.575) {
             return true;
         }
         return false;
@@ -1320,9 +1299,9 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * Regenerates the clouds display list with the current daylight value.
+     * Generates the cloud display list with the current daylight value.
      */
-    public void regenerateClouds() {
+    public void generateClouds() {
 
         FastRandom rand = new FastRandom(getSeed().hashCode());
 
@@ -1348,10 +1327,7 @@ public final class World extends RenderableObject {
         }
 
     }
-    
-    /*
-     * 
-     */
+
     /**
      * 
      * @return

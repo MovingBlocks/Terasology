@@ -35,6 +35,8 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 
@@ -208,6 +210,9 @@ public final class Main {
         _world.render();
 
         // Unbind textures
+        GL13.glActiveTexture(GL13.GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
         // Disable shader
         ShaderManager.getInstance().enableShader(null);
@@ -475,7 +480,8 @@ public final class Main {
                 _world.setSpawningPoint();
                 success = true;
             }
-        } catch (IndexOutOfBoundsException e) {
+        } catch (Exception e) {
+            Helper.LOGGER.log(Level.INFO, e.getMessage());
         }
 
         if (success) {

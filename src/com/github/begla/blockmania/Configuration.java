@@ -77,10 +77,6 @@ public final class Configuration {
      */
     public static final int DL_UPDATES_PER_CYCLE = 2;
     /**
-     * Global brightness factor, which is applied to vertices on the creation of the display lists.
-     */
-    public static final float BRIGHTNESS_FACTOR = 1.0f;
-    /**
      * 
      */
     public static final float PROB_COAL = -3f;

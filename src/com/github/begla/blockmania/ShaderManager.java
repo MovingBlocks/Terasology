@@ -20,6 +20,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.logging.Level;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
 
@@ -54,14 +59,21 @@ public class ShaderManager {
      */
     public ShaderManager() {
         initShader();
+
+        Helper.LOGGER.log(Level.INFO, "Loading Blockmania shader manager...");
+        Helper.LOGGER.log(Level.INFO, "GL_VERSION: {0}", GL11.glGetString(GL11.GL_VERSION));
+        Helper.LOGGER.log(Level.INFO, "SHADING_LANGUAGE VERSION: {0}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
+        Helper.LOGGER.log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
     }
 
     /**
      * 
      */
     private void initShader() {
-        createVertexShader("fog_vert.glsl", "fog");
-        createFragShader("fog_frag.glsl", "fog");
+        createVertexShader("chunk_vert.glsl", "chunk");
+        createFragShader("chunk_frag.glsl", "chunk");
+        createVertexShader("cloud_vert.glsl", "cloud");
+        createFragShader("cloud_frag.glsl", "cloud");
 
         for (String s : _fragmentShader.keySet()) {
             int shaderProgram = GL20.glCreateProgram();
@@ -126,7 +138,7 @@ public class ShaderManager {
 
         GL20.glShaderSource(_vertexShader.get(title), fragCode);
         GL20.glCompileShader(_vertexShader.get(title));
-        
+
         printLogInfo(_vertexShader.get(title));
 
         return _vertexShader.get(title);
@@ -134,7 +146,10 @@ public class ShaderManager {
 
     private static void printLogInfo(int obj) {
         String output = GL20.glGetShaderInfoLog(obj, 1024);
-        Helper.LOGGER.log(Level.INFO, "{0}", output);
+
+        if (output.length() > 0) {
+            Helper.LOGGER.log(Level.INFO, "{0}", output);
+        }
     }
 
     /**

@@ -239,8 +239,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.multiFractalNoise(0.009f * x, 0.009f, 0.009f * z, 16, 0.25f, 2f) * 0.1f;
-
+        result += _pGen2.multiFractalNoise(0.009f * x, 0.009f, 0.009f * z, 16, 2f, 4f) * 0.1f;
 
         return result;
     }
