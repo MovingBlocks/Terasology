@@ -30,7 +30,7 @@ void main(){
     /*
         Nights are slightly bluish.
     */
-    daylightValue.b += 0.3;
+    daylightValue.b += 0.1;
 
     color.xyz *= clamp(daylightValue + blocklightValue, 0.0, 1.0);
 

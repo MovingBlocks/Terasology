@@ -417,7 +417,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         byte block = _blocks[x][y][z];
         RENDER_TYPE renderType = RENDER_TYPE.BILLBOARD;
 
-        // Ignore invisible blocks like air and normal block!
+        // Ignore invisible blocks like air and normal blocks!
         if (Block.getBlockForType(block).isBlockInvisible() || !Block.getBlockForType(block).isBlockBillboard()) {
             return;
         }
@@ -548,6 +548,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     private void generateBlockVertices(int x, int y, int z) {
         byte block = _blocks[x][y][z];
+
+        /*
+         * Determine the render process.
+         */
         RENDER_TYPE renderType = RENDER_TYPE.TRANS;
 
         if (!Block.getBlockForType(block).isBlockTypeTranslucent()) {
@@ -559,10 +563,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             return;
         }
 
-        float offsetX = _position.x * Configuration.CHUNK_DIMENSIONS.x;
-        float offsetY = _position.y * Configuration.CHUNK_DIMENSIONS.y;
-        float offsetZ = _position.z * Configuration.CHUNK_DIMENSIONS.z;
-
         boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
         byte blockToCheck = _parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z));
 
@@ -573,434 +573,255 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             drawTop = true;
         }
 
-        TFloatArrayList quads = new TFloatArrayList();
-        TFloatArrayList normals = new TFloatArrayList();
-        TFloatArrayList tex = new TFloatArrayList();
-        TFloatArrayList color = new TFloatArrayList();
-
         if (drawTop) {
+            Vector3f p1 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
+            Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
+            Vector3f p3 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
+            Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
+
+            Vector3f norm = VectorPool.getVector(0, 1, 0);
+
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
             float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 1, 0);
+            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
+            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
 
-            float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x;
-            float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y;
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(1.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 0, 1, 0, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(1.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 0, 1, 0, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY);
-            quads.add(0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(1.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 0, 1, 0, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(1.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 0, 1, 0, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
-
-
+            VectorPool.putVector(p1);
+            VectorPool.putVector(p2);
+            VectorPool.putVector(p3);
+            VectorPool.putVector(p4);
+            VectorPool.putVector(norm);
         }
 
         blockToCheck = _parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1));
         drawFront = isSideVisibleForBlockTypes(blockToCheck, block);
 
         if (drawFront) {
+            Vector3f p1 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
+            Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
+            Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
+            Vector3f p4 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
+
+            Vector3f norm = VectorPool.getVector(0, 0, -1);
+
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
             float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 0, -1);
+            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
+            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
 
-            float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x;
-            float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y;
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            normals.add(-1.0f);
-            addLightTexCoordFor(x, y, z, 0, 0, -1, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            normals.add(-1.0f);
-            addLightTexCoordFor(x, y, z, 0, 0, -1, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY);
-            quads.add(0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            normals.add(-1.0f);
-            addLightTexCoordFor(x, y, z, 0, 0, -1, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            normals.add(-1.0f);
-            addLightTexCoordFor(x, y, z, 0, 0, -1, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
-
-
+            VectorPool.putVector(p1);
+            VectorPool.putVector(p2);
+            VectorPool.putVector(p3);
+            VectorPool.putVector(p4);
+            VectorPool.putVector(norm);
         }
 
         blockToCheck = _parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1));
         drawBack = isSideVisibleForBlockTypes(blockToCheck, block);
 
         if (drawBack) {
+            Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
+            Vector3f p2 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
+            Vector3f p3 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
+            Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
+
+
+            Vector3f norm = VectorPool.getVector(0, 0, 1);
+
+
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
             float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 0, 1);
 
+            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
+            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
 
-            float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x;
-            float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y;
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            normals.add(1.0f);
-            addLightTexCoordFor(x, y, z, 0, 0, 1, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            normals.add(1.0f);
-            addLightTexCoordFor(x, y, z, 0, 0, 1, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            normals.add(1.0f);
-            addLightTexCoordFor(x, y, z, 0, 0, 1, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY);
-            quads.add(0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            normals.add(1.0f);
-            addLightTexCoordFor(x, y, z, 0, 0, 1, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-
+            VectorPool.putVector(p1);
+            VectorPool.putVector(p2);
+            VectorPool.putVector(p3);
+            VectorPool.putVector(p4);
+            VectorPool.putVector(norm);
         }
 
         blockToCheck = _parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z));
         drawLeft = isSideVisibleForBlockTypes(blockToCheck, block);
 
         if (drawLeft) {
+            Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
+            Vector3f p2 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
+            Vector3f p3 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
+            Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
+
+            Vector3f norm = VectorPool.getVector(-1, 0, 0);
+
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.LEFT);
             float shadowIntens = Configuration.BLOCK_SIDE_DIMMING;
 
-            float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x;
-            float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y;
+            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
+            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(-1.0f);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, -1, 0, 0, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(-1.0f);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, -1, 0, 0, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(-1.0f);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, -1, 0, 0, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(-1.0f);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, -1, 0, 0, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
-
+            VectorPool.putVector(p1);
+            VectorPool.putVector(p2);
+            VectorPool.putVector(p3);
+            VectorPool.putVector(p4);
+            VectorPool.putVector(norm);
         }
 
         blockToCheck = _parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z));
         drawRight = isSideVisibleForBlockTypes(blockToCheck, block);
 
         if (drawRight) {
+            Vector3f p1 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
+            Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
+            Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
+            Vector3f p4 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
+
+            Vector3f norm = VectorPool.getVector(1, 0, 0);
+
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.RIGHT);
             float shadowIntens = Configuration.BLOCK_SIDE_DIMMING;
 
-            float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x;
-            float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y;
+            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
+            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(1.0f);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 1, 0, 0, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY);
-            quads.add(0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(1.0f);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 1, 0, 0, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY);
-            quads.add(0.5f + x + offsetX);
-            quads.add(0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(1.0f);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 1, 0, 0, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(1.0f);
-            normals.add(0.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 1, 0, 0, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
-
-
+            VectorPool.putVector(p1);
+            VectorPool.putVector(p2);
+            VectorPool.putVector(p3);
+            VectorPool.putVector(p4);
+            VectorPool.putVector(norm);
         }
 
         blockToCheck = _parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z));
         drawBottom = isSideVisibleForBlockTypes(blockToCheck, block);
 
         if (drawBottom) {
+            Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
+            Vector3f p2 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
+            Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
+            Vector3f p4 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
+
+            Vector3f norm = VectorPool.getVector(0, -1, 0);
+
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BOTTOM);
             float shadowIntens = 1f;
 
-            float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x;
-            float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y;
+            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
+            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(-1.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 0, -1, 0, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
+            VectorPool.putVector(p1);
+            VectorPool.putVector(p2);
+            VectorPool.putVector(p3);
+            VectorPool.putVector(p4);
+            VectorPool.putVector(norm);
+        }
+    }
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(-1.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 0, -1, 0, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY);
-            quads.add(0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(-0.5f + z + offsetZ);
+    /**
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @param p1
+     * @param p2
+     * @param p3
+     * @param p4
+     * @param norm 
+     * @param colorOffset
+     * @param texOffset
+     * @param shadowIntens
+     * @param renderType 
+     */
+    public void generateVerticesForBlockSide(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, float shadowIntens, RENDER_TYPE renderType) {
+        float offsetX = _position.x * Configuration.CHUNK_DIMENSIONS.x;
+        float offsetY = _position.y * Configuration.CHUNK_DIMENSIONS.y;
+        float offsetZ = _position.z * Configuration.CHUNK_DIMENSIONS.z;
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(-1.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 0, -1, 0, renderType);
-            tex.add(texOffsetX + 0.0624f);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
+        TFloatArrayList color = _colorOpaque;
+        TFloatArrayList normals = _normalsOpaque;
+        TFloatArrayList tex = _texOpaque;
+        TFloatArrayList quads = _quadsOpaque;
 
-            color.add(colorOffset.x * shadowIntens);
-            color.add(colorOffset.y * shadowIntens);
-            color.add(colorOffset.z * shadowIntens);
-            color.add(colorOffset.w);
-            normals.add(0.0f);
-            normals.add(-1.0f);
-            normals.add(0.0f);
-            addLightTexCoordFor(x, y, z, 0, -1, 0, renderType);
-            tex.add(texOffsetX);
-            tex.add(texOffsetY + 0.0624f);
-            quads.add(-0.5f + x + offsetX);
-            quads.add(-0.5f + y + offsetY);
-            quads.add(0.5f + z + offsetZ);
-
-
+        if (renderType == RENDER_TYPE.TRANS) {
+            color = _colorTranslucent;
+            normals = _normalsTranslucent;
+            tex = _texTranslucent;
+            quads = _quadsTranslucent;
         }
 
-        if (!Block.getBlockForType(block).isBlockTypeTranslucent()) {
-            _normalsOpaque.addAll(normals);
-            _quadsOpaque.addAll(quads);
-            _texOpaque.addAll(tex);
-            _colorOpaque.addAll(color);
+        /*
+         * Rotate the texture coordinates according to the
+         * orientation of the plane.
+         */
+        if (norm.z == 1 || norm.x == -1) {
+            tex.add(texOffset.x);
+            tex.add(texOffset.y + 0.0624f);
+            tex.add(texOffset.x + 0.0624f);
+            tex.add(texOffset.y + 0.0624f);
+            tex.add(texOffset.x + 0.0624f);
+            tex.add(texOffset.y);
+            tex.add(texOffset.x);
+            tex.add(texOffset.y);
         } else {
-            _normalsTranslucent.addAll(normals);
-            _quadsTranslucent.addAll(quads);
-            _texTranslucent.addAll(tex);
-            _colorTranslucent.addAll(color);
+            tex.add(texOffset.x);
+            tex.add(texOffset.y);
+            tex.add(texOffset.x + 0.0624f);
+            tex.add(texOffset.y);
+            tex.add(texOffset.x + 0.0624f);
+            tex.add(texOffset.y + 0.0624f);
+            tex.add(texOffset.x);
+            tex.add(texOffset.y + 0.0624f);
         }
 
+        color.add(colorOffset.x * shadowIntens);
+        color.add(colorOffset.y * shadowIntens);
+        color.add(colorOffset.z * shadowIntens);
+        color.add(colorOffset.w);
+        normals.add(norm.x);
+        normals.add(norm.y);
+        normals.add(norm.z);
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType);
+
+        quads.add(p1.x + x + offsetX);
+        quads.add(p1.y + y + offsetY);
+        quads.add(p1.z + z + offsetZ);
+
+        color.add(colorOffset.x * shadowIntens);
+        color.add(colorOffset.y * shadowIntens);
+        color.add(colorOffset.z * shadowIntens);
+        color.add(colorOffset.w);
+        normals.add(norm.x);
+        normals.add(norm.y);
+        normals.add(norm.z);
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType);
+
+        quads.add(p2.x + x + offsetX);
+        quads.add(p2.y + y + offsetY);
+        quads.add(p2.z + z + offsetZ);
+
+        color.add(colorOffset.x * shadowIntens);
+        color.add(colorOffset.y * shadowIntens);
+        color.add(colorOffset.z * shadowIntens);
+        color.add(colorOffset.w);
+        normals.add(norm.x);
+        normals.add(norm.y);
+        normals.add(norm.z);
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType);
+
+        quads.add(p3.x + x + offsetX);
+        quads.add(p3.y + y + offsetY);
+        quads.add(p3.z + z + offsetZ);
+
+        color.add(colorOffset.x * shadowIntens);
+        color.add(colorOffset.y * shadowIntens);
+        color.add(colorOffset.z * shadowIntens);
+        color.add(colorOffset.w);
+        normals.add(norm.x);
+        normals.add(norm.y);
+        normals.add(norm.z);
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType);
+
+        quads.add(p4.x + x + offsetX);
+        quads.add(p4.y + y + offsetY);
+        quads.add(p4.z + z + offsetZ);
     }
 
     /**
@@ -1069,24 +890,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         cb.flip();
         nb.flip();
 
-        glNewList(_displayListOpaque, GL_COMPILE);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glEnableClientState(GL_COLOR_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-        glTexCoordPointer(2, 0, tb);
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-        glTexCoordPointer(3, 0, tb2);
-        glColorPointer(4, 0, cb);
-        glVertexPointer(3, 0, vb);
-        glNormalPointer(0, nb);
-        glDrawArrays(GL_QUADS, 0, _quadsOpaque.size() / 3);
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glEndList();
+        generateDisplayList(_displayListOpaque, vb, tb, tb2, cb, nb);
 
         nb = BufferUtils.createFloatBuffer(_normalsTranslucent.size());
 
@@ -1126,24 +930,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         cb.flip();
         nb.flip();
 
-        glNewList(_displayListTranslucent, GL_COMPILE);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glEnableClientState(GL_COLOR_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-        glTexCoordPointer(2, 0, tb);
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-        glNormalPointer(0, nb);
-        glTexCoordPointer(3, 0, tb2);
-        glColorPointer(4, 0, cb);
-        glVertexPointer(3, 0, vb);
-        glDrawArrays(GL_QUADS, 0, _quadsTranslucent.size() / 3);
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glEndList();
+        generateDisplayList(_displayListTranslucent, vb, tb, tb2, cb, nb);
 
         /*
          * Reset normals buffer and list.
@@ -1184,21 +971,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         tb2.flip();
         cb.flip();
 
-        glNewList(_displayListBillboard, GL_COMPILE);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glEnableClientState(GL_COLOR_ARRAY);
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-        glTexCoordPointer(2, 0, tb);
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-        glTexCoordPointer(3, 0, tb2);
-        glColorPointer(4, 0, cb);
-        glVertexPointer(3, 0, vb);
-        glDrawArrays(GL_QUADS, 0, _quadsBillboard.size() / 3);
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glEndList();
+        generateDisplayList(_displayListBillboard, vb, tb, tb2, cb, null);
 
         _quadsTranslucent = null;
         _texTranslucent = null;
@@ -1213,6 +986,48 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         _texLightBillboard = null;
         _texLightOpaque = null;
         _texLightTranslucent = null;
+    }
+
+    private void generateDisplayList(int displayList, FloatBuffer vb, FloatBuffer tb, FloatBuffer tb2, FloatBuffer cb, FloatBuffer nb) {
+        glNewList(displayList, GL_COMPILE);
+
+        if (vb != null) {
+            glEnableClientState(GL_VERTEX_ARRAY);
+            glVertexPointer(3, 0, vb);
+        }
+
+        if (tb != null || tb2 != null) {
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        }
+
+        if (tb != null) {
+            GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+            glTexCoordPointer(2, 0, tb);
+        }
+
+        if (tb2 != null) {
+            GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+            glTexCoordPointer(3, 0, tb2);
+        }
+
+        if (cb != null) {
+            glEnableClientState(GL_COLOR_ARRAY);
+            glColorPointer(4, 0, cb);
+        }
+
+        if (nb != null) {
+            glEnableClientState(GL_NORMAL_ARRAY);
+            glNormalPointer(0, nb);
+        }
+
+        glDrawArrays(GL_QUADS, 0, vb.capacity() / 3);
+
+        glDisableClientState(GL_COLOR_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+
+        glEndList();
     }
 
     /**
