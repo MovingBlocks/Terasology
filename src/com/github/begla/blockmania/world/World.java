@@ -390,6 +390,10 @@ public final class World extends RenderableObject {
         glColor4f(1f, 1f, 1f, 1.0f);
 
         glEnable(GL_BLEND);
+        int blend_src = glGetInteger(GL_BLEND_SRC);
+        int blend_dst = glGetInteger(GL_BLEND_DST);
+        
+        glBlendFunc(GL_ONE, GL_ONE);
 
         if (isDaytime()) {
             _textureSun.bind();
@@ -409,6 +413,8 @@ public final class World extends RenderableObject {
 
         glDisable(GL_BLEND);
         glPopMatrix();
+        
+        glBlendFunc(blend_src, blend_dst);
     }
 
     /**
