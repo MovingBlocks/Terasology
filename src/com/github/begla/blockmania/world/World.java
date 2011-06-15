@@ -79,7 +79,6 @@ public final class World extends RenderableObject {
     /* ------ */
     private long _lastDaytimeMeasurement = Helper.getInstance().getTime();
     private long _latestDirtEvolvement = Helper.getInstance().getTime();
-    private long _lastUpdateTime = Helper.getInstance().getTime();
     /* ------ */
     private static Texture _textureSun, _textureMoon;
     /* ------ */
@@ -170,10 +169,9 @@ public final class World extends RenderableObject {
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
-
         resetPlayer();
+
         _visibleChunks = fetchVisibleChunks();
-        updateDaylight();
 
         _updateThread = new Thread(new Runnable() {
 
@@ -206,18 +204,10 @@ public final class World extends RenderableObject {
                      */
                     _chunkUpdateManager.updateChunks();
 
-                    /*
-                     * These updates do not need to be run every iteration.
-                     */
-                    if (Helper.getInstance().getTime() - _lastUpdateTime > 1000) {
-                        // Update the the list of visible chunks
-                        _visibleChunks = fetchVisibleChunks();
-                        // Remove chunks which are out of range
-                        _chunkUpdateManager.removeInvisibleChunkUpdates();
-
-                        _lastUpdateTime = Helper.getInstance().getTime();
-                    }
-
+                    // Update the the list of visible chunks
+                    _visibleChunks = fetchVisibleChunks();
+                    // Remove chunks which are out of range
+                    // _chunkUpdateManager.removeInvisibleChunkUpdates();
 
                     /*
                      * Update the time of day.
@@ -286,9 +276,9 @@ public final class World extends RenderableObject {
         // Pick one chunk for grass updates every 100 ms
         if (Helper.getInstance().getTime() - _latestDirtEvolvement > 100) {
 
-            // Do NOT replant chunks when updates are queued...
-            // And do NOT replant chunks during the night...
-            if (_chunkUpdateManager.updatesSize() > 0 || isNighttime() || _visibleChunks.isEmpty()) {
+            // Do NOT replant chunks during the night...
+            if (isNighttime()) {
+                _latestDirtEvolvement = Helper.getInstance().getTime();
                 return;
             }
 
@@ -318,8 +308,10 @@ public final class World extends RenderableObject {
     public static void init() {
         try {
             Helper.LOGGER.log(Level.INFO, "Loading world textures...");
-            _textureSun = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/images/sun.png").openStream(), GL_NEAREST);
-            _textureMoon = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/images/moon.png").openStream(), GL_NEAREST);
+            _textureSun = TextureLoader.getTexture("png", ResourceLoader.getResource("DATA/sun.png").openStream(), GL_NEAREST);
+            _textureSun.bind();
+            _textureMoon = TextureLoader.getTexture("png", ResourceLoader.getResource("DATA/moon.png").openStream(), GL_NEAREST);
+            _textureMoon.bind();
             Helper.LOGGER.log(Level.INFO, "Finished loading world textures!");
         } catch (IOException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);
@@ -329,7 +321,7 @@ public final class World extends RenderableObject {
          * Create cloud array.
          */
         try {
-            BufferedImage cloudImage = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/images/clouds.png").openStream());
+            BufferedImage cloudImage = ImageIO.read(ResourceLoader.getResource("DATA/clouds.png").openStream());
             _clouds = new boolean[cloudImage.getWidth()][cloudImage.getHeight()];
 
             for (int x = 0; x < cloudImage.getWidth(); x++) {
@@ -358,6 +350,17 @@ public final class World extends RenderableObject {
      */
     @Override
     public void render() {
+        /*
+         * Transfer the daylight value to the shaders.
+         */
+        ShaderManager.getInstance().enableShader("chunk");
+        int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
+        GL20.glUniform1f(daylight, getDaylight());
+        ShaderManager.getInstance().enableShader("cloud");
+        daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("cloud"), "daylight");
+        GL20.glUniform1f(daylight, getDaylight());
+        ShaderManager.getInstance().enableShader(null);
+
         renderHorizon();
         renderChunks();
     }
@@ -371,12 +374,6 @@ public final class World extends RenderableObject {
         ShaderManager.getInstance().enableShader("cloud");
 
         /*
-         * Transfer the daylight value to the chunk shader.
-         */
-        int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("cloud"), "daylight");
-        GL20.glUniform1f(daylight, getDaylight());
-
-        /*
          * Draw clouds.
          */
         if (_dlClouds > 0) {
@@ -385,6 +382,7 @@ public final class World extends RenderableObject {
             glCallList(_dlClouds);
             glPopMatrix();
         }
+
         ShaderManager.getInstance().enableShader(null);
 
         glPushMatrix();
@@ -546,7 +544,7 @@ public final class World extends RenderableObject {
 
         if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0x0) {
 
-            byte oldValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
+            byte currentValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
 
             if (Block.getBlockForType(c.getBlock(blockPosX, y, blockPosZ)).isRemovable()) {
                 c.setBlock(blockPosX, y, blockPosZ, type);
@@ -564,10 +562,8 @@ public final class World extends RenderableObject {
                 /*
                  * Spread sunlight.
                  */
-                if (newValue > oldValue) {
+                if (newValue > currentValue) {
                     c.spreadLight(blockPosX, y, blockPosZ, newValue, Chunk.LIGHT_TYPE.SUN);
-                } else if (newValue < oldValue) {
-                    c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.SUN);
                 }
 
                 /*
@@ -575,15 +571,29 @@ public final class World extends RenderableObject {
                  */
                 byte luminance = Block.getBlockForType(type).getLuminance();
 
-                oldValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
-                c.setLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
-                newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+                /*
+                 * Is this block glowing?
+                 */
+                if (luminance > 0) {
 
-                if (newValue > oldValue) {
-                    c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
-                } else {
-                    c.unspreadLight(blockPosX, y, blockPosZ, oldValue, Chunk.LIGHT_TYPE.BLOCK);
+                    currentValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+                    c.setLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
+                    newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+
+                    /*
+                     * Spread the light if the luminance is brighter than the
+                     * current value.
+                     */
+                    if (newValue > currentValue) {
+                        c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
+                    }
+
                 }
+
+                /*
+                 * Update the block light intensity of the current block.
+                 */
+                c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.BLOCK);
 
                 /*
                  * Finally queue the chunk and its neighbors for updating.
@@ -684,7 +694,7 @@ public final class World extends RenderableObject {
             return c.getLight(blockPosX, y, blockPosZ, type);
         }
 
-        return -1;
+        return 1;
     }
 
     /**
@@ -758,16 +768,18 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * Recursive light calculation.
+     * TODO: Not working.
      * 
      * @param x
      * @param y
      * @param z
-     * @param oldValue
+     * @param oldValue 
      * @param depth
      * @param type
      * @param lightSources  
+     * @deprecated 
      */
+    @Deprecated
     public void unspreadLight(int x, int y, int z, byte oldValue, int depth, Chunk.LIGHT_TYPE type, ArrayList<LightNode> lightSources) {
         int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
         int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
@@ -1270,7 +1282,7 @@ public final class World extends RenderableObject {
                 _seed = root.getAttribute("seed").getValue();
                 _spawningPoint = VectorPool.getVector(Float.parseFloat(player.getAttribute("x").getValue()), Float.parseFloat(player.getAttribute("y").getValue()), Float.parseFloat(player.getAttribute("z").getValue()));
                 _title = root.getAttributeValue("title");
-                _time = Float.parseFloat(root.getAttributeValue("time"));
+                setTime(Float.parseFloat(root.getAttributeValue("time")));
 
                 return true;
 
@@ -1332,6 +1344,9 @@ public final class World extends RenderableObject {
 
     }
 
+    /**
+     * 
+     */
     public static void generateSunMoonDisplayList() {
         glNewList(_dlSunMoon, GL_COMPILE);
         glBegin(GL_QUADS);

@@ -55,9 +55,12 @@ public final class ChunkUpdateManager {
 
         if (nearestChunkUpdate != null) {
             _chunkUpdates.remove(nearestChunkUpdate);
+            
+            if (!_parent.isChunkVisible(nearestChunkUpdate.getChunk())) {
+                return;
+            }
             processChunkUpdate(nearestChunkUpdate);
         }
-
 
         _meanUpdateDuration += System.currentTimeMillis() - timeStart;
         _meanUpdateDuration /= 2;
@@ -112,7 +115,7 @@ public final class ChunkUpdateManager {
             // Ignore duplicate updates
             if (!_chunkUpdates.contains(cu)) {
                 _chunkUpdates.add(cu);
-                
+
                 synchronized (_chunkUpdates) {
                     Collections.sort(_chunkUpdates);
                 }

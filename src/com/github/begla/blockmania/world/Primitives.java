@@ -32,7 +32,6 @@ public class Primitives {
      * @param x
      * @param y
      * @param z
-     * @param brightness
      */
     public static void drawCloud(float scaleX, float scaleY, float scaleZ, float x, float y, float z) {
         // Front face

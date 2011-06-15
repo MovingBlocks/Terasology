@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
@@ -34,11 +33,7 @@ public class BlockGrass extends Block {
 
     @Override
     public Vector4f getColorOffsetFor(Block.SIDE side) {
-        if (side == Block.SIDE.TOP) {
-            return new Vector4f(120f / 255f, 196f / 255f, 75f / 255f, 1.0f);
-        }
-
-        return new Vector4f(1f, 1f, 1f, 1.0f);
+        return new Vector4f(183f / 255f, 235f / 255f, 100f / 255f, 1.0f);
     }
 
     @Override

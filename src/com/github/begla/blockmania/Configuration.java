@@ -43,7 +43,7 @@ public final class Configuration {
     /**
      * The string used to generate the default world. If not set, a random seed is used.
      */
-    public static final String DEFAULT_SEED = "yMfLzKzZvHzQiWhA";
+    public static final String DEFAULT_SEED = "cPpCzKqBpVkQpVjP";
     /**
      * The pixel format used to init. the display.
      */
@@ -67,11 +67,11 @@ public final class Configuration {
     /**
      * The intensity at which surrounding blocks 'dim' each other.
      */
-    public static final float OCCLUSION_INTENS = 0.85f;
+    public static final float OCCLUSION_INTENS = 0.5f;
     /**
      * The intensity at which the front and back side of blocks are constantly 'dimmed'.
      */
-    public static final float BLOCK_SIDE_DIMMING = 0.75f;
+    public static final float BLOCK_SIDE_DIMMING = 0.65f;
     /**
      * 
      */

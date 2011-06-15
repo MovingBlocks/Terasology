@@ -3,7 +3,6 @@
 uniform sampler2D textureAtlas;
 uniform float daylight = 1.0;
 
-varying vec4 vertColor;
 varying float fog;
 varying vec3 normal;
 
@@ -12,8 +11,16 @@ vec4 gamma(vec4 color){
 }
 
 void main(){
-    vec4 color = gl_Color * texture2D(textureAtlas, vec2(gl_TexCoord[0]));
-    vec3 lightCoord = vec3(gl_TexCoord[1]);
+    vec4 color = texture2D(textureAtlas, vec2(gl_TexCoord[0]));
+
+    /*
+        Apply non-grey vertex colors only to grey texture values.
+    */
+    if (color.r == color.g && color.g == color.b) {
+        color.rgb *= gl_Color.rgb; 
+    }
+
+    vec2 lightCoord = vec2(gl_TexCoord[1]);
 
     float daylightPow = pow(0.8, (1.0-daylight)*15.0);
 
@@ -28,9 +35,12 @@ void main(){
     blocklightValue.b *= 0.2;
 
     /*
-        Nights are slightly bluish.
+        Nights are slightly bluish and not completely black.
     */
-    daylightValue.b += 0.1;
+    daylightValue.b += 0.175;
+    daylightValue.g += 0.075;
+    daylightValue.r += 0.075;
+
 
     color.xyz *= clamp(daylightValue + blocklightValue, 0.0, 1.0);
 

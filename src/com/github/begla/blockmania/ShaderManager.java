@@ -50,7 +50,6 @@ public class ShaderManager {
             _instance = new ShaderManager();
         }
 
-
         return _instance;
     }
 
@@ -78,7 +77,6 @@ public class ShaderManager {
         for (String s : _fragmentShader.keySet()) {
             int shaderProgram = GL20.glCreateProgram();
 
-
             GL20.glAttachShader(shaderProgram, _fragmentShader.get(s));
             GL20.glAttachShader(shaderProgram, _vertexShader.get(s));
             GL20.glLinkProgram(shaderProgram);
@@ -99,7 +97,7 @@ public class ShaderManager {
         String fragCode = "";
         String line;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/shader/" + filename).openStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/shaders/" + filename).openStream()));
             while ((line = reader.readLine()) != null) {
                 fragCode += line + "\n";
             }
@@ -127,7 +125,7 @@ public class ShaderManager {
         String fragCode = "";
         String line;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/shader/" + filename).openStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/shaders/" + filename).openStream()));
             while ((line = reader.readLine()) != null) {
                 fragCode += line + "\n";
             }

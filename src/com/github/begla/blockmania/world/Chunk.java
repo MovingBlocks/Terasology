@@ -175,7 +175,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public static void init() {
         try {
             Helper.LOGGER.log(Level.FINE, "Loading chunk textures...");
-            _textureMap = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/images/terrain.png").openStream(), GL_NEAREST);
+            _textureMap = TextureLoader.getTexture("png", ResourceLoader.getResource("DATA/terrain.png").openStream(), GL_NEAREST);
+            _textureMap.bind();
             Helper.LOGGER.log(Level.FINE, "Finished loading chunk textures!");
         } catch (IOException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);
@@ -266,17 +267,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         ShaderManager.getInstance().enableShader("chunk");
         _textureMap.bind();
 
-        /*
-         * Transfer the daylight value to the chunk shader.
-         */
-        int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
-        GL20.glUniform1f(daylight, _parent.getDaylight());
-
         if (!translucent) {
             glCallList(_displayListOpaque);
         } else {
             glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glEnable(GL_ALPHA_TEST);
             glAlphaFunc(GL_GREATER, 0.1f);
 
@@ -291,7 +285,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
 
         ShaderManager.getInstance().enableShader(null);
-
     }
 
     /**
@@ -361,49 +354,53 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Generates the vertex-, texture- and color-arrays.
      */
     public synchronized void generateVertexArrays() {
-        _quadsTranslucent = new TFloatArrayList();
-        _normalsOpaque = new TFloatArrayList();
-        _normalsTranslucent = new TFloatArrayList();
-        _texTranslucent = new TFloatArrayList();
-        _colorTranslucent = new TFloatArrayList();
-        _quadsOpaque = new TFloatArrayList();
-        _texOpaque = new TFloatArrayList();
-        _colorOpaque = new TFloatArrayList();
-        _quadsBillboard = new TFloatArrayList();
-        _texBillboard = new TFloatArrayList();
-        _colorBillboard = new TFloatArrayList();
+        if (!_fresh) {
+            _quadsTranslucent = new TFloatArrayList();
+            _normalsOpaque = new TFloatArrayList();
+            _normalsTranslucent = new TFloatArrayList();
+            _texTranslucent = new TFloatArrayList();
+            _colorTranslucent = new TFloatArrayList();
+            _quadsOpaque = new TFloatArrayList();
+            _texOpaque = new TFloatArrayList();
+            _colorOpaque = new TFloatArrayList();
+            _quadsBillboard = new TFloatArrayList();
+            _texBillboard = new TFloatArrayList();
+            _colorBillboard = new TFloatArrayList();
 
-        _texLightTranslucent = new TFloatArrayList();
-        _texLightOpaque = new TFloatArrayList();
-        _texLightBillboard = new TFloatArrayList();
+            _texLightTranslucent = new TFloatArrayList();
+            _texLightOpaque = new TFloatArrayList();
+            _texLightBillboard = new TFloatArrayList();
 
-        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                    generateBlockVertices(x, y, z);
-                    generateBillboardVertices(x, y, z);
+            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+                for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
+                    for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+                        generateBlockVertices(x, y, z);
+                        generateBillboardVertices(x, y, z);
+                    }
                 }
             }
-        }
 
-        setDirty(false);
-        _statVertexArrayUpdateCount++;
+            setDirty(false);
+            _statVertexArrayUpdateCount++;
+        }
     }
 
-    private void addLightTexCoordFor(int x, int y, int z, int dirX, int dirY, int dirZ, RENDER_TYPE r) {
+    private void addLightTexCoordFor(int x, int y, int z, int dirX, int dirY, int dirZ, RENDER_TYPE r, float dimming) {
+        TFloatArrayList l = null;
+
         if (r == RENDER_TYPE.BILLBOARD) {
-            _texLightBillboard.add((float) _parent.getLight(getBlockWorldPosX(x) + dirX, getBlockWorldPosY(y) + dirY, getBlockWorldPosZ(z) + dirZ, LIGHT_TYPE.SUN) / 15f);
-            _texLightBillboard.add((float) _parent.getLight(getBlockWorldPosX(x) + dirX, getBlockWorldPosY(y) + dirY, getBlockWorldPosZ(z) + dirZ, LIGHT_TYPE.BLOCK) / 15f);
-            _texLightBillboard.add(0f);
-        } else if (r == RENDER_TYPE.OPAQUE) {
-            _texLightOpaque.add((float) _parent.getLight(getBlockWorldPosX(x) + dirX, getBlockWorldPosY(y) + dirY, getBlockWorldPosZ(z) + dirZ, LIGHT_TYPE.SUN) / 15f);
-            _texLightOpaque.add((float) _parent.getLight(getBlockWorldPosX(x) + dirX, getBlockWorldPosY(y) + dirY, getBlockWorldPosZ(z) + dirZ, LIGHT_TYPE.BLOCK) / 15f);
-            _texLightOpaque.add(0f);
+            l = _texLightBillboard;
         } else if (r == RENDER_TYPE.TRANS) {
-            _texLightTranslucent.add((float) _parent.getLight(getBlockWorldPosX(x) + dirX, getBlockWorldPosY(y) + dirY, getBlockWorldPosZ(z) + dirZ, LIGHT_TYPE.SUN) / 15f);
-            _texLightTranslucent.add((float) _parent.getLight(getBlockWorldPosX(x) + dirX, getBlockWorldPosY(y) + dirY, getBlockWorldPosZ(z) + dirZ, LIGHT_TYPE.BLOCK) / 15f);
-            _texLightTranslucent.add(0f);
+            l = _texLightTranslucent;
+        } else {
+            l = _texLightOpaque;
         }
+
+        float sunlight = (float) _parent.getLight(getBlockWorldPosX(x) + dirX, getBlockWorldPosY(y) + dirY, getBlockWorldPosZ(z) + dirZ, LIGHT_TYPE.SUN) / 15f;
+        float blocklight = (float) _parent.getLight(getBlockWorldPosX(x) + dirX, getBlockWorldPosY(y) + dirY, getBlockWorldPosZ(z) + dirZ, LIGHT_TYPE.BLOCK) / 15f;
+
+        l.add(sunlight * dimming);
+        l.add(blocklight * dimming);
     }
 
     /**
@@ -417,8 +414,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         byte block = _blocks[x][y][z];
         RENDER_TYPE renderType = RENDER_TYPE.BILLBOARD;
 
-        // Ignore invisible blocks like air and normal blocks!
-        if (Block.getBlockForType(block).isBlockInvisible() || !Block.getBlockForType(block).isBlockBillboard()) {
+        // Ignore normal blocks
+        if (!Block.getBlockForType(block).isBlockBillboard()) {
             return;
         }
 
@@ -426,124 +423,108 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         float offsetY = _position.y * Configuration.CHUNK_DIMENSIONS.y;
         float offsetZ = _position.z * Configuration.CHUNK_DIMENSIONS.z;
 
-        TFloatArrayList quads = new TFloatArrayList();
-        TFloatArrayList tex = new TFloatArrayList();
-        TFloatArrayList color = new TFloatArrayList();
-
         /*
          * First side of the billboard
          */
-        Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
+        Vector4f _colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
         float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x;
         float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y;
 
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
+        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
+        _colorBillboard.add(_colorBillboardOffset.x);
+        _colorBillboard.add(_colorBillboardOffset.y);
+        _colorBillboard.add(_colorBillboardOffset.z);
+        _colorBillboard.add(_colorBillboardOffset.w);
+        _texBillboard.add(texOffsetX);
+        _texBillboard.add(texOffsetY + 0.0624f);
+        _quadsBillboard.add(-0.5f + x + offsetX);
+        _quadsBillboard.add(-0.5f + y + offsetY);
+        _quadsBillboard.add(z + offsetZ);
 
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType);
-        tex.add(texOffsetX);
-        tex.add(texOffsetY + 0.0624f);
-        quads.add(-0.5f + x + offsetX);
-        quads.add(-0.5f + y + offsetY);
-        quads.add(z + offsetZ);
+        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
+        _colorBillboard.add(_colorBillboardOffset.x);
+        _colorBillboard.add(_colorBillboardOffset.y);
+        _colorBillboard.add(_colorBillboardOffset.z);
+        _colorBillboard.add(_colorBillboardOffset.w);
+        _texBillboard.add(texOffsetX + 0.0624f);
+        _texBillboard.add(texOffsetY + 0.0624f);
+        _quadsBillboard.add(0.5f + x + offsetX);
+        _quadsBillboard.add(-0.5f + y + offsetY);
+        _quadsBillboard.add(z + offsetZ);
 
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
+        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
+        _colorBillboard.add(_colorBillboardOffset.x);
+        _colorBillboard.add(_colorBillboardOffset.y);
+        _colorBillboard.add(_colorBillboardOffset.z);
+        _colorBillboard.add(_colorBillboardOffset.w);
+        _texBillboard.add(texOffsetX + 0.0624f);
+        _texBillboard.add(texOffsetY);
+        _quadsBillboard.add(0.5f + x + offsetX);
+        _quadsBillboard.add(0.5f + y + offsetY);
+        _quadsBillboard.add(z + offsetZ);
 
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType);
-        tex.add(texOffsetX + 0.0624f);
-        tex.add(texOffsetY + 0.0624f);
-        quads.add(0.5f + x + offsetX);
-        quads.add(-0.5f + y + offsetY);
-        quads.add(z + offsetZ);
+        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
+        _colorBillboard.add(_colorBillboardOffset.x);
+        _colorBillboard.add(_colorBillboardOffset.y);
+        _colorBillboard.add(_colorBillboardOffset.z);
+        _colorBillboard.add(_colorBillboardOffset.w);
+        _texBillboard.add(texOffsetX);
+        _texBillboard.add(texOffsetY);
+        _quadsBillboard.add(-0.5f + x + offsetX);
+        _quadsBillboard.add(0.5f + y + offsetY);
+        _quadsBillboard.add(z + offsetZ);
 
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType);
-        tex.add(texOffsetX + 0.0624f);
-        tex.add(texOffsetY);
-        quads.add(0.5f + x + offsetX);
-        quads.add(0.5f + y + offsetY);
-        quads.add(z + offsetZ);
-
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType);
-        tex.add(texOffsetX);
-        tex.add(texOffsetY);
-        quads.add(-0.5f + x + offsetX);
-        quads.add(0.5f + y + offsetY);
-        quads.add(z + offsetZ);
 
         /*
          * Second side of the billboard
          */
-        colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
+        _colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
         texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x;
         texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y;
 
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
+        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
+        _colorBillboard.add(_colorBillboardOffset.x);
+        _colorBillboard.add(_colorBillboardOffset.y);
+        _colorBillboard.add(_colorBillboardOffset.z);
+        _colorBillboard.add(_colorBillboardOffset.w);
+        _texBillboard.add(texOffsetX);
+        _texBillboard.add(texOffsetY + 0.0624f);
+        _quadsBillboard.add(x + offsetX);
+        _quadsBillboard.add(-0.5f + y + offsetY);
+        _quadsBillboard.add(-0.5f + z + offsetZ);
 
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType);
-        tex.add(texOffsetX);
-        tex.add(texOffsetY + 0.0624f);
-        quads.add(x + offsetX);
-        quads.add(-0.5f + y + offsetY);
-        quads.add(-0.5f + z + offsetZ);
+        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
+        _colorBillboard.add(_colorBillboardOffset.x);
+        _colorBillboard.add(_colorBillboardOffset.y);
+        _colorBillboard.add(_colorBillboardOffset.z);
+        _colorBillboard.add(_colorBillboardOffset.w);
+        _texBillboard.add(texOffsetX + 0.0624f);
+        _texBillboard.add(texOffsetY + 0.0624f);
+        _quadsBillboard.add(x + offsetX);
+        _quadsBillboard.add(-0.5f + y + offsetY);
+        _quadsBillboard.add(0.5f + z + offsetZ);
 
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
+        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
+        _colorBillboard.add(_colorBillboardOffset.x);
+        _colorBillboard.add(_colorBillboardOffset.y);
+        _colorBillboard.add(_colorBillboardOffset.z);
+        _colorBillboard.add(_colorBillboardOffset.w);
+        _texBillboard.add(texOffsetX + 0.0624f);
+        _texBillboard.add(texOffsetY);
+        _quadsBillboard.add(x + offsetX);
+        _quadsBillboard.add(0.5f + y + offsetY);
+        _quadsBillboard.add(0.5f + z + offsetZ);
 
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType);
-        tex.add(texOffsetX + 0.0624f);
-        tex.add(texOffsetY + 0.0624f);
-        quads.add(x + offsetX);
-        quads.add(-0.5f + y + offsetY);
-        quads.add(0.5f + z + offsetZ);
-
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType);
-        tex.add(texOffsetX + 0.0624f);
-        tex.add(texOffsetY);
-        quads.add(x + offsetX);
-        quads.add(0.5f + y + offsetY);
-        quads.add(0.5f + z + offsetZ);
-
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType);
-        tex.add(texOffsetX);
-        tex.add(texOffsetY);
-        quads.add(x + offsetX);
-        quads.add(0.5f + y + offsetY);
-        quads.add(-0.5f + z + offsetZ);
-
-        // All billboards are translucent
-        _quadsBillboard.addAll(quads);
-        _texBillboard.addAll(tex);
-        _colorBillboard.addAll(color);
+        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
+        _colorBillboard.add(_colorBillboardOffset.x);
+        _colorBillboard.add(_colorBillboardOffset.y);
+        _colorBillboard.add(_colorBillboardOffset.z);
+        _colorBillboard.add(_colorBillboardOffset.w);
+        _texBillboard.add(texOffsetX);
+        _texBillboard.add(texOffsetY);
+        _quadsBillboard.add(x + offsetX);
+        _quadsBillboard.add(0.5f + y + offsetY);
+        _quadsBillboard.add(-0.5f + z + offsetZ);
     }
 
     private void generateBlockVertices(int x, int y, int z) {
@@ -558,7 +539,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             renderType = RENDER_TYPE.OPAQUE;
         }
 
-        // Ignore invisible blocks and billboards like air and flowers!
+        // Ignore invisible blocks and billboards
         if (Block.getBlockForType(block).isBlockInvisible() || Block.getBlockForType(block).isBlockBillboard()) {
             return;
         }
@@ -583,6 +564,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
             float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 1, 0);
+
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
             generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
 
@@ -606,6 +588,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
             float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 0, -1);
+
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
             generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
 
@@ -754,71 +737,73 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (norm.z == 1 || norm.x == -1) {
             tex.add(texOffset.x);
             tex.add(texOffset.y + 0.0624f);
+
             tex.add(texOffset.x + 0.0624f);
             tex.add(texOffset.y + 0.0624f);
+
             tex.add(texOffset.x + 0.0624f);
             tex.add(texOffset.y);
+
             tex.add(texOffset.x);
             tex.add(texOffset.y);
         } else {
             tex.add(texOffset.x);
             tex.add(texOffset.y);
+
             tex.add(texOffset.x + 0.0624f);
             tex.add(texOffset.y);
+
             tex.add(texOffset.x + 0.0624f);
             tex.add(texOffset.y + 0.0624f);
+
             tex.add(texOffset.x);
             tex.add(texOffset.y + 0.0624f);
         }
 
-        color.add(colorOffset.x * shadowIntens);
-        color.add(colorOffset.y * shadowIntens);
-        color.add(colorOffset.z * shadowIntens);
+        color.add(colorOffset.x);
+        color.add(colorOffset.y);
+        color.add(colorOffset.z);
         color.add(colorOffset.w);
         normals.add(norm.x);
         normals.add(norm.y);
         normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType);
-
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntens);
         quads.add(p1.x + x + offsetX);
         quads.add(p1.y + y + offsetY);
         quads.add(p1.z + z + offsetZ);
 
-        color.add(colorOffset.x * shadowIntens);
-        color.add(colorOffset.y * shadowIntens);
-        color.add(colorOffset.z * shadowIntens);
+        color.add(colorOffset.x);
+        color.add(colorOffset.y);
+        color.add(colorOffset.z);
         color.add(colorOffset.w);
         normals.add(norm.x);
         normals.add(norm.y);
         normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType);
-
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntens);
         quads.add(p2.x + x + offsetX);
         quads.add(p2.y + y + offsetY);
         quads.add(p2.z + z + offsetZ);
 
-        color.add(colorOffset.x * shadowIntens);
-        color.add(colorOffset.y * shadowIntens);
-        color.add(colorOffset.z * shadowIntens);
+        color.add(colorOffset.x);
+        color.add(colorOffset.y);
+        color.add(colorOffset.z);
         color.add(colorOffset.w);
         normals.add(norm.x);
         normals.add(norm.y);
         normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType);
-
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntens);
         quads.add(p3.x + x + offsetX);
         quads.add(p3.y + y + offsetY);
         quads.add(p3.z + z + offsetZ);
 
-        color.add(colorOffset.x * shadowIntens);
-        color.add(colorOffset.y * shadowIntens);
-        color.add(colorOffset.z * shadowIntens);
+        color.add(colorOffset.x);
+        color.add(colorOffset.y);
+        color.add(colorOffset.z);
         color.add(colorOffset.w);
         normals.add(norm.x);
         normals.add(norm.y);
         normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType);
-
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntens);
         quads.add(p4.x + x + offsetX);
         quads.add(p4.y + y + offsetY);
         quads.add(p4.z + z + offsetZ);
@@ -932,13 +917,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         generateDisplayList(_displayListTranslucent, vb, tb, tb2, cb, nb);
 
-        /*
-         * Reset normals buffer and list.
-         */
-        nb = null;
-        _normalsOpaque = null;
-        _normalsTranslucent = null;
-
         vb = BufferUtils.createFloatBuffer(_quadsBillboard.size());
 
         for (TFloatIterator it = _quadsBillboard.iterator(); it.hasNext();) {
@@ -986,28 +964,33 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         _texLightBillboard = null;
         _texLightOpaque = null;
         _texLightTranslucent = null;
+
+        _normalsOpaque = null;
+        _normalsTranslucent = null;
+
     }
 
     private void generateDisplayList(int displayList, FloatBuffer vb, FloatBuffer tb, FloatBuffer tb2, FloatBuffer cb, FloatBuffer nb) {
         glNewList(displayList, GL_COMPILE);
 
-        if (vb != null) {
-            glEnableClientState(GL_VERTEX_ARRAY);
-            glVertexPointer(3, 0, vb);
+        if (vb == null || tb == null || tb2 == null || cb == null) {
+            return;
         }
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, 0, vb);
 
         if (tb != null || tb2 != null) {
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         }
 
-        if (tb != null) {
+        if (tb != null && tb2 != null) {
             GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(2, 0, tb);
-        }
 
-        if (tb2 != null) {
             GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-            glTexCoordPointer(3, 0, tb2);
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            glTexCoordPointer(2, 0, tb2);
         }
 
         if (cb != null) {
@@ -1022,11 +1005,25 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         glDrawArrays(GL_QUADS, 0, vb.capacity() / 3);
 
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        if (cb != null) {
+            glDisableClientState(GL_COLOR_ARRAY);
+        }
 
+        if (nb != null) {
+            glDisableClientState(GL_NORMAL_ARRAY);
+        }
+
+        if (tb != null && tb2 != null) {
+            GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+            glTexCoordPointer(2, 0, tb);
+
+            GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+            glTexCoordPointer(2, 0, tb2);
+        }
+
+        glDisableClientState(GL_VERTEX_ARRAY);
         glEndList();
     }
 
@@ -1126,7 +1123,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
                     spreadLight(x, y, z, newValue, LIGHT_TYPE.SUN);
                 }
             } else if ((b.getClass() == BlockAir.class || b.isBlockBillboard()) && covered) {
-                byte oldValue = _sunlight[x][y][z];
                 _sunlight[x][y][z] = 0;
 
                 if (refreshSunlight) {
@@ -1178,32 +1174,34 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * TODO
+     * TODO: Not working
      * 
      * @param x
      * @param y
      * @param z 
      * @param oldLightValue
      * @param type  
+     * @deprecated 
      */
+    @Deprecated
     public void unspreadLight(int x, int y, int z, byte oldLightValue, LIGHT_TYPE type) {
-//        ArrayList<LightNode> lightSources = new ArrayList<LightNode>();
-//        unspreadLight(x, y, z, oldLightValue, 0, type, lightSources);
-//        
-//        System.out.println(lightSources.size());
-//
-//        // Spread light of brighter light sources
-//        for (LightNode l : lightSources) {
-//            if (l.getType() == LightNode.NODE_TYPE.SPREAD) {
-//                //_parent.spreadLight(l.x, l.y, l.z, l.getLightIntens(), 0, type);
-//            } else {
-//                _parent.setLight(l.x, l.y, l.z, l.getLightIntens(), type);
-//            }
-//        }
+        ArrayList<LightNode> lightSources = new ArrayList<LightNode>();
+        unspreadLight(x, y, z, oldLightValue, 0, type, lightSources);
+
+        System.out.println(lightSources.size());
+
+        // Spread light of brighter light sources
+        for (LightNode l : lightSources) {
+            if (l.getType() == LightNode.NODE_TYPE.SPREAD) {
+                //_parent.spreadLight(l.x, l.y, l.z, l.getLightIntens(), 0, type);
+            } else {
+                _parent.setLight(l.x, l.y, l.z, l.getLightIntens(), type);
+            }
+        }
     }
 
     /**
-     * TODO
+     * TODO: Not working
      * 
      * @param x
      * @param y
@@ -1212,7 +1210,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param oldLightValue
      * @param type
      * @param lightSources  
+     * @deprecated 
      */
+    @Deprecated
     public void unspreadLight(int x, int y, int z, byte oldLightValue, int depth, LIGHT_TYPE type, ArrayList<LightNode> lightSources) {
         if (depth > oldLightValue) {
             return;
@@ -1536,10 +1536,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ));
         positions.add(VectorPool.getVector(x + dirX, y + dirY, z + dirZ + 1));
         positions.add(VectorPool.getVector(x + dirX, y + dirY, z + dirZ - 1));
-//        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ + 1));
-//        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ - 1));
-//        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ - 1));
-//        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ + 1));
 
         for (Vector3f p : positions) {
             if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX((int) p.x), getBlockWorldPosY((int) p.y), getBlockWorldPosZ((int) p.z))).isCastingShadows()) {

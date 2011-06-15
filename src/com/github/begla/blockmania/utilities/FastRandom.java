@@ -100,7 +100,7 @@ public class FastRandom {
     }
 
     /**
-     * Calculates a standardized normal distributed value (using to the polar method).
+     * Calculates a standardized normal distributed value (using the polar method).
      * 
      * @return 
      */
@@ -110,7 +110,7 @@ public class FastRandom {
         double u1 = 0;
         double u2 = 0;
 
-        while (q > 1d) {
+        while (q >= 1d || q == 0) {
             u1 = randomDouble();
             u2 = randomDouble();
 
@@ -118,7 +118,7 @@ public class FastRandom {
         }
 
         double p = Math.sqrt((-2d * (Math.log(q))) / q);
-        return u1 * p; // oder u2 * p
+        return u1 * p; // or u2 * p
     }
 
     /**

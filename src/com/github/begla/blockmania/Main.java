@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.webupdater.WebUpdater;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.player.Player;
 import com.github.begla.blockmania.world.Chunk;
@@ -35,6 +36,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.newdawn.slick.Color;
@@ -77,6 +79,16 @@ public final class Main {
     public static void main(String[] args) {
 
         Helper.LOGGER.log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
+        
+        /*
+         * Update missing game files...
+         */
+        WebUpdater wu = new WebUpdater();
+        
+        if (!wu.update()) {
+            Helper.LOGGER.log(Level.SEVERE, "Couldn't download missing game files. Sorry.");
+            System.exit(0);
+        }
 
         Main main = null;
 
@@ -144,11 +156,18 @@ public final class Main {
         _font1 = new TrueTypeFont(new Font("Arial", Font.PLAIN, 12), true);
 
         /*
+         * Load shaders.
+         */
+        ShaderManager.getInstance();
+
+        /*
          * Init. OpenGL
          */
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
 
         Chunk.init();
         World.init();
@@ -159,9 +178,11 @@ public final class Main {
         _player = new Player();
         // Generate a world with a random seed value
         String worldSeed = Configuration.DEFAULT_SEED;
+
         if (worldSeed.length() == 0) {
             worldSeed = _rand.randomCharacterString(16);
         }
+
         initNewWorld("World1", worldSeed);
     }
 
@@ -209,12 +230,7 @@ public final class Main {
         _player.render();
         _world.render();
 
-        // Unbind textures
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, 0);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        // Disable shader
         ShaderManager.getInstance().enableShader(null);
 
         renderHUD();
@@ -240,7 +256,7 @@ public final class Main {
      * Starts the render loop.
      */
     private void start() {
-        Helper.LOGGER.log(Level.INFO, "Starting the game...");
+        Helper.LOGGER.log(Level.INFO, "Starting Blockmania...");
         _lastLoopTime = Helper.getInstance().getTime();
 
         double nextGameTick = Helper.getInstance().getTime();
@@ -531,7 +547,7 @@ public final class Main {
         Helper.LOGGER.log(Level.INFO, "Waiting for some chunks to pop up...", seed);
         while (_world.getAmountGeneratedChunks() < 64) {
             try {
-                Thread.sleep(50);
+                Thread.sleep(150);
             } catch (InterruptedException ex) {
                 Helper.LOGGER.log(Level.SEVERE, null, ex);
             }
