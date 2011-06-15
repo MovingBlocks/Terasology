@@ -8,6 +8,7 @@ vec4 gamma(vec4 color){
 
 void main(){
     vec4 color = gl_Color;
+
     color.xyz *= daylight;
     gl_FragColor = gamma(color);
 }

@@ -143,9 +143,9 @@ public final class Configuration {
         _settingsBoolean.put("BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);
-        _settingsNumeric.put("JUMP_INTENSITY", 0.15f);
+        _settingsNumeric.put("JUMP_INTENSITY", 0.13f);
         _settingsNumeric.put("MAX_GRAVITY", 0.5f);
-        _settingsNumeric.put("WALKING_SPEED", 0.015f);
+        _settingsNumeric.put("WALKING_SPEED", 0.0175f);
         _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
         _settingsNumeric.put("GRAVITY", 0.0075f);
         _settingsNumeric.put("FRICTION", 0.1f);

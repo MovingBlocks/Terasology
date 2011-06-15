@@ -72,8 +72,6 @@ import org.xml.sax.InputSource;
  */
 public final class World extends RenderableObject {
 
-    private static boolean[][] _clouds;
-    private int _displayListClouds = -1;
     private Vector2f _cloudOffset = new Vector2f();
     private Vector2f _windDirection = new Vector2f(0.25f, 0);
     private double _lastWindUpdate = 0;
@@ -114,7 +112,9 @@ public final class World extends RenderableObject {
     /* ----- */
     private FastList<Chunk> _visibleChunks;
     /* ----- */
-    private int _textureLight = -1;
+    private static int _dlSunMoon = -1;
+    private static int _dlClouds = -1;
+    private static boolean[][] _clouds;
 
     /**
      * Initializes a new world for the single player mode.
@@ -168,15 +168,11 @@ public final class World extends RenderableObject {
         _generatorFirTree = new ObjectGeneratorFirTree(this, seed);
         _generatorGrass = new ChunkGeneratorFlora(seed);
 
-        _displayListClouds = glGenLists(1);
-
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
 
         resetPlayer();
         _visibleChunks = fetchVisibleChunks();
-
-        generateClouds();
         updateDaylight();
 
         _updateThread = new Thread(new Runnable() {
@@ -346,6 +342,15 @@ public final class World extends RenderableObject {
         } catch (IOException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);
         }
+
+
+        // Init display lists
+        _dlClouds = glGenLists(1);
+        _dlSunMoon = glGenLists(1);
+
+        generateSunMoonDisplayList();
+        generateCloudDisplayList();
+
     }
 
     /**
@@ -374,10 +379,10 @@ public final class World extends RenderableObject {
         /*
          * Draw clouds.
          */
-        if (_displayListClouds > 0) {
+        if (_dlClouds > 0) {
             glPushMatrix();
             glTranslatef(_player.getPosition().x + _cloudOffset.x, 100f, _player.getPosition().z + _cloudOffset.y);
-            glCallList(_displayListClouds);
+            glCallList(_dlClouds);
             glPopMatrix();
         }
         ShaderManager.getInstance().enableShader(null);
@@ -392,7 +397,7 @@ public final class World extends RenderableObject {
         glEnable(GL_BLEND);
         int blend_src = glGetInteger(GL_BLEND_SRC);
         int blend_dst = glGetInteger(GL_BLEND_DST);
-        
+
         glBlendFunc(GL_ONE, GL_ONE);
 
         if (isDaytime()) {
@@ -400,20 +405,14 @@ public final class World extends RenderableObject {
         } else {
             _textureMoon.bind();
         }
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-Configuration.SUN_SIZE, Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
-        glTexCoord2f(1.f, 0.0f);
-        glVertex3f(Configuration.SUN_SIZE, Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
-        glTexCoord2f(1.f, 1.0f);
-        glVertex3f(Configuration.SUN_SIZE, -Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
-        glTexCoord2f(0.f, 1.0f);
-        glVertex3f(-Configuration.SUN_SIZE, -Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
-        glEnd();
+
+        if (_dlSunMoon > 0) {
+            glCallList(_dlSunMoon);
+        }
 
         glDisable(GL_BLEND);
         glPopMatrix();
-        
+
         glBlendFunc(blend_src, blend_dst);
     }
 
@@ -1305,23 +1304,22 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * Generates the cloud display list with the current daylight value.
+     * Generates the cloud display list.
      */
-    public void generateClouds() {
+    public static void generateCloudDisplayList() {
 
-        FastRandom rand = new FastRandom(getSeed().hashCode());
+        FastRandom rand = new FastRandom();
 
         try {
-            glNewList(_displayListClouds, GL_COMPILE);
+            glNewList(_dlClouds, GL_COMPILE);
             glBegin(GL_QUADS);
 
             int length = _clouds.length;
 
             for (int x = 0; x < length; x++) {
                 for (int y = 0; y < length; y++) {
-                    double r = rand.standNormalDistrDouble();
-                    if (_clouds[x][y] && r > -2 && r < 0) {
-                        Primitives.drawCloud(32, 8, 16, x * 32f - (length / 2 * 32f), 0, y * 16f - (length / 2 * 16f), getDaylight());
+                    if (!_clouds[x][y]) {
+                        Primitives.drawCloud(32, 8, 16, x * 32f - (length / 2 * 32f), 0, y * 16f - (length / 2 * 16f));
                     }
                 }
             }
@@ -1332,6 +1330,21 @@ public final class World extends RenderableObject {
         } catch (Exception e) {
         }
 
+    }
+
+    public static void generateSunMoonDisplayList() {
+        glNewList(_dlSunMoon, GL_COMPILE);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-Configuration.SUN_SIZE, Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
+        glTexCoord2f(1.f, 0.0f);
+        glVertex3f(Configuration.SUN_SIZE, Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
+        glTexCoord2f(1.f, 1.0f);
+        glVertex3f(Configuration.SUN_SIZE, -Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
+        glTexCoord2f(0.f, 1.0f);
+        glVertex3f(-Configuration.SUN_SIZE, -Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
+        glEnd();
+        glEndList();
     }
 
     /**
