@@ -476,7 +476,6 @@ public final class Player extends RenderableObject {
      * Updates the position of the player.
      * 
      * TODO: Fix easing-artifact
-     * TODO: Fix "double-jumping bug"
      * 
      * @param delta Delta value since the last frame update
      */
@@ -486,8 +485,8 @@ public final class Player extends RenderableObject {
         oldPosition.set(_position);
 
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-            _position.z += 0.75f;
-            return;
+           _position.z += 0.1;
+           return;
         }
 
         /*
