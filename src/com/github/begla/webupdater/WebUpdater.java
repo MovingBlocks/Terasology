@@ -60,7 +60,7 @@ public class WebUpdater {
             File f = new File(c.getLocalPath());
 
             if (!f.exists()) {
-                Helper.LOGGER.log(Level.INFO, "Blockmania is  out of date.");
+                Helper.LOGGER.log(Level.INFO, "Blockmania is out of date.");
                 return false;
             } else {
                 try {
