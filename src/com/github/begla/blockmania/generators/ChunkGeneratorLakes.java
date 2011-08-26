@@ -88,7 +88,7 @@ public class ChunkGeneratorLakes extends ChunkGeneratorTerrain {
      */
     protected float calcLakeIntensity(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(x * 0.01f, 0.01f, 0.01f * z, 12, 1.9f, 5f);
+        result += _pGen3.multiFractalNoise(x * 0.01f, 0.01f, 0.01f * z, 6, 1.9836171f);
         return (float) Math.sqrt(Math.abs(result));
     }
 }

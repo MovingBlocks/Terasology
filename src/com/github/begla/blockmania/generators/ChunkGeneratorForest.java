@@ -42,8 +42,8 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
     @Override
     public void generate(Chunk c) {
         for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x+=2) {
-                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z+=2) {
+            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
                     generateGrassAndFlowers(c, x, y, z);
                     generateTree(c, x, y, z);
                 }
@@ -68,11 +68,11 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
                  * Generate high grass.
                  */
                 double rand = _rand.standNormalDistrDouble();
-                if (rand > -1 && rand < 1) {
+                if (rand >= 0) {
                     if (c.canBlockSeeTheSky(x, y + 1, z)) {
                         c.setBlock(x, y + 1, z, (byte) 0xB);
                     }
-                } else {
+                } else if (rand <= -1) {
                     if (c.canBlockSeeTheSky(x, y + 1, z)) {
                         c.setBlock(x, y + 1, z, (byte) 0xC);
                     }
@@ -145,7 +145,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      */
     protected float calcForestDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.006f * x, 0.006f * y, 0.006f * z, 2, 8f, 12f);
+        result += _pGen3.multiFractalNoise(0.006f * x, 0.006f * y, 0.006f * z, 3, 2.3614521f);
         return result;
     }
 
@@ -158,7 +158,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      */
     protected float calcGrassDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.8f * x, 0.8f * y, 0.8f * z, 2, 0.5f, 0.25f);
+        result += _pGen3.multiFractalNoise(0.02f * x, 0.02f * y, 0.02f * z, 8, 2.37152f);
         return result;
     }
 }

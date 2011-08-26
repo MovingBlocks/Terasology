@@ -6,12 +6,17 @@ uniform float daylight = 1.0;
 varying float fog;
 varying vec3 normal;
 
-vec4 gamma(vec4 color){
-    return pow(color, vec4(1.0 / 1.2));
+vec4 srgbToLinear(vec4 color){
+    return pow(color, vec4(1.0 / 2.2));
+}
+
+vec4 linearToSrgb(vec4 color){
+    return pow(color, vec4(2.2));
 }
 
 void main(){
     vec4 color = texture2D(textureAtlas, vec2(gl_TexCoord[0]));
+    color = srgbToLinear(color);
 
     /*
         Apply non-grey vertex colors only to grey texture values.
@@ -44,6 +49,6 @@ void main(){
 
     color.xyz *= clamp(daylightValue + blocklightValue, 0.0, 1.0);
 
-    gl_FragColor.rgb = gamma(mix(color, gl_Fog.color, fog / 2.0)).rgb;
+    gl_FragColor.rgb = mix(linearToSrgb(color), gl_Fog.color, fog / 2.0).rgb;
     gl_FragColor.w = color.w;
 }

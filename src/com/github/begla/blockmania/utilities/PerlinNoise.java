@@ -120,35 +120,14 @@ public class PerlinNoise {
      * @param gain 
      * @return
      */
-    public double multiFractalNoise(double x, double y, double z, int octaves, double lacunarity, double gain) {
-        double frequency = 1f;
-        double signal = 1f;
+    public double multiFractalNoise(double x, double y, double z, int octaves, double lacunarity) {
+        double result = 0;
 
-        /*
-         * Fetch the first noise octave.
-         */
-        signal = noise(x, y, z);
-        double result = signal;
-        double weight = 1f;
-
-        for (int i = 0; i < octaves; i++) {
-            x *= lacunarity;
-            y *= lacunarity;
-            z *= lacunarity;
-
-            weight = gain * signal;
-
-            if (weight > 1.0f) {
-                weight = 1.0f;
-            } else if (weight < 0.0f) {
-                weight = 0.0f;
-            }
-
-            signal = noise(x, y, z);
-
-            signal *= weight;
-            result += signal * Math.pow(frequency, -1f);
-            frequency *= lacunarity;
+        for (int i = 1; i <= octaves; i++) {
+                result += noise(x,y,z) * Math.pow(lacunarity, -0.76471*i);
+                
+                y *= lacunarity;
+                z *= lacunarity;
         }
 
         return result;
@@ -176,7 +155,7 @@ public class PerlinNoise {
         double result = signal;
         double weight = 1f;
 
-        for (int i = 0; i < octaves; i++) {
+        for (int i = 1; i <= octaves; i++) {
             x *= lacunarity;
             y *= lacunarity;
             z *= lacunarity;
@@ -192,7 +171,7 @@ public class PerlinNoise {
             signal = ridge(noise(x, y, z), offset);
 
             signal *= weight;
-            result += signal * Math.pow(frequency, -1f);
+            result += signal * Math.pow(frequency, -0.86461f);
             frequency *= lacunarity;
         }
 

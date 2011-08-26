@@ -17,8 +17,6 @@ package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.blocks.Block;
 
 /**
  * Generates the base terrain of the world.
@@ -49,7 +47,11 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
         for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x += SAMPLE_RATE_3D_HOR) {
             for (int z = 0; z <= Configuration.CHUNK_DIMENSIONS.z; z += SAMPLE_RATE_3D_HOR) {
                 for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.y; y += SAMPLE_RATE_3D_VERT) {
-                    densityMap[x][y][z] = calcMountainDensity(x + getOffsetX(c), y + getOffsetY(c), z + getOffsetZ(c));
+                    float density = calcMountainDensity(x + getOffsetX(c), y + getOffsetY(c), z + getOffsetZ(c));
+
+                    density -= (float)y/160;
+
+                    densityMap[x][y][z] = density;
                 }
             }
         }
@@ -64,35 +66,15 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
          */
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                for (int y = 100; y >= 0; y--) {
-                    float height = (calcHeightMap(x + getOffsetX(c), z + getOffsetZ(c)) * 128f + 32f);
-
-                    if (height < 0) {
-                        break;
-                    }
-
-                    if (height > 100f) {
-                        height = 100f;
-                    }
+                for (int y = (int) Configuration.CHUNK_DIMENSIONS.y; y >= 0; y--) {
 
                     float dens = densityMap[x][y][z];
-                    float p = (float) y / height;
-
 
                     if (c.getBlock(x, y, z) == 0x1 || c.getBlock(x, y, z) == 0x2) {
                         break;
                     }
 
-                    /*
-                     * Reduce the density with growing height.
-                     */
-                    if (p > 0.6f && p < 1.0f) {
-                        dens *= 1f - (p - 0.6f);
-                    } else if (p >= 1.0) {
-                        dens = 0f;
-                    }
-
-                    if ((dens > 0.06f && dens < 0.1f) || (dens >= 0.1f && p >= 0.95f)) {
+                    if ((dens > 0.0f && dens < 0.1f)) {
                         /*
                          * The outer layer is made of dirt and grass.
                          */
@@ -101,7 +83,7 @@ public class ChunkGeneratorMountain extends ChunkGeneratorTerrain {
                         } else {
                             c.setBlock(x, y, z, getBlockTypeForPosition(c, x, y, z, 1.0f));
                         }
-                    } else if (dens >= 0.1f && p < 0.95f) {
+                    } else if (dens >= 0.1f) {
                         /*
                          * The inner layer is made of stone. But only if the height is < 90 %.
                          */

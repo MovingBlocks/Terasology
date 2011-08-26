@@ -213,7 +213,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @return 
      */
     public float calcHeightMap(float x, float z) {
-        float heightMap = (float) calcTerrainElevation(x, z) + (calcTerrainRoughness(x, z) * calcTerrainDetail(x, z));
+        float heightMap = (float) calcTerrainElevation(x, z) + (calcTerrainRoughness(x, z) * 0.1f + calcTerrainDetail(x, z) * 0.05f);
         return heightMap;
     }
 
@@ -226,7 +226,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noise(0.0009f * x, 0.0009f, 0.0009f * z) * 0.95f;
+        result += _pGen1.noise(0.0009f * x, 0.0009f, 0.0009f * z);
         return result;
     }
 
@@ -239,7 +239,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.multiFractalNoise(0.009f * x, 0.009f, 0.009f * z, 16, 2f, 4f) * 0.1f;
+        result += _pGen2.multiFractalNoise(0.009f * x, 0.009f, 0.009f * z, 16, 2.351421f);
 
         return result;
     }
@@ -253,7 +253,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.ridgedMultiFractalNoise(x * 0.008f, 0.008f, z * 0.008f, 8, 1.2f, 3f, 1f) * 0.6;
+        result += _pGen3.ridgedMultiFractalNoise(x * 0.008f, 0.008f, z * 0.008f, 8, 1.2f, 3f, 1f);
         return result;
     }
 
@@ -266,7 +266,17 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcMountainDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen2.multiFractalNoise(x * 0.01f, 0.009f * y, z * 0.01f, 8, 8f, 12f);
+        
+        x *= 0.005;
+        y *= 0.0048;
+        z *= 0.005;
+      
+        result += _pGen2.noise(x * 11.55, y * 11.55, z * 11.55) * 0.05;
+        result += _pGen2.noise(x * 11.44, y * 11.44, z * 11.44) * 0.125;
+        result += _pGen2.noise(x * 8.03, y * 8.03, z * 8.03) * 0.25;
+        result += _pGen2.noise(x * 5.96, y * 5.96, z * 5.96) * 0.1;
+        result += _pGen2.noise(x * 1.01, y * 1.01, z * 1.01) * 1.00;
+        
         return result;
     }
 }
