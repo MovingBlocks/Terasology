@@ -15,25 +15,24 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.utilities.Helper;
+import javolution.util.FastList;
+
 import java.util.Collections;
 import java.util.TreeMap;
 import java.util.logging.Level;
-import javolution.util.FastList;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ChunkCache {
 
     private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
-    private World _parent;
+    private final World _parent;
 
     /**
-     * 
      * @param _parent
      */
     public ChunkCache(World _parent) {
@@ -42,8 +41,8 @@ public final class ChunkCache {
 
     /**
      * Loads a specified chunk from cache or queues a new chunk for generation.
-     *
-     * NOTE: This method ALWAYS returns a valid chunk (if positive x and z values are provided) 
+     * <p/>
+     * NOTE: This method ALWAYS returns a valid chunk (if positive x and z values are provided)
      * since a new chunk is generated if none of the present chunks fit the request.
      *
      * @param x X-coordinate of the chunk
@@ -67,7 +66,7 @@ public final class ChunkCache {
         // Delete some elements if the cache size is exceeded
         if (_chunkCache.size() > capacity()) {
             // Fetch all chunks within the cache
-            FastList<Chunk> sortedChunks = null;
+            FastList<Chunk> sortedChunks;
             sortedChunks = new FastList<Chunk>(_chunkCache.values());
             // Sort them according to their distance to the player
             Collections.sort(sortedChunks);
@@ -98,7 +97,7 @@ public final class ChunkCache {
 
     /**
      * Returns true if the given chunk is present in the cache.
-     * 
+     *
      * @param c The chunk
      * @return True if the chunk is present in the chunk cache
      */
@@ -109,18 +108,16 @@ public final class ChunkCache {
     /**
      * Tries to load a chunk from the cache. Returns null if no
      * chunk is found.
-     * 
+     *
      * @param x X-coordinate
      * @param z Z-coordinate
      * @return The loaded chunk
      */
     public Chunk loadChunk(int x, int z) {
-        Chunk c = _chunkCache.get(BlockMath.cantorize(x, z));
-        return c;
+        return _chunkCache.get(BlockMath.cantorize(x, z));
     }
 
     /**
-     * 
      * @param key
      * @return
      */
@@ -146,7 +143,6 @@ public final class ChunkCache {
     }
 
     /**
-     * 
      * @return
      */
     public int size() {
@@ -154,10 +150,9 @@ public final class ChunkCache {
     }
 
     /**
-     * 
      * @return
      */
-    public int capacity() {
+    int capacity() {
         return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) * 2;
     }
 }

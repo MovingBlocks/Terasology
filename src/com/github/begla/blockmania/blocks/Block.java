@@ -22,7 +22,6 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class Block {
@@ -55,14 +54,15 @@ public abstract class Block {
         /**
          * Back side.
          */
-        BACK;
-    };
-    private static Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockTreeTrunk(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockHighGrass(), new BlockLargeHighGrass(), new BlockTorch(), new BlockLava(), new BlockWood(), new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick(), new BlockCoal(), new BlockGold(),  new BlockDarkLeaf()};
-    private static BlockNil nilBlock = new BlockNil();
+        BACK
+    }
+
+    private static final Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockTreeTrunk(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockHighGrass(), new BlockLargeHighGrass(), new BlockTorch(), new BlockLava(), new BlockWood(), new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick(), new BlockCoal(), new BlockGold(), new BlockDarkLeaf()};
+    private static final BlockNil nilBlock = new BlockNil();
 
     /**
      * Returns the object for the given block type ID.
-     * 
+     *
      * @param type Block type ID
      * @return The object for the given ID
      */
@@ -75,37 +75,8 @@ public abstract class Block {
     }
 
     /**
-     * 
-     * @param c
-     * @return 
-     */
-    public static Block getBlockForClass(Class c) {
-        for (int i = 0; i < _blocks.length; i++) {
-            if (_blocks[i].getClass() == c) {
-                return _blocks[i];
-            }
-        }
-
-        return nilBlock;
-    }
-
-    /**
-     * 
-     * @param c
-     * @return 
-     */
-    public static int getTypeForClass(Class c) {
-        for (int i = 0; i < _blocks.length; i++) {
-            if (_blocks[i].getClass() == c) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    /**
      * Returns the amount of blocks available.
+     *
      * @return Amount of blocks available
      */
     public static int getBlockCount() {
@@ -145,7 +116,7 @@ public abstract class Block {
 
     /**
      * Returns true, if the current block is a billboard.
-     * 
+     *
      * @return True if billboard
      */
     public boolean isBlockBillboard() {
@@ -180,9 +151,8 @@ public abstract class Block {
     public boolean isCastingShadows() {
         return true;
     }
-    
+
     /**
-     * 
      * @return
      */
     public boolean doNotTessellate() {
@@ -190,15 +160,13 @@ public abstract class Block {
     }
 
     /**
-     * 
-     * @return 
+     * @return
      */
     public boolean renderBoundingBox() {
         return true;
     }
 
     /**
-     * 
      * @return
      */
     public byte getLuminance() {
@@ -206,15 +174,6 @@ public abstract class Block {
     }
 
     /**
-     * 
-     * @return
-     */
-    public byte getHardness() {
-        return 8;
-    }
-
-    /**
-     * 
      * @return
      */
     public boolean isRemovable() {
@@ -222,7 +181,6 @@ public abstract class Block {
     }
 
     /**
-     * 
      * @param x
      * @param y
      * @param z

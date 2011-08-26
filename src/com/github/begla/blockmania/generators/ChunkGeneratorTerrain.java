@@ -15,32 +15,31 @@
  */
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.world.Chunk;
-import com.github.begla.blockmania.Configuration;
 
 /**
  * Generates the base terrain of the world.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /**
-     * 
+     *
      */
-    public static int SAMPLE_RATE_2D = 16;
-    /**
-     * 
-     */
-    public static int SAMPLE_RATE_3D_HOR = 8;
-    /**
-     * 
-     */
-    public static int SAMPLE_RATE_3D_VERT = 16;
-
+    private static final int SAMPLE_RATE_2D = 16;
     /**
      *
+     */
+    private static final int SAMPLE_RATE_3D_HOR = 8;
+    /**
+     *
+     */
+    private static final int SAMPLE_RATE_3D_VERT = 16;
+
+    /**
      * @param seed
      */
     public ChunkGeneratorTerrain(String seed) {
@@ -48,7 +47,6 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     /**
-     *
      * @param c
      */
     @Override
@@ -64,7 +62,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     float density = calcMountainDensity(x + getOffsetX(c), y + getOffsetY(c), z + getOffsetZ(c));
 
                     float height = calcHeightMap(x + getOffsetX(c), z + getOffsetZ(c));
-                    
+
                     density = height + density;
                     density /= (y + 1) * 2f;
 
@@ -103,13 +101,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                          * The outer layer is made of dirt and grass.
                          */
                         if (!set) {
-                            c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, y, z, 1.0f), y));
+                            c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(y, 1.0f), y));
                         } else {
-                            c.setBlock(x, y, z, getBlockTypeForPosition(c, x, y, z, 1.0f));
+                            c.setBlock(x, y, z, getBlockTypeForPosition(y, 1.0f));
                         }
                         set = true;
                     } else if (dens >= 0.1f) {
-                        c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, y, z, 0.2f), y));
+                        c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(y, 0.2f), y));
                         set = true;
                     }
                 }
@@ -118,57 +116,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     /**
-     * 
-     * @param c
-     * @return
+     * @param densityMap
      */
-    protected float[][] generateHeightMap(Chunk c) {
-
-        float[][] heightMap = new float[(int) Configuration.CHUNK_DIMENSIONS.x + 1][(int) Configuration.CHUNK_DIMENSIONS.z + 1];
-
-        /*
-         * Calculate the height map at a low sample rate.
-         */
-        for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x += SAMPLE_RATE_2D) {
-            for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.z; y += SAMPLE_RATE_2D) {
-                float height = calcHeightMap(x + getOffsetX(c), y + getOffsetZ(c));
-                heightMap[x][y] = height;
-            }
-        }
-
-        /*
-         * Binlinear interpolate the missing values.
-         */
-        biLerpHeightMap(heightMap);
-
-        return heightMap;
-    }
-
-    /**
-     * 
-     * @param heightMap
-     */
-    @Deprecated
-    protected void biLerpHeightMap(float[][] heightMap) {
-        /*
-         * Bilinear interpolate the missing values.
-         */
-        for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.z; y++) {
-            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-                if (!(x % SAMPLE_RATE_2D == 0 && y % SAMPLE_RATE_2D == 0)) {
-                    int offsetX = (x / SAMPLE_RATE_2D) * SAMPLE_RATE_2D;
-                    int offsetY = (y / SAMPLE_RATE_2D) * SAMPLE_RATE_2D;
-                    heightMap[x][y] = BlockMath.biLerp(x, y, heightMap[offsetX][offsetY], heightMap[offsetX][SAMPLE_RATE_2D + offsetY], heightMap[SAMPLE_RATE_2D + offsetX][offsetY], heightMap[SAMPLE_RATE_2D + offsetX][offsetY + SAMPLE_RATE_2D], offsetX, SAMPLE_RATE_2D + offsetX, offsetY, SAMPLE_RATE_2D + offsetY);
-                }
-            }
-        }
-    }
-
-    /**
-     * 
-     * @param densityMap 
-     */
-    protected void triLerpDensityMap(float[][][] densityMap) {
+    void triLerpDensityMap(float[][][] densityMap) {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -184,13 +134,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     /**
-     * 
      * @param c
      * @param type
      * @param y
      * @return
      */
-    public byte getBlockTailpiece(Chunk c, byte type, int y) {
+    byte getBlockTailpiece(Chunk c, byte type, int y) {
         // Sand
         if (type == 0x7) {
             return 0x7;
@@ -207,15 +156,11 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     /**
-     * 
-     * @param c
-     * @param x
      * @param y
-     * @param z
-     * @param heightPerc 
+     * @param heightPerc
      * @return
      */
-    public byte getBlockTypeForPosition(Chunk c, int x, int y, int z, float heightPerc) {
+    byte getBlockTypeForPosition(int y, float heightPerc) {
         // Sand
         if (y >= 28 && y <= 32) {
             return (byte) 0x7;
@@ -229,24 +174,22 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     /**
-     * 
-     * @param x
-     * @param z
-     * @return 
-     */
-    public float calcHeightMap(float x, float z) {
-        float heightMap = (float) (calcTerrainElevation(x, z) + calcLakeIntensity(x, z) * 0.2) * 0.5f + calcTerrainRoughness(x, z) * 0.3f + calcTerrainDetail(x, z) * 0.1f ;
-        return heightMap;
-    }
-
-    /**
-     * Returns the base elevation for the terrain.
-     * 
      * @param x
      * @param z
      * @return
      */
-    protected float calcTerrainElevation(float x, float z) {
+    public float calcHeightMap(float x, float z) {
+        return (float) (calcTerrainElevation(x, z) + calcLakeIntensity(x, z) * 0.2) * 0.5f + calcTerrainRoughness(x, z) * 0.3f + calcTerrainDetail(x, z) * 0.1f;
+    }
+
+    /**
+     * Returns the base elevation for the terrain.
+     *
+     * @param x
+     * @param z
+     * @return
+     */
+    float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
         result += _pGen1.noise(0.001f * x, 0.001f, 0.001f * z);
         return result;
@@ -254,12 +197,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /**
      * Returns the roughness for the base terrain.
-     * 
+     *
      * @param x
      * @param z
      * @return
      */
-    protected float calcTerrainRoughness(float x, float z) {
+    float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
         result += _pGen2.multiFractalNoise(0.0008f * x, 0.0008f, 0.0008f * z, 16, 2.351421f);
 
@@ -268,25 +211,24 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /**
      * Returns the detail level for the base terrain.
-     * 
+     *
      * @param x
      * @param z
      * @return
      */
-    protected float calcTerrainDetail(float x, float z) {
+    float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
         result += _pGen3.ridgedMultiFractalNoise(x * 0.004f, 0.004f, z * 0.004f, 8, 1.2f, 3f, 1f);
         return result;
     }
 
     /**
-     * 
      * @param x
      * @param y
      * @param z
      * @return
      */
-    protected float calcMountainDensity(float x, float y, float z) {
+    float calcMountainDensity(float x, float y, float z) {
         float result = 0.0f;
 
         // Turbulence
@@ -311,15 +253,14 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
         return result;
     }
-    
-    
+
+
     /**
-     * 
      * @param x
      * @param z
-     * @return 
+     * @return
      */
-    protected float calcLakeIntensity(float x, float z) {
+    float calcLakeIntensity(float x, float z) {
         float result = 0.0f;
         result += _pGen3.multiFractalNoise(x * 0.01f, 0.01f, 0.01f * z, 3, 1.9836171f);
         return (float) Math.sqrt(Math.abs(result));

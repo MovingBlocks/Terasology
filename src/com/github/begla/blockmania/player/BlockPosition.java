@@ -22,7 +22,7 @@ import org.lwjgl.util.vector.Vector3f;
 /**
  * Represents the position of a block. This class is used within the
  * collision detection process.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class BlockPosition implements Comparable<BlockPosition> {
@@ -36,11 +36,12 @@ public final class BlockPosition implements Comparable<BlockPosition> {
     /**
      * Position on the z-axis.
      */
-    public int x, y, z;
-    private Vector3f _origin;
+    public final int x;
+    public final int y;
+    public final int z;
+    private final Vector3f _origin;
 
     /**
-     * 
      * @param x
      * @param y
      * @param z
@@ -54,36 +55,17 @@ public final class BlockPosition implements Comparable<BlockPosition> {
     }
 
     /**
-     * 
-     * @param origin
-     */
-    public void setOrigin(Vector3f origin) {
-        this._origin = origin;
-    }
-
-    /**
-     * 
      * @return
      */
-    public Vector3f getOrigin() {
-        return _origin;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public float getDistance() {
+    float getDistance() {
         return VectorPool.getVector((float) x - _origin.x, (float) y - _origin.y, (float) z - _origin.z).lengthSquared();
     }
 
     /**
-     * 
      * @param o
      * @return
      */
-    @Override
     public int compareTo(BlockPosition o) {
-        return new Float(getDistance()).compareTo(new Float(o.getDistance()));
+        return new Float(getDistance()).compareTo(o.getDistance());
     }
 }

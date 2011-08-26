@@ -17,20 +17,19 @@ package com.github.begla.blockmania.utilities;
 
 import com.github.begla.blockmania.RenderableObject;
 import org.lwjgl.util.vector.Vector3f;
+
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class AABB extends RenderableObject {
 
-    private Vector3f _dimensions;
+    private final Vector3f _dimensions;
 
     /**
-     * 
      * @param position
-     * @param dimensions 
+     * @param dimensions
      */
     public AABB(Vector3f position, Vector3f dimensions) {
         this._position = position;
@@ -38,7 +37,6 @@ public class AABB extends RenderableObject {
     }
 
     /**
-     * 
      * @param aabb2
      * @return
      */
@@ -48,27 +46,6 @@ public class AABB extends RenderableObject {
     }
 
     /**
-     * 
-     * @param point
-     * @return 
-     */
-    public boolean inside(Vector3f point) {
-        Vector3f t = Vector3f.sub(point, getPosition(), null);
-        return (Math.abs(t.x) <= getDimensions().x && Math.abs(t.y) <= getDimensions().y && Math.abs(t.z) <= getDimensions().z);
-    }
-
-    /**
-     * 
-     * @param aabb1
-     * @param aabb2
-     * @return
-     */
-    public static boolean checkForIntersection(AABB aabb1, AABB aabb2) {
-        return aabb1.overlaps(aabb2);
-    }
-
-    /**
-     * 
      * @return
      */
     public Vector3f getDimensions() {
@@ -136,7 +113,6 @@ public class AABB extends RenderableObject {
     }
 
     /**
-     * 
      * @param point
      * @return
      */

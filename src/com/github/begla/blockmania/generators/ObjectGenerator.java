@@ -16,8 +16,8 @@
 
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.world.World;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
@@ -30,18 +30,17 @@ public abstract class ObjectGenerator {
     /**
      *
      */
-    protected final FastRandom _rand;
+    final FastRandom _rand;
     /**
      *
      */
-    protected final World _world;
+    final World _world;
 
     /**
-     *
      * @param w
      * @param seed
      */
-    public ObjectGenerator(World w, String seed) {
+    ObjectGenerator(World w, String seed) {
         _rand = new FastRandom(seed.hashCode());
         _world = w;
     }
@@ -49,9 +48,9 @@ public abstract class ObjectGenerator {
     /**
      * Generates an object at the given position.
      *
-     * @param posX Position on the x-axis
-     * @param posY Position on the y-axis
-     * @param posZ Position on the z-axis
+     * @param posX   Position on the x-axis
+     * @param posY   Position on the y-axis
+     * @param posZ   Position on the z-axis
      * @param update If true, the chunk will be queued for updating
      */
     public void generate(int posX, int posY, int posZ, boolean update) {

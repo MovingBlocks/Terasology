@@ -20,7 +20,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 /**
  * The base class of all renderable objects.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class RenderableObject {

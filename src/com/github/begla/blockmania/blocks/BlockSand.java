@@ -22,7 +22,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A sand block.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockSand extends Block {

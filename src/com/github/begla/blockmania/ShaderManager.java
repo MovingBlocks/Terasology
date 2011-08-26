@@ -16,27 +16,23 @@
 package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.utilities.Helper;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+import org.newdawn.slick.util.ResourceLoader;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.logging.Level;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.newdawn.slick.util.ResourceLoader;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderManager {
 
-    private HashMap<String, Integer> _shaderPrograms = new HashMap<String, Integer>();
-    private HashMap<String, Integer> _fragmentShader = new HashMap<String, Integer>();
-    private HashMap<String, Integer> _vertexShader = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> _shaderPrograms = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> _fragmentShader = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> _vertexShader = new HashMap<String, Integer>();
     private static ShaderManager _instance = null;
 
     /**
@@ -54,9 +50,9 @@ public class ShaderManager {
     }
 
     /**
-     * 
+     *
      */
-    public ShaderManager() {
+    private ShaderManager() {
         initShader();
 
         Helper.LOGGER.log(Level.INFO, "Loading Blockmania shader manager...");
@@ -66,7 +62,7 @@ public class ShaderManager {
     }
 
     /**
-     * 
+     *
      */
     private void initShader() {
         createVertexShader("chunk_vert.glsl", "chunk");
@@ -151,7 +147,6 @@ public class ShaderManager {
     }
 
     /**
-     * 
      * @param s
      */
     public void enableShader(String s) {
@@ -165,7 +160,6 @@ public class ShaderManager {
     }
 
     /**
-     * 
      * @param s
      * @return
      */

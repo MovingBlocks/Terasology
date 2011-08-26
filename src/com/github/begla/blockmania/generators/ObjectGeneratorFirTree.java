@@ -27,7 +27,6 @@ import com.github.begla.blockmania.world.World;
 public class ObjectGeneratorFirTree extends ObjectGenerator {
 
     /**
-     * 
      * @param w
      * @param seed
      */

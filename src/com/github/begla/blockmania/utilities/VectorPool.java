@@ -15,19 +15,18 @@
  */
 package com.github.begla.blockmania.utilities;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import org.lwjgl.util.vector.Vector3f;
 
+import java.util.concurrent.ArrayBlockingQueue;
+
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class VectorPool {
 
-    static ArrayBlockingQueue<Vector3f> _pool = new ArrayBlockingQueue<Vector3f>(512);
+    private static final ArrayBlockingQueue<Vector3f> _pool = new ArrayBlockingQueue<Vector3f>(512);
 
     /**
-     * 
      * @param x
      * @param y
      * @param z
@@ -46,7 +45,6 @@ public class VectorPool {
     }
 
     /**
-     * 
      * @return
      */
     public static Vector3f getVector() {
@@ -54,12 +52,9 @@ public class VectorPool {
     }
 
     /**
-     * 
      * @param v
      */
     public static void putVector(Vector3f v) {
-        if (_pool.size() < 512) {
-            _pool.add(v);
-        }
+        _pool.add(v);
     }
 }

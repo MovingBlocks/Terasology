@@ -19,17 +19,17 @@ import java.util.ArrayList;
 
 /**
  * Random number generator based on the Xorshift generator by George Marsaglia.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class FastRandom {
 
-    long seed = System.currentTimeMillis();
+    private long seed = System.currentTimeMillis();
 
     /**
      * Initializes a new instance of the random number generator using
      * a specified seed.
-     * 
+     *
      * @param seed The seed to use
      */
     public FastRandom(long seed) {
@@ -101,14 +101,14 @@ public class FastRandom {
 
     /**
      * Calculates a standardized normal distributed value (using the polar method).
-     * 
-     * @return 
+     *
+     * @return
      */
     public double standNormalDistrDouble() {
 
         double q = Double.MAX_VALUE;
         double u1 = 0;
-        double u2 = 0;
+        double u2;
 
         while (q >= 1d || q == 0) {
             u1 = randomDouble();
@@ -122,20 +122,9 @@ public class FastRandom {
     }
 
     /**
-     * Calculates a normal distributed value according to the given variance and mean.
-     * 
-     * @param variance 
-     * @param mean 
-     * @return
-     */
-    public double normalDistrDouble(double variance, double mean) {
-        return standNormalDistrDouble() * Math.sqrt(variance) + mean;
-    }
-
-    /**
      * Fisher-Yates shuffling algorithm by Donald Knuth.
-     * 
-     * @param array 
+     *
+     * @param array
      */
     public void shuffle(ArrayList<Integer> array) {
         for (int i = array.size() - 1; i >= 0; i--) {

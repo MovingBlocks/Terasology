@@ -21,7 +21,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 /**
  * Represents an intersection of a ray with the face of a block.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class Intersection implements Comparable<Intersection> {
@@ -36,7 +36,7 @@ public final class Intersection implements Comparable<Intersection> {
          */
         FRONT,
         /**
-         * 
+         *
          */
         BACK,
         /**
@@ -44,7 +44,7 @@ public final class Intersection implements Comparable<Intersection> {
          */
         LEFT,
         /**
-         * 
+         *
          */
         RIGHT,
         /**
@@ -52,7 +52,7 @@ public final class Intersection implements Comparable<Intersection> {
          */
         TOP,
         /**
-         * 
+         *
          */
         BOTTOM,
         /**
@@ -60,16 +60,18 @@ public final class Intersection implements Comparable<Intersection> {
          */
         NONE
     }
-    private Vector3f v0, v1, v2;
-    private float d;
-    private float t;
-    private Vector3f origin;
-    private Vector3f ray;
-    private Vector3f intersectPoint;
-    private Vector3f blockPos;
+
+    private final Vector3f v0;
+    private final Vector3f v1;
+    private final Vector3f v2;
+    private final float d;
+    private final float t;
+    private final Vector3f origin;
+    private final Vector3f ray;
+    private final Vector3f intersectPoint;
+    private final Vector3f blockPos;
 
     /**
-     *
      * @param blockPos
      * @param v0
      * @param v1
@@ -93,11 +95,9 @@ public final class Intersection implements Comparable<Intersection> {
     }
 
     /**
-     *
      * @param o
      * @return
      */
-    @Override
     public int compareTo(Intersection o) {
         return new Float(Math.abs(getT())).compareTo(Math.abs(o.getT()));
     }
@@ -112,7 +112,7 @@ public final class Intersection implements Comparable<Intersection> {
     /**
      * @return the t
      */
-    public float getT() {
+    float getT() {
         return t;
     }
 
@@ -138,40 +138,13 @@ public final class Intersection implements Comparable<Intersection> {
     }
 
     /**
-     *
      * @return
      */
-    public SIDE calcSide() {
-        Vector3f norm = calcSurfaceNormal();
-
-        if (norm.equals(VectorPool.getVector(0, 1, 0))) {
-            return SIDE.TOP;
-        } else if (norm.equals(VectorPool.getVector(0, -1, 0))) {
-            return SIDE.BOTTOM;
-        } else if (norm.equals(VectorPool.getVector(0, 0, 1))) {
-            return SIDE.BACK;
-        } else if (norm.equals(VectorPool.getVector(0, 0, -1))) {
-            return SIDE.FRONT;
-        } else if (norm.equals(VectorPool.getVector(1, 0, 0))) {
-            return SIDE.RIGHT;
-        } else if (norm.equals(VectorPool.getVector(-1, 0, 0))) {
-            return SIDE.LEFT;
-        }
-        
-        VectorPool.putVector(norm);
-
-        return SIDE.NONE;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Vector3f calcSurfaceNormal() {
+    Vector3f calcSurfaceNormal() {
         Vector3f a = Vector3f.sub(v1, v0, null);
         Vector3f b = Vector3f.sub(v2, v0, null);
         Vector3f norm = Vector3f.cross(a, b, null);
-        
+
         VectorPool.putVector(a);
         VectorPool.putVector(b);
 
@@ -179,7 +152,6 @@ public final class Intersection implements Comparable<Intersection> {
     }
 
     /**
-     *
      * @return
      */
     public Vector3f calcAdjacentBlockPos() {
@@ -194,7 +166,6 @@ public final class Intersection implements Comparable<Intersection> {
     }
 
     /**
-     * 
      * @return
      */
     @Override

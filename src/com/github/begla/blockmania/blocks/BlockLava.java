@@ -21,7 +21,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A lava block (light source).
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockLava extends Block {
@@ -57,7 +57,6 @@ public class BlockLava extends Block {
     }
 
     /**
-     * 
      * @return
      */
     @Override

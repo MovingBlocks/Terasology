@@ -15,21 +15,19 @@
  */
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.blocks.BlockGrass;
 import com.github.begla.blockmania.blocks.BlockStone;
+import com.github.begla.blockmania.world.Chunk;
 
 /**
  * TODO
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ChunkGeneratorResources extends ChunkGeneratorTerrain {
 
     /**
-     *
      * @param seed
      */
     public ChunkGeneratorResources(String seed) {
@@ -37,7 +35,6 @@ public class ChunkGeneratorResources extends ChunkGeneratorTerrain {
     }
 
     /**
-     *
      * @param c
      */
     @Override

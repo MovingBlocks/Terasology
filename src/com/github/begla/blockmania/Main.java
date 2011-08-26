@@ -15,21 +15,15 @@
  */
 package com.github.begla.blockmania;
 
-import com.github.begla.webupdater.WebUpdater;
-import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.player.Player;
-import com.github.begla.blockmania.world.Chunk;
-import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.HeightMapFrame;
+import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.world.Primitives;
-import java.awt.Font;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.util.glu.GLU.*;
-
-import java.nio.FloatBuffer;
-import java.util.logging.Level;
+import com.github.begla.blockmania.world.World;
+import com.github.begla.webupdater.WebUpdater;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -37,10 +31,15 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL13;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
+
+import java.awt.*;
+import java.nio.FloatBuffer;
+import java.util.logging.Level;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 /**
  * The heart and soul of Blockmania.
@@ -50,9 +49,9 @@ import org.newdawn.slick.TrueTypeFont;
 public final class Main {
 
     /* ------- */
-    private final int TICKS_PER_SECOND = 60;
-    private final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-    private final int MAX_FRAMESKIP = 10;
+    private static final int TICKS_PER_SECOND = 60;
+    private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+    private static final int MAX_FRAMESKIP = 10;
     /* ------- */
     private static TrueTypeFont _font1;
     private long _lastLoopTime;
@@ -66,25 +65,25 @@ public final class Main {
     private float _meanFps;
     private float _memoryUsage;
     /* ------- */
-    Player _player;
-    World _world;
+    private Player _player;
+    private World _world;
     /* ------- */
-    FastRandom _rand = new FastRandom();
+    private final FastRandom _rand = new FastRandom();
 
     /**
      * Entry point of the application.
-     * 
+     *
      * @param args Arguments
      */
     public static void main(String[] args) {
 
         Helper.LOGGER.log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
-        
+
         /*
-         * Update missing game files...
-         */
+        * Update missing game files...
+        */
         WebUpdater wu = new WebUpdater();
-        
+
         if (!wu.update()) {
             Helper.LOGGER.log(Level.SEVERE, "Couldn't download missing game files. Sorry.");
             System.exit(0);
@@ -260,7 +259,7 @@ public final class Main {
         _lastLoopTime = Helper.getInstance().getTime();
 
         double nextGameTick = Helper.getInstance().getTime();
-        int loopCounter = 0;
+        int loopCounter;
 
         /*
          * Main game loop.
@@ -334,10 +333,10 @@ public final class Main {
          * Draw debugging information.
          */
         if (Configuration.getSettingBoolean("DEBUG")) {
-            _font1.drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage, Color.white));
-            _font1.drawString(4, 22, String.format("%s", _player, Color.white));
-            _font1.drawString(4, 38, String.format("%s", _world, Color.white));
-            _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount(), Color.white));
+            _font1.drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage));
+            _font1.drawString(4, 22, String.format("%s", _player));
+            _font1.drawString(4, 38, String.format("%s", _world));
+            _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount()));
         }
 
         if (_pauseGame) {
@@ -525,9 +524,9 @@ public final class Main {
 
     /**
      * Prepares a new world with a given name and seed value.
-     * 
+     *
      * @param title Title of the world
-     * @param seed Seed value used for the generators
+     * @param seed  Seed value used for the generators
      */
     private void initNewWorld(String title, String seed) {
         Helper.LOGGER.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);

@@ -22,7 +22,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A torch (light source).
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockTorch extends Block {
@@ -63,7 +63,6 @@ public class BlockTorch extends Block {
     }
 
     /**
-     * 
      * @return
      */
     @Override

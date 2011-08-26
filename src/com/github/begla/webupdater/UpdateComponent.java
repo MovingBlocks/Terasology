@@ -16,19 +16,18 @@
 package com.github.begla.webupdater;
 
 import com.github.begla.blockmania.utilities.Helper;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UpdateComponent {
+class UpdateComponent {
 
-    URL _locationURL;
-    String _fileName;
+    private final URL _locationURL;
+    private final String _fileName;
 
     public UpdateComponent(URL _webURL, String _fileName) {
         this._locationURL = _webURL;
@@ -39,7 +38,7 @@ public class UpdateComponent {
         return _fileName;
     }
 
-    public URL getLocationURL() {
+    URL getLocationURL() {
         return _locationURL;
     }
 

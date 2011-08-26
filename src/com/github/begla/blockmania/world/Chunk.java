@@ -15,46 +15,43 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.ShaderManager;
-import com.github.begla.blockmania.utilities.BlockMath;
-import com.github.begla.blockmania.player.LightNode;
-import com.github.begla.blockmania.blocks.BlockAir;
-import java.util.ArrayList;
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.RenderableObject;
-import javolution.util.FastList;
-import java.nio.channels.FileChannel;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.nio.ByteBuffer;
-import com.github.begla.blockmania.generators.ChunkGenerator;
+import com.github.begla.blockmania.ShaderManager;
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.blocks.BlockAir;
+import com.github.begla.blockmania.generators.ChunkGenerator;
+import com.github.begla.blockmania.utilities.BlockMath;
+import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.VectorPool;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.list.array.TFloatArrayList;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import org.newdawn.slick.util.ResourceLoader;
-import org.lwjgl.util.vector.Vector4f;
-import java.nio.FloatBuffer;
-import org.lwjgl.util.vector.Vector3f;
-import java.io.IOException;
-import java.util.logging.Level;
-import org.newdawn.slick.opengl.Texture;
+import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
+import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
+import org.newdawn.slick.util.ResourceLoader;
+
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.logging.Level;
+
 import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
  * determined its dimensions. Chunks are used to manage the world efficiently and
  * to reduce the batch count within the render loop.
- *
+ * <p/>
  * Chunks are tessellated on creation and saved to vertex arrays. From those display lists are generated
  * which are then used for the actual rendering process.
- *
+ * <p/>
  * The default size of one chunk is 16x128x16 (32768) blocks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -70,100 +67,71 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private int _chunkID = -1;
     private static Texture _textureMap;
     /* ------ */
-    private TFloatArrayList _quadsTranslucent;
-    private TFloatArrayList _normalsTranslucent;
-    private TFloatArrayList _texTranslucent;
-    private TFloatArrayList _colorTranslucent;
-    private TFloatArrayList _texLightTranslucent;
-    private TFloatArrayList _quadsOpaque;
-    private TFloatArrayList _normalsOpaque;
-    private TFloatArrayList _texOpaque;
-    private TFloatArrayList _colorOpaque;
-    private TFloatArrayList _texLightOpaque;
-    private TFloatArrayList _quadsBillboard;
-    private TFloatArrayList _texBillboard;
-    private TFloatArrayList _colorBillboard;
-    private TFloatArrayList _texLightBillboard;
-    ;
+    private final TFloatArrayList _quadsTranslucent;
+    private final TFloatArrayList _normalsTranslucent;
+    private final TFloatArrayList _texTranslucent;
+    private final TFloatArrayList _colorTranslucent;
+    private final TFloatArrayList _texLightTranslucent;
+    private final TFloatArrayList _quadsOpaque;
+    private final TFloatArrayList _normalsOpaque;
+    private final TFloatArrayList _texOpaque;
+    private final TFloatArrayList _colorOpaque;
+    private final TFloatArrayList _texLightOpaque;
+    private final TFloatArrayList _quadsBillboard;
+    private final TFloatArrayList _texBillboard;
+    private final TFloatArrayList _colorBillboard;
+    private final TFloatArrayList _texLightBillboard;
     /* ------ */
     private World _parent = null;
 
     /* ------ */
-    private byte[][][] _blocks;
-    private byte[][][] _sunlight;
-    private byte[][][] _light;
+    private final byte[][][] _blocks;
+    private final byte[][][] _sunlight;
+    private final byte[][][] _light;
     /* ------ */
     private int _displayListOpaque = -1;
     private int _displayListTranslucent = -1;
     private int _displayListBillboard = -1;
     /* ------ */
-    private FastList<ChunkGenerator> _generators = new FastList<ChunkGenerator>();
+    private final FastList<ChunkGenerator> _generators = new FastList<ChunkGenerator>();
 
     /**
-     * 
+     *
      */
     public enum SIDE {
 
-        /**
-         * 
-         */
-        LEFT,
-        /**
-         * 
-         */
-        RIGHT,
-        /**
-         * 
-         */
-        TOP,
-        /**
-         * 
-         */
-        BOTTOM,
-        /**
-         * 
-         */
-        FRONT,
-        /**
-         * 
-         */
-        BACK;
     }
 
     /**
-     * 
+     *
      */
     public enum LIGHT_TYPE {
 
         /**
-         * 
-         */
-        NONE,
-        /**
-         * 
+         *
          */
         BLOCK,
         /**
-         * 
+         *
          */
         SUN
     }
 
     /**
-     * 
+     *
      */
     public enum RENDER_TYPE {
 
         /**
-         * 
+         *
          */
         TRANS,
         /**
-         * 
+         *
          */
         OPAQUE,
         /**
-         * 
+         *
          */
         BILLBOARD
     }
@@ -186,9 +154,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Init. the chunk with a parent world, an absolute position and a list
      * of generators. The generators are applied when the chunk is generated.
      *
-     * @param p The parent world
+     * @param p        The parent world
      * @param position The absolute position of the chunk within the world
-     * @param g A list of generators which should be applied to this chunk
+     * @param g        A list of generators which should be applied to this chunk
      */
     public Chunk(World p, Vector3f position, FastList<ChunkGenerator> g) {
         this._position = position;
@@ -231,7 +199,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Draws the opaque or translucent elements of a chunk.
-     * 
+     *
      * @param translucent True if the translucent elements should be rendered
      */
     public void render(boolean translucent) {
@@ -283,7 +251,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         _textureMap.bind();
 
         if (!translucent) {
-            glCallList(_displayListOpaque);
+             glCallList(_displayListOpaque);
         } else {
             glEnable(GL_BLEND);
             glEnable(GL_ALPHA_TEST);
@@ -320,7 +288,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
                 return true;
             }
 
-            for (FastList.Node<ChunkGenerator> n = _generators.head(), end = _generators.tail(); (n = n.getNext()) != end;) {
+            for (FastList.Node<ChunkGenerator> n = _generators.head(), end = _generators.tail(); (n = n.getNext()) != end; ) {
                 n.getValue().generate(this);
             }
 
@@ -386,7 +354,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     private void addLightTexCoordFor(int x, int y, int z, int dirX, int dirY, int dirZ, RENDER_TYPE r, float dimming) {
-        TFloatArrayList l = null;
+        TFloatArrayList l;
 
         if (r == RENDER_TYPE.BILLBOARD) {
             l = _texLightBillboard;
@@ -699,7 +667,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * 
      * @param x
      * @param y
      * @param z
@@ -707,13 +674,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param p2
      * @param p3
      * @param p4
-     * @param norm 
+     * @param norm
      * @param colorOffset
      * @param texOffset
      * @param shadowIntens
-     * @param renderType 
+     * @param renderType
      */
-    public void generateVerticesForBlockSide(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, float shadowIntens, RENDER_TYPE renderType) {
+    void generateVerticesForBlockSide(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, float shadowIntens, RENDER_TYPE renderType) {
         float offsetX = _position.x * Configuration.CHUNK_DIMENSIONS.x;
         float offsetY = _position.y * Configuration.CHUNK_DIMENSIONS.y;
         float offsetZ = _position.z * Configuration.CHUNK_DIMENSIONS.z;
@@ -832,39 +799,39 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             _displayListBillboard = glGenLists(1);
         }
 
-        FloatBuffer nb = null;
-        FloatBuffer cb = null;
-        FloatBuffer tb = null;
-        FloatBuffer tb2 = null;
-        FloatBuffer vb = null;
+        FloatBuffer nb;
+        FloatBuffer cb;
+        FloatBuffer tb;
+        FloatBuffer tb2;
+        FloatBuffer vb;
 
         nb = BufferUtils.createFloatBuffer(_normalsOpaque.size());
 
-        for (TFloatIterator it = _normalsOpaque.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _normalsOpaque.iterator(); it.hasNext(); ) {
             nb.put(it.next());
         }
 
         vb = BufferUtils.createFloatBuffer(_quadsOpaque.size());
 
-        for (TFloatIterator it = _quadsOpaque.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _quadsOpaque.iterator(); it.hasNext(); ) {
             vb.put(it.next());
         }
 
         tb = BufferUtils.createFloatBuffer(_texOpaque.size());
 
-        for (TFloatIterator it = _texOpaque.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _texOpaque.iterator(); it.hasNext(); ) {
             tb.put(it.next());
         }
 
         tb2 = BufferUtils.createFloatBuffer(_texLightOpaque.size());
 
-        for (TFloatIterator it = _texLightOpaque.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _texLightOpaque.iterator(); it.hasNext(); ) {
             tb2.put(it.next());
         }
 
         cb = BufferUtils.createFloatBuffer(_colorOpaque.size());
 
-        for (TFloatIterator it = _colorOpaque.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _colorOpaque.iterator(); it.hasNext(); ) {
             cb.put(it.next());
         }
 
@@ -878,33 +845,33 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         nb = BufferUtils.createFloatBuffer(_normalsTranslucent.size());
 
-        for (TFloatIterator it = _normalsTranslucent.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _normalsTranslucent.iterator(); it.hasNext(); ) {
             nb.put(it.next());
         }
 
         vb = BufferUtils.createFloatBuffer(_quadsTranslucent.size());
 
-        for (TFloatIterator it = _quadsTranslucent.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _quadsTranslucent.iterator(); it.hasNext(); ) {
             vb.put(it.next());
         }
 
         tb = BufferUtils.createFloatBuffer(_texTranslucent.size());
 
-        for (TFloatIterator it = _texTranslucent.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _texTranslucent.iterator(); it.hasNext(); ) {
             tb.put(it.next());
         }
 
 
         tb2 = BufferUtils.createFloatBuffer(_texLightTranslucent.size());
 
-        for (TFloatIterator it = _texLightTranslucent.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _texLightTranslucent.iterator(); it.hasNext(); ) {
             tb2.put(it.next());
         }
 
 
         cb = BufferUtils.createFloatBuffer(_colorTranslucent.size());
 
-        for (TFloatIterator it = _colorTranslucent.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _colorTranslucent.iterator(); it.hasNext(); ) {
             cb.put(it.next());
         }
 
@@ -918,28 +885,28 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         vb = BufferUtils.createFloatBuffer(_quadsBillboard.size());
 
-        for (TFloatIterator it = _quadsBillboard.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _quadsBillboard.iterator(); it.hasNext(); ) {
             vb.put(it.next());
         }
 
 
         tb = BufferUtils.createFloatBuffer(_texBillboard.size());
 
-        for (TFloatIterator it = _texBillboard.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _texBillboard.iterator(); it.hasNext(); ) {
             tb.put(it.next());
         }
 
 
         tb2 = BufferUtils.createFloatBuffer(_texLightBillboard.size());
 
-        for (TFloatIterator it = _texLightBillboard.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _texLightBillboard.iterator(); it.hasNext(); ) {
             tb2.put(it.next());
         }
 
 
         cb = BufferUtils.createFloatBuffer(_colorBillboard.size());
 
-        for (TFloatIterator it = _colorBillboard.iterator(); it.hasNext();) {
+        for (TFloatIterator it = _colorBillboard.iterator(); it.hasNext(); ) {
             cb.put(it.next());
         }
 
@@ -976,23 +943,16 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, 0, vb);
 
-        if (tb != null || tb2 != null) {
-        }
+        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glTexCoordPointer(2, 0, tb);
 
-        if (tb != null && tb2 != null) {
-            GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glTexCoordPointer(2, 0, tb);
+        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glTexCoordPointer(2, 0, tb2);
 
-            GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glTexCoordPointer(2, 0, tb2);
-        }
-
-        if (cb != null) {
-            glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(4, 0, cb);
-        }
+        glEnableClientState(GL_COLOR_ARRAY);
+        glColorPointer(4, 0, cb);
 
         if (nb != null) {
             glEnableClientState(GL_NORMAL_ARRAY);
@@ -1001,23 +961,19 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         glDrawArrays(GL_QUADS, 0, vb.capacity() / 3);
 
-        if (cb != null) {
-            glDisableClientState(GL_COLOR_ARRAY);
-        }
+        glDisableClientState(GL_COLOR_ARRAY);
 
         if (nb != null) {
             glDisableClientState(GL_NORMAL_ARRAY);
         }
 
-        if (tb != null && tb2 != null) {
-            GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-            glTexCoordPointer(2, 0, tb);
+        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glTexCoordPointer(2, 0, tb);
 
-            GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-            glTexCoordPointer(2, 0, tb2);
-        }
+        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glTexCoordPointer(2, 0, tb2);
 
         glDisableClientState(GL_VERTEX_ARRAY);
         glEndList();
@@ -1026,8 +982,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Returns true if the block side is adjacent to a translucent block or an air
      * block.
-     *
+     * <p/>
      * NOTE: Air and leafs have to be handled separately. Otherwise the water surface would not be displayed due to the tessellation process.
+     *
+     * @param blockToCheck
+     * @param currentBlock
+     * @return
      */
     private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock) {
         Block bCheck = Block.getBlockForType(blockToCheck);
@@ -1038,30 +998,34 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the position of the chunk within the world.
+     *
      * @return
      */
-    public int getChunkWorldPosX() {
+    int getChunkWorldPosX() {
         return (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
     }
 
     /**
      * Returns the position of the chunk within the world.
+     *
      * @return
      */
-    public int getChunkWorldPosY() {
+    int getChunkWorldPosY() {
         return (int) _position.y * (int) Configuration.CHUNK_DIMENSIONS.y;
     }
 
     /**
      * Returns the position of the chunk within the world.
+     *
      * @return
      */
-    public int getChunkWorldPosZ() {
+    int getChunkWorldPosZ() {
         return (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
     }
 
     /**
      * Returns the position of block within the world.
+     *
      * @param x
      * @return
      */
@@ -1071,7 +1035,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the position of block within the world.
-     * @param y 
+     *
+     * @param y
      * @return
      */
     public int getBlockWorldPosY(int y) {
@@ -1080,7 +1045,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the position of block within the world.
-     * @param z 
+     *
+     * @param z
      * @return
      */
     public int getBlockWorldPosZ(int z) {
@@ -1089,11 +1055,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Calculates the sunlight at a given column within the chunk.
-     * 
-     * @param x Local block position on the x-axis
-     * @param z Local block position on the z-axis
+     *
+     * @param x               Local block position on the x-axis
+     * @param z               Local block position on the z-axis
      * @param spreadLight
-     * @param refreshSunlight  
+     * @param refreshSunlight
      */
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
         boolean covered = false;
@@ -1133,11 +1099,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * 
      * @param x
      * @param y
      * @param z
-     * @param type  
+     * @param type
      */
     public void refreshLightAtLocalPos(int x, int y, int z, LIGHT_TYPE type) {
         if (x < 0 || z < 0 || y < 0) {
@@ -1178,120 +1143,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * TODO: Not working
-     * 
-     * @param x
-     * @param y
-     * @param z 
-     * @param oldLightValue
-     * @param type  
-     * @deprecated 
-     */
-    @Deprecated
-    public void unspreadLight(int x, int y, int z, byte oldLightValue, LIGHT_TYPE type) {
-        ArrayList<LightNode> lightSources = new ArrayList<LightNode>();
-        unspreadLight(x, y, z, oldLightValue, 0, type, lightSources);
-
-        System.out.println(lightSources.size());
-
-        // Spread light of brighter light sources
-        for (LightNode l : lightSources) {
-            if (l.getType() == LightNode.NODE_TYPE.SPREAD) {
-                //_parent.spreadLight(l.x, l.y, l.z, l.getLightIntens(), 0, type);
-            } else {
-                _parent.setLight(l.x, l.y, l.z, l.getLightIntens(), type);
-            }
-        }
-    }
-
-    /**
-     * TODO: Not working
-     * 
-     * @param x
-     * @param y
-     * @param z 
-     * @param depth 
-     * @param oldLightValue
-     * @param type
-     * @param lightSources  
-     * @deprecated 
-     */
-    @Deprecated
-    public void unspreadLight(int x, int y, int z, byte oldLightValue, int depth, LIGHT_TYPE type, ArrayList<LightNode> lightSources) {
-        if (x < 0 || z < 0 || y < 0) {
-            return;
-        }
-
-        if (depth > oldLightValue) {
-            return;
-        }
-
-        int blockPosX = getBlockWorldPosX(x);
-        int blockPosY = getBlockWorldPosY(y);
-        int blockPosZ = getBlockWorldPosZ(z);
-
-        byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ, type);
-        byte type1 = _parent.getBlock(blockPosX + 1, blockPosY, blockPosZ);
-        byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ, type);
-        byte type2 = _parent.getBlock(blockPosX - 1, blockPosY, blockPosZ);
-        byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1, type);
-        byte type3 = _parent.getBlock(blockPosX, blockPosY, blockPosZ + 1);
-        byte val4 = _parent.getLight(blockPosX, blockPosY, blockPosZ - 1, type);
-        byte type4 = _parent.getBlock(blockPosX, blockPosY, blockPosZ - 1);
-        byte val5 = _parent.getLight(blockPosX, blockPosY + 1, blockPosZ, type);
-        byte type5 = _parent.getBlock(blockPosX, blockPosY + 1, blockPosZ);
-        byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ, type);
-        byte type6 = _parent.getBlock(blockPosX, blockPosY - 1, blockPosZ);
-
-        lightSources.add(new LightNode(blockPosX, blockPosY, blockPosZ, (byte) 0, LightNode.NODE_TYPE.UNSPREAD));
-        byte currentValue = (byte) (oldLightValue - depth);
-
-
-        if (val1 < currentValue && val1 > 0 && Block.getBlockForType(type1).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX + 1, blockPosY, blockPosZ, oldLightValue, depth + 1, type, lightSources);
-        } else if (val1 >= oldLightValue) {
-            //lightSources.add(new LightNode(blockPosX - 1, blockPosY, blockPosZ, oldLightValue, LightNode.NODE_TYPE.SPREAD));
-        }
-
-        if (val2 < currentValue && val2 > 0 && Block.getBlockForType(type2).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX - 1, blockPosY, blockPosZ, oldLightValue, depth + 1, type, lightSources);
-        } else if (val2 >= oldLightValue) {
-            //lightSources.add(new LightNode(blockPosX - 1, blockPosY, blockPosZ, oldLightValue, LightNode.NODE_TYPE.SPREAD));
-        }
-
-        if (val3 < currentValue && val3 > 0 && Block.getBlockForType(type3).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX, blockPosY, blockPosZ + 1, oldLightValue, depth + 1, type, lightSources);
-        } else if (val3 >= oldLightValue) {
-            //lightSources.add(new LightNode(blockPosX, blockPosY, blockPosZ + 1, oldLightValue, LightNode.NODE_TYPE.SPREAD));
-        }
-
-        if (val4 < currentValue && val4 > 0 && Block.getBlockForType(type4).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX, blockPosY, blockPosZ - 1, oldLightValue, depth + 1, type, lightSources);
-        } else if (val4 >= oldLightValue) {
-            //lightSources.add(new LightNode(blockPosX, blockPosY, blockPosZ - 1, oldLightValue, LightNode.NODE_TYPE.SPREAD));
-        }
-
-        if (val5 < currentValue && val5 > 0 && Block.getBlockForType(type5).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX, blockPosY + 1, blockPosZ, oldLightValue, depth + 1, type, lightSources);
-        } else if (val5 >= oldLightValue) {
-            //lightSources.add(new LightNode(blockPosX, blockPosY + 1, blockPosZ, oldLightValue, LightNode.NODE_TYPE.SPREAD));
-        }
-
-        if (val6 < currentValue && val6 > 0 && Block.getBlockForType(type6).isBlockTypeTranslucent()) {
-            _parent.unspreadLight(blockPosX, blockPosY - 1, blockPosZ, oldLightValue, depth + 1, type, lightSources);
-        } else if (val6 >= oldLightValue) {
-            //lightSources.add(new LightNode(blockPosX, blockPosY - 1, blockPosZ, oldLightValue, LightNode.NODE_TYPE.SPREAD));
-        }
-    }
-
-    /**
      * Recursive light calculation.
-     * 
+     *
      * @param x
      * @param y
      * @param z
      * @param lightValue
-     * @param type  
+     * @param type
      */
     public void spreadLight(int x, int y, int z, byte lightValue, LIGHT_TYPE type) {
         spreadLight(x, y, z, lightValue, 0, type);
@@ -1299,13 +1157,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Recursive light calculation.
-     * 
+     *
      * @param x
      * @param y
-     * @param z 
+     * @param z
      * @param lightValue
      * @param depth
-     * @param type  
+     * @param type
      */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type) {
         if (x < 0 || z < 0 || y < 0) {
@@ -1333,7 +1191,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ, type);
         byte type6 = _parent.getBlock(blockPosX, blockPosY - 1, blockPosZ);
 
-        byte newLightValue = 0;
+        byte newLightValue;
         newLightValue = (byte) (lightValue - depth);
 
         _parent.setLight(blockPosX, blockPosY, blockPosZ, newLightValue, type);
@@ -1373,28 +1231,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * Returns the amount of blocks within this chunk.
-     *
-     * @return The amount of blocks
-     */
-    public int blockCount() {
-        int counter = 0;
-
-        for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
-                for (int y = 0; y < (int) Configuration.CHUNK_DIMENSIONS.y; y++) {
-                    if (_blocks[x][y][z] > 0) {
-                        counter++;
-                    }
-                }
-            }
-        }
-        return counter;
-    }
-
-    /**
      * Calculates the distance of the chunk to the player.
-     * 
+     *
      * @return The distance of the chunk to the player
      */
     public double distanceToPlayer() {
@@ -1404,10 +1242,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Returns the light intensity at a given local block position.
      *
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
-     * @param type 
+     * @param x    Local block position on the x-axis
+     * @param y    Local block position on the y-axis
+     * @param z    Local block position on the z-axis
+     * @param type
      * @return The light intensity
      */
     public byte getLight(int x, int y, int z, LIGHT_TYPE type) {
@@ -1423,7 +1261,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -1431,12 +1269,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     /**
      * Sets the light value at the given position.
-     * 
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
-     * @param intens 
-     * @param type  
+     *
+     * @param x      Local block position on the x-axis
+     * @param y      Local block position on the y-axis
+     * @param z      Local block position on the z-axis
+     * @param intens
+     * @param type
      */
     public void setLight(int x, int y, int z, byte intens, LIGHT_TYPE type) {
         if (x < 0 || z < 0 || y < 0) {
@@ -1448,7 +1286,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             return;
         }
 
-        byte[][][] lSource = null;
+        byte[][][] lSource;
         if (type == LIGHT_TYPE.SUN) {
             lSource = _sunlight;
         } else if (type == LIGHT_TYPE.BLOCK) {
@@ -1458,7 +1296,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
 
         if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
-            Block b = Block.getBlockForType(getBlock(x, y, z));
             byte oldValue = lSource[x][y][z];
             lSource[x][y][z] = intens;
 
@@ -1488,10 +1325,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Sets the block value at the given position.
-     * 
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
+     *
+     * @param x    Local block position on the x-axis
+     * @param y    Local block position on the y-axis
+     * @param z    Local block position on the z-axis
      * @param type The block type
      */
     public void setBlock(int x, int y, int z, byte type) {
@@ -1516,11 +1353,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * 
      * @param x
      * @param y
      * @param z
-     * @return 
+     * @return
      */
     public boolean canBlockSeeTheSky(int x, int y, int z) {
         while (y < Configuration.CHUNK_DIMENSIONS.y) {
@@ -1535,16 +1371,16 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Calculates a simple occlusion value based on the amount of blocks
      * surrounding the given block position.
-     * 
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
-     * @param dirX 
-     * @param dirY 
-     * @param dirZ 
+     *
+     * @param x    Local block position on the x-axis
+     * @param y    Local block position on the y-axis
+     * @param z    Local block position on the z-axis
+     * @param dirX
+     * @param dirY
+     * @param dirZ
      * @return Occlusion amount
      */
-    public float simpleOcclusionAmount(int x, int y, int z, int dirX, int dirY, int dirZ) {
+    float simpleOcclusionAmount(int x, int y, int z, int dirX, int dirY, int dirZ) {
         if (x < 0 || z < 0 || y < 0) {
             return 0;
         }
@@ -1587,33 +1423,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * Marks the neighbors of this chunks as dirty.
-     */
-    public void markNeighborsDirty() {
-        Chunk[] neighbors = loadOrCreateNeighbors();
-
-        if (neighbors[1] != null) {
-            neighbors[1]._dirty = true;
-        }
-        if (neighbors[0] != null) {
-            neighbors[0]._dirty = true;
-        }
-        if (neighbors[3] != null) {
-            neighbors[3]._dirty = true;
-        }
-        if (neighbors[2] != null) {
-            neighbors[2]._dirty = true;
-        }
-    }
-
-    /**
      * Marks those neighbors of a chunk dirty, that are adjacent to
      * the given block coordinate.
-     * 
+     *
      * @param x Local block position on the x-axis
      * @param z Local block position on the z-axis
      */
-    public void markNeighborsDirty(int x, int z) {
+    void markNeighborsDirty(int x, int z) {
         if (x < 0 || z < 0) {
             return;
         }
@@ -1639,7 +1455,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the parent world.
-     * 
+     *
      * @return
      */
     public World getParent() {
@@ -1648,7 +1464,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Returns the amount of executed vertex array updates.
-     * 
+     *
      * @return The amount of updates
      */
     public static int getVertexArrayUpdateCount() {
@@ -1661,13 +1477,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param o The chunk to compare to
      * @return
      */
-    @Override
     public int compareTo(Chunk o) {
         if (_parent.getPlayer() != null) {
             return new Double(distanceToPlayer()).compareTo(o.distanceToPlayer());
         }
 
-        return new Integer(o.getChunkID()).compareTo(new Integer(getChunkID()));
+        return new Integer(o.getChunkID()).compareTo(getChunkID());
     }
 
     /**
@@ -1682,10 +1497,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Saves this chunk to disk.
-     * 
      * TODO: Chunks use a lot of memory...
-     * 
-     * @return 
+     *
+     * @return
      */
     public boolean writeChunkToDisk() {
         // Don't save fresh chunks
@@ -1694,7 +1508,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
 
         ByteBuffer output = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3 + 1);
-        File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath().toString(), BlockMath.cantorize((int) _position.x, (int) _position.z)));
+        File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath(), BlockMath.cantorize((int) _position.x, (int) _position.z)));
 
         // Save flags...
         byte flags = 0x0;
@@ -1736,10 +1550,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Loads this chunk from the disk (if present).
-     * 
-     * @return 
+     *
+     * @return
      */
-    public boolean loadChunkFromFile() {
+    boolean loadChunkFromFile() {
         ByteBuffer input = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3 + 1);
         File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath(), BlockMath.cantorize((int) _position.x, (int) _position.z)));
 
@@ -1782,50 +1596,44 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * 
-     * @return 
+     * @return
      */
     public boolean isDirty() {
         return _dirty;
     }
 
     /**
-     * 
-     * @return 
+     * @return
      */
     public boolean isFresh() {
         return _fresh;
     }
 
     /**
-     * 
-     * @return 
+     * @return
      */
     public boolean isLightDirty() {
         return _lightDirty;
     }
 
     /**
-     * 
-     * @param _dirty 
+     * @param _dirty
      */
     public void setDirty(boolean _dirty) {
         this._dirty = _dirty;
     }
 
     /**
-     * 
-     * @param _lightDirty 
+     * @param _lightDirty
      */
-    public void setLightDirty(boolean _lightDirty) {
+    void setLightDirty(boolean _lightDirty) {
         this._lightDirty = _lightDirty;
     }
 
     /**
-     * 
-     * @return 
+     * @return
      */
-    public int getChunkID() {
+    int getChunkID() {
         return _chunkID;
     }
 }

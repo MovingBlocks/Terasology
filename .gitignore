@@ -1,8 +1,6 @@
-.DS_Store
-/build
-errors.*
-/dist
-/nbproject/private/*
-*.log*
-SAVED_WORLDS
+.idea/workspace.xml
+.idea/tasks.xml
 DATA
+SAVED_WORLDS
+*.log
+out

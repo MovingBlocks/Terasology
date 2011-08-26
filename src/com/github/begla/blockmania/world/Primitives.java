@@ -19,13 +19,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Primitives {
 
     /**
-     * 
      * @param scaleX
      * @param scaleY
      * @param scaleZ
@@ -102,7 +100,6 @@ public class Primitives {
     }
 
     /**
-     * 
      * @param brightness
      */
     public static void drawSkyBox(float brightness) {
@@ -137,7 +134,7 @@ public class Primitives {
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
 
         // Top Face
-        GL11.glColor3f(skyColor.x  * brightness, skyColor.y  * brightness, skyColor.z  * brightness);
+        GL11.glColor3f(skyColor.x * brightness, skyColor.y * brightness, skyColor.z * brightness);
         GL11.glTexCoord2f(0.0f, 0.5f);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
         GL11.glTexCoord2f(0.0f, 0.0f);

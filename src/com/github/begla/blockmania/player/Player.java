@@ -17,24 +17,27 @@
 package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.RenderableObject;
-import com.github.begla.blockmania.world.World;
-import com.github.begla.blockmania.utilities.VectorPool;
-import javolution.util.FastList;
-import com.github.begla.blockmania.utilities.AABB;
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.utilities.AABB;
+import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.PerlinNoise;
-import java.util.Collections;
+import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.world.World;
+import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
-import static org.lwjgl.opengl.GL11.*;
+
+import java.util.Collections;
+
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * This class contains all functions regarding the player's actions,
  * movement and the orientation of the camera.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glawwtzel@me.com>
  */
 public final class Player extends RenderableObject {
@@ -50,11 +53,11 @@ public final class Player extends RenderableObject {
     private float _gravity = 0.0f;
     private World _parent = null;
     private final PerlinNoise _pGen = new PerlinNoise((int) Helper.getInstance().getTime());
-    private Vector3f _viewingDirection = VectorPool.getVector();
+    private final Vector3f _viewingDirection = VectorPool.getVector();
     private boolean _playerIsTouchingGround = false;
 
     /**
-     * 
+     *
      */
     public Player() {
         resetPlayer();
@@ -80,7 +83,6 @@ public final class Player extends RenderableObject {
             float bobbing1 = (float) _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.05f;
             glTranslatef(0.0f, bobbing1, 0);
         }
-
 
 
         // Position the camera in the upper part of the player's bounding box
@@ -124,7 +126,7 @@ public final class Player extends RenderableObject {
      *
      * @param diff Amount of yawing to be applied.
      */
-    public void yaw(float diff) {
+    void yaw(float diff) {
         double nYaw = (_yaw + diff) % 360;
         if (nYaw < 0) {
             nYaw += 360;
@@ -137,7 +139,7 @@ public final class Player extends RenderableObject {
      *
      * @param diff Amount of pitching to be applied.
      */
-    public void pitch(float diff) {
+    void pitch(float diff) {
         double nPitch = (_pitch - diff) % 360;
         if (nPitch < 0) {
             nPitch += 360;
@@ -152,11 +154,11 @@ public final class Player extends RenderableObject {
     /**
      * Moves the player forward.
      */
-    public void walkForward() {
-        _movement.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+    void walkForward() {
+        _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
         if (Configuration.getSettingBoolean("GOD_MODE")) {
-            _movement.y -= (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
+            _movement.y -= _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
         _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
@@ -165,36 +167,36 @@ public final class Player extends RenderableObject {
     /**
      * Moves the player backward.
      */
-    public void walkBackwards() {
-        _movement.x -= (double) _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+    void walkBackwards() {
+        _movement.x -= _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
 
         if (Configuration.getSettingBoolean("GOD_MODE")) {
-            _movement.y += (double) _wSpeed * Math.sin(Math.toRadians(_pitch));
+            _movement.y += _wSpeed * Math.sin(Math.toRadians(_pitch));
         }
 
-        _movement.z += (double) _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+        _movement.z += _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
     }
 
     /**
      * Lets the player strafe left.
      */
-    public void strafeLeft() {
-        _movement.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw - 90));
-        _movement.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw - 90));
+    void strafeLeft() {
+        _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw - 90));
+        _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw - 90));
     }
 
     /**
      * Lets the player strafe right.
      */
-    public void strafeRight() {
-        _movement.x += (double) _wSpeed * Math.sin(Math.toRadians(_yaw + 90));
-        _movement.z -= (double) _wSpeed * Math.cos(Math.toRadians(_yaw + 90));
+    void strafeRight() {
+        _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw + 90));
+        _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw + 90));
     }
 
     /**
      * Lets the player jump.
      */
-    public void jump() {
+    void jump() {
         if (_playerIsTouchingGround) {
             _jump = true;
         }
@@ -202,10 +204,10 @@ public final class Player extends RenderableObject {
 
     /**
      * Calculates the currently looked at block in front of the player.
-     * 
+     *
      * @return Intersection point of the looked at block
      */
-    public Intersection calcSelectedBlock() {
+    Intersection calcSelectedBlock() {
         FastList<Intersection> inters = new FastList<Intersection>();
         for (int x = -4; x < 4; x++) {
             for (int y = -4; y < 4; y++) {
@@ -233,7 +235,6 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * 
      * @return
      */
     public String selectedBlockInformation() {
@@ -268,7 +269,7 @@ public final class Player extends RenderableObject {
 
     /**
      * Plants a tree of a given type in front of the player.
-     * 
+     *
      * @param type The type of the tree
      */
     public void plantTree(int type) {
@@ -287,7 +288,7 @@ public final class Player extends RenderableObject {
     /**
      * Removes a block.
      */
-    public void removeBlock() {
+    void removeBlock() {
         if (getParent() != null) {
             Intersection is = calcSelectedBlock();
             if (is != null) {
@@ -299,9 +300,9 @@ public final class Player extends RenderableObject {
 
     /**
      * Processes the keyboard input.
-     * 
-     * @param key Pressed key on the keyboard
-     * @param state The state of the key
+     *
+     * @param key         Pressed key on the keyboard
+     * @param state       The state of the key
      * @param repeatEvent True if repeat event
      */
     public void processKeyboardInput(int key, boolean state, boolean repeatEvent) {
@@ -336,9 +337,9 @@ public final class Player extends RenderableObject {
 
     /**
      * Processes the mouse input.
-     * 
+     *
      * @param button Pressed mouse button
-     * @param state State of the mouse button
+     * @param state  State of the mouse button
      */
     public void processMouseInput(int button, boolean state) {
         if (button == 0 && state) {
@@ -375,7 +376,7 @@ public final class Player extends RenderableObject {
     /**
      * Checks for blocks below and above the player.
      *
-     * @param oldPosition The position before the player's position was updated
+     * @param origin
      * @return True if a vertical collision was detected
      */
     private boolean verticalHitTest(Vector3f origin) {
@@ -390,7 +391,7 @@ public final class Player extends RenderableObject {
             return false;
         }
 
-        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end;) {
+        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
             byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
 
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
@@ -407,9 +408,8 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * 
      * @param origin
-     * @return 
+     * @return
      */
     private FastList<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
         /*
@@ -437,15 +437,16 @@ public final class Player extends RenderableObject {
 
     /**
      * Checks for blocks around the player.
-     * 
-     * @param oldPosition The position before the player's position was updated
+     *
+     * @param origin
+     * @return
      */
     private boolean horizontalHitTest(Vector3f origin) {
         boolean result = false;
         FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
         // Check each block positions for collisions
-        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end;) {
+        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
             byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
 
             if (!Block.getBlockForType(blockType1).isPenetrable()) {
@@ -474,10 +475,8 @@ public final class Player extends RenderableObject {
 
     /**
      * Updates the position of the player.
-     * 
+     * <p/>
      * TODO: Fix easing-artifact
-     * 
-     * @param delta Delta value since the last frame update
      */
     private void updatePlayerPosition() {
         // Save the previous position before changing any of the values
@@ -485,8 +484,8 @@ public final class Player extends RenderableObject {
         oldPosition.set(_position);
 
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-           _position.z += 0.1;
-           return;
+            _position.z += 0.1;
+            return;
         }
 
         /*
@@ -587,13 +586,13 @@ public final class Player extends RenderableObject {
      *
      * @return The parent world
      */
-    public World getParent() {
+    World getParent() {
         return _parent;
     }
 
     /**
      * Sets the parent world an resets the player.
-     * 
+     *
      * @param parent The parent world
      */
     public void setParent(World parent) {
@@ -601,8 +600,7 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * 
-     * @return 
+     * @return
      */
     public Vector3f getViewDirection() {
         return _viewingDirection;
@@ -610,10 +608,10 @@ public final class Player extends RenderableObject {
 
     /**
      * Cycles the selected block type.
-     * 
+     *
      * @param upDown Cycling direction
      */
-    public void cycleBlockTypes(int upDown) {
+    void cycleBlockTypes(int upDown) {
         _selectedBlockType += upDown;
 
         if (_selectedBlockType >= Block.getBlockCount()) {
@@ -625,7 +623,7 @@ public final class Player extends RenderableObject {
 
     /**
      * Returns some information about the player as a string.
-     * 
+     *
      * @return
      */
     @Override
@@ -635,16 +633,16 @@ public final class Player extends RenderableObject {
 
     /**
      * Returns player's AABB.
-     * 
-     * @return 
+     *
+     * @return
      */
-    public AABB getAABB() {
+    AABB getAABB() {
         return new AABB(_position, VectorPool.getVector(.3f, 0.7f, .3f));
     }
 
     /**
      * Returns the spawning point of the player.
-     * 
+     *
      * @return The coordinates of the spawning point
      */
     public static Vector3f getPlayerOrigin() {
@@ -652,7 +650,6 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * 
      * @return
      */
     public double getYaw() {
@@ -660,7 +657,6 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * 
      * @return
      */
     public double getPitch() {

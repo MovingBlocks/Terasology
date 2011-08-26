@@ -61,29 +61,21 @@ public final class Configuration {
      */
     public static final byte MAX_LIGHT = 15;
     /**
-     * Minimum light value.
-     */
-    public static final byte MIN_LIGHT = 0;
-    /**
-     * The intensity at which surrounding blocks 'dim' each other.
-     */
-    public static final float OCCLUSION_INTENS = 0.5f;
-    /**
      * The intensity at which the front and back side of blocks are constantly 'dimmed'.
      */
     public static final float BLOCK_SIDE_DIMMING = 0.65f;
     /**
-     * 
+     *
      */
     public static final int DL_UPDATES_PER_CYCLE = 2;
     /**
-     * 
+     *
      */
-    public static final float PROB_COAL = -3f;
+    public static final float PROB_COAL = -2f;
     /**
-     * 
+     *
      */
-    public static final float PROB_GOLD = -3.5f;
+    public static final float PROB_GOLD = -2.5f;
     /* ------- */
     private static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
@@ -94,7 +86,7 @@ public final class Configuration {
 
     /**
      * Returns a numeric value of a setting for a given key.
-     * 
+     *
      * @param key The key
      * @return The numeric value
      */
@@ -104,7 +96,7 @@ public final class Configuration {
 
     /**
      * Returns the boolean value of a setting for a given key.
-     * 
+     *
      * @param key The key
      * @return The boolean value
      */
@@ -114,8 +106,8 @@ public final class Configuration {
 
     /**
      * Sets a boolean value of a setting for a given key.
-     * 
-     * @param key The key
+     *
+     * @param key   The key
      * @param value The boolean value
      */
     public static void setSetting(String key, Boolean value) {
@@ -125,7 +117,7 @@ public final class Configuration {
     /**
      * Sets a numeric value of a setting for a given key.
      *
-     * @param key The key
+     * @param key   The key
      * @param value The numeric value
      */
     public static void setSetting(String key, Float value) {
@@ -135,7 +127,7 @@ public final class Configuration {
     /**
      * Loads the default values for the global settings.
      */
-    public static void loadDefaults() {
+    private static void loadDefaults() {
         _settingsBoolean.put("PLACING_BOX", true);
         _settingsBoolean.put("CHUNK_OUTLINES", false);
         _settingsBoolean.put("DEBUG", false);
@@ -155,10 +147,9 @@ public final class Configuration {
 
     /**
      * Loads the saved settings.
-     * 
      * TODO: Should not always load the default settings.
      */
-    public static void loadSettings() {
+    private static void loadSettings() {
         loadDefaults();
     }
 }

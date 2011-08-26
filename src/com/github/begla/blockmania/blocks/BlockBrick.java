@@ -18,17 +18,16 @@ package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A brick block.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockBrick extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-       return Helper.getInstance().calcOffsetForTextureAt(7, 0);
+        return Helper.getInstance().calcOffsetForTextureAt(7, 0);
     }
 }

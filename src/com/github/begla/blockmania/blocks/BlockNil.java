@@ -17,7 +17,7 @@ package com.github.begla.blockmania.blocks;
 
 /**
  * A nil block. Usable as placeholder for 'impossible' block types.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockNil extends Block {

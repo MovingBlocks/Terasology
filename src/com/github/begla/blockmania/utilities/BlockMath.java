@@ -16,13 +16,11 @@
 package com.github.begla.blockmania.utilities;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockMath {
 
     /**
-     * 
      * @param x
      * @param y
      * @param q11
@@ -33,7 +31,7 @@ public class BlockMath {
      * @param x2
      * @param y1
      * @param y2
-     * @return 
+     * @return
      */
     public static float biLerp(float x, float y, float q11, float q12, float q21, float q22, float x1, float x2, float y1, float y2) {
         float r1 = lerp(x, x1, x2, q11, q21);
@@ -44,8 +42,8 @@ public class BlockMath {
     /*
      * 
      */
+
     /**
-     * 
      * @param x
      * @param q00
      * @param q01
@@ -53,12 +51,11 @@ public class BlockMath {
      * @param x2
      * @return
      */
-    public static float lerp(float x, float x1, float x2, float q00, float q01) {
+    private static float lerp(float x, float x1, float x2, float q00, float q01) {
         return ((x2 - x) / (x2 - x1)) * q00 + ((x - x1) / (x2 - x1)) * q01;
     }
 
     /**
-     * 
      * @param x
      * @param y
      * @param z
@@ -101,7 +98,7 @@ public class BlockMath {
 
     /**
      * Inverse function of Cantor's pairing function.
-     * 
+     *
      * @param c Cantor value
      * @return Value along the x-axis
      */
@@ -112,11 +109,11 @@ public class BlockMath {
 
     /**
      * Inverse function of Cantor's pairing function.
-     * 
+     *
      * @param c Cantor value
      * @return Value along the y-axis
      */
-    public static int cantorY(int c) {
+    private static int cantorY(int c) {
         int j = (int) Math.floor(Math.sqrt(0.25 + 2 * c) - 0.5);
         return c - j * (j + 1) / 2;
     }

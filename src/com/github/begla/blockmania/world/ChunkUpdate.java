@@ -16,16 +16,14 @@
 package com.github.begla.blockmania.world;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ChunkUpdate implements Comparable<ChunkUpdate> {
 
-    private boolean _updateNeighbors;
-    private Chunk _chunk;
+    private final boolean _updateNeighbors;
+    private final Chunk _chunk;
 
     /**
-     * 
      * @param _updateNeighbors
      * @param _chunk
      */
@@ -35,7 +33,6 @@ public final class ChunkUpdate implements Comparable<ChunkUpdate> {
     }
 
     /**
-     * 
      * @return
      */
     public boolean isUpdateNeighbors() {
@@ -43,7 +40,6 @@ public final class ChunkUpdate implements Comparable<ChunkUpdate> {
     }
 
     /**
-     * 
      * @return
      */
     public Chunk getChunk() {
@@ -51,26 +47,21 @@ public final class ChunkUpdate implements Comparable<ChunkUpdate> {
     }
 
     /**
-     * 
-     * @return 
+     * @return
      */
-    public double getWeight() {
-        double weight = _chunk.distanceToPlayer();
-        return weight;
+    double getWeight() {
+        return _chunk.distanceToPlayer();
     }
 
     /**
-     * 
      * @param o
      * @return
      */
-    @Override
     public int compareTo(ChunkUpdate o) {
         return new Double(getWeight()).compareTo(o.getWeight());
     }
 
     /**
-     * 
      * @param o
      * @return
      */
@@ -84,7 +75,6 @@ public final class ChunkUpdate implements Comparable<ChunkUpdate> {
     }
 
     /**
-     * 
      * @return
      */
     @Override

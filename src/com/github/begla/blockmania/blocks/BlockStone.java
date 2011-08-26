@@ -22,7 +22,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A stone block.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockStone extends Block {
@@ -39,6 +39,6 @@ public class BlockStone extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-       return Helper.getInstance().calcOffsetForTextureAt(1, 0);
+        return Helper.getInstance().calcOffsetForTextureAt(1, 0);
     }
 }

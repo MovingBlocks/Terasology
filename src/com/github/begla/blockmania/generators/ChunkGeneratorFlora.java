@@ -16,11 +16,11 @@
 
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockDirt;
 import com.github.begla.blockmania.blocks.BlockWater;
+import com.github.begla.blockmania.world.Chunk;
 
 /**
  * Generates grass (substitutes dirt blocks), flowers and high grass.
@@ -31,7 +31,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorForest {
 
     /**
      * Init. the flora generator.
-     * 
+     *
      * @param seed
      */
     public ChunkGeneratorFlora(String seed) {
@@ -40,7 +40,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorForest {
 
     /**
      * Apply the generation process to the given chunk.
-     * 
+     *
      * @param c
      */
     @Override

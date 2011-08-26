@@ -18,11 +18,10 @@ package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector4f;
 
 /**
  * An ice block.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockIce extends Block {
@@ -31,10 +30,10 @@ public class BlockIce extends Block {
     public boolean isBlockTypeTranslucent() {
         return true;
     }
-    
-    
+
+
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-       return Helper.getInstance().calcOffsetForTextureAt(3, 4);
+        return Helper.getInstance().calcOffsetForTextureAt(3, 4);
     }
 }

@@ -20,7 +20,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 /**
  * An air block.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockAir extends Block {

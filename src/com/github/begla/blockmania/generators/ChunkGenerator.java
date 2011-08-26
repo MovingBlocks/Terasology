@@ -16,9 +16,9 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.PerlinNoise;
+import com.github.begla.blockmania.world.Chunk;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
@@ -32,35 +32,35 @@ public abstract class ChunkGenerator {
     /**
      * First Perlin noise generator.
      */
-    protected PerlinNoise _pGen1;
+    final PerlinNoise _pGen1;
     /**
      * Second Perlin noise generator.
      */
-    protected PerlinNoise _pGen2;
+    final PerlinNoise _pGen2;
     /**
      * Third Perlin noise generator.
      */
-    protected PerlinNoise _pGen3;
+    final PerlinNoise _pGen3;
     /**
      * Fast random number generator.
      */
-    protected final FastRandom _rand;
+    final FastRandom _rand;
 
     /**
      * Init. the generator with a given seed value.
-     * 
+     *
      * @param seed
      */
-    public ChunkGenerator(String seed) {
+    ChunkGenerator(String seed) {
         _rand = new FastRandom(seed.hashCode());
         _pGen1 = new PerlinNoise(seed.hashCode());
-        _pGen2 = new PerlinNoise(seed.hashCode()+1);
-        _pGen3 = new PerlinNoise(seed.hashCode()+2);
+        _pGen2 = new PerlinNoise(seed.hashCode() + 1);
+        _pGen3 = new PerlinNoise(seed.hashCode() + 2);
     }
 
     /**
      * Apply the generation process to the given chunk.
-     * 
+     *
      * @param c
      */
     public void generate(Chunk c) {
@@ -68,29 +68,26 @@ public abstract class ChunkGenerator {
     }
 
     /**
-     * 
      * @param c
      * @return
      */
-    public int getOffsetX(Chunk c) {
+    int getOffsetX(Chunk c) {
         return (int) c.getPosition().x * (int) Configuration.CHUNK_DIMENSIONS.x;
     }
 
     /**
-     * 
      * @param c
      * @return
      */
-    public int getOffsetY(Chunk c) {
+    int getOffsetY(Chunk c) {
         return (int) c.getPosition().y * (int) Configuration.CHUNK_DIMENSIONS.y;
     }
 
     /**
-     * 
      * @param c
      * @return
      */
-    public int getOffsetZ(Chunk c) {
+    int getOffsetZ(Chunk c) {
         return (int) c.getPosition().z * (int) Configuration.CHUNK_DIMENSIONS.z;
     }
 }

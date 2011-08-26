@@ -21,7 +21,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A leaf block.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockDarkLeaf extends Block {
@@ -47,7 +47,6 @@ public class BlockDarkLeaf extends Block {
     }
 
     /**
-     * 
      * @return
      */
     @Override

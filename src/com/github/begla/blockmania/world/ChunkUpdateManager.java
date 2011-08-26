@@ -16,12 +16,12 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
-import java.util.Collection;
-import java.util.Collections;
 import javolution.util.FastList;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ChunkUpdateManager {
@@ -30,10 +30,9 @@ public final class ChunkUpdateManager {
     private final FastList<ChunkUpdate> _chunkUpdates = new FastList<ChunkUpdate>(1024);
     private int _amountGeneratedChunks = 0;
     private double _meanUpdateDuration = 0.0f;
-    private World _parent;
+    private final World _parent;
 
     /**
-     * 
      * @param _parent
      */
     public ChunkUpdateManager(World _parent) {
@@ -41,18 +40,24 @@ public final class ChunkUpdateManager {
     }
 
     /**
-     * 
+     *
      */
     public void updateChunk() {
         long timeStart = System.currentTimeMillis();
-        timeStart = System.currentTimeMillis();
 
-        ChunkUpdate closestChunkUpdate = null;
+        ChunkUpdate closestChunkUpdate;
+
+        Collections.sort(_chunkUpdates);
         removeInvisibleChunkUpdates();
-        
+
         if (!_chunkUpdates.isEmpty()) {
             closestChunkUpdate = _chunkUpdates.removeFirst();
 
+            // IMPORTANT: Do not touch any chunks which display lists are being generated at the moment!!
+            if (_displayListUpdates.contains(closestChunkUpdate))
+                return;
+
+            // Ignore chunks out of view
             if (!_parent.isChunkVisible(closestChunkUpdate.getChunk())) {
                 return;
             }
@@ -65,12 +70,13 @@ public final class ChunkUpdateManager {
     }
 
     /**
-     * 
+     *
      */
     public void updateDisplayLists() {
         for (int i = 0; i < Configuration.DL_UPDATES_PER_CYCLE; i++) {
             // Take one chunk from the queue
-            try {
+
+            if (_displayListUpdates.size() > 0) {
                 ChunkUpdate cu = _displayListUpdates.getFirst();
 
                 if (cu != null) {
@@ -88,35 +94,28 @@ public final class ChunkUpdateManager {
                         }
                     }
 
-                    // Remove the center chunk
                     _displayListUpdates.remove(cu);
                 }
-            } catch (Exception e) {
             }
-
         }
     }
 
     /**
-     * 
      * @param c
      * @param updateNeighbors
      * @param markDirty
-     * @param forceInvisibleChunks 
+     * @param forceInvisibleChunks
      */
     public void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty, boolean forceInvisibleChunks) {
         if (markDirty) {
             c.setDirty(true);
         }
-
         // Do not queue clean chunks
         if (c.isDirty() && (_parent.isChunkVisible(c) || forceInvisibleChunks)) {
             ChunkUpdate cu = new ChunkUpdate(updateNeighbors, c);
 
             if (!_chunkUpdates.contains(cu)) {
                 _chunkUpdates.add(cu);
-
-                Collections.sort(_chunkUpdates);
             }
         }
     }
@@ -124,7 +123,7 @@ public final class ChunkUpdateManager {
     /**
      * TODO
      *
-     * @param c The chunk to process
+     * @param cu
      */
     private void processChunkUpdate(ChunkUpdate cu) {
         if (cu != null) {
@@ -145,9 +144,9 @@ public final class ChunkUpdateManager {
              * Before starting the illumination process, make sure that the neighbor chunks
              * are present and generated.
              */
-            for (int i = 0; i < neighbors.length; i++) {
-                if (neighbors[i] != null) {
-                    neighbors[i].generate();
+            for (Chunk neighbor : neighbors) {
+                if (neighbor != null) {
+                    neighbor.generate();
                 }
             }
 
@@ -162,16 +161,16 @@ public final class ChunkUpdateManager {
                 lightCalculated = true;
             }
 
-            for (int i = 0; i < neighbors.length; i++) {
-                if (neighbors[i] != null) {
-                    if (neighbors[i].isDirty() && cu.isUpdateNeighbors()) {
-                        if (neighbors[i].isLightDirty()) {
-                            queueChunkForUpdate(neighbors[i], false, false, false);
+            for (Chunk neighbor : neighbors) {
+                if (neighbor != null) {
+                    if (neighbor.isDirty() && cu.isUpdateNeighbors()) {
+                        if (neighbor.isLightDirty()) {
+                            queueChunkForUpdate(neighbor, false, false, false);
                         } else {
-                            neighbors[i].generateVertexArrays();
+                            neighbor.generateVertexArrays();
                         }
                     } else if (lightCalculated) {
-                        queueChunkForUpdate(neighbors[i], false, false, false);
+                        queueChunkForUpdate(neighbor, false, false, false);
                     }
                 }
             }
@@ -192,7 +191,6 @@ public final class ChunkUpdateManager {
     }
 
     /**
-     * 
      * @return
      */
     public int updatesSize() {
@@ -200,7 +198,6 @@ public final class ChunkUpdateManager {
     }
 
     /**
-     * 
      * @return
      */
     public int updatesDLSize() {
@@ -208,17 +205,16 @@ public final class ChunkUpdateManager {
     }
 
     /**
-     * 
      * @param updates
      */
-    public void removeChunkUpdates(Collection<ChunkUpdate> updates) {
+    void removeChunkUpdates(Collection<ChunkUpdate> updates) {
         _chunkUpdates.removeAll(updates);
     }
 
-    public void removeInvisibleChunkUpdates() {
+    void removeInvisibleChunkUpdates() {
         FastList<ChunkUpdate> updatesToDelete = new FastList<ChunkUpdate>();
 
-        for (FastList.Node<ChunkUpdate> n = _chunkUpdates.tail(), end = _chunkUpdates.head(); (n = n.getPrevious()) != end;) {
+        for (FastList.Node<ChunkUpdate> n = _chunkUpdates.tail(), end = _chunkUpdates.head(); (n = n.getPrevious()) != end; ) {
 
             Chunk c = n.getValue().getChunk();
 
@@ -235,7 +231,6 @@ public final class ChunkUpdateManager {
     }
 
     /**
-     * 
      * @return
      */
     public double getMeanUpdateDuration() {
@@ -243,7 +238,6 @@ public final class ChunkUpdateManager {
     }
 
     /**
-     * 
      * @return
      */
     public int getAmountGeneratedChunks() {

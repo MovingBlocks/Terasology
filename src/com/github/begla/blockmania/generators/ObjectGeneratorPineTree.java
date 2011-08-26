@@ -26,7 +26,6 @@ import com.github.begla.blockmania.world.World;
 public class ObjectGeneratorPineTree extends ObjectGenerator {
 
     /**
-     * 
      * @param w
      * @param seed
      */

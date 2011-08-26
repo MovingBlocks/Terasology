@@ -21,7 +21,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 /**
  * A dirt block.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockDirt extends Block {

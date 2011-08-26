@@ -21,7 +21,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A grass block.
- * 
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockGrass extends Block {

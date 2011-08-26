@@ -16,8 +16,7 @@
 package com.github.begla.webupdater;
 
 import com.github.begla.blockmania.utilities.Helper;
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,10 +26,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class WebUpdater {
@@ -38,7 +35,7 @@ public class WebUpdater {
     public WebUpdater() {
     }
 
-    public ArrayList<UpdateComponent> getUpdateComponents() {
+    ArrayList<UpdateComponent> getUpdateComponents() {
         ArrayList<UpdateComponent> result = new ArrayList<UpdateComponent>();
 
         try {
@@ -53,7 +50,7 @@ public class WebUpdater {
         return result;
     }
 
-    public boolean isUpToDate() {
+    boolean isUpToDate() {
         ArrayList<UpdateComponent> components = getUpdateComponents();
 
         for (UpdateComponent c : components) {
@@ -101,8 +98,8 @@ public class WebUpdater {
             for (UpdateComponent c : components) {
                 Helper.LOGGER.log(Level.INFO, "Downloading... {0}", c.getFileName());
 
-                InputStream is = null;
-                FileOutputStream fos = null;
+                InputStream is;
+                FileOutputStream fos;
 
                 is = c.getURL().openStream();
                 fos = new FileOutputStream(c.getLocalPath());
