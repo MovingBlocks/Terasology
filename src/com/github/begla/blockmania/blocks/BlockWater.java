@@ -52,6 +52,6 @@ public class BlockWater extends Block {
 
     @Override
     public boolean isRemovable() {
-        return false;
+        return true;
     }
 }

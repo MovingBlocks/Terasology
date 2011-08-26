@@ -36,8 +36,8 @@ void main(){
         Blocklight has a reddish color.
     */
     blocklightValue.r *= 1.0;
-    blocklightValue.g *= 0.4;
-    blocklightValue.b *= 0.2;
+    blocklightValue.g *= 0.7;
+    blocklightValue.b *= 0.7;
 
     /*
         Nights are slightly bluish and not completely black.
