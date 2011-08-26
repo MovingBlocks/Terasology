@@ -226,7 +226,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noise(0.0009f * x, 0.0009f, 0.0009f * z);
+        result += _pGen1.noise(0.001f * x, 0.001f, 0.001f * z) * 0.7;
         return result;
     }
 
@@ -266,17 +266,28 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcMountainDensity(float x, float y, float z) {
         float result = 0.0f;
+
+                // Turbulence
+        float turb = (float)_pGen1.noise(x*0.4, y*0.4, z *0.4) * 2f;
+        x+= turb;
+        y+= turb;
+        z+= turb;
         
-        x *= 0.005;
-        y *= 0.0048;
-        z *= 0.005;
-      
-        result += _pGen2.noise(x * 11.55, y * 11.55, z * 11.55) * 0.05;
-        result += _pGen2.noise(x * 11.44, y * 11.44, z * 11.44) * 0.125;
-        result += _pGen2.noise(x * 8.03, y * 8.03, z * 8.03) * 0.25;
-        result += _pGen2.noise(x * 5.96, y * 5.96, z * 5.96) * 0.1;
+        x *= 0.002;
+        y *= 0.004;
+        z *= 0.002;
+
+        result += _pGen2.noise(x * 24.55, y * 24.55, z * 24.55) * 0.005;
+        result += _pGen2.noise(x * 23.44, y * 23.44, z * 23.44) * 0.01;
+        result += _pGen2.noise(x * 22.03, y * 22.03, z * 22.03) * 0.01;
+        result += _pGen2.noise(x * 20.99, y * 20.99, z * 20.99) * 0.02;
+        result += _pGen2.noise(x * 18.96, y *  18.96, z * 18.96) * 0.03;
+        result += _pGen2.noise(x * 16.96, y * 16.96, z * 16.96) * 0.05;
+        result += _pGen2.noise(x * 14.48, y *14.48, z * 4.48) * 0.1;
+        result += _pGen2.noise(x * 12.28, y * 12.28, z * 12.28) * 0.1;
+        result += _pGen2.noise(x * 9.96, y * 9.96, z * 9.96) * 0.2;
         result += _pGen2.noise(x * 1.01, y * 1.01, z * 1.01) * 1.00;
-        
+
         return result;
     }
 }

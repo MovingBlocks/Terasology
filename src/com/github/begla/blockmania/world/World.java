@@ -202,7 +202,7 @@ public final class World extends RenderableObject {
                     /*
                      * Update chunks queued for updating.
                      */
-                    _chunkUpdateManager.updateChunks();
+                    _chunkUpdateManager.updateChunk();
 
                     // Update the the list of visible chunks
                     _visibleChunks = fetchVisibleChunks();
@@ -1120,8 +1120,8 @@ public final class World extends RenderableObject {
     public Chunk prepareNewChunk(int x, int z) {
         FastList<ChunkGenerator> gs = new FastList<ChunkGenerator>();
         gs.add(_generatorTerrain);
-        gs.add(_generatorLakes);
         gs.add(_generatorMountain);
+        gs.add(_generatorLakes);
         gs.add(_generatorResources);
         gs.add(_generatorForest);
 

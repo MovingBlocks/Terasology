@@ -31,6 +31,7 @@ public final class ChunkUpdateManager {
     private int _amountGeneratedChunks = 0;
     private double _meanUpdateDuration = 0.0f;
     private World _parent;
+    private int tick = 0;
 
     /**
      * 
@@ -43,27 +44,32 @@ public final class ChunkUpdateManager {
     /**
      * 
      */
-    public void updateChunks() {
+    public void updateChunk() {
+        if (tick % 10 == 0)
+            removeInvisibleChunkUpdates();
+        
         long timeStart = System.currentTimeMillis();
         timeStart = System.currentTimeMillis();
 
-        ChunkUpdate nearestChunkUpdate = null;
+        ChunkUpdate closestChunkUpdate = null;
 
         if (!_chunkUpdates.isEmpty()) {
-            nearestChunkUpdate = _chunkUpdates.getFirst();
+            closestChunkUpdate = _chunkUpdates.getFirst();
         }
 
-        if (nearestChunkUpdate != null) {
-            _chunkUpdates.remove(nearestChunkUpdate);
+        if (closestChunkUpdate != null) {
+            _chunkUpdates.remove(closestChunkUpdate);
             
-            if (!_parent.isChunkVisible(nearestChunkUpdate.getChunk())) {
+            if (!_parent.isChunkVisible(closestChunkUpdate.getChunk())) {
                 return;
             }
-            processChunkUpdate(nearestChunkUpdate);
+            processChunkUpdate(closestChunkUpdate);
         }
 
         _meanUpdateDuration += System.currentTimeMillis() - timeStart;
         _meanUpdateDuration /= 2;
+        
+        tick++;
     }
 
     /**
