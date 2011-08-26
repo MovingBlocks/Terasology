@@ -53,43 +53,64 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     @Override
     public void generate(Chunk c) {
-        /*
-         * Fetch the bilinear interpolated height map.
-         */
-        float[][] heightMap = generateHeightMap(c);
+        float[][][] densityMap = new float[(int) Configuration.CHUNK_DIMENSIONS.x + 1][(int) Configuration.CHUNK_DIMENSIONS.y + 1][(int) Configuration.CHUNK_DIMENSIONS.z + 1];
 
         /*
-         * Generate the chunk from the values of the height map.
+         * Create the density map at a lower sample rate.
+         */
+        for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x += SAMPLE_RATE_3D_HOR) {
+            for (int z = 0; z <= Configuration.CHUNK_DIMENSIONS.z; z += SAMPLE_RATE_3D_HOR) {
+                for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.y; y += SAMPLE_RATE_3D_VERT) {
+                    float density = calcMountainDensity(x + getOffsetX(c), y + getOffsetY(c), z + getOffsetZ(c));
+
+                    float height = calcHeightMap(x + getOffsetX(c), z + getOffsetZ(c));
+                    
+                    density = height + density;
+                    density /= (y + 1) * 2f;
+
+                    densityMap[x][y][z] = density;
+                }
+            }
+        }
+
+        /*
+         * Trilinear interpolate the missing values.
+         */
+        triLerpDensityMap(densityMap);
+
+        /*
+         * Generate the chunk from the density map.
          */
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                int height = (int) (128f * heightMap[x][z]);
 
-                boolean first = true;
-                for (int i = (int) Configuration.CHUNK_DIMENSIONS.y; i >= 0; i--) {
-                    if (first && i == height) {
-                        first = false;
-                        // Generate grass on the top layer
-                        c.setBlock(x, i, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, i, z, (float) i / (float) height), i));
+                boolean set = false;
+                for (int y = (int) Configuration.CHUNK_DIMENSIONS.y; y >= 0; y--) {
 
-                    } else if (i < height) {
-                        c.setBlock(x, i, z, getBlockTypeForPosition(c, x, i, z, (float) i / (float) height));
+                    if (y == 0) { // Stone ground layer
+                        c.setBlock(x, y, z, (byte) 0x8);
+                        break;
                     }
 
-                    /*
-                     * Generate the "ocean".
-                     */
-                    if (i < 32 && i > 0) {
-                        if (c.getBlock(x, i, z) == 0) {
-                            c.setBlock(x, i, z, (byte) 0x4);
+                    if (y < 30 && y > 0) { // Ocean
+                        c.setBlock(x, y, z, (byte) 0x4);
+                    }
+
+                    float dens = densityMap[x][y][z];
+
+                    if ((dens > 0.01f && dens < 0.1f)) {
+                        /*
+                         * The outer layer is made of dirt and grass.
+                         */
+                        if (!set) {
+                            c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, y, z, 1.0f), y));
+                        } else {
+                            c.setBlock(x, y, z, getBlockTypeForPosition(c, x, y, z, 1.0f));
                         }
-                    }
-
-                    /*
-                     * Generate hard stone layer.
-                     */
-                    if (i == 0) {
-                        c.setBlock(x, i, z, (byte) 0x8);
+                        set = true;
+                    } else if (dens >= 0.1f) {
+                        c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(c, x, y, z, 0.2f), y));
+                        set = true;
                     }
                 }
             }
@@ -127,6 +148,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * 
      * @param heightMap
      */
+    @Deprecated
     protected void biLerpHeightMap(float[][] heightMap) {
         /*
          * Bilinear interpolate the missing values.
@@ -213,7 +235,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @return 
      */
     public float calcHeightMap(float x, float z) {
-        float heightMap = (float) calcTerrainElevation(x, z) + (calcTerrainRoughness(x, z) * 0.1f + calcTerrainDetail(x, z) * 0.05f);
+        float heightMap = (float) (calcTerrainElevation(x, z) + calcLakeIntensity(x, z) * 0.2) * 0.5f + calcTerrainRoughness(x, z) * 0.3f + calcTerrainDetail(x, z) * 0.1f ;
         return heightMap;
     }
 
@@ -226,7 +248,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noise(0.001f * x, 0.001f, 0.001f * z) * 0.7;
+        result += _pGen1.noise(0.001f * x, 0.001f, 0.001f * z);
         return result;
     }
 
@@ -239,7 +261,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.multiFractalNoise(0.009f * x, 0.009f, 0.009f * z, 16, 2.351421f);
+        result += _pGen2.multiFractalNoise(0.0008f * x, 0.0008f, 0.0008f * z, 16, 2.351421f);
 
         return result;
     }
@@ -253,7 +275,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     protected float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.ridgedMultiFractalNoise(x * 0.008f, 0.008f, z * 0.008f, 8, 1.2f, 3f, 1f);
+        result += _pGen3.ridgedMultiFractalNoise(x * 0.004f, 0.004f, z * 0.004f, 8, 1.2f, 3f, 1f);
         return result;
     }
 
@@ -267,27 +289,39 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     protected float calcMountainDensity(float x, float y, float z) {
         float result = 0.0f;
 
-                // Turbulence
-        float turb = (float)_pGen1.noise(x*0.4, y*0.4, z *0.4) * 2f;
-        x+= turb;
-        y+= turb;
-        z+= turb;
-        
-        x *= 0.002;
-        y *= 0.004;
-        z *= 0.002;
+        // Turbulence
+        float turb = (float) _pGen3.multiFractalNoise(x * 0.07, y * 0.07, z * 0.07, 6, 2.372618) * 32f;
+        x += turb;
+        y += turb;
+        z += turb;
 
-        result += _pGen2.noise(x * 24.55, y * 24.55, z * 24.55) * 0.005;
-        result += _pGen2.noise(x * 23.44, y * 23.44, z * 23.44) * 0.01;
-        result += _pGen2.noise(x * 22.03, y * 22.03, z * 22.03) * 0.01;
-        result += _pGen2.noise(x * 20.99, y * 20.99, z * 20.99) * 0.02;
-        result += _pGen2.noise(x * 18.96, y *  18.96, z * 18.96) * 0.03;
-        result += _pGen2.noise(x * 16.96, y * 16.96, z * 16.96) * 0.05;
-        result += _pGen2.noise(x * 14.48, y *14.48, z * 4.48) * 0.1;
-        result += _pGen2.noise(x * 12.28, y * 12.28, z * 12.28) * 0.1;
-        result += _pGen2.noise(x * 9.96, y * 9.96, z * 9.96) * 0.2;
+        x *= 0.0004;
+        y *= 0.0005;
+        z *= 0.0004;
+
+        result += _pGen2.noise(x * 76.55, y * 76.55, z * 76.55) * 0.05;
+        result += _pGen2.noise(x * 75.44, y * 75.44, z * 75.44) * 0.10;
+        result += _pGen2.noise(x * 70.03, y * 70.03, z * 70.03) * 0.15;
+        result += _pGen2.noise(x * 60.99, y * 60.99, z * 60.99) * 0.25;
+        result += _pGen2.noise(x * 50.96, y * 50.96, z * 50.96) * 0.35;
+        result += _pGen2.noise(x * 40.96, y * 40.96, z * 40.96) * 0.55;
+        result += _pGen2.noise(x * 24.48, y * 24.48, z * 24.48) * 0.65;
+        result += _pGen2.noise(x * 12.28, y * 8.28, z * 8.28) * 0.7;
         result += _pGen2.noise(x * 1.01, y * 1.01, z * 1.01) * 1.00;
 
         return result;
+    }
+    
+    
+    /**
+     * 
+     * @param x
+     * @param z
+     * @return 
+     */
+    protected float calcLakeIntensity(float x, float z) {
+        float result = 0.0f;
+        result += _pGen3.multiFractalNoise(x * 0.01f, 0.01f, 0.01f * z, 3, 1.9836171f);
+        return (float) Math.sqrt(Math.abs(result));
     }
 }

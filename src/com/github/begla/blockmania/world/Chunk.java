@@ -44,7 +44,6 @@ import java.util.logging.Level;
 import org.newdawn.slick.opengl.Texture;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.opengl.TextureLoader;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -205,6 +204,22 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         _lightDirty = true;
         _dirty = true;
+
+        _quadsTranslucent = new TFloatArrayList();
+        _normalsOpaque = new TFloatArrayList();
+        _normalsTranslucent = new TFloatArrayList();
+        _texTranslucent = new TFloatArrayList();
+        _colorTranslucent = new TFloatArrayList();
+        _quadsOpaque = new TFloatArrayList();
+        _texOpaque = new TFloatArrayList();
+        _colorOpaque = new TFloatArrayList();
+        _quadsBillboard = new TFloatArrayList();
+        _texBillboard = new TFloatArrayList();
+        _colorBillboard = new TFloatArrayList();
+
+        _texLightTranslucent = new TFloatArrayList();
+        _texLightOpaque = new TFloatArrayList();
+        _texLightBillboard = new TFloatArrayList();
     }
 
     /**
@@ -353,23 +368,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the vertex-, texture- and color-arrays.
      */
-    public synchronized void generateVertexArrays() {
+    public void generateVertexArrays() {
         if (!_fresh) {
-            _quadsTranslucent = new TFloatArrayList();
-            _normalsOpaque = new TFloatArrayList();
-            _normalsTranslucent = new TFloatArrayList();
-            _texTranslucent = new TFloatArrayList();
-            _colorTranslucent = new TFloatArrayList();
-            _quadsOpaque = new TFloatArrayList();
-            _texOpaque = new TFloatArrayList();
-            _colorOpaque = new TFloatArrayList();
-            _quadsBillboard = new TFloatArrayList();
-            _texBillboard = new TFloatArrayList();
-            _colorBillboard = new TFloatArrayList();
-
-            _texLightTranslucent = new TFloatArrayList();
-            _texLightOpaque = new TFloatArrayList();
-            _texLightBillboard = new TFloatArrayList();
 
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
@@ -812,9 +812,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the display lists from the pre calculated arrays.
      */
-    public synchronized void generateDisplayLists() {
-        // Check if the vertex arrays are present
-        if (_quadsOpaque == null) {
+    public void generateDisplayLists() {
+        if (_quadsOpaque.isEmpty()) {
             return;
         }
 
@@ -951,23 +950,20 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         generateDisplayList(_displayListBillboard, vb, tb, tb2, cb, null);
 
-        _quadsTranslucent = null;
-        _texTranslucent = null;
-        _colorTranslucent = null;
-        _quadsOpaque = null;
-        _texOpaque = null;
-        _colorOpaque = null;
-        _quadsBillboard = null;
-        _texBillboard = null;
-        _colorBillboard = null;
-
-        _texLightBillboard = null;
-        _texLightOpaque = null;
-        _texLightTranslucent = null;
-
-        _normalsOpaque = null;
-        _normalsTranslucent = null;
-
+        _quadsTranslucent.clear();
+        _normalsTranslucent.clear();
+        _texTranslucent.clear();
+        _colorTranslucent.clear();
+        _texLightTranslucent.clear();
+        _quadsOpaque.clear();
+        _normalsOpaque.clear();
+        _texOpaque.clear();
+        _colorOpaque.clear();
+        _texLightOpaque.clear();
+        _quadsBillboard.clear();
+        _texBillboard.clear();
+        _colorBillboard.clear();
+        _texLightBillboard.clear();
     }
 
     private void generateDisplayList(int displayList, FloatBuffer vb, FloatBuffer tb, FloatBuffer tb2, FloatBuffer cb, FloatBuffer nb) {
@@ -1102,6 +1098,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
         boolean covered = false;
 
+        if (x < 0 || z < 0) {
+            return;
+        }
+
         for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
             Block b = Block.getBlockForType(_blocks[x][y][z]);
 
@@ -1140,6 +1140,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param type  
      */
     public void refreshLightAtLocalPos(int x, int y, int z, LIGHT_TYPE type) {
+        if (x < 0 || z < 0 || y < 0) {
+            return;
+        }
+
         int blockPosX = getBlockWorldPosX(x);
         int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
@@ -1214,6 +1218,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     @Deprecated
     public void unspreadLight(int x, int y, int z, byte oldLightValue, int depth, LIGHT_TYPE type, ArrayList<LightNode> lightSources) {
+        if (x < 0 || z < 0 || y < 0) {
+            return;
+        }
+
         if (depth > oldLightValue) {
             return;
         }
@@ -1300,6 +1308,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param type  
      */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type) {
+        if (x < 0 || z < 0 || y < 0) {
+            return;
+        }
+
         if (depth > lightValue) {
             return;
         }
@@ -1407,7 +1419,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             }
         }
 
-        return -1;
+        return 15;
     }
 
     /**
@@ -1427,6 +1439,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param type  
      */
     public void setLight(int x, int y, int z, byte intens, LIGHT_TYPE type) {
+        if (x < 0 || z < 0 || y < 0) {
+            return;
+        }
+
         if (isFresh()) {
             // Sunlight should not be changed within fresh blocks
             return;
@@ -1529,6 +1545,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return Occlusion amount
      */
     public float simpleOcclusionAmount(int x, int y, int z, int dirX, int dirY, int dirZ) {
+        if (x < 0 || z < 0 || y < 0) {
+            return 0;
+        }
+
         int intens = 0;
 
         ArrayList<Vector3f> positions = new ArrayList<Vector3f>();
@@ -1594,6 +1614,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param z Local block position on the z-axis
      */
     public void markNeighborsDirty(int x, int z) {
+        if (x < 0 || z < 0) {
+            return;
+        }
+
         Chunk[] neighbors = loadOrCreateNeighbors();
 
         if (x == 0 && neighbors[1] != null) {

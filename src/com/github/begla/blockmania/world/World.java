@@ -25,8 +25,6 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.generators.ChunkGeneratorForest;
 import com.github.begla.blockmania.generators.ChunkGeneratorFlora;
-import com.github.begla.blockmania.generators.ChunkGeneratorLakes;
-import com.github.begla.blockmania.generators.ChunkGeneratorMountain;
 import com.github.begla.blockmania.generators.ChunkGeneratorResources;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.ObjectGeneratorFirTree;
@@ -95,10 +93,8 @@ public final class World extends RenderableObject {
     private final ChunkCache _chunkCache = new ChunkCache(this);
     /* ------ */
     private final ChunkGeneratorTerrain _generatorTerrain;
-    private final ChunkGeneratorMountain _generatorMountain;
     private final ChunkGeneratorForest _generatorForest;
     private final ChunkGeneratorResources _generatorResources;
-    private final ChunkGeneratorLakes _generatorLakes;
     private final ChunkGeneratorFlora _generatorGrass;
     private final ObjectGeneratorTree _generatorTree;
     private final ObjectGeneratorPineTree _generatorPineTree;
@@ -158,10 +154,8 @@ public final class World extends RenderableObject {
 
         // Init. generators
         _generatorTerrain = new ChunkGeneratorTerrain(seed);
-        _generatorMountain = new ChunkGeneratorMountain(seed);
         _generatorForest = new ChunkGeneratorForest(seed);
         _generatorResources = new ChunkGeneratorResources(seed);
-        _generatorLakes = new ChunkGeneratorLakes(seed);
         _generatorTree = new ObjectGeneratorTree(this, seed);
         _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
         _generatorFirTree = new ObjectGeneratorFirTree(this, seed);
@@ -378,7 +372,7 @@ public final class World extends RenderableObject {
          */
         if (_dlClouds > 0) {
             glPushMatrix();
-            glTranslatef(_player.getPosition().x + _cloudOffset.x, 100f, _player.getPosition().z + _cloudOffset.y);
+            glTranslatef(_player.getPosition().x + _cloudOffset.x, 180f, _player.getPosition().z + _cloudOffset.y);
             glCallList(_dlClouds);
             glPopMatrix();
         }
@@ -426,7 +420,7 @@ public final class World extends RenderableObject {
                 if (c != null) {
                     // If this chunk was not visible, update it
                     if (!isChunkVisible(c)) {
-                        _chunkUpdateManager.queueChunkForUpdate(c, false, true, true);
+                        _chunkUpdateManager.queueChunkForUpdate(c, false, false, true);
                     }
                     visibleChunks.add(c);
                 }
@@ -694,7 +688,7 @@ public final class World extends RenderableObject {
             return c.getLight(blockPosX, y, blockPosZ, type);
         }
 
-        return 1;
+        return 15;
     }
 
     /**
@@ -1120,8 +1114,6 @@ public final class World extends RenderableObject {
     public Chunk prepareNewChunk(int x, int z) {
         FastList<ChunkGenerator> gs = new FastList<ChunkGenerator>();
         gs.add(_generatorTerrain);
-        gs.add(_generatorMountain);
-        gs.add(_generatorLakes);
         gs.add(_generatorResources);
         gs.add(_generatorForest);
 
@@ -1319,9 +1311,6 @@ public final class World extends RenderableObject {
      * Generates the cloud display list.
      */
     public static void generateCloudDisplayList() {
-
-        FastRandom rand = new FastRandom();
-
         try {
             glNewList(_dlClouds, GL_COMPILE);
             glBegin(GL_QUADS);

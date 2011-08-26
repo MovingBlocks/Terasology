@@ -158,6 +158,6 @@ public final class ChunkCache {
      * @return
      */
     public int capacity() {
-        return Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue() + 512;
+        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) * 2;
     }
 }
