@@ -1,7 +1,22 @@
+ /*
+ *  Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
 package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.player.Intersection;
 import com.github.begla.blockmania.utilities.VectorPool;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
@@ -10,11 +25,9 @@ import org.lwjgl.util.vector.Vector3f;
 import java.util.Collections;
 
 /**
- * Created by IntelliJ IDEA.
- * User: bg
- * Date: 27.08.11
- * Time: 02:21
- * To change this template use File | Settings | File Templates.
+ * Helper class for ray-box intersection tests.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class RayBoxIntersectionHelper {
      /**
@@ -48,11 +61,11 @@ public class RayBoxIntersectionHelper {
      * @param x
      * @param y
      * @param z
-     * @param origin
-     * @param ray
+     * @param rayOrigin
+     * @param rayDirection
      * @return Distance-ordered list of ray-face-intersections
      */
-    public static FastList<Intersection> rayBlockIntersection(World w, int x, int y, int z, Vector3f origin, Vector3f ray) {
+    public static FastList<RayBoxIntersection> rayBlockIntersection(World w, int x, int y, int z, Vector3f rayOrigin, Vector3f rayDirection) {
         /*
          * Ignore invisible blocks.
          */
@@ -60,7 +73,7 @@ public class RayBoxIntersectionHelper {
             return null;
         }
 
-        FastList<Intersection> result = new FastList<Intersection>();
+        FastList<RayBoxIntersection> result = new FastList<RayBoxIntersection>();
 
         /*
          * Fetch all vertices of the specified block.
@@ -73,37 +86,37 @@ public class RayBoxIntersectionHelper {
          */
 
         // Front
-        Intersection is = rayFaceIntersection(blockPos, vertices[0], vertices[3], vertices[2], origin, ray);
+        RayBoxIntersection is = rayFaceIntersection(blockPos, vertices[0], vertices[3], vertices[2], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
 
         // Back
-        is = rayFaceIntersection(blockPos, vertices[4], vertices[5], vertices[6], origin, ray);
+        is = rayFaceIntersection(blockPos, vertices[4], vertices[5], vertices[6], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
 
         // Left
-        is = rayFaceIntersection(blockPos, vertices[0], vertices[4], vertices[7], origin, ray);
+        is = rayFaceIntersection(blockPos, vertices[0], vertices[4], vertices[7], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
 
         // Right
-        is = rayFaceIntersection(blockPos, vertices[1], vertices[2], vertices[6], origin, ray);
+        is = rayFaceIntersection(blockPos, vertices[1], vertices[2], vertices[6], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
 
         // Top
-        is = rayFaceIntersection(blockPos, vertices[3], vertices[7], vertices[6], origin, ray);
+        is = rayFaceIntersection(blockPos, vertices[3], vertices[7], vertices[6], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
 
         // Bottom
-        is = rayFaceIntersection(blockPos, vertices[0], vertices[1], vertices[5], origin, ray);
+        is = rayFaceIntersection(blockPos, vertices[0], vertices[1], vertices[5], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
@@ -126,7 +139,7 @@ public class RayBoxIntersectionHelper {
      * @param ray      Direction of the intersection ray
      * @return Ray-face-intersection
      */
-    private static Intersection rayFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
+    private static RayBoxIntersection rayFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
 
         // Calculate the plane to intersect with
         Vector3f a = Vector3f.sub(v1, v0, null);
@@ -152,7 +165,7 @@ public class RayBoxIntersectionHelper {
         Vector3f.add(intersectPoint, origin, intersectPoint);
 
         if (intersectPoint.x >= v0.x && intersectPoint.x <= v2.x && intersectPoint.y >= v0.y && intersectPoint.y <= v2.y && intersectPoint.z >= v0.z && intersectPoint.z <= v2.z) {
-            return new Intersection(blockPos, v0, v1, v2, d, t, origin, ray, intersectPoint);
+            return new RayBoxIntersection(blockPos, v0, v1, v2, d, t, origin, ray, intersectPoint);
         }
 
         return null;

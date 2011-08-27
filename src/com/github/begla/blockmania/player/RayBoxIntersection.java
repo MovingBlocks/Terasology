@@ -24,7 +24,7 @@ import org.lwjgl.util.vector.Vector3f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Intersection implements Comparable<Intersection> {
+public final class RayBoxIntersection implements Comparable<RayBoxIntersection> {
 
     /**
      *
@@ -82,7 +82,7 @@ public final class Intersection implements Comparable<Intersection> {
      * @param ray
      * @param intersectPoint
      */
-    public Intersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, float d, float t, Vector3f origin, Vector3f ray, Vector3f intersectPoint) {
+    public RayBoxIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, float d, float t, Vector3f origin, Vector3f ray, Vector3f intersectPoint) {
         this.d = d;
         this.t = t;
         this.origin = origin;
@@ -98,7 +98,7 @@ public final class Intersection implements Comparable<Intersection> {
      * @param o
      * @return
      */
-    public int compareTo(Intersection o) {
+    public int compareTo(RayBoxIntersection o) {
         return new Float(Math.abs(getT())).compareTo(Math.abs(o.getT()));
     }
 

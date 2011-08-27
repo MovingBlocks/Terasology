@@ -20,7 +20,6 @@ import com.github.begla.blockmania.RenderableObject;
 import com.github.begla.blockmania.ShaderManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.*;
-import com.github.begla.blockmania.player.Intersection;
 import com.github.begla.blockmania.player.Player;
 import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.utilities.FastRandom;
@@ -43,7 +42,6 @@ import org.xml.sax.InputSource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.Collections;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;

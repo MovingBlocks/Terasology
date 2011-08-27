@@ -38,7 +38,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  * This class contains all functions regarding the player's actions,
  * movement and the orientation of the camera.
  *
- * @author Benjamin Glatzel <benjamin.glawwtzel@me.com>
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class Player extends RenderableObject {
 
@@ -87,7 +87,7 @@ public final class Player extends RenderableObject {
 
         // Position the camera in the upper part of the player's bounding box
         glTranslatef(-_position.x, -_position.y - getAABB().getDimensions().y / 1.2f, -_position.z);
-        Intersection is = calcSelectedBlock();
+        RayBoxIntersection is = calcSelectedBlock();
 
         // Display the block the player is aiming at
         if (Configuration.getSettingBoolean("PLACING_BOX")) {
@@ -207,14 +207,15 @@ public final class Player extends RenderableObject {
      *
      * @return Intersection point of the looked at block
      */
-    Intersection calcSelectedBlock() {
-        FastList<Intersection> inters = new FastList<Intersection>();
+    RayBoxIntersection calcSelectedBlock() {
+        FastList<RayBoxIntersection> inters = new FastList<RayBoxIntersection>();
         for (int x = -4; x < 4; x++) {
             for (int y = -4; y < 4; y++) {
                 for (int z = -4; z < 4; z++) {
                     if (x != 0 || y != 0 || z != 0) {
                         // The ray originates from the "player's eye"
-                        FastList<Intersection> iss = RayBoxIntersectionHelper.rayBlockIntersection(_parent, (int) _position.x + x, (int) _position.y + y, (int) _position.z + z, VectorPool.getVector(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
+                        FastList<RayBoxIntersection> iss = RayBoxIntersectionHelper.rayBlockIntersection(_parent, (int) _position.x + x, (int) _position.y + y, (int) _position.z + z, VectorPool.getVector(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
+
                         if (iss != null) {
                             inters.addAll(iss);
                         }
@@ -238,7 +239,7 @@ public final class Player extends RenderableObject {
      * @return
      */
     public String selectedBlockInformation() {
-        Intersection r = calcSelectedBlock();
+        RayBoxIntersection r = calcSelectedBlock();
         Vector3f bp = r.getBlockPos();
         byte blockType = _parent.getBlock((int) bp.x, (int) bp.y, (int) bp.z);
 
@@ -252,7 +253,7 @@ public final class Player extends RenderableObject {
      */
     public void placeBlock(byte type) {
         if (getParent() != null) {
-            Intersection is = calcSelectedBlock();
+            RayBoxIntersection is = calcSelectedBlock();
             if (is != null) {
                 Vector3f blockPos = is.calcAdjacentBlockPos();
 
@@ -273,7 +274,7 @@ public final class Player extends RenderableObject {
      * @param type The type of the tree
      */
     public void plantTree(int type) {
-        Intersection is = calcSelectedBlock();
+        RayBoxIntersection is = calcSelectedBlock();
         if (is != null) {
             Vector3f blockPos = is.getBlockPos();
 
@@ -290,7 +291,7 @@ public final class Player extends RenderableObject {
      */
     void removeBlock() {
         if (getParent() != null) {
-            Intersection is = calcSelectedBlock();
+            RayBoxIntersection is = calcSelectedBlock();
             if (is != null) {
                 Vector3f blockPos = is.getBlockPos();
                 getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
