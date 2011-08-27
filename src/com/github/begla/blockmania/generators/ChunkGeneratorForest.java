@@ -117,7 +117,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
                 r += 3f;
             }
 
-            if (r > -0.05 && r < 0.05) {
+            if (r > -0.1 && r < 0.1) {
                 double r2 = _rand.standNormalDistrDouble();
                 if (r2 > -2 && r2 < -1) {
                     c.setBlock(x, y + 1, z, (byte) 0x0);
@@ -143,7 +143,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      */
     float calcForestDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.006f * x, 0.006f * y, 0.006f * z, 3, 2.3614521f);
+        result += _pGen3.multiFractalNoise(0.009f * x, 0.009f * y, 0.009f * z, 4, 2.3614521f);
         return result;
     }
 
