@@ -24,7 +24,7 @@ import org.lwjgl.util.vector.Vector3f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-final class RayBoxIntersection implements Comparable<RayBoxIntersection> {
+public final class RayBoxIntersection implements Comparable<RayBoxIntersection> {
 
     /**
      *

@@ -24,7 +24,7 @@ import java.util.logging.Level;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-class UpdateComponent {
+public class UpdateComponent {
 
     private final URL _locationURL;
     private final String _fileName;

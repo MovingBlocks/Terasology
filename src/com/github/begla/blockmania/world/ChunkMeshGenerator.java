@@ -322,7 +322,7 @@ public class ChunkMeshGenerator {
             Vector3f norm = VectorPool.getVector(-1, 0, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.LEFT);
-            float shadowIntens = Configuration.BLOCK_SIDE_DIMMING;
+            float shadowIntens = (Block.getBlockForType(block).isCastingShadows()) ? Configuration.BLOCK_SIDE_DIMMING : 1;
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
@@ -346,7 +346,7 @@ public class ChunkMeshGenerator {
             Vector3f norm = VectorPool.getVector(1, 0, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.RIGHT);
-            float shadowIntens = Configuration.BLOCK_SIDE_DIMMING;
+            float shadowIntens = (Block.getBlockForType(block).isCastingShadows()) ? Configuration.BLOCK_SIDE_DIMMING : 1;
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);

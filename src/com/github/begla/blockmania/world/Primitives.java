@@ -21,7 +21,7 @@ import org.lwjgl.util.vector.Vector3f;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-class Primitives {
+public class Primitives {
 
     /**
      * @param scaleX

@@ -28,7 +28,7 @@ public class BlockLeaf extends Block {
 
     @Override
     public boolean isCastingShadows() {
-        return false;
+        return true;
     }
 
     @Override

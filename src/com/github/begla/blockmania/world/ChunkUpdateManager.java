@@ -24,7 +24,7 @@ import java.util.Collections;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-final class ChunkUpdateManager {
+public final class ChunkUpdateManager {
 
     private final FastList<ChunkUpdate> _displayListUpdates = new FastList<ChunkUpdate>(128);
     private final FastList<ChunkUpdate> _chunkUpdates = new FastList<ChunkUpdate>(1024);

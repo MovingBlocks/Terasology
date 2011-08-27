@@ -185,7 +185,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noise(0.001f * x, 0.001f, 0.001f * z);
+        result += (_pGen1.noise(0.001f * x, 0.001f, 0.001f * z) + 1.0f) / 2f;
         return result;
     }
 

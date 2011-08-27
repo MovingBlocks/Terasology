@@ -266,12 +266,12 @@ public class ChunkMesh extends RenderableObject {
         } else {
             glEnable(GL_BLEND);
             glEnable(GL_ALPHA_TEST);
-            glAlphaFunc(GL_GREATER, 0.1f);
+            glAlphaFunc(GL_GREATER, 0.5f);
 
             if (_displayListTranslucent != -1)
                 glCallList(_displayListTranslucent);
 
-            glDisable(GL_CULL_FACE);
+
             if (_displayListBillboard != -1)
                 glCallList(_displayListBillboard);
             glEnable(GL_CULL_FACE);
