@@ -4,6 +4,7 @@ import com.github.begla.blockmania.RenderableObject;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.list.array.TFloatArrayList;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
 import java.nio.FloatBuffer;
@@ -272,6 +273,7 @@ public class ChunkMesh extends RenderableObject {
                 glCallList(_displayListTranslucent);
 
 
+            glDisable(GL_CULL_FACE);
             if (_displayListBillboard != -1)
                 glCallList(_displayListBillboard);
             glEnable(GL_CULL_FACE);

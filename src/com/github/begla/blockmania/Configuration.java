@@ -29,6 +29,10 @@ import org.lwjgl.util.vector.Vector3f;
 public final class Configuration {
 
     /**
+     * The initial time for new worlds.
+     */
+    public static final float INITIAL_TIME = 0.096f;
+    /**
      * The mouse sensitivity.
      */
     public static final float MOUSE_SENS = 0.075f;

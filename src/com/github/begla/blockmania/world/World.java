@@ -68,7 +68,7 @@ public final class World extends RenderableObject {
     /* ------ */
     private static Texture _textureSun, _textureMoon;
     /* ------ */
-    private float _time = 0f;
+    private float _time = Configuration.INITIAL_TIME;
     private float _daylight = 1.0f;
     private Player _player;
     private Vector3f _spawningPoint;

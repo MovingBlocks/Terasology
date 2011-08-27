@@ -85,7 +85,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                     float dens = densityMap[x][y][z];
 
-                    if ((dens > 0.01f && dens < 0.1f)) {
+                    if ((dens > 0.01f && dens < 0.0104f)) {
                         /*
                          * The outer layer is made of dirt and grass.
                          */
@@ -94,8 +94,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                         } else {
                             c.setBlock(x, y, z, getBlockTypeForPosition(y, 1.0f));
                         }
+
                         set = true;
-                    } else if (dens >= 0.1f) {
+                    } else if (dens >= 0.0104f) {
                         c.setBlock(x, y, z, getBlockTailpiece(getBlockTypeForPosition(y, 0.2f), y));
                         set = true;
                     }
