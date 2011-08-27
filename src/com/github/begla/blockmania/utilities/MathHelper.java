@@ -18,7 +18,7 @@ package com.github.begla.blockmania.utilities;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockMath {
+public class MathHelper {
 
     /**
      * @param x

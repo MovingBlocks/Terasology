@@ -113,7 +113,7 @@ public final class Player extends RenderableObject {
         float dx = Mouse.getDX();
         float dy = Mouse.getDY();
 
-        yaw(dx  * Configuration.MOUSE_SENS);
+        yaw(dx * Configuration.MOUSE_SENS);
         pitch(dy * Configuration.MOUSE_SENS);
 
         processMovement();

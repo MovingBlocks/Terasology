@@ -18,7 +18,6 @@ package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Object generators are used to generate objects within the world.

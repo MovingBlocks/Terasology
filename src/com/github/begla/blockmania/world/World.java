@@ -21,9 +21,9 @@ import com.github.begla.blockmania.ShaderManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.player.Player;
-import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.utilities.VectorPool;
 import javolution.util.FastList;
 import javolution.util.FastSet;
@@ -909,7 +909,7 @@ public final class World extends RenderableObject {
     public void printPlayerChunkPosition() {
         int chunkPosX = calcChunkPosX((int) _player.getPosition().x);
         int chunkPosZ = calcChunkPosX((int) _player.getPosition().z);
-        System.out.println(_chunkCache.getChunkByKey(BlockMath.cantorize(chunkPosX, chunkPosZ)));
+        System.out.println(_chunkCache.getChunkByKey(MathHelper.cantorize(chunkPosX, chunkPosZ)));
     }
 
     /**

@@ -169,7 +169,7 @@ final class ChunkUpdateManager {
                         if (neighbor.isLightDirty()) {
                             queueChunkForUpdate(neighbor, false, false, false);
                         } else {
-                            neighbor.generateVertexArrays();
+                            neighbor.generateMesh();
                         }
                     } else if (lightCalculated) {
                         queueChunkForUpdate(neighbor, false, false, false);
@@ -185,7 +185,7 @@ final class ChunkUpdateManager {
                 /*
                  * ... if yes, regenerate the vertex arrays
                  */
-                cu.getChunk().generateVertexArrays();
+                cu.getChunk().generateMesh();
                 _displayListUpdates.add(cu);
                 _amountGeneratedChunks++;
             }

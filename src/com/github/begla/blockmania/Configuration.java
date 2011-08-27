@@ -29,7 +29,7 @@ import org.lwjgl.util.vector.Vector3f;
 public final class Configuration {
 
     /**
-     * TODO
+     * The mouse sensitivity.
      */
     public static final float MOUSE_SENS = 0.075f;
     /**
@@ -75,11 +75,11 @@ public final class Configuration {
     /**
      *
      */
-    public static final float PROB_COAL = -2f;
+    public static final float PROB_COAL = -1f;
     /**
      *
      */
-    public static final float PROB_GOLD = -2.5f;
+    public static final float PROB_GOLD = -1.5f;
     /* ------- */
     private static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
@@ -145,8 +145,8 @@ public final class Configuration {
         _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
         _settingsNumeric.put("GRAVITY", 0.0075f);
         _settingsNumeric.put("FRICTION", 0.1f);
-        _settingsNumeric.put("V_DIST_X", 24f);
-        _settingsNumeric.put("V_DIST_Z", 24f);
+        _settingsNumeric.put("V_DIST_X", 32f);
+        _settingsNumeric.put("V_DIST_Z", 32f);
     }
 
     /**

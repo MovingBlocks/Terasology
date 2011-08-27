@@ -90,8 +90,7 @@ public class WebUpdater {
         Helper.LOGGER.log(Level.INFO, "Downloading new files...");
         File gfxDir = new File("DATA");
 
-        if (gfxDir.mkdir())
-        {
+        if (gfxDir.mkdir()) {
 
             try {
                 ArrayList<UpdateComponent> components = getUpdateComponents();

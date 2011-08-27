@@ -21,25 +21,18 @@ import com.github.begla.blockmania.ShaderManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
 import com.github.begla.blockmania.generators.ChunkGenerator;
-import com.github.begla.blockmania.utilities.BlockMath;
 import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.utilities.VectorPool;
-import gnu.trove.iterator.TFloatIterator;
-import gnu.trove.list.array.TFloatArrayList;
+import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -67,33 +60,18 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private int _chunkID = -1;
     private static Texture _textureMap;
     /* ------ */
-    private final TFloatArrayList _quadsTranslucent;
-    private final TFloatArrayList _normalsTranslucent;
-    private final TFloatArrayList _texTranslucent;
-    private final TFloatArrayList _colorTranslucent;
-    private final TFloatArrayList _texLightTranslucent;
-    private final TFloatArrayList _quadsOpaque;
-    private final TFloatArrayList _normalsOpaque;
-    private final TFloatArrayList _texOpaque;
-    private final TFloatArrayList _colorOpaque;
-    private final TFloatArrayList _texLightOpaque;
-    private final TFloatArrayList _quadsBillboard;
-    private final TFloatArrayList _texBillboard;
-    private final TFloatArrayList _colorBillboard;
-    private final TFloatArrayList _texLightBillboard;
+    ChunkMesh _activeMesh;
+    ChunkMesh _newMesh;
     /* ------ */
-    private World _parent = null;
-
+    private World _parent;
     /* ------ */
     private final byte[][][] _blocks;
     private final byte[][][] _sunlight;
     private final byte[][][] _light;
     /* ------ */
-    private int _displayListOpaque = -1;
-    private int _displayListTranslucent = -1;
-    private int _displayListBillboard = -1;
-    /* ------ */
     private final FastList<ChunkGenerator> _generators = new FastList<ChunkGenerator>();
+    /* ------ */
+    private ChunkMeshGenerator _meshGenerator;
 
     /**
      *
@@ -110,24 +88,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         SUN
     }
 
-    /**
-     *
-     */
-    public enum RENDER_TYPE {
-
-        /**
-         *
-         */
-        TRANS,
-        /**
-         *
-         */
-        OPAQUE,
-        /**
-         *
-         */
-        BILLBOARD
-    }
 
     /**
      * Init. the textures used within chunks.
@@ -154,33 +114,19 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public Chunk(World p, Vector3f position, FastList<ChunkGenerator> g) {
         this._position = position;
         // Set the chunk ID
-        _chunkID = BlockMath.cantorize((int) _position.x, (int) _position.z);
+        _chunkID = MathHelper.cantorize((int) _position.x, (int) _position.z);
 
         _parent = p;
         _blocks = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
         _sunlight = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
         _light = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
 
+        _meshGenerator = new ChunkMeshGenerator(this);
+
         _generators.addAll(g);
 
         _lightDirty = true;
         _dirty = true;
-
-        _quadsTranslucent = new TFloatArrayList();
-        _normalsOpaque = new TFloatArrayList();
-        _normalsTranslucent = new TFloatArrayList();
-        _texTranslucent = new TFloatArrayList();
-        _colorTranslucent = new TFloatArrayList();
-        _quadsOpaque = new TFloatArrayList();
-        _texOpaque = new TFloatArrayList();
-        _colorOpaque = new TFloatArrayList();
-        _quadsBillboard = new TFloatArrayList();
-        _texBillboard = new TFloatArrayList();
-        _colorBillboard = new TFloatArrayList();
-
-        _texLightTranslucent = new TFloatArrayList();
-        _texLightOpaque = new TFloatArrayList();
-        _texLightBillboard = new TFloatArrayList();
     }
 
     /**
@@ -192,12 +138,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     @Override
     public void render() {
-       render(false);
+        render(true);
+        render(false);
     }
 
     @Override
     public void update() {
-       // Do nothing.
+        // Do nothing.
     }
 
     /**
@@ -250,27 +197,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             glPopMatrix();
         }
 
-        ShaderManager.getInstance().enableShader("chunk");
-        _textureMap.bind();
+        // Render the generated chunk mesh
+        if (_activeMesh != null) {
+            ShaderManager.getInstance().enableShader("chunk");
+            _textureMap.bind();
 
-        if (!translucent) {
-             glCallList(_displayListOpaque);
-        } else {
-            glEnable(GL_BLEND);
-            glEnable(GL_ALPHA_TEST);
-            glAlphaFunc(GL_GREATER, 0.1f);
+            _activeMesh.render(translucent);
 
-            glCallList(_displayListTranslucent);
-
-            glDisable(GL_CULL_FACE);
-            glCallList(_displayListBillboard);
-            glEnable(GL_CULL_FACE);
-
-            glDisable(GL_BLEND);
-            glDisable(GL_ALPHA_TEST);
+            ShaderManager.getInstance().enableShader(null);
         }
-
-        ShaderManager.getInstance().enableShader(null);
     }
 
     /**
@@ -339,664 +274,21 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Generates the vertex-, texture- and color-arrays.
      */
-    public void generateVertexArrays() {
+    public void generateMesh() {
         if (!_fresh) {
-
-            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-                for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-                    for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                        generateBlockVertices(x, y, z);
-                        generateBillboardVertices(x, y, z);
-                    }
-                }
-            }
+            _newMesh = _meshGenerator.generateMesh();
 
             setDirty(false);
             _statVertexArrayUpdateCount++;
         }
     }
 
-    private void addLightTexCoordFor(int x, int y, int z, int dirX, int dirY, int dirZ, RENDER_TYPE r, float dimming) {
-        TFloatArrayList l;
-
-        if (r == RENDER_TYPE.BILLBOARD) {
-            l = _texLightBillboard;
-        } else if (r == RENDER_TYPE.TRANS) {
-            l = _texLightTranslucent;
-        } else {
-            l = _texLightOpaque;
-        }
-
-        float sunlight = (float) _parent.getLight(getBlockWorldPosX(x) + dirX, getBlockWorldPosY(y) + dirY, getBlockWorldPosZ(z) + dirZ, LIGHT_TYPE.SUN) / 15f;
-        float blocklight = (float) _parent.getLight(getBlockWorldPosX(x) + dirX, getBlockWorldPosY(y) + dirY, getBlockWorldPosZ(z) + dirZ, LIGHT_TYPE.BLOCK) / 15f;
-
-        l.add(sunlight * dimming);
-        l.add(blocklight * dimming);
-    }
-
-    /**
-     * Generates the billboard vertices for a given local block position.
-     *
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
-     */
-    private void generateBillboardVertices(int x, int y, int z) {
-        byte block = _blocks[x][y][z];
-        RENDER_TYPE renderType = RENDER_TYPE.BILLBOARD;
-
-        // Ignore normal blocks
-        if (!Block.getBlockForType(block).isBlockBillboard()) {
-            return;
-        }
-
-        float offsetX = _position.x * Configuration.CHUNK_DIMENSIONS.x;
-        float offsetY = _position.y * Configuration.CHUNK_DIMENSIONS.y;
-        float offsetZ = _position.z * Configuration.CHUNK_DIMENSIONS.z;
-
-        /*
-         * First side of the billboard
-         */
-        Vector4f _colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
-        float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x;
-        float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y;
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
-        _colorBillboard.add(_colorBillboardOffset.x);
-        _colorBillboard.add(_colorBillboardOffset.y);
-        _colorBillboard.add(_colorBillboardOffset.z);
-        _colorBillboard.add(_colorBillboardOffset.w);
-        _texBillboard.add(texOffsetX);
-        _texBillboard.add(texOffsetY + 0.0624f);
-        _quadsBillboard.add(-0.5f + x + offsetX);
-        _quadsBillboard.add(-0.5f + y + offsetY);
-        _quadsBillboard.add(z + offsetZ);
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
-        _colorBillboard.add(_colorBillboardOffset.x);
-        _colorBillboard.add(_colorBillboardOffset.y);
-        _colorBillboard.add(_colorBillboardOffset.z);
-        _colorBillboard.add(_colorBillboardOffset.w);
-        _texBillboard.add(texOffsetX + 0.0624f);
-        _texBillboard.add(texOffsetY + 0.0624f);
-        _quadsBillboard.add(0.5f + x + offsetX);
-        _quadsBillboard.add(-0.5f + y + offsetY);
-        _quadsBillboard.add(z + offsetZ);
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
-        _colorBillboard.add(_colorBillboardOffset.x);
-        _colorBillboard.add(_colorBillboardOffset.y);
-        _colorBillboard.add(_colorBillboardOffset.z);
-        _colorBillboard.add(_colorBillboardOffset.w);
-        _texBillboard.add(texOffsetX + 0.0624f);
-        _texBillboard.add(texOffsetY);
-        _quadsBillboard.add(0.5f + x + offsetX);
-        _quadsBillboard.add(0.5f + y + offsetY);
-        _quadsBillboard.add(z + offsetZ);
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
-        _colorBillboard.add(_colorBillboardOffset.x);
-        _colorBillboard.add(_colorBillboardOffset.y);
-        _colorBillboard.add(_colorBillboardOffset.z);
-        _colorBillboard.add(_colorBillboardOffset.w);
-        _texBillboard.add(texOffsetX);
-        _texBillboard.add(texOffsetY);
-        _quadsBillboard.add(-0.5f + x + offsetX);
-        _quadsBillboard.add(0.5f + y + offsetY);
-        _quadsBillboard.add(z + offsetZ);
-
-
-        /*
-         * Second side of the billboard
-         */
-        _colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
-        texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x;
-        texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y;
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
-        _colorBillboard.add(_colorBillboardOffset.x);
-        _colorBillboard.add(_colorBillboardOffset.y);
-        _colorBillboard.add(_colorBillboardOffset.z);
-        _colorBillboard.add(_colorBillboardOffset.w);
-        _texBillboard.add(texOffsetX);
-        _texBillboard.add(texOffsetY + 0.0624f);
-        _quadsBillboard.add(x + offsetX);
-        _quadsBillboard.add(-0.5f + y + offsetY);
-        _quadsBillboard.add(-0.5f + z + offsetZ);
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
-        _colorBillboard.add(_colorBillboardOffset.x);
-        _colorBillboard.add(_colorBillboardOffset.y);
-        _colorBillboard.add(_colorBillboardOffset.z);
-        _colorBillboard.add(_colorBillboardOffset.w);
-        _texBillboard.add(texOffsetX + 0.0624f);
-        _texBillboard.add(texOffsetY + 0.0624f);
-        _quadsBillboard.add(x + offsetX);
-        _quadsBillboard.add(-0.5f + y + offsetY);
-        _quadsBillboard.add(0.5f + z + offsetZ);
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
-        _colorBillboard.add(_colorBillboardOffset.x);
-        _colorBillboard.add(_colorBillboardOffset.y);
-        _colorBillboard.add(_colorBillboardOffset.z);
-        _colorBillboard.add(_colorBillboardOffset.w);
-        _texBillboard.add(texOffsetX + 0.0624f);
-        _texBillboard.add(texOffsetY);
-        _quadsBillboard.add(x + offsetX);
-        _quadsBillboard.add(0.5f + y + offsetY);
-        _quadsBillboard.add(0.5f + z + offsetZ);
-
-        addLightTexCoordFor(x, y, z, 0, 0, 0, renderType, 1f);
-        _colorBillboard.add(_colorBillboardOffset.x);
-        _colorBillboard.add(_colorBillboardOffset.y);
-        _colorBillboard.add(_colorBillboardOffset.z);
-        _colorBillboard.add(_colorBillboardOffset.w);
-        _texBillboard.add(texOffsetX);
-        _texBillboard.add(texOffsetY);
-        _quadsBillboard.add(x + offsetX);
-        _quadsBillboard.add(0.5f + y + offsetY);
-        _quadsBillboard.add(-0.5f + z + offsetZ);
-    }
-
-    private void generateBlockVertices(int x, int y, int z) {
-        byte block = _blocks[x][y][z];
-
-        /*
-         * Determine the render process.
-         */
-        RENDER_TYPE renderType = RENDER_TYPE.TRANS;
-
-        if (!Block.getBlockForType(block).isBlockTypeTranslucent()) {
-            renderType = RENDER_TYPE.OPAQUE;
-        }
-
-        // Ignore invisible blocks and billboards
-        if (Block.getBlockForType(block).isBlockInvisible() || Block.getBlockForType(block).isBlockBillboard()) {
-            return;
-        }
-
-        boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
-        byte blockToCheck = _parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y + 1), getBlockWorldPosZ(z));
-
-        drawTop = isSideVisibleForBlockTypes(blockToCheck, block);
-
-        // Draw the chunk if the height map produced a too large number
-        if (y == Configuration.CHUNK_DIMENSIONS.y - 1) {
-            drawTop = true;
-        }
-
-        if (drawTop) {
-            Vector3f p1 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
-            Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
-            Vector3f p3 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
-            Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
-
-            Vector3f norm = VectorPool.getVector(0, 1, 0);
-
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
-            float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 1, 0);
-
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
-            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
-        }
-
-        blockToCheck = _parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z - 1));
-        drawFront = isSideVisibleForBlockTypes(blockToCheck, block);
-
-        if (drawFront) {
-            Vector3f p1 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
-            Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
-            Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
-            Vector3f p4 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
-
-            Vector3f norm = VectorPool.getVector(0, 0, -1);
-
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
-            float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 0, -1);
-
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
-            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
-        }
-
-        blockToCheck = _parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z + 1));
-        drawBack = isSideVisibleForBlockTypes(blockToCheck, block);
-
-        if (drawBack) {
-            Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
-            Vector3f p2 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
-            Vector3f p3 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
-            Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
-
-
-            Vector3f norm = VectorPool.getVector(0, 0, 1);
-
-
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
-            float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 0, 1);
-
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
-            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
-        }
-
-        blockToCheck = _parent.getBlock(getBlockWorldPosX(x - 1), getBlockWorldPosY(y), getBlockWorldPosZ(z));
-        drawLeft = isSideVisibleForBlockTypes(blockToCheck, block);
-
-        if (drawLeft) {
-            Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
-            Vector3f p2 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
-            Vector3f p3 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
-            Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
-
-            Vector3f norm = VectorPool.getVector(-1, 0, 0);
-
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.LEFT);
-            float shadowIntens = Configuration.BLOCK_SIDE_DIMMING;
-
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
-            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
-        }
-
-        blockToCheck = _parent.getBlock(getBlockWorldPosX(x + 1), getBlockWorldPosY(y), getBlockWorldPosZ(z));
-        drawRight = isSideVisibleForBlockTypes(blockToCheck, block);
-
-        if (drawRight) {
-            Vector3f p1 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
-            Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
-            Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
-            Vector3f p4 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
-
-            Vector3f norm = VectorPool.getVector(1, 0, 0);
-
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.RIGHT);
-            float shadowIntens = Configuration.BLOCK_SIDE_DIMMING;
-
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
-            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
-        }
-
-        blockToCheck = _parent.getBlock(getBlockWorldPosX(x), getBlockWorldPosY(y - 1), getBlockWorldPosZ(z));
-        drawBottom = isSideVisibleForBlockTypes(blockToCheck, block);
-
-        if (drawBottom) {
-            Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
-            Vector3f p2 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
-            Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
-            Vector3f p4 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
-
-            Vector3f norm = VectorPool.getVector(0, -1, 0);
-
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BOTTOM);
-            float shadowIntens = 1f;
-
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
-            generateVerticesForBlockSide(x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
-        }
-    }
-
-    /**
-     * @param x
-     * @param y
-     * @param z
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param norm
-     * @param colorOffset
-     * @param texOffset
-     * @param shadowIntensity
-     * @param renderType
-     */
-    void generateVerticesForBlockSide(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, float shadowIntensity, RENDER_TYPE renderType) {
-        float offsetX = _position.x * Configuration.CHUNK_DIMENSIONS.x;
-        float offsetY = _position.y * Configuration.CHUNK_DIMENSIONS.y;
-        float offsetZ = _position.z * Configuration.CHUNK_DIMENSIONS.z;
-
-        TFloatArrayList color = _colorOpaque;
-        TFloatArrayList normals = _normalsOpaque;
-        TFloatArrayList tex = _texOpaque;
-        TFloatArrayList quads = _quadsOpaque;
-
-        if (renderType == RENDER_TYPE.TRANS) {
-            color = _colorTranslucent;
-            normals = _normalsTranslucent;
-            tex = _texTranslucent;
-            quads = _quadsTranslucent;
-        }
-
-        /*
-         * Rotate the texture coordinates according to the
-         * orientation of the plane.
-         */
-        if (norm.z == 1 || norm.x == -1) {
-            tex.add(texOffset.x);
-            tex.add(texOffset.y + 0.0624f);
-
-            tex.add(texOffset.x + 0.0624f);
-            tex.add(texOffset.y + 0.0624f);
-
-            tex.add(texOffset.x + 0.0624f);
-            tex.add(texOffset.y);
-
-            tex.add(texOffset.x);
-            tex.add(texOffset.y);
-        } else {
-            tex.add(texOffset.x);
-            tex.add(texOffset.y);
-
-            tex.add(texOffset.x + 0.0624f);
-            tex.add(texOffset.y);
-
-            tex.add(texOffset.x + 0.0624f);
-            tex.add(texOffset.y + 0.0624f);
-
-            tex.add(texOffset.x);
-            tex.add(texOffset.y + 0.0624f);
-        }
-
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-        normals.add(norm.x);
-        normals.add(norm.y);
-        normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
-        quads.add(p1.x + x + offsetX);
-        quads.add(p1.y + y + offsetY);
-        quads.add(p1.z + z + offsetZ);
-
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-        normals.add(norm.x);
-        normals.add(norm.y);
-        normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
-        quads.add(p2.x + x + offsetX);
-        quads.add(p2.y + y + offsetY);
-        quads.add(p2.z + z + offsetZ);
-
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-        normals.add(norm.x);
-        normals.add(norm.y);
-        normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
-        quads.add(p3.x + x + offsetX);
-        quads.add(p3.y + y + offsetY);
-        quads.add(p3.z + z + offsetZ);
-
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-        normals.add(norm.x);
-        normals.add(norm.y);
-        normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
-        quads.add(p4.x + x + offsetX);
-        quads.add(p4.y + y + offsetY);
-        quads.add(p4.z + z + offsetZ);
-    }
-
-    /**
-     * Generates the display lists from the pre calculated arrays.
-     */
     public void generateDisplayLists() {
-        if (_quadsOpaque.isEmpty()) {
-            return;
+        if (_newMesh != null) {
+            _newMesh.generateDisplayLists();
+
+            _activeMesh = _newMesh;
         }
-
-        /*
-         * Create the display lists if necessary.
-         */
-        if (_displayListOpaque == -1) {
-            _displayListOpaque = glGenLists(1);
-        }
-
-        if (_displayListTranslucent == -1) {
-            _displayListTranslucent = glGenLists(1);
-        }
-
-        if (_displayListBillboard == -1) {
-            _displayListBillboard = glGenLists(1);
-        }
-
-        FloatBuffer nb;
-        FloatBuffer cb;
-        FloatBuffer tb;
-        FloatBuffer tb2;
-        FloatBuffer vb;
-
-        nb = BufferUtils.createFloatBuffer(_normalsOpaque.size());
-
-        for (TFloatIterator it = _normalsOpaque.iterator(); it.hasNext(); ) {
-            nb.put(it.next());
-        }
-
-        vb = BufferUtils.createFloatBuffer(_quadsOpaque.size());
-
-        for (TFloatIterator it = _quadsOpaque.iterator(); it.hasNext(); ) {
-            vb.put(it.next());
-        }
-
-        tb = BufferUtils.createFloatBuffer(_texOpaque.size());
-
-        for (TFloatIterator it = _texOpaque.iterator(); it.hasNext(); ) {
-            tb.put(it.next());
-        }
-
-        tb2 = BufferUtils.createFloatBuffer(_texLightOpaque.size());
-
-        for (TFloatIterator it = _texLightOpaque.iterator(); it.hasNext(); ) {
-            tb2.put(it.next());
-        }
-
-        cb = BufferUtils.createFloatBuffer(_colorOpaque.size());
-
-        for (TFloatIterator it = _colorOpaque.iterator(); it.hasNext(); ) {
-            cb.put(it.next());
-        }
-
-        vb.flip();
-        tb.flip();
-        tb2.flip();
-        cb.flip();
-        nb.flip();
-
-        generateDisplayList(_displayListOpaque, vb, tb, tb2, cb, nb);
-
-        nb = BufferUtils.createFloatBuffer(_normalsTranslucent.size());
-
-        for (TFloatIterator it = _normalsTranslucent.iterator(); it.hasNext(); ) {
-            nb.put(it.next());
-        }
-
-        vb = BufferUtils.createFloatBuffer(_quadsTranslucent.size());
-
-        for (TFloatIterator it = _quadsTranslucent.iterator(); it.hasNext(); ) {
-            vb.put(it.next());
-        }
-
-        tb = BufferUtils.createFloatBuffer(_texTranslucent.size());
-
-        for (TFloatIterator it = _texTranslucent.iterator(); it.hasNext(); ) {
-            tb.put(it.next());
-        }
-
-
-        tb2 = BufferUtils.createFloatBuffer(_texLightTranslucent.size());
-
-        for (TFloatIterator it = _texLightTranslucent.iterator(); it.hasNext(); ) {
-            tb2.put(it.next());
-        }
-
-
-        cb = BufferUtils.createFloatBuffer(_colorTranslucent.size());
-
-        for (TFloatIterator it = _colorTranslucent.iterator(); it.hasNext(); ) {
-            cb.put(it.next());
-        }
-
-        vb.flip();
-        tb.flip();
-        tb2.flip();
-        cb.flip();
-        nb.flip();
-
-        generateDisplayList(_displayListTranslucent, vb, tb, tb2, cb, nb);
-
-        vb = BufferUtils.createFloatBuffer(_quadsBillboard.size());
-
-        for (TFloatIterator it = _quadsBillboard.iterator(); it.hasNext(); ) {
-            vb.put(it.next());
-        }
-
-
-        tb = BufferUtils.createFloatBuffer(_texBillboard.size());
-
-        for (TFloatIterator it = _texBillboard.iterator(); it.hasNext(); ) {
-            tb.put(it.next());
-        }
-
-
-        tb2 = BufferUtils.createFloatBuffer(_texLightBillboard.size());
-
-        for (TFloatIterator it = _texLightBillboard.iterator(); it.hasNext(); ) {
-            tb2.put(it.next());
-        }
-
-
-        cb = BufferUtils.createFloatBuffer(_colorBillboard.size());
-
-        for (TFloatIterator it = _colorBillboard.iterator(); it.hasNext(); ) {
-            cb.put(it.next());
-        }
-
-        vb.flip();
-        tb.flip();
-        tb2.flip();
-        cb.flip();
-
-        generateDisplayList(_displayListBillboard, vb, tb, tb2, cb, null);
-
-        _quadsTranslucent.clear();
-        _normalsTranslucent.clear();
-        _texTranslucent.clear();
-        _colorTranslucent.clear();
-        _texLightTranslucent.clear();
-        _quadsOpaque.clear();
-        _normalsOpaque.clear();
-        _texOpaque.clear();
-        _colorOpaque.clear();
-        _texLightOpaque.clear();
-        _quadsBillboard.clear();
-        _texBillboard.clear();
-        _colorBillboard.clear();
-        _texLightBillboard.clear();
-    }
-
-    private void generateDisplayList(int displayList, FloatBuffer vb, FloatBuffer tb, FloatBuffer tb2, FloatBuffer cb, FloatBuffer nb) {
-        glNewList(displayList, GL_COMPILE);
-
-        if (vb == null || tb == null || tb2 == null || cb == null) {
-            return;
-        }
-
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(3, 0, vb);
-
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glTexCoordPointer(2, 0, tb);
-
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glTexCoordPointer(2, 0, tb2);
-
-        glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer(4, 0, cb);
-
-        if (nb != null) {
-            glEnableClientState(GL_NORMAL_ARRAY);
-            glNormalPointer(0, nb);
-        }
-
-        glDrawArrays(GL_QUADS, 0, vb.capacity() / 3);
-
-        glDisableClientState(GL_COLOR_ARRAY);
-
-        if (nb != null) {
-            glDisableClientState(GL_NORMAL_ARRAY);
-        }
-
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glTexCoordPointer(2, 0, tb);
-
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glTexCoordPointer(2, 0, tb2);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glEndList();
-    }
-
-    /**
-     * Returns true if the block side is adjacent to a translucent block or an air
-     * block.
-     * <p/>
-     * NOTE: Air and leafs have to be handled separately. Otherwise the water surface would not be displayed due to the tessellation process.
-     *
-     * @param blockToCheck
-     * @param currentBlock
-     * @return
-     */
-    private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock) {
-        Block bCheck = Block.getBlockForType(blockToCheck);
-        Block cBlock = Block.getBlockForType(currentBlock);
-
-        return bCheck.getClass() == BlockAir.class || cBlock.doNotTessellate() || bCheck.isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
     }
 
     /**
@@ -1124,13 +416,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         } else {
             // If the block was removed: Find the brightest neighbor and
             // set the current block to this value - 1
-            byte val = _parent.getLight(blockPosX, blockPosY, blockPosZ, type);
-            byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ, type);
-            byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ, type);
-            byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1, type);
-            byte val4 = _parent.getLight(blockPosX, blockPosY, blockPosZ - 1, type);
-            byte val5 = _parent.getLight(blockPosX, blockPosY + 1, blockPosZ, type);
-            byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ, type);
+            byte val = getParent().getLight(blockPosX, blockPosY, blockPosZ, type);
+            byte val1 = getParent().getLight(blockPosX + 1, blockPosY, blockPosZ, type);
+            byte val2 = getParent().getLight(blockPosX - 1, blockPosY, blockPosZ, type);
+            byte val3 = getParent().getLight(blockPosX, blockPosY, blockPosZ + 1, type);
+            byte val4 = getParent().getLight(blockPosX, blockPosY, blockPosZ - 1, type);
+            byte val5 = getParent().getLight(blockPosX, blockPosY + 1, blockPosZ, type);
+            byte val6 = getParent().getLight(blockPosX, blockPosY - 1, blockPosZ, type);
 
             byte max = (byte) (Math.max(Math.max(Math.max(val1, val2), Math.max(val3, val4)), Math.max(val5, val6)) - 1);
 
@@ -1181,55 +473,55 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
 
-        byte val1 = _parent.getLight(blockPosX + 1, blockPosY, blockPosZ, type);
-        byte type1 = _parent.getBlock(blockPosX + 1, blockPosY, blockPosZ);
-        byte val2 = _parent.getLight(blockPosX - 1, blockPosY, blockPosZ, type);
-        byte type2 = _parent.getBlock(blockPosX - 1, blockPosY, blockPosZ);
-        byte val3 = _parent.getLight(blockPosX, blockPosY, blockPosZ + 1, type);
-        byte type3 = _parent.getBlock(blockPosX, blockPosY, blockPosZ + 1);
-        byte val4 = _parent.getLight(blockPosX, blockPosY, blockPosZ - 1, type);
-        byte type4 = _parent.getBlock(blockPosX, blockPosY, blockPosZ - 1);
-        byte val5 = _parent.getLight(blockPosX, blockPosY + 1, blockPosZ, type);
-        byte type5 = _parent.getBlock(blockPosX, blockPosY + 1, blockPosZ);
-        byte val6 = _parent.getLight(blockPosX, blockPosY - 1, blockPosZ, type);
-        byte type6 = _parent.getBlock(blockPosX, blockPosY - 1, blockPosZ);
+        byte val1 = getParent().getLight(blockPosX + 1, blockPosY, blockPosZ, type);
+        byte type1 = getParent().getBlock(blockPosX + 1, blockPosY, blockPosZ);
+        byte val2 = getParent().getLight(blockPosX - 1, blockPosY, blockPosZ, type);
+        byte type2 = getParent().getBlock(blockPosX - 1, blockPosY, blockPosZ);
+        byte val3 = getParent().getLight(blockPosX, blockPosY, blockPosZ + 1, type);
+        byte type3 = getParent().getBlock(blockPosX, blockPosY, blockPosZ + 1);
+        byte val4 = getParent().getLight(blockPosX, blockPosY, blockPosZ - 1, type);
+        byte type4 = getParent().getBlock(blockPosX, blockPosY, blockPosZ - 1);
+        byte val5 = getParent().getLight(blockPosX, blockPosY + 1, blockPosZ, type);
+        byte type5 = getParent().getBlock(blockPosX, blockPosY + 1, blockPosZ);
+        byte val6 = getParent().getLight(blockPosX, blockPosY - 1, blockPosZ, type);
+        byte type6 = getParent().getBlock(blockPosX, blockPosY - 1, blockPosZ);
 
         byte newLightValue;
         newLightValue = (byte) (lightValue - depth);
 
-        _parent.setLight(blockPosX, blockPosY, blockPosZ, newLightValue, type);
+        getParent().setLight(blockPosX, blockPosY, blockPosZ, newLightValue, type);
 
         if (lightValue <= 0) {
             return;
         }
 
         if (val1 < newLightValue - 1 && Block.getBlockForType(type1).isBlockTypeTranslucent()) {
-            _parent.spreadLight(blockPosX + 1, blockPosY, blockPosZ, lightValue, depth + 1, type);
+            getParent().spreadLight(blockPosX + 1, blockPosY, blockPosZ, lightValue, depth + 1, type);
         }
 
 
         if (val2 < newLightValue - 1 && Block.getBlockForType(type2).isBlockTypeTranslucent()) {
-            _parent.spreadLight(blockPosX - 1, blockPosY, blockPosZ, lightValue, depth + 1, type);
+            getParent().spreadLight(blockPosX - 1, blockPosY, blockPosZ, lightValue, depth + 1, type);
         }
 
 
         if (val3 < newLightValue - 1 && Block.getBlockForType(type3).isBlockTypeTranslucent()) {
-            _parent.spreadLight(blockPosX, blockPosY, blockPosZ + 1, lightValue, depth + 1, type);
+            getParent().spreadLight(blockPosX, blockPosY, blockPosZ + 1, lightValue, depth + 1, type);
         }
 
 
         if (val4 < newLightValue - 1 && Block.getBlockForType(type4).isBlockTypeTranslucent()) {
-            _parent.spreadLight(blockPosX, blockPosY, blockPosZ - 1, lightValue, depth + 1, type);
+            getParent().spreadLight(blockPosX, blockPosY, blockPosZ - 1, lightValue, depth + 1, type);
         }
 
 
         if (val5 < newLightValue - 1 && Block.getBlockForType(type5).isBlockTypeTranslucent()) {
-            _parent.spreadLight(blockPosX, blockPosY + 1, blockPosZ, lightValue, depth + 1, type);
+            getParent().spreadLight(blockPosX, blockPosY + 1, blockPosZ, lightValue, depth + 1, type);
         }
 
 
         if (val6 < newLightValue - 1 && Block.getBlockForType(type6).isBlockTypeTranslucent()) {
-            _parent.spreadLight(blockPosX, blockPosY - 1, blockPosZ, lightValue, depth + 1, type);
+            getParent().spreadLight(blockPosX, blockPosY - 1, blockPosZ, lightValue, depth + 1, type);
         }
     }
 
@@ -1239,7 +531,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return The distance of the chunk to the player
      */
     public double distanceToPlayer() {
-        return Math.sqrt(Math.pow(_parent.getPlayer().getPosition().x - getChunkWorldPosX(), 2) + Math.pow(_parent.getPlayer().getPosition().z - getChunkWorldPosZ(), 2));
+        return Math.sqrt(Math.pow(getParent().getPlayer().getPosition().x - getChunkWorldPosX(), 2) + Math.pow(getParent().getPlayer().getPosition().z - getChunkWorldPosZ(), 2));
     }
 
     /**
@@ -1273,9 +565,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Sets the light value at the given position.
      *
-     * @param x      Local block position on the x-axis
-     * @param y      Local block position on the y-axis
-     * @param z      Local block position on the z-axis
+     * @param x         Local block position on the x-axis
+     * @param y         Local block position on the y-axis
+     * @param z         Local block position on the z-axis
      * @param intensity
      * @param type
      */
@@ -1372,56 +664,20 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * Calculates a simple occlusion value based on the amount of blocks
-     * surrounding the given block position.
-     *
-     * @param x    Local block position on the x-axis
-     * @param y    Local block position on the y-axis
-     * @param z    Local block position on the z-axis
-     * @param dirX
-     * @param dirY
-     * @param dirZ
-     * @return Occlusion amount
-     */
-    float simpleOcclusionAmount(int x, int y, int z, int dirX, int dirY, int dirZ) {
-        if (x < 0 || z < 0 || y < 0) {
-            return 0;
-        }
-
-        int intens = 0;
-
-        ArrayList<Vector3f> positions = new ArrayList<Vector3f>();
-        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ));
-        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ));
-        positions.add(VectorPool.getVector(x + dirX, y + dirY, z + dirZ + 1));
-        positions.add(VectorPool.getVector(x + dirX, y + dirY, z + dirZ - 1));
-
-        for (Vector3f p : positions) {
-            if (Block.getBlockForType(_parent.getBlock(getBlockWorldPosX((int) p.x), getBlockWorldPosY((int) p.y), getBlockWorldPosZ((int) p.z))).isCastingShadows()) {
-                intens++;
-            }
-
-            VectorPool.putVector(p);
-        }
-
-        return (float) (Math.pow(0.9, intens));
-    }
-
-    /**
      * Returns the neighbor chunks of this chunk.
      *
      * @return The adjacent chunks
      */
     public Chunk[] loadOrCreateNeighbors() {
         Chunk[] chunks = new Chunk[8];
-        chunks[0] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z);
-        chunks[1] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z);
-        chunks[2] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x, (int) _position.z + 1);
-        chunks[3] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x, (int) _position.z - 1);
-        chunks[4] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z + 1);
-        chunks[5] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z - 1);
-        chunks[6] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z + 1);
-        chunks[7] = _parent.getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z - 1);
+        chunks[0] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z);
+        chunks[1] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z);
+        chunks[2] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x, (int) _position.z + 1);
+        chunks[3] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x, (int) _position.z - 1);
+        chunks[4] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z + 1);
+        chunks[5] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z - 1);
+        chunks[6] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z + 1);
+        chunks[7] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z - 1);
         return chunks;
     }
 
@@ -1481,7 +737,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return
      */
     public int compareTo(Chunk o) {
-        if (_parent.getPlayer() != null) {
+        if (getParent().getPlayer() != null) {
             return new Double(distanceToPlayer()).compareTo(o.distanceToPlayer());
         }
 
@@ -1511,7 +767,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
 
         ByteBuffer output = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3 + 1);
-        File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath(), BlockMath.cantorize((int) _position.x, (int) _position.z)));
+        File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), MathHelper.cantorize((int) _position.x, (int) _position.z)));
 
         // Save flags...
         byte flags = 0x0;
@@ -1558,7 +814,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     boolean loadChunkFromFile() {
         ByteBuffer input = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3 + 1);
-        File f = new File(String.format("%s/%d.bc", _parent.getWorldSavePath(), BlockMath.cantorize((int) _position.x, (int) _position.z)));
+        File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), MathHelper.cantorize((int) _position.x, (int) _position.z)));
 
         if (!f.exists()) {
             return false;
