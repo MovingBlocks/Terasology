@@ -59,14 +59,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x += SAMPLE_RATE_3D_HOR) {
             for (int z = 0; z <= Configuration.CHUNK_DIMENSIONS.z; z += SAMPLE_RATE_3D_HOR) {
                 for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.y; y += SAMPLE_RATE_3D_VERT) {
-                    float density = calcMountainDensity(x + getOffsetX(c), y + getOffsetY(c), z + getOffsetZ(c));
-
-                    float height = calcHeightMap(x + getOffsetX(c), z + getOffsetZ(c));
-
-                    density = height + density;
-                    density /= (y + 1) * 2f;
-
-                    densityMap[x][y][z] = density;
+                    densityMap[x][y][z] = calcDensity(x + getOffsetX(c),y + getOffsetY(c),z + getOffsetZ(c));
                 }
             }
         }
@@ -178,8 +171,14 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    public float calcHeightMap(float x, float z) {
-        return (float) (calcTerrainElevation(x, z) + calcLakeIntensity(x, z) * 0.2) * 0.5f + calcTerrainRoughness(x, z) * 0.3f + calcTerrainDetail(x, z) * 0.1f;
+    public float calcDensity(float x, float y, float z) {
+        float height = (float) (calcTerrainElevation(x, z) + calcLakeIntensity(x, z) * 0.2) * 0.5f + calcTerrainRoughness(x, z) * 0.3f + calcTerrainDetail(x, z) * 0.1f;
+        float density = calcMountainDensity(x, y, z);
+
+        density = height + density;
+        density /= (y + 1) * 2f;
+
+        return density;
     }
 
     /**

@@ -17,7 +17,6 @@ package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.player.Player;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.utilities.HeightMapFrame;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.VectorPool;
 import com.github.begla.blockmania.world.Chunk;
@@ -484,9 +483,6 @@ public final class Main {
                 success = true;
             } else if (parsingResult.get(0).equals("chunk_pos")) {
                 _world.printPlayerChunkPosition();
-                success = true;
-            } else if (parsingResult.get(0).equals("map")) {
-                new HeightMapFrame(_world).setVisible(true);
                 success = true;
             } else if (parsingResult.get(0).equals("update_all")) {
                 _world.updateAllChunks();

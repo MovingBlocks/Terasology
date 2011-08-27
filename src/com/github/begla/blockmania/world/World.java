@@ -92,8 +92,6 @@ public final class World extends RenderableObject {
     /* ------ */
     private String _title, _seed;
     /* ----- */
-    int _lastGeneratedChunkID = 0;
-    /* ----- */
     private FastList<Chunk> _visibleChunks;
     /* ----- */
     private static int _dlSunMoon = -1;
@@ -1043,11 +1041,8 @@ public final class World extends RenderableObject {
      */
     private Vector3f findSpawningPoint() {
         for (int xz = 1024; ; xz++) {
-            float height = _generatorTerrain.calcHeightMap(xz, xz) * 128f;
-
-            if (height > 32 && height < 34) {
-                // Find a spawning point at the beach
-                return VectorPool.getVector(xz, height + 8, xz);
+            if (_generatorTerrain.calcDensity(xz,30,xz) > 0.01f) {
+                return new Vector3f(xz,30,xz);
             }
         }
     }
