@@ -18,7 +18,7 @@ package com.github.begla.blockmania.utilities;
 import java.util.ArrayList;
 
 /**
- * Improved Perlin Noise based on the reference implementation by Ken Perlin.
+ * Improved Perlin noise based on the reference implementation by Ken Perlin.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

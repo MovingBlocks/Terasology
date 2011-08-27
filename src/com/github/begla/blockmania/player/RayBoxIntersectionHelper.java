@@ -29,7 +29,7 @@ import java.util.Collections;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class RayBoxIntersectionHelper {
+class RayBoxIntersectionHelper {
      /**
      * Returns the vertices of a block at the given position.
      *

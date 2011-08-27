@@ -53,7 +53,5 @@ public abstract class ObjectGenerator {
      * @param posZ   Position on the z-axis
      * @param update If true, the chunk will be queued for updating
      */
-    public void generate(int posX, int posY, int posZ, boolean update) {
-        throw new NotImplementedException();
-    }
+    public abstract void generate(int posX, int posY, int posZ, boolean update);
 }

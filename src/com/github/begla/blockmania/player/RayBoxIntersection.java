@@ -24,41 +24,13 @@ import org.lwjgl.util.vector.Vector3f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class RayBoxIntersection implements Comparable<RayBoxIntersection> {
+final class RayBoxIntersection implements Comparable<RayBoxIntersection> {
 
     /**
      *
      */
     public enum SIDE {
 
-        /**
-         *
-         */
-        FRONT,
-        /**
-         *
-         */
-        BACK,
-        /**
-         *
-         */
-        LEFT,
-        /**
-         *
-         */
-        RIGHT,
-        /**
-         *
-         */
-        TOP,
-        /**
-         *
-         */
-        BOTTOM,
-        /**
-         *
-         */
-        NONE
     }
 
     private final Vector3f v0;
@@ -103,38 +75,10 @@ public final class RayBoxIntersection implements Comparable<RayBoxIntersection> 
     }
 
     /**
-     * @return the d
-     */
-    public float getD() {
-        return d;
-    }
-
-    /**
      * @return the t
      */
     float getT() {
         return t;
-    }
-
-    /**
-     * @return the origin
-     */
-    public Vector3f getOrigin() {
-        return origin;
-    }
-
-    /**
-     * @return the ray
-     */
-    public Vector3f getRay() {
-        return ray;
-    }
-
-    /**
-     * @return the intersectPoint
-     */
-    public Vector3f getIntersectPoint() {
-        return intersectPoint;
     }
 
     /**

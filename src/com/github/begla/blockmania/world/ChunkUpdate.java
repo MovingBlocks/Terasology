@@ -18,7 +18,7 @@ package com.github.begla.blockmania.world;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class ChunkUpdate implements Comparable<ChunkUpdate> {
+final class ChunkUpdate implements Comparable<ChunkUpdate> {
 
     private final boolean _updateNeighbors;
     private final Chunk _chunk;

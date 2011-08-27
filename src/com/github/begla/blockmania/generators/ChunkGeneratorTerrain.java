@@ -29,10 +29,6 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     /**
      *
      */
-    private static final int SAMPLE_RATE_2D = 16;
-    /**
-     *
-     */
     private static final int SAMPLE_RATE_3D_HOR = 8;
     /**
      *
@@ -94,13 +90,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                          * The outer layer is made of dirt and grass.
                          */
                         if (!set) {
-                            c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(y, 1.0f), y));
+                            c.setBlock(x, y, z, getBlockTailpiece(getBlockTypeForPosition(y, 1.0f), y));
                         } else {
                             c.setBlock(x, y, z, getBlockTypeForPosition(y, 1.0f));
                         }
                         set = true;
                     } else if (dens >= 0.1f) {
-                        c.setBlock(x, y, z, getBlockTailpiece(c, getBlockTypeForPosition(y, 0.2f), y));
+                        c.setBlock(x, y, z, getBlockTailpiece(getBlockTypeForPosition(y, 0.2f), y));
                         set = true;
                     }
                 }
@@ -127,12 +123,11 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     /**
-     * @param c
      * @param type
      * @param y
      * @return
      */
-    byte getBlockTailpiece(Chunk c, byte type, int y) {
+    byte getBlockTailpiece(byte type, int y) {
         // Sand
         if (type == 0x7) {
             return 0x7;
@@ -150,16 +145,16 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /**
      * @param y
-     * @param heightPerc
+     * @param heightPercentage
      * @return
      */
-    byte getBlockTypeForPosition(int y, float heightPerc) {
+    byte getBlockTypeForPosition(int y, float heightPercentage) {
         // Sand
         if (y >= 28 && y <= 32) {
             return (byte) 0x7;
         }
 
-        if (heightPerc <= 0.8) {
+        if (heightPercentage <= 0.8) {
             return (byte) 0x3;
         }
 

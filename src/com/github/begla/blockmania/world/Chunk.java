@@ -98,13 +98,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      *
      */
-    public enum SIDE {
-
-    }
-
-    /**
-     *
-     */
     public enum LIGHT_TYPE {
 
         /**
@@ -195,6 +188,16 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public void dispose() {
         writeChunkToDisk();
+    }
+
+    @Override
+    public void render() {
+       render(false);
+    }
+
+    @Override
+    public void update() {
+       // Do nothing.
     }
 
     /**
@@ -677,10 +680,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param norm
      * @param colorOffset
      * @param texOffset
-     * @param shadowIntens
+     * @param shadowIntensity
      * @param renderType
      */
-    void generateVerticesForBlockSide(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, float shadowIntens, RENDER_TYPE renderType) {
+    void generateVerticesForBlockSide(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, float shadowIntensity, RENDER_TYPE renderType) {
         float offsetX = _position.x * Configuration.CHUNK_DIMENSIONS.x;
         float offsetY = _position.y * Configuration.CHUNK_DIMENSIONS.y;
         float offsetZ = _position.z * Configuration.CHUNK_DIMENSIONS.z;
@@ -734,7 +737,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         normals.add(norm.x);
         normals.add(norm.y);
         normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntens);
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
         quads.add(p1.x + x + offsetX);
         quads.add(p1.y + y + offsetY);
         quads.add(p1.z + z + offsetZ);
@@ -746,7 +749,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         normals.add(norm.x);
         normals.add(norm.y);
         normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntens);
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
         quads.add(p2.x + x + offsetX);
         quads.add(p2.y + y + offsetY);
         quads.add(p2.z + z + offsetZ);
@@ -758,7 +761,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         normals.add(norm.x);
         normals.add(norm.y);
         normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntens);
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
         quads.add(p3.x + x + offsetX);
         quads.add(p3.y + y + offsetY);
         quads.add(p3.z + z + offsetZ);
@@ -770,7 +773,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         normals.add(norm.x);
         normals.add(norm.y);
         normals.add(norm.z);
-        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntens);
+        addLightTexCoordFor(x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
         quads.add(p4.x + x + offsetX);
         quads.add(p4.y + y + offsetY);
         quads.add(p4.z + z + offsetZ);
@@ -1273,10 +1276,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param x      Local block position on the x-axis
      * @param y      Local block position on the y-axis
      * @param z      Local block position on the z-axis
-     * @param intens
+     * @param intensity
      * @param type
      */
-    public void setLight(int x, int y, int z, byte intens, LIGHT_TYPE type) {
+    public void setLight(int x, int y, int z, byte intensity, LIGHT_TYPE type) {
         if (x < 0 || z < 0 || y < 0) {
             return;
         }
@@ -1297,9 +1300,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
             byte oldValue = lSource[x][y][z];
-            lSource[x][y][z] = intens;
+            lSource[x][y][z] = intensity;
 
-            if (oldValue != intens) {
+            if (oldValue != intensity) {
                 setDirty(true);
                 // Mark the neighbors as dirty
                 markNeighborsDirty(x, z);

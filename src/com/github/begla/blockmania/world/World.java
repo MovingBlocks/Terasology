@@ -922,13 +922,6 @@ public final class World extends RenderableObject {
     /**
      * @return
      */
-    public String getSeed() {
-        return _seed;
-    }
-
-    /**
-     * @return
-     */
     private Vector3f findSpawningPoint() {
         for (int xz = 1024; ; xz++) {
             if (_generatorTerrain.calcDensity(xz, 30, xz) > 0.01f) {

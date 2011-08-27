@@ -606,13 +606,6 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * @return
-     */
-    public Vector3f getViewDirection() {
-        return _viewingDirection;
-    }
-
-    /**
      * Cycles the selected block type.
      *
      * @param upDown Cycling direction
@@ -644,19 +637,5 @@ public final class Player extends RenderableObject {
      */
     AABB getAABB() {
         return new AABB(_position, VectorPool.getVector(.3f, 0.7f, .3f));
-    }
-
-    /**
-     * @return
-     */
-    public double getYaw() {
-        return _yaw;
-    }
-
-    /**
-     * @return
-     */
-    public double getPitch() {
-        return _pitch;
     }
 }

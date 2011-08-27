@@ -90,41 +90,46 @@ public class WebUpdater {
         Helper.LOGGER.log(Level.INFO, "Downloading new files...");
         File gfxDir = new File("DATA");
 
-        gfxDir.mkdir();
+        if (gfxDir.mkdir())
+        {
 
-        try {
-            ArrayList<UpdateComponent> components = getUpdateComponents();
+            try {
+                ArrayList<UpdateComponent> components = getUpdateComponents();
 
-            for (UpdateComponent c : components) {
-                Helper.LOGGER.log(Level.INFO, "Downloading... {0}", c.getFileName());
+                for (UpdateComponent c : components) {
+                    Helper.LOGGER.log(Level.INFO, "Downloading... {0}", c.getFileName());
 
-                InputStream is;
-                FileOutputStream fos;
+                    InputStream is;
+                    FileOutputStream fos;
 
-                is = c.getURL().openStream();
-                fos = new FileOutputStream(c.getLocalPath());
+                    is = c.getURL().openStream();
+                    fos = new FileOutputStream(c.getLocalPath());
 
-                int i;
-                while ((i = is.read()) != -1) {
-                    fos.write(i);
+                    int i;
+                    while ((i = is.read()) != -1) {
+                        fos.write(i);
+                    }
+
+                    Helper.LOGGER.log(Level.INFO, "Finished downloading... {0}", c.getFileName());
+
+                    fos.flush();
+                    fos.close();
+                    is.close();
                 }
 
-                Helper.LOGGER.log(Level.INFO, "Finished downloading... {0}", c.getFileName());
-
-                fos.flush();
-                fos.close();
-                is.close();
+            } catch (MalformedURLException ex) {
+                Helper.LOGGER.log(Level.SEVERE, null, ex);
+                return false;
+            } catch (IOException ex) {
+                Helper.LOGGER.log(Level.SEVERE, null, ex);
+                return false;
             }
 
-        } catch (MalformedURLException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
-            return false;
-        } catch (IOException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
-            return false;
+            Helper.LOGGER.log(Level.INFO, "Finished updating Blockmania!");
+            return true;
+
         }
 
-        Helper.LOGGER.log(Level.INFO, "Finished updating Blockmania!");
-        return true;
+        return false;
     }
 }

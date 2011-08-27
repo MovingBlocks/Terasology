@@ -48,7 +48,7 @@ public class FastRandom {
      *
      * @return Random value
      */
-    public long randomLong() {
+    long randomLong() {
         seed ^= (seed << 21);
         seed ^= (seed >>> 35);
         seed ^= (seed << 4);

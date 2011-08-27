@@ -93,7 +93,7 @@ public abstract class Block {
     }
 
     /**
-     * Calculates the color offset for a given block type and a speific
+     * Calculates the color offset for a given block type and a specific
      * side of the block.
      *
      * @param side The block side

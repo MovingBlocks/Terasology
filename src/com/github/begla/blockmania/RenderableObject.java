@@ -33,14 +33,12 @@ public abstract class RenderableObject {
     /**
      * Rendering operations have to be placed here.
      */
-    public void render() {
-    }
+    public abstract void render();
 
     /**
      * Updating operations have to be placed here.
      */
-    public void update() {
-    }
+    public abstract void update();
 
     /**
      * Returns the position of the object.

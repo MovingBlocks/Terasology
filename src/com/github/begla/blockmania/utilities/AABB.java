@@ -112,6 +112,11 @@ public class AABB extends RenderableObject {
         glPopMatrix();
     }
 
+    @Override
+    public void update() {
+        // Do nothing. Really.
+    }
+
     /**
      * @param point
      * @return
