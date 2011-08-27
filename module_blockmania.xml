@@ -2,9 +2,6 @@
 <project name="module_blockmania" default="compile.module.blockmania">
   <dirname property="module.blockmania.basedir" file="${ant.file.module_blockmania}"/>
   
-  <property name="module.jdk.home.blockmania" value="${project.jdk.home}"/>
-  <property name="module.jdk.bin.blockmania" value="${project.jdk.bin}"/>
-  <property name="module.jdk.classpath.blockmania" value="${project.jdk.classpath}"/>
   
   <property name="compiler.args.blockmania" value="${compiler.args}"/>
   
@@ -16,7 +13,6 @@
   </path>
   
   <path id="blockmania.module.production.classpath">
-    <path refid="${module.jdk.classpath.blockmania}"/>
     <path refid="library.lwjgl.classpath"/>
     <path refid="library.others.classpath"/>
   </path>
@@ -28,7 +24,6 @@
   </path>
   
   <path id="blockmania.module.classpath">
-    <path refid="${module.jdk.classpath.blockmania}"/>
     <pathelement location="${blockmania.output.dir}"/>
     <path refid="library.lwjgl.classpath"/>
     <path refid="library.others.classpath"/>
@@ -59,15 +54,15 @@
   
   <target name="compile.module.blockmania" depends="compile.module.blockmania.production,compile.module.blockmania.tests" description="Compile module Blockmania"/>
   
-  <target name="compile.module.blockmania.production" depends="register.custom.compilers" description="Compile module Blockmania; production classes">
+  <target name="compile.module.blockmania.production" description="Compile module Blockmania; production classes">
     <mkdir dir="${blockmania.output.dir}"/>
-    <javac2 destdir="${blockmania.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.blockmania}/javac">
+    <javac destdir="${blockmania.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
       <compilerarg line="${compiler.args.blockmania}"/>
       <bootclasspath refid="blockmania.module.bootclasspath"/>
       <classpath refid="blockmania.module.production.classpath"/>
       <src refid="blockmania.module.sourcepath"/>
       <patternset refid="excluded.from.compilation.blockmania"/>
-    </javac2>
+    </javac>
     
     <copy todir="${blockmania.output.dir}">
       <fileset dir="${module.blockmania.basedir}/src">
@@ -77,7 +72,7 @@
     </copy>
   </target>
   
-  <target name="compile.module.blockmania.tests" depends="register.custom.compilers,compile.module.blockmania.production" description="compile module Blockmania; test classes" unless="skip.tests"/>
+  <target name="compile.module.blockmania.tests" depends="compile.module.blockmania.production" description="compile module Blockmania; test classes" unless="skip.tests"/>
   
   <target name="clean.module.blockmania" description="cleanup module">
     <delete dir="${blockmania.output.dir}"/>

@@ -56,32 +56,6 @@
     <include name="**/?*.glsl"/>
   </patternset>
   
-  <!-- JDK definitions -->
-  
-  <property name="jdk.bin.1.6" value="${jdk.home.1.6}/bin"/>
-  <path id="jdk.classpath.1.6">
-    <fileset dir="${jdk.home.1.6}">
-      <include name="jre/lib/alt-rt.jar"/>
-      <include name="jre/lib/alt-string.jar"/>
-      <include name="jre/lib/charsets.jar"/>
-      <include name="jre/lib/deploy.jar"/>
-      <include name="jre/lib/javaws.jar"/>
-      <include name="jre/lib/jce.jar"/>
-      <include name="jre/lib/jsse.jar"/>
-      <include name="jre/lib/management-agent.jar"/>
-      <include name="jre/lib/plugin.jar"/>
-      <include name="jre/lib/resources.jar"/>
-      <include name="jre/lib/rt.jar"/>
-      <include name="jre/lib/ext/dnsns.jar"/>
-      <include name="jre/lib/ext/localedata.jar"/>
-      <include name="jre/lib/ext/sunjce_provider.jar"/>
-    </fileset>
-  </path>
-  
-  <property name="project.jdk.home" value="${jdk.home.1.6}"/>
-  <property name="project.jdk.bin" value="${jdk.bin.1.6}"/>
-  <property name="project.jdk.classpath" value="jdk.classpath.1.6"/>
-  
   
   <!-- Project Libraries -->
   
@@ -96,19 +70,6 @@
       <patternset refid="library.patterns"/>
     </fileset>
   </path>
-  <!-- Register Custom Compiler Taskdefs -->
-  <property name="javac2.home" value="${idea.home}/lib"/>
-  <path id="javac2.classpath">
-    <pathelement location="${javac2.home}/javac2.jar"/>
-    <pathelement location="${javac2.home}/jdom.jar"/>
-    <pathelement location="${javac2.home}/asm.jar"/>
-    <pathelement location="${javac2.home}/asm-commons.jar"/>
-    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
-  </path>
-  <target name="register.custom.compilers">
-    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
-    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
-  </target>
   
   <!-- Modules -->
   
@@ -122,5 +83,45 @@
   
   <target name="build.modules" depends="init, clean, compile.module.blockmania" description="build all modules"/>
   
-  <target name="all" depends="build.modules" description="build all"/>
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.blockmania:jar" value="${basedir}/out/artifacts/Blockmania_jar"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.Blockmania.jar" value="${artifacts.temp.dir}/Blockmania.jar"/>
+  </target>
+  
+  <target name="artifact.blockmania:jar" depends="init.artifacts, compile.module.blockmania" description="Build &apos;Blockmania:jar&apos; artifact">
+    <property name="artifact.temp.output.blockmania:jar" value="${artifacts.temp.dir}/Blockmania_jar"/>
+    <mkdir dir="${artifact.temp.output.blockmania:jar}"/>
+    <jar destfile="${temp.jar.path.Blockmania.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset file="${basedir}/src/META-INF/MANIFEST.MF" prefix="META-INF"/>
+      <zipfileset dir="${blockmania.output.dir}"/>
+      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/AppleJavaExtensions.jar"/>
+      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/jinput.jar"/>
+      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lwjgl-debug.jar"/>
+      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lwjgl.jar"/>
+      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lwjgl_test.jar"/>
+      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lwjgl_util.jar"/>
+      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lwjgl_util_applet.jar"/>
+      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lzma.jar"/>
+      <zipfileset src="${basedir}/lib/javolution-5.5.1.jar"/>
+      <zipfileset src="${basedir}/lib/jdom.jar"/>
+      <zipfileset src="${basedir}/lib/slick-util.jar"/>
+      <zipfileset src="${basedir}/lib/slick.jar"/>
+      <zipfileset src="${basedir}/lib/trove-3.0.0rc2.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.Blockmania.jar}" tofile="${artifact.temp.output.blockmania:jar}/Blockmania.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.blockmania:jar" description="Build all artifacts">
+    <mkdir dir="${artifact.output.blockmania:jar}"/>
+    <copy todir="${artifact.output.blockmania:jar}">
+      <fileset dir="${artifact.temp.output.blockmania:jar}"/>
+    </copy>
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
 </project>
