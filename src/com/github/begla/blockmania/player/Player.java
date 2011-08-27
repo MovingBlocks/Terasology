@@ -214,7 +214,7 @@ public final class Player extends RenderableObject {
                 for (int z = -4; z < 4; z++) {
                     if (x != 0 || y != 0 || z != 0) {
                         // The ray originates from the "player's eye"
-                        FastList<Intersection> iss = _parent.rayBlockIntersection((int) _position.x + x, (int) _position.y + y, (int) _position.z + z, VectorPool.getVector(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
+                        FastList<Intersection> iss = RayBoxIntersectionHelper.rayBlockIntersection(_parent, (int) _position.x + x, (int) _position.y + y, (int) _position.z + z, VectorPool.getVector(_position.x, _position.y + getAABB().getDimensions().y / 1.2f, _position.z), _viewingDirection);
                         if (iss != null) {
                             inters.addAll(iss);
                         }
