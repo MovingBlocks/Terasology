@@ -209,23 +209,6 @@ public final class Main {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
-        /**
-         * Sky box.
-         */
-        glRotatef((float) _player.getPitch(), 1f, 0f, 0f);
-        glRotatef((float) _player.getYaw(), 0f, 1f, 0f);
-
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
-        glBegin(GL_QUADS);
-        Primitives.drawSkyBox(_world.getDaylight());
-        glEnd();
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
-
-        glLoadIdentity();
-
-        _player.render();
         _world.render();
 
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -242,7 +225,7 @@ public final class Main {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(74.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.2f, 1024f);
+        gluPerspective(74.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 1024f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);

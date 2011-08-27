@@ -27,12 +27,14 @@ import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.Collections;
 
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
  * This class contains all functions regarding the player's actions,
@@ -42,7 +44,6 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  */
 public final class Player extends RenderableObject {
 
-    private static final Vector3f _playerOrigin = VectorPool.getVector(128, 100, 128);
     private boolean _jump = false;
     private byte _selectedBlockType = 1;
     private double _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
@@ -68,25 +69,6 @@ public final class Player extends RenderableObject {
      */
     @Override
     public void render() {
-
-        if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
-            float bobbing2 = (float) _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.75f;
-            float bobbing3 = (float) _pGen.noise(_position.x * 1.5f, _position.z * 1.5f, 0f) * 0.75f;
-            glRotatef(bobbing2, 0f, 1f, 0f);
-            glRotatef(bobbing3, 1f, 0f, 1f);
-        }
-
-        glRotatef((float) _pitch, 1f, 0f, 0f);
-        glRotatef((float) _yaw, 0f, 1f, 0f);
-
-        if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
-            float bobbing1 = (float) _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.05f;
-            glTranslatef(0.0f, bobbing1, 0);
-        }
-
-
-        // Position the camera in the upper part of the player's bounding box
-        glTranslatef(-_position.x, -_position.y - getAABB().getDimensions().y / 1.2f, -_position.z);
         RayBoxIntersection is = calcSelectedBlock();
 
         // Display the block the player is aiming at
@@ -98,9 +80,29 @@ public final class Player extends RenderableObject {
                 }
             }
         }
+    }
 
-        // Render the player's AABB
-        // getAABB().render();
+    public void applyPlayerModelViewMatrix() {
+
+        glMatrixMode(GL11.GL_MODELVIEW);
+        glLoadIdentity();
+
+        float bobbing1 = 0.0f;
+
+        if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
+            bobbing1 = (float) _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.05f;
+        }
+
+        float newPosY = _position.y + getAABB().getDimensions().y / 1.2f + bobbing1;
+        GLU.gluLookAt(_position.x, newPosY, _position.z, _position.x + _viewingDirection.x, newPosY + _viewingDirection.y, _position.z + _viewingDirection.z, 0, 1, 0);
+    }
+
+    public void applyNormalizedModelViewMatrix() {
+
+        glMatrixMode(GL11.GL_MODELVIEW);
+        glLoadIdentity();
+
+        GLU.gluLookAt(0, 0, 0, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, 0, 1, 0);
     }
 
     /**
@@ -108,8 +110,11 @@ public final class Player extends RenderableObject {
      */
     @Override
     public void update() {
-        yaw(Mouse.getDX() * 0.1f);
-        pitch(Mouse.getDY() * 0.1f);
+        float dx = Mouse.getDX();
+        float dy = Mouse.getDY();
+
+        yaw(dx  * Configuration.MOUSE_SENS);
+        pitch(dy * Configuration.MOUSE_SENS);
 
         processMovement();
         updatePlayerPosition();
@@ -639,15 +644,6 @@ public final class Player extends RenderableObject {
      */
     AABB getAABB() {
         return new AABB(_position, VectorPool.getVector(.3f, 0.7f, .3f));
-    }
-
-    /**
-     * Returns the spawning point of the player.
-     *
-     * @return The coordinates of the spawning point
-     */
-    public static Vector3f getPlayerOrigin() {
-        return _playerOrigin;
     }
 
     /**

@@ -29,6 +29,10 @@ import org.lwjgl.util.vector.Vector3f;
 public final class Configuration {
 
     /**
+     * TODO
+     */
+    public static final float MOUSE_SENS = 0.075f;
+    /**
      * The title string of the game.
      */
     public static final String GAME_TITLE = "Blockmania Pre Alpha";

@@ -53,16 +53,18 @@ public final class ChunkUpdateManager {
         if (!_chunkUpdates.isEmpty()) {
             closestChunkUpdate = _chunkUpdates.removeFirst();
 
-            // IMPORTANT: Do not touch any chunks which display lists are being generated at the moment!!
-            if (_displayListUpdates.contains(closestChunkUpdate))
-                return;
+            if (closestChunkUpdate != null) {
+                // IMPORTANT: Do not touch any chunks which display lists are being generated at the moment!!
+                if (_displayListUpdates.contains(closestChunkUpdate))
+                    return;
 
-            // Ignore chunks out of view
-            if (!_parent.isChunkVisible(closestChunkUpdate.getChunk())) {
-                return;
+                // Ignore chunks out of view
+                if (!_parent.isChunkVisible(closestChunkUpdate.getChunk())) {
+                    return;
+                }
+
+                processChunkUpdate(closestChunkUpdate);
             }
-
-            processChunkUpdate(closestChunkUpdate);
         }
 
         _meanUpdateDuration += System.currentTimeMillis() - timeStart;

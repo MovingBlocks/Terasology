@@ -26,6 +26,7 @@ import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.VectorPool;
 import javolution.util.FastList;
+import javolution.util.FastSet;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -90,7 +91,7 @@ public final class World extends RenderableObject {
     /* ------ */
     private String _title, _seed;
     /* ----- */
-    private FastList<Chunk> _visibleChunks;
+    private FastSet<Chunk> _visibleChunks;
     /* ----- */
     private static int _dlSunMoon = -1;
     private static int _dlClouds = -1;
@@ -183,9 +184,9 @@ public final class World extends RenderableObject {
                     _chunkUpdateManager.updateChunk();
 
                     // Update the the list of visible chunks
-                    _visibleChunks = fetchVisibleChunks();
-                    // Remove chunks which are out of range
-                    // _chunkUpdateManager.removeInvisibleChunkUpdates();
+                    synchronized (_updateThread) {
+                        _visibleChunks = fetchVisibleChunks();
+                    }
 
                     /*
                      * Update the time of day.
@@ -251,8 +252,8 @@ public final class World extends RenderableObject {
      *
      */
     private void replantDirt() {
-        // Pick one chunk for grass updates every 100 ms
-        if (Helper.getInstance().getTime() - _latestDirtEvolvement > 100) {
+        // Pick one chunk for grass updates every 1000 ms
+        if (Helper.getInstance().getTime() - _latestDirtEvolvement > 1000) {
 
             // Do NOT replant chunks during the night...
             if (isNighttime()) {
@@ -260,14 +261,19 @@ public final class World extends RenderableObject {
                 return;
             }
 
-            Chunk c = _visibleChunks.get((int) (Math.abs(_rand.randomLong()) % _visibleChunks.size()));
+            for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
 
-            if (!c.isFresh() && !c.isDirty() && !c.isLightDirty()) {
-                _generatorGrass.generate(c);
-                _chunkUpdateManager.queueChunkForUpdate(c, false, false, false);
+                Chunk c = _visibleChunks.valueOf(n);
+
+                if (c != null) {
+                    if (!c.isFresh() && !c.isDirty() && !c.isLightDirty()) {
+                        _generatorGrass.generate(c);
+                        _chunkUpdateManager.queueChunkForUpdate(c, false, false, false);
+                    }
+
+                    _latestDirtEvolvement = Helper.getInstance().getTime();
+                }
             }
-
-            _latestDirtEvolvement = Helper.getInstance().getTime();
         }
     }
 
@@ -275,8 +281,10 @@ public final class World extends RenderableObject {
      * Queues all displayed chunks for updating.
      */
     public void updateAllChunks() {
-        for (FastList.Node<Chunk> n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            _chunkUpdateManager.queueChunkForUpdate(n.getValue(), false, true, false);
+        synchronized (_updateThread) {
+            for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
+                _chunkUpdateManager.queueChunkForUpdate(_visibleChunks.valueOf(n), false, true, false);
+            }
         }
     }
 
@@ -328,6 +336,28 @@ public final class World extends RenderableObject {
      */
     @Override
     public void render() {
+        /**
+         * Sky box.
+         */
+        _player.applyNormalizedModelViewMatrix();
+
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+        glBegin(GL_QUADS);
+        Primitives.drawSkyBox(getDaylight());
+        glEnd();
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+
+        glLoadIdentity();
+
+        _player.applyPlayerModelViewMatrix();
+
+        /*
+         * Render the player.
+         */
+        _player.render();
+
         /*
          * Transfer the daylight value to the shaders.
          */
@@ -395,8 +425,8 @@ public final class World extends RenderableObject {
     /**
      * @return
      */
-    FastList<Chunk> fetchVisibleChunks() {
-        FastList<Chunk> visibleChunks = new FastList<Chunk>();
+    FastSet<Chunk> fetchVisibleChunks() {
+        FastSet<Chunk> visibleChunks = new FastSet<Chunk>();
         for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
             for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
                 Chunk c = _chunkCache.loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
@@ -417,11 +447,13 @@ public final class World extends RenderableObject {
      * Renders all active chunks.
      */
     void renderChunks() {
-        for (FastList.Node<Chunk> n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            n.getValue().render(false);
-        }
-        for (FastList.Node<Chunk> n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            n.getValue().render(true);
+        synchronized (_updateThread) {
+            for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
+                _visibleChunks.valueOf(n).render(false);
+            }
+            for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
+                _visibleChunks.valueOf(n).render(true);
+            }
         }
     }
 
@@ -756,7 +788,6 @@ public final class World extends RenderableObject {
     }
 
 
-
     /**
      * Displays some information about the world formatted as a string.
      *
@@ -900,8 +931,8 @@ public final class World extends RenderableObject {
      */
     private Vector3f findSpawningPoint() {
         for (int xz = 1024; ; xz++) {
-            if (_generatorTerrain.calcDensity(xz,30,xz) > 0.01f) {
-                return new Vector3f(xz,30,xz);
+            if (_generatorTerrain.calcDensity(xz, 30, xz) > 0.01f) {
+                return new Vector3f(xz, 30, xz);
             }
         }
     }
