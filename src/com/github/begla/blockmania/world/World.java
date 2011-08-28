@@ -556,11 +556,12 @@ public final class World extends RenderableObject {
             }
 
             if (update) {
+
                 /*
                  * Update sunlight.
                  */
                 c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, true, true);
-                c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.SUN);
+                //c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.SUN);
 
                 byte newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
 

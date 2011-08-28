@@ -34,6 +34,7 @@ import java.util.Collections;
 
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glRotatef;
 
 /**
  * This class contains all functions regarding the player's actions,
@@ -87,10 +88,14 @@ public final class Player extends RenderableObject {
         glLoadIdentity();
 
         float bobbing1 = 0.0f;
+        float bobbing2 = 0.0f;
 
-        if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsTouchingGround) {
-            bobbing1 = (float) _pGen.noise(_position.x * 2f, _position.z * 2f, 0f) * 0.05f;
+        if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
+            bobbing1 = (float) ((_pGen.noise(_position.x * 0.6f, _position.z * 0.6f, 0f) + 1) /2) * 0.4f;
+            bobbing2 = (float) (_pGen.noise(_position.x * 0.6f, _position.z * 0.6f, 0f)) * 0.01f;
         }
+
+        glRotatef(bobbing2*180,0,0,1);
 
         float newPosY = _position.y + getAABB().getDimensions().y / 1.2f + bobbing1;
         GLU.gluLookAt(_position.x, newPosY, _position.z, _position.x + _viewingDirection.x, newPosY + _viewingDirection.y, _position.z + _viewingDirection.z, 0, 1, 0);

@@ -370,7 +370,7 @@ public class ChunkMeshGenerator {
             Vector3f norm = VectorPool.getVector(0, -1, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BOTTOM);
-            float shadowIntens = 1f;
+            float shadowIntens = simpleOcclusionAmount(x, y, z, 0, -1, 0);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
