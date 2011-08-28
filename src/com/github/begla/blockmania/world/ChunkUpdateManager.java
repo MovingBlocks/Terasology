@@ -83,7 +83,11 @@ public final class ChunkUpdateManager {
 
                 if (cu != null) {
                     // Generate the display list of the center chunk
-                    cu.getChunk().generateDisplayLists();
+                    try {
+                        cu.getChunk().generateDisplayLists();
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
 
                     if (cu.isUpdateNeighbors()) {
                         Chunk[] neighbors = cu.getChunk().loadOrCreateNeighbors();
@@ -91,13 +95,17 @@ public final class ChunkUpdateManager {
                         // Generate the display lists of the neighbor chunks
                         for (Chunk n : neighbors) {
                             if (n != null) {
-                                n.generateDisplayLists();
+                                try {
+                                    n.generateDisplayLists();
+                                } catch (Exception e) {
+                                    // Do nothing
+                                }
                             }
                         }
                     }
-
-                    _displayListUpdates.remove(cu);
                 }
+
+                _displayListUpdates.remove(cu);
             }
         }
     }

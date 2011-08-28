@@ -16,15 +16,11 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.RenderableObject;
-import com.github.begla.blockmania.ShaderManager;
+import com.github.begla.blockmania.utilities.ShaderManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.player.Player;
-import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.utilities.*;
 import javolution.util.FastList;
 import javolution.util.FastSet;
 import org.jdom.Document;

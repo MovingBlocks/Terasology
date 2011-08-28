@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.blocks;
 
-import com.github.begla.blockmania.utilities.AABB;
+import com.github.begla.blockmania.player.AABB;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.VectorPool;
 import org.lwjgl.util.vector.Vector2f;

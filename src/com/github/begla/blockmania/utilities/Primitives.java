@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.utilities;
 
+import com.github.begla.blockmania.Configuration;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
+import static org.lwjgl.opengl.GL11.*;
+
 /**
+ * A collection of some basic primitives.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Primitives {
 
     /**
-     * @param scaleX
-     * @param scaleY
-     * @param scaleZ
-     * @param x
-     * @param y
-     * @param z
+     * @param scaleX Scale along the x-axis
+     * @param scaleY Scale along the y-axis
+     * @param scaleZ Scale along the z-axis
+     * @param x      Position on the x-axis
+     * @param y      Position on the y-axis
+     * @param z      Position on the z-axis
      */
     public static void drawCloud(float scaleX, float scaleY, float scaleZ, float x, float y, float z) {
         // Front face
@@ -100,7 +105,9 @@ public class Primitives {
     }
 
     /**
-     * @param brightness
+     * Draws a simple gradient skybox.
+     *
+     * @param brightness The brightness of the skybox.
      */
     public static void drawSkyBox(float brightness) {
         Vector3f skyColor = new Vector3f(0.80f * brightness, 0.90f * brightness, 0.98f * brightness);
@@ -183,5 +190,44 @@ public class Primitives {
         GL11.glTexCoord2f(0.0f, 0.5f);
         GL11.glColor3f(skyColor.x * brightness, skyColor.y * brightness, skyColor.z * brightness);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
+    }
+
+    /**
+     * Draws the outline of a chunk.
+     */
+    public static void drawChunkOutline() {
+        glLineWidth(2.0f);
+        glColor3f(255.0f, 255.0f, 255.0f);
+
+        glBegin(GL_LINE_LOOP);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
+        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
+        glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
+        glEnd();
+
+        glBegin(GL_LINE_LOOP);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
+        glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
+        glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glEnd();
+
+        glBegin(GL_LINE_LOOP);
+        glVertex3f(0.0f, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
+        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
+        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
+        glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
+        glVertex3f(0.0f, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
+        glEnd();
+
+        glBegin(GL_LINE_LOOP);
+        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
+        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
+        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
+        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
+        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
+        glEnd();
     }
 }

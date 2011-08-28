@@ -17,9 +17,8 @@
 package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.RenderableObject;
+import com.github.begla.blockmania.world.RenderableObject;
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.utilities.AABB;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.PerlinNoise;
 import com.github.begla.blockmania.utilities.VectorPool;

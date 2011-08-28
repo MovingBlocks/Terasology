@@ -19,6 +19,7 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/slick-util.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/slick.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/trove-3.0.0rc2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/annotations.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

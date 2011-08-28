@@ -18,6 +18,7 @@ package com.github.begla.blockmania;
 import com.github.begla.blockmania.player.Player;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
+import com.github.begla.blockmania.utilities.ShaderManager;
 import com.github.begla.blockmania.utilities.VectorPool;
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.world.World;

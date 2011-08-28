@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania;
+package com.github.begla.blockmania.utilities;
 
-import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
@@ -147,9 +146,9 @@ public class ShaderManager {
     }
 
     /**
-     * @param s
+     * @param s Name of the shader to activate
      */
-    public void enableShader(String s) {
+    public void enableShader(@org.jetbrains.annotations.Nullable String s) {
         if (s == null) {
             GL20.glUseProgram(0);
             return;
@@ -160,8 +159,8 @@ public class ShaderManager {
     }
 
     /**
-     * @param s
-     * @return
+     * @param s Nave of the shader to return
+     * @return The id of the requested shader
      */
     public int getShader(String s) {
         return _shaderPrograms.get(s);

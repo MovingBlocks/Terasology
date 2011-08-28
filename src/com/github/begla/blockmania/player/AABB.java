@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.utilities;
+package com.github.begla.blockmania.player;
 
-import com.github.begla.blockmania.RenderableObject;
+import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.world.RenderableObject;
 import org.lwjgl.util.vector.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;

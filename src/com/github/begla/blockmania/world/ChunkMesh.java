@@ -1,10 +1,8 @@
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.RenderableObject;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.list.array.TFloatArrayList;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
 import java.nio.FloatBuffer;
@@ -55,10 +53,10 @@ public class ChunkMesh extends RenderableObject {
     /**
      * Generates the display lists from the pre calculated arrays.
      */
-    public void generateDisplayLists() {
-        // IMPORTANT: Mesh can only be generated once.
+    public void generateDisplayLists() throws Exception {
+        // IMPORTANT: A mesh can only be generated once.
         if (_generated)
-            return;
+            throw new Exception("A chunk mesh can only be generated once.");
 
         /*
         * Create the display lists if necessary.
@@ -291,6 +289,6 @@ public class ChunkMesh extends RenderableObject {
 
     @Override
     public void update() {
-        // Do nothin'.
+        // Do nothing.
     }
 }
