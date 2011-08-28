@@ -17,11 +17,11 @@
 package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.world.RenderableObject;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.PerlinNoise;
 import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.world.RenderableObject;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
@@ -32,9 +32,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import java.util.Collections;
 
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * This class contains all functions regarding the player's actions,
@@ -58,7 +56,7 @@ public final class Player extends RenderableObject {
     private boolean _playerIsTouchingGround = false;
 
     /**
-     *
+     * Init. the player
      */
     public Player() {
         resetPlayer();
@@ -91,11 +89,11 @@ public final class Player extends RenderableObject {
         float bobbing2 = 0.0f;
 
         if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
-            bobbing1 = (float) ((_pGen.noise(_position.x * 0.6f, _position.z * 0.6f, 0f) + 1) /2) * 0.4f;
-            bobbing2 = (float) (_pGen.noise(_position.x * 0.6f, _position.z * 0.6f, 0f)) * 0.01f;
+            bobbing1 = (float) ((_pGen.noise(_position.x * 0.4f, _position.z * 0.4f, 0f) + 1f) / 2f) * 0.2f;
+            bobbing2 = (float) (_pGen.noise(_position.x * 0.4f, 0f, 0f)) * 0.05f;
         }
 
-        glRotatef(bobbing2*180,0,0,1);
+        glRotatef(bobbing2 * 32f, 0, 0, 1);
 
         float newPosY = _position.y + getAABB().getDimensions().y / 1.2f + bobbing1;
         GLU.gluLookAt(_position.x, newPosY, _position.z, _position.x + _viewingDirection.x, newPosY + _viewingDirection.y, _position.z + _viewingDirection.z, 0, 1, 0);
@@ -149,15 +147,14 @@ public final class Player extends RenderableObject {
      * @param diff Amount of pitching to be applied.
      */
     void pitch(float diff) {
-        double nPitch = (_pitch - diff) % 360;
-        if (nPitch < 0) {
-            nPitch += 360;
-        }
-        // Do not allow the player to "look on his back" :-)
-        // TODO: Problematic if the mouse movement is very fast
-        if ((nPitch > 0 && nPitch < 90) || (nPitch < 360 && nPitch > 270)) {
-            _pitch = nPitch;
-        }
+        double nPitch = (_pitch - diff);
+
+        if (nPitch > 89)
+            nPitch = 89;
+        else if (nPitch < -89)
+            nPitch = -89;
+
+        _pitch = nPitch;
     }
 
     /**
@@ -245,7 +242,7 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * @return
+     * @return Some information about the selected block
      */
     public String selectedBlockInformation() {
         RayBoxIntersection r = calcSelectedBlock();
@@ -386,7 +383,7 @@ public final class Player extends RenderableObject {
     /**
      * Checks for blocks below and above the player.
      *
-     * @param origin
+     * @param origin The original position of the player
      * @return True if a vertical collision was detected
      */
     private boolean verticalHitTest(Vector3f origin) {
@@ -418,8 +415,8 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * @param origin
-     * @return
+     * @param origin The original player position
+     * @return A list of adjacent block positions
      */
     private FastList<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
         /*
@@ -448,8 +445,8 @@ public final class Player extends RenderableObject {
     /**
      * Checks for blocks around the player.
      *
-     * @param origin
-     * @return
+     * @param origin The original position of the player
+     * @return True if the player is colliding horizontally
      */
     private boolean horizontalHitTest(Vector3f origin) {
         boolean result = false;
@@ -485,7 +482,6 @@ public final class Player extends RenderableObject {
 
     /**
      * Updates the position of the player.
-     * <p/>
      * TODO: Fix easing-artifact
      */
     private void updatePlayerPosition() {
@@ -627,7 +623,7 @@ public final class Player extends RenderableObject {
     /**
      * Returns some information about the player as a string.
      *
-     * @return
+     * @return The string
      */
     @Override
     public String toString() {
@@ -637,7 +633,7 @@ public final class Player extends RenderableObject {
     /**
      * Returns player's AABB.
      *
-     * @return
+     * @return The AABB
      */
     AABB getAABB() {
         return new AABB(_position, VectorPool.getVector(.3f, 0.7f, .3f));

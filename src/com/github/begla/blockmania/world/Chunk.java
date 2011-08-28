@@ -16,13 +16,13 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.utilities.ShaderManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.utilities.Primitives;
+import com.github.begla.blockmania.utilities.ShaderManager;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
@@ -325,7 +325,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      *
      * @param x               Local block position on the x-axis
      * @param z               Local block position on the z-axis
-     * @param spreadLight Spread light if a light value is greater than the old one
+     * @param spreadLight     Spread light if a light value is greater than the old one
      * @param refreshSunlight Refreshes the sunlight using the surrounding chunks when the light value is lower than before
      */
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
@@ -371,9 +371,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
+     * @param x    Local block position on the x-axis
+     * @param y    Local block position on the y-axis
+     * @param z    Local block position on the z-axis
      * @param type The type of the light
      */
     public void refreshLightAtLocalPos(int x, int y, int z, LIGHT_TYPE type) {
@@ -418,11 +418,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Recursive light calculation.
      *
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
+     * @param x          Local block position on the x-axis
+     * @param y          Local block position on the y-axis
+     * @param z          Local block position on the z-axis
      * @param lightValue The light value used to spread the light
-     * @param type The type of the light
+     * @param type       The type of the light
      */
     public void spreadLight(int x, int y, int z, byte lightValue, LIGHT_TYPE type) {
         spreadLight(x, y, z, lightValue, 0, type);
@@ -431,12 +431,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Recursive light calculation.
      *
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
+     * @param x          Local block position on the x-axis
+     * @param y          Local block position on the y-axis
+     * @param z          Local block position on the z-axis
      * @param lightValue The light value used to spread the light
-     * @param depth Depth of the recursion
-     * @param type The type of the light
+     * @param depth      Depth of the recursion
+     * @param type       The type of the light
      */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type) {
         if (x < 0 || z < 0 || y < 0) {
@@ -525,20 +525,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @return
-     */
-    /**
      * Sets the light value at the given position.
      *
      * @param x         Local block position on the x-axis
      * @param y         Local block position on the y-axis
      * @param z         Local block position on the z-axis
      * @param intensity The light intensity
-     * @param type The type of the light
+     * @param type      The type of the light
      */
     public void setLight(int x, int y, int z, byte intensity, LIGHT_TYPE type) {
         if (x < 0 || z < 0 || y < 0) {

@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.utilities.ShaderManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.player.Player;
