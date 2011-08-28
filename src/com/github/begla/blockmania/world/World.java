@@ -192,7 +192,6 @@ public final class World extends RenderableObject {
                      * Evolve chunks.
                      */
                     replantDirt();
-
                 }
             }
         });
@@ -263,22 +262,10 @@ public final class World extends RenderableObject {
                 if (c != null) {
                     if (!c.isFresh() && !c.isDirty() && !c.isLightDirty()) {
                         _generatorGrass.generate(c);
-                        _chunkUpdateManager.queueChunkForUpdate(c, false, false, false);
                     }
 
                     _latestDirtEvolvement = Helper.getInstance().getTime();
                 }
-            }
-        }
-    }
-
-    /**
-     * Queues all displayed chunks for updating.
-     */
-    public void updateAllChunks() {
-        synchronized (_updateThread) {
-            for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
-                _chunkUpdateManager.queueChunkForUpdate(_visibleChunks.valueOf(n), false, true, false);
             }
         }
     }
@@ -396,9 +383,6 @@ public final class World extends RenderableObject {
         glColor4f(1f, 1f, 1f, 1.0f);
 
         glEnable(GL_BLEND);
-        int blend_src = glGetInteger(GL_BLEND_SRC);
-        int blend_dst = glGetInteger(GL_BLEND_DST);
-
         glBlendFunc(GL_ONE, GL_ONE);
 
         if (isDaytime()) {
@@ -413,8 +397,6 @@ public final class World extends RenderableObject {
 
         glDisable(GL_BLEND);
         glPopMatrix();
-
-        glBlendFunc(blend_src, blend_dst);
     }
 
     /**
@@ -425,11 +407,8 @@ public final class World extends RenderableObject {
         for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
             for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
                 Chunk c = _chunkCache.loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
+
                 if (c != null) {
-                    // If this chunk was not visible, update it
-                    if (!isChunkVisible(c)) {
-                        _chunkUpdateManager.queueChunkForUpdate(c, false, false, true);
-                    }
                     visibleChunks.add(c);
                 }
             }
@@ -457,6 +436,15 @@ public final class World extends RenderableObject {
      */
     @Override
     public void update() {
+
+        FastSet<Chunk> visibleChunks;
+
+        synchronized (_updateThread) {
+            visibleChunks = _visibleChunks;
+        }
+
+        _player.update();
+
         _chunkUpdateManager.updateDisplayLists();
 
         // Move the clouds a bit each update
@@ -476,6 +464,11 @@ public final class World extends RenderableObject {
             _lastWindUpdate = Helper.getInstance().getTime();
         }
 
+        for (Chunk c : visibleChunks) {
+            c.update();
+        }
+
+        _chunkUpdateManager.updateVisibleChunks(visibleChunks);
     }
 
     /**
@@ -599,11 +592,6 @@ public final class World extends RenderableObject {
                  * Update the block light intensity of the current block.
                  */
                 c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.BLOCK);
-
-                /*
-                 * Finally queue the chunk and its neighbors for updating.
-                 */
-                _chunkUpdateManager.queueChunkForUpdate(c, true, false, false);
             }
         }
     }
@@ -891,15 +879,6 @@ public final class World extends RenderableObject {
     }
 
     /**
-     * @param c
-     * @return
-     */
-    public boolean isChunkVisible(Chunk c) {
-        return _visibleChunks != null && _visibleChunks.contains(c);
-
-    }
-
-    /**
      *
      */
     public void printPlayerChunkPosition() {
@@ -911,17 +890,10 @@ public final class World extends RenderableObject {
     /**
      * @return
      */
-    public int getAmountGeneratedChunks() {
-        return _chunkUpdateManager.getAmountGeneratedChunks();
-    }
-
-    /**
-     * @return
-     */
     private Vector3f findSpawningPoint() {
         for (int xz = 1024; ; xz++) {
-            if (_generatorTerrain.calcDensity(xz, 30, xz) > 0.01f) {
-                return new Vector3f(xz, 30, xz);
+            if (_generatorTerrain.calcDensity(xz, 64, xz) > 0.01f) {
+                return new Vector3f(xz, 64, xz);
             }
         }
     }
@@ -1059,7 +1031,7 @@ public final class World extends RenderableObject {
             for (int x = 0; x < length; x++) {
                 for (int y = 0; y < length; y++) {
                     if (!_clouds[x][y]) {
-                        Primitives.drawCloud(32, 8, 16, x * 32f - (length / 2 * 32f), 0, y * 16f - (length / 2 * 16f));
+                        Primitives.drawCloud(64, 32, 64, x * 64f - (length / 2 * 64f), 0, y * 64f - (length / 2 * 64f));
                     }
                 }
             }

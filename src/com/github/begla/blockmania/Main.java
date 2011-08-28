@@ -190,17 +190,12 @@ public final class Main {
     private void render() {
 
         // Fog has the same color as the sky
-        float[] fogColor = {_world.getDaylight(), _world.getDaylight(), _world.getDaylight(), 1.0f};
-        FloatBuffer fogColorBuffer = BufferUtils.createFloatBuffer(4);
-        fogColorBuffer.put(fogColor);
-        fogColorBuffer.rewind();
-        glFog(GL_FOG_COLOR, fogColorBuffer);
         glFogi(GL_FOG_MODE, GL_LINEAR);
 
         // Update the viewing distance
         float minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
         float viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, 16f);
+        glFogf(GL_FOG_START, viewingDistance*0.25f);
         glFogf(GL_FOG_END, viewingDistance);
 
         /*
@@ -276,11 +271,10 @@ public final class Main {
     }
 
     /**
-     * Updates the player and world.
+     * Updates the world.
      */
     private void update() {
         _world.update();
-        _player.update();
     }
 
     /**
@@ -297,6 +291,7 @@ public final class Main {
 
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // Draw the crosshair
         if (Configuration.getSettingBoolean("CROSSHAIR")) {
@@ -467,9 +462,6 @@ public final class Main {
             } else if (parsingResult.get(0).equals("chunk_pos")) {
                 _world.printPlayerChunkPosition();
                 success = true;
-            } else if (parsingResult.get(0).equals("update_all")) {
-                _world.updateAllChunks();
-                success = true;
             } else if (parsingResult.get(0).equals("set_spawn")) {
                 _world.setSpawningPoint();
                 success = true;
@@ -521,15 +513,6 @@ public final class Main {
         _player.setParent(_world);
 
         _world.startUpdateThread();
-
-        Helper.LOGGER.log(Level.INFO, "Waiting for some chunks to pop up...", seed);
-        while (_world.getAmountGeneratedChunks() < 64) {
-            try {
-                Thread.sleep(150);
-            } catch (InterruptedException ex) {
-                Helper.LOGGER.log(Level.SEVERE, null, ex);
-            }
-        }
 
         // Reset the delta value
         _lastLoopTime = Helper.getInstance().getTime();

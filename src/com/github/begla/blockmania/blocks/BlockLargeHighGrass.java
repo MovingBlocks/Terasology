@@ -39,7 +39,7 @@ public class BlockLargeHighGrass extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(8, 3);
+        return Helper.getInstance().calcOffsetForTextureAt(13, 6);
     }
 
     @Override

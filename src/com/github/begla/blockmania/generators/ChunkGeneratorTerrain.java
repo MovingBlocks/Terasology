@@ -33,7 +33,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     /**
      *
      */
-    private static final int SAMPLE_RATE_3D_VERT = 16;
+    private static final int SAMPLE_RATE_3D_VERT = 4;
 
     /**
      * @param seed
@@ -85,7 +85,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                     float dens = densityMap[x][y][z];
 
-                    if ((dens > 0.01f && dens < 0.0104f)) {
+                    if ((dens > 0.01f && dens < 0.02f)) {
                         /*
                          * The outer layer is made of dirt and grass.
                          */
@@ -96,7 +96,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                         }
 
                         set = true;
-                    } else if (dens >= 0.0104f) {
+                    } else if (dens >= 0.02f) {
                         c.setBlock(x, y, z, getBlockTailpiece(getBlockTypeForPosition(y, 0.2f), y));
                         set = true;
                     }
@@ -168,11 +168,11 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @return
      */
     public float calcDensity(float x, float y, float z) {
-        float height = (float) (calcTerrainElevation(x, z) + calcLakeIntensity(x, z) * 0.2) * 0.5f + calcTerrainRoughness(x, z) * 0.3f + calcTerrainDetail(x, z) * 0.1f;
+        float height = (float) (calcTerrainElevation(x, z) + calcLakeIntensity(x, z) * 0.3) * 0.3f + calcTerrainRoughness(x, z) * 0.2f + calcTerrainDetail(x, z) * 0.2f;
         float density = calcMountainDensity(x, y, z);
 
         density = height + density;
-        density /= (y + 1) * 2f;
+        density /= (y + 1) * 1.7f;
 
         return density;
     }
@@ -199,7 +199,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.multiFractalNoise(0.0008f * x, 0.0008f, 0.0008f * z, 16, 2.351421f);
+        result += _pGen2.multiFractalNoise(0.0004f * x, 0.0004f, 0.0004f * z, 16, 2.151421f);
 
         return result;
     }
@@ -213,7 +213,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     float calcTerrainDetail(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.ridgedMultiFractalNoise(x * 0.004f, 0.004f, z * 0.004f, 8, 1.2f, 3f, 1f);
+        result += _pGen3.ridgedMultiFractalNoise(x * 0.002f, 0.002f, z * 0.002f, 8, 2.2631f, 2f, 0.8f);
         return result;
     }
 
@@ -227,7 +227,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         float result = 0.0f;
 
         // Turbulence
-        float turb = (float) _pGen3.multiFractalNoise(x * 0.07, y * 0.07, z * 0.07, 6, 2.372618) * 32f;
+        float turb = (float) _pGen3.noise(x * 0.1f, y * 0.1f, z * 0.1f) * 2f;
         x += turb;
         y += turb;
         z += turb;
@@ -236,15 +236,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         y *= 0.0005;
         z *= 0.0004;
 
-        result += _pGen2.noise(x * 76.55, y * 76.55, z * 76.55) * 0.05;
-        result += _pGen2.noise(x * 75.44, y * 75.44, z * 75.44) * 0.10;
-        result += _pGen2.noise(x * 70.03, y * 70.03, z * 70.03) * 0.15;
-        result += _pGen2.noise(x * 60.99, y * 60.99, z * 60.99) * 0.25;
-        result += _pGen2.noise(x * 50.96, y * 50.96, z * 50.96) * 0.35;
-        result += _pGen2.noise(x * 40.96, y * 40.96, z * 40.96) * 0.55;
-        result += _pGen2.noise(x * 24.48, y * 24.48, z * 24.48) * 0.65;
-        result += _pGen2.noise(x * 12.28, y * 8.28, z * 8.28) * 0.7;
-        result += _pGen2.noise(x * 1.01, y * 1.01, z * 1.01) * 1.00;
+        result += _pGen2.noise(x * 256.038729, y * 256.038729, z * 256.038729) * 0.075;
+        result += _pGen2.noise(x * 128.37821, y * 128.37821, z * 128.37821) * 0.125;
+        result += _pGen2.noise(x * 92.313, y * 92.313, z * 92.313) * 0.25;
+        result += _pGen2.noise(x * 48.96, y * 48.96, z * 48.96) * 0.5;
+        result += _pGen2.noise(x * 24.48, y * 24.48, z * 24.48) * 0.75;
+        result += _pGen2.noise(x * 1.00, y * 1.00, z * 1.00) * 1.0;
 
         return result;
     }

@@ -53,11 +53,11 @@ public class PerlinNoise {
      * @return
      */
     public double noise(double x, double y, double z) {
-        int X = (int) Math.floor(x) & 255, Y = (int) Math.floor(y) & 255, Z = (int) Math.floor(z) & 255;
+        int X = (int) MathHelper.fastFloor(x) & 255, Y = (int) MathHelper.fastFloor(y) & 255, Z = (int) MathHelper.fastFloor(z) & 255;
 
-        x -= Math.floor(x);
-        y -= Math.floor(y);
-        z -= Math.floor(z);
+        x -= MathHelper.fastFloor(x);
+        y -= MathHelper.fastFloor(y);
+        z -= MathHelper.fastFloor(z);
 
         double u = fade(x), v = fade(y), w = fade(z);
         int A = noisePerm[X % 255] + Y, AA = noisePerm[A % 255] + Z, AB = noisePerm[(A + 1) % 255] + Z,
@@ -116,7 +116,7 @@ public class PerlinNoise {
         double result = 0;
 
         for (int i = 1; i <= octaves; i++) {
-            result += noise(x, y, z) * Math.pow(lacunarity, -0.76471 * i);
+            result += noise(x, y, z) * Math.pow(lacunarity, -0.96471 * i);
 
             x *= lacunarity;
             y *= lacunarity;
@@ -163,7 +163,7 @@ public class PerlinNoise {
             signal = ridge(noise(x, y, z), offset);
 
             signal *= weight;
-            result += signal * Math.pow(frequency, -0.86461f);
+            result += signal * Math.pow(frequency, -0.96461f);
             frequency *= lacunarity;
         }
 

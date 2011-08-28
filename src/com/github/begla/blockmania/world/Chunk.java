@@ -143,7 +143,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     @Override
     public void update() {
-        // Do nothing.
+        if (_newMesh != null) {
+            if (_newMesh.isGenerated()) {
+                _activeMesh = _newMesh;
+                _newMesh = null;
+            }
+        }
     }
 
     /**
@@ -259,7 +264,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public void generateDisplayLists() throws Exception {
         if (_newMesh != null) {
             _newMesh.generateDisplayLists();
-            _activeMesh = _newMesh;
         }
     }
 

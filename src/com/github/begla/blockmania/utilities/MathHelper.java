@@ -20,6 +20,14 @@ package com.github.begla.blockmania.utilities;
  */
 public class MathHelper {
 
+    public static double fastAbs(double x) {
+        return (x > 0) ? x : -x;
+    }
+
+    public static double fastFloor(double x) {
+      return x > 0 ? (int) x : (int) x - 1;
+    }
+
     /**
      * @param x
      * @param y

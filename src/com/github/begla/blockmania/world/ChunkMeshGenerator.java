@@ -544,6 +544,6 @@ public class ChunkMeshGenerator {
             VectorPool.putVector(p);
         }
 
-        return (float) Math.pow(0.9, intens);
+        return (float) Math.pow(Configuration.OCCLUSION_INTENS, (float)intens/ 4.0f);
     }
 }

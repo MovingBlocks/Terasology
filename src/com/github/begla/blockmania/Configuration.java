@@ -71,11 +71,15 @@ public final class Configuration {
     /**
      * The intensity at which the front and back side of blocks are constantly 'dimmed'.
      */
-    public static final float BLOCK_SIDE_DIMMING = 0.65f;
+    public static final float BLOCK_SIDE_DIMMING = 0.7f;
+    /**
+     * TODO
+     */
+    public static final float OCCLUSION_INTENS = 0.75f;
     /**
      *
      */
-    public static final int DL_UPDATES_PER_CYCLE = 2;
+    public static final int DL_UPDATES_PER_CYCLE = 4;
     /**
      *
      */

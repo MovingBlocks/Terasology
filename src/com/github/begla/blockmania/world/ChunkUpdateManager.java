@@ -17,8 +17,8 @@ package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
 import javolution.util.FastList;
+import javolution.util.FastSet;
 
-import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -26,8 +26,9 @@ import java.util.Collections;
  */
 public final class ChunkUpdateManager {
 
-    private final FastList<ChunkUpdate> _displayListUpdates = new FastList<ChunkUpdate>(128);
-    private final FastList<ChunkUpdate> _chunkUpdates = new FastList<ChunkUpdate>(1024);
+    private final FastList<Chunk> _displayListUpdates = new FastList<Chunk>(128);
+    private FastList<Chunk> _visibleChunks;
+
     private int _amountGeneratedChunks = 0;
     private double _meanUpdateDuration = 0.0f;
     private final World _parent;
@@ -40,30 +41,31 @@ public final class ChunkUpdateManager {
     }
 
     /**
-     *
+     * TODO
      */
     public void updateChunk() {
+        if (_visibleChunks == null)
+            return;
+
+        FastList<Chunk> visibleChunks = _visibleChunks;
+        Collections.sort(visibleChunks);
+
         long timeStart = System.currentTimeMillis();
 
-        ChunkUpdate closestChunkUpdate;
+        Chunk closestChunk;
 
-        Collections.sort(_chunkUpdates);
-        removeInvisibleChunkUpdates();
+        if (!visibleChunks.isEmpty()) {
+            closestChunk = visibleChunks.getFirst();
 
-        if (!_chunkUpdates.isEmpty()) {
-            closestChunkUpdate = _chunkUpdates.removeFirst();
+            if (closestChunk != null) {
 
-            if (closestChunkUpdate != null) {
                 // IMPORTANT: Do not touch any chunks which display lists are being generated at the moment!!
-                if (_displayListUpdates.contains(closestChunkUpdate))
-                    return;
-
-                // Ignore chunks out of view
-                if (!_parent.isChunkVisible(closestChunkUpdate.getChunk())) {
-                    return;
+                synchronized (this) {
+                    if (_displayListUpdates.contains(closestChunk))
+                        return;
                 }
 
-                processChunkUpdate(closestChunkUpdate);
+                processChunkUpdate(closestChunk);
             }
         }
 
@@ -72,60 +74,31 @@ public final class ChunkUpdateManager {
     }
 
     /**
-     *
+     * TODO
      */
     public void updateDisplayLists() {
+
+        synchronized (this) {
+            Collections.sort(_displayListUpdates);
+        }
+
         for (int i = 0; i < Configuration.DL_UPDATES_PER_CYCLE; i++) {
-            // Take one chunk from the queue
 
             if (_displayListUpdates.size() > 0) {
-                ChunkUpdate cu = _displayListUpdates.getFirst();
+                Chunk c = _displayListUpdates.getFirst();
 
-                if (cu != null) {
+                if (c != null) {
                     // Generate the display list of the center chunk
                     try {
-                        cu.getChunk().generateDisplayLists();
+                        c.generateDisplayLists();
                     } catch (Exception e) {
                         // Do nothing
                     }
-
-                    if (cu.isUpdateNeighbors()) {
-                        Chunk[] neighbors = cu.getChunk().loadOrCreateNeighbors();
-
-                        // Generate the display lists of the neighbor chunks
-                        for (Chunk n : neighbors) {
-                            if (n != null) {
-                                try {
-                                    n.generateDisplayLists();
-                                } catch (Exception e) {
-                                    // Do nothing
-                                }
-                            }
-                        }
-                    }
                 }
 
-                _displayListUpdates.remove(cu);
-            }
-        }
-    }
-
-    /**
-     * @param c
-     * @param updateNeighbors
-     * @param markDirty
-     * @param forceInvisibleChunks
-     */
-    public void queueChunkForUpdate(Chunk c, boolean updateNeighbors, boolean markDirty, boolean forceInvisibleChunks) {
-        if (markDirty) {
-            c.setDirty(true);
-        }
-        // Do not queue clean chunks
-        if (c.isDirty() && (_parent.isChunkVisible(c) || forceInvisibleChunks)) {
-            ChunkUpdate cu = new ChunkUpdate(updateNeighbors, c);
-
-            if (!_chunkUpdates.contains(cu)) {
-                _chunkUpdates.add(cu);
+                synchronized (this) {
+                    _displayListUpdates.remove(c);
+                }
             }
         }
     }
@@ -133,22 +106,37 @@ public final class ChunkUpdateManager {
     /**
      * TODO
      *
-     * @param cu
+     * @param visibleChunks
      */
-    private void processChunkUpdate(ChunkUpdate cu) {
-        if (cu != null) {
-            boolean lightCalculated = false;
+    public void updateVisibleChunks(FastSet<Chunk> visibleChunks) {
+        FastList<Chunk> newVisibleChunks = new FastList<Chunk>(visibleChunks);
 
+        // Remove chunks which need no update
+        for (int i = newVisibleChunks.size() - 1; i >= 0; --i) {
+            Chunk c = newVisibleChunks.get(i);
+
+            if (!c.isDirty() && !c.isLightDirty() && !c.isFresh()) {
+                newVisibleChunks.remove(i);
+            }
+        }
+
+        _visibleChunks = newVisibleChunks;
+    }
+
+    /**
+     * TODO
+     */
+    private void processChunkUpdate(Chunk c) {
+        if (c != null) {
             /*
              * Generate the chunk...
              */
-            cu.getChunk().generate();
+            c.generate();
 
             /*
              * ... and fetch its neighbors...
              */
-            Chunk[] neighbors = cu.getChunk().loadOrCreateNeighbors();
-
+            Chunk[] neighbors = c.loadOrCreateNeighbors();
 
             /*
              * Before starting the illumination process, make sure that the neighbor chunks
@@ -163,38 +151,22 @@ public final class ChunkUpdateManager {
             /*
              * If the light of this chunk is marked as dirty...
              */
-            if (cu.getChunk().isLightDirty()) {
+            if (c.isLightDirty()) {
                 /*
                  * ... propagate light into adjacent chunks...
                  */
-                cu.getChunk().updateLight();
-                lightCalculated = true;
+                c.updateLight();
             }
-
-            for (Chunk neighbor : neighbors) {
-                if (neighbor != null) {
-                    if (neighbor.isDirty() && cu.isUpdateNeighbors()) {
-                        if (neighbor.isLightDirty()) {
-                            queueChunkForUpdate(neighbor, false, false, false);
-                        } else {
-                            neighbor.generateMesh();
-                        }
-                    } else if (lightCalculated) {
-                        queueChunkForUpdate(neighbor, false, false, false);
-                    }
-                }
-            }
-
 
             /*
              * Check if this chunk was changed...
              */
-            if (cu.getChunk().isDirty()) {
+            if (c.isDirty()) {
                 /*
                  * ... if yes, regenerate the vertex arrays
                  */
-                cu.getChunk().generateMesh();
-                _displayListUpdates.add(cu);
+                c.generateMesh();
+                _displayListUpdates.add(c);
                 _amountGeneratedChunks++;
             }
         }
@@ -204,7 +176,7 @@ public final class ChunkUpdateManager {
      * @return
      */
     public int updatesSize() {
-        return _chunkUpdates.size();
+        return _visibleChunks.size();
     }
 
     /**
@@ -212,32 +184,6 @@ public final class ChunkUpdateManager {
      */
     public int updatesDLSize() {
         return _displayListUpdates.size();
-    }
-
-    /**
-     * @param updates
-     */
-    void removeChunkUpdates(Collection<ChunkUpdate> updates) {
-        _chunkUpdates.removeAll(updates);
-    }
-
-    void removeInvisibleChunkUpdates() {
-        FastList<ChunkUpdate> updatesToDelete = new FastList<ChunkUpdate>();
-
-        for (FastList.Node<ChunkUpdate> n = _chunkUpdates.tail(), end = _chunkUpdates.head(); (n = n.getPrevious()) != end; ) {
-
-            Chunk c = n.getValue().getChunk();
-
-            if (c != null) {
-                if (!_parent.isChunkVisible(c)) {
-                    updatesToDelete.add(n.getValue());
-                } else {
-                    break;
-                }
-            }
-        }
-
-        removeChunkUpdates(updatesToDelete);
     }
 
     /**

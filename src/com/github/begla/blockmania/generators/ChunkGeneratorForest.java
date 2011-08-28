@@ -113,11 +113,11 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
             double r = _rand.standNormalDistrDouble();
 
             // Create some trees outside of forests
-            if (forestDens < 0.01) {
-                r += 3f;
+            if (forestDens < 0) {
+                r += 1f;
             }
 
-            if (r > -0.1 && r < 0.1) {
+            if (r > -0.05 && r < 0.05) {
                 double r2 = _rand.standNormalDistrDouble();
                 if (r2 > -2 && r2 < -1) {
                     c.setBlock(x, y + 1, z, (byte) 0x0);
@@ -143,7 +143,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      */
     float calcForestDensity(float x, float y, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.009f * x, 0.009f * y, 0.009f * z, 4, 2.3614521f);
+        result += _pGen3.multiFractalNoise(0.0009f * x, 0.0009f * y, 0.0009f * z, 9, 2.3614521f);
         return result;
     }
 

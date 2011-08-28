@@ -264,6 +264,7 @@ public class ChunkMesh extends RenderableObject {
                 glCallList(_displayListOpaque);
         } else {
             glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glEnable(GL_ALPHA_TEST);
             glAlphaFunc(GL_GREATER, 0.5f);
 
@@ -290,5 +291,9 @@ public class ChunkMesh extends RenderableObject {
     @Override
     public void update() {
         // Do nothing.
+    }
+
+    public boolean isGenerated() {
+        return _generated;
     }
 }
