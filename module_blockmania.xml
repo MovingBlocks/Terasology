@@ -13,27 +13,23 @@
   </path>
   
   <path id="blockmania.module.production.classpath">
-    <path refid="library.lwjgl.classpath"/>
-    <path refid="library.others.classpath"/>
+    <path refid="library.libs.classpath"/>
   </path>
   
   <path id="blockmania.runtime.production.module.classpath">
     <pathelement location="${blockmania.output.dir}"/>
-    <path refid="library.lwjgl.classpath"/>
-    <path refid="library.others.classpath"/>
+    <path refid="library.libs.classpath"/>
   </path>
   
   <path id="blockmania.module.classpath">
     <pathelement location="${blockmania.output.dir}"/>
-    <path refid="library.lwjgl.classpath"/>
-    <path refid="library.others.classpath"/>
+    <path refid="library.libs.classpath"/>
   </path>
   
   <path id="blockmania.runtime.module.classpath">
     <pathelement location="${blockmania.testoutput.dir}"/>
     <pathelement location="${blockmania.output.dir}"/>
-    <path refid="library.lwjgl.classpath"/>
-    <path refid="library.others.classpath"/>
+    <path refid="library.libs.classpath"/>
   </path>
   
   
