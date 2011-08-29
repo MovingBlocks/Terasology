@@ -816,6 +816,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return The comparison value
      */
     public int compareTo(Chunk o) {
+        if (o == null) {
+            return 0;
+        }
+
         if (getParent().getPlayer() != null) {
             double distance = distanceToPlayer();
             double distance2 = o.distanceToPlayer();

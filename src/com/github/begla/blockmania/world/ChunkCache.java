@@ -28,7 +28,7 @@ import java.util.TreeMap;
 public final class ChunkCache {
 
     private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
-    private final FastList<Chunk> _chunkCacheList = new FastList<Chunk>(2048);
+    private final FastList<Chunk> _chunkCacheList = new FastList<Chunk>(capacity());
 
     private final World _parent;
 
@@ -78,7 +78,11 @@ public final class ChunkCache {
 
         while (_chunkCacheList.size() > capacity()) {
             if (!first) {
-                Collections.sort(_chunkCacheList);
+                try {
+                    Collections.sort(_chunkCacheList);
+                } catch (Exception e) {
+                    // Do nothing
+                }
                 first = true;
             }
 
@@ -149,7 +153,7 @@ public final class ChunkCache {
     /**
      * @return
      */
-    int capacity() {
-        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) * 2;
+    static int capacity() {
+        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) * 2 + 1024;
     }
 }

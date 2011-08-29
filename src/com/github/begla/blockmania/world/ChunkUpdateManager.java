@@ -77,10 +77,6 @@ public final class ChunkUpdateManager {
      */
     public void updateDisplayLists() {
 
-        synchronized (this) {
-            Collections.sort(_displayListUpdates);
-        }
-
         for (int i = 0; i < Configuration.DL_UPDATES_PER_CYCLE; i++) {
 
             if (_displayListUpdates.size() > 0) {
