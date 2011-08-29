@@ -128,13 +128,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         _dirty = true;
     }
 
-    /**
-     * Saves the chunk to disk.
-     */
-    public void dispose() {
-        writeChunkToDisk();
-    }
-
     @Override
     public void render() {
         render(true);
@@ -795,7 +788,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     @Override
     public String toString() {
-        return String.format("Chunk (%d) at %s.", _chunkID, _position);
+        return String.format("Chunk (%d) at %s.", getChunkId(), _position);
     }
 
     /**
@@ -820,14 +813,14 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * Chunks are comparable by the relative distance to the player.
      *
      * @param o The chunk to compare to
-     * @return The comparement value
+     * @return The comparison value
      */
     public int compareTo(Chunk o) {
         if (getParent().getPlayer() != null) {
             return new Double(distanceToPlayer()).compareTo(o.distanceToPlayer());
         }
 
-        return new Integer(o.getChunkID()).compareTo(getChunkID());
+        return new Integer(o.getChunkId()).compareTo(getChunkId());
     }
 
     /**
@@ -868,7 +861,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * @return The id of the current chunk
      */
-    int getChunkID() {
+    public int getChunkId() {
         return _chunkID;
     }
 }

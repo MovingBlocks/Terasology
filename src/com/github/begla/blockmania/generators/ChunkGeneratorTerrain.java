@@ -71,7 +71,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
 
-                boolean set = false;
+                int firstBlockHeight = -1;
                 for (int y = (int) Configuration.CHUNK_DIMENSIONS.y; y >= 0; y--) {
 
                     if (y == 0) { // Stone ground layer
@@ -85,20 +85,29 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                     float dens = densityMap[x][y][z];
 
-                    if ((dens > 0.01f && dens < 0.02f)) {
+                    if ((dens >= 0.01f && dens < 0.012f)) {
                         /*
                          * The outer layer is made of dirt and grass.
                          */
-                        if (!set) {
+                        if (firstBlockHeight == -1) {
                             c.setBlock(x, y, z, getBlockTailpiece(getBlockTypeForPosition(y, 1.0f), y));
+
+                            /* Generate lakes */
+                            if (calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c)) < 0.15) {
+                                c.setBlock(x, y, z, (byte) 0x4);
+                            }
+
                         } else {
-                            c.setBlock(x, y, z, getBlockTypeForPosition(y, 1.0f));
+                            c.setBlock(x, y, z, getBlockTypeForPosition(y, 1.0f - ((float) (firstBlockHeight - y) / 16f)));
                         }
 
-                        set = true;
-                    } else if (dens >= 0.02f) {
+                        if (firstBlockHeight == -1)
+                            firstBlockHeight = y;
+                    } else if (dens >= 0.012f) {
                         c.setBlock(x, y, z, getBlockTailpiece(getBlockTypeForPosition(y, 0.2f), y));
-                        set = true;
+
+                        if (firstBlockHeight == -1)
+                            firstBlockHeight = y;
                     }
                 }
             }
@@ -168,12 +177,15 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @return
      */
     public float calcDensity(float x, float y, float z) {
-        float height = (float) (calcTerrainElevation(x, z) + calcLakeIntensity(x, z) * 0.3) * 0.3f + calcTerrainRoughness(x, z) * 0.2f + calcTerrainDetail(x, z) * 0.2f;
+        float height = calcTerrainElevation(x, z) + calcTerrainRoughness(x, z);
         float density = calcMountainDensity(x, y, z);
 
-        density = height + density;
-        density /= (y + 1) * 1.7f;
+        density = height - density;
 
+        if (y < 120)
+            density /= (y + 1) * 1.6f;
+        else
+            density /= (y + 1) * 2.0f;
         return density;
     }
 
@@ -186,7 +198,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += (_pGen1.noise(0.001f * x, 0.001f, 0.001f * z) + 1.0f) / 2f;
+        result += _pGen1.noise(0.0008f * x, 0.0008f * z, 0f);
         return result;
     }
 
@@ -199,21 +211,8 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.multiFractalNoise(0.0004f * x, 0.0004f, 0.0004f * z, 16, 2.151421f);
+        result += _pGen2.multiFractalNoise(0.001f * x, 0.00f, 0.001f * z, 7, 2.151421f);
 
-        return result;
-    }
-
-    /**
-     * Returns the detail level for the base terrain.
-     *
-     * @param x
-     * @param z
-     * @return
-     */
-    float calcTerrainDetail(float x, float z) {
-        float result = 0.0f;
-        result += _pGen3.ridgedMultiFractalNoise(x * 0.002f, 0.002f, z * 0.002f, 8, 2.2631f, 2f, 0.8f);
         return result;
     }
 
@@ -226,22 +225,23 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     float calcMountainDensity(float x, float y, float z) {
         float result = 0.0f;
 
-        // Turbulence
-        float turb = (float) _pGen3.noise(x * 0.1f, y * 0.1f, z * 0.1f) * 2f;
-        x += turb;
-        y += turb;
-        z += turb;
+        float x1, y1, z1;
 
-        x *= 0.0004;
-        y *= 0.0005;
-        z *= 0.0004;
+        x1 = x * 0.0007f;
+        y1 = y * 0.0009f;
+        z1 = z * 0.0007f;
 
-        result += _pGen2.noise(x * 256.038729, y * 256.038729, z * 256.038729) * 0.075;
-        result += _pGen2.noise(x * 128.37821, y * 128.37821, z * 128.37821) * 0.125;
-        result += _pGen2.noise(x * 92.313, y * 92.313, z * 92.313) * 0.25;
-        result += _pGen2.noise(x * 48.96, y * 48.96, z * 48.96) * 0.5;
-        result += _pGen2.noise(x * 24.48, y * 24.48, z * 24.48) * 0.75;
-        result += _pGen2.noise(x * 1.00, y * 1.00, z * 1.00) * 1.0;
+        float oct1 = 1.432f, oct2 = 4.4281f, oct3 = 7.371f, oct4 = 11.463819f, oct5 = 14.62819f, oct6 = 22.3672891f, oct7 = 44.47381f, oct8 = 53.47381f, oct9 = 64.47381f;
+
+        result += _pGen2.noise(x1 * oct9, y1 * oct9, z1 * oct9) * 0.2;
+        result += _pGen2.noise(x1 * oct8, y1 * oct8, z1 * oct8) * 0.3;
+        result += _pGen2.noise(x1 * oct7, y1 * oct7, z1 * oct7) * 0.4;
+        result += _pGen2.noise(x1 * oct6, y1 * oct6, z1 * oct6) * 0.5;
+        result += _pGen2.noise(x1 * oct5, y1 * oct5, z1 * oct5) * 0.6;
+        result += _pGen2.noise(x1 * oct4, y1 * oct4, z1 * oct4) * 0.7;
+        result += _pGen2.noise(x1 * oct3, y1 * oct3, z1 * oct3) * 0.8;
+        result += _pGen2.noise(x1 * oct2, y1 * oct2, z1 * oct2) * 0.9;
+        result += _pGen2.noise(x1 * oct1, y1 * oct1, z1 * oct1) * 1.0;
 
         return result;
     }
@@ -254,7 +254,8 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     float calcLakeIntensity(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(x * 0.01f, 0.01f, 0.01f * z, 3, 1.9836171f);
+        result += _pGen3.multiFractalNoise(x * 0.01f, 0.01f, 0.01f * z, 8, 2.1836171f);
         return (float) Math.sqrt(Math.abs(result));
     }
+
 }

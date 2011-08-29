@@ -15,8 +15,6 @@
  */
 package com.github.begla.blockmania.utilities;
 
-import java.util.ArrayList;
-
 /**
  * Improved Perlin noise based on the reference implementation by Ken Perlin.
  *
@@ -31,18 +29,15 @@ public class PerlinNoise {
      */
     public PerlinNoise(int seed) {
         FastRandom rand = new FastRandom(seed);
-        noisePerm = new int[256];
-
-        ArrayList<Integer> permutations = new ArrayList<Integer>();
+        noisePerm = new int[512];
 
         for (int i = 0; i < 256; i++) {
-            permutations.add(i);
-        }
+            int r = rand.randomInt();
 
-        rand.shuffle(permutations);
+            if (r < 0)
+                r *= -1;
 
-        for (int i = 0; i < 256; i++) {
-            noisePerm[i] = permutations.get(i);
+            noisePerm[i] = noisePerm[i+256] = r % 256;
         }
     }
 

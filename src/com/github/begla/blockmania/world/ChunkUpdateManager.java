@@ -166,7 +166,9 @@ public final class ChunkUpdateManager {
                  * ... if yes, regenerate the vertex arrays
                  */
                 c.generateMesh();
-                _displayListUpdates.add(c);
+                synchronized (this) {
+                    _displayListUpdates.add(c);
+                }
                 _amountGeneratedChunks++;
             }
         }

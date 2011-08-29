@@ -37,7 +37,7 @@ public class BlockWater extends Block {
 
     @Override
     public boolean isPenetrable() {
-        return false;
+        return true;
     }
 
     @Override

@@ -490,7 +490,7 @@ public final class Player extends RenderableObject {
         oldPosition.set(_position);
 
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-            _position.z += 0.1;
+            _position.z += 0.05;
             return;
         }
 

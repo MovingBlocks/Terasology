@@ -296,4 +296,19 @@ public class ChunkMesh extends RenderableObject {
     public boolean isGenerated() {
         return _generated;
     }
+
+    protected void finalize() {
+        if (_displayListBillboard != -1) {
+            glDeleteLists(_displayListBillboard, 1);
+            _displayListBillboard = -1;
+        }
+        if (_displayListOpaque != -1) {
+            glDeleteLists(_displayListOpaque, 1);
+            _displayListOpaque = -1;
+        }
+        if (_displayListTranslucent != -1) {
+            glDeleteLists(_displayListTranslucent, 1);
+            _displayListTranslucent = -1;
+        }
+    }
 }

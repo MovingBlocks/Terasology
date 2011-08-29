@@ -277,9 +277,7 @@ public final class World extends RenderableObject {
         try {
             Helper.LOGGER.log(Level.INFO, "Loading world textures...");
             _textureSun = TextureLoader.getTexture("png", ResourceLoader.getResource("DATA/sun.png").openStream(), GL_NEAREST);
-            _textureSun.bind();
             _textureMoon = TextureLoader.getTexture("png", ResourceLoader.getResource("DATA/moon.png").openStream(), GL_NEAREST);
-            _textureMoon.bind();
             Helper.LOGGER.log(Level.INFO, "Finished loading world textures!");
         } catch (IOException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);
@@ -302,7 +300,6 @@ public final class World extends RenderableObject {
         } catch (IOException ex) {
             Helper.LOGGER.log(Level.SEVERE, null, ex);
         }
-
 
         // Init display lists
         _dlClouds = glGenLists(1);
@@ -368,7 +365,7 @@ public final class World extends RenderableObject {
          */
         if (_dlClouds > 0) {
             glPushMatrix();
-            glTranslatef(_player.getPosition().x + _cloudOffset.x, 180f, _player.getPosition().z + _cloudOffset.y);
+            glTranslatef(_player.getPosition().x + _cloudOffset.x, 140f, _player.getPosition().z + _cloudOffset.y);
             glCallList(_dlClouds);
             glPopMatrix();
         }
@@ -451,15 +448,15 @@ public final class World extends RenderableObject {
         _cloudOffset.x += _windDirection.x;
         _cloudOffset.y += _windDirection.y;
 
-        if (_cloudOffset.x >= _clouds.length * 16 / 2 || _cloudOffset.x <= -(_clouds.length * 16 / 2)) {
+        if (_cloudOffset.x >= _clouds.length * 64 / 2 || _cloudOffset.x <= -(_clouds.length * 64 / 2)) {
             _windDirection.x = -_windDirection.x;
-        } else if (_cloudOffset.y >= _clouds.length * 32 / 2 || _cloudOffset.y <= -(_clouds.length * 32 / 2)) {
+        } else if (_cloudOffset.y >= _clouds.length * 64 / 2 || _cloudOffset.y <= -(_clouds.length * 64 / 2)) {
             _windDirection.y = -_windDirection.y;
         }
 
         if (Helper.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
-            _windDirection.x = (float) _rand.randomDouble() / 4f;
-            _windDirection.y = (float) _rand.randomDouble() / 4f;
+            _windDirection.x = (float) _rand.randomDouble();
+            _windDirection.y = (float) _rand.randomDouble();
             _nextWindUpdateInSeconds = (short) (Math.abs(_rand.randomInt()) % 16 + 32);
             _lastWindUpdate = Helper.getInstance().getTime();
         }
@@ -1041,7 +1038,6 @@ public final class World extends RenderableObject {
 
         } catch (Exception ignored) {
         }
-
     }
 
     /**

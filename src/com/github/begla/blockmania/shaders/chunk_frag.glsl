@@ -6,7 +6,7 @@ uniform float daylight = 1.0;
 varying float fog;
 varying vec3 normal;
 
-vec3 daylightColor = vec3(0.96, 0.92, 0.96);
+vec3 daylightColor = vec3(1.01, 0.99, 0.98);
 vec3 moonlightColor = vec3(0.7, 0.7, 1.0);
 
 vec4 srgbToLinear(vec4 color){

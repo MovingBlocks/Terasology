@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.Chunk;
 
 /**
@@ -45,7 +46,25 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
                     generateGrassAndFlowers(c, x, y, z);
-                    generateTree(c, x, y, z);
+                }
+            }
+        }
+
+        FastRandom rand = new FastRandom(c.getChunkId());
+
+        for (int y = 32; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
+            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x += 4) {
+                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z += 4) {
+                    float forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+                    if (forestDens > 0.01) {
+
+                        int randX = x + rand.randomInt() % 12;
+                        int randZ = z + rand.randomInt() % 12;
+
+                        if (c.getBlock(randX, y, randZ) == 0x1) {
+                            generateTree(c, randX, y, randZ);
+                        }
+                    }
                 }
             }
         }
@@ -57,10 +76,11 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      * @param y
      * @param z
      */
+
     void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
 
         if (c.getBlock(x, y, z) == 0x1) {
-            float grassDens = calcGrassDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
+            float grassDens = calcGrassDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
             if (grassDens > 0.0) {
                 /*
@@ -103,33 +123,16 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      * @param z
      */
     void generateTree(Chunk c, int x, int y, int z) {
-        // Do not create trees too close to surrounding blocks.
-        if (c.getParent().isBlockSurrounded(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y + 1), c.getBlockWorldPosZ(z)) || !c.canBlockSeeTheSky(x, y + 1, z)) {
-            return;
-        }
-
-        if (c.getBlock(x, y, z) == 0x1 && y > 32) {
-            float forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z));
-            double r = _rand.standNormalDistrDouble();
-
-            // Create some trees outside of forests
-            if (forestDens < 0) {
-                r += 1f;
-            }
-
-            if (r > -0.05 && r < 0.05) {
-                double r2 = _rand.standNormalDistrDouble();
-                if (r2 > -2 && r2 < -1) {
-                    c.setBlock(x, y + 1, z, (byte) 0x0);
-                    c.getParent().getGeneratorPineTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
-                } else if (r2 > -3 && r2 < -2) {
-                    c.setBlock(x, y + 1, z, (byte) 0x0);
-                    c.getParent().getGeneratorFirTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
-                } else {
-                    c.setBlock(x, y + 1, z, (byte) 0x0);
-                    c.getParent().getGeneratorTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
-                }
-            }
+        double r2 = _rand.standNormalDistrDouble();
+        if (r2 > -2 && r2 < -1) {
+            c.setBlock(x, y + 1, z, (byte) 0x0);
+            c.getParent().getGeneratorPineTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
+        } else if (r2 > 1 && r2 < 2) {
+            c.setBlock(x, y + 1, z, (byte) 0x0);
+            c.getParent().getGeneratorFirTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
+        } else {
+            c.setBlock(x, y + 1, z, (byte) 0x0);
+            c.getParent().getGeneratorTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
         }
     }
 
@@ -137,25 +140,23 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      * Returns the cave density for the base terrain.
      *
      * @param x
-     * @param y
      * @param z
      * @return
      */
-    float calcForestDensity(float x, float y, float z) {
+    float calcForestDensity(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.0009f * x, 0.0009f * y, 0.0009f * z, 9, 2.3614521f);
+        result += _pGen3.multiFractalNoise(0.4f * x, 0f, 0.4f * z, 3, 2.3614521f);
         return result;
     }
 
     /**
      * @param x
-     * @param y
      * @param z
      * @return
      */
-    float calcGrassDensity(float x, float y, float z) {
+    float calcGrassDensity(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.02f * x, 0.02f * y, 0.02f * z, 8, 2.37152f);
+        result += _pGen3.multiFractalNoise(0.2f * x, 0f, 0.2f * z, 3, 2.37152f);
         return result;
     }
 }

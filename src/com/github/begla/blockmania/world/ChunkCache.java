@@ -16,13 +16,13 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
 
 import java.util.Collections;
+import java.util.Queue;
+import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.logging.Level;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -30,6 +30,8 @@ import java.util.logging.Level;
 public final class ChunkCache {
 
     private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
+    private final FastList<Chunk> _chunkCacheList = new FastList<Chunk>(2048);
+
     private final World _parent;
 
     /**
@@ -63,34 +65,23 @@ public final class ChunkCache {
             return c;
         }
 
-        // Delete some elements if the cache size is exceeded
-        if (_chunkCache.size() > capacity()) {
-            // Fetch all chunks within the cache
-            FastList<Chunk> sortedChunks;
-            sortedChunks = new FastList<Chunk>(_chunkCache.values());
-            // Sort them according to their distance to the player
-            Collections.sort(sortedChunks);
+        // Delete the oldest element if the cache size is exceeded
+        if (_chunkCacheList.size() > capacity()) {
+            Collections.sort(_chunkCacheList);
+            Chunk chunkToDeltete = _chunkCacheList.removeLast();
 
-            Helper.LOGGER.log(Level.FINE, "Cache full. Removing some chunks from the chunk cache...");
-
-            // Free some space
-            for (int i = 0; i < 32; i++) {
-                int indexToDelete = sortedChunks.size() - i;
-
-                if (indexToDelete >= 0 && indexToDelete < sortedChunks.size()) {
-                    Chunk cc = sortedChunks.get(indexToDelete);
-                    // Save the chunk before removing it from the cache
-                    _chunkCache.remove(MathHelper.cantorize((int) cc.getPosition().x, (int) cc.getPosition().z));
-                    cc.dispose();
-                }
+            if (chunkToDeltete != null) {
+                // Save the chunk before removing it from the cache
+                _chunkCache.remove(chunkToDeltete.getChunkId());
+                chunkToDeltete.writeChunkToDisk();
             }
-
-            Helper.LOGGER.log(Level.FINE, "Finished removing chunks from the chunk cache.");
         }
 
         // Init a new chunk
         c = _parent.prepareNewChunk(x, z);
-        _chunkCache.put(MathHelper.cantorize(x, z), c);
+
+        _chunkCache.put(c.getChunkId(), c);
+        _chunkCacheList.add(c);
 
         return c;
     }
