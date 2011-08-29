@@ -179,7 +179,7 @@ public final class World extends RenderableObject {
                     _chunkUpdateManager.updateChunk();
 
                     // Update the the list of visible chunks
-                    synchronized (_updateThread) {
+                    synchronized (this) {
                         _visibleChunks = fetchVisibleChunks();
                     }
 
@@ -420,13 +420,13 @@ public final class World extends RenderableObject {
      * Renders all active chunks.
      */
     void renderChunks() {
-        synchronized (_updateThread) {
-            for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
-                _visibleChunks.valueOf(n).render(false);
-            }
-            for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
-                _visibleChunks.valueOf(n).render(true);
-            }
+        FastSet<Chunk> visibleChunks = _visibleChunks;
+
+        for (FastSet.Record n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            visibleChunks.valueOf(n).render(false);
+        }
+        for (FastSet.Record n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            visibleChunks.valueOf(n).render(true);
         }
     }
 
@@ -438,7 +438,7 @@ public final class World extends RenderableObject {
 
         FastSet<Chunk> visibleChunks;
 
-        synchronized (_updateThread) {
+        synchronized (this) {
             visibleChunks = _visibleChunks;
         }
 
