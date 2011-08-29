@@ -178,11 +178,6 @@ public final class World extends RenderableObject {
                      */
                     _chunkUpdateManager.updateChunk();
 
-                    // Update the the list of visible chunks
-                    synchronized (this) {
-                        _visibleChunks = fetchVisibleChunks();
-                    }
-
                     /*
                      * Update the time of day.
                      */
@@ -408,7 +403,9 @@ public final class World extends RenderableObject {
                 Chunk c = _chunkCache.loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
 
                 if (c != null) {
-                    visibleChunks.add(c);
+                    if (_player.getViewFrustum().Intersects(c.getAABB())) {
+                        visibleChunks.add(c);
+                    }
                 }
             }
         }
@@ -420,13 +417,22 @@ public final class World extends RenderableObject {
      * Renders all active chunks.
      */
     void renderChunks() {
-        FastSet<Chunk> visibleChunks = _visibleChunks;
 
-        for (FastSet.Record n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            visibleChunks.valueOf(n).render(false);
+        _visibleChunks = fetchVisibleChunks();
+
+        for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            Chunk c = _visibleChunks.valueOf(n);
+
+            c.render(false);
+
+            if (Configuration.getSettingBoolean("CHUNK_OUTLINES")) {
+                c.getAABB().render();
+            }
+
         }
-        for (FastSet.Record n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            visibleChunks.valueOf(n).render(true);
+
+        for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            _visibleChunks.valueOf(n).render(true);
         }
     }
 
@@ -435,12 +441,6 @@ public final class World extends RenderableObject {
      */
     @Override
     public void update() {
-
-        FastSet<Chunk> visibleChunks;
-
-        synchronized (this) {
-            visibleChunks = _visibleChunks;
-        }
 
         _player.update();
 
@@ -463,11 +463,11 @@ public final class World extends RenderableObject {
             _lastWindUpdate = Helper.getInstance().getTime();
         }
 
-        for (Chunk c : visibleChunks) {
+        for (Chunk c : _visibleChunks) {
             c.update();
         }
 
-        _chunkUpdateManager.updateVisibleChunks(visibleChunks);
+        _chunkUpdateManager.updateVisibleChunks(_visibleChunks);
     }
 
     /**

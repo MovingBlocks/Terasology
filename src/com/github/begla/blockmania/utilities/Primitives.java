@@ -192,43 +192,4 @@ public class Primitives {
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
     }
-
-    /**
-     * Draws the outline of a chunk.
-     */
-    public static void drawChunkOutline() {
-        glLineWidth(2.0f);
-        glColor3f(255.0f, 255.0f, 255.0f);
-
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
-        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
-        glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
-        glEnd();
-
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
-        glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
-        glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glEnd();
-
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(0.0f, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
-        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
-        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
-        glVertex3f(0.0f, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
-        glVertex3f(0.0f, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
-        glEnd();
-
-        glBegin(GL_LINE_LOOP);
-        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
-        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, Configuration.CHUNK_DIMENSIONS.z);
-        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, Configuration.CHUNK_DIMENSIONS.z);
-        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, Configuration.CHUNK_DIMENSIONS.y, 0.0f);
-        glVertex3f(Configuration.CHUNK_DIMENSIONS.x, 0.0f, 0.0f);
-        glEnd();
-    }
 }

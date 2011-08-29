@@ -171,4 +171,20 @@ public class AABB extends RenderableObject {
 
         return VectorPool.getVector();
     }
+
+    public Vector3f[] getVertices() {
+
+        Vector3f[] result = new Vector3f[8];
+
+        result[0] = VectorPool.getVector(_position.x + _dimensions.x, _position.y - _dimensions.y, _position.z + _dimensions.z);
+        result[1] = VectorPool.getVector(_position.x + _dimensions.x, _position.y + _dimensions.y, _position.z + _dimensions.z);
+        result[2] = VectorPool.getVector(_position.x - _dimensions.x, _position.y + _dimensions.y, _position.z + _dimensions.z);
+        result[3] = VectorPool.getVector(_position.x - _dimensions.x, _position.y - _dimensions.y, _position.z + _dimensions.z);
+        result[4] = VectorPool.getVector(_position.x + _dimensions.x, _position.y - _dimensions.y, _position.z - _dimensions.z);
+        result[5] = VectorPool.getVector(_position.x + _dimensions.x, _position.y + _dimensions.y, _position.z - _dimensions.z);
+        result[6] = VectorPool.getVector(_position.x - _dimensions.x, _position.y + _dimensions.y, _position.z - _dimensions.z);
+        result[7] = VectorPool.getVector(_position.x - _dimensions.x, _position.y - _dimensions.y, _position.z - _dimensions.z);
+
+        return result;
+    }
 }

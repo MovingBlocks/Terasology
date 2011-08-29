@@ -19,6 +19,7 @@ import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
 import com.github.begla.blockmania.generators.ChunkGenerator;
+import com.github.begla.blockmania.player.AABB;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.utilities.Primitives;
@@ -72,6 +73,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private final FastList<ChunkGenerator> _generators = new FastList<ChunkGenerator>();
     /* ------ */
     private ChunkMeshGenerator _meshGenerator;
+    /* ------ */
+    private AABB _aabb;
 
     /**
      *
@@ -150,17 +153,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param translucent True if the translucent elements should be rendered
      */
     public void render(boolean translucent) {
-
-        /*
-         * Draws the outline of each chunk.
-         */
-        if (Configuration.getSettingBoolean("CHUNK_OUTLINES")) {
-            glPushMatrix();
-            glTranslatef(_position.x * (int) Configuration.CHUNK_DIMENSIONS.x, _position.y * (int) Configuration.CHUNK_DIMENSIONS.y, _position.z * (int) Configuration.CHUNK_DIMENSIONS.z);
-            Primitives.drawChunkOutline();
-            glPopMatrix();
-        }
-
         // Render the generated chunk mesh
         if (_activeMesh != null) {
             ShaderManager.getInstance().enableShader("chunk");
@@ -834,6 +826,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             return 0;
 
         return o.getChunkId() > getChunkId() ? 1 : -1;
+    }
+
+    public AABB getAABB() {
+        if (_aabb == null) {
+            Vector3f dimensions = new Vector3f(Configuration.CHUNK_DIMENSIONS.x / 2, Configuration.CHUNK_DIMENSIONS.y / 2, Configuration.CHUNK_DIMENSIONS.z / 2);
+            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX(), getChunkWorldPosY() + dimensions.getY(), getChunkWorldPosZ() + dimensions.getZ());
+            _aabb = new AABB(position, dimensions);
+        }
+        return _aabb;
     }
 
     /**

@@ -18,9 +18,7 @@ package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.utilities.PerlinNoise;
-import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.utilities.*;
 import com.github.begla.blockmania.world.RenderableObject;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
@@ -54,6 +52,8 @@ public final class Player extends RenderableObject {
     private final PerlinNoise _pGen = new PerlinNoise((int) Helper.getInstance().getTime());
     private final Vector3f _viewingDirection = VectorPool.getVector();
     private boolean _playerIsTouchingGround = false;
+
+    private ViewFrustum _viewFrustum = new ViewFrustum();
 
     /**
      * Init. the player
@@ -97,6 +97,9 @@ public final class Player extends RenderableObject {
 
         float newPosY = _position.y + getAABB().getDimensions().y / 1.2f + bobbing1;
         GLU.gluLookAt(_position.x, newPosY, _position.z, _position.x + _viewingDirection.x, newPosY + _viewingDirection.y, _position.z + _viewingDirection.z, 0, 1, 0);
+
+        // Update the current view frustum
+        _viewFrustum.updateFrustum();
     }
 
     public void applyNormalizedModelViewMatrix() {
@@ -637,5 +640,9 @@ public final class Player extends RenderableObject {
      */
     AABB getAABB() {
         return new AABB(_position, VectorPool.getVector(.3f, 0.7f, .3f));
+    }
+
+    public ViewFrustum getViewFrustum() {
+        return _viewFrustum;
     }
 }
