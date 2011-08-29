@@ -20,8 +20,6 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
 
 import java.util.Collections;
-import java.util.Queue;
-import java.util.SortedSet;
 import java.util.TreeMap;
 
 /**
@@ -65,9 +63,25 @@ public final class ChunkCache {
             return c;
         }
 
-        // Delete the oldest element if the cache size is exceeded
-        if (_chunkCacheList.size() > capacity()) {
-            Collections.sort(_chunkCacheList);
+        // Init a new chunk
+        c = _parent.prepareNewChunk(x, z);
+
+        _chunkCache.put(c.getChunkId(), c);
+        _chunkCacheList.add(c);
+
+        return c;
+    }
+
+    public void flushCache() {
+
+        boolean first = false;
+
+        while (_chunkCacheList.size() > capacity()) {
+            if (!first) {
+                Collections.sort(_chunkCacheList);
+                first = true;
+            }
+
             Chunk chunkToDeltete = _chunkCacheList.removeLast();
 
             if (chunkToDeltete != null) {
@@ -76,14 +90,6 @@ public final class ChunkCache {
                 chunkToDeltete.writeChunkToDisk();
             }
         }
-
-        // Init a new chunk
-        c = _parent.prepareNewChunk(x, z);
-
-        _chunkCache.put(c.getChunkId(), c);
-        _chunkCacheList.add(c);
-
-        return c;
     }
 
     /**

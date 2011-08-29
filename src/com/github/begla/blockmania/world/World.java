@@ -192,6 +192,8 @@ public final class World extends RenderableObject {
                      * Evolve chunks.
                      */
                     replantDirt();
+
+                    _chunkCache.flushCache();
                 }
             }
         });
