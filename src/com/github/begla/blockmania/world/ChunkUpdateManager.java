@@ -84,11 +84,7 @@ public final class ChunkUpdateManager {
 
                 if (c != null) {
                     // Generate the display list of the center chunk
-                    try {
-                        c.generateDisplayLists();
-                    } catch (Exception e) {
-                        // Do nothing
-                    }
+                    c.generateDisplayLists();
                 }
 
                 synchronized (this) {

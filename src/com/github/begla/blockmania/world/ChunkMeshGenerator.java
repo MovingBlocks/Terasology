@@ -74,11 +74,11 @@ public class ChunkMeshGenerator {
         TFloatArrayList l;
 
         if (r == RENDER_TYPE.BILLBOARD) {
-            l = mesh.texLightBillboard;
+            l = mesh._vertexElements[2].light;
         } else if (r == RENDER_TYPE.TRANS) {
-            l = mesh.texLightTranslucent;
+            l = mesh._vertexElements[1].light;
         } else {
-            l = mesh.texLightOpaque;
+            l = mesh._vertexElements[0].light;
         }
 
         float sunlight = (float) _chunk.getParent().getLight(_chunk.getBlockWorldPosX(x) + dirX, _chunk.getBlockWorldPosY(y) + dirY, _chunk.getBlockWorldPosZ(z) + dirZ, Chunk.LIGHT_TYPE.SUN) / 15f;
@@ -116,48 +116,48 @@ public class ChunkMeshGenerator {
         float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y;
 
         addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
-        mesh.colorBillboard.add(_colorBillboardOffset.x);
-        mesh.colorBillboard.add(_colorBillboardOffset.y);
-        mesh.colorBillboard.add(_colorBillboardOffset.z);
-        mesh.colorBillboard.add(_colorBillboardOffset.w);
-        mesh.texBillboard.add(texOffsetX);
-        mesh.texBillboard.add(texOffsetY + 0.0624f);
-        mesh.quadsBillboard.add(-0.5f + x + offsetX);
-        mesh.quadsBillboard.add(-0.5f + y + offsetY);
-        mesh.quadsBillboard.add(z + offsetZ);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
+        mesh._vertexElements[2].tex.add(texOffsetX);
+        mesh._vertexElements[2].tex.add(texOffsetY + 0.0624f);
+        mesh._vertexElements[2].quads.add(-0.5f + x + offsetX);
+        mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
+        mesh._vertexElements[2].quads.add(z + offsetZ);
 
         addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
-        mesh.colorBillboard.add(_colorBillboardOffset.x);
-        mesh.colorBillboard.add(_colorBillboardOffset.y);
-        mesh.colorBillboard.add(_colorBillboardOffset.z);
-        mesh.colorBillboard.add(_colorBillboardOffset.w);
-        mesh.texBillboard.add(texOffsetX + 0.0624f);
-        mesh.texBillboard.add(texOffsetY + 0.0624f);
-        mesh.quadsBillboard.add(0.5f + x + offsetX);
-        mesh.quadsBillboard.add(-0.5f + y + offsetY);
-        mesh.quadsBillboard.add(z + offsetZ);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
+        mesh._vertexElements[2].tex.add(texOffsetX + 0.0624f);
+        mesh._vertexElements[2].tex.add(texOffsetY + 0.0624f);
+        mesh._vertexElements[2].quads.add(0.5f + x + offsetX);
+        mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
+        mesh._vertexElements[2].quads.add(z + offsetZ);
 
         addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
-        mesh.colorBillboard.add(_colorBillboardOffset.x);
-        mesh.colorBillboard.add(_colorBillboardOffset.y);
-        mesh.colorBillboard.add(_colorBillboardOffset.z);
-        mesh.colorBillboard.add(_colorBillboardOffset.w);
-        mesh.texBillboard.add(texOffsetX + 0.0624f);
-        mesh.texBillboard.add(texOffsetY);
-        mesh.quadsBillboard.add(0.5f + x + offsetX);
-        mesh.quadsBillboard.add(0.5f + y + offsetY);
-        mesh.quadsBillboard.add(z + offsetZ);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
+        mesh._vertexElements[2].tex.add(texOffsetX + 0.0624f);
+        mesh._vertexElements[2].tex.add(texOffsetY);
+        mesh._vertexElements[2].quads.add(0.5f + x + offsetX);
+        mesh._vertexElements[2].quads.add(0.5f + y + offsetY);
+        mesh._vertexElements[2].quads.add(z + offsetZ);
 
         addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
-        mesh.colorBillboard.add(_colorBillboardOffset.x);
-        mesh.colorBillboard.add(_colorBillboardOffset.y);
-        mesh.colorBillboard.add(_colorBillboardOffset.z);
-        mesh.colorBillboard.add(_colorBillboardOffset.w);
-        mesh.texBillboard.add(texOffsetX);
-        mesh.texBillboard.add(texOffsetY);
-        mesh.quadsBillboard.add(-0.5f + x + offsetX);
-        mesh.quadsBillboard.add(0.5f + y + offsetY);
-        mesh.quadsBillboard.add(z + offsetZ);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
+        mesh._vertexElements[2].tex.add(texOffsetX);
+        mesh._vertexElements[2].tex.add(texOffsetY);
+        mesh._vertexElements[2].quads.add(-0.5f + x + offsetX);
+        mesh._vertexElements[2].quads.add(0.5f + y + offsetY);
+        mesh._vertexElements[2].quads.add(z + offsetZ);
 
 
         /*
@@ -168,48 +168,48 @@ public class ChunkMeshGenerator {
         texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y;
 
         addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
-        mesh.colorBillboard.add(_colorBillboardOffset.x);
-        mesh.colorBillboard.add(_colorBillboardOffset.y);
-        mesh.colorBillboard.add(_colorBillboardOffset.z);
-        mesh.colorBillboard.add(_colorBillboardOffset.w);
-        mesh.texBillboard.add(texOffsetX);
-        mesh.texBillboard.add(texOffsetY + 0.0624f);
-        mesh.quadsBillboard.add(x + offsetX);
-        mesh.quadsBillboard.add(-0.5f + y + offsetY);
-        mesh.quadsBillboard.add(-0.5f + z + offsetZ);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
+        mesh._vertexElements[2].tex.add(texOffsetX);
+        mesh._vertexElements[2].tex.add(texOffsetY + 0.0624f);
+        mesh._vertexElements[2].quads.add(x + offsetX);
+        mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
+        mesh._vertexElements[2].quads.add(-0.5f + z + offsetZ);
 
         addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
-        mesh.colorBillboard.add(_colorBillboardOffset.x);
-        mesh.colorBillboard.add(_colorBillboardOffset.y);
-        mesh.colorBillboard.add(_colorBillboardOffset.z);
-        mesh.colorBillboard.add(_colorBillboardOffset.w);
-        mesh.texBillboard.add(texOffsetX + 0.0624f);
-        mesh.texBillboard.add(texOffsetY + 0.0624f);
-        mesh.quadsBillboard.add(x + offsetX);
-        mesh.quadsBillboard.add(-0.5f + y + offsetY);
-        mesh.quadsBillboard.add(0.5f + z + offsetZ);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
+        mesh._vertexElements[2].tex.add(texOffsetX + 0.0624f);
+        mesh._vertexElements[2].tex.add(texOffsetY + 0.0624f);
+        mesh._vertexElements[2].quads.add(x + offsetX);
+        mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
+        mesh._vertexElements[2].quads.add(0.5f + z + offsetZ);
 
         addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
-        mesh.colorBillboard.add(_colorBillboardOffset.x);
-        mesh.colorBillboard.add(_colorBillboardOffset.y);
-        mesh.colorBillboard.add(_colorBillboardOffset.z);
-        mesh.colorBillboard.add(_colorBillboardOffset.w);
-        mesh.texBillboard.add(texOffsetX + 0.0624f);
-        mesh.texBillboard.add(texOffsetY);
-        mesh.quadsBillboard.add(x + offsetX);
-        mesh.quadsBillboard.add(0.5f + y + offsetY);
-        mesh.quadsBillboard.add(0.5f + z + offsetZ);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
+        mesh._vertexElements[2].tex.add(texOffsetX + 0.0624f);
+        mesh._vertexElements[2].tex.add(texOffsetY);
+        mesh._vertexElements[2].quads.add(x + offsetX);
+        mesh._vertexElements[2].quads.add(0.5f + y + offsetY);
+        mesh._vertexElements[2].quads.add(0.5f + z + offsetZ);
 
         addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
-        mesh.colorBillboard.add(_colorBillboardOffset.x);
-        mesh.colorBillboard.add(_colorBillboardOffset.y);
-        mesh.colorBillboard.add(_colorBillboardOffset.z);
-        mesh.colorBillboard.add(_colorBillboardOffset.w);
-        mesh.texBillboard.add(texOffsetX);
-        mesh.texBillboard.add(texOffsetY);
-        mesh.quadsBillboard.add(x + offsetX);
-        mesh.quadsBillboard.add(0.5f + y + offsetY);
-        mesh.quadsBillboard.add(-0.5f + z + offsetZ);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
+        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
+        mesh._vertexElements[2].tex.add(texOffsetX);
+        mesh._vertexElements[2].tex.add(texOffsetY);
+        mesh._vertexElements[2].quads.add(x + offsetX);
+        mesh._vertexElements[2].quads.add(0.5f + y + offsetY);
+        mesh._vertexElements[2].quads.add(-0.5f + z + offsetZ);
     }
 
     private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z) {
@@ -402,16 +402,16 @@ public class ChunkMeshGenerator {
         float offsetY = _chunk.getPosition().y * Configuration.CHUNK_DIMENSIONS.y;
         float offsetZ = _chunk.getPosition().z * Configuration.CHUNK_DIMENSIONS.z;
 
-        TFloatArrayList color = mesh.colorOpaque;
-        TFloatArrayList normals = mesh.normalsOpaque;
-        TFloatArrayList tex = mesh.texOpaque;
-        TFloatArrayList quads = mesh.quadsOpaque;
+        TFloatArrayList color = mesh._vertexElements[0].color;
+        TFloatArrayList normals = mesh._vertexElements[0].normals;
+        TFloatArrayList tex = mesh._vertexElements[0].tex;
+        TFloatArrayList quads = mesh._vertexElements[0].quads;
 
         if (renderType == RENDER_TYPE.TRANS) {
-            color = mesh.colorTranslucent;
-            normals = mesh.normalsTranslucent;
-            tex = mesh.texTranslucent;
-            quads = mesh.quadsTranslucent;
+            color = mesh._vertexElements[1].color;
+            normals = mesh._vertexElements[1].normals;
+            tex = mesh._vertexElements[1].tex;
+            quads = mesh._vertexElements[1].quads;
         }
 
         /*
@@ -544,6 +544,6 @@ public class ChunkMeshGenerator {
             VectorPool.putVector(p);
         }
 
-        return (float) Math.pow(Configuration.OCCLUSION_INTENS, (float)intens/ 4.0f);
+        return (float) Math.pow(Configuration.OCCLUSION_INTENS, (float) intens / 4.0f);
     }
 }

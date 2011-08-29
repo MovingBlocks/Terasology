@@ -254,9 +254,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      *
      * @throws Exception Thrown if a mesh is tried to generated twice
      */
-    public void generateDisplayLists() throws Exception {
+    public void generateDisplayLists() {
         if (_newMesh != null) {
-            _newMesh.generateDisplayLists();
+            _newMesh.generateVBOs();
         }
     }
 
