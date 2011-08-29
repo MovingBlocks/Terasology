@@ -195,7 +195,7 @@ public final class Main {
         // Update the viewing distance
         float minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
         float viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, viewingDistance*0.25f);
+        glFogf(GL_FOG_START, viewingDistance*0.05f);
         glFogf(GL_FOG_END, viewingDistance);
 
         /*

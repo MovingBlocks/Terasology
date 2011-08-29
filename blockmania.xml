@@ -96,19 +96,6 @@
     <jar destfile="${temp.jar.path.Blockmania.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
       <zipfileset file="${basedir}/src/META-INF/MANIFEST.MF" prefix="META-INF"/>
       <zipfileset dir="${blockmania.output.dir}"/>
-      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/AppleJavaExtensions.jar"/>
-      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/jinput.jar"/>
-      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lwjgl-debug.jar"/>
-      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lwjgl.jar"/>
-      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lwjgl_test.jar"/>
-      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lwjgl_util.jar"/>
-      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lwjgl_util_applet.jar"/>
-      <zipfileset src="${basedir}/lib/lwjgl-2.7.1/jar/lzma.jar"/>
-      <zipfileset src="${basedir}/lib/javolution-5.5.1.jar"/>
-      <zipfileset src="${basedir}/lib/jdom.jar"/>
-      <zipfileset src="${basedir}/lib/slick-util.jar"/>
-      <zipfileset src="${basedir}/lib/slick.jar"/>
-      <zipfileset src="${basedir}/lib/trove-3.0.0rc2.jar"/>
     </jar>
     <copy file="${temp.jar.path.Blockmania.jar}" tofile="${artifact.temp.output.blockmania:jar}/Blockmania.jar"/>
   </target>

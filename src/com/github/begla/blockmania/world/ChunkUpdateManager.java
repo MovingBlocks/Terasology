@@ -48,7 +48,6 @@ public final class ChunkUpdateManager {
             return;
 
         FastList<Chunk> visibleChunks = _visibleChunks;
-        Collections.sort(visibleChunks);
 
         long timeStart = System.currentTimeMillis();
 
@@ -120,6 +119,7 @@ public final class ChunkUpdateManager {
             }
         }
 
+        Collections.sort(newVisibleChunks);
         _visibleChunks = newVisibleChunks;
     }
 

@@ -6,20 +6,6 @@
         <element id="file-copy" path="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="Blockmania" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl-2.7.1/jar/AppleJavaExtensions.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl-2.7.1/jar/jinput.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl-2.7.1/jar/lwjgl-debug.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl-2.7.1/jar/lwjgl.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl-2.7.1/jar/lwjgl_test.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl-2.7.1/jar/lwjgl_util.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl-2.7.1/jar/lwjgl_util_applet.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl-2.7.1/jar/lzma.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/javolution-5.5.1.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jdom.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/slick-util.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/slick.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/trove-3.0.0rc2.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/annotations.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

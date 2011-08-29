@@ -110,8 +110,8 @@ public class Primitives {
      * @param brightness The brightness of the skybox.
      */
     public static void drawSkyBox(float brightness) {
-        Vector3f skyColor = new Vector3f(0.92f * brightness, 0.96f * brightness, 1f * brightness);
-        Vector3f skyColor2 = new Vector3f(0.88f * brightness, 0.92f * brightness, 1f * brightness);
+        Vector3f skyColor = new Vector3f(0.72f * brightness, 0.78f * brightness, 1.0f * brightness);
+        Vector3f skyColor2 = new Vector3f(0.84f * brightness, 0.88f * brightness, 1f * brightness);
 
         // Front face
         GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);

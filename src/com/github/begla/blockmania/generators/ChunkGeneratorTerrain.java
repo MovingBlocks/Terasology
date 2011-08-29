@@ -93,7 +93,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                             c.setBlock(x, y, z, getBlockTailpiece(getBlockTypeForPosition(y, 1.0f), y));
 
                             /* Generate lakes */
-                            if (calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c)) < 0.15) {
+                            if (calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c)) < 0.1) {
                                 c.setBlock(x, y, z, (byte) 0x4);
                             }
 
@@ -177,13 +177,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @return
      */
     public float calcDensity(float x, float y, float z) {
-        float height = calcTerrainElevation(x, z) + calcTerrainRoughness(x, z);
+        float height = (calcTerrainElevation(x, z) + 1)/2 + (calcTerrainRoughness(x, z)+1) / 2;
         float density = calcMountainDensity(x, y, z);
 
         density = height - density;
 
         if (y < 120)
-            density /= (y + 1) * 1.6f;
+            density /= (y + 1) * 1.7f;
         else
             density /= (y + 1) * 2.0f;
         return density;
