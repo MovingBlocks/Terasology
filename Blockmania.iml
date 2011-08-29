@@ -4,6 +4,7 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/libs" />
     <content url="file://$MODULE_DIR$/natives" />
+    <content url="file://$MODULE_DIR$/scripts" />
     <content url="file://$MODULE_DIR$/src">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
