@@ -17,7 +17,6 @@ package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
 import javolution.util.FastList;
-import javolution.util.FastSet;
 
 import java.util.Collections;
 
@@ -27,11 +26,11 @@ import java.util.Collections;
 public final class ChunkUpdateManager {
 
     private final FastList<Chunk> _displayListUpdates = new FastList<Chunk>(128);
-    private FastList<Chunk> _visibleChunks;
 
-    private int _amountGeneratedChunks = 0;
     private double _meanUpdateDuration = 0.0f;
     private final World _parent;
+
+    private int _chunkUpdateAmount;
 
     /**
      * @param _parent
@@ -44,28 +43,24 @@ public final class ChunkUpdateManager {
      * TODO
      */
     public void updateChunk() {
-        if (_visibleChunks == null)
-            return;
-
-        FastList<Chunk> visibleChunks = _visibleChunks;
-
         long timeStart = System.currentTimeMillis();
 
-        Chunk closestChunk;
+        FastList<Chunk> dirtyChunks = new FastList<Chunk>(_parent.getVisibleChunks());
 
-        if (!visibleChunks.isEmpty()) {
-            closestChunk = visibleChunks.getFirst();
+        for (int i = dirtyChunks.size() - 1; i >= 0; i--) {
+            Chunk c = dirtyChunks.get(i);
 
-            if (closestChunk != null) {
-
-                // IMPORTANT: Do not touch any chunks which display lists are being generated at the moment!!
-                synchronized (this) {
-                    if (_displayListUpdates.contains(closestChunk))
-                        return;
-                }
-
-                processChunkUpdate(closestChunk);
+            if (!(c.isDirty() || c.isFresh() || c.isLightDirty())) {
+                dirtyChunks.remove(i);
             }
+        }
+
+        Collections.sort(dirtyChunks);
+        _chunkUpdateAmount = dirtyChunks.size();
+
+        if (!dirtyChunks.isEmpty()) {
+            Chunk closestChunk = dirtyChunks.getFirst();
+            processChunkUpdate(closestChunk);
         }
 
         _meanUpdateDuration += System.currentTimeMillis() - timeStart;
@@ -80,39 +75,14 @@ public final class ChunkUpdateManager {
         for (int i = 0; i < Configuration.DL_UPDATES_PER_CYCLE; i++) {
 
             if (_displayListUpdates.size() > 0) {
-                Chunk c = _displayListUpdates.getFirst();
+                Chunk c = _displayListUpdates.removeFirst();
 
                 if (c != null) {
                     // Generate the display list of the center chunk
                     c.generateDisplayLists();
                 }
-
-                synchronized (this) {
-                    _displayListUpdates.remove(c);
-                }
             }
         }
-    }
-
-    /**
-     * TODO
-     *
-     * @param visibleChunks
-     */
-    public void updateVisibleChunks(FastSet<Chunk> visibleChunks) {
-        FastList<Chunk> newVisibleChunks = new FastList<Chunk>(visibleChunks);
-
-        // Remove chunks which need no update
-        for (int i = newVisibleChunks.size() - 1; i >= 0; --i) {
-            Chunk c = newVisibleChunks.get(i);
-
-            if (!c.isDirty() && !c.isLightDirty() && !c.isFresh()) {
-                newVisibleChunks.remove(i);
-            }
-        }
-
-        Collections.sort(newVisibleChunks);
-        _visibleChunks = newVisibleChunks;
     }
 
     /**
@@ -158,10 +128,7 @@ public final class ChunkUpdateManager {
                  * ... if yes, regenerate the vertex arrays
                  */
                 c.generateMesh();
-                synchronized (this) {
-                    _displayListUpdates.add(c);
-                }
-                _amountGeneratedChunks++;
+                _displayListUpdates.add(c);
             }
         }
     }
@@ -170,7 +137,7 @@ public final class ChunkUpdateManager {
      * @return
      */
     public int updatesSize() {
-        return _visibleChunks.size();
+        return _chunkUpdateAmount;
     }
 
     /**
@@ -185,12 +152,5 @@ public final class ChunkUpdateManager {
      */
     public double getMeanUpdateDuration() {
         return _meanUpdateDuration;
-    }
-
-    /**
-     * @return
-     */
-    public int getAmountGeneratedChunks() {
-        return _amountGeneratedChunks;
     }
 }

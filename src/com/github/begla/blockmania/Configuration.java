@@ -140,6 +140,7 @@ public final class Configuration {
      * Loads the default values for the global settings.
      */
     private static void loadDefaults() {
+        _settingsBoolean.put("DISABLE_SAVING",false);
         _settingsBoolean.put("PLACING_BOX", true);
         _settingsBoolean.put("CHUNK_OUTLINES", false);
         _settingsBoolean.put("DEBUG", false);

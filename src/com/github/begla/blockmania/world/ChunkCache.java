@@ -28,8 +28,6 @@ import java.util.TreeMap;
 public final class ChunkCache {
 
     private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
-    private final FastList<Chunk> _chunkCacheList = new FastList<Chunk>(capacity());
-
     private final World _parent;
 
     /**
@@ -49,7 +47,7 @@ public final class ChunkCache {
      * @param z Z-coordinate of the chunk
      * @return The chunk
      */
-    public Chunk loadOrCreateChunk(int x, int z) {
+    public synchronized Chunk loadOrCreateChunk(int x, int z) {
         // Catch negative values
         if (x < 0 || z < 0) {
             return null;
@@ -65,88 +63,49 @@ public final class ChunkCache {
 
         // Init a new chunk
         c = _parent.prepareNewChunk(x, z);
-
         _chunkCache.put(c.getChunkId(), c);
-        _chunkCacheList.add(c);
 
         return c;
     }
 
-    public void flushCache() {
-
-        boolean first = false;
-
-        while (_chunkCacheList.size() > capacity()) {
-            if (!first) {
-                try {
-                    Collections.sort(_chunkCacheList);
-                } catch (Exception e) {
-                    // Do nothing
-                }
-                first = true;
-            }
-
-            Chunk chunkToDeltete = _chunkCacheList.removeLast();
-
-            if (chunkToDeltete != null) {
-                // Save the chunk before removing it from the cache
-                _chunkCache.remove(chunkToDeltete.getChunkId());
-                chunkToDeltete.writeChunkToDisk();
-            }
+    public synchronized void freeCache() {
+        if (_chunkCache.size() <= capacity()) {
+            return;
         }
-    }
 
-    /**
-     * Returns true if the given chunk is present in the cache.
-     *
-     * @param c The chunk
-     * @return True if the chunk is present in the chunk cache
-     */
-    public boolean isChunkCached(Chunk c) {
-        return loadChunk((int) c.getPosition().x, (int) c.getPosition().z) != null;
-    }
+        FastList<Chunk> cachedChunks = new FastList(_chunkCache.values());
+        Collections.sort(cachedChunks);
 
-    /**
-     * Tries to load a chunk from the cache. Returns null if no
-     * chunk is found.
-     *
-     * @param x X-coordinate
-     * @param z Z-coordinate
-     * @return The loaded chunk
-     */
-    public Chunk loadChunk(int x, int z) {
-        return _chunkCache.get(MathHelper.cantorize(x, z));
+        while (cachedChunks.size() > capacity()) {
+            Chunk chunkToDelete = cachedChunks.removeLast();
+            _chunkCache.remove(chunkToDelete.getChunkId());
+
+            if (!Configuration.getSettingBoolean("DISABLE_SAVING"))
+                chunkToDelete.writeChunkToDisk();
+        }
     }
 
     /**
      * @param key
      * @return
      */
-    public Chunk getChunkByKey(int key) {
+    public synchronized Chunk getChunkByKey(int key) {
         return _chunkCache.get(key);
     }
 
     /**
      * Writes all chunks to disk.
      */
-    public void writeAllChunksToDisk() {
-        _parent.suspendUpdateThread();
-        /*
-         * Wait until the update thread is suspended.
-         */
-        while (_parent.isUpdateThreadRunning()) {
-            // Do nothing
-        }
+    public synchronized void writeAllChunksToDisk() {
         for (Chunk c : _chunkCache.values()) {
             c.writeChunkToDisk();
         }
-        _parent.resumeUpdateThread();
     }
 
     /**
      * @return
      */
-    public int size() {
+    public synchronized int size() {
         return _chunkCache.size();
     }
 
@@ -154,6 +113,6 @@ public final class ChunkCache {
      * @return
      */
     static int capacity() {
-        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) * 2 + 1024;
+        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 512;
     }
 }

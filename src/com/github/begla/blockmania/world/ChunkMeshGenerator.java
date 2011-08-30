@@ -234,11 +234,6 @@ public class ChunkMeshGenerator {
 
         drawTop = isSideVisibleForBlockTypes(blockToCheck, block);
 
-        // Draw the chunk if the height map produced a too large number
-        if (y == Configuration.CHUNK_DIMENSIONS.y - 1) {
-            drawTop = true;
-        }
-
         if (drawTop) {
             Vector3f p1 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
             Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, 0.5f);

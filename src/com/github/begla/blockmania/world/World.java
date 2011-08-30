@@ -173,22 +173,10 @@ public final class World extends RenderableObject {
                         }
                     }
 
-                    /*
-                     * Update chunks queued for updating.
-                     */
+                    _chunkCache.freeCache();
                     _chunkUpdateManager.updateChunk();
-
-                    /*
-                     * Update the time of day.
-                     */
                     updateDaytime();
-
-                    /*
-                     * Evolve chunks.
-                     */
                     replantDirt();
-
-                    _chunkCache.flushCache();
                 }
             }
         });
@@ -360,7 +348,7 @@ public final class World extends RenderableObject {
         /*
          * Draw clouds.
          */
-        if (_dlClouds > 0) {
+        if (_dlClouds > 0 && isDaytime()) {
             glPushMatrix();
             glTranslatef(_player.getPosition().x + _cloudOffset.x, 140f, _player.getPosition().z + _cloudOffset.y);
             glCallList(_dlClouds);
@@ -400,6 +388,7 @@ public final class World extends RenderableObject {
         FastSet<Chunk> visibleChunks = new FastSet<Chunk>();
         for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
             for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
+
                 Chunk c = _chunkCache.loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
 
                 if (c != null) {
@@ -466,8 +455,6 @@ public final class World extends RenderableObject {
         for (Chunk c : _visibleChunks) {
             c.update();
         }
-
-        _chunkUpdateManager.updateVisibleChunks(_visibleChunks);
     }
 
     /**
@@ -618,13 +605,13 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = _chunkCache.loadChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
             return c.getBlock(blockPosX, y, blockPosZ);
         }
 
-        return -1;
+        return 0;
     }
 
     /**
@@ -635,8 +622,18 @@ public final class World extends RenderableObject {
      * @param z The Z-coordinate
      * @return
      */
+    @SuppressWarnings({"UnusedDeclaration"})
     public final boolean isBlockSurrounded(int x, int y, int z) {
         return (getBlock(x + 1, y, z) > 0 || getBlock(x - 1, y, z) > 0 || getBlock(x, y, z + 1) > 0 || getBlock(x, y, z - 1) > 0);
+    }
+
+    public final int maxHeightAt(int x, int z) {
+        for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
+            if (getBlock(x, y, z) != 0x0)
+                return y;
+        }
+
+        return 0;
     }
 
     /**
@@ -655,13 +652,16 @@ public final class World extends RenderableObject {
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = _chunkCache.loadChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c != null) {
             return c.getLight(blockPosX, y, blockPosZ, type);
         }
 
-        return 15;
+        if (type == Chunk.LIGHT_TYPE.SUN)
+            return 15;
+        else
+            return 0;
     }
 
     /**
@@ -1018,6 +1018,13 @@ public final class World extends RenderableObject {
     }
 
     /**
+     * @return
+     */
+    public ChunkUpdateManager getChunkUpdateManager() {
+        return _chunkUpdateManager;
+    }
+
+    /**
      * Generates the cloud display list.
      */
     private static void generateCloudDisplayList() {
@@ -1060,10 +1067,7 @@ public final class World extends RenderableObject {
         glEndList();
     }
 
-    /**
-     * @return
-     */
-    public boolean isUpdateThreadRunning() {
-        return !_updateThread.isInterrupted() && _updateThread.isAlive();
+    public FastSet<Chunk> getVisibleChunks() {
+        return _visibleChunks;
     }
 }

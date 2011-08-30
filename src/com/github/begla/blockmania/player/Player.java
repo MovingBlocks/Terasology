@@ -18,7 +18,10 @@ package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.utilities.*;
+import com.github.begla.blockmania.utilities.Helper;
+import com.github.begla.blockmania.utilities.PerlinNoise;
+import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.utilities.ViewFrustum;
 import com.github.begla.blockmania.world.RenderableObject;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
@@ -85,19 +88,25 @@ public final class Player extends RenderableObject {
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
 
-        float bobbing1 = 0.0f;
-        float bobbing2 = 0.0f;
+        if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
 
-        if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
-            bobbing1 = (float) ((_pGen.noise(_position.x * 0.4f, _position.z * 0.4f, 0f) + 1f) / 2f) * 0.2f;
-            bobbing2 = (float) (_pGen.noise(_position.x * 0.4f, 0f, 0f)) * 0.05f;
+            float bobbing1 = 0.0f;
+            float bobbing2 = 0.0f;
+
+            if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
+                bobbing1 = (float) ((_pGen.noise(_position.x * 0.4f, _position.z * 0.4f, 0f) + 1f) / 2f) * 0.2f;
+                bobbing2 = (float) (_pGen.noise(_position.x * 0.4f, 0f, 0f)) * 0.05f;
+            }
+
+            glRotatef(bobbing2 * 32f, 0, 0, 1);
+
+            float newPosY = _position.y + getAABB().getDimensions().y / 1.2f + bobbing1;
+            GLU.gluLookAt(_position.x, newPosY, _position.z, _position.x + _viewingDirection.x, newPosY + _viewingDirection.y, _position.z + _viewingDirection.z, 0, 1, 0);
+
+
+        } else {
+            GLU.gluLookAt(_position.x, _position.y, _position.z, _position.x, 40f, _position.z + 128f, 0, 1, 0);
         }
-
-        glRotatef(bobbing2 * 32f, 0, 0, 1);
-
-        float newPosY = _position.y + getAABB().getDimensions().y / 1.2f + bobbing1;
-        GLU.gluLookAt(_position.x, newPosY, _position.z, _position.x + _viewingDirection.x, newPosY + _viewingDirection.y, _position.z + _viewingDirection.z, 0, 1, 0);
-
         // Update the current view frustum
         _viewFrustum.updateFrustum();
     }
@@ -107,7 +116,9 @@ public final class Player extends RenderableObject {
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
 
-        GLU.gluLookAt(0, 0, 0, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, 0, 1, 0);
+        if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
+            GLU.gluLookAt(0, 0, 0, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, 0, 1, 0);
+        }
     }
 
     /**
@@ -493,7 +504,18 @@ public final class Player extends RenderableObject {
         oldPosition.set(_position);
 
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-            _position.z += 0.05;
+            _position.z += 0.1;
+
+            int maxHeight = _parent.maxHeightAt((int) _position.x, (int) _position.z + 8) + 16;
+
+            _position.y += (maxHeight - _position.y) / 128f;
+
+            if (_position.y > 128)
+                _position.y = 128;
+
+            if (_position.y < 40f)
+                _position.y = 40f;
+
             return;
         }
 

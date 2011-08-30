@@ -22,7 +22,6 @@ import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.player.AABB;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.utilities.Primitives;
 import com.github.begla.blockmania.utilities.ShaderManager;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
@@ -36,7 +35,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.logging.Level;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -75,6 +74,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private ChunkMeshGenerator _meshGenerator;
     /* ------ */
     private AABB _aabb;
+    /* ------ */
 
     /**
      *
@@ -510,7 +510,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             }
         }
 
-        return 15;
+        if (type == Chunk.LIGHT_TYPE.SUN)
+            return 15;
+        else
+            return 0;
     }
 
     /**
@@ -523,10 +526,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param type      The type of the light
      */
     public void setLight(int x, int y, int z, byte intensity, LIGHT_TYPE type) {
-        if (x < 0 || z < 0 || y < 0) {
-            return;
-        }
-
         if (isFresh()) {
             // Sunlight should not be changed within fresh blocks
             return;
@@ -565,7 +564,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (Helper.getInstance().checkBounds3D(x, y, z, _blocks)) {
             return _blocks[x][y][z];
         } else {
-            return -1;
+            return 0;
         }
     }
 
