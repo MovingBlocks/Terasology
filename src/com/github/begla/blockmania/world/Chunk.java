@@ -20,9 +20,7 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.player.AABB;
-import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.utilities.ShaderManager;
+import com.github.begla.blockmania.utilities.*;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
@@ -65,9 +63,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /* ------ */
     private World _parent;
     /* ------ */
-    private final byte[][][] _blocks;
-    private final byte[][][] _sunlight;
-    private final byte[][][] _light;
+    private final BlockmaniaArray _blocks;
+    private final BlockmaniaSmartArray _sunlight;
+    private final BlockmaniaSmartArray _light;
     /* ------ */
     private final FastList<ChunkGenerator> _generators = new FastList<ChunkGenerator>();
     /* ------ */
@@ -119,9 +117,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         _chunkID = MathHelper.cantorize((int) _position.x, (int) _position.z);
 
         _parent = p;
-        _blocks = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
-        _sunlight = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
-        _light = new byte[(int) Configuration.CHUNK_DIMENSIONS.x][(int) Configuration.CHUNK_DIMENSIONS.y][(int) Configuration.CHUNK_DIMENSIONS.z];
+        _blocks = new BlockmaniaArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
+        _sunlight = new BlockmaniaSmartArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
+        _light = new BlockmaniaSmartArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
 
         _meshGenerator = new ChunkMeshGenerator(this);
 
@@ -141,6 +139,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public void update() {
         if (_newMesh != null) {
             if (_newMesh.isGenerated()) {
+                ChunkMesh oldMesh = _activeMesh;
+
+                if (oldMesh != null)
+                    oldMesh.dispose();
+
                 _activeMesh = _newMesh;
                 _newMesh = null;
             }
@@ -325,7 +328,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         }
 
         for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
-            Block b = Block.getBlockForType(_blocks[x][y][z]);
+            Block b = Block.getBlockForType(_blocks.get(x, y, z));
 
             // Remember if this "column" is covered
             if ((b.getClass() != BlockAir.class && !b.isBlockBillboard())) {
@@ -335,9 +338,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
             // If the column is not covered...
             if ((b.getClass() == BlockAir.class || b.isBlockBillboard()) && !covered) {
-                byte oldValue = _sunlight[x][y][z];
-                _sunlight[x][y][z] = Configuration.MAX_LIGHT;
-                byte newValue = _sunlight[x][y][z];
+                byte oldValue = _sunlight.get(x, y, z);
+                _sunlight.set(x, y, z, Configuration.MAX_LIGHT);
+                byte newValue = _sunlight.get(x, y, z);
 
                 /*
                  * Spread sunlight if the new light value is more intense
@@ -349,7 +352,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
                 // Otherwise the column is covered. Don't generate any light in the cells...
             } else if ((b.getClass() == BlockAir.class || b.isBlockBillboard()) && covered) {
-                _sunlight[x][y][z] = 0;
+                _sunlight.set(x, y, z, (byte) 0);
 
                 // Update the sunlight at the current position (check the surrounding cells)
                 if (refreshSunlight) {
@@ -502,12 +505,17 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return The light intensity
      */
     public byte getLight(int x, int y, int z, LIGHT_TYPE type) {
-        if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
-            if (type == LIGHT_TYPE.SUN) {
-                return _sunlight[x][y][z];
-            } else {
-                return _light[x][y][z];
-            }
+
+        byte result;
+
+        if (type == LIGHT_TYPE.SUN) {
+            result = _sunlight.get(x, y, z);
+        } else {
+            result = _light.get(x, y, z);
+        }
+
+        if (result >= 0) {
+            return result;
         }
 
         if (type == Chunk.LIGHT_TYPE.SUN)
@@ -531,7 +539,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             return;
         }
 
-        byte[][][] lSource;
+        BlockmaniaSmartArray lSource;
         if (type == LIGHT_TYPE.SUN) {
             lSource = _sunlight;
         } else if (type == LIGHT_TYPE.BLOCK) {
@@ -540,15 +548,14 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             return;
         }
 
-        if (Helper.getInstance().checkBounds3D(x, y, z, _sunlight)) {
-            byte oldValue = lSource[x][y][z];
-            lSource[x][y][z] = intensity;
 
-            if (oldValue != intensity) {
-                setDirty(true);
-                // Mark the neighbors as dirty
-                markNeighborsDirty(x, z);
-            }
+        byte oldValue = lSource.get(x, y, z);
+        lSource.set(x, y, z, intensity);
+
+        if (oldValue != intensity) {
+            setDirty(true);
+            // Mark the neighbors as dirty
+            markNeighborsDirty(x, z);
         }
     }
 
@@ -561,11 +568,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return The block type
      */
     public byte getBlock(int x, int y, int z) {
-        if (Helper.getInstance().checkBounds3D(x, y, z, _blocks)) {
-            return _blocks[x][y][z];
-        } else {
-            return 0;
+        byte result = _blocks.get(x, y, z);
+
+        if (result >= 0) {
+            return result;
         }
+
+        return 0;
     }
 
     /**
@@ -577,23 +586,21 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param type The block type
      */
     public void setBlock(int x, int y, int z, byte type) {
-        if (Helper.getInstance().checkBounds3D(x, y, z, _blocks)) {
-            byte oldValue = _blocks[x][y][z];
-            _blocks[x][y][z] = type;
+        byte oldValue = _blocks.get(x, y, z);
+        _blocks.set(x, y, z, type);
 
-            Block b = Block.getBlockForType(type);
+        Block b = Block.getBlockForType(type);
 
-            // If an opaque block was set, remove the light from this field
-            if (!b.isBlockTypeTranslucent()) {
-                _sunlight[x][y][z] = 0;
-            }
+        // If an opaque block was set, remove the light from this field
+        if (!b.isBlockTypeTranslucent()) {
+            _sunlight.set(x, y, z, (byte) 0);
+        }
 
-            if (oldValue != type) {
-                // Update vertex arrays and light
-                setDirty(true);
-                // Mark the neighbors as dirty
-                markNeighborsDirty(x, z);
-            }
+        if (oldValue != type) {
+            // Update vertex arrays and light
+            setDirty(true);
+            // Mark the neighbors as dirty
+            markNeighborsDirty(x, z);
         }
     }
 
@@ -684,8 +691,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             return false;
         }
 
-        ByteBuffer output = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3 + 1);
-        File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), MathHelper.cantorize((int) _position.x, (int) _position.z)));
+        ByteBuffer output = BufferUtils.createByteBuffer(_blocks.getSize() + _sunlight.getPackedSize() + _light.getPackedSize() + 1);
+        File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), getChunkId()));
 
         // Save flags...
         byte flags = 0x0;
@@ -696,15 +703,15 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         // The flags are stored within the first byte of the file...
         output.put(flags);
 
-        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                    output.put(_blocks[x][y][z]);
-                    output.put(_sunlight[x][y][z]);
-                    output.put(_light[x][y][z]);
-                }
-            }
-        }
+
+        for (int i = 0; i < _blocks.getSize(); i++)
+            output.put(_blocks.getRawByte(i));
+
+        for (int i = 0; i < _sunlight.getPackedSize(); i++)
+            output.put(_sunlight.getRawByte(i));
+
+        for (int i = 0; i < _light.getPackedSize(); i++)
+            output.put(_light.getRawByte(i));
 
         output.rewind();
 
@@ -731,8 +738,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return True if the chunk was successfully loaded
      */
     boolean loadChunkFromFile() {
-        ByteBuffer input = BufferUtils.createByteBuffer((int) Configuration.CHUNK_DIMENSIONS.x * (int) Configuration.CHUNK_DIMENSIONS.y * (int) Configuration.CHUNK_DIMENSIONS.z * 3 + 1);
-        File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), MathHelper.cantorize((int) _position.x, (int) _position.z)));
+        ByteBuffer input = BufferUtils.createByteBuffer(_blocks.getSize() + _sunlight.getPackedSize() + _light.getPackedSize() + 1);
+        File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), getChunkId()));
 
         if (!f.exists()) {
             return false;
@@ -759,15 +766,14 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         // Parse the flags...
         _lightDirty = Helper.getInstance().isFlagSet(flags, (short) 0);
 
-        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                    _blocks[x][y][z] = input.get();
-                    _sunlight[x][y][z] = input.get();
-                    _light[x][y][z] = input.get();
-                }
-            }
-        }
+        for (int i = 0; i < _blocks.getSize(); i++)
+            _blocks.setRawByte(i, input.get());
+
+        for (int i = 0; i < _sunlight.getPackedSize(); i++)
+            _sunlight.setRawByte(i, input.get());
+
+        for (int i = 0; i < _light.getPackedSize(); i++)
+            _light.setRawByte(i, input.get());
 
         return true;
     }
@@ -876,5 +882,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public int getChunkId() {
         return _chunkID;
+    }
+
+    public void dispose() {
+        if (_activeMesh != null)
+            _activeMesh.dispose();
     }
 }

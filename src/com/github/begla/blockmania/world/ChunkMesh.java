@@ -30,7 +30,8 @@ public class ChunkMesh extends RenderableObject {
     }
 
     private int[] _vertexBuffers = new int[3];
-    private IntBuffer[] _idxBuffer = new IntBuffer[3];
+    private int[] _idxBuffers = new int[3];
+    private int[] _idxBufferCount = new int[3];
     public VertexElements[] _vertexElements = new VertexElements[3];
 
     boolean _generated;
@@ -60,9 +61,10 @@ public class ChunkMesh extends RenderableObject {
 
     private void generateVBO(int id) {
         _vertexBuffers[id] = createVboId();
+        _idxBuffers[id] = createVboId();
 
         FloatBuffer vertices = BufferUtils.createFloatBuffer(_vertexElements[id].quads.size() + _vertexElements[id].tex.size() + _vertexElements[id].light.size() + _vertexElements[id].color.size());
-        _idxBuffer[id] = BufferUtils.createIntBuffer(_vertexElements[id].quads.size());
+        IntBuffer idxBuffer = BufferUtils.createIntBuffer(_vertexElements[id].quads.size());
 
         HashMap<Vector3f, Integer> indexLut = new HashMap<Vector3f, Integer>();
 
@@ -76,7 +78,7 @@ public class ChunkMesh extends RenderableObject {
             // Check if this vertex is a new one
             if (indexLut.containsKey(vertexPos)) {
                 int index = indexLut.get(vertexPos);
-                _idxBuffer[id].put(index);
+                idxBuffer.put(index);
                 continue;
             }
 
@@ -97,12 +99,15 @@ public class ChunkMesh extends RenderableObject {
 
             // Log this vertex
             indexLut.put(vertexPos, idxCounter);
-            _idxBuffer[id].put(idxCounter++);
+            idxBuffer.put(idxCounter++);
         }
 
-        _idxBuffer[id].flip();
+        idxBuffer.flip();
         vertices.flip();
 
+        _idxBufferCount[id] = idxBuffer.limit();
+
+        bufferVboElementData(_idxBuffers[id], idxBuffer);
         bufferVboData(_vertexBuffers[id], vertices);
     }
 
@@ -117,6 +122,7 @@ public class ChunkMesh extends RenderableObject {
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
 
+        ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, _idxBuffers[id]);
         ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, _vertexBuffers[id]);
 
         int offset = (0 * 4);
@@ -137,7 +143,7 @@ public class ChunkMesh extends RenderableObject {
 
         glColorPointer(4, GL11.GL_FLOAT, stride, offset);
 
-        GL12.glDrawRangeElements(GL11.GL_QUADS, 0, _idxBuffer[id].limit(), _idxBuffer[id]);
+        GL12.glDrawRangeElements(GL11.GL_QUADS, 0, _idxBufferCount[id], _idxBufferCount[id], GL_UNSIGNED_INT, 0);
 
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -179,13 +185,17 @@ public class ChunkMesh extends RenderableObject {
         return _generated;
     }
 
-    protected void finalize() {
+    public void dispose() {
         // Remove the old VBOs.
-        IntBuffer ib = BufferUtils.createIntBuffer(3);
+        IntBuffer ib = BufferUtils.createIntBuffer(6);
         ib.put(_vertexBuffers[0]);
         ib.put(_vertexBuffers[1]);
         ib.put(_vertexBuffers[2]);
-        ARBBufferObject.glDeleteBuffersARB(ib);
+        ib.put(_idxBuffers[0]);
+        ib.put(_idxBuffers[1]);
+        ib.put(_idxBuffers[2]);
+        ib.flip();
+        ARBVertexBufferObject.glDeleteBuffersARB(ib);
     }
 
     public static int createVboId() {

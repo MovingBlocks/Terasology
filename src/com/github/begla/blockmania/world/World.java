@@ -172,11 +172,8 @@ public final class World extends RenderableObject {
                             }
                         }
                     }
-
-                    _chunkCache.freeCache();
                     _chunkUpdateManager.updateChunk();
                     updateDaytime();
-                    replantDirt();
                 }
             }
         });
@@ -230,28 +227,16 @@ public final class World extends RenderableObject {
     /**
      *
      */
-    private void replantDirt() {
-        // Pick one chunk for grass updates every 1000 ms
-        if (Helper.getInstance().getTime() - _latestDirtEvolvement > 1000) {
+    private void replantDirt(Chunk c) {
+        // Do NOT replant chunks during the night...
+        if (isNighttime()) {
+            _latestDirtEvolvement = Helper.getInstance().getTime();
+            return;
+        }
 
-            // Do NOT replant chunks during the night...
-            if (isNighttime()) {
-                _latestDirtEvolvement = Helper.getInstance().getTime();
-                return;
-            }
-
-            for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
-
-                Chunk c = _visibleChunks.valueOf(n);
-
-                if (c != null) {
-                    if (!c.isFresh() && !c.isDirty() && !c.isLightDirty()) {
-                        _generatorGrass.generate(c);
-                    }
-
-                    _latestDirtEvolvement = Helper.getInstance().getTime();
-                }
-            }
+        if (!c.isFresh() && !c.isDirty() && !c.isLightDirty()) {
+            _generatorGrass.generate(c);
+            _latestDirtEvolvement = Helper.getInstance().getTime();
         }
     }
 
@@ -385,6 +370,13 @@ public final class World extends RenderableObject {
      * @return
      */
     FastSet<Chunk> fetchVisibleChunks() {
+
+        boolean replantDirt = false;
+
+        if (Helper.getInstance().getTime() - _latestDirtEvolvement > Configuration.getSettingNumeric("REPLANT_DIRT_TIME") && Configuration.getSettingBoolean("REPLANT_DIRT")) {
+            replantDirt = true;
+        }
+
         FastSet<Chunk> visibleChunks = new FastSet<Chunk>();
         for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
             for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
@@ -393,6 +385,10 @@ public final class World extends RenderableObject {
 
                 if (c != null) {
                     if (_player.getViewFrustum().Intersects(c.getAABB())) {
+
+                        if (replantDirt)
+                            replantDirt(c);
+
                         visibleChunks.add(c);
                     }
                 }
@@ -455,6 +451,8 @@ public final class World extends RenderableObject {
         for (Chunk c : _visibleChunks) {
             c.update();
         }
+
+        _chunkCache.freeCache();
     }
 
     /**

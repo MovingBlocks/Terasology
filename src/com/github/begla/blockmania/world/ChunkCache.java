@@ -20,14 +20,14 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
 
 import java.util.Collections;
-import java.util.TreeMap;
+import java.util.HashMap;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ChunkCache {
 
-    private final TreeMap<Integer, Chunk> _chunkCache = new TreeMap<Integer, Chunk>();
+    private final HashMap<Integer, Chunk> _chunkCache = new HashMap<Integer, Chunk>();
     private final World _parent;
 
     /**
@@ -47,14 +47,18 @@ public final class ChunkCache {
      * @param z Z-coordinate of the chunk
      * @return The chunk
      */
-    public synchronized Chunk loadOrCreateChunk(int x, int z) {
+    public Chunk loadOrCreateChunk(int x, int z) {
         // Catch negative values
         if (x < 0 || z < 0) {
             return null;
         }
 
         // Try to load the chunk from the cache
-        Chunk c = _chunkCache.get(MathHelper.cantorize(x, z));
+        Chunk c;
+
+        synchronized (this) {
+            c = _chunkCache.get(MathHelper.cantorize(x, z));
+        }
 
         // We got a chunk! Already! Great!
         if (c != null) {
@@ -63,25 +67,37 @@ public final class ChunkCache {
 
         // Init a new chunk
         c = _parent.prepareNewChunk(x, z);
-        _chunkCache.put(c.getChunkId(), c);
+
+        synchronized (this) {
+            _chunkCache.put(Integer.valueOf(c.getChunkId()), c);
+        }
 
         return c;
     }
 
-    public synchronized void freeCache() {
+    public void freeCache() {
         if (_chunkCache.size() <= capacity()) {
             return;
         }
 
-        FastList<Chunk> cachedChunks = new FastList(_chunkCache.values());
+        FastList<Chunk> cachedChunks;
+
+        synchronized (this) {
+            cachedChunks = new FastList(_chunkCache.values());
+        }
         Collections.sort(cachedChunks);
 
         while (cachedChunks.size() > capacity()) {
             Chunk chunkToDelete = cachedChunks.removeLast();
-            _chunkCache.remove(chunkToDelete.getChunkId());
+
+            synchronized (this) {
+                _chunkCache.remove(chunkToDelete.getChunkId());
+            }
 
             if (!Configuration.getSettingBoolean("DISABLE_SAVING"))
                 chunkToDelete.writeChunkToDisk();
+
+            chunkToDelete.dispose();
         }
     }
 
@@ -89,16 +105,24 @@ public final class ChunkCache {
      * @param key
      * @return
      */
-    public synchronized Chunk getChunkByKey(int key) {
-        return _chunkCache.get(key);
+    public Chunk getChunkByKey(int key) {
+        Chunk result;
+
+        synchronized (this) {
+            result = _chunkCache.get(key);
+        }
+
+        return result;
     }
 
     /**
      * Writes all chunks to disk.
      */
-    public synchronized void writeAllChunksToDisk() {
-        for (Chunk c : _chunkCache.values()) {
-            c.writeChunkToDisk();
+    public void writeAllChunksToDisk() {
+        synchronized (this) {
+            for (Chunk c : _chunkCache.values()) {
+                c.writeChunkToDisk();
+            }
         }
     }
 
@@ -113,6 +137,6 @@ public final class ChunkCache {
      * @return
      */
     static int capacity() {
-        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 512;
+        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 2048;
     }
 }

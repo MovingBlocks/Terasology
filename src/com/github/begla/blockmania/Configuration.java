@@ -79,7 +79,7 @@ public final class Configuration {
     /**
      *
      */
-    public static final int DL_UPDATES_PER_CYCLE = 4;
+    public static final int DL_UPDATES_PER_CYCLE = 1;
     /**
      *
      */
@@ -140,6 +140,8 @@ public final class Configuration {
      * Loads the default values for the global settings.
      */
     private static void loadDefaults() {
+        _settingsNumeric.put("REPLANT_DIRT_TIME",30000f);
+        _settingsBoolean.put("REPLANT_DIRT",true);
         _settingsBoolean.put("DISABLE_SAVING",false);
         _settingsBoolean.put("PLACING_BOX", true);
         _settingsBoolean.put("CHUNK_OUTLINES", false);
@@ -158,11 +160,33 @@ public final class Configuration {
         _settingsNumeric.put("V_DIST_Z", 32f);
     }
 
+        private static void loadDemo() {
+        _settingsNumeric.put("REPLANT_DIRT_TIME",30000f);
+        _settingsBoolean.put("REPLANT_DIRT",false);
+        _settingsBoolean.put("DISABLE_SAVING",true);
+        _settingsBoolean.put("PLACING_BOX", false);
+        _settingsBoolean.put("CHUNK_OUTLINES", false);
+        _settingsBoolean.put("DEBUG", false);
+        _settingsBoolean.put("CROSSHAIR", false);
+        _settingsBoolean.put("BOBBING", true);
+        _settingsBoolean.put("DEMO_FLIGHT", true);
+        _settingsBoolean.put("GOD_MODE", true);
+        _settingsNumeric.put("JUMP_INTENSITY", 0.13f);
+        _settingsNumeric.put("MAX_GRAVITY", 0.7f);
+        _settingsNumeric.put("WALKING_SPEED", 0.2f);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
+        _settingsNumeric.put("GRAVITY", 0.0075f);
+        _settingsNumeric.put("FRICTION", 0.1f);
+        _settingsNumeric.put("V_DIST_X", 40f);
+        _settingsNumeric.put("V_DIST_Z", 40f);
+    }
+
     /**
      * Loads the saved settings.
      * TODO: Should not always load the default settings.
      */
     private static void loadSettings() {
         loadDefaults();
+        //loadDemo();
     }
 }

@@ -15,16 +15,15 @@
  */
 package com.github.begla.blockmania.utilities;
 
+import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
-
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class VectorPool {
 
-    private static final ArrayBlockingQueue<Vector3f> _pool = new ArrayBlockingQueue<Vector3f>(512);
+    private static final FastList<Vector3f> _pool = new FastList<Vector3f>(512);
 
     /**
      * @param x
@@ -33,7 +32,14 @@ public class VectorPool {
      * @return
      */
     public static Vector3f getVector(float x, float y, float z) {
-        Vector3f v = _pool.poll();
+
+        Vector3f v = null;
+
+        synchronized (_pool) {
+            if (_pool.size() > 0) {
+                v = _pool.removeFirst();
+            }
+        }
 
         if (v == null) {
             v = new Vector3f(x, y, z);
@@ -48,13 +54,18 @@ public class VectorPool {
      * @return
      */
     public static Vector3f getVector() {
-        return getVector(0f, 0f, 0f);
+        synchronized (_pool) {
+            return getVector(0f, 0f, 0f);
+        }
     }
 
     /**
      * @param v
      */
     public static void putVector(Vector3f v) {
-        _pool.add(v);
+        synchronized (_pool) {
+            if (_pool.size() < 512)
+                _pool.add(v);
+        }
     }
 }

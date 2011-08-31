@@ -15,11 +15,8 @@
  */
 package com.github.begla.blockmania.utilities;
 
-import com.github.begla.blockmania.Configuration;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * A collection of some basic primitives.
@@ -27,6 +24,9 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Primitives {
+
+    private static final Vector3f skyColor = new Vector3f(0.72f, 0.78f, 1.0f);
+    private static final Vector3f skyColor2 = new Vector3f(0.84f, 0.88f, 1f);
 
     /**
      * @param scaleX Scale along the x-axis
@@ -110,52 +110,49 @@ public class Primitives {
      * @param brightness The brightness of the skybox.
      */
     public static void drawSkyBox(float brightness) {
-        Vector3f skyColor = new Vector3f(0.72f * brightness, 0.78f * brightness, 1.0f * brightness);
-        Vector3f skyColor2 = new Vector3f(0.84f * brightness, 0.88f * brightness, 1f * brightness);
-
         // Front face
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(-0.5f, 0.0f, 0.5f);
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(0.5f, 0.0f, 0.5f);
-        GL11.glColor3f(skyColor.x, skyColor.y , skyColor.z );
+        GL11.glColor3f(skyColor.x *brightness, skyColor.y *brightness, skyColor.z *brightness);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glColor3f(skyColor.x , skyColor.y , skyColor.z );
+        GL11.glColor3f(skyColor.x *brightness, skyColor.y *brightness, skyColor.z *brightness);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
 
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
         GL11.glVertex3f(0.5f, 0.0f, 0.5f);
         GL11.glVertex3f(-0.5f, 0.0f, 0.5f);
 
         // Back Face
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(-0.5f, 0.0f, -0.5f);
-        GL11.glColor3f(skyColor.x , skyColor.y , skyColor.z );
+        GL11.glColor3f(skyColor.x *brightness, skyColor.y *brightness, skyColor.z *brightness);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-        GL11.glColor3f(skyColor.x , skyColor.y , skyColor.z );
+        GL11.glColor3f(skyColor.x *brightness, skyColor.y *brightness, skyColor.z *brightness);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(0.5f, 0f, -0.5f);
 
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
         GL11.glVertex3f(-0.5f, 0.0f, -0.5f);
         GL11.glVertex3f(0.5f, 0.0f, -0.5f);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
 
         // Right face
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(0.5f, 0f, -0.5f);
-        GL11.glColor3f(skyColor.x , skyColor.y , skyColor.z );
+        GL11.glColor3f(skyColor.x *brightness, skyColor.y *brightness, skyColor.z *brightness);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glColor3f(skyColor.x , skyColor.y , skyColor.z );
+        GL11.glColor3f(skyColor.x *brightness, skyColor.y *brightness, skyColor.z *brightness);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(0.5f, 0f, 0.5f);
 
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
         GL11.glVertex3f(0.5f, 0.0f, -0.5f);
         GL11.glVertex3f(0.5f, 0.0f, 0.5f);
@@ -163,30 +160,30 @@ public class Primitives {
 
 
         // Left Face
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(-0.5f, 0f, -0.5f);
-         GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(-0.5f, 0f, 0.5f);
-        GL11.glColor3f(skyColor.x , skyColor.y , skyColor.z );
+        GL11.glColor3f(skyColor.x *brightness, skyColor.y *brightness, skyColor.z *brightness);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glColor3f(skyColor.x , skyColor.y , skyColor.z );
+        GL11.glColor3f(skyColor.x *brightness, skyColor.y *brightness, skyColor.z *brightness);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
         GL11.glVertex3f(-0.5f, 0.0f, 0.5f);
         GL11.glVertex3f(-0.5f, 0.0f, -0.5f);
 
         // Top Face
-        GL11.glColor3f(skyColor.x , skyColor.y , skyColor.z );
+        GL11.glColor3f(skyColor.x *brightness, skyColor.y *brightness, skyColor.z *brightness);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
 
         // Bottom Face
-        GL11.glColor3f(skyColor2.x, skyColor2.y, skyColor2.z);
+        GL11.glColor3f(skyColor2.x *brightness, skyColor2.y *brightness, skyColor2.z *brightness);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
