@@ -1,20 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e2de95e1-48fd-480f-ac3c-3c86edaba85d" name="Default" comment=" * Many, many optimizations&#10; * Reduced chunk size&#10; * Fixed possible deadlocks">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/libs/junit-dep-4.9.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/tests/BlockmaniaSmartArrayTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/BlockmaniaArray.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/BlockmaniaSmartArray.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+    <list default="true" id="e2de95e1-48fd-480f-ac3c-3c86edaba85d" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/Primitives.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/Primitives.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/VectorPool.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/VectorPool.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/Chunk.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/Chunk.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkCache.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkCache.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/Main.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/Main.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMesh.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMesh.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java" />
     </list>
     <ignored path="Blockmania.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -78,10 +69,63 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="BlockmaniaSmartArrayTest.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="BlockmaniaSmartArrayTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/tests/BlockmaniaSmartArrayTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="33" selection-start="203" selection-end="203" vertical-scroll-proportion="0.12177651">
+            <state line="6" column="33" selection-start="203" selection-end="203" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Main.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Main.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="184" column="36" selection-start="5216" selection-end="5216" vertical-scroll-proportion="0.0">
+              <folding>
+                <marker date="1314786327911" expanded="true" signature="1182:1311" placeholder="/**...*/" />
+                <marker date="1314786327911" expanded="true" signature="2016:2208" placeholder="/**...*/" />
+                <marker date="1314786327911" expanded="true" signature="2956:3076" placeholder="/**...*/" />
+                <marker date="1314786327911" expanded="true" signature="3878:3902" placeholder="/**...*/" />
+                <marker date="1314786327911" expanded="true" signature="4044:4083" placeholder="/**...*/" />
+                <marker date="1314786327911" expanded="true" signature="4867:4915" placeholder="/**...*/" />
+                <marker date="1314786327911" expanded="true" signature="5699:6058" placeholder="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ChunkMesh.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMesh.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="40" column="34" selection-start="1195" selection-end="1196" vertical-scroll-proportion="0.7550143">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Chunk.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/Chunk.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="163" column="0" selection-start="5514" selection-end="5514" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Configuration.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="166" column="36" selection-start="5321" selection-end="5321" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="World.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="480" column="51" selection-start="15561" selection-end="15561" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -104,7 +148,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/PackedByteArray.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/Packed2DByteArray.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/Packed3DByteArray.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/Nibble3DArrayTest.java" />
@@ -114,12 +157,13 @@
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/VectorPool.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/BlockmaniaArray.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/BlockmaniaSmartArray.java" />
-        <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMesh.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkCache.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/world/Chunk.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java" />
-        <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/tests/BlockmaniaSmartArrayTest.java" />
+        <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" />
+        <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/Main.java" />
+        <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMesh.java" />
       </list>
     </option>
   </component>
@@ -943,7 +987,7 @@
     <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="true" />
     <option name="DEFAULT_PATCH_EXTENSION" value="patch" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value=" * Searching for a bug" />
+    <option name="LAST_COMMIT_MESSAGE" value=" * Many, many optimizations&#10; * Reduced chunk size&#10; * Fixed possible deadlocks" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -975,6 +1019,7 @@
     <MESSAGE value=" * Added frustum culling &#10; * Optimized rendering and updating accordingly" />
     <MESSAGE value=" * Overhauled caching and rendering&#10; * Many performance improvements&#10; * Fixed rare deadlock (finally)&#10; * Some more minor improvements&#10; * Added missing files" />
     <MESSAGE value=" * Searching for a bug" />
+    <MESSAGE value=" * Many, many optimizations&#10; * Reduced chunk size&#10; * Fixed possible deadlocks" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -984,13 +1029,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorTerrain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="109" column="58" selection-start="3987" selection-end="3987" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorResources.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="37" column="23" selection-start="1158" selection-end="1158" vertical-scroll-proportion="0.0">
@@ -1047,20 +1085,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMesh.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="187" column="10" selection-start="5779" selection-end="5779" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/Chunk.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="142" column="47" selection-start="4951" selection-end="4951" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkUpdateManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="25" column="19" selection-start="868" selection-end="868" vertical-scroll-proportion="0.0">
@@ -1075,23 +1099,52 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java">
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/tests/BlockmaniaSmartArrayTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="384" column="93" selection-start="12761" selection-end="12761" vertical-scroll-proportion="33.423077">
+        <state line="6" column="33" selection-start="203" selection-end="203" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="189" column="10" selection-start="6226" selection-end="6239" vertical-scroll-proportion="0.7808023">
+        <state line="166" column="36" selection-start="5321" selection-end="5321" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/tests/BlockmaniaSmartArrayTest.java">
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="33" selection-start="203" selection-end="203" vertical-scroll-proportion="0.12177651">
+        <state line="480" column="51" selection-start="15561" selection-end="15561" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="184" column="36" selection-start="5216" selection-end="5216" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1314786327911" expanded="true" signature="1182:1311" placeholder="/**...*/" />
+            <marker date="1314786327911" expanded="true" signature="2016:2208" placeholder="/**...*/" />
+            <marker date="1314786327911" expanded="true" signature="2956:3076" placeholder="/**...*/" />
+            <marker date="1314786327911" expanded="true" signature="3878:3902" placeholder="/**...*/" />
+            <marker date="1314786327911" expanded="true" signature="4044:4083" placeholder="/**...*/" />
+            <marker date="1314786327911" expanded="true" signature="4867:4915" placeholder="/**...*/" />
+            <marker date="1314786327911" expanded="true" signature="5699:6058" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/Chunk.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="163" column="0" selection-start="5514" selection-end="5514" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMesh.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="34" selection-start="1195" selection-end="1196" vertical-scroll-proportion="0.7550143">
           <folding />
         </state>
       </provider>
