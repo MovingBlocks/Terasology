@@ -56,13 +56,16 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x += 4) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z += 4) {
                     float forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+
                     if (forestDens > 0.01) {
 
                         int randX = x + rand.randomInt() % 12;
                         int randZ = z + rand.randomInt() % 12;
 
-                        if (c.getBlock(randX, y, randZ) == 0x1) {
+                        if (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17) {
                             generateTree(c, randX, y, randZ);
+                        } else if (c.getBlock(randX, y, randZ) == 0x7) {
+                          c.getParent().getGeneratorCactus().generate(c.getBlockWorldPosX(randX), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(randZ), false);
                         }
                     }
                 }

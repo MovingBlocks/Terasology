@@ -3,11 +3,9 @@ package com.github.begla.blockmania.world;
 import gnu.trove.list.array.TFloatArrayList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
-import org.lwjgl.util.vector.Vector3f;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.HashMap;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -19,14 +17,15 @@ public class ChunkMesh extends RenderableObject {
             normals = new TFloatArrayList();
             tex = new TFloatArrayList();
             color = new TFloatArrayList();
-            light = new TFloatArrayList();
         }
 
         public TFloatArrayList quads;
         public TFloatArrayList normals;
         public TFloatArrayList tex;
         public TFloatArrayList color;
-        public TFloatArrayList light;
+
+        public FloatBuffer vertices;
+        public IntBuffer indices;
     }
 
     private int[] _vertexBuffers = new int[3];
@@ -62,53 +61,10 @@ public class ChunkMesh extends RenderableObject {
     private void generateVBO(int id) {
         _vertexBuffers[id] = createVboId();
         _idxBuffers[id] = createVboId();
+        _idxBufferCount[id] = _vertexElements[id].indices.limit();
 
-        FloatBuffer vertices = BufferUtils.createFloatBuffer(_vertexElements[id].quads.size() + _vertexElements[id].tex.size() + _vertexElements[id].light.size() + _vertexElements[id].color.size());
-        IntBuffer idxBuffer = BufferUtils.createIntBuffer(_vertexElements[id].quads.size());
-
-        HashMap<Vector3f, Integer> indexLut = new HashMap<Vector3f, Integer>();
-
-        int tex = 0;
-        int color = 0;
-        int idxCounter = 0;
-        for (int i = 0; i < _vertexElements[id].quads.size(); i += 3, tex += 2, color += 4) {
-
-            Vector3f vertexPos = new Vector3f(_vertexElements[id].quads.get(i), _vertexElements[id].quads.get(i + 1), _vertexElements[id].quads.get(i + 2));
-
-            // Check if this vertex is a new one
-            if (indexLut.containsKey(vertexPos)) {
-                int index = indexLut.get(vertexPos);
-                idxBuffer.put(index);
-                continue;
-            }
-
-            vertices.put(vertexPos.x);
-            vertices.put(vertexPos.y);
-            vertices.put(vertexPos.z);
-
-            vertices.put(_vertexElements[id].tex.get(tex));
-            vertices.put(_vertexElements[id].tex.get(tex + 1));
-
-            vertices.put(_vertexElements[id].light.get(tex));
-            vertices.put(_vertexElements[id].light.get(tex + 1));
-
-            vertices.put(_vertexElements[id].color.get(color));
-            vertices.put(_vertexElements[id].color.get(color + 1));
-            vertices.put(_vertexElements[id].color.get(color + 2));
-            vertices.put(_vertexElements[id].color.get(color + 3));
-
-            // Log this vertex
-            indexLut.put(vertexPos, idxCounter);
-            idxBuffer.put(idxCounter++);
-        }
-
-        idxBuffer.flip();
-        vertices.flip();
-
-        _idxBufferCount[id] = idxBuffer.limit();
-
-        bufferVboElementData(_idxBuffers[id], idxBuffer);
-        bufferVboData(_vertexBuffers[id], vertices);
+        bufferVboElementData(_idxBuffers[id], _vertexElements[id].indices);
+        bufferVboData(_vertexBuffers[id], _vertexElements[id].vertices);
     }
 
     private void renderVbo(int id) {

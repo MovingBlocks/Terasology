@@ -35,6 +35,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     private static final int SAMPLE_RATE_3D_VERT = 4;
 
+    private enum BIOME_TYPE {
+        FOREST, SNOW, DESERT
+    }
+
     /**
      * @param seed
      */
@@ -71,7 +75,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
 
+                BIOME_TYPE type = CalcBiomeType(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
                 int firstBlockHeight = -1;
+
                 for (int y = (int) Configuration.CHUNK_DIMENSIONS.y; y >= 0; y--) {
 
                     if (y == 0) { // Stone ground layer
@@ -86,32 +92,100 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     float dens = densityMap[x][y][z];
 
                     if ((dens >= 0.01f && dens < 0.012f)) {
-                        /*
-                         * The outer layer is made of dirt and grass.
-                         */
-                        if (firstBlockHeight == -1) {
-                            c.setBlock(x, y, z, getBlockTailpiece(getBlockTypeForPosition(y, 1.0f), y));
 
-                            /* Generate lakes */
-                            if (calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c)) < 0.1) {
-                                c.setBlock(x, y, z, (byte) 0x4);
-                            }
-
-                        } else {
-                            c.setBlock(x, y, z, getBlockTypeForPosition(y, 1.0f - ((float) (firstBlockHeight - y) / 16f)));
-                        }
-
+                        // Some block was set...
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
+
+                        GenerateOuterLayer(x, y, z, firstBlockHeight, c, type);
                     } else if (dens >= 0.012f) {
-                        c.setBlock(x, y, z, getBlockTailpiece(getBlockTypeForPosition(y, 0.2f), y));
 
+                        // Some block was set...
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
+
+                        GenerateInnerLayer(x, y, z, c, type);
                     }
                 }
             }
         }
+    }
+
+    private void GenerateInnerLayer(int x, int y, int z, Chunk c, BIOME_TYPE type) {
+        c.setBlock(x, y, z, (byte) 0x3);
+    }
+
+    private void GenerateOuterLayer(int x, int y, int z, int firstBlockHeight, Chunk c, BIOME_TYPE type) {
+
+        float heightPercentage = (float) (firstBlockHeight - y) / (float) firstBlockHeight;
+
+        switch (type) {
+            case FOREST:
+                // Beach
+                if (y >= 26 && y <= 32) {
+                    c.setBlock(x, y, z, (byte) 0x7);
+                    break;
+                }
+
+                if (heightPercentage == 0f && y > 32) {
+                    // Grass on top
+                    c.setBlock(x, y, z, (byte) 0x1);
+                } else if (heightPercentage > 0.2) {
+                    // Stone
+                    c.setBlock(x, y, z, (byte) 0x3);
+                } else {
+                    // Dirt
+                    c.setBlock(x, y, z, (byte) 0x2);
+                }
+
+                /* Generate lakes */
+                if (calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c)) < 0.15) {
+                    c.setBlock(x, y, z, (byte) 0x4);
+                }
+                break;
+
+            case SNOW:
+
+                if (heightPercentage == 0.0f) {
+                    // Snow on top
+                    c.setBlock(x, y, z, (byte) 0x17);
+                } else if (heightPercentage > 0.2) {
+                    // Stone
+                    c.setBlock(x, y, z, (byte) 0x3);
+                } else {
+                    // Dirt
+                    c.setBlock(x, y, z, (byte) 0x2);
+                }
+
+                /* Generate lakes */
+                if (calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c)) < 0.15) {
+                    c.setBlock(x, y, z, (byte) 0x4);
+                }
+                break;
+
+            case DESERT:
+                if (heightPercentage > 0.2) {
+                    // Stone
+                    c.setBlock(x, y, z, (byte) 0x3);
+                } else {
+                    c.setBlock(x, y, z, (byte) 0x7);
+                }
+
+                break;
+
+        }
+    }
+
+    private BIOME_TYPE CalcBiomeType(int x, int z) {
+        float temp = calcTemperature(x, z);
+
+        if (temp > 50) {
+            return BIOME_TYPE.DESERT;
+        } else if (temp < 16) {
+            return BIOME_TYPE.SNOW;
+        }
+
+        return BIOME_TYPE.FOREST;
     }
 
     /**
@@ -133,64 +207,33 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     /**
-     * @param type
-     * @param y
-     * @return
-     */
-    byte getBlockTailpiece(byte type, int y) {
-        // Sand
-        if (type == 0x7) {
-            return 0x7;
-        } else if (type == 0x3) {
-            return 0x3;
-        }
-
-        // No grass below the water surface
-        if (y > 32) {
-            return 0x1;
-        } else {
-            return 0x2;
-        }
-    }
-
-    /**
-     * @param y
-     * @param heightPercentage
-     * @return
-     */
-    byte getBlockTypeForPosition(int y, float heightPercentage) {
-        // Sand
-        if (y >= 28 && y <= 32) {
-            return (byte) 0x7;
-        }
-
-        if (heightPercentage <= 0.8) {
-            return (byte) 0x3;
-        }
-
-        return 0x2;
-    }
-
-    /**
      * @param x
      * @param z
      * @return
      */
     public float calcDensity(float x, float y, float z) {
-        float height = calcTerrainElevation(x, z)  +calcTerrainRoughness(x, z);
+        BIOME_TYPE type = CalcBiomeType((int) x, (int) z);
+
+        float height = calcTerrainElevation(x, z) + calcTerrainRoughness(x, z);
         height = 1.0f + height;
 
-
-        float density = calcMountainDensity(x, y, z) * (float) _voronoi.noise(x,y,z, 0.002);
-
+        float density = calcMountainDensity(x, y, z) * (float) _voronoi.noise(x, y, z, 0.002);
         density = height - density;
 
-        if (y < 120)
-            density /= (y + 1) * 1.7f;
-        else
-            density /= (y + 1) * 2.0f;
+        float div;
 
-        return density;
+        if (y < 120)
+            div = (y + 1) * 1.7f;
+        else
+            div = (y + 1) * 2.0f;
+
+        if (type == BIOME_TYPE.DESERT) {
+            div *= 1.2;
+        } else if (type == BIOME_TYPE.FOREST) {
+            div /= 1.2;
+        }
+
+        return density / div;
     }
 
     /**
@@ -200,7 +243,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    float calcTerrainElevation(float x, float z) {
+    public float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
         result += _pGen1.noise(0.0009f * x, 0.0009f * z, 0f);
         return result;
@@ -213,7 +256,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    float calcTerrainRoughness(float x, float z) {
+    public float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
         result += _pGen2.multiFractalNoise(0.001f * x, 0.00f, 0.001f * z, 3, 2.151421f);
 
@@ -226,7 +269,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    float calcMountainDensity(float x, float y, float z) {
+    public float calcMountainDensity(float x, float y, float z) {
         float result = 0.0f;
 
         float x1, y1, z1;
@@ -256,10 +299,16 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    float calcLakeIntensity(float x, float z) {
+    public float calcLakeIntensity(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(x * 0.01f, 0.01f, 0.01f * z, 8, 2.1836171f);
+        result += _pGen3.multiFractalNoise(x * 0.01f, 0f, 0.01f * z, 8, 2.1836171f);
         return (float) Math.sqrt(Math.abs(result));
     }
 
+    public float calcTemperature(float x, float z) {
+        float result = 0.0f;
+        result += _pGen1.multiFractalNoise(x * 0.001f, 0f, 0.001f * z, 8, 2.1836171f) * 4f;
+        result = (0.5f + result) * 100f;
+        return result;
+    }
 }

@@ -27,7 +27,7 @@ import java.util.HashMap;
  */
 public final class ChunkCache {
 
-    private final HashMap<Integer, Chunk> _chunkCache = new HashMap<Integer, Chunk>();
+    private final HashMap<Integer, Chunk> _chunkCache = new HashMap<Integer, Chunk>(capacity());
     private final World _parent;
 
     /**

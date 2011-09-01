@@ -20,19 +20,20 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.VectorPool;
-import gnu.trove.list.array.TFloatArrayList;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+
+import java.util.HashMap;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ChunkMeshGenerator {
 
-    private Chunk _chunk;
-
     private static Vector3f[] _rayLut;
     private static FastRandom _rand = new FastRandom(32);
+    private Chunk _chunk;
 
     static {
         _rayLut = new Vector3f[16];
@@ -84,6 +85,8 @@ public class ChunkMeshGenerator {
     public ChunkMesh generateMesh() {
         ChunkMesh mesh = new ChunkMesh();
 
+        HashMap<Vector3f, Integer> indexMap = new HashMap<Vector3f, Integer>();
+
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -93,26 +96,121 @@ public class ChunkMeshGenerator {
             }
         }
 
+        generateOptimizedBuffers(mesh);
+
         return mesh;
     }
 
-    private void addLightTexCoordFor(ChunkMesh mesh, int x, int y, int z, int dirX, int dirY, int dirZ, RENDER_TYPE r, float dimming) {
-        TFloatArrayList l;
+    private void generateOptimizedBuffers(ChunkMesh mesh) {
 
-        if (r == RENDER_TYPE.BILLBOARD) {
-            l = mesh._vertexElements[2].light;
-        } else if (r == RENDER_TYPE.TRANS) {
-            l = mesh._vertexElements[1].light;
-        } else {
-            l = mesh._vertexElements[0].light;
+
+        for (int j = 0; j < 3; j++) {
+            mesh._vertexElements[j].vertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].quads.size() + mesh._vertexElements[j].tex.size() * 2 + mesh._vertexElements[j].color.size());
+            mesh._vertexElements[j].indices = BufferUtils.createIntBuffer(mesh._vertexElements[j].quads.size());
+
+            HashMap<Vector3f, Integer> indexLut = new HashMap<Vector3f, Integer>(mesh._vertexElements[j].vertices.capacity());
+
+            int tex = 0;
+            int color = 0;
+            int idxCounter = 0;
+            for (int i = 0; i < mesh._vertexElements[j].quads.size(); i += 3, tex += 2, color += 4) {
+
+                Vector3f vertexPos = VectorPool.getVector(mesh._vertexElements[j].quads.get(i), mesh._vertexElements[j].quads.get(i + 1), mesh._vertexElements[j].quads.get(i + 2));
+
+                // Check if this vertex is a new one
+                if (indexLut.containsKey(vertexPos)) {
+                    int index = indexLut.get(vertexPos);
+                    mesh._vertexElements[j].indices.put(index);
+                    continue;
+                }
+
+                mesh._vertexElements[j].vertices.put(vertexPos.x);
+                mesh._vertexElements[j].vertices.put(vertexPos.y);
+                mesh._vertexElements[j].vertices.put(vertexPos.z);
+
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(tex));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(tex + 1));
+
+                mesh._vertexElements[j].vertices.put(getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.SUN)*getOcclusionValue(vertexPos, Chunk.LIGHT_TYPE.SUN));
+                mesh._vertexElements[j].vertices.put(getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.BLOCK)*getOcclusionValue(vertexPos, Chunk.LIGHT_TYPE.BLOCK));
+
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(color));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(color + 1));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(color + 2));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(color + 3));
+
+                // Log this vertex
+                indexLut.put(vertexPos, idxCounter);
+                mesh._vertexElements[j].indices.put(idxCounter++);
+            }
+
+            mesh._vertexElements[j].vertices.flip();
+            mesh._vertexElements[j].indices.flip();
+        }
+    }
+
+    private float getLightForVertexPos(Vector3f vertexPos, Chunk.LIGHT_TYPE lightType) {
+        float result = 0.0f;
+
+        float[] lights = new float[8];
+
+        lights[0] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f), lightType) / 15f;
+        lights[1] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f), lightType) / 15f;
+        lights[2] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f), lightType) / 15f;
+        lights[3] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f), lightType) / 15f;
+
+        lights[4] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f), lightType) / 15f;
+        lights[5] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f), lightType) / 15f;
+        lights[6] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f), lightType) / 15f;
+        lights[7] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f), lightType) / 15f;
+
+        boolean[] blocks = new boolean[8];
+
+        blocks[0] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f))).isBlockTypeTranslucent();
+        blocks[1] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f))).isBlockTypeTranslucent();
+        blocks[2] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f))).isBlockTypeTranslucent();
+        blocks[3] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f))).isBlockTypeTranslucent();
+
+        blocks[4] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f))).isBlockTypeTranslucent();
+        blocks[5] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f))).isBlockTypeTranslucent();
+        blocks[6] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f))).isBlockTypeTranslucent();
+        blocks[7] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f))).isBlockTypeTranslucent();
+
+        int counter = 0;
+        for (int i = 0; i < 8; i++) {
+            if (blocks[i]) {
+                result += lights[i];
+                counter++;
+            }
         }
 
-        float sunlight = (float) _chunk.getParent().getLight(_chunk.getBlockWorldPosX(x) + dirX, _chunk.getBlockWorldPosY(y) + dirY, _chunk.getBlockWorldPosZ(z) + dirZ, Chunk.LIGHT_TYPE.SUN) / 15f;
-        float blocklight = (float) _chunk.getParent().getLight(_chunk.getBlockWorldPosX(x) + dirX, _chunk.getBlockWorldPosY(y) + dirY, _chunk.getBlockWorldPosZ(z) + dirZ, Chunk.LIGHT_TYPE.BLOCK) / 15f;
-
-        l.add(sunlight * dimming);
-        l.add(blocklight * dimming);
+        return result / counter;
     }
+
+    private float getOcclusionValue(Vector3f vertexPos, Chunk.LIGHT_TYPE lightType) {
+
+        float result = 1.0f;
+        boolean[] blocks = new boolean[8];
+
+        blocks[0] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f))).isCastingShadows();
+        blocks[1] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f))).isCastingShadows();
+        blocks[2] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f))).isCastingShadows();
+        blocks[3] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f))).isCastingShadows();
+
+        blocks[4] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f))).isCastingShadows();
+        blocks[5] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f))).isCastingShadows();
+        blocks[6] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f))).isCastingShadows();
+        blocks[7] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f))).isCastingShadows();
+
+        for (int i = 0; i < 8; i++) {
+            if (blocks[i]) {
+                result -= 1f / 24f;
+            }
+        }
+
+        return result;
+    }
+
 
     /**
      * Generates the billboard vertices for a given local block position.
@@ -141,7 +239,6 @@ public class ChunkMeshGenerator {
         float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x;
         float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y;
 
-        addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
@@ -152,7 +249,6 @@ public class ChunkMeshGenerator {
         mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
         mesh._vertexElements[2].quads.add(z + offsetZ);
 
-        addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
@@ -163,7 +259,6 @@ public class ChunkMeshGenerator {
         mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
         mesh._vertexElements[2].quads.add(z + offsetZ);
 
-        addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
@@ -174,7 +269,6 @@ public class ChunkMeshGenerator {
         mesh._vertexElements[2].quads.add(0.5f + y + offsetY);
         mesh._vertexElements[2].quads.add(z + offsetZ);
 
-        addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
@@ -193,7 +287,6 @@ public class ChunkMeshGenerator {
         texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x;
         texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y;
 
-        addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
@@ -204,7 +297,6 @@ public class ChunkMeshGenerator {
         mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
         mesh._vertexElements[2].quads.add(-0.5f + z + offsetZ);
 
-        addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
@@ -215,7 +307,6 @@ public class ChunkMeshGenerator {
         mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
         mesh._vertexElements[2].quads.add(0.5f + z + offsetZ);
 
-        addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
@@ -226,7 +317,6 @@ public class ChunkMeshGenerator {
         mesh._vertexElements[2].quads.add(0.5f + y + offsetY);
         mesh._vertexElements[2].quads.add(0.5f + z + offsetZ);
 
-        addLightTexCoordFor(mesh, x, y, z, 0, 0, 0, renderType, 1f);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
         mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
@@ -416,16 +506,10 @@ public class ChunkMeshGenerator {
         float offsetY = _chunk.getPosition().y * Configuration.CHUNK_DIMENSIONS.y;
         float offsetZ = _chunk.getPosition().z * Configuration.CHUNK_DIMENSIONS.z;
 
-        TFloatArrayList color = mesh._vertexElements[0].color;
-        TFloatArrayList normals = mesh._vertexElements[0].normals;
-        TFloatArrayList tex = mesh._vertexElements[0].tex;
-        TFloatArrayList quads = mesh._vertexElements[0].quads;
+        ChunkMesh.VertexElements vertexElements = mesh._vertexElements[0];
 
         if (renderType == RENDER_TYPE.TRANS) {
-            color = mesh._vertexElements[1].color;
-            normals = mesh._vertexElements[1].normals;
-            tex = mesh._vertexElements[1].tex;
-            quads = mesh._vertexElements[1].quads;
+            vertexElements = mesh._vertexElements[1];
         }
 
         /*
@@ -433,82 +517,74 @@ public class ChunkMeshGenerator {
          * orientation of the plane.
          */
         if (norm.z == 1 || norm.x == -1) {
-            tex.add(texOffset.x);
-            tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.x);
+            vertexElements.tex.add(texOffset.y + 0.0624f);
 
-            tex.add(texOffset.x + 0.0624f);
-            tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.x + 0.0624f);
+            vertexElements.tex.add(texOffset.y + 0.0624f);
 
-            tex.add(texOffset.x + 0.0624f);
-            tex.add(texOffset.y);
+            vertexElements.tex.add(texOffset.x + 0.0624f);
+            vertexElements.tex.add(texOffset.y);
 
-            tex.add(texOffset.x);
-            tex.add(texOffset.y);
+            vertexElements.tex.add(texOffset.x);
+            vertexElements.tex.add(texOffset.y);
         } else {
-            tex.add(texOffset.x);
-            tex.add(texOffset.y);
+            vertexElements.tex.add(texOffset.x);
+            vertexElements.tex.add(texOffset.y);
 
-            tex.add(texOffset.x + 0.0624f);
-            tex.add(texOffset.y);
+            vertexElements.tex.add(texOffset.x + 0.0624f);
+            vertexElements.tex.add(texOffset.y);
 
-            tex.add(texOffset.x + 0.0624f);
-            tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.x + 0.0624f);
+            vertexElements.tex.add(texOffset.y + 0.0624f);
 
-            tex.add(texOffset.x);
-            tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.x);
+            vertexElements.tex.add(texOffset.y + 0.0624f);
         }
 
-        float shadowIntensity = calcAmbientOcclusion(new Vector3f(p1.x + x + offsetX, p1.y + y + offsetY, p1.z + z + offsetZ));
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-        normals.add(norm.x);
-        normals.add(norm.y);
-        normals.add(norm.z);
-        addLightTexCoordFor(mesh, x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
-        quads.add(p1.x + x + offsetX);
-        quads.add(p1.y + y + offsetY);
-        quads.add(p1.z + z + offsetZ);
+        vertexElements.color.add(colorOffset.x);
+        vertexElements.color.add(colorOffset.y);
+        vertexElements.color.add(colorOffset.z);
+        vertexElements.color.add(colorOffset.w);
+        vertexElements.normals.add(norm.x);
+        vertexElements.normals.add(norm.y);
+        vertexElements.normals.add(norm.z);
+        vertexElements.quads.add(p1.x + x + offsetX);
+        vertexElements.quads.add(p1.y + y + offsetY);
+        vertexElements.quads.add(p1.z + z + offsetZ);
 
-        shadowIntensity = calcAmbientOcclusion(new Vector3f(p2.x + x + offsetX, p2.y + y + offsetY, p2.z + z + offsetZ));
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-        normals.add(norm.x);
-        normals.add(norm.y);
-        normals.add(norm.z);
-        addLightTexCoordFor(mesh, x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
-        quads.add(p2.x + x + offsetX);
-        quads.add(p2.y + y + offsetY);
-        quads.add(p2.z + z + offsetZ);
+        vertexElements.color.add(colorOffset.x);
+        vertexElements.color.add(colorOffset.y);
+        vertexElements.color.add(colorOffset.z);
+        vertexElements.color.add(colorOffset.w);
+        vertexElements.normals.add(norm.x);
+        vertexElements.normals.add(norm.y);
+        vertexElements.normals.add(norm.z);
+        vertexElements.quads.add(p2.x + x + offsetX);
+        vertexElements.quads.add(p2.y + y + offsetY);
+        vertexElements.quads.add(p2.z + z + offsetZ);
 
-        shadowIntensity = calcAmbientOcclusion(new Vector3f(p3.x + x + offsetX, p3.y + y + offsetY, p3.z + z + offsetZ));
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-        normals.add(norm.x);
-        normals.add(norm.y);
-        normals.add(norm.z);
-        addLightTexCoordFor(mesh, x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
-        quads.add(p3.x + x + offsetX);
-        quads.add(p3.y + y + offsetY);
-        quads.add(p3.z + z + offsetZ);
+        vertexElements.color.add(colorOffset.x);
+        vertexElements.color.add(colorOffset.y);
+        vertexElements.color.add(colorOffset.z);
+        vertexElements.color.add(colorOffset.w);
+        vertexElements.normals.add(norm.x);
+        vertexElements.normals.add(norm.y);
+        vertexElements.normals.add(norm.z);
+        vertexElements.quads.add(p3.x + x + offsetX);
+        vertexElements.quads.add(p3.y + y + offsetY);
+        vertexElements.quads.add(p3.z + z + offsetZ);
 
-        shadowIntensity = calcAmbientOcclusion(new Vector3f(p4.x + x + offsetX, p4.y + y + offsetY, p4.z + z + offsetZ));
-        color.add(colorOffset.x);
-        color.add(colorOffset.y);
-        color.add(colorOffset.z);
-        color.add(colorOffset.w);
-        normals.add(norm.x);
-        normals.add(norm.y);
-        normals.add(norm.z);
-        addLightTexCoordFor(mesh, x, y, z, (int) norm.x, (int) norm.y, (int) norm.z, renderType, shadowIntensity);
-        quads.add(p4.x + x + offsetX);
-        quads.add(p4.y + y + offsetY);
-        quads.add(p4.z + z + offsetZ);
+        vertexElements.color.add(colorOffset.x);
+        vertexElements.color.add(colorOffset.y);
+        vertexElements.color.add(colorOffset.z);
+        vertexElements.color.add(colorOffset.w);
+        vertexElements.normals.add(norm.x);
+        vertexElements.normals.add(norm.y);
+        vertexElements.normals.add(norm.z);
+        vertexElements.quads.add(p4.x + x + offsetX);
+        vertexElements.quads.add(p4.y + y + offsetY);
+        vertexElements.quads.add(p4.z + z + offsetZ);
     }
 
 
@@ -528,48 +604,4 @@ public class ChunkMeshGenerator {
 
         return bCheck.getClass() == BlockAir.class || cBlock.doNotTessellate() || bCheck.isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
     }
-
-    /**
-     * Calculates the ambient occlusion value based on the amount of blocks
-     * surrounding the given block position.
-     *
-     * @return Occlusion amount
-     */
-    float calcAmbientOcclusion(Vector3f vertexPosition) {
-        // Initial visibility
-        double visiblity = 1.0;
-
-        /*
-        * For each ray...
-        */
-        for (int i = 0; i < _rayLut.length; i++) {
-
-            Vector3f rayDir = _rayLut[i];
-
-            rayDir.normalise();
-
-            // Initial ray visibility
-            double rayVisiblity = 1.0;
-
-            int posX = (int) (vertexPosition.x + rayDir.x + 0.5f);
-            int posY = (int) (vertexPosition.y + rayDir.y + 0.5f);
-            int posZ = (int) (vertexPosition.z + rayDir.z + 0.5f);
-
-            byte b = _chunk.getParent().getBlock(posX, posY, posZ);
-
-            if (Block.getBlockForType(b).isCastingShadows()) {
-                if (Block.getBlockForType(b).isBlockBillboard())
-                    rayVisiblity *= 0.86;
-                else
-                    rayVisiblity *= Configuration.OCCLUSION_INTENS;
-            }
-
-            visiblity += rayVisiblity;
-        }
-
-        visiblity /= (float) _rayLut.length;
-
-        return (float) visiblity;
-    }
-
 }

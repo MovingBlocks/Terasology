@@ -27,6 +27,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -82,6 +83,8 @@ public final class World extends RenderableObject {
     private final ObjectGeneratorTree _generatorTree;
     private final ObjectGeneratorPineTree _generatorPineTree;
     private final ObjectGeneratorFirTree _generatorFirTree;
+    private final ObjectGeneratorCactus _generatorCactus;
+
     private final FastRandom _rand;
     /* ------ */
     private String _title, _seed;
@@ -141,6 +144,7 @@ public final class World extends RenderableObject {
         _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
         _generatorFirTree = new ObjectGeneratorFirTree(this, seed);
         _generatorGrass = new ChunkGeneratorFlora(seed);
+        _generatorCactus = new ObjectGeneratorCactus(this, seed);
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
@@ -292,9 +296,11 @@ public final class World extends RenderableObject {
 
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
+
         glBegin(GL_QUADS);
         Primitives.drawSkyBox(getDaylight());
         glEnd();
+
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
 
@@ -318,29 +324,14 @@ public final class World extends RenderableObject {
         GL20.glUniform1f(daylight, getDaylight());
         ShaderManager.getInstance().enableShader(null);
 
-        renderHorizon();
         renderChunks();
+        renderHorizon();
     }
 
     /**
      * Renders the horizon.
      */
     void renderHorizon() {
-
-
-        ShaderManager.getInstance().enableShader("cloud");
-
-        /*
-         * Draw clouds.
-         */
-        if (_dlClouds > 0 && isDaytime()) {
-            glPushMatrix();
-            glTranslatef(_player.getPosition().x + _cloudOffset.x, 140f, _player.getPosition().z + _cloudOffset.y);
-            glCallList(_dlClouds);
-            glPopMatrix();
-        }
-
-        ShaderManager.getInstance().enableShader(null);
 
         glPushMatrix();
         // Position the sun relatively to the player
@@ -364,6 +355,23 @@ public final class World extends RenderableObject {
 
         glDisable(GL_BLEND);
         glPopMatrix();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL11.GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
+        ShaderManager.getInstance().enableShader("cloud");
+
+        /*
+         * Draw clouds.
+         */
+        if (_dlClouds > 0 && isDaytime()) {
+            glPushMatrix();
+            glTranslatef(_player.getPosition().x + _cloudOffset.x, 140f, _player.getPosition().z + _cloudOffset.y);
+            glCallList(_dlClouds);
+            glPopMatrix();
+        }
+
+        ShaderManager.getInstance().enableShader(null);
+        glDisable(GL_BLEND);
     }
 
     /**
@@ -435,9 +443,9 @@ public final class World extends RenderableObject {
         _cloudOffset.x += _windDirection.x;
         _cloudOffset.y += _windDirection.y;
 
-        if (_cloudOffset.x >= _clouds.length * 64 / 2 || _cloudOffset.x <= -(_clouds.length * 64 / 2)) {
+        if (_cloudOffset.x >= _clouds.length * 16 / 2 || _cloudOffset.x <= -(_clouds.length * 16 / 2)) {
             _windDirection.x = -_windDirection.x;
-        } else if (_cloudOffset.y >= _clouds.length * 64 / 2 || _cloudOffset.y <= -(_clouds.length * 64 / 2)) {
+        } else if (_cloudOffset.y >= _clouds.length * 16 / 2 || _cloudOffset.y <= -(_clouds.length * 16 / 2)) {
             _windDirection.y = -_windDirection.y;
         }
 
@@ -843,6 +851,13 @@ public final class World extends RenderableObject {
     }
 
     /**
+     * @return
+     */
+    public ObjectGeneratorCactus getGeneratorCactus() {
+        return _generatorCactus;
+    }
+
+    /**
      * Returns true if it is daytime.
      *
      * @return
@@ -1035,7 +1050,11 @@ public final class World extends RenderableObject {
             for (int x = 0; x < length; x++) {
                 for (int y = 0; y < length; y++) {
                     if (!_clouds[x][y]) {
-                        Primitives.drawCloud(64, 32, 64, x * 64f - (length / 2 * 64f), 0, y * 64f - (length / 2 * 64f));
+                        try {
+                            Primitives.drawCloud(16, 16, 16, x * 16f - (length / 2 * 16f), 0, y * 16f - (length / 2 * 16f), _clouds[x - 1][y], _clouds[x + 1][y], _clouds[x][y + 1], _clouds[x][y - 1]);
+                        } catch (Exception e) {
+
+                        }
                     }
                 }
             }
