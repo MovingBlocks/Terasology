@@ -131,8 +131,8 @@ public class ChunkMeshGenerator {
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(tex));
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(tex + 1));
 
-                mesh._vertexElements[j].vertices.put(getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.SUN)*getOcclusionValue(vertexPos, Chunk.LIGHT_TYPE.SUN));
-                mesh._vertexElements[j].vertices.put(getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.BLOCK)*getOcclusionValue(vertexPos, Chunk.LIGHT_TYPE.BLOCK));
+                mesh._vertexElements[j].vertices.put(getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.SUN) * getOcclusionValue(vertexPos, Chunk.LIGHT_TYPE.SUN));
+                mesh._vertexElements[j].vertices.put(getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.BLOCK) * getOcclusionValue(vertexPos, Chunk.LIGHT_TYPE.BLOCK));
 
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(color));
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(color + 1));
@@ -221,111 +221,46 @@ public class ChunkMeshGenerator {
      */
     private void generateBillboardVertices(ChunkMesh mesh, int x, int y, int z) {
         byte block = _chunk.getBlock(x, y, z);
-        RENDER_TYPE renderType = RENDER_TYPE.BILLBOARD;
 
         // Ignore normal blocks
         if (!Block.getBlockForType(block).isBlockBillboard()) {
             return;
         }
 
-        float offsetX = _chunk.getPosition().x * Configuration.CHUNK_DIMENSIONS.x;
-        float offsetY = _chunk.getPosition().y * Configuration.CHUNK_DIMENSIONS.y;
-        float offsetZ = _chunk.getPosition().z * Configuration.CHUNK_DIMENSIONS.z;
-
         /*
          * First side of the billboard
          */
-        Vector4f _colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
-        float texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x;
-        float texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y;
+        Vector4f colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
+        Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0);
 
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
-        mesh._vertexElements[2].tex.add(texOffsetX);
-        mesh._vertexElements[2].tex.add(texOffsetY + 0.0624f);
-        mesh._vertexElements[2].quads.add(-0.5f + x + offsetX);
-        mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
-        mesh._vertexElements[2].quads.add(z + offsetZ);
+        Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
+        Vector3f p2 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
+        Vector3f p3 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
+        Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
 
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
-        mesh._vertexElements[2].tex.add(texOffsetX + 0.0624f);
-        mesh._vertexElements[2].tex.add(texOffsetY + 0.0624f);
-        mesh._vertexElements[2].quads.add(0.5f + x + offsetX);
-        mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
-        mesh._vertexElements[2].quads.add(z + offsetZ);
-
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
-        mesh._vertexElements[2].tex.add(texOffsetX + 0.0624f);
-        mesh._vertexElements[2].tex.add(texOffsetY);
-        mesh._vertexElements[2].quads.add(0.5f + x + offsetX);
-        mesh._vertexElements[2].quads.add(0.5f + y + offsetY);
-        mesh._vertexElements[2].quads.add(z + offsetZ);
-
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
-        mesh._vertexElements[2].tex.add(texOffsetX);
-        mesh._vertexElements[2].tex.add(texOffsetY);
-        mesh._vertexElements[2].quads.add(-0.5f + x + offsetX);
-        mesh._vertexElements[2].quads.add(0.5f + y + offsetY);
-        mesh._vertexElements[2].quads.add(z + offsetZ);
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p2));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p3));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p4));
+        addBlockTextureData(mesh._vertexElements[2], texOffset, VectorPool.getVector(0, 0, 1));
 
 
         /*
-         * Second side of the billboard
-         */
-        _colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
-        texOffsetX = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x;
-        texOffsetY = Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y;
+        * Second side of the billboard
+        */
+        colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
+        texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0);
 
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
-        mesh._vertexElements[2].tex.add(texOffsetX);
-        mesh._vertexElements[2].tex.add(texOffsetY + 0.0624f);
-        mesh._vertexElements[2].quads.add(x + offsetX);
-        mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
-        mesh._vertexElements[2].quads.add(-0.5f + z + offsetZ);
+        p1 = VectorPool.getVector(-0.5f, -0.5f,-0.5f);
+        p2 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
+        p3 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
+        p4 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
 
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
-        mesh._vertexElements[2].tex.add(texOffsetX + 0.0624f);
-        mesh._vertexElements[2].tex.add(texOffsetY + 0.0624f);
-        mesh._vertexElements[2].quads.add(x + offsetX);
-        mesh._vertexElements[2].quads.add(-0.5f + y + offsetY);
-        mesh._vertexElements[2].quads.add(0.5f + z + offsetZ);
-
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
-        mesh._vertexElements[2].tex.add(texOffsetX + 0.0624f);
-        mesh._vertexElements[2].tex.add(texOffsetY);
-        mesh._vertexElements[2].quads.add(x + offsetX);
-        mesh._vertexElements[2].quads.add(0.5f + y + offsetY);
-        mesh._vertexElements[2].quads.add(0.5f + z + offsetZ);
-
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.x);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.y);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.z);
-        mesh._vertexElements[2].color.add(_colorBillboardOffset.w);
-        mesh._vertexElements[2].tex.add(texOffsetX);
-        mesh._vertexElements[2].tex.add(texOffsetY);
-        mesh._vertexElements[2].quads.add(x + offsetX);
-        mesh._vertexElements[2].quads.add(0.5f + y + offsetY);
-        mesh._vertexElements[2].quads.add(-0.5f + z + offsetZ);
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p2));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p3));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p4));
+        addBlockTextureData(mesh._vertexElements[2], texOffset, VectorPool.getVector(0, 0, 1));
     }
 
     private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z) {
@@ -361,7 +296,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -384,7 +319,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -409,7 +344,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -432,7 +367,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.LEFT);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -455,7 +390,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.RIGHT);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -478,7 +413,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BOTTOM);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -501,21 +436,56 @@ public class ChunkMeshGenerator {
      * @param texOffset
      * @param renderType
      */
-    void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, RENDER_TYPE renderType) {
-        float offsetX = _chunk.getPosition().x * Configuration.CHUNK_DIMENSIONS.x;
-        float offsetY = _chunk.getPosition().y * Configuration.CHUNK_DIMENSIONS.y;
-        float offsetZ = _chunk.getPosition().z * Configuration.CHUNK_DIMENSIONS.z;
-
+    void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
         ChunkMesh.VertexElements vertexElements = mesh._vertexElements[0];
 
         if (renderType == RENDER_TYPE.TRANS) {
             vertexElements = mesh._vertexElements[1];
         }
 
+        if (blockForm == Block.BLOCK_FORM.CACTUS) {
+            generateCactusSide(p1, p2, p3, p4, norm);
+        }
+
+        addBlockTextureData(vertexElements, texOffset, norm);
+
+        addBlockVertexData(vertexElements, colorOffset, moveVectorToWorldSpace(x, y, z, p1));
+        addBlockVertexData(vertexElements, colorOffset, moveVectorToWorldSpace(x, y, z, p2));
+        addBlockVertexData(vertexElements, colorOffset, moveVectorToWorldSpace(x, y, z, p3));
+        addBlockVertexData(vertexElements, colorOffset, moveVectorToWorldSpace(x, y, z, p4));
+    }
+
+    private Vector3f moveVectorToWorldSpace(int cPosX, int cPosY, int cPosZ, Vector3f offset) {
+        float offsetX = _chunk.getPosition().x * Configuration.CHUNK_DIMENSIONS.x;
+        float offsetY = _chunk.getPosition().y * Configuration.CHUNK_DIMENSIONS.y;
+        float offsetZ = _chunk.getPosition().z * Configuration.CHUNK_DIMENSIONS.z;
+
+        offset.x += offsetX + cPosX;
+        offset.y += offsetY + cPosY;
+        offset.z += offsetZ + cPosZ;
+
+        return offset;
+    }
+
+    private void generateCactusSide(Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm) {
+        if (norm.x == 1.0f || norm.x == -1.0f) {
+            p1.x -= 0.0625 * norm.x;
+            p2.x -= 0.0625 * norm.x;
+            p3.x -= 0.0625 * norm.x;
+            p4.x -= 0.0625 * norm.x;
+        } else if (norm.z == 1.0f || norm.z == -1.0f) {
+            p1.z -= 0.0625 * norm.z;
+            p2.z -= 0.0625 * norm.z;
+            p3.z -= 0.0625 * norm.z;
+            p4.z -= 0.0625 * norm.z;
+        }
+    }
+
+    private void addBlockTextureData(ChunkMesh.VertexElements vertexElements, Vector3f texOffset, Vector3f norm) {
         /*
-         * Rotate the texture coordinates according to the
-         * orientation of the plane.
-         */
+        * Rotate the texture coordinates according to the
+        * orientation of the plane.
+        */
         if (norm.z == 1 || norm.x == -1) {
             vertexElements.tex.add(texOffset.x);
             vertexElements.tex.add(texOffset.y + 0.0624f);
@@ -541,50 +511,16 @@ public class ChunkMeshGenerator {
             vertexElements.tex.add(texOffset.x);
             vertexElements.tex.add(texOffset.y + 0.0624f);
         }
+    }
 
+    private void addBlockVertexData(ChunkMesh.VertexElements vertexElements, Vector4f colorOffset, Vector3f vertex) {
         vertexElements.color.add(colorOffset.x);
         vertexElements.color.add(colorOffset.y);
         vertexElements.color.add(colorOffset.z);
         vertexElements.color.add(colorOffset.w);
-        vertexElements.normals.add(norm.x);
-        vertexElements.normals.add(norm.y);
-        vertexElements.normals.add(norm.z);
-        vertexElements.quads.add(p1.x + x + offsetX);
-        vertexElements.quads.add(p1.y + y + offsetY);
-        vertexElements.quads.add(p1.z + z + offsetZ);
-
-        vertexElements.color.add(colorOffset.x);
-        vertexElements.color.add(colorOffset.y);
-        vertexElements.color.add(colorOffset.z);
-        vertexElements.color.add(colorOffset.w);
-        vertexElements.normals.add(norm.x);
-        vertexElements.normals.add(norm.y);
-        vertexElements.normals.add(norm.z);
-        vertexElements.quads.add(p2.x + x + offsetX);
-        vertexElements.quads.add(p2.y + y + offsetY);
-        vertexElements.quads.add(p2.z + z + offsetZ);
-
-        vertexElements.color.add(colorOffset.x);
-        vertexElements.color.add(colorOffset.y);
-        vertexElements.color.add(colorOffset.z);
-        vertexElements.color.add(colorOffset.w);
-        vertexElements.normals.add(norm.x);
-        vertexElements.normals.add(norm.y);
-        vertexElements.normals.add(norm.z);
-        vertexElements.quads.add(p3.x + x + offsetX);
-        vertexElements.quads.add(p3.y + y + offsetY);
-        vertexElements.quads.add(p3.z + z + offsetZ);
-
-        vertexElements.color.add(colorOffset.x);
-        vertexElements.color.add(colorOffset.y);
-        vertexElements.color.add(colorOffset.z);
-        vertexElements.color.add(colorOffset.w);
-        vertexElements.normals.add(norm.x);
-        vertexElements.normals.add(norm.y);
-        vertexElements.normals.add(norm.z);
-        vertexElements.quads.add(p4.x + x + offsetX);
-        vertexElements.quads.add(p4.y + y + offsetY);
-        vertexElements.quads.add(p4.z + z + offsetZ);
+        vertexElements.quads.add(vertex.x);
+        vertexElements.quads.add(vertex.y);
+        vertexElements.quads.add(vertex.z);
     }
 
 

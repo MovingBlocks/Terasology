@@ -14,13 +14,11 @@ public class ChunkMesh extends RenderableObject {
     public class VertexElements {
         public VertexElements() {
             quads = new TFloatArrayList();
-            normals = new TFloatArrayList();
             tex = new TFloatArrayList();
             color = new TFloatArrayList();
         }
 
         public TFloatArrayList quads;
-        public TFloatArrayList normals;
         public TFloatArrayList tex;
         public TFloatArrayList color;
 

@@ -57,6 +57,11 @@ public abstract class Block {
         BACK
     }
 
+
+    public static enum BLOCK_FORM {
+        NORMAL, CACTUS
+    }
+
     private static final Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockTreeTrunk(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockHighGrass(), new BlockLargeHighGrass(), new BlockTorch(), new BlockLava(), new BlockWood(), new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick(), new BlockCoal(), new BlockGold(), new BlockDarkLeaf(), new BlockSnow(), new BlockCactus()};
     private static final BlockNil nilBlock = new BlockNil();
 
@@ -188,5 +193,12 @@ public abstract class Block {
      */
     public static AABB AABBForBlockAt(int x, int y, int z) {
         return new AABB(VectorPool.getVector(x, y, z), VectorPool.getVector(0.5f, 0.5f, 0.5f));
+    }
+
+    /**
+     * @return
+     */
+    public BLOCK_FORM getBlockForm() {
+        return BLOCK_FORM.NORMAL;
     }
 }

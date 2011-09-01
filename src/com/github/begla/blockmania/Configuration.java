@@ -199,7 +199,8 @@ public final class Configuration {
      * TODO: Should not always load the default settings.
      */
     private static void loadSettings() {
-        loadDefaults();
+        //loadDefaults();
         //loadDemo();
+        loadDebug();
     }
 }
