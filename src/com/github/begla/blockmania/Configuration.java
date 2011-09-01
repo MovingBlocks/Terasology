@@ -69,14 +69,6 @@ public final class Configuration {
      */
     public static final byte MAX_LIGHT = 15;
     /**
-     * The intensity at which the front and back side of blocks are constantly 'dimmed'.
-     */
-    public static final float BLOCK_SIDE_DIMMING = 0.6f;
-    /**
-     * TODO
-     */
-    public static final float OCCLUSION_INTENS = 0.65f;
-    /**
      *
      */
     public static final int DL_UPDATES_PER_CYCLE = 1;
@@ -140,9 +132,9 @@ public final class Configuration {
      * Loads the default values for the global settings.
      */
     private static void loadDefaults() {
-        _settingsNumeric.put("REPLANT_DIRT_TIME",30000f);
-        _settingsBoolean.put("REPLANT_DIRT",true);
-        _settingsBoolean.put("DISABLE_SAVING",false);
+        _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);
+        _settingsBoolean.put("REPLANT_DIRT", true);
+        _settingsBoolean.put("DISABLE_SAVING", false);
         _settingsBoolean.put("PLACING_BOX", true);
         _settingsBoolean.put("CHUNK_OUTLINES", false);
         _settingsBoolean.put("DEBUG", false);
@@ -150,7 +142,7 @@ public final class Configuration {
         _settingsBoolean.put("BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);
-        _settingsNumeric.put("JUMP_INTENSITY", 0.13f);
+        _settingsNumeric.put("JUMP_INTENSITY", 0.14f);
         _settingsNumeric.put("MAX_GRAVITY", 0.7f);
         _settingsNumeric.put("WALKING_SPEED", 0.0175f);
         _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
@@ -160,18 +152,39 @@ public final class Configuration {
         _settingsNumeric.put("V_DIST_Z", 32f);
     }
 
-        private static void loadDemo() {
-        _settingsNumeric.put("REPLANT_DIRT_TIME",30000f);
-        _settingsBoolean.put("REPLANT_DIRT",false);
-        _settingsBoolean.put("DISABLE_SAVING",true);
+    private static void loadDebug() {
+        _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);
+        _settingsBoolean.put("REPLANT_DIRT", false);
+        _settingsBoolean.put("DISABLE_SAVING", true);
+        _settingsBoolean.put("PLACING_BOX", true);
+        _settingsBoolean.put("CHUNK_OUTLINES", false);
+        _settingsBoolean.put("DEBUG", false);
+        _settingsBoolean.put("CROSSHAIR", true);
+        _settingsBoolean.put("BOBBING", true);
+        _settingsBoolean.put("DEMO_FLIGHT", false);
+        _settingsBoolean.put("GOD_MODE", true);
+        _settingsNumeric.put("JUMP_INTENSITY", 0.14f);
+        _settingsNumeric.put("MAX_GRAVITY", 0.7f);
+        _settingsNumeric.put("WALKING_SPEED", 0.2f);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
+        _settingsNumeric.put("GRAVITY", 0.0075f);
+        _settingsNumeric.put("FRICTION", 0.1f);
+        _settingsNumeric.put("V_DIST_X", 40f);
+        _settingsNumeric.put("V_DIST_Z", 40f);
+    }
+
+    private static void loadDemo() {
+        _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);
+        _settingsBoolean.put("REPLANT_DIRT", false);
+        _settingsBoolean.put("DISABLE_SAVING", true);
         _settingsBoolean.put("PLACING_BOX", false);
         _settingsBoolean.put("CHUNK_OUTLINES", false);
         _settingsBoolean.put("DEBUG", false);
         _settingsBoolean.put("CROSSHAIR", false);
         _settingsBoolean.put("BOBBING", true);
-        _settingsBoolean.put("DEMO_FLIGHT", true);
+        _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", true);
-        _settingsNumeric.put("JUMP_INTENSITY", 0.13f);
+        _settingsNumeric.put("JUMP_INTENSITY", 0.14f);
         _settingsNumeric.put("MAX_GRAVITY", 0.7f);
         _settingsNumeric.put("WALKING_SPEED", 0.2f);
         _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
