@@ -496,7 +496,6 @@ public final class Player extends RenderableObject {
 
     /**
      * Updates the position of the player.
-     * TODO: Fix easing-artifact
      */
     private void updatePlayerPosition() {
         // Save the previous position before changing any of the values
@@ -597,6 +596,8 @@ public final class Player extends RenderableObject {
         if (!Configuration.getSettingBoolean("GOD_MODE")) {
             if (horizontalHitTest(oldPosition)) {
                 // Do something while the player is colliding
+                _acc.x = 0;
+                _acc.z = 0;
             }
         }
 
