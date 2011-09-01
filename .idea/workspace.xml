@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e2de95e1-48fd-480f-ac3c-3c86edaba85d" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/BlockCactus.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ObjectGeneratorCactus.java" />
+    <list default="true" id="e2de95e1-48fd-480f-ac3c-3c86edaba85d" name="Default" comment=" * Etc.">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/Block.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/Block.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorForest.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorForest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorTerrain.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorTerrain.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMeshGenerator.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMeshGenerator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java" />
     </list>
     <list id="22112ba9-65da-4a56-b22f-a6639884d472" name="Not to commit" comment="Not to commit">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" />
@@ -80,7 +73,7 @@
       <file leaf-file-name="Chunk.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/Chunk.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="320" column="24" selection-start="10336" selection-end="10346" vertical-scroll-proportion="94.92308">
+            <state line="320" column="24" selection-start="10336" selection-end="10346" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -98,7 +91,7 @@
       <file leaf-file-name="ChunkGeneratorTerrain.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorTerrain.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="143" column="79" selection-start="4801" selection-end="4801" vertical-scroll-proportion="0.6785206">
+            <state line="151" column="61" selection-start="5039" selection-end="5039" vertical-scroll-proportion="0.5220729">
               <folding />
             </state>
           </provider>
@@ -153,9 +146,7 @@
         <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="846" column="27" selection-start="27105" selection-end="27105" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -163,7 +154,7 @@
       <file leaf-file-name="Configuration.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="69" column="44" selection-start="2299" selection-end="2299" vertical-scroll-proportion="-3.48">
+            <state line="69" column="44" selection-start="2299" selection-end="2299" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -261,6 +252,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Favorites" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -531,7 +523,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Favorites" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <PATH>
@@ -825,17 +816,17 @@
   <component name="PropertiesComponent">
     <property name="GenerateAntBuildDialog.generateIdeaHomeProperty" value="false" />
     <property name="project.structure.last.edited" value="Artifacts" />
-    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit3" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="274" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="293" />
-    <property name="OverrideImplement.combined" value="true" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit3" />
     <property name="project.structure.proportion" value="0.15" />
+    <property name="OverrideImplement.combined" value="true" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="293" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="Repository.Attach.JavaDocs" value="false" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="289" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
-    <property name="GenerateAntBuildDialog.generateSingleFile" value="false" />
     <property name="MemberChooser.sorted" value="false" />
+    <property name="GenerateAntBuildDialog.generateSingleFile" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="289" />
     <property name="recentsLimit" value="5" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
@@ -849,25 +840,25 @@
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
-    <property name="Repository.Attach.Sources" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
+    <property name="Repository.Attach.Sources" value="false" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="Downloaded.Files.Path" value="C:\Users\bg\Desktop\Blockmania\lib" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
     <property name="options.lastSelected" value="project.scopes" />
-    <property name="project.structure.side.proportion" value="0.2" />
     <property name="GenerateAntBuildDialog.forceTargetJdk" value="false" />
+    <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="false" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLanguage" value="Java" />
     <property name="GenerateAntBuildDialog.backupFiles" value="false" />
-    <property name="dynamic.classpath" value="false" />
     <property name="options.searchVisible" value="true" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.RecentsKey">
@@ -1075,7 +1066,7 @@
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.51704544" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44695482" sideWeight="0.9903743" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.67092335" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.16791444" sideWeight="0.7200393" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4086444" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1085,9 +1076,9 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17363344" sideWeight="0.45309383" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.6768173" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.6768173" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17326203" sideWeight="0.73182714" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17326203" sideWeight="0.5530452" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2681729" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2681729" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.67092335" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1121,7 +1112,7 @@
     <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="true" />
     <option name="DEFAULT_PATCH_EXTENSION" value="patch" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value=" * Work in progress" />
+    <option name="LAST_COMMIT_MESSAGE" value=" * New lighting engine&#10; * Began implementing biomes...&#10; * Added cacti&#10; * Some optimizations" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -1158,6 +1149,7 @@
     <MESSAGE value=" * Adjusted scripts" />
     <MESSAGE value=" * Massively improved playability of the terrain (looks more natural now)&#10; * Replaced simple occlusion lighting with real ambient occlusion&#10; * Increased grass density&#10; * Changed forest density&#10; * Adjusted overall coloring&#10; * And some more minor changes/fixes" />
     <MESSAGE value=" * Work in progress" />
+    <MESSAGE value=" * New lighting engine&#10; * Began implementing biomes...&#10; * Added cacti&#10; * Some optimizations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1169,114 +1161,86 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkCache.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="19" selection-start="951" selection-end="951" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="27" column="19" selection-start="951" selection-end="951" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/shaders/chunk_frag.glsl">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="45" selection-start="800" selection-end="800" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="33" column="45" selection-start="800" selection-end="800" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/shaders/chunk_vert.glsl">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkUpdateManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="19" selection-start="868" selection-end="868" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="25" column="19" selection-start="868" selection-end="868" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMeshGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="134" column="160" selection-start="4777" selection-end="4777" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="134" column="160" selection-start="4777" selection-end="4777" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMesh.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="55" selection-start="698" selection-end="698" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="25" column="55" selection-start="698" selection-end="698" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/Chunk.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="320" column="24" selection-start="10336" selection-end="10346" vertical-scroll-proportion="94.92308">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/BlockGrass.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="0" selection-start="1242" selection-end="1649" vertical-scroll-proportion="0.0">
+        <state line="320" column="24" selection-start="10336" selection-end="10346" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/Block.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="59" column="522" selection-start="1977" selection-end="1977" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorFlora.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="13" selection-start="1081" selection-end="1081" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="69" column="44" selection-start="2299" selection-end="2299" vertical-scroll-proportion="-3.48">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="846" column="27" selection-start="27105" selection-end="27105" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
+        <state line="59" column="522" selection-start="1977" selection-end="1977" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/BlockCactus.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="11" selection-start="782" selection-end="782" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorForest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="151" selection-start="2586" selection-end="2586" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="22" column="11" selection-start="782" selection-end="782" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ObjectGeneratorCactus.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="106" selection-start="729" selection-end="729" vertical-scroll-proportion="0.0">
+        <state line="19" column="106" selection-start="729" selection-end="729" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorForest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="67" column="151" selection-start="2586" selection-end="2586" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorFlora.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="13" selection-start="1081" selection-end="1081" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/BlockGrass.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="0" selection-start="1242" selection-end="1649" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="846" column="27" selection-start="27105" selection-end="27105" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="69" column="44" selection-start="2299" selection-end="2299" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorTerrain.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="143" column="79" selection-start="4801" selection-end="4801" vertical-scroll-proportion="0.6785206">
+        <state line="151" column="61" selection-start="5039" selection-end="5039" vertical-scroll-proportion="0.5220729">
           <folding />
         </state>
       </provider>
