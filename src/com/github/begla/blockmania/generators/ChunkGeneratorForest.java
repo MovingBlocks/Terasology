@@ -87,11 +87,11 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
                  * Generate high grass.
                  */
                 double rand = _rand.standNormalDistrDouble();
-                if (rand >= 0) {
+                if (rand > 0) {
                     if (c.canBlockSeeTheSky(x, y + 1, z)) {
                         c.setBlock(x, y + 1, z, (byte) 0xB);
                     }
-                } else if (rand <= -1) {
+                } else if (rand < 0) {
                     if (c.canBlockSeeTheSky(x, y + 1, z)) {
                         c.setBlock(x, y + 1, z, (byte) 0xC);
                     }
@@ -145,7 +145,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      */
     float calcForestDensity(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.4f * x, 0f, 0.4f * z, 3, 2.3614521f);
+        result += _pGen3.multiFractalNoise(0.2f * x, 0f, 0.2f * z, 7, 2.3614521f);
         return result;
     }
 
@@ -156,7 +156,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      */
     float calcGrassDensity(float x, float z) {
         float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.2f * x, 0f, 0.2f * z, 3, 2.37152f);
+        result += _pGen3.multiFractalNoise(0.01f * x, 0f, 0.01f * z, 7, 2.37152f);
         return result;
     }
 }

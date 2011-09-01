@@ -54,7 +54,7 @@ public class BlockLargeHighGrass extends Block {
 
     @Override
     public boolean isCastingShadows() {
-        return false;
+        return true;
     }
 
     @Override

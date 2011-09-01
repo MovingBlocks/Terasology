@@ -33,7 +33,7 @@ public class BlockGrass extends Block {
 
     @Override
     public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(230f / 255f, 255f / 255f, 150f / 255f, 1.0f);
+        return new Vector4f(222f / 255f, 220f / 255f, 58f / 255f, 1.0f);
     }
 
     @Override

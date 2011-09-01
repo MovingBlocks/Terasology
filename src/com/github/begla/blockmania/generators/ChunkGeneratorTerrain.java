@@ -177,8 +177,11 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @return
      */
     public float calcDensity(float x, float y, float z) {
-        float height = (calcTerrainElevation(x, z) + 1)/2 + (calcTerrainRoughness(x, z)+1) / 2;
-        float density = calcMountainDensity(x, y, z);
+        float height = calcTerrainElevation(x, z)  +calcTerrainRoughness(x, z);
+        height = 1.0f + height;
+
+
+        float density = calcMountainDensity(x, y, z) * (float) _voronoi.noise(x,y,z, 0.002);
 
         density = height - density;
 
@@ -186,6 +189,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             density /= (y + 1) * 1.7f;
         else
             density /= (y + 1) * 2.0f;
+
         return density;
     }
 
@@ -198,7 +202,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.noise(0.0008f * x, 0.0008f * z, 0f);
+        result += _pGen1.noise(0.0009f * x, 0.0009f * z, 0f);
         return result;
     }
 
@@ -211,7 +215,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
-        result += _pGen2.multiFractalNoise(0.001f * x, 0.00f, 0.001f * z, 7, 2.151421f);
+        result += _pGen2.multiFractalNoise(0.001f * x, 0.00f, 0.001f * z, 3, 2.151421f);
 
         return result;
     }

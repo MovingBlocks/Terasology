@@ -18,12 +18,11 @@ package com.github.begla.blockmania.world;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
+import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.VectorPool;
 import gnu.trove.list.array.TFloatArrayList;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
-
-import java.util.ArrayList;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -31,6 +30,33 @@ import java.util.ArrayList;
 public class ChunkMeshGenerator {
 
     private Chunk _chunk;
+
+    private static Vector3f[] _rayLut;
+    private static FastRandom _rand = new FastRandom(32);
+
+    static {
+        _rayLut = new Vector3f[16];
+
+        for (int i = 0; i < _rayLut.length; i++) {
+            _rayLut[i] = RandomDirection();
+        }
+    }
+
+    private static Vector3f RandomDirection() {
+        Vector3f result = new Vector3f();
+
+        while (true) {
+            result.x = (float) _rand.randomDouble();
+            result.y = (float) _rand.randomDouble();
+            result.z = (float) _rand.randomDouble();
+            if (result.x * result.x + result.y * result.y + result.z * result.z > 1) continue;
+
+            if (Vector3f.dot(result, new Vector3f(0, 1, 0)) < 0) continue;
+
+            result.normalise();
+            return result;
+        }
+    }
 
     /**
      *
@@ -243,10 +269,9 @@ public class ChunkMeshGenerator {
             Vector3f norm = VectorPool.getVector(0, 1, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
-            float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 1, 0);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -267,10 +292,9 @@ public class ChunkMeshGenerator {
             Vector3f norm = VectorPool.getVector(0, 0, -1);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
-            float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 0, -1);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -293,10 +317,9 @@ public class ChunkMeshGenerator {
 
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
-            float shadowIntens = simpleOcclusionAmount(x, y, z, 0, 0, 1);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -317,10 +340,9 @@ public class ChunkMeshGenerator {
             Vector3f norm = VectorPool.getVector(-1, 0, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.LEFT);
-            float shadowIntens = (Block.getBlockForType(block).isCastingShadows()) ? Configuration.BLOCK_SIDE_DIMMING : 1;
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -341,10 +363,9 @@ public class ChunkMeshGenerator {
             Vector3f norm = VectorPool.getVector(1, 0, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.RIGHT);
-            float shadowIntens = (Block.getBlockForType(block).isCastingShadows()) ? Configuration.BLOCK_SIDE_DIMMING : 1;
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -365,10 +386,9 @@ public class ChunkMeshGenerator {
             Vector3f norm = VectorPool.getVector(0, -1, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BOTTOM);
-            float shadowIntens = simpleOcclusionAmount(x, y, z, 0, -1, 0);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, shadowIntens, renderType);
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -389,10 +409,9 @@ public class ChunkMeshGenerator {
      * @param norm
      * @param colorOffset
      * @param texOffset
-     * @param shadowIntensity
      * @param renderType
      */
-    void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, float shadowIntensity, RENDER_TYPE renderType) {
+    void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, RENDER_TYPE renderType) {
         float offsetX = _chunk.getPosition().x * Configuration.CHUNK_DIMENSIONS.x;
         float offsetY = _chunk.getPosition().y * Configuration.CHUNK_DIMENSIONS.y;
         float offsetZ = _chunk.getPosition().z * Configuration.CHUNK_DIMENSIONS.z;
@@ -439,6 +458,7 @@ public class ChunkMeshGenerator {
             tex.add(texOffset.y + 0.0624f);
         }
 
+        float shadowIntensity = calcAmbientOcclusion(new Vector3f(p1.x + x + offsetX, p1.y + y + offsetY, p1.z + z + offsetZ));
         color.add(colorOffset.x);
         color.add(colorOffset.y);
         color.add(colorOffset.z);
@@ -451,6 +471,7 @@ public class ChunkMeshGenerator {
         quads.add(p1.y + y + offsetY);
         quads.add(p1.z + z + offsetZ);
 
+        shadowIntensity = calcAmbientOcclusion(new Vector3f(p2.x + x + offsetX, p2.y + y + offsetY, p2.z + z + offsetZ));
         color.add(colorOffset.x);
         color.add(colorOffset.y);
         color.add(colorOffset.z);
@@ -463,6 +484,7 @@ public class ChunkMeshGenerator {
         quads.add(p2.y + y + offsetY);
         quads.add(p2.z + z + offsetZ);
 
+        shadowIntensity = calcAmbientOcclusion(new Vector3f(p3.x + x + offsetX, p3.y + y + offsetY, p3.z + z + offsetZ));
         color.add(colorOffset.x);
         color.add(colorOffset.y);
         color.add(colorOffset.z);
@@ -475,6 +497,7 @@ public class ChunkMeshGenerator {
         quads.add(p3.y + y + offsetY);
         quads.add(p3.z + z + offsetZ);
 
+        shadowIntensity = calcAmbientOcclusion(new Vector3f(p4.x + x + offsetX, p4.y + y + offsetY, p4.z + z + offsetZ));
         color.add(colorOffset.x);
         color.add(colorOffset.y);
         color.add(colorOffset.z);
@@ -507,38 +530,46 @@ public class ChunkMeshGenerator {
     }
 
     /**
-     * Calculates a simple occlusion value based on the amount of blocks
+     * Calculates the ambient occlusion value based on the amount of blocks
      * surrounding the given block position.
      *
-     * @param x    Local block position on the x-axis
-     * @param y    Local block position on the y-axis
-     * @param z    Local block position on the z-axis
-     * @param dirX
-     * @param dirY
-     * @param dirZ
      * @return Occlusion amount
      */
-    float simpleOcclusionAmount(int x, int y, int z, int dirX, int dirY, int dirZ) {
-        if (x < 0 || z < 0 || y < 0) {
-            return 0;
-        }
+    float calcAmbientOcclusion(Vector3f vertexPosition) {
+        // Initial visibility
+        double visiblity = 1.0;
 
-        int intens = 0;
+        /*
+        * For each ray...
+        */
+        for (int i = 0; i < _rayLut.length; i++) {
 
-        ArrayList<Vector3f> positions = new ArrayList<Vector3f>();
-        positions.add(VectorPool.getVector(x + dirX + 1, y + dirY, z + dirZ));
-        positions.add(VectorPool.getVector(x + dirX - 1, y + dirY, z + dirZ));
-        positions.add(VectorPool.getVector(x + dirX, y + dirY, z + dirZ + 1));
-        positions.add(VectorPool.getVector(x + dirX, y + dirY, z + dirZ - 1));
+            Vector3f rayDir = _rayLut[i];
 
-        for (Vector3f p : positions) {
-            if (Block.getBlockForType(_chunk.getParent().getBlock(_chunk.getBlockWorldPosX((int) p.x), _chunk.getBlockWorldPosY((int) p.y), _chunk.getBlockWorldPosZ((int) p.z))).isCastingShadows()) {
-                intens++;
+            rayDir.normalise();
+
+            // Initial ray visibility
+            double rayVisiblity = 1.0;
+
+            int posX = (int) (vertexPosition.x + rayDir.x + 0.5f);
+            int posY = (int) (vertexPosition.y + rayDir.y + 0.5f);
+            int posZ = (int) (vertexPosition.z + rayDir.z + 0.5f);
+
+            byte b = _chunk.getParent().getBlock(posX, posY, posZ);
+
+            if (Block.getBlockForType(b).isCastingShadows()) {
+                if (Block.getBlockForType(b).isBlockBillboard())
+                    rayVisiblity *= 0.86;
+                else
+                    rayVisiblity *= Configuration.OCCLUSION_INTENS;
             }
 
-            VectorPool.putVector(p);
+            visiblity += rayVisiblity;
         }
 
-        return (float) Math.pow(Configuration.OCCLUSION_INTENS, (float) intens / 4.0f);
+        visiblity /= (float) _rayLut.length;
+
+        return (float) visiblity;
     }
+
 }

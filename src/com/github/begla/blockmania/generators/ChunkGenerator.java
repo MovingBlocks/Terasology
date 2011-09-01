@@ -18,6 +18,7 @@ package com.github.begla.blockmania.generators;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.PerlinNoise;
+import com.github.begla.blockmania.utilities.VoronoiNoise;
 import com.github.begla.blockmania.world.Chunk;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -45,6 +46,10 @@ public abstract class ChunkGenerator {
      * Fast random number generator.
      */
     final FastRandom _rand;
+    /**
+     * TODO
+     */
+    final VoronoiNoise _voronoi;
 
     /**
      * Init. the generator with a given seed value.
@@ -56,6 +61,7 @@ public abstract class ChunkGenerator {
         _pGen1 = new PerlinNoise(seed.hashCode());
         _pGen2 = new PerlinNoise(seed.hashCode() + 1);
         _pGen3 = new PerlinNoise(seed.hashCode() + 2);
+        _voronoi = new VoronoiNoise((seed.hashCode()));
     }
 
     /**

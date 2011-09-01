@@ -6,7 +6,7 @@ uniform float daylight = 1.0;
 varying float fog;
 varying vec3 normal;
 
-vec3 daylightColor = vec3(1.15, 1.13, 1.13);
+vec3 daylightColor = vec3(1.00, 1.00, 1.00);
 vec3 moonlightColor = vec3(0.7, 0.7, 1.0);
 
 vec4 srgbToLinear(vec4 color){
@@ -25,7 +25,7 @@ void main(){
         Apply non-grey vertex colors only to grey texture values.
     */
     if (color.r == color.g && color.g == color.b) {
-        color.rgb *= gl_Color.rgb; 
+        color.rgb *= gl_Color.rgb;
     }
 
     vec2 lightCoord = vec2(gl_TexCoord[1]);

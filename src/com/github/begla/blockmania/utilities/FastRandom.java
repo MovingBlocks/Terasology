@@ -136,4 +136,10 @@ public class FastRandom {
             array.set(j, iElem);
         }
     }
+
+    public static double randomNoise(double x, double y, double z, int seed) {
+        int u = (int) x * 702395077 + (int) y * 915488749 + (int) z * 1299721 + seed * 1402024253;
+        u = (u << 13) ^ u;
+        return (1.0 - ((u * (u * u * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
+    }
 }
