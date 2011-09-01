@@ -1,4 +1,6 @@
 DATA
 SAVED_WORLDS
-*.log
+*.log*
 out
+.idea/workspace.xml
+.idea/tasks.xml

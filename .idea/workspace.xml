@@ -2,15 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e2de95e1-48fd-480f-ac3c-3c86edaba85d" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/player/Player.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/player/Player.java" />
-    </list>
-    <list id="22112ba9-65da-4a56-b22f-a6639884d472" name="Not to commit" comment="Not to commit">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" afterPath="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" />
+      <change type="DELETED" beforePath="C:\Users\bg\Desktop\Blockmania\.idea\workspace.xml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
     </list>
     <ignored path="Blockmania.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" changelist="e2de95e1-48fd-480f-ac3c-3c86edaba85d" time="1314896819290" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,10 +76,37 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Player.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="Player.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/player/Player.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="497" column="42" selection-start="17190" selection-end="17190" vertical-scroll-proportion="-1.6386913">
+            <state line="584" column="51" selection-start="19989" selection-end="19989" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Configuration.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="98" column="84" selection-start="3024" selection-end="3024" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="workspace.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="596" column="34" selection-start="27484" selection-end="27484" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="5" column="36" selection-start="64" selection-end="64" vertical-scroll-proportion="0.12996942">
               <folding />
             </state>
           </provider>
@@ -106,14 +129,11 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/BlockHighGrass.java" />
-        <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/BlockSnow.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkCache.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/utilities/Primitives.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/Main.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMesh.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/shaders/chunk_frag.glsl" />
-        <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/BlockCactus.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/blocks/Block.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/world/World.java" />
@@ -122,6 +142,9 @@
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorTerrain.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkMeshGenerator.java" />
         <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/player/Player.java" />
+        <option value="$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java" />
+        <option value="$PROJECT_DIR$/.idea/workspace.xml" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -964,7 +987,6 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="e2de95e1-48fd-480f-ac3c-3c86edaba85d" name="Default" comment="" />
-      <changelist id="22112ba9-65da-4a56-b22f-a6639884d472" name="Not to commit" comment="" />
       <created>1314397900183</created>
       <updated>1314786457277</updated>
     </task>
@@ -995,19 +1017,19 @@
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32907662" sideWeight="0.0" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32907662" sideWeight="0.0" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.67092335" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.16791444" sideWeight="0.7200393" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4086444" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3272727" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.327112" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.327112" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3283433" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3280943" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17363344" sideWeight="0.45309383" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.6768173" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.6768173" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32994652" sideWeight="0.73182714" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32994652" sideWeight="0.67092335" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2681729" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2681729" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.67092335" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1041,7 +1063,7 @@
     <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="true" />
     <option name="DEFAULT_PATCH_EXTENSION" value="patch" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value=" * Etc." />
+    <option name="LAST_COMMIT_MESSAGE" value=" * Updated configuration file&#10;" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -1054,8 +1076,6 @@
     <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
-    <MESSAGE value="Split chunk mesh from the actual chunk. Optimized rendering accordingly." />
-    <MESSAGE value="Fixed billboards and stone now shows up more frequently." />
     <MESSAGE value="Cleanup and comments." />
     <MESSAGE value="Improved player &quot;bobbing&quot;." />
     <MESSAGE value="Fixed chunky player view pitching." />
@@ -1079,6 +1099,8 @@
     <MESSAGE value=" * Work in progress" />
     <MESSAGE value=" * New lighting engine&#10; * Began implementing biomes...&#10; * Added cacti&#10; * Some optimizations" />
     <MESSAGE value=" * Etc." />
+    <MESSAGE value="Fixed easing artifact (collision detection)" />
+    <MESSAGE value=" * Updated configuration file&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1088,16 +1110,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/shaders/chunk_frag.glsl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="45" selection-start="800" selection-end="800" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/shaders/chunk_vert.glsl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/world/ChunkUpdateManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="25" column="19" selection-start="868" selection-end="868" vertical-scroll-proportion="0.0" />
@@ -1138,11 +1150,6 @@
         <state line="846" column="27" selection-start="27105" selection-end="27105" vertical-scroll-proportion="0.032629557" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="69" column="44" selection-start="2299" selection-end="2299" vertical-scroll-proportion="0.033398822" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/generators/ChunkGeneratorTerrain.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="148" column="146" selection-start="4897" selection-end="4897" vertical-scroll-proportion="0.0" />
@@ -1167,7 +1174,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/player/Player.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="497" column="42" selection-start="17190" selection-end="17190" vertical-scroll-proportion="-1.6386913">
+        <state line="584" column="51" selection-start="19989" selection-end="19989" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Configuration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="98" column="84" selection-start="3024" selection-end="3024" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="596" column="34" selection-start="27484" selection-end="27484" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="36" selection-start="64" selection-end="64" vertical-scroll-proportion="0.12996942">
           <folding />
         </state>
       </provider>
