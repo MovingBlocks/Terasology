@@ -156,43 +156,21 @@ public final class Configuration {
     }
 
     private static void loadDebug() {
-        _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);
-        _settingsBoolean.put("REPLANT_DIRT", false);
-        _settingsBoolean.put("DISABLE_SAVING", true);
-        _settingsBoolean.put("PLACING_BOX", true);
-        _settingsBoolean.put("CHUNK_OUTLINES", false);
-        _settingsBoolean.put("DEBUG", false);
+        _settingsBoolean.put("DEBUG", true);
         _settingsBoolean.put("CROSSHAIR", true);
-        _settingsBoolean.put("BOBBING", true);
-        _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", true);
-        _settingsNumeric.put("JUMP_INTENSITY", 0.14f);
-        _settingsNumeric.put("MAX_GRAVITY", 0.7f);
-        _settingsNumeric.put("WALKING_SPEED", 0.2f);
-        _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
-        _settingsNumeric.put("GRAVITY", 0.0075f);
-        _settingsNumeric.put("FRICTION", 0.1f);
         _settingsNumeric.put("V_DIST_X", 40f);
         _settingsNumeric.put("V_DIST_Z", 40f);
+        _settingsNumeric.put("RUNNING_FACTOR", 4.0f);
     }
 
     private static void loadDemo() {
-        _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);
         _settingsBoolean.put("REPLANT_DIRT", false);
         _settingsBoolean.put("DISABLE_SAVING", true);
         _settingsBoolean.put("PLACING_BOX", false);
-        _settingsBoolean.put("CHUNK_OUTLINES", false);
-        _settingsBoolean.put("DEBUG", false);
         _settingsBoolean.put("CROSSHAIR", false);
-        _settingsBoolean.put("BOBBING", true);
-        _settingsBoolean.put("DEMO_FLIGHT", false);
+        _settingsBoolean.put("DEMO_FLIGHT", true);
         _settingsBoolean.put("GOD_MODE", true);
-        _settingsNumeric.put("JUMP_INTENSITY", 0.14f);
-        _settingsNumeric.put("MAX_GRAVITY", 0.7f);
-        _settingsNumeric.put("WALKING_SPEED", 0.2f);
-        _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
-        _settingsNumeric.put("GRAVITY", 0.0075f);
-        _settingsNumeric.put("FRICTION", 0.1f);
         _settingsNumeric.put("V_DIST_X", 40f);
         _settingsNumeric.put("V_DIST_Z", 40f);
     }
@@ -202,8 +180,12 @@ public final class Configuration {
      * TODO: Should not always load the default settings.
      */
     private static void loadSettings() {
-        //loadDefaults();
-        //loadDemo();
-        loadDebug();
+        loadDefaults();
+
+        if (Boolean.getBoolean("blockmania.demo")) {
+            loadDemo();
+        } else if (Boolean.getBoolean("blockmania.debugMode")) {
+            loadDebug();
+        }
     }
 }
