@@ -102,8 +102,6 @@ public class ChunkMeshGenerator {
     }
 
     private void generateOptimizedBuffers(ChunkMesh mesh) {
-
-
         for (int j = 0; j < 3; j++) {
             mesh._vertexElements[j].vertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].quads.size() + mesh._vertexElements[j].tex.size() * 2 + mesh._vertexElements[j].color.size());
             mesh._vertexElements[j].indices = BufferUtils.createIntBuffer(mesh._vertexElements[j].quads.size());
@@ -204,7 +202,7 @@ public class ChunkMeshGenerator {
 
         for (int i = 0; i < 8; i++) {
             if (blocks[i]) {
-                result -= 1f / 24f;
+                result -= Configuration.OCCLUSION_AMOUNT;
             }
         }
 
@@ -244,14 +242,13 @@ public class ChunkMeshGenerator {
         addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p4));
         addBlockTextureData(mesh._vertexElements[2], texOffset, VectorPool.getVector(0, 0, 1));
 
-
         /*
         * Second side of the billboard
         */
         colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
         texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0);
 
-        p1 = VectorPool.getVector(-0.5f, -0.5f,-0.5f);
+        p1 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
         p2 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
         p3 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
         p4 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
@@ -284,8 +281,20 @@ public class ChunkMeshGenerator {
         byte blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y + 1), _chunk.getBlockWorldPosZ(z));
 
         drawTop = isSideVisibleForBlockTypes(blockToCheck, block);
+        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z - 1));
+        drawFront = isSideVisibleForBlockTypes(blockToCheck, block);
+        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z + 1));
+        drawBack = isSideVisibleForBlockTypes(blockToCheck, block);
+        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z));
+        drawLeft = isSideVisibleForBlockTypes(blockToCheck, block);
+        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z));
+        drawRight = isSideVisibleForBlockTypes(blockToCheck, block);
+        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z));
+        drawBottom = isSideVisibleForBlockTypes(blockToCheck, block);
 
         if (drawTop) {
+            Block.BLOCK_FORM blockForm = Block.getBlockForType(block).getBlockForm();
+
             Vector3f p1 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
             Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
             Vector3f p3 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
@@ -296,7 +305,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -305,10 +314,9 @@ public class ChunkMeshGenerator {
             VectorPool.putVector(norm);
         }
 
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z - 1));
-        drawFront = isSideVisibleForBlockTypes(blockToCheck, block);
-
         if (drawFront) {
+            Block.BLOCK_FORM blockForm = Block.getBlockForType(block).getBlockForm();
+
             Vector3f p1 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
             Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
             Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
@@ -319,7 +327,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -328,23 +336,20 @@ public class ChunkMeshGenerator {
             VectorPool.putVector(norm);
         }
 
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z + 1));
-        drawBack = isSideVisibleForBlockTypes(blockToCheck, block);
-
         if (drawBack) {
+            Block.BLOCK_FORM blockForm = Block.getBlockForType(block).getBlockForm();
+
             Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
             Vector3f p2 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
             Vector3f p3 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
             Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
 
-
             Vector3f norm = VectorPool.getVector(0, 0, 1);
-
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -353,10 +358,9 @@ public class ChunkMeshGenerator {
             VectorPool.putVector(norm);
         }
 
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z));
-        drawLeft = isSideVisibleForBlockTypes(blockToCheck, block);
-
         if (drawLeft) {
+            Block.BLOCK_FORM blockForm = Block.getBlockForType(block).getBlockForm();
+
             Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
             Vector3f p2 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
             Vector3f p3 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
@@ -367,7 +371,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.LEFT);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -376,10 +380,9 @@ public class ChunkMeshGenerator {
             VectorPool.putVector(norm);
         }
 
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z));
-        drawRight = isSideVisibleForBlockTypes(blockToCheck, block);
-
         if (drawRight) {
+            Block.BLOCK_FORM blockForm = Block.getBlockForType(block).getBlockForm();
+
             Vector3f p1 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
             Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
             Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
@@ -390,7 +393,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.RIGHT);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -399,10 +402,9 @@ public class ChunkMeshGenerator {
             VectorPool.putVector(norm);
         }
 
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z));
-        drawBottom = isSideVisibleForBlockTypes(blockToCheck, block);
-
         if (drawBottom) {
+            Block.BLOCK_FORM blockForm = Block.getBlockForType(block).getBlockForm();
+
             Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
             Vector3f p2 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
             Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
@@ -413,7 +415,7 @@ public class ChunkMeshGenerator {
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BOTTOM);
 
             Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, Block.getBlockForType(block).getBlockForm());
+            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
 
             VectorPool.putVector(p1);
             VectorPool.putVector(p2);
@@ -443,8 +445,10 @@ public class ChunkMeshGenerator {
             vertexElements = mesh._vertexElements[1];
         }
 
-        if (blockForm == Block.BLOCK_FORM.CACTUS) {
-            generateCactusSide(p1, p2, p3, p4, norm);
+        switch (blockForm) {
+            case CACTUS:
+                generateCactusSide(p1, p2, p3, p4, norm);
+                break;
         }
 
         addBlockTextureData(vertexElements, texOffset, norm);

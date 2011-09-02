@@ -68,6 +68,8 @@ public final class Configuration {
      * Maximum light value.
      */
     public static final byte MAX_LIGHT = 15;
+    /* ------- */
+    public static final float OCCLUSION_AMOUNT = 1f / 28f;
     /**
      *
      */
@@ -80,7 +82,8 @@ public final class Configuration {
      *
      */
     public static final float PROB_GOLD = -3f;
-    /* ------- */
+
+
     private static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
 
