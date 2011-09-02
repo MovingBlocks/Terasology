@@ -1,13 +1,13 @@
 package com.github.begla.blockmania.tests;
 
 
+import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.utilities.BlockmaniaSmartArray;
 
 public class BlockmaniaSmartArrayTest extends junit.framework.TestCase {
 
-    byte[][][] _testArray = new byte[128][128][128];
-    BlockmaniaSmartArray _array = new BlockmaniaSmartArray(128, 128, 128);
+    private final byte[][][] _testArray = new byte[128][128][128];
+    private final BlockmaniaSmartArray _array = new BlockmaniaSmartArray(128, 128, 128);
 
     public void testOrigin() throws Exception {
         _array.set(0, 0, 0, (byte) 15);

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.player;
+package com.github.begla.blockmania.datastructures;
 
-import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.rendering.VectorPool;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.RenderableObject;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -43,7 +44,7 @@ public class AABB extends RenderableObject {
      */
     public boolean overlaps(AABB aabb2) {
         Vector3f t = Vector3f.sub(aabb2.getPosition(), getPosition(), null);
-        return Math.abs(t.x) <= (getDimensions().x + aabb2.getDimensions().x) && Math.abs(t.y) <= (getDimensions().y + aabb2.getDimensions().y) && Math.abs(t.z) <= (getDimensions().z + aabb2.getDimensions().z);
+        return MathHelper.fastAbs(t.x) <= (getDimensions().x + aabb2.getDimensions().x) && MathHelper.fastAbs(t.y) <= (getDimensions().y + aabb2.getDimensions().y) && MathHelper.fastAbs(t.z) <= (getDimensions().z + aabb2.getDimensions().z);
     }
 
     /**

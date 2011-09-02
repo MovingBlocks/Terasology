@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.rendering.VectorPool;
 import org.lwjgl.util.vector.Vector3f;
 
 /**

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.utilities;
+package com.github.begla.blockmania.rendering;
 
-import com.github.begla.blockmania.player.AABB;
+import com.github.begla.blockmania.datastructures.AABB;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
@@ -27,10 +27,10 @@ import java.nio.FloatBuffer;
  */
 public class ViewFrustum {
 
-    private FrustumPlane[] _planes = new FrustumPlane[6];
-    private FloatBuffer _proj = BufferUtils.createFloatBuffer(16);
-    private FloatBuffer _model = BufferUtils.createFloatBuffer(16);
-    private FloatBuffer _clip = BufferUtils.createFloatBuffer(16);
+    private final FrustumPlane[] _planes = new FrustumPlane[6];
+    private final FloatBuffer _proj = BufferUtils.createFloatBuffer(16);
+    private final FloatBuffer _model = BufferUtils.createFloatBuffer(16);
+    private final FloatBuffer _clip = BufferUtils.createFloatBuffer(16);
 
     public ViewFrustum() {
         for (int i = 0; i < 6; i++)

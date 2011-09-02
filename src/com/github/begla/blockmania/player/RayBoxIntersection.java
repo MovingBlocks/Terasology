@@ -16,7 +16,7 @@
  */
 package com.github.begla.blockmania.player;
 
-import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.rendering.VectorPool;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -71,7 +71,17 @@ public final class RayBoxIntersection implements Comparable<RayBoxIntersection> 
      * @return
      */
     public int compareTo(RayBoxIntersection o) {
-        return new Float(Math.abs(getT())).compareTo(Math.abs(o.getT()));
+        if (o == null) {
+            return 0;
+        }
+
+        double distance = t;
+        double distance2 = o.t;
+
+        if (distance == distance2)
+            return 0;
+
+        return distance2 > distance ? -1 : 1;
     }
 
     /**

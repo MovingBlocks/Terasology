@@ -92,8 +92,8 @@ public class FastRandom {
         StringBuilder s = new StringBuilder();
 
         for (int i = 0; i < length / 2; i++) {
-            s.append((char) ('a' + Math.abs(randomDouble()) * 26d));
-            s.append((char) ('A' + Math.abs(randomDouble()) * 26d));
+            s.append((char) ('a' + MathHelper.fastAbs(randomDouble()) * 26d));
+            s.append((char) ('A' + MathHelper.fastAbs(randomDouble()) * 26d));
         }
 
         return s.toString();
@@ -122,21 +122,14 @@ public class FastRandom {
     }
 
     /**
-     * Fisher-Yates shuffling algorithm by Donald Knuth.
+     * Some random noise.
      *
-     * @param array
+     * @param x
+     * @param y
+     * @param z
+     * @param seed
+     * @return
      */
-    public void shuffle(ArrayList<Integer> array) {
-        for (int i = array.size() - 1; i >= 0; i--) {
-            int j = (int) (Math.abs(randomLong()) % array.size());
-            int jElem = array.get(j);
-            int iElem = array.get(i);
-
-            array.set(i, jElem);
-            array.set(j, iElem);
-        }
-    }
-
     public static double randomNoise(double x, double y, double z, int seed) {
         int u = (int) x * 702395077 + (int) y * 915488749 + (int) z * 1299721 + seed * 1402024253;
         u = (u << 13) ^ u;

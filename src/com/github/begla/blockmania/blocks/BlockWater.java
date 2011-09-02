@@ -15,8 +15,11 @@
  */
 package com.github.begla.blockmania.blocks;
 
+import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A water block.
@@ -25,14 +28,21 @@ import org.lwjgl.util.vector.Vector2f;
  */
 public class BlockWater extends Block {
 
+    private static Vector4f colorOffset = new Vector4f(0.9f, 0.9f, 1.0f, 0.8f);
+
     @Override
     public boolean isBlockTypeTranslucent() {
         return true;
     }
 
     @Override
+    public Vector4f getColorOffsetFor(SIDE side) {
+        return colorOffset;
+    }
+
+    @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(14, 13);
+        return Helper.getInstance().calcOffsetForTextureAt(15, 13);
     }
 
     @Override
@@ -53,5 +63,10 @@ public class BlockWater extends Block {
     @Override
     public boolean isRemovable() {
         return true;
+    }
+
+    @Override
+    public BLOCK_FORM getBlockForm() {
+        return BLOCK_FORM.LOWERED_BOCK;
     }
 }

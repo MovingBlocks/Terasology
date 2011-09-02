@@ -69,7 +69,7 @@ public final class ChunkCache {
         c = _parent.prepareNewChunk(x, z);
 
         synchronized (this) {
-            _chunkCache.put(Integer.valueOf(c.getChunkId()), c);
+            _chunkCache.put(c.getChunkId(), c);
         }
 
         return c;
@@ -136,7 +136,7 @@ public final class ChunkCache {
     /**
      * @return
      */
-    static int capacity() {
+    private static int capacity() {
         return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 2048;
     }
 }

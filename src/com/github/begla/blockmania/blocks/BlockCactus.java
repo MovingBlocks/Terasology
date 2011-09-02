@@ -27,6 +27,11 @@ import org.lwjgl.util.vector.Vector2f;
 public class BlockCactus extends Block {
 
     @Override
+    public boolean doNotTessellate() {
+        return true;
+    }
+
+    @Override
     public boolean isBlockTypeTranslucent() {
         return true;
     }

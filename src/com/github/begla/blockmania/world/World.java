@@ -19,7 +19,12 @@ import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.player.Player;
-import com.github.begla.blockmania.utilities.*;
+import com.github.begla.blockmania.rendering.Primitives;
+import com.github.begla.blockmania.rendering.ShaderManager;
+import com.github.begla.blockmania.rendering.VectorPool;
+import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.utilities.Helper;
+import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
 import javolution.util.FastSet;
 import org.jdom.Document;
@@ -266,7 +271,7 @@ public final class World extends RenderableObject {
 
             for (int x = 0; x < cloudImage.getWidth(); x++) {
                 for (int y = 0; y < cloudImage.getHeight(); y++) {
-                    if (cloudImage.getRGB(x, y) > 0) {
+                    if ((cloudImage.getRGB(x,y) & 0x00FFFFFF) != 0) {
                         _clouds[x][y] = true;
                     }
                 }
@@ -357,17 +362,27 @@ public final class World extends RenderableObject {
         glPopMatrix();
 
         glEnable(GL_BLEND);
-        glBlendFunc(GL11.GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
+        GL11.glBlendFunc(770, 771);
+
         ShaderManager.getInstance().enableShader("cloud");
 
-        /*
-         * Draw clouds.
-         */
-        if (_dlClouds > 0 && isDaytime()) {
-            glPushMatrix();
-            glTranslatef(_player.getPosition().x + _cloudOffset.x, 140f, _player.getPosition().z + _cloudOffset.y);
-            glCallList(_dlClouds);
-            glPopMatrix();
+        // Render two passes: The first one only writes to the depth buffer, the second one to the frame buffer
+        for (int i = 0; i < 2; i++) {
+            if (i == 0) {
+                glColorMask(false, false, false, false);
+            } else {
+                glColorMask(true, true, true, true);
+            }
+
+            /*
+            * Draw clouds.
+            */
+            if (_dlClouds > 0 && isDaytime()) {
+                glPushMatrix();
+                glTranslatef(_player.getPosition().x + _cloudOffset.x, 140f, _player.getPosition().z + _cloudOffset.y);
+                glCallList(_dlClouds);
+                glPopMatrix();
+            }
         }
 
         ShaderManager.getInstance().enableShader(null);
@@ -452,7 +467,7 @@ public final class World extends RenderableObject {
         if (Helper.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
             _windDirection.x = (float) _rand.randomDouble();
             _windDirection.y = (float) _rand.randomDouble();
-            _nextWindUpdateInSeconds = (short) (Math.abs(_rand.randomInt()) % 16 + 32);
+            _nextWindUpdateInSeconds = (short) (MathHelper.fastAbs(_rand.randomInt()) % 16 + 32);
             _lastWindUpdate = Helper.getInstance().getTime();
         }
 
@@ -745,7 +760,7 @@ public final class World extends RenderableObject {
      *
      * @return The daylight value
      */
-    public float getDaylight() {
+    float getDaylight() {
         return _daylight;
     }
 
@@ -1041,29 +1056,26 @@ public final class World extends RenderableObject {
      * Generates the cloud display list.
      */
     private static void generateCloudDisplayList() {
-        try {
-            glNewList(_dlClouds, GL_COMPILE);
-            glBegin(GL_QUADS);
+        glNewList(_dlClouds, GL_COMPILE);
+        glBegin(GL_QUADS);
 
-            int length = _clouds.length;
+        int length = _clouds.length;
 
-            for (int x = 0; x < length; x++) {
-                for (int y = 0; y < length; y++) {
-                    if (!_clouds[x][y]) {
-                        try {
-                            Primitives.drawCloud(16, 16, 16, x * 16f - (length / 2 * 16f), 0, y * 16f - (length / 2 * 16f), _clouds[x - 1][y], _clouds[x + 1][y], _clouds[x][y + 1], _clouds[x][y - 1]);
-                        } catch (Exception e) {
+        for (int x = 0; x < length; x++) {
+            for (int y = 0; y < length; y++) {
+                if (_clouds[x][y]) {
+                    try {
+                        Primitives.drawCloud(16, 16, 16, x * 16f - (length / 2 * 16f), 0, y * 16f - (length / 2 * 16f), !_clouds[x - 1][y], !_clouds[x + 1][y], !_clouds[x][y + 1], !_clouds[x][y - 1]);
+                    } catch (Exception e) {
 
-                        }
                     }
                 }
             }
-
-            glEnd();
-            glEndList();
-
-        } catch (Exception ignored) {
         }
+
+        glEnd();
+        glEndList();
+
     }
 
     /**

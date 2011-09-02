@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.utilities;
+package com.github.begla.blockmania.noise;
 
+import com.github.begla.blockmania.utilities.FastRandom;
 import gnu.trove.list.array.TDoubleArrayList;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -23,7 +24,7 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class VoronoiNoise {
 
-    int _seed;
+    private final int _seed;
 
     public VoronoiNoise(int seed) {
         _seed = seed;

@@ -30,12 +30,6 @@ public class BlockGrass extends Block {
     public boolean isBlockTypeTranslucent() {
         return false;
     }
-
-    @Override
-    public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(222f / 255f, 220f / 255f, 58f / 255f, 1.0f);
-    }
-
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
         if (side == Block.SIDE.LEFT || side == Block.SIDE.RIGHT || side == Block.SIDE.FRONT || side == Block.SIDE.BACK) {

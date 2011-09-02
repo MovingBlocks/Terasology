@@ -18,8 +18,11 @@ package com.github.begla.blockmania.world;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
+import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.datastructures.BlockmaniaArray;
+import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.generators.ChunkGenerator;
-import com.github.begla.blockmania.player.AABB;
+import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.utilities.*;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
@@ -58,10 +61,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private int _chunkID = -1;
     private static Texture _textureMap;
     /* ------ */
-    ChunkMesh _activeMesh;
-    ChunkMesh _newMesh;
+    private ChunkMesh _activeMesh;
+    private ChunkMesh _newMesh;
     /* ------ */
-    private World _parent;
+    private final World _parent;
     /* ------ */
     private final BlockmaniaArray _blocks;
     private final BlockmaniaSmartArray _sunlight;
@@ -69,7 +72,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /* ------ */
     private final FastList<ChunkGenerator> _generators = new FastList<ChunkGenerator>();
     /* ------ */
-    private ChunkMeshGenerator _meshGenerator;
+    private final ChunkMeshGenerator _meshGenerator;
     /* ------ */
     private AABB _aabb;
     /* ------ */
@@ -249,7 +252,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      *
      * @throws Exception Thrown if a mesh is tried to generated twice
      */
-    public void generateDisplayLists() {
+    public void generateVBOs() {
         if (_newMesh != null) {
             _newMesh.generateVBOs();
         }
@@ -625,7 +628,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      *
      * @return The distance of the chunk to the player
      */
-    public double distanceToPlayer() {
+    double distanceToPlayer() {
         return Math.sqrt(Math.pow(getParent().getPlayer().getPosition().x - getChunkWorldPosX(), 2) + Math.pow(getParent().getPlayer().getPosition().z - getChunkWorldPosZ(), 2));
     }
 
@@ -866,7 +869,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * @param _dirty The dirty flag
      */
-    public void setDirty(boolean _dirty) {
+    void setDirty(boolean _dirty) {
         this._dirty = _dirty;
     }
 

@@ -243,7 +243,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    public float calcTerrainElevation(float x, float z) {
+    float calcTerrainElevation(float x, float z) {
         float result = 0.0f;
         result += _pGen1.noise(0.0009f * x, 0.0009f * z, 0f);
         return result;
@@ -256,7 +256,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    public float calcTerrainRoughness(float x, float z) {
+    float calcTerrainRoughness(float x, float z) {
         float result = 0.0f;
         result += _pGen2.multiFractalNoise(0.001f * x, 0.00f, 0.001f * z, 3, 2.151421f);
 
@@ -269,7 +269,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    public float calcMountainDensity(float x, float y, float z) {
+    float calcMountainDensity(float x, float y, float z) {
         float result = 0.0f;
 
         float x1, y1, z1;
@@ -299,13 +299,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    public float calcLakeIntensity(float x, float z) {
+    float calcLakeIntensity(float x, float z) {
         float result = 0.0f;
         result += _pGen3.multiFractalNoise(x * 0.01f, 0f, 0.01f * z, 8, 2.1836171f);
-        return (float) Math.sqrt(Math.abs(result));
+        return (float) Math.sqrt(MathHelper.fastAbs(result));
     }
 
-    public float calcTemperature(float x, float z) {
+    float calcTemperature(float x, float z) {
         float result = 0.0f;
         result += _pGen1.multiFractalNoise(x * 0.001f, 0f, 0.001f * z, 8, 2.1836171f) * 4f;
         result = (0.5f + result) * 100f;

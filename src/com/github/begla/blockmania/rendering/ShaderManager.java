@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.utilities;
+package com.github.begla.blockmania.rendering;
 
+import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;

@@ -18,10 +18,11 @@ package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.utilities.PerlinNoise;
-import com.github.begla.blockmania.utilities.VectorPool;
-import com.github.begla.blockmania.utilities.ViewFrustum;
+import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.noise.PerlinNoise;
+import com.github.begla.blockmania.rendering.VectorPool;
+import com.github.begla.blockmania.rendering.ViewFrustum;
+import com.github.begla.blockmania.utilities.*;
 import com.github.begla.blockmania.world.RenderableObject;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
@@ -56,7 +57,7 @@ public final class Player extends RenderableObject {
     private final Vector3f _viewingDirection = VectorPool.getVector();
     private boolean _playerIsTouchingGround = false;
 
-    private ViewFrustum _viewFrustum = new ViewFrustum();
+    private final ViewFrustum _viewFrustum = new ViewFrustum();
 
     /**
      * Init. the player
@@ -521,20 +522,20 @@ public final class Player extends RenderableObject {
         /*
          * Slowdown the speed of the player each time this method is called.
          */
-        if (Math.abs(_acc.y) > 0f) {
+        if (MathHelper.fastAbs(_acc.y) > 0f) {
             _acc.y += -1f * _acc.y * Configuration.getSettingNumeric("FRICTION");
         }
 
-        if (Math.abs(_acc.x) > 0f) {
+        if (MathHelper.fastAbs(_acc.x) > 0f) {
             _acc.x += -1f * _acc.x * Configuration.getSettingNumeric("FRICTION");
         }
 
-        if (Math.abs(_acc.z) > 0f) {
+        if (MathHelper.fastAbs(_acc.z) > 0f) {
             _acc.z += -1f * _acc.z * Configuration.getSettingNumeric("FRICTION");
         }
 
-        if (Math.abs(_acc.x) > _wSpeed || Math.abs(_acc.z) > _wSpeed || Math.abs(_acc.z) > _wSpeed) {
-            double max = Math.max(Math.max(Math.abs(_acc.x), Math.abs(_acc.z)), _acc.y);
+        if (MathHelper.fastAbs(_acc.x) > _wSpeed || MathHelper.fastAbs(_acc.z) > _wSpeed || MathHelper.fastAbs(_acc.z) > _wSpeed) {
+            double max = Math.max(Math.max(MathHelper.fastAbs(_acc.x), MathHelper.fastAbs(_acc.z)), _acc.y);
             double div = max / _wSpeed;
 
             _acc.x /= div;

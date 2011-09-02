@@ -15,9 +15,9 @@
  */
 package com.github.begla.blockmania.blocks;
 
-import com.github.begla.blockmania.player.AABB;
+import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.utilities.VectorPool;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -59,11 +59,13 @@ public abstract class Block {
 
 
     public static enum BLOCK_FORM {
-        NORMAL, CACTUS
+        NORMAL, CACTUS, LOWERED_BOCK
     }
+
 
     private static final Block[] _blocks = {new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), new BlockWater(), new BlockTreeTrunk(), new BlockLeaf(), new BlockSand(), new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), new BlockHighGrass(), new BlockLargeHighGrass(), new BlockTorch(), new BlockLava(), new BlockWood(), new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick(), new BlockCoal(), new BlockGold(), new BlockDarkLeaf(), new BlockSnow(), new BlockCactus()};
     private static final BlockNil nilBlock = new BlockNil();
+    private static Vector4f colorOffset = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     /**
      * Returns the object for the given block type ID.
@@ -105,7 +107,7 @@ public abstract class Block {
      * @return The color offset
      */
     public Vector4f getColorOffsetFor(SIDE side) {
-        return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+        return colorOffset;
     }
 
     /**

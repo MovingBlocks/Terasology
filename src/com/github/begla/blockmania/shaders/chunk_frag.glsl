@@ -21,12 +21,11 @@ void main(){
     vec4 color = texture2D(textureAtlas, vec2(gl_TexCoord[0]));
     color = srgbToLinear(color);
 
-    /*
-        Apply non-grey vertex colors only to grey texture values.
-    */
-    if (color.r == color.g && color.g == color.b) {
-        color.rgb *= gl_Color.rgb;
-    }
+    if (color.a < 0.1)
+        discard;
+
+    color.rgb *= gl_Color.rgb;
+    color.a *= gl_Color.a;
 
     vec2 lightCoord = vec2(gl_TexCoord[1]);
 
@@ -62,5 +61,5 @@ void main(){
     color.xyz *= clamp(daylightColorValue + blocklightColorValue, 0.0, 1.0);
 
     gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.84,0.88,1,1) * daylight, fog).rgb;
-    gl_FragColor.w = color.w;
+    gl_FragColor.a = color.a;
 }

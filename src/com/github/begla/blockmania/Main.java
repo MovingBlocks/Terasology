@@ -16,15 +16,14 @@
 package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.player.Player;
+import com.github.begla.blockmania.rendering.ShaderManager;
+import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.utilities.ShaderManager;
-import com.github.begla.blockmania.utilities.VectorPool;
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.world.World;
 import com.github.begla.webupdater.WebUpdater;
 import javolution.util.FastList;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -34,7 +33,6 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 
 import java.awt.*;
-import java.nio.FloatBuffer;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;

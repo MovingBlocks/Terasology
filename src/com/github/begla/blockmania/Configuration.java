@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania;
 
-import com.github.begla.blockmania.utilities.VectorPool;
+import com.github.begla.blockmania.rendering.VectorPool;
 import javolution.util.FastMap;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
@@ -69,7 +69,7 @@ public final class Configuration {
      */
     public static final byte MAX_LIGHT = 15;
     /* ------- */
-    public static final float OCCLUSION_AMOUNT = 1f / 28f;
+    public static final float OCCLUSION_AMOUNT = 1f / 8f;
     /**
      *
      */

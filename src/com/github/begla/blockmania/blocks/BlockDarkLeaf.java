@@ -26,6 +26,8 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public class BlockDarkLeaf extends Block {
 
+    private static Vector4f colorOffset = new Vector4f(0.8f, 0.8f, 0.8f, 1.0f);
+
     @Override
     public boolean isCastingShadows() {
         return true;
@@ -38,7 +40,7 @@ public class BlockDarkLeaf extends Block {
 
     @Override
     public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(160f / 255f, 200f / 255f, 80f / 255f, 1.0f);
+        return colorOffset;
     }
 
     @Override

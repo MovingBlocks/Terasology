@@ -33,14 +33,9 @@ public class BlockSnow extends Block {
     }
 
     @Override
-    public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(255f / 255f, 255f / 255f, 255f / 255f, 1.0f);
-    }
-
-    @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
         if (side == Block.SIDE.LEFT || side == Block.SIDE.RIGHT || side == Block.SIDE.FRONT || side == Block.SIDE.BACK) {
-            return Helper.getInstance().calcOffsetForTextureAt(3, 0);
+            return Helper.getInstance().calcOffsetForTextureAt(4, 4);
 
         } else if (side == Block.SIDE.BOTTOM) {
             return Helper.getInstance().calcOffsetForTextureAt(2, 0);

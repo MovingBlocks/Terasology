@@ -16,9 +16,9 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.noise.PerlinNoise;
+import com.github.begla.blockmania.noise.VoronoiNoise;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.utilities.PerlinNoise;
-import com.github.begla.blockmania.utilities.VoronoiNoise;
 import com.github.begla.blockmania.world.Chunk;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 

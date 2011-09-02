@@ -111,7 +111,7 @@ public class MathHelper {
      * @return Value along the x-axis
      */
     public static int cantorX(int c) {
-        int j = (int) Math.floor(Math.sqrt(0.25 + 2 * c) - 0.5);
+        int j = (int) (Math.sqrt(0.25 + 2 * c) - 0.5);
         return j - cantorY(c);
     }
 
@@ -122,7 +122,7 @@ public class MathHelper {
      * @return Value along the y-axis
      */
     private static int cantorY(int c) {
-        int j = (int) Math.floor(Math.sqrt(0.25 + 2 * c) - 0.5);
+        int j = (int) (Math.sqrt(0.25 + 2 * c) - 0.5);
         return c - j * (j + 1) / 2;
     }
 }

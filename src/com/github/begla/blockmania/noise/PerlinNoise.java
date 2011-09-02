@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.utilities;
+package com.github.begla.blockmania.noise;
+
+import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.utilities.MathHelper;
 
 /**
  * Improved Perlin noise based on the reference implementation by Ken Perlin.
@@ -167,7 +170,7 @@ public class PerlinNoise {
     }
 
     private double ridge(double n, double offset) {
-        n = Math.abs(n);
+        n = MathHelper.fastAbs(n);
         n = offset - n;
         n = n * n;
         return n;

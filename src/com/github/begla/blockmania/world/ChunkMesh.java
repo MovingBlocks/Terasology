@@ -18,20 +18,20 @@ public class ChunkMesh extends RenderableObject {
             color = new TFloatArrayList();
         }
 
-        public TFloatArrayList quads;
-        public TFloatArrayList tex;
-        public TFloatArrayList color;
+        public final TFloatArrayList quads;
+        public final TFloatArrayList tex;
+        public final TFloatArrayList color;
 
         public FloatBuffer vertices;
         public IntBuffer indices;
     }
 
-    private int[] _vertexBuffers = new int[3];
-    private int[] _idxBuffers = new int[3];
-    private int[] _idxBufferCount = new int[3];
+    private final int[] _vertexBuffers = new int[3];
+    private final int[] _idxBuffers = new int[3];
+    private final int[] _idxBufferCount = new int[3];
     public VertexElements[] _vertexElements = new VertexElements[3];
 
-    boolean _generated;
+    private boolean _generated;
 
     public ChunkMesh() {
         _vertexElements[0] = new VertexElements();
@@ -108,19 +108,33 @@ public class ChunkMesh extends RenderableObject {
         if (!translucent) {
             renderVbo(0);
         } else {
+            // Render two passes: The first one only writes to the depth buffer, the second one to the frame buffer
+            for (int i = 0; i < 2; i++) {
+                if (i == 0) {
+                    glColorMask(false, false, false, false);
+                } else {
+                    glColorMask(true, true, true, true);
+                }
+                glDisable(GL_CULL_FACE);
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+                // WATER
+                renderVbo(1);
+
+                glDisable(GL_BLEND);
+                glEnable(GL_CULL_FACE);
+            }
+
             glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glEnable(GL_ALPHA_TEST);
-            glAlphaFunc(GL_GREATER, 0.5f);
-
-            renderVbo(1);
-
             glDisable(GL_CULL_FACE);
-            renderVbo(2);
-            glEnable(GL_CULL_FACE);
 
+            // BILLBOARDS
+            renderVbo(2);
+
+            glEnable(GL_CULL_FACE);
             glDisable(GL_BLEND);
-            glDisable(GL_ALPHA_TEST);
+
         }
     }
 
@@ -159,7 +173,7 @@ public class ChunkMesh extends RenderableObject {
         _idxBuffers[2] = -1;
     }
 
-    public static int createVboId() {
+    private static int createVboId() {
         if (GLContext.getCapabilities().GL_ARB_vertex_buffer_object) {
             IntBuffer buffer = BufferUtils.createIntBuffer(1);
             ARBVertexBufferObject.glGenBuffersARB(buffer);
@@ -168,14 +182,14 @@ public class ChunkMesh extends RenderableObject {
         return 0;
     }
 
-    public static void bufferVboData(int id, FloatBuffer buffer) {
+    private static void bufferVboData(int id, FloatBuffer buffer) {
         if (GLContext.getCapabilities().GL_ARB_vertex_buffer_object) {
             ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, id);
             ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, buffer, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
         }
     }
 
-    public static void bufferVboElementData(int id, IntBuffer buffer) {
+    private static void bufferVboElementData(int id, IntBuffer buffer) {
         if (GLContext.getCapabilities().GL_ARB_vertex_buffer_object) {
             ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, id);
             ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, buffer, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);

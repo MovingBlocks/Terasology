@@ -17,7 +17,9 @@
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
@@ -27,6 +29,8 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public class BlockLargeHighGrass extends Block {
 
+    private static Vector4f colorOffset = new Vector4f(0.8f, 0.8f, 0.8f, 1.0f);
+
     @Override
     public boolean isBlockTypeTranslucent() {
         return true;
@@ -34,12 +38,12 @@ public class BlockLargeHighGrass extends Block {
 
     @Override
     public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(160f / 255f, 223f / 255f, 84f / 255f, 1.0f);
+        return colorOffset;
     }
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(15, 6);
+        return Helper.getInstance().calcOffsetForTextureAt(15, 11);
     }
 
     @Override

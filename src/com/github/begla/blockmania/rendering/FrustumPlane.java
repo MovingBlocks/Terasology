@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.utilities;
+package com.github.begla.blockmania.rendering;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

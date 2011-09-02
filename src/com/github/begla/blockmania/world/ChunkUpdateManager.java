@@ -79,7 +79,7 @@ public final class ChunkUpdateManager {
 
                 if (c != null) {
                     // Generate the display list of the center chunk
-                    c.generateDisplayLists();
+                    c.generateVBOs();
                 }
             }
         }

@@ -33,13 +33,8 @@ public class BlockHighGrass extends Block {
     }
 
     @Override
-    public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return new Vector4f(140f / 255f, 200f / 255f, 80f / 255f, 1.0f);
-    }
-
-    @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(12, 6);
+        return Helper.getInstance().calcOffsetForTextureAt(12, 11);
     }
 
     @Override
