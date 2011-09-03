@@ -166,7 +166,7 @@
     <property name="artifact.temp.output.blockmania:jar" value="${artifacts.temp.dir}/Blockmania_jar"/>
     <mkdir dir="${artifact.temp.output.blockmania:jar}"/>
     <jar destfile="${temp.jar.path.Blockmania.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
-      <zipfileset file="${basedir}/src/com/github/begla/blockmania/META-INF/MANIFEST.MF" prefix="META-INF"/>
+      <zipfileset file="${basedir}/src/META-INF/MANIFEST.MF" prefix="META-INF"/>
       <zipfileset dir="${blockmania.output.dir}"/>
       <zipfileset src="${basedir}/libs/annotations.jar"/>
       <zipfileset src="${basedir}/libs/AppleJavaExtensions.jar"/>

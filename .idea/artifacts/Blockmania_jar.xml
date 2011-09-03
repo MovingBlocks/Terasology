@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/Blockmania_jar</output-path>
     <root id="archive" name="Blockmania.jar">
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/src/com/github/begla/blockmania/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="Blockmania" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/annotations.jar" path-in-jar="/" />
