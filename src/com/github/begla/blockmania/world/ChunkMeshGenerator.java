@@ -157,25 +157,16 @@ public class ChunkMeshGenerator {
         lights[6] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f), lightType) / 15f;
         lights[7] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f), lightType) / 15f;
 
-        boolean[] blocks = new boolean[8];
-
-        blocks[0] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f))).isBlockTypeTranslucent();
-        blocks[1] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f))).isBlockTypeTranslucent();
-        blocks[2] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f))).isBlockTypeTranslucent();
-        blocks[3] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f))).isBlockTypeTranslucent();
-
-        blocks[4] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f))).isBlockTypeTranslucent();
-        blocks[5] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f))).isBlockTypeTranslucent();
-        blocks[6] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f))).isBlockTypeTranslucent();
-        blocks[7] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f))).isBlockTypeTranslucent();
-
         int counter = 0;
         for (int i = 0; i < 8; i++) {
-            if (blocks[i]) {
+            if (lights[i] > 0) {
                 result += lights[i];
                 counter++;
             }
         }
+
+        if (counter == 0)
+            return 0;
 
         return result / counter;
     }
@@ -183,21 +174,19 @@ public class ChunkMeshGenerator {
     private float getOcclusionValue(Vector3f vertexPos) {
 
         float result = 1.0f;
-        boolean[] blocks = new boolean[8];
+        byte[] blocks = new byte[8];
 
-        blocks[0] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f))).isCastingShadows();
-        blocks[1] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f))).isCastingShadows();
-        blocks[2] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f))).isCastingShadows();
-        blocks[3] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f))).isCastingShadows();
-
-        blocks[4] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f))).isCastingShadows();
-        blocks[5] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f))).isCastingShadows();
-        blocks[6] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f))).isCastingShadows();
-        blocks[7] = Block.getBlockForType(_chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f))).isCastingShadows();
+        blocks[0] = _chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f));
+        blocks[1] = _chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f));
+        blocks[2] = _chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f));
+        blocks[3] = _chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f));
 
         for (int i = 0; i < 4; i++) {
-            if (blocks[i]) {
+            Block b = Block.getBlockForType(blocks[i]);
+            if (b.isCastingShadows() && !b.isBlockBillboard()) {
                 result -= Configuration.OCCLUSION_AMOUNT;
+            } else if (b.isCastingShadows() && b.isBlockBillboard()) {
+                result -= Configuration.OCCLUSION_AMOUNT / 2;
             }
         }
 

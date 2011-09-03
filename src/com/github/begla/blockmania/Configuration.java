@@ -155,13 +155,15 @@ public final class Configuration {
     }
 
     private static void loadDebug() {
+        _settingsBoolean.put("DEBUG", true);
         _settingsBoolean.put("GOD_MODE", true);
         _settingsNumeric.put("V_DIST_X", 40f);
         _settingsNumeric.put("V_DIST_Z", 40f);
-        _settingsNumeric.put("RUNNING_FACTOR", 4.0f);
+        _settingsNumeric.put("RUNNING_FACTOR", 12.0f);
     }
 
     private static void loadDemo() {
+        _settingsBoolean.put("DEBUG", false);
         _settingsBoolean.put("REPLANT_DIRT", false);
         _settingsBoolean.put("PLACING_BOX", false);
         _settingsBoolean.put("CROSSHAIR", false);

@@ -24,7 +24,6 @@ import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
 import javolution.util.FastSet;
@@ -45,6 +44,7 @@ import org.xml.sax.InputSource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -922,8 +922,8 @@ public final class World extends RenderableObject {
      */
     private Vector3f findSpawningPoint() {
         for (int xz = 1024; ; xz++) {
-            if (_generatorTerrain.calcDensity(xz, 64, xz) >= 0.012f) {
-                return new Vector3f(xz, 64, xz);
+            if (_generatorTerrain.calcDensity(xz, 26, xz) >= 0.012f) {
+                return new Vector3f(xz, 26, xz);
             }
         }
     }

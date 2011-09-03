@@ -65,7 +65,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
                         if (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17) {
                             generateTree(c, randX, y, randZ);
                         } else if (c.getBlock(randX, y, randZ) == 0x7) {
-                          c.getParent().getGeneratorCactus().generate(c.getBlockWorldPosX(randX), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(randZ), false);
+                            c.getParent().getGeneratorCactus().generate(c.getBlockWorldPosX(randX), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(randZ), false);
                         }
                     }
                 }
@@ -90,14 +90,10 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
                  * Generate high grass.
                  */
                 double rand = _rand.standNormalDistrDouble();
-                if (rand > 0) {
-                    if (c.canBlockSeeTheSky(x, y + 1, z)) {
-                        c.setBlock(x, y + 1, z, (byte) 0xB);
-                    }
-                } else if (rand < 0) {
-                    if (c.canBlockSeeTheSky(x, y + 1, z)) {
-                        c.setBlock(x, y + 1, z, (byte) 0xC);
-                    }
+                if (rand > -0.4 && rand < 0.4) {
+                    c.setBlock(x, y + 1, z, (byte) 0xB);
+                } else if (rand > -0.8 && rand < -0.8) {
+                    c.setBlock(x, y + 1, z, (byte) 0xC);
                 }
 
                 /*
@@ -105,13 +101,9 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
                  */
                 if (_rand.standNormalDistrDouble() < -2) {
                     if (_rand.randomBoolean()) {
-                        if (c.canBlockSeeTheSky(x, y + 1, z)) {
-                            c.setBlock(x, y + 1, z, (byte) 0x9);
-                        }
+                        c.setBlock(x, y + 1, z, (byte) 0x9);
                     } else {
-                        if (c.canBlockSeeTheSky(x, y + 1, z)) {
-                            c.setBlock(x, y + 1, z, (byte) 0xA);
-                        }
+                        c.setBlock(x, y + 1, z, (byte) 0xA);
                     }
 
                 }

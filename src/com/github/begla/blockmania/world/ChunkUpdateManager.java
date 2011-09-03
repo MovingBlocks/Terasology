@@ -58,9 +58,13 @@ public final class ChunkUpdateManager {
         Collections.sort(dirtyChunks);
         _chunkUpdateAmount = dirtyChunks.size();
 
-        if (!dirtyChunks.isEmpty()) {
-            Chunk closestChunk = dirtyChunks.getFirst();
-            processChunkUpdate(closestChunk);
+        for (int i = 0; i < 32; i++) {
+            if (dirtyChunks.size() > 0) {
+                Chunk closestChunk = dirtyChunks.getFirst();
+                processChunkUpdate(closestChunk);
+            } else {
+                break;
+            }
         }
 
         _meanUpdateDuration += System.currentTimeMillis() - timeStart;
@@ -90,6 +94,10 @@ public final class ChunkUpdateManager {
      */
     private void processChunkUpdate(Chunk c) {
         if (c != null) {
+            if (!c.isDirty() && !c.isFresh() && !c.isLightDirty()) {
+                return;
+            }
+
             /*
              * Generate the chunk...
              */
