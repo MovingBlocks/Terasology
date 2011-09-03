@@ -922,7 +922,7 @@ public final class World extends RenderableObject {
      */
     private Vector3f findSpawningPoint() {
         for (int xz = 1024; ; xz++) {
-            if (_generatorTerrain.calcDensity(xz, 64, xz) > 0.01f) {
+            if (_generatorTerrain.calcDensity(xz, 64, xz) >= 0.012f) {
                 return new Vector3f(xz, 64, xz);
             }
         }

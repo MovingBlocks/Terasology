@@ -139,7 +139,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                 }
 
                 /* Generate lakes */
-                if (calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c)) < 0.15) {
+                if (calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c)) < 0.15 && heightPercentage < 0.05) {
                     c.setBlock(x, y, z, (byte) 0x4);
                 }
                 break;

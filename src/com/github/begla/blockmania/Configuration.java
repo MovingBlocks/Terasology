@@ -135,12 +135,10 @@ public final class Configuration {
      * Loads the default values for the global settings.
      */
     private static void loadDefaults() {
-        _settingsBoolean.put("DEBUG", true);
-        _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);
         _settingsBoolean.put("REPLANT_DIRT", true);
         _settingsBoolean.put("PLACING_BOX", true);
         _settingsBoolean.put("CHUNK_OUTLINES", false);
-        _settingsBoolean.put("DEBUG", false);
+        _settingsBoolean.put("DEBUG", true);
         _settingsBoolean.put("CROSSHAIR", true);
         _settingsBoolean.put("BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
@@ -153,11 +151,10 @@ public final class Configuration {
         _settingsNumeric.put("FRICTION", 0.1f);
         _settingsNumeric.put("V_DIST_X", 32f);
         _settingsNumeric.put("V_DIST_Z", 32f);
+        _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);
     }
 
     private static void loadDebug() {
-        _settingsBoolean.put("DEBUG", true);
-        _settingsBoolean.put("CROSSHAIR", true);
         _settingsBoolean.put("GOD_MODE", true);
         _settingsNumeric.put("V_DIST_X", 40f);
         _settingsNumeric.put("V_DIST_Z", 40f);
