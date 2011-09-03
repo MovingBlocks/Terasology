@@ -29,7 +29,7 @@ void main(){
 
     vec2 lightCoord = vec2(gl_TexCoord[1]);
 
-    float daylightPow = clamp(pow(0.8, (1.0-daylight)*15.0)+0.6, 0.0, 1.0);
+    float daylightPow = clamp(pow(0.8, (1.0-daylight)*15.0)+0.2, 0.0, 1.0);
     float daylightValue = daylightPow * lightCoord.x;
 
     float blocklightValue = lightCoord.y;
