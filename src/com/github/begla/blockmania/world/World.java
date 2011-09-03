@@ -44,7 +44,6 @@ import org.xml.sax.InputSource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;

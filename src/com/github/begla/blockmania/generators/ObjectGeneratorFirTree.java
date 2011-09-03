@@ -73,6 +73,6 @@ public class ObjectGeneratorFirTree extends ObjectGenerator {
             stage++;
         }
 
-        _world.setBlock(posX, posY + height, posZ, (byte) 0x6, update, false);
+        _world.setBlock(posX, posY + height, posZ, (byte) 0x16, update, false);
     }
 }

@@ -40,7 +40,7 @@ public class PerlinNoise {
             if (r < 0)
                 r *= -1;
 
-            noisePerm[i] = noisePerm[i+256] = r % 256;
+            noisePerm[i] = noisePerm[i + 256] = r % 256;
         }
     }
 

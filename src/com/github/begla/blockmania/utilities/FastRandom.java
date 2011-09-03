@@ -15,8 +15,6 @@
  */
 package com.github.begla.blockmania.utilities;
 
-import java.util.ArrayList;
-
 /**
  * Random number generator based on the Xorshift generator by George Marsaglia.
  *

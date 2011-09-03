@@ -22,7 +22,7 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.noise.PerlinNoise;
 import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.rendering.ViewFrustum;
-import com.github.begla.blockmania.utilities.*;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.RenderableObject;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;

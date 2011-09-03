@@ -46,7 +46,7 @@ public class BlockCactus extends Block {
         return Helper.calcOffsetForTextureAt(5, 4);
     }
 
-        public BLOCK_FORM getBlockForm() {
+    public BLOCK_FORM getBlockForm() {
         return BLOCK_FORM.CACTUS;
     }
 }

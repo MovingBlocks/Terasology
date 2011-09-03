@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Blockmania.iml" filepath="$PROJECT_DIR$/src/com/github/begla/blockmania/Blockmania.iml" />
-    </modules>
-  </component>
+    <component name="ProjectModuleManager">
+        <modules>
+            <module fileurl="file://$PROJECT_DIR$/src/com/github/begla/blockmania/Blockmania.iml"
+                    filepath="$PROJECT_DIR$/src/com/github/begla/blockmania/Blockmania.iml"/>
+        </modules>
+    </component>
 </project>
 

@@ -16,10 +16,9 @@
 package com.github.begla.blockmania;
 
 
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.Display;
 
 import java.applet.Applet;
-import java.awt.*;
 
 /**
  * The heart and soul of Blockmania.

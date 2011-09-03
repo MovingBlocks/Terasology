@@ -147,7 +147,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
             case SNOW:
 
-                if (heightPercentage == 0.0f  && y > 32) {
+                if (heightPercentage == 0.0f && y > 32) {
                     // Snow on top
                     c.setBlock(x, y, z, (byte) 0x17);
                 } else if (heightPercentage > 0.2) {
@@ -183,12 +183,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         if (temp >= 80) {
             return BIOME_TYPE.DESERT;
         } else if (temp >= 32) {
-            return BIOME_TYPE.PLAINS;
+            return BIOME_TYPE.MOUNTAINS;
         } else if (temp < 16) {
             return BIOME_TYPE.SNOW;
         }
 
-        return BIOME_TYPE.MOUNTAINS;
+        return BIOME_TYPE.PLAINS;
     }
 
     /**
@@ -231,13 +231,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             div = (y + 1) * 2.0f;
 
         if (type == BIOME_TYPE.DESERT) {
-            div *= 1.4;
-        } else if (type == BIOME_TYPE.MOUNTAINS) {
-            div *= 1.0;
+            div *= 1.8;
         } else if (type == BIOME_TYPE.PLAINS) {
+            div *= 1.8;
+        } else if (type == BIOME_TYPE.MOUNTAINS) {
             div *= 1.4;
         } else if (type == BIOME_TYPE.SNOW) {
-            div *= 1.2;
+            div *= 1.6;
         }
 
         return density / div;
@@ -314,7 +314,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     float calcTemperature(float x, float z) {
         float result = 0.0f;
-        result += _pGen1.multiFractalNoise(x * 0.001f, 0f, 0.001f * z, 9, 2.162718) * 2f;
+        result += _pGen1.multiFractalNoise(x * 0.0008f, 0f, 0.0008f * z, 9, 2.162718) * 4f;
         result = (0.5f + result) * 100f;
         return result;
     }

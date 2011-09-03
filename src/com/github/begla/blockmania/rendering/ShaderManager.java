@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.rendering;
 
 import com.github.begla.blockmania.Game;
-import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;

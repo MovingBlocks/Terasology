@@ -20,7 +20,7 @@ package com.github.begla.blockmania.rendering;
  */
 public class FrustumPlane {
 
-    private float a,b,c,d;
+    private float a, b, c, d;
 
     public FrustumPlane() {
         // Do nothing.

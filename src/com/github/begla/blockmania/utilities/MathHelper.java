@@ -25,7 +25,7 @@ public class MathHelper {
     }
 
     public static double fastFloor(double x) {
-      return x > 0 ? (int) x : (int) x - 1;
+        return x > 0 ? (int) x : (int) x - 1;
     }
 
     /**

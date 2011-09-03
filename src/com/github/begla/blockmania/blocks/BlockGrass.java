@@ -17,7 +17,6 @@ package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A grass block.
@@ -30,6 +29,7 @@ public class BlockGrass extends Block {
     public boolean isBlockTypeTranslucent() {
         return false;
     }
+
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
         if (side == Block.SIDE.LEFT || side == Block.SIDE.RIGHT || side == Block.SIDE.FRONT || side == Block.SIDE.BACK) {
