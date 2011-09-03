@@ -19,12 +19,11 @@ import com.github.begla.blockmania.player.Player;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.world.World;
-import com.github.begla.webupdater.WebUpdater;
 import javolution.util.FastList;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -33,7 +32,13 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 
 import java.awt.*;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
@@ -43,7 +48,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Main {
+public final class Game {
 
     /* ------- */
     private static final int TICKS_PER_SECOND = 60;
@@ -66,6 +71,21 @@ public final class Main {
     private World _world;
     /* ------- */
     private final FastRandom _rand = new FastRandom();
+    /* ------- */
+    private long _timerTicksPerSecond;
+    /* ------- */
+    private static Game _instance;
+    /* ------- */
+    private final Logger _logger = Logger.getLogger("blockmania");
+    /* ------- */
+    private boolean _sandbox = false;
+
+    // Singleton
+    public static Game getInstance() {
+        if (_instance == null)
+            _instance = new Game();
+        return _instance;
+    }
 
     /**
      * Entry point of the application.
@@ -74,29 +94,41 @@ public final class Main {
      */
     public static void main(String[] args) {
 
-        Helper.LOGGER.log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
+        Game.getInstance().addLogFileHandler("blockmania.log");
+        Game.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
 
         /*
         * Update missing game files...
         */
-        WebUpdater wu = new WebUpdater();
-
-        if (!wu.update()) {
-            Helper.LOGGER.log(Level.SEVERE, "Couldn't download missing game files. Sorry.");
-            System.exit(0);
-        }
-
-        Main main = null;
+        // WebUpdater wu = new WebUpdater();
 
         try {
-            main = new Main();
-            main.create();
-            main.start();
+            loadLibs();
+        } catch (Exception e) {
+            Game.getInstance().getLogger().log(Level.SEVERE, "Couldn't link static libraries. Sorry: " + e);
+        }
+
+/*        if (!wu.update()) {
+            Game.getInstance().getLogger().log(Level.SEVERE, "Couldn't download missing game files. Sorry.");
+            System.exit(0);
+        }*/
+
+        Game game = null;
+
+        try {
+            game = Game.getInstance();
+
+            game.initDisplay();
+            game.initControls();
+
+            game.initGame();
+
+            game.startGame();
         } catch (Exception ex) {
-            Helper.LOGGER.log(Level.SEVERE, ex.toString(), ex);
+            Game.getInstance().getLogger().log(Level.SEVERE, ex.toString(), ex);
         } finally {
-            if (main != null) {
-                main.destroy();
+            if (game != null) {
+                game.destroy();
             }
         }
 
@@ -104,12 +136,47 @@ public final class Main {
     }
 
     /**
+     * Returns the system time in milliseconds.
+     *
+     * @return The system time in milliseconds.
+     */
+    public long getTime() {
+        return (Sys.getTime() * 1000) / _timerTicksPerSecond;
+    }
+
+    private static void loadLibs() throws Exception {
+        if (System.getProperty("os.name").equals("Mac OS X"))
+            addLibraryPath("natives/macosx");
+        else if (System.getProperty("os.name").equals("Linux"))
+            addLibraryPath("natives/linux");
+        else
+            addLibraryPath("natives/windows");
+    }
+
+    private static void addLibraryPath(String s) throws Exception {
+        final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
+        usrPathsField.setAccessible(true);
+
+        final String[] paths = (String[]) usrPathsField.get(null);
+
+        for (String path : paths) {
+            if (path.equals(s)) {
+                return;
+            }
+        }
+
+        final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
+        newPaths[newPaths.length - 1] = s;
+        usrPathsField.set(null, newPaths);
+    }
+
+    /**
      * Init. the display and mouse/keyboard input.
      *
      * @throws LWJGLException
      */
-    private void create() throws LWJGLException {
-        Helper.LOGGER.log(Level.INFO, "Loading Blockmania. Please stand by...");
+    public void initDisplay() throws LWJGLException {
+        Game.getInstance().getLogger().log(Level.INFO, "Loading Blockmania. Please stand by...");
 
         // Display
         if (Configuration.FULLSCREEN) {
@@ -122,6 +189,12 @@ public final class Main {
         Display.setTitle(Configuration.GAME_TITLE);
         Display.create(Configuration.PIXEL_FORMAT);
 
+    }
+
+    /**
+     * @throws LWJGLException
+     */
+    public void initControls() throws LWJGLException {
         // Keyboard
         Keyboard.create();
         Keyboard.enableRepeatEvents(true);
@@ -129,25 +202,19 @@ public final class Main {
         // Mouse
         Mouse.setGrabbed(true);
         Mouse.create();
-
-        // OpenGL
-        initGL();
-        resizeGL();
     }
 
     /**
      * Clean up before exiting the application.
      */
-    private void destroy() {
+    public void destroy() {
         Mouse.destroy();
         Keyboard.destroy();
         Display.destroy();
     }
 
-    /**
-     * Initializes OpenGL.
-     */
-    private void initGL() {
+    public void initGame() {
+        _timerTicksPerSecond = Sys.getTimerResolution();
         // Init. fonts
         _font1 = new TrueTypeFont(new Font("Arial", Font.PLAIN, 12), true);
 
@@ -186,14 +253,13 @@ public final class Main {
      * Renders the scene.
      */
     private void render() {
-
         // Fog has the same color as the sky
         glFogi(GL_FOG_MODE, GL_LINEAR);
 
         // Update the viewing distance
         float minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
         float viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, viewingDistance*0.05f);
+        glFogf(GL_FOG_START, viewingDistance * 0.05f);
         glFogf(GL_FOG_END, viewingDistance);
 
         /*
@@ -213,7 +279,7 @@ public final class Main {
     /**
      * Resizes the viewport according to the chosen display width and height.
      */
-    private void resizeGL() {
+    private void resizeViewport() {
         glViewport(0, 0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight());
 
         glMatrixMode(GL_PROJECTION);
@@ -229,15 +295,17 @@ public final class Main {
     /**
      * Starts the render loop.
      */
-    private void start() {
-        Helper.LOGGER.log(Level.INFO, "Starting Blockmania...");
-        _lastLoopTime = Helper.getInstance().getTime();
+    public void startGame() {
+        Game.getInstance().getLogger().log(Level.INFO, "Starting Blockmania...");
+        _lastLoopTime = getTime();
 
-        double nextGameTick = Helper.getInstance().getTime();
+        double nextGameTick = getTime();
         int loopCounter;
 
+        resizeViewport();
+
         /*
-         * Main game loop.
+         * Game game loop.
          */
         while (_runGame && !Display.isCloseRequested()) {
             updateStatistics();
@@ -246,7 +314,7 @@ public final class Main {
 
             // Pause the game while the debug console is being shown
             loopCounter = 0;
-            while (Helper.getInstance().getTime() > nextGameTick && loopCounter < MAX_FRAMESKIP) {
+            while (getTime() > nextGameTick && loopCounter < MAX_FRAMESKIP) {
                 if (!_pauseGame) {
                     update();
                 }
@@ -265,7 +333,22 @@ public final class Main {
         if (_saveWorldOnExit) {
             _world.dispose();
         }
+
         Display.destroy();
+    }
+
+    public void stopGame() {
+        _runGame = false;
+    }
+
+    public void pauseGame() {
+        _world.suspendUpdateThread();
+        _pauseGame = true;
+    }
+
+    public void unpauseGame() {
+        _pauseGame = false;
+        _world.resumeUpdateThread();
     }
 
     /**
@@ -446,7 +529,7 @@ public final class Main {
                 _runGame = false;
                 success = true;
             } else if (parsingResult.get(0).equals("info")) {
-                Helper.LOGGER.log(Level.INFO, _player.selectedBlockInformation());
+                Game.getInstance().getLogger().log(Level.INFO, _player.selectedBlockInformation());
                 success = true;
             } else if (parsingResult.get(0).equals("load")) {
                 String worldSeed = _rand.randomCharacterString(16);
@@ -465,13 +548,13 @@ public final class Main {
                 success = true;
             }
         } catch (Exception e) {
-            Helper.LOGGER.log(Level.INFO, e.getMessage());
+            Game.getInstance().getLogger().log(Level.INFO, e.getMessage());
         }
 
         if (success) {
-            Helper.LOGGER.log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
+            Game.getInstance().getLogger().log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
         } else {
-            Helper.LOGGER.log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
+            Game.getInstance().getLogger().log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
         }
 
         toggleDebugConsole();
@@ -482,12 +565,11 @@ public final class Main {
      */
     private void toggleDebugConsole() {
         if (!_pauseGame) {
-            _world.suspendUpdateThread();
+            pauseGame();
             _consoleInput.setLength(0);
-            _pauseGame = true;
+
         } else {
-            _pauseGame = false;
-            _world.resumeUpdateThread();
+            unpauseGame();
         }
     }
 
@@ -498,7 +580,7 @@ public final class Main {
      * @param seed  Seed value used for the generators
      */
     private void initNewWorld(String title, String seed) {
-        Helper.LOGGER.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+        Game.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Get rid of the old world
         if (_world != null) {
@@ -513,7 +595,7 @@ public final class Main {
         _world.startUpdateThread();
 
         // Reset the delta value
-        _lastLoopTime = Helper.getInstance().getTime();
+        _lastLoopTime = getTime();
     }
 
     /**
@@ -521,8 +603,8 @@ public final class Main {
      */
     private void updateStatistics() {
         // Measure a delta value and the frames per second
-        long delta = Helper.getInstance().getTime() - _lastLoopTime;
-        _lastLoopTime = Helper.getInstance().getTime();
+        long delta = getTime() - _lastLoopTime;
+        _lastLoopTime = getTime();
         _lastFpsTime += delta;
         _fps++;
 
@@ -538,5 +620,30 @@ public final class Main {
 
             _fps = 0;
         }
+    }
+
+    /**
+     * @param s
+     */
+    public void addLogFileHandler(String s) {
+        try {
+            FileHandler fh = new FileHandler(s, true);
+            fh.setFormatter(new SimpleFormatter());
+            _logger.addHandler(fh);
+        } catch (IOException ex) {
+            _logger.log(Level.WARNING, ex.toString(), ex);
+        }
+    }
+
+    public Logger getLogger() {
+        return _logger;
+    }
+
+    public void setSandboxed(boolean b) {
+        _sandbox = b;
+    }
+
+    public boolean isSandboxed() {
+        return _sandbox;
     }
 }

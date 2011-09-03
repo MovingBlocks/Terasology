@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.Game;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.player.Player;
@@ -64,8 +65,8 @@ public final class World extends RenderableObject {
     private double _lastWindUpdate = 0;
     private short _nextWindUpdateInSeconds = 32;
     /* ------ */
-    private long _lastDaytimeMeasurement = Helper.getInstance().getTime();
-    private long _latestDirtEvolvement = Helper.getInstance().getTime();
+    private long _lastDaytimeMeasurement = Game.getInstance().getTime();
+    private long _latestDirtEvolvement = Game.getInstance().getTime();
     /* ------ */
     private static Texture _textureSun, _textureMoon;
     /* ------ */
@@ -134,10 +135,12 @@ public final class World extends RenderableObject {
 
         // If loading failed accept the given seed
         if (!loadMetaData()) {
-            // Generate the save directory if needed
-            File dir = new File(getWorldSavePath());
-            if (!dir.exists()) {
-                dir.mkdirs();
+            if (!Game.getInstance().isSandboxed()) {
+                // Generate the save directory if needed
+                File dir = new File(getWorldSavePath());
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
             }
         }
 
@@ -177,7 +180,7 @@ public final class World extends RenderableObject {
                             try {
                                 _updateThread.wait();
                             } catch (InterruptedException ex) {
-                                Helper.LOGGER.log(Level.SEVERE, ex.toString());
+                                Game.getInstance().getLogger().log(Level.SEVERE, ex.toString());
                             }
                         }
                     }
@@ -192,7 +195,7 @@ public final class World extends RenderableObject {
      * Stops the updating thread and writes all chunks to disk.
      */
     public void dispose() {
-        Helper.LOGGER.log(Level.INFO, "Disposing world {0} and saving all chunks.", _title);
+        Game.getInstance().getLogger().log(Level.INFO, "Disposing world {0} and saving all chunks.", _title);
 
         synchronized (_updateThread) {
             _updateThreadAlive = false;
@@ -208,9 +211,9 @@ public final class World extends RenderableObject {
      * time is updated every 15 seconds.
      */
     private void updateDaytime() {
-        if (Helper.getInstance().getTime() - _lastDaytimeMeasurement >= 100) {
+        if (Game.getInstance().getTime() - _lastDaytimeMeasurement >= 100) {
             setTime(_time + 1f / ((5f * 60f * 10f)));
-            _lastDaytimeMeasurement = Helper.getInstance().getTime();
+            _lastDaytimeMeasurement = Game.getInstance().getTime();
         }
     }
 
@@ -239,13 +242,13 @@ public final class World extends RenderableObject {
     private void replantDirt(Chunk c) {
         // Do NOT replant chunks during the night...
         if (isNighttime()) {
-            _latestDirtEvolvement = Helper.getInstance().getTime();
+            _latestDirtEvolvement = Game.getInstance().getTime();
             return;
         }
 
         if (!c.isFresh() && !c.isDirty() && !c.isLightDirty()) {
             _generatorGrass.generate(c);
-            _latestDirtEvolvement = Helper.getInstance().getTime();
+            _latestDirtEvolvement = Game.getInstance().getTime();
         }
     }
 
@@ -254,30 +257,30 @@ public final class World extends RenderableObject {
      */
     public static void init() {
         try {
-            Helper.LOGGER.log(Level.INFO, "Loading world textures...");
-            _textureSun = TextureLoader.getTexture("png", ResourceLoader.getResource("DATA/sun.png").openStream(), GL_NEAREST);
-            _textureMoon = TextureLoader.getTexture("png", ResourceLoader.getResource("DATA/moon.png").openStream(), GL_NEAREST);
-            Helper.LOGGER.log(Level.INFO, "Finished loading world textures!");
+            Game.getInstance().getLogger().log(Level.INFO, "Loading world textures...");
+            _textureSun = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/sun.png").openStream(), GL_NEAREST);
+            _textureMoon = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/moon.png").openStream(), GL_NEAREST);
+            Game.getInstance().getLogger().log(Level.INFO, "Finished loading world textures!");
         } catch (IOException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
+            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
 
         /*
          * Create cloud array.
          */
         try {
-            BufferedImage cloudImage = ImageIO.read(ResourceLoader.getResource("DATA/clouds.png").openStream());
+            BufferedImage cloudImage = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/clouds.png").openStream());
             _clouds = new boolean[cloudImage.getWidth()][cloudImage.getHeight()];
 
             for (int x = 0; x < cloudImage.getWidth(); x++) {
                 for (int y = 0; y < cloudImage.getHeight(); y++) {
-                    if ((cloudImage.getRGB(x,y) & 0x00FFFFFF) != 0) {
+                    if ((cloudImage.getRGB(x, y) & 0x00FFFFFF) != 0) {
                         _clouds[x][y] = true;
                     }
                 }
             }
         } catch (IOException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
+            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
 
         // Init display lists
@@ -396,7 +399,7 @@ public final class World extends RenderableObject {
 
         boolean replantDirt = false;
 
-        if (Helper.getInstance().getTime() - _latestDirtEvolvement > Configuration.getSettingNumeric("REPLANT_DIRT_TIME") && Configuration.getSettingBoolean("REPLANT_DIRT")) {
+        if (Game.getInstance().getTime() - _latestDirtEvolvement > Configuration.getSettingNumeric("REPLANT_DIRT_TIME") && Configuration.getSettingBoolean("REPLANT_DIRT")) {
             replantDirt = true;
         }
 
@@ -464,11 +467,11 @@ public final class World extends RenderableObject {
             _windDirection.y = -_windDirection.y;
         }
 
-        if (Helper.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
+        if (Game.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
             _windDirection.x = (float) _rand.randomDouble();
             _windDirection.y = (float) _rand.randomDouble();
             _nextWindUpdateInSeconds = (short) (MathHelper.fastAbs(_rand.randomInt()) % 16 + 32);
-            _lastWindUpdate = Helper.getInstance().getTime();
+            _lastWindUpdate = Game.getInstance().getTime();
         }
 
         for (Chunk c : _visibleChunks) {
@@ -958,12 +961,16 @@ public final class World extends RenderableObject {
      * @return
      */
     private boolean saveMetaData() {
+        if (Game.getInstance().isSandboxed()) {
+            return false;
+        }
+
         File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));
 
         try {
             f.createNewFile();
         } catch (IOException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
+            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
 
         Element root = new Element("World");
@@ -991,12 +998,12 @@ public final class World extends RenderableObject {
             try {
                 outputter.output(doc, output);
             } catch (IOException ex) {
-                Helper.LOGGER.log(Level.SEVERE, null, ex);
+                Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
             }
 
             return true;
         } catch (FileNotFoundException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
+            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
 
 
@@ -1007,6 +1014,10 @@ public final class World extends RenderableObject {
      * @return
      */
     private boolean loadMetaData() {
+        if (Game.getInstance().isSandboxed()) {
+            return false;
+        }
+
         File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));
 
         try {
@@ -1026,9 +1037,9 @@ public final class World extends RenderableObject {
                 return true;
 
             } catch (JDOMException ex) {
-                Helper.LOGGER.log(Level.SEVERE, null, ex);
+                Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Helper.LOGGER.log(Level.SEVERE, null, ex);
+                Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
             }
 
         } catch (FileNotFoundException ex) {

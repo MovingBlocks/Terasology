@@ -34,6 +34,6 @@ public class BlockGlass extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(1, 3);
+        return Helper.calcOffsetForTextureAt(1, 3);
     }
 }

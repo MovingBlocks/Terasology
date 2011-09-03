@@ -118,7 +118,7 @@ public abstract class Block {
      * @return The texture offset
      */
     public Vector2f getTextureOffsetFor(SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(2, 0);
+        return Helper.calcOffsetForTextureAt(2, 0);
     }
 
     /**

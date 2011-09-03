@@ -163,7 +163,6 @@ public class ChunkMesh extends RenderableObject {
         ib.put(_idxBuffers[1]);
         ib.put(_idxBuffers[2]);
         ib.flip();
-        ARBVertexBufferObject.glDeleteBuffersARB(ib);
 
         _vertexBuffers[0] = -1;
         _vertexBuffers[1] = -1;
@@ -171,6 +170,8 @@ public class ChunkMesh extends RenderableObject {
         _idxBuffers[0] = -1;
         _idxBuffers[1] = -1;
         _idxBuffers[2] = -1;
+
+        ARBVertexBufferObject.glDeleteBuffersARB(ib);
     }
 
     private static int createVboId() {

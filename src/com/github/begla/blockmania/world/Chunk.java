@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.Game;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
 import com.github.begla.blockmania.datastructures.AABB;
@@ -97,12 +98,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public static void init() {
         try {
-            Helper.LOGGER.log(Level.FINE, "Loading chunk textures...");
-            _textureMap = TextureLoader.getTexture("png", ResourceLoader.getResource("DATA/terrain.png").openStream(), GL_NEAREST);
+            Game.getInstance().getLogger().log(Level.FINE, "Loading chunk textures...");
+            _textureMap = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/terrain.png").openStream(), GL_NEAREST);
             _textureMap.bind();
-            Helper.LOGGER.log(Level.FINE, "Finished loading chunk textures!");
+            Game.getInstance().getLogger().log(Level.FINE, "Finished loading chunk textures!");
         } catch (IOException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
+            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
     }
 
@@ -184,7 +185,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             // Try to load the chunk from disk
             if (loadChunkFromFile()) {
                 _fresh = false;
-                Helper.LOGGER.log(Level.FINEST, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+                Game.getInstance().getLogger().log(Level.FINEST, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
                 return true;
             }
 
@@ -195,7 +196,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             updateSunlight();
             _fresh = false;
 
-            Helper.LOGGER.log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+            Game.getInstance().getLogger().log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
             return true;
         }
         return false;
@@ -694,13 +695,17 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             return false;
         }
 
+        if (Game.getInstance().isSandboxed()) {
+            return false;
+        }
+
         ByteBuffer output = BufferUtils.createByteBuffer(_blocks.getSize() + _sunlight.getPackedSize() + _light.getPackedSize() + 1);
         File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), getChunkId()));
 
         // Save flags...
         byte flags = 0x0;
         if (_lightDirty) {
-            flags = Helper.getInstance().setFlag(flags, (short) 0);
+            flags = Helper.setFlag(flags, (short) 0);
         }
 
         // The flags are stored within the first byte of the file...
@@ -722,13 +727,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             FileOutputStream oS = new FileOutputStream(f);
             FileChannel c = oS.getChannel();
             c.write(output);
-            Helper.LOGGER.log(Level.FINE, "Wrote chunk {0} to disk.", this);
+            Game.getInstance().getLogger().log(Level.FINE, "Wrote chunk {0} to disk.", this);
             oS.close();
         } catch (FileNotFoundException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
+            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
             return false;
         } catch (IOException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
+            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
             return false;
         }
 
@@ -741,6 +746,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @return True if the chunk was successfully loaded
      */
     boolean loadChunkFromFile() {
+        if (Game.getInstance().isSandboxed()) {
+            return false;
+        }
+
         ByteBuffer input = BufferUtils.createByteBuffer(_blocks.getSize() + _sunlight.getPackedSize() + _light.getPackedSize() + 1);
         File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), getChunkId()));
 
@@ -752,13 +761,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             FileInputStream iS = new FileInputStream(f);
             FileChannel c = iS.getChannel();
             c.read(input);
-            Helper.LOGGER.log(Level.FINE, "Loaded chunk {0} from disk.", this);
+            Game.getInstance().getLogger().log(Level.FINE, "Loaded chunk {0} from disk.", this);
             iS.close();
         } catch (FileNotFoundException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
+            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
             return false;
         } catch (IOException ex) {
-            Helper.LOGGER.log(Level.SEVERE, null, ex);
+            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
             return false;
         }
 
@@ -767,7 +776,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         // The first byte contains the flags...
         byte flags = input.get();
         // Parse the flags...
-        _lightDirty = Helper.getInstance().isFlagSet(flags, (short) 0);
+        _lightDirty = Helper.isFlagSet(flags, (short) 0);
 
         for (int i = 0; i < _blocks.getSize(); i++)
             _blocks.setRawByte(i, input.get());

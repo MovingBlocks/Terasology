@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.rendering;
 
+import com.github.begla.blockmania.Game;
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -55,10 +56,10 @@ public class ShaderManager {
     private ShaderManager() {
         initShader();
 
-        Helper.LOGGER.log(Level.INFO, "Loading Blockmania shader manager...");
-        Helper.LOGGER.log(Level.INFO, "GL_VERSION: {0}", GL11.glGetString(GL11.GL_VERSION));
-        Helper.LOGGER.log(Level.INFO, "SHADING_LANGUAGE VERSION: {0}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
-        Helper.LOGGER.log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
+        Game.getInstance().getLogger().log(Level.INFO, "Loading Blockmania shader manager...");
+        Game.getInstance().getLogger().log(Level.INFO, "GL_VERSION: {0}", GL11.glGetString(GL11.GL_VERSION));
+        Game.getInstance().getLogger().log(Level.INFO, "SHADING_LANGUAGE VERSION: {0}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
+        Game.getInstance().getLogger().log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
     }
 
     /**
@@ -98,7 +99,7 @@ public class ShaderManager {
                 fragCode += line + "\n";
             }
         } catch (Exception e) {
-            Helper.LOGGER.log(Level.SEVERE, "Failed reading fragment shading code.");
+            Game.getInstance().getLogger().log(Level.SEVERE, "Failed reading fragment shading code.");
             return 0;
         }
 
@@ -126,7 +127,7 @@ public class ShaderManager {
                 fragCode += line + "\n";
             }
         } catch (Exception e) {
-            Helper.LOGGER.log(Level.SEVERE, "Failed reading vertex shading code.");
+            Game.getInstance().getLogger().log(Level.SEVERE, "Failed reading vertex shading code.");
             return 0;
         }
 
@@ -142,7 +143,7 @@ public class ShaderManager {
         String output = GL20.glGetShaderInfoLog(obj, 1024);
 
         if (output.length() > 0) {
-            Helper.LOGGER.log(Level.INFO, "{0}", output);
+            Game.getInstance().getLogger().log(Level.INFO, "{0}", output);
         }
     }
 

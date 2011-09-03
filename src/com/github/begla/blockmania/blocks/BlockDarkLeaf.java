@@ -45,7 +45,7 @@ public class BlockDarkLeaf extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(4, 3);
+        return Helper.calcOffsetForTextureAt(4, 3);
     }
 
     /**

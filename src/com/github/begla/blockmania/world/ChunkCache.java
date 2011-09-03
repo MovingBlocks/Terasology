@@ -94,9 +94,7 @@ public final class ChunkCache {
                 _chunkCache.remove(chunkToDelete.getChunkId());
             }
 
-            if (!Configuration.getSettingBoolean("DISABLE_SAVING"))
-                chunkToDelete.writeChunkToDisk();
-
+            chunkToDelete.writeChunkToDisk();
             chunkToDelete.dispose();
         }
     }

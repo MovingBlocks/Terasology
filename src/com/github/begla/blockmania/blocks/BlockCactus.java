@@ -39,11 +39,11 @@ public class BlockCactus extends Block {
     @Override
     public Vector2f getTextureOffsetFor(SIDE side) {
         if (side == Block.SIDE.LEFT || side == Block.SIDE.RIGHT || side == Block.SIDE.FRONT || side == Block.SIDE.BACK) {
-            return Helper.getInstance().calcOffsetForTextureAt(6, 4);
+            return Helper.calcOffsetForTextureAt(6, 4);
 
         }
 
-        return Helper.getInstance().calcOffsetForTextureAt(5, 4);
+        return Helper.calcOffsetForTextureAt(5, 4);
     }
 
         public BLOCK_FORM getBlockForm() {

@@ -28,6 +28,6 @@ public class BlockBrick extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(7, 0);
+        return Helper.calcOffsetForTextureAt(7, 0);
     }
 }

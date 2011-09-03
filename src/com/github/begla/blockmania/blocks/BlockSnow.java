@@ -35,12 +35,12 @@ public class BlockSnow extends Block {
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
         if (side == Block.SIDE.LEFT || side == Block.SIDE.RIGHT || side == Block.SIDE.FRONT || side == Block.SIDE.BACK) {
-            return Helper.getInstance().calcOffsetForTextureAt(4, 4);
+            return Helper.calcOffsetForTextureAt(4, 4);
 
         } else if (side == Block.SIDE.BOTTOM) {
-            return Helper.getInstance().calcOffsetForTextureAt(2, 0);
+            return Helper.calcOffsetForTextureAt(2, 0);
         } else {
-            return Helper.getInstance().calcOffsetForTextureAt(2, 4);
+            return Helper.calcOffsetForTextureAt(2, 4);
         }
     }
 }

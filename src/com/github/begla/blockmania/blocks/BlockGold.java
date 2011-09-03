@@ -28,6 +28,6 @@ public class BlockGold extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(0, 2);
+        return Helper.calcOffsetForTextureAt(0, 2);
     }
 }

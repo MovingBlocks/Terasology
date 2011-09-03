@@ -53,7 +53,7 @@ public final class Player extends RenderableObject {
     private final Vector3f _acc = VectorPool.getVector(0, 0, 0);
     private float _gravity = 0.0f;
     private World _parent = null;
-    private final PerlinNoise _pGen = new PerlinNoise((int) Helper.getInstance().getTime());
+    private final PerlinNoise _pGen = new PerlinNoise(42);
     private final Vector3f _viewingDirection = VectorPool.getVector();
     private boolean _playerIsTouchingGround = false;
 

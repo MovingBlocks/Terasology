@@ -33,6 +33,6 @@ public class BlockDirt extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(2, 0);
+        return Helper.calcOffsetForTextureAt(2, 0);
     }
 }

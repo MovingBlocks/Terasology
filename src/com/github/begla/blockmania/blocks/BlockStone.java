@@ -34,6 +34,6 @@ public class BlockStone extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.getInstance().calcOffsetForTextureAt(1, 0);
+        return Helper.calcOffsetForTextureAt(1, 0);
     }
 }

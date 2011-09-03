@@ -1,9 +1,9 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="Blockmania:jar">
+  <artifact type="jar" name="Blockmania:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Blockmania_jar</output-path>
     <root id="archive" name="Blockmania.jar">
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/src/com/github/begla/blockmania/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="Blockmania" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/annotations.jar" path-in-jar="/" />
@@ -11,6 +11,7 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/javolution-5.5.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/jdom.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/jinput.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/junit-dep-4.9.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/lwjgl-debug.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/lwjgl.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/lwjgl_test.jar" path-in-jar="/" />

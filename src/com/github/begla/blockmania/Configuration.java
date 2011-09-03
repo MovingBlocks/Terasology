@@ -51,7 +51,7 @@ public final class Configuration {
     /**
      * The string used to generate the default world. If not set, a random seed is used.
      */
-    public static final String DEFAULT_SEED = "cPpCzKqBpVkQpVjP";
+    public static final String DEFAULT_SEED = "";
     /**
      * The pixel format used to init. the display.
      */
@@ -135,9 +135,9 @@ public final class Configuration {
      * Loads the default values for the global settings.
      */
     private static void loadDefaults() {
+        _settingsBoolean.put("DEBUG", true);
         _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);
         _settingsBoolean.put("REPLANT_DIRT", true);
-        _settingsBoolean.put("DISABLE_SAVING", false);
         _settingsBoolean.put("PLACING_BOX", true);
         _settingsBoolean.put("CHUNK_OUTLINES", false);
         _settingsBoolean.put("DEBUG", false);
@@ -166,7 +166,6 @@ public final class Configuration {
 
     private static void loadDemo() {
         _settingsBoolean.put("REPLANT_DIRT", false);
-        _settingsBoolean.put("DISABLE_SAVING", true);
         _settingsBoolean.put("PLACING_BOX", false);
         _settingsBoolean.put("CROSSHAIR", false);
         _settingsBoolean.put("DEMO_FLIGHT", true);
@@ -182,10 +181,12 @@ public final class Configuration {
     private static void loadSettings() {
         loadDefaults();
 
-        if (Boolean.getBoolean("blockmania.demo")) {
-            loadDemo();
-        } else if (Boolean.getBoolean("blockmania.debugMode")) {
-            loadDebug();
+        if (!Game.getInstance().isSandboxed()) {
+            if (Boolean.getBoolean("blockmania.demo")) {
+                loadDemo();
+            } else if (Boolean.getBoolean("blockmania.debugMode")) {
+                loadDebug();
+            }
         }
     }
 }
