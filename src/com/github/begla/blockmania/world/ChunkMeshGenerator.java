@@ -110,8 +110,8 @@ public class ChunkMeshGenerator {
                 Vector3f vertexPos = VectorPool.getVector(mesh._vertexElements[j].quads.get(i), mesh._vertexElements[j].quads.get(i + 1), mesh._vertexElements[j].quads.get(i + 2));
 
                 // Check if this vertex is a new one
-                if (indexLut.containsKey(vertexPos)) {
-                    int index = indexLut.get(vertexPos);
+                Integer index = indexLut.get(vertexPos);
+                if (index != null) {
                     mesh._vertexElements[j].indices.put(index);
                     continue;
                 }

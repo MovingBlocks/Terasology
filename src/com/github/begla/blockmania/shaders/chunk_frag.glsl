@@ -6,9 +6,6 @@ uniform float daylight = 1.0;
 varying float fog;
 varying vec3 normal;
 
-vec3 daylightColor = vec3(0.01, 0.0, 0.0);
-vec3 moonlightColor = vec3(0.0, 0.0, 0.2);
-
 vec4 srgbToLinear(vec4 color){
     return pow(color, vec4(1.0 / 2.2));
 }
@@ -37,18 +34,14 @@ void main(){
     vec3 daylightColorValue = vec3(daylightValue);
     vec3 blocklightColorValue = vec3(blocklightValue);
 
-    /*
-        Blocklight has a reddish color.
-    */
     blocklightColorValue.r *= 1.0;
-    blocklightColorValue.g *= 0.8;
+    blocklightColorValue.g *= 0.9;
     blocklightColorValue.b *= 0.8;
 
     blocklightColorValue = clamp(blocklightColorValue,0.0,1.0);
     daylightColorValue = clamp(daylightColorValue, 0.0, 1.0);
 
-    color.xyz *= clamp(daylightColorValue + blocklightColorValue, 0.0, 1.0);
-    color.xyz += mix(daylightColor, moonlightColor, 1.0-daylight);
+    color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
     gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.84,0.88,1,1) * daylight, fog).rgb;
     gl_FragColor.a = color.a;

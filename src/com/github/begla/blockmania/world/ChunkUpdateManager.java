@@ -15,7 +15,6 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.Configuration;
 import javolution.util.FastList;
 
 import java.util.Collections;
@@ -43,8 +42,6 @@ public final class ChunkUpdateManager {
      * TODO
      */
     public void updateChunk() {
-        long timeStart = System.currentTimeMillis();
-
         FastList<Chunk> dirtyChunks = new FastList<Chunk>(_parent.getVisibleChunks());
 
         for (int i = dirtyChunks.size() - 1; i >= 0; i--) {
@@ -57,14 +54,12 @@ public final class ChunkUpdateManager {
 
         Collections.sort(dirtyChunks);
         _chunkUpdateAmount = dirtyChunks.size();
+        long timeStart = System.currentTimeMillis();
 
-        for (int i = 0; i < 32; i++) {
-            if (dirtyChunks.size() > 0) {
-                Chunk closestChunk = dirtyChunks.getFirst();
-                processChunkUpdate(closestChunk);
-            } else {
-                break;
-            }
+
+        if (dirtyChunks.size() > 0) {
+            Chunk closestChunk = dirtyChunks.removeFirst();
+            processChunkUpdate(closestChunk);
         }
 
         _meanUpdateDuration += System.currentTimeMillis() - timeStart;
@@ -75,17 +70,9 @@ public final class ChunkUpdateManager {
      * TODO
      */
     public void updateDisplayLists() {
-
-        for (int i = 0; i < Configuration.DL_UPDATES_PER_CYCLE; i++) {
-
-            if (_displayListUpdates.size() > 0) {
-                Chunk c = _displayListUpdates.removeFirst();
-
-                if (c != null) {
-                    // Generate the display list of the center chunk
-                    c.generateVBOs();
-                }
-            }
+        if (!_displayListUpdates.isEmpty()) {
+            Chunk c = _displayListUpdates.removeFirst();
+            c.generateVBOs();
         }
     }
 

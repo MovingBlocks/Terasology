@@ -144,14 +144,14 @@ public final class World extends RenderableObject {
         }
 
         // Init. generators
-        _generatorTerrain = new ChunkGeneratorTerrain(seed);
-        _generatorForest = new ChunkGeneratorForest(seed);
-        _generatorResources = new ChunkGeneratorResources(seed);
-        _generatorTree = new ObjectGeneratorTree(this, seed);
-        _generatorPineTree = new ObjectGeneratorPineTree(this, seed);
-        _generatorFirTree = new ObjectGeneratorFirTree(this, seed);
-        _generatorGrass = new ChunkGeneratorFlora(seed);
-        _generatorCactus = new ObjectGeneratorCactus(this, seed);
+        _generatorTerrain = new ChunkGeneratorTerrain(_seed);
+        _generatorForest = new ChunkGeneratorForest(_seed);
+        _generatorResources = new ChunkGeneratorResources(_seed);
+        _generatorTree = new ObjectGeneratorTree(this, _seed);
+        _generatorPineTree = new ObjectGeneratorPineTree(this, _seed);
+        _generatorFirTree = new ObjectGeneratorFirTree(this, _seed);
+        _generatorGrass = new ChunkGeneratorFlora(_seed);
+        _generatorCactus = new ObjectGeneratorCactus(this, _seed);
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());

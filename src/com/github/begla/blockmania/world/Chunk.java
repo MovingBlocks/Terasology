@@ -466,10 +466,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         getParent().setLight(blockPosX, blockPosY, blockPosZ, newLightValue, type);
 
-        if (lightValue <= 0) {
-            return;
-        }
-
         if (val1 < newLightValue - 1 && Block.getBlockForType(type1).isBlockTypeTranslucent()) {
             getParent().spreadLight(blockPosX + 1, blockPosY, blockPosZ, lightValue, depth + 1, type);
         }

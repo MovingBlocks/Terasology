@@ -73,10 +73,6 @@ public final class Configuration {
     /**
      *
      */
-    public static final int DL_UPDATES_PER_CYCLE = 1;
-    /**
-     *
-     */
     public static final float PROB_COAL = -2f;
     /**
      *
