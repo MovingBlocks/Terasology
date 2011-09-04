@@ -117,7 +117,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     private void GenerateOuterLayer(int x, int y, int z, int firstBlockHeight, Chunk c, BIOME_TYPE type) {
 
-        float heightPercentage = (float) (firstBlockHeight - y) / (float) firstBlockHeight;
+        float heightPercentage = (float) (firstBlockHeight - y) / Configuration.CHUNK_DIMENSIONS.y;
 
         switch (type) {
             case PLAINS:
@@ -139,10 +139,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     c.setBlock(x, y, z, (byte) 0x2);
                 }
 
-                /* Generate lakes */
-                if (calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c)) < 0.15 && heightPercentage < 0.05) {
-                    c.setBlock(x, y, z, (byte) 0x4);
-                }
+                generateLake(c, x, y, z, heightPercentage);
                 break;
 
             case SNOW:
@@ -158,10 +155,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     c.setBlock(x, y, z, (byte) 0x2);
                 }
 
-                /* Generate lakes */
-                if (calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c)) < 0.15 && heightPercentage < 0.05) {
-                    c.setBlock(x, y, z, (byte) 0x4);
-                }
+                generateLake(c, x, y, z, heightPercentage);
                 break;
 
             case DESERT:
@@ -174,6 +168,16 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                 break;
 
+        }
+    }
+
+    private void generateLake(Chunk c, int x, int y, int z, double heightPercentage) {
+        double lakeIntens = calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c));
+
+        if (lakeIntens < 0.15 && heightPercentage < 0.02) {
+            c.setBlock(x, y, z, (byte) 0x0);
+        } else if (lakeIntens < 0.15 && heightPercentage >= 0.02 && heightPercentage < 0.05) {
+            c.setBlock(x, y, z, (byte) 0x4);
         }
     }
 
