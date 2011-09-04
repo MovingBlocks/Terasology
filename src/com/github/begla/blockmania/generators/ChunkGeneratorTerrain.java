@@ -80,13 +80,19 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                 for (int y = (int) Configuration.CHUNK_DIMENSIONS.y; y >= 0; y--) {
 
-                    if (y == 0) { // Stone ground layer
+                    if (y == 0) { // Hard stone ground layer
                         c.setBlock(x, y, z, (byte) 0x8);
                         break;
                     }
 
                     if (y < 30 && y > 0) { // Ocean
                         c.setBlock(x, y, z, (byte) 0x4);
+
+                        if (y == 29) {
+                            // Ice layer
+                            if (type == BIOME_TYPE.SNOW)
+                                c.setBlock(x, y, z, (byte) 0x11);
+                        }
                     }
 
                     float dens = densityMap[x][y][z];
@@ -139,7 +145,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     c.setBlock(x, y, z, (byte) 0x2);
                 }
 
-                generateLake(c, x, y, z, heightPercentage);
+                generateLake(c, x, y, z, heightPercentage, type);
                 break;
 
             case SNOW:
@@ -155,7 +161,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     c.setBlock(x, y, z, (byte) 0x2);
                 }
 
-                generateLake(c, x, y, z, heightPercentage);
+                generateLake(c, x, y, z, heightPercentage, type);
                 break;
 
             case DESERT:
@@ -171,13 +177,17 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    private void generateLake(Chunk c, int x, int y, int z, double heightPercentage) {
+    private void generateLake(Chunk c, int x, int y, int z, double heightPercentage, BIOME_TYPE type) {
         double lakeIntens = calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c));
 
         if (lakeIntens < 0.15 && heightPercentage < 0.02) {
             c.setBlock(x, y, z, (byte) 0x0);
-        } else if (lakeIntens < 0.15 && heightPercentage >= 0.02 && heightPercentage < 0.05) {
-            c.setBlock(x, y, z, (byte) 0x4);
+        } else if (lakeIntens < 0.15 && heightPercentage > 0.02 && heightPercentage < 0.05) {
+            if (type == BIOME_TYPE.SNOW) {
+                c.setBlock(x, y, z, (byte) 0x11);
+            } else {
+                c.setBlock(x, y, z, (byte) 0x04);
+            }
         }
     }
 

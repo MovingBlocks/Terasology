@@ -31,9 +31,18 @@ public class BlockIce extends Block {
         return true;
     }
 
+    @Override
+    public BLOCK_FORM getBlockForm() {
+        return BLOCK_FORM.LOWERED_BOCK;
+    }
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
         return Helper.calcOffsetForTextureAt(3, 4);
+    }
+
+    @Override
+    public boolean isCastingShadows() {
+        return false;
     }
 }
