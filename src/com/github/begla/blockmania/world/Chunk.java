@@ -24,6 +24,7 @@ import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.rendering.ShaderManager;
+import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
@@ -54,11 +55,15 @@ import static org.lwjgl.opengl.GL11.GL_NEAREST;
  */
 public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
-    private boolean _dirty;
-    private boolean _lightDirty;
+    private static final
+    Vector3f[] _directions = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), VectorPool.getVector(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
+    /* ------ */
     private static int _statVertexArrayUpdateCount = 0;
     /* ------ */
+    private boolean _dirty;
+    private boolean _lightDirty;
     private boolean _fresh = true;
+    private boolean _cached = false;
     /* ------ */
     private int _chunkID = -1;
     private static Texture _textureMap;
@@ -444,8 +449,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         for (int i = 0; i < brightSpots.size(); i++) {
             Vector3f pos = brightSpots.get(i);
-            getParent().spreadLight((int) pos.x, (int) pos.y, (int) pos.z, _parent.getLight((int) pos.x, (int) pos.y, (int) pos.z, LIGHT_TYPE.SUN), 0, LIGHT_TYPE.SUN);
-            getParent().spreadLight((int) pos.x, (int) pos.y, (int) pos.z, _parent.getLight((int) pos.x, (int) pos.y, (int) pos.z, LIGHT_TYPE.BLOCK), 0, LIGHT_TYPE.BLOCK);
+            getParent().spreadLight((int) pos.x, (int) pos.y, (int) pos.z, _parent.getLight((int) pos.x, (int) pos.y, (int) pos.z, type), 0, type);
         }
     }
 
@@ -468,59 +472,19 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
 
-        byte val1 = getParent().getLight(blockPosX + 1, blockPosY, blockPosZ, type);
-        byte type1 = getParent().getBlock(blockPosX + 1, blockPosY, blockPosZ);
-        byte val2 = getParent().getLight(blockPosX - 1, blockPosY, blockPosZ, type);
-        byte type2 = getParent().getBlock(blockPosX - 1, blockPosY, blockPosZ);
-        byte val3 = getParent().getLight(blockPosX, blockPosY, blockPosZ + 1, type);
-        byte type3 = getParent().getBlock(blockPosX, blockPosY, blockPosZ + 1);
-        byte val4 = getParent().getLight(blockPosX, blockPosY, blockPosZ - 1, type);
-        byte type4 = getParent().getBlock(blockPosX, blockPosY, blockPosZ - 1);
-        byte val5 = getParent().getLight(blockPosX, blockPosY + 1, blockPosZ, type);
-        byte type5 = getParent().getBlock(blockPosX, blockPosY + 1, blockPosZ);
-        byte val6 = getParent().getLight(blockPosX, blockPosY - 1, blockPosZ, type);
-        byte type6 = getParent().getBlock(blockPosX, blockPosY - 1, blockPosZ);
-
         // Remove the light at this point
         getParent().setLight(blockPosX, blockPosY, blockPosZ, (byte) 0x0, type);
 
-        if (val1 < lightValue && val1 > 0 && Block.getBlockForType(type1).isBlockTypeTranslucent()) {
-            getParent().unspreadLight(blockPosX + 1, blockPosY, blockPosZ, (byte) (lightValue - 1), depth + 1, type, brightSpots);
-        } else if (val1 >= lightValue) {
-            brightSpots.add(new Vector3f(blockPosX + 1, blockPosY, blockPosZ));
-        }
+        for (int i = 0; i < 6; i++) {
 
-        if (val2 < lightValue && val2 > 0 && Block.getBlockForType(type2).isBlockTypeTranslucent()) {
-            getParent().unspreadLight(blockPosX - 1, blockPosY, blockPosZ, (byte) (lightValue - 1), depth + 1, type, brightSpots);
-        } else if (val2 >= lightValue) {
-            brightSpots.add(new Vector3f(blockPosX - 1, blockPosY, blockPosZ));
-        }
+            byte neighborValue = getParent().getLight(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z, type);
+            byte neighborType = getParent().getBlock(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z);
 
-
-        if (val3 < lightValue && val3 > 0 && Block.getBlockForType(type3).isBlockTypeTranslucent()) {
-            getParent().unspreadLight(blockPosX, blockPosY, blockPosZ + 1, (byte) (lightValue - 1), depth + 1, type, brightSpots);
-        } else if (val3 >= lightValue) {
-            brightSpots.add(new Vector3f(blockPosX, blockPosY, blockPosZ + 1));
-        }
-
-
-        if (val4 < lightValue && val4 > 0 && Block.getBlockForType(type4).isBlockTypeTranslucent()) {
-            getParent().unspreadLight(blockPosX, blockPosY, blockPosZ - 1, (byte) (lightValue - 1), depth + 1, type, brightSpots);
-        } else if (val4 >= lightValue) {
-            brightSpots.add(new Vector3f(blockPosX + 1, blockPosY, blockPosZ - 1));
-        }
-
-
-        if (val5 < lightValue && val5 > 0 && Block.getBlockForType(type5).isBlockTypeTranslucent()) {
-            getParent().unspreadLight(blockPosX, blockPosY + 1, blockPosZ, (byte) (lightValue - 1), depth + 1, type, brightSpots);
-        } else if (val5 >= lightValue) {
-            brightSpots.add(new Vector3f(blockPosX, blockPosY + 1, blockPosZ));
-        }
-
-        if (val6 < lightValue && val6 > 0 && Block.getBlockForType(type6).isBlockTypeTranslucent()) {
-            getParent().unspreadLight(blockPosX, blockPosY - 1, blockPosZ, (byte) (lightValue - 1), depth + 1, type, brightSpots);
-        } else if (val6 >= lightValue) {
-            brightSpots.add(new Vector3f(blockPosX, blockPosY - 1, blockPosZ));
+            if (neighborValue < lightValue && neighborValue > 0 && Block.getBlockForType(neighborType).isBlockTypeTranslucent()) {
+                getParent().unspreadLight(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+            } else if (neighborValue >= lightValue) {
+                brightSpots.add(new Vector3f(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z));
+            }
         }
     }
 
@@ -561,51 +525,18 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
 
-        byte val1 = getParent().getLight(blockPosX + 1, blockPosY, blockPosZ, type);
-        byte type1 = getParent().getBlock(blockPosX + 1, blockPosY, blockPosZ);
-        byte val2 = getParent().getLight(blockPosX - 1, blockPosY, blockPosZ, type);
-        byte type2 = getParent().getBlock(blockPosX - 1, blockPosY, blockPosZ);
-        byte val3 = getParent().getLight(blockPosX, blockPosY, blockPosZ + 1, type);
-        byte type3 = getParent().getBlock(blockPosX, blockPosY, blockPosZ + 1);
-        byte val4 = getParent().getLight(blockPosX, blockPosY, blockPosZ - 1, type);
-        byte type4 = getParent().getBlock(blockPosX, blockPosY, blockPosZ - 1);
-        byte val5 = getParent().getLight(blockPosX, blockPosY + 1, blockPosZ, type);
-        byte type5 = getParent().getBlock(blockPosX, blockPosY + 1, blockPosZ);
-        byte val6 = getParent().getLight(blockPosX, blockPosY - 1, blockPosZ, type);
-        byte type6 = getParent().getBlock(blockPosX, blockPosY - 1, blockPosZ);
-
         byte newLightValue;
         newLightValue = (byte) (lightValue - depth);
 
         getParent().setLight(blockPosX, blockPosY, blockPosZ, newLightValue, type);
 
-        if (val1 < newLightValue - 1 && Block.getBlockForType(type1).isBlockTypeTranslucent()) {
-            getParent().spreadLight(blockPosX + 1, blockPosY, blockPosZ, lightValue, depth + 1, type);
-        }
+        for (int i = 0; i < 6; i++) {
+            byte neighborValue = getParent().getLight(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z, type);
+            byte neighborType = getParent().getBlock(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z);
 
-
-        if (val2 < newLightValue - 1 && Block.getBlockForType(type2).isBlockTypeTranslucent()) {
-            getParent().spreadLight(blockPosX - 1, blockPosY, blockPosZ, lightValue, depth + 1, type);
-        }
-
-
-        if (val3 < newLightValue - 1 && Block.getBlockForType(type3).isBlockTypeTranslucent()) {
-            getParent().spreadLight(blockPosX, blockPosY, blockPosZ + 1, lightValue, depth + 1, type);
-        }
-
-
-        if (val4 < newLightValue - 1 && Block.getBlockForType(type4).isBlockTypeTranslucent()) {
-            getParent().spreadLight(blockPosX, blockPosY, blockPosZ - 1, lightValue, depth + 1, type);
-        }
-
-
-        if (val5 < newLightValue - 1 && Block.getBlockForType(type5).isBlockTypeTranslucent()) {
-            getParent().spreadLight(blockPosX, blockPosY + 1, blockPosZ, lightValue, depth + 1, type);
-        }
-
-
-        if (val6 < newLightValue - 1 && Block.getBlockForType(type6).isBlockTypeTranslucent()) {
-            getParent().spreadLight(blockPosX, blockPosY - 1, blockPosZ, lightValue, depth + 1, type);
+            if (neighborValue < newLightValue - 1 && Block.getBlockForType(neighborType).isBlockTypeTranslucent()) {
+                getParent().spreadLight(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z, lightValue, depth + 1, type);
+            }
         }
     }
 
@@ -1004,5 +935,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public void dispose() {
         if (_activeMesh != null)
             _activeMesh.dispose();
+    }
+
+    public void setCached(boolean b) {
+        _cached = b;
+    }
+
+    public boolean isCached() {
+        return _cached;
     }
 }

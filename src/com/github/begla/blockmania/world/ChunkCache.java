@@ -70,6 +70,7 @@ public final class ChunkCache {
 
         synchronized (this) {
             _chunkCache.put(c.getChunkId(), c);
+            c.setCached(true);
         }
 
         return c;
@@ -92,6 +93,7 @@ public final class ChunkCache {
 
             synchronized (this) {
                 _chunkCache.remove(chunkToDelete.getChunkId());
+                chunkToDelete.setCached(false);
             }
 
             chunkToDelete.writeChunkToDisk();
@@ -134,7 +136,7 @@ public final class ChunkCache {
     /**
      * @return
      */
-    private static int capacity() {
+    public static int capacity() {
         return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 2048;
     }
 }
