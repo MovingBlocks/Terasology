@@ -273,8 +273,13 @@ public class ChunkMeshGenerator {
         drawLeft = isSideVisibleForBlockTypes(blockToCheck, block);
         blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z));
         drawRight = isSideVisibleForBlockTypes(blockToCheck, block);
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z));
-        drawBottom = isSideVisibleForBlockTypes(blockToCheck, block);
+
+        if (y > 0) {
+            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z));
+            drawBottom = isSideVisibleForBlockTypes(blockToCheck, block);
+        } else {
+            drawBottom = false;
+        }
 
         Block.BLOCK_FORM blockForm = Block.getBlockForType(block).getBlockForm();
 

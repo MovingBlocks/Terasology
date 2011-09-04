@@ -143,6 +143,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     @Override
     public void update() {
         if (_newMesh != null) {
+            // Do not update the mesh if one of the neighbors is dirty
+            for (Chunk nc : loadOrCreateNeighbors()) {
+                if (nc.isDirty()) {
+                    return;
+                }
+            }
+
             if (_newMesh.isGenerated()) {
                 ChunkMesh oldMesh = _activeMesh;
 

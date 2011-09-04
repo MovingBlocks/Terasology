@@ -70,7 +70,7 @@ public final class ChunkUpdateManager {
      * TODO
      */
     public void updateDisplayLists() {
-        if (!_displayListUpdates.isEmpty()) {
+        while (!_displayListUpdates.isEmpty()) {
             Chunk c = _displayListUpdates.removeFirst();
             c.generateVBOs();
         }
