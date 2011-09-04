@@ -562,16 +562,7 @@ public final class World extends RenderableObject {
                  * Update sunlight.
                  */
                 c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, true, true);
-                //c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.SUN);
-
                 byte newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
-
-                /*
-                 * Spread sunlight.
-                 */
-                if (newValue > currentValue) {
-                    c.spreadLight(blockPosX, y, blockPosZ, newValue, Chunk.LIGHT_TYPE.SUN);
-                }
 
                 /*
                  * Spread light of block light sources.
@@ -582,25 +573,30 @@ public final class World extends RenderableObject {
                  * Is this block glowing?
                  */
                 if (luminance > 0) {
-
                     currentValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
                     c.setLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
                     newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
-
-                    /*
-                     * Spread the light if the luminance is brighter than the
-                     * current value.
-                     */
-                    if (newValue > currentValue) {
-                        c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
-                    }
-
+                } else {
+                    currentValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+                    c.setLight(blockPosX, y, blockPosZ, (byte) 0x0, Chunk.LIGHT_TYPE.BLOCK);
+                    newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
                 }
 
                 /*
                  * Update the block light intensity of the current block.
                  */
                 c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.BLOCK);
+
+
+                /*
+                * Spread the light if the luminance is brighter than the
+                * current value.
+                */
+                if (newValue > currentValue) {
+                    c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
+                } else if (newValue < currentValue) {
+                    c.unspreadLight(blockPosX, y, blockPosZ, currentValue, Chunk.LIGHT_TYPE.BLOCK);
+                }
             }
         }
     }
@@ -650,6 +646,11 @@ public final class World extends RenderableObject {
         return (getBlock(x + 1, y, z) > 0 || getBlock(x - 1, y, z) > 0 || getBlock(x, y, z + 1) > 0 || getBlock(x, y, z - 1) > 0);
     }
 
+    /**
+     * @param x
+     * @param z
+     * @return
+     */
     public final int maxHeightAt(int x, int z) {
         for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
             if (getBlock(x, y, z) != 0x0)
@@ -731,6 +732,29 @@ public final class World extends RenderableObject {
 
         if (c != null) {
             c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, spreadLight, refreshSunlight);
+        }
+    }
+
+    /**
+     * Recursive light calculation.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @param lightValue
+     * @param depth
+     * @param type
+     */
+    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, FastList<Vector3f> brightSpots) {
+        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
+        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+
+        int blockPosX = calcBlockPosX(x, chunkPosX);
+        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        if (c != null) {
+            c.unspreadLight(blockPosX, y, blockPosZ, lightValue, depth, type, brightSpots);
         }
     }
 

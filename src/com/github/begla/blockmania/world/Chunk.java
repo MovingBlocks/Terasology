@@ -336,33 +336,43 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             Block b = Block.getBlockForType(_blocks.get(x, y, z));
 
             // Remember if this "column" is covered
-            if ((b.getClass() != BlockAir.class && !b.isBlockBillboard())) {
+            if ((b.getClass() != BlockAir.class && !b.isBlockBillboard()) && !covered) {
                 covered = true;
-                continue;
             }
 
-            // If the column is not covered...
-            if ((b.getClass() == BlockAir.class || b.isBlockBillboard()) && !covered) {
-                byte oldValue = _sunlight.get(x, y, z);
-                _sunlight.set(x, y, z, Configuration.MAX_LIGHT);
-                byte newValue = _sunlight.get(x, y, z);
+            byte oldValue = _sunlight.get(x, y, z);
+            byte newValue = 0x0;
 
-                /*
-                 * Spread sunlight if the new light value is more intense
-                 * than the old value.
-                 */
-                if (spreadLight && oldValue < newValue) {
-                    spreadLight(x, y, z, newValue, LIGHT_TYPE.SUN);
-                }
+            // If the column is not covered...
+            if (!covered) {
+                if (b.getClass().equals(BlockAir.class) || b.isBlockBillboard())
+                    _sunlight.set(x, y, z, Configuration.MAX_LIGHT);
+                else
+                    _sunlight.set(x, y, z, (byte) 0x0);
+
+                newValue = _sunlight.get(x, y, z);
 
                 // Otherwise the column is covered. Don't generate any light in the cells...
-            } else if ((b.getClass() == BlockAir.class || b.isBlockBillboard()) && covered) {
+            } else if (covered) {
                 _sunlight.set(x, y, z, (byte) 0);
 
                 // Update the sunlight at the current position (check the surrounding cells)
                 if (refreshSunlight) {
                     refreshLightAtLocalPos(x, y, z, LIGHT_TYPE.SUN);
                 }
+
+                newValue = _sunlight.get(x, y, z);
+            }
+
+
+            if (spreadLight && oldValue > newValue)
+                unspreadLight(x, y, z, oldValue, Chunk.LIGHT_TYPE.SUN);
+            else if (spreadLight && oldValue < newValue) {
+                /*
+                * Spread sunlight if the new light value is more intense
+                * than the old value.
+                */
+                spreadLight(x, y, z, newValue, LIGHT_TYPE.SUN);
             }
         }
     }
@@ -411,6 +421,102 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             setLight(x, y, z, res, type);
         }
     }
+
+    /**
+     * Recursive light calculation.
+     *
+     * @param x          Local block position on the x-axis
+     * @param y          Local block position on the y-axis
+     * @param z          Local block position on the z-axis
+     * @param lightValue The light value used to spread the light
+     * @param type       The type of the light
+     */
+    public void unspreadLight(int x, int y, int z, byte lightValue, LIGHT_TYPE type) {
+        FastList<Vector3f> brightSpots = new FastList<Vector3f>();
+        unspreadLight(x, y, z, lightValue, 0, type, brightSpots);
+
+        for (int i = 0; i < brightSpots.size(); i++) {
+            Vector3f pos = brightSpots.get(i);
+            getParent().spreadLight((int) pos.x, (int) pos.y, (int) pos.z, _parent.getLight((int) pos.x, (int) pos.y, (int) pos.z, LIGHT_TYPE.SUN), 0, LIGHT_TYPE.SUN);
+            getParent().spreadLight((int) pos.x, (int) pos.y, (int) pos.z, _parent.getLight((int) pos.x, (int) pos.y, (int) pos.z, LIGHT_TYPE.BLOCK), 0, LIGHT_TYPE.BLOCK);
+        }
+    }
+
+    /**
+     * Recursive light calculation.
+     *
+     * @param x          Local block position on the x-axis
+     * @param y          Local block position on the y-axis
+     * @param z          Local block position on the z-axis
+     * @param lightValue The light value used to spread the light
+     * @param depth      Depth of the recursion
+     * @param type       The type of the light
+     */
+    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type, FastList<Vector3f> brightSpots) {
+        if (x < 0 || z < 0 || y < 0) {
+            return;
+        }
+
+        int blockPosX = getBlockWorldPosX(x);
+        int blockPosY = getBlockWorldPosY(y);
+        int blockPosZ = getBlockWorldPosZ(z);
+
+        byte val1 = getParent().getLight(blockPosX + 1, blockPosY, blockPosZ, type);
+        byte type1 = getParent().getBlock(blockPosX + 1, blockPosY, blockPosZ);
+        byte val2 = getParent().getLight(blockPosX - 1, blockPosY, blockPosZ, type);
+        byte type2 = getParent().getBlock(blockPosX - 1, blockPosY, blockPosZ);
+        byte val3 = getParent().getLight(blockPosX, blockPosY, blockPosZ + 1, type);
+        byte type3 = getParent().getBlock(blockPosX, blockPosY, blockPosZ + 1);
+        byte val4 = getParent().getLight(blockPosX, blockPosY, blockPosZ - 1, type);
+        byte type4 = getParent().getBlock(blockPosX, blockPosY, blockPosZ - 1);
+        byte val5 = getParent().getLight(blockPosX, blockPosY + 1, blockPosZ, type);
+        byte type5 = getParent().getBlock(blockPosX, blockPosY + 1, blockPosZ);
+        byte val6 = getParent().getLight(blockPosX, blockPosY - 1, blockPosZ, type);
+        byte type6 = getParent().getBlock(blockPosX, blockPosY - 1, blockPosZ);
+
+        // Remove the light at this point
+        getParent().setLight(blockPosX, blockPosY, blockPosZ, (byte) 0x0, type);
+
+        if (val1 < lightValue && val1 > 0 && Block.getBlockForType(type1).isBlockTypeTranslucent()) {
+            getParent().unspreadLight(blockPosX + 1, blockPosY, blockPosZ, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+        } else if (val1 >= lightValue) {
+            brightSpots.add(new Vector3f(blockPosX + 1, blockPosY, blockPosZ));
+        }
+
+        if (val2 < lightValue && val2 > 0 && Block.getBlockForType(type2).isBlockTypeTranslucent()) {
+            getParent().unspreadLight(blockPosX - 1, blockPosY, blockPosZ, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+        } else if (val2 >= lightValue) {
+            brightSpots.add(new Vector3f(blockPosX - 1, blockPosY, blockPosZ));
+        }
+
+
+        if (val3 < lightValue && val3 > 0 && Block.getBlockForType(type3).isBlockTypeTranslucent()) {
+            getParent().unspreadLight(blockPosX, blockPosY, blockPosZ + 1, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+        } else if (val3 >= lightValue) {
+            brightSpots.add(new Vector3f(blockPosX, blockPosY, blockPosZ + 1));
+        }
+
+
+        if (val4 < lightValue && val4 > 0 && Block.getBlockForType(type4).isBlockTypeTranslucent()) {
+            getParent().unspreadLight(blockPosX, blockPosY, blockPosZ - 1, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+        } else if (val4 >= lightValue) {
+            brightSpots.add(new Vector3f(blockPosX + 1, blockPosY, blockPosZ - 1));
+        }
+
+
+        if (val5 < lightValue && val5 > 0 && Block.getBlockForType(type5).isBlockTypeTranslucent()) {
+            getParent().unspreadLight(blockPosX, blockPosY + 1, blockPosZ, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+        } else if (val5 >= lightValue) {
+            brightSpots.add(new Vector3f(blockPosX, blockPosY + 1, blockPosZ));
+        }
+
+        if (val6 < lightValue && val6 > 0 && Block.getBlockForType(type6).isBlockTypeTranslucent()) {
+            getParent().unspreadLight(blockPosX, blockPosY - 1, blockPosZ, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+        } else if (val6 >= lightValue) {
+            brightSpots.add(new Vector3f(blockPosX, blockPosY - 1, blockPosZ));
+        }
+    }
+
 
     /**
      * Recursive light calculation.
@@ -591,11 +697,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         _blocks.set(x, y, z, type);
 
         Block b = Block.getBlockForType(type);
-
-        // If an opaque block was set, remove the light from this field
-        if (!b.isBlockTypeTranslucent()) {
-            _sunlight.set(x, y, z, (byte) 0);
-        }
 
         if (oldValue != type) {
             // Update vertex arrays and light
