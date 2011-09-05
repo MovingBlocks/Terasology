@@ -23,23 +23,17 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.generators.ChunkGenerator;
-import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
-import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.logging.Level;
-
-import static org.lwjgl.opengl.GL11.GL_NEAREST;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -66,7 +60,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private boolean _cached = false;
     /* ------ */
     private int _chunkID = -1;
-    private static Texture _textureMap;
     /* ------ */
     private ChunkMesh _activeMesh;
     private ChunkMesh _newMesh;
@@ -97,20 +90,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
          *
          */
         SUN
-    }
-
-    /**
-     * Init. the textures used within chunks.
-     */
-    public static void init() {
-        try {
-            Game.getInstance().getLogger().log(Level.FINE, "Loading chunk textures...");
-            _textureMap = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/terrain.png").openStream(), GL_NEAREST);
-            _textureMap.bind();
-            Game.getInstance().getLogger().log(Level.FINE, "Finished loading chunk textures!");
-        } catch (IOException ex) {
-            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
-        }
     }
 
     /**
@@ -148,18 +127,16 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     @Override
     public void update() {
         if (_newMesh != null) {
-            // Do not update the mesh if one of the neighbors is dirty
-            for (Chunk nc : loadOrCreateNeighbors()) {
-                if (nc.isDirty()) {
+            // Do not update the mesh if one of the VISIBLE neighbors is dirty
+            for (Chunk nc : loadOrCreateNeighbors())
+                if (nc.isDirty() && nc.isChunkInFrustum())
                     return;
-                }
-            }
 
             if (_newMesh.isGenerated()) {
                 ChunkMesh oldMesh = _activeMesh;
 
                 if (oldMesh != null)
-                    oldMesh.dispose();
+                    oldMesh.disposeMesh();
 
                 _activeMesh = _newMesh;
                 _newMesh = null;
@@ -175,12 +152,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public void render(boolean translucent) {
         // Render the generated chunk mesh
         if (_activeMesh != null) {
-            ShaderManager.getInstance().enableShader("chunk");
-            _textureMap.bind();
-
             _activeMesh.render(translucent);
-
-            ShaderManager.getInstance().enableShader(null);
         }
     }
 
@@ -263,8 +235,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Generates the display lists and swaps the old mesh with the current mesh.
-     *
-     * @throws Exception Thrown if a mesh is tried to generated twice
      */
     public void generateVBOs() {
         if (_newMesh != null) {
@@ -353,7 +323,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             }
 
             byte oldValue = _sunlight.get(x, y, z);
-            byte newValue = 0x0;
+            byte newValue;
 
             // If the column is not covered...
             if (!covered) {
@@ -365,7 +335,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
                 newValue = _sunlight.get(x, y, z);
 
                 // Otherwise the column is covered. Don't generate any light in the cells...
-            } else if (covered) {
+            } else {
                 _sunlight.set(x, y, z, (byte) 0);
 
                 // Update the sunlight at the current position (check the surrounding cells)
@@ -447,8 +417,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         FastList<Vector3f> brightSpots = new FastList<Vector3f>();
         unspreadLight(x, y, z, lightValue, 0, type, brightSpots);
 
-        for (int i = 0; i < brightSpots.size(); i++) {
-            Vector3f pos = brightSpots.get(i);
+        for (Vector3f pos : brightSpots) {
             getParent().spreadLight((int) pos.x, (int) pos.y, (int) pos.z, _parent.getLight((int) pos.x, (int) pos.y, (int) pos.z, type), 0, type);
         }
     }
@@ -456,12 +425,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     /**
      * Recursive light calculation.
      *
-     * @param x          Local block position on the x-axis
-     * @param y          Local block position on the y-axis
-     * @param z          Local block position on the z-axis
-     * @param lightValue The light value used to spread the light
-     * @param depth      Depth of the recursion
-     * @param type       The type of the light
+     * @param x           Local block position on the x-axis
+     * @param y           Local block position on the y-axis
+     * @param z           Local block position on the z-axis
+     * @param lightValue  The light value used to spread the light
+     * @param depth       Depth of the recursion
+     * @param type        The type of the light
+     * @param brightSpots Log of light spots, which where brighter than the current light node
      */
     public void unspreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type, FastList<Vector3f> brightSpots) {
         if (x < 0 || z < 0 || y < 0) {
@@ -634,30 +604,12 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         byte oldValue = _blocks.get(x, y, z);
         _blocks.set(x, y, z, type);
 
-        Block b = Block.getBlockForType(type);
-
         if (oldValue != type) {
             // Update vertex arrays and light
             setDirty(true);
             // Mark the neighbors as dirty
             markNeighborsDirty(x, z);
         }
-    }
-
-    /**
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
-     * @return True if the sun can be seen from the current local block position
-     */
-    public boolean canBlockSeeTheSky(int x, int y, int z) {
-        while (y < Configuration.CHUNK_DIMENSIONS.y) {
-            if (!Block.getBlockForType(getBlock(x, y, z)).isBlockTypeTranslucent()) {
-                return false;
-            }
-            y++;
-        }
-        return true;
     }
 
     /**
@@ -826,36 +778,18 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         return true;
     }
 
-    /**
-     * Returns some information about the chunk as a string.
-     *
-     * @return The string
-     */
+    public void disposeChunk() {
+        if (_activeMesh != null)
+            _activeMesh.disposeMesh();
+    }
+
     @Override
     public String toString() {
         return String.format("Chunk (%d) at %s.", getChunkId(), _position);
     }
 
     /**
-     * Returns the parent world.
-     *
-     * @return The parent world
-     */
-    public World getParent() {
-        return _parent;
-    }
-
-    /**
-     * Returns the amount of executed vertex array updates.
-     *
-     * @return The amount of updates
-     */
-    public static int getVertexArrayUpdateCount() {
-        return _statVertexArrayUpdateCount;
-    }
-
-    /**
-     * Chunks are comparable by the relative distance to the player.
+     * Chunks are comparable by their relative distance to the player.
      *
      * @param o The chunk to compare to
      * @return The comparison value
@@ -890,58 +824,48 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         return _aabb;
     }
 
-    /**
-     * @return True if the chunk is dirty
-     */
+    public World getParent() {
+        return _parent;
+    }
+
+    public static int getVertexArrayUpdateCount() {
+        return _statVertexArrayUpdateCount;
+    }
+
     public boolean isDirty() {
         return _dirty;
     }
 
-    /**
-     * @return True if the chunk is fresh
-     */
     public boolean isFresh() {
         return _fresh;
     }
 
-    /**
-     * @return The if the light of the chunk is marked as dirty
-     */
     public boolean isLightDirty() {
         return _lightDirty;
     }
 
-    /**
-     * @param _dirty The dirty flag
-     */
     void setDirty(boolean _dirty) {
         this._dirty = _dirty;
     }
 
-    /**
-     * @param _lightDirty The light dirty flag
-     */
     void setLightDirty(boolean _lightDirty) {
         this._lightDirty = _lightDirty;
     }
 
-    /**
-     * @return The id of the current chunk
-     */
     public int getChunkId() {
         return _chunkID;
-    }
-
-    public void dispose() {
-        if (_activeMesh != null)
-            _activeMesh.dispose();
     }
 
     public void setCached(boolean b) {
         _cached = b;
     }
 
+    @SuppressWarnings({"UnusedDeclaration"})
     public boolean isCached() {
         return _cached;
+    }
+
+    public boolean isChunkInFrustum() {
+        return _parent.getPlayer().getViewFrustum().intersects(getAABB());
     }
 }

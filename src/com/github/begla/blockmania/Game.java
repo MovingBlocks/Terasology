@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania;
 
+import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.player.Player;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.VectorPool;
@@ -41,6 +42,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.util.glu.GLU.gluLookAt;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 /**
@@ -79,6 +81,8 @@ public final class Game {
     private final Logger _logger = Logger.getLogger("blockmania");
     /* ------- */
     private boolean _sandbox = false;
+    /* ------- */
+    private float _cubeRotation;
 
     // Singleton
     public static Game getInstance() {
@@ -229,10 +233,9 @@ public final class Game {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-        glShadeModel(GL11.GL_SMOOTH);
         GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
+        glShadeModel(GL11.GL_SMOOTH);
 
-        Chunk.init();
         World.init();
 
         /*
@@ -267,9 +270,6 @@ public final class Game {
         glLoadIdentity();
 
         _world.render();
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-        ShaderManager.getInstance().enableShader(null);
 
         renderHUD();
     }
@@ -353,7 +353,32 @@ public final class Game {
      * Updates the world.
      */
     private void update() {
+        _cubeRotation += 0.5;
         _world.update();
+    }
+
+    private void drawRotatingBlock() {
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluPerspective(25f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 32f);
+        glMatrixMode(GL_MODELVIEW);
+
+        glLoadIdentity();
+
+        glEnable(GL11.GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glAlphaFunc(GL_GREATER, 0.1f);
+        glDisable(GL_DEPTH_TEST);
+        gluLookAt(0, 0, -25, 8f, 4.5f, 0, 0, 1, 0);
+        glRotatef(_cubeRotation % 360, 0, 1, 1);
+        Block.getBlockForType(_player.getSelectedBlockType()).renderBlock(true);
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL11.GL_BLEND);
+
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
     }
 
     /**
@@ -363,7 +388,7 @@ public final class Game {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, -1, 1);
+        glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, -5, 1);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
@@ -407,6 +432,10 @@ public final class Game {
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
+
+        if (Configuration.getSettingBoolean("ROTATING_BLOCK")) {
+            drawRotatingBlock();
+        }
     }
 
     /*
@@ -606,7 +635,7 @@ public final class Game {
         _lastFpsTime += delta;
         _fps++;
 
-        // Update the FPS and calculate the mean for displaying
+        // Update the FPS and calculate the average
         if (_lastFpsTime >= 1000) {
             _lastFpsTime = 0;
 
@@ -620,9 +649,6 @@ public final class Game {
         }
     }
 
-    /**
-     * @param s
-     */
     public void addLogFileHandler(String s) {
         try {
             FileHandler fh = new FileHandler(s, true);

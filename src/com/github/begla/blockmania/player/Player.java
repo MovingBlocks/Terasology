@@ -77,7 +77,7 @@ public final class Player extends RenderableObject {
         if (Configuration.getSettingBoolean("PLACING_BOX")) {
             if (is != null) {
 
-                if (Block.getBlockForType(_parent.getBlockAtPosition(is.getBlockPos())).renderBoundingBox()) {
+                if (Block.getBlockForType(_parent.getBlockAtPosition(is.getBlockPos())).shouldRenderBoundingBox()) {
                     Block.AABBForBlockAt((int) is.getBlockPos().x, (int) is.getBlockPos().y, (int) is.getBlockPos().z).render();
                 }
             }
@@ -300,9 +300,9 @@ public final class Player extends RenderableObject {
             Vector3f blockPos = is.getBlockPos();
 
             if (type == 0) {
-                _parent.getGeneratorTree().generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
+                _parent.getObjectGenerator("tree").generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
             } else {
-                _parent.getGeneratorPineTree().generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
+                _parent.getObjectGenerator("pineTree").generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
             }
         }
     }
@@ -668,5 +668,13 @@ public final class Player extends RenderableObject {
 
     public ViewFrustum getViewFrustum() {
         return _viewFrustum;
+    }
+
+    public byte getSelectedBlockType() {
+        return _selectedBlockType;
+    }
+
+    public Vector3f getViewingDirection() {
+        return _viewingDirection;
     }
 }

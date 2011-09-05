@@ -25,6 +25,7 @@ import java.util.Collections;
 public final class ChunkUpdateManager {
 
     private final FastList<Chunk> _displayListUpdates = new FastList<Chunk>(128);
+    private final FastList<Chunk> _externalChunkUpdates = new FastList<Chunk>(128);
 
     private double _meanUpdateDuration = 0.0f;
     private final World _parent;
@@ -41,7 +42,9 @@ public final class ChunkUpdateManager {
     /**
      * TODO
      */
-    public void updateChunk() {
+    public void processChunkUpdates() {
+        long timeStart = System.currentTimeMillis();
+
         FastList<Chunk> dirtyChunks = new FastList<Chunk>(_parent.getVisibleChunks());
 
         for (int i = dirtyChunks.size() - 1; i >= 0; i--) {
@@ -52,28 +55,16 @@ public final class ChunkUpdateManager {
             }
         }
 
-        Collections.sort(dirtyChunks);
-        _chunkUpdateAmount = dirtyChunks.size();
-        long timeStart = System.currentTimeMillis();
-
-
-        if (dirtyChunks.size() > 0) {
-            Chunk closestChunk = dirtyChunks.removeFirst();
+        if (!dirtyChunks.isEmpty()) {
+            Collections.sort(dirtyChunks);
+            Chunk closestChunk = dirtyChunks.getFirst();
             processChunkUpdate(closestChunk);
         }
 
+        _chunkUpdateAmount = dirtyChunks.size();
+
         _meanUpdateDuration += System.currentTimeMillis() - timeStart;
         _meanUpdateDuration /= 2;
-    }
-
-    /**
-     * TODO
-     */
-    public void updateDisplayLists() {
-        while (!_displayListUpdates.isEmpty()) {
-            Chunk c = _displayListUpdates.removeFirst();
-            c.generateVBOs();
-        }
     }
 
     /**
@@ -125,6 +116,16 @@ public final class ChunkUpdateManager {
                 c.generateMesh();
                 _displayListUpdates.add(c);
             }
+        }
+    }
+
+    /**
+     * TODO
+     */
+    public void updateDisplayLists() {
+        while (!_displayListUpdates.isEmpty()) {
+            Chunk c = _displayListUpdates.removeFirst();
+            c.generateVBOs();
         }
     }
 

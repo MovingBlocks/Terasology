@@ -145,7 +145,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     c.setBlock(x, y, z, (byte) 0x2);
                 }
 
-                generateLake(c, x, y, z, heightPercentage, type);
+                generateRiver(c, x, y, z, heightPercentage, type);
                 break;
 
             case SNOW:
@@ -161,7 +161,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     c.setBlock(x, y, z, (byte) 0x2);
                 }
 
-                generateLake(c, x, y, z, heightPercentage, type);
+                generateRiver(c, x, y, z, heightPercentage, type);
                 break;
 
             case DESERT:
@@ -177,7 +177,11 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    private void generateLake(Chunk c, int x, int y, int z, double heightPercentage, BIOME_TYPE type) {
+    private void generateRiver(Chunk c, int x, int y, int z, double heightPercentage, BIOME_TYPE type) {
+        // Rivers under water?
+        if (y < 30)
+            return;
+
         double lakeIntens = calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c));
 
         if (lakeIntens < 0.15 && heightPercentage < 0.02) {

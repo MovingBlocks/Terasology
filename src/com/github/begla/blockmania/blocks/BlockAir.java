@@ -15,9 +15,6 @@
  */
 package com.github.begla.blockmania.blocks;
 
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector4f;
-
 /**
  * An air block.
  *
@@ -36,16 +33,6 @@ public class BlockAir extends Block {
     }
 
     @Override
-    public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return null;
-    }
-
-    @Override
-    public Vector4f getColorOffsetFor(Block.SIDE side) {
-        return null;
-    }
-
-    @Override
     public boolean isPenetrable() {
         return true;
     }
@@ -56,7 +43,7 @@ public class BlockAir extends Block {
     }
 
     @Override
-    public boolean renderBoundingBox() {
+    public boolean shouldRenderBoundingBox() {
         return false;
     }
 }

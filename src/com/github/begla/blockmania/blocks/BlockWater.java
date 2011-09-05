@@ -54,7 +54,7 @@ public class BlockWater extends Block {
     }
 
     @Override
-    public boolean renderBoundingBox() {
+    public boolean shouldRenderBoundingBox() {
         return false;
     }
 

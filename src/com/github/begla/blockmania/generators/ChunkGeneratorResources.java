@@ -50,6 +50,17 @@ public class ChunkGeneratorResources extends ChunkGeneratorTerrain {
                         if (_rand.standNormalDistrDouble() < Configuration.PROB_GOLD) {
                             c.setBlock(x, y, z, (byte) 0x15);
                         }
+
+                        if (_rand.standNormalDistrDouble() < Configuration.PROB_DIAMOND) {
+                            c.setBlock(x, y, z, (byte) 35);
+                        }
+                        if (_rand.standNormalDistrDouble() < Configuration.PROB_REDSTONE) {
+                            c.setBlock(x, y, z, (byte) 33);
+                        }
+
+                        if (_rand.standNormalDistrDouble() < Configuration.PROB_SILVER) {
+                            c.setBlock(x, y, z, (byte) 34);
+                        }
                     }
                 }
             }

@@ -40,7 +40,6 @@ public class BlockCactus extends Block {
     public Vector2f getTextureOffsetFor(SIDE side) {
         if (side == Block.SIDE.LEFT || side == Block.SIDE.RIGHT || side == Block.SIDE.FRONT || side == Block.SIDE.BACK) {
             return Helper.calcOffsetForTextureAt(6, 4);
-
         }
 
         return Helper.calcOffsetForTextureAt(5, 4);

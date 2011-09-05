@@ -43,7 +43,7 @@ public final class Configuration {
     /**
      * The three dimensions of a chunk.
      */
-    public static final Vector3f CHUNK_DIMENSIONS = VectorPool.getVector(16, 128, 16);
+    public static final Vector3f CHUNK_DIMENSIONS = VectorPool.getVector(16, 256, 16);
     /**
      * The size of the sun.
      */
@@ -64,22 +64,19 @@ public final class Configuration {
      * If set to true, the game is rendered as a full screen application.
      */
     public static final boolean FULLSCREEN = false;
-    /**
-     * Maximum light value.
-     */
+
+    /* LIGHTING */
     public static final byte MAX_LIGHT = 15;
-    /* ------- */
     public static final float OCCLUSION_AMOUNT = 1f / 8f;
-    /**
-     *
-     */
+
+    /* RESOURCES */
     public static final float PROB_COAL = -2f;
-    /**
-     *
-     */
     public static final float PROB_GOLD = -3f;
+    public static final float PROB_SILVER = -2.5f;
+    public static final float PROB_REDSTONE = -3f;
+    public static final float PROB_DIAMOND = -4f;
 
-
+    /* -------- */
     private static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
 
@@ -131,6 +128,7 @@ public final class Configuration {
      * Loads the default values for the global settings.
      */
     private static void loadDefaults() {
+        _settingsBoolean.put("ROTATING_BLOCK", true);
         _settingsBoolean.put("REPLANT_DIRT", true);
         _settingsBoolean.put("PLACING_BOX", true);
         _settingsBoolean.put("CHUNK_OUTLINES", false);
@@ -160,7 +158,6 @@ public final class Configuration {
 
     private static void loadDemo() {
         _settingsBoolean.put("DEBUG", false);
-        _settingsBoolean.put("REPLANT_DIRT", false);
         _settingsBoolean.put("PLACING_BOX", false);
         _settingsBoolean.put("CROSSHAIR", false);
         _settingsBoolean.put("DEMO_FLIGHT", true);

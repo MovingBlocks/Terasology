@@ -9,7 +9,7 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class ChunkMesh extends RenderableObject {
+public class ChunkMesh {
 
     public class VertexElements {
         public VertexElements() {
@@ -26,6 +26,12 @@ public class ChunkMesh extends RenderableObject {
         public IntBuffer indices;
     }
 
+    private final int stride = (3 + 2 + 2 + 4) * 4;
+    private final int offsetVertex = 0;
+    private final int offsetTex0 = (3 * 4);
+    private final int offsetTex1 = ((2 + 3) * 4);
+    private final int offsetColor = ((2 + 3 + 2) * 4);
+    /* ------ */
     private final int[] _vertexBuffers = new int[3];
     private final int[] _idxBuffers = new int[3];
     private final int[] _idxBufferCount = new int[3];
@@ -47,7 +53,7 @@ public class ChunkMesh extends RenderableObject {
         if (_generated)
             return;
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < _vertexBuffers.length; i++)
             generateVBO(i);
 
         // IMPORTANT: Free unused memory!!
@@ -70,8 +76,6 @@ public class ChunkMesh extends RenderableObject {
         if (_vertexBuffers[id] == -1)
             return;
 
-        int stride = (3 + 2 + 2 + 4) * 4;
-
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
@@ -79,25 +83,17 @@ public class ChunkMesh extends RenderableObject {
         ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, _idxBuffers[id]);
         ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, _vertexBuffers[id]);
 
-        int offset = (0 * 4);
+        glVertexPointer(3, GL11.GL_FLOAT, stride, offsetVertex);
 
-        glVertexPointer(3, GL11.GL_FLOAT, stride, offset);
-
-        offset = (3 * 4);
         GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+        glTexCoordPointer(2, GL11.GL_FLOAT, stride, offsetTex0);
 
-        glTexCoordPointer(2, GL11.GL_FLOAT, stride, offset);
-
-        offset = ((2 + 3) * 4);
         GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+        glTexCoordPointer(2, GL11.GL_FLOAT, stride, offsetTex1);
 
-        glTexCoordPointer(2, GL11.GL_FLOAT, stride, offset);
+        glColorPointer(4, GL11.GL_FLOAT, stride, offsetColor);
 
-        offset = ((2 + 3 + 2) * 4);
-
-        glColorPointer(4, GL11.GL_FLOAT, stride, offset);
-
-        GL12.glDrawRangeElements(GL11.GL_QUADS, 0, _idxBufferCount[id], _idxBufferCount[id], GL_UNSIGNED_INT, 0);
+        GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, _idxBufferCount[id], _idxBufferCount[id], GL_UNSIGNED_INT, 0);
 
         glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -108,23 +104,12 @@ public class ChunkMesh extends RenderableObject {
         if (!translucent) {
             renderVbo(0);
         } else {
-            // Render two passes: The first one only writes to the depth buffer, the second one to the frame buffer
-            for (int i = 0; i < 2; i++) {
-                if (i == 0) {
-                    glColorMask(false, false, false, false);
-                } else {
-                    glColorMask(true, true, true, true);
-                }
-                glDisable(GL_CULL_FACE);
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDisable(GL_CULL_FACE);
 
-                // WATER
-                renderVbo(1);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-                glDisable(GL_BLEND);
-                glEnable(GL_CULL_FACE);
-            }
+            renderVbo(1);
 
             glEnable(GL_BLEND);
             glDisable(GL_CULL_FACE);
@@ -138,38 +123,20 @@ public class ChunkMesh extends RenderableObject {
         }
     }
 
-    @Override
-    public void render() {
-        render(false);
-        render(true);
-    }
-
-    @Override
-    public void update() {
-        // Do nothing.
-    }
-
     public boolean isGenerated() {
         return _generated;
     }
 
-    public void dispose() {
+    public void disposeMesh() {
         // Remove the old VBOs.
-        IntBuffer ib = BufferUtils.createIntBuffer(6);
-        ib.put(_vertexBuffers[0]);
-        ib.put(_vertexBuffers[1]);
-        ib.put(_vertexBuffers[2]);
-        ib.put(_idxBuffers[0]);
-        ib.put(_idxBuffers[1]);
-        ib.put(_idxBuffers[2]);
+        IntBuffer ib = BufferUtils.createIntBuffer(_vertexBuffers.length + _idxBuffers.length);
+        for (int i = 0; i < _vertexBuffers.length; i++) {
+            ib.put(_idxBuffers[i]);
+            ib.put(_vertexBuffers[i]);
+            _idxBuffers[i] = -1;
+            _vertexBuffers[i] = -1;
+        }
         ib.flip();
-
-        _vertexBuffers[0] = -1;
-        _vertexBuffers[1] = -1;
-        _vertexBuffers[2] = -1;
-        _idxBuffers[0] = -1;
-        _idxBuffers[1] = -1;
-        _idxBuffers[2] = -1;
 
         ARBVertexBufferObject.glDeleteBuffersARB(ib);
     }

@@ -13,48 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
 
 /**
- * A lava block (light source).
+ * A bookshelf block.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockLava extends Block {
+public class BlockBookShelf extends Block {
 
     @Override
-    public boolean isBlockTypeTranslucent() {
-        return false;
-    }
+    public Vector2f getTextureOffsetFor(SIDE side) {
+        if (side == SIDE.TOP || side == SIDE.BOTTOM) {
+            return Helper.calcOffsetForTextureAt(6,5);
+        }
 
-    @Override
-    public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.calcOffsetForTextureAt(15, 15);
-    }
-
-    @Override
-    public boolean isPenetrable() {
-        return true;
-    }
-
-    @Override
-    public boolean isCastingShadows() {
-        return false;
-    }
-
-    @Override
-    public boolean shouldRenderBoundingBox() {
-        return false;
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public byte getLuminance() {
-        return 8;
+        return Helper.calcOffsetForTextureAt(3, 2);
     }
 }

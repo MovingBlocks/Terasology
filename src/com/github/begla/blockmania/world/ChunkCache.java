@@ -97,7 +97,7 @@ public final class ChunkCache {
             }
 
             chunkToDelete.writeChunkToDisk();
-            chunkToDelete.dispose();
+            chunkToDelete.disposeChunk();
         }
     }
 

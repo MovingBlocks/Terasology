@@ -19,45 +19,16 @@ import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
 import com.github.begla.blockmania.rendering.VectorPool;
-import com.github.begla.blockmania.utilities.FastRandom;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
-
-import java.util.HashMap;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ChunkMeshGenerator {
 
-    private static final Vector3f[] _rayLut;
-    private static final FastRandom _rand = new FastRandom(32);
     private final Chunk _chunk;
-
-    static {
-        _rayLut = new Vector3f[16];
-
-        for (int i = 0; i < _rayLut.length; i++) {
-            _rayLut[i] = RandomDirection();
-        }
-    }
-
-    private static Vector3f RandomDirection() {
-        Vector3f result = new Vector3f();
-
-        while (true) {
-            result.x = (float) _rand.randomDouble();
-            result.y = (float) _rand.randomDouble();
-            result.z = (float) _rand.randomDouble();
-            if (result.x * result.x + result.y * result.y + result.z * result.z > 1) continue;
-
-            if (Vector3f.dot(result, new Vector3f(0, 1, 0)) < 0) continue;
-
-            result.normalise();
-            return result;
-        }
-    }
 
     /**
      *
@@ -81,8 +52,8 @@ public class ChunkMeshGenerator {
     public ChunkMesh generateMesh() {
         ChunkMesh mesh = new ChunkMesh();
 
-        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
+        for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
+            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
                     generateBlockVertices(mesh, x, y, z);
                     generateBillboardVertices(mesh, x, y, z);
@@ -100,41 +71,40 @@ public class ChunkMeshGenerator {
             mesh._vertexElements[j].vertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].quads.size() + mesh._vertexElements[j].tex.size() * 2 + mesh._vertexElements[j].color.size());
             mesh._vertexElements[j].indices = BufferUtils.createIntBuffer(mesh._vertexElements[j].quads.size());
 
-            HashMap<Vector3f, Integer> indexLut = new HashMap<Vector3f, Integer>(mesh._vertexElements[j].vertices.capacity());
+            int cTex = 0;
+            int cColor = 0;
+            int cIndex = 0;
+            for (int i = 0; i < mesh._vertexElements[j].quads.size(); i += 3, cTex += 2, cColor += 4) {
 
-            int tex = 0;
-            int color = 0;
-            int idxCounter = 0;
-            for (int i = 0; i < mesh._vertexElements[j].quads.size(); i += 3, tex += 2, color += 4) {
+                if (i % 4 == 0) {
+                    mesh._vertexElements[j].indices.put(cIndex + 0);
+                    mesh._vertexElements[j].indices.put(cIndex + 1);
+                    mesh._vertexElements[j].indices.put(cIndex + 2);
+
+                    mesh._vertexElements[j].indices.put(cIndex + 2);
+                    mesh._vertexElements[j].indices.put(cIndex + 3);
+                    mesh._vertexElements[j].indices.put(cIndex + 0);
+                    cIndex += 4;
+                }
 
                 Vector3f vertexPos = VectorPool.getVector(mesh._vertexElements[j].quads.get(i), mesh._vertexElements[j].quads.get(i + 1), mesh._vertexElements[j].quads.get(i + 2));
-
-                // Check if this vertex is a new one
-                Integer index = indexLut.get(vertexPos);
-                if (index != null) {
-                    mesh._vertexElements[j].indices.put(index);
-                    continue;
-                }
 
                 mesh._vertexElements[j].vertices.put(vertexPos.x);
                 mesh._vertexElements[j].vertices.put(vertexPos.y);
                 mesh._vertexElements[j].vertices.put(vertexPos.z);
 
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(tex));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(tex + 1));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
 
                 float occlusionValue = getOcclusionValue(vertexPos);
                 mesh._vertexElements[j].vertices.put(getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.SUN) * occlusionValue);
                 mesh._vertexElements[j].vertices.put(getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.BLOCK) * occlusionValue);
 
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(color));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(color + 1));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(color + 2));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(color + 3));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 1));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 2));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 3));
 
-                // Log this vertex
-                indexLut.put(vertexPos, idxCounter);
-                mesh._vertexElements[j].indices.put(idxCounter++);
             }
 
             mesh._vertexElements[j].vertices.flip();
@@ -192,7 +162,6 @@ public class ChunkMeshGenerator {
 
         return result;
     }
-
 
     /**
      * Generates the billboard vertices for a given local block position.
@@ -472,6 +441,7 @@ public class ChunkMeshGenerator {
         if (norm.x == 1.0f) {
             p1.y -= 0.25;
             p2.y -= 0.25;
+
             if (lowerBottom) {
                 p3.y -= 0.25;
                 p4.y -= 0.25;
@@ -576,8 +546,6 @@ public class ChunkMeshGenerator {
     /**
      * Returns true if the block side is adjacent to a translucent block or an air
      * block.
-     * <p/>
-     * NOTE: Air and leafs have to be handled separately. Otherwise the water surface would not be displayed due to the tessellation process.
      *
      * @param blockToCheck
      * @param currentBlock

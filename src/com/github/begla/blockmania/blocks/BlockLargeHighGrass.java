@@ -60,7 +60,7 @@ public class BlockLargeHighGrass extends Block {
     }
 
     @Override
-    public boolean renderBoundingBox() {
+    public boolean shouldRenderBoundingBox() {
         return false;
     }
 }

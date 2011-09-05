@@ -65,7 +65,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
                         if (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17) {
                             generateTree(c, randX, y, randZ);
                         } else if (c.getBlock(randX, y, randZ) == 0x7) {
-                            c.getParent().getGeneratorCactus().generate(c.getBlockWorldPosX(randX), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(randZ), false);
+                            c.getParent().getObjectGenerator("cactus").generate(c.getBlockWorldPosX(randX), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(randZ), false);
                         }
                     }
                 }
@@ -121,13 +121,13 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
         double r2 = _rand.standNormalDistrDouble();
         if (r2 > -2 && r2 < -1) {
             c.setBlock(x, y + 1, z, (byte) 0x0);
-            c.getParent().getGeneratorPineTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
+            c.getParent().getObjectGenerator("pineTree").generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
         } else if (r2 > 1 && r2 < 2) {
             c.setBlock(x, y + 1, z, (byte) 0x0);
-            c.getParent().getGeneratorFirTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
+            c.getParent().getObjectGenerator("firTree").generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
         } else {
             c.setBlock(x, y + 1, z, (byte) 0x0);
-            c.getParent().getGeneratorTree().generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
+            c.getParent().getObjectGenerator("tree").generate(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y) + 1, c.getBlockWorldPosZ(z), false);
         }
     }
 
