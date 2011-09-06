@@ -43,7 +43,7 @@ public final class Configuration {
     /**
      * The three dimensions of a chunk.
      */
-    public static final Vector3f CHUNK_DIMENSIONS = VectorPool.getVector(16, 256, 16);
+    public static final Vector3f CHUNK_DIMENSIONS = VectorPool.getVector(16, 128, 16);
     /**
      * The size of the sun.
      */

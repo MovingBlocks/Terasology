@@ -16,12 +16,16 @@
 package com.github.begla.blockmania.rendering;
 
 import com.github.begla.blockmania.Game;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.logging.Level;
 
@@ -139,11 +143,25 @@ public class ShaderManager {
     }
 
     private static void printLogInfo(int obj) {
-        String output = GL20.glGetShaderInfoLog(obj, 1024);
+        IntBuffer intBuffer = BufferUtils.createIntBuffer(1);
+        ARBShaderObjects.glGetObjectParameterARB(obj, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB, intBuffer);
 
-        if (output.length() > 0) {
-            Game.getInstance().getLogger().log(Level.INFO, "{0}", output);
+        int length = intBuffer.get();
+
+        if (length <= 1) {
+            return;
         }
+
+        ByteBuffer infoBuffer = ByteBuffer.allocateDirect(length);
+        intBuffer.flip();
+
+        GL20.glGetShaderInfoLog(obj, intBuffer, infoBuffer);
+
+        int actualLength = intBuffer.get();
+        byte[] infoBytes = new byte[actualLength];
+        infoBuffer.get(infoBytes);
+
+        Game.getInstance().getLogger().log(Level.INFO, "{0}", new String(infoBytes));
     }
 
     /**
