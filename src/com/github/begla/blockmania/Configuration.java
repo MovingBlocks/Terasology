@@ -43,7 +43,7 @@ public final class Configuration {
     /**
      * The three dimensions of a chunk.
      */
-    public static final Vector3f CHUNK_DIMENSIONS = VectorPool.getVector(16, 128, 16);
+    public static final Vector3f CHUNK_DIMENSIONS;
     /**
      * The size of the sun.
      */
@@ -81,6 +81,12 @@ public final class Configuration {
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
 
     static {
+        if (Game.getInstance().isSandboxed()) {
+            CHUNK_DIMENSIONS = VectorPool.getVector(16, 128, 16);
+        } else {
+            CHUNK_DIMENSIONS = VectorPool.getVector(16, 256, 16);
+        }
+
         loadSettings();
     }
 
@@ -151,8 +157,8 @@ public final class Configuration {
     private static void loadDebug() {
         _settingsBoolean.put("DEBUG", true);
         _settingsBoolean.put("GOD_MODE", true);
-        _settingsNumeric.put("V_DIST_X", 40f);
-        _settingsNumeric.put("V_DIST_Z", 40f);
+        _settingsNumeric.put("V_DIST_X", 32f);
+        _settingsNumeric.put("V_DIST_Z", 32f);
         _settingsNumeric.put("RUNNING_FACTOR", 12.0f);
     }
 
@@ -162,14 +168,15 @@ public final class Configuration {
         _settingsBoolean.put("CROSSHAIR", false);
         _settingsBoolean.put("DEMO_FLIGHT", true);
         _settingsBoolean.put("GOD_MODE", true);
-        _settingsNumeric.put("V_DIST_X", 40f);
-        _settingsNumeric.put("V_DIST_Z", 40f);
+        _settingsNumeric.put("V_DIST_X", 32f);
+        _settingsNumeric.put("V_DIST_Z", 32f);
     }
 
-    /**
-     * Loads the saved settings.
-     * TODO: Should not always load the default settings.
-     */
+    public static void loadApplet() {
+        _settingsNumeric.put("V_DIST_X", 16f);
+        _settingsNumeric.put("V_DIST_Z", 16f);
+    }
+
     private static void loadSettings() {
         loadDefaults();
 
@@ -179,6 +186,8 @@ public final class Configuration {
             } else if (Boolean.getBoolean("blockmania.debugMode")) {
                 loadDebug();
             }
+        } else {
+            loadApplet();
         }
     }
 }
