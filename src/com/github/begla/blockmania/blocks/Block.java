@@ -76,8 +76,8 @@ public abstract class Block {
             new BlockBookShelf(), new BlockColorBlack(), new BlockColorBlue(), new BlockColorBrown(), new BlockColorGreen(), // 25-29
             new BlockColorPurple(), new BlockColorRed(), new BlockColorWhite(), new BlockRedStone(), new BlockSilver(), new BlockDiamond() // 30-35
     };
-    private static final BlockNil nilBlock = new BlockNil();
-    private static Vector4f colorOffset = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    private static final BlockNil NIL_BLOCK = new BlockNil();
+    private static Vector4f _colorOffset = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     /**
      * Returns the object for the given block type ID.
@@ -87,7 +87,7 @@ public abstract class Block {
      */
     public static Block getBlockForType(byte type) {
         if (type < 0 || type >= _blocks.length) {
-            return nilBlock;
+            return NIL_BLOCK;
         }
 
         return _blocks[type];
@@ -119,7 +119,7 @@ public abstract class Block {
      * @return The color offset
      */
     public Vector4f getColorOffsetFor(SIDE side) {
-        return colorOffset;
+        return _colorOffset;
     }
 
     /**

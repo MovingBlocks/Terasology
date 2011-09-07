@@ -59,7 +59,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private boolean _fresh = true;
     private boolean _cached = false;
     /* ------ */
-    private int _chunkID = -1;
+    private int _chunkId = -1;
     /* ------ */
     private ChunkMesh _activeMesh;
     private ChunkMesh _newMesh;
@@ -103,7 +103,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public Chunk(World p, Vector3f position, FastList<ChunkGenerator> g) {
         this._position = position;
         // Set the chunk ID
-        _chunkID = MathHelper.cantorize((int) _position.x, (int) _position.z);
+        _chunkId = MathHelper.cantorize((int) _position.x, (int) _position.z);
 
         _parent = p;
         _blocks = new BlockmaniaArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
@@ -853,7 +853,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     public int getChunkId() {
-        return _chunkID;
+        return _chunkId;
     }
 
     public void setCached(boolean b) {

@@ -25,14 +25,14 @@ import com.github.begla.blockmania.utilities.MathHelper;
  */
 public class PerlinNoise {
 
-    private final int[] noisePerm;
+    private final int[] _noisePermutations;
 
     /**
      * @param seed
      */
     public PerlinNoise(int seed) {
         FastRandom rand = new FastRandom(seed);
-        noisePerm = new int[512];
+        _noisePermutations = new int[512];
 
         for (int i = 0; i < 256; i++) {
             int r = rand.randomInt();
@@ -40,7 +40,7 @@ public class PerlinNoise {
             if (r < 0)
                 r *= -1;
 
-            noisePerm[i] = noisePerm[i + 256] = r % 256;
+            _noisePermutations[i] = _noisePermutations[i + 256] = r % 256;
         }
     }
 
@@ -58,17 +58,17 @@ public class PerlinNoise {
         z -= MathHelper.fastFloor(z);
 
         double u = fade(x), v = fade(y), w = fade(z);
-        int A = noisePerm[X % 255] + Y, AA = noisePerm[A % 255] + Z, AB = noisePerm[(A + 1) % 255] + Z,
-                B = noisePerm[(X + 1) % 255] + Y, BA = noisePerm[B % 255] + Z, BB = noisePerm[(B + 1) % 255] + Z;
+        int A = _noisePermutations[X % 255] + Y, AA = _noisePermutations[A % 255] + Z, AB = _noisePermutations[(A + 1) % 255] + Z,
+                B = _noisePermutations[(X + 1) % 255] + Y, BA = _noisePermutations[B % 255] + Z, BB = _noisePermutations[(B + 1) % 255] + Z;
 
-        return lerp(w, lerp(v, lerp(u, grad(noisePerm[AA % 255], x, y, z),
-                grad(noisePerm[BA % 255], x - 1, y, z)),
-                lerp(u, grad(noisePerm[AB % 255], x, y - 1, z),
-                        grad(noisePerm[BB % 255], x - 1, y - 1, z))),
-                lerp(v, lerp(u, grad(noisePerm[(AA + 1) % 255], x, y, z - 1),
-                        grad(noisePerm[(BA + 1) % 255], x - 1, y, z - 1)),
-                        lerp(u, grad(noisePerm[(AB + 1) % 255], x, y - 1, z - 1),
-                                grad(noisePerm[(BB + 1) % 255], x - 1, y - 1, z - 1))));
+        return lerp(w, lerp(v, lerp(u, grad(_noisePermutations[AA % 255], x, y, z),
+                grad(_noisePermutations[BA % 255], x - 1, y, z)),
+                lerp(u, grad(_noisePermutations[AB % 255], x, y - 1, z),
+                        grad(_noisePermutations[BB % 255], x - 1, y - 1, z))),
+                lerp(v, lerp(u, grad(_noisePermutations[(AA + 1) % 255], x, y, z - 1),
+                        grad(_noisePermutations[(BA + 1) % 255], x - 1, y, z - 1)),
+                        lerp(u, grad(_noisePermutations[(AB + 1) % 255], x, y - 1, z - 1),
+                                grad(_noisePermutations[(BB + 1) % 255], x - 1, y - 1, z - 1))));
     }
 
     /**

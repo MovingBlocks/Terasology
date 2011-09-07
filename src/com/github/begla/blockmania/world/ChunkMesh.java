@@ -26,12 +26,14 @@ public class ChunkMesh {
         public IntBuffer indices;
     }
 
-    private final int stride = (3 + 2 + 2 + 4) * 4;
-    private final int offsetVertex = 0;
-    private final int offsetTex0 = (3 * 4);
-    private final int offsetTex1 = ((2 + 3) * 4);
-    private final int offsetColor = ((2 + 3 + 2) * 4);
+    private static final int STRIDE = (3 + 2 + 2 + 4) * 4;
+    private static final int OFFSET_VERTEX = 0;
+    private static final int OFFSET_TEX_0 = (3 * 4);
+    private static final int OFFSET_TEX_1 = ((2 + 3) * 4);
+    private static final int OFFSET_COLOR = ((2 + 3 + 2) * 4);
+
     /* ------ */
+
     private final int[] _vertexBuffers = new int[3];
     private final int[] _idxBuffers = new int[3];
     private final int[] _idxBufferCount = new int[3];
@@ -83,15 +85,15 @@ public class ChunkMesh {
         ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, _idxBuffers[id]);
         ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, _vertexBuffers[id]);
 
-        glVertexPointer(3, GL11.GL_FLOAT, stride, offsetVertex);
+        glVertexPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
 
         GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-        glTexCoordPointer(2, GL11.GL_FLOAT, stride, offsetTex0);
+        glTexCoordPointer(2, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
 
         GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-        glTexCoordPointer(2, GL11.GL_FLOAT, stride, offsetTex1);
+        glTexCoordPointer(2, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);
 
-        glColorPointer(4, GL11.GL_FLOAT, stride, offsetColor);
+        glColorPointer(4, GL11.GL_FLOAT, STRIDE, OFFSET_COLOR);
 
         GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, _idxBufferCount[id], _idxBufferCount[id], GL_UNSIGNED_INT, 0);
 

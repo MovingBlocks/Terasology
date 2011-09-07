@@ -22,7 +22,7 @@ package com.github.begla.blockmania.utilities;
  */
 public class FastRandom {
 
-    private long seed = System.currentTimeMillis();
+    private long _seed = System.currentTimeMillis();
 
     /**
      * Initializes a new instance of the random number generator using
@@ -31,7 +31,7 @@ public class FastRandom {
      * @param seed The seed to use
      */
     public FastRandom(long seed) {
-        this.seed = seed;
+        this._seed = seed;
     }
 
     /**
@@ -47,10 +47,10 @@ public class FastRandom {
      * @return Random value
      */
     long randomLong() {
-        seed ^= (seed << 21);
-        seed ^= (seed >>> 35);
-        seed ^= (seed << 4);
-        return seed;
+        _seed ^= (_seed << 21);
+        _seed ^= (_seed >>> 35);
+        _seed ^= (_seed << 4);
+        return _seed;
     }
 
     /**
