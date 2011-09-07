@@ -477,7 +477,7 @@ public final class Player extends RenderableObject {
                     direction.x -= origin.x;
                     direction.z -= origin.z;
                     // Calculate the intensity of the diversion alongside the block
-                    float length = Vector3f.dot(slideVector, direction) * 2;
+                    float length = Vector3f.dot(slideVector, direction);
                     _position.z = origin.z + length * slideVector.z;
                     _position.x = origin.x + length * slideVector.x;
 
@@ -499,7 +499,7 @@ public final class Player extends RenderableObject {
         oldPosition.set(_position);
 
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-            _position.z += 0.1;
+            _position.z += Configuration.getSettingNumeric("WALKING_SPEED");
 
             int maxHeight = _parent.maxHeightAt((int) _position.x, (int) _position.z + 8) + 16;
 
@@ -592,8 +592,6 @@ public final class Player extends RenderableObject {
         if (!Configuration.getSettingBoolean("GOD_MODE")) {
             if (horizontalHitTest(oldPosition)) {
                 // Do something while the player is colliding
-                _acc.x = 0;
-                _acc.z = 0;
             }
         }
 

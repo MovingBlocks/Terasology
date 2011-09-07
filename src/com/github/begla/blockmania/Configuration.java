@@ -151,7 +151,7 @@ public final class Configuration {
         _settingsNumeric.put("WALKING_SPEED", 0.03f);
         _settingsNumeric.put("RUNNING_FACTOR", 1.8f);
         _settingsNumeric.put("GRAVITY", 0.0075f);
-        _settingsNumeric.put("FRICTION", 0.1f);
+        _settingsNumeric.put("FRICTION", 0.08f);
         _settingsNumeric.put("V_DIST_X", 32f);
         _settingsNumeric.put("V_DIST_Z", 32f);
         _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);
