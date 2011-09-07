@@ -282,7 +282,7 @@ public final class Game {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(78.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 1024f);
+        gluPerspective(80.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 1024f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);

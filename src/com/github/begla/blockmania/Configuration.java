@@ -65,6 +65,9 @@ public final class Configuration {
      */
     public static final boolean FULLSCREEN = false;
 
+    /* PLAYER */
+    public static final float BOBBING_ANGLE = 2.5f;
+
     /* LIGHTING */
     public static final byte MAX_LIGHT = 15;
     public static final float OCCLUSION_AMOUNT = 1f / 8f;
@@ -143,12 +146,12 @@ public final class Configuration {
         _settingsBoolean.put("BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);
-        _settingsNumeric.put("JUMP_INTENSITY", 0.14f);
+        _settingsNumeric.put("JUMP_INTENSITY", 0.145f);
         _settingsNumeric.put("MAX_GRAVITY", 0.7f);
-        _settingsNumeric.put("WALKING_SPEED", 0.0175f);
-        _settingsNumeric.put("RUNNING_FACTOR", 1.4f);
+        _settingsNumeric.put("WALKING_SPEED", 0.03f);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.8f);
         _settingsNumeric.put("GRAVITY", 0.0075f);
-        _settingsNumeric.put("FRICTION", 0.1f);
+        _settingsNumeric.put("FRICTION", 0.08f);
         _settingsNumeric.put("V_DIST_X", 32f);
         _settingsNumeric.put("V_DIST_Z", 32f);
         _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);

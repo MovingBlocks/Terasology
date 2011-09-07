@@ -91,17 +91,12 @@ public final class Player extends RenderableObject {
 
         if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
 
-            float bobbing1 = 0.0f;
-            float bobbing2 = 0.0f;
-
             if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
-                bobbing1 = (float) ((_pGen.noise(_position.x * 0.4f, _position.z * 0.4f, 0f) + 1f) / 2f) * 0.2f;
-                bobbing2 = (float) (_pGen.noise(_position.x * 0.4f, 0f, 0f)) * 0.05f;
+                float bobbing = (float) (_pGen.noise(_position.x * 0.5f, 0f, _position.z * 0.5f));
+                glRotatef(bobbing * Configuration.BOBBING_ANGLE, 0, 0, 1);
             }
 
-            glRotatef(bobbing2 * 32f, 0, 0, 1);
-
-            float newPosY = _position.y + getAABB().getDimensions().y / 1.2f + bobbing1;
+            float newPosY = _position.y + getAABB().getDimensions().y;
             GLU.gluLookAt(_position.x, newPosY, _position.z, _position.x + _viewingDirection.x, newPosY + _viewingDirection.y, _position.z + _viewingDirection.z, 0, 1, 0);
 
 
@@ -504,7 +499,7 @@ public final class Player extends RenderableObject {
         oldPosition.set(_position);
 
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-            _position.z += 0.1;
+            _position.z += Configuration.getSettingNumeric("WALKING_SPEED");
 
             int maxHeight = _parent.maxHeightAt((int) _position.x, (int) _position.z + 8) + 16;
 
@@ -597,8 +592,6 @@ public final class Player extends RenderableObject {
         if (!Configuration.getSettingBoolean("GOD_MODE")) {
             if (horizontalHitTest(oldPosition)) {
                 // Do something while the player is colliding
-                _acc.x = 0;
-                _acc.z = 0;
             }
         }
 
@@ -663,7 +656,7 @@ public final class Player extends RenderableObject {
      * @return The AABB
      */
     AABB getAABB() {
-        return new AABB(_position, VectorPool.getVector(.3f, 0.7f, .3f));
+        return new AABB(_position, VectorPool.getVector(.3f, 0.8f, .3f));
     }
 
     public ViewFrustum getViewFrustum() {
