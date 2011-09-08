@@ -29,6 +29,10 @@ import org.lwjgl.util.vector.Vector3f;
 public final class Configuration {
 
     /**
+     * Maximum amount frames to skip.
+     */
+    public static final int FRAME_SKIP_MAX_FRAMES = 5;
+    /**
      * The initial time for new worlds.
      */
     public static final float INITIAL_TIME = 0.096f;
@@ -87,7 +91,7 @@ public final class Configuration {
         if (Game.getInstance().isSandboxed()) {
             CHUNK_DIMENSIONS = VectorPool.getVector(16, 128, 16);
         } else {
-            CHUNK_DIMENSIONS = VectorPool.getVector(16, 256, 16);
+            CHUNK_DIMENSIONS = VectorPool.getVector(16, 128, 16);
         }
 
         loadSettings();
@@ -141,16 +145,17 @@ public final class Configuration {
         _settingsBoolean.put("REPLANT_DIRT", true);
         _settingsBoolean.put("PLACING_BOX", true);
         _settingsBoolean.put("CHUNK_OUTLINES", false);
-        _settingsBoolean.put("DEBUG", true);
+        _settingsBoolean.put("DEBUG", false);
+        _settingsBoolean.put("DEBUG_COLLISION", false);
         _settingsBoolean.put("CROSSHAIR", true);
         _settingsBoolean.put("BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);
-        _settingsNumeric.put("JUMP_INTENSITY", 0.145f);
+        _settingsNumeric.put("JUMP_INTENSITY", 0.08f);
         _settingsNumeric.put("MAX_GRAVITY", 0.7f);
-        _settingsNumeric.put("WALKING_SPEED", 0.03f);
+        _settingsNumeric.put("WALKING_SPEED", 0.02f);
         _settingsNumeric.put("RUNNING_FACTOR", 1.8f);
-        _settingsNumeric.put("GRAVITY", 0.0075f);
+        _settingsNumeric.put("GRAVITY", 0.002f);
         _settingsNumeric.put("FRICTION", 0.08f);
         _settingsNumeric.put("V_DIST_X", 32f);
         _settingsNumeric.put("V_DIST_Z", 32f);
@@ -159,10 +164,11 @@ public final class Configuration {
 
     private static void loadDebug() {
         _settingsBoolean.put("DEBUG", true);
-        _settingsBoolean.put("GOD_MODE", true);
+        _settingsBoolean.put("DEBUG_COLLISION", true);
+        _settingsBoolean.put("GOD_MODE", false);
         _settingsNumeric.put("V_DIST_X", 32f);
         _settingsNumeric.put("V_DIST_Z", 32f);
-        _settingsNumeric.put("RUNNING_FACTOR", 12.0f);
+        //_settingsNumeric.put("RUNNING_FACTOR", 12.0f);
     }
 
     private static void loadDemo() {
@@ -175,7 +181,7 @@ public final class Configuration {
         _settingsNumeric.put("V_DIST_Z", 32f);
     }
 
-    public static void loadApplet() {
+    public static void loadSanboxed() {
         _settingsNumeric.put("V_DIST_X", 16f);
         _settingsNumeric.put("V_DIST_Z", 16f);
     }
@@ -190,7 +196,7 @@ public final class Configuration {
                 loadDebug();
             }
         } else {
-            loadApplet();
+            loadSanboxed();
         }
     }
 }

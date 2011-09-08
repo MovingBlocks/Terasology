@@ -25,6 +25,10 @@ public class VectorPool {
 
     private static final FastList<Vector3f> _pool = new FastList<Vector3f>(512);
 
+    public static Vector3f getVector(Vector3f v) {
+        return getVector(v.x, v.y, v.z);
+    }
+
     /**
      * @param x
      * @param y

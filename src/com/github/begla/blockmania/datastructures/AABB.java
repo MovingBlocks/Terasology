@@ -16,8 +16,8 @@
 package com.github.begla.blockmania.datastructures;
 
 import com.github.begla.blockmania.rendering.VectorPool;
-import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.RenderableObject;
+import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -28,40 +28,129 @@ import static org.lwjgl.opengl.GL11.*;
 public class AABB extends RenderableObject {
 
     private final Vector3f _dimensions;
+    private Vector3f[] _vertices;
 
-    /**
-     * @param position
-     * @param dimensions
-     */
     public AABB(Vector3f position, Vector3f dimensions) {
         this._position = position;
         this._dimensions = dimensions;
     }
 
-    /**
-     * @param aabb2
-     * @return
-     */
-    public boolean overlaps(AABB aabb2) {
-        Vector3f t = Vector3f.sub(aabb2.getPosition(), getPosition(), null);
-        return MathHelper.fastAbs(t.x) <= (getDimensions().x + aabb2.getDimensions().x) && MathHelper.fastAbs(t.y) <= (getDimensions().y + aabb2.getDimensions().y) && MathHelper.fastAbs(t.z) <= (getDimensions().z + aabb2.getDimensions().z);
+    public double minX() {
+        return (_position.x - _dimensions.x);
     }
 
-    /**
-     * @return
-     */
+    public double minY() {
+        return (_position.y - _dimensions.y);
+    }
+
+    public double minZ() {
+        return (_position.z - _dimensions.z);
+    }
+
+    public double maxX() {
+        return (_position.x + _dimensions.x);
+    }
+
+    public double maxY() {
+        return (_position.y + _dimensions.y);
+    }
+
+    public double maxZ() {
+        return (_position.z + _dimensions.z);
+    }
+
+    public boolean overlaps(AABB aabb2) {
+        if (maxX() < aabb2.minX() || minX() > aabb2.maxX()) return false;
+        if (maxY() < aabb2.minY() || minY() > aabb2.maxY()) return false;
+        if (maxZ() < aabb2.minZ() || minZ() > aabb2.maxZ()) return false;
+        return true;
+    }
+
     public Vector3f getDimensions() {
         return _dimensions;
     }
 
+    public Vector3f closestPointOnAABBToPoint(Vector3f p) {
+        Vector3f r = VectorPool.getVector(p);
+
+        if (p.x < minX()) r.x = (float) minX();
+        if (p.x > maxX()) r.x = (float) maxX();
+        if (p.y < minY()) r.y = (float) minY();
+        if (p.y > maxY()) r.y = (float) maxY();
+        if (p.z < minZ()) r.z = (float) minZ();
+        if (p.z > maxZ()) r.z = (float) maxZ();
+
+        return r;
+    }
+
+    public Vector3f normalForPlaneClosestToOrigin(Vector3f pointOnAABB, Vector3f origin, boolean testX, boolean testY, boolean testZ) {
+        FastList<Vector3f> normals = new FastList();
+
+        if (pointOnAABB.z == minZ() && testZ) normals.add(VectorPool.getVector(0, 0, -1));
+        if (pointOnAABB.z == maxZ() && testZ) normals.add(VectorPool.getVector(0, 0, 1));
+        if (pointOnAABB.x == minX() && testX) normals.add(VectorPool.getVector(-1, 0, 0));
+        if (pointOnAABB.x == maxX() && testX) normals.add(VectorPool.getVector(1, 0, 0));
+        if (pointOnAABB.y == minY() && testY) normals.add(VectorPool.getVector(0, -1, 0));
+        if (pointOnAABB.y == maxY() && testY) normals.add(VectorPool.getVector(0, 1, 0));
+
+        float minDistance = Float.MAX_VALUE;
+        Vector3f closestNormal = VectorPool.getVector();
+
+        for (Vector3f v : normals) {
+            float distance = Vector3f.sub(centerPointForNormal(v),origin,null).length();
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestNormal = v;
+            }
+        }
+
+        return closestNormal;
+    }
+
+    public Vector3f centerPointForNormal(Vector3f normal) {
+        if (normal.x == 1 && normal.y == 0 && normal.z == 0)
+            return VectorPool.getVector(_position.x + _dimensions.x, _position.y, _position.z);
+        if (normal.x == -1 && normal.y == 0 && normal.z == 0)
+            return VectorPool.getVector(_position.x - _dimensions.x, _position.y, _position.z);
+        if (normal.x == 0 && normal.y == 0 && normal.z == 1)
+            return VectorPool.getVector(_position.x, _position.y, _position.z + _dimensions.z);
+        if (normal.x == 0 && normal.y == 0 && normal.z == -1)
+            return VectorPool.getVector(_position.x, _position.y, _position.z - _dimensions.z);
+        if (normal.x == 0 && normal.y == 1 && normal.z == 0)
+            return VectorPool.getVector(_position.x, _position.y + _dimensions.y, _position.z);
+        if (normal.x == 0 && normal.y == -1 && normal.z == 0)
+            return VectorPool.getVector(_position.x, _position.y - _dimensions.y, _position.z);
+
+        return VectorPool.getVector();
+    }
+
+    public Vector3f[] getVertices() {
+
+        if (_vertices == null) {
+            _vertices = new Vector3f[8];
+
+            _vertices[0] = VectorPool.getVector((float) minX(), (float) minY(), (float) maxZ());
+            _vertices[1] = VectorPool.getVector((float) maxX(), (float) minY(), (float) maxZ());
+            _vertices[2] = VectorPool.getVector((float) maxX(), (float) maxY(), (float) maxZ());
+            _vertices[3] = VectorPool.getVector((float) minX(), (float) maxY(), (float) maxZ());
+            _vertices[4] = VectorPool.getVector((float) minX(), (float) minY(), (float) minZ());
+            _vertices[5] = VectorPool.getVector((float) maxX(), (float) minY(), (float) minZ());
+            _vertices[6] = VectorPool.getVector((float) maxX(), (float) maxY(), (float) minZ());
+            _vertices[7] = VectorPool.getVector((float) minX(), (float) maxY(), (float) minZ());
+        }
+
+        return _vertices;
+    }
+
     @Override
     public void render() {
-        float offset = 0.001f;
+        float offset = 0.005f;
 
         glPushMatrix();
         glTranslatef(_position.x, _position.y, _position.z);
 
-        glLineWidth(2f);
+        glLineWidth(6f);
         glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 
         // FRONT
@@ -117,75 +206,5 @@ public class AABB extends RenderableObject {
     @Override
     public void update() {
         // Do nothing. Really.
-    }
-
-    /**
-     * @param point
-     * @return
-     */
-    public Vector3f closestNormalToPoint(Vector3f point) {
-
-        Vector3f[] sides = new Vector3f[6];
-
-        // Calculate the center points of each of the six sides
-        // Top side
-        sides[0] = VectorPool.getVector(_position.x, _position.y + _dimensions.y, _position.z);
-        // Left side
-        sides[1] = VectorPool.getVector(_position.x - _dimensions.x, _position.y, _position.z);
-        // Right side
-        sides[2] = VectorPool.getVector(_position.x + _dimensions.x, _position.y, _position.z);
-        // Bottom side
-        sides[3] = VectorPool.getVector(_position.x, _position.y - _dimensions.y, _position.z);
-        // Front side
-        sides[4] = VectorPool.getVector(_position.x, _position.y, _position.z + _dimensions.z);
-        // Back side
-        sides[5] = VectorPool.getVector(_position.x, _position.y, _position.z - _dimensions.z);
-
-        int closestSideIndex = -1;
-        float closestSideDistance = Integer.MAX_VALUE;
-
-        // Calculate the distance of each center point to the given point
-        for (int i = sides.length - 1; i >= 0; i--) {
-            Vector3f sideToPoint = Vector3f.sub(point, sides[i], null);
-            float distance = sideToPoint.length();
-
-            if (distance < closestSideDistance) {
-                closestSideDistance = distance;
-                closestSideIndex = i;
-            }
-        }
-
-        switch (closestSideIndex) {
-            case 0:
-                return VectorPool.getVector(0, 1, 0);
-            case 1:
-                return VectorPool.getVector(1, 0, 0);
-            case 2:
-                return VectorPool.getVector(-1, 0, 0);
-            case 3:
-                return VectorPool.getVector(0, -1, 0);
-            case 4:
-                return VectorPool.getVector(0, 0, 1);
-            case 5:
-                return VectorPool.getVector(0, 0, -1);
-        }
-
-        return VectorPool.getVector();
-    }
-
-    public Vector3f[] getVertices() {
-
-        Vector3f[] result = new Vector3f[8];
-
-        result[0] = VectorPool.getVector(_position.x + _dimensions.x, _position.y - _dimensions.y, _position.z + _dimensions.z);
-        result[1] = VectorPool.getVector(_position.x + _dimensions.x, _position.y + _dimensions.y, _position.z + _dimensions.z);
-        result[2] = VectorPool.getVector(_position.x - _dimensions.x, _position.y + _dimensions.y, _position.z + _dimensions.z);
-        result[3] = VectorPool.getVector(_position.x - _dimensions.x, _position.y - _dimensions.y, _position.z + _dimensions.z);
-        result[4] = VectorPool.getVector(_position.x + _dimensions.x, _position.y - _dimensions.y, _position.z - _dimensions.z);
-        result[5] = VectorPool.getVector(_position.x + _dimensions.x, _position.y + _dimensions.y, _position.z - _dimensions.z);
-        result[6] = VectorPool.getVector(_position.x - _dimensions.x, _position.y + _dimensions.y, _position.z - _dimensions.z);
-        result[7] = VectorPool.getVector(_position.x - _dimensions.x, _position.y - _dimensions.y, _position.z - _dimensions.z);
-
-        return result;
     }
 }

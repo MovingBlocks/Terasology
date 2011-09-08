@@ -411,6 +411,16 @@ public final class World extends RenderableObject {
 
         _chunkUpdateManager.updateDisplayLists();
 
+        updateClouds();
+
+        for (Chunk c : _visibleChunks) {
+            c.update();
+        }
+
+        _chunkCache.freeCache();
+    }
+
+    private void updateClouds() {
         // Move the clouds a bit each update
         _cloudOffset.x += _windDirection.x;
         _cloudOffset.y += _windDirection.y;
@@ -422,17 +432,11 @@ public final class World extends RenderableObject {
         }
 
         if (Game.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
-            _windDirection.x = (float) _rand.randomDouble();
-            _windDirection.y = (float) _rand.randomDouble();
+            _windDirection.x = (float) _rand.randomDouble() / 8;
+            _windDirection.y = (float) _rand.randomDouble() / 8;
             _nextWindUpdateInSeconds = (short) (MathHelper.fastAbs(_rand.randomInt()) % 16 + 32);
             _lastWindUpdate = Game.getInstance().getTime();
         }
-
-        for (Chunk c : _visibleChunks) {
-            c.update();
-        }
-
-        _chunkCache.freeCache();
     }
 
     /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package com.github.begla.blockmania.player;
+package com.github.begla.blockmania.datastructures;
 
 import com.github.begla.blockmania.rendering.VectorPool;
 import org.lwjgl.util.vector.Vector3f;
@@ -58,7 +58,7 @@ public final class BlockPosition implements Comparable<BlockPosition> {
      * @return
      */
     float getDistance() {
-        return VectorPool.getVector((float) x - _origin.x, (float) y - _origin.y, (float) z - _origin.z).lengthSquared();
+        return VectorPool.getVector((float) x - _origin.x, (float) y - _origin.y, (float) z - _origin.z).length();
     }
 
     /**
@@ -66,6 +66,15 @@ public final class BlockPosition implements Comparable<BlockPosition> {
      * @return
      */
     public int compareTo(BlockPosition o) {
-        return new Float(getDistance()).compareTo(o.getDistance());
+        float distance = getDistance();
+        float oDistance = o.getDistance();
+
+        if (oDistance > distance)
+            return -1;
+
+        if (oDistance < distance)
+            return 1;
+
+        return 0;
     }
 }
