@@ -648,26 +648,38 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param z Local block position on the z-axis
      */
     void markNeighborsDirty(int x, int z) {
-        if (x < 0 || z < 0) {
-            return;
-        }
-
         Chunk[] neighbors = loadOrCreateNeighbors();
 
         if (x == 0 && neighbors[1] != null) {
-            neighbors[1]._dirty = true;
+            neighbors[1].setDirty(true);
         }
 
         if (x == Configuration.CHUNK_DIMENSIONS.x - 1 && neighbors[0] != null) {
-            neighbors[0]._dirty = true;
+            neighbors[0].setDirty(true);
         }
 
         if (z == 0 && neighbors[3] != null) {
-            neighbors[3]._dirty = true;
+            neighbors[3].setDirty(true);
         }
 
         if (z == Configuration.CHUNK_DIMENSIONS.z - 1 && neighbors[2] != null) {
-            neighbors[2]._dirty = true;
+            neighbors[2].setDirty(true);
+        }
+
+        if (x == Configuration.CHUNK_DIMENSIONS.x - 1 && z == 0 && neighbors[7] != null) {
+            neighbors[7].setDirty(true);
+        }
+
+        if (x == 0 && z == Configuration.CHUNK_DIMENSIONS.z - 1 && neighbors[6] != null) {
+            neighbors[6].setDirty(true);
+        }
+
+        if (x == 0 && z == 0 && neighbors[5] != null) {
+            neighbors[5].setDirty(true);
+        }
+
+        if (x == Configuration.CHUNK_DIMENSIONS.x - 1 && z == Configuration.CHUNK_DIMENSIONS.z - 1 && neighbors[4] != null) {
+            neighbors[4].setDirty(true);
         }
     }
 

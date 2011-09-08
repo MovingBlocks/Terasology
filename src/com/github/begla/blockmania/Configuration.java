@@ -163,8 +163,9 @@ public final class Configuration {
     }
 
     private static void loadDebug() {
+        _settingsBoolean.put("CHUNK_OUTLINES", true);
         _settingsBoolean.put("DEBUG", true);
-        _settingsBoolean.put("DEBUG_COLLISION", true);
+        _settingsBoolean.put("DEBUG_COLLISION", false);
         _settingsBoolean.put("GOD_MODE", false);
         _settingsNumeric.put("V_DIST_X", 32f);
         _settingsNumeric.put("V_DIST_Z", 32f);
