@@ -17,6 +17,7 @@
 package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.datastructures.RayBoxIntersection;
 import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;

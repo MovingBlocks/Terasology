@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package com.github.begla.blockmania.player;
+package com.github.begla.blockmania.datastructures;
 
 import com.github.begla.blockmania.rendering.VectorPool;
 import org.lwjgl.util.vector.Vector3f;

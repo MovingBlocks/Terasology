@@ -20,6 +20,7 @@ import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.datastructures.RayBoxIntersection;
 import com.github.begla.blockmania.noise.PerlinNoise;
 import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.rendering.ViewFrustum;

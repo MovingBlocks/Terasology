@@ -50,7 +50,7 @@ import java.util.logging.Level;
 public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     private static final
-    Vector3f[] _directions = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), VectorPool.getVector(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
+    Vector3f[] _lightDirections = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), VectorPool.getVector(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
     /* ------ */
     private static int _statVertexArrayUpdateCount = 0;
     /* ------ */
@@ -75,20 +75,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private final ChunkMeshGenerator _meshGenerator;
     /* ------ */
     private AABB _aabb;
-    /* ------ */
 
-    /**
-     *
-     */
     public enum LIGHT_TYPE {
-
-        /**
-         *
-         */
         BLOCK,
-        /**
-         *
-         */
         SUN
     }
 
@@ -178,7 +167,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
                 n.getValue().generate(this);
             }
 
-            updateSunlight();
+            generateSunlight();
             _fresh = false;
 
             Game.getInstance().getLogger().log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
@@ -209,9 +198,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * Updates the sunlight.
+     * Generates the initial sunlight.
      */
-    private void updateSunlight() {
+    private void generateSunlight() {
         if (_fresh) {
             for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -234,72 +223,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     }
 
     /**
-     * Generates the display lists and swaps the old mesh with the current mesh.
-     */
-    public void generateVBOs() {
-        if (_newMesh != null) {
-            _newMesh.generateVBOs();
-        }
-    }
-
-    /**
-     * Returns the position of the chunk within the world.
-     *
-     * @return The world position
-     */
-    int getChunkWorldPosX() {
-        return (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
-    }
-
-    /**
-     * Returns the position of the chunk within the world.
-     *
-     * @return The world  position
-     */
-    int getChunkWorldPosY() {
-        return (int) _position.y * (int) Configuration.CHUNK_DIMENSIONS.y;
-    }
-
-    /**
-     * Returns the position of the chunk within the world.
-     *
-     * @return Thew world position
-     */
-    int getChunkWorldPosZ() {
-        return (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
-    }
-
-    /**
-     * Returns the position of block within the world.
-     *
-     * @param x The local position
-     * @return The world position
-     */
-    public int getBlockWorldPosX(int x) {
-        return x + getChunkWorldPosX();
-    }
-
-    /**
-     * Returns the position of block within the world.
-     *
-     * @param y The local position
-     * @return The world position
-     */
-    public int getBlockWorldPosY(int y) {
-        return y + getChunkWorldPosY();
-    }
-
-    /**
-     * Returns the position of block within the world.
-     *
-     * @param z The local position
-     * @return The world position
-     */
-    public int getBlockWorldPosZ(int z) {
-        return z + getChunkWorldPosZ();
-    }
-
-    /**
      * Calculates the sunlight at a given column within the chunk.
      *
      * @param x               Local block position on the x-axis
@@ -309,10 +232,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      */
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
         boolean covered = false;
-
-        if (x < 0 || z < 0) {
-            return;
-        }
 
         for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
             Block b = Block.getBlockForType(_blocks.get(x, y, z));
@@ -366,10 +285,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param type The type of the light
      */
     public void refreshLightAtLocalPos(int x, int y, int z, LIGHT_TYPE type) {
-        if (x < 0 || z < 0 || y < 0) {
-            return;
-        }
-
         int blockPosX = getBlockWorldPosX(x);
         int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
@@ -434,10 +349,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param brightSpots Log of light spots, which where brighter than the current light node
      */
     public void unspreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type, FastList<Vector3f> brightSpots) {
-        if (x < 0 || z < 0 || y < 0) {
-            return;
-        }
-
         int blockPosX = getBlockWorldPosX(x);
         int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
@@ -447,13 +358,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
         for (int i = 0; i < 6; i++) {
 
-            byte neighborValue = getParent().getLight(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z, type);
-            byte neighborType = getParent().getBlock(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z);
+            byte neighborValue = getParent().getLight(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, type);
+            byte neighborType = getParent().getBlock(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z);
 
             if (neighborValue < lightValue && neighborValue > 0 && Block.getBlockForType(neighborType).isBlockTypeTranslucent()) {
-                getParent().unspreadLight(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+                getParent().unspreadLight(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
             } else if (neighborValue >= lightValue) {
-                brightSpots.add(new Vector3f(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z));
+                brightSpots.add(new Vector3f(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z));
             }
         }
     }
@@ -483,10 +394,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param type       The type of the light
      */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type) {
-        if (x < 0 || z < 0 || y < 0) {
-            return;
-        }
-
         if (depth > lightValue) {
             return;
         }
@@ -501,11 +408,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         getParent().setLight(blockPosX, blockPosY, blockPosZ, newLightValue, type);
 
         for (int i = 0; i < 6; i++) {
-            byte neighborValue = getParent().getLight(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z, type);
-            byte neighborType = getParent().getBlock(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z);
+            byte neighborValue = getParent().getLight(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, type);
+            byte neighborType = getParent().getBlock(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z);
 
             if (neighborValue < newLightValue - 1 && Block.getBlockForType(neighborType).isBlockTypeTranslucent()) {
-                getParent().spreadLight(blockPosX + (int) _directions[i].x, blockPosY + (int) _directions[i].y, blockPosZ + (int) _directions[i].z, lightValue, depth + 1, type);
+                getParent().spreadLight(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, lightValue, depth + 1, type);
             }
         }
     }
@@ -617,10 +524,9 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      *
      * @return The distance of the chunk to the player
      */
-    double distanceToPlayer() {
+    public double distanceToPlayer() {
         return Math.sqrt(Math.pow(getParent().getPlayer().getPosition().x - getChunkWorldPosX(), 2) + Math.pow(getParent().getPlayer().getPosition().z - getChunkWorldPosZ(), 2));
     }
-
 
     /**
      * Returns the neighbor chunks of this chunk.
@@ -647,7 +553,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param x Local block position on the x-axis
      * @param z Local block position on the z-axis
      */
-    void markNeighborsDirty(int x, int z) {
+    private void markNeighborsDirty(int x, int z) {
         Chunk[] neighbors = loadOrCreateNeighbors();
 
         if (x == 0 && neighbors[1] != null) {
@@ -685,7 +591,6 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     /**
      * Saves this chunk to disk.
-     * TODO: Chunks use a lot of memory...
      *
      * @return True if the chunk was successfully written to the disk
      */
@@ -745,7 +650,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      *
      * @return True if the chunk was successfully loaded
      */
-    boolean loadChunkFromFile() {
+    public boolean loadChunkFromFile() {
         if (Game.getInstance().isSandboxed()) {
             return false;
         }
@@ -834,6 +739,73 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             _aabb = new AABB(position, dimensions);
         }
         return _aabb;
+    }
+
+
+    /**
+     * Generates the display lists and swaps the old mesh with the current mesh.
+     */
+    public void generateVBOs() {
+        if (_newMesh != null) {
+            _newMesh.generateVBOs();
+        }
+    }
+
+    /**
+     * Returns the position of the chunk within the world.
+     *
+     * @return The world position
+     */
+    int getChunkWorldPosX() {
+        return (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
+    }
+
+    /**
+     * Returns the position of the chunk within the world.
+     *
+     * @return The world  position
+     */
+    int getChunkWorldPosY() {
+        return (int) _position.y * (int) Configuration.CHUNK_DIMENSIONS.y;
+    }
+
+    /**
+     * Returns the position of the chunk within the world.
+     *
+     * @return Thew world position
+     */
+    int getChunkWorldPosZ() {
+        return (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
+    }
+
+    /**
+     * Returns the position of block within the world.
+     *
+     * @param x The local position
+     * @return The world position
+     */
+    public int getBlockWorldPosX(int x) {
+        return x + getChunkWorldPosX();
+    }
+
+    /**
+     * Returns the position of block within the world.
+     *
+     * @param y The local position
+     * @return The world position
+     */
+    public int getBlockWorldPosY(int y) {
+        return y + getChunkWorldPosY();
+    }
+
+    /**
+     * Returns the position of block within the world.
+     *
+     * @param z The local position
+     * @return The world position
+     */
+    public int getBlockWorldPosZ(int z) {
+        return z + getChunkWorldPosZ();
     }
 
     public World getParent() {

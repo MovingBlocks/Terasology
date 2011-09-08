@@ -27,26 +27,11 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public final class BlockPosition implements Comparable<BlockPosition> {
 
-    /**
-     * Position on the x-axis.
-     */
-    /**
-     * Position on the y-axis.
-     */
-    /**
-     * Position on the z-axis.
-     */
     public final int x;
     public final int y;
     public final int z;
     private final Vector3f _origin;
 
-    /**
-     * @param x
-     * @param y
-     * @param z
-     * @param origin
-     */
     public BlockPosition(int x, int y, int z, Vector3f origin) {
         this.x = x;
         this.y = y;
@@ -54,17 +39,10 @@ public final class BlockPosition implements Comparable<BlockPosition> {
         this._origin = origin;
     }
 
-    /**
-     * @return
-     */
     float getDistance() {
         return VectorPool.getVector((float) x - _origin.x, (float) y - _origin.y, (float) z - _origin.z).length();
     }
 
-    /**
-     * @param o
-     * @return
-     */
     public int compareTo(BlockPosition o) {
         float distance = getDistance();
         float oDistance = o.getDistance();

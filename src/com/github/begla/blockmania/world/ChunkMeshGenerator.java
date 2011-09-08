@@ -30,18 +30,8 @@ public class ChunkMeshGenerator {
 
     private final Chunk _chunk;
 
-    /**
-     *
-     */
     public enum RENDER_TYPE {
-
-        /**
-         *
-         */
         TRANS,
-        /**
-         *
-         */
         OPAQUE,
     }
 
@@ -77,13 +67,13 @@ public class ChunkMeshGenerator {
             for (int i = 0; i < mesh._vertexElements[j].quads.size(); i += 3, cTex += 2, cColor += 4) {
 
                 if (i % 4 == 0) {
-                    mesh._vertexElements[j].indices.put(cIndex + 0);
+                    mesh._vertexElements[j].indices.put(cIndex);
                     mesh._vertexElements[j].indices.put(cIndex + 1);
                     mesh._vertexElements[j].indices.put(cIndex + 2);
 
                     mesh._vertexElements[j].indices.put(cIndex + 2);
                     mesh._vertexElements[j].indices.put(cIndex + 3);
-                    mesh._vertexElements[j].indices.put(cIndex + 0);
+                    mesh._vertexElements[j].indices.put(cIndex);
                     cIndex += 4;
                 }
 
@@ -166,9 +156,10 @@ public class ChunkMeshGenerator {
     /**
      * Generates the billboard vertices for a given local block position.
      *
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
+     * @param mesh The active mesh
+     * @param x    Local block position on the x-axis
+     * @param y    Local block position on the y-axis
+     * @param z    Local block position on the z-axis
      */
     private void generateBillboardVertices(ChunkMesh mesh, int x, int y, int z) {
         byte block = _chunk.getBlock(x, y, z);
@@ -243,6 +234,7 @@ public class ChunkMeshGenerator {
         blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z));
         drawRight = isSideVisibleForBlockTypes(blockToCheck, block);
 
+        // Don't draw anything "below" the world
         if (y > 0) {
             blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z));
             drawBottom = isSideVisibleForBlockTypes(blockToCheck, block);
@@ -252,7 +244,14 @@ public class ChunkMeshGenerator {
 
         Block.BLOCK_FORM blockForm = Block.getBlockForType(block).getBlockForm();
 
+        // If the block is lowered, some more faces have to be drawn
         if (blockForm == Block.BLOCK_FORM.LOWERED_BOCK) {
+            // Draw the top if a non-lowered block is above the lowered block
+            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y + 1), _chunk.getBlockWorldPosZ(z));
+            if (Block.getBlockForType(blockToCheck).getBlockForm() != Block.BLOCK_FORM.LOWERED_BOCK) {
+                drawTop = true;
+            }
+
             blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z - 1));
             drawFront = isSideVisibleForBlockTypes(blockToCheck, block) || drawFront;
             blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z + 1));
@@ -385,19 +384,6 @@ public class ChunkMeshGenerator {
         }
     }
 
-    /**
-     * @param x
-     * @param y
-     * @param z
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param norm
-     * @param colorOffset
-     * @param texOffset
-     * @param renderType
-     */
     void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
         ChunkMesh.VertexElements vertexElements = mesh._vertexElements[0];
 
@@ -542,14 +528,13 @@ public class ChunkMeshGenerator {
         vertexElements.quads.add(vertex.z);
     }
 
-
     /**
      * Returns true if the block side is adjacent to a translucent block or an air
      * block.
      *
-     * @param blockToCheck
-     * @param currentBlock
-     * @return
+     * @param blockToCheck The block to check
+     * @param currentBlock The current block
+     * @return True if the side is visible for the given block types
      */
     private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock) {
         Block bCheck = Block.getBlockForType(blockToCheck);
