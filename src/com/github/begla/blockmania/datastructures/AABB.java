@@ -66,6 +66,14 @@ public class AABB extends RenderableObject {
         return true;
     }
 
+    public boolean contains(Vector3f point) {
+        if (maxX() < point.x || minX() > point.x) return false;
+        if (maxY() < point.y || minY() > point.y) return false;
+        if (maxZ() < point.z || minZ() > point.z) return false;
+
+        return true;
+    }
+
     public Vector3f getDimensions() {
         return _dimensions;
     }
@@ -97,7 +105,7 @@ public class AABB extends RenderableObject {
         Vector3f closestNormal = VectorPool.getVector();
 
         for (Vector3f v : normals) {
-            float distance = Vector3f.sub(centerPointForNormal(v),origin,null).length();
+            float distance = Vector3f.sub(centerPointForNormal(v), origin, null).length();
 
             if (distance < minDistance) {
                 minDistance = distance;

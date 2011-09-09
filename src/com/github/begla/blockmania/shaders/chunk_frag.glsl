@@ -2,6 +2,7 @@
 
 uniform sampler2D textureAtlas;
 uniform float daylight = 1.0;
+uniform int swimming = 0;
 
 varying float fog;
 varying vec3 normal;
@@ -43,6 +44,15 @@ void main(){
 
     color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
-    gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.84,0.88,1,1) * daylight, fog).rgb;
+    if (swimming == 0) {
+        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.84,0.88,1.0,1.0) * daylight, fog).rgb;
+    } else {
+        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.0,0.0,0.0,1.0) * daylight, fog*16.0).rgb;
+        gl_FragColor.rg *= 0.4;
+        gl_FragColor.b *= 0.7;
+    }
+
+
+
     gl_FragColor.a = color.a;
 }

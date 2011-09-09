@@ -246,12 +246,6 @@ public class ChunkMeshGenerator {
 
         // If the block is lowered, some more faces have to be drawn
         if (blockForm == Block.BLOCK_FORM.LOWERED_BOCK) {
-            // Draw the top if a non-lowered block is above the lowered block
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y + 1), _chunk.getBlockWorldPosZ(z));
-            if (Block.getBlockForType(blockToCheck).getBlockForm() != Block.BLOCK_FORM.LOWERED_BOCK) {
-                drawTop = true;
-            }
-
             blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z - 1));
             drawFront = isSideVisibleForBlockTypes(blockToCheck, block) || drawFront;
             blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z + 1));

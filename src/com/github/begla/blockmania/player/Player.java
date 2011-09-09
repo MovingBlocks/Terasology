@@ -18,6 +18,7 @@ package com.github.begla.blockmania.player;
 
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.blocks.BlockWater;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.datastructures.RayBoxIntersection;
@@ -58,6 +59,7 @@ public final class Player extends RenderableObject {
     private final PerlinNoise _pGen = new PerlinNoise(42);
     private final Vector3f _viewingDirection = VectorPool.getVector();
     private boolean _playerIsTouchingGround = false;
+    private boolean _playerIsSwimming = false, _playerHeadUnderWater = false;
 
     private final ViewFrustum _viewFrustum = new ViewFrustum();
 
@@ -81,7 +83,6 @@ public final class Player extends RenderableObject {
                 if (Block.getBlockForType(_parent.getBlockAtPosition(is.getBlockPos())).shouldRenderBoundingBox()) {
                     Block.AABBForBlockAt((int) is.getBlockPos().x, (int) is.getBlockPos().y, (int) is.getBlockPos().z).render();
                 }
-
             }
         }
 
@@ -141,6 +142,7 @@ public final class Player extends RenderableObject {
         yaw(dx * Configuration.MOUSE_SENS);
         pitch(dy * Configuration.MOUSE_SENS);
 
+        updateSwimStatus();
         processMovement();
         updatePlayerPosition();
 
@@ -184,9 +186,13 @@ public final class Player extends RenderableObject {
      * Moves the player forward.
      */
     void walkForward() {
-        if (!Configuration.getSettingBoolean("GOD_MODE")) {
+        if (!Configuration.getSettingBoolean("GOD_MODE") && !_playerIsSwimming) {
             _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw));
             _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw));
+        } else if (!Configuration.getSettingBoolean("GOD_MODE") && _playerIsSwimming) {
+            _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+            _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+            _movement.y -= _wSpeed * Math.sin(Math.toRadians(_pitch));
         } else {
             _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
             _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
@@ -198,9 +204,13 @@ public final class Player extends RenderableObject {
      * Moves the player backward.
      */
     void walkBackwards() {
-        if (!Configuration.getSettingBoolean("GOD_MODE")) {
+        if (!Configuration.getSettingBoolean("GOD_MODE") && !_playerIsSwimming) {
             _movement.x -= _wSpeed * Math.sin(Math.toRadians(_yaw));
             _movement.z += _wSpeed * Math.cos(Math.toRadians(_yaw));
+        } else if (!Configuration.getSettingBoolean("GOD_MODE") && _playerIsSwimming) {
+            _movement.x -= _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+            _movement.z += _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
+            _movement.y += _wSpeed * Math.sin(Math.toRadians(_pitch));
         } else {
             _movement.x -= _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
             _movement.z += _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
@@ -563,8 +573,8 @@ public final class Player extends RenderableObject {
         /*
          * Apply friction.
          */
-        if (MathHelper.fastAbs(_acc.x) > _wSpeed || MathHelper.fastAbs(_acc.z) > _wSpeed || MathHelper.fastAbs(_acc.z) > _wSpeed) {
-            double max = Math.max(Math.max(MathHelper.fastAbs(_acc.x), MathHelper.fastAbs(_acc.z)), _acc.y);
+        if (MathHelper.fastAbs(_acc.x) > _wSpeed || MathHelper.fastAbs(_acc.z) > _wSpeed || MathHelper.fastAbs(_acc.y) > _wSpeed) {
+            double max = Math.max(Math.max(MathHelper.fastAbs(_acc.x), MathHelper.fastAbs(_acc.z)), MathHelper.fastAbs(_acc.y));
             double div = max / _wSpeed;
 
             _acc.x /= div;
@@ -580,12 +590,22 @@ public final class Player extends RenderableObject {
         _acc.y += _movement.y;
         _acc.z += _movement.z;
 
-        if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY") && !Configuration.getSettingBoolean("GOD_MODE")) {
+        // Normal gravity
+        if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY") && !Configuration.getSettingBoolean("GOD_MODE") && !_playerIsSwimming) {
             _gravity -= Configuration.getSettingNumeric("GRAVITY");
+        }
 
-            if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY")) {
-                _gravity = -Configuration.getSettingNumeric("MAX_GRAVITY");
-            }
+        if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY") && !Configuration.getSettingBoolean("GOD_MODE") && !_playerIsSwimming) {
+            _gravity = -Configuration.getSettingNumeric("MAX_GRAVITY");
+        }
+
+        // Gravity under water
+        if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsSwimming) {
+            _gravity -= Configuration.getSettingNumeric("GRAVITY_SWIMMING");
+        }
+
+        if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING")  && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsSwimming) {
+            _gravity = -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING");
         }
 
         getPosition().y += _acc.y;
@@ -629,6 +649,34 @@ public final class Player extends RenderableObject {
         }
 
         VectorPool.putVector(oldPosition);
+    }
+
+    public void updateSwimStatus() {
+        FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(_position);
+
+        boolean swimming = false, headUnderWater = false;
+
+        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
+            byte blockType = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
+            AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
+
+            if (Block.getBlockForType(blockType).getClass().equals(BlockWater.class) && getAABB().overlaps(blockAABB)) {
+                swimming = true;
+            }
+
+            Vector3f eyePos = calcEyePosition();
+            // Add distance to the near plane
+            eyePos.x += _viewingDirection.x * 0.1;
+            eyePos.y += _viewingDirection.y * 0.1;
+            eyePos.z += _viewingDirection.z * 0.1;
+
+            if (Block.getBlockForType(blockType).getClass().equals(BlockWater.class) && blockAABB.contains(eyePos)) {
+                headUnderWater = true;
+            }
+        }
+
+        _playerHeadUnderWater = headUnderWater;
+        _playerIsSwimming = swimming;
     }
 
     /**
@@ -713,5 +761,13 @@ public final class Player extends RenderableObject {
         Vector3f eyePosition = VectorPool.getVector(aabb.getPosition());
         eyePosition.y += aabb.getDimensions().y - 0.2;
         return eyePosition;
+    }
+
+    public boolean isPlayerSwimming() {
+        return _playerIsSwimming;
+    }
+
+    public boolean isHeadUnderWater() {
+        return _playerHeadUnderWater;
     }
 }

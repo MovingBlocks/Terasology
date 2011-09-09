@@ -260,22 +260,29 @@ public final class World extends RenderableObject {
      */
     @Override
     public void render() {
-        /**
-         * Sky box.
-         */
-        _player.applyNormalizedModelViewMatrix();
+        if (!_player.isHeadUnderWater()) {
+            /**
+             * Sky box.
+             */
+            _player.applyNormalizedModelViewMatrix();
 
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
+            glDisable(GL_CULL_FACE);
+            glDisable(GL_DEPTH_TEST);
 
-        glBegin(GL_QUADS);
-        Primitives.drawSkyBox(getDaylight());
-        glEnd();
+            glBegin(GL_QUADS);
+            Primitives.drawSkyBox(getDaylight());
+            glEnd();
 
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
+            glEnable(GL_CULL_FACE);
+            glEnable(GL_DEPTH_TEST);
+        }
 
         _player.applyPlayerModelViewMatrix();
+
+        renderSunMoon();
+
+        if (!_player.isHeadUnderWater())
+            renderClouds();
 
         /*
          * Render the player.
@@ -287,15 +294,15 @@ public final class World extends RenderableObject {
          */
         ShaderManager.getInstance().enableShader("chunk");
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
+        int swimmimg = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
         GL20.glUniform1f(daylight, getDaylight());
+        GL20.glUniform1i(swimmimg, _player.isHeadUnderWater() ? 1 : 0);
         ShaderManager.getInstance().enableShader("cloud");
         daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("cloud"), "daylight");
         GL20.glUniform1f(daylight, getDaylight());
         ShaderManager.getInstance().enableShader(null);
 
         renderChunks();
-        renderSunMoon();
-        renderClouds();
     }
 
     private void renderSunMoon() {
