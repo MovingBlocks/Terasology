@@ -26,13 +26,6 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public final class RayBoxIntersection implements Comparable<RayBoxIntersection> {
 
-    /**
-     *
-     */
-    public enum SIDE {
-
-    }
-
     private final Vector3f v0;
     private final Vector3f v1;
     private final Vector3f v2;

@@ -122,15 +122,7 @@ public final class World extends RenderableObject {
         this._seed = seed;
 
         // If loading failed accept the given seed
-        if (!loadMetaData()) {
-            if (!Game.getInstance().isSandboxed()) {
-                // Generate the save directory if needed
-                File dir = new File(getWorldSavePath());
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-            }
-        }
+        loadMetaData();
 
         // Init. generators
         _chunkGenerators.put("terrain", new ChunkGeneratorTerrain(_seed));
@@ -317,6 +309,7 @@ public final class World extends RenderableObject {
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
 
+        glEnable(GL_TEXTURE_2D);
         if (isDaytime()) {
             TextureManager.getInstance().bindTexture("sun");
         } else {
@@ -328,6 +321,8 @@ public final class World extends RenderableObject {
         glDisable(GL_BLEND);
         glDisable(GL_TEXTURE_2D);
         glPopMatrix();
+
+        glDisable(GL_TEXTURE_2D);
     }
 
     private void renderClouds() {
@@ -380,6 +375,8 @@ public final class World extends RenderableObject {
     private void renderChunks() {
 
         ShaderManager.getInstance().enableShader("chunk");
+
+        glEnable(GL_TEXTURE_2D);
         TextureManager.getInstance().bindTexture("terrain");
 
         _visibleChunks = fetchVisibleChunks();
@@ -405,6 +402,7 @@ public final class World extends RenderableObject {
             }
         }
 
+        glDisable(GL_TEXTURE_2D);
         ShaderManager.getInstance().enableShader(null);
     }
 
@@ -932,6 +930,12 @@ public final class World extends RenderableObject {
     private boolean saveMetaData() {
         if (Game.getInstance().isSandboxed()) {
             return false;
+        }
+
+        // Generate the save directory if needed
+        File dir = new File(getWorldSavePath());
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
 
         File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));

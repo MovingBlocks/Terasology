@@ -38,6 +38,6 @@ public class BlockHardStone extends Block {
 
     @Override
     public boolean isRemovable() {
-        return true;
+        return false;
     }
 }

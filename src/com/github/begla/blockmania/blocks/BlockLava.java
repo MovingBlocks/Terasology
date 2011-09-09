@@ -50,6 +50,11 @@ public class BlockLava extends Block {
         return false;
     }
 
+    @Override
+    public boolean isRemovable() {
+        return false;
+    }
+
     /**
      * @return
      */

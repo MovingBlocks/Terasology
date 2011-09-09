@@ -393,12 +393,9 @@ public final class Game {
         glLoadIdentity();
 
         glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         // Draw the crosshair
         if (Configuration.getSettingBoolean("CROSSHAIR")) {
-            glColor3f(1f, 1f, 1f);
+            glColor4f(1f, 1f, 1f, 1f);
             glLineWidth(2f);
 
             glBegin(GL_LINES);
@@ -409,9 +406,12 @@ public final class Game {
             glEnd();
         }
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         /*
-         * Draw debugging information.
-         */
+        * Draw debugging information.
+        */
         if (Configuration.getSettingBoolean("DEBUG")) {
             _font1.drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage));
             _font1.drawString(4, 22, String.format("%s", _player));

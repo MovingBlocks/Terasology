@@ -195,11 +195,15 @@ public abstract class Block {
         return BLOCK_FORM.NORMAL;
     }
 
+    public boolean letSelectionRayThrough() {
+        return false;
+    }
+
     public void renderBlock(boolean shaded) {
         if (isBlockInvisible())
             return;
 
-        glEnable(GL11.GL_TEXTURE_2D);
+        glEnable(GL_TEXTURE_2D);
         TextureManager.getInstance().bindTexture("terrain");
 
         glBegin(GL_QUADS);

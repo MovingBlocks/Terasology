@@ -254,6 +254,13 @@ public final class Player extends RenderableObject {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -3; z <= 3; z++) {
                     if (x != 0 || y != 0 || z != 0) {
+                        byte block = _parent.getBlock((int) _position.x + x, (int) _position.y + y, (int) _position.z + z);
+
+                        // Ignore special blocks
+                        if (Block.getBlockForType(block).letSelectionRayThrough()) {
+                            continue;
+                        }
+
                         // The ray originates from the "player's eye"
                         FastList<RayBoxIntersection> iss = RayBoxIntersectionHelper.rayBlockIntersection(_parent, (int) _position.x + x, (int) _position.y + y, (int) _position.z + z, calcEyePosition(), _viewingDirection);
 
@@ -604,7 +611,7 @@ public final class Player extends RenderableObject {
             _gravity -= Configuration.getSettingNumeric("GRAVITY_SWIMMING");
         }
 
-        if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING")  && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsSwimming) {
+        if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsSwimming) {
             _gravity = -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING");
         }
 
