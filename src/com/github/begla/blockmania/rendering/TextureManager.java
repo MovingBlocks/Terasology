@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.rendering;
 
 import com.github.begla.blockmania.Game;
+import javolution.util.FastMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
@@ -36,7 +37,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class TextureManager {
 
     private static TextureManager _instance;
-    private HashMap<String, Texture> _textures = new HashMap<String, Texture>();
+    private FastMap<String, Texture> _textures = new FastMap<String, Texture>(32);
 
     public static TextureManager getInstance() {
         if (_instance == null)

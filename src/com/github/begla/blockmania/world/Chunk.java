@@ -603,6 +603,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         if (Game.getInstance().isSandboxed()) {
             return false;
         }
+        // Generate the save directory if needed
+        File dir = new File(_parent.getWorldSavePath());
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
 
         ByteBuffer output = BufferUtils.createByteBuffer(_blocks.getSize() + _sunlight.getPackedSize() + _light.getPackedSize() + 1);
         File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), getChunkId()));

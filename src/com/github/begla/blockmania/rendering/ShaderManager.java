@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.rendering;
 
 import com.github.begla.blockmania.Game;
+import javolution.util.FastMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
@@ -34,9 +35,9 @@ import java.util.logging.Level;
  */
 public class ShaderManager {
 
-    private final HashMap<String, Integer> _shaderPrograms = new HashMap<String, Integer>();
-    private final HashMap<String, Integer> _fragmentShader = new HashMap<String, Integer>();
-    private final HashMap<String, Integer> _vertexShader = new HashMap<String, Integer>();
+    private final FastMap<String, Integer> _shaderPrograms = new FastMap<String, Integer>(32);
+    private final FastMap<String, Integer> _fragmentShader = new FastMap<String, Integer>(32);
+    private final FastMap<String, Integer> _vertexShader = new FastMap<String, Integer>(32);
     private static ShaderManager _instance = null;
 
     /**

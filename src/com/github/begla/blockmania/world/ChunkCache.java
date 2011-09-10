@@ -18,6 +18,7 @@ package com.github.begla.blockmania.world;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
+import javolution.util.FastMap;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,7 +28,7 @@ import java.util.HashMap;
  */
 public final class ChunkCache {
 
-    private final HashMap<Integer, Chunk> _chunkCache = new HashMap<Integer, Chunk>(capacity());
+    private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>(capacity());
     private final World _parent;
 
     /**

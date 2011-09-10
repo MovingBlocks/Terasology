@@ -27,6 +27,7 @@ import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
+import javolution.util.FastMap;
 import javolution.util.FastSet;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -62,8 +63,8 @@ public final class World extends RenderableObject {
     /* PLAYER */
     private Player _player;
     /* WORLD GENERATION */
-    private final HashMap<String, ChunkGenerator> _chunkGenerators = new HashMap<String, ChunkGenerator>();
-    private final HashMap<String, ObjectGenerator> _objectGenerators = new HashMap<String, ObjectGenerator>();
+    private final FastMap<String, ChunkGenerator> _chunkGenerators = new FastMap<String, ChunkGenerator>(32);
+    private final FastMap<String, ObjectGenerator> _objectGenerators = new FastMap<String, ObjectGenerator>(32);
     /* ------ */
     private final FastRandom _rand;
     /* PROPERTIES */

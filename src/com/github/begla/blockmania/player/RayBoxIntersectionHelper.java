@@ -143,9 +143,15 @@ public class RayBoxIntersectionHelper {
     private static RayBoxIntersection rayFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
 
         // Calculate the plane to intersect with
-        Vector3f a = Vector3f.sub(v1, v0, null);
-        Vector3f b = Vector3f.sub(v2, v0, null);
-        Vector3f norm = Vector3f.cross(a, b, null);
+        Vector3f a = VectorPool.getVector();
+        Vector3f.sub(v1, v0, a);
+        Vector3f b = VectorPool.getVector();
+        Vector3f.sub(v2, v0, b);
+        Vector3f norm = VectorPool.getVector();
+        Vector3f.cross(a, b, norm);
+
+        VectorPool.putVector(a);
+        VectorPool.putVector(b);
 
 
         float d = -(norm.x * v0.x + norm.y * v0.y + norm.z * v0.z);
@@ -155,9 +161,8 @@ public class RayBoxIntersectionHelper {
          */
         float t = -(norm.x * origin.x + norm.y * origin.y + norm.z * origin.z + d) / (Vector3f.dot(ray, norm));
 
-        if (t < 0) {
+        if (t < 0)
             return null;
-        }
 
         /**
          * Calc. the point of intersection.
@@ -168,6 +173,9 @@ public class RayBoxIntersectionHelper {
         if (intersectPoint.x >= v0.x && intersectPoint.x <= v2.x && intersectPoint.y >= v0.y && intersectPoint.y <= v2.y && intersectPoint.z >= v0.z && intersectPoint.z <= v2.z) {
             return new RayBoxIntersection(blockPos, v0, v1, v2, d, t, origin, ray, intersectPoint);
         }
+
+        VectorPool.putVector(intersectPoint);
+        VectorPool.putVector(norm);
 
         return null;
     }

@@ -168,10 +168,10 @@ public final class Configuration {
         _settingsBoolean.put("CHUNK_OUTLINES", true);
         _settingsBoolean.put("DEBUG", true);
         _settingsBoolean.put("DEBUG_COLLISION", false);
-        _settingsBoolean.put("GOD_MODE", false);
+        _settingsBoolean.put("GOD_MODE", true);
         _settingsNumeric.put("V_DIST_X", 32f);
         _settingsNumeric.put("V_DIST_Z", 32f);
-        //_settingsNumeric.put("RUNNING_FACTOR", 12.0f);
+        _settingsNumeric.put("RUNNING_FACTOR", 12.0f);
     }
 
     private static void loadDemo() {
