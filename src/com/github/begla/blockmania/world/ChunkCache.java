@@ -57,7 +57,7 @@ public final class ChunkCache {
         Chunk c;
 
         synchronized (this) {
-            c = _chunkCache.get(MathHelper.cantorize(x, z));
+            c = _chunkCache.get(Integer.valueOf(MathHelper.cantorize(x, z)));
         }
 
         // We got a chunk! Already! Great!
@@ -88,7 +88,7 @@ public final class ChunkCache {
         }
         Collections.sort(cachedChunks);
 
-        while (cachedChunks.size() > capacity()) {
+        for (int i = 0; i < 32 && _chunkCache.size() > capacity(); i++) {
             Chunk chunkToDelete = cachedChunks.removeLast();
 
             synchronized (this) {
@@ -109,7 +109,7 @@ public final class ChunkCache {
         Chunk result;
 
         synchronized (this) {
-            result = _chunkCache.get(key);
+            result = _chunkCache.get(Integer.valueOf(key));
         }
 
         return result;

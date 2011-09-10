@@ -889,7 +889,7 @@ public final class World extends RenderableObject {
     private Vector3f findSpawningPoint() {
         for (int xz = 1024; ; xz++) {
             if (((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(xz, 26, xz) >= 0.012f) {
-                return new Vector3f(xz, 26, xz);
+                return VectorPool.getVector(xz, 26, xz);
             }
         }
     }
@@ -898,7 +898,7 @@ public final class World extends RenderableObject {
      * Sets the spawning point to the player's current position.
      */
     public void setSpawningPoint() {
-        _spawningPoint = new Vector3f(_player.getPosition());
+        _spawningPoint = VectorPool.getVector(_player.getPosition());
     }
 
     /**

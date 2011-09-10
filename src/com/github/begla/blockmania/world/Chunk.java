@@ -58,7 +58,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private boolean _fresh = true;
     private boolean _cached = false;
     /* ------ */
-    private int _chunkId = -1;
+    private Integer _chunkId = -1;
     /* ------ */
     private ChunkMesh _activeMesh;
     private ChunkMesh _newMesh;
@@ -91,7 +91,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     public Chunk(World p, Vector3f position, FastList<ChunkGenerator> g) {
         this._position = position;
         // Set the chunk ID
-        _chunkId = MathHelper.cantorize((int) _position.x, (int) _position.z);
+        _chunkId = Integer.valueOf(MathHelper.cantorize((int) _position.x, (int) _position.z));
 
         _parent = p;
         _blocks = new BlockmaniaArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
@@ -363,7 +363,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             if (neighborValue < lightValue && neighborValue > 0 && Block.getBlockForType(neighborType).isBlockTypeTranslucent()) {
                 getParent().unspreadLight(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
             } else if (neighborValue >= lightValue) {
-                brightSpots.add(new Vector3f(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z));
+                brightSpots.add(VectorPool.getVector(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z));
             }
         }
     }
@@ -733,16 +733,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             return distance2 > distance ? -1 : 1;
         }
 
-        if (o.getChunkId() == getChunkId())
-            return 0;
-
-        return o.getChunkId() > getChunkId() ? 1 : -1;
+        return getChunkId().compareTo(o.getChunkId());
     }
 
     public AABB getAABB() {
         if (_aabb == null) {
-            Vector3f dimensions = new Vector3f(Configuration.CHUNK_DIMENSIONS.x / 2, Configuration.CHUNK_DIMENSIONS.y / 2, Configuration.CHUNK_DIMENSIONS.z / 2);
-            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX(), getChunkWorldPosY() + dimensions.getY(), getChunkWorldPosZ() + dimensions.getZ());
+            Vector3f dimensions = VectorPool.getVector(Configuration.CHUNK_DIMENSIONS.x / 2, Configuration.CHUNK_DIMENSIONS.y / 2, Configuration.CHUNK_DIMENSIONS.z / 2);
+            Vector3f position = VectorPool.getVector(getChunkWorldPosX() + dimensions.getX(), getChunkWorldPosY() + dimensions.getY(), getChunkWorldPosZ() + dimensions.getZ());
             _aabb = new AABB(position, dimensions);
         }
         return _aabb;
@@ -843,7 +840,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         this._lightDirty = _lightDirty;
     }
 
-    public int getChunkId() {
+    public Integer getChunkId() {
         return _chunkId;
     }
 

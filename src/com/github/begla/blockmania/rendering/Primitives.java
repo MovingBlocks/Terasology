@@ -28,7 +28,7 @@ public class Primitives {
 
     private static final Vector4f CLOUD_COLOR_1 = new Vector4f(0.92f, 0.92f, 0.92f, 0.9f);
     private static final Vector4f CLOUD_COLOR_2 = new Vector4f(1.0f, 1.0f, 1.0f, 0.9f);
-    private static final Vector3f SKY_COLOR_1 = new Vector3f(0.72f, 0.78f, 1.0f);
+    private static final Vector3f SKY_COLOR_1 = new Vector3f(0.52f, 0.58f, 1.0f);
     private static final Vector3f SKY_COLOR_2 = new Vector3f(0.84f, 0.88f, 1f);
 
     /**
