@@ -340,11 +340,13 @@ public final class Game {
 
     public void pauseGame() {
         _world.suspendUpdateThread();
+        Mouse.setGrabbed(false);
         _pauseGame = true;
     }
 
     public void unpauseGame() {
         _pauseGame = false;
+        Mouse.setGrabbed(true);
         _world.resumeUpdateThread();
     }
 
