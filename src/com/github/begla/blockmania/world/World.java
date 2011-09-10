@@ -19,7 +19,6 @@ import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.Game;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.*;
-import com.github.begla.blockmania.player.Player;
 import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
@@ -44,7 +43,6 @@ import org.xml.sax.InputSource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -936,7 +934,10 @@ public final class World extends RenderableObject {
         // Generate the save directory if needed
         File dir = new File(getWorldSavePath());
         if (!dir.exists()) {
-            dir.mkdirs();
+            if (!dir.mkdirs()) {
+                Game.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
+                return false;
+            }
         }
 
         File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));

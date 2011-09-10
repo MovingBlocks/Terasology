@@ -16,11 +16,11 @@
 package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.player.Player;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.Chunk;
+import com.github.begla.blockmania.world.Player;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.LWJGLException;

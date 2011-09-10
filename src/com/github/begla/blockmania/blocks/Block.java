@@ -21,6 +21,7 @@ import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -61,9 +62,8 @@ public abstract class Block {
         BACK
     }
 
-
     public static enum BLOCK_FORM {
-        NORMAL, CACTUS, LOWERED_BOCK
+        NORMAL, CACTUS, LOWERED_BOCK, BILLBOARD
     }
 
     private static final Block[] _blocks = {
@@ -77,7 +77,7 @@ public abstract class Block {
             new BlockColorPurple(), new BlockColorRed(), new BlockColorWhite(), new BlockRedStone(), new BlockSilver(), new BlockDiamond() // 30-35
     };
     private static final BlockNil NIL_BLOCK = new BlockNil();
-    private static Vector4f _colorOffset = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    private static final Vector4f _colorOffset = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     /**
      * Returns the object for the given block type ID.
@@ -134,15 +134,6 @@ public abstract class Block {
     }
 
     /**
-     * Returns true, if the current block is a billboard.
-     *
-     * @return True if billboard
-     */
-    public boolean isBlockBillboard() {
-        return false;
-    }
-
-    /**
      * Returns true, if the block is invisible.
      *
      * @return True if invisible
@@ -185,6 +176,14 @@ public abstract class Block {
 
     public boolean isRemovable() {
         return true;
+    }
+
+    public boolean playerCanAttachBlocks() {
+        return (getBlockForm() == BLOCK_FORM.NORMAL);
+    }
+
+    public static AABB AABBForBlockAt(Vector3f pos) {
+        return new AABB(VectorPool.getVector(pos), VectorPool.getVector(0.5f, 0.5f, 0.5f));
     }
 
     public static AABB AABBForBlockAt(int x, int y, int z) {

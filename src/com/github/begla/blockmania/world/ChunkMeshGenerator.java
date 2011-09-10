@@ -45,8 +45,18 @@ public class ChunkMeshGenerator {
         for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                    generateBlockVertices(mesh, x, y, z);
-                    generateBillboardVertices(mesh, x, y, z);
+                    byte blockType = _chunk.getBlock(x, y, z);
+                    Block block = Block.getBlockForType(blockType);
+
+                    if (block.isBlockInvisible())
+                        continue;
+
+                    Block.BLOCK_FORM blockForm = block.getBlockForm();
+
+                    if (blockForm == Block.BLOCK_FORM.LOWERED_BOCK || blockForm == Block.BLOCK_FORM.CACTUS || blockForm == Block.BLOCK_FORM.NORMAL)
+                        generateBlockVertices(mesh, x, y, z);
+                    else if (blockForm == Block.BLOCK_FORM.BILLBOARD)
+                        generateBillboardVertices(mesh, x, y, z);
                 }
             }
         }
@@ -143,9 +153,9 @@ public class ChunkMeshGenerator {
 
         for (int i = 0; i < 4; i++) {
             Block b = Block.getBlockForType(blocks[i]);
-            if (b.isCastingShadows() && !b.isBlockBillboard()) {
+            if (b.isCastingShadows() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) {
                 result -= Configuration.OCCLUSION_AMOUNT;
-            } else if (b.isCastingShadows() && b.isBlockBillboard()) {
+            } else if (b.isCastingShadows() && b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
                 result -= Configuration.OCCLUSION_AMOUNT / 2;
             }
         }
@@ -163,11 +173,6 @@ public class ChunkMeshGenerator {
      */
     private void generateBillboardVertices(ChunkMesh mesh, int x, int y, int z) {
         byte block = _chunk.getBlock(x, y, z);
-
-        // Ignore normal blocks
-        if (!Block.getBlockForType(block).isBlockBillboard()) {
-            return;
-        }
 
         /*
          * First side of the billboard
@@ -214,11 +219,6 @@ public class ChunkMeshGenerator {
 
         if (!Block.getBlockForType(block).isBlockTypeTranslucent()) {
             renderType = RENDER_TYPE.OPAQUE;
-        }
-
-        // Ignore invisible blocks and billboards
-        if (Block.getBlockForType(block).isBlockInvisible() || Block.getBlockForType(block).isBlockBillboard()) {
-            return;
         }
 
         boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
@@ -534,6 +534,6 @@ public class ChunkMeshGenerator {
         Block bCheck = Block.getBlockForType(blockToCheck);
         Block cBlock = Block.getBlockForType(currentBlock);
 
-        return bCheck.getClass() == BlockAir.class || cBlock.doNotTessellate() || bCheck.isBlockBillboard() || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
+        return bCheck.getClass() == BlockAir.class || cBlock.doNotTessellate() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
     }
 }

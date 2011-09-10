@@ -184,7 +184,7 @@ public final class Configuration {
         _settingsNumeric.put("V_DIST_Z", 32f);
     }
 
-    public static void loadSanboxed() {
+    private static void loadSanboxed() {
         _settingsNumeric.put("V_DIST_X", 16f);
         _settingsNumeric.put("V_DIST_Z", 16f);
     }

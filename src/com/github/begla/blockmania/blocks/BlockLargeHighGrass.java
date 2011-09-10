@@ -27,7 +27,7 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public class BlockLargeHighGrass extends Block {
 
-    private static Vector4f colorOffset = new Vector4f(0.8f, 0.8f, 0.8f, 1.0f);
+    private static final Vector4f colorOffset = new Vector4f(0.8f, 0.8f, 0.8f, 1.0f);
 
     @Override
     public boolean isBlockTypeTranslucent() {
@@ -45,11 +45,6 @@ public class BlockLargeHighGrass extends Block {
     }
 
     @Override
-    public boolean isBlockBillboard() {
-        return true;
-    }
-
-    @Override
     public boolean isPenetrable() {
         return true;
     }
@@ -62,5 +57,10 @@ public class BlockLargeHighGrass extends Block {
     @Override
     public boolean shouldRenderBoundingBox() {
         return false;
+    }
+
+    @Override
+    public BLOCK_FORM getBlockForm() {
+        return BLOCK_FORM.BILLBOARD;
     }
 }

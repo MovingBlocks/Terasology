@@ -92,7 +92,7 @@ public class AABB extends RenderableObject {
     }
 
     public Vector3f normalForPlaneClosestToOrigin(Vector3f pointOnAABB, Vector3f origin, boolean testX, boolean testY, boolean testZ) {
-        FastList<Vector3f> normals = new FastList();
+        FastList<Vector3f> normals = new FastList<Vector3f>();
 
         if (pointOnAABB.z == minZ() && testZ) normals.add(VectorPool.getVector(0, 0, -1));
         if (pointOnAABB.z == maxZ() && testZ) normals.add(VectorPool.getVector(0, 0, 1));
@@ -138,10 +138,12 @@ public class AABB extends RenderableObject {
         if (_vertices == null) {
             _vertices = new Vector3f[8];
 
+            // Front
             _vertices[0] = VectorPool.getVector((float) minX(), (float) minY(), (float) maxZ());
             _vertices[1] = VectorPool.getVector((float) maxX(), (float) minY(), (float) maxZ());
             _vertices[2] = VectorPool.getVector((float) maxX(), (float) maxY(), (float) maxZ());
             _vertices[3] = VectorPool.getVector((float) minX(), (float) maxY(), (float) maxZ());
+            // Back
             _vertices[4] = VectorPool.getVector((float) minX(), (float) minY(), (float) minZ());
             _vertices[5] = VectorPool.getVector((float) maxX(), (float) minY(), (float) minZ());
             _vertices[6] = VectorPool.getVector((float) maxX(), (float) maxY(), (float) minZ());

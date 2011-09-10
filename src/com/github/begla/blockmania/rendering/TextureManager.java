@@ -26,7 +26,6 @@ import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -37,7 +36,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class TextureManager {
 
     private static TextureManager _instance;
-    private FastMap<String, Texture> _textures = new FastMap<String, Texture>(32);
+    private final FastMap<String, Texture> _textures = new FastMap<String, Texture>(32);
 
     public static TextureManager getInstance() {
         if (_instance == null)

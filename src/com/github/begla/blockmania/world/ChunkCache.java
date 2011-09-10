@@ -21,7 +21,6 @@ import javolution.util.FastList;
 import javolution.util.FastMap;
 
 import java.util.Collections;
-import java.util.HashMap;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -85,7 +84,7 @@ public final class ChunkCache {
         FastList<Chunk> cachedChunks;
 
         synchronized (this) {
-            cachedChunks = new FastList(_chunkCache.values());
+            cachedChunks = new FastList<Chunk>(_chunkCache.values());
         }
         Collections.sort(cachedChunks);
 

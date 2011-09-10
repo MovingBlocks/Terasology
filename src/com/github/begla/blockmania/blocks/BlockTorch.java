@@ -37,11 +37,6 @@ public class BlockTorch extends Block {
     }
 
     @Override
-    public boolean isBlockBillboard() {
-        return true;
-    }
-
-    @Override
     public boolean isPenetrable() {
         return true;
     }
@@ -62,5 +57,10 @@ public class BlockTorch extends Block {
     @Override
     public byte getLuminance() {
         return 15;
+    }
+
+    @Override
+    public BLOCK_FORM getBlockForm() {
+        return BLOCK_FORM.BILLBOARD;
     }
 }

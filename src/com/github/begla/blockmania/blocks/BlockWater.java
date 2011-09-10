@@ -26,7 +26,7 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public class BlockWater extends Block {
 
-    private static Vector4f colorOffset = new Vector4f(0.9f, 0.9f, 1.0f, 0.7f);
+    private static final Vector4f colorOffset = new Vector4f(0.9f, 0.9f, 1.0f, 0.7f);
 
     @Override
     public boolean isBlockTypeTranslucent() {

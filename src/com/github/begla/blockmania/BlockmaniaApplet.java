@@ -27,7 +27,7 @@ import java.applet.Applet;
  */
 public final class BlockmaniaApplet extends Applet {
 
-    private Game _game;
+    private final Game _game;
 
     public BlockmaniaApplet() {
         _game = Game.getInstance();

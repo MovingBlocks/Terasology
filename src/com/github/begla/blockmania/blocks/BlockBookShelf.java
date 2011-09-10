@@ -29,7 +29,7 @@ public class BlockBookShelf extends Block {
     @Override
     public Vector2f getTextureOffsetFor(SIDE side) {
         if (side == SIDE.TOP || side == SIDE.BOTTOM) {
-            return Helper.calcOffsetForTextureAt(6,5);
+            return Helper.calcOffsetForTextureAt(6, 5);
         }
 
         return Helper.calcOffsetForTextureAt(3, 2);

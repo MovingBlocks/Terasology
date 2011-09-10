@@ -27,7 +27,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 /**
@@ -54,9 +53,6 @@ public class ShaderManager {
         return _instance;
     }
 
-    /**
-     *
-     */
     private ShaderManager() {
         initShader();
 
@@ -66,9 +62,6 @@ public class ShaderManager {
         Game.getInstance().getLogger().log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
     }
 
-    /**
-     *
-     */
     private void initShader() {
         createVertexShader("chunk_vert.glsl", "chunk");
         createFragShader("chunk_frag.glsl", "chunk");

@@ -37,11 +37,6 @@ public class BlockYellowFlower extends Block {
     }
 
     @Override
-    public boolean isBlockBillboard() {
-        return true;
-    }
-
-    @Override
     public boolean isPenetrable() {
         return true;
     }
@@ -54,5 +49,10 @@ public class BlockYellowFlower extends Block {
     @Override
     public boolean shouldRenderBoundingBox() {
         return false;
+    }
+
+    @Override
+    public BLOCK_FORM getBlockForm() {
+        return BLOCK_FORM.BILLBOARD;
     }
 }

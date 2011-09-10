@@ -18,7 +18,6 @@ package com.github.begla.blockmania.world;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.Game;
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.blocks.BlockAir;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
@@ -237,7 +236,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             Block b = Block.getBlockForType(_blocks.get(x, y, z));
 
             // Remember if this "column" is covered
-            if ((b.getClass() != BlockAir.class && !b.isBlockBillboard()) && !covered) {
+            if ((!b.isBlockInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) && !covered) {
                 covered = true;
             }
 
@@ -246,7 +245,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
             // If the column is not covered...
             if (!covered) {
-                if (b.getClass().equals(BlockAir.class) || b.isBlockBillboard())
+                if (b.isBlockInvisible() || b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
                     _sunlight.set(x, y, z, Configuration.MAX_LIGHT);
                 else
                     _sunlight.set(x, y, z, (byte) 0x0);
@@ -606,7 +605,10 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         // Generate the save directory if needed
         File dir = new File(_parent.getWorldSavePath());
         if (!dir.exists()) {
-            dir.mkdirs();
+            if (!dir.mkdirs()) {
+                Game.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
+                return false;
+            }
         }
 
         ByteBuffer output = BufferUtils.createByteBuffer(_blocks.getSize() + _sunlight.getPackedSize() + _light.getPackedSize() + 1);
