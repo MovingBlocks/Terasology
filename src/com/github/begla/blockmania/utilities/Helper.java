@@ -24,7 +24,7 @@ import org.lwjgl.util.vector.Vector2f;
  */
 public final class Helper {
 
-    private static final float DIV = 1.0f / 16.0f;
+    private static final double DIV = 1.0 / 16.0;
 
     /**
      * Calculates the texture offset for a given position within
@@ -35,7 +35,7 @@ public final class Helper {
      * @return The texture offset
      */
     public static Vector2f calcOffsetForTextureAt(int x, int y) {
-        return new Vector2f(x * DIV, y * DIV);
+        return new Vector2f((float) (x * DIV), (float) (y * DIV));
     }
 
     /**

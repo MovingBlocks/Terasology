@@ -26,7 +26,7 @@ public final class ChunkUpdateManager {
 
     private final FastList<Chunk> _displayListUpdates = new FastList<Chunk>(128);
 
-    private double _meanUpdateDuration = 0.0f;
+    private double _meanUpdateDuration = 0.0;
     private final World _parent;
 
     private int _chunkUpdateAmount;

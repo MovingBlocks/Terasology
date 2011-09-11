@@ -135,7 +135,7 @@ public class PerlinNoise {
      * @return
      */
     public double ridgedMultiFractalNoise(double x, double y, double z, int octaves, double lacunarity, double gain, double offset) {
-        double frequency = 1f;
+        double frequency = 1.0;
         double signal;
 
         /*
@@ -152,10 +152,10 @@ public class PerlinNoise {
 
             weight = gain * signal;
 
-            if (weight > 1.0f) {
-                weight = 1.0f;
-            } else if (weight < 0.0f) {
-                weight = 0.0f;
+            if (weight > 1.0) {
+                weight = 1.0;
+            } else if (weight < 0.0) {
+                weight = 0.0;
             }
 
             signal = ridge(noise(x, y, z), offset);

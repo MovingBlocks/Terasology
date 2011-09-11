@@ -58,7 +58,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
             for (int x = -2; x < 3; x++) {
                 for (int z = -2; z < 3; z++) {
                     if (!(x == -2 && z == -2) && !(x == 2 && z == 2) && !(x == -2 && z == 2) && !(x == 2 && z == -2)) {
-                        if (_rand.randomDouble() <= 0.8f) {
+                        if (_rand.randomDouble() <= 0.8) {
                             _world.setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update, false);
                             _world.refreshSunlightAt(posX + x, posZ + z, false, true);
                         }

@@ -107,7 +107,7 @@ public class ViewFrustum {
         _planes[5].normalize();
     }
 
-    public boolean intersects(float x, float y, float z) {
+    public boolean intersects(double x, double y, double z) {
         for (int i = 0; i < 6; i++) {
             if (_planes[i].getA() * x + _planes[i].getB() * y + _planes[i].getC() * z + _planes[i].getD() <= 0) {
                 return false;

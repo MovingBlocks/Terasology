@@ -35,11 +35,11 @@ public final class Configuration {
     /**
      * The initial time for new worlds.
      */
-    public static final float INITIAL_TIME = 0.096f;
+    public static final double INITIAL_TIME = 0.096;
     /**
      * The mouse sensitivity.
      */
-    public static final float MOUSE_SENS = 0.075f;
+    public static final double MOUSE_SENS = 0.075;
     /**
      * The title string of the game.
      */
@@ -51,7 +51,7 @@ public final class Configuration {
     /**
      * The size of the sun.
      */
-    public static final float SUN_SIZE = 64f;
+    public static final double SUN_SIZE = 64;
     /**
      * The string used to generate the default world. If not set, a random seed is used.
      */
@@ -70,21 +70,21 @@ public final class Configuration {
     public static final boolean FULLSCREEN = false;
 
     /* PLAYER */
-    public static final float BOBBING_ANGLE = 2.5f;
+    public static final double BOBBING_ANGLE = 2.5;
 
     /* LIGHTING */
     public static final byte MAX_LIGHT = 15;
-    public static final float OCCLUSION_AMOUNT = 1f / 8f;
+    public static final double OCCLUSION_AMOUNT = 1.0 / 8.0;
 
     /* RESOURCES */
-    public static final float PROB_COAL = -2f;
-    public static final float PROB_GOLD = -3f;
-    public static final float PROB_SILVER = -2.5f;
-    public static final float PROB_REDSTONE = -3f;
-    public static final float PROB_DIAMOND = -4f;
+    public static final double PROB_COAL = -2;
+    public static final double PROB_GOLD = -3;
+    public static final double PROB_SILVER = -2.5;
+    public static final double PROB_REDSTONE = -3;
+    public static final double PROB_DIAMOND = -4;
 
     /* -------- */
-    private static final FastMap<String, Float> _settingsNumeric = new FastMap<String, Float>();
+    private static final FastMap<String, Double> _settingsNumeric = new FastMap<String, Double>();
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
 
     static {
@@ -103,7 +103,7 @@ public final class Configuration {
      * @param key The key
      * @return The numeric value
      */
-    public static Float getSettingNumeric(String key) {
+    public static Double getSettingNumeric(String key) {
         return _settingsNumeric.get(key);
     }
 
@@ -133,7 +133,7 @@ public final class Configuration {
      * @param key   The key
      * @param value The numeric value
      */
-    public static void setSetting(String key, Float value) {
+    public static void setSetting(String key, Double value) {
         _settingsNumeric.put(key, value);
     }
 
@@ -151,17 +151,17 @@ public final class Configuration {
         _settingsBoolean.put("BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);
-        _settingsNumeric.put("JUMP_INTENSITY", 0.08f);
-        _settingsNumeric.put("MAX_GRAVITY", 0.7f);
-        _settingsNumeric.put("WALKING_SPEED", 0.02f);
-        _settingsNumeric.put("RUNNING_FACTOR", 1.8f);
-        _settingsNumeric.put("GRAVITY", 0.002f);
-        _settingsNumeric.put("MAX_GRAVITY_SWIMMING", 0.01f);
-        _settingsNumeric.put("GRAVITY_SWIMMING", 0.0001f);
-        _settingsNumeric.put("FRICTION", 0.08f);
-        _settingsNumeric.put("V_DIST_X", 32f);
-        _settingsNumeric.put("V_DIST_Z", 32f);
-        _settingsNumeric.put("REPLANT_DIRT_TIME", 30000f);
+        _settingsNumeric.put("JUMP_INTENSITY", 0.08);
+        _settingsNumeric.put("MAX_GRAVITY", 0.7);
+        _settingsNumeric.put("WALKING_SPEED", 0.02);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.8);
+        _settingsNumeric.put("GRAVITY", 0.002);
+        _settingsNumeric.put("MAX_GRAVITY_SWIMMING", 0.01);
+        _settingsNumeric.put("GRAVITY_SWIMMING", 0.0001);
+        _settingsNumeric.put("FRICTION", 0.08);
+        _settingsNumeric.put("V_DIST_X", 32.0);
+        _settingsNumeric.put("V_DIST_Z", 32.0);
+        _settingsNumeric.put("REPLANT_DIRT_TIME", 30000.0);
     }
 
     private static void loadDebug() {
@@ -169,9 +169,9 @@ public final class Configuration {
         _settingsBoolean.put("DEBUG", true);
         _settingsBoolean.put("DEBUG_COLLISION", false);
         _settingsBoolean.put("GOD_MODE", true);
-        _settingsNumeric.put("V_DIST_X", 32f);
-        _settingsNumeric.put("V_DIST_Z", 32f);
-        _settingsNumeric.put("RUNNING_FACTOR", 12.0f);
+        _settingsNumeric.put("V_DIST_X", 32.0);
+        _settingsNumeric.put("V_DIST_Z", 32.0);
+        _settingsNumeric.put("WALKING_SPEED", 0.5);
     }
 
     private static void loadDemo() {
@@ -180,13 +180,13 @@ public final class Configuration {
         _settingsBoolean.put("CROSSHAIR", false);
         _settingsBoolean.put("DEMO_FLIGHT", true);
         _settingsBoolean.put("GOD_MODE", true);
-        _settingsNumeric.put("V_DIST_X", 32f);
-        _settingsNumeric.put("V_DIST_Z", 32f);
+        _settingsNumeric.put("V_DIST_X", 32.0);
+        _settingsNumeric.put("V_DIST_Z", 32.0);
     }
 
     private static void loadSanboxed() {
-        _settingsNumeric.put("V_DIST_X", 16f);
-        _settingsNumeric.put("V_DIST_Z", 16f);
+        _settingsNumeric.put("V_DIST_X", 16.0);
+        _settingsNumeric.put("V_DIST_Z", 16.0);
     }
 
     private static void loadSettings() {

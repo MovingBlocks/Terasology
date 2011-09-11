@@ -38,11 +38,11 @@ public class RayBlockIntersection {
      */
     public static class Intersection implements Comparable<Intersection> {
 
-        private final float _d;
-        private final float _t;
+        private final double _d;
+        private final double _t;
         private final Vector3f _rayOrigin, _intersectionPoint, _surfaceNormal, _blockPosition, _rayDirection;
 
-        public Intersection(Vector3f blockPosition, Vector3f normal, float d, float t, Vector3f rayOrigin, Vector3f rayDirection, Vector3f intersectionPoint) {
+        public Intersection(Vector3f blockPosition, Vector3f normal, double d, double t, Vector3f rayOrigin, Vector3f rayDirection, Vector3f intersectionPoint) {
             this._d = d;
             this._t = t;
             this._rayOrigin = rayOrigin;
@@ -199,12 +199,12 @@ public class RayBlockIntersection {
         VectorPool.putVector(b);
 
 
-        float d = -(norm.x * v0.x + norm.y * v0.y + norm.z * v0.z);
+        double d = -(norm.x * v0.x + norm.y * v0.y + norm.z * v0.z);
 
         /**
          * Calculate the distance on the ray, where the intersection occurs.
          */
-        float t = -(norm.x * origin.x + norm.y * origin.y + norm.z * origin.z + d) / (Vector3f.dot(ray, norm));
+        double t = -(norm.x * origin.x + norm.y * origin.y + norm.z * origin.z + d) / (Vector3f.dot(ray, norm));
 
         if (t < 0)
             return null;

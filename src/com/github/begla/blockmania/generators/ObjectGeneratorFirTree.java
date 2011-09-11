@@ -56,7 +56,7 @@ public class ObjectGeneratorFirTree extends ObjectGenerator {
 
         int stage = 2;
         // Generate the treetop
-        for (int y = height - 1; y >= (height * (1f / 3f)); y--) {
+        for (int y = height - 1; y >= (height * (1.0 / 3.0)); y--) {
             for (int x = -(stage / 2); x <= (stage / 2); x++) {
                 if (!(x == 0)) {
                     _world.setBlock(posX + x, posY + y, posZ, (byte) 0x16, update, false);

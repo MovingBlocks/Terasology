@@ -96,9 +96,9 @@ public class ChunkMeshGenerator {
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex));
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
 
-                float occlusionValue = getOcclusionValue(vertexPos);
-                mesh._vertexElements[j].vertices.put(getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.SUN) * occlusionValue);
-                mesh._vertexElements[j].vertices.put(getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.BLOCK) * occlusionValue);
+                double occlusionValue = getOcclusionValue(vertexPos);
+                mesh._vertexElements[j].vertices.put((float) (getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.SUN) * occlusionValue));
+                mesh._vertexElements[j].vertices.put((float) (getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.BLOCK) * occlusionValue));
 
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor));
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 1));
@@ -112,10 +112,10 @@ public class ChunkMeshGenerator {
         }
     }
 
-    private float getLightForVertexPos(Vector3f vertexPos, Chunk.LIGHT_TYPE lightType) {
-        float result = 0.0f;
+    private double getLightForVertexPos(Vector3f vertexPos, Chunk.LIGHT_TYPE lightType) {
+        double result = 0.0;
 
-        float[] lights = new float[8];
+        double[] lights = new double[8];
 
         lights[0] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f), lightType) / 15f;
         lights[1] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f), lightType) / 15f;
@@ -141,9 +141,9 @@ public class ChunkMeshGenerator {
         return result / counter;
     }
 
-    private float getOcclusionValue(Vector3f vertexPos) {
+    private double getOcclusionValue(Vector3f vertexPos) {
 
-        float result = 1.0f;
+        double result = 1.0;
         byte[] blocks = new byte[8];
 
         blocks[0] = _chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f));
@@ -403,9 +403,9 @@ public class ChunkMeshGenerator {
     }
 
     private Vector3f moveVectorToWorldSpace(int cPosX, int cPosY, int cPosZ, Vector3f offset) {
-        float offsetX = _chunk.getPosition().x * Configuration.CHUNK_DIMENSIONS.x;
-        float offsetY = _chunk.getPosition().y * Configuration.CHUNK_DIMENSIONS.y;
-        float offsetZ = _chunk.getPosition().z * Configuration.CHUNK_DIMENSIONS.z;
+        double offsetX = _chunk.getPosition().x * Configuration.CHUNK_DIMENSIONS.x;
+        double offsetY = _chunk.getPosition().y * Configuration.CHUNK_DIMENSIONS.y;
+        double offsetZ = _chunk.getPosition().z * Configuration.CHUNK_DIMENSIONS.z;
 
         offset.x += offsetX + cPosX;
         offset.y += offsetY + cPosY;

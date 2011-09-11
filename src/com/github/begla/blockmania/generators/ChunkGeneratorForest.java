@@ -55,7 +55,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
         for (int y = 32; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x += 4) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z += 4) {
-                    float forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+                    double forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
                     if (forestDens > 0.01) {
 
@@ -83,7 +83,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
     void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
 
         if (c.getBlock(x, y, z) == 0x1) {
-            float grassDens = calcGrassDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+            double grassDens = calcGrassDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
             if (grassDens > 0.0) {
                 /*
@@ -138,9 +138,9 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      * @param z
      * @return
      */
-    float calcForestDensity(float x, float z) {
-        float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.2f * x, 0f, 0.2f * z, 7, 2.3614521f);
+    double calcForestDensity(double x, double z) {
+        double result = 0.0;
+        result += _pGen3.multiFractalNoise(0.2 * x, 0, 0.2 * z, 7, 2.3614521);
         return result;
     }
 
@@ -149,9 +149,9 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      * @param z
      * @return
      */
-    float calcGrassDensity(float x, float z) {
-        float result = 0.0f;
-        result += _pGen3.multiFractalNoise(0.01f * x, 0f, 0.01f * z, 7, 2.37152f);
+    double calcGrassDensity(double x, double z) {
+        double result = 0.0;
+        result += _pGen3.multiFractalNoise(0.01 * x, 0, 0.01 * z, 7, 2.37152);
         return result;
     }
 }

@@ -28,24 +28,31 @@ public class MathHelper {
         return x > 0 ? (int) x : (int) x - 1;
     }
 
-    public static float biLerp(float x, float y, float q11, float q12, float q21, float q22, float x1, float x2, float y1, float y2) {
-        float r1 = lerp(x, x1, x2, q11, q21);
-        float r2 = lerp(x, x1, x2, q12, q22);
+    public static double biLerp(double x, double y, double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2) {
+        double r1 = lerp(x, x1, x2, q11, q21);
+        double r2 = lerp(x, x1, x2, q12, q22);
         return lerp(y, y1, y2, r1, r2);
     }
 
-    private static float lerp(float x, float x1, float x2, float q00, float q01) {
+    private static double lerp(double x, double x1, double x2, double q00, double q01) {
         return ((x2 - x) / (x2 - x1)) * q00 + ((x - x1) / (x2 - x1)) * q01;
     }
 
-    public static float triLerp(float x, float y, float z, float q000, float q001, float q010, float q011, float q100, float q101, float q110, float q111, float x1, float x2, float y1, float y2, float z1, float z2) {
-        float x00 = lerp(x, x1, x2, q000, q100);
-        float x10 = lerp(x, x1, x2, q010, q110);
-        float x01 = lerp(x, x1, x2, q001, q101);
-        float x11 = lerp(x, x1, x2, q011, q111);
-        float r0 = lerp(y, y1, y2, x00, x01);
-        float r1 = lerp(y, y1, y2, x10, x11);
+    public static double triLerp(double x, double y, double z, double q000, double q001, double q010, double q011, double q100, double q101, double q110, double q111, double x1, double x2, double y1, double y2, double z1, double z2) {
+        double x00 = lerp(x, x1, x2, q000, q100);
+        double x10 = lerp(x, x1, x2, q010, q110);
+        double x01 = lerp(x, x1, x2, q001, q101);
+        double x11 = lerp(x, x1, x2, q011, q111);
+        double r0 = lerp(y, y1, y2, x00, x01);
+        double r1 = lerp(y, y1, y2, x10, x11);
         return lerp(z, z1, z2, r0, r1);
+    }
+
+    public static int mapToPositive(int x) {
+        if (x >= 0)
+            return x * 2;
+
+        return -x * 2 - 1;
     }
 
     /**
@@ -56,6 +63,9 @@ public class MathHelper {
      * @return Unique 1D value
      */
     public static int cantorize(int k1, int k2) {
+        k1 = mapToPositive(k1);
+        k2 = mapToPositive(k2);
+
         return ((k1 + k2) * (k1 + k2 + 1) / 2) + k2;
     }
 

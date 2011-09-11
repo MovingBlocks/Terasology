@@ -52,7 +52,7 @@ public final class Player extends RenderableObject {
     private double _pitch;
     private final Vector3f _movement = VectorPool.getVector(0, 0, 0);
     private final Vector3f _acc = VectorPool.getVector(0, 0, 0);
-    private float _gravity = 0.0f;
+    private double _gravity = 0.0;
     private World _parent = null;
     private final PerlinNoise _pGen = new PerlinNoise(42);
     private final Vector3f _viewingDirection = VectorPool.getVector();
@@ -104,8 +104,8 @@ public final class Player extends RenderableObject {
         if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
 
             if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
-                float bobbing = (float) (_pGen.noise(_position.x * 0.5f, 0f, _position.z * 0.5f));
-                glRotatef(bobbing * Configuration.BOBBING_ANGLE, 0, 0, 1);
+                double bobbing = _pGen.noise(_position.x * 0.5, 0, _position.z * 0.5);
+                glRotated(bobbing * Configuration.BOBBING_ANGLE, 0, 0, 1);
             }
 
             Vector3f eyePosition = calcEyePosition();
@@ -113,7 +113,7 @@ public final class Player extends RenderableObject {
 
 
         } else {
-            GLU.gluLookAt(_position.x, _position.y, _position.z, _position.x, 40f, _position.z + 128f, 0, 1, 0);
+            GLU.gluLookAt(_position.x, _position.y, _position.z, _position.x, 40, _position.z + 128, 0, 1, 0);
         }
         // Update the current view frustum
         _viewFrustum.updateFrustum();
@@ -134,8 +134,8 @@ public final class Player extends RenderableObject {
      */
     @Override
     public void update() {
-        float dx = Mouse.getDX();
-        float dy = Mouse.getDY();
+        double dx = Mouse.getDX();
+        double dy = Mouse.getDY();
 
         yaw(dx * Configuration.MOUSE_SENS);
         pitch(dy * Configuration.MOUSE_SENS);
@@ -145,7 +145,7 @@ public final class Player extends RenderableObject {
         updatePlayerPosition();
 
         // Update the viewing direction
-        _viewingDirection.set((float) Math.sin(Math.toRadians(_yaw)) * (float) Math.cos(Math.toRadians(_pitch)), -1f * (float) Math.sin(Math.toRadians(_pitch)), -1 * (float) Math.cos(Math.toRadians(_pitch)) * (float) Math.cos(Math.toRadians(_yaw)));
+        _viewingDirection.set((float) (Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch))), (float) -Math.sin(Math.toRadians(_pitch)), (float) (-Math.cos(Math.toRadians(_pitch)) * Math.cos(Math.toRadians(_yaw))));
         _viewingDirection.normalise();
 
         _movement.set(0, 0, 0);
@@ -156,7 +156,7 @@ public final class Player extends RenderableObject {
      *
      * @param diff Amount of yawing to be applied.
      */
-    void yaw(float diff) {
+    void yaw(double diff) {
         double nYaw = (_yaw + diff) % 360;
         if (nYaw < 0) {
             nYaw += 360;
@@ -169,7 +169,7 @@ public final class Player extends RenderableObject {
      *
      * @param diff Amount of pitching to be applied.
      */
-    void pitch(float diff) {
+    void pitch(double diff) {
         double nPitch = (_pitch - diff);
 
         if (nPitch > 89)
@@ -439,7 +439,7 @@ public final class Player extends RenderableObject {
             if (Block.getBlockForType(blockType1).isPenetrable() || !playerAABB.overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z)))
                 continue;
 
-            float direction = origin.y - _position.y;
+            double direction = origin.y - _position.y;
 
             if (direction >= 0)
                 _position.y = n.getValue().y + 0.50001f + playerAABB.getDimensions().y;
@@ -466,9 +466,9 @@ public final class Player extends RenderableObject {
         for (int x = -1; x < 2; x++) {
             for (int z = -1; z < 2; z++) {
                 for (int y = -1; y < 2; y++) {
-                    int blockPosX = (int) (origin.x + 0.5f) + x;
-                    int blockPosY = (int) (origin.y + 0.5f) + y;
-                    int blockPosZ = (int) (origin.z + 0.5f) + z;
+                    int blockPosX = (int) (origin.x + (origin.x >= 0 ? 0.5f : -0.5f)) + x;
+                    int blockPosY = (int) (origin.y + (origin.y >= 0 ? 0.5f : -0.5f)) + y;
+                    int blockPosZ = (int) (origin.z + (origin.z >= 0 ? 0.5f : -0.5f)) + z;
 
                     blockPositions.add(new BlockPosition(blockPosX, blockPosY, blockPosZ, origin));
                 }
@@ -517,11 +517,11 @@ public final class Player extends RenderableObject {
                     Vector3f.sub(blockPoi, playerPoi, pushBack);
 
                     // Calculate the intensity of the diversion alongside the block
-                    float length = Vector3f.dot(slideVector, direction);
+                    double length = Vector3f.dot(slideVector, direction);
 
                     Vector3f newPosition = VectorPool.getVector();
-                    newPosition.z = origin.z + pushBack.z * 0.2f + length * slideVector.z;
-                    newPosition.x = origin.x + pushBack.x * 0.2f + length * slideVector.x;
+                    newPosition.z = (float) (origin.z + pushBack.z * 0.2 + length * slideVector.z);
+                    newPosition.x = (float) (origin.x + pushBack.x * 0.2 + length * slideVector.x);
                     newPosition.y = origin.y;
 
                     // Update the position

@@ -2,6 +2,8 @@
 
 varying float fog;
 
+float c = 0.01;
+
 float fogEyeRadial(vec4 eyePos) {
     return length(eyePos / eyePos.w);
 }
@@ -9,6 +11,7 @@ float fogEyeRadial(vec4 eyePos) {
 void main()
 {
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	//gl_Position.z = log(c*gl_Position.z + 1) / log(c*756 + 1) * gl_Position.w;
 
 	gl_TexCoord[0] = gl_MultiTexCoord0;
     gl_TexCoord[1] = gl_MultiTexCoord1;

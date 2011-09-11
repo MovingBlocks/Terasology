@@ -20,55 +20,55 @@ package com.github.begla.blockmania.rendering;
  */
 public class FrustumPlane {
 
-    private float a, b, c, d;
+    private double a, b, c, d;
 
     public FrustumPlane() {
         // Do nothing.
     }
 
-    public FrustumPlane(float a, float b, float c, float d) {
+    public FrustumPlane(double a, double b, double c, double d) {
         this.a = a;
         this.b = b;
         this.c = c;
         this.d = d;
     }
 
-    public float getA() {
+    public double getA() {
         return a;
     }
 
-    public void setA(float a) {
+    public void setA(double a) {
         this.a = a;
     }
 
-    public float getB() {
+    public double getB() {
         return b;
     }
 
-    public void setB(float b) {
+    public void setB(double b) {
         this.b = b;
     }
 
 
-    public float getC() {
+    public double getC() {
         return c;
     }
 
-    void setC(float c) {
+    void setC(double c) {
         this.c = c;
     }
 
 
-    public float getD() {
+    public double getD() {
         return d;
     }
 
-    public void setD(float d) {
+    public void setD(double d) {
         this.d = d;
     }
 
     public void normalize() {
-        float t = (float) Math.sqrt(a * a + b * b + c * c);
+        double t = Math.sqrt(a * a + b * b + c * c);
         a /= t;
         b /= t;
         c /= t;

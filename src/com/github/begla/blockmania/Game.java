@@ -65,8 +65,8 @@ public final class Game {
     private boolean _runGame = true;
     private boolean _saveWorldOnExit = true;
     /* ------- */
-    private float _meanFps;
-    private float _memoryUsage;
+    private double _meanFps;
+    private double _memoryUsage;
     /* ------- */
     private Player _player;
     private World _world;
@@ -81,7 +81,7 @@ public final class Game {
     /* ------- */
     private boolean _sandbox = false;
     /* ------- */
-    private float _cubeRotation;
+    private double _cubeRotation;
 
     // Singleton
     public static Game getInstance() {
@@ -257,10 +257,10 @@ public final class Game {
     private void render() {
         glFogi(GL_FOG_MODE, GL_LINEAR);
         // Update the viewing distance
-        float minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
-        float viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, viewingDistance * 0.05f);
-        glFogf(GL_FOG_END, viewingDistance);
+        double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
+        double viewingDistance = minDist / 2f;
+        glFogf(GL_FOG_START, (float) (viewingDistance * 0.05));
+        glFogf(GL_FOG_END, (float) viewingDistance);
 
         /*
          * Render the player, world and HUD.
@@ -281,7 +281,7 @@ public final class Game {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(80.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 1024f);
+        gluPerspective(80.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 756f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
@@ -372,7 +372,7 @@ public final class Game {
         glAlphaFunc(GL_GREATER, 0.1f);
         glDisable(GL_DEPTH_TEST);
         gluLookAt(0, 0, -25, 8f, 4.5f, 0, 0, 1, 0);
-        glRotatef(_cubeRotation % 360, 0, 1, 1);
+        glRotated(_cubeRotation % 360, 0, 1, 1);
         Block.getBlockForType(_player.getSelectedBlockType()).renderBlock(true);
         glEnable(GL_DEPTH_TEST);
         glDisable(GL11.GL_BLEND);
@@ -476,7 +476,7 @@ public final class Game {
 
                     char c = Keyboard.getEventCharacter();
 
-                    if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.' || c == '!') {
+                    if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.' || c == '!' || c == '-') {
                         _consoleInput.append(c);
                     }
                 }
@@ -531,9 +531,9 @@ public final class Game {
                         Configuration.setSetting(parsingResult.get(1).toUpperCase(), Boolean.parseBoolean(parsingResult.get(2)));
                         success = true;
                     } else {
-                        Float fRes = Configuration.getSettingNumeric(parsingResult.get(1).toUpperCase());
+                        Double fRes = Configuration.getSettingNumeric(parsingResult.get(1).toUpperCase());
                         if (fRes != null) {
-                            Configuration.setSetting(parsingResult.get(1).toUpperCase(), Float.parseFloat(parsingResult.get(2)));
+                            Configuration.setSetting(parsingResult.get(1).toUpperCase(), Double.parseDouble(parsingResult.get(2)));
                             success = true;
                         }
                     }

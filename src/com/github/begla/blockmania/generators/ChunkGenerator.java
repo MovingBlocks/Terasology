@@ -29,18 +29,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public abstract class ChunkGenerator {
 
-    /**
-     * First Perlin noise generator.
-     */
-    final PerlinNoise _pGen1;
-    /**
-     * Second Perlin noise generator.
-     */
-    final PerlinNoise _pGen2;
-    /**
-     * Third Perlin noise generator.
-     */
-    final PerlinNoise _pGen3;
+    final PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen6;
     /**
      * Fast random number generator.
      */
@@ -56,6 +45,9 @@ public abstract class ChunkGenerator {
         _pGen1 = new PerlinNoise(seed.hashCode());
         _pGen2 = new PerlinNoise(seed.hashCode() + 1);
         _pGen3 = new PerlinNoise(seed.hashCode() + 2);
+        _pGen4 = new PerlinNoise(seed.hashCode() + 3);
+        _pGen5 = new PerlinNoise(seed.hashCode() + 4);
+        _pGen6 = new PerlinNoise(seed.hashCode() + 5);
     }
 
     /**

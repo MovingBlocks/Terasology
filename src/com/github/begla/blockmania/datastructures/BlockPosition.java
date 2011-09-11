@@ -39,13 +39,13 @@ public final class BlockPosition implements Comparable<BlockPosition> {
         this._origin = origin;
     }
 
-    float getDistance() {
-        return VectorPool.getVector((float) x - _origin.x, (float) y - _origin.y, (float) z - _origin.z).length();
+    double getDistance() {
+        return VectorPool.getVector(x - _origin.x, y - _origin.y, z - _origin.z).length();
     }
 
     public int compareTo(BlockPosition o) {
-        float distance = getDistance();
-        float oDistance = o.getDistance();
+        double distance = getDistance();
+        double oDistance = o.getDistance();
 
         if (oDistance > distance)
             return -1;

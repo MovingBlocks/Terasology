@@ -62,7 +62,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorForest {
 
                     if (Block.getBlockForType(type).getClass() == BlockDirt.class) {
                         // Not every block should be updated each turn
-                        if (_rand.randomDouble() > 0.025f) {
+                        if (_rand.randomDouble() > 0.025) {
                             c.setBlock(x, y, z, (byte) 0x1);
                             generateGrassAndFlowers(c, x, y, z);
                         }

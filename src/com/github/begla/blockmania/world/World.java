@@ -68,9 +68,9 @@ public final class World extends RenderableObject {
     /* PROPERTIES */
     private String _title, _seed;
     private Vector3f _spawningPoint;
-    private float _time = Configuration.INITIAL_TIME;
+    private double _time = Configuration.INITIAL_TIME;
     private long _lastDaytimeMeasurement = Game.getInstance().getTime();
-    private float _daylight = 1.0f;
+    private double _daylight = 1.0f;
     /* RENDERING */
     private FastSet<Chunk> _visibleChunks;
     /* UPDATING & CACHING */
@@ -286,11 +286,11 @@ public final class World extends RenderableObject {
         ShaderManager.getInstance().enableShader("chunk");
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
         int swimmimg = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
-        GL20.glUniform1f(daylight, getDaylight());
+        GL20.glUniform1f(daylight, (float) getDaylight());
         GL20.glUniform1i(swimmimg, _player.isHeadUnderWater() ? 1 : 0);
         ShaderManager.getInstance().enableShader("cloud");
         daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("cloud"), "daylight");
-        GL20.glUniform1f(daylight, getDaylight());
+        GL20.glUniform1f(daylight, (float) getDaylight());
         ShaderManager.getInstance().enableShader(null);
 
         renderChunks();
@@ -299,7 +299,7 @@ public final class World extends RenderableObject {
     private void renderSunMoon() {
         glPushMatrix();
         // Position the sun relatively to the player
-        glTranslatef(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 2.0f, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
+        glTranslated(_player.getPosition().x, Configuration.CHUNK_DIMENSIONS.y * 2.0, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z + _player.getPosition().z);
         glRotatef(-35, 1, 0, 0);
 
         glColor4f(1f, 1f, 1f, 1.0f);
@@ -450,6 +450,10 @@ public final class World extends RenderableObject {
      * @return The X-coordinate of the chunk
      */
     private int calcChunkPosX(int x) {
+        // Offset for negative chunks
+        if (x < 0)
+            x -= 15;
+
         return (x / (int) Configuration.CHUNK_DIMENSIONS.x);
     }
 
@@ -460,6 +464,10 @@ public final class World extends RenderableObject {
      * @return The Z-coordinate of the chunk
      */
     private int calcChunkPosZ(int z) {
+        // Offset for negative chunks
+        if (z < 0)
+            z -= 15;
+
         return (z / (int) Configuration.CHUNK_DIMENSIONS.z);
     }
 
@@ -471,8 +479,11 @@ public final class World extends RenderableObject {
      * @return The X-coordinate of the block within the chunk
      */
     private int calcBlockPosX(int x1, int x2) {
-        x1 = x1 % (Configuration.getSettingNumeric("V_DIST_X").intValue() * (int) Configuration.CHUNK_DIMENSIONS.x);
-        return (x1 - (x2 * (int) Configuration.CHUNK_DIMENSIONS.x));
+        int blockPos = (x1 - (x2 * (int) Configuration.CHUNK_DIMENSIONS.x));
+
+        assert (blockPos >= 0) : "Every position MUST be positive or zero: " + blockPos;
+
+        return blockPos;
     }
 
     /**
@@ -483,8 +494,11 @@ public final class World extends RenderableObject {
      * @return The Z-coordinate of the block within the chunk
      */
     private int calcBlockPosZ(int z1, int z2) {
-        z1 = z1 % (Configuration.getSettingNumeric("V_DIST_Z").intValue() * (int) Configuration.CHUNK_DIMENSIONS.z);
-        return (z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
+        int blockPos = (z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
+
+        assert (blockPos >= 0) : "Every position MUST be positive or zero: " + blockPos;
+
+        return blockPos;
     }
 
     /**
@@ -499,8 +513,8 @@ public final class World extends RenderableObject {
      * @param overwrite
      */
     public final void setBlock(int x, int y, int z, byte type, boolean update, boolean overwrite) {
-        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
-        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+        int chunkPosX = calcChunkPosX(x);
+        int chunkPosZ = calcChunkPosZ(z);
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
@@ -569,7 +583,7 @@ public final class World extends RenderableObject {
      * @return
      */
     public final byte getBlockAtPosition(Vector3f pos) {
-        return getBlock((int) (pos.x + 0.5f), (int) (pos.y + 0.5f), (int) (pos.z + 0.5f));
+        return getBlock((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)));
     }
 
     /**
@@ -581,8 +595,8 @@ public final class World extends RenderableObject {
      * @return The type of the block
      */
     public final byte getBlock(int x, int y, int z) {
-        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
-        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+        int chunkPosX = calcChunkPosX(x);
+        int chunkPosZ = calcChunkPosZ(z);
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
@@ -633,8 +647,8 @@ public final class World extends RenderableObject {
      * @return The light value
      */
     public final byte getLight(int x, int y, int z, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
-        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+        int chunkPosX = calcChunkPosX(x);
+        int chunkPosZ = calcChunkPosZ(z);
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
@@ -661,12 +675,11 @@ public final class World extends RenderableObject {
      * @param type
      */
     public void setLight(int x, int y, int z, byte intens, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
-        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+        int chunkPosX = calcChunkPosX(x);
+        int chunkPosZ = calcChunkPosZ(z);
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-
 
         Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
@@ -684,12 +697,11 @@ public final class World extends RenderableObject {
      * @param z
      */
     public void refreshSunlightAt(int x, int z, boolean spreadLight, boolean refreshSunlight) {
-        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
-        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+        int chunkPosX = calcChunkPosX(x);
+        int chunkPosZ = calcChunkPosZ(z);
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-
 
         Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
@@ -709,8 +721,8 @@ public final class World extends RenderableObject {
      * @param type
      */
     public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, FastList<Vector3f> brightSpots) {
-        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
-        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+        int chunkPosX = calcChunkPosX(x);
+        int chunkPosZ = calcChunkPosZ(z);
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
@@ -732,8 +744,8 @@ public final class World extends RenderableObject {
      * @param type
      */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = calcChunkPosX(x) % Configuration.getSettingNumeric("V_DIST_X").intValue();
-        int chunkPosZ = calcChunkPosZ(z) % Configuration.getSettingNumeric("V_DIST_Z").intValue();
+        int chunkPosX = calcChunkPosX(x);
+        int chunkPosZ = calcChunkPosZ(z);
 
         int blockPosX = calcBlockPosX(x, chunkPosX);
         int blockPosZ = calcBlockPosZ(z, chunkPosZ);
@@ -749,7 +761,7 @@ public final class World extends RenderableObject {
      *
      * @return The daylight value
      */
-    float getDaylight() {
+    double getDaylight() {
         return _daylight;
     }
 
@@ -821,7 +833,7 @@ public final class World extends RenderableObject {
      *
      * @param time The time to set
      */
-    public void setTime(float time) {
+    public void setTime(double time) {
         _time = time;
 
         if (_time < 0) {
@@ -887,9 +899,11 @@ public final class World extends RenderableObject {
      * @return
      */
     private Vector3f findSpawningPoint() {
-        for (int xz = 1024; ; xz++) {
-            if (((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(xz, 26, xz) >= 0.012f) {
-                return VectorPool.getVector(xz, 26, xz);
+        for (; ; ) {
+            int randX = (int) (_rand.randomDouble() * 16000f);
+            int randZ = (int) (_rand.randomDouble() * 16000f);
+            if (((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 26, randZ) >= 0.01f) {
+                return VectorPool.getVector(randX, 26, randZ);
             }
         }
     }
@@ -954,7 +968,7 @@ public final class World extends RenderableObject {
         // Save the world metadata
         root.setAttribute("seed", _seed);
         root.setAttribute("title", _title);
-        root.setAttribute("time", Float.toString(_time));
+        root.setAttribute("time", Double.toString(_time));
 
         // Save the player metadata
         Element player = new Element("Player");
@@ -1063,20 +1077,17 @@ public final class World extends RenderableObject {
         glEndList();
     }
 
-    /**
-     *
-     */
     private static void generateSunMoonDisplayList() {
         glNewList(_dlSunMoon, GL_COMPILE);
         glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-Configuration.SUN_SIZE, Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
+        glVertex3d(-Configuration.SUN_SIZE, Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
         glTexCoord2f(1.f, 0.0f);
-        glVertex3f(Configuration.SUN_SIZE, Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
+        glVertex3d(Configuration.SUN_SIZE, Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
         glTexCoord2f(1.f, 1.0f);
-        glVertex3f(Configuration.SUN_SIZE, -Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
+        glVertex3d(Configuration.SUN_SIZE, -Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
         glTexCoord2f(0.f, 1.0f);
-        glVertex3f(-Configuration.SUN_SIZE, -Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
+        glVertex3d(-Configuration.SUN_SIZE, -Configuration.SUN_SIZE, -Configuration.SUN_SIZE);
         glEnd();
         glEndList();
     }

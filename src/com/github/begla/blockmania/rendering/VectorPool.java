@@ -35,7 +35,7 @@ public class VectorPool {
      * @param z
      * @return
      */
-    public static Vector3f getVector(float x, float y, float z) {
+    public static Vector3f getVector(double x, double y, double z) {
 
         Vector3f v = null;
 
@@ -46,9 +46,9 @@ public class VectorPool {
         }
 
         if (v == null) {
-            v = new Vector3f(x, y, z);
+            v = new Vector3f((float) x, (float) y, (float) z);
         } else {
-            v.set(x, y, z);
+            v.set((float) x, (float) y, (float) z);
         }
 
         return v;

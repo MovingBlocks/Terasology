@@ -60,16 +60,16 @@ public class AABB extends RenderableObject {
     }
 
     public boolean overlaps(AABB aabb2) {
-        if (maxX() < aabb2.minX() || minX() > aabb2.maxX()) return false;
-        if (maxY() < aabb2.minY() || minY() > aabb2.maxY()) return false;
-        if (maxZ() < aabb2.minZ() || minZ() > aabb2.maxZ()) return false;
+        if (maxX() <= aabb2.minX() || minX() >= aabb2.maxX()) return false;
+        if (maxY() <= aabb2.minY() || minY() >= aabb2.maxY()) return false;
+        if (maxZ() <= aabb2.minZ() || minZ() >= aabb2.maxZ()) return false;
         return true;
     }
 
     public boolean contains(Vector3f point) {
-        if (maxX() < point.x || minX() > point.x) return false;
-        if (maxY() < point.y || minY() > point.y) return false;
-        if (maxZ() < point.z || minZ() > point.z) return false;
+        if (maxX() <= point.x || minX() >= point.x) return false;
+        if (maxY() <= point.y || minY() >= point.y) return false;
+        if (maxZ() <= point.z || minZ() >= point.z) return false;
 
         return true;
     }
@@ -101,11 +101,11 @@ public class AABB extends RenderableObject {
         if (pointOnAABB.y == minY() && testY) normals.add(VectorPool.getVector(0, -1, 0));
         if (pointOnAABB.y == maxY() && testY) normals.add(VectorPool.getVector(0, 1, 0));
 
-        float minDistance = Float.MAX_VALUE;
+        double minDistance = Double.MAX_VALUE;
         Vector3f closestNormal = VectorPool.getVector();
 
         for (Vector3f v : normals) {
-            float distance = Vector3f.sub(centerPointForNormal(v), origin, null).length();
+            double distance = Vector3f.sub(centerPointForNormal(v), origin, null).length();
 
             if (distance < minDistance) {
                 minDistance = distance;
@@ -139,15 +139,15 @@ public class AABB extends RenderableObject {
             _vertices = new Vector3f[8];
 
             // Front
-            _vertices[0] = VectorPool.getVector((float) minX(), (float) minY(), (float) maxZ());
-            _vertices[1] = VectorPool.getVector((float) maxX(), (float) minY(), (float) maxZ());
-            _vertices[2] = VectorPool.getVector((float) maxX(), (float) maxY(), (float) maxZ());
-            _vertices[3] = VectorPool.getVector((float) minX(), (float) maxY(), (float) maxZ());
+            _vertices[0] = VectorPool.getVector(minX(), minY(), maxZ());
+            _vertices[1] = VectorPool.getVector(maxX(), minY(), maxZ());
+            _vertices[2] = VectorPool.getVector(maxX(), maxY(), maxZ());
+            _vertices[3] = VectorPool.getVector(minX(), maxY(), maxZ());
             // Back
-            _vertices[4] = VectorPool.getVector((float) minX(), (float) minY(), (float) minZ());
-            _vertices[5] = VectorPool.getVector((float) maxX(), (float) minY(), (float) minZ());
-            _vertices[6] = VectorPool.getVector((float) maxX(), (float) maxY(), (float) minZ());
-            _vertices[7] = VectorPool.getVector((float) minX(), (float) maxY(), (float) minZ());
+            _vertices[4] = VectorPool.getVector(minX(), minY(), minZ());
+            _vertices[5] = VectorPool.getVector(maxX(), minY(), minZ());
+            _vertices[6] = VectorPool.getVector(maxX(), maxY(), minZ());
+            _vertices[7] = VectorPool.getVector(minX(), maxY(), minZ());
         }
 
         return _vertices;
@@ -155,7 +155,7 @@ public class AABB extends RenderableObject {
 
     @Override
     public void render() {
-        float offset = 0.005f;
+        double offset = 0.01;
 
         glPushMatrix();
         glTranslatef(_position.x, _position.y, _position.z);
@@ -165,50 +165,50 @@ public class AABB extends RenderableObject {
 
         // FRONT
         glBegin(GL_LINE_LOOP);
-        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
-        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
+        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
+        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
         glEnd();
 
         // BACK
         glBegin(GL_LINE_LOOP);
-        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
-        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
+        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
+        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
         glEnd();
 
         // TOP
         glBegin(GL_LINE_LOOP);
-        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
         glEnd();
 
         // BOTTOM
         glBegin(GL_LINE_LOOP);
-        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
-        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
-        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
-        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
+        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
+        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
+        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
+        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
         glEnd();
 
         // LEFT
         glBegin(GL_LINE_LOOP);
-        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3f(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
-        glVertex3f(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
+        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
+        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
         glEnd();
 
         // RIGHT
         glBegin(GL_LINE_LOOP);
-        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3f(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
-        glVertex3f(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
+        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
+        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
+        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
+        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
         glEnd();
         glPopMatrix();
     }

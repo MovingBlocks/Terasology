@@ -48,11 +48,6 @@ public final class ChunkCache {
      * @return The chunk
      */
     public Chunk loadOrCreateChunk(int x, int z) {
-        // Catch negative values
-        if (x < 0 || z < 0) {
-            return null;
-        }
-
         // Try to load the chunk from the cache
         Chunk c;
 
