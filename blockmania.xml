@@ -157,14 +157,15 @@
   
   <target name="init.artifacts">
     <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.blockmania:zip" value="${basedir}/out/artifacts/dist"/>
     <property name="artifact.output.blockmania" value="${basedir}/out/artifacts/Blockmania"/>
     <property name="artifact.output.blockmania:jar" value="${basedir}/out/artifacts/Blockmania_jar"/>
     <mkdir dir="${artifacts.temp.dir}"/>
     <property name="temp.jar.path.Blockmania.jar" value="${artifacts.temp.dir}/Blockmania.jar"/>
   </target>
-  
-  <target name="clean.artifact.blockmania" description="clean Blockmania artifact output">
-    <delete dir="${artifact.output.blockmania}"/>
+
+  <target name="clean.artifact.blockmania" depends="init.artifacts" description="clean Blockmania artifact output">
+    <delete dir="${artifact.output.blockmania}"></delete>
   </target>
   
   <target name="artifact.blockmania" depends="init.artifacts, artifact.blockmania:jar" description="Build &apos;Blockmania&apos; artifact">
@@ -180,6 +181,11 @@
       <fileset dir="${basedir}/natives"/>
     </copy>
   </target>
+
+    <target name="artifact.blockmania:zip" depends="artifact.blockmania" description="None">
+        <mkdir dir="${artifact.output.blockmania:zip}"></mkdir>
+        <zip basedir="${artifact.output.blockmania}" destfile="${artifact.output.blockmania:zip}/Blockmania.zip"></zip>
+    </target>
   
   <target name="artifact.blockmania:jar" depends="init.artifacts, compile.module.blockmania" description="Build &apos;Blockmania:jar&apos; artifact">
     <property name="artifact.temp.output.blockmania:jar" value="${artifacts.temp.dir}/Blockmania_jar"/>
@@ -206,7 +212,7 @@
     <copy file="${temp.jar.path.Blockmania.jar}" tofile="${artifact.temp.output.blockmania:jar}/Blockmania.jar"/>
   </target>
   
-  <target name="build.all.artifacts" depends="artifact.blockmania, artifact.blockmania:jar" description="Build all artifacts">
+  <target name="build.all.artifacts" depends="artifact.blockmania, artifact.blockmania:jar, artifact.blockmania:zip" description="Build all artifacts">
     <mkdir dir="${artifact.output.blockmania:jar}"/>
     <copy todir="${artifact.output.blockmania:jar}">
       <fileset dir="${artifact.temp.output.blockmania:jar}"/>
