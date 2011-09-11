@@ -273,8 +273,8 @@ public final class World implements RenderableObject {
             renderClouds();
 
         /*
-         * Render the world from the player's view.
-         */
+        * Render the world from the player's view.
+        */
         _player.render();
 
         /*
@@ -290,8 +290,8 @@ public final class World implements RenderableObject {
         GL20.glUniform1f(daylight, (float) getDaylight());
         ShaderManager.getInstance().enableShader(null);
 
-        renderChunks();
         renderEntities();
+        renderChunks();
     }
 
     private void renderEntities() {
