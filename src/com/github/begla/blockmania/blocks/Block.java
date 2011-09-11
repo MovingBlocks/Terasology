@@ -274,4 +274,8 @@ public abstract class Block implements RenderableObject {
 
         glDisable(GL11.GL_TEXTURE_2D);
     }
+
+    public void update() {
+        // Do nothing
+    }
 }
