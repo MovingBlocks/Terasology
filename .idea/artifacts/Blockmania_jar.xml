@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="Blockmania:jar">
+  <artifact type="jar" build-on-make="true" name="Blockmania:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Blockmania_jar</output-path>
     <root id="archive" name="Blockmania.jar">
       <element id="directory" name="META-INF">

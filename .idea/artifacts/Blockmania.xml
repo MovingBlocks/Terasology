@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="Blockmania">
+    <output-path>$PROJECT_DIR$/out/artifacts/Blockmania</output-path>
+    <root id="root">
+      <element id="artifact" artifact-name="Blockmania:jar" />
+      <element id="file-copy" path="$PROJECT_DIR$/scripts/run_linux.sh" />
+      <element id="file-copy" path="$PROJECT_DIR$/scripts/run_macosx.command" />
+      <element id="file-copy" path="$PROJECT_DIR$/scripts/run_windows.bat" />
+      <element id="directory" name="natives">
+        <element id="dir-copy" path="$PROJECT_DIR$/natives" />
+      </element>
+    </root>
+  </artifact>
+</component>
