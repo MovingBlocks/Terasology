@@ -902,9 +902,11 @@ public final class World extends RenderableObject {
         for (; ; ) {
             int randX = (int) (_rand.randomDouble() * 16000f);
             int randZ = (int) (_rand.randomDouble() * 16000f);
-            if (((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 26, randZ) >= 0.01f) {
-                return VectorPool.getVector(randX, 26, randZ);
-            }
+
+            double dens = ((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 32, randZ);
+
+            if (dens >= 0.008 && dens < 0.02)
+                return VectorPool.getVector(randX, 32, randZ);
         }
     }
 

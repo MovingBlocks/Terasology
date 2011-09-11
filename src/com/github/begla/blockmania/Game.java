@@ -96,25 +96,14 @@ public final class Game {
      * @param args Arguments
      */
     public static void main(String[] args) {
-
-        Game.getInstance().addLogFileHandler("blockmania.log");
+        Game.getInstance().addLogFileHandler("blockmania.log", Level.SEVERE);
         Game.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
-
-        /*
-        * Update missing game files...
-        */
-        // WebUpdater wu = new WebUpdater();
 
         try {
             loadLibs();
         } catch (Exception e) {
             Game.getInstance().getLogger().log(Level.SEVERE, "Couldn't link static libraries. Sorry: " + e);
         }
-
-/*        if (!wu.update()) {
-            Game.getInstance().getLogger().log(Level.SEVERE, "Couldn't download missing game files. Sorry.");
-            System.exit(0);
-        }*/
 
         Game game = null;
 
@@ -652,9 +641,10 @@ public final class Game {
         }
     }
 
-    public void addLogFileHandler(String s) {
+    public void addLogFileHandler(String s, Level logLevel) {
         try {
             FileHandler fh = new FileHandler(s, true);
+            fh.setLevel(logLevel);
             fh.setFormatter(new SimpleFormatter());
             _logger.addHandler(fh);
         } catch (IOException ex) {
