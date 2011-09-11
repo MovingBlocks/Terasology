@@ -22,7 +22,6 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.generators.ChunkGenerator;
-import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
@@ -46,10 +45,10 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Chunk extends RenderableObject implements Comparable<Chunk> {
+public final class Chunk extends StaticEntity implements Comparable<Chunk> {
 
     private static final
-    Vector3f[] _lightDirections = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), VectorPool.getVector(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
+    Vector3f[] _lightDirections = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
     /* ------ */
     private static int _statVertexArrayUpdateCount = 0;
     /* ------ */
@@ -74,6 +73,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
     private final ChunkMeshGenerator _meshGenerator;
     /* ------ */
     private AABB _aabb;
+    private final Vector3f _position = new Vector3f();
 
     public enum LIGHT_TYPE {
         BLOCK,
@@ -89,7 +89,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
      * @param g        A list of generators which will be used to generate this chunk
      */
     public Chunk(World p, Vector3f position, FastList<ChunkGenerator> g) {
-        this._position = position;
+        setPosition(position);
         // Set the chunk ID
         _chunkId = Integer.valueOf(MathHelper.cantorize((int) _position.x, (int) _position.z));
 
@@ -106,13 +106,11 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
         _dirty = true;
     }
 
-    @Override
     public void render() {
         render(true);
         render(false);
     }
 
-    @Override
     public void update() {
         if (_newMesh != null) {
             // Do not update the mesh if one of the VISIBLE neighbors is dirty
@@ -363,7 +361,7 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
             if (neighborValue < lightValue && neighborValue > 0 && Block.getBlockForType(neighborType).isBlockTypeTranslucent()) {
                 getParent().unspreadLight(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
             } else if (neighborValue >= lightValue) {
-                brightSpots.add(VectorPool.getVector(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z));
+                brightSpots.add(new Vector3f(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z));
             }
         }
     }
@@ -738,8 +736,8 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     public AABB getAABB() {
         if (_aabb == null) {
-            Vector3f dimensions = VectorPool.getVector(Configuration.CHUNK_DIMENSIONS.x / 2, Configuration.CHUNK_DIMENSIONS.y / 2, Configuration.CHUNK_DIMENSIONS.z / 2);
-            Vector3f position = VectorPool.getVector(getChunkWorldPosX() + dimensions.getX(), getChunkWorldPosY() + dimensions.getY(), getChunkWorldPosZ() + dimensions.getZ());
+            Vector3f dimensions = new Vector3f(Configuration.CHUNK_DIMENSIONS.x / 2, Configuration.CHUNK_DIMENSIONS.y / 2, Configuration.CHUNK_DIMENSIONS.z / 2);
+            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX(), getChunkWorldPosY() + dimensions.getY(), getChunkWorldPosZ() + dimensions.getZ());
             _aabb = new AABB(position, dimensions);
         }
         return _aabb;
@@ -855,5 +853,13 @@ public final class Chunk extends RenderableObject implements Comparable<Chunk> {
 
     public boolean isChunkInFrustum() {
         return _parent.getPlayer().getViewFrustum().intersects(getAABB());
+    }
+
+    public Vector3f getPosition() {
+        return _position;
+    }
+
+    public void setPosition(Vector3f position) {
+        _position.set(position);
     }
 }

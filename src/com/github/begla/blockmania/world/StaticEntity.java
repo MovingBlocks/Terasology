@@ -16,18 +16,8 @@
 package com.github.begla.blockmania.world;
 
 /**
- * The base class of all renderable objects.
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface RenderableObject {
-    /**
-     * Rendering operations have to be placed here.
-     */
-    public abstract void render();
+public abstract class StaticEntity extends Entity {
 
-    /**
-     * Updating operations have to be placed here.
-     */
-    public abstract void update();
 }

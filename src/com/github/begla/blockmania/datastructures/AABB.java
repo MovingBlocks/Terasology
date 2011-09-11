@@ -15,7 +15,6 @@
  */
 package com.github.begla.blockmania.datastructures;
 
-import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.world.RenderableObject;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
@@ -25,38 +24,39 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class AABB extends RenderableObject {
+public class AABB implements RenderableObject {
 
+    private final Vector3f _position = new Vector3f();
     private final Vector3f _dimensions;
     private Vector3f[] _vertices;
 
     public AABB(Vector3f position, Vector3f dimensions) {
-        this._position = position;
+        setPosition(position);
         this._dimensions = dimensions;
     }
 
     public double minX() {
-        return (_position.x - _dimensions.x);
+        return (getPosition().x - _dimensions.x);
     }
 
     public double minY() {
-        return (_position.y - _dimensions.y);
+        return (getPosition().y - _dimensions.y);
     }
 
     public double minZ() {
-        return (_position.z - _dimensions.z);
+        return (getPosition().z - _dimensions.z);
     }
 
     public double maxX() {
-        return (_position.x + _dimensions.x);
+        return (getPosition().x + _dimensions.x);
     }
 
     public double maxY() {
-        return (_position.y + _dimensions.y);
+        return (getPosition().y + _dimensions.y);
     }
 
     public double maxZ() {
-        return (_position.z + _dimensions.z);
+        return (getPosition().z + _dimensions.z);
     }
 
     public boolean overlaps(AABB aabb2) {
@@ -79,7 +79,7 @@ public class AABB extends RenderableObject {
     }
 
     public Vector3f closestPointOnAABBToPoint(Vector3f p) {
-        Vector3f r = VectorPool.getVector(p);
+        Vector3f r = new Vector3f(p);
 
         if (p.x < minX()) r.x = (float) minX();
         if (p.x > maxX()) r.x = (float) maxX();
@@ -94,15 +94,15 @@ public class AABB extends RenderableObject {
     public Vector3f normalForPlaneClosestToOrigin(Vector3f pointOnAABB, Vector3f origin, boolean testX, boolean testY, boolean testZ) {
         FastList<Vector3f> normals = new FastList<Vector3f>();
 
-        if (pointOnAABB.z == minZ() && testZ) normals.add(VectorPool.getVector(0, 0, -1));
-        if (pointOnAABB.z == maxZ() && testZ) normals.add(VectorPool.getVector(0, 0, 1));
-        if (pointOnAABB.x == minX() && testX) normals.add(VectorPool.getVector(-1, 0, 0));
-        if (pointOnAABB.x == maxX() && testX) normals.add(VectorPool.getVector(1, 0, 0));
-        if (pointOnAABB.y == minY() && testY) normals.add(VectorPool.getVector(0, -1, 0));
-        if (pointOnAABB.y == maxY() && testY) normals.add(VectorPool.getVector(0, 1, 0));
+        if (pointOnAABB.z == minZ() && testZ) normals.add(new Vector3f(0, 0, -1));
+        if (pointOnAABB.z == maxZ() && testZ) normals.add(new Vector3f(0, 0, 1));
+        if (pointOnAABB.x == minX() && testX) normals.add(new Vector3f(-1, 0, 0));
+        if (pointOnAABB.x == maxX() && testX) normals.add(new Vector3f(1, 0, 0));
+        if (pointOnAABB.y == minY() && testY) normals.add(new Vector3f(0, -1, 0));
+        if (pointOnAABB.y == maxY() && testY) normals.add(new Vector3f(0, 1, 0));
 
         double minDistance = Double.MAX_VALUE;
-        Vector3f closestNormal = VectorPool.getVector();
+        Vector3f closestNormal = new Vector3f();
 
         for (Vector3f v : normals) {
             double distance = Vector3f.sub(centerPointForNormal(v), origin, null).length();
@@ -118,19 +118,19 @@ public class AABB extends RenderableObject {
 
     public Vector3f centerPointForNormal(Vector3f normal) {
         if (normal.x == 1 && normal.y == 0 && normal.z == 0)
-            return VectorPool.getVector(_position.x + _dimensions.x, _position.y, _position.z);
+            return new Vector3f(getPosition().x + _dimensions.x, getPosition().y, getPosition().z);
         if (normal.x == -1 && normal.y == 0 && normal.z == 0)
-            return VectorPool.getVector(_position.x - _dimensions.x, _position.y, _position.z);
+            return new Vector3f(getPosition().x - _dimensions.x, getPosition().y, getPosition().z);
         if (normal.x == 0 && normal.y == 0 && normal.z == 1)
-            return VectorPool.getVector(_position.x, _position.y, _position.z + _dimensions.z);
+            return new Vector3f(getPosition().x, getPosition().y, getPosition().z + _dimensions.z);
         if (normal.x == 0 && normal.y == 0 && normal.z == -1)
-            return VectorPool.getVector(_position.x, _position.y, _position.z - _dimensions.z);
+            return new Vector3f(getPosition().x, getPosition().y, getPosition().z - _dimensions.z);
         if (normal.x == 0 && normal.y == 1 && normal.z == 0)
-            return VectorPool.getVector(_position.x, _position.y + _dimensions.y, _position.z);
+            return new Vector3f(getPosition().x, getPosition().y + _dimensions.y, getPosition().z);
         if (normal.x == 0 && normal.y == -1 && normal.z == 0)
-            return VectorPool.getVector(_position.x, _position.y - _dimensions.y, _position.z);
+            return new Vector3f(getPosition().x, getPosition().y - _dimensions.y, getPosition().z);
 
-        return VectorPool.getVector();
+        return new Vector3f();
     }
 
     public Vector3f[] getVertices() {
@@ -139,26 +139,25 @@ public class AABB extends RenderableObject {
             _vertices = new Vector3f[8];
 
             // Front
-            _vertices[0] = VectorPool.getVector(minX(), minY(), maxZ());
-            _vertices[1] = VectorPool.getVector(maxX(), minY(), maxZ());
-            _vertices[2] = VectorPool.getVector(maxX(), maxY(), maxZ());
-            _vertices[3] = VectorPool.getVector(minX(), maxY(), maxZ());
+            _vertices[0] = new Vector3f((float) minX(), (float) minY(), (float) maxZ());
+            _vertices[1] = new Vector3f((float) maxX(), (float) minY(), (float) maxZ());
+            _vertices[2] = new Vector3f((float) maxX(), (float) maxY(), (float) maxZ());
+            _vertices[3] = new Vector3f((float) minX(), (float) maxY(), (float) maxZ());
             // Back
-            _vertices[4] = VectorPool.getVector(minX(), minY(), minZ());
-            _vertices[5] = VectorPool.getVector(maxX(), minY(), minZ());
-            _vertices[6] = VectorPool.getVector(maxX(), maxY(), minZ());
-            _vertices[7] = VectorPool.getVector(minX(), maxY(), minZ());
+            _vertices[4] = new Vector3f((float) minX(), (float) minY(), (float) minZ());
+            _vertices[5] = new Vector3f((float) maxX(), (float) minY(), (float) minZ());
+            _vertices[6] = new Vector3f((float) maxX(), (float) maxY(), (float) minZ());
+            _vertices[7] = new Vector3f((float) minX(), (float) maxY(), (float) minZ());
         }
 
         return _vertices;
     }
 
-    @Override
     public void render() {
         double offset = 0.01;
 
         glPushMatrix();
-        glTranslatef(_position.x, _position.y, _position.z);
+        glTranslatef(getPosition().x, getPosition().y, getPosition().z);
 
         glLineWidth(6f);
         glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
@@ -213,8 +212,15 @@ public class AABB extends RenderableObject {
         glPopMatrix();
     }
 
-    @Override
     public void update() {
         // Do nothing. Really.
+    }
+
+    public Vector3f getPosition() {
+        return _position;
+    }
+
+    public void setPosition(Vector3f position) {
+        _position.set(position);
     }
 }

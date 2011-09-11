@@ -15,7 +15,6 @@
  */
 package com.github.begla.blockmania;
 
-import com.github.begla.blockmania.rendering.VectorPool;
 import javolution.util.FastMap;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
@@ -89,9 +88,9 @@ public final class Configuration {
 
     static {
         if (Game.getInstance().isSandboxed()) {
-            CHUNK_DIMENSIONS = VectorPool.getVector(16, 128, 16);
+            CHUNK_DIMENSIONS = new Vector3f(16, 128, 16);
         } else {
-            CHUNK_DIMENSIONS = VectorPool.getVector(16, 128, 16);
+            CHUNK_DIMENSIONS = new Vector3f(16, 128, 16);
         }
 
         loadSettings();

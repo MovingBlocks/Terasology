@@ -15,19 +15,36 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.datastructures.AABB;
+import org.lwjgl.util.vector.Vector3f;
+
 /**
- * The base class of all renderable objects.
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface RenderableObject {
-    /**
-     * Rendering operations have to be placed here.
-     */
-    public abstract void render();
+public abstract class Entity implements RenderableObject {
+
+    private Vector3f _position = new Vector3f();
 
     /**
-     * Updating operations have to be placed here.
+     * Returns the position of the entity.
+     *
+     * @return The position
      */
-    public abstract void update();
+    public Vector3f getPosition() {
+        return _position;
+    }
+
+    /**
+     * Sets the position of the entity.
+     *
+     * @param position The position
+     */
+    public void setPosition(Vector3f position) {
+        _position.set(position);
+    }
+
+    /**
+     * @return The AABB of the entity
+     */
+    public abstract AABB getAABB();
 }

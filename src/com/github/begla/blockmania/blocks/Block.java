@@ -17,8 +17,8 @@ package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.rendering.TextureManager;
-import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.Helper;
+import com.github.begla.blockmania.world.RenderableObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -29,7 +29,7 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class Block {
+public abstract class Block implements RenderableObject {
 
     /**
      * The six sides of a block.
@@ -183,11 +183,11 @@ public abstract class Block {
     }
 
     public static AABB AABBForBlockAt(Vector3f pos) {
-        return new AABB(VectorPool.getVector(pos), VectorPool.getVector(0.5f, 0.5f, 0.5f));
+        return new AABB(pos, new Vector3f(0.5f, 0.5f, 0.5f));
     }
 
     public static AABB AABBForBlockAt(int x, int y, int z) {
-        return new AABB(VectorPool.getVector(x, y, z), VectorPool.getVector(0.5f, 0.5f, 0.5f));
+        return new AABB(new Vector3f(x, y, z), new Vector3f(0.5f, 0.5f, 0.5f));
     }
 
     public BLOCK_FORM getBlockForm() {
@@ -198,7 +198,7 @@ public abstract class Block {
         return false;
     }
 
-    public void renderBlock(boolean shaded) {
+    public void render() {
         if (isBlockInvisible())
             return;
 
@@ -249,8 +249,7 @@ public abstract class Block {
         GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x, getTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
 
-        if (shaded)
-            GL11.glColor3f(0.5f, 0.5f, 0.5f);
+        GL11.glColor3f(0.5f, 0.5f, 0.5f);
 
         // FRONT
         GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x, getTextureOffsetFor(SIDE.FRONT).y);

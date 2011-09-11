@@ -18,14 +18,10 @@ package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.blocks.BlockWater;
 import com.github.begla.blockmania.datastructures.AABB;
-import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.noise.PerlinNoise;
-import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.rendering.ViewFrustum;
-import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -43,35 +39,29 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Player extends RenderableObject {
+public final class Player extends MovableEntity {
 
-    private boolean _jump = false;
     private byte _selectedBlockType = 1;
-    private double _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
-    private double _yaw = 135d;
-    private double _pitch;
-    private final Vector3f _movement = VectorPool.getVector(0, 0, 0);
-    private final Vector3f _acc = VectorPool.getVector(0, 0, 0);
-    private double _gravity = 0.0;
-    private World _parent = null;
     private final PerlinNoise _pGen = new PerlinNoise(42);
-    private final Vector3f _viewingDirection = VectorPool.getVector();
-    private boolean _playerIsTouchingGround = false;
-    private boolean _playerIsSwimming = false, _playerHeadUnderWater = false;
 
     private final ViewFrustum _viewFrustum = new ViewFrustum();
 
-    /**
-     * Init. the player
-     */
-    public Player() {
-        resetPlayer();
+    public Player(World parent) {
+        super(parent, Configuration.getSettingNumeric("WALKING_SPEED"), Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
+    }
+
+    public void update() {
+        _godMode = Configuration.getSettingBoolean("GOD_MODE");
+        _walkingSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
+        _runningFactor = Configuration.getSettingNumeric("RUNNING_FACTOR");
+        _jumpIntensity = Configuration.getSettingNumeric("JUMP_INTENSITY");
+
+        super.update();
     }
 
     /**
      * Positions the player within the world and adjusts the player's view accordingly.
      */
-    @Override
     public void render() {
         RayBlockIntersection.Intersection is = calcSelectedBlock();
 
@@ -84,16 +74,7 @@ public final class Player extends RenderableObject {
             }
         }
 
-        if (Configuration.getSettingBoolean("DEBUG_COLLISION")) {
-            getAABB().render();
-
-            FastList<BlockPosition> blocks = gatherAdjacentBlockPositions(_position);
-
-            for (BlockPosition p : blocks) {
-                AABB blockAABB = Block.AABBForBlockAt(p.x, p.y, p.z);
-                blockAABB.render();
-            }
-        }
+        super.render();
     }
 
     public void applyPlayerModelViewMatrix() {
@@ -104,7 +85,7 @@ public final class Player extends RenderableObject {
         if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
 
             if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
-                double bobbing = _pGen.noise(_position.x * 0.5, 0, _position.z * 0.5);
+                double bobbing = _pGen.noise(getPosition().x * 0.5, 0, getPosition().z * 0.5);
                 glRotated(bobbing * Configuration.BOBBING_ANGLE, 0, 0, 1);
             }
 
@@ -113,7 +94,7 @@ public final class Player extends RenderableObject {
 
 
         } else {
-            GLU.gluLookAt(_position.x, _position.y, _position.z, _position.x, 40, _position.z + 128, 0, 1, 0);
+            GLU.gluLookAt(getPosition().x, getPosition().y, getPosition().z, getPosition().x, 40, getPosition().z + 128, 0, 1, 0);
         }
         // Update the current view frustum
         _viewFrustum.updateFrustum();
@@ -129,116 +110,27 @@ public final class Player extends RenderableObject {
         }
     }
 
-    /**
-     * Updates the player.
-     */
-    @Override
-    public void update() {
-        double dx = Mouse.getDX();
-        double dy = Mouse.getDY();
+    public void updatePosition() {
+        /*
+        * DEMO MODE
+        */
+        if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
+            getPosition().z += Configuration.getSettingNumeric("WALKING_SPEED");
 
-        yaw(dx * Configuration.MOUSE_SENS);
-        pitch(dy * Configuration.MOUSE_SENS);
+            int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 
-        updateSwimStatus();
-        processMovement();
-        updatePlayerPosition();
+            getPosition().y += (maxHeight - getPosition().y) / 128f;
 
-        // Update the viewing direction
-        _viewingDirection.set((float) (Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch))), (float) -Math.sin(Math.toRadians(_pitch)), (float) (-Math.cos(Math.toRadians(_pitch)) * Math.cos(Math.toRadians(_yaw))));
-        _viewingDirection.normalise();
+            if (getPosition().y > 128)
+                getPosition().y = 128;
 
-        _movement.set(0, 0, 0);
-    }
+            if (getPosition().y < 40f)
+                getPosition().y = 40f;
 
-    /**
-     * Yaws the player's point of view.
-     *
-     * @param diff Amount of yawing to be applied.
-     */
-    void yaw(double diff) {
-        double nYaw = (_yaw + diff) % 360;
-        if (nYaw < 0) {
-            nYaw += 360;
+            return;
         }
-        _yaw = nYaw;
-    }
 
-    /**
-     * Pitches the player's point of view.
-     *
-     * @param diff Amount of pitching to be applied.
-     */
-    void pitch(double diff) {
-        double nPitch = (_pitch - diff);
-
-        if (nPitch > 89)
-            nPitch = 89;
-        else if (nPitch < -89)
-            nPitch = -89;
-
-        _pitch = nPitch;
-    }
-
-    /**
-     * Moves the player forward.
-     */
-    void walkForward() {
-        if (!Configuration.getSettingBoolean("GOD_MODE") && !_playerIsSwimming) {
-            _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw));
-            _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw));
-        } else if (!Configuration.getSettingBoolean("GOD_MODE") && _playerIsSwimming) {
-            _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movement.y -= _wSpeed * Math.sin(Math.toRadians(_pitch));
-        } else {
-            _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movement.y -= _wSpeed * Math.sin(Math.toRadians(_pitch));
-        }
-    }
-
-    /**
-     * Moves the player backward.
-     */
-    void walkBackwards() {
-        if (!Configuration.getSettingBoolean("GOD_MODE") && !_playerIsSwimming) {
-            _movement.x -= _wSpeed * Math.sin(Math.toRadians(_yaw));
-            _movement.z += _wSpeed * Math.cos(Math.toRadians(_yaw));
-        } else if (!Configuration.getSettingBoolean("GOD_MODE") && _playerIsSwimming) {
-            _movement.x -= _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movement.z += _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movement.y += _wSpeed * Math.sin(Math.toRadians(_pitch));
-        } else {
-            _movement.x -= _wSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movement.z += _wSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movement.y += _wSpeed * Math.sin(Math.toRadians(_pitch));
-        }
-    }
-
-    /**
-     * Lets the player strafe left.
-     */
-    void strafeLeft() {
-        _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw - 90));
-        _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw - 90));
-    }
-
-    /**
-     * Lets the player strafe right.
-     */
-    void strafeRight() {
-        _movement.x += _wSpeed * Math.sin(Math.toRadians(_yaw + 90));
-        _movement.z -= _wSpeed * Math.cos(Math.toRadians(_yaw + 90));
-    }
-
-    /**
-     * Lets the player jump.
-     */
-    void jump() {
-        if (_playerIsTouchingGround) {
-            _jump = true;
-        }
+        super.updatePosition();
     }
 
     /**
@@ -251,7 +143,7 @@ public final class Player extends RenderableObject {
         for (int x = -3; x <= 3; x++) {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -3; z <= 3; z++) {
-                    byte blockType = _parent.getBlock((int) (_position.x + x), (int) (_position.y + y), (int) (_position.z + z));
+                    byte blockType = _parent.getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
 
                     // Ignore special blocks
                     if (Block.getBlockForType(blockType).letSelectionRayThrough()) {
@@ -259,7 +151,7 @@ public final class Player extends RenderableObject {
                     }
 
                     // The ray originates from the "player's eye"
-                    FastList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent, (int) _position.x + x, (int) _position.y + y, (int) _position.z + z, calcEyePosition(), _viewingDirection);
+                    FastList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent, (int) getPosition().x + x, (int) getPosition().y + y, (int) getPosition().z + z, calcEyePosition(), _viewingDirection);
 
                     if (iss != null) {
                         inters.addAll(iss);
@@ -400,10 +292,16 @@ public final class Player extends RenderableObject {
     }
 
     /**
-     * Checks for pressed keys and executes the respective movement
+     * Checks for pressed keys and mouse movement and executes the respective movement
      * command.
      */
-    private void processMovement() {
+    public void processMovement() {
+        double dx = Mouse.getDX();
+        double dy = Mouse.getDY();
+
+        yaw(dx * Configuration.MOUSE_SENS);
+        pitch(dy * Configuration.MOUSE_SENS);
+
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
             walkForward();
         }
@@ -416,302 +314,11 @@ public final class Player extends RenderableObject {
         if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
             strafeRight();
         }
-        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && _playerIsTouchingGround) {
-            _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED") * Configuration.getSettingNumeric("RUNNING_FACTOR");
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && _touchingGround) {
+            _running = true;
         } else {
-            _wSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
+            _running = false;
         }
-    }
-
-    /**
-     * Checks for blocks below and above the player.
-     *
-     * @param origin The original position of the player
-     * @return True if a vertical collision was detected
-     */
-    private boolean verticalHitTest(Vector3f origin) {
-        FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
-
-        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
-            byte blockType1 = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
-            AABB playerAABB = getAABB();
-
-            if (Block.getBlockForType(blockType1).isPenetrable() || !playerAABB.overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z)))
-                continue;
-
-            double direction = origin.y - _position.y;
-
-            if (direction >= 0)
-                _position.y = n.getValue().y + 0.50001f + playerAABB.getDimensions().y;
-            else
-                _position.y = n.getValue().y - 0.50001f - playerAABB.getDimensions().y;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param origin The original player position
-     * @return A list of adjacent block positions
-     */
-    private FastList<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
-        /*
-         * Gather the surrounding block positions
-         * and order those by the distance to the originating point.
-         */
-        FastList<BlockPosition> blockPositions = new FastList<BlockPosition>();
-
-        for (int x = -1; x < 2; x++) {
-            for (int z = -1; z < 2; z++) {
-                for (int y = -1; y < 2; y++) {
-                    int blockPosX = (int) (origin.x + (origin.x >= 0 ? 0.5f : -0.5f)) + x;
-                    int blockPosY = (int) (origin.y + (origin.y >= 0 ? 0.5f : -0.5f)) + y;
-                    int blockPosZ = (int) (origin.z + (origin.z >= 0 ? 0.5f : -0.5f)) + z;
-
-                    blockPositions.add(new BlockPosition(blockPosX, blockPosY, blockPosZ, origin));
-                }
-            }
-        }
-
-        // Sort the block positions
-        Collections.sort(blockPositions);
-        return blockPositions;
-    }
-
-    /**
-     * Checks for blocks around the player.
-     *
-     * @param origin The original position of the player
-     * @return True if the player is colliding horizontally
-     */
-    private boolean horizontalHitTest(Vector3f origin) {
-        boolean result = false;
-        FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
-
-        // Check each block position for collision
-        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
-            byte blockType = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
-            AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
-
-            if (!Block.getBlockForType(blockType).isPenetrable()) {
-                if (getAABB().overlaps(blockAABB)) {
-                    result = true;
-
-                    // Calculate the direction from the origin to the current position
-                    Vector3f direction = VectorPool.getVector(_position.x, 0f, _position.z);
-                    direction.x -= origin.x;
-                    direction.z -= origin.z;
-
-                    // Calculate the point of intersection on the block's AABB
-                    Vector3f blockPoi = blockAABB.closestPointOnAABBToPoint(origin);
-                    Vector3f playerPoi = generateAABBForPosition(origin).closestPointOnAABBToPoint(blockPoi);
-
-                    Vector3f planeNormal = blockAABB.normalForPlaneClosestToOrigin(blockPoi, origin, true, false, true);
-
-                    // Find a vector parallel to the surface normal
-                    Vector3f slideVector = VectorPool.getVector(planeNormal.z, 0, -planeNormal.x);
-                    Vector3f pushBack = VectorPool.getVector();
-
-                    Vector3f.sub(blockPoi, playerPoi, pushBack);
-
-                    // Calculate the intensity of the diversion alongside the block
-                    double length = Vector3f.dot(slideVector, direction);
-
-                    Vector3f newPosition = VectorPool.getVector();
-                    newPosition.z = (float) (origin.z + pushBack.z * 0.2 + length * slideVector.z);
-                    newPosition.x = (float) (origin.x + pushBack.x * 0.2 + length * slideVector.x);
-                    newPosition.y = origin.y;
-
-                    // Update the position
-                    _position.set(newPosition);
-
-                    VectorPool.putVector(newPosition);
-                    VectorPool.putVector(slideVector);
-                    VectorPool.putVector(direction);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Updates the position of the player.
-     */
-    private void updatePlayerPosition() {
-        // Save the previous position before changing any of the values
-        Vector3f oldPosition = VectorPool.getVector(_position);
-
-        /*
-         * DEMO MODE
-         */
-        if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-            _position.z += Configuration.getSettingNumeric("WALKING_SPEED");
-
-            int maxHeight = _parent.maxHeightAt((int) _position.x, (int) _position.z + 8) + 16;
-
-            _position.y += (maxHeight - _position.y) / 128f;
-
-            if (_position.y > 128)
-                _position.y = 128;
-
-            if (_position.y < 40f)
-                _position.y = 40f;
-
-            return;
-        }
-
-        /*
-         * Slowdown the speed of the player each time this method is called.
-         */
-        if (MathHelper.fastAbs(_acc.y) > 0f) {
-            _acc.y += -1f * _acc.y * Configuration.getSettingNumeric("FRICTION");
-        }
-
-        if (MathHelper.fastAbs(_acc.x) > 0f) {
-            _acc.x += -1f * _acc.x * Configuration.getSettingNumeric("FRICTION");
-        }
-
-        if (MathHelper.fastAbs(_acc.z) > 0f) {
-            _acc.z += -1f * _acc.z * Configuration.getSettingNumeric("FRICTION");
-        }
-
-        /*
-         * Apply friction.
-         */
-        if (MathHelper.fastAbs(_acc.x) > _wSpeed || MathHelper.fastAbs(_acc.z) > _wSpeed || MathHelper.fastAbs(_acc.y) > _wSpeed) {
-            double max = Math.max(Math.max(MathHelper.fastAbs(_acc.x), MathHelper.fastAbs(_acc.z)), MathHelper.fastAbs(_acc.y));
-            double div = max / _wSpeed;
-
-            _acc.x /= div;
-            _acc.z /= div;
-            _acc.y /= div;
-        }
-
-        /*
-         * Increase the speed of the player by adding the movement
-         * vector to the acceleration vector.
-         */
-        _acc.x += _movement.x;
-        _acc.y += _movement.y;
-        _acc.z += _movement.z;
-
-        // Normal gravity
-        if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY") && !Configuration.getSettingBoolean("GOD_MODE") && !_playerIsSwimming) {
-            _gravity -= Configuration.getSettingNumeric("GRAVITY");
-        }
-
-        if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY") && !Configuration.getSettingBoolean("GOD_MODE") && !_playerIsSwimming) {
-            _gravity = -Configuration.getSettingNumeric("MAX_GRAVITY");
-        }
-
-        // Gravity under water
-        if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsSwimming) {
-            _gravity -= Configuration.getSettingNumeric("GRAVITY_SWIMMING");
-        }
-
-        if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING") && !Configuration.getSettingBoolean("GOD_MODE") && _playerIsSwimming) {
-            _gravity = -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING");
-        }
-
-        getPosition().y += _acc.y;
-        getPosition().y += _gravity;
-
-        if (!Configuration.getSettingBoolean("GOD_MODE")) {
-            if (verticalHitTest(oldPosition)) {
-                _gravity = 0;
-
-                // Jumping is only possible, if the player is standing on ground
-                if (_jump) {
-                    _jump = false;
-                    _gravity = Configuration.getSettingNumeric("JUMP_INTENSITY");
-                }
-
-                _playerIsTouchingGround = true;
-            } else {
-                _playerIsTouchingGround = false;
-            }
-        } else {
-            _gravity = 0f;
-        }
-
-        oldPosition.set(_position);
-
-        /*
-         * Update the position of the player
-         * according to the acceleration vector.
-         */
-        getPosition().x += _acc.x;
-        getPosition().z += _acc.z;
-
-        /*
-         * Check for horizontal collisions __after__ checking for vertical
-         * collisions.
-         */
-        if (!Configuration.getSettingBoolean("GOD_MODE")) {
-            if (horizontalHitTest(oldPosition)) {
-                // Do something while the player is colliding
-            }
-        }
-
-        VectorPool.putVector(oldPosition);
-    }
-
-    public void updateSwimStatus() {
-        FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(_position);
-
-        boolean swimming = false, headUnderWater = false;
-
-        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
-            byte blockType = _parent.getBlockAtPosition(VectorPool.getVector(n.getValue().x, n.getValue().y, n.getValue().z));
-            AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
-
-            if (Block.getBlockForType(blockType).getClass().equals(BlockWater.class) && getAABB().overlaps(blockAABB)) {
-                swimming = true;
-            }
-
-            Vector3f eyePos = calcEyePosition();
-            // Add distance to the near plane
-            eyePos.x += _viewingDirection.x * 0.1;
-            eyePos.y += _viewingDirection.y * 0.1;
-            eyePos.z += _viewingDirection.z * 0.1;
-
-            if (Block.getBlockForType(blockType).getClass().equals(BlockWater.class) && blockAABB.contains(eyePos)) {
-                headUnderWater = true;
-            }
-        }
-
-        _playerHeadUnderWater = headUnderWater;
-        _playerIsSwimming = swimming;
-    }
-
-    /**
-     * Resets the player's attributes.
-     */
-    public void resetPlayer() {
-        _acc.set(0, 0, 0);
-        _movement.set(0, 0, 0);
-        _gravity = 0.0f;
-    }
-
-    /**
-     * Returns the parent world.
-     *
-     * @return The parent world
-     */
-    World getParent() {
-        return _parent;
-    }
-
-    /**
-     * Sets the parent world an resets the player.
-     *
-     * @param parent The parent world
-     */
-    public void setParent(World parent) {
-        this._parent = parent;
     }
 
     /**
@@ -736,11 +343,11 @@ public final class Player extends RenderableObject {
      */
     @Override
     public String toString() {
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", _position.x, _position.y, _position.z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _selectedBlockType, _gravity, _movement.x, _movement.y, _movement.z);
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", getPosition().x, getPosition().y, getPosition().z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _selectedBlockType, _gravity, _movementDirection.x, _movementDirection.y, _movementDirection.z);
     }
 
-    private AABB generateAABBForPosition(Vector3f p) {
-        return new AABB(p, VectorPool.getVector(.3f, 0.7f, .3f));
+    protected AABB generateAABBForPosition(Vector3f p) {
+        return new AABB(p, new Vector3f(.3f, 0.7f, .3f));
     }
 
     /**
@@ -749,7 +356,17 @@ public final class Player extends RenderableObject {
      * @return The AABB
      */
     public AABB getAABB() {
-        return generateAABBForPosition(_position);
+        return generateAABBForPosition(getPosition());
+    }
+
+    @Override
+    protected void handleVerticalCollision() {
+        // Nothing special to do.
+    }
+
+    @Override
+    protected void handleHorizontalCollision() {
+        // Uh. A wall.
     }
 
     public ViewFrustum getViewFrustum() {
@@ -758,24 +375,5 @@ public final class Player extends RenderableObject {
 
     public byte getSelectedBlockType() {
         return _selectedBlockType;
-    }
-
-    public Vector3f getViewingDirection() {
-        return _viewingDirection;
-    }
-
-    public Vector3f calcEyePosition() {
-        AABB aabb = getAABB();
-        Vector3f eyePosition = VectorPool.getVector(aabb.getPosition());
-        eyePosition.y += aabb.getDimensions().y - 0.2;
-        return eyePosition;
-    }
-
-    public boolean isPlayerSwimming() {
-        return _playerIsSwimming;
-    }
-
-    public boolean isHeadUnderWater() {
-        return _playerHeadUnderWater;
     }
 }

@@ -17,7 +17,6 @@ package com.github.begla.blockmania;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.Chunk;
 import com.github.begla.blockmania.world.Player;
@@ -29,6 +28,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
 
@@ -226,10 +226,6 @@ public final class Game {
 
         World.init();
 
-        /*
-         * Init. player and world
-         */
-        _player = new Player();
         // Generate a world with a random seed value
         String worldSeed = Configuration.DEFAULT_SEED;
 
@@ -237,7 +233,7 @@ public final class Game {
             worldSeed = _rand.randomCharacterString(16);
         }
 
-        initNewWorld("World1", worldSeed);
+        initNewWorldAndPlayer("World1", worldSeed);
     }
 
     /**
@@ -364,7 +360,7 @@ public final class Game {
         glDisable(GL_DEPTH_TEST);
         gluLookAt(0, 0, -25, 8f, 4.5f, 0, 0, 1, 0);
         glRotated(_cubeRotation % 360, 0, 1, 1);
-        Block.getBlockForType(_player.getSelectedBlockType()).renderBlock(true);
+        Block.getBlockForType(_player.getSelectedBlockType()).render();
         glEnable(GL_DEPTH_TEST);
         glDisable(GL11.GL_BLEND);
 
@@ -537,7 +533,7 @@ public final class Game {
                 int x = Integer.parseInt(parsingResult.get(1));
                 int y = Integer.parseInt(parsingResult.get(2));
                 int z = Integer.parseInt(parsingResult.get(3));
-                _player.setPosition(VectorPool.getVector(x, y, z));
+                _player.setPosition(new Vector3f(x, y, z));
                 success = true;
             } else if (parsingResult.get(0).equals("exit")) {
                 _saveWorldOnExit = true;
@@ -557,7 +553,7 @@ public final class Game {
                     worldSeed = parsingResult.get(1);
                 }
 
-                initNewWorld(worldSeed, worldSeed);
+                initNewWorldAndPlayer(worldSeed, worldSeed);
                 success = true;
             } else if (parsingResult.get(0).equals("chunk_pos")) {
                 _world.printPlayerChunkPosition();
@@ -598,7 +594,7 @@ public final class Game {
      * @param title Title of the world
      * @param seed  Seed value used for the generators
      */
-    private void initNewWorld(String title, String seed) {
+    private void initNewWorldAndPlayer(String title, String seed) {
         Game.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Get rid of the old world
@@ -607,9 +603,10 @@ public final class Game {
         }
 
         // Init some world
-        _world = new World(title, seed, _player);
-        // Link the player to the world
-        _player.setParent(_world);
+        _world = new World(title, seed);
+        // Init. a new player
+        _player = new Player(_world);
+        _world.setPlayer(_player);
 
         _world.startUpdateThread();
 

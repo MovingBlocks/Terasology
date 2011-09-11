@@ -52,6 +52,7 @@ public class TextureManager {
             _textures.put("terrain", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/terrain.png").openStream(), GL_NEAREST));
             _textures.put("sun", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/sun.png").openStream(), GL_NEAREST));
             _textures.put("moon", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/moon.png").openStream(), GL_NEAREST));
+            _textures.put("slime", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/slime.png").openStream(), GL_NEAREST));
 
             _textures.put("shading", new TextureImpl("shading", GL11.GL_TEXTURE_1D, createShadeTexture()));
             Game.getInstance().getLogger().log(Level.FINE, "Finished loading textures!");

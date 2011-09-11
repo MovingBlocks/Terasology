@@ -18,7 +18,6 @@ package com.github.begla.blockmania.world;
 import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
-import com.github.begla.blockmania.rendering.VectorPool;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -87,7 +86,7 @@ public class ChunkMeshGenerator {
                     cIndex += 4;
                 }
 
-                Vector3f vertexPos = VectorPool.getVector(mesh._vertexElements[j].quads.get(i), mesh._vertexElements[j].quads.get(i + 1), mesh._vertexElements[j].quads.get(i + 2));
+                Vector3f vertexPos = new Vector3f(mesh._vertexElements[j].quads.get(i), mesh._vertexElements[j].quads.get(i + 1), mesh._vertexElements[j].quads.get(i + 2));
 
                 mesh._vertexElements[j].vertices.put(vertexPos.x);
                 mesh._vertexElements[j].vertices.put(vertexPos.y);
@@ -178,35 +177,35 @@ public class ChunkMeshGenerator {
          * First side of the billboard
          */
         Vector4f colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
-        Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0);
+        Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0);
 
-        Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
-        Vector3f p2 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
-        Vector3f p3 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
-        Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
+        Vector3f p1 = new Vector3f(-0.5f, -0.5f, 0.5f);
+        Vector3f p2 = new Vector3f(0.5f, -0.5f, -0.5f);
+        Vector3f p3 = new Vector3f(0.5f, 0.5f, -0.5f);
+        Vector3f p4 = new Vector3f(-0.5f, 0.5f, 0.5f);
 
         addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p1));
         addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p2));
         addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p3));
         addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p4));
-        addBlockTextureData(mesh._vertexElements[2], texOffset, VectorPool.getVector(0, 0, 1));
+        addBlockTextureData(mesh._vertexElements[2], texOffset, new Vector3f(0, 0, 1));
 
         /*
         * Second side of the billboard
         */
         colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
-        texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0);
+        texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0);
 
-        p1 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
-        p2 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
-        p3 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
-        p4 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
+        p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
+        p2 = new Vector3f(0.5f, -0.5f, 0.5f);
+        p3 = new Vector3f(0.5f, 0.5f, 0.5f);
+        p4 = new Vector3f(-0.5f, 0.5f, -0.5f);
 
         addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p1));
         addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p2));
         addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p3));
         addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p4));
-        addBlockTextureData(mesh._vertexElements[2], texOffset, VectorPool.getVector(0, 0, 1));
+        addBlockTextureData(mesh._vertexElements[2], texOffset, new Vector3f(0, 0, 1));
     }
 
     private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z) {
@@ -257,124 +256,88 @@ public class ChunkMeshGenerator {
         }
 
         if (drawTop) {
-            Vector3f p1 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
-            Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
-            Vector3f p3 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
-            Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
+            Vector3f p1 = new Vector3f(-0.5f, 0.5f, 0.5f);
+            Vector3f p2 = new Vector3f(0.5f, 0.5f, 0.5f);
+            Vector3f p3 = new Vector3f(0.5f, 0.5f, -0.5f);
+            Vector3f p4 = new Vector3f(-0.5f, 0.5f, -0.5f);
 
-            Vector3f norm = VectorPool.getVector(0, 1, 0);
+            Vector3f norm = new Vector3f(0, 1, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
 
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
+            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
         }
 
         if (drawFront) {
 
-            Vector3f p1 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
-            Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
-            Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
-            Vector3f p4 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
+            Vector3f p1 = new Vector3f(-0.5f, 0.5f, -0.5f);
+            Vector3f p2 = new Vector3f(0.5f, 0.5f, -0.5f);
+            Vector3f p3 = new Vector3f(0.5f, -0.5f, -0.5f);
+            Vector3f p4 = new Vector3f(-0.5f, -0.5f, -0.5f);
 
-            Vector3f norm = VectorPool.getVector(0, 0, -1);
+            Vector3f norm = new Vector3f(0, 0, -1);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
 
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
+            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
         }
 
         if (drawBack) {
-            Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
-            Vector3f p2 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
-            Vector3f p3 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
-            Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
+            Vector3f p1 = new Vector3f(-0.5f, -0.5f, 0.5f);
+            Vector3f p2 = new Vector3f(0.5f, -0.5f, 0.5f);
+            Vector3f p3 = new Vector3f(0.5f, 0.5f, 0.5f);
+            Vector3f p4 = new Vector3f(-0.5f, 0.5f, 0.5f);
 
-            Vector3f norm = VectorPool.getVector(0, 0, 1);
+            Vector3f norm = new Vector3f(0, 0, 1);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
 
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
+            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
         }
 
         if (drawLeft) {
-            Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
-            Vector3f p2 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
-            Vector3f p3 = VectorPool.getVector(-0.5f, 0.5f, 0.5f);
-            Vector3f p4 = VectorPool.getVector(-0.5f, 0.5f, -0.5f);
+            Vector3f p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
+            Vector3f p2 = new Vector3f(-0.5f, -0.5f, 0.5f);
+            Vector3f p3 = new Vector3f(-0.5f, 0.5f, 0.5f);
+            Vector3f p4 = new Vector3f(-0.5f, 0.5f, -0.5f);
 
-            Vector3f norm = VectorPool.getVector(-1, 0, 0);
+            Vector3f norm = new Vector3f(-1, 0, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.LEFT);
 
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
+            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
         }
 
         if (drawRight) {
-            Vector3f p1 = VectorPool.getVector(0.5f, 0.5f, -0.5f);
-            Vector3f p2 = VectorPool.getVector(0.5f, 0.5f, 0.5f);
-            Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
-            Vector3f p4 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
+            Vector3f p1 = new Vector3f(0.5f, 0.5f, -0.5f);
+            Vector3f p2 = new Vector3f(0.5f, 0.5f, 0.5f);
+            Vector3f p3 = new Vector3f(0.5f, -0.5f, 0.5f);
+            Vector3f p4 = new Vector3f(0.5f, -0.5f, -0.5f);
 
-            Vector3f norm = VectorPool.getVector(1, 0, 0);
+            Vector3f norm = new Vector3f(1, 0, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.RIGHT);
 
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
+            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
         }
 
         if (drawBottom) {
-            Vector3f p1 = VectorPool.getVector(-0.5f, -0.5f, -0.5f);
-            Vector3f p2 = VectorPool.getVector(0.5f, -0.5f, -0.5f);
-            Vector3f p3 = VectorPool.getVector(0.5f, -0.5f, 0.5f);
-            Vector3f p4 = VectorPool.getVector(-0.5f, -0.5f, 0.5f);
+            Vector3f p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
+            Vector3f p2 = new Vector3f(0.5f, -0.5f, -0.5f);
+            Vector3f p3 = new Vector3f(0.5f, -0.5f, 0.5f);
+            Vector3f p4 = new Vector3f(-0.5f, -0.5f, 0.5f);
 
-            Vector3f norm = VectorPool.getVector(0, -1, 0);
+            Vector3f norm = new Vector3f(0, -1, 0);
 
             Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BOTTOM);
 
-            Vector3f texOffset = VectorPool.getVector(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
+            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-
-            VectorPool.putVector(p1);
-            VectorPool.putVector(p2);
-            VectorPool.putVector(p3);
-            VectorPool.putVector(p4);
-            VectorPool.putVector(norm);
         }
     }
 

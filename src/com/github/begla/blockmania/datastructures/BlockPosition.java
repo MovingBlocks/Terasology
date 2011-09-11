@@ -16,7 +16,6 @@
  */
 package com.github.begla.blockmania.datastructures;
 
-import com.github.begla.blockmania.rendering.VectorPool;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -40,7 +39,7 @@ public final class BlockPosition implements Comparable<BlockPosition> {
     }
 
     double getDistance() {
-        return VectorPool.getVector(x - _origin.x, y - _origin.y, z - _origin.z).length();
+        return new Vector3f(x - _origin.x, y - _origin.y, z - _origin.z).length();
     }
 
     public int compareTo(BlockPosition o) {

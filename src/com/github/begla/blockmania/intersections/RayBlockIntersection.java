@@ -17,7 +17,6 @@
 package com.github.begla.blockmania.intersections;
 
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
@@ -125,7 +124,7 @@ public class RayBlockIntersection {
          * Fetch all vertices of the specified block.
          */
         Vector3f[] vertices = Block.AABBForBlockAt(x, y, z).getVertices();
-        Vector3f blockPos = VectorPool.getVector(x, y, z);
+        Vector3f blockPos = new Vector3f(x, y, z);
 
         /*
          * Generate a new intersection for each side of the block.
@@ -188,16 +187,12 @@ public class RayBlockIntersection {
     private static Intersection exectuteBlockFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
 
         // Calculate the plane to intersect with
-        Vector3f a = VectorPool.getVector();
+        Vector3f a = new Vector3f();
         Vector3f.sub(v1, v0, a);
-        Vector3f b = VectorPool.getVector();
+        Vector3f b = new Vector3f();
         Vector3f.sub(v2, v0, b);
-        Vector3f norm = VectorPool.getVector();
+        Vector3f norm = new Vector3f();
         Vector3f.cross(a, b, norm);
-
-        VectorPool.putVector(a);
-        VectorPool.putVector(b);
-
 
         double d = -(norm.x * v0.x + norm.y * v0.y + norm.z * v0.z);
 
@@ -212,15 +207,12 @@ public class RayBlockIntersection {
         /**
          * Calc. the point of intersection.
          */
-        Vector3f intersectPoint = VectorPool.getVector(ray.x * t, ray.y * t, ray.z * t);
+        Vector3f intersectPoint = new Vector3f((float) (ray.x * t), (float) (ray.y * t), (float) (ray.z * t));
         Vector3f.add(intersectPoint, origin, intersectPoint);
 
         if (intersectPoint.x >= v0.x && intersectPoint.x <= Math.max(v1.x, v2.x) && intersectPoint.y >= v0.y && intersectPoint.y <= Math.max(v1.y, v2.y) && intersectPoint.z >= v0.z && intersectPoint.z <= Math.max(v1.z, v2.z)) {
             return new Intersection(blockPos, norm, d, t, origin, ray, intersectPoint);
         }
-
-        VectorPool.putVector(intersectPoint);
-        VectorPool.putVector(norm);
 
         return null;
     }

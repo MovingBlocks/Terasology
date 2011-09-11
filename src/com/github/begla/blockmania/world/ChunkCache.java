@@ -83,7 +83,7 @@ public final class ChunkCache {
         }
         Collections.sort(cachedChunks);
 
-        for (int i = 0; i < 32 && _chunkCache.size() > capacity(); i++) {
+        while (_chunkCache.size() > capacity()) {
             Chunk chunkToDelete = cachedChunks.removeLast();
 
             synchronized (this) {
@@ -132,6 +132,6 @@ public final class ChunkCache {
      * @return
      */
     public static int capacity() {
-        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 2048;
+        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 1024;
     }
 }

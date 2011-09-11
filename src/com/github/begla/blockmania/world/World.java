@@ -19,10 +19,10 @@ import com.github.begla.blockmania.Configuration;
 import com.github.begla.blockmania.Game;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.*;
+import com.github.begla.blockmania.mobs.Slime;
 import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
-import com.github.begla.blockmania.rendering.VectorPool;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
@@ -56,7 +56,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class World extends RenderableObject {
+public final class World implements RenderableObject {
 
     /* PLAYER */
     private Player _player;
@@ -87,6 +87,8 @@ public final class World extends RenderableObject {
     private final Vector2f _windDirection = new Vector2f(0.25f, 0);
     private double _lastWindUpdate = 0;
     private short _nextWindUpdateInSeconds = 32;
+    /* ENTITIES */
+    private final FastList<Entity> _entities = new FastList<Entity>();
 
     /**
      * Initializes a new world for the single player mode.
@@ -95,7 +97,7 @@ public final class World extends RenderableObject {
      * @param seed  The seed string used to generate the terrain
      * @param p     The player
      */
-    public World(String title, String seed, Player p) {
+    public World(String title, String seed) {
         if (title == null) {
             throw new IllegalArgumentException("No title provided.");
         }
@@ -112,11 +114,6 @@ public final class World extends RenderableObject {
             throw new IllegalArgumentException("No seed provided.");
         }
 
-        if (p == null) {
-            throw new IllegalArgumentException("No player provided.");
-        }
-
-        this._player = p;
         this._title = title;
         this._seed = seed;
 
@@ -134,9 +131,6 @@ public final class World extends RenderableObject {
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
-
-        // Reset the player's position
-        resetPlayer();
         _visibleChunks = new FastSet();
 
         _updateThread = new Thread(new Runnable() {
@@ -163,6 +157,7 @@ public final class World extends RenderableObject {
                             }
                         }
                     }
+
                     _chunkUpdateManager.processChunkUpdates();
                     updateDaytime();
                 }
@@ -249,8 +244,10 @@ public final class World extends RenderableObject {
     /**
      * Renders the world.
      */
-    @Override
     public void render() {
+        if (_player == null)
+            return;
+
         if (!_player.isHeadUnderWater()) {
             /**
              * Sky box.
@@ -276,7 +273,7 @@ public final class World extends RenderableObject {
             renderClouds();
 
         /*
-         * Render the player.
+         * Render the world from the player's view.
          */
         _player.render();
 
@@ -294,6 +291,19 @@ public final class World extends RenderableObject {
         ShaderManager.getInstance().enableShader(null);
 
         renderChunks();
+        renderEntities();
+    }
+
+    private void renderEntities() {
+        for (int i = 0; i < _entities.size(); i++) {
+            _entities.get(i).render();
+        }
+    }
+
+    private void updateEntities() {
+        for (int i = 0; i < _entities.size(); i++) {
+            _entities.get(i).update();
+        }
     }
 
     private void renderSunMoon() {
@@ -408,11 +418,8 @@ public final class World extends RenderableObject {
     /**
      * Update all dirty display lists.
      */
-    @Override
     public void update() {
-
         _player.update();
-
         _chunkUpdateManager.updateDisplayLists();
 
         updateClouds();
@@ -421,6 +428,7 @@ public final class World extends RenderableObject {
             c.update();
         }
 
+        updateEntities();
         _chunkCache.freeCache();
     }
 
@@ -761,7 +769,7 @@ public final class World extends RenderableObject {
      *
      * @return The daylight value
      */
-    double getDaylight() {
+    public double getDaylight() {
         return _daylight;
     }
 
@@ -772,6 +780,24 @@ public final class World extends RenderableObject {
      */
     public Player getPlayer() {
         return _player;
+    }
+
+    public void setPlayer(Player p) {
+        _player = p;
+        // Reset the player's position
+        resetPlayer();
+
+        for (int i = 0; i < 64; i++) {
+            Entity slime = new Slime(this);
+            Vector3f slimeSpawningPoint = new Vector3f(_spawningPoint);
+
+            slimeSpawningPoint.x += _rand.randomDouble() * 30f;
+            slimeSpawningPoint.z += _rand.randomDouble() * 30f;
+
+            slime.setPosition(slimeSpawningPoint);
+            slime.getPosition().y = 100;
+            _entities.add(slime);
+        }
     }
 
     /**
@@ -883,7 +909,7 @@ public final class World extends RenderableObject {
         gs.add(getChunkGenerator("forest"));
 
         // Generate a new chunk and return it
-        return new Chunk(this, VectorPool.getVector(x, 0, z), gs);
+        return new Chunk(this, new Vector3f(x, 0, z), gs);
     }
 
     /**
@@ -906,7 +932,7 @@ public final class World extends RenderableObject {
             double dens = ((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 32, randZ);
 
             if (dens >= 0.008 && dens < 0.02)
-                return VectorPool.getVector(randX, 32, randZ);
+                return new Vector3f(randX, 32, randZ);
         }
     }
 
@@ -914,7 +940,7 @@ public final class World extends RenderableObject {
      * Sets the spawning point to the player's current position.
      */
     public void setSpawningPoint() {
-        _spawningPoint = VectorPool.getVector(_player.getPosition());
+        _spawningPoint = new Vector3f(_player.getPosition());
     }
 
     /**
@@ -923,10 +949,10 @@ public final class World extends RenderableObject {
     public void resetPlayer() {
         if (_spawningPoint == null) {
             _spawningPoint = findSpawningPoint();
-            _player.resetPlayer();
+            _player.resetEntity();
             _player.setPosition(_spawningPoint);
         } else {
-            _player.resetPlayer();
+            _player.resetEntity();
             _player.setPosition(_spawningPoint);
         }
     }
@@ -1021,7 +1047,7 @@ public final class World extends RenderableObject {
                 Element player = root.getChild("Player");
 
                 _seed = root.getAttribute("seed").getValue();
-                _spawningPoint = VectorPool.getVector(Float.parseFloat(player.getAttribute("x").getValue()), Float.parseFloat(player.getAttribute("y").getValue()), Float.parseFloat(player.getAttribute("z").getValue()));
+                _spawningPoint = new Vector3f(Float.parseFloat(player.getAttribute("x").getValue()), Float.parseFloat(player.getAttribute("y").getValue()), Float.parseFloat(player.getAttribute("z").getValue()));
                 _title = root.getAttributeValue("title");
                 setTime(Float.parseFloat(root.getAttributeValue("time")));
 
