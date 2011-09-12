@@ -16,12 +16,14 @@
  */
 package com.github.begla.blockmania.world.characters;
 
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.ViewFrustum;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
+import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.noise.PerlinNoise;
+import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
@@ -29,6 +31,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Vector3f;
+import org.newdawn.slick.openal.Audio;
 
 import java.util.Collections;
 
@@ -42,13 +45,27 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Player extends Character {
 
+    private Audio _currentFootstepSound;
+    private Audio[] _footstepSounds;
     private byte _selectedBlockType = 1;
     private final PerlinNoise _pGen = new PerlinNoise(42);
+    private final FastRandom _rand = new FastRandom();
 
     private final ViewFrustum _viewFrustum = new ViewFrustum();
 
     public Player(World parent) {
         super(parent, Configuration.getSettingNumeric("WALKING_SPEED"), Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
+
+        initAudio();
+    }
+
+    private void initAudio() {
+        _footstepSounds = new Audio[5];
+        _footstepSounds[0] = AudioManager.getInstance().getAudio("FootGrass1");
+        _footstepSounds[1] = AudioManager.getInstance().getAudio("FootGrass2");
+        _footstepSounds[2] = AudioManager.getInstance().getAudio("FootGrass3");
+        _footstepSounds[3] = AudioManager.getInstance().getAudio("FootGrass4");
+        _footstepSounds[4] = AudioManager.getInstance().getAudio("FootGrass5");
     }
 
     public void update() {
@@ -58,6 +75,21 @@ public final class Player extends Character {
         _jumpIntensity = Configuration.getSettingNumeric("JUMP_INTENSITY");
 
         super.update();
+
+        playMovementSound();
+    }
+
+    public void playMovementSound() {
+        if ((Math.abs(_velocity.x) > 0.001 || Math.abs(_velocity.z) > 0.001) && _touchingGround) {
+            if (_currentFootstepSound == null) {
+                _currentFootstepSound = _footstepSounds[Math.abs(_rand.randomInt()) % 5];
+                _currentFootstepSound.playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false);
+            } else {
+                if (!_currentFootstepSound.isPlaying()) {
+                    _currentFootstepSound = null;
+                }
+            }
+        }
     }
 
     /**
@@ -206,6 +238,7 @@ public final class Player extends Character {
                 }
 
                 getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
+                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false);
             }
         }
     }
@@ -237,6 +270,7 @@ public final class Player extends Character {
             if (is != null) {
                 Vector3f blockPos = is.getBlockPosition();
                 getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
+                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) Math.abs(_rand.randomDouble()) * 0.4f, 0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false);
             }
         }
     }

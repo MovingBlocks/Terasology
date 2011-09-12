@@ -16,6 +16,7 @@
       <entry name="?*.ftl" />
       <entry name="?*.glsl" />
       <entry name="?*.png" />
+      <entry name="?*.ogg" />
     </wildcardResourcePatterns>
     <annotationProcessing enabled="false" useClasspath="true" />
   </component>
