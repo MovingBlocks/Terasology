@@ -114,7 +114,7 @@ public class PerlinNoise {
         double result = 0;
 
         for (int i = 1; i <= octaves; i++) {
-            result += noise(x, y, z) * Math.pow(lacunarity, -0.96471 * i);
+            result += noise(x, y, z) * Math.pow(lacunarity, -0.86471 * i);
 
             x *= lacunarity;
             y *= lacunarity;
