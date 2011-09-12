@@ -35,12 +35,12 @@ void main(){
     vec3 daylightColorValue = vec3(daylightValue);
     vec3 blocklightColorValue = vec3(blocklightValue);
 
-    blocklightColorValue.r *= 1.0;
-    blocklightColorValue.g *= 0.9;
-    blocklightColorValue.b *= 0.8;
-
     blocklightColorValue = clamp(blocklightColorValue,0.0,1.0);
     daylightColorValue = clamp(daylightColorValue, 0.0, 1.0);
+
+    blocklightColorValue.x *= 1.5;
+    blocklightColorValue.y *= 1.3;
+    blocklightColorValue.z *= 0.6;
 
     color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
@@ -51,8 +51,6 @@ void main(){
         gl_FragColor.rg *= 0.4;
         gl_FragColor.b *= 0.7;
     }
-
-
 
     gl_FragColor.a = color.a;
 }
