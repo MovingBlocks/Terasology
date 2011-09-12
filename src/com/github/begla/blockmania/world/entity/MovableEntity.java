@@ -15,15 +15,18 @@
  */
 package com.github.begla.blockmania.world.entity;
 
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockWater;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
+import org.newdawn.slick.openal.Audio;
 
 import java.util.Collections;
 
@@ -31,6 +34,11 @@ import java.util.Collections;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class MovableEntity extends Entity {
+
+    protected final FastRandom _rand = new FastRandom();
+    protected Audio _currentFootstepSound;
+    protected Audio[] _footstepSounds;
+
     protected double _walkingSpeed;
     protected double _runningFactor;
     protected double _jumpIntensity;
@@ -51,6 +59,16 @@ public abstract class MovableEntity extends Entity {
         _runningFactor = runningFactor;
         _jumpIntensity = jumpIntensity;
         resetEntity();
+        initAudio();
+    }
+
+    private void initAudio() {
+        _footstepSounds = new Audio[5];
+        _footstepSounds[0] = AudioManager.getInstance().getAudio("FootGrass1");
+        _footstepSounds[1] = AudioManager.getInstance().getAudio("FootGrass2");
+        _footstepSounds[2] = AudioManager.getInstance().getAudio("FootGrass3");
+        _footstepSounds[3] = AudioManager.getInstance().getAudio("FootGrass4");
+        _footstepSounds[4] = AudioManager.getInstance().getAudio("FootGrass5");
     }
 
     public abstract void processMovement();
@@ -85,7 +103,24 @@ public abstract class MovableEntity extends Entity {
         updateSwimStatus();
 
         _movementDirection.set(0, 0, 0);
+
+        playMovementSound();
     }
+
+    private void playMovementSound() {
+        if ((Math.abs(_velocity.x) > 0.001 || Math.abs(_velocity.z) > 0.001) && _touchingGround) {
+            if (_currentFootstepSound == null) {
+                Vector3f playerDirection = directionOfPlayer();
+                _currentFootstepSound = _footstepSounds[Math.abs(_rand.randomInt()) % 5];
+                _currentFootstepSound.playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+            } else {
+                if (!_currentFootstepSound.isPlaying()) {
+                    _currentFootstepSound = null;
+                }
+            }
+        }
+    }
+
 
     /**
      * Resets the entity's attributes.
@@ -281,7 +316,12 @@ public abstract class MovableEntity extends Entity {
                         _gravity = _jumpIntensity;
                     }
 
-                    _touchingGround = true;
+                    // Player reaches the ground
+                    if (_touchingGround == false) {
+                        Vector3f playerDirection = directionOfPlayer();
+                        _footstepSounds[Math.abs(_rand.randomInt()) % 5].playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+                        _touchingGround = true;
+                    }
                 } else {
                     _touchingGround = false;
                 }
@@ -416,6 +456,10 @@ public abstract class MovableEntity extends Entity {
         if (_touchingGround) {
             _jump = true;
         }
+    }
+
+    protected Vector3f directionOfPlayer() {
+        return Vector3f.sub(getPosition(), _parent.getPlayer().getPosition(), null);
     }
 
     protected double distanceSquaredTo(Vector3f target) {

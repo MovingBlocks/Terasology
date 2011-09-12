@@ -45,27 +45,13 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Player extends Character {
 
-    private Audio _currentFootstepSound;
-    private Audio[] _footstepSounds;
     private byte _selectedBlockType = 1;
     private final PerlinNoise _pGen = new PerlinNoise(42);
-    private final FastRandom _rand = new FastRandom();
 
     private final ViewFrustum _viewFrustum = new ViewFrustum();
 
     public Player(World parent) {
         super(parent, Configuration.getSettingNumeric("WALKING_SPEED"), Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
-
-        initAudio();
-    }
-
-    private void initAudio() {
-        _footstepSounds = new Audio[5];
-        _footstepSounds[0] = AudioManager.getInstance().getAudio("FootGrass1");
-        _footstepSounds[1] = AudioManager.getInstance().getAudio("FootGrass2");
-        _footstepSounds[2] = AudioManager.getInstance().getAudio("FootGrass3");
-        _footstepSounds[3] = AudioManager.getInstance().getAudio("FootGrass4");
-        _footstepSounds[4] = AudioManager.getInstance().getAudio("FootGrass5");
     }
 
     public void update() {
@@ -75,21 +61,6 @@ public final class Player extends Character {
         _jumpIntensity = Configuration.getSettingNumeric("JUMP_INTENSITY");
 
         super.update();
-
-        playMovementSound();
-    }
-
-    public void playMovementSound() {
-        if ((Math.abs(_velocity.x) > 0.001 || Math.abs(_velocity.z) > 0.001) && _touchingGround) {
-            if (_currentFootstepSound == null) {
-                _currentFootstepSound = _footstepSounds[Math.abs(_rand.randomInt()) % 5];
-                _currentFootstepSound.playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false);
-            } else {
-                if (!_currentFootstepSound.isPlaying()) {
-                    _currentFootstepSound = null;
-                }
-            }
-        }
     }
 
     /**
