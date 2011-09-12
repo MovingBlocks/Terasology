@@ -11,16 +11,14 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/javolution-5.5.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/jdom.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/jinput.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/jogg-0.0.7.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/jorbis-0.0.15.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/junit-dep-4.9.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/lwjgl-debug.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/lwjgl.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/lwjgl_test.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/lwjgl_util.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/lwjgl_util_applet.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/lzma.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/slick-util.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/slick.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/trove-3.0.0rc2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/trove-3.0.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/lwjgl.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

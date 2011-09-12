@@ -202,18 +202,16 @@
             <zipfileset src="${basedir}/libs/annotations.jar"/>
             <zipfileset src="${basedir}/libs/AppleJavaExtensions.jar"/>
             <zipfileset src="${basedir}/libs/javolution-5.5.1.jar"/>
+            <zipfileset src="${basedir}/libs/jogg-0.0.7.jar.jar"/>
+            <zipfileset src="${basedir}/libs/jorbis-0.0.15.jar"/>
             <zipfileset src="${basedir}/libs/jdom.jar"/>
             <zipfileset src="${basedir}/libs/jinput.jar"/>
             <zipfileset src="${basedir}/libs/junit-dep-4.9.jar"/>
-            <zipfileset src="${basedir}/libs/lwjgl-debug.jar"/>
             <zipfileset src="${basedir}/libs/lwjgl.jar"/>
-            <zipfileset src="${basedir}/libs/lwjgl_test.jar"/>
             <zipfileset src="${basedir}/libs/lwjgl_util.jar"/>
-            <zipfileset src="${basedir}/libs/lwjgl_util_applet.jar"/>
             <zipfileset src="${basedir}/libs/lzma.jar"/>
             <zipfileset src="${basedir}/libs/slick-util.jar"/>
-            <zipfileset src="${basedir}/libs/slick.jar"/>
-            <zipfileset src="${basedir}/libs/trove-3.0.0rc2.jar"/>
+            <zipfileset src="${basedir}/libs/trove-3.0.0.jar"/>
         </jar>
         <copy file="${temp.jar.path.Blockmania.jar}" tofile="${artifact.temp.output.blockmania:jar}/Blockmania.jar"/>
     </target>
