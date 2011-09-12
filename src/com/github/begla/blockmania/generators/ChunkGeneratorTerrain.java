@@ -26,13 +26,7 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
-    /**
-     *
-     */
     private static final int SAMPLE_RATE_3D_HOR = 16;
-    /**
-     *
-     */
     private static final int SAMPLE_RATE_3D_VERT = 4;
 
     private enum BIOME_TYPE {
@@ -183,7 +177,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     private void generateRiver(Chunk c, int x, int y, int z, double heightPercentage, BIOME_TYPE type) {
         // Rivers under water?
-        if (y < 32)
+        if (y <= 32)
             return;
 
         double lakeIntens = calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c));
@@ -239,10 +233,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     public double calcDensity(double x, double y, double z) {
         BIOME_TYPE type = calcBiomeType((int) x, (int) z);
 
-        double height = baseTerrain(x, z) * 2 + 0.2;
+        double height = baseTerrain(x, z) * 1.6;
 
         double density = calcMountainDensity(x, y, z);
-        density = height - density;
 
         double div = (y + 1) * 0.6;
 
@@ -250,16 +243,16 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             div *= 2.0;
 
         if (type == BIOME_TYPE.DESERT) {
-            div *= 1.3;
+            div *= 1.2;
         } else if (type == BIOME_TYPE.PLAINS) {
             div *= 1.3;
         } else if (type == BIOME_TYPE.MOUNTAINS) {
-            div *= 1.2;
+            div *= 1.0;
         } else if (type == BIOME_TYPE.SNOW) {
             div *= 1.2;
         }
 
-        return density / div;
+        return (height - density) / div;
     }
 
 

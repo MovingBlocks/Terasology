@@ -118,6 +118,10 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
      * @param z
      */
     void generateTree(Chunk c, int x, int y, int z) {
+        // Trees should only be placed in direct sunlight
+        if (!c.canBlockSeeTheSky(x,y+1,z))
+            return;
+
         double r2 = _rand.standNormalDistrDouble();
         if (r2 > -2 && r2 < -1) {
             c.setBlock(x, y + 1, z, (byte) 0x0);

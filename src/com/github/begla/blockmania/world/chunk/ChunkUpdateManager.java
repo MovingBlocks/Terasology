@@ -102,7 +102,7 @@ public final class ChunkUpdateManager {
             /*
              * Check if this chunk was changed...
              */
-            if (c.isDirty()) {
+            if (c.isDirty() && !c.isLightDirty() && !c.isFresh()) {
                 /*
                  * ... if yes, regenerate the vertex arrays
                  */

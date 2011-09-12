@@ -15,17 +15,17 @@
  */
 package com.github.begla.blockmania.world.chunk;
 
-import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.main.Game;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.generators.ChunkGenerator;
+import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.Game;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.entity.StaticEntity;
 import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.entity.StaticEntity;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
@@ -119,10 +119,10 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
         if (_newMesh != null) {
             // Do not update the mesh if one of the VISIBLE neighbors is dirty
             for (Chunk nc : loadOrCreateNeighbors())
-                if (nc.isDirty() && nc.isChunkInFrustum())
+                if ((nc.isDirty() || nc.isLightDirty()) && nc.isChunkInFrustum())
                     return;
 
-            if (_newMesh.isGenerated()) {
+            if (_newMesh.isGenerated() && !isDirty() && !isFresh() && !isLightDirty()) {
                 ChunkMesh oldMesh = _activeMesh;
 
                 if (oldMesh != null)
@@ -490,6 +490,15 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
         }
 
         return 0;
+    }
+
+    public boolean canBlockSeeTheSky(int x, int y, int z) {
+        for (int y1 = y; y1 < Configuration.CHUNK_DIMENSIONS.y; y1++) {
+            if (!Block.getBlockForType(getBlock(x, y1, z)).isBlockTypeTranslucent())
+                return false;
+        }
+
+        return true;
     }
 
     /**

@@ -15,18 +15,18 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.main.Game;
-import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.rendering.RenderableObject;
-import com.github.begla.blockmania.world.characters.Player;
-import com.github.begla.blockmania.generators.*;
-import com.github.begla.blockmania.world.characters.Slime;
 import com.github.begla.blockmania.rendering.Primitives;
+import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
+import com.github.begla.blockmania.world.characters.Player;
+import com.github.begla.blockmania.world.characters.Slime;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkCache;
 import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
@@ -527,14 +527,14 @@ public final class World implements RenderableObject {
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.
      *
-     * @param x         The X-coordinate
-     * @param y         The Y-coordinate
-     * @param z         The Z-coordinate
-     * @param type      The type of the block to set
-     * @param update    If set the affected chunk is queued for updating
+     * @param x           The X-coordinate
+     * @param y           The Y-coordinate
+     * @param z           The Z-coordinate
+     * @param type        The type of the block to set
+     * @param updateLight If set the affected chunk is queued for updating
      * @param overwrite
      */
-    public final void setBlock(int x, int y, int z, byte type, boolean update, boolean overwrite) {
+    public final void setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
         int chunkPosX = calcChunkPosX(x);
         int chunkPosZ = calcChunkPosZ(z);
 
@@ -549,52 +549,50 @@ public final class World implements RenderableObject {
 
         if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0x0) {
 
-            byte currentValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
+            byte oldBlock = c.getBlock(blockPosX, y, blockPosZ);
+            byte newBlock = oldBlock;
 
             if (Block.getBlockForType(c.getBlock(blockPosX, y, blockPosZ)).isRemovable()) {
                 c.setBlock(blockPosX, y, blockPosZ, type);
+                newBlock = type;
+            } else {
+                return;
             }
 
-            if (update) {
+            if (updateLight) {
 
                 /*
-                 * Update sunlight.
-                 */
+                * Update sunlight.
+                */
                 c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, true, true);
-                byte newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.SUN);
 
-                /*
-                 * Spread light of block light sources.
-                 */
-                byte luminance = Block.getBlockForType(type).getLuminance();
+                byte blockLightPrev = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+                byte blockLightCurrent = blockLightPrev;
 
-                /*
-                 * Is this block glowing?
-                 */
-                if (luminance > 0) {
-                    currentValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+                // New block placed
+                if (oldBlock == 0x0 && newBlock != 0x0) {
+                    /*
+                    * Spread light of block light sources.
+                    */
+                    byte luminance = Block.getBlockForType(type).getLuminance();
+
+                    // Set the block light value to the luminance of this block
                     c.setLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
-                    newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
-                } else {
-                    currentValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+                    blockLightCurrent = luminance;
+                } else { // Block removed
+                    /*
+                    * Update the block light intensity of the current block.
+                    */
                     c.setLight(blockPosX, y, blockPosZ, (byte) 0x0, Chunk.LIGHT_TYPE.BLOCK);
-                    newValue = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
+                    c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.BLOCK);
+                    blockLightCurrent = getLight(x, y, z, Chunk.LIGHT_TYPE.BLOCK);
                 }
 
-                /*
-                 * Update the block light intensity of the current block.
-                 */
-                c.refreshLightAtLocalPos(blockPosX, y, blockPosZ, Chunk.LIGHT_TYPE.BLOCK);
-
-
-                /*
-                * Spread the light if the luminance is brighter than the
-                * current value.
-                */
-                if (newValue > currentValue) {
-                    c.spreadLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
-                } else if (newValue < currentValue) {
-                    c.unspreadLight(blockPosX, y, blockPosZ, currentValue, Chunk.LIGHT_TYPE.BLOCK);
+                // Block light is brighter than before
+                if (blockLightCurrent > blockLightPrev) {
+                    c.spreadLight(blockPosX, y, blockPosZ, blockLightCurrent, Chunk.LIGHT_TYPE.BLOCK);
+                } else if (blockLightCurrent < blockLightPrev) { // Block light is darker than before
+                    c.unspreadLight(blockPosX, y, blockPosZ, blockLightPrev, Chunk.LIGHT_TYPE.BLOCK);
                 }
             }
         }
@@ -685,6 +683,22 @@ public final class World implements RenderableObject {
             return 15;
         else
             return 0;
+    }
+
+    public final boolean canBlockSeeTheSky(int x, int y, int z) {
+        int chunkPosX = calcChunkPosX(x);
+        int chunkPosZ = calcChunkPosZ(z);
+
+        int blockPosX = calcBlockPosX(x, chunkPosX);
+        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+
+        if (c != null) {
+            return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
+        }
+
+        return false;
     }
 
     /**
