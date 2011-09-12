@@ -26,6 +26,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
@@ -200,6 +201,7 @@ public final class Game {
      * Clean up before exiting the application.
      */
     public void destroy() {
+        AL.destroy();
         Mouse.destroy();
         Keyboard.destroy();
         Display.destroy();
