@@ -36,6 +36,7 @@ import java.util.Collections;
 public abstract class MovableEntity extends Entity {
 
     protected final FastRandom _rand = new FastRandom();
+
     protected Audio _currentFootstepSound;
     protected Audio[] _footstepSounds;
 
@@ -64,11 +65,11 @@ public abstract class MovableEntity extends Entity {
 
     private void initAudio() {
         _footstepSounds = new Audio[5];
-        _footstepSounds[0] = AudioManager.getInstance().getAudio("FootGrass1");
-        _footstepSounds[1] = AudioManager.getInstance().getAudio("FootGrass2");
-        _footstepSounds[2] = AudioManager.getInstance().getAudio("FootGrass3");
-        _footstepSounds[3] = AudioManager.getInstance().getAudio("FootGrass4");
-        _footstepSounds[4] = AudioManager.getInstance().getAudio("FootGrass5");
+        _footstepSounds[0] = AudioManager.getInstance().loadAudio("FootGrass1");
+        _footstepSounds[1] = AudioManager.getInstance().loadAudio("FootGrass2");
+        _footstepSounds[2] = AudioManager.getInstance().loadAudio("FootGrass3");
+        _footstepSounds[3] = AudioManager.getInstance().loadAudio("FootGrass4");
+        _footstepSounds[4] = AudioManager.getInstance().loadAudio("FootGrass5");
     }
 
     public abstract void processMovement();
@@ -459,7 +460,7 @@ public abstract class MovableEntity extends Entity {
     }
 
     protected Vector3f directionOfPlayer() {
-        return Vector3f.sub(getPosition(), _parent.getPlayer().getPosition(), null);
+        return Vector3f.sub(_parent.getPlayer().getPosition(), getPosition(), null);
     }
 
     protected double distanceSquaredTo(Vector3f target) {
