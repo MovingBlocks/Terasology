@@ -104,12 +104,12 @@ public class AABB implements RenderableObject {
         double minDistance = Double.MAX_VALUE;
         Vector3f closestNormal = new Vector3f();
 
-        for (Vector3f v : normals) {
-            double distance = Vector3f.sub(centerPointForNormal(v), origin, null).length();
+        for (FastList.Node<Vector3f> n = normals.head(), end = normals.tail(); (n = n.getNext()) != end; ) {
+            double distance = Vector3f.sub(centerPointForNormal(n.getValue()), origin, null).length();
 
             if (distance < minDistance) {
                 minDistance = distance;
-                closestNormal = v;
+                closestNormal = n.getValue();
             }
         }
 

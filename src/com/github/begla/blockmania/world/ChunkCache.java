@@ -20,6 +20,7 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 
+import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -27,14 +28,15 @@ import java.util.Collections;
  */
 public final class ChunkCache {
 
-    private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>(capacity());
+    private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>(capacity()).shared();
+    private final Collection<Chunk> _disposableChunks = new FastList<Chunk>().shared();
     private final World _parent;
 
     /**
-     * @param _parent
+     * @param parent
      */
-    public ChunkCache(World _parent) {
-        this._parent = _parent;
+    public ChunkCache(World parent) {
+        _parent = parent;
     }
 
     /**
@@ -51,9 +53,7 @@ public final class ChunkCache {
         // Try to load the chunk from the cache
         Chunk c;
 
-        synchronized (this) {
-            c = _chunkCache.get(Integer.valueOf(MathHelper.cantorize(x, z)));
-        }
+        c = _chunkCache.get(Integer.valueOf(MathHelper.cantorize(x, z)));
 
         // We got a chunk! Already! Great!
         if (c != null) {
@@ -63,36 +63,35 @@ public final class ChunkCache {
         // Init a new chunk
         c = _parent.prepareNewChunk(x, z);
 
-        synchronized (this) {
-            _chunkCache.put(c.getChunkId(), c);
-            c.setCached(true);
-        }
+        _chunkCache.put(c.getChunkId(), c);
+        c.setCached(true);
 
         return c;
     }
 
-    public void freeCache() {
+    public void freeCacheSpace() {
         if (_chunkCache.size() <= capacity()) {
             return;
         }
 
-        FastList<Chunk> cachedChunks;
-
-        synchronized (this) {
-            cachedChunks = new FastList<Chunk>(_chunkCache.values());
-        }
+        FastList<Chunk> cachedChunks = new FastList<Chunk>(_chunkCache.values());
         Collections.sort(cachedChunks);
 
         while (_chunkCache.size() > capacity()) {
             Chunk chunkToDelete = cachedChunks.removeLast();
+            _chunkCache.remove(chunkToDelete.getChunkId());
 
-            synchronized (this) {
-                _chunkCache.remove(chunkToDelete.getChunkId());
-                chunkToDelete.setCached(false);
-            }
-
+            chunkToDelete.setCached(false);
             chunkToDelete.writeChunkToDisk();
-            chunkToDelete.disposeChunk();
+
+            _disposableChunks.add(chunkToDelete);
+        }
+    }
+
+    public void disposeUnusedChunks() {
+        for (Chunk c : _disposableChunks) {
+            c.disposeChunk();
+            _disposableChunks.remove(c);
         }
     }
 
@@ -101,30 +100,27 @@ public final class ChunkCache {
      * @return
      */
     public Chunk getChunkByKey(int key) {
-        Chunk result;
-
-        synchronized (this) {
-            result = _chunkCache.get(Integer.valueOf(key));
-        }
-
-        return result;
+        return _chunkCache.get(Integer.valueOf(key));
     }
 
     /**
-     * Writes all chunks to disk.
+     * Writes all chunks to disk and disposes them.
      */
-    public void writeAllChunksToDisk() {
-        synchronized (this) {
-            for (Chunk c : _chunkCache.values()) {
-                c.writeChunkToDisk();
-            }
+    public void saveAndDisposeAllChunks() {
+        for (FastMap.Entry<Integer, Chunk> e = _chunkCache.head(), end = _chunkCache.tail(); (e = e.getNext()) != end; ) {
+            e.getValue().setCached(false);
+            e.getValue().writeChunkToDisk();
+            e.getValue().disposeChunk();
         }
+
+        disposeUnusedChunks();
+        _chunkCache.clear();
     }
 
     /**
      * @return
      */
-    public synchronized int size() {
+    public int size() {
         return _chunkCache.size();
     }
 
@@ -132,6 +128,6 @@ public final class ChunkCache {
      * @return
      */
     public static int capacity() {
-        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 1024;
+        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 512;
     }
 }

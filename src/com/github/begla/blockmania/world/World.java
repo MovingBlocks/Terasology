@@ -43,6 +43,7 @@ import org.xml.sax.InputSource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Collections;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -72,7 +73,7 @@ public final class World implements RenderableObject {
     private long _lastDaytimeMeasurement = Game.getInstance().getTime();
     private double _daylight = 1.0f;
     /* RENDERING */
-    private FastSet<Chunk> _visibleChunks;
+    private FastList<Chunk> _visibleChunks;
     /* UPDATING & CACHING */
     private final ChunkUpdateManager _chunkUpdateManager = new ChunkUpdateManager(this);
     private final ChunkCache _chunkCache = new ChunkCache(this);
@@ -131,7 +132,7 @@ public final class World implements RenderableObject {
 
         // Init. random generator
         _rand = new FastRandom(seed.hashCode());
-        _visibleChunks = new FastSet();
+        _visibleChunks = new FastList<Chunk>();
 
         _updateThread = new Thread(new Runnable() {
 
@@ -159,7 +160,7 @@ public final class World implements RenderableObject {
                     }
 
                     _chunkUpdateManager.processChunkUpdates();
-                    updateDaytime();
+                    _chunkCache.freeCacheSpace();
                 }
             }
         });
@@ -176,8 +177,14 @@ public final class World implements RenderableObject {
             _updateThread.notify();
         }
 
+        try {
+            _updateThread.join();
+        } catch (InterruptedException e) {
+
+        }
+
         saveMetaData();
-        _chunkCache.writeAllChunksToDisk();
+        _chunkCache.saveAndDisposeAllChunks();
     }
 
     /**
@@ -363,8 +370,8 @@ public final class World implements RenderableObject {
         glDisable(GL_BLEND);
     }
 
-    private FastSet<Chunk> fetchVisibleChunks() {
-        FastSet<Chunk> visibleChunks = new FastSet<Chunk>();
+    private FastList<Chunk> fetchVisibleChunks() {
+        FastList<Chunk> visibleChunks = new FastList<Chunk>();
         for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
             for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
 
@@ -378,6 +385,7 @@ public final class World implements RenderableObject {
             }
         }
 
+        Collections.sort(visibleChunks);
         return visibleChunks;
     }
 
@@ -419,17 +427,18 @@ public final class World implements RenderableObject {
      * Update all dirty display lists.
      */
     public void update() {
+        updateDaytime();
+
         _player.update();
         _chunkUpdateManager.updateDisplayLists();
 
         updateClouds();
 
-        for (Chunk c : _visibleChunks) {
-            c.update();
-        }
+        for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; )
+            _visibleChunks.valueOf(n).update();
 
         updateEntities();
-        _chunkCache.freeCache();
+        _chunkCache.disposeUnusedChunks();
     }
 
     private void updateClouds() {
@@ -1120,7 +1129,7 @@ public final class World implements RenderableObject {
         glEndList();
     }
 
-    public FastSet<Chunk> getVisibleChunks() {
+    public FastList<Chunk> getVisibleChunks() {
         return _visibleChunks;
     }
 }

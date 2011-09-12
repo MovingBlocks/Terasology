@@ -3,7 +3,7 @@
     <option name="myName" value="Project Default" />
     <option name="myLocal" value="false" />
     <inspection_tool class="SpellCheckingInspection" enabled="true" level="TYPO" enabled_by_default="true">
-      <option name="processCode" value="false" />
+      <option name="processCode" value="true" />
       <option name="processLiterals" value="false" />
       <option name="processComments" value="true" />
     </inspection_tool>

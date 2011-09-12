@@ -17,8 +17,6 @@ package com.github.begla.blockmania.world;
 
 import javolution.util.FastList;
 
-import java.util.Collections;
-
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -55,7 +53,6 @@ public final class ChunkUpdateManager {
         }
 
         if (!dirtyChunks.isEmpty()) {
-            Collections.sort(dirtyChunks);
             Chunk closestChunk = dirtyChunks.getFirst();
             processChunkUpdate(closestChunk);
         }
@@ -71,10 +68,6 @@ public final class ChunkUpdateManager {
      */
     private void processChunkUpdate(Chunk c) {
         if (c != null) {
-            if (!c.isDirty() && !c.isFresh() && !c.isLightDirty()) {
-                return;
-            }
-
             /*
              * Generate the chunk...
              */
@@ -89,9 +82,9 @@ public final class ChunkUpdateManager {
              * Before starting the illumination process, make sure that the neighbor chunks
              * are present and generated.
              */
-            for (Chunk neighbor : neighbors) {
-                if (neighbor != null) {
-                    neighbor.generate();
+            for (int i = 0; i < neighbors.length; i++) {
+                if (neighbors[i] != null) {
+                    neighbors[i].generate();
                 }
             }
 
@@ -122,7 +115,7 @@ public final class ChunkUpdateManager {
      * TODO
      */
     public void updateDisplayLists() {
-        while (!_displayListUpdates.isEmpty()) {
+        if (!_displayListUpdates.isEmpty()) {
             Chunk c = _displayListUpdates.removeFirst();
             c.generateVBOs();
         }

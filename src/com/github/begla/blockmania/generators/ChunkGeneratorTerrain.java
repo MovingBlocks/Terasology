@@ -138,10 +138,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                 // Beach
                 if (y >= 26 && y <= 32) {
                     c.setBlock(x, y, z, (byte) 0x7);
-                    break;
-                }
-
-                if (heightPercentage == 0 && y > 32) {
+                } else if (heightPercentage == 0 && y > 32) {
                     // Grass on top
                     c.setBlock(x, y, z, (byte) 0x1);
                 } else if (heightPercentage > 0.02) {
@@ -242,10 +239,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     public double calcDensity(double x, double y, double z) {
         BIOME_TYPE type = calcBiomeType((int) x, (int) z);
 
-        double height = baseTerrain(x, z) * 2.0;
+        double height = baseTerrain(x, z) + 0.4;
 
         double density = calcMountainDensity(x, y, z);
-        density = height - density;
+        density = height + density;
 
         double div;
 

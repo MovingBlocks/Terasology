@@ -54,8 +54,8 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
     /* ------ */
     private boolean _dirty;
     private boolean _lightDirty;
-    private boolean _fresh = true;
-    private boolean _cached = false;
+    private boolean _fresh;
+    private boolean _cached;
     /* ------ */
     private Integer _chunkId = -1;
     /* ------ */
@@ -104,6 +104,8 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
 
         _lightDirty = true;
         _dirty = true;
+        _fresh = true;
+        _cached = false;
     }
 
     public void render() {
@@ -198,11 +200,9 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      * Generates the initial sunlight.
      */
     private void generateSunlight() {
-        if (_fresh) {
-            for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
-                for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
-                    refreshSunlightAtLocalPos(x, z, false, false);
-                }
+        for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
+                refreshSunlightAtLocalPos(x, z, false, false);
             }
         }
     }
@@ -391,7 +391,7 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      * @param type       The type of the light
      */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type) {
-        if (depth > lightValue) {
+        if (depth > lightValue || lightValue - depth < 1) {
             return;
         }
 
@@ -424,7 +424,6 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      * @return The light intensity
      */
     public byte getLight(int x, int y, int z, LIGHT_TYPE type) {
-
         byte result;
 
         if (type == LIGHT_TYPE.SUN) {
@@ -453,11 +452,6 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      * @param type      The type of the light
      */
     public void setLight(int x, int y, int z, byte intensity, LIGHT_TYPE type) {
-        if (isFresh()) {
-            // Sunlight should not be changed within fresh blocks
-            return;
-        }
-
         BlockmaniaSmartArray lSource;
         if (type == LIGHT_TYPE.SUN) {
             lSource = _sunlight;
@@ -532,6 +526,7 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      */
     public Chunk[] loadOrCreateNeighbors() {
         Chunk[] chunks = new Chunk[8];
+
         chunks[0] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z);
         chunks[1] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z);
         chunks[2] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x, (int) _position.z + 1);
@@ -748,6 +743,9 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      * Generates the display lists and swaps the old mesh with the current mesh.
      */
     public void generateVBOs() {
+        if (!isCached())
+            return;
+
         if (_newMesh != null) {
             _newMesh.generateVBOs();
         }

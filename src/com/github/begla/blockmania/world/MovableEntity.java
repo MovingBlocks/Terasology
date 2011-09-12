@@ -62,8 +62,8 @@ public abstract class MovableEntity extends Entity {
 
             FastList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());
 
-            for (BlockPosition p : blocks) {
-                AABB blockAABB = Block.AABBForBlockAt(p.x, p.y, p.z);
+            for (FastList.Node<BlockPosition> n = blocks.head(), end = blocks.tail(); (n = n.getNext()) != end; ) {
+                AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
                 blockAABB.render();
             }
         }

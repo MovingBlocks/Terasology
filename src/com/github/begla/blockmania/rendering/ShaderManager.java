@@ -68,15 +68,15 @@ public class ShaderManager {
         createVertexShader("cloud_vert.glsl", "cloud");
         createFragShader("cloud_frag.glsl", "cloud");
 
-        for (String s : _fragmentShader.keySet()) {
+        for (FastMap.Entry<String, Integer> e = _fragmentShader.head(), end = _fragmentShader.tail(); (e = e.getNext()) != end; ) {
             int shaderProgram = GL20.glCreateProgram();
 
-            GL20.glAttachShader(shaderProgram, _fragmentShader.get(s));
-            GL20.glAttachShader(shaderProgram, _vertexShader.get(s));
+            GL20.glAttachShader(shaderProgram, _fragmentShader.get(e.getKey()));
+            GL20.glAttachShader(shaderProgram, _vertexShader.get(e.getKey()));
             GL20.glLinkProgram(shaderProgram);
             GL20.glValidateProgram(shaderProgram);
 
-            _shaderPrograms.put(s, shaderProgram);
+            _shaderPrograms.put(e.getKey(), shaderProgram);
         }
     }
 

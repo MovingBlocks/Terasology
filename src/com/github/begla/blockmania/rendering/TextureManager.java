@@ -17,18 +17,14 @@ package com.github.begla.blockmania.rendering;
 
 import com.github.begla.blockmania.Game;
 import javolution.util.FastMap;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureImpl;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.logging.Level;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -54,32 +50,10 @@ public class TextureManager {
             _textures.put("moon", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/moon.png").openStream(), GL_NEAREST));
             _textures.put("slime", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/slime.png").openStream(), GL_NEAREST));
 
-            _textures.put("shading", new TextureImpl("shading", GL11.GL_TEXTURE_1D, createShadeTexture()));
             Game.getInstance().getLogger().log(Level.FINE, "Finished loading textures!");
         } catch (IOException ex) {
             Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
-    }
-
-    public int createShadeTexture() {
-        int texture = GL11.glGenTextures();
-
-        glBindTexture(GL11.GL_TEXTURE_1D, texture);
-        ByteBuffer buffer = BufferUtils.createByteBuffer(3 * 256);
-
-        for (int i = 0; i < 256; i++) {
-            buffer.put((byte) i);
-            buffer.put((byte) i);
-            buffer.put((byte) i);
-        }
-
-        buffer.flip();
-
-        glTexImage1D(GL11.GL_TEXTURE_1D, 0, GL11.GL_RGB, 256, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, buffer);
-        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-
-        return texture;
     }
 
     public void bindTexture(String s) {
