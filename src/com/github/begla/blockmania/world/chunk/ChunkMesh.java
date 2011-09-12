@@ -1,4 +1,4 @@
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.rendering.VBOHelper;
 import gnu.trove.list.array.TFloatArrayList;

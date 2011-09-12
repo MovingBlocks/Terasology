@@ -16,11 +16,11 @@
 
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockDirt;
 import com.github.begla.blockmania.blocks.BlockWater;
-import com.github.begla.blockmania.world.Chunk;
+import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
  * Generates grass (substitutes dirt blocks), flowers and high grass.

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.chunk;
 
-import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.Game;
+import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.Game;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
@@ -24,6 +24,8 @@ import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
+import com.github.begla.blockmania.world.entity.StaticEntity;
+import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;

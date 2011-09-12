@@ -14,14 +14,13 @@
  *  limitations under the License.
  *
  */
-package com.github.begla.blockmania.mobs;
+package com.github.begla.blockmania.world.characters;
 
-import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.Game;
+import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.Game;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.MovableEntity;
 import com.github.begla.blockmania.world.World;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
@@ -29,12 +28,9 @@ import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * This class contains all functions regarding the player's actions,
- * movement and the orientation of the camera.
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Slime extends MovableEntity {
+public final class Slime extends Character {
 
     public static int _instanceCounter;
 

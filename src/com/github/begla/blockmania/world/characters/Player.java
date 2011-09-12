@@ -14,14 +14,15 @@
  *  limitations under the License.
  *
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.characters;
 
-import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.datastructures.ViewFrustum;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.noise.PerlinNoise;
-import com.github.begla.blockmania.rendering.ViewFrustum;
+import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -39,7 +40,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Player extends MovableEntity {
+public final class Player extends Character {
 
     private byte _selectedBlockType = 1;
     private final PerlinNoise _pGen = new PerlinNoise(42);

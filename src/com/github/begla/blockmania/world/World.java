@@ -15,16 +15,22 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.Configuration;
-import com.github.begla.blockmania.Game;
+import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.Game;
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.rendering.RenderableObject;
+import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.generators.*;
-import com.github.begla.blockmania.mobs.Slime;
+import com.github.begla.blockmania.world.characters.Slime;
 import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
+import com.github.begla.blockmania.world.chunk.Chunk;
+import com.github.begla.blockmania.world.chunk.ChunkCache;
+import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
+import com.github.begla.blockmania.world.entity.Entity;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
@@ -225,7 +231,7 @@ public final class World implements RenderableObject {
          * Create cloud array.
          */
         try {
-            BufferedImage cloudImage = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/clouds.png").openStream());
+            BufferedImage cloudImage = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/clouds.png").openStream());
             _clouds = new boolean[cloudImage.getWidth()][cloudImage.getHeight()];
 
             for (int x = 0; x < cloudImage.getWidth(); x++) {
@@ -245,7 +251,6 @@ public final class World implements RenderableObject {
 
         generateSunMoonDisplayList();
         generateCloudDisplayList();
-
     }
 
     /**

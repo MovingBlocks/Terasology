@@ -131,37 +131,37 @@ public class RayBlockIntersection {
          */
 
         // Front
-        Intersection is = exectuteBlockFaceIntersection(blockPos, vertices[0], vertices[1], vertices[3], rayOrigin, rayDirection);
+        Intersection is = executeBlockFaceIntersection(blockPos, vertices[0], vertices[1], vertices[3], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
 
         // Back
-        is = exectuteBlockFaceIntersection(blockPos, vertices[4], vertices[7], vertices[5], rayOrigin, rayDirection);
+        is = executeBlockFaceIntersection(blockPos, vertices[4], vertices[7], vertices[5], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
 
         // Left
-        is = exectuteBlockFaceIntersection(blockPos, vertices[4], vertices[0], vertices[7], rayOrigin, rayDirection);
+        is = executeBlockFaceIntersection(blockPos, vertices[4], vertices[0], vertices[7], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
 
         // Right
-        is = exectuteBlockFaceIntersection(blockPos, vertices[5], vertices[6], vertices[1], rayOrigin, rayDirection);
+        is = executeBlockFaceIntersection(blockPos, vertices[5], vertices[6], vertices[1], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
 
         // Top
-        is = exectuteBlockFaceIntersection(blockPos, vertices[7], vertices[3], vertices[6], rayOrigin, rayDirection);
+        is = executeBlockFaceIntersection(blockPos, vertices[7], vertices[3], vertices[6], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
 
         // Bottom
-        is = exectuteBlockFaceIntersection(blockPos, vertices[4], vertices[5], vertices[0], rayOrigin, rayDirection);
+        is = executeBlockFaceIntersection(blockPos, vertices[4], vertices[5], vertices[0], rayOrigin, rayDirection);
         if (is != null) {
             result.add(is);
         }
@@ -184,7 +184,7 @@ public class RayBlockIntersection {
      * @param ray      Direction of the intersection ray
      * @return Ray-face-intersection
      */
-    private static Intersection exectuteBlockFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
+    private static Intersection executeBlockFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
 
         // Calculate the plane to intersect with
         Vector3f a = new Vector3f();

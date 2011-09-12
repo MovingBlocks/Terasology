@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.rendering;
 
-import com.github.begla.blockmania.Game;
+import com.github.begla.blockmania.main.Game;
 import javolution.util.FastMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBShaderObjects;
@@ -91,7 +91,7 @@ public class ShaderManager {
         String fragCode = "";
         String line;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/shaders/" + filename).openStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/data/shaders/" + filename).openStream()));
             while ((line = reader.readLine()) != null) {
                 fragCode += line + "\n";
             }
@@ -119,7 +119,7 @@ public class ShaderManager {
         String fragCode = "";
         String line;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/shaders/" + filename).openStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/data/shaders/" + filename).openStream()));
             while ((line = reader.readLine()) != null) {
                 fragCode += line + "\n";
             }

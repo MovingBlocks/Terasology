@@ -15,10 +15,10 @@
  */
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.noise.PerlinNoise;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.Chunk;
+import com.github.begla.blockmania.world.chunk.Chunk;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**

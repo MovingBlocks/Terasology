@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.entity;
 
 import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.rendering.RenderableObject;
 import org.lwjgl.util.vector.Vector3f;
 
 /**

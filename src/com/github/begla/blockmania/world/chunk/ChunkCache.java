@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.chunk;
 
-import com.github.begla.blockmania.Configuration;
+import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.MathHelper;
+import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 

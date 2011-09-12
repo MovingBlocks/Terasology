@@ -13,21 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.entity;
 
 /**
- * The base class of all renderable objects.
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface RenderableObject {
-    /**
-     * Rendering operations have to be placed here.
-     */
-    public abstract void render();
+public abstract class StaticEntity extends Entity {
 
-    /**
-     * Updating operations have to be placed here.
-     */
-    public abstract void update();
 }

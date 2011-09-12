@@ -16,9 +16,9 @@
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.world.RenderableObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
