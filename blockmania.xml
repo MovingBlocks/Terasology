@@ -202,7 +202,7 @@
             <zipfileset src="${basedir}/libs/annotations.jar"/>
             <zipfileset src="${basedir}/libs/AppleJavaExtensions.jar"/>
             <zipfileset src="${basedir}/libs/javolution-5.5.1.jar"/>
-            <zipfileset src="${basedir}/libs/jogg-0.0.7.jar.jar"/>
+            <zipfileset src="${basedir}/libs/jogg-0.0.7.jar"/>
             <zipfileset src="${basedir}/libs/jorbis-0.0.15.jar"/>
             <zipfileset src="${basedir}/libs/jdom.jar"/>
             <zipfileset src="${basedir}/libs/jinput.jar"/>
