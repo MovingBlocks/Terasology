@@ -51,16 +51,17 @@ public class AudioManager {
     }
 
     private void loadAudioFiles() {
+        _audioFiles.put("PlaceRemoveBlock", loadAudio("PlaceRemoveBlock"));
+    }
+
+    public Audio loadAudio(String s) {
         try {
-            _audioFiles.put("FootGrass1", AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/sounds/FootGrass1.ogg")));
-            _audioFiles.put("FootGrass2", AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/sounds/FootGrass2.ogg")));
-            _audioFiles.put("FootGrass3", AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/sounds/FootGrass3.ogg")));
-            _audioFiles.put("FootGrass4", AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/sounds/FootGrass4.ogg")));
-            _audioFiles.put("FootGrass5", AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/sounds/FootGrass5.ogg")));
-            _audioFiles.put("PlaceRemoveBlock", AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/sounds/PlaceRemoveBlock.ogg")));
+            return AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/sounds/" + s + ".ogg"));
         } catch (IOException e) {
             Game.getInstance().getLogger().log(Level.SEVERE, e.getLocalizedMessage());
         }
+
+        return null;
     }
 
     public Audio getAudio(String s) {

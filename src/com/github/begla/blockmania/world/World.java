@@ -23,6 +23,7 @@ import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
+import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.characters.Player;
@@ -96,6 +97,8 @@ public final class World implements RenderableObject {
     private short _nextWindUpdateInSeconds = 32;
     /* ENTITIES */
     private final FastList<Entity> _entities = new FastList<Entity>();
+    /* PARTICLE EMITTERS */
+    private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter();
 
     /**
      * Initializes a new world for the single player mode.
@@ -304,6 +307,16 @@ public final class World implements RenderableObject {
 
         renderEntities();
         renderChunks();
+
+        renderParticleEmitters();
+    }
+
+    private void renderParticleEmitters() {
+        _blockParticleEmitter.render();
+    }
+
+    private void updateParticleEmitters() {
+        _blockParticleEmitter.update();
     }
 
     private void renderEntities() {
@@ -444,6 +457,8 @@ public final class World implements RenderableObject {
 
         updateEntities();
         _chunkCache.disposeUnusedChunks();
+
+        updateParticleEmitters();
     }
 
     private void updateClouds() {
@@ -1150,5 +1165,9 @@ public final class World implements RenderableObject {
 
     public FastList<Chunk> getVisibleChunks() {
         return _visibleChunks;
+    }
+
+    public BlockParticleEmitter getBlockParticleEmitter() {
+        return _blockParticleEmitter;
     }
 }

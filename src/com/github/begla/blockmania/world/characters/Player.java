@@ -23,7 +23,6 @@ import com.github.begla.blockmania.datastructures.ViewFrustum;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.noise.PerlinNoise;
-import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
@@ -31,7 +30,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Vector3f;
-import org.newdawn.slick.openal.Audio;
 
 import java.util.Collections;
 
@@ -240,7 +238,11 @@ public final class Player extends Character {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
                 Vector3f blockPos = is.getBlockPosition();
+                byte currentBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
                 getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
+
+                _parent.getBlockParticleEmitter().setOrigin(blockPos);
+                _parent.getBlockParticleEmitter().emitParticles(128, currentBlockType);
                 AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) Math.abs(_rand.randomDouble()) * 0.4f, 0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false);
             }
         }
