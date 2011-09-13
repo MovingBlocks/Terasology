@@ -22,7 +22,6 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
@@ -252,23 +251,23 @@ public abstract class MovableEntity extends Entity {
         /*
          * Slowdown the speed of the entity each time this method is called.
          */
-        if (MathHelper.fastAbs(_velocity.y) > 0f) {
+        if (Math.abs(_velocity.y) > 0f) {
             _velocity.y += -1f * _velocity.y * Configuration.getSettingNumeric("FRICTION");
         }
 
-        if (MathHelper.fastAbs(_velocity.x) > 0f) {
+        if (Math.abs(_velocity.x) > 0f) {
             _velocity.x += -1f * _velocity.x * Configuration.getSettingNumeric("FRICTION");
         }
 
-        if (MathHelper.fastAbs(_velocity.z) > 0f) {
+        if (Math.abs(_velocity.z) > 0f) {
             _velocity.z += -1f * _velocity.z * Configuration.getSettingNumeric("FRICTION");
         }
 
         /*
          * Apply friction.
          */
-        if (MathHelper.fastAbs(_velocity.x) > _activeWalkingSpeed || MathHelper.fastAbs(_velocity.z) > _activeWalkingSpeed || MathHelper.fastAbs(_velocity.y) > _activeWalkingSpeed) {
-            double max = Math.max(Math.max(MathHelper.fastAbs(_velocity.x), MathHelper.fastAbs(_velocity.z)), MathHelper.fastAbs(_velocity.y));
+        if (Math.abs(_velocity.x) > _activeWalkingSpeed || Math.abs(_velocity.z) > _activeWalkingSpeed || Math.abs(_velocity.y) > _activeWalkingSpeed) {
+            double max = Math.max(Math.max(Math.abs(_velocity.x), Math.abs(_velocity.z)), Math.abs(_velocity.y));
             double div = max / _activeWalkingSpeed;
 
             _velocity.x /= div;

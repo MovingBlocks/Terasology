@@ -16,11 +16,11 @@
 package com.github.begla.blockmania.main;
 
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.characters.Player;
+import com.github.begla.blockmania.world.chunk.Chunk;
 import javolution.util.FastList;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -54,7 +54,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
 public final class Game {
 
     /* ------- */
-    private static final int TICKS_PER_SECOND = 120;
+    private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
     /* ------- */
     private static TrueTypeFont _font1;
@@ -101,7 +101,7 @@ public final class Game {
         Game.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
 
         try {
-            loadLibs();
+            loadNativeLibs();
         } catch (Exception e) {
             Game.getInstance().getLogger().log(Level.SEVERE, "Couldn't link static libraries. Sorry: " + e);
         }
@@ -128,16 +128,7 @@ public final class Game {
         System.exit(0);
     }
 
-    /**
-     * Returns the system time in milliseconds.
-     *
-     * @return The system time in milliseconds.
-     */
-    public long getTime() {
-        return (Sys.getTime() * 1000) / _timerTicksPerSecond;
-    }
-
-    private static void loadLibs() throws Exception {
+    private static void loadNativeLibs() throws Exception {
         if (System.getProperty("os.name").equals("Mac OS X"))
             addLibraryPath("natives/macosx");
         else if (System.getProperty("os.name").equals("Linux"))
@@ -161,6 +152,18 @@ public final class Game {
         final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
         newPaths[newPaths.length - 1] = s;
         usrPathsField.set(null, newPaths);
+    }
+
+    /**
+     * Returns the system time in milliseconds.
+     *
+     * @return The system time in milliseconds.
+     */
+    public long getTime() {
+        if (_timerTicksPerSecond == 0)
+            return 0;
+
+        return (Sys.getTime() * 1000) / _timerTicksPerSecond;
     }
 
     /**
@@ -545,9 +548,6 @@ public final class Game {
                 _saveWorldOnExit = false;
                 _runGame = false;
                 success = true;
-            } else if (parsingResult.get(0).equals("info")) {
-                Game.getInstance().getLogger().log(Level.INFO, _player.selectedBlockInformation());
-                success = true;
             } else if (parsingResult.get(0).equals("load")) {
                 String worldSeed = _rand.randomCharacterString(16);
 
@@ -556,9 +556,6 @@ public final class Game {
                 }
 
                 initNewWorldAndPlayer(worldSeed, worldSeed);
-                success = true;
-            } else if (parsingResult.get(0).equals("chunk_pos")) {
-                _world.printPlayerChunkPosition();
                 success = true;
             } else if (parsingResult.get(0).equals("set_spawn")) {
                 _world.setSpawningPoint();

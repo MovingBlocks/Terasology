@@ -24,8 +24,8 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public abstract class ParticleEmitter implements RenderableObject {
 
-    protected int _particlesToEmitPerTurn = 8;
-    protected int _particlesToEmit = 100;
+    protected int _particlesToEmitPerTurn = 16;
+    protected int _particlesToEmit;
 
     protected FastList<Particle> _particles = new FastList();
     protected Vector3f _origin = new Vector3f();

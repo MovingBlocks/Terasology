@@ -30,7 +30,7 @@ public final class Configuration {
     /**
      * Maximum amount frames to skip.
      */
-    public static final int FRAME_SKIP_MAX_FRAMES = 5;
+    public static final int FRAME_SKIP_MAX_FRAMES = 10;
     /**
      * The initial time for new worlds.
      */
@@ -83,8 +83,8 @@ public final class Configuration {
     public static final double PROB_DIAMOND = -4;
 
     /* -------- */
-    private static final FastMap<String, Double> _settingsNumeric = new FastMap<String, Double>();
-    private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
+    private static final FastMap<String, Double> _settingsNumeric = new FastMap<String, Double>(32);
+    private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>(32);
 
     static {
         if (Game.getInstance().isSandboxed()) {
@@ -150,17 +150,16 @@ public final class Configuration {
         _settingsBoolean.put("BOBBING", true);
         _settingsBoolean.put("DEMO_FLIGHT", false);
         _settingsBoolean.put("GOD_MODE", false);
-        _settingsNumeric.put("JUMP_INTENSITY", 0.08);
+        _settingsNumeric.put("JUMP_INTENSITY", 0.125);
         _settingsNumeric.put("MAX_GRAVITY", 0.7);
-        _settingsNumeric.put("WALKING_SPEED", 0.02);
+        _settingsNumeric.put("WALKING_SPEED", 0.03);
         _settingsNumeric.put("RUNNING_FACTOR", 1.8);
-        _settingsNumeric.put("GRAVITY", 0.002);
+        _settingsNumeric.put("GRAVITY", 0.006);
         _settingsNumeric.put("MAX_GRAVITY_SWIMMING", 0.01);
         _settingsNumeric.put("GRAVITY_SWIMMING", 0.0001);
         _settingsNumeric.put("FRICTION", 0.08);
-        _settingsNumeric.put("V_DIST_X", 32.0);
-        _settingsNumeric.put("V_DIST_Z", 32.0);
-        _settingsNumeric.put("REPLANT_DIRT_TIME", 30000.0);
+        _settingsNumeric.put("V_DIST_X", 24.0);
+        _settingsNumeric.put("V_DIST_Z", 24.0);
     }
 
     private static void loadDebug() {
@@ -168,8 +167,6 @@ public final class Configuration {
         _settingsBoolean.put("DEBUG", true);
         _settingsBoolean.put("DEBUG_COLLISION", false);
         _settingsBoolean.put("GOD_MODE", true);
-        _settingsNumeric.put("V_DIST_X", 32.0);
-        _settingsNumeric.put("V_DIST_Z", 32.0);
         _settingsNumeric.put("WALKING_SPEED", 0.5);
     }
 
@@ -179,8 +176,6 @@ public final class Configuration {
         _settingsBoolean.put("CROSSHAIR", false);
         _settingsBoolean.put("DEMO_FLIGHT", true);
         _settingsBoolean.put("GOD_MODE", true);
-        _settingsNumeric.put("V_DIST_X", 32.0);
-        _settingsNumeric.put("V_DIST_Z", 32.0);
     }
 
     private static void loadSanboxed() {

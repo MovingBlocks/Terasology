@@ -26,8 +26,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public abstract class Particle implements RenderableObject {
 
-    private final Vector3f _targetVelocity = new Vector3f(0.0f, -0.02f, 0.0f);
-    private final Vector3f _velDecSpeed = new Vector3f(0.0005f, 0.0005f, 0.0005f);
+    private final Vector3f _targetVelocity = new Vector3f(0.0f, -0.04f, 0.0f);
+    private final Vector3f _velDecSpeed = new Vector3f(0.002f, 0.002f, 0.002f);
 
     private final Vector3f _position = new Vector3f();
     private final Vector3f _velocity = new Vector3f();
@@ -39,7 +39,7 @@ public abstract class Particle implements RenderableObject {
 
     public Particle(int lifeTime, Vector3f position) {
         _position.set(position);
-        _velocity.set((float) _rand.randomDouble() / 30f, (float) _rand.randomDouble() / 30f, (float) _rand.randomDouble() / 30f);
+        _velocity.set((float) _rand.randomDouble() / 15f, (float) _rand.randomDouble() / 15f, (float) _rand.randomDouble() / 15f);
         _lifeTime = lifeTime;
         _orientation = _rand.randomInt() % 360;
     }

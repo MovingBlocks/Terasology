@@ -26,10 +26,10 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
-    private static final int SAMPLE_RATE_3D_HOR = 16;
+    private static final int SAMPLE_RATE_3D_HOR = 8;
     private static final int SAMPLE_RATE_3D_VERT = 4;
 
-    private enum BIOME_TYPE {
+    public enum BIOME_TYPE {
         MOUNTAINS, SNOW, DESERT, PLAINS
     }
 
@@ -52,8 +52,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
          */
         for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x += SAMPLE_RATE_3D_HOR) {
             for (int z = 0; z <= Configuration.CHUNK_DIMENSIONS.z; z += SAMPLE_RATE_3D_HOR) {
+                BIOME_TYPE type = calcBiomeType(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+
                 for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.y; y += SAMPLE_RATE_3D_VERT) {
-                    densityMap[x][y][z] = calcDensity(x + getOffsetX(c), y + getOffsetY(c), z + getOffsetZ(c));
+                    densityMap[x][y][z] = calcDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z), type);
                 }
             }
         }
@@ -68,7 +70,6 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
          */
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-
                 BIOME_TYPE type = calcBiomeType(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
                 int firstBlockHeight = -1;
 
@@ -105,7 +106,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosY(y), c.getBlockWorldPosZ(z)) > -0.2)
+                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.6)
                             GenerateInnerLayer(x, y, z, c, type);
 
                         continue;
@@ -176,15 +177,15 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     private void generateRiver(Chunk c, int x, int y, int z, double heightPercentage, BIOME_TYPE type) {
-        // Rivers under water?
+        // Rivers under water? Nope.
         if (y <= 32)
             return;
 
-        double lakeIntens = calcLakeIntensity(x + getOffsetX(c), z + getOffsetZ(c));
+        double lakeIntens = calcLakeIntensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
-        if (lakeIntens < 0.15 && heightPercentage < 0.015) {
+        if (lakeIntens < 0.2 && heightPercentage < 0.015) {
             c.setBlock(x, y, z, (byte) 0x0);
-        } else if (lakeIntens < 0.15 && heightPercentage >= 0.015 && heightPercentage < 0.05) {
+        } else if (lakeIntens < 0.2 && heightPercentage >= 0.015 && heightPercentage < 0.05) {
             if (type == BIOME_TYPE.SNOW) {
                 c.setBlock(x, y, z, (byte) 0x11);
             } else {
@@ -193,14 +194,14 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    private BIOME_TYPE calcBiomeType(int x, int z) {
+    protected BIOME_TYPE calcBiomeType(int x, int z) {
         double temp = calcTemperature(x, z);
 
-        if (temp >= 80) {
+        if (temp >= 60) {
             return BIOME_TYPE.DESERT;
-        } else if (temp >= 64) {
+        } else if (temp >= 32) {
             return BIOME_TYPE.MOUNTAINS;
-        } else if (temp < 16) {
+        } else if (temp < 8) {
             return BIOME_TYPE.SNOW;
         }
 
@@ -210,7 +211,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     /**
      * @param densityMap
      */
-    void triLerpDensityMap(double[][][] densityMap) {
+    private void triLerpDensityMap(double[][][] densityMap) {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -230,31 +231,27 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    public double calcDensity(double x, double y, double z) {
-        BIOME_TYPE type = calcBiomeType((int) x, (int) z);
-
-        double height = baseTerrain(x, z) * 1.6;
-
+    public double calcDensity(double x, double y, double z, BIOME_TYPE type) {
+        double height = calcBaseTerrain(x, z);
         double density = calcMountainDensity(x, y, z);
 
-        double div = (y + 1) * 0.6;
+        double divHeight = (y + 1) * 1.2;
 
-        if (y > 120)
-            div *= 2.0;
+        if (y > 100)
+            divHeight *= 2.0;
 
         if (type == BIOME_TYPE.DESERT) {
-            div *= 1.2;
+            divHeight *= 1.3;
         } else if (type == BIOME_TYPE.PLAINS) {
-            div *= 1.3;
+            divHeight *= 1.4;
         } else if (type == BIOME_TYPE.MOUNTAINS) {
-            div *= 1.0;
+            divHeight *= 1.0;
         } else if (type == BIOME_TYPE.SNOW) {
-            div *= 1.2;
+            divHeight *= 1.2;
         }
 
-        return (height - density) / div;
+        return (height + density) / divHeight;
     }
-
 
     /**
      * Returns the roughness for the base terrain.
@@ -263,10 +260,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    double baseTerrain(double x, double z) {
+    protected double calcBaseTerrain(double x, double z) {
         double result = 0.0;
 
-        result += _pGen2.multiFractalNoise(0.0008 * x, 0, 0.0008 * z, 12, 2.351421);
+        result += _pGen2.fBm(0.0009 * x, 0, 0.0009 * z, 3, 2.2341, 0.94321) + 0.4;
 
         return result;
     }
@@ -277,26 +274,25 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    double calcMountainDensity(double x, double y, double z) {
+    protected double calcMountainDensity(double x, double y, double z) {
         double result = 0.0;
 
         double x1, y1, z1;
 
-        x1 = x * 0.0005;
-        y1 = y * 0.0009;
-        z1 = z * 0.0005;
+        x1 = x * 0.0006;
+        y1 = y * 0.0008;
+        z1 = z * 0.0006;
 
-        double freq[] = {1.432, 4.4281, 8.371, 12.463819, 24.62819, 32.3672891, 38.47381, 44.47381, 50.47381};
-        double amp[] = {1.0, 1.4, 1.6, 1.8, 2.0, 2.4, 2.6, 2.8, 3.0};
+        double freq[] = {1.232, 8.4281, 16.371, 32, 64};
+        double amp[] = {1.0, 1.4, 1.6, 1.8, 2.0};
 
         double ampSum = 0.0;
         for (int i = 0; i < freq.length; i++) {
             result += _pGen5.noise(x1 * freq[i], y1 * freq[i], z1 * freq[i]) * amp[i];
-            result += _pGen4.noise(x1 * freq[i], y1 * freq[i], z1 * freq[i]) * amp[i];
             ampSum += amp[i];
         }
 
-        return (result / ampSum) / 2;
+        return (result / ampSum);
     }
 
 
@@ -305,22 +301,24 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      * @param z
      * @return
      */
-    double calcLakeIntensity(double x, double z) {
+    protected double calcLakeIntensity(double x, double z) {
         double result = 0.0;
-        result += _pGen3.multiFractalNoise(x * 0.01, 0, 0.01 * z, 4, 2.1836171);
-        return Math.sqrt(MathHelper.fastAbs(result));
+        result += _pGen3.fBm(x * 0.01, 0.01, 0.01 * z, 3, 2.1836171, 0.9631);
+        return Math.sqrt(Math.abs(result));
     }
 
-    double calcTemperature(double x, double z) {
+    protected double calcTemperature(double x, double z) {
         double result = 0.0;
-        result += _pGen4.multiFractalNoise(x * 0.0008, 0, 0.0008 * z, 8, 2.1321) * 3;
-        result = 32 + result * 100;
+        result += _pGen4.fBm(x * 0.0008, 0, 0.0008 * z, 7, 2.1836171, 0.7631);
+
+        result = 32.0 + (result) * 64.0;
+
         return result;
     }
 
-    double calcCaveDensity(double x, double y, double z) {
+    protected double calcCaveDensity(double x, double y, double z) {
         double result = 0.0;
-        result += _pGen6.multiFractalNoise(x * 0.02, y * 0.02, z * 0.02, 3, 2.1287129);
+        result += _pGen6.fBm(x * 0.06, y * 0.06, z * 0.06, 2, 2.1287129, 0.8531);
         return result;
     }
 }

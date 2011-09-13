@@ -25,7 +25,6 @@ import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.characters.Slime;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -475,7 +474,7 @@ public final class World implements RenderableObject {
         if (Game.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
             _windDirection.x = (float) _rand.randomDouble() / 8;
             _windDirection.y = (float) _rand.randomDouble() / 8;
-            _nextWindUpdateInSeconds = (short) (MathHelper.fastAbs(_rand.randomInt()) % 16 + 32);
+            _nextWindUpdateInSeconds = (short) (Math.abs(_rand.randomInt()) % 16 + 32);
             _lastWindUpdate = Game.getInstance().getTime();
         }
     }
@@ -486,7 +485,7 @@ public final class World implements RenderableObject {
      * @param x The X-coordinate of the block
      * @return The X-coordinate of the chunk
      */
-    private int calcChunkPosX(int x) {
+    public int calcChunkPosX(int x) {
         // Offset for negative chunks
         if (x < 0)
             x -= 15;
@@ -500,7 +499,7 @@ public final class World implements RenderableObject {
      * @param z The Z-coordinate of the block
      * @return The Z-coordinate of the chunk
      */
-    private int calcChunkPosZ(int z) {
+    public int calcChunkPosZ(int z) {
         // Offset for negative chunks
         if (z < 0)
             z -= 15;
@@ -515,12 +514,8 @@ public final class World implements RenderableObject {
      * @param x2 The X-coordinate of the chunk within the world
      * @return The X-coordinate of the block within the chunk
      */
-    private int calcBlockPosX(int x1, int x2) {
-        int blockPos = (x1 - (x2 * (int) Configuration.CHUNK_DIMENSIONS.x));
-
-        assert (blockPos >= 0) : "Every position MUST be positive or zero: " + blockPos;
-
-        return blockPos;
+    public int calcBlockPosX(int x1, int x2) {
+        return Math.abs(x1 - (x2 * (int) Configuration.CHUNK_DIMENSIONS.x));
     }
 
     /**
@@ -530,12 +525,8 @@ public final class World implements RenderableObject {
      * @param z2 The Z-coordinate of the chunk within the world
      * @return The Z-coordinate of the block within the chunk
      */
-    private int calcBlockPosZ(int z1, int z2) {
-        int blockPos = (z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
-
-        assert (blockPos >= 0) : "Every position MUST be positive or zero: " + blockPos;
-
-        return blockPos;
+    public int calcBlockPosZ(int z1, int z2) {
+        return Math.abs(z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
     }
 
     /**
@@ -956,15 +947,6 @@ public final class World implements RenderableObject {
     }
 
     /**
-     *
-     */
-    public void printPlayerChunkPosition() {
-        int chunkPosX = calcChunkPosX((int) _player.getPosition().x);
-        int chunkPosZ = calcChunkPosX((int) _player.getPosition().z);
-        System.out.println(_chunkCache.getChunkByKey(MathHelper.cantorize(chunkPosX, chunkPosZ)));
-    }
-
-    /**
      * @return
      */
     private Vector3f findSpawningPoint() {
@@ -972,10 +954,10 @@ public final class World implements RenderableObject {
             int randX = (int) (_rand.randomDouble() * 16000f);
             int randZ = (int) (_rand.randomDouble() * 16000f);
 
-            double dens = ((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 32, randZ);
+            double dens = ((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 32, randZ, ChunkGeneratorTerrain.BIOME_TYPE.PLAINS);
 
             if (dens >= 0.008 && dens < 0.02)
-                return new Vector3f(randX, 32, randZ);
+                return new Vector3f(randX, 128, randZ);
         }
     }
 

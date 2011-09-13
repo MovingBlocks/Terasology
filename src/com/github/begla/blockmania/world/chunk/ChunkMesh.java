@@ -128,7 +128,6 @@ public class ChunkMesh {
 
             glEnable(GL_CULL_FACE);
             glDisable(GL_BLEND);
-
         }
     }
 
@@ -137,7 +136,6 @@ public class ChunkMesh {
     }
 
     public void disposeMesh() {
-        // Remove the old VBOs.
         IntBuffer ib = BufferUtils.createIntBuffer(_vertexBuffers.length + _idxBuffers.length);
         for (int i = 0; i < _vertexBuffers.length; i++) {
             ib.put(_idxBuffers[i]);

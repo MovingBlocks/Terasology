@@ -174,17 +174,6 @@ public final class Player extends Character {
     }
 
     /**
-     * @return Some information about the selected block
-     */
-    public String selectedBlockInformation() {
-        RayBlockIntersection.Intersection r = calcSelectedBlock();
-        Vector3f bp = r.getBlockPosition();
-        byte blockType = _parent.getBlock((int) bp.x, (int) bp.y, (int) bp.z);
-
-        return String.format("%s (t: %d) ", r, blockType);
-    }
-
-    /**
      * Places a block of a given type in front of the player.
      *
      * @param type The type of the block

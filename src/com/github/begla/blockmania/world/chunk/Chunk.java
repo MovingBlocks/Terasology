@@ -102,12 +102,14 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
 
         _meshGenerator = new ChunkMeshGenerator(this);
 
-        _generators.addAll(g);
-
         _lightDirty = true;
         _dirty = true;
         _fresh = true;
         _cached = false;
+
+
+        if (g != null)
+            _generators.addAll(g);
     }
 
     public void render() {
@@ -285,7 +287,6 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      */
     public void refreshLightAtLocalPos(int x, int y, int z, LIGHT_TYPE type) {
         int blockPosX = getBlockWorldPosX(x);
-        int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
 
         byte bType = getBlock(x, y, z);
@@ -296,13 +297,13 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
         } else {
             // If the block was removed: Find the brightest neighbor and
             // set the current light value to this value - 1
-            byte val = getParent().getLight(blockPosX, blockPosY, blockPosZ, type);
-            byte val1 = getParent().getLight(blockPosX + 1, blockPosY, blockPosZ, type);
-            byte val2 = getParent().getLight(blockPosX - 1, blockPosY, blockPosZ, type);
-            byte val3 = getParent().getLight(blockPosX, blockPosY, blockPosZ + 1, type);
-            byte val4 = getParent().getLight(blockPosX, blockPosY, blockPosZ - 1, type);
-            byte val5 = getParent().getLight(blockPosX, blockPosY + 1, blockPosZ, type);
-            byte val6 = getParent().getLight(blockPosX, blockPosY - 1, blockPosZ, type);
+            byte val = getParent().getLight(blockPosX, y, blockPosZ, type);
+            byte val1 = getParent().getLight(blockPosX + 1, y, blockPosZ, type);
+            byte val2 = getParent().getLight(blockPosX - 1, y, blockPosZ, type);
+            byte val3 = getParent().getLight(blockPosX, y, blockPosZ + 1, type);
+            byte val4 = getParent().getLight(blockPosX, y, blockPosZ - 1, type);
+            byte val5 = getParent().getLight(blockPosX, y + 1, blockPosZ, type);
+            byte val6 = getParent().getLight(blockPosX, y - 1, blockPosZ, type);
 
             byte max = (byte) (Math.max(Math.max(Math.max(val1, val2), Math.max(val3, val4)), Math.max(val5, val6)) - 1);
 
@@ -349,21 +350,20 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      */
     public void unspreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type, FastList<Vector3f> brightSpots) {
         int blockPosX = getBlockWorldPosX(x);
-        int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
 
         // Remove the light at this point
-        getParent().setLight(blockPosX, blockPosY, blockPosZ, (byte) 0x0, type);
+        getParent().setLight(blockPosX, y, blockPosZ, (byte) 0x0, type);
 
         for (int i = 0; i < 6; i++) {
 
-            byte neighborValue = getParent().getLight(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, type);
-            byte neighborType = getParent().getBlock(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z);
+            byte neighborValue = getParent().getLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, type);
+            byte neighborType = getParent().getBlock(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z);
 
             if (neighborValue < lightValue && neighborValue > 0 && Block.getBlockForType(neighborType).isBlockTypeTranslucent()) {
-                getParent().unspreadLight(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+                getParent().unspreadLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
             } else if (neighborValue >= lightValue) {
-                brightSpots.add(new Vector3f(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z));
+                brightSpots.add(new Vector3f(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z));
             }
         }
     }
@@ -398,20 +398,19 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
         }
 
         int blockPosX = getBlockWorldPosX(x);
-        int blockPosY = getBlockWorldPosY(y);
         int blockPosZ = getBlockWorldPosZ(z);
 
         byte newLightValue;
         newLightValue = (byte) (lightValue - depth);
 
-        getParent().setLight(blockPosX, blockPosY, blockPosZ, newLightValue, type);
+        getParent().setLight(blockPosX, y, blockPosZ, newLightValue, type);
 
         for (int i = 0; i < 6; i++) {
-            byte neighborValue = getParent().getLight(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, type);
-            byte neighborType = getParent().getBlock(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z);
+            byte neighborValue = getParent().getLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, type);
+            byte neighborType = getParent().getBlock(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z);
 
             if (neighborValue < newLightValue - 1 && Block.getBlockForType(neighborType).isBlockTypeTranslucent()) {
-                getParent().spreadLight(blockPosX + (int) _lightDirections[i].x, blockPosY + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, lightValue, depth + 1, type);
+                getParent().spreadLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, lightValue, depth + 1, type);
             }
         }
     }
@@ -707,8 +706,12 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
     }
 
     public void disposeChunk() {
+        if (_newMesh != null)
+            _newMesh.disposeMesh();
+        _newMesh = null;
         if (_activeMesh != null)
             _activeMesh.disposeMesh();
+        _activeMesh = null;
     }
 
     @Override
@@ -743,7 +746,7 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
     public AABB getAABB() {
         if (_aabb == null) {
             Vector3f dimensions = new Vector3f(Configuration.CHUNK_DIMENSIONS.x / 2, Configuration.CHUNK_DIMENSIONS.y / 2, Configuration.CHUNK_DIMENSIONS.z / 2);
-            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX(), getChunkWorldPosY() + dimensions.getY(), getChunkWorldPosZ() + dimensions.getZ());
+            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX(), dimensions.getY(), getChunkWorldPosZ() + dimensions.getZ());
             _aabb = new AABB(position, dimensions);
         }
         return _aabb;
@@ -774,15 +777,6 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
     /**
      * Returns the position of the chunk within the world.
      *
-     * @return The world  position
-     */
-    int getChunkWorldPosY() {
-        return (int) _position.y * (int) Configuration.CHUNK_DIMENSIONS.y;
-    }
-
-    /**
-     * Returns the position of the chunk within the world.
-     *
      * @return Thew world position
      */
     int getChunkWorldPosZ() {
@@ -797,16 +791,6 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      */
     public int getBlockWorldPosX(int x) {
         return x + getChunkWorldPosX();
-    }
-
-    /**
-     * Returns the position of block within the world.
-     *
-     * @param y The local position
-     * @return The world position
-     */
-    public int getBlockWorldPosY(int y) {
-        return y + getChunkWorldPosY();
     }
 
     /**

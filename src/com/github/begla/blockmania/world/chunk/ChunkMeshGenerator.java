@@ -15,9 +15,9 @@
  */
 package com.github.begla.blockmania.world.chunk;
 
-import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
+import com.github.begla.blockmania.main.Configuration;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -222,20 +222,21 @@ public class ChunkMeshGenerator {
 
         boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
 
-        byte blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y + 1), _chunk.getBlockWorldPosZ(z));
+        byte blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
         drawTop = isSideVisibleForBlockTypes(blockToCheck, block);
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z - 1));
+        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y, _chunk.getBlockWorldPosZ(z - 1));
         drawFront = isSideVisibleForBlockTypes(blockToCheck, block);
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z + 1));
+        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y, _chunk.getBlockWorldPosZ(z + 1));
         drawBack = isSideVisibleForBlockTypes(blockToCheck, block);
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z));
+        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), y, _chunk.getBlockWorldPosZ(z));
         drawLeft = isSideVisibleForBlockTypes(blockToCheck, block);
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), _chunk.getBlockWorldPosY(y), _chunk.getBlockWorldPosZ(z));
+        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y, _chunk.getBlockWorldPosZ(z));
         drawRight = isSideVisibleForBlockTypes(blockToCheck, block);
 
         // Don't draw anything "below" the world
         if (y > 0) {
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z));
+            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z))
+            ;
             drawBottom = isSideVisibleForBlockTypes(blockToCheck, block);
         } else {
             drawBottom = false;
@@ -245,13 +246,13 @@ public class ChunkMeshGenerator {
 
         // If the block is lowered, some more faces have to be drawn
         if (blockForm == Block.BLOCK_FORM.LOWERED_BOCK) {
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z - 1));
+            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z - 1));
             drawFront = isSideVisibleForBlockTypes(blockToCheck, block) || drawFront;
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z + 1));
+            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z + 1));
             drawBack = isSideVisibleForBlockTypes(blockToCheck, block) || drawBack;
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z));
+            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), y - 1, _chunk.getBlockWorldPosZ(z));
             drawLeft = isSideVisibleForBlockTypes(blockToCheck, block) || drawLeft;
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z));
+            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y - 1, _chunk.getBlockWorldPosZ(z));
             drawRight = isSideVisibleForBlockTypes(blockToCheck, block) || drawRight;
         }
 
@@ -378,7 +379,7 @@ public class ChunkMeshGenerator {
     }
 
     private void generateLoweredBlock(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm) {
-        byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosY(y - 1), _chunk.getBlockWorldPosZ(z));
+        byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
         boolean lowerBottom = Block.getBlockForType(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BOCK || bottomBlock == 0x0;
 
         if (norm.x == 1.0f) {
