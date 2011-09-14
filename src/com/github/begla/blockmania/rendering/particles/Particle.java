@@ -27,23 +27,25 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class Particle implements RenderableObject {
+    protected ParticleEmitter _parent;
 
-    private final Vector3f _targetVelocity = new Vector3f(0.0f, -0.04f, 0.0f);
-    private final Vector3f _velDecSpeed = new Vector3f(0.002f, 0.002f, 0.002f);
+    protected final Vector3f _targetVelocity = new Vector3f(0.0f, -0.04f, 0.0f);
+    protected final Vector3f _velDecSpeed = new Vector3f(0.002f, 0.002f, 0.002f);
 
-    private final Vector3f _position = new Vector3f();
-    private final Vector3f _velocity = new Vector3f();
-    private int _orientation = 0;
+    protected final Vector3f _position = new Vector3f();
+    protected final Vector3f _velocity = new Vector3f();
+    protected int _orientation = 0;
 
-    private static final FastRandom _rand = new FastRandom();
+    protected static final FastRandom _rand = new FastRandom();
 
-    private int _lifeTime;
+    protected int _lifeTime;
 
-    public Particle(int lifeTime, Vector3f position) {
+    public Particle(int lifeTime, Vector3f position, ParticleEmitter parent) {
         _position.set(position);
         _velocity.set((float) _rand.randomDouble() / 15f, (float) _rand.randomDouble() / 15f, (float) _rand.randomDouble() / 15f);
         _lifeTime = lifeTime;
         _orientation = _rand.randomInt() % 360;
+        _parent = parent;
     }
 
     protected abstract void renderParticle();
@@ -79,7 +81,14 @@ public abstract class Particle implements RenderableObject {
             _velocity.z += _velDecSpeed.z;
     }
 
+    protected boolean canMove() {
+        return true;
+    }
+
     protected void updatePosition() {
+        if (!canMove())
+            return;
+
         Vector3f.add(_position, _velocity, _position);
     }
 
@@ -90,5 +99,9 @@ public abstract class Particle implements RenderableObject {
 
     public boolean isAlive() {
         return _lifeTime > 0;
+    }
+
+    protected ParticleEmitter getParent() {
+        return _parent;
     }
 }

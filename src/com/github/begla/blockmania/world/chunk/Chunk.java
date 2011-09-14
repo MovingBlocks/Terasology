@@ -118,6 +118,7 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
 
     /**
      * Draws the opaque or translucent elements of a chunk.
+     *
      * @param type The type of vertices to render
      */
     public void render(ChunkMesh.RENDER_TYPE type) {

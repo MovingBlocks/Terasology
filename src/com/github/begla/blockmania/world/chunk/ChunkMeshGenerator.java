@@ -238,8 +238,7 @@ public class ChunkMeshGenerator {
 
         // Don't draw anything "below" the world
         if (y > 0) {
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z))
-            ;
+            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
             drawBottom = isSideVisibleForBlockTypes(blockToCheck, block);
         } else {
             drawBottom = false;

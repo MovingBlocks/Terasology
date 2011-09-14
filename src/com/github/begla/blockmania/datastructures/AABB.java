@@ -63,16 +63,16 @@ public class AABB implements RenderableObject {
     }
 
     public boolean overlaps(AABB aabb2) {
-        if (maxX() <= aabb2.minX() || minX() >= aabb2.maxX()) return false;
-        if (maxY() <= aabb2.minY() || minY() >= aabb2.maxY()) return false;
-        if (maxZ() <= aabb2.minZ() || minZ() >= aabb2.maxZ()) return false;
+        if (maxX() < aabb2.minX() || minX() > aabb2.maxX()) return false;
+        if (maxY() < aabb2.minY() || minY() > aabb2.maxY()) return false;
+        if (maxZ() < aabb2.minZ() || minZ() > aabb2.maxZ()) return false;
         return true;
     }
 
     public boolean contains(Vector3f point) {
-        if (maxX() <= point.x || minX() >= point.x) return false;
-        if (maxY() <= point.y || minY() >= point.y) return false;
-        if (maxZ() <= point.z || minZ() >= point.z) return false;
+        if (maxX() < point.x || minX() > point.x) return false;
+        if (maxY() < point.y || minY() > point.y) return false;
+        if (maxZ() < point.z || minZ() > point.z) return false;
 
         return true;
     }

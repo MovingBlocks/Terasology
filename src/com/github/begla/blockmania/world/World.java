@@ -85,7 +85,7 @@ public final class World implements RenderableObject {
     /* ENTITIES */
     private final FastList<Entity> _entities = new FastList<Entity>();
     /* PARTICLE EMITTERS */
-    private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter();
+    private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
     /* HORIZON */
     private final Clouds _clouds;
     private final SunMoon _sunMoon;
@@ -327,6 +327,7 @@ public final class World implements RenderableObject {
             TextureManager.getInstance().bindTexture("terrain");
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
 
+            // ANIMATED LAVA
             GL20.glUniform1i(animationType, 1);
             GL20.glUniform1f(animationOffset, ((float) (_textureAnimationTick % 16)) * (1.0f / 16f));
             TextureManager.getInstance().bindTexture("custom_lava_still");
@@ -348,7 +349,7 @@ public final class World implements RenderableObject {
         GL20.glUniform1i(animationType, 1);
 
         for (int i = 0; i < 2; i++) {
-            // ANIMATED WATER AND LAVA
+            // ANIMATED WATER
             for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
 
                 if (i == 0) {
@@ -528,6 +529,15 @@ public final class World implements RenderableObject {
      */
     public final byte getBlockAtPosition(Vector3f pos) {
         return getBlock((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)));
+    }
+
+
+    /**
+     * @param pos
+     * @return
+     */
+    public final byte getLightAtPosition(Vector3f pos, Chunk.LIGHT_TYPE type) {
+        return getLight((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)), type);
     }
 
     /**
@@ -750,7 +760,7 @@ public final class World implements RenderableObject {
      */
     @Override
     public String toString() {
-        return String.format("world (cdl: %d, cn: %d, cache: %d, ud: %fs, seed: \"%s\", title: \"%s\")", _chunkUpdateManager.updatesDLSize(), _chunkUpdateManager.updatesSize(), _chunkCache.size(), _chunkUpdateManager.getMeanUpdateDuration() / 1000d, _seed, _title);
+        return String.format("world (cdl: %d, cn: %d, cache: %d, ud: %fs, seed: \"%s\", title: \"%s\")", _chunkUpdateManager.getVboUpdatesSize(), _chunkUpdateManager.getUpdatesSize(), _chunkCache.size(), _chunkUpdateManager.getMeanUpdateDuration() / 1000d, _seed, _title);
     }
 
     /**
