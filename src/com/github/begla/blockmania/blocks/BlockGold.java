@@ -20,7 +20,7 @@ import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
 
 /**
- * A coal block.
+ * A gold block.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

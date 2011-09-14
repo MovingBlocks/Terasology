@@ -20,6 +20,8 @@ import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
+ * Simple particle system.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class ParticleEmitter implements RenderableObject {

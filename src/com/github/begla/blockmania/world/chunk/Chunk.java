@@ -40,7 +40,7 @@ import java.util.logging.Level;
  * determined its dimensions. Chunks are used to manage the world efficiently and
  * to reduce the batch count within the render loop.
  * <p/>
- * Chunks are tessellated on creation and saved to vertex arrays. From those display lists are generated
+ * Chunks are tessellated on creation and saved to vertex arrays. From those Vertex Buffer Objects are generated
  * which are then used for the actual rendering process.
  * <p/>
  * The default size of one chunk is 16x128x16 (32768) blocks.

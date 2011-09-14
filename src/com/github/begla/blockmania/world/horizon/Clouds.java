@@ -32,6 +32,9 @@ import java.util.logging.Level;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
+ * Some blocky clouds which randomly float around and follow the player's movement.
+ * Nothing more, nothing less.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Clouds implements RenderableObject {

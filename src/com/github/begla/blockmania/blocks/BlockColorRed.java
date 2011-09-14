@@ -20,6 +20,8 @@ import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
 
 /**
+ * A red color block.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockColorRed extends Block {

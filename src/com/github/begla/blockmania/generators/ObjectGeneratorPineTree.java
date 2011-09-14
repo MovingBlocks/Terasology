@@ -19,7 +19,7 @@ import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.world.World;
 
 /**
- * Generates a simple, bushy tree.
+ * Generates a simple pine tree.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

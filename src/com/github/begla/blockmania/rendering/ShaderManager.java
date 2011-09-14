@@ -30,6 +30,8 @@ import java.nio.IntBuffer;
 import java.util.logging.Level;
 
 /**
+ * Provides support for loading and applying shaders.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderManager {

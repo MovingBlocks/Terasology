@@ -23,6 +23,8 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
+ * Generates tessellated chunk meshes from chunks.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ChunkMeshGenerator {

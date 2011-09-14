@@ -36,8 +36,8 @@ import java.util.Collections;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * This class contains all functions regarding the player's actions,
- * movement and the orientation of the camera.
+ * Extends the character class and provides support for player functionality. Also provides the
+ * modelview matrix from the player's point of view.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

@@ -16,6 +16,8 @@
 package com.github.begla.blockmania.world.entity;
 
 /**
+ * TODO: Fill with functionality.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class StaticEntity extends Entity {

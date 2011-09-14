@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
+ * Provides a dynamic cache for caching chunks.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ChunkCache {
@@ -41,7 +43,7 @@ public final class ChunkCache {
     }
 
     /**
-     * Loads a specified chunk from cache or queues a new chunk for generation.
+     * Loads a specified chunk from cache or from the disk.
      * <p/>
      * NOTE: This method ALWAYS returns a valid chunk (if positive x and z values are provided)
      * since a new chunk is generated if none of the present chunks fit the request.
@@ -114,8 +116,8 @@ public final class ChunkCache {
             e.getValue().disposeChunk();
         }
 
-        disposeUnusedChunks();
         _chunkCache.clear();
+        disposeUnusedChunks();
     }
 
     /**
@@ -129,6 +131,6 @@ public final class ChunkCache {
      * @return
      */
     public static int capacity() {
-        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 256;
+        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 1024;
     }
 }

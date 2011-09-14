@@ -24,7 +24,7 @@ import org.lwjgl.util.vector.Vector3f;
 import java.util.Collections;
 
 /**
- * Helper class for ray-box intersection tests.
+ * Provides support for ray-box intersection tests.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -103,6 +103,7 @@ public class RayBlockIntersection {
      * Calculates the intersection of a given ray originating from a specified point with
      * a block. Returns a list of intersections ordered by the distance to the player.
      *
+     * @param w
      * @param x
      * @param y
      * @param z

@@ -20,7 +20,7 @@ import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 
 /**
- * Object generators are used to generate objects within the world.
+ * Object generators are used to generate objects like trees etc.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

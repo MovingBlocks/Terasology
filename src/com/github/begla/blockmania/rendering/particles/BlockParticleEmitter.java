@@ -18,6 +18,8 @@ package com.github.begla.blockmania.rendering.particles;
 import com.github.begla.blockmania.rendering.TextureManager;
 
 /**
+ * Emits block particles.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockParticleEmitter extends ParticleEmitter {

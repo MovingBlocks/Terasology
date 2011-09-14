@@ -22,11 +22,13 @@ import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
+ * Particle used when blocks are destroyed.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockParticle extends Particle {
 
-    private float _size = 0.04f;
+    private static final float _size = 0.04f;
     private byte _blockType = 0x1;
 
     public BlockParticle(int lifeTime, Vector3f position, byte blockType) {

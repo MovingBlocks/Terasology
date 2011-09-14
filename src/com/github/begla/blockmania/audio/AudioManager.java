@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 /**
+ * Simple managing class for loading and caching audio files.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class AudioManager {

@@ -18,8 +18,6 @@ package com.github.begla.blockmania.generators;
 import com.github.begla.blockmania.world.World;
 
 /**
- * TODO
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ObjectGeneratorCactus extends ObjectGenerator {

@@ -20,7 +20,7 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
- * Generates the base terrain of the world.
+ * Generates the terrain of the world using a hybrid voxel-/heightmap-based approach.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -228,7 +228,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /**
      * @param x
+     * @param y
      * @param z
+     * @param type
      * @return
      */
     public double calcDensity(double x, double y, double z, BIOME_TYPE type) {

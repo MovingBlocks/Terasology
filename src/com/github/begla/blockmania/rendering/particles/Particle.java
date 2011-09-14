@@ -22,6 +22,8 @@ import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
+ * Basic particle used by the particle emitter.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class Particle implements RenderableObject {

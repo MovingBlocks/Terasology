@@ -115,6 +115,7 @@ public class PerlinNoise {
      * @param z
      * @param octaves
      * @param lacunarity
+     * @param h
      * @return
      */
     public double fBm(double x, double y, double z, int octaves, double lacunarity, double h) {

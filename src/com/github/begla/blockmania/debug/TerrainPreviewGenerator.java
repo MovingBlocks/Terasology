@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * Simple preview generator. Generates heightmap images using the terrain generator.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {

@@ -26,7 +26,6 @@ import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.characters.Player;
-import com.github.begla.blockmania.world.characters.Slime;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkCache;
 import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
@@ -46,7 +45,6 @@ import org.lwjgl.util.vector.Vector3f;
 import org.xml.sax.InputSource;
 
 import java.io.*;
-import java.util.Collections;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -76,7 +74,7 @@ public final class World implements RenderableObject {
     private long _lastDaytimeMeasurement = Game.getInstance().getTime();
     private double _daylight = 1.0f;
     /* RENDERING */
-    private FastList<Chunk> _visibleChunks;
+    private FastList<Chunk> _visibleChunks = new FastList(128);
     /* UPDATING & CACHING */
     private final ChunkUpdateManager _chunkUpdateManager = new ChunkUpdateManager(this);
     private final ChunkCache _chunkCache = new ChunkCache(this);
@@ -118,7 +116,7 @@ public final class World implements RenderableObject {
         this._title = title;
         this._seed = seed;
 
-        // If loading failed accept the given seed
+        // Load the meta data of this world
         loadMetaData();
 
         // Init. horizon
@@ -136,7 +134,6 @@ public final class World implements RenderableObject {
 
         // Init. random generator
         _random = new FastRandom(seed.hashCode());
-        _visibleChunks = new FastList<Chunk>();
 
         _updateThread = new Thread(new Runnable() {
 
@@ -296,8 +293,9 @@ public final class World implements RenderableObject {
         }
     }
 
-    private FastList<Chunk> fetchVisibleChunks() {
-        FastList<Chunk> visibleChunks = new FastList<Chunk>();
+    private void updateVisibleChunks() {
+        _visibleChunks.clear();
+
         for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
             for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
 
@@ -305,14 +303,11 @@ public final class World implements RenderableObject {
 
                 if (c != null) {
                     if (c.isChunkInFrustum()) {
-                        visibleChunks.add(c);
+                        _visibleChunks.add(c);
                     }
                 }
             }
         }
-
-        Collections.sort(visibleChunks);
-        return visibleChunks;
     }
 
     private void renderChunks() {
@@ -322,7 +317,7 @@ public final class World implements RenderableObject {
         glEnable(GL_TEXTURE_2D);
         TextureManager.getInstance().bindTexture("terrain");
 
-        _visibleChunks = fetchVisibleChunks();
+       updateVisibleChunks();
 
         for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
             Chunk c = _visibleChunks.valueOf(n);
@@ -581,22 +576,6 @@ public final class World implements RenderableObject {
             return 0;
     }
 
-    public final boolean canBlockSeeTheSky(int x, int y, int z) {
-        int chunkPosX = calcChunkPosX(x);
-        int chunkPosZ = calcChunkPosZ(z);
-
-        int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-
-        if (c != null) {
-            return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
-        }
-
-        return false;
-    }
-
     /**
      * Sets the light value at the given position.
      *
@@ -621,7 +600,7 @@ public final class World implements RenderableObject {
     }
 
     /**
-     * TODO
+     * Refreshes sunlight vertically at a given global position.
      *
      * @param x
      * @param spreadLight
@@ -710,18 +689,6 @@ public final class World implements RenderableObject {
         _player = p;
         // Reset the player's position
         resetPlayer();
-
-        for (int i = 0; i < 64; i++) {
-            Entity slime = new Slime(this);
-            Vector3f slimeSpawningPoint = new Vector3f(_spawningPoint);
-
-            slimeSpawningPoint.x += _random.randomDouble() * 30f;
-            slimeSpawningPoint.z += _random.randomDouble() * 30f;
-
-            slime.setPosition(slimeSpawningPoint);
-            slime.getPosition().y = 100;
-            _entities.add(slime);
-        }
     }
 
     /**

@@ -28,6 +28,8 @@ import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
+ * Funny slime.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class Slime extends Character {

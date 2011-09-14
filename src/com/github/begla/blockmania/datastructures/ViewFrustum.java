@@ -22,6 +22,8 @@ import org.lwjgl.util.vector.Vector3f;
 import java.nio.FloatBuffer;
 
 /**
+ * View frustum class which can be used for frustum culling.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ViewFrustum {
@@ -36,9 +38,6 @@ public class ViewFrustum {
             _planes[i] = new FrustumPlane();
     }
 
-    /**
-     * TODO
-     */
     public void updateFrustum() {
         GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, _proj);
         GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, _model);

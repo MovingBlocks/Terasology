@@ -13,6 +13,9 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 
+/**
+ * Stores the vertex data of a tessellated chunk.
+ */
 public class ChunkMesh {
 
     public class VertexElements {

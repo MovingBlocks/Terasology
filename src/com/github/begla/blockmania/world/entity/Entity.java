@@ -20,6 +20,9 @@ import com.github.begla.blockmania.rendering.RenderableObject;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
+ * Entities are renderable objects in the world. Entities provide a
+ * position and a axis-aligned bounding box.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class Entity implements RenderableObject {

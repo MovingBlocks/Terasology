@@ -30,6 +30,8 @@ import org.newdawn.slick.openal.Audio;
 import java.util.Collections;
 
 /**
+ * Movable entities extend normal entities to support collision detection, basic physics, movement and audio.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class MovableEntity extends Entity {

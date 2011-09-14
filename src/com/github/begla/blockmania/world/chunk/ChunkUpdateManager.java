@@ -18,7 +18,11 @@ package com.github.begla.blockmania.world.chunk;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 
+import java.util.Collections;
+
 /**
+ * Provides support for updating and generating chunks.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ChunkUpdateManager {
@@ -37,9 +41,6 @@ public final class ChunkUpdateManager {
         this._parent = _parent;
     }
 
-    /**
-     * TODO
-     */
     public void processChunkUpdates() {
         long timeStart = System.currentTimeMillis();
 
@@ -48,12 +49,18 @@ public final class ChunkUpdateManager {
         for (int i = dirtyChunks.size() - 1; i >= 0; i--) {
             Chunk c = dirtyChunks.get(i);
 
+            if (c == null) {
+                dirtyChunks.remove(i);
+                continue;
+            }
+
             if (!(c.isDirty() || c.isFresh() || c.isLightDirty())) {
                 dirtyChunks.remove(i);
             }
         }
 
         if (!dirtyChunks.isEmpty()) {
+            Collections.sort(dirtyChunks);
             Chunk closestChunk = dirtyChunks.getFirst();
             processChunkUpdate(closestChunk);
         }
@@ -64,9 +71,6 @@ public final class ChunkUpdateManager {
         _meanUpdateDuration /= 2;
     }
 
-    /**
-     * TODO
-     */
     private void processChunkUpdate(Chunk c) {
         if (c != null) {
             /*
@@ -112,9 +116,6 @@ public final class ChunkUpdateManager {
         }
     }
 
-    /**
-     * TODO
-     */
     public void updateDisplayLists() {
         if (!_displayListUpdates.isEmpty()) {
             Chunk c = _displayListUpdates.removeFirst();
@@ -122,23 +123,14 @@ public final class ChunkUpdateManager {
         }
     }
 
-    /**
-     * @return
-     */
     public int updatesSize() {
         return _chunkUpdateAmount;
     }
 
-    /**
-     * @return
-     */
     public int updatesDLSize() {
         return _displayListUpdates.size();
     }
 
-    /**
-     * @return
-     */
     public double getMeanUpdateDuration() {
         return _meanUpdateDuration;
     }

@@ -16,6 +16,8 @@
 package com.github.begla.blockmania.datastructures;
 
 /**
+ * A fast 3D array for efficient storage of byte values.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockmaniaSmartArray {

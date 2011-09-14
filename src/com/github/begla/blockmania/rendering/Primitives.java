@@ -38,6 +38,10 @@ public class Primitives {
      * @param x      Position on the x-axis
      * @param y      Position on the y-axis
      * @param z      Position on the z-axis
+     * @param drawLeft
+     * @param drawRight
+     * @param drawFront
+     * @param drawBack
      */
     public static void drawCloud(double scaleX, double scaleY, double scaleZ, double x, double y, double z, boolean drawLeft, boolean drawRight, boolean drawFront, boolean drawBack) {
 

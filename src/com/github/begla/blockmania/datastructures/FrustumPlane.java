@@ -16,6 +16,8 @@
 package com.github.begla.blockmania.datastructures;
 
 /**
+ * Represents a plane of a view frustum.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class FrustumPlane {

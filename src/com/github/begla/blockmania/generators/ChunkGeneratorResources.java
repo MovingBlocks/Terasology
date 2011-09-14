@@ -21,7 +21,7 @@ import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
- * TODO
+ * Generates some basic resources.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

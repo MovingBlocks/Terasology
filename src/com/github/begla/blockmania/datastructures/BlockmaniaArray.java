@@ -16,6 +16,8 @@
 package com.github.begla.blockmania.datastructures;
 
 /**
+ * A fast array wrapper.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockmaniaArray {

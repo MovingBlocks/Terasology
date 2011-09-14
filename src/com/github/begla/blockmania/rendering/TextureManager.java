@@ -27,6 +27,8 @@ import java.util.logging.Level;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 
 /**
+ * Provides support for loading and applying textures.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class TextureManager {

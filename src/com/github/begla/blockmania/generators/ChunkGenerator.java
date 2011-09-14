@@ -21,7 +21,7 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
- * Generators are used to generate the basic terrain, to generate caves
+ * Generators are used to generate the terrain, to generate caves
  * and to populate the surface.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

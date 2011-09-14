@@ -23,6 +23,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 /**
+ * Provides support for creating and buffering Vertex Buffer Objects.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class VBOHelper {

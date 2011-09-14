@@ -23,6 +23,8 @@ import com.github.begla.blockmania.world.World;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
+ * A simple renderable sun/moon.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class SunMoon implements RenderableObject {

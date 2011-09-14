@@ -22,6 +22,9 @@ import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
+ * An axis-aligned bounding box. Provides basic support for inclusion
+ * and intersection tests.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class AABB implements RenderableObject {

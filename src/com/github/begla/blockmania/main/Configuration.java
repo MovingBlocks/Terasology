@@ -21,7 +21,7 @@ import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
- * Helper class to allow global access to properties and game settings.
+ * Blockmania's global settings.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

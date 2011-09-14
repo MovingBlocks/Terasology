@@ -19,7 +19,7 @@ import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.world.World;
 
 /**
- * TODO
+ * A strange thing that looks like a magic tree.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Dominik Wilhelm

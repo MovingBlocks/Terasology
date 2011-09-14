@@ -20,7 +20,7 @@ import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
 
 /**
- * A red stone block.
+ * A diamond block.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
