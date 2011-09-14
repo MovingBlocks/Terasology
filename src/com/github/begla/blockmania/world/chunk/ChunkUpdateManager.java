@@ -27,7 +27,7 @@ import java.util.Collections;
  */
 public final class ChunkUpdateManager {
 
-    private final FastList<Chunk> _displayListUpdates = new FastList<Chunk>(128);
+    private final FastList<Chunk> _vboUpdates = new FastList<Chunk>(128);
 
     private double _meanUpdateDuration = 0.0;
     private final World _parent;
@@ -111,14 +111,14 @@ public final class ChunkUpdateManager {
                  * ... if yes, regenerate the vertex arrays
                  */
                 c.generateMesh();
-                _displayListUpdates.add(c);
+                _vboUpdates.add(c);
             }
         }
     }
 
-    public void updateDisplayLists() {
-        if (!_displayListUpdates.isEmpty()) {
-            Chunk c = _displayListUpdates.removeFirst();
+    public void updateVBOs() {
+        while (!_vboUpdates.isEmpty()) {
+            Chunk c = _vboUpdates.removeFirst();
             c.generateVBOs();
         }
     }
@@ -128,7 +128,7 @@ public final class ChunkUpdateManager {
     }
 
     public int updatesDLSize() {
-        return _displayListUpdates.size();
+        return _vboUpdates.size();
     }
 
     public double getMeanUpdateDuration() {

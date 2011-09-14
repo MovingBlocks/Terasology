@@ -21,6 +21,7 @@ import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.world.World;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.util.ResourceLoader;
 
@@ -58,9 +59,6 @@ public class Clouds implements RenderableObject {
     }
 
     private void generateClouds() {
-        /*
-        * Create cloud array.
-        */
         try {
             BufferedImage cloudImage = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/clouds.png").openStream());
             _clouds = new boolean[cloudImage.getWidth()][cloudImage.getHeight()];
@@ -107,6 +105,8 @@ public class Clouds implements RenderableObject {
         GL11.glBlendFunc(770, 771);
 
         ShaderManager.getInstance().enableShader("cloud");
+        int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("cloud"), "daylight");
+        GL20.glUniform1f(daylight, (float) _parent.getDaylight());
 
         // Render two passes: The first one only writes to the depth buffer, the second one to the frame buffer
         for (int i = 0; i < 2; i++) {

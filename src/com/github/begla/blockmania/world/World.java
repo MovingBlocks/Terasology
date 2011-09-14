@@ -28,6 +28,7 @@ import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkCache;
+import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.entity.Entity;
 import com.github.begla.blockmania.world.horizon.Clouds;
@@ -88,6 +89,9 @@ public final class World implements RenderableObject {
     /* HORIZON */
     private final Clouds _clouds;
     private final SunMoon _sunMoon;
+    /* WATER AND LAVA ANIMATION */
+    private int _textureAnimationTick = 0;
+    private long _lastWaterAnimationTickUpdate;
 
     /**
      * Initializes a new world for the single player mode.
@@ -122,6 +126,9 @@ public final class World implements RenderableObject {
         // Init. horizon
         _clouds = new Clouds(this);
         _sunMoon = new SunMoon(this);
+
+        // Init. etc.
+        _lastWaterAnimationTickUpdate = Blockmania.getInstance().getTime();
 
         // Init. generators
         _chunkGenerators.put("terrain", new ChunkGeneratorTerrain(_seed));
@@ -254,19 +261,6 @@ public final class World implements RenderableObject {
         */
         _player.render();
 
-        /*
-         * Transfer the daylight value to the shaders.
-         */
-        ShaderManager.getInstance().enableShader("chunk");
-        int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
-        int swimmimg = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
-        GL20.glUniform1f(daylight, (float) getDaylight());
-        GL20.glUniform1i(swimmimg, _player.isHeadUnderWater() ? 1 : 0);
-        ShaderManager.getInstance().enableShader("cloud");
-        daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("cloud"), "daylight");
-        GL20.glUniform1f(daylight, (float) getDaylight());
-        ShaderManager.getInstance().enableShader(null);
-
         renderEntities();
         renderChunks();
 
@@ -313,35 +307,64 @@ public final class World implements RenderableObject {
     private void renderChunks() {
 
         ShaderManager.getInstance().enableShader("chunk");
+        int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
+        int swimmimg = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
+        int animationOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animationOffset");
+        int animationType = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animationType");
+        GL20.glUniform1f(daylight, (float) getDaylight());
+        GL20.glUniform1i(animationType, 0);
+        GL20.glUniform1i(swimmimg, _player.isHeadUnderWater() ? 1 : 0);
 
         glEnable(GL_TEXTURE_2D);
-        TextureManager.getInstance().bindTexture("terrain");
 
         updateVisibleChunks();
 
+        // OPAQUE ELEMENTS
         for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
             Chunk c = _visibleChunks.valueOf(n);
 
-            c.render(false);
+            GL20.glUniform1i(animationType, 0);
+            TextureManager.getInstance().bindTexture("terrain");
+            c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
+
+            GL20.glUniform1i(animationType, 1);
+            GL20.glUniform1f(animationOffset, ((float) (_textureAnimationTick % 16)) * (1.0f / 16f));
+            TextureManager.getInstance().bindTexture("custom_lava_still");
+            _visibleChunks.valueOf(n).render(ChunkMesh.RENDER_TYPE.LAVA);
 
             if (Configuration.getSettingBoolean("CHUNK_OUTLINES")) {
                 c.getAABB().render();
             }
         }
 
+        GL20.glUniform1i(animationType, 0);
+        TextureManager.getInstance().bindTexture("terrain");
+
+        // BILLBOARDS AND TRANSLUCENT ELEMENTS
         for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            for (int i = 0; i < 2; i++) {
+            _visibleChunks.valueOf(n).render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
+        }
+
+        GL20.glUniform1i(animationType, 1);
+
+        for (int i = 0; i < 2; i++) {
+            // ANIMATED WATER AND LAVA
+            for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
+
                 if (i == 0) {
                     glColorMask(false, false, false, false);
                 } else {
                     glColorMask(true, true, true, true);
                 }
-                _visibleChunks.valueOf(n).render(true);
+
+                GL20.glUniform1f(animationOffset, ((float) (_textureAnimationTick / 2 % 12)) * (1.0f / 16f));
+                TextureManager.getInstance().bindTexture("custom_water_still");
+                _visibleChunks.valueOf(n).render(ChunkMesh.RENDER_TYPE.WATER);
             }
         }
 
-        glDisable(GL_TEXTURE_2D);
         ShaderManager.getInstance().enableShader(null);
+        glDisable(GL_TEXTURE_2D);
     }
 
     /**
@@ -349,9 +372,10 @@ public final class World implements RenderableObject {
      */
     public void update() {
         updateDaytime();
+        updateWaterLavaAnimationTick();
 
         _player.update();
-        _chunkUpdateManager.updateDisplayLists();
+        _chunkUpdateManager.updateVBOs();
 
         _clouds.update();
 
@@ -362,6 +386,13 @@ public final class World implements RenderableObject {
         _chunkCache.disposeUnusedChunks();
 
         updateParticleEmitters();
+    }
+
+    private void updateWaterLavaAnimationTick() {
+        if (Blockmania.getInstance().getTime() - _lastWaterAnimationTickUpdate >= 200) {
+            _textureAnimationTick++;
+            _lastWaterAnimationTickUpdate = Blockmania.getInstance().getTime();
+        }
     }
 
     /**
@@ -425,7 +456,7 @@ public final class World implements RenderableObject {
      * @param updateLight If set the affected chunk is queued for updating
      * @param overwrite
      */
-    public final void setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
+    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
         int chunkPosX = calcChunkPosX(x);
         int chunkPosZ = calcChunkPosZ(z);
 
@@ -435,7 +466,7 @@ public final class World implements RenderableObject {
         Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
 
         if (c == null) {
-            return;
+            return false;
         }
 
         if (overwrite || c.getBlock(blockPosX, y, blockPosZ) == 0x0) {
@@ -447,7 +478,7 @@ public final class World implements RenderableObject {
                 c.setBlock(blockPosX, y, blockPosZ, type);
                 newBlock = type;
             } else {
-                return;
+                return false;
             }
 
             if (updateLight) {
@@ -487,6 +518,8 @@ public final class World implements RenderableObject {
                 }
             }
         }
+
+        return true;
     }
 
     /**

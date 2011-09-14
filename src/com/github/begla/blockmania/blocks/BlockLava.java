@@ -32,6 +32,11 @@ public class BlockLava extends Block {
 
     @Override
     public Vector2f getTextureOffsetFor(Block.SIDE side) {
+        return Helper.calcOffsetForTextureAt(0, 0);
+    }
+
+    @Override
+    public Vector2f getTerrainTextureOffsetFor(Block.SIDE side) {
         return Helper.calcOffsetForTextureAt(15, 15);
     }
 

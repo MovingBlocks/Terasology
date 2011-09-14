@@ -327,8 +327,8 @@ public final class Player extends Character {
         _selectedBlockType += upDown;
 
         if (_selectedBlockType >= Block.getBlockCount()) {
-            _selectedBlockType = 0;
-        } else if (_selectedBlockType < 0) {
+            _selectedBlockType = 1;
+        } else if (_selectedBlockType < 1) {
             _selectedBlockType = (byte) (Block.getBlockCount() - 1);
         }
     }

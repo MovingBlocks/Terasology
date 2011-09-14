@@ -113,8 +113,18 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
     }
 
     public void render() {
-        render(true);
-        render(false);
+        // Nothing to do
+    }
+
+    /**
+     * Draws the opaque or translucent elements of a chunk.
+     * @param type The type of vertices to render
+     */
+    public void render(ChunkMesh.RENDER_TYPE type) {
+        // Render the generated chunk mesh
+        if (_activeMesh != null) {
+            _activeMesh.render(type);
+        }
     }
 
     public void update() {
@@ -133,18 +143,6 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
                 _activeMesh = _newMesh;
                 _newMesh = null;
             }
-        }
-    }
-
-    /**
-     * Draws the opaque or translucent elements of a chunk.
-     *
-     * @param translucent True if the translucent elements should be rendered
-     */
-    public void render(boolean translucent) {
-        // Render the generated chunk mesh
-        if (_activeMesh != null) {
-            _activeMesh.render(translucent);
         }
     }
 

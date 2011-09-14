@@ -17,6 +17,8 @@ package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockAir;
+import com.github.begla.blockmania.blocks.BlockLava;
+import com.github.begla.blockmania.blocks.BlockWater;
 import com.github.begla.blockmania.main.Configuration;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
@@ -30,11 +32,6 @@ import org.lwjgl.util.vector.Vector4f;
 public class ChunkMeshGenerator {
 
     private final Chunk _chunk;
-
-    public enum RENDER_TYPE {
-        TRANS,
-        OPAQUE,
-    }
 
     public ChunkMeshGenerator(Chunk chunk) {
         _chunk = chunk;
@@ -68,7 +65,7 @@ public class ChunkMeshGenerator {
     }
 
     private void generateOptimizedBuffers(ChunkMesh mesh) {
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < mesh._vertexElements.length; j++) {
             mesh._vertexElements[j].vertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].quads.size() + mesh._vertexElements[j].tex.size() * 2 + mesh._vertexElements[j].color.size());
             mesh._vertexElements[j].indices = BufferUtils.createIntBuffer(mesh._vertexElements[j].quads.size());
 
@@ -216,11 +213,15 @@ public class ChunkMeshGenerator {
         /*
          * Determine the render process.
          */
-        RENDER_TYPE renderType = RENDER_TYPE.TRANS;
+        ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT;
 
-        if (!Block.getBlockForType(block).isBlockTypeTranslucent()) {
-            renderType = RENDER_TYPE.OPAQUE;
-        }
+        if (!Block.getBlockForType(block).isBlockTypeTranslucent())
+            renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
+        if (Block.getBlockForType(block).getClass().equals(BlockWater.class))
+            renderType = ChunkMesh.RENDER_TYPE.WATER;
+        if (Block.getBlockForType(block).getClass().equals(BlockLava.class))
+            renderType = ChunkMesh.RENDER_TYPE.LAVA;
+
 
         boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
 
@@ -344,11 +345,19 @@ public class ChunkMeshGenerator {
         }
     }
 
-    void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
+    void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, ChunkMesh.RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
         ChunkMesh.VertexElements vertexElements = mesh._vertexElements[0];
 
-        if (renderType == RENDER_TYPE.TRANS) {
-            vertexElements = mesh._vertexElements[1];
+        switch (renderType) {
+            case BILLBOARD_AND_TRANSLUCENT:
+                vertexElements = mesh._vertexElements[1];
+                break;
+            case WATER:
+                vertexElements = mesh._vertexElements[3];
+                break;
+            case LAVA:
+                vertexElements = mesh._vertexElements[4];
+                break;
         }
 
         switch (blockForm) {

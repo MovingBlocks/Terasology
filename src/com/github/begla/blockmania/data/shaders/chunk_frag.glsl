@@ -3,6 +3,8 @@
 uniform sampler2D textureAtlas;
 uniform float daylight = 1.0;
 uniform int swimming = 0;
+uniform float animationOffset = 0;
+uniform int animationType = 0;
 
 varying float fog;
 varying vec3 normal;
@@ -16,7 +18,17 @@ vec4 linearToSrgb(vec4 color){
 }
 
 void main(){
-    vec4 color = texture2D(textureAtlas, vec2(gl_TexCoord[0]));
+    vec4 texCoord = gl_TexCoord[0];
+
+    // TEXTURE ANIMATION
+    if (animationType == 1) {
+        texCoord.x *= 16;
+        texCoord.y /= 4;
+
+        texCoord.y += animationOffset;
+    }
+
+    vec4 color = texture2D(textureAtlas, vec2(texCoord));
     color = srgbToLinear(color);
 
     if (color.a < 0.1)

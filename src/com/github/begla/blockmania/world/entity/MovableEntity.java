@@ -110,6 +110,9 @@ public abstract class MovableEntity extends Entity {
     }
 
     private void playMovementSound() {
+        if (_godMode)
+            return;
+
         if ((Math.abs(_velocity.x) > 0.001 || Math.abs(_velocity.z) > 0.001) && _touchingGround) {
             if (_currentFootstepSound == null) {
                 Vector3f playerDirection = directionOfPlayer();
@@ -370,10 +373,7 @@ public abstract class MovableEntity extends Entity {
             }
 
             Vector3f eyePos = calcEyePosition();
-            // Add distance to the near plane
-            eyePos.x += _viewingDirection.x * 0.1;
-            eyePos.y += _viewingDirection.y * 0.1;
-            eyePos.z += _viewingDirection.z * 0.1;
+            eyePos.y += 0.25;
 
             if (Block.getBlockForType(blockType).getClass().equals(BlockWater.class) && blockAABB.contains(eyePos)) {
                 headUnderWater = true;

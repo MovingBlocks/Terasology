@@ -133,6 +133,10 @@ public abstract class Block implements RenderableObject {
         return Helper.calcOffsetForTextureAt(2, 0);
     }
 
+    public Vector2f getTerrainTextureOffsetFor(SIDE side) {
+        return getTextureOffsetFor(side);
+    }
+
     /**
      * Returns true, if the block is invisible.
      *
@@ -209,65 +213,65 @@ public abstract class Block implements RenderableObject {
         GL11.glColor3f(1.0f, 1.0f, 1.0f);
 
         // TOP
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x, getTextureOffsetFor(SIDE.TOP).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.TOP).x, getTerrainTextureOffsetFor(SIDE.TOP).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x + 0.0624f, getTextureOffsetFor(SIDE.TOP).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.TOP).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.TOP).y);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x + 0.0624f, getTextureOffsetFor(SIDE.TOP).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.TOP).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.TOP).y + 0.0624f);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x, getTextureOffsetFor(SIDE.TOP).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.TOP).x, getTerrainTextureOffsetFor(SIDE.TOP).y + 0.0624f);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 
         // LEFT
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x, getTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.LEFT).x, getTerrainTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x + 0.0624f, getTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.LEFT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x + 0.0624f, getTextureOffsetFor(SIDE.LEFT).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.LEFT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.LEFT).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x, getTextureOffsetFor(SIDE.LEFT).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.LEFT).x, getTerrainTextureOffsetFor(SIDE.LEFT).y);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 
 
         // BACK
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x, getTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BACK).x, getTerrainTextureOffsetFor(SIDE.BACK).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x + 0.0624f, getTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BACK).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.BACK).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x + 0.0624f, getTextureOffsetFor(SIDE.BACK).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BACK).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.BACK).y);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x, getTextureOffsetFor(SIDE.BACK).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BACK).x, getTerrainTextureOffsetFor(SIDE.BACK).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
 
         // RIGHT
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x, getTextureOffsetFor(SIDE.RIGHT).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.RIGHT).x, getTerrainTextureOffsetFor(SIDE.RIGHT).y);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, getTextureOffsetFor(SIDE.RIGHT).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.RIGHT).y);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, getTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x, getTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.RIGHT).x, getTerrainTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
 
         GL11.glColor3f(0.5f, 0.5f, 0.5f);
 
         // FRONT
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x, getTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.FRONT).x, getTerrainTextureOffsetFor(SIDE.FRONT).y);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x + 0.0624f, getTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.FRONT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.FRONT).y);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x + 0.0624f, getTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.FRONT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x, getTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.FRONT).x, getTerrainTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
         // BOTTOM
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x, getTextureOffsetFor(SIDE.BOTTOM).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BOTTOM).x, getTerrainTextureOffsetFor(SIDE.BOTTOM).y);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, getTextureOffsetFor(SIDE.BOTTOM).y);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.BOTTOM).y);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, getTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x, getTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
+        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BOTTOM).x, getTerrainTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
 
         GL11.glEnd();
