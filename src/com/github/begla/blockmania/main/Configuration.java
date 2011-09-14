@@ -87,7 +87,7 @@ public final class Configuration {
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>(32);
 
     static {
-        if (Game.getInstance().isSandboxed()) {
+        if (Blockmania.getInstance().isSandboxed()) {
             CHUNK_DIMENSIONS = new Vector3f(16, 128, 16);
         } else {
             CHUNK_DIMENSIONS = new Vector3f(16, 128, 16);
@@ -186,7 +186,7 @@ public final class Configuration {
     private static void loadSettings() {
         loadDefaults();
 
-        if (!Game.getInstance().isSandboxed()) {
+        if (!Blockmania.getInstance().isSandboxed()) {
             if (Boolean.getBoolean("blockmania.demo")) {
                 loadDemo();
             } else if (Boolean.getBoolean("blockmania.debugMode")) {

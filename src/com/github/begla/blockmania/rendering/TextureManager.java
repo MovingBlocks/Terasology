@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.rendering;
 
-import com.github.begla.blockmania.main.Game;
+import com.github.begla.blockmania.main.Blockmania;
 import javolution.util.FastMap;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -45,16 +45,16 @@ public class TextureManager {
 
     public TextureManager() {
         try {
-            Game.getInstance().getLogger().log(Level.FINE, "Loading textures...");
+            Blockmania.getInstance().getLogger().log(Level.FINE, "Loading textures...");
 
             _textures.put("terrain", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/terrain.png").openStream(), GL_NEAREST));
             _textures.put("sun", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/sun.png").openStream(), GL_NEAREST));
             _textures.put("moon", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/moon.png").openStream(), GL_NEAREST));
             _textures.put("slime", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/slime.png").openStream(), GL_NEAREST));
 
-            Game.getInstance().getLogger().log(Level.FINE, "Finished loading textures!");
+            Blockmania.getInstance().getLogger().log(Level.FINE, "Finished loading textures!");
         } catch (IOException ex) {
-            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
     }
 

@@ -17,8 +17,8 @@ package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.generators.*;
+import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.main.Game;
 import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
@@ -71,7 +71,7 @@ public final class World implements RenderableObject {
     private String _title, _seed;
     private Vector3f _spawningPoint;
     private double _time = Configuration.INITIAL_TIME;
-    private long _lastDaytimeMeasurement = Game.getInstance().getTime();
+    private long _lastDaytimeMeasurement = Blockmania.getInstance().getTime();
     private double _daylight = 1.0f;
     /* RENDERING */
     private FastList<Chunk> _visibleChunks = new FastList(128);
@@ -155,7 +155,7 @@ public final class World implements RenderableObject {
                             try {
                                 _updateThread.wait();
                             } catch (InterruptedException ex) {
-                                Game.getInstance().getLogger().log(Level.SEVERE, ex.toString());
+                                Blockmania.getInstance().getLogger().log(Level.SEVERE, ex.toString());
                             }
                         }
                     }
@@ -171,7 +171,7 @@ public final class World implements RenderableObject {
      * Stops the updating thread and writes all chunks to disk.
      */
     public void dispose() {
-        Game.getInstance().getLogger().log(Level.INFO, "Disposing world {0} and saving all chunks.", _title);
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Disposing world {0} and saving all chunks.", _title);
 
         synchronized (_updateThread) {
             _updateThreadAlive = false;
@@ -193,9 +193,9 @@ public final class World implements RenderableObject {
      * time is updated every 15 seconds.
      */
     private void updateDaytime() {
-        if (Game.getInstance().getTime() - _lastDaytimeMeasurement >= 100) {
+        if (Blockmania.getInstance().getTime() - _lastDaytimeMeasurement >= 100) {
             setTime(_time + 1f / ((5f * 60f * 10f)));
-            _lastDaytimeMeasurement = Game.getInstance().getTime();
+            _lastDaytimeMeasurement = Blockmania.getInstance().getTime();
         }
     }
 
@@ -851,7 +851,7 @@ public final class World implements RenderableObject {
      * @return
      */
     private boolean saveMetaData() {
-        if (Game.getInstance().isSandboxed()) {
+        if (Blockmania.getInstance().isSandboxed()) {
             return false;
         }
 
@@ -859,7 +859,7 @@ public final class World implements RenderableObject {
         File dir = new File(getWorldSavePath());
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
-                Game.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
+                Blockmania.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
                 return false;
             }
         }
@@ -869,7 +869,7 @@ public final class World implements RenderableObject {
         try {
             f.createNewFile();
         } catch (IOException ex) {
-            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
 
         Element root = new Element("World");
@@ -897,12 +897,12 @@ public final class World implements RenderableObject {
             try {
                 outputter.output(doc, output);
             } catch (IOException ex) {
-                Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+                Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
             }
 
             return true;
         } catch (FileNotFoundException ex) {
-            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
 
 
@@ -913,7 +913,7 @@ public final class World implements RenderableObject {
      * @return
      */
     private boolean loadMetaData() {
-        if (Game.getInstance().isSandboxed()) {
+        if (Blockmania.getInstance().isSandboxed()) {
             return false;
         }
 
@@ -936,9 +936,9 @@ public final class World implements RenderableObject {
                 return true;
 
             } catch (JDOMException ex) {
-                Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+                Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+                Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
             }
 
         } catch (FileNotFoundException ex) {

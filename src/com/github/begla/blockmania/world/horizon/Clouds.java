@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.world.horizon;
 
-import com.github.begla.blockmania.main.Game;
+import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
@@ -73,7 +73,7 @@ public class Clouds implements RenderableObject {
                 }
             }
         } catch (IOException ex) {
-            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
     }
 
@@ -142,11 +142,11 @@ public class Clouds implements RenderableObject {
             _windDirection.y = -_windDirection.y;
         }
 
-        if (Game.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
+        if (Blockmania.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
             _windDirection.x = (float) _parent.getRandom().randomDouble() / 8;
             _windDirection.y = (float) _parent.getRandom().randomDouble() / 8;
             _nextWindUpdateInSeconds = (short) (Math.abs(_parent.getRandom().randomInt()) % 16 + 32);
-            _lastWindUpdate = Game.getInstance().getTime();
+            _lastWindUpdate = Blockmania.getInstance().getTime();
         }
     }
 }

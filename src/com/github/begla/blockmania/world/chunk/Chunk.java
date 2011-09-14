@@ -20,8 +20,8 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.generators.ChunkGenerator;
+import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.main.Game;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.World;
@@ -162,7 +162,7 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
             // Try to load the chunk from disk
             if (loadChunkFromFile()) {
                 _fresh = false;
-                Game.getInstance().getLogger().log(Level.FINEST, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+                Blockmania.getInstance().getLogger().log(Level.FINEST, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
                 return true;
             }
 
@@ -173,7 +173,7 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
             generateSunlight();
             _fresh = false;
 
-            Game.getInstance().getLogger().log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+            Blockmania.getInstance().getLogger().log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
             return true;
         }
         return false;
@@ -602,14 +602,14 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
             return false;
         }
 
-        if (Game.getInstance().isSandboxed()) {
+        if (Blockmania.getInstance().isSandboxed()) {
             return false;
         }
         // Generate the save directory if needed
         File dir = new File(_parent.getWorldSavePath());
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
-                Game.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
+                Blockmania.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
                 return false;
             }
         }
@@ -642,13 +642,13 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
             FileOutputStream oS = new FileOutputStream(f);
             FileChannel c = oS.getChannel();
             c.write(output);
-            Game.getInstance().getLogger().log(Level.FINE, "Wrote chunk {0} to disk.", this);
+            Blockmania.getInstance().getLogger().log(Level.FINE, "Wrote chunk {0} to disk.", this);
             oS.close();
         } catch (FileNotFoundException ex) {
-            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
             return false;
         } catch (IOException ex) {
-            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
             return false;
         }
 
@@ -661,7 +661,7 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      * @return True if the chunk was successfully loaded
      */
     public boolean loadChunkFromFile() {
-        if (Game.getInstance().isSandboxed()) {
+        if (Blockmania.getInstance().isSandboxed()) {
             return false;
         }
 
@@ -676,13 +676,13 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
             FileInputStream iS = new FileInputStream(f);
             FileChannel c = iS.getChannel();
             c.read(input);
-            Game.getInstance().getLogger().log(Level.FINE, "Loaded chunk {0} from disk.", this);
+            Blockmania.getInstance().getLogger().log(Level.FINE, "Loaded chunk {0} from disk.", this);
             iS.close();
         } catch (FileNotFoundException ex) {
-            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
             return false;
         } catch (IOException ex) {
-            Game.getInstance().getLogger().log(Level.SEVERE, null, ex);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
             return false;
         }
 

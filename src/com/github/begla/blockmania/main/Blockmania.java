@@ -51,7 +51,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Game {
+public final class Blockmania {
 
     /* ------- */
     private static final int TICKS_PER_SECOND = 60;
@@ -76,7 +76,7 @@ public final class Game {
     /* ------- */
     private long _timerTicksPerSecond;
     /* ------- */
-    private static Game _instance;
+    private static Blockmania _instance;
     /* ------- */
     private final Logger _logger = Logger.getLogger("blockmania");
     /* ------- */
@@ -85,9 +85,9 @@ public final class Game {
     private double _cubeRotation;
 
     // Singleton
-    public static Game getInstance() {
+    public static Blockmania getInstance() {
         if (_instance == null)
-            _instance = new Game();
+            _instance = new Blockmania();
         return _instance;
     }
 
@@ -97,31 +97,31 @@ public final class Game {
      * @param args Arguments
      */
     public static void main(String[] args) {
-        Game.getInstance().addLogFileHandler("blockmania.log", Level.SEVERE);
-        Game.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
+        Blockmania.getInstance().addLogFileHandler("blockmania.log", Level.SEVERE);
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
 
         try {
             loadNativeLibs();
         } catch (Exception e) {
-            Game.getInstance().getLogger().log(Level.SEVERE, "Couldn't link static libraries. Sorry: " + e);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Couldn't link static libraries. Sorry: " + e);
         }
 
-        Game game = null;
+        Blockmania blockmania = null;
 
         try {
-            game = Game.getInstance();
+            blockmania = Blockmania.getInstance();
 
-            game.initDisplay();
-            game.initControls();
+            blockmania.initDisplay();
+            blockmania.initControls();
 
-            game.initGame();
+            blockmania.initGame();
 
-            game.startGame();
+            blockmania.startGame();
         } catch (Exception ex) {
-            Game.getInstance().getLogger().log(Level.SEVERE, ex.toString(), ex);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, ex.toString(), ex);
         } finally {
-            if (game != null) {
-                game.destroy();
+            if (blockmania != null) {
+                blockmania.destroy();
             }
         }
 
@@ -172,7 +172,7 @@ public final class Game {
      * @throws LWJGLException
      */
     public void initDisplay() throws LWJGLException {
-        Game.getInstance().getLogger().log(Level.INFO, "Loading Blockmania. Please stand by...");
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Loading Blockmania. Please stand by...");
 
         // Display
         if (Configuration.FULLSCREEN) {
@@ -281,7 +281,7 @@ public final class Game {
      * Starts the render loop.
      */
     public void startGame() {
-        Game.getInstance().getLogger().log(Level.INFO, "Starting Blockmania...");
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Starting Blockmania...");
         _lastLoopTime = getTime();
 
         double nextGameTick = getTime();
@@ -290,7 +290,7 @@ public final class Game {
         resizeViewport();
 
         /*
-         * Game game loop.
+         * Blockmania game loop.
          */
         while (_runGame && !Display.isCloseRequested()) {
             updateStatistics();
@@ -560,13 +560,13 @@ public final class Game {
                 success = true;
             }
         } catch (Exception e) {
-            Game.getInstance().getLogger().log(Level.INFO, e.getMessage());
+            Blockmania.getInstance().getLogger().log(Level.INFO, e.getMessage());
         }
 
         if (success) {
-            Game.getInstance().getLogger().log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
+            Blockmania.getInstance().getLogger().log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
         } else {
-            Game.getInstance().getLogger().log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
+            Blockmania.getInstance().getLogger().log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
         }
 
         toggleDebugConsole();
@@ -592,7 +592,7 @@ public final class Game {
      * @param seed  Seed value used for the generators
      */
     private void initNewWorldAndPlayer(String title, String seed) {
-        Game.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Get rid of the old world
         if (_world != null) {

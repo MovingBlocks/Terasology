@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.audio;
 
-import com.github.begla.blockmania.main.Game;
+import com.github.begla.blockmania.main.Blockmania;
 import javolution.util.FastMap;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
@@ -60,7 +60,7 @@ public class AudioManager {
         try {
             return AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/sounds/" + s + ".ogg"));
         } catch (IOException e) {
-            Game.getInstance().getLogger().log(Level.SEVERE, e.getLocalizedMessage());
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.getLocalizedMessage());
         }
 
         return null;

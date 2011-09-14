@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.rendering;
 
-import com.github.begla.blockmania.main.Game;
+import com.github.begla.blockmania.main.Blockmania;
 import javolution.util.FastMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBShaderObjects;
@@ -58,10 +58,10 @@ public class ShaderManager {
     private ShaderManager() {
         initShader();
 
-        Game.getInstance().getLogger().log(Level.INFO, "Loading Blockmania shader manager...");
-        Game.getInstance().getLogger().log(Level.INFO, "GL_VERSION: {0}", GL11.glGetString(GL11.GL_VERSION));
-        Game.getInstance().getLogger().log(Level.INFO, "SHADING_LANGUAGE VERSION: {0}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
-        Game.getInstance().getLogger().log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Loading Blockmania shader manager...");
+        Blockmania.getInstance().getLogger().log(Level.INFO, "GL_VERSION: {0}", GL11.glGetString(GL11.GL_VERSION));
+        Blockmania.getInstance().getLogger().log(Level.INFO, "SHADING_LANGUAGE VERSION: {0}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
+        Blockmania.getInstance().getLogger().log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
     }
 
     private void initShader() {
@@ -98,7 +98,7 @@ public class ShaderManager {
                 fragCode += line + "\n";
             }
         } catch (Exception e) {
-            Game.getInstance().getLogger().log(Level.SEVERE, "Failed reading fragment shading code.");
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed reading fragment shading code.");
             return 0;
         }
 
@@ -126,7 +126,7 @@ public class ShaderManager {
                 fragCode += line + "\n";
             }
         } catch (Exception e) {
-            Game.getInstance().getLogger().log(Level.SEVERE, "Failed reading vertex shading code.");
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed reading vertex shading code.");
             return 0;
         }
 
@@ -157,7 +157,7 @@ public class ShaderManager {
         byte[] infoBytes = new byte[actualLength];
         infoBuffer.get(infoBytes);
 
-        Game.getInstance().getLogger().log(Level.INFO, "{0}", new String(infoBytes));
+        Blockmania.getInstance().getLogger().log(Level.INFO, "{0}", new String(infoBytes));
     }
 
     /**
