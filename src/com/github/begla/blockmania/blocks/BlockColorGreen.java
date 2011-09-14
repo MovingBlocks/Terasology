@@ -21,6 +21,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 /**
  * A green color block.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockColorGreen extends Block {

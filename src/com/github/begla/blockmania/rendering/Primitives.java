@@ -32,12 +32,12 @@ public class Primitives {
     private static final Vector3f SKY_COLOR_2 = new Vector3f(0.84f, 0.88f, 1f);
 
     /**
-     * @param scaleX Scale along the x-axis
-     * @param scaleY Scale along the y-axis
-     * @param scaleZ Scale along the z-axis
-     * @param x      Position on the x-axis
-     * @param y      Position on the y-axis
-     * @param z      Position on the z-axis
+     * @param scaleX    Scale along the x-axis
+     * @param scaleY    Scale along the y-axis
+     * @param scaleZ    Scale along the z-axis
+     * @param x         Position on the x-axis
+     * @param y         Position on the y-axis
+     * @param z         Position on the z-axis
      * @param drawLeft
      * @param drawRight
      * @param drawFront

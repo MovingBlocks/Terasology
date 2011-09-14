@@ -317,7 +317,7 @@ public final class World implements RenderableObject {
         glEnable(GL_TEXTURE_2D);
         TextureManager.getInstance().bindTexture("terrain");
 
-       updateVisibleChunks();
+        updateVisibleChunks();
 
         for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
             Chunk c = _visibleChunks.valueOf(n);
