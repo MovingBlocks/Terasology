@@ -229,8 +229,6 @@ public final class Game {
         GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
         glShadeModel(GL11.GL_SMOOTH);
 
-        World.init();
-
         // Generate a world with a random seed value
         String worldSeed = Configuration.DEFAULT_SEED;
 
