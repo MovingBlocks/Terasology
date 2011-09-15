@@ -80,7 +80,6 @@ public final class Player extends Character {
     }
 
     public void applyPlayerModelViewMatrix() {
-
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
 
@@ -103,7 +102,6 @@ public final class Player extends Character {
     }
 
     public void applyNormalizedModelViewMatrix() {
-
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
 
@@ -113,9 +111,7 @@ public final class Player extends Character {
     }
 
     public void updatePosition() {
-        /*
-        * DEMO MODE
-        */
+        // DEMO MODE
         if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
             getPosition().z += Configuration.getSettingNumeric("WALKING_SPEED");
 

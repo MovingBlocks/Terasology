@@ -10,7 +10,7 @@ public class BlockmaniaChunkTest extends junit.framework.TestCase {
 
     @Test
     public void testChunkToWorldMapping() throws Exception {
-        Chunk chunk1 = new Chunk(null, new Vector3f(-1, 0, -1), null);
+        Chunk chunk1 = new Chunk(null, new Vector3f(-1, 0, -1));
 
         int blockPosX = 0;
         int blockPosZ = 0;
@@ -30,7 +30,7 @@ public class BlockmaniaChunkTest extends junit.framework.TestCase {
         assertEquals(-1, chunk1.getBlockWorldPosX(blockPosX));
         assertEquals(-1, chunk1.getBlockWorldPosZ(blockPosZ));
 
-        Chunk chunk2 = new Chunk(null, new Vector3f(-2, 0, -2), null);
+        Chunk chunk2 = new Chunk(null, new Vector3f(-2, 0, -2));
 
         blockPosX = 15;
         blockPosZ = 15;

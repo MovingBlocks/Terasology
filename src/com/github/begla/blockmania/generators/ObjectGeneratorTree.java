@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.WorldProvider;
 
 /**
  * Generates a simple, bushy tree.
@@ -29,7 +29,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
      * @param w
      * @param seed
      */
-    public ObjectGeneratorTree(World w, String seed) {
+    public ObjectGeneratorTree(WorldProvider w, String seed) {
         super(w, seed);
     }
 
@@ -50,7 +50,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            _world.setBlock(posX, posY + i, posZ, (byte) 0x5, update, false);
+            _worldProvider.setBlock(posX, posY + i, posZ, (byte) 0x5, update, false);
         }
 
         // Generate the treetop
@@ -59,8 +59,8 @@ public class ObjectGeneratorTree extends ObjectGenerator {
                 for (int z = -2; z < 3; z++) {
                     if (!(x == -2 && z == -2) && !(x == 2 && z == 2) && !(x == -2 && z == 2) && !(x == 2 && z == -2)) {
                         if (_rand.randomDouble() <= 0.8) {
-                            _world.setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update, false);
-                            _world.refreshSunlightAt(posX + x, posZ + z, false, true);
+                            _worldProvider.setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update, false);
+                            _worldProvider.refreshSunlightAt(posX + x, posZ + z, false, true);
                         }
                     }
                 }

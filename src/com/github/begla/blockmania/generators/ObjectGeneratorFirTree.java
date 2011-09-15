@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.WorldProvider;
 
 /**
  * A strange thing that looks like a magic tree.
@@ -30,7 +30,7 @@ public class ObjectGeneratorFirTree extends ObjectGenerator {
      * @param w
      * @param seed
      */
-    public ObjectGeneratorFirTree(World w, String seed) {
+    public ObjectGeneratorFirTree(WorldProvider w, String seed) {
         super(w, seed);
     }
 
@@ -51,7 +51,7 @@ public class ObjectGeneratorFirTree extends ObjectGenerator {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            _world.setBlock(posX, posY + i, posZ, (byte) 0x5, update, false);
+            _worldProvider.setBlock(posX, posY + i, posZ, (byte) 0x5, update, false);
         }
 
         int stage = 2;
@@ -59,20 +59,20 @@ public class ObjectGeneratorFirTree extends ObjectGenerator {
         for (int y = height - 1; y >= (height * (1.0 / 3.0)); y--) {
             for (int x = -(stage / 2); x <= (stage / 2); x++) {
                 if (!(x == 0)) {
-                    _world.setBlock(posX + x, posY + y, posZ, (byte) 0x16, update, false);
-                    _world.refreshSunlightAt(posX + x, 0, false, true);
+                    _worldProvider.setBlock(posX + x, posY + y, posZ, (byte) 0x16, update, false);
+                    _worldProvider.refreshSunlightAt(posX + x, 0, false, true);
                 }
             }
             for (int z = -(stage / 2); z <= (stage / 2); z++) {
                 if (!(z == 0)) {
-                    _world.setBlock(posX, posY + y, posZ + z, (byte) 0x16, update, false);
-                    _world.refreshSunlightAt(0, posZ + z, false, true);
+                    _worldProvider.setBlock(posX, posY + y, posZ + z, (byte) 0x16, update, false);
+                    _worldProvider.refreshSunlightAt(0, posZ + z, false, true);
                 }
             }
 
             stage++;
         }
 
-        _world.setBlock(posX, posY + height, posZ, (byte) 0x16, update, false);
+        _worldProvider.setBlock(posX, posY + height, posZ, (byte) 0x16, update, false);
     }
 }

@@ -65,6 +65,8 @@ public class ShaderManager {
     }
 
     private void initShader() {
+        createVertexShader("sky_vert.glsl", "sky");
+        createFragShader("sky_frag.glsl", "sky");
         createVertexShader("chunk_vert.glsl", "chunk");
         createFragShader("chunk_frag.glsl", "chunk");
         createVertexShader("cloud_vert.glsl", "cloud");

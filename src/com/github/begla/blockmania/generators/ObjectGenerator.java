@@ -17,7 +17,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.WorldProvider;
 
 /**
  * Object generators are used to generate objects like trees etc.
@@ -33,15 +33,15 @@ public abstract class ObjectGenerator {
     /**
      *
      */
-    final World _world;
+    final WorldProvider _worldProvider;
 
     /**
      * @param w
      * @param seed
      */
-    ObjectGenerator(World w, String seed) {
+    ObjectGenerator(WorldProvider w, String seed) {
         _rand = new FastRandom(seed.hashCode());
-        _world = w;
+        _worldProvider = w;
     }
 
     /**

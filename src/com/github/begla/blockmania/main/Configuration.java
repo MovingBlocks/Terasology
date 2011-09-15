@@ -158,8 +158,8 @@ public final class Configuration {
         _settingsNumeric.put("MAX_GRAVITY_SWIMMING", 0.01);
         _settingsNumeric.put("GRAVITY_SWIMMING", 0.0001);
         _settingsNumeric.put("FRICTION", 0.08);
-        _settingsNumeric.put("V_DIST_X", 24.0);
-        _settingsNumeric.put("V_DIST_Z", 24.0);
+        _settingsNumeric.put("V_DIST_X", 32.0);
+        _settingsNumeric.put("V_DIST_Z", 32.0);
     }
 
     private static void loadDebug() {

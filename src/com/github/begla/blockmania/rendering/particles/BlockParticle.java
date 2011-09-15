@@ -29,13 +29,21 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class BlockParticle extends Particle {
 
+    private float _lightOffset = 1.0f;
     private float _size;
     private byte _blockType = 0x1;
 
     public BlockParticle(int lifeTime, Vector3f position, byte blockType, BlockParticleEmitter parent) {
         super(lifeTime, position, parent);
         _blockType = blockType;
-        _size = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.04f;
+        _size = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.08f;
+        _lightOffset = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.6f + 0.4f;
+
+        _position.x += _rand.randomDouble() * 0.4;
+        _position.y += _rand.randomDouble() * 0.4;
+        _position.z += _rand.randomDouble() * 0.4;
+
+        _lifetime *= (_rand.randomDouble() + 1.0) / 2.0;
     }
 
     @Override
@@ -43,7 +51,7 @@ public class BlockParticle extends Particle {
         BlockParticleEmitter pE = (BlockParticleEmitter) getParent();
 
         // Very simple "collision detection" for particles.
-        if (pE.getParent().getBlockAtPosition(new Vector3f(_position.x + 2*((_velocity.x >= 0) ? _size : -_size), _position.y + 2*((_velocity.y >= 0) ? _size : -_size), _position.z + 2*((_velocity.z >= 0) ? _size : -_size))) != 0x0) {
+        if (pE.getParent().getBlockAtPosition(new Vector3f(_position.x + 2 * ((_velocity.x >= 0) ? _size : -_size), _position.y + 2 * ((_velocity.y >= 0) ? _size : -_size), _position.z + 2 * ((_velocity.z >= 0) ? _size : -_size))) != 0x0) {
             return false;
         }
 
@@ -62,7 +70,7 @@ public class BlockParticle extends Particle {
         lightValueSun = Math.pow(0.8, 15 - lightValueSun);
         double lightValueBlock = pE.getParent().getLightAtPosition(_position, Chunk.LIGHT_TYPE.BLOCK);
         lightValueBlock = Math.pow(0.8, 15 - lightValueBlock);
-        float lightValue = (float) Math.max(lightValueSun  / 2.0f, lightValueBlock);
+        float lightValue = (float) Math.max(lightValueSun, lightValueBlock) * _lightOffset;
 
         glBegin(GL_QUADS);
         GL11.glColor3f(lightValue, lightValue, lightValue);

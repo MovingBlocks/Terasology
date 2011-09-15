@@ -15,14 +15,16 @@
  */
 package com.github.begla.blockmania.world.chunk;
 
+import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.WorldProvider;
 import javolution.util.FastList;
 import javolution.util.FastMap;
+import org.lwjgl.util.vector.Vector3f;
 
-import java.util.Collection;
+import java.io.*;
 import java.util.Collections;
+import java.util.logging.Level;
 
 /**
  * Provides a dynamic cache for caching chunks.
@@ -32,13 +34,12 @@ import java.util.Collections;
 public final class ChunkCache {
 
     private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>(capacity()).shared();
-    private final Collection<Chunk> _disposableChunks = new FastList<Chunk>().shared();
-    private final World _parent;
+    private final WorldProvider _parent;
 
     /**
      * @param parent
      */
-    public ChunkCache(World parent) {
+    public ChunkCache(WorldProvider parent) {
         _parent = parent;
     }
 
@@ -54,9 +55,10 @@ public final class ChunkCache {
      */
     public Chunk loadOrCreateChunk(int x, int z) {
         // Try to load the chunk from the cache
-        Chunk c;
 
-        c = _chunkCache.get(Integer.valueOf(MathHelper.cantorize(x, z)));
+
+        int chunkId = Chunk.idForPosition(new Vector3f(x, 0, z));
+        Chunk c = _chunkCache.get(chunkId);
 
         // We got a chunk! Already! Great!
         if (c != null) {
@@ -64,7 +66,11 @@ public final class ChunkCache {
         }
 
         // Init a new chunk
-        c = _parent.prepareNewChunk(x, z);
+        c = loadChunkFromDisk(chunkId);
+
+        if (c == null) {
+            c = new Chunk(_parent, new Vector3f(x, 0, z));
+        }
 
         _chunkCache.put(c.getChunkId(), c);
         c.setCached(true);
@@ -85,25 +91,10 @@ public final class ChunkCache {
             _chunkCache.remove(chunkToDelete.getChunkId());
 
             chunkToDelete.setCached(false);
-            chunkToDelete.writeChunkToDisk();
+            writeChunkToDisk(chunkToDelete);
 
-            _disposableChunks.add(chunkToDelete);
+            chunkToDelete.freeBuffers();
         }
-    }
-
-    public void disposeUnusedChunks() {
-        for (Chunk c : _disposableChunks) {
-            c.disposeChunk();
-            _disposableChunks.remove(c);
-        }
-    }
-
-    /**
-     * @param key
-     * @return
-     */
-    public Chunk getChunkByKey(int key) {
-        return _chunkCache.get(Integer.valueOf(key));
     }
 
     /**
@@ -111,13 +102,15 @@ public final class ChunkCache {
      */
     public void saveAndDisposeAllChunks() {
         for (FastMap.Entry<Integer, Chunk> e = _chunkCache.head(), end = _chunkCache.tail(); (e = e.getNext()) != end; ) {
-            e.getValue().setCached(false);
-            e.getValue().writeChunkToDisk();
-            e.getValue().disposeChunk();
+            Chunk c = e.getValue();
+
+            c.setCached(false);
+            writeChunkToDisk(c);
+
+            c.freeBuffers();
         }
 
         _chunkCache.clear();
-        disposeUnusedChunks();
     }
 
     /**
@@ -132,5 +125,59 @@ public final class ChunkCache {
      */
     public static int capacity() {
         return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue()) + 1024;
+    }
+
+    private void writeChunkToDisk(Chunk c) {
+        if (Blockmania.getInstance().isSandboxed())
+            return;
+
+        if (c.isFresh()) {
+            return;
+        }
+
+        File dir = new File(_parent.getWorldSavePath());
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                Blockmania.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
+                return;
+            }
+        }
+
+        File f = new File((String.format("%s/%d.bc", _parent.getWorldSavePath(), c.getChunkId())));
+
+        try {
+            FileOutputStream fileOut = new FileOutputStream(f);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(c);
+            out.close();
+            fileOut.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Chunk loadChunkFromDisk(int id) {
+        File f = new File((String.format("%s/%d.bc", _parent.getWorldSavePath(), id)));
+
+        if (!f.exists())
+            return null;
+
+        try {
+            FileInputStream fileIn = new FileInputStream(f);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+
+            Chunk result = (Chunk) in.readObject();
+            result.setPosition(new Vector3f(Chunk.posXForId(id), 0, Chunk.posZForId(id)));
+            result.setParent(_parent);
+
+            in.close();
+            fileIn.close();
+
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

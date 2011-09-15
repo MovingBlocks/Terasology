@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world.chunk;
+package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.chunk.Chunk;
 import javolution.util.FastList;
 
 import java.util.Collections;
@@ -25,7 +25,7 @@ import java.util.Collections;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class ChunkUpdateManager {
+public final class WorldUpdateManager {
 
     private final FastList<Chunk> _vboUpdates = new FastList<Chunk>(128);
 
@@ -37,7 +37,7 @@ public final class ChunkUpdateManager {
     /**
      * @param _parent
      */
-    public ChunkUpdateManager(World _parent) {
+    public WorldUpdateManager(World _parent) {
         this._parent = _parent;
     }
 
@@ -73,46 +73,8 @@ public final class ChunkUpdateManager {
 
     private void processChunkUpdate(Chunk c) {
         if (c != null) {
-            /*
-             * Generate the chunk...
-             */
-            c.generate();
-
-            /*
-             * ... and fetch its neighbors...
-             */
-            Chunk[] neighbors = c.loadOrCreateNeighbors();
-
-            /*
-             * Before starting the illumination process, make sure that the neighbor chunks
-             * are present and generated.
-             */
-            for (int i = 0; i < neighbors.length; i++) {
-                if (neighbors[i] != null) {
-                    neighbors[i].generate();
-                }
-            }
-
-            /*
-             * If the light of this chunk is marked as dirty...
-             */
-            if (c.isLightDirty()) {
-                /*
-                 * ... propagate light into adjacent chunks...
-                 */
-                c.updateLight();
-            }
-
-            /*
-             * Check if this chunk was changed...
-             */
-            if (c.isDirty() && !c.isLightDirty() && !c.isFresh()) {
-                /*
-                 * ... if yes, regenerate the vertex arrays
-                 */
-                c.generateMesh();
+            if (c.processChunk())
                 _vboUpdates.add(c);
-            }
         }
     }
 

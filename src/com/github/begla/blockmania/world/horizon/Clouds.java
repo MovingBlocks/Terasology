@@ -43,12 +43,11 @@ public class Clouds implements RenderableObject {
     private boolean[][] _clouds;
     private int _dlClouds = -1;
 
-    private final Vector2f _cloudOffset = new Vector2f();
-    private final Vector2f _windDirection = new Vector2f(0.25f, 0);
-    private double _lastWindUpdate = 0;
+    private final Vector2f _cloudOffset = new Vector2f(), _windDirection = new Vector2f(0.25f, 0);
     private short _nextWindUpdateInSeconds = 32;
+    private double _lastWindUpdate = 0;
 
-    private World _parent;
+    private final World _parent;
 
     public Clouds(World parent) {
         _parent = parent;
@@ -102,7 +101,7 @@ public class Clouds implements RenderableObject {
 
     public void render() {
         glEnable(GL_BLEND);
-        GL11.glBlendFunc(770, 771);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         ShaderManager.getInstance().enableShader("cloud");
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("cloud"), "daylight");
@@ -116,15 +115,10 @@ public class Clouds implements RenderableObject {
                 glColorMask(true, true, true, true);
             }
 
-            /*
-            * Draw clouds.
-            */
-            if (_dlClouds > 0 && _parent.isDaytime()) {
-                glPushMatrix();
-                glTranslatef(_parent.getPlayer().getPosition().x + _cloudOffset.x, 140f, _parent.getPlayer().getPosition().z + _cloudOffset.y);
-                glCallList(_dlClouds);
-                glPopMatrix();
-            }
+            glPushMatrix();
+            glTranslatef(_parent.getPlayer().getPosition().x + _cloudOffset.x, 190f, _parent.getPlayer().getPosition().z + _cloudOffset.y);
+            glCallList(_dlClouds);
+            glPopMatrix();
         }
 
         ShaderManager.getInstance().enableShader(null);

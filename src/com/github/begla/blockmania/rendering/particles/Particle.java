@@ -29,8 +29,8 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class Particle implements RenderableObject {
     protected ParticleEmitter _parent;
 
-    protected final Vector3f _targetVelocity = new Vector3f(0.0f, -0.04f, 0.0f);
-    protected final Vector3f _velDecSpeed = new Vector3f(0.002f, 0.002f, 0.002f);
+    protected final Vector3f _targetVelocity = new Vector3f(0.0f, -0.03f, 0.0f);
+    protected final Vector3f _velDecSpeed = new Vector3f(0.004f, 0.004f, 0.004f);
 
     protected final Vector3f _position = new Vector3f();
     protected final Vector3f _velocity = new Vector3f();
@@ -38,12 +38,12 @@ public abstract class Particle implements RenderableObject {
 
     protected static final FastRandom _rand = new FastRandom();
 
-    protected int _lifeTime;
+    protected int _lifetime;
 
     public Particle(int lifeTime, Vector3f position, ParticleEmitter parent) {
         _position.set(position);
-        _velocity.set((float) _rand.randomDouble() / 15f, (float) _rand.randomDouble() / 15f, (float) _rand.randomDouble() / 15f);
-        _lifeTime = lifeTime;
+        _velocity.set((float) _rand.randomDouble() / 16f, (float) _rand.randomDouble() / 16f, (float) _rand.randomDouble() / 16f);
+        _lifetime = lifeTime;
         _orientation = _rand.randomInt() % 360;
         _parent = parent;
     }
@@ -93,12 +93,12 @@ public abstract class Particle implements RenderableObject {
     }
 
     protected void decLifetime() {
-        if (_lifeTime > 0)
-            _lifeTime--;
+        if (_lifetime > 0)
+            _lifetime--;
     }
 
     public boolean isAlive() {
-        return _lifeTime > 0;
+        return _lifetime > 0;
     }
 
     protected ParticleEmitter getParent() {

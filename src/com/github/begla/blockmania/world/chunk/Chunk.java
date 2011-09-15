@@ -19,20 +19,19 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
-import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.WorldProvider;
 import com.github.begla.blockmania.world.entity.StaticEntity;
 import javolution.util.FastList;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.logging.Level;
 
 /**
@@ -47,104 +46,58 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Chunk extends StaticEntity implements Comparable<Chunk> {
+public class Chunk extends StaticEntity implements Comparable<Chunk>, Externalizable {
 
-    private static final
+    protected static final
     Vector3f[] _lightDirections = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
     /* ------ */
+    protected boolean _dirty, _lightDirty, _fresh, _cached;
+    /* ------ */
+    protected Integer _chunkId = -1;
+    /* ------ */
+    protected WorldProvider _parent;
+    /* ------ */
+    protected final BlockmaniaArray _blocks;
+    protected final BlockmaniaSmartArray _sunlight, _light;
+    /* ------ */
+    protected AABB _aabb;
+    /* RENDERING */
     private static int _statVertexArrayUpdateCount = 0;
-    /* ------ */
-    private boolean _dirty;
-    private boolean _lightDirty;
-    private boolean _fresh;
-    private boolean _cached;
-    /* ------ */
-    private Integer _chunkId = -1;
     /* ------ */
     private ChunkMesh _activeMesh;
     private ChunkMesh _newMesh;
     /* ------ */
-    private final World _parent;
-    /* ------ */
-    private final BlockmaniaArray _blocks;
-    private final BlockmaniaSmartArray _sunlight;
-    private final BlockmaniaSmartArray _light;
-    /* ------ */
-    private final FastList<ChunkGenerator> _generators = new FastList<ChunkGenerator>();
-    /* ------ */
     private final ChunkMeshGenerator _meshGenerator;
-    /* ------ */
-    private AABB _aabb;
-    private final Vector3f _position = new Vector3f();
 
     public enum LIGHT_TYPE {
         BLOCK,
         SUN
     }
 
-    /**
-     * Init. the chunk with a parent world, an absolute position and a list
-     * of generators. The generators are applied when the chunk is generated.
-     *
-     * @param p        The parent world
-     * @param position The absolute position of the chunk within the world
-     * @param g        A list of generators which will be used to generate this chunk
-     */
-    public Chunk(World p, Vector3f position, FastList<ChunkGenerator> g) {
-        setPosition(position);
-        // Set the chunk ID
-        _chunkId = Integer.valueOf(MathHelper.cantorize((int) _position.x, (int) _position.z));
+    public Chunk() {
+        _meshGenerator = new ChunkMeshGenerator(this);
 
-        _parent = p;
         _blocks = new BlockmaniaArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
         _sunlight = new BlockmaniaSmartArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
         _light = new BlockmaniaSmartArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
-
-        _meshGenerator = new ChunkMeshGenerator(this);
 
         _lightDirty = true;
         _dirty = true;
         _fresh = true;
         _cached = false;
-
-
-        if (g != null)
-            _generators.addAll(g);
-    }
-
-    public void render() {
-        // Nothing to do
     }
 
     /**
-     * Draws the opaque or translucent elements of a chunk.
+     * Init. the chunk with a parent world and an absolute position.
      *
-     * @param type The type of vertices to render
+     * @param p        The parent world
+     * @param position The absolute position of the chunk within the world
      */
-    public void render(ChunkMesh.RENDER_TYPE type) {
-        // Render the generated chunk mesh
-        if (_activeMesh != null) {
-            _activeMesh.render(type);
-        }
-    }
+    public Chunk(WorldProvider p, Vector3f position) {
+        this();
 
-    public void update() {
-        if (_newMesh != null) {
-            // Do not update the mesh if one of the VISIBLE neighbors is dirty
-            for (Chunk nc : loadOrCreateNeighbors())
-                if ((nc.isDirty() || nc.isLightDirty()) && nc.isChunkInFrustum())
-                    return;
-
-            if (_newMesh.isGenerated() && !isDirty() && !isFresh() && !isLightDirty()) {
-                ChunkMesh oldMesh = _activeMesh;
-
-                if (oldMesh != null)
-                    oldMesh.disposeMesh();
-
-                _activeMesh = _newMesh;
-                _newMesh = null;
-            }
-        }
+        setPosition(position);
+        _parent = p;
     }
 
     /**
@@ -158,16 +111,9 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
             // Apply all generators to this chunk
             long timeStart = System.currentTimeMillis();
 
-            // Try to load the chunk from disk
-            if (loadChunkFromFile()) {
-                _fresh = false;
-                Blockmania.getInstance().getLogger().log(Level.FINEST, "Chunk ({1}) loaded from disk ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
-                return true;
-            }
-
-            for (FastList.Node<ChunkGenerator> n = _generators.head(), end = _generators.tail(); (n = n.getNext()) != end; ) {
-                n.getValue().generate(this);
-            }
+            _parent.getChunkGenerator("terrain").generate(this);
+            _parent.getChunkGenerator("resources").generate(this);
+            _parent.getChunkGenerator("forest").generate(this);
 
             generateSunlight();
             _fresh = false;
@@ -207,18 +153,6 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
             for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
                 refreshSunlightAtLocalPos(x, z, false, false);
             }
-        }
-    }
-
-    /**
-     * Generates the terrain mesh (creates the internal vertex arrays).
-     */
-    public void generateMesh() {
-        if (!_fresh) {
-            _newMesh = _meshGenerator.generateMesh();
-
-            setDirty(false);
-            _statVertexArrayUpdateCount++;
         }
     }
 
@@ -525,7 +459,7 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
      * @return The distance of the chunk to the player
      */
     public double distanceToPlayer() {
-        return Math.sqrt(Math.pow(getParent().getPlayer().getPosition().x - getChunkWorldPosX(), 2) + Math.pow(getParent().getPlayer().getPosition().z - getChunkWorldPosZ(), 2));
+        return Math.sqrt(Math.pow(getParent().getOrigin().x - getChunkWorldPosX(), 2) + Math.pow(getParent().getOrigin().z - getChunkWorldPosZ(), 2));
     }
 
     /**
@@ -590,129 +524,6 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
         }
     }
 
-    /**
-     * Saves this chunk to disk.
-     *
-     * @return True if the chunk was successfully written to the disk
-     */
-    public boolean writeChunkToDisk() {
-        // Don't save fresh chunks
-        if (_fresh) {
-            return false;
-        }
-
-        if (Blockmania.getInstance().isSandboxed()) {
-            return false;
-        }
-        // Generate the save directory if needed
-        File dir = new File(_parent.getWorldSavePath());
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                Blockmania.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
-                return false;
-            }
-        }
-
-        ByteBuffer output = BufferUtils.createByteBuffer(_blocks.getSize() + _sunlight.getPackedSize() + _light.getPackedSize() + 1);
-        File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), getChunkId()));
-
-        // Save flags...
-        byte flags = 0x0;
-        if (_lightDirty) {
-            flags = Helper.setFlag(flags, (short) 0);
-        }
-
-        // The flags are stored within the first byte of the file...
-        output.put(flags);
-
-
-        for (int i = 0; i < _blocks.getSize(); i++)
-            output.put(_blocks.getRawByte(i));
-
-        for (int i = 0; i < _sunlight.getPackedSize(); i++)
-            output.put(_sunlight.getRawByte(i));
-
-        for (int i = 0; i < _light.getPackedSize(); i++)
-            output.put(_light.getRawByte(i));
-
-        output.rewind();
-
-        try {
-            FileOutputStream oS = new FileOutputStream(f);
-            FileChannel c = oS.getChannel();
-            c.write(output);
-            Blockmania.getInstance().getLogger().log(Level.FINE, "Wrote chunk {0} to disk.", this);
-            oS.close();
-        } catch (FileNotFoundException ex) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
-            return false;
-        } catch (IOException ex) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Loads this chunk from the disk (if present).
-     *
-     * @return True if the chunk was successfully loaded
-     */
-    public boolean loadChunkFromFile() {
-        if (Blockmania.getInstance().isSandboxed()) {
-            return false;
-        }
-
-        ByteBuffer input = BufferUtils.createByteBuffer(_blocks.getSize() + _sunlight.getPackedSize() + _light.getPackedSize() + 1);
-        File f = new File(String.format("%s/%d.bc", getParent().getWorldSavePath(), getChunkId()));
-
-        if (!f.exists()) {
-            return false;
-        }
-
-        try {
-            FileInputStream iS = new FileInputStream(f);
-            FileChannel c = iS.getChannel();
-            c.read(input);
-            Blockmania.getInstance().getLogger().log(Level.FINE, "Loaded chunk {0} from disk.", this);
-            iS.close();
-        } catch (FileNotFoundException ex) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
-            return false;
-        } catch (IOException ex) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
-            return false;
-        }
-
-        input.rewind();
-
-        // The first byte contains the flags...
-        byte flags = input.get();
-        // Parse the flags...
-        _lightDirty = Helper.isFlagSet(flags, (short) 0);
-
-        for (int i = 0; i < _blocks.getSize(); i++)
-            _blocks.setRawByte(i, input.get());
-
-        for (int i = 0; i < _sunlight.getPackedSize(); i++)
-            _sunlight.setRawByte(i, input.get());
-
-        for (int i = 0; i < _light.getPackedSize(); i++)
-            _light.setRawByte(i, input.get());
-
-        return true;
-    }
-
-    public void disposeChunk() {
-        if (_newMesh != null)
-            _newMesh.disposeMesh();
-        _newMesh = null;
-        if (_activeMesh != null)
-            _activeMesh.disposeMesh();
-        _activeMesh = null;
-    }
-
     @Override
     public String toString() {
         return String.format("Chunk (%d) at %s.", getChunkId(), _position);
@@ -729,17 +540,13 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
             return 0;
         }
 
-        if (getParent().getPlayer() != null) {
-            double distance = distanceToPlayer();
-            double distance2 = o.distanceToPlayer();
+        double distance = distanceToPlayer();
+        double distance2 = o.distanceToPlayer();
 
-            if (distance == distance2)
-                return 0;
+        if (distance == distance2)
+            return 0;
 
-            return distance2 > distance ? -1 : 1;
-        }
-
-        return getChunkId().compareTo(o.getChunkId());
+        return distance2 > distance ? -1 : 1;
     }
 
     public AABB getAABB() {
@@ -749,6 +556,113 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
             _aabb = new AABB(position, dimensions);
         }
         return _aabb;
+    }
+
+    public boolean processChunk() {
+        /*
+        * Generate the chunk...
+        */
+        generate();
+
+        /*
+        * ... and fetch its neighbors...
+        */
+        Chunk[] neighbors = loadOrCreateNeighbors();
+
+        /*
+        * Before starting the illumination process, make sure that the neighbor chunks
+        * are present and generated.
+        */
+        for (int i = 0; i < neighbors.length; i++) {
+            if (neighbors[i] != null) {
+                neighbors[i].generate();
+            }
+        }
+
+        /*
+        * If the light of this chunk is marked as dirty...
+        */
+        if (isLightDirty()) {
+            /*
+            * ... propagate light into adjacent chunks...
+            */
+            updateLight();
+        }
+
+        /*
+        * Check if this chunk was changed...
+        */
+        if (isDirty() && !isLightDirty() && !isFresh()) {
+            /*
+            * ... if yes, regenerate the vertex arrays
+            */
+            generateMesh();
+            return true;
+        }
+
+        return false;
+    }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+        // Save flags...
+        byte flags = 0x0;
+        if (_lightDirty) {
+            flags = Helper.setFlag(flags, (short) 0);
+        }
+
+        // The flags are stored within the first byte of the file...
+        out.writeByte(flags);
+
+        for (int i = 0; i < _blocks.getSize(); i++)
+            out.writeByte(_blocks.getRawByte(i));
+
+        for (int i = 0; i < _sunlight.getPackedSize(); i++)
+            out.writeByte(_sunlight.getRawByte(i));
+
+        for (int i = 0; i < _light.getPackedSize(); i++)
+            out.writeByte(_light.getRawByte(i));
+    }
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        // The first byte contains the flags...
+        byte flags = in.readByte();
+        // Parse the flags...
+        _lightDirty = Helper.isFlagSet(flags, (short) 0);
+
+        for (int i = 0; i < _blocks.getSize(); i++)
+            _blocks.setRawByte(i, in.readByte());
+
+        for (int i = 0; i < _sunlight.getPackedSize(); i++)
+            _sunlight.setRawByte(i, in.readByte());
+
+        for (int i = 0; i < _light.getPackedSize(); i++)
+            _light.setRawByte(i, in.readByte());
+
+        _fresh = false;
+    }
+
+    public static int idForPosition(Vector3f position) {
+        return MathHelper.cantorize(MathHelper.mapToPositive((int) position.x), MathHelper.mapToPositive((int) position.z));
+    }
+
+    public static int posXForId(int id) {
+        return MathHelper.redoMapToPositive(MathHelper.cantorX(id));
+    }
+
+    public static int posZForId(int id) {
+        return MathHelper.redoMapToPositive(MathHelper.cantorY(id));
+    }
+
+    /**
+     * Generates the terrain mesh (creates the internal vertex arrays).
+     */
+    public void generateMesh() {
+        if (!_fresh) {
+            _newMesh = _meshGenerator.generateMesh();
+
+            setDirty(false);
+            _statVertexArrayUpdateCount++;
+        }
     }
 
 
@@ -764,11 +678,62 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
         }
     }
 
+
+    /**
+     * Draws the opaque or translucent elements of a chunk.
+     *
+     * @param type The type of vertices to render
+     */
+    public void render(ChunkMesh.RENDER_TYPE type) {
+        // Render the generated chunk mesh
+        if (_activeMesh != null) {
+            _activeMesh.render(type);
+        }
+    }
+
+    public void update() {
+        if (_newMesh != null) {
+            // Do not update the mesh if one of the VISIBLE neighbors is dirty
+            for (Chunk nc : loadOrCreateNeighbors())
+                if ((nc.isDirty() || nc.isLightDirty()) && _parent.isChunkVisible(nc))
+                    return;
+
+            if (_newMesh.isGenerated() && !isDirty() && !isFresh() && !isLightDirty()) {
+                ChunkMesh oldMesh = _activeMesh;
+
+                if (oldMesh != null)
+                    oldMesh.disposeMesh();
+
+                _activeMesh = _newMesh;
+                _newMesh = null;
+            }
+        }
+    }
+
+    public void render() {
+        // Nothing to do
+    }
+
+    public void freeBuffers() {
+        if (_newMesh != null)
+            _newMesh.disposeMesh();
+        _newMesh = null;
+        if (_activeMesh != null)
+            _activeMesh.disposeMesh();
+        _activeMesh = null;
+    }
+
+    public static int getVertexArrayUpdateCount() {
+        return _statVertexArrayUpdateCount;
+    }
+
+
     /**
      * Returns the position of the chunk within the world.
      *
      * @return The world position
      */
+
     int getChunkWorldPosX() {
         return (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
     }
@@ -802,12 +767,8 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
         return z + getChunkWorldPosZ();
     }
 
-    public World getParent() {
+    public WorldProvider getParent() {
         return _parent;
-    }
-
-    public static int getVertexArrayUpdateCount() {
-        return _statVertexArrayUpdateCount;
     }
 
     public boolean isDirty() {
@@ -838,20 +799,16 @@ public final class Chunk extends StaticEntity implements Comparable<Chunk> {
         _cached = b;
     }
 
-    @SuppressWarnings({"UnusedDeclaration"})
     public boolean isCached() {
         return _cached;
     }
 
-    public boolean isChunkInFrustum() {
-        return _parent.getPlayer().getViewFrustum().intersects(getAABB());
-    }
-
-    public Vector3f getPosition() {
-        return _position;
-    }
-
     public void setPosition(Vector3f position) {
-        _position.set(position);
+        super.setPosition(position);
+        _chunkId = Chunk.idForPosition(position);
+    }
+
+    public void setParent(WorldProvider parent) {
+        _parent = parent;
     }
 }

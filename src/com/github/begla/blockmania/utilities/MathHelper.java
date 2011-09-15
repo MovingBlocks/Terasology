@@ -47,6 +47,14 @@ public class MathHelper {
         return -x * 2 - 1;
     }
 
+    public static int redoMapToPositive(int x) {
+        if (x % 2 == 0) {
+            return x/2;
+        }
+
+        return -(x / 2) - 1;
+    }
+
     /**
      * Applies Cantor's pairing function to 2D coordinates.
      *
@@ -55,9 +63,6 @@ public class MathHelper {
      * @return Unique 1D value
      */
     public static int cantorize(int k1, int k2) {
-        k1 = mapToPositive(k1);
-        k2 = mapToPositive(k2);
-
         return ((k1 + k2) * (k1 + k2 + 1) / 2) + k2;
     }
 
@@ -78,7 +83,7 @@ public class MathHelper {
      * @param c Cantor value
      * @return Value along the y-axis
      */
-    private static int cantorY(int c) {
+    public static int cantorY(int c) {
         int j = (int) (Math.sqrt(0.25 + 2 * c) - 0.5);
         return c - j * (j + 1) / 2;
     }
