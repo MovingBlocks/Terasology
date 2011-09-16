@@ -17,6 +17,7 @@ package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.world.chunk.Chunk;
 import javolution.util.FastList;
+import javolution.util.FastSet;
 
 import java.util.Collections;
 
@@ -28,6 +29,7 @@ import java.util.Collections;
 public final class WorldUpdateManager {
 
     private final FastList<Chunk> _vboUpdates = new FastList<Chunk>(128);
+    private final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
 
     private double _meanUpdateDuration = 0.0;
     private final World _parent;
@@ -44,7 +46,7 @@ public final class WorldUpdateManager {
     public void processChunkUpdates() {
         long timeStart = System.currentTimeMillis();
 
-        FastList<Chunk> dirtyChunks = new FastList<Chunk>(_parent.getVisibleChunks());
+        final FastList<Chunk> dirtyChunks = new FastList<Chunk>(_parent.getVisibleChunks());
 
         for (int i = dirtyChunks.size() - 1; i >= 0; i--) {
             Chunk c = dirtyChunks.get(i);
@@ -59,14 +61,41 @@ public final class WorldUpdateManager {
             }
         }
 
-        if (!dirtyChunks.isEmpty()) {
-            Collections.sort(dirtyChunks);
-            Chunk closestChunk = dirtyChunks.getFirst();
-            processChunkUpdate(closestChunk);
+        Collections.sort(dirtyChunks);
+
+        if (dirtyChunks.isEmpty()) {
+            return;
+        }
+
+        final Chunk chunkToProcess = dirtyChunks.removeFirst();
+
+        if (!_currentlyProcessedChunks.contains(chunkToProcess)) {
+
+            _currentlyProcessedChunks.add(chunkToProcess);
+
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    synchronized (_currentlyProcessedChunks) {
+                        if (_currentlyProcessedChunks.size() > Runtime.getRuntime().availableProcessors() / 2) {
+                            try {
+                                _currentlyProcessedChunks.wait();
+                            } catch (InterruptedException e) {
+                            }
+                        }
+                    }
+                    processChunkUpdate(chunkToProcess);
+                    synchronized (_currentlyProcessedChunks) {
+                        _currentlyProcessedChunks.remove(chunkToProcess);
+                        _currentlyProcessedChunks.notify();
+                    }
+                }
+            };
+
+            t.start();
         }
 
         _chunkUpdateAmount = dirtyChunks.size();
-
         _meanUpdateDuration += System.currentTimeMillis() - timeStart;
         _meanUpdateDuration /= 2;
     }
