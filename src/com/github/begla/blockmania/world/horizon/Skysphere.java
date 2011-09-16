@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world.horizon;
 
+import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.world.World;
@@ -105,7 +106,10 @@ public class Skysphere implements RenderableObject {
     }
 
     public void update() {
-        // Nothing to do?
+        if (_parent.getActiveBiome() == ChunkGeneratorTerrain.BIOME_TYPE.SNOW)
+            _turbidity = 10;
+        else
+            _turbidity = 5;
     }
 
     public float getSunPosAngle() {

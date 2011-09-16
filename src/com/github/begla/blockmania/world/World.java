@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.rendering.ShaderManager;
@@ -245,6 +246,7 @@ public final class World extends WorldProvider {
     public void update() {
         updateDaylight();
         updateTicks();
+        _skysphere.update();
 
         // Update the player
         _player.update();
@@ -271,12 +273,6 @@ public final class World extends WorldProvider {
         }
     }
 
-    public void setPlayer(Player p) {
-        _player = p;
-        // Reset the player's position
-        resetPlayer();
-    }
-
     /**
      * Chunk position of the player.
      *
@@ -295,17 +291,22 @@ public final class World extends WorldProvider {
         return (int) (_player.getPosition().z / Configuration.CHUNK_DIMENSIONS.z);
     }
 
+    public void setPlayer(Player p) {
+        _player = p;
+        // Reset the player's position
+        resetPlayer();
+    }
+
     public void resetPlayer() {
         _player.resetEntity();
         _player.setPosition(getSpawningPoint());
     }
 
-    public FastList<Chunk> getVisibleChunks() {
-        return _visibleChunks;
-    }
-
-    public BlockParticleEmitter getBlockParticleEmitter() {
-        return _blockParticleEmitter;
+    /*
+     * Returns the active biome at the player's position.
+     */
+    public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome() {
+        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcBiomeTypeForGlobalPosition((int) _player.getPosition().x, (int) _player.getPosition().z);
     }
 
     /**
@@ -388,5 +389,13 @@ public final class World extends WorldProvider {
      */
     public double getDaylight() {
         return _daylight;
+    }
+
+    public FastList<Chunk> getVisibleChunks() {
+        return _visibleChunks;
+    }
+
+    public BlockParticleEmitter getBlockParticleEmitter() {
+        return _blockParticleEmitter;
     }
 }

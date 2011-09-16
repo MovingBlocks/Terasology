@@ -26,8 +26,8 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
-    private static final int SAMPLE_RATE_3D_HOR = 8;
-    private static final int SAMPLE_RATE_3D_VERT = 4;
+    protected static final int SAMPLE_RATE_3D_HOR = 8;
+    protected static final int SAMPLE_RATE_3D_VERT = 4;
 
     public enum BIOME_TYPE {
         MOUNTAINS, SNOW, DESERT, PLAINS
@@ -52,7 +52,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
          */
         for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x += SAMPLE_RATE_3D_HOR) {
             for (int z = 0; z <= Configuration.CHUNK_DIMENSIONS.z; z += SAMPLE_RATE_3D_HOR) {
-                BIOME_TYPE type = calcBiomeType(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+                BIOME_TYPE type = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
                 for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.y; y += SAMPLE_RATE_3D_VERT) {
                     densityMap[x][y][z] = calcDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z), type);
@@ -70,7 +70,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
          */
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
-                BIOME_TYPE type = calcBiomeType(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+                BIOME_TYPE type = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
                 int firstBlockHeight = -1;
 
                 for (int y = (int) Configuration.CHUNK_DIMENSIONS.y; y >= 0; y--) {
@@ -119,11 +119,25 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    private void GenerateInnerLayer(int x, int y, int z, Chunk c, BIOME_TYPE type) {
+    public BIOME_TYPE calcBiomeTypeForGlobalPosition(int x, int z) {
+        double temp = calcTemperature(x, z);
+
+        if (temp >= 60) {
+            return BIOME_TYPE.DESERT;
+        } else if (temp >= 32) {
+            return BIOME_TYPE.MOUNTAINS;
+        } else if (temp < 8) {
+            return BIOME_TYPE.SNOW;
+        }
+
+        return BIOME_TYPE.PLAINS;
+    }
+
+    protected void GenerateInnerLayer(int x, int y, int z, Chunk c, BIOME_TYPE type) {
         c.setBlock(x, y, z, (byte) 0x3);
     }
 
-    private void GenerateOuterLayer(int x, int y, int z, int firstBlockHeight, Chunk c, BIOME_TYPE type) {
+    protected void GenerateOuterLayer(int x, int y, int z, int firstBlockHeight, Chunk c, BIOME_TYPE type) {
 
         double heightPercentage = (firstBlockHeight - y) / Configuration.CHUNK_DIMENSIONS.y;
 
@@ -176,7 +190,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    private void generateRiver(Chunk c, int x, int y, int z, double heightPercentage, BIOME_TYPE type) {
+    protected void generateRiver(Chunk c, int x, int y, int z, double heightPercentage, BIOME_TYPE type) {
         // Rivers under water? Nope.
         if (y <= 32)
             return;
@@ -194,24 +208,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    protected BIOME_TYPE calcBiomeType(int x, int z) {
-        double temp = calcTemperature(x, z);
-
-        if (temp >= 60) {
-            return BIOME_TYPE.DESERT;
-        } else if (temp >= 32) {
-            return BIOME_TYPE.MOUNTAINS;
-        } else if (temp < 8) {
-            return BIOME_TYPE.SNOW;
-        }
-
-        return BIOME_TYPE.PLAINS;
-    }
-
     /**
      * @param densityMap
      */
-    private void triLerpDensityMap(double[][][] densityMap) {
+    protected void triLerpDensityMap(double[][][] densityMap) {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
@@ -297,12 +297,6 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         return (result / ampSum);
     }
 
-
-    /**
-     * @param x
-     * @param z
-     * @return
-     */
     protected double calcLakeIntensity(double x, double z) {
         double result = 0.0;
         result += _pGen3.fBm(x * 0.01, 0.01, 0.01 * z, 3, 2.1836171, 0.9631);

@@ -51,7 +51,7 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
         for (int x = -512; x < 512; x++) {
             for (int y = -512; y < 512; y++) {
-                BIOME_TYPE n = calcBiomeType(x * zoomOut, y * zoomOut);
+                BIOME_TYPE n = calcBiomeTypeForGlobalPosition(x * zoomOut, y * zoomOut);
 
                 Color color = Color.BLACK;
 
