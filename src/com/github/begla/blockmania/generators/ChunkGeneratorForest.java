@@ -50,7 +50,7 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
             }
         }
 
-        FastRandom rand = new FastRandom(c.getChunkId());
+        FastRandom rand = new FastRandom(c.hashCode());
 
         for (int y = 32; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x += 4) {

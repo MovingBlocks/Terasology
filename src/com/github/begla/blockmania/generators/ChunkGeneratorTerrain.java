@@ -314,7 +314,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     protected double calcCaveDensity(double x, double y, double z) {
         double result = 0.0;
-        result += _pGen6.fBm(x * 0.06, y * 0.06, z * 0.06, 2, 2.1287129, 0.8531);
+        result += _pGen6.fBm(x * 0.04, y * 0.04, z * 0.04, 2, 2.0, 0.98);
         return result;
     }
 }

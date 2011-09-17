@@ -49,7 +49,7 @@ public final class World extends WorldProvider {
     /* PLAYER */
     private Player _player;
     /* RENDERING */
-    private FastList<Chunk> _visibleChunks = new FastList(128);
+    private FastList<Chunk> _visibleChunks = new FastList(256);
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
     /* HORIZON */
@@ -64,6 +64,7 @@ public final class World extends WorldProvider {
     private final Thread _updateThread;
     private final WorldUpdateManager _worldUpdateManager;
     private boolean _updatingEnabled = false, _updateThreadAlive = true;
+    private int prevChunkPosX = 0, prevChunkPosZ = 0;
 
     /**
      * Initializes a new world for the single player mode.
@@ -105,7 +106,9 @@ public final class World extends WorldProvider {
                         }
                     }
 
+                    updateVisibleChunks();
                     _worldUpdateManager.processChunkUpdates();
+                    _chunkCache.freeCacheSpace();
                 }
             }
         });
@@ -143,20 +146,22 @@ public final class World extends WorldProvider {
     }
 
     private void updateVisibleChunks() {
-        _visibleChunks.clear();
+        if (prevChunkPosX == calcPlayerChunkOffsetX() && prevChunkPosX == calcPlayerChunkOffsetX())
+            return;
+
+        prevChunkPosX = calcPlayerChunkOffsetX();
+        prevChunkPosZ = calcPlayerChunkOffsetZ();
+        FastList<Chunk> visibleChunks = new FastList<Chunk>();
 
         for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
             for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
 
-                Chunk c = getChunkCache().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
-
-                if (c != null) {
-                    if (getPlayer().getViewFrustum().intersects(c.getAABB())) {
-                        _visibleChunks.add(c);
-                    }
-                }
+                Chunk c = getChunkCache().loadOrCreateChunk(prevChunkPosX + x, prevChunkPosZ + z);
+                visibleChunks.add(c);
             }
         }
+
+        _visibleChunks = visibleChunks;
     }
 
 
@@ -188,8 +193,6 @@ public final class World extends WorldProvider {
         GL20.glUniform1i(swimmimg, _player.isHeadUnderWater() ? 1 : 0);
 
         glEnable(GL_TEXTURE_2D);
-
-        updateVisibleChunks();
 
         // OPAQUE ELEMENTS
         for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
@@ -261,9 +264,6 @@ public final class World extends WorldProvider {
 
         // Update the particle emitters
         updateParticleEmitters();
-
-        // And finally free cache space if the cache is full
-        getChunkCache().freeCacheSpace();
     }
 
     private void updateTicks() {
@@ -323,7 +323,6 @@ public final class World extends WorldProvider {
         try {
             _updateThread.join();
         } catch (InterruptedException e) {
-
         }
 
         saveMetaData();

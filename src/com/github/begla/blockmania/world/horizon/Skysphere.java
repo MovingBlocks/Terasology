@@ -107,9 +107,9 @@ public class Skysphere implements RenderableObject {
 
     public void update() {
         if (_parent.getActiveBiome() == ChunkGeneratorTerrain.BIOME_TYPE.SNOW)
-            _turbidity = 10;
+            _turbidity = 14;
         else
-            _turbidity = 5;
+            _turbidity = 10;
     }
 
     public float getSunPosAngle() {
