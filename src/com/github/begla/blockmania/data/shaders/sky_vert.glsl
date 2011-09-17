@@ -42,7 +42,7 @@ vec3	allweatherSky ( float t, float cosTheta, float cosGamma, float cosThetaSun 
 	vec3	clrYxy   = zenith * allweather ( t, cosTheta, cosGamma ) / allweather ( t, 1.0, cosThetaSun );
   
  if(cosTheta<0.35){
-   thetaSun=0;
+   thetaSun=0.0;
   }
 
 	//clrYxy [0] *= smoothstep ( 0.0, EPS, thetaSun);
