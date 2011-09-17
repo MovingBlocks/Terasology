@@ -65,6 +65,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     private ChunkMesh _newMesh;
     /* ------ */
     private final ChunkMeshGenerator _meshGenerator;
+    /* ------ */
+    private boolean _visible = false;
 
     public enum LIGHT_TYPE {
         BLOCK,
@@ -695,15 +697,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (_newMesh != null) {
             // Do not update the mesh if one of the VISIBLE neighbors is dirty
             for (Chunk nc : loadOrCreateNeighbors())
-                if ((nc.isDirty() || nc.isLightDirty()) && _parent.isChunkVisible(nc))
+                if ((nc.isDirty() || nc.isLightDirty()) && nc.isVisible())
                     return;
 
             if (_newMesh.isGenerated() && !isDirty() && !isFresh() && !isLightDirty()) {
-                ChunkMesh oldMesh = _activeMesh;
-
-                if (oldMesh != null)
-                    oldMesh.disposeMesh();
-
                 _activeMesh = _newMesh;
                 _newMesh = null;
             }
@@ -712,15 +709,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public void render() {
         // Nothing to do
-    }
-
-    public synchronized void freeBuffers() {
-        if (_newMesh != null)
-            _newMesh.disposeMesh();
-        _newMesh = null;
-        if (_activeMesh != null)
-            _activeMesh.disposeMesh();
-        _activeMesh = null;
     }
 
     public static int getVertexArrayUpdateCount() {
@@ -827,5 +815,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public String getChunkFileName() {
         return Chunk.getChunkFileNameForPosition(_position);
+    }
+
+    public void setVisible(boolean visible) {
+        _visible = visible;
+    }
+
+    public boolean isVisible() {
+        return _visible;
     }
 }

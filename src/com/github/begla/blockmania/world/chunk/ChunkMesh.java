@@ -154,17 +154,4 @@ public class ChunkMesh {
     public boolean isGenerated() {
         return _generated;
     }
-
-    public void disposeMesh() {
-        IntBuffer ib = BufferUtils.createIntBuffer(_vertexBuffers.length + _idxBuffers.length);
-        for (int i = 0; i < _vertexBuffers.length; i++) {
-            ib.put(_idxBuffers[i]);
-            ib.put(_vertexBuffers[i]);
-            _idxBuffers[i] = -1;
-            _vertexBuffers[i] = -1;
-        }
-        ib.flip();
-
-        ARBVertexBufferObject.glDeleteBuffersARB(ib);
-    }
 }

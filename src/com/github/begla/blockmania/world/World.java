@@ -28,7 +28,6 @@ import com.github.begla.blockmania.world.horizon.Clouds;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import com.github.begla.blockmania.world.horizon.SunMoon;
 import javolution.util.FastList;
-import javolution.util.FastSet;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -49,12 +48,12 @@ public final class World extends WorldProvider {
     /* PLAYER */
     private Player _player;
     /* RENDERING */
-    private FastList<Chunk> _visibleChunks = new FastList(256);
+    private FastList<Chunk> _chunksInProximity = new FastList();
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
     /* HORIZON */
     private final Clouds _clouds;
-    private final SunMoon _sunMoon;
+    //private final SunMoon _sunMoon;
     private final Skysphere _skysphere;
     protected double _daylight = 1.0f;
     /* WATER AND LAVA ANIMATION */
@@ -77,7 +76,7 @@ public final class World extends WorldProvider {
 
         // Init. horizon
         _clouds = new Clouds(this);
-        _sunMoon = new SunMoon(this);
+        //_sunMoon = new SunMoon(this);
         _skysphere = new Skysphere(this);
 
         _worldUpdateManager = new WorldUpdateManager(this);
@@ -106,7 +105,7 @@ public final class World extends WorldProvider {
                         }
                     }
 
-                    updateVisibleChunks();
+                    updateChunksInProximity();
                     _worldUpdateManager.processChunkUpdates();
                     _chunkCache.freeCacheSpace();
                 }
@@ -145,23 +144,22 @@ public final class World extends WorldProvider {
         _blockParticleEmitter.update();
     }
 
-    private void updateVisibleChunks() {
-        if (prevChunkPosX == calcPlayerChunkOffsetX() && prevChunkPosX == calcPlayerChunkOffsetX())
-            return;
+    private void updateChunksInProximity() {
+        if (prevChunkPosX != calcPlayerChunkOffsetX() || prevChunkPosZ != calcPlayerChunkOffsetZ()) {
+            prevChunkPosX = calcPlayerChunkOffsetX();
+            prevChunkPosZ = calcPlayerChunkOffsetZ();
 
-        prevChunkPosX = calcPlayerChunkOffsetX();
-        prevChunkPosZ = calcPlayerChunkOffsetZ();
-        FastList<Chunk> visibleChunks = new FastList<Chunk>();
+            FastList<Chunk> newChunksInProximity = new FastList<Chunk>();
 
-        for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
-            for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
-
-                Chunk c = getChunkCache().loadOrCreateChunk(prevChunkPosX + x, prevChunkPosZ + z);
-                visibleChunks.add(c);
+            for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
+                for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
+                    Chunk c = getChunkCache().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
+                    newChunksInProximity.add(c);
+                }
             }
-        }
 
-        _visibleChunks = visibleChunks;
+            _chunksInProximity = newChunksInProximity;
+        }
     }
 
 
@@ -181,6 +179,25 @@ public final class World extends WorldProvider {
         }
     }
 
+    private FastList<Chunk> fetchVisibleChunks() {
+        FastList<Chunk> result = new FastList<Chunk>();
+        FastList<Chunk> chunksInPromity = _chunksInProximity;
+
+        for (FastList.Node<Chunk> n = chunksInPromity.head(), end = chunksInPromity.tail(); (n = n.getNext()) != end; ) {
+            Chunk c = n.getValue();
+
+            if (isChunkVisible(c)) {
+                c.setVisible(true);
+                result.add(c);
+                continue;
+            }
+
+            c.setVisible(false);
+        }
+
+        return result;
+    }
+
     private void renderChunks() {
 
         ShaderManager.getInstance().enableShader("chunk");
@@ -192,11 +209,13 @@ public final class World extends WorldProvider {
         GL20.glUniform1i(animationType, 0);
         GL20.glUniform1i(swimmimg, _player.isHeadUnderWater() ? 1 : 0);
 
+        FastList<Chunk> visibleChunks = fetchVisibleChunks();
+
         glEnable(GL_TEXTURE_2D);
 
         // OPAQUE ELEMENTS
-        for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            Chunk c = _visibleChunks.valueOf(n);
+        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            Chunk c = n.getValue();
 
             GL20.glUniform1i(animationType, 0);
             TextureManager.getInstance().bindTexture("terrain");
@@ -206,7 +225,7 @@ public final class World extends WorldProvider {
             GL20.glUniform1i(animationType, 1);
             GL20.glUniform1f(animationOffset, ((float) (_tick % 16)) * (1.0f / 16f));
             TextureManager.getInstance().bindTexture("custom_lava_still");
-            _visibleChunks.valueOf(n).render(ChunkMesh.RENDER_TYPE.LAVA);
+            visibleChunks.valueOf(n).render(ChunkMesh.RENDER_TYPE.LAVA);
 
             if (Configuration.getSettingBoolean("CHUNK_OUTLINES")) {
                 c.getAABB().render();
@@ -217,15 +236,17 @@ public final class World extends WorldProvider {
         TextureManager.getInstance().bindTexture("terrain");
 
         // BILLBOARDS AND TRANSLUCENT ELEMENTS
-        for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            _visibleChunks.valueOf(n).render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
+        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            Chunk c = n.getValue();
+            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
         }
 
         GL20.glUniform1i(animationType, 1);
 
         for (int i = 0; i < 2; i++) {
             // ANIMATED WATER
-            for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
+                Chunk c = n.getValue();
 
                 if (i == 0) {
                     glColorMask(false, false, false, false);
@@ -235,7 +256,7 @@ public final class World extends WorldProvider {
 
                 GL20.glUniform1f(animationOffset, ((float) (_tick / 2 % 12)) * (1.0f / 16f));
                 TextureManager.getInstance().bindTexture("custom_water_still");
-                _visibleChunks.valueOf(n).render(ChunkMesh.RENDER_TYPE.WATER);
+                c.render(ChunkMesh.RENDER_TYPE.WATER);
             }
         }
 
@@ -259,8 +280,8 @@ public final class World extends WorldProvider {
         _clouds.update();
 
         // Update chunks
-        for (FastSet.Record n = _visibleChunks.head(), end = _visibleChunks.tail(); (n = n.getNext()) != end; )
-            _visibleChunks.valueOf(n).update();
+        for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; )
+            n.getValue().update();
 
         // Update the particle emitters
         updateParticleEmitters();
@@ -390,8 +411,8 @@ public final class World extends WorldProvider {
         return _daylight;
     }
 
-    public FastList<Chunk> getVisibleChunks() {
-        return _visibleChunks;
+    public FastList<Chunk> getChunksInProximity() {
+        return _chunksInProximity;
     }
 
     public BlockParticleEmitter getBlockParticleEmitter() {
