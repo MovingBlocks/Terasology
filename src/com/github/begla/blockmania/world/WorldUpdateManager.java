@@ -78,7 +78,7 @@ public final class WorldUpdateManager {
             Thread t = new Thread() {
                 @Override
                 public void run() {
-                    while (_threadCount > Runtime.getRuntime().availableProcessors()) {
+                    while (_threadCount > Math.max(Runtime.getRuntime().availableProcessors()/2, 1)) {
                         synchronized (_currentlyProcessedChunks) {
                             try {
                                 _currentlyProcessedChunks.wait();
