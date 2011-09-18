@@ -19,6 +19,8 @@ import com.github.begla.blockmania.rendering.RenderableObject;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 
+import java.util.Vector;
+
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -137,20 +139,21 @@ public class AABB implements RenderableObject {
     }
 
     public Vector3f[] getVertices() {
-
         if (_vertices == null) {
-            _vertices = new Vector3f[8];
+            Vector3f[] vertices = new Vector3f[8];
 
             // Front
-            _vertices[0] = new Vector3f((float) minX(), (float) minY(), (float) maxZ());
-            _vertices[1] = new Vector3f((float) maxX(), (float) minY(), (float) maxZ());
-            _vertices[2] = new Vector3f((float) maxX(), (float) maxY(), (float) maxZ());
-            _vertices[3] = new Vector3f((float) minX(), (float) maxY(), (float) maxZ());
+            vertices[0] = new Vector3f((float) minX(), (float) minY(), (float) maxZ());
+            vertices[1] = new Vector3f((float) maxX(), (float) minY(), (float) maxZ());
+            vertices[2] = new Vector3f((float) maxX(), (float) maxY(), (float) maxZ());
+            vertices[3] = new Vector3f((float) minX(), (float) maxY(), (float) maxZ());
             // Back
-            _vertices[4] = new Vector3f((float) minX(), (float) minY(), (float) minZ());
-            _vertices[5] = new Vector3f((float) maxX(), (float) minY(), (float) minZ());
-            _vertices[6] = new Vector3f((float) maxX(), (float) maxY(), (float) minZ());
-            _vertices[7] = new Vector3f((float) minX(), (float) maxY(), (float) minZ());
+            vertices[4] = new Vector3f((float) minX(), (float) minY(), (float) minZ());
+            vertices[5] = new Vector3f((float) maxX(), (float) minY(), (float) minZ());
+            vertices[6] = new Vector3f((float) maxX(), (float) maxY(), (float) minZ());
+            vertices[7] = new Vector3f((float) minX(), (float) maxY(), (float) minZ());
+
+            _vertices = vertices;
         }
 
         return _vertices;

@@ -650,6 +650,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             _light.setRawByte(i, in.readByte());
 
         _fresh = false;
+        _dirty = true;
     }
 
     /**

@@ -178,7 +178,7 @@ public final class World extends WorldProvider {
         }
     }
 
-    private FastList<Chunk> fetchVisibleChunks() {
+    public FastList<Chunk> fetchVisibleChunks() {
         FastList<Chunk> result = new FastList<Chunk>();
         FastList<Chunk> chunksInPromity = _chunksInProximity;
 

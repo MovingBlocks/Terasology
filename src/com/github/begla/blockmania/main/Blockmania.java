@@ -112,11 +112,12 @@ public final class Blockmania {
 
             blockmania.initDisplay();
             blockmania.initControls();
-
             blockmania.initGame();
 
             blockmania.startGame();
-        } catch (Exception e) {
+        } catch (LWJGLException e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
+        } catch (SlickException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
         } finally {
             if (blockmania != null) {
@@ -207,7 +208,7 @@ public final class Blockmania {
         Display.destroy();
     }
 
-    public void initGame() throws IOException, SlickException {
+    public void initGame() throws SlickException {
         _timerTicksPerSecond = Sys.getTimerResolution();
 
         /*
