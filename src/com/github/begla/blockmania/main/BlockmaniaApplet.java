@@ -28,10 +28,11 @@ import java.awt.*;
  */
 public final class BlockmaniaApplet extends Applet {
 
-    private final Blockmania _blockmania;
-    private final Canvas _canvas;
+    private Blockmania _blockmania;
+    private Canvas _canvas;
 
-    public BlockmaniaApplet() {
+    @Override
+    public void init() {
         _blockmania = Blockmania.getInstance();
         _blockmania.setSandboxed(true);
 
@@ -66,8 +67,6 @@ public final class BlockmaniaApplet extends Applet {
             public void run() {
                 try {
                     Display.setParent(_canvas);
-                    //Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(1024, 576));
-                    //Display.setTitle("Blockmania - Applet");
                     Display.create();
 
                     _blockmania.initControls();
@@ -80,11 +79,6 @@ public final class BlockmaniaApplet extends Applet {
         };
 
         t.start();
-    }
-
-    @Override
-    public void init() {
-        startGame();
     }
 
     @Override
