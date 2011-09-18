@@ -30,6 +30,7 @@ public final class BlockmaniaApplet extends Applet {
 
     private Blockmania _blockmania;
     private Canvas _canvas;
+    private Thread _gameThread;
 
     @Override
     public void init() {
@@ -49,6 +50,11 @@ public final class BlockmaniaApplet extends Applet {
             public void removeNotify() {
                 super.removeNotify();
                 _blockmania.stopGame();
+
+                try {
+                    _gameThread.join();
+                } catch (InterruptedException e) {
+                }
             }
         };
 
@@ -62,7 +68,7 @@ public final class BlockmaniaApplet extends Applet {
     }
 
     private void startGame() {
-        Thread t = new Thread() {
+        _gameThread = new Thread() {
             @Override
             public void run() {
                 try {
@@ -78,18 +84,15 @@ public final class BlockmaniaApplet extends Applet {
             }
         };
 
-        t.start();
+        _gameThread.start();
     }
 
     @Override
     public void start() {
-        _blockmania.unpauseGame();
     }
 
     @Override
     public void stop() {
-        _blockmania.pauseGame();
-
     }
 
     @Override
