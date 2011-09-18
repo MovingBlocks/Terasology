@@ -43,6 +43,7 @@ public final class BlockmaniaApplet extends Applet {
                 try {
                     Display.setParent(null);
                     Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(1280, 720));
+                    Display.setTitle(Configuration.GAME_TITLE);
                     Display.create();
 
                     _blockmania = Blockmania.getInstance();
