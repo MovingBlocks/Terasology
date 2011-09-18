@@ -66,8 +66,8 @@ public final class BlockmaniaApplet extends Applet {
             public void run() {
                 try {
                     Display.setParent(_canvas);
-                    Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(1024, 576));
-                    Display.setTitle("Blockmania - Applet");
+                    //Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(1024, 576));
+                    //Display.setTitle("Blockmania - Applet");
                     Display.create();
 
                     _blockmania.initControls();
