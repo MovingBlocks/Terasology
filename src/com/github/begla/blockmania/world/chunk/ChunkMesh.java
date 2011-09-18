@@ -85,7 +85,7 @@ public class ChunkMesh {
     }
 
     private void renderVbo(int id) {
-        if (_vertexBuffers[id] == -1)
+        if (_vertexBuffers[id] <= 0)
             return;
 
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -153,12 +153,12 @@ public class ChunkMesh {
             int id = _vertexBuffers[i];
 
             VBOManager.getInstance().putVboId(id);
-            _vertexBuffers[i] = -1;
+            _vertexBuffers[i] = 0;
 
             id = _idxBuffers[i];
 
             VBOManager.getInstance().putVboId(id);
-            _idxBuffers[i] = -1;
+            _idxBuffers[i] = 0;
         }
     }
 
