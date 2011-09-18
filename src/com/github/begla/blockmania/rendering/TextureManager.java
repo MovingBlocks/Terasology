@@ -34,7 +34,7 @@ import static org.lwjgl.opengl.GL11.GL_NEAREST;
 public class TextureManager {
 
     private static TextureManager _instance;
-    private final FastMap<String, Texture> _textures = new FastMap<String, Texture>(32);
+    private final FastMap<String, Texture> _textures = new FastMap<String, Texture>();
 
     public static TextureManager getInstance() {
         if (_instance == null)

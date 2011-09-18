@@ -655,23 +655,27 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     /**
      * Generates the terrain mesh (creates the internal vertex arrays).
      */
-    public synchronized void generateMesh() {
-        if (!isCached())
+    public void generateMesh() {
+        if (!isCached() || _fresh)
             return;
 
-        if (!_fresh) {
-            _newMesh = _meshGenerator.generateMesh();
-
-            setDirty(false);
-            _statVertexArrayUpdateCount++;
+        if (_newMesh != null) {
+            // Put the buffers back into the pool
+            _newMesh.freeBuffers();
+            _newMesh = null;
         }
+
+        _newMesh = _meshGenerator.generateMesh();
+
+        setDirty(false);
+        _statVertexArrayUpdateCount++;
     }
 
 
     /**
      * Generates the display lists and swaps the old mesh with the current mesh.
      */
-    public synchronized void generateVBOs() {
+    public void generateVBOs() {
         if (!isCached())
             return;
 
@@ -701,7 +705,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
                     return;
 
             if (_newMesh.isGenerated() && !isDirty() && !isFresh() && !isLightDirty()) {
+                ChunkMesh oldMesh = _activeMesh;
                 _activeMesh = _newMesh;
+
+                // Put the buffers back into the pool
+                if (oldMesh != null)
+                    oldMesh.freeBuffers();
+
                 _newMesh = null;
             }
         }
@@ -823,5 +833,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public boolean isVisible() {
         return _visible;
+    }
+
+    public void freeBuffers() {
+        if (_activeMesh != null)
+            _activeMesh.freeBuffers();
+        if (_newMesh != null) {
+            _newMesh.freeBuffers();
+        }
     }
 }

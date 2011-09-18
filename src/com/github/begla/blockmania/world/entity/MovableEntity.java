@@ -322,7 +322,7 @@ public abstract class MovableEntity extends Entity {
                         _gravity = _jumpIntensity;
                     }
 
-                    // Player reaches the ground
+                    // Entity reaches the ground
                     if (_touchingGround == false) {
                         Vector3f playerDirection = directionOfPlayer();
                         _footstepSounds[Math.abs(_rand.randomInt()) % 5].playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);

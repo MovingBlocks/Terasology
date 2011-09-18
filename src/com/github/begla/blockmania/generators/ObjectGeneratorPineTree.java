@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.world.WorldProvider;
 
 /**

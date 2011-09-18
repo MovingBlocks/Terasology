@@ -56,6 +56,7 @@
         <include name="**/?*.glsl"/>
         <include name="**/?*.png"/>
         <include name="**/?*.ogg"/>
+        <include name="**/?*.fnt"/>
     </patternset>
 
 
@@ -210,6 +211,7 @@
             <zipfileset src="${basedir}/libs/lwjgl.jar"/>
             <zipfileset src="${basedir}/libs/lwjgl_util.jar"/>
             <zipfileset src="${basedir}/libs/lzma.jar"/>
+            <zipfileset src="${basedir}/libs/slick.jar"/>
             <zipfileset src="${basedir}/libs/slick-util.jar"/>
             <zipfileset src="${basedir}/libs/trove-3.0.0.jar"/>
         </jar>

@@ -49,7 +49,7 @@ public class MathHelper {
 
     public static int redoMapToPositive(int x) {
         if (x % 2 == 0) {
-            return x/2;
+            return x / 2;
         }
 
         return -(x / 2) - 1;

@@ -20,7 +20,6 @@ import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.world.World;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.util.ResourceLoader;

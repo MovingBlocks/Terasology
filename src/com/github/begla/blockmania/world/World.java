@@ -26,7 +26,6 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.horizon.Clouds;
 import com.github.begla.blockmania.world.horizon.Skysphere;
-import com.github.begla.blockmania.world.horizon.SunMoon;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
@@ -279,8 +278,10 @@ public final class World extends WorldProvider {
         // Update the clouds
         _clouds.update();
 
+        FastList<Chunk> visibleChunks = fetchVisibleChunks();
+
         // Update chunks
-        for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; )
+        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; )
             n.getValue().update();
 
         // Update the particle emitters

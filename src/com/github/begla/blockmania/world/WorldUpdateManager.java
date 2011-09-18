@@ -114,8 +114,8 @@ public final class WorldUpdateManager {
 
     private void processChunkUpdate(Chunk c) {
         if (c != null) {
-            if (c.processChunk())
-                _vboUpdates.add(c);
+            if (c.processChunk()) ;
+            _vboUpdates.add(c);
         }
     }
 

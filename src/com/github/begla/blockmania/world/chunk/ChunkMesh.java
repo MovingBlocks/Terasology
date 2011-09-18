@@ -1,12 +1,11 @@
 package com.github.begla.blockmania.world.chunk;
 
-import com.github.begla.blockmania.rendering.VBOHelper;
+import com.github.begla.blockmania.rendering.VBOManager;
 import gnu.trove.list.array.TFloatArrayList;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL15;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -71,23 +70,21 @@ public class ChunkMesh {
         for (int i = 0; i < _vertexBuffers.length; i++)
             generateVBO(i);
 
-        // IMPORTANT: Free unused memory!!
         _vertexElements = null;
         // Make sure this mesh can not be generated again
         _generated = true;
     }
 
     private void generateVBO(int id) {
-        _vertexBuffers[id] = VBOHelper.getInstance().createVboId();
-        _idxBuffers[id] = VBOHelper.getInstance().createVboId();
+        _vertexBuffers[id] = VBOManager.getInstance().getVboId();
+        _idxBuffers[id] = VBOManager.getInstance().getVboId();
         _idxBufferCount[id] = _vertexElements[id].indices.limit();
 
-        VBOHelper.getInstance().bufferVboElementData(_idxBuffers[id], _vertexElements[id].indices, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
-        VBOHelper.getInstance().bufferVboData(_vertexBuffers[id], _vertexElements[id].vertices, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
+        VBOManager.getInstance().bufferVboElementData(_idxBuffers[id], _vertexElements[id].indices, GL15.GL_STATIC_DRAW);
+        VBOManager.getInstance().bufferVboData(_vertexBuffers[id], _vertexElements[id].vertices, GL15.GL_STATIC_DRAW);
     }
 
     private void renderVbo(int id) {
-
         if (_vertexBuffers[id] == -1)
             return;
 
@@ -95,8 +92,8 @@ public class ChunkMesh {
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
 
-        ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, _idxBuffers[id]);
-        ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, _vertexBuffers[id]);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, _idxBuffers[id]);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, _vertexBuffers[id]);
 
         glVertexPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
 
@@ -114,8 +111,8 @@ public class ChunkMesh {
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
 
-        ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
-        ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     public void render(RENDER_TYPE type) {
@@ -148,6 +145,20 @@ public class ChunkMesh {
                 break;
             default:
                 return;
+        }
+    }
+
+    public void freeBuffers() {
+        for (int i = 0; i < _vertexBuffers.length; i++) {
+            int id = _vertexBuffers[i];
+
+            VBOManager.getInstance().putVboId(id);
+            _vertexBuffers[i] = -1;
+
+            id = _idxBuffers[i];
+
+            VBOManager.getInstance().putVboId(id);
+            _idxBuffers[i] = -1;
         }
     }
 

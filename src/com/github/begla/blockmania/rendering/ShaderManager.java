@@ -18,7 +18,6 @@ package com.github.begla.blockmania.rendering;
 import com.github.begla.blockmania.main.Blockmania;
 import javolution.util.FastMap;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
@@ -100,7 +99,7 @@ public class ShaderManager {
                 fragCode += line + "\n";
             }
         } catch (Exception e) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed reading fragment shading code.");
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to read fragment shader.");
             return 0;
         }
 
@@ -128,7 +127,7 @@ public class ShaderManager {
                 fragCode += line + "\n";
             }
         } catch (Exception e) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed reading vertex shading code.");
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to read vertex shader.");
             return 0;
         }
 
@@ -142,7 +141,7 @@ public class ShaderManager {
 
     private static void printLogInfo(int obj) {
         IntBuffer intBuffer = BufferUtils.createIntBuffer(1);
-        ARBShaderObjects.glGetObjectParameterARB(obj, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB, intBuffer);
+        GL20.glGetShader(obj, GL20.GL_INFO_LOG_LENGTH, intBuffer);
 
         int length = intBuffer.get();
 
@@ -150,7 +149,7 @@ public class ShaderManager {
             return;
         }
 
-        ByteBuffer infoBuffer = ByteBuffer.allocateDirect(length);
+        ByteBuffer infoBuffer = BufferUtils.createByteBuffer(length);
         intBuffer.flip();
 
         GL20.glGetShaderInfoLog(obj, intBuffer, infoBuffer);

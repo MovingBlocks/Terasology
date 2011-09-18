@@ -17,8 +17,8 @@
 package com.github.begla.blockmania.world.characters;
 
 import com.github.begla.blockmania.datastructures.AABB;
-import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;

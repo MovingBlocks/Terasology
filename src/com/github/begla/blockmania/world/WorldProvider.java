@@ -41,8 +41,8 @@ import java.util.logging.Level;
 public class WorldProvider {
 
     /* WORLD GENERATION */
-    protected final FastMap<String, ChunkGenerator> _chunkGenerators = new FastMap<String, ChunkGenerator>(32);
-    protected final FastMap<String, ObjectGenerator> _objectGenerators = new FastMap<String, ObjectGenerator>(32);
+    protected final FastMap<String, ChunkGenerator> _chunkGenerators = new FastMap<String, ChunkGenerator>();
+    protected final FastMap<String, ObjectGenerator> _objectGenerators = new FastMap<String, ObjectGenerator>();
     /* PROPERTIES */
     protected String _title, _seed;
     protected long _creationTime = Blockmania.getInstance().getTime();

@@ -34,7 +34,7 @@ import java.util.logging.Level;
  */
 public final class ChunkCache {
 
-    private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>(128000).shared();
+    private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>().shared();
     private final WorldProvider _parent;
 
     /**
@@ -94,6 +94,7 @@ public final class ChunkCache {
             writeChunkToDisk(chunkToDelete);
             // When the chunk is written, finally remove it from the cache
             _chunkCache.values().remove(chunkToDelete);
+            chunkToDelete.freeBuffers();
         }
     }
 

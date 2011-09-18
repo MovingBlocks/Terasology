@@ -32,10 +32,6 @@ public final class Configuration {
      */
     public static final int FRAME_SKIP_MAX_FRAMES = 10;
     /**
-     * The initial time for new worlds.
-     */
-    public static final double INITIAL_TIME = 0.096;
-    /**
      * The mouse sensitivity.
      */
     public static final double MOUSE_SENS = 0.075;
@@ -83,8 +79,8 @@ public final class Configuration {
     public static final double PROB_DIAMOND = -4;
 
     /* -------- */
-    private static final FastMap<String, Double> _settingsNumeric = new FastMap<String, Double>(32);
-    private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>(32);
+    private static final FastMap<String, Double> _settingsNumeric = new FastMap<String, Double>();
+    private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
 
     static {
         if (Blockmania.getInstance().isSandboxed()) {
@@ -163,7 +159,7 @@ public final class Configuration {
     }
 
     private static void loadDebug() {
-        _settingsBoolean.put("CHUNK_OUTLINES", true);
+        _settingsBoolean.put("CHUNK_OUTLINES", false);
         _settingsBoolean.put("DEBUG", true);
         _settingsBoolean.put("DEBUG_COLLISION", false);
         _settingsBoolean.put("GOD_MODE", true);
@@ -176,9 +172,10 @@ public final class Configuration {
         _settingsBoolean.put("CROSSHAIR", false);
         _settingsBoolean.put("DEMO_FLIGHT", true);
         _settingsBoolean.put("GOD_MODE", true);
+        _settingsNumeric.put("WALKING_SPEED", 0.1);
     }
 
-    private static void loadSanboxed() {
+    private static void loadSandboxed() {
         _settingsNumeric.put("V_DIST_X", 16.0);
         _settingsNumeric.put("V_DIST_Z", 16.0);
     }
@@ -193,7 +190,7 @@ public final class Configuration {
                 loadDebug();
             }
         } else {
-            loadSanboxed();
+            loadSandboxed();
         }
     }
 }

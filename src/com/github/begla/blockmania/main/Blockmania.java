@@ -16,7 +16,9 @@
 package com.github.begla.blockmania.main;
 
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.rendering.FontManager;
 import com.github.begla.blockmania.rendering.ShaderManager;
+import com.github.begla.blockmania.rendering.VBOManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.world.characters.Player;
@@ -30,10 +32,8 @@ import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
-import org.newdawn.slick.Color;
-import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.SlickException;
 
-import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -57,7 +57,6 @@ public final class Blockmania {
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
     /* ------- */
-    private static TrueTypeFont _font1;
     private long _lastLoopTime;
     private long _lastFpsTime;
     private int _fps;
@@ -97,13 +96,13 @@ public final class Blockmania {
      * @param args Arguments
      */
     public static void main(String[] args) {
-        Blockmania.getInstance().addLogFileHandler("blockmania.log", Level.SEVERE);
+        Blockmania.getInstance().addLogFileHandler("blockmania.log", Level.INFO);
         Blockmania.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
 
         try {
             loadNativeLibs();
         } catch (Exception e) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Couldn't link static libraries. Sorry: " + e);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Couldn't link static libraries. Sorry. " + e.toString(), e);
         }
 
         Blockmania blockmania = null;
@@ -117,8 +116,8 @@ public final class Blockmania {
             blockmania.initGame();
 
             blockmania.startGame();
-        } catch (Exception ex) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, ex.toString(), ex);
+        } catch (Exception e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
         } finally {
             if (blockmania != null) {
                 blockmania.destroy();
@@ -167,14 +166,11 @@ public final class Blockmania {
     }
 
     /**
-     * Init. the display and mouse/keyboard input.
+     * Init. the display.
      *
      * @throws LWJGLException
      */
     public void initDisplay() throws LWJGLException {
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Loading Blockmania. Please stand by...");
-
-        // Display
         if (Configuration.FULLSCREEN) {
             Display.setDisplayMode(Display.getDesktopDisplayMode());
             Display.setFullscreen(true);
@@ -184,10 +180,11 @@ public final class Blockmania {
 
         Display.setTitle(Configuration.GAME_TITLE);
         Display.create(Configuration.PIXEL_FORMAT);
-
     }
 
     /**
+     * Init. keyboard and mouse input.
+     *
      * @throws LWJGLException
      */
     public void initControls() throws LWJGLException {
@@ -210,15 +207,15 @@ public final class Blockmania {
         Display.destroy();
     }
 
-    public void initGame() {
+    public void initGame() throws IOException, SlickException {
         _timerTicksPerSecond = Sys.getTimerResolution();
-        // Init. fonts
-        _font1 = new TrueTypeFont(new Font("Arial", Font.PLAIN, 12), true);
 
         /*
-         * Load shaders.
+         * Init. management classes.
          */
         ShaderManager.getInstance();
+        VBOManager.getInstance();
+        FontManager.getInstance();
 
         /*
          * Init. OpenGL
@@ -247,17 +244,16 @@ public final class Blockmania {
         // Update the viewing distance
         double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
         double viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, (float) (viewingDistance * 0.5));
+        glFogf(GL_FOG_START, (float) (viewingDistance * 0.025));
         glFogf(GL_FOG_END, (float) viewingDistance);
 
-        /*
-         * Render the player, world and HUD.
-         */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
+        // RENDER WORLD
         _world.render();
 
+        // RENDER HUD
         renderHUD();
     }
 
@@ -341,13 +337,16 @@ public final class Blockmania {
     }
 
     /**
-     * Updates the world.
+     * Executes updates.
      */
     private void update() {
         _cubeRotation += 0.5;
         _world.update();
     }
 
+    /**
+     * A small rotating cube that servers as a HUD element.
+     */
     private void drawRotatingBlock() {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
@@ -405,15 +404,15 @@ public final class Blockmania {
         * Draw debugging information.
         */
         if (Configuration.getSettingBoolean("DEBUG")) {
-            _font1.drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage));
-            _font1.drawString(4, 22, String.format("%s", _player));
-            _font1.drawString(4, 38, String.format("%s", _world));
-            _font1.drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount()));
+            FontManager.getInstance().getFont("default").drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage));
+            FontManager.getInstance().getFont("default").drawString(4, 22, String.format("%s", _player));
+            FontManager.getInstance().getFont("default").drawString(4, 38, String.format("%s", _world));
+            FontManager.getInstance().getFont("default").drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount()));
         }
 
         if (_pauseGame) {
             // Display the console input text
-            _font1.drawString(4, Display.getDisplayMode().getHeight() - 16 - 4, String.format("%s_", _consoleInput), Color.red);
+            FontManager.getInstance().getFont("default").drawString(4, Display.getDisplayMode().getHeight() - 16 - 4, String.format("%s_", _consoleInput));
         }
 
         glDisable(GL_BLEND);

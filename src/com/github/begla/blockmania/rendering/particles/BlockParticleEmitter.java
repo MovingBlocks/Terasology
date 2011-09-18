@@ -17,7 +17,6 @@ package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.world.World;
-import org.jdom.Parent;
 
 /**
  * Emits block particles.
@@ -44,7 +43,7 @@ public class BlockParticleEmitter extends ParticleEmitter {
     }
 
     public World getParent() {
-       return _parent;
+        return _parent;
     }
 
     @Override
