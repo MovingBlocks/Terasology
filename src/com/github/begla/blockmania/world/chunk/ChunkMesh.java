@@ -49,7 +49,7 @@ public class ChunkMesh {
     private final int[] _idxBufferCount = new int[5];
     public VertexElements[] _vertexElements = new VertexElements[5];
 
-    private boolean _generated;
+    private boolean _generated, _disposed = false;
 
     public ChunkMesh() {
         _vertexElements[0] = new VertexElements();
@@ -64,7 +64,7 @@ public class ChunkMesh {
      */
     public void generateVBOs() {
         // IMPORTANT: A mesh can only be generated once.
-        if (_generated)
+        if (_generated || _disposed)
             return;
 
         for (int i = 0; i < _vertexBuffers.length; i++)
@@ -76,43 +76,51 @@ public class ChunkMesh {
     }
 
     private void generateVBO(int id) {
-        _vertexBuffers[id] = VBOManager.getInstance().getVboId();
-        _idxBuffers[id] = VBOManager.getInstance().getVboId();
-        _idxBufferCount[id] = _vertexElements[id].indices.limit();
+        synchronized (this) {
+            if (_disposed) {
+                return;
+            }
 
-        VBOManager.getInstance().bufferVboElementData(_idxBuffers[id], _vertexElements[id].indices, GL15.GL_STATIC_DRAW);
-        VBOManager.getInstance().bufferVboData(_vertexBuffers[id], _vertexElements[id].vertices, GL15.GL_STATIC_DRAW);
+            _vertexBuffers[id] = VBOManager.getInstance().getVboId();
+            _idxBuffers[id] = VBOManager.getInstance().getVboId();
+            _idxBufferCount[id] = _vertexElements[id].indices.limit();
+
+            VBOManager.getInstance().bufferVboElementData(_idxBuffers[id], _vertexElements[id].indices, GL15.GL_STATIC_DRAW);
+            VBOManager.getInstance().bufferVboData(_vertexBuffers[id], _vertexElements[id].vertices, GL15.GL_STATIC_DRAW);
+        }
     }
 
-    private synchronized void renderVbo(int id) {
-        if (_vertexBuffers[id] <= 0)
-            return;
+    private void renderVbo(int id) {
+        synchronized (this) {
+            if (_vertexBuffers[id] <= 0 || _disposed)
+                return;
 
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glEnableClientState(GL_COLOR_ARRAY);
+            glEnableClientState(GL_VERTEX_ARRAY);
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            glEnableClientState(GL_COLOR_ARRAY);
 
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, _idxBuffers[id]);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, _vertexBuffers[id]);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, _idxBuffers[id]);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, _vertexBuffers[id]);
 
-        glVertexPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
+            glVertexPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
 
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-        glTexCoordPointer(2, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
+            GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+            glTexCoordPointer(2, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
 
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-        glTexCoordPointer(2, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);
+            GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+            glTexCoordPointer(2, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);
 
-        glColorPointer(4, GL11.GL_FLOAT, STRIDE, OFFSET_COLOR);
+            glColorPointer(4, GL11.GL_FLOAT, STRIDE, OFFSET_COLOR);
 
-        GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, _idxBufferCount[id], _idxBufferCount[id], GL_UNSIGNED_INT, 0);
+            GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, _idxBufferCount[id], _idxBufferCount[id], GL_UNSIGNED_INT, 0);
 
-        glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
+            glDisableClientState(GL_COLOR_ARRAY);
+            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+            glDisableClientState(GL_VERTEX_ARRAY);
 
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        }
     }
 
     public void render(RENDER_TYPE type) {
@@ -148,21 +156,32 @@ public class ChunkMesh {
         }
     }
 
-    public synchronized void freeBuffers() {
-        for (int i = 0; i < _vertexBuffers.length; i++) {
-            int id = _vertexBuffers[i];
+    public void freeBuffers() {
+        if (_disposed)
+            return;
 
-            VBOManager.getInstance().putVboId(id);
-            _vertexBuffers[i] = 0;
+        synchronized (this) {
+            for (int i = 0; i < _vertexBuffers.length; i++) {
+                int id = _vertexBuffers[i];
 
-            id = _idxBuffers[i];
+                VBOManager.getInstance().putVboId(id);
+                _vertexBuffers[i] = 0;
 
-            VBOManager.getInstance().putVboId(id);
-            _idxBuffers[i] = 0;
+                id = _idxBuffers[i];
+
+                VBOManager.getInstance().putVboId(id);
+                _idxBuffers[i] = 0;
+            }
+
+            _disposed = true;
         }
     }
 
     public boolean isGenerated() {
         return _generated;
+    }
+
+    public boolean isDisposed() {
+        return _disposed;
     }
 }

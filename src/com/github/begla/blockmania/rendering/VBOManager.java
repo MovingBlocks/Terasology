@@ -30,7 +30,7 @@ import java.nio.IntBuffer;
 public class VBOManager {
 
     private static VBOManager _instance = null;
-    private TIntArrayList _vertexBufferObjectPool = new TIntArrayList(32000);
+    private TIntArrayList _vertexBufferObjectPool = new TIntArrayList();
 
     public static VBOManager getInstance() {
         if (_instance == null) {
@@ -41,10 +41,6 @@ public class VBOManager {
     }
 
     public VBOManager() {
-        IntBuffer buffer = createVbos(32000);
-        for (int i = 0; i < 32000; i++) {
-            _vertexBufferObjectPool.add(buffer.get(i));
-        }
     }
 
     private IntBuffer createVbos(int size) {
@@ -54,8 +50,9 @@ public class VBOManager {
     }
 
     public synchronized Integer getVboId() {
-        if (_vertexBufferObjectPool.size() > 0)
-            return _vertexBufferObjectPool.removeAt(_vertexBufferObjectPool.size() - 1);
+        for (int i = _vertexBufferObjectPool.size()-1; i >= 0; i--)
+            GL15.glDeleteBuffers(_vertexBufferObjectPool.removeAt(i));
+
         return createVbos(1).get(0);
     }
 
