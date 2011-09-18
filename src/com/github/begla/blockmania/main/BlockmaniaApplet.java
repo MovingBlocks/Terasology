@@ -34,9 +34,6 @@ public final class BlockmaniaApplet extends Applet {
 
     @Override
     public void init() {
-        _blockmania = Blockmania.getInstance();
-        _blockmania.setSandboxed(true);
-
         setLayout(new BorderLayout());
 
         _canvas = new Canvas() {
@@ -74,6 +71,9 @@ public final class BlockmaniaApplet extends Applet {
                 try {
                     Display.setParent(_canvas);
                     Display.create();
+
+                    _blockmania = Blockmania.getInstance();
+                    _blockmania.setSandboxed(true);
 
                     _blockmania.initControls();
                     _blockmania.initGame();
