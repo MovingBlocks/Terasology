@@ -1,8 +1,8 @@
 varying	vec3 	v;
 varying	vec3 	l;
 varying	vec3 	colorYxy;
-varying	float	lv;
-
+varying	float	lv;					
+varying	float	sunHighlight;					
 float	colorExp = 25.0;
 
 vec3	convertColor ()
@@ -11,9 +11,9 @@ vec3	convertColor ()
 
 	clrYxy [0] = 1.0 - exp ( -clrYxy [0] / colorExp );
 
-	float	ratio    = clrYxy [0] / clrYxy [2];
-
-	vec3	XYZ;
+	float	ratio    = clrYxy [0] / clrYxy [2];	
+  
+  vec3	XYZ;
 	XYZ.x = clrYxy [1] * ratio;						// X = x * ratio
 	XYZ.y = clrYxy [0];								// Y = Y
 	XYZ.z = ratio - XYZ.x - XYZ.y;					// Z = ratio - X - Y
@@ -22,10 +22,10 @@ vec3	convertColor ()
 	const	vec3	gCoeffs = vec3 ( -0.969256, 1.875991, 0.041556 );
 	const	vec3	bCoeffs = vec3 ( 0.055684, -0.204043, 1.057311 );
 
-	return	vec3 ( dot ( rCoeffs, XYZ ), dot ( gCoeffs, XYZ ), dot ( bCoeffs, XYZ ) );
+	return	vec3 ( dot ( rCoeffs, XYZ )+3/(sunHighlight), dot ( gCoeffs, XYZ )+3/(sunHighlight), dot ( bCoeffs, XYZ ));
 }
 
 void main ()
 {
-	gl_FragColor = vec4	( clamp ( convertColor (), 0.0, 1.0 ), 1.0 );
+	gl_FragColor = vec4( clamp ( convertColor (), 0.0, 1.0 ), 1.0 );
 }
