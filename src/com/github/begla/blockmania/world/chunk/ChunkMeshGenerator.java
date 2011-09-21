@@ -33,6 +33,8 @@ public class ChunkMeshGenerator {
 
     private final Chunk _chunk;
 
+    private static int _statVertexArrayUpdateCount = 0;
+
     public ChunkMeshGenerator(Chunk chunk) {
         _chunk = chunk;
     }
@@ -60,6 +62,7 @@ public class ChunkMeshGenerator {
         }
 
         generateOptimizedBuffers(mesh);
+        _statVertexArrayUpdateCount++;
 
         return mesh;
     }
@@ -510,4 +513,9 @@ public class ChunkMeshGenerator {
 
         return bCheck.getClass() == BlockAir.class || cBlock.doNotTessellate() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
     }
+
+    public static int getVertexArrayUpdateCount() {
+        return _statVertexArrayUpdateCount;
+    }
+
 }

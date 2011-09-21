@@ -94,7 +94,7 @@ public final class ChunkCache {
             writeChunkToDisk(chunkToDelete);
             // When the chunk is written, finally remove it from the cache
             _chunkCache.values().remove(chunkToDelete);
-            chunkToDelete.freeBuffers();
+            chunkToDelete.dispose();
         }
     }
 
