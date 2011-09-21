@@ -295,7 +295,7 @@ public abstract class Block implements RenderableObject {
 
     public Block() {
         try {
-            colorLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/grassColor.png").openStream());
+            colorLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/grasscolor.png").openStream());
             foliageLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/foliagecolor.png").openStream());
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
