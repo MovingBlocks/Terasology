@@ -324,11 +324,30 @@ public final class World extends WorldProvider {
         _player.setPosition(getSpawningPoint());
     }
 
-    /*
+    /**
      * Returns the active biome at the player's position.
      */
     public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome() {
-        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcBiomeTypeForGlobalPosition((int) _player.getPosition().x, (int) _player.getPosition().z);
+        return getActiveBiome((int) _player.getPosition().x, (int) _player.getPosition().z);
+    }
+
+    /**
+     * Returns the humidity at the player's position.
+     *
+     * @return
+     */
+    public double getActiveHumidity() {
+
+        return getHumidityAt((int) _player.getPosition().x, (int) _player.getPosition().z);
+    }
+
+    /**
+     * Returns the temeperature at the player's position.
+     *
+     * @return
+     */
+    public double getActiveTemperature() {
+        return getTemperatureAt((int) _player.getPosition().x, (int) _player.getPosition().z);
     }
 
     /**
