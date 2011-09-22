@@ -55,12 +55,31 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
         for (int y = 32; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x += 4) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z += 4) {
-                    double forestDens = calcForestDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
-                    if (forestDens > 0.01) {
+                    double treeRand = (_rand.randomDouble() + 1.0) / 2.0;
+                    double treeProb = 1.0;
 
-                        int randX = x + rand.randomInt() % 12 + 4;
-                        int randZ = z + rand.randomInt() % 12 + 4;
+                    BIOME_TYPE biome = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+
+                    switch (biome) {
+                        case PLAINS:
+                            treeProb = 0.98;
+                            break;
+                        case MOUNTAINS:
+                            treeProb = 0.9;
+                            break;
+                        case SNOW:
+                            treeProb = 0.92;
+                            break;
+                        case FOREST:
+                            treeProb = 0.1;
+                            break;
+                    }
+
+                    if (treeRand > treeProb) {
+
+                        int randX = x + rand.randomInt() % 12 + 6;
+                        int randZ = z + rand.randomInt() % 12 + 6;
 
                         if (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17) {
                             generateTree(c, randX, y, randZ);
@@ -83,16 +102,32 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
     void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
 
         if (c.getBlock(x, y, z) == 0x1) {
-            double grassDens = calcGrassDensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
-            if (grassDens > 0.0) {
+            double grassRand = (_rand.randomDouble() + 1.0) / 2.0;
+            double grassProb = 1.0;
+
+            BIOME_TYPE biome = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+
+            switch (biome) {
+                case PLAINS:
+                    grassProb = 0.4;
+                    break;
+                case MOUNTAINS:
+                    grassProb = 0.9;
+                    break;
+                case FOREST:
+                    grassProb = 0.6;
+                    break;
+            }
+
+            if (grassRand > grassProb) {
                 /*
                  * Generate high grass.
                  */
                 double rand = _rand.standNormalDistrDouble();
                 if (rand > -0.4 && rand < 0.4) {
                     c.setBlock(x, y + 1, z, (byte) 0xB);
-                } else if (rand > -0.8 && rand < -0.8) {
+                } else {
                     c.setBlock(x, y + 1, z, (byte) 0xC);
                 }
 
@@ -133,29 +168,5 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
             c.setBlock(x, y + 1, z, (byte) 0x0);
             c.getParent().getObjectGenerator("tree").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
         }
-    }
-
-    /**
-     * Returns the cave density for the base terrain.
-     *
-     * @param x
-     * @param z
-     * @return
-     */
-    double calcForestDensity(double x, double z) {
-        double result = 0.0;
-        result += _pGen1.fBm(0.01 * x, 0, 0.01 * z, 7, 2.3614521, 0.85431);
-        return result;
-    }
-
-    /**
-     * @param x
-     * @param z
-     * @return
-     */
-    double calcGrassDensity(double x, double z) {
-        double result = 0.0;
-        result += _pGen3.fBm(0.05 * x, 0, 0.05 * z, 4, 2.37152, 0.8571);
-        return result;
     }
 }

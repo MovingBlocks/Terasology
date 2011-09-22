@@ -17,7 +17,6 @@ package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A water block.
@@ -26,16 +25,10 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public class BlockWater extends Block {
 
-    private static final Vector4f colorOffset = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     @Override
     public boolean isBlockTypeTranslucent() {
         return true;
-    }
-
-    @Override
-    public Vector4f getColorOffsetFor(SIDE side) {
-        return colorOffset;
     }
 
     @Override

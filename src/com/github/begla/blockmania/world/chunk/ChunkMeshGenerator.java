@@ -20,6 +20,7 @@ import com.github.begla.blockmania.blocks.BlockAir;
 import com.github.begla.blockmania.blocks.BlockLava;
 import com.github.begla.blockmania.blocks.BlockWater;
 import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.noise.PerlinNoise;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -32,6 +33,8 @@ import org.lwjgl.util.vector.Vector4f;
 public class ChunkMeshGenerator {
 
     private final Chunk _chunk;
+    private static final PerlinNoise _pGen = new PerlinNoise(0);
+    private static int _statVertexArrayUpdateCount = 0;
 
     public ChunkMeshGenerator(Chunk chunk) {
         _chunk = chunk;
@@ -40,9 +43,12 @@ public class ChunkMeshGenerator {
     public ChunkMesh generateMesh() {
         ChunkMesh mesh = new ChunkMesh();
 
-        for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
+            for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+                double biomeTemp = _chunk.getParent().getTemperatureAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
+                double biomeHumidity = _chunk.getParent().getHumidityAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
+
+                for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                     byte blockType = _chunk.getBlock(x, y, z);
                     Block block = Block.getBlockForType(blockType);
 
@@ -52,14 +58,15 @@ public class ChunkMeshGenerator {
                     Block.BLOCK_FORM blockForm = block.getBlockForm();
 
                     if (blockForm == Block.BLOCK_FORM.LOWERED_BOCK || blockForm == Block.BLOCK_FORM.CACTUS || blockForm == Block.BLOCK_FORM.NORMAL)
-                        generateBlockVertices(mesh, x, y, z);
+                        generateBlockVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
                     else if (blockForm == Block.BLOCK_FORM.BILLBOARD)
-                        generateBillboardVertices(mesh, x, y, z);
+                        generateBillboardVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
                 }
             }
         }
 
         generateOptimizedBuffers(mesh);
+        _statVertexArrayUpdateCount++;
 
         return mesh;
     }
@@ -152,9 +159,9 @@ public class ChunkMeshGenerator {
         for (int i = 0; i < 4; i++) {
             Block b = Block.getBlockForType(blocks[i]);
             if (b.isCastingShadows() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) {
-                result -= Configuration.OCCLUSION_AMOUNT;
+                result -= Configuration.OCCLUSION_AMOUNT_DEFAULT;
             } else if (b.isCastingShadows() && b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                result -= Configuration.OCCLUSION_AMOUNT / 2;
+                result -= Configuration.OCCLUSION_AMOUNT_BILLBOARDS;
             }
         }
 
@@ -169,13 +176,13 @@ public class ChunkMeshGenerator {
      * @param y    Local block position on the y-axis
      * @param z    Local block position on the z-axis
      */
-    private void generateBillboardVertices(ChunkMesh mesh, int x, int y, int z) {
+    private void generateBillboardVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
         byte block = _chunk.getBlock(x, y, z);
 
         /*
          * First side of the billboard
          */
-        Vector4f colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
+        Vector4f colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
         Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0);
 
         Vector3f p1 = new Vector3f(-0.5f, -0.5f, 0.5f);
@@ -192,7 +199,7 @@ public class ChunkMeshGenerator {
         /*
         * Second side of the billboard
         */
-        colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
+        colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
         texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0);
 
         p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
@@ -207,7 +214,7 @@ public class ChunkMeshGenerator {
         addBlockTextureData(mesh._vertexElements[2], texOffset, new Vector3f(0, 0, 1));
     }
 
-    private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z) {
+    private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
         byte block = _chunk.getBlock(x, y, z);
 
         /*
@@ -266,7 +273,7 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, 1, 0);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.TOP);
+            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
             Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
@@ -281,7 +288,7 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, 0, -1);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT);
+            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
             Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
@@ -295,7 +302,7 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, 0, 1);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BACK);
+            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
             Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
@@ -309,7 +316,7 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(-1, 0, 0);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.LEFT);
+            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
             Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
@@ -323,7 +330,7 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(1, 0, 0);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.RIGHT);
+            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
             Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
@@ -337,7 +344,7 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, -1, 0);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.BOTTOM);
+            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
             Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
@@ -510,4 +517,9 @@ public class ChunkMeshGenerator {
 
         return bCheck.getClass() == BlockAir.class || cBlock.doNotTessellate() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
     }
+
+    public static int getVertexArrayUpdateCount() {
+        return _statVertexArrayUpdateCount;
+    }
+
 }

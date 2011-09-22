@@ -19,5 +19,5 @@ void main()
     float fogScale = 1.0 / (gl_Fog.end - gl_Fog.start);
     fog = (gl_Fog.end - gl_FogFragCoord) * fogScale;
 
-    fog = clamp(1.0 - fog,0.0,0.6);
+    fog = clamp(1.0 - fog,0.0,1.0);
 }

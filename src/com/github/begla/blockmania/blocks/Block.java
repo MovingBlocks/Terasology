@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.utilities.Helper;
@@ -23,6 +24,13 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+import org.newdawn.slick.util.ResourceLoader;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -118,7 +126,7 @@ public abstract class Block implements RenderableObject {
      * @param side The block side
      * @return The color offset
      */
-    public Vector4f getColorOffsetFor(SIDE side) {
+    public Vector4f getColorOffsetFor(SIDE side, double temp, double hum) {
         return _colorOffset;
     }
 
@@ -281,5 +289,32 @@ public abstract class Block implements RenderableObject {
 
     public void update() {
         // Do nothing
+    }
+
+    BufferedImage colorLut, foliageLut;
+
+    public Block() {
+        try {
+            colorLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/grasscolor.png").openStream());
+            foliageLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/foliagecolor.png").openStream());
+        } catch (IOException e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+        }
+    }
+
+    public Vector4f colorForTemperatureAndHumidity(double temp, double hum) {
+        hum *= temp;
+        int rgbValue = colorLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
+
+        Color c = new Color(rgbValue);
+        return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
+    }
+
+    public Vector4f foliageColorForTemperatureAndHumidity(double temp, double hum) {
+        hum *= temp;
+        int rgbValue = colorLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
+
+        Color c = new Color(rgbValue);
+        return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
     }
 }

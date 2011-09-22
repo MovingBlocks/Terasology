@@ -340,7 +340,7 @@ public final class Player extends Character {
     }
 
     protected AABB generateAABBForPosition(Vector3f p) {
-        return new AABB(p, new Vector3f(.3f, 0.7f, .3f));
+        return new AABB(p, new Vector3f(.3f, 0.8f, .3f));
     }
 
     /**

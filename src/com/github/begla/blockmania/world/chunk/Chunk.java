@@ -58,8 +58,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     protected final BlockmaniaSmartArray _sunlight, _light;
     /* ------ */
     protected AABB _aabb;
-    /* RENDERING */
-    private static int _statVertexArrayUpdateCount = 0;
     /* ------ */
     private ChunkMesh _activeMesh;
     private ChunkMesh _newMesh;
@@ -67,6 +65,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     private final ChunkMeshGenerator _meshGenerator;
     /* ------ */
     private boolean _visible = false;
+    /* ------ */
+    private boolean _disposed = false;
 
     public enum LIGHT_TYPE {
         BLOCK,
@@ -660,16 +660,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (!isCached() || _fresh)
             return;
 
-        if (_newMesh != null) {
-            // Put the buffers back into the pool
-            _newMesh.freeBuffers();
-            _newMesh = null;
-        }
-
-        _newMesh = _meshGenerator.generateMesh();
-
+        setNewMesh(_meshGenerator.generateMesh());
         setDirty(false);
-        _statVertexArrayUpdateCount++;
     }
 
 
@@ -699,33 +691,53 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void update() {
-        if (_newMesh != null) {
-            // Do not update the mesh if one of the VISIBLE neighbors is dirty
-            for (Chunk nc : loadOrCreateNeighbors())
-                if ((nc.isDirty() || nc.isLightDirty()) && nc.isVisible())
-                    return;
+        // Do not update the mesh if one of the VISIBLE neighbors is dirty
+        for (Chunk nc : loadOrCreateNeighbors())
+            if ((nc.isDirty() || nc.isLightDirty()) && nc.isVisible())
+                return;
 
-            if (_newMesh.isGenerated() && !isDirty() && !isFresh() && !isLightDirty()) {
-                ChunkMesh oldMesh = _activeMesh;
-                _activeMesh = _newMesh;
-
-                // Put the buffers back into the pool
-                if (oldMesh != null)
-                    oldMesh.freeBuffers();
-
-                _newMesh = null;
-            }
-        }
+        if (!isDirty() && !isFresh() && !isLightDirty())
+            swapActiveMesh();
     }
 
     public void render() {
         // Nothing to do
     }
 
-    public static int getVertexArrayUpdateCount() {
-        return _statVertexArrayUpdateCount;
+    private void setNewMesh(ChunkMesh newMesh) {
+        synchronized (this) {
+            if (_disposed)
+                return;
+
+            ChunkMesh oldNewMesh = _newMesh;
+            _newMesh = newMesh;
+
+            if (oldNewMesh != null) {
+                oldNewMesh.dispose();
+            }
+        }
     }
 
+    private void swapActiveMesh() {
+        synchronized (this) {
+            if (_disposed)
+                return;
+
+            if (_newMesh != null) {
+                if (!_newMesh.isGenerated() || _newMesh.isDisposed())
+                    return;
+
+                ChunkMesh newMesh = _newMesh;
+                _newMesh = null;
+
+                ChunkMesh oldActiveMesh = _activeMesh;
+                _activeMesh = newMesh;
+
+                if (oldActiveMesh != null)
+                    oldActiveMesh.dispose();
+            }
+        }
+    }
 
     /**
      * Returns the position of the chunk within the world.
@@ -733,7 +745,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @return The world position
      */
 
-    int getChunkWorldPosX() {
+    public int getChunkWorldPosX() {
         return (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
     }
 
@@ -742,7 +754,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      *
      * @return Thew world position
      */
-    int getChunkWorldPosZ() {
+    public int getChunkWorldPosZ() {
         return (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
     }
 
@@ -832,15 +844,39 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         _visible = visible;
     }
 
+    /**
+     * Returns true if this chunk is currently visible.
+     *
+     * @return
+     */
     public boolean isVisible() {
         return _visible;
     }
 
-    public void freeBuffers() {
-        if (_activeMesh != null)
-            _activeMesh.freeBuffers();
-        if (_newMesh != null) {
-            _newMesh.freeBuffers();
+    /**
+     * Returns true if this chunk was disposed.
+     *
+     * @return
+     */
+    public boolean isDisposed() {
+        return _disposed;
+    }
+
+    /**
+     * Disposes this chunk. Can NOT be undone.
+     */
+    public void dispose() {
+        synchronized (this) {
+            if (_disposed)
+                return;
+
+            if (_activeMesh != null)
+                _activeMesh.dispose();
+            if (_newMesh != null) {
+                _newMesh.dispose();
+            }
+
+            _disposed = true;
         }
     }
 }

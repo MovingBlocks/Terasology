@@ -19,8 +19,6 @@ import com.github.begla.blockmania.rendering.RenderableObject;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 
-import java.util.Vector;
-
 import static org.lwjgl.opengl.GL11.*;
 
 /**

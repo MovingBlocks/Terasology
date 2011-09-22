@@ -82,6 +82,9 @@ public class WorldProvider {
         // Init. random generator
         _random = new FastRandom(seed.hashCode());
 
+        // Initial time
+        setTime(0.05);
+
         // Load the meta data of this world
         loadMetaData();
 
@@ -600,5 +603,20 @@ public class WorldProvider {
 
     public Vector3f getSpawningPoint() {
         return _spawningPoint;
+    }
+
+    public double getHumidityAt(int x, int z) {
+        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcHumidityAtGlobalPosition(x, z);
+    }
+
+    public double getTemperatureAt(int x, int z) {
+        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcTemperatureAtGlobalPosition(x, z);
+    }
+
+    /*
+    * Returns the active biome at the given position.
+    */
+    public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome(int x, int z) {
+        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcBiomeTypeForGlobalPosition(x, z);
     }
 }

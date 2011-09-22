@@ -156,7 +156,7 @@ public class ChunkMesh {
         }
     }
 
-    public void freeBuffers() {
+    public void dispose() {
         if (_disposed)
             return;
 
@@ -174,6 +174,7 @@ public class ChunkMesh {
             }
 
             _disposed = true;
+            _generated = false;
         }
     }
 

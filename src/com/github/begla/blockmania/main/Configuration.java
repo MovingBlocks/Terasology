@@ -69,7 +69,8 @@ public final class Configuration {
 
     /* LIGHTING */
     public static final byte MAX_LIGHT = 15;
-    public static final double OCCLUSION_AMOUNT = 1.0 / 8.0;
+    public static final double OCCLUSION_AMOUNT_DEFAULT = 1.0 / 16.0;
+    public static final double OCCLUSION_AMOUNT_BILLBOARDS = OCCLUSION_AMOUNT_DEFAULT / 8.0;
 
     /* RESOURCES */
     public static final double PROB_COAL = -2;

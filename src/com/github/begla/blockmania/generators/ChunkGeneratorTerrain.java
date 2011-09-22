@@ -30,7 +30,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     protected static final int SAMPLE_RATE_3D_VERT = 4;
 
     public enum BIOME_TYPE {
-        MOUNTAINS, SNOW, DESERT, PLAINS
+        MOUNTAINS, SNOW, DESERT, FOREST, PLAINS
     }
 
     /**
@@ -120,17 +120,23 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     public BIOME_TYPE calcBiomeTypeForGlobalPosition(int x, int z) {
-        double temp = calcTemperature(x, z);
+        double temp = calcTemperatureAtGlobalPosition(x, z);
+        double humidity = calcHumidityAtGlobalPosition(x, z);
 
-        if (temp >= 60) {
+        if (temp >= 0.6 && humidity < 0.3) {
             return BIOME_TYPE.DESERT;
-        } else if (temp >= 32) {
+        }
+        if (temp >= 0.30 && temp < 0.6 && humidity < 0.4) {
             return BIOME_TYPE.MOUNTAINS;
-        } else if (temp < 8) {
+        }
+        if (humidity > 0.30 && humidity < 0.5 && temp > 0.5) {
+            return BIOME_TYPE.PLAINS;
+        }
+        if (temp < 0.3 && humidity < 0.4) {
             return BIOME_TYPE.SNOW;
         }
 
-        return BIOME_TYPE.PLAINS;
+        return BIOME_TYPE.FOREST;
     }
 
     protected void GenerateInnerLayer(int x, int y, int z, Chunk c, BIOME_TYPE type) {
@@ -142,6 +148,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double heightPercentage = (firstBlockHeight - y) / Configuration.CHUNK_DIMENSIONS.y;
 
         switch (type) {
+            case FOREST:
             case PLAINS:
             case MOUNTAINS:
                 // Beach
@@ -158,7 +165,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     c.setBlock(x, y, z, (byte) 0x2);
                 }
 
-                if (type == BIOME_TYPE.PLAINS)
+                if (type == BIOME_TYPE.PLAINS || type == BIOME_TYPE.FOREST)
                     generateRiver(c, x, y, z, heightPercentage, type);
                 break;
             case SNOW:
@@ -245,11 +252,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         if (type == BIOME_TYPE.DESERT) {
             divHeight *= 1.3;
         } else if (type == BIOME_TYPE.PLAINS) {
-            divHeight *= 1.4;
+            divHeight *= 1.6;
         } else if (type == BIOME_TYPE.MOUNTAINS) {
             divHeight *= 1.0;
         } else if (type == BIOME_TYPE.SNOW) {
             divHeight *= 1.2;
+        } else if (type == BIOME_TYPE.FOREST) {
+            divHeight *= 1.5;
         }
 
         return (height + density) / divHeight;
@@ -265,7 +274,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     protected double calcBaseTerrain(double x, double z) {
         double result = 0.0;
 
-        result += _pGen2.fBm(0.0009 * x, 0, 0.0009 * z, 3, 2.2341, 0.94321) + 0.4;
+        result += _pGen2.fBm(0.0009 * x, 0, 0.0009 * z, 3, 2.2341, 0.94321) + 0.7;
 
         return result;
     }
@@ -303,13 +312,16 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         return Math.sqrt(Math.abs(result));
     }
 
-    protected double calcTemperature(double x, double z) {
+    public double calcTemperatureAtGlobalPosition(double x, double z) {
         double result = 0.0;
-        result += _pGen4.fBm(x * 0.0008, 0, 0.0008 * z, 7, 2.1836171, 0.7631);
+        result += _pGen4.fBm(x * 0.005, 0, 0.005 * z, 4, 2.0, 0.81);
+        return MathHelper.clamp((result + 1.0) / 2.0);
+    }
 
-        result = 32.0 + (result) * 64.0;
-
-        return result;
+    public double calcHumidityAtGlobalPosition(double x, double z) {
+        double result = 0.0;
+        result += _pGen5.fBm(x * 0.005, 0, 0.005 * z, 4, 2.0, 0.91);
+        return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     protected double calcCaveDensity(double x, double y, double z) {
