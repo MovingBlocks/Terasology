@@ -1,3 +1,5 @@
+#version 120
+
 varying	vec3 	v;
 varying	vec3 	l;
 varying	vec3 	colorYxy;
@@ -44,7 +46,7 @@ vec3	allweatherSky ( float t, float cosTheta, float cosGamma, float cosThetaSun 
 	vec3	clrYxy = zenith * allweather ( t, cosTheta, cosGamma ) / allweather ( t, 1.0, cosThetaSun );
   
   if(cosTheta < 0.35){
-    thetaSun = 0;
+    thetaSun = 0.0;
   }
 
 	//clrYxy [0] *= smoothstep ( 0.0, EPS, thetaSun);
@@ -60,6 +62,6 @@ void main(void)
         lv              = dot  ( l, v );
 	colorYxy        = allweatherSky ( turbidity, v.y+0.35, lv, l.y );
 	gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
-        sunHighlight    = 3/(pow(max(0, (distance(ls, v)+1.0)), 27)*0.05);  
+        sunHighlight    = 3/(pow(max(0.0, (distance(ls, v)+1.0)), 27.0)*0.05);
 	gl_TexCoord [0] = gl_MultiTexCoord0;
 }

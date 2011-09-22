@@ -1,3 +1,5 @@
+#version 120
+
 varying	vec3 	v;
 varying	vec3 	l;
 varying	vec3 	colorYxy;

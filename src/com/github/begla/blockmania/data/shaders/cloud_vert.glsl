@@ -1,3 +1,5 @@
+#version 120
+
 varying float fog;
 
 float fogEyeRadial(vec4 eyePos) {
