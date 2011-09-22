@@ -26,7 +26,7 @@ import org.lwjgl.util.vector.Vector4f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Anthony Kireev <adeon.k87@gmail.com>
  */
 public class Skysphere implements RenderableObject {
 
