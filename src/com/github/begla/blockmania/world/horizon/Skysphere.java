@@ -17,7 +17,7 @@ package com.github.begla.blockmania.world.horizon;
 
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.singleplayer.SPWorld;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.vector.Vector3f;
@@ -36,9 +36,9 @@ public class Skysphere implements RenderableObject {
     private Sphere _sphere = new Sphere();
     private Vector3f _zenithColor = new Vector3f();
 
-    private World _parent;
+    private SPWorld _parent;
 
-    public Skysphere(World parent) {
+    public Skysphere(SPWorld parent) {
         _parent = parent;
     }
 
@@ -52,7 +52,7 @@ public class Skysphere implements RenderableObject {
         glDisable(GL_DEPTH_TEST);
 
         //float sunPosInRadians = (float)Math.toRadians(180*(_time-0.075));
-        _sunPosAngle = 5.3f * (float) _parent.getTime() - 1.6f;
+        _sunPosAngle = 5.3f * (float) _parent.getTime() - 1.4f;
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         sunNormalise = sunNormalise.normalise(null);
 
@@ -61,7 +61,7 @@ public class Skysphere implements RenderableObject {
         ShaderManager.getInstance().enableShader("sky");
 
         int sunPos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunPos");
-        GL20.glUniform4f(sunPos, 0.0f, -5 * (float) Math.cos(_sunPosAngle), -5 * (float) Math.sin(_sunPosAngle), 1.0f);
+        GL20.glUniform4f(sunPos, 0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
 
         int turbidity = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "turbidity");
         GL20.glUniform1f(turbidity, _turbidity);
@@ -70,7 +70,7 @@ public class Skysphere implements RenderableObject {
         GL20.glUniform3f(zenith, _zenithColor.x, _zenithColor.y, _zenithColor.z);
 
         glPushMatrix();
-        _sphere.draw(22, 40, 40);
+        _sphere.draw(22, 80, 80);
         glPopMatrix();
 
         ShaderManager.getInstance().enableShader(null);

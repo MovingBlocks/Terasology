@@ -30,7 +30,7 @@ import java.io.IOException;
  */
 public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
-    private static int zoomOut = 2;
+    private static int zoomOut = 16;
 
     /**
      * @param seed
@@ -67,6 +67,9 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
                         break;
                     case DESERT:
                         color = Color.YELLOW;
+                        break;
+                    case FOREST:
+                        color = Color.GREEN;
                         break;
                 }
 

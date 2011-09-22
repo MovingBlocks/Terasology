@@ -30,7 +30,7 @@ public abstract class Particle implements RenderableObject {
     protected ParticleEmitter _parent;
 
     protected final Vector3f _targetVelocity = new Vector3f(0.0f, -0.03f, 0.0f);
-    protected final Vector3f _velDecSpeed = new Vector3f(0.004f, 0.004f, 0.004f);
+    protected final Vector3f _velDecSpeed = new Vector3f(0.003f, 0.003f, 0.003f);
 
     protected final Vector3f _position = new Vector3f();
     protected final Vector3f _velocity = new Vector3f();

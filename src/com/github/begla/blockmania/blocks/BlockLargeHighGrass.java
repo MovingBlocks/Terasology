@@ -33,8 +33,8 @@ public class BlockLargeHighGrass extends Block {
     }
 
     @Override
-    public Vector4f getColorOffsetFor(SIDE side, double temp, double hum) {
-        Vector4f grassColor = colorForTemperatureAndHumidity(temp, hum);
+    public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
+        Vector4f grassColor = colorForTemperatureAndHumidity(temperature, humidity);
         return new Vector4f(grassColor.x * 0.9f, grassColor.y * 0.9f, grassColor.z * 0.9f, 1.0f);
     }
 

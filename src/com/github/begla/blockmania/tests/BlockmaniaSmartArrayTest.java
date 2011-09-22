@@ -36,7 +36,6 @@ public class BlockmaniaSmartArrayTest extends junit.framework.TestCase {
     }
 
     public void testAgainstArray() throws Exception {
-
         FastRandom rand = new FastRandom();
 
         for (int x = 0; x < 128; x++) {
@@ -59,5 +58,4 @@ public class BlockmaniaSmartArrayTest extends junit.framework.TestCase {
             }
         }
     }
-
 }

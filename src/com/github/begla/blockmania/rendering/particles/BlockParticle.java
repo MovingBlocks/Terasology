@@ -29,9 +29,9 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class BlockParticle extends Particle {
 
-    private float _lightOffset = 1.0f;
+    private float _lightOffset;
     private float _size;
-    private byte _blockType = 0x1;
+    private byte _blockType;
 
     public BlockParticle(int lifeTime, Vector3f position, byte blockType, BlockParticleEmitter parent) {
         super(lifeTime, position, parent);

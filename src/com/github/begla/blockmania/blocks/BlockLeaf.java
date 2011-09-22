@@ -27,8 +27,8 @@ import org.lwjgl.util.vector.Vector4f;
 public class BlockLeaf extends Block {
 
     @Override
-    public Vector4f getColorOffsetFor(SIDE side, double temp, double hum) {
-        return foliageColorForTemperatureAndHumidity(temp, hum);
+    public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
+        return foliageColorForTemperatureAndHumidity(temperature, humidity);
     }
 
     @Override

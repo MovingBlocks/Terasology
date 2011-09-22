@@ -19,7 +19,7 @@ import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.singleplayer.SPWorld;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.util.ResourceLoader;
@@ -46,9 +46,9 @@ public class Clouds implements RenderableObject {
     private short _nextWindUpdateInSeconds = 32;
     private double _lastWindUpdate = 0;
 
-    private final World _parent;
+    private final SPWorld _parent;
 
-    public Clouds(World parent) {
+    public Clouds(SPWorld parent) {
         _parent = parent;
         _dlClouds = glGenLists(1);
 
@@ -99,6 +99,10 @@ public class Clouds implements RenderableObject {
     }
 
     public void render() {
+        // Nothing to do if the player is swimming
+        if (_parent.getPlayer().isHeadUnderWater())
+            return;
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

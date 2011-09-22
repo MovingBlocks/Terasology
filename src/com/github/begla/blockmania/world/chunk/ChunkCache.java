@@ -45,10 +45,10 @@ public final class ChunkCache {
     }
 
     /**
-     * Loads a specified chunk from cache or from the disk.
+     * Loads a specified chunk from the cache or from the disk.
      * <p/>
-     * NOTE: This method ALWAYS returns a valid chunk (if positive x and z values are provided)
-     * since a new chunk is generated if none of the present chunks fit the request.
+     * NOTE: This method ALWAYS returns a valid chunk since a new chunk is generated if none of the present
+     * chunks fit the request.
      *
      * @param x X-coordinate of the chunk
      * @param z Z-coordinate of the chunk

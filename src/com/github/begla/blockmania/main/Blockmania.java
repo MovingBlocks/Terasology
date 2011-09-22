@@ -20,9 +20,9 @@ import com.github.begla.blockmania.rendering.FontManager;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.VBOManager;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.ChunkMeshGenerator;
+import com.github.begla.blockmania.world.singleplayer.SPWorld;
 import javolution.util.FastList;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -70,7 +70,7 @@ public final class Blockmania {
     private double _memoryUsage;
     /* ------- */
     private Player _player;
-    private World _world;
+    private SPWorld _world;
     /* ------- */
     private final FastRandom _rand = new FastRandom();
     /* ------- */
@@ -611,7 +611,7 @@ public final class Blockmania {
         }
 
         // Init some world
-        _world = new World(title, seed);
+        _world = new SPWorld(title, seed);
         // Init. a new player
         _player = new Player(_world);
         _world.setPlayer(_player);

@@ -28,8 +28,8 @@ import org.lwjgl.util.vector.Vector4f;
 public class BlockDirt extends Block {
 
     @Override
-    public Vector4f getColorOffsetFor(SIDE side, double temp, double hum) {
-        return colorForTemperatureAndHumidity(temp, hum);
+    public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
+        return colorForTemperatureAndHumidity(temperature, humidity);
     }
 
     @Override

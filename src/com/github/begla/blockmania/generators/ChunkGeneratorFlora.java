@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
@@ -24,14 +23,14 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
+public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
     /**
      * Init. the forest generator.
      *
      * @param seed
      */
-    public ChunkGeneratorForest(String seed) {
+    public ChunkGeneratorFlora(String seed) {
         super(seed);
     }
 
@@ -50,47 +49,56 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
             }
         }
 
-        FastRandom rand = new FastRandom(c.hashCode());
+        generateTreesAndCacti(c);
+    }
 
+    private void generateTreesAndCacti(Chunk c) {
         for (int y = 32; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x += 4) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z += 4) {
 
-                    double treeRand = (_rand.randomDouble() + 1.0) / 2.0;
-                    double treeProb = 1.0;
+                    double rand = (_rand.randomDouble() + 1.0) / 2.0;
+                    double prob = 1.0;
 
                     BIOME_TYPE biome = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+                    double humidity = calcHumidityAtGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+                    double temperature = calcTemperatureAtGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
                     switch (biome) {
                         case PLAINS:
-                            treeProb = 0.98;
+                            prob = 0.7;
                             break;
                         case MOUNTAINS:
-                            treeProb = 0.9;
+                            prob = 0.6;
                             break;
                         case SNOW:
-                            treeProb = 0.92;
+                            prob = 0.7;
                             break;
                         case FOREST:
-                            treeProb = 0.1;
+                            prob = 0.1;
+                            break;
+                        case DESERT:
+                            prob = 0.9;
                             break;
                     }
 
-                    if (treeRand > treeProb) {
+                    if (rand > prob) {
 
-                        int randX = x + rand.randomInt() % 12 + 6;
-                        int randZ = z + rand.randomInt() % 12 + 6;
+                        int randX = x + _rand.randomInt() % 12 + 6;
+                        int randZ = z + _rand.randomInt() % 12 + 6;
 
-                        if (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17) {
-                            generateTree(c, randX, y, randZ);
-                        } else if (c.getBlock(randX, y, randZ) == 0x7) {
-                            c.getParent().getObjectGenerator("cactus").generate(c.getBlockWorldPosX(randX), y + 1, c.getBlockWorldPosZ(randZ), false);
+                        if (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17 || c.getBlock(randX, y, randZ) == 0x7) {
+                            if (temperature > 0.55 && humidity < 0.33)
+                                c.getParent().getObjectGenerator("cactus").generate(c.getBlockWorldPosX(randX), y + 1, c.getBlockWorldPosZ(randZ), false);
+                            else
+                                generateTree(c, randX, y, randZ);
                         }
                     }
                 }
             }
         }
     }
+
 
     /**
      * @param c

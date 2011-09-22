@@ -22,7 +22,7 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.singleplayer.SPWorld;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.Audio;
@@ -46,7 +46,7 @@ public abstract class MovableEntity extends Entity {
     protected double _jumpIntensity;
     protected boolean _godMode;
 
-    protected World _parent;
+    protected SPWorld _parent;
 
     protected boolean _jump = false;
     protected double _activeWalkingSpeed;
@@ -55,7 +55,7 @@ public abstract class MovableEntity extends Entity {
     protected final Vector3f _movementDirection = new Vector3f(), _velocity = new Vector3f(), _viewingDirection = new Vector3f();
     protected boolean _isSwimming = false, _headUnderWater = false, _touchingGround = false, _running = false;
 
-    public MovableEntity(World parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
+    public MovableEntity(SPWorld parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
         _parent = parent;
         _walkingSpeed = walkingSpeed;
         _runningFactor = runningFactor;
@@ -521,7 +521,7 @@ public abstract class MovableEntity extends Entity {
         return _headUnderWater;
     }
 
-    public World getParent() {
+    public SPWorld getParent() {
         return _parent;
     }
 }

@@ -23,7 +23,7 @@ import com.github.begla.blockmania.datastructures.ViewFrustum;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.noise.PerlinNoise;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.singleplayer.SPWorld;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -48,7 +48,7 @@ public final class Player extends Character {
 
     private final ViewFrustum _viewFrustum = new ViewFrustum();
 
-    public Player(World parent) {
+    public Player(SPWorld parent) {
         super(parent, Configuration.getSettingNumeric("WALKING_SPEED"), Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
     }
 

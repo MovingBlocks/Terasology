@@ -129,7 +129,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         if (temp >= 0.30 && temp < 0.6 && humidity < 0.4) {
             return BIOME_TYPE.MOUNTAINS;
         }
-        if (humidity > 0.30 && humidity < 0.5 && temp > 0.5) {
+        if (humidity > 0.30 && humidity < 0.8 && temp > 0.5) {
             return BIOME_TYPE.PLAINS;
         }
         if (temp < 0.3 && humidity < 0.4) {
@@ -152,7 +152,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             case PLAINS:
             case MOUNTAINS:
                 // Beach
-                if (y >= 26 && y <= 32) {
+                if (y >= 28 && y <= 34) {
                     c.setBlock(x, y, z, (byte) 0x7);
                 } else if (heightPercentage == 0 && y > 32) {
                     // Grass on top
@@ -242,26 +242,34 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
      */
     public double calcDensity(double x, double y, double z, BIOME_TYPE type) {
         double height = calcBaseTerrain(x, z);
-        double density = calcMountainDensity(x, y, z);
 
-        double divHeight = (y + 1) * 1.2;
-
-        if (y > 100)
-            divHeight *= 2.0;
+        double freqY = 1.0;
+        double amp = 1.0;
 
         if (type == BIOME_TYPE.DESERT) {
-            divHeight *= 1.3;
+            freqY *= 1.0;
+            amp *= 1.1;
         } else if (type == BIOME_TYPE.PLAINS) {
-            divHeight *= 1.6;
+            freqY *= 1.0;
+            amp *= 0.6;
         } else if (type == BIOME_TYPE.MOUNTAINS) {
-            divHeight *= 1.0;
+            freqY *= 0.75;
+            amp *= 4.0;
         } else if (type == BIOME_TYPE.SNOW) {
-            divHeight *= 1.2;
+            freqY *= 1.2;
+            amp *= 1.2;
         } else if (type == BIOME_TYPE.FOREST) {
-            divHeight *= 1.5;
+            freqY *= 1.1;
+            amp *= 1.1;
         }
 
-        return (height + density) / divHeight;
+        double density = calcMountainDensity(x, y * freqY, z) * amp;
+        double divHeight = (y + 1) * 1.75;
+
+        if (y > 248)
+            divHeight *= 2.0;
+
+        return (height - density) / divHeight;
     }
 
     /**
@@ -274,7 +282,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     protected double calcBaseTerrain(double x, double z) {
         double result = 0.0;
 
-        result += _pGen2.fBm(0.0009 * x, 0, 0.0009 * z, 3, 2.2341, 0.94321) + 0.7;
+        result += _pGen2.fBm(0.00008 * x, 0, 0.00008 * z, 3, 2.28371, 0.78) + 0.3;
 
         return result;
     }
@@ -291,11 +299,11 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double x1, y1, z1;
 
         x1 = x * 0.0006;
-        y1 = y * 0.0008;
+        y1 = y * 0.001;
         z1 = z * 0.0006;
 
-        double freq[] = {1.232, 8.4281, 16.371, 32, 64};
-        double amp[] = {1.0, 1.4, 1.6, 1.8, 2.0};
+        double freq[] = {1.232, 8.4281, 16.371, 22, 24, 28, 32, 36};
+        double amp[] = {1.0, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.8};
 
         double ampSum = 0.0;
         for (int i = 0; i < freq.length; i++) {
@@ -308,19 +316,19 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     protected double calcLakeIntensity(double x, double z) {
         double result = 0.0;
-        result += _pGen3.fBm(x * 0.01, 0.01, 0.01 * z, 3, 2.1836171, 0.9631);
+        result += _pGen3.fBm(x * 0.01, 0.01, 0.01 * z, 4, 2.1836171, 0.7631);
         return Math.sqrt(Math.abs(result));
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
         double result = 0.0;
-        result += _pGen4.fBm(x * 0.005, 0, 0.005 * z, 4, 2.0, 0.81);
+        result += _pGen4.fBm(x * 0.001, 0, 0.001 * z, 4, 2.12351, 0.81);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcHumidityAtGlobalPosition(double x, double z) {
         double result = 0.0;
-        result += _pGen5.fBm(x * 0.005, 0, 0.005 * z, 4, 2.0, 0.91);
+        result += _pGen5.fBm(x * 0.002, 0, 0.002 * z, 4, 2.221312, 0.91);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 

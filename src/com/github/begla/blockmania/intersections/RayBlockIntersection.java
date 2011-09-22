@@ -17,7 +17,7 @@
 package com.github.begla.blockmania.intersections;
 
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.singleplayer.SPWorld;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -111,7 +111,7 @@ public class RayBlockIntersection {
      * @param rayDirection
      * @return Distance-ordered list of ray-face-intersections
      */
-    public static FastList<Intersection> executeIntersection(World w, int x, int y, int z, Vector3f rayOrigin, Vector3f rayDirection) {
+    public static FastList<Intersection> executeIntersection(SPWorld w, int x, int y, int z, Vector3f rayOrigin, Vector3f rayDirection) {
         /*
          * Ignore invisible blocks.
          */

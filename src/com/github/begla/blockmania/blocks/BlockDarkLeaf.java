@@ -37,8 +37,8 @@ public class BlockDarkLeaf extends Block {
     }
 
     @Override
-    public Vector4f getColorOffsetFor(SIDE side, double temp, double hum) {
-        Vector4f leafColor = foliageColorForTemperatureAndHumidity(temp, hum);
+    public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
+        Vector4f leafColor = foliageColorForTemperatureAndHumidity(temperature, humidity);
         return new Vector4f(leafColor.x * 0.8f, leafColor.y * 0.8f, leafColor.z * 0.8f, 1.0f);
     }
 

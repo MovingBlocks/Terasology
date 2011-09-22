@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.singleplayer;
 
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
@@ -21,6 +21,7 @@ import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
+import com.github.begla.blockmania.world.WorldProvider;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
@@ -43,24 +44,23 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class World extends WorldProvider {
+public final class SPWorld extends WorldProvider {
     /* PLAYER */
     private Player _player;
-    /* RENDERING */
+    /* CHUNKS */
     private FastList<Chunk> _chunksInProximity = new FastList();
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
     /* HORIZON */
     private final Clouds _clouds;
-    //private final SunMoon _sunMoon;
     private final Skysphere _skysphere;
-    protected double _daylight = 1.0f;
+    protected double _daylight;
     /* WATER AND LAVA ANIMATION */
     private int _tick = 0;
     private long _lastTick;
     /* UPDATING */
     private final Thread _updateThread;
-    private final WorldUpdateManager _worldUpdateManager;
+    private final SPWorldUpdateManager _worldUpdateManager;
     private boolean _updatingEnabled = false, _updateThreadAlive = true;
     private int prevChunkPosX = 0, prevChunkPosZ = 0;
 
@@ -70,15 +70,14 @@ public final class World extends WorldProvider {
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
-    public World(String title, String seed) {
+    public SPWorld(String title, String seed) {
         super(title, seed);
 
         // Init. horizon
         _clouds = new Clouds(this);
-        //_sunMoon = new SunMoon(this);
         _skysphere = new Skysphere(this);
 
-        _worldUpdateManager = new WorldUpdateManager(this);
+        _worldUpdateManager = new SPWorldUpdateManager(this);
         _updateThread = new Thread(new Runnable() {
 
             public void run() {
@@ -116,31 +115,14 @@ public final class World extends WorldProvider {
      * Renders the world.
      */
     public void render() {
-
+        /* SKYSPHERE */
         _skysphere.render();
-
+        /* WORLD RENDERING */
         _player.applyPlayerModelViewMatrix();
-
-        // _sunMoon.render();
-
-        if (!_player.isHeadUnderWater())
-            _clouds.render();
-
-        /*
-        * Render the world from the player's view.
-        */
+        _clouds.render();
         _player.render();
-
         renderChunks();
-        renderParticleEmitters();
-    }
-
-    private void renderParticleEmitters() {
         _blockParticleEmitter.render();
-    }
-
-    private void updateParticleEmitters() {
-        _blockParticleEmitter.update();
     }
 
     private void updateChunksInProximity() {
@@ -197,7 +179,6 @@ public final class World extends WorldProvider {
     }
 
     private void renderChunks() {
-
         ShaderManager.getInstance().enableShader("chunk");
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
         int swimmimg = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
@@ -262,9 +243,6 @@ public final class World extends WorldProvider {
         glDisable(GL_TEXTURE_2D);
     }
 
-    /**
-     * Update all dirty display lists.
-     */
     public void update() {
         updateDaylight();
         updateTicks();
@@ -284,7 +262,7 @@ public final class World extends WorldProvider {
             n.getValue().update();
 
         // Update the particle emitters
-        updateParticleEmitters();
+        _blockParticleEmitter.update();
     }
 
     private void updateTicks() {
@@ -324,32 +302,6 @@ public final class World extends WorldProvider {
     }
 
     /**
-     * Returns the active biome at the player's position.
-     */
-    public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome() {
-        return getActiveBiome((int) _player.getPosition().x, (int) _player.getPosition().z);
-    }
-
-    /**
-     * Returns the humidity at the player's position.
-     *
-     * @return
-     */
-    public double getActiveHumidity() {
-
-        return getHumidityAt((int) _player.getPosition().x, (int) _player.getPosition().z);
-    }
-
-    /**
-     * Returns the temeperature at the player's position.
-     *
-     * @return
-     */
-    public double getActiveTemperature() {
-        return getTemperatureAt((int) _player.getPosition().x, (int) _player.getPosition().z);
-    }
-
-    /**
      * Stops the updating thread and writes all chunks to disk.
      */
     public void dispose() {
@@ -376,7 +328,7 @@ public final class World extends WorldProvider {
      */
     @Override
     public String toString() {
-        return String.format("world (time: %f, sun: %f, cdl: %d, cn: %d, cache: %d, ud: %fs, seed: \"%s\", title: \"%s\")", getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _worldUpdateManager.getUpdatesSize(), _chunkCache.size(), _worldUpdateManager.getMeanUpdateDuration() / 1000d, _seed, _title);
+        return String.format("world (biome: %s, time: %f, sun: %f, cdl: %d, cn: %d, cache: %d, ud: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _worldUpdateManager.getUpdatesSize(), _chunkCache.size(), _worldUpdateManager.getMeanUpdateDuration() / 1000d, _seed, _title);
     }
 
     /**
@@ -421,11 +373,6 @@ public final class World extends WorldProvider {
         return _player.getViewFrustum().intersects(c.getAABB());
     }
 
-    /**
-     * Returns the daylight value.
-     *
-     * @return The daylight value
-     */
     public double getDaylight() {
         return _daylight;
     }
@@ -436,5 +383,31 @@ public final class World extends WorldProvider {
 
     public BlockParticleEmitter getBlockParticleEmitter() {
         return _blockParticleEmitter;
+    }
+
+    /**
+     * Returns the active biome at the player's position.
+     */
+    public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome() {
+        return getActiveBiome((int) _player.getPosition().x, (int) _player.getPosition().z);
+    }
+
+    /**
+     * Returns the humidity at the player's position.
+     *
+     * @return
+     */
+    public double getActiveHumidity() {
+
+        return getHumidityAt((int) _player.getPosition().x, (int) _player.getPosition().z);
+    }
+
+    /**
+     * Returns the temeperature at the player's position.
+     *
+     * @return
+     */
+    public double getActiveTemperature() {
+        return getTemperatureAt((int) _player.getPosition().x, (int) _player.getPosition().z);
     }
 }
