@@ -62,6 +62,6 @@ void main(void)
         lv              = dot  ( l, v );
 	colorYxy        = allweatherSky ( turbidity, v.y+0.35, lv, l.y );
 	gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
-        sunHighlight    = pow(max(0, (distance(ls, v)+1.0)), 27)*0.05;  
+        sunHighlight    = 3/(pow(max(0, (distance(ls, v)+1.0)), 27)*0.05);  
 	gl_TexCoord [0] = gl_MultiTexCoord0;
 }

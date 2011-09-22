@@ -22,7 +22,7 @@ vec3	convertColor ()
 	const	vec3	gCoeffs = vec3 ( -0.969256, 1.875991, 0.041556 );
 	const	vec3	bCoeffs = vec3 ( 0.055684, -0.204043, 1.057311 );
 
-	return	vec3 ( dot ( rCoeffs, XYZ )+3/(sunHighlight), dot ( gCoeffs, XYZ )+3/(sunHighlight), dot ( bCoeffs, XYZ ));
+	return	vec3 ( dot ( rCoeffs, XYZ )+(sunHighlight), dot ( gCoeffs, XYZ )+(sunHighlight), dot ( bCoeffs, XYZ ));
 }
 
 void main ()
