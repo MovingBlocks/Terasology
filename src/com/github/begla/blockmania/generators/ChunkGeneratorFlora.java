@@ -83,16 +83,13 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                     }
 
                     if (rand > prob) {
-
                         int randX = x + _rand.randomInt() % 12 + 6;
                         int randZ = z + _rand.randomInt() % 12 + 6;
 
-                        if (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17 || c.getBlock(randX, y, randZ) == 0x7) {
-                            if (temperature > 0.55 && humidity < 0.33)
-                                c.getParent().getObjectGenerator("cactus").generate(c.getBlockWorldPosX(randX), y + 1, c.getBlockWorldPosZ(randZ), false);
-                            else
-                                generateTree(c, randX, y, randZ);
-                        }
+                        if (temperature > 0.55 && humidity < 0.33 && (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17 || c.getBlock(randX, y, randZ) == 0x7))
+                            c.getParent().getObjectGenerator("cactus").generate(c.getBlockWorldPosX(randX), y + 1, c.getBlockWorldPosZ(randZ), false);
+                        else if (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17)
+                            generateTree(c, randX, y, randZ);
                     }
                 }
             }
