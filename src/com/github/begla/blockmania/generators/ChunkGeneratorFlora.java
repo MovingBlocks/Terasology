@@ -66,13 +66,13 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
                     switch (biome) {
                         case PLAINS:
-                            prob = 0.7;
+                            prob = 0.9;
                             break;
                         case MOUNTAINS:
-                            prob = 0.6;
+                            prob = 0.8;
                             break;
                         case SNOW:
-                            prob = 0.7;
+                            prob = 0.8;
                             break;
                         case FOREST:
                             prob = 0.1;
@@ -118,7 +118,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                     grassProb = 0.4;
                     break;
                 case MOUNTAINS:
-                    grassProb = 0.9;
+                    grassProb = 0.7;
                     break;
                 case FOREST:
                     grassProb = 0.6;
