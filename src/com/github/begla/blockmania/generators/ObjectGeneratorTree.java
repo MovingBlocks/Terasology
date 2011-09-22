@@ -42,7 +42,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
      */
     @Override
     public void generate(int posX, int posY, int posZ, boolean update) {
-        int height = _rand.randomInt() % 2 + 6;
+        int height = Math.abs(_rand.randomInt() % 4) + 4;
 
         if (posY + height >= Configuration.CHUNK_DIMENSIONS.y) {
             return;

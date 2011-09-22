@@ -22,7 +22,7 @@ import com.github.begla.blockmania.rendering.VBOManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.world.characters.Player;
-import com.github.begla.blockmania.world.chunk.Chunk;
+import com.github.begla.blockmania.world.chunk.ChunkMeshGenerator;
 import javolution.util.FastList;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -34,6 +34,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.SlickException;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -96,7 +97,7 @@ public final class Blockmania {
      * @param args Arguments
      */
     public static void main(String[] args) {
-        Blockmania.getInstance().addLogFileHandler("blockmania.log", Level.INFO);
+        initDefaultLogger();
         Blockmania.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
 
         try {
@@ -126,6 +127,18 @@ public final class Blockmania {
         }
 
         System.exit(0);
+    }
+
+    private static void initDefaultLogger() {
+        File dirPath = new File("logs");
+
+        if (!dirPath.exists()) {
+            if (!dirPath.mkdirs()) {
+                return;
+            }
+        }
+
+        Blockmania.getInstance().addLogFileHandler("logs/blockmania.log", Level.INFO);
     }
 
     private static void loadNativeLibs() throws Exception {
@@ -245,7 +258,7 @@ public final class Blockmania {
         // Update the viewing distance
         double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
         double viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, (float) (viewingDistance * 0.025));
+        glFogf(GL_FOG_START, (float) (viewingDistance * 0.25));
         glFogf(GL_FOG_END, (float) viewingDistance);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -408,7 +421,7 @@ public final class Blockmania {
             FontManager.getInstance().getFont("default").drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage));
             FontManager.getInstance().getFont("default").drawString(4, 22, String.format("%s", _player));
             FontManager.getInstance().getFont("default").drawString(4, 38, String.format("%s", _world));
-            FontManager.getInstance().getFont("default").drawString(4, 54, String.format("total vus: %s", Chunk.getVertexArrayUpdateCount()));
+            FontManager.getInstance().getFont("default").drawString(4, 54, String.format("total vus: %s", ChunkMeshGenerator.getVertexArrayUpdateCount()));
         }
 
         if (_pauseGame) {
