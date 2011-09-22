@@ -30,7 +30,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     protected static final int SAMPLE_RATE_3D_VERT = 4;
 
     public enum BIOME_TYPE {
-        MOUNTAINS, SNOW, DESERT, PLAINS
+        MOUNTAINS, SNOW, DESERT, FOREST, PLAINS
     }
 
     /**
@@ -129,11 +129,14 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         if (temp >= 0.30 && temp < 0.6 && humidity < 0.4) {
             return BIOME_TYPE.MOUNTAINS;
         }
+        if (humidity > 0.30 && humidity < 0.5 && temp > 0.5) {
+            return BIOME_TYPE.PLAINS;
+        }
         if (temp < 0.3 && humidity < 0.4) {
             return BIOME_TYPE.SNOW;
         }
 
-        return BIOME_TYPE.PLAINS;
+        return BIOME_TYPE.FOREST;
     }
 
     protected void GenerateInnerLayer(int x, int y, int z, Chunk c, BIOME_TYPE type) {
@@ -145,6 +148,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double heightPercentage = (firstBlockHeight - y) / Configuration.CHUNK_DIMENSIONS.y;
 
         switch (type) {
+            case FOREST:
             case PLAINS:
             case MOUNTAINS:
                 // Beach
@@ -161,7 +165,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     c.setBlock(x, y, z, (byte) 0x2);
                 }
 
-                if (type == BIOME_TYPE.PLAINS)
+                if (type == BIOME_TYPE.PLAINS || type == BIOME_TYPE.FOREST)
                     generateRiver(c, x, y, z, heightPercentage, type);
                 break;
             case SNOW:
@@ -248,11 +252,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         if (type == BIOME_TYPE.DESERT) {
             divHeight *= 1.3;
         } else if (type == BIOME_TYPE.PLAINS) {
-            divHeight *= 1.4;
+            divHeight *= 1.6;
         } else if (type == BIOME_TYPE.MOUNTAINS) {
             divHeight *= 1.0;
         } else if (type == BIOME_TYPE.SNOW) {
             divHeight *= 1.2;
+        } else if (type == BIOME_TYPE.FOREST) {
+            divHeight *= 1.5;
         }
 
         return (height + density) / divHeight;

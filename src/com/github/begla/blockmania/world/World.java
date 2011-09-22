@@ -161,7 +161,6 @@ public final class World extends WorldProvider {
         }
     }
 
-
     private void updateDaylight() {
         // Sunrise
         if (getTime() < 0.1f && getTime() > 0.0f) {

@@ -258,7 +258,7 @@ public final class Blockmania {
         // Update the viewing distance
         double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
         double viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, (float) (viewingDistance * 0.5));
+        glFogf(GL_FOG_START, (float) (viewingDistance * 0.25));
         glFogf(GL_FOG_END, (float) viewingDistance);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

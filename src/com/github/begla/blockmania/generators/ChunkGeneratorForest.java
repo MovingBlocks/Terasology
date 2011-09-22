@@ -63,20 +63,23 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
 
                     switch (biome) {
                         case PLAINS:
-                            treeProb = 0.8;
+                            treeProb = 0.98;
                             break;
                         case MOUNTAINS:
-                            treeProb = 0.7;
+                            treeProb = 0.9;
                             break;
                         case SNOW:
-                            treeProb = 0.95;
+                            treeProb = 0.92;
+                            break;
+                        case FOREST:
+                            treeProb = 0.1;
                             break;
                     }
 
                     if (treeRand > treeProb) {
 
-                        int randX = x + rand.randomInt() % 12 + 4;
-                        int randZ = z + rand.randomInt() % 12 + 4;
+                        int randX = x + rand.randomInt() % 12 + 6;
+                        int randZ = z + rand.randomInt() % 12 + 6;
 
                         if (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17) {
                             generateTree(c, randX, y, randZ);
@@ -107,10 +110,13 @@ public class ChunkGeneratorForest extends ChunkGeneratorTerrain {
 
             switch (biome) {
                 case PLAINS:
-                    grassProb = 0.7;
+                    grassProb = 0.4;
                     break;
                 case MOUNTAINS:
                     grassProb = 0.9;
+                    break;
+                case FOREST:
+                    grassProb = 0.6;
                     break;
             }
 

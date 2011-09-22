@@ -56,7 +56,7 @@ void main(){
     color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
     if (swimming == 0) {
-        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(1.0,1.0,1.0,1.0) * daylight, clamp(fog,0.0,0.5)).rgb;
+        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(1.0,1.0,1.0,1.0) * daylight, clamp(fog,0.0,0.3)).rgb;
         gl_FragColor.a = color.a;
     } else {
         gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.0,0.0,0.0,1.0) * daylight, clamp(fog*16.0,0.0,1.0)).rgb;
@@ -64,6 +64,4 @@ void main(){
         gl_FragColor.b *= 0.7;
         gl_FragColor.a = 1.0;
     }
-
-    gl_FragColor = pow(gl_FragColor, vec4(1.0/0.9));
 }
