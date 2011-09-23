@@ -58,16 +58,12 @@ public final class Blockmania {
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
     /* ------- */
-    private long _lastLoopTime;
-    private long _lastFpsTime;
+    private long _lastLoopTime, _lastFpsTime;
     private int _fps;
     private final StringBuffer _consoleInput = new StringBuffer();
-    private boolean _pauseGame = false;
-    private boolean _runGame = true;
-    private boolean _saveWorldOnExit = true;
+    private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
     /* ------- */
-    private double _meanFps;
-    private double _memoryUsage;
+    private double _averageFps;
     /* ------- */
     private Player _player;
     private SPWorld _world;
@@ -418,7 +414,9 @@ public final class Blockmania {
         * Draw debugging information.
         */
         if (Configuration.getSettingBoolean("DEBUG")) {
-            FontManager.getInstance().getFont("default").drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage));
+            double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
+
+            FontManager.getInstance().getFont("default").drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f)", Configuration.GAME_TITLE, _averageFps, memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
             FontManager.getInstance().getFont("default").drawString(4, 22, String.format("%s", _player));
             FontManager.getInstance().getFont("default").drawString(4, 38, String.format("%s", _world));
             FontManager.getInstance().getFont("default").drawString(4, 54, String.format("total vus: %s", ChunkMeshGenerator.getVertexArrayUpdateCount()));
@@ -636,11 +634,8 @@ public final class Blockmania {
         if (_lastFpsTime >= 1000) {
             _lastFpsTime = 0;
 
-            _meanFps += _fps;
-            _meanFps /= 2;
-
-            // Calculate the current memory usage in MB
-            _memoryUsage = (Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
+            _averageFps += _fps;
+            _averageFps /= 2;
 
             _fps = 0;
         }

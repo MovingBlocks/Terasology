@@ -109,7 +109,7 @@ public final class SPWorldUpdateManager {
         return _vboUpdates.size();
     }
 
-    public double getMeanUpdateDuration() {
+    public double getAverageUpdateDuration() {
         return _averageUpdateDuration;
     }
 }
