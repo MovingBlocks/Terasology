@@ -278,8 +278,8 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         y1 = y * 0.0005;
         z1 = z * 0.0006;
 
-        double freq[] = {1.232, 8.4281, 16.371, 32.47281, 64.457281, 66.0, 68.0};
-        double amp[] = {1.0, 2.0, 4.0, 8.0, 16.0, 17.0, 18.0};
+        double freq[] = {1.232, 2.0, 4.0, 8.4281, 16.371, 32.47281, 64.457281};
+        double amp[] = {1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0};
 
         double ampSum = 0.0;
         for (int i = 0; i < amp.length; i++) {
@@ -292,7 +292,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     protected double calcLakeIntensity(double x, double z) {
         double result = 0.0;
-        result += _pGen3.fBm(x * 0.01, 0.01, 0.01 * z, 4, 2.1836171, 0.7631);
+        result += _pGen2.fBm(x * 0.004, 0, 0.004 * z, 4, 2.1836171, 0.7631);
         return Math.sqrt(Math.abs(result));
     }
 
