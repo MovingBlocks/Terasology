@@ -209,9 +209,6 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    /**
-     * @param densityMap
-     */
     protected void triLerpDensityMap(double[][][] densityMap) {
         for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
             for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
@@ -227,13 +224,6 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    /**
-     * @param x
-     * @param y
-     * @param z
-     * @param type
-     * @return
-     */
     public double calcDensity(double x, double y, double z, BIOME_TYPE type) {
         double height = calcBaseTerrain(x, z);
 
@@ -245,72 +235,62 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             amp *= 0.3;
         } else if (type == BIOME_TYPE.PLAINS) {
             freqY *= 1.0;
-            amp *= 0.1;
+            amp *= 0.2;
         } else if (type == BIOME_TYPE.MOUNTAINS) {
             freqY *= 1.0;
-            amp *= 1.0;
+            amp *= 0.75;
         } else if (type == BIOME_TYPE.SNOW) {
             freqY *= 1.0;
-            amp *= 0.3;
+            amp *= 0.4;
         } else if (type == BIOME_TYPE.FOREST) {
             freqY *= 1.0;
-            amp *= 0.2;
+            amp *= 0.4;
         }
 
         double density = calcMountainDensity(x, y * freqY, z) * amp;
-        return -y + ((height * 64.0 + 32.0) - density * 128.0);
+        return -y + ((height * 64.0 + 32.0) + density * 128.0);
     }
 
-    protected double calcBaseTerrain(double x, double z) {
-        double result = 0.0;
-
-        result += _pGen2.fBm(0.0009 * x, 0, 0.0009 * z, 8, 2.28371, 0.78);
-
-        return result;
+    public double calcBaseTerrain(double x, double z) {
+        return _pGen2.fBm(0.0009 * x, 0, 0.0009 * z, 8, 2.28371, 0.78);
     }
 
-    protected double calcMountainDensity(double x, double y, double z) {
+    public double calcMountainDensity(double x, double y, double z) {
         double result = 0.0;
 
         double x1, y1, z1;
 
-        x1 = x * 0.0006;
-        y1 = y * 0.0005;
-        z1 = z * 0.0006;
+        x1 = x * 0.0003;
+        y1 = y * 0.0003;
+        z1 = z * 0.0003;
 
-        double freq[] = {1.232, 2.0, 4.0, 8.4281, 16.371, 32.47281, 64.457281};
-        double amp[] = {1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0};
+        double freq[] = {1.232, 2.0, 4.0, 8.4281, 16.371, 32.0, 64.0};
+        double amp[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
 
-        double ampSum = 0.0;
         for (int i = 0; i < amp.length; i++) {
             result += _pGen5.noise(x1 * freq[i], y1 * freq[i], z1 * freq[i]) * amp[i];
-            ampSum += amp[i];
         }
 
-        return (result / ampSum);
+        return Math.abs(result);
     }
 
-    protected double calcLakeIntensity(double x, double z) {
-        double result = 0.0;
-        result += _pGen2.fBm(x * 0.004, 0, 0.004 * z, 4, 2.1836171, 0.7631);
+    public double calcLakeIntensity(double x, double z) {
+        double result = _pGen2.fBm(x * 0.004, 0, 0.004 * z, 4, 2.1836171, 0.7631);
         return Math.sqrt(Math.abs(result));
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
-        double result = 0.0;
-        result += _pGen4.fBm(x * 0.004, 0, 0.004 * z, 4, 2.12351, 0.91);
+        double result = _pGen4.fBm(x * 0.001, 0, 0.001 * z, 8, 2.12351, 0.91);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcHumidityAtGlobalPosition(double x, double z) {
-        double result = 0.0;
-        result += _pGen5.fBm(x * 0.004, 0, 0.004 * z, 4, 2.221312, 0.81);
+        double result = _pGen5.fBm(x * 0.001, 0, 0.001 * z, 8, 2.221312, 0.61);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
-    protected double calcCaveDensity(double x, double y, double z) {
-        double result = 0.0;
-        result += _pGen6.fBm(x * 0.04, y * 0.04, z * 0.04, 2, 2.0, 0.98);
+    public double calcCaveDensity(double x, double y, double z) {
+        double result = _pGen6.fBm(x * 0.04, y * 0.04, z * 0.04, 2, 2.0, 0.98);
         return result;
     }
 }

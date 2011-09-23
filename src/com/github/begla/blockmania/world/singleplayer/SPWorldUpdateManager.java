@@ -19,7 +19,6 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import javolution.util.FastList;
 import javolution.util.FastSet;
 
-import java.util.Collections;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;

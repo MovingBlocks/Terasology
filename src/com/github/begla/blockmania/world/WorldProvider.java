@@ -438,7 +438,7 @@ public class WorldProvider {
 
             double dens = ((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 32, randZ, ChunkGeneratorTerrain.BIOME_TYPE.PLAINS);
 
-            if (dens > 0.0 && dens < 64.0)
+            if (dens >= 0.0 && dens < 64.0)
                 return new Vector3f(randX, 128, randZ);
         }
     }
