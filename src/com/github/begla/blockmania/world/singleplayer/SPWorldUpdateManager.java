@@ -15,14 +15,14 @@
  */
 package com.github.begla.blockmania.world.singleplayer;
 
-import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import javolution.util.FastList;
 import javolution.util.FastSet;
 
 import java.util.Collections;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.logging.Level;
 
 /**
  * Provides support for updating and generating chunks.
@@ -31,11 +31,13 @@ import java.util.logging.Level;
  */
 public final class SPWorldUpdateManager {
 
-    private final PriorityBlockingQueue<Chunk> _vboUpdates = new PriorityBlockingQueue<Chunk>(64);
-    private final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>(16);
+    private static final int MAX_THREADS = Math.max(Runtime.getRuntime().availableProcessors() / 2, 1);
+    private static final Executor _threadPool = Executors.newFixedThreadPool(MAX_THREADS);
     /* ------ */
-    private int _threadCount = 0, _chunkUpdateAmount;
-    private double _meanUpdateDuration = 0.0;
+    private final PriorityBlockingQueue<Chunk> _vboUpdates = new PriorityBlockingQueue<Chunk>();
+    private final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
+    /* ------ */
+    private double _averageUpdateDuration = 0.0;
     /* ------ */
     private final SPWorld _parent;
 
@@ -48,84 +50,34 @@ public final class SPWorldUpdateManager {
         this._parent = _parent;
     }
 
-    /**
-     * Retrieves the currently visible chunks from the parent world and updates one dirty/fresh chunk
-     * using a new thread. If the thread limit is reached, the new thread is put to sleep until an active thread
-     * finished its job.
-     */
-    public void processChunkUpdates() {
-        long timeStart = System.currentTimeMillis();
-
-        // Fetch the currently visible chunks
-        final FastList<Chunk> dirtyChunks = new FastList<Chunk>(_parent.fetchVisibleChunks());
-
-        // Remove "okay" chunks
-        for (int i = dirtyChunks.size() - 1; i >= 0; i--) {
-            Chunk c = dirtyChunks.get(i);
-
-            if (c == null) {
-                dirtyChunks.remove(i);
-                continue;
-            }
-
-            if (!(c.isDirty() || c.isFresh() || c.isLightDirty())) {
-                dirtyChunks.remove(i);
-            }
+    public void queueChunkUpdates(FastList<Chunk> visibleChunks) {
+        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            if (n.getValue().isDirty() || n.getValue().isFresh() || n.getValue().isLightDirty())
+                queueChunkUpdate(n.getValue());
         }
+    }
 
-        // Nothing to do? Escape!
-        if (dirtyChunks.isEmpty()) {
-            return;
-        }
+    public void queueChunkUpdate(Chunk c) {
+        final Chunk chunkToProcess = c;
 
-        // Sort the chunks according to the distance to the world origin (normally the player).
-        Collections.sort(dirtyChunks);
-
-        // Retrieve the first chunk...
-        final Chunk chunkToProcess = dirtyChunks.getFirst();
-
-        // ... and if this chunk is not updated at the moment...
-        if (!_currentlyProcessedChunks.contains(chunkToProcess)) {
-
+        if (!_currentlyProcessedChunks.contains(chunkToProcess) && _currentlyProcessedChunks.size() < MAX_THREADS) {
             _currentlyProcessedChunks.add(chunkToProcess);
 
             // ... create a new thread and start processing.
-            Thread t = new Thread() {
-                @Override
+            Runnable r = new Runnable() {
                 public void run() {
-                    while (_threadCount > Math.max(Runtime.getRuntime().availableProcessors() - 2, 1)) {
-                        synchronized (_currentlyProcessedChunks) {
-                            try {
-                                _currentlyProcessedChunks.wait();
-                            } catch (InterruptedException e) {
-                                Blockmania.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
-                            }
-                        }
-                    }
-
-                    synchronized (_currentlyProcessedChunks) {
-                        _threadCount++;
-                    }
+                    long timeStart = System.currentTimeMillis();
 
                     processChunkUpdate(chunkToProcess);
                     _currentlyProcessedChunks.remove(chunkToProcess);
 
-                    synchronized (_currentlyProcessedChunks) {
-                        _threadCount--;
-                    }
-
-                    synchronized (_currentlyProcessedChunks) {
-                        _currentlyProcessedChunks.notify();
-                    }
+                    _averageUpdateDuration += System.currentTimeMillis() - timeStart;
+                    _averageUpdateDuration /= 2;
                 }
             };
 
-            t.start();
+            _threadPool.execute(r);
         }
-
-        _chunkUpdateAmount = dirtyChunks.size();
-        _meanUpdateDuration += System.currentTimeMillis() - timeStart;
-        _meanUpdateDuration /= 2;
     }
 
     /**
@@ -153,15 +105,11 @@ public final class SPWorldUpdateManager {
         }
     }
 
-    public int getUpdatesSize() {
-        return _chunkUpdateAmount;
-    }
-
     public int getVboUpdatesSize() {
         return _vboUpdates.size();
     }
 
     public double getMeanUpdateDuration() {
-        return _meanUpdateDuration;
+        return _averageUpdateDuration;
     }
 }

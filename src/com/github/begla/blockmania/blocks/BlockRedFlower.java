@@ -18,6 +18,7 @@ package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A red flower billboard block.
@@ -25,6 +26,12 @@ import org.lwjgl.util.vector.Vector2f;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockRedFlower extends Block {
+
+    @Override
+    public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
+        Vector4f foliageColor = foliageColorForTemperatureAndHumidity(temperature, humidity);
+        return new Vector4f(foliageColor.x, foliageColor.y, foliageColor.z, 1.0f);
+    }
 
     @Override
     public boolean isBlockTypeTranslucent() {

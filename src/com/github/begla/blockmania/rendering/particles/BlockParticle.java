@@ -37,7 +37,7 @@ public class BlockParticle extends Particle {
         super(lifeTime, position, parent);
         _blockType = blockType;
         _size = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.08f;
-        _lightOffset = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.6f + 0.4f;
+        _lightOffset = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.2f + 0.8f;
 
         _position.x += _rand.randomDouble() * 0.4;
         _position.y += _rand.randomDouble() * 0.4;
@@ -67,9 +67,9 @@ public class BlockParticle extends Particle {
 
         BlockParticleEmitter pE = (BlockParticleEmitter) getParent();
         double lightValueSun = pE.getParent().getDaylight() * ((double) pE.getParent().getLightAtPosition(_position, Chunk.LIGHT_TYPE.SUN));
-        lightValueSun = Math.pow(0.8, 15 - lightValueSun);
+        lightValueSun = Math.pow(0.82, 15.0 - lightValueSun);
         double lightValueBlock = pE.getParent().getLightAtPosition(_position, Chunk.LIGHT_TYPE.BLOCK);
-        lightValueBlock = Math.pow(0.8, 15 - lightValueBlock);
+        lightValueBlock = lightValueBlock / 15.0;
         float lightValue = (float) Math.max(lightValueSun, lightValueBlock) * _lightOffset;
 
         glBegin(GL_QUADS);

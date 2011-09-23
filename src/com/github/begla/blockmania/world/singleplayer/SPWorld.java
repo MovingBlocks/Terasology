@@ -31,6 +31,7 @@ import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
 
+import java.util.Collections;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -104,7 +105,6 @@ public final class SPWorld extends WorldProvider {
                     }
 
                     updateChunksInProximity();
-                    _worldUpdateManager.processChunkUpdates();
                     _chunkCache.freeCacheSpace();
                 }
             }
@@ -117,11 +117,17 @@ public final class SPWorld extends WorldProvider {
     public void render() {
         /* SKYSPHERE */
         _skysphere.render();
+
         /* WORLD RENDERING */
         _player.applyPlayerModelViewMatrix();
-        _clouds.render();
         _player.render();
+
         renderChunks();
+
+        /* CLOUDS */
+        _clouds.render();
+
+        /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();
     }
 
@@ -139,6 +145,7 @@ public final class SPWorld extends WorldProvider {
                 }
             }
 
+            Collections.sort(newChunksInProximity);
             _chunksInProximity = newChunksInProximity;
         }
     }
@@ -261,6 +268,8 @@ public final class SPWorld extends WorldProvider {
         for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; )
             n.getValue().update();
 
+        _worldUpdateManager.queueChunkUpdates(visibleChunks);
+
         // Update the particle emitters
         _blockParticleEmitter.update();
     }
@@ -328,7 +337,7 @@ public final class SPWorld extends WorldProvider {
      */
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, sun: %f, cdl: %d, cn: %d, cache: %d, ud: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _worldUpdateManager.getUpdatesSize(), _chunkCache.size(), _worldUpdateManager.getMeanUpdateDuration() / 1000d, _seed, _title);
+        return String.format("world (biome: %s, time: %f, sun: %f, cdl: %d, cache: %d, ud: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _chunkCache.size(), _worldUpdateManager.getMeanUpdateDuration() / 1000d, _seed, _title);
     }
 
     /**

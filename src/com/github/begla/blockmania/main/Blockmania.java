@@ -54,7 +54,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  */
 public final class Blockmania {
 
-    /* ------- */
+    private static final int FRAME_SKIP_MAX_FRAMES = 10;
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
     /* ------- */
@@ -309,7 +309,7 @@ public final class Blockmania {
 
             // Pause the game while the debug console is being shown
             loopCounter = 0;
-            while (getTime() > nextGameTick && loopCounter < Configuration.FRAME_SKIP_MAX_FRAMES) {
+            while (getTime() > nextGameTick && loopCounter < FRAME_SKIP_MAX_FRAMES) {
                 if (!_pauseGame) {
                     update();
                 }

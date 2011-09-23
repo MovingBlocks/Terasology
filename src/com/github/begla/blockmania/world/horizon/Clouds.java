@@ -140,8 +140,8 @@ public class Clouds implements RenderableObject {
         }
 
         if (Blockmania.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
-            _windDirection.x = (float) _parent.getRandom().randomDouble() / 8;
-            _windDirection.y = (float) _parent.getRandom().randomDouble() / 8;
+            _windDirection.x = (float) _parent.getRandom().randomDouble() / 4;
+            _windDirection.y = (float) _parent.getRandom().randomDouble() / 4;
             _nextWindUpdateInSeconds = (short) (Math.abs(_parent.getRandom().randomInt()) % 16 + 32);
             _lastWindUpdate = Blockmania.getInstance().getTime();
         }

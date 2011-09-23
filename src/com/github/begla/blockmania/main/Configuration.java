@@ -28,10 +28,6 @@ import org.lwjgl.util.vector.Vector3f;
 public final class Configuration {
 
     /**
-     * Maximum amount frames to skip.
-     */
-    public static final int FRAME_SKIP_MAX_FRAMES = 10;
-    /**
      * The mouse sensitivity.
      */
     public static final double MOUSE_SENS = 0.075;
