@@ -504,7 +504,7 @@ public class WorldProvider {
      * @return True if saving was successful
      */
     public boolean saveMetaData() {
-        if (Blockmania.getInstance().isSandboxed()) {
+        if (Configuration.getSettingBoolean("SANDBOXED")) {
             return false;
         }
 
@@ -559,7 +559,7 @@ public class WorldProvider {
      * @return True if loading was successful
      */
     private boolean loadMetaData() {
-        if (Blockmania.getInstance().isSandboxed()) {
+        if (Configuration.getSettingBoolean("SANDBOXED")) {
             return false;
         }
 

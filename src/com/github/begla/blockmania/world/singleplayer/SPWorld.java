@@ -78,7 +78,7 @@ public final class SPWorld extends WorldProvider {
         _clouds = new Clouds(this);
         _skysphere = new Skysphere(this);
 
-        _worldUpdateManager = new SPWorldUpdateManager(this);
+        _worldUpdateManager = new SPWorldUpdateManager();
         _updateThread = new Thread(new Runnable() {
 
             public void run() {
@@ -265,10 +265,13 @@ public final class SPWorld extends WorldProvider {
         FastList<Chunk> visibleChunks = fetchVisibleChunks();
 
         // Update chunks
-        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; )
+        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
             n.getValue().update();
 
-        _worldUpdateManager.queueChunkUpdates(visibleChunks);
+            if (n.getValue().isDirty() || n.getValue().isFresh() || n.getValue().isLightDirty()) {
+                _worldUpdateManager.queueChunkUpdate(n.getValue());
+            }
+        }
 
         // Update the particle emitters
         _blockParticleEmitter.update();

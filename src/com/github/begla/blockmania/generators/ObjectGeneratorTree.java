@@ -50,7 +50,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            _worldProvider.setBlock(posX, posY + i, posZ, (byte) 0x5, update, false);
+            _worldProvider.setBlock(posX, posY + i, posZ, (byte) 0x5, update, true);
         }
 
         // Generate the treetop

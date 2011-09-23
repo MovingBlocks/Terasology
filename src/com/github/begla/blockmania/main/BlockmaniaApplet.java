@@ -21,8 +21,6 @@ import org.lwjgl.opengl.Display;
 import java.applet.Applet;
 
 /**
- * The heart and soul of Blockmania.
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class BlockmaniaApplet extends Applet {
@@ -40,15 +38,16 @@ public final class BlockmaniaApplet extends Applet {
             @Override
             public void run() {
                 try {
+                    Configuration.loadSandboxed();
+
                     Display.setParent(null);
                     Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(1280, 720));
                     Display.setTitle(Configuration.GAME_TITLE);
                     Display.create();
 
                     _blockmania = Blockmania.getInstance();
-                    _blockmania.setSandboxed(true);
-
                     _blockmania.initControls();
+
                     _blockmania.initGame();
                     _blockmania.startGame();
                 } catch (Exception e) {

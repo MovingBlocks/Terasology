@@ -80,7 +80,15 @@ public final class Configuration {
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
 
     static {
-        loadSettings();
+        loadDefaults();
+
+        if (Boolean.getBoolean("blockmania.demo")) {
+            loadDemo();
+        } else if (Boolean.getBoolean("blockmania.debug")) {
+            loadDebug();
+        } else if (Boolean.getBoolean("blockmania.sandboxed")) {
+            loadSandboxed();
+        }
     }
 
     /**
@@ -126,7 +134,9 @@ public final class Configuration {
     /**
      * Loads the default values for the global settings.
      */
-    private static void loadDefaults() {
+    public static void loadDefaults() {
+        _settingsBoolean.put("SANDBOXED", false);
+        _settingsBoolean.put("SAVE_CHUNKS", true);
         _settingsBoolean.put("ROTATING_BLOCK", true);
         _settingsBoolean.put("REPLANT_DIRT", true);
         _settingsBoolean.put("PLACING_BOX", true);
@@ -149,7 +159,7 @@ public final class Configuration {
         _settingsNumeric.put("V_DIST_Z", 32.0);
     }
 
-    private static void loadDebug() {
+    public static void loadDebug() {
         _settingsBoolean.put("CHUNK_OUTLINES", false);
         _settingsBoolean.put("DEBUG", true);
         _settingsBoolean.put("DEBUG_COLLISION", false);
@@ -157,31 +167,22 @@ public final class Configuration {
         _settingsNumeric.put("WALKING_SPEED", 0.5);
     }
 
-    private static void loadDemo() {
+    public static void loadDemo() {
+        _settingsBoolean.put("ROTATING_BLOCK", false);
+        _settingsBoolean.put("SAVE_CHUNKS", false);
         _settingsBoolean.put("DEBUG", false);
         _settingsBoolean.put("PLACING_BOX", false);
         _settingsBoolean.put("CROSSHAIR", false);
         _settingsBoolean.put("DEMO_FLIGHT", true);
         _settingsBoolean.put("GOD_MODE", true);
         _settingsNumeric.put("WALKING_SPEED", 0.1);
+        _settingsNumeric.put("V_DIST_X", 46.0);
+        _settingsNumeric.put("V_DIST_Z", 46.0);
     }
 
-    private static void loadSandboxed() {
+    public static void loadSandboxed() {
+        _settingsBoolean.put("SANDBOXED", true);
         _settingsNumeric.put("V_DIST_X", 8.0);
         _settingsNumeric.put("V_DIST_Z", 8.0);
-    }
-
-    private static void loadSettings() {
-        loadDefaults();
-
-        if (!Blockmania.getInstance().isSandboxed()) {
-            if (Boolean.getBoolean("blockmania.demo")) {
-                loadDemo();
-            } else if (Boolean.getBoolean("blockmania.debugMode")) {
-                loadDebug();
-            }
-        } else {
-            loadSandboxed();
-        }
     }
 }

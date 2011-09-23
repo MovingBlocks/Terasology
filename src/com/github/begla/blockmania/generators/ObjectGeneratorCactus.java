@@ -40,7 +40,7 @@ public class ObjectGeneratorCactus extends ObjectGenerator {
     @Override
     public void generate(int posX, int posY, int posZ, boolean update) {
         for (int y = posY; y < posY + 3; y++) {
-            _worldProvider.setBlock(posX, y, posZ, (byte) 0x18, update, false);
+            _worldProvider.setBlock(posX, y, posZ, (byte) 0x18, update, true);
         }
     }
 }

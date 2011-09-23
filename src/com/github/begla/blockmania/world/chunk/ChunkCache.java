@@ -125,8 +125,9 @@ public final class ChunkCache {
     }
 
     private void writeChunkToDisk(Chunk c) {
-        if (Blockmania.getInstance().isSandboxed())
+        if (Configuration.getSettingBoolean("SANDBOXED") || !Configuration.getSettingBoolean("SAVE_CHUNKS")) {
             return;
+        }
 
         if (c.isFresh()) {
             return;

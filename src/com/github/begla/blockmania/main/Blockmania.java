@@ -76,8 +76,6 @@ public final class Blockmania {
     /* ------- */
     private final Logger _logger = Logger.getLogger("blockmania");
     /* ------- */
-    private boolean _sandbox = false;
-    /* ------- */
     private double _cubeRotation;
 
     // Singleton
@@ -654,13 +652,5 @@ public final class Blockmania {
 
     public Logger getLogger() {
         return _logger;
-    }
-
-    public void setSandboxed(boolean b) {
-        _sandbox = b;
-    }
-
-    public boolean isSandboxed() {
-        return _sandbox;
     }
 }
