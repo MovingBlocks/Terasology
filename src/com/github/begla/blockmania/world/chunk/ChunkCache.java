@@ -129,20 +129,6 @@ public final class ChunkCache {
         _chunkCache.clear();
     }
 
-    /**
-     * @return
-     */
-    public int size() {
-        return _chunkCache.size();
-    }
-
-    /**
-     * @return
-     */
-    public static int capacity() {
-        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue() + 1024);
-    }
-
     private void writeChunkToDisk(Chunk c) {
         if (Configuration.getSettingBoolean("SANDBOXED") || !Configuration.getSettingBoolean("SAVE_CHUNKS")) {
             return;
@@ -195,5 +181,13 @@ public final class ChunkCache {
         }
 
         return null;
+    }
+
+    public int size() {
+        return _chunkCache.size();
+    }
+
+    public static int capacity() {
+        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue() + 512);
     }
 }

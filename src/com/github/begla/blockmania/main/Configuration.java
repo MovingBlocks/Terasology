@@ -77,7 +77,6 @@ public final class Configuration {
 
     static {
         loadDefaults();
-        automaticallySetViewingDistance();
 
         if (Boolean.getBoolean("blockmania.demo")) {
             loadDemo();
@@ -86,6 +85,8 @@ public final class Configuration {
         } else if (Boolean.getBoolean("blockmania.sandboxed")) {
             loadSandboxed();
         }
+
+        determineAndSetViewingDistance();
     }
 
     /**
@@ -152,8 +153,8 @@ public final class Configuration {
         _settingsNumeric.put("MAX_GRAVITY_SWIMMING", 0.01);
         _settingsNumeric.put("GRAVITY_SWIMMING", 0.0001);
         _settingsNumeric.put("FRICTION", 0.08);
-        _settingsNumeric.put("V_DIST_X", 16.0);
-        _settingsNumeric.put("V_DIST_Z", 16.0);
+        _settingsNumeric.put("V_DIST_X", 8.0);
+        _settingsNumeric.put("V_DIST_Z", 8.0);
     }
 
     public static void loadDebug() {
@@ -181,11 +182,11 @@ public final class Configuration {
         _settingsBoolean.put("SANDBOXED", true);
     }
 
-    private static void automaticallySetViewingDistance() {
-        if (Runtime.getRuntime().maxMemory() > 512) {
+    private static void determineAndSetViewingDistance() {
+        if (Runtime.getRuntime().maxMemory() / 1048576.0 > 400) {
             _settingsNumeric.put("V_DIST_X", 32.0);
             _settingsNumeric.put("V_DIST_Z", 32.0);
-        } else if (Runtime.getRuntime().maxMemory() > 128) {
+        } else if (Runtime.getRuntime().maxMemory() / 1048576.0 > 200) {
             _settingsNumeric.put("V_DIST_X", 16.0);
             _settingsNumeric.put("V_DIST_Z", 16.0);
         } else {
