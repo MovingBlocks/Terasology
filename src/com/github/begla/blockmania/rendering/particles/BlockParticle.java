@@ -29,7 +29,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class BlockParticle extends Particle {
 
-    private float _lightOffset;
+    private float _texOffset, _lightOffset;
     private float _size;
     private byte _blockType;
 
@@ -38,6 +38,7 @@ public class BlockParticle extends Particle {
         _blockType = blockType;
         _size = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.08f;
         _lightOffset = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.2f + 0.8f;
+        _texOffset = (float) (((_rand.randomDouble() + 1.0) / 2.0) * (0.0624 - 0.02));
 
         _position.x += _rand.randomDouble() * 0.4;
         _position.y += _rand.randomDouble() * 0.4;
@@ -74,13 +75,13 @@ public class BlockParticle extends Particle {
 
         glBegin(GL_QUADS);
         GL11.glColor3f(lightValue, lightValue, lightValue);
-        GL11.glTexCoord2f(Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).y);
+        GL11.glTexCoord2f(Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).x + _texOffset, Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).y + _texOffset);
         GL11.glVertex3f(-_size, _size, -_size);
-        GL11.glTexCoord2f(Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).x + 0.0624f, Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).y);
+        GL11.glTexCoord2f(Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).x + 0.02f + _texOffset, Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).y + _texOffset);
         GL11.glVertex3f(_size, _size, -_size);
-        GL11.glTexCoord2f(Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).x + 0.0624f, Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).y + 0.0624f);
+        GL11.glTexCoord2f(Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).x + 0.02f + _texOffset, Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).y + 0.02f + _texOffset);
         GL11.glVertex3f(_size, -_size, -_size);
-        GL11.glTexCoord2f(Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).y + 0.0624f);
+        GL11.glTexCoord2f(Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).x + _texOffset, Block.getBlockForType(_blockType).getTextureOffsetFor(Block.SIDE.FRONT).y + 0.02f + _texOffset);
         GL11.glVertex3f(-_size, -_size, -_size);
         glEnd();
 
