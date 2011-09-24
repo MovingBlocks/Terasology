@@ -248,6 +248,8 @@ public final class Blockmania {
      * Renders the scene.
      */
     private void render() {
+        resizeViewport();
+
         glFogi(GL_FOG_MODE, GL_LINEAR);
         // Update the viewing distance
         double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
@@ -273,7 +275,7 @@ public final class Blockmania {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(80.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 1024f);
+        gluPerspective(Configuration.getSettingNumeric("FOV").floatValue(), (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 1024f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
@@ -290,8 +292,6 @@ public final class Blockmania {
 
         double nextGameTick = getTime();
         int loopCounter;
-
-        resizeViewport();
 
         /*
          * Blockmania game loop.
@@ -310,6 +310,7 @@ public final class Blockmania {
                 nextGameTick += SKIP_TICKS;
                 loopCounter++;
             }
+
             render();
 
             // Clear dirty flag and swap buffer

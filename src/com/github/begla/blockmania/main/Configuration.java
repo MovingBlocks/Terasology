@@ -133,6 +133,7 @@ public final class Configuration {
      * Loads the default values for the global settings.
      */
     public static void loadDefaults() {
+        _settingsNumeric.put("FOV", 70.0);
         _settingsBoolean.put("SANDBOXED", false);
         _settingsBoolean.put("SAVE_CHUNKS", true);
         _settingsBoolean.put("ROTATING_BLOCK", true);
