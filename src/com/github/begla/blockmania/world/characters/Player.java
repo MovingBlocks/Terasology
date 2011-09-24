@@ -233,6 +233,12 @@ public final class Player extends Character {
                 byte currentBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
                 getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
 
+                // Remove the upper block if it's a billboard
+                byte upperBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
+                if (Block.getBlockForType(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
+                    getParent().setBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z, (byte) 0x0, true, true);
+                }
+
                 _parent.getBlockParticleEmitter().setOrigin(blockPos);
                 _parent.getBlockParticleEmitter().emitParticles(128, currentBlockType);
                 AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) Math.abs(_rand.randomDouble()) * 0.4f, 0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false);

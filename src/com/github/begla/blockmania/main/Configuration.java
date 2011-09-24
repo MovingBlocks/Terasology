@@ -179,8 +179,6 @@ public final class Configuration {
 
     public static void loadSandboxed() {
         _settingsBoolean.put("SANDBOXED", true);
-        _settingsNumeric.put("V_DIST_X", 8.0);
-        _settingsNumeric.put("V_DIST_Z", 8.0);
     }
 
     private static void automaticallySetViewingDistance() {
