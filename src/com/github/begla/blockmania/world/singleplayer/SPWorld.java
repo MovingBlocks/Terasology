@@ -60,9 +60,7 @@ public final class SPWorld extends WorldProvider {
     private int _tick = 0;
     private long _lastTick;
     /* UPDATING */
-    private final Thread _updateThread;
     private final SPWorldUpdateManager _worldUpdateManager;
-    private boolean _updatingEnabled = false, _updateThreadAlive = true;
     private int prevChunkPosX = 0, prevChunkPosZ = 0;
 
     /**
@@ -79,36 +77,6 @@ public final class SPWorld extends WorldProvider {
         _skysphere = new Skysphere(this);
 
         _worldUpdateManager = new SPWorldUpdateManager();
-        _updateThread = new Thread(new Runnable() {
-
-            public void run() {
-                while (true) {
-                    /*
-                     * Checks if the thread should be killed.
-                     */
-                    if (!_updateThreadAlive) {
-                        return;
-                    }
-
-                    /*
-                     * Puts the thread to sleep
-                     * if updating is disabled.
-                     */
-                    if (!_updatingEnabled) {
-                        synchronized (_updateThread) {
-                            try {
-                                _updateThread.wait();
-                            } catch (InterruptedException ex) {
-                                Blockmania.getInstance().getLogger().log(Level.SEVERE, ex.toString());
-                            }
-                        }
-                    }
-
-                    updateChunksInProximity();
-                    _chunkCache.freeCacheSpace();
-                }
-            }
-        });
     }
 
     /**
@@ -253,28 +221,31 @@ public final class SPWorld extends WorldProvider {
     public void update() {
         updateDaylight();
         updateTicks();
+
         _skysphere.update();
 
         // Update the player
         _player.update();
-        // Generate new VBOs if available
-        _worldUpdateManager.updateVBOs();
         // Update the clouds
         _clouds.update();
 
+        updateChunksInProximity();
         FastList<Chunk> visibleChunks = fetchVisibleChunks();
 
         // Update chunks
         for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            n.getValue().update();
-
-            if (n.getValue().isDirty() || n.getValue().isFresh() || n.getValue().isLightDirty()) {
+            if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
                 _worldUpdateManager.queueChunkUpdate(n.getValue());
             }
+
+            n.getValue().update();
         }
 
         // Update the particle emitters
         _blockParticleEmitter.update();
+
+        // Generate new VBOs if available
+        _worldUpdateManager.updateVBOs();
     }
 
     private void updateTicks() {
@@ -318,17 +289,6 @@ public final class SPWorld extends WorldProvider {
      */
     public void dispose() {
         Blockmania.getInstance().getLogger().log(Level.INFO, "Disposing world {0} and saving all chunks.", getTitle());
-
-        synchronized (_updateThread) {
-            _updateThreadAlive = false;
-            _updateThread.notify();
-        }
-
-        try {
-            _updateThread.join();
-        } catch (InterruptedException e) {
-        }
-
         saveMetaData();
         getChunkCache().saveAndDisposeAllChunks();
     }
@@ -341,31 +301,6 @@ public final class SPWorld extends WorldProvider {
     @Override
     public String toString() {
         return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _chunkCache.size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _seed, _title);
-    }
-
-    /**
-     * Starts the updating thread.
-     */
-    public void startUpdateThread() {
-        _updatingEnabled = true;
-        _updateThread.start();
-    }
-
-    /**
-     * Resumes the updating thread.
-     */
-    public void resumeUpdateThread() {
-        _updatingEnabled = true;
-        synchronized (_updateThread) {
-            _updateThread.notify();
-        }
-    }
-
-    /**
-     * Safely suspends the updating thread.
-     */
-    public void suspendUpdateThread() {
-        _updatingEnabled = false;
     }
 
     public void setSpawningPointToPlayerPosition() {

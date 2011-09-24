@@ -21,7 +21,7 @@ import javolution.util.FastSet;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * Provides support for updating and generating chunks.
@@ -29,11 +29,12 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class SPWorldUpdateManager {
+
     private static final int MAX_THREADS = Math.max(Runtime.getRuntime().availableProcessors() - 2, 1);
     private static final ExecutorService _threadPool = Executors.newFixedThreadPool(MAX_THREADS);
+    private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
     /* ------ */
-    private final LinkedBlockingQueue<Chunk> _vboUpdates = new LinkedBlockingQueue<Chunk>();
-    private final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
+    private final PriorityBlockingQueue<Chunk> _vboUpdates = new PriorityBlockingQueue<Chunk>();
     /* ------ */
     private double _averageUpdateDuration = 0.0;
 
@@ -78,10 +79,12 @@ public final class SPWorldUpdateManager {
      * Updates the VBOs of all currently queued chunks.
      */
     public void updateVBOs() {
-        Chunk c = _vboUpdates.poll();
+        while (_vboUpdates.size() > 0) {
+            Chunk c = _vboUpdates.poll();
 
-        if (c != null)
-            c.generateVBOs();
+            if (c != null)
+                c.generateVBOs();
+        }
     }
 
     public int getVboUpdatesSize() {

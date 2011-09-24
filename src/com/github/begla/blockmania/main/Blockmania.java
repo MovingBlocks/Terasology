@@ -331,8 +331,6 @@ public final class Blockmania {
     }
 
     public void pauseGame() {
-        if (_world != null)
-            _world.suspendUpdateThread();
         Mouse.setGrabbed(false);
         _pauseGame = true;
     }
@@ -340,8 +338,6 @@ public final class Blockmania {
     public void unpauseGame() {
         _pauseGame = false;
         Mouse.setGrabbed(true);
-        if (_world != null)
-            _world.resumeUpdateThread();
     }
 
     /**
@@ -611,9 +607,6 @@ public final class Blockmania {
         // Init. a new player
         _player = new Player(_world);
         _world.setPlayer(_player);
-
-        _world.startUpdateThread();
-
         // Reset the delta value
         _lastLoopTime = getTime();
     }
