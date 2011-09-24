@@ -59,9 +59,9 @@ void main(){
     blocklightColorValue = clamp(blocklightColorValue,0.0,1.0);
     daylightColorValue = clamp(daylightColorValue, 0.0, 1.0);
 
-    blocklightColorValue.x *= 1.5;
-    blocklightColorValue.y *= 1.3;
-    blocklightColorValue.z *= 0.6;
+    blocklightColorValue.x *= 1.2;
+    blocklightColorValue.y *= 1.1;
+    blocklightColorValue.z *= 0.7;
 
     color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
