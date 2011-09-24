@@ -92,7 +92,7 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
         for (int x = -512; x < 512; x++) {
             for (int y = -512; y < 512; y++) {
-                double n = -calcMountainDensity(x * zoomOut, 64, y * zoomOut);
+                double n = calcMountainDensity(x * zoomOut, 64, y * zoomOut);
 
                 int color = (int) (n * 255.0);
                 color = (color > 255) ? 255 : color;

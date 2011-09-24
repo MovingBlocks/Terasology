@@ -26,7 +26,7 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
-    protected static final int SAMPLE_RATE_3D_HOR = 16;
+    protected static final int SAMPLE_RATE_3D_HOR = 8;
     protected static final int SAMPLE_RATE_3D_VERT = 8;
 
     public enum BIOME_TYPE {
@@ -264,11 +264,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         y1 = y * 0.0003;
         z1 = z * 0.0003;
 
+        double perturb = _pGen3.fBm(x * 0.005, y * 0.005, z * 0.005,4, 2.217281, 0.6371);
+
         double freq[] = {1.232, 2.0, 4.0, 8.4281, 16.371, 32.0, 64.0};
         double amp[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
 
         for (int i = 0; i < amp.length; i++) {
-            result += _pGen5.noise(x1 * freq[i], y1 * freq[i], z1 * freq[i]) * amp[i];
+            result += _pGen5.noise(x1 * freq[i] + perturb, y1 * freq[i] + perturb, z1 * freq[i] + perturb) * amp[i];
         }
 
         return Math.abs(result);
