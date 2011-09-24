@@ -10,11 +10,11 @@ varying float fog;
 varying vec3 normal;
 
 vec4 srgbToLinear(vec4 color){
-    return pow(color, vec4(1.0 / 1.8));
+    return pow(color, vec4(1.0 / 2.2));
 }
 
 vec4 linearToSrgb(vec4 color){
-    return pow(color, vec4(1.8));
+    return pow(color, vec4(2.2));
 }
 
 void main(){
@@ -34,13 +34,23 @@ void main(){
     if (color.a < 0.1)
         discard;
 
-    color.rgb *= gl_Color.rgb;
-    color.a *= gl_Color.a;
+    // APPLY TEXTURE OFFSET
+    if (!(texCoord.x >= 0.0625 * 3 && texCoord.x < 0.0625 * 4 && texCoord.y >= 0.0625 * 0 && texCoord.y < 0.0625 * 1)) {
+        color.rgb *= gl_Color.rgb;
+        color.a *= gl_Color.a;
+    } else {
+        // MASK GRASS
+        if (texture2D(textureAtlas, vec2(texCoord.x + 3*0.0625, texCoord.y + 2*0.0625)).a > 0) {
+            color.rgb *= gl_Color.rgb;
+            color.a *= gl_Color.a;
+        }
+    }
 
+    // FETCH LIGHT VALUES
     vec2 lightCoord = vec2(gl_TexCoord[1]);
 
+    // CALCULATE DAYLIGHT AND BLOCKLIGHT
     float daylightValue = clamp(daylight + 0.4, 0.0, 1.0) * pow(0.82, (1.0-lightCoord.x)*15.0);
-
     float blocklightValue = lightCoord.y;
 
     vec3 daylightColorValue = vec3(daylightValue);

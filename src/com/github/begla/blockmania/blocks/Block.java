@@ -87,7 +87,8 @@ public abstract class Block implements RenderableObject {
             new BlockWood(), new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick(), // 15-19
             new BlockCoal(), new BlockGold(), new BlockDarkLeaf(), new BlockSnow(), new BlockCactus(), // 20-24
             new BlockBookShelf(), new BlockColorBlack(), new BlockColorBlue(), new BlockColorBrown(), new BlockColorGreen(), // 25-29
-            new BlockColorPurple(), new BlockColorRed(), new BlockColorWhite(), new BlockRedStone(), new BlockSilver(), new BlockDiamond() // 30-35
+            new BlockColorPurple(), new BlockColorRed(), new BlockColorWhite(), new BlockRedStone(), new BlockSilver(), new BlockDiamond(), // 30-35
+            new BlockMediumHighGrass() // 36
     };
 
     private static final BlockNil NIL_BLOCK = new BlockNil();

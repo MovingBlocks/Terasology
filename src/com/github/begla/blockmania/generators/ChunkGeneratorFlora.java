@@ -132,6 +132,8 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                 double rand = _rand.standNormalDistrDouble();
                 if (rand > -0.4 && rand < 0.4) {
                     c.setBlock(x, y + 1, z, (byte) 0xB);
+                } else if (rand > -0.6 && rand < 0.6) {
+                    c.setBlock(x, y + 1, z, (byte) 0x24);
                 } else {
                     c.setBlock(x, y + 1, z, (byte) 0xC);
                 }

@@ -18,20 +18,48 @@ package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector4f;
 
 /**
- * A dirt block.
+ * A large high grass billboard block.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockDirt extends Block {
+public class BlockMediumHighGrass extends Block {
+
     @Override
     public boolean isBlockTypeTranslucent() {
+        return true;
+    }
+
+    @Override
+    public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
+        Vector4f foliageColor = foliageColorForTemperatureAndHumidity(temperature, humidity);
+        return new Vector4f(foliageColor.x, foliageColor.y, foliageColor.z, 1.0f);
+    }
+
+    @Override
+    public Vector2f getTextureOffsetFor(SIDE side) {
+        return Helper.calcOffsetForTextureAt(13, 11);
+    }
+
+    @Override
+    public boolean isPenetrable() {
+        return true;
+    }
+
+    @Override
+    public boolean isCastingShadows() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldRenderBoundingBox() {
         return false;
     }
 
     @Override
-    public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.calcOffsetForTextureAt(2, 0);
+    public BLOCK_FORM getBlockForm() {
+        return BLOCK_FORM.BILLBOARD;
     }
 }

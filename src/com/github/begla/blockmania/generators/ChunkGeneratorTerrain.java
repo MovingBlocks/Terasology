@@ -26,8 +26,8 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
-    protected static final int SAMPLE_RATE_3D_HOR = 8;
-    protected static final int SAMPLE_RATE_3D_VERT = 4;
+    protected static final int SAMPLE_RATE_3D_HOR = 16;
+    protected static final int SAMPLE_RATE_3D_VERT = 8;
 
     public enum BIOME_TYPE {
         MOUNTAINS, SNOW, DESERT, FOREST, PLAINS
