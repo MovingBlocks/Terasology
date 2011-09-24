@@ -40,13 +40,9 @@ public final class Configuration {
      */
     public static final Vector3f CHUNK_DIMENSIONS = new Vector3f(16, 256, 16);
     /**
-     * The size of the sun.
-     */
-    public static final double SUN_SIZE = 64;
-    /**
      * The string used to generate the default world. If not set, a random seed is used.
      */
-    public static final String DEFAULT_SEED = "";
+    public static final String DEFAULT_SEED = "waltterrr";
     /**
      * The pixel format used to init. the display.
      */
@@ -81,6 +77,7 @@ public final class Configuration {
 
     static {
         loadDefaults();
+        automaticallySetViewingDistance();
 
         if (Boolean.getBoolean("blockmania.demo")) {
             loadDemo();
@@ -155,8 +152,8 @@ public final class Configuration {
         _settingsNumeric.put("MAX_GRAVITY_SWIMMING", 0.01);
         _settingsNumeric.put("GRAVITY_SWIMMING", 0.0001);
         _settingsNumeric.put("FRICTION", 0.08);
-        _settingsNumeric.put("V_DIST_X", 32.0);
-        _settingsNumeric.put("V_DIST_Z", 32.0);
+        _settingsNumeric.put("V_DIST_X", 16.0);
+        _settingsNumeric.put("V_DIST_Z", 16.0);
     }
 
     public static void loadDebug() {
@@ -184,5 +181,18 @@ public final class Configuration {
         _settingsBoolean.put("SANDBOXED", true);
         _settingsNumeric.put("V_DIST_X", 8.0);
         _settingsNumeric.put("V_DIST_Z", 8.0);
+    }
+
+    private static void automaticallySetViewingDistance() {
+        if (Runtime.getRuntime().maxMemory() > 512) {
+            _settingsNumeric.put("V_DIST_X", 32.0);
+            _settingsNumeric.put("V_DIST_Z", 32.0);
+        } else if (Runtime.getRuntime().maxMemory() > 128) {
+            _settingsNumeric.put("V_DIST_X", 16.0);
+            _settingsNumeric.put("V_DIST_Z", 16.0);
+        } else {
+            _settingsNumeric.put("V_DIST_X", 8.0);
+            _settingsNumeric.put("V_DIST_Z", 8.0);
+        }
     }
 }
