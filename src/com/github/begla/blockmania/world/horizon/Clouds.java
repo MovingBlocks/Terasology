@@ -19,7 +19,7 @@ import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.world.singleplayer.SPWorld;
+import com.github.begla.blockmania.world.World;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector2f;
 import org.newdawn.slick.util.ResourceLoader;
@@ -33,7 +33,6 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Some blocky clouds which randomly float around and follow the player's movement.
- * Nothing more, nothing less.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -46,9 +45,9 @@ public class Clouds implements RenderableObject {
     private short _nextWindUpdateInSeconds = 32;
     private double _lastWindUpdate = 0;
 
-    private final SPWorld _parent;
+    private final World _parent;
 
-    public Clouds(SPWorld parent) {
+    public Clouds(World parent) {
         _parent = parent;
         _dlClouds = glGenLists(1);
 

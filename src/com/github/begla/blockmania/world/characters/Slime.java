@@ -21,7 +21,7 @@ import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.singleplayer.SPWorld;
+import com.github.begla.blockmania.world.World;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -40,7 +40,7 @@ public final class Slime extends Character {
     private long _lastChangeOfDirectionAt = Blockmania.getInstance().getTime();
     private Vector3f _movementTarget = new Vector3f();
 
-    public Slime(SPWorld parent) {
+    public Slime(World parent) {
         super(parent, Configuration.getSettingNumeric("WALKING_SPEED") / 4, Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
         _instanceCounter++;
     }

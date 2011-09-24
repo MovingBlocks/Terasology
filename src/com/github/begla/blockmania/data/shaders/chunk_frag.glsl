@@ -2,9 +2,9 @@
 
 uniform sampler2D textureAtlas;
 uniform float daylight = 1.0;
-uniform int swimming = 0;
-uniform float animationOffset = 0;
-uniform int animationType = 0;
+uniform bool swimming;
+uniform bool animated;
+uniform float animationOffset;
 
 varying float fog;
 varying vec3 normal;
@@ -21,7 +21,7 @@ void main(){
     vec4 texCoord = gl_TexCoord[0];
 
     // TEXTURE ANIMATION
-    if (animationType == 1) {
+    if (animated) {
         texCoord.x *= 16;
         texCoord.y /= 4;
 
@@ -65,7 +65,7 @@ void main(){
 
     color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
-    if (swimming == 0) {
+    if (!swimming) {
         gl_FragColor.rgb = mix(linearToSrgb(color), vec4(1.0,1.0,1.0,1.0) * daylight, clamp(fog,0.0,0.3)).rgb;
         gl_FragColor.a = color.a;
     } else {

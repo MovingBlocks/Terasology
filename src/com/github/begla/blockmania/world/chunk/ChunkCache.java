@@ -18,7 +18,7 @@ package com.github.begla.blockmania.world.chunk;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.WorldProvider;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 import org.lwjgl.util.vector.Vector3f;
@@ -40,12 +40,12 @@ public final class ChunkCache {
     private static boolean _running = false;
     /* ------ */
     private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>().shared();
-    private final WorldProvider _parent;
+    private final LocalWorldProvider _parent;
 
     /**
      * @param parent
      */
-    public ChunkCache(WorldProvider parent) {
+    public ChunkCache(LocalWorldProvider parent) {
         _parent = parent;
     }
 

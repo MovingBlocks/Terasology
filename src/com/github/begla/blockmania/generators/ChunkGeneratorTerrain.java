@@ -92,7 +92,8 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
 
-                        GenerateOuterLayer(x, y, z, firstBlockHeight, c, type);
+                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.6)
+                            GenerateOuterLayer(x, y, z, firstBlockHeight, c, type);
                         continue;
                     } else if (dens >= 64) {
 
@@ -139,7 +140,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     protected void GenerateOuterLayer(int x, int y, int z, int firstBlockHeight, Chunk c, BIOME_TYPE type) {
 
-        double heightPercentage = (firstBlockHeight - y) / Configuration.CHUNK_DIMENSIONS.y;
+        int depth = (firstBlockHeight - y);
 
         switch (type) {
             case FOREST:
@@ -148,10 +149,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                 // Beach
                 if (y >= 28 && y <= 34) {
                     c.setBlock(x, y, z, (byte) 0x7);
-                } else if (heightPercentage == 0 && y > 32) {
+                } else if (depth == 0 && y > 32) {
                     // Grass on top
                     c.setBlock(x, y, z, (byte) 0x1);
-                } else if (heightPercentage > 0.02) {
+                } else if (depth > 8) {
                     // Stone
                     c.setBlock(x, y, z, (byte) 0x3);
                 } else {
@@ -160,14 +161,14 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                 }
 
                 if (type == BIOME_TYPE.PLAINS || type == BIOME_TYPE.FOREST)
-                    generateRiver(c, x, y, z, heightPercentage, type);
+                    generateRiver(c, x, y, z, depth, type);
                 break;
             case SNOW:
 
-                if (heightPercentage == 0.0 && y > 32) {
+                if (depth == 0.0 && y > 32) {
                     // Snow on top
                     c.setBlock(x, y, z, (byte) 0x17);
-                } else if (heightPercentage > 0.02) {
+                } else if (depth > 8) {
                     // Stone
                     c.setBlock(x, y, z, (byte) 0x3);
                 } else {
@@ -175,11 +176,11 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                     c.setBlock(x, y, z, (byte) 0x2);
                 }
 
-                generateRiver(c, x, y, z, heightPercentage, type);
+                generateRiver(c, x, y, z, depth, type);
                 break;
 
             case DESERT:
-                if (heightPercentage > 0.2) {
+                if (depth > 8) {
                     // Stone
                     c.setBlock(x, y, z, (byte) 0x3);
                 } else {
@@ -191,16 +192,16 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    protected void generateRiver(Chunk c, int x, int y, int z, double heightPercentage, BIOME_TYPE type) {
+    protected void generateRiver(Chunk c, int x, int y, int z, int depth, BIOME_TYPE type) {
         // Rivers under water? Nope.
-        if (y <= 32)
+        if (y < 32)
             return;
 
         double lakeIntens = calcLakeIntensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
-        if (lakeIntens < 0.2 && heightPercentage < 0.015) {
+        if (lakeIntens < 0.2 && depth < 2) {
             c.setBlock(x, y, z, (byte) 0x0);
-        } else if (lakeIntens < 0.2 && heightPercentage >= 0.015 && heightPercentage < 0.05) {
+        } else if (lakeIntens < 0.2 && depth >= 2 && depth < 8) {
             if (type == BIOME_TYPE.SNOW) {
                 c.setBlock(x, y, z, (byte) 0x11);
             } else {
@@ -264,7 +265,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         y1 = y * 0.0003;
         z1 = z * 0.0003;
 
-        double perturb = _pGen3.fBm(x * 0.005, y * 0.005, z * 0.005,4, 2.217281, 0.6371);
+        double perturb = _pGen3.fBm(x * 0.004, y * 0.003, z * 0.004, 4, 2.217281, 0.6371);
 
         double freq[] = {1.232, 2.0, 4.0, 8.4281, 16.371, 32.0, 64.0};
         double amp[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
@@ -292,7 +293,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     public double calcCaveDensity(double x, double y, double z) {
-        double result = _pGen6.fBm(x * 0.04, y * 0.04, z * 0.04, 2, 2.0, 0.98);
+        double result = _pGen6.fBm(x * 0.03, y * 0.03, z * 0.03, 3, 2.3719, 0.7);
         return result;
     }
 }

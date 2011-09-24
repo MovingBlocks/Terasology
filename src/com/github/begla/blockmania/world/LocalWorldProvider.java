@@ -42,20 +42,25 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class WorldProvider {
+public class LocalWorldProvider {
 
     /* CONST */
     protected final long DAY_NIGHT_LENGTH_IN_MS = (60 * 1000) * 20; // 20 minutes in milliseconds
+
     /* WORLD GENERATION */
     protected final FastMap<String, ChunkGenerator> _chunkGenerators = new FastMap<String, ChunkGenerator>(8);
     protected final FastMap<String, ObjectGenerator> _objectGenerators = new FastMap<String, ObjectGenerator>(8);
+
     /* PROPERTIES */
     protected String _title, _seed;
     protected long _creationTime = Blockmania.getInstance().getTime();
-    /* UPDATING & CACHING */
+
+    /* CHUNK CACHE */
     protected final ChunkCache _chunkCache = new ChunkCache(this);
+
     /* RANDOMNESS */
     protected final FastRandom _random;
+
     /* SPAWNING POINT */
     protected Vector3f _spawningPoint;
 
@@ -65,12 +70,10 @@ public class WorldProvider {
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
-    public WorldProvider(String title, String seed) {
+    public LocalWorldProvider(String title, String seed) {
         if (title == null) {
             throw new IllegalArgumentException("No title provided.");
-        }
-
-        if (title.isEmpty()) {
+        } else if (title.isEmpty()) {
             throw new IllegalArgumentException("No title provided.");
         }
 
@@ -105,56 +108,6 @@ public class WorldProvider {
         if (_spawningPoint == null) {
             _spawningPoint = findNewSpawningPoint();
         }
-    }
-
-    /**
-     * Returns the chunk position of a given coordinate.
-     *
-     * @param x The X-coordinate of the block
-     * @return The X-coordinate of the chunk
-     */
-    public int calcChunkPosX(int x) {
-        // Offset for chunks with negative positions
-        if (x < 0)
-            x -= 15;
-
-        return (x / (int) Configuration.CHUNK_DIMENSIONS.x);
-    }
-
-    /**
-     * Returns the chunk position of a given coordinate.
-     *
-     * @param z The Z-coordinate of the block
-     * @return The Z-coordinate of the chunk
-     */
-    public int calcChunkPosZ(int z) {
-        // Offset for chunks with negative positions
-        if (z < 0)
-            z -= 15;
-
-        return (z / (int) Configuration.CHUNK_DIMENSIONS.z);
-    }
-
-    /**
-     * Returns the internal position of a block within a chunk.
-     *
-     * @param x1 The X-coordinate of the block in the world
-     * @param x2 The X-coordinate of the chunk in the world
-     * @return The X-coordinate of the block within the chunk
-     */
-    public int calcBlockPosX(int x1, int x2) {
-        return Math.abs(x1 - (x2 * (int) Configuration.CHUNK_DIMENSIONS.x));
-    }
-
-    /**
-     * Returns the internal position of a block within a chunk.
-     *
-     * @param z1 The Z-coordinate of the block in the world
-     * @param z2 The Z-coordinate of the chunk in the world
-     * @return The Z-coordinate of the block within the chunk
-     */
-    public int calcBlockPosZ(int z1, int z2) {
-        return Math.abs(z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
     }
 
     /**
@@ -275,22 +228,6 @@ public class WorldProvider {
     }
 
     /**
-     * Returns the maximum height at a given position.
-     *
-     * @param x The X-coordinate
-     * @param z The Z-coordinate
-     * @return The maximum height
-     */
-    public final int maxHeightAt(int x, int z) {
-        for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
-            if (getBlock(x, y, z) != 0x0)
-                return y;
-        }
-
-        return 0;
-    }
-
-    /**
      * Returns the light value at the given position.
      *
      * @param x    The X-coordinate
@@ -350,7 +287,7 @@ public class WorldProvider {
     }
 
     /**
-     * Recursive light calculation.
+     * "Unspreads" light recursively.
      *
      * @param x           The X-coordinate
      * @param y           The Y-coordinate
@@ -372,7 +309,7 @@ public class WorldProvider {
     }
 
     /**
-     * Recursive light calculation.
+     * Propagates light recursively.
      *
      * @param x          The X-coordinate
      * @param y          The Y-coordinate
@@ -390,6 +327,72 @@ public class WorldProvider {
 
         Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
         c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
+    }
+
+    /**
+     * Returns the maximum height at a given position.
+     *
+     * @param x The X-coordinate
+     * @param z The Z-coordinate
+     * @return The maximum height
+     */
+    public final int maxHeightAt(int x, int z) {
+        for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
+            if (getBlock(x, y, z) != 0x0)
+                return y;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Returns the chunk position of a given coordinate.
+     *
+     * @param x The X-coordinate of the block
+     * @return The X-coordinate of the chunk
+     */
+    public int calcChunkPosX(int x) {
+        // Offset for chunks with negative positions
+        if (x < 0)
+            x -= 15;
+
+        return (x / (int) Configuration.CHUNK_DIMENSIONS.x);
+    }
+
+    /**
+     * Returns the chunk position of a given coordinate.
+     *
+     * @param z The Z-coordinate of the block
+     * @return The Z-coordinate of the chunk
+     */
+    public int calcChunkPosZ(int z) {
+        // Offset for chunks with negative positions
+        if (z < 0)
+            z -= 15;
+
+        return (z / (int) Configuration.CHUNK_DIMENSIONS.z);
+    }
+
+    /**
+     * Returns the internal position of a block within a chunk.
+     *
+     * @param x1 The X-coordinate of the block in the world
+     * @param x2 The X-coordinate of the chunk in the world
+     * @return The X-coordinate of the block within the chunk
+     */
+    public int calcBlockPosX(int x1, int x2) {
+        return Math.abs(x1 - (x2 * (int) Configuration.CHUNK_DIMENSIONS.x));
+    }
+
+    /**
+     * Returns the internal position of a block within a chunk.
+     *
+     * @param z1 The Z-coordinate of the block in the world
+     * @param z2 The Z-coordinate of the chunk in the world
+     * @return The Z-coordinate of the block within the chunk
+     */
+    public int calcBlockPosZ(int z1, int z2) {
+        return Math.abs(z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
     }
 
     /**
@@ -444,61 +447,6 @@ public class WorldProvider {
     }
 
     /**
-     * Returns the humidity at the given position.
-     *
-     * @param x The X-coordinate
-     * @param z The Z-coordinate
-     * @return The humidity
-     */
-    public double getHumidityAt(int x, int z) {
-        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcHumidityAtGlobalPosition(x, z);
-    }
-
-    /**
-     * Returns the temperature at the given position.
-     *
-     * @param x The X-coordinate
-     * @param z The Z-coordinate
-     * @return The temperature
-     */
-    public double getTemperatureAt(int x, int z) {
-        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcTemperatureAtGlobalPosition(x, z);
-    }
-
-    /*
-    * Returns the biome type at the given position.
-    */
-    public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome(int x, int z) {
-        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcBiomeTypeForGlobalPosition(x, z);
-    }
-
-    /**
-     * @return The save path of this world.
-     */
-    public String getWorldSavePath() {
-        return String.format("SAVED_WORLDS/%s", _title);
-    }
-
-    /**
-     * @return The current time
-     */
-    public double getTime() {
-        long milliSecsSinceCreation = Blockmania.getInstance().getTime() - _creationTime;
-        long wrappedTime = milliSecsSinceCreation % DAY_NIGHT_LENGTH_IN_MS;
-
-        return (double) wrappedTime / (double) DAY_NIGHT_LENGTH_IN_MS;
-    }
-
-    /**
-     * Sets the current time.
-     *
-     * @param time The time to set
-     */
-    public void setTime(double time) {
-        _creationTime = Blockmania.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
-    }
-
-    /**
      * Saves the meta data of this world.
      *
      * @return True if saving was successful
@@ -527,7 +475,7 @@ public class WorldProvider {
             return false;
         }
 
-        Element root = new Element("SPWorld");
+        Element root = new Element("World");
         Document doc = new Document(root);
 
         // Save the world metadata
@@ -584,6 +532,61 @@ public class WorldProvider {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Returns the humidity at the given position.
+     *
+     * @param x The X-coordinate
+     * @param z The Z-coordinate
+     * @return The humidity
+     */
+    public double getHumidityAt(int x, int z) {
+        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcHumidityAtGlobalPosition(x, z);
+    }
+
+    /**
+     * Returns the temperature at the given position.
+     *
+     * @param x The X-coordinate
+     * @param z The Z-coordinate
+     * @return The temperature
+     */
+    public double getTemperatureAt(int x, int z) {
+        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcTemperatureAtGlobalPosition(x, z);
+    }
+
+    /*
+    * Returns the biome type at the given position.
+    */
+    public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome(int x, int z) {
+        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcBiomeTypeForGlobalPosition(x, z);
+    }
+
+    /**
+     * @return The save path of this world.
+     */
+    public String getWorldSavePath() {
+        return String.format("SAVED_WORLDS/%s", _title);
+    }
+
+    /**
+     * @return The current time
+     */
+    public double getTime() {
+        long milliSecsSinceCreation = Blockmania.getInstance().getTime() - _creationTime;
+        long wrappedTime = milliSecsSinceCreation % DAY_NIGHT_LENGTH_IN_MS;
+
+        return (double) wrappedTime / (double) DAY_NIGHT_LENGTH_IN_MS;
+    }
+
+    /**
+     * Sets the current time.
+     *
+     * @param time The time to set
+     */
+    public void setTime(double time) {
+        _creationTime = Blockmania.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
     }
 
     public ChunkCache getChunkCache() {

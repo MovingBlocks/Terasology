@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.world.WorldProvider;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 
 /**
  * A strange thing that looks like a magic tree.
@@ -30,7 +30,7 @@ public class ObjectGeneratorFirTree extends ObjectGenerator {
      * @param w
      * @param seed
      */
-    public ObjectGeneratorFirTree(WorldProvider w, String seed) {
+    public ObjectGeneratorFirTree(LocalWorldProvider w, String seed) {
         super(w, seed);
     }
 

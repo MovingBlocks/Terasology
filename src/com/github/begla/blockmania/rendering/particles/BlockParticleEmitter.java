@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.rendering.TextureManager;
-import com.github.begla.blockmania.world.singleplayer.SPWorld;
+import com.github.begla.blockmania.world.World;
 
 /**
  * Emits block particles.
@@ -25,10 +25,10 @@ import com.github.begla.blockmania.world.singleplayer.SPWorld;
  */
 public class BlockParticleEmitter extends ParticleEmitter {
 
-    private SPWorld _parent;
+    private World _parent;
     private byte _currentBlockType = 0x1;
 
-    public BlockParticleEmitter(SPWorld parent) {
+    public BlockParticleEmitter(World parent) {
         _parent = parent;
     }
 
@@ -42,7 +42,7 @@ public class BlockParticleEmitter extends ParticleEmitter {
         super.render();
     }
 
-    public SPWorld getParent() {
+    public World getParent() {
         return _parent;
     }
 

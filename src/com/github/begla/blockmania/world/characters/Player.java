@@ -23,7 +23,7 @@ import com.github.begla.blockmania.datastructures.ViewFrustum;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.noise.PerlinNoise;
-import com.github.begla.blockmania.world.singleplayer.SPWorld;
+import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -43,12 +43,16 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Player extends Character {
 
+    /* PROPERTIES */
     private byte _selectedBlockType = 1;
+
+    /* MOVEMENT */
     private final PerlinNoise _pGen = new PerlinNoise(42);
 
+    /* VIEW FRUSTUM */
     private final ViewFrustum _viewFrustum = new ViewFrustum();
 
-    public Player(SPWorld parent) {
+    public Player(World parent) {
         super(parent, Configuration.getSettingNumeric("WALKING_SPEED"), Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
     }
 
@@ -61,9 +65,6 @@ public final class Player extends Character {
         super.update();
     }
 
-    /**
-     * Positions the player within the world and adjusts the player's view accordingly.
-     */
     public void render() {
         RayBlockIntersection.Intersection is = calcSelectedBlock();
 
@@ -79,6 +80,9 @@ public final class Player extends Character {
         super.render();
     }
 
+    /**
+     * Applies the modelview matrix from the player's point of view.
+     */
     public void applyPlayerModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
@@ -101,6 +105,9 @@ public final class Player extends Character {
         _viewFrustum.updateFrustum();
     }
 
+    /**
+     * Applies a modelview matrix which looks from the origin into the viewing direction of the player.
+     */
     public void applyNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
@@ -132,9 +139,9 @@ public final class Player extends Character {
     }
 
     /**
-     * Calculates the currently looked at block in front of the player.
+     * Calculates the currently targeted block in front of the player.
      *
-     * @return Intersection point of the looked at block
+     * @return Intersection point of the targeted block
      */
     RayBlockIntersection.Intersection calcSelectedBlock() {
         FastList<RayBlockIntersection.Intersection> inters = new FastList<RayBlockIntersection.Intersection>();

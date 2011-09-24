@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.world.WorldProvider;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 
 /**
  * Generates a simple, bushy tree.
@@ -29,7 +29,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
      * @param w
      * @param seed
      */
-    public ObjectGeneratorTree(WorldProvider w, String seed) {
+    public ObjectGeneratorTree(LocalWorldProvider w, String seed) {
         super(w, seed);
     }
 

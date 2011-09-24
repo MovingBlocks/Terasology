@@ -17,7 +17,7 @@ package com.github.begla.blockmania.world.horizon;
 
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.world.singleplayer.SPWorld;
+import com.github.begla.blockmania.world.World;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.vector.Vector3f;
@@ -36,9 +36,9 @@ public class Skysphere implements RenderableObject {
     private Sphere _sphere = new Sphere();
     private Vector3f _zenithColor = new Vector3f();
 
-    private SPWorld _parent;
+    private World _parent;
 
-    public Skysphere(SPWorld parent) {
+    public Skysphere(World parent) {
         _parent = parent;
     }
 

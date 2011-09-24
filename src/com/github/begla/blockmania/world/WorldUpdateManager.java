@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world.singleplayer;
+package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -28,16 +28,24 @@ import java.util.concurrent.PriorityBlockingQueue;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class SPWorldUpdateManager {
+public final class WorldUpdateManager {
 
+    /* CHUNK UPDATES */
     private static final int MAX_THREADS = Math.max(Runtime.getRuntime().availableProcessors() - 2, 1);
     private static final ExecutorService _threadPool = Executors.newFixedThreadPool(MAX_THREADS);
     private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
-    /* ------ */
-    private final PriorityBlockingQueue<Chunk> _vboUpdates = new PriorityBlockingQueue<Chunk>();
-    /* ------ */
     private double _averageUpdateDuration = 0.0;
 
+    /* VBO UPDATES */
+    private final PriorityBlockingQueue<Chunk> _vboUpdates = new PriorityBlockingQueue<Chunk>();
+
+    /**
+     * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
+     * is reached, the chunk update is ignored.
+     *
+     * @param c The chunk to update
+     * @return True if a chunk update was executed
+     */
     public boolean queueChunkUpdate(Chunk c) {
         final Chunk chunkToProcess = c;
 
@@ -49,7 +57,10 @@ public final class SPWorldUpdateManager {
                 public void run() {
                     long timeStart = Blockmania.getInstance().getTime();
 
-                    processChunkUpdate(chunkToProcess);
+                    // If the chunk was changed, update the VBOs.
+                    if (chunkToProcess.processChunk())
+                        _vboUpdates.add(chunkToProcess);
+
                     _currentlyProcessedChunks.remove(chunkToProcess);
 
                     _averageUpdateDuration += Blockmania.getInstance().getTime() - timeStart;
@@ -62,17 +73,6 @@ public final class SPWorldUpdateManager {
         }
 
         return false;
-    }
-
-    /**
-     * Processes the given chunk and finally queues it for updating the VBOs.
-     *
-     * @param c The chunk to process
-     */
-    private void processChunkUpdate(Chunk c) {
-        // If the chunk was changed, update the VBOs.
-        if (c.processChunk())
-            _vboUpdates.add(c);
     }
 
     /**

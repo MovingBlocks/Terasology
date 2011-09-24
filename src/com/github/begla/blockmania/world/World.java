@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world.singleplayer;
+package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
@@ -21,7 +21,6 @@ import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
-import com.github.begla.blockmania.world.WorldProvider;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
@@ -45,22 +44,28 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class SPWorld extends WorldProvider {
+public final class World extends LocalWorldProvider {
+
     /* PLAYER */
     private Player _player;
+
     /* CHUNKS */
     private FastList<Chunk> _chunksInProximity = new FastList();
+
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
+
     /* HORIZON */
     private final Clouds _clouds;
     private final Skysphere _skysphere;
     protected double _daylight;
+
     /* WATER AND LAVA ANIMATION */
     private int _tick = 0;
     private long _lastTick;
+
     /* UPDATING */
-    private final SPWorldUpdateManager _worldUpdateManager;
+    private final WorldUpdateManager _worldUpdateManager;
     private int prevChunkPosX = 0, prevChunkPosZ = 0;
 
     /**
@@ -69,14 +74,14 @@ public final class SPWorld extends WorldProvider {
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
-    public SPWorld(String title, String seed) {
+    public World(String title, String seed) {
         super(title, seed);
 
         // Init. horizon
         _clouds = new Clouds(this);
         _skysphere = new Skysphere(this);
 
-        _worldUpdateManager = new SPWorldUpdateManager();
+        _worldUpdateManager = new WorldUpdateManager();
     }
 
     /**
@@ -118,6 +123,9 @@ public final class SPWorld extends WorldProvider {
         }
     }
 
+    /**
+     * Updates the daylight value according to the current world time.
+     */
     private void updateDaylight() {
         // Sunrise
         if (getTime() < 0.1f && getTime() > 0.0f) {
@@ -134,6 +142,11 @@ public final class SPWorld extends WorldProvider {
         }
     }
 
+    /**
+     * Fetches the currently visible chunks (in sight of the player).
+     *
+     * @return The visible chunks
+     */
     public FastList<Chunk> fetchVisibleChunks() {
         FastList<Chunk> result = new FastList<Chunk>();
         FastList<Chunk> chunksInPromity = _chunksInProximity;
@@ -153,14 +166,17 @@ public final class SPWorld extends WorldProvider {
         return result;
     }
 
+    /**
+     * Renders the chunks.
+     */
     private void renderChunks() {
         ShaderManager.getInstance().enableShader("chunk");
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
         int swimmimg = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
         int animationOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animationOffset");
-        int animationType = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animationType");
+        int animated = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animated");
         GL20.glUniform1f(daylight, (float) getDaylight());
-        GL20.glUniform1i(animationType, 0);
+        GL20.glUniform1i(animated, 0);
         GL20.glUniform1i(swimmimg, _player.isHeadUnderWater() ? 1 : 0);
 
         FastList<Chunk> visibleChunks = fetchVisibleChunks();
@@ -171,12 +187,12 @@ public final class SPWorld extends WorldProvider {
         for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
             Chunk c = n.getValue();
 
-            GL20.glUniform1i(animationType, 0);
+            GL20.glUniform1i(animated, 0);
             TextureManager.getInstance().bindTexture("terrain");
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
 
             // ANIMATED LAVA
-            GL20.glUniform1i(animationType, 1);
+            GL20.glUniform1i(animated, 1);
             GL20.glUniform1f(animationOffset, ((float) (_tick % 16)) * (1.0f / 16f));
             TextureManager.getInstance().bindTexture("custom_lava_still");
             visibleChunks.valueOf(n).render(ChunkMesh.RENDER_TYPE.LAVA);
@@ -186,7 +202,7 @@ public final class SPWorld extends WorldProvider {
             }
         }
 
-        GL20.glUniform1i(animationType, 0);
+        GL20.glUniform1i(animated, 0);
         TextureManager.getInstance().bindTexture("terrain");
 
         // BILLBOARDS AND TRANSLUCENT ELEMENTS
@@ -195,7 +211,7 @@ public final class SPWorld extends WorldProvider {
             c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
         }
 
-        GL20.glUniform1i(animationType, 1);
+        GL20.glUniform1i(animated, 1);
 
         for (int i = 0; i < 2; i++) {
             // ANIMATED WATER
@@ -220,7 +236,7 @@ public final class SPWorld extends WorldProvider {
 
     public void update() {
         updateDaylight();
-        updateTicks();
+        updateTick();
 
         _skysphere.update();
 
@@ -229,11 +245,14 @@ public final class SPWorld extends WorldProvider {
         // Update the clouds
         _clouds.update();
 
+        // Update the list of relevant chunks
         updateChunksInProximity();
+        // And fetch those chunks that are in sight of the player
         FastList<Chunk> visibleChunks = fetchVisibleChunks();
 
         // Update chunks
         for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            // Queue dirty chunks for updating
             if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
                 _worldUpdateManager.queueChunkUpdate(n.getValue());
             }
@@ -248,8 +267,11 @@ public final class SPWorld extends WorldProvider {
         _worldUpdateManager.updateVBOs();
     }
 
-    private void updateTicks() {
-        if (Blockmania.getInstance().getTime() - _lastTick >= 200) {
+    /**
+     * Updates the tick value used for animating the textures.
+     */
+    private void updateTick() {
+        if (Blockmania.getInstance().getTime() - _lastTick >= 100) {
             _tick++;
             _lastTick = Blockmania.getInstance().getTime();
         }
@@ -273,22 +295,31 @@ public final class SPWorld extends WorldProvider {
         return (int) (_player.getPosition().z / Configuration.CHUNK_DIMENSIONS.z);
     }
 
+    /**
+     * Sets a new player and spawns him at the spawning point.
+     *
+     * @param p The player
+     */
     public void setPlayer(Player p) {
         _player = p;
         // Reset the player's position
         resetPlayer();
     }
 
+    /**
+     * Resets the player's attributes and respawns him.
+     */
     public void resetPlayer() {
         _player.resetEntity();
         _player.setPosition(getSpawningPoint());
     }
 
     /**
-     * Stops the updating thread and writes all chunks to disk.
+     * Writes all chunks to disk and disposes them.
      */
     public void dispose() {
         Blockmania.getInstance().getLogger().log(Level.INFO, "Disposing world {0} and saving all chunks.", getTitle());
+
         saveMetaData();
         getChunkCache().saveAndDisposeAllChunks();
     }
@@ -303,6 +334,9 @@ public final class SPWorld extends WorldProvider {
         return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _chunkCache.size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _seed, _title);
     }
 
+    /**
+     * Sets the current player position as spawning point.
+     */
     public void setSpawningPointToPlayerPosition() {
         _spawningPoint = new Vector3f(_player.getPosition());
     }

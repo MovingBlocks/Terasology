@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.world.WorldProvider;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -26,7 +26,7 @@ public class ObjectGeneratorCactus extends ObjectGenerator {
      * @param w
      * @param seed
      */
-    public ObjectGeneratorCactus(WorldProvider w, String seed) {
+    public ObjectGeneratorCactus(LocalWorldProvider w, String seed) {
         super(w, seed);
     }
 
