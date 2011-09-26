@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
@@ -20,15 +21,31 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 /**
- * A leaf block.
+ * A large high grass billboard block.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockLeaf extends Block {
+public class BlockMediumHighGrass extends Block {
+
+    @Override
+    public boolean isBlockTypeTranslucent() {
+        return true;
+    }
 
     @Override
     public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
-        return foliageColorForTemperatureAndHumidity(temperature, humidity);
+        Vector4f foliageColor = foliageColorForTemperatureAndHumidity(temperature, humidity);
+        return new Vector4f(foliageColor.x, foliageColor.y, foliageColor.z, 1.0f);
+    }
+
+    @Override
+    public Vector2f getTextureOffsetFor(SIDE side) {
+        return Helper.calcOffsetForTextureAt(13, 11);
+    }
+
+    @Override
+    public boolean isPenetrable() {
+        return true;
     }
 
     @Override
@@ -37,20 +54,12 @@ public class BlockLeaf extends Block {
     }
 
     @Override
-    public boolean isBlockTypeTranslucent() {
-        return true;
+    public boolean shouldRenderBoundingBox() {
+        return false;
     }
 
     @Override
-    public Vector2f getTextureOffsetFor(Block.SIDE side) {
-        return Helper.calcOffsetForTextureAt(4, 3);
-    }
-
-    /**
-     * @return
-     */
-    @Override
-    public boolean doNotTessellate() {
-        return true;
+    public BLOCK_FORM getBlockForm() {
+        return BLOCK_FORM.BILLBOARD;
     }
 }

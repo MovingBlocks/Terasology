@@ -17,5 +17,4 @@ public class TestMathHelper extends junit.framework.TestCase {
         assertEquals(11, MathHelper.redoMapToPositive(MathHelper.cantorY(cant)));
         assertEquals(-22, MathHelper.redoMapToPositive(MathHelper.cantorX(cant)));
     }
-
 }

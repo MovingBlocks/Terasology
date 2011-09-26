@@ -18,7 +18,6 @@ package com.github.begla.blockmania.blocks;
 
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector4f;
 
 /**
  * A dirt block.
@@ -26,12 +25,6 @@ import org.lwjgl.util.vector.Vector4f;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockDirt extends Block {
-
-    @Override
-    public Vector4f getColorOffsetFor(SIDE side, double temp, double hum) {
-        return colorForTemperatureAndHumidity(temp, hum);
-    }
-
     @Override
     public boolean isBlockTypeTranslucent() {
         return false;

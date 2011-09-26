@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.world.WorldProvider;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 
 /**
  * Generates a simple pine tree.
@@ -29,7 +29,7 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
      * @param w
      * @param seed
      */
-    public ObjectGeneratorPineTree(WorldProvider w, String seed) {
+    public ObjectGeneratorPineTree(LocalWorldProvider w, String seed) {
         super(w, seed);
     }
 
@@ -50,7 +50,7 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            _worldProvider.setBlock(posX, posY + i, posZ, (byte) 0x5, update, false);
+            _worldProvider.setBlock(posX, posY + i, posZ, (byte) 0x5, update, true);
         }
 
         int stage = 2;

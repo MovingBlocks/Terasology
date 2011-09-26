@@ -39,7 +39,7 @@ public final class Helper {
     }
 
     /**
-     * Returns true if the flag at given byte position
+     * Returns true if the flag at the given byte position
      * is set.
      *
      * @param value Byte value storing the flags

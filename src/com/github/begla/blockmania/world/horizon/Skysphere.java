@@ -26,7 +26,7 @@ import org.lwjgl.util.vector.Vector4f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Anthony Kireev <adeon.k87@gmail.com>
  */
 public class Skysphere implements RenderableObject {
 
@@ -105,7 +105,7 @@ public class Skysphere implements RenderableObject {
     }
 
     public void update() {
-        _turbidity = (float) _parent.getActiveHumidity() * 5f + (float) _parent.getActiveTemperature() * 5f;
+        _turbidity = 12.0f + (float) _parent.getActiveHumidity() * (float) _parent.getActiveTemperature();
     }
 
     public float getSunPosAngle() {

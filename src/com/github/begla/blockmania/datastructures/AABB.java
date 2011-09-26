@@ -33,35 +33,23 @@ public class AABB implements RenderableObject {
     private final Vector3f _dimensions;
     private Vector3f[] _vertices;
 
+    /**
+     * Creates a new AABB at the given position with the given dimensions.
+     *
+     * @param position   The position
+     * @param dimensions The dimensions
+     */
     public AABB(Vector3f position, Vector3f dimensions) {
         setPosition(position);
         this._dimensions = dimensions;
     }
 
-    public double minX() {
-        return (getPosition().x - _dimensions.x);
-    }
-
-    public double minY() {
-        return (getPosition().y - _dimensions.y);
-    }
-
-    public double minZ() {
-        return (getPosition().z - _dimensions.z);
-    }
-
-    public double maxX() {
-        return (getPosition().x + _dimensions.x);
-    }
-
-    public double maxY() {
-        return (getPosition().y + _dimensions.y);
-    }
-
-    public double maxZ() {
-        return (getPosition().z + _dimensions.z);
-    }
-
+    /**
+     * Returns true if this AABB overlaps the given AABB.
+     *
+     * @param aabb2 The AABB to check for overlapping
+     * @return True if overlapping
+     */
     public boolean overlaps(AABB aabb2) {
         if (maxX() < aabb2.minX() || minX() > aabb2.maxX()) return false;
         if (maxY() < aabb2.minY() || minY() > aabb2.maxY()) return false;
@@ -69,6 +57,12 @@ public class AABB implements RenderableObject {
         return true;
     }
 
+    /**
+     * Returns true if the AABB contains the given point.
+     *
+     * @param point The point to check for inclusion
+     * @return True if containing
+     */
     public boolean contains(Vector3f point) {
         if (maxX() < point.x || minX() > point.x) return false;
         if (maxY() < point.y || minY() > point.y) return false;
@@ -77,10 +71,12 @@ public class AABB implements RenderableObject {
         return true;
     }
 
-    public Vector3f getDimensions() {
-        return _dimensions;
-    }
-
+    /**
+     * Returns the closest point on the AABB to a given point.
+     *
+     * @param p The point
+     * @return The point on the AABB closest to the given point
+     */
     public Vector3f closestPointOnAABBToPoint(Vector3f p) {
         Vector3f r = new Vector3f(p);
 
@@ -94,6 +90,16 @@ public class AABB implements RenderableObject {
         return r;
     }
 
+    /**
+     * Returns the normal of the plane closest to the given origin.
+     *
+     * @param pointOnAABB A point on the AABB
+     * @param origin      The origin
+     * @param testX       True if the x-axis should be tested
+     * @param testY       True if the y-axis should be tested
+     * @param testZ       True if the z-axis should be tested
+     * @return
+     */
     public Vector3f normalForPlaneClosestToOrigin(Vector3f pointOnAABB, Vector3f origin, boolean testX, boolean testY, boolean testZ) {
         FastList<Vector3f> normals = new FastList<Vector3f>();
 
@@ -119,6 +125,12 @@ public class AABB implements RenderableObject {
         return closestNormal;
     }
 
+    /**
+     * Returns the center point of one of the six planes for the given normal.
+     *
+     * @param normal The normal
+     * @return The center point
+     */
     public Vector3f centerPointForNormal(Vector3f normal) {
         if (normal.x == 1 && normal.y == 0 && normal.z == 0)
             return new Vector3f(getPosition().x + _dimensions.x, getPosition().y, getPosition().z);
@@ -136,6 +148,11 @@ public class AABB implements RenderableObject {
         return new Vector3f();
     }
 
+    /**
+     * Returns the vertices of this AABB.
+     *
+     * @return The vertices
+     */
     public Vector3f[] getVertices() {
         if (_vertices == null) {
             Vector3f[] vertices = new Vector3f[8];
@@ -157,6 +174,9 @@ public class AABB implements RenderableObject {
         return _vertices;
     }
 
+    /**
+     * Renders the AABB (SLOW!).
+     */
     public void render() {
         double offset = 0.01;
 
@@ -218,6 +238,34 @@ public class AABB implements RenderableObject {
 
     public void update() {
         // Do nothing. Really.
+    }
+
+    public double minX() {
+        return (getPosition().x - _dimensions.x);
+    }
+
+    public double minY() {
+        return (getPosition().y - _dimensions.y);
+    }
+
+    public double minZ() {
+        return (getPosition().z - _dimensions.z);
+    }
+
+    public double maxX() {
+        return (getPosition().x + _dimensions.x);
+    }
+
+    public double maxY() {
+        return (getPosition().y + _dimensions.y);
+    }
+
+    public double maxZ() {
+        return (getPosition().z + _dimensions.z);
+    }
+
+    public Vector3f getDimensions() {
+        return _dimensions;
     }
 
     public Vector3f getPosition() {

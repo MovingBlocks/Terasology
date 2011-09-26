@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.world.WorldProvider;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 
 /**
  * Generates a simple, bushy tree.
@@ -29,7 +29,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
      * @param w
      * @param seed
      */
-    public ObjectGeneratorTree(WorldProvider w, String seed) {
+    public ObjectGeneratorTree(LocalWorldProvider w, String seed) {
         super(w, seed);
     }
 
@@ -42,7 +42,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
      */
     @Override
     public void generate(int posX, int posY, int posZ, boolean update) {
-        int height = Math.abs(_rand.randomInt() % 4) + 4;
+        int height = Math.abs(_rand.randomInt() % 4) + 6;
 
         if (posY + height >= Configuration.CHUNK_DIMENSIONS.y) {
             return;
@@ -50,7 +50,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            _worldProvider.setBlock(posX, posY + i, posZ, (byte) 0x5, update, false);
+            _worldProvider.setBlock(posX, posY + i, posZ, (byte) 0x5, update, true);
         }
 
         // Generate the treetop

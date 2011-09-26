@@ -43,9 +43,13 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Player extends Character {
 
+    /* PROPERTIES */
     private byte _selectedBlockType = 1;
+
+    /* MOVEMENT */
     private final PerlinNoise _pGen = new PerlinNoise(42);
 
+    /* VIEW FRUSTUM */
     private final ViewFrustum _viewFrustum = new ViewFrustum();
 
     public Player(World parent) {
@@ -61,9 +65,6 @@ public final class Player extends Character {
         super.update();
     }
 
-    /**
-     * Positions the player within the world and adjusts the player's view accordingly.
-     */
     public void render() {
         RayBlockIntersection.Intersection is = calcSelectedBlock();
 
@@ -79,6 +80,9 @@ public final class Player extends Character {
         super.render();
     }
 
+    /**
+     * Applies the modelview matrix from the player's point of view.
+     */
     public void applyPlayerModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
@@ -101,6 +105,9 @@ public final class Player extends Character {
         _viewFrustum.updateFrustum();
     }
 
+    /**
+     * Applies a modelview matrix which looks from the origin into the viewing direction of the player.
+     */
     public void applyNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
@@ -132,9 +139,9 @@ public final class Player extends Character {
     }
 
     /**
-     * Calculates the currently looked at block in front of the player.
+     * Calculates the currently targeted block in front of the player.
      *
-     * @return Intersection point of the looked at block
+     * @return Intersection point of the targeted block
      */
     RayBlockIntersection.Intersection calcSelectedBlock() {
         FastList<RayBlockIntersection.Intersection> inters = new FastList<RayBlockIntersection.Intersection>();
@@ -225,6 +232,12 @@ public final class Player extends Character {
                 Vector3f blockPos = is.getBlockPosition();
                 byte currentBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
                 getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
+
+                // Remove the upper block if it's a billboard
+                byte upperBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
+                if (Block.getBlockForType(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
+                    getParent().setBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z, (byte) 0x0, true, true);
+                }
 
                 _parent.getBlockParticleEmitter().setOrigin(blockPos);
                 _parent.getBlockParticleEmitter().emitParticles(128, currentBlockType);
@@ -336,7 +349,7 @@ public final class Player extends Character {
      */
     @Override
     public String toString() {
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z:, %.2f)", getPosition().x, getPosition().y, getPosition().z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _selectedBlockType, _gravity, _movementDirection.x, _movementDirection.y, _movementDirection.z);
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z: %.2f)", getPosition().x, getPosition().y, getPosition().z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _selectedBlockType, _gravity, _movementDirection.x, _movementDirection.y, _movementDirection.z);
     }
 
     protected AABB generateAABBForPosition(Vector3f p) {

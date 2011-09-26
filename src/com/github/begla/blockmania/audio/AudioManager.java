@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 /**
- * Simple managing class for loading and caching audio files.
+ * Simple managing class for loading and storing audio files.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -56,6 +56,12 @@ public class AudioManager {
         _audioFiles.put("PlaceRemoveBlock", loadAudio("PlaceRemoveBlock"));
     }
 
+    /**
+     * Loads the audio file with the given name.
+     *
+     * @param s The name of the audio file
+     * @return The loaded audio file
+     */
     public Audio loadAudio(String s) {
         try {
             return AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/sounds/" + s + ".ogg"));
@@ -66,6 +72,12 @@ public class AudioManager {
         return null;
     }
 
+    /**
+     * Returns the stored audio file with the given name.
+     *
+     * @param s The name of the audio file
+     * @return The loaded audio file
+     */
     public Audio getAudio(String s) {
         return _audioFiles.get(s);
     }

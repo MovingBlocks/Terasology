@@ -28,18 +28,15 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public abstract class ChunkGenerator {
 
-    final PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen6;
-    /**
-     * Fast random number generator.
-     */
-    final FastRandom _rand;
+    protected final PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen6;
+    protected final FastRandom _rand;
 
     /**
      * Init. the generator with a given seed value.
      *
      * @param seed
      */
-    ChunkGenerator(String seed) {
+    public ChunkGenerator(String seed) {
         _rand = new FastRandom(seed.hashCode());
         _pGen1 = new PerlinNoise(seed.hashCode());
         _pGen2 = new PerlinNoise(seed.hashCode() + 1);
@@ -52,7 +49,7 @@ public abstract class ChunkGenerator {
     /**
      * Apply the generation process to the given chunk.
      *
-     * @param c
+     * @param c The chunk to generate/populate
      */
     public void generate(Chunk c) {
         throw new NotImplementedException();

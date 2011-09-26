@@ -15,11 +15,12 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.world.chunk.Chunk;
-import javolution.util.FastList;
 import javolution.util.FastSet;
 
-import java.util.Collections;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
@@ -29,96 +30,54 @@ import java.util.concurrent.PriorityBlockingQueue;
  */
 public final class WorldUpdateManager {
 
+    /* CHUNK UPDATES */
+    private static final int MAX_THREADS = Math.max(Runtime.getRuntime().availableProcessors() - 2, 1);
+    private static final ExecutorService _threadPool = Executors.newFixedThreadPool(MAX_THREADS);
+    private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
+    private double _averageUpdateDuration = 0.0;
+
+    /* VBO UPDATES */
     private final PriorityBlockingQueue<Chunk> _vboUpdates = new PriorityBlockingQueue<Chunk>();
-    private final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
-    private int _threadCount = 0;
-
-    private double _meanUpdateDuration = 0.0;
-    private final World _parent;
-
-    private int _chunkUpdateAmount;
 
     /**
-     * @param _parent
+     * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
+     * is reached, the chunk update is ignored.
+     *
+     * @param c The chunk to update
+     * @return True if a chunk update was executed
      */
-    public WorldUpdateManager(World _parent) {
-        this._parent = _parent;
-    }
+    public boolean queueChunkUpdate(Chunk c) {
+        final Chunk chunkToProcess = c;
 
-    public void processChunkUpdates() {
-        long timeStart = System.currentTimeMillis();
-
-        final FastList<Chunk> dirtyChunks = new FastList<Chunk>(_parent.fetchVisibleChunks());
-
-        for (int i = dirtyChunks.size() - 1; i >= 0; i--) {
-            Chunk c = dirtyChunks.get(i);
-
-            if (c == null) {
-                dirtyChunks.remove(i);
-                continue;
-            }
-
-            if (!(c.isDirty() || c.isFresh() || c.isLightDirty())) {
-                dirtyChunks.remove(i);
-            }
-        }
-
-        if (dirtyChunks.isEmpty()) {
-            return;
-        }
-
-        Collections.sort(dirtyChunks);
-
-        final Chunk chunkToProcess = dirtyChunks.getFirst();
-
-        if (!_currentlyProcessedChunks.contains(chunkToProcess)) {
-
+        if (!_currentlyProcessedChunks.contains(chunkToProcess) && _currentlyProcessedChunks.size() < MAX_THREADS) {
             _currentlyProcessedChunks.add(chunkToProcess);
 
-            Thread t = new Thread() {
-                @Override
+            // ... create a new thread and start processing.
+            Runnable r = new Runnable() {
                 public void run() {
-                    while (_threadCount > Math.max(Runtime.getRuntime().availableProcessors() - 2, 1)) {
-                        synchronized (_currentlyProcessedChunks) {
-                            try {
-                                _currentlyProcessedChunks.wait();
-                            } catch (InterruptedException e) {
-                            }
-                        }
-                    }
+                    long timeStart = Blockmania.getInstance().getTime();
 
-                    synchronized (_currentlyProcessedChunks) {
-                        _threadCount++;
-                    }
+                    // If the chunk was changed, update the VBOs.
+                    if (chunkToProcess.processChunk())
+                        _vboUpdates.add(chunkToProcess);
 
-                    processChunkUpdate(chunkToProcess);
                     _currentlyProcessedChunks.remove(chunkToProcess);
 
-                    synchronized (_currentlyProcessedChunks) {
-                        _threadCount--;
-                    }
-
-                    synchronized (_currentlyProcessedChunks) {
-                        _currentlyProcessedChunks.notify();
-                    }
+                    _averageUpdateDuration += Blockmania.getInstance().getTime() - timeStart;
+                    _averageUpdateDuration /= 2;
                 }
             };
 
-            t.start();
+            _threadPool.execute(r);
+            return true;
         }
 
-        _chunkUpdateAmount = dirtyChunks.size();
-        _meanUpdateDuration += System.currentTimeMillis() - timeStart;
-        _meanUpdateDuration /= 2;
+        return false;
     }
 
-    private void processChunkUpdate(Chunk c) {
-        if (c != null) {
-            if (c.processChunk()) ;
-            _vboUpdates.add(c);
-        }
-    }
-
+    /**
+     * Updates the VBOs of all currently queued chunks.
+     */
     public void updateVBOs() {
         while (_vboUpdates.size() > 0) {
             Chunk c = _vboUpdates.poll();
@@ -128,19 +87,11 @@ public final class WorldUpdateManager {
         }
     }
 
-    public int getUpdatesSize() {
-        return _chunkUpdateAmount;
-    }
-
     public int getVboUpdatesSize() {
         return _vboUpdates.size();
     }
 
-    public double getMeanUpdateDuration() {
-        return _meanUpdateDuration;
-    }
-
-    public int getThreadCount() {
-        return _threadCount;
+    public double getAverageUpdateDuration() {
+        return _averageUpdateDuration;
     }
 }

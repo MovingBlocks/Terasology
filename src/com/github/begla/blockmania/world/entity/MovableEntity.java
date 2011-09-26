@@ -23,6 +23,7 @@ import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.Audio;
@@ -38,22 +39,18 @@ public abstract class MovableEntity extends Entity {
 
     protected final FastRandom _rand = new FastRandom();
 
+    /* AUDIO */
     protected Audio _currentFootstepSound;
     protected Audio[] _footstepSounds;
 
-    protected double _walkingSpeed;
-    protected double _runningFactor;
-    protected double _jumpIntensity;
-    protected boolean _godMode;
-
+    /* PARENT WORLD */
     protected World _parent;
 
-    protected boolean _jump = false;
-    protected double _activeWalkingSpeed;
-    protected double _yaw = 135d, _pitch;
-    protected double _gravity;
+    /* MOVEMENT */
+    protected double _walkingSpeed, _runningFactor, _jumpIntensity;
+    protected double _activeWalkingSpeed, _yaw = 135d, _pitch, _gravity;
     protected final Vector3f _movementDirection = new Vector3f(), _velocity = new Vector3f(), _viewingDirection = new Vector3f();
-    protected boolean _isSwimming = false, _headUnderWater = false, _touchingGround = false, _running = false;
+    protected boolean _isSwimming = false, _headUnderWater = false, _touchingGround = false, _running = false, _godMode, _jump = false;
 
     public MovableEntity(World parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
         _parent = parent;
@@ -75,8 +72,9 @@ public abstract class MovableEntity extends Entity {
     }
 
     public abstract void processMovement();
-
     protected abstract AABB generateAABBForPosition(Vector3f p);
+    protected abstract void handleVerticalCollision();
+    protected abstract void handleHorizontalCollision();
 
     public void render() {
         if (Configuration.getSettingBoolean("DEBUG_COLLISION")) {
@@ -116,7 +114,7 @@ public abstract class MovableEntity extends Entity {
 
         if ((Math.abs(_velocity.x) > 0.01 || Math.abs(_velocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
-                Vector3f playerDirection = directionOfPlayer();
+                Vector3f playerDirection = directionOfOrigin();
                 _currentFootstepSound = _footstepSounds[Math.abs(_rand.randomInt()) % 5];
                 _currentFootstepSound.playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
             } else {
@@ -324,7 +322,7 @@ public abstract class MovableEntity extends Entity {
 
                     // Entity reaches the ground
                     if (_touchingGround == false) {
-                        Vector3f playerDirection = directionOfPlayer();
+                        Vector3f playerDirection = directionOfOrigin();
                         _footstepSounds[Math.abs(_rand.randomInt()) % 5].playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
                         _touchingGround = true;
                     }
@@ -360,6 +358,9 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
+    /**
+     * Updates the status if the entity is currently swimming (in water).
+     */
     protected void updateSwimStatus() {
         FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(getPosition());
 
@@ -461,16 +462,15 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
-    protected Vector3f directionOfPlayer() {
-        return Vector3f.sub(_parent.getPlayer().getPosition(), getPosition(), null);
+    protected Vector3f directionOfOrigin() {
+        return Vector3f.sub(_parent.getOrigin(), getPosition(), null);
     }
 
     protected double distanceSquaredTo(Vector3f target) {
         Vector3f targetDirection = new Vector3f();
         Vector3f.sub(target, getPosition(), targetDirection);
-        double distance = targetDirection.lengthSquared();
 
-        return distance;
+        return targetDirection.lengthSquared();
     }
 
     protected void lookAt(Vector3f target) {
@@ -491,10 +491,6 @@ public abstract class MovableEntity extends Entity {
         eyePosition.y += aabb.getDimensions().y - 0.2;
         return eyePosition;
     }
-
-    protected abstract void handleVerticalCollision();
-
-    protected abstract void handleHorizontalCollision();
 
     public Vector3f getViewingDirection() {
         return _viewingDirection;
@@ -521,7 +517,7 @@ public abstract class MovableEntity extends Entity {
         return _headUnderWater;
     }
 
-    public World getParent() {
+    public LocalWorldProvider getParent() {
         return _parent;
     }
 }

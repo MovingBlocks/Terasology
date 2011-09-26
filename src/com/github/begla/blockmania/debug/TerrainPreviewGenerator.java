@@ -30,7 +30,7 @@ import java.io.IOException;
  */
 public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
-    private static int zoomOut = 2;
+    private static int zoomOut = 1;
 
     /**
      * @param seed
@@ -43,6 +43,7 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
         TerrainPreviewGenerator gen = new TerrainPreviewGenerator("abcd");
         gen.generateBaseTerrainImage();
         gen.generateBiomeMap();
+        gen.generateDensityImage();
     }
 
     public void generateBiomeMap() {
@@ -68,6 +69,9 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
                     case DESERT:
                         color = Color.YELLOW;
                         break;
+                    case FOREST:
+                        color = Color.GREEN;
+                        break;
                 }
 
                 g.setColor(color);
@@ -77,6 +81,30 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
         try {
             ImageIO.write(image, "png", new File("BiomeMap.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void generateDensityImage() {
+        BufferedImage image = new BufferedImage(1024, 1024, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+
+        for (int x = -512; x < 512; x++) {
+            for (int y = -512; y < 512; y++) {
+                double n = calcMountainDensity(x * zoomOut, 64, y * zoomOut);
+
+                int color = (int) (n * 255.0);
+                color = (color > 255) ? 255 : color;
+                color = (color < 0) ? 0 : color;
+
+                g.setColor(new Color(color, color, color));
+                g.fillRect(x + 512, y + 512, 1, 1);
+            }
+        }
+
+        try {
+            ImageIO.write(image, "png", new File("Density.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

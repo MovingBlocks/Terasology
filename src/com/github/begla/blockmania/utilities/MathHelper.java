@@ -16,10 +16,15 @@
 package com.github.begla.blockmania.utilities;
 
 /**
+ * Collection of math functions.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class MathHelper {
 
+    /**
+     * Clamps a given value to be an element of [0..1].
+     */
     public static double clamp(double value) {
         if (value > 1.0)
             return 1.0;
@@ -28,16 +33,25 @@ public class MathHelper {
         return value;
     }
 
+    /**
+     * Bilinear interpolation.
+     */
     public static double biLerp(double x, double y, double q11, double q12, double q21, double q22, double x1, double x2, double y1, double y2) {
         double r1 = lerp(x, x1, x2, q11, q21);
         double r2 = lerp(x, x1, x2, q12, q22);
         return lerp(y, y1, y2, r1, r2);
     }
 
+    /**
+     * Linear interpolation.
+     */
     private static double lerp(double x, double x1, double x2, double q00, double q01) {
         return ((x2 - x) / (x2 - x1)) * q00 + ((x - x1) / (x2 - x1)) * q01;
     }
 
+    /**
+     * Trilinear interpolation.
+     */
     public static double triLerp(double x, double y, double z, double q000, double q001, double q010, double q011, double q100, double q101, double q110, double q111, double x1, double x2, double y1, double y2, double z1, double z2) {
         double x00 = lerp(x, x1, x2, q000, q100);
         double x10 = lerp(x, x1, x2, q010, q110);
@@ -48,6 +62,9 @@ public class MathHelper {
         return lerp(z, z1, z2, r0, r1);
     }
 
+    /**
+     * Maps any given value to be positive only.
+     */
     public static int mapToPositive(int x) {
         if (x >= 0)
             return x * 2;
@@ -55,6 +72,9 @@ public class MathHelper {
         return -x * 2 - 1;
     }
 
+    /**
+     * Recreates the original value after applying "mapToPositive".
+     */
     public static int redoMapToPositive(int x) {
         if (x % 2 == 0) {
             return x / 2;

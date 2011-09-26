@@ -1,8 +1,4 @@
-varying float fog;
-
-float fogEyeRadial(vec4 eyePos) {
-    return length(eyePos / eyePos.w);
-}
+#version 120
 
 void main()
 {

@@ -33,7 +33,6 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Some blocky clouds which randomly float around and follow the player's movement.
- * Nothing more, nothing less.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -99,6 +98,10 @@ public class Clouds implements RenderableObject {
     }
 
     public void render() {
+        // Nothing to do if the player is swimming
+        if (_parent.getPlayer().isHeadUnderWater())
+            return;
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -136,8 +139,8 @@ public class Clouds implements RenderableObject {
         }
 
         if (Blockmania.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
-            _windDirection.x = (float) _parent.getRandom().randomDouble() / 8;
-            _windDirection.y = (float) _parent.getRandom().randomDouble() / 8;
+            _windDirection.x = (float) _parent.getRandom().randomDouble() / 4;
+            _windDirection.y = (float) _parent.getRandom().randomDouble() / 4;
             _nextWindUpdateInSeconds = (short) (Math.abs(_parent.getRandom().randomInt()) % 16 + 32);
             _lastWindUpdate = Blockmania.getInstance().getTime();
         }

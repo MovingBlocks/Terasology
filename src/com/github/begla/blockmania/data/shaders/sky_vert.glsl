@@ -1,3 +1,4 @@
+#version 120
 varying	vec4 	McPosition;
 varying	vec3 	colorYxy;
 uniform	vec4 	sunPos;
@@ -35,28 +36,19 @@ vec3	allweather ( float t, float cosTheta, float cosGamma )
 
 vec3	allweatherSky ( float t, float cosTheta, float cosGamma, float cosThetaSun )
 {
-	float	thetaSun = acos( cosThetaSun );
 
-	vec3	clrYxy   = zenith * allweather ( t, cosTheta, cosGamma ) / allweather ( t, 1.0, cosThetaSun );
-  
- if(cosTheta<0.35){
-   thetaSun=0;
-  }
+  float	thetaSun = acos( cosThetaSun );
 
-	//clrYxy [0] *= smoothstep ( 0.0, EPS, thetaSun);
-	
+	vec3	clrYxy = zenith * allweather ( t, cosTheta, cosGamma ) / allweather ( t, 1.0, cosThetaSun );	
 	return clrYxy;
 }
 
 void main(void)
 {
-	vec3 v               = normalize ( (gl_Vertex-eyePos).xyz );
-        
+	vec3 v               = normalize ( (gl_Vertex-eyePos).xyz );    
         vec3 l               = normalize ( sunPos.xyz );
         float lv             = dot  ( l, v );
         colorYxy        = allweatherSky ( turbidity, abs(v.y)+0.35, lv, l.y );
-
-
         McPosition      = gl_Vertex;
 	gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
 	gl_TexCoord [0] = gl_MultiTexCoord0;

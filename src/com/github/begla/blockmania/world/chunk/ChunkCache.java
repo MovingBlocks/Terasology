@@ -18,13 +18,15 @@ package com.github.begla.blockmania.world.chunk;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.WorldProvider;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.io.*;
 import java.util.Collections;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 /**
@@ -34,27 +36,32 @@ import java.util.logging.Level;
  */
 public final class ChunkCache {
 
+    private static final ExecutorService _threadPool = Executors.newFixedThreadPool(1);
+    private static boolean _running = false;
+    /* ------ */
     private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>().shared();
-    private final WorldProvider _parent;
+    private final LocalWorldProvider _parent;
 
     /**
      * @param parent
      */
-    public ChunkCache(WorldProvider parent) {
+    public ChunkCache(LocalWorldProvider parent) {
         _parent = parent;
     }
 
     /**
-     * Loads a specified chunk from cache or from the disk.
+     * Loads a specified chunk from the cache or from the disk.
      * <p/>
-     * NOTE: This method ALWAYS returns a valid chunk (if positive x and z values are provided)
-     * since a new chunk is generated if none of the present chunks fit the request.
+     * NOTE: This method ALWAYS returns a valid chunk since a new chunk is generated if none of the present
+     * chunks fit the request.
      *
      * @param x X-coordinate of the chunk
      * @param z Z-coordinate of the chunk
      * @return The chunk
      */
     public Chunk loadOrCreateChunk(int x, int z) {
+        freeCacheSpace();
+
         int chunkId = MathHelper.cantorize(MathHelper.mapToPositive(x), MathHelper.mapToPositive(z));
         // Try to load the chunk from the cache
         Chunk c = _chunkCache.get(chunkId);
@@ -75,27 +82,39 @@ public final class ChunkCache {
         _chunkCache.put(chunkId, c);
         c.setCached(true);
 
+        if (_chunkCache.size() > capacity())
+            freeCacheSpace();
+
         return c;
     }
 
-    public void freeCacheSpace() {
-        if (_chunkCache.size() <= capacity()) {
+    private void freeCacheSpace() {
+        if (_running)
             return;
-        }
 
-        FastList<Chunk> cachedChunks = new FastList<Chunk>(_chunkCache.values());
-        Collections.sort(cachedChunks);
+        _running = true;
 
-        if (_chunkCache.size() > capacity()) {
-            Chunk chunkToDelete = cachedChunks.getLast();
-            // Prevent further updates to this chunk
-            chunkToDelete.setCached(false);
-            // Write the chunk to disk (but do not remove it from the cache just now)
-            writeChunkToDisk(chunkToDelete);
-            // When the chunk is written, finally remove it from the cache
-            _chunkCache.values().remove(chunkToDelete);
-            chunkToDelete.dispose();
-        }
+        Runnable r = new Runnable() {
+            public void run() {
+                FastList<Chunk> cachedChunks = new FastList<Chunk>(_chunkCache.values());
+                Collections.sort(cachedChunks);
+
+                while (cachedChunks.size() >= capacity()) {
+                    Chunk chunkToDelete = cachedChunks.removeLast();
+                    // Prevent further updates to this chunk
+                    chunkToDelete.setCached(false);
+                    // Write the chunk to disk (but do not remove it from the cache just now)
+                    writeChunkToDisk(chunkToDelete);
+                    // When the chunk is written, finally remove it from the cache
+                    _chunkCache.values().remove(chunkToDelete);
+                    chunkToDelete.dispose();
+                }
+
+                _running = false;
+            }
+        };
+
+        _threadPool.submit(r);
     }
 
     /**
@@ -110,23 +129,10 @@ public final class ChunkCache {
         _chunkCache.clear();
     }
 
-    /**
-     * @return
-     */
-    public int size() {
-        return _chunkCache.size();
-    }
-
-    /**
-     * @return
-     */
-    public static int capacity() {
-        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue() + 1024);
-    }
-
     private void writeChunkToDisk(Chunk c) {
-        if (Blockmania.getInstance().isSandboxed())
+        if (Configuration.getSettingBoolean("SANDBOXED") || !Configuration.getSettingBoolean("SAVE_CHUNKS")) {
             return;
+        }
 
         if (c.isFresh()) {
             return;
@@ -175,5 +181,13 @@ public final class ChunkCache {
         }
 
         return null;
+    }
+
+    public int size() {
+        return _chunkCache.size();
+    }
+
+    public static int capacity() {
+        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue() + 512);
     }
 }

@@ -28,10 +28,6 @@ import org.lwjgl.util.vector.Vector3f;
 public final class Configuration {
 
     /**
-     * Maximum amount frames to skip.
-     */
-    public static final int FRAME_SKIP_MAX_FRAMES = 10;
-    /**
      * The mouse sensitivity.
      */
     public static final double MOUSE_SENS = 0.075;
@@ -42,15 +38,11 @@ public final class Configuration {
     /**
      * The three dimensions of a chunk.
      */
-    public static final Vector3f CHUNK_DIMENSIONS;
-    /**
-     * The size of the sun.
-     */
-    public static final double SUN_SIZE = 64;
+    public static final Vector3f CHUNK_DIMENSIONS = new Vector3f(16, 256, 16);
     /**
      * The string used to generate the default world. If not set, a random seed is used.
      */
-    public static final String DEFAULT_SEED = "";
+    public static final String DEFAULT_SEED = "waltterrr";
     /**
      * The pixel format used to init. the display.
      */
@@ -84,13 +76,17 @@ public final class Configuration {
     private static final FastMap<String, Boolean> _settingsBoolean = new FastMap<String, Boolean>();
 
     static {
-        if (Blockmania.getInstance().isSandboxed()) {
-            CHUNK_DIMENSIONS = new Vector3f(16, 128, 16);
-        } else {
-            CHUNK_DIMENSIONS = new Vector3f(16, 128, 16);
+        loadDefaults();
+
+        if (Boolean.getBoolean("blockmania.demo")) {
+            loadDemo();
+        } else if (Boolean.getBoolean("blockmania.debug")) {
+            loadDebug();
+        } else if (Boolean.getBoolean("blockmania.sandboxed")) {
+            loadSandboxed();
         }
 
-        loadSettings();
+        determineAndSetViewingDistance();
     }
 
     /**
@@ -136,7 +132,10 @@ public final class Configuration {
     /**
      * Loads the default values for the global settings.
      */
-    private static void loadDefaults() {
+    public static void loadDefaults() {
+        _settingsNumeric.put("FOV", 70.0);
+        _settingsBoolean.put("SANDBOXED", false);
+        _settingsBoolean.put("SAVE_CHUNKS", true);
         _settingsBoolean.put("ROTATING_BLOCK", true);
         _settingsBoolean.put("REPLANT_DIRT", true);
         _settingsBoolean.put("PLACING_BOX", true);
@@ -155,11 +154,11 @@ public final class Configuration {
         _settingsNumeric.put("MAX_GRAVITY_SWIMMING", 0.01);
         _settingsNumeric.put("GRAVITY_SWIMMING", 0.0001);
         _settingsNumeric.put("FRICTION", 0.08);
-        _settingsNumeric.put("V_DIST_X", 32.0);
-        _settingsNumeric.put("V_DIST_Z", 32.0);
+        _settingsNumeric.put("V_DIST_X", 8.0);
+        _settingsNumeric.put("V_DIST_Z", 8.0);
     }
 
-    private static void loadDebug() {
+    public static void loadDebug() {
         _settingsBoolean.put("CHUNK_OUTLINES", false);
         _settingsBoolean.put("DEBUG", true);
         _settingsBoolean.put("DEBUG_COLLISION", false);
@@ -167,31 +166,33 @@ public final class Configuration {
         _settingsNumeric.put("WALKING_SPEED", 0.5);
     }
 
-    private static void loadDemo() {
+    public static void loadDemo() {
+        _settingsBoolean.put("ROTATING_BLOCK", false);
+        _settingsBoolean.put("SAVE_CHUNKS", false);
         _settingsBoolean.put("DEBUG", false);
         _settingsBoolean.put("PLACING_BOX", false);
         _settingsBoolean.put("CROSSHAIR", false);
         _settingsBoolean.put("DEMO_FLIGHT", true);
         _settingsBoolean.put("GOD_MODE", true);
         _settingsNumeric.put("WALKING_SPEED", 0.1);
+        _settingsNumeric.put("V_DIST_X", 46.0);
+        _settingsNumeric.put("V_DIST_Z", 46.0);
     }
 
-    private static void loadSandboxed() {
-        _settingsNumeric.put("V_DIST_X", 16.0);
-        _settingsNumeric.put("V_DIST_Z", 16.0);
+    public static void loadSandboxed() {
+        _settingsBoolean.put("SANDBOXED", true);
     }
 
-    private static void loadSettings() {
-        loadDefaults();
-
-        if (!Blockmania.getInstance().isSandboxed()) {
-            if (Boolean.getBoolean("blockmania.demo")) {
-                loadDemo();
-            } else if (Boolean.getBoolean("blockmania.debugMode")) {
-                loadDebug();
-            }
+    private static void determineAndSetViewingDistance() {
+        if (Runtime.getRuntime().maxMemory() / 1048576.0 > 400) {
+            _settingsNumeric.put("V_DIST_X", 32.0);
+            _settingsNumeric.put("V_DIST_Z", 32.0);
+        } else if (Runtime.getRuntime().maxMemory() / 1048576.0 > 200) {
+            _settingsNumeric.put("V_DIST_X", 16.0);
+            _settingsNumeric.put("V_DIST_Z", 16.0);
         } else {
-            loadSandboxed();
+            _settingsNumeric.put("V_DIST_X", 8.0);
+            _settingsNumeric.put("V_DIST_Z", 8.0);
         }
     }
 }

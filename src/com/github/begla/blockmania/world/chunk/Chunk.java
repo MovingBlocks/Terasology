@@ -22,7 +22,7 @@ import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.Helper;
-import com.github.begla.blockmania.world.WorldProvider;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.entity.StaticEntity;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
@@ -52,7 +52,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     /* ------ */
     protected boolean _dirty, _lightDirty, _fresh, _cached;
     /* ------ */
-    protected WorldProvider _parent;
+    protected LocalWorldProvider _parent;
     /* ------ */
     protected final BlockmaniaArray _blocks;
     protected final BlockmaniaSmartArray _sunlight, _light;
@@ -92,7 +92,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @param p        The parent world
      * @param position The absolute position of the chunk within the world
      */
-    public Chunk(WorldProvider p, Vector3f position) {
+    public Chunk(LocalWorldProvider p, Vector3f position) {
         this();
 
         setPosition(position);
@@ -778,7 +778,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return z + getChunkWorldPosZ();
     }
 
-    public WorldProvider getParent() {
+    public LocalWorldProvider getParent() {
         return _parent;
     }
 
@@ -814,7 +814,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         super.setPosition(position);
     }
 
-    public void setParent(WorldProvider parent) {
+    public void setParent(LocalWorldProvider parent) {
         _parent = parent;
     }
 

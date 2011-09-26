@@ -54,20 +54,16 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  */
 public final class Blockmania {
 
-    /* ------- */
+    private static final int FRAME_SKIP_MAX_FRAMES = 10;
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
     /* ------- */
-    private long _lastLoopTime;
-    private long _lastFpsTime;
+    private long _lastLoopTime, _lastFpsTime;
     private int _fps;
     private final StringBuffer _consoleInput = new StringBuffer();
-    private boolean _pauseGame = false;
-    private boolean _runGame = true;
-    private boolean _saveWorldOnExit = true;
+    private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
     /* ------- */
-    private double _meanFps;
-    private double _memoryUsage;
+    private double _averageFps;
     /* ------- */
     private Player _player;
     private World _world;
@@ -79,8 +75,6 @@ public final class Blockmania {
     private static Blockmania _instance;
     /* ------- */
     private final Logger _logger = Logger.getLogger("blockmania");
-    /* ------- */
-    private boolean _sandbox = false;
     /* ------- */
     private double _cubeRotation;
 
@@ -254,6 +248,8 @@ public final class Blockmania {
      * Renders the scene.
      */
     private void render() {
+        resizeViewport();
+
         glFogi(GL_FOG_MODE, GL_LINEAR);
         // Update the viewing distance
         double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
@@ -279,7 +275,7 @@ public final class Blockmania {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(80.0f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 1024f);
+        gluPerspective(Configuration.getSettingNumeric("FOV").floatValue(), (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 1024f);
         glPushMatrix();
 
         glMatrixMode(GL_MODELVIEW);
@@ -297,8 +293,6 @@ public final class Blockmania {
         double nextGameTick = getTime();
         int loopCounter;
 
-        resizeViewport();
-
         /*
          * Blockmania game loop.
          */
@@ -309,13 +303,14 @@ public final class Blockmania {
 
             // Pause the game while the debug console is being shown
             loopCounter = 0;
-            while (getTime() > nextGameTick && loopCounter < Configuration.FRAME_SKIP_MAX_FRAMES) {
+            while (getTime() > nextGameTick && loopCounter < FRAME_SKIP_MAX_FRAMES) {
                 if (!_pauseGame) {
                     update();
                 }
                 nextGameTick += SKIP_TICKS;
                 loopCounter++;
             }
+
             render();
 
             // Clear dirty flag and swap buffer
@@ -337,8 +332,6 @@ public final class Blockmania {
     }
 
     public void pauseGame() {
-        if (_world != null)
-            _world.suspendUpdateThread();
         Mouse.setGrabbed(false);
         _pauseGame = true;
     }
@@ -346,8 +339,6 @@ public final class Blockmania {
     public void unpauseGame() {
         _pauseGame = false;
         Mouse.setGrabbed(true);
-        if (_world != null)
-            _world.resumeUpdateThread();
     }
 
     /**
@@ -418,7 +409,9 @@ public final class Blockmania {
         * Draw debugging information.
         */
         if (Configuration.getSettingBoolean("DEBUG")) {
-            FontManager.getInstance().getFont("default").drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB)", Configuration.GAME_TITLE, _meanFps, _memoryUsage));
+            double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
+
+            FontManager.getInstance().getFont("default").drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f)", Configuration.GAME_TITLE, _averageFps, memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
             FontManager.getInstance().getFont("default").drawString(4, 22, String.format("%s", _player));
             FontManager.getInstance().getFont("default").drawString(4, 38, String.format("%s", _world));
             FontManager.getInstance().getFont("default").drawString(4, 54, String.format("total vus: %s", ChunkMeshGenerator.getVertexArrayUpdateCount()));
@@ -615,9 +608,6 @@ public final class Blockmania {
         // Init. a new player
         _player = new Player(_world);
         _world.setPlayer(_player);
-
-        _world.startUpdateThread();
-
         // Reset the delta value
         _lastLoopTime = getTime();
     }
@@ -636,11 +626,8 @@ public final class Blockmania {
         if (_lastFpsTime >= 1000) {
             _lastFpsTime = 0;
 
-            _meanFps += _fps;
-            _meanFps /= 2;
-
-            // Calculate the current memory usage in MB
-            _memoryUsage = (Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
+            _averageFps += _fps;
+            _averageFps /= 2;
 
             _fps = 0;
         }
@@ -659,13 +646,5 @@ public final class Blockmania {
 
     public Logger getLogger() {
         return _logger;
-    }
-
-    public void setSandboxed(boolean b) {
-        _sandbox = b;
-    }
-
-    public boolean isSandboxed() {
-        return _sandbox;
     }
 }

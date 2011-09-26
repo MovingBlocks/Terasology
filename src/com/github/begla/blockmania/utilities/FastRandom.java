@@ -36,13 +36,13 @@ public class FastRandom {
 
     /**
      * Initializes a new instance of the random number generator using
-     * System.currentTimeMillis() as seed.
+     * "System.currentTimeMillis()" as seed.
      */
     public FastRandom() {
     }
 
     /**
-     * Returns a random value as long.
+     * Returns a random long value.
      *
      * @return Random value
      */
@@ -54,7 +54,7 @@ public class FastRandom {
     }
 
     /**
-     * Returns a random value as integer.
+     * Returns a random int value.
      *
      * @return Random value
      */
@@ -63,7 +63,7 @@ public class FastRandom {
     }
 
     /**
-     * Returns a random value as double.
+     * Returns a random double value.
      *
      * @return Random value
      */
@@ -72,7 +72,7 @@ public class FastRandom {
     }
 
     /**
-     * Returns a random value as boolean.
+     * Returns a random bool.
      *
      * @return Random value
      */
@@ -117,20 +117,5 @@ public class FastRandom {
 
         double p = Math.sqrt((-2d * (Math.log(q))) / q);
         return u1 * p; // or u2 * p
-    }
-
-    /**
-     * Some random noise.
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @param seed
-     * @return
-     */
-    public static double randomNoise(double x, double y, double z, int seed) {
-        int u = (int) x * 702395077 + (int) y * 915488749 + (int) z * 1299721 + seed * 1402024253;
-        u = (u << 13) ^ u;
-        return (1.0 - ((u * (u * u * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
     }
 }

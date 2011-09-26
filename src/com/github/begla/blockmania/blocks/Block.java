@@ -70,9 +70,14 @@ public abstract class Block implements RenderableObject {
         BACK
     }
 
+    /**
+     * Possible forms of blocks.
+     */
     public static enum BLOCK_FORM {
         NORMAL, CACTUS, LOWERED_BOCK, BILLBOARD
     }
+
+    private int _displayList = -1;
 
     private static final Block[] _blocks = {
             new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), // 0-3
@@ -82,10 +87,53 @@ public abstract class Block implements RenderableObject {
             new BlockWood(), new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick(), // 15-19
             new BlockCoal(), new BlockGold(), new BlockDarkLeaf(), new BlockSnow(), new BlockCactus(), // 20-24
             new BlockBookShelf(), new BlockColorBlack(), new BlockColorBlue(), new BlockColorBrown(), new BlockColorGreen(), // 25-29
-            new BlockColorPurple(), new BlockColorRed(), new BlockColorWhite(), new BlockRedStone(), new BlockSilver(), new BlockDiamond() // 30-35
+            new BlockColorPurple(), new BlockColorRed(), new BlockColorWhite(), new BlockRedStone(), new BlockSilver(), new BlockDiamond(), // 30-35
+            new BlockMediumHighGrass() // 36
     };
+
     private static final BlockNil NIL_BLOCK = new BlockNil();
     private static final Vector4f _colorOffset = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    private static BufferedImage colorLut, foliageLut;
+
+    static {
+        try {
+            colorLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/grasscolor.png").openStream());
+            foliageLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/foliagecolor.png").openStream());
+        } catch (IOException e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+        }
+    }
+
+    /**
+     * Calculates the block color offset value for the given humidity and temperature.
+     *
+     * @param temp The temperature
+     * @param hum  The humidity
+     * @return The color value
+     */
+    public Vector4f colorForTemperatureAndHumidity(double temp, double hum) {
+        hum *= temp;
+        int rgbValue = colorLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
+
+        Color c = new Color(rgbValue);
+        return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
+    }
+
+    /**
+     * Calculates the foliage color for the given humidity and temperature.
+     *
+     * @param temp The temperature
+     * @param hum  The humidity
+     * @return The color value
+     */
+    public Vector4f foliageColorForTemperatureAndHumidity(double temp, double hum) {
+        hum *= temp;
+        int rgbValue = foliageLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
+
+        Color c = new Color(rgbValue);
+        return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
+    }
 
     /**
      * Returns the object for the given block type ID.
@@ -123,16 +171,18 @@ public abstract class Block implements RenderableObject {
      * Calculates the color offset for a given block type and a specific
      * side of the block.
      *
-     * @param side The block side
+     * @param side        The block side
+     * @param temperature The temperature
+     * @param humidity    The humidity
      * @return The color offset
      */
-    public Vector4f getColorOffsetFor(SIDE side, double temp, double hum) {
+    public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
         return _colorOffset;
     }
 
     /**
      * Calculates the texture offset for a given block type and a specific
-     * side of the block.
+     * side of the block in the actual texture used for world rendering.
      *
      * @param side The side of the block
      * @return The texture offset
@@ -141,6 +191,13 @@ public abstract class Block implements RenderableObject {
         return Helper.calcOffsetForTextureAt(2, 0);
     }
 
+    /**
+     * Calculates the texture offset for a given block type and a specific
+     * side of the block in the terrain texture atlas.
+     *
+     * @param side The side of the block
+     * @return The texture offset
+     */
     public Vector2f getTerrainTextureOffsetFor(SIDE side) {
         return getTextureOffsetFor(side);
     }
@@ -156,7 +213,7 @@ public abstract class Block implements RenderableObject {
 
     /**
      * Returns true, if the block should be ignored
-     * within the collision checks.
+     * during collision checks.
      *
      * @return True if penetrable
      */
@@ -174,49 +231,98 @@ public abstract class Block implements RenderableObject {
         return true;
     }
 
+    /**
+     * Returns true if this block should be ignored in the tessellation process.
+     *
+     * @return True if ignored while tessellating
+     */
     public boolean doNotTessellate() {
         return false;
     }
 
+    /**
+     * Returns true if this block should render a bounding box when selected by the player.
+     *
+     * @return True if a bounding box should be rendered
+     */
     public boolean shouldRenderBoundingBox() {
         return true;
     }
 
+    /**
+     * Returns the luminance of the block.
+     *
+     * @return The luminance
+     */
     public byte getLuminance() {
         return 0;
     }
 
+    /**
+     * Returns true if the block can be removed by the player.
+     *
+     * @return True if removable
+     */
     public boolean isRemovable() {
         return true;
     }
 
+    /**
+     * True if the player is allowed to attach blocks to this block.
+     *
+     * @return True if the player can attach blocks
+     */
     public boolean playerCanAttachBlocks() {
         return (getBlockForm() == BLOCK_FORM.NORMAL);
     }
 
+    /**
+     * Returns the AABB for a block at the given position.
+     *
+     * @param pos The position
+     * @return The AABB
+     */
     public static AABB AABBForBlockAt(Vector3f pos) {
         return new AABB(pos, new Vector3f(0.5f, 0.5f, 0.5f));
     }
 
+    /**
+     * Returns the AABB for a block at the given position.
+     *
+     * @param x Position on the x-axis
+     * @param y Position on the y-axis
+     * @param z Position on the z-axis
+     * @return The AABB
+     */
     public static AABB AABBForBlockAt(int x, int y, int z) {
         return new AABB(new Vector3f(x, y, z), new Vector3f(0.5f, 0.5f, 0.5f));
     }
 
+    /**
+     * Returns the form of the block.
+     *
+     * @return The form of the block
+     */
     public BLOCK_FORM getBlockForm() {
         return BLOCK_FORM.NORMAL;
     }
 
+    /**
+     * True if the selection ray can pass through the block.
+     *
+     * @return True if selection ray can pass
+     */
     public boolean letSelectionRayThrough() {
         return false;
     }
 
-    public void render() {
-        if (isBlockInvisible())
+    private void generateDisplayList() {
+        if (_displayList > 0)
             return;
 
-        glEnable(GL_TEXTURE_2D);
-        TextureManager.getInstance().bindTexture("terrain");
+        _displayList = glGenLists(1);
 
+        glNewList(_displayList, GL11.GL_COMPILE);
         glBegin(GL_QUADS);
         GL11.glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -283,38 +389,25 @@ public abstract class Block implements RenderableObject {
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
 
         GL11.glEnd();
+        glEndList();
+    }
+
+    public void render() {
+        if (isBlockInvisible())
+            return;
+
+        if (_displayList == -1)
+            generateDisplayList();
+
+        glEnable(GL_TEXTURE_2D);
+        TextureManager.getInstance().bindTexture("terrain");
+
+        glCallList(_displayList);
 
         glDisable(GL11.GL_TEXTURE_2D);
     }
 
     public void update() {
         // Do nothing
-    }
-
-    BufferedImage colorLut, foliageLut;
-
-    public Block() {
-        try {
-            colorLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/grasscolor.png").openStream());
-            foliageLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/foliagecolor.png").openStream());
-        } catch (IOException e) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
-        }
-    }
-
-    public Vector4f colorForTemperatureAndHumidity(double temp, double hum) {
-        hum *= temp;
-        int rgbValue = colorLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
-
-        Color c = new Color(rgbValue);
-        return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
-    }
-
-    public Vector4f foliageColorForTemperatureAndHumidity(double temp, double hum) {
-        hum *= temp;
-        int rgbValue = colorLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
-
-        Color c = new Color(rgbValue);
-        return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
     }
 }
