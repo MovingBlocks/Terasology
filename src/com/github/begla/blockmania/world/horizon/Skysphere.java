@@ -43,7 +43,7 @@ public class Skysphere implements RenderableObject {
     }
 
     public void render() {
-        if (_parent.getPlayer().isHeadUnderWater() || !(_parent.getTime() >= 0.0f && _parent.getTime() <= 0.6))
+        if (_parent.getPlayer().isHeadUnderWater())
             return;
 
         _parent.getPlayer().applyNormalizedModelViewMatrix();
