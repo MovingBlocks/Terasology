@@ -105,7 +105,7 @@ public class Skysphere implements RenderableObject {
     }
 
     public void update() {
-        _turbidity = 12.0f + (float) _parent.getActiveHumidity() * (float) _parent.getActiveTemperature();
+        _turbidity = 6.0f + (float) _parent.getActiveHumidity() * (float) _parent.getActiveTemperature();
     }
 
     public float getSunPosAngle() {
