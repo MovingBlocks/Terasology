@@ -26,8 +26,14 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.horizon.Clouds;
 import com.github.begla.blockmania.world.horizon.Skysphere;
+import com.github.begla.blockmania.world.horizon.Stars;
 import javolution.util.FastList;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.glu.GLUtessellator;
+import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.Collections;
@@ -36,13 +42,6 @@ import java.util.logging.Level;
 import static org.lwjgl.opengl.GL11.*;
 
 /*Test*/
-import com.github.begla.blockmania.world.horizon.Stars;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.util.glu.GLU;
-import org.lwjgl.util.glu.Sphere;
-import org.lwjgl.opengl.ARBMultitexture;
 
 
 /**
@@ -77,10 +76,11 @@ public final class World extends LocalWorldProvider {
     /* UPDATING */
     private final WorldUpdateManager _worldUpdateManager;
     private int prevChunkPosX = 0, prevChunkPosZ = 0;
-    
+
     /* Test */
     private Stars _stars;
     private Sphere _sphere;
+
     /**
      * Initializes a new world for the single player mode.
      *
@@ -93,13 +93,11 @@ public final class World extends LocalWorldProvider {
         // Init. horizon
         _clouds = new Clouds(this);
         _skysphere = new Skysphere(this);
-        
+
         /* Test */
         Stars _stars = new Stars();
         _stars.loadTextures();
         _sphere = new Sphere();
-        _sphere.setNormals(GLU.GLU_SMOOTH);
-        _sphere.setTextureFlag(true);
 
         _worldUpdateManager = new WorldUpdateManager();
     }
@@ -109,13 +107,9 @@ public final class World extends LocalWorldProvider {
      */
     public void render() {
         /* SKYSPHERE */
-      
-      /* Test */
-       if(getTime()>0.6){
-        _skysphere.render();
-       }else{
-         renderStars();
-       }
+
+        /* Test */
+        renderStars();
 
         /* WORLD RENDERING */
         _player.applyPlayerModelViewMatrix();
@@ -129,19 +123,29 @@ public final class World extends LocalWorldProvider {
         /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();
     }
-    
+
     /* Test */
-    private void renderStars(){
-      ARBMultitexture.glActiveTextureARB(ARBMultitexture.GL_TEXTURE6_ARB );
-      GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _stars.textureId.get(0));
-      
-      //TextureManager.getInstance().bindTexture("stars");
-      
-      glPushMatrix    ();
-      _sphere.draw(22 , 40, 40);  
-      glPopMatrix     ();
-      
-      glDisable(GL13.GL_TEXTURE_CUBE_MAP);
+    private void renderStars() {
+        ShaderManager.getInstance().enableShader("stars");
+
+        _player.applyNormalizedModelViewMatrix();
+
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+
+        glEnable(GL13.GL_TEXTURE_CUBE_MAP);
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, Stars.textureId.get(0));
+
+        glPushMatrix();
+        _sphere.draw(22, 40, 40);
+        glPopMatrix();
+
+        glDisable(GL13.GL_TEXTURE_CUBE_MAP);
+
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+
+        ShaderManager.getInstance().enableShader(null);
     }
 
     private void updateChunksInProximity() {
