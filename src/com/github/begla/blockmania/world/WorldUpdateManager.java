@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import javolution.util.FastSet;
 
@@ -31,8 +32,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 public final class WorldUpdateManager {
 
     /* CHUNK UPDATES */
-    private static final int MAX_THREADS = Math.max(Runtime.getRuntime().availableProcessors() - 2, 1);
-    private static final ExecutorService _threadPool = Executors.newFixedThreadPool(MAX_THREADS);
+    private static final int MAX_THREADS = Math.max(Runtime.getRuntime().availableProcessors() / 2, 1);
+    private static final ExecutorService _threadPool = Executors.newFixedThreadPool(16);
     private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
     private double _averageUpdateDuration = 0.0;
 
@@ -79,7 +80,7 @@ public final class WorldUpdateManager {
      * Updates the VBOs of all currently queued chunks.
      */
     public void updateVBOs() {
-        while (_vboUpdates.size() > 0) {
+        for (int i = 0; i < Configuration.VBO_UPDATES_PER_FRAME && _vboUpdates.size() > 0; i++) {
             Chunk c = _vboUpdates.poll();
 
             if (c != null)

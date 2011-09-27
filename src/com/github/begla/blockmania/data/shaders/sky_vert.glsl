@@ -8,7 +8,6 @@ uniform vec3 zenith;
 
 #define	EPS	0.1
 
-
 vec3	allweather ( float t, float cosTheta, float cosGamma )
 {
 	float	gamma      = acos ( cosGamma );
@@ -46,10 +45,10 @@ vec3	allweatherSky ( float t, float cosTheta, float cosGamma, float cosThetaSun 
 void main(void)
 {
 	vec3 v               = normalize ( (gl_Vertex-eyePos).xyz );    
-        vec3 l               = normalize ( sunPos.xyz );
-        float lv             = dot  ( l, v );
-        colorYxy        = allweatherSky ( turbidity, abs(v.y)+0.35, lv, l.y );
-        McPosition      = gl_Vertex;
+    vec3 l               = normalize ( sunPos.xyz );
+    float lv             = dot  ( l, v );
+    colorYxy        = allweatherSky ( turbidity, abs(v.y)+0.35, lv, l.y );
+    McPosition      = gl_Vertex;
 	gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
 	gl_TexCoord [0] = gl_MultiTexCoord0;
 }

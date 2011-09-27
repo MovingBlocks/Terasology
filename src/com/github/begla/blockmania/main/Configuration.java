@@ -28,6 +28,14 @@ import org.lwjgl.util.vector.Vector3f;
 public final class Configuration {
 
     /**
+     * Amount of VBO updates per frame.
+     */
+    public static final int VBO_UPDATES_PER_FRAME  = 2;
+    /**
+     * Sunrise/sunset duration
+     */
+    public static final double SUN_RISE_SET_DURATION = 0.025;
+    /**
      * The mouse sensitivity.
      */
     public static final double MOUSE_SENS = 0.075;

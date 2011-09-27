@@ -18,6 +18,7 @@ package com.github.begla.blockmania.world.horizon;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.world.World;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.vector.Vector3f;
@@ -29,17 +30,33 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Anthony Kireev <adeon.k87@gmail.com>
  */
 public class Skysphere implements RenderableObject {
+    private static int _displayListSphere = -1;
+    private static final float PI = 3.1415926f, PI2 = 2 * PI, PIHALF = PI / 2;
 
-    private static final float PI = 3.1415926f;
     /* SKY */
     private float _turbidity = 10.0f, _sunPosAngle = 0.1f;
-    private Sphere _sphere = new Sphere();
     private Vector3f _zenithColor = new Vector3f();
-
     private World _parent;
 
     public Skysphere(World parent) {
         _parent = parent;
+    }
+
+    private void drawSphere() {
+        if (_displayListSphere == -1) {
+            _displayListSphere = glGenLists(1);
+
+            Sphere sphere = new Sphere();
+            glNewList(_displayListSphere, GL11.GL_COMPILE);
+
+            glPushMatrix();
+            sphere.draw(16, 8, 8);
+            glPopMatrix();
+
+            glEndList();
+        }
+
+        glCallList(_displayListSphere);
     }
 
     public void render() {
@@ -51,8 +68,7 @@ public class Skysphere implements RenderableObject {
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
 
-        //float sunPosInRadians = (float)Math.toRadians(180*(_time-0.075));
-        _sunPosAngle = 5.3f * (float) _parent.getTime() - 1.4f;
+        _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getTime() - 90.0);
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         sunNormalise = sunNormalise.normalise(null);
 
@@ -69,9 +85,7 @@ public class Skysphere implements RenderableObject {
         int zenith = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "zenith");
         GL20.glUniform3f(zenith, _zenithColor.x, _zenithColor.y, _zenithColor.z);
 
-        glPushMatrix();
-        _sphere.draw(22, 80, 80);
-        glPopMatrix();
+        drawSphere();
 
         ShaderManager.getInstance().enableShader(null);
 

@@ -4,11 +4,11 @@ varying	vec4 	McPosition;
 vec4 	eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
 uniform	vec4 	sunPos;
-float	colorExp = 25.0;
+float	colorExp = 6.0;
 
 vec3	convertColor ()
 {
-	vec3	clrYxy = vec3 ( colorYxy );
+	vec3 clrYxy = vec3 ( colorYxy );
 
 	clrYxy [0] = 1.0 - exp ( -clrYxy [0] / colorExp );
 
@@ -29,15 +29,15 @@ vec3	convertColor ()
 
 void main ()
 {
-       vec3 v               = normalize ( McPosition.xyz );
-       
-       if(v.y>-0.35){
+   vec3 v                       = normalize ( McPosition.xyz );
+
+   if(v.y>-0.35){
         vec3 l                  = normalize ( sunPos.xyz );
         vec3 ls                 = normalize ( vec3 (sunPos.x, sunPos.y-0.3, sunPos.z-0.3 ));
         float sunHighlight      = 0.8*pow(max(0.0, dot(ls, v)), 50.0);
         float largeSunHighlight = 0.3*pow(max(0.0, dot(ls, v)), 25.0);
-	gl_FragColor = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight + largeSunHighlight, 1.0 );
-       }else{
+        gl_FragColor = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight + largeSunHighlight, 1.0 );
+   } else {
         gl_FragColor = vec4	( 0.0, 0.0, 0.0, 1.0);
-       }
+   }
 }

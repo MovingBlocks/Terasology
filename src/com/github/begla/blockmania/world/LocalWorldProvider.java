@@ -89,9 +89,6 @@ public class LocalWorldProvider {
         // Init. random generator
         _random = new FastRandom(seed.hashCode());
 
-        // Initial time
-        setTime(0.01);
-
         // Load the meta data of this world
         loadMetaData();
 
@@ -575,9 +572,8 @@ public class LocalWorldProvider {
      */
     public double getTime() {
         long milliSecsSinceCreation = Blockmania.getInstance().getTime() - _creationTime;
-        long wrappedTime = milliSecsSinceCreation % DAY_NIGHT_LENGTH_IN_MS;
 
-        return (double) wrappedTime / (double) DAY_NIGHT_LENGTH_IN_MS;
+        return (double) milliSecsSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
     }
 
     /**

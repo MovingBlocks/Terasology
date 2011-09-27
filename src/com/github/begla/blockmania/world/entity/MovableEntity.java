@@ -116,7 +116,7 @@ public abstract class MovableEntity extends Entity {
             if (_currentFootstepSound == null) {
                 Vector3f playerDirection = directionOfOrigin();
                 _currentFootstepSound = _footstepSounds[Math.abs(_rand.randomInt()) % 5];
-                _currentFootstepSound.playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+                _currentFootstepSound.playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.1f + (float) Math.abs(_rand.randomDouble()) * 0.1f, false, playerDirection.x, playerDirection.y, playerDirection.z);
             } else {
                 if (!_currentFootstepSound.isPlaying()) {
                     _currentFootstepSound = null;

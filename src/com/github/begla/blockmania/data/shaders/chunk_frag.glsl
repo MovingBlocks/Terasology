@@ -68,7 +68,7 @@ void main(){
     color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
     if (!swimming) {
-        gl_FragColor.rgb = linearToSrgb(color).rgb;
+        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.95,0.95,1.0,1.0) * daylightTrans, clamp(fog,0.0,0.4)).rgb;
         gl_FragColor.a = color.a;
     } else {
         gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.0,0.0,0.0,1.0) * daylightTrans, clamp(fog*16.0,0.0,1.0)).rgb;

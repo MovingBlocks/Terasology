@@ -57,6 +57,7 @@ public abstract class ParticleEmitter implements RenderableObject {
 
             if (!p.isAlive()) {
                 _particles.remove(i);
+                p.dipose();
             }
         }
     }

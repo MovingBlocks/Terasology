@@ -127,17 +127,19 @@ public final class World extends LocalWorldProvider {
      * Updates the daylight value according to the current world time.
      */
     private void updateDaylight() {
+        double time = getTime() % 1;
+
         // Sunrise
-        if (getTime() < 0.1f && getTime() > 0.0f) {
-            _daylight = getTime() / 0.1f;
-        } else if (getTime() >= 0.1 && getTime() <= 0.5f) {
+        if (time < Configuration.SUN_RISE_SET_DURATION && time > 0.0f) {
+            _daylight = time / Configuration.SUN_RISE_SET_DURATION;
+        } else if (time >= Configuration.SUN_RISE_SET_DURATION && time <= 0.5f) {
             _daylight = 1.0f;
         }
 
         // Sunset
-        if (getTime() > 0.5f && getTime() < 0.6f) {
-            _daylight = 1.0f - (getTime() - 0.5f) / 0.1f;
-        } else if (getTime() >= 0.6f && getTime() <= 1.0f) {
+        if (time > 0.5 - Configuration.SUN_RISE_SET_DURATION && time < 0.5f) {
+            _daylight = (0.5f - time) / Configuration.SUN_RISE_SET_DURATION;
+        } else if (time >= 0.5 && time <= 1.0f) {
             _daylight = 0.0f;
         }
     }

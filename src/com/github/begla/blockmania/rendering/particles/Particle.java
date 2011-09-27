@@ -39,6 +39,7 @@ public abstract class Particle implements RenderableObject {
     protected final Vector3f _position = new Vector3f();
     protected final Vector3f _velocity = new Vector3f();
     protected int _orientation = 0;
+    protected int _displayList = -1;
 
     protected static final FastRandom _rand = new FastRandom();
 
@@ -59,7 +60,15 @@ public abstract class Particle implements RenderableObject {
             glPushMatrix();
             glTranslatef(_position.x, _position.y, _position.z);
             applyOrientation();
-            renderParticle();
+
+            if (_displayList == -1) {
+                glGenLists(_displayList);
+                renderParticle();
+                glEndList();
+            }
+
+            glCallList(_displayList);
+
             glPopMatrix();
         }
     }
@@ -125,5 +134,11 @@ public abstract class Particle implements RenderableObject {
 
     protected ParticleEmitter getParent() {
         return _parent;
+    }
+
+    protected void dipose() {
+        if (_displayList != -1)
+            glDeleteLists(_displayList, 1);
+        _displayList = 0;
     }
 }
