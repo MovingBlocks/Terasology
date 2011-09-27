@@ -93,6 +93,7 @@ public final class World extends LocalWorldProvider {
 
         /* WORLD RENDERING */
         _player.applyPlayerModelViewMatrix();
+
         _player.render();
 
         renderChunks();
