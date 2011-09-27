@@ -60,6 +60,10 @@ public final class Configuration {
      */
     public static final DisplayMode DISPLAY_MODE = new DisplayMode(1280, 720);
     /**
+     * Aspect ratio.
+     */
+    public static final double ASPECT_RATIO = 16.0/9.0;
+    /**
      * If set to true, the game is rendered as a full screen application.
      */
     public static final boolean FULLSCREEN = false;

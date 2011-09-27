@@ -49,9 +49,7 @@ public class Skysphere implements RenderableObject {
             Sphere sphere = new Sphere();
             glNewList(_displayListSphere, GL11.GL_COMPILE);
 
-            glPushMatrix();
-            sphere.draw(16, 8, 8);
-            glPopMatrix();
+            sphere.draw(16, 8, 8);;
 
             glEndList();
         }
@@ -62,8 +60,6 @@ public class Skysphere implements RenderableObject {
     public void render() {
         if (_parent.getPlayer().isHeadUnderWater())
             return;
-
-        _parent.getPlayer().applyNormalizedModelViewMatrix();
 
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);

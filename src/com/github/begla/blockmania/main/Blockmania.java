@@ -15,14 +15,13 @@
  */
 package com.github.begla.blockmania.main;
 
-import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.gui.HUD;
 import com.github.begla.blockmania.rendering.FontManager;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.VBOManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.world.characters.Player;
-import com.github.begla.blockmania.world.chunk.ChunkMeshGenerator;
 import javolution.util.FastList;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -44,7 +43,6 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.util.glu.GLU.gluLookAt;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 /**
@@ -65,8 +63,8 @@ public final class Blockmania {
     /* ------- */
     private double _averageFps;
     /* ------- */
-    private Player _player;
     private World _world;
+    private HUD _hud;
     /* ------- */
     private final FastRandom _rand = new FastRandom();
     /* ------- */
@@ -75,8 +73,6 @@ public final class Blockmania {
     private static Blockmania _instance;
     /* ------- */
     private final Logger _logger = Logger.getLogger("blockmania");
-    /* ------- */
-    private double _cubeRotation;
 
     // Singleton
     public static Blockmania getInstance() {
@@ -219,6 +215,11 @@ public final class Blockmania {
         _timerTicksPerSecond = Sys.getTimerResolution();
 
         /*
+         * Init. GUI.
+         */
+        _hud = new HUD();
+
+        /*
          * Init. management classes.
          */
         ShaderManager.getInstance();
@@ -228,6 +229,7 @@ public final class Blockmania {
         /*
          * Init. OpenGL
          */
+        resizeViewport();
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
@@ -248,8 +250,6 @@ public final class Blockmania {
      * Renders the scene.
      */
     private void render() {
-        resizeViewport();
-
         glFogi(GL_FOG_MODE, GL_LINEAR);
         // Update the viewing distance
         double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
@@ -258,29 +258,26 @@ public final class Blockmania {
         glFogf(GL_FOG_END, (float) viewingDistance);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glLoadIdentity();
+        applyPerspective();
 
         // RENDER WORLD
         _world.render();
+        _hud.render();
+    }
 
-        // RENDER HUD
-        renderHUD();
+    private void resizeViewport() {
+        glViewport(0, 0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight());
     }
 
     /**
      * Resizes the viewport according to the chosen display width and height.
      */
-    private void resizeViewport() {
-        glViewport(0, 0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight());
-
+    private void applyPerspective() {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(Configuration.getSettingNumeric("FOV").floatValue(), (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 1024f);
-        glPushMatrix();
-
+        gluPerspective(Configuration.getSettingNumeric("FOV").floatValue(), (float) Configuration.ASPECT_RATIO, 0.1f, 1024f);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glPushMatrix();
     }
 
     /**
@@ -345,94 +342,7 @@ public final class Blockmania {
      * Executes updates.
      */
     private void update() {
-        _cubeRotation += 0.5;
         _world.update();
-    }
-
-    /**
-     * A small rotating cube that servers as a HUD element.
-     */
-    private void drawRotatingBlock() {
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        gluPerspective(25f, (float) Display.getDisplayMode().getWidth() / (float) Display.getDisplayMode().getHeight(), 0.1f, 32f);
-        glMatrixMode(GL_MODELVIEW);
-
-        glLoadIdentity();
-
-        glEnable(GL11.GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glAlphaFunc(GL_GREATER, 0.1f);
-        glDisable(GL_DEPTH_TEST);
-        gluLookAt(0, 0, -25, 8f, 4.5f, 0, 0, 1, 0);
-        glRotated(_cubeRotation % 360, 0, 1, 1);
-        Block.getBlockForType(_player.getSelectedBlockType()).render();
-        glEnable(GL_DEPTH_TEST);
-        glDisable(GL11.GL_BLEND);
-
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-    }
-
-    /**
-     * Renders the HUD on the screen.
-     */
-    private void renderHUD() {
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, -5, 1);
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-
-        glDisable(GL_DEPTH_TEST);
-        // Draw the crosshair
-        if (Configuration.getSettingBoolean("CROSSHAIR")) {
-            glColor4f(1f, 1f, 1f, 1f);
-            glLineWidth(2f);
-
-            glBegin(GL_LINES);
-            glVertex2d(Display.getDisplayMode().getWidth() / 2f - 8f, Display.getDisplayMode().getHeight() / 2f);
-            glVertex2d(Display.getDisplayMode().getWidth() / 2f + 8f, Display.getDisplayMode().getHeight() / 2f);
-            glVertex2d(Display.getDisplayMode().getWidth() / 2f, Display.getDisplayMode().getHeight() / 2f - 8f);
-            glVertex2d(Display.getDisplayMode().getWidth() / 2f, Display.getDisplayMode().getHeight() / 2f + 8f);
-            glEnd();
-        }
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        /*
-        * Draw debugging information.
-        */
-        if (Configuration.getSettingBoolean("DEBUG")) {
-            double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-
-            FontManager.getInstance().getFont("default").drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f)", Configuration.GAME_TITLE, _averageFps, memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
-            FontManager.getInstance().getFont("default").drawString(4, 22, String.format("%s", _player));
-            FontManager.getInstance().getFont("default").drawString(4, 38, String.format("%s", _world));
-            FontManager.getInstance().getFont("default").drawString(4, 54, String.format("total vus: %s", ChunkMeshGenerator.getVertexArrayUpdateCount()));
-        }
-
-        if (_pauseGame) {
-            // Display the console input text
-            FontManager.getInstance().getFont("default").drawString(4, Display.getDisplayMode().getHeight() - 16 - 4, String.format("%s_", _consoleInput));
-        }
-
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
-
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-
-        if (Configuration.getSettingBoolean("ROTATING_BLOCK")) {
-            drawRotatingBlock();
-        }
     }
 
     /*
@@ -441,7 +351,7 @@ public final class Blockmania {
     private void processMouseInput() {
         while (Mouse.next()) {
             int button = Mouse.getEventButton();
-            _player.processMouseInput(button, Mouse.getEventButtonState());
+            _world.getPlayer().processMouseInput(button, Mouse.getEventButtonState());
         }
     }
 
@@ -477,7 +387,7 @@ public final class Blockmania {
                     }
                 }
             } else {
-                _player.processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
+                _world.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
             }
         }
     }
@@ -508,10 +418,10 @@ public final class Blockmania {
         try {
             if (parsingResult.get(0).equals("place")) {
                 if (parsingResult.get(1).equals("tree")) {
-                    _player.plantTree(Integer.parseInt(parsingResult.get(2)));
+                    _world.getPlayer().plantTree(Integer.parseInt(parsingResult.get(2)));
                     success = true;
                 } else if (parsingResult.get(1).equals("block")) {
-                    _player.placeBlock(Byte.parseByte(parsingResult.get(2)));
+                    _world.getPlayer().placeBlock(Byte.parseByte(parsingResult.get(2)));
                     success = true;
                 }
             } else if (parsingResult.get(0).equals("set")) {
@@ -540,7 +450,7 @@ public final class Blockmania {
                 int x = Integer.parseInt(parsingResult.get(1));
                 int y = Integer.parseInt(parsingResult.get(2));
                 int z = Integer.parseInt(parsingResult.get(3));
-                _player.setPosition(new Vector3f(x, y, z));
+                _world.getPlayer().setPosition(new Vector3f(x, y, z));
                 success = true;
             } else if (parsingResult.get(0).equals("exit")) {
                 _saveWorldOnExit = true;
@@ -605,9 +515,7 @@ public final class Blockmania {
 
         // Init some world
         _world = new World(title, seed);
-        // Init. a new player
-        _player = new Player(_world);
-        _world.setPlayer(_player);
+        _world.setPlayer(new Player(_world));
         // Reset the delta value
         _lastLoopTime = getTime();
     }
@@ -646,5 +554,21 @@ public final class Blockmania {
 
     public Logger getLogger() {
         return _logger;
+    }
+
+    public boolean isGamePaused() {
+        return _pauseGame;
+    }
+
+    public double getAverageFps() {
+        return _averageFps;
+    }
+
+    public World getActiveWorld() {
+        return _world;
+    }
+
+    public StringBuffer getConsoleInput() {
+        return _consoleInput;
     }
 }

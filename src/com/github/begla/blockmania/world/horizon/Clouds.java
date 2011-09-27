@@ -113,6 +113,9 @@ public class Clouds implements RenderableObject {
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("cloud"), "daylight");
         GL20.glUniform1f(daylight, (float) _parent.getDaylight());
 
+        glPushMatrix();
+        glTranslatef(_parent.getPlayer().getPosition().x + _cloudOffset.x, 190f, _parent.getPlayer().getPosition().z + _cloudOffset.y);
+
         // Render two passes: The first one only writes to the depth buffer, the second one to the frame buffer
         for (int i = 0; i < 2; i++) {
             if (i == 0) {
@@ -121,11 +124,10 @@ public class Clouds implements RenderableObject {
                 glColorMask(true, true, true, true);
             }
 
-            glPushMatrix();
-            glTranslatef(_parent.getPlayer().getPosition().x + _cloudOffset.x, 190f, _parent.getPlayer().getPosition().z + _cloudOffset.y);
             drawClouds();
-            glPopMatrix();
         }
+
+        glPopMatrix();
 
         ShaderManager.getInstance().enableShader(null);
         glDisable(GL_BLEND);

@@ -89,12 +89,14 @@ public final class World extends LocalWorldProvider {
      */
     public void render() {
         /* SKYSPHERE */
+        _player.applyNormalizedModelViewMatrix();
+
         _skysphere.render();
 
         /* WORLD RENDERING */
         _player.applyPlayerModelViewMatrix();
-        _player.render();
 
+        _player.render();
         renderChunks();
 
         /* CLOUDS */
@@ -173,13 +175,14 @@ public final class World extends LocalWorldProvider {
      */
     private void renderChunks() {
         ShaderManager.getInstance().enableShader("chunk");
+
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
-        int swimmimg = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
+        int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
         int animationOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animationOffset");
         int animated = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animated");
         GL20.glUniform1f(daylight, (float) getDaylight());
         GL20.glUniform1i(animated, 0);
-        GL20.glUniform1i(swimmimg, _player.isHeadUnderWater() ? 1 : 0);
+        GL20.glUniform1i(swimming, _player.isHeadUnderWater() ? 1 : 0);
 
         FastList<Chunk> visibleChunks = fetchVisibleChunks();
 
@@ -214,6 +217,8 @@ public final class World extends LocalWorldProvider {
         }
 
         GL20.glUniform1i(animated, 1);
+        GL20.glUniform1f(animationOffset, ((float) (_tick / 2 % 12)) * (1.0f / 16f));
+        TextureManager.getInstance().bindTexture("custom_water_still");
 
         for (int i = 0; i < 2; i++) {
             // ANIMATED WATER
@@ -226,13 +231,12 @@ public final class World extends LocalWorldProvider {
                     glColorMask(true, true, true, true);
                 }
 
-                GL20.glUniform1f(animationOffset, ((float) (_tick / 2 % 12)) * (1.0f / 16f));
-                TextureManager.getInstance().bindTexture("custom_water_still");
                 c.render(ChunkMesh.RENDER_TYPE.WATER);
             }
         }
 
         ShaderManager.getInstance().enableShader(null);
+
         glDisable(GL_TEXTURE_2D);
     }
 
