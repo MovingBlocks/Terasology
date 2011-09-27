@@ -43,7 +43,7 @@ public class Skysphere implements RenderableObject {
     }
 
     public void render() {
-        if (_parent.getPlayer().isHeadUnderWater() || !(_parent.getTime() >= 0.0f && _parent.getTime() <= 0.6))
+        if (_parent.getPlayer().isHeadUnderWater())
             return;
 
         _parent.getPlayer().applyNormalizedModelViewMatrix();
@@ -105,7 +105,7 @@ public class Skysphere implements RenderableObject {
     }
 
     public void update() {
-        _turbidity = 12.0f + (float) _parent.getActiveHumidity() * (float) _parent.getActiveTemperature();
+        _turbidity = 6.0f + (float) _parent.getActiveHumidity() * (float) _parent.getActiveTemperature();
     }
 
     public float getSunPosAngle() {
