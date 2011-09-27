@@ -17,7 +17,11 @@ package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.utilities.FastRandom;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
+
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -54,7 +58,7 @@ public abstract class Particle implements RenderableObject {
         if (isAlive()) {
             glPushMatrix();
             glTranslatef(_position.x, _position.y, _position.z);
-            glRotatef(_orientation, 0, 1, 0);
+            applyOrientation();
             renderParticle();
             glPopMatrix();
         }
@@ -64,6 +68,24 @@ public abstract class Particle implements RenderableObject {
         updateVelocity();
         updatePosition();
         decLifetime();
+    }
+
+    private void applyOrientation() {
+        // Fetch the current modelview matrix
+        final FloatBuffer model = BufferUtils.createFloatBuffer(16);
+        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, model);
+
+        // And undo all rotations and scaling
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (i == j)
+                    model.put(i * 4 + j, 1.0f);
+                else
+                    model.put(i * 4 + j, 0.0f);
+            }
+        }
+
+        GL11.glLoadMatrix(model);
     }
 
     protected void updateVelocity() {
