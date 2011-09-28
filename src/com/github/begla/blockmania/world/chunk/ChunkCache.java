@@ -60,8 +60,6 @@ public final class ChunkCache {
      * @return The chunk
      */
     public Chunk loadOrCreateChunk(int x, int z) {
-        freeCacheSpace();
-
         int chunkId = MathHelper.cantorize(MathHelper.mapToPositive(x), MathHelper.mapToPositive(z));
         // Try to load the chunk from the cache
         Chunk c = _chunkCache.get(chunkId);
@@ -80,16 +78,12 @@ public final class ChunkCache {
         }
 
         _chunkCache.put(chunkId, c);
-        c.setCached(true);
-
-        if (_chunkCache.size() > capacity())
-            freeCacheSpace();
 
         return c;
     }
 
-    private void freeCacheSpace() {
-        if (_running)
+    public void freeCacheSpace() {
+        if (_running || _chunkCache.size() <= capacity())
             return;
 
         _running = true;
@@ -99,14 +93,13 @@ public final class ChunkCache {
                 FastList<Chunk> cachedChunks = new FastList<Chunk>(_chunkCache.values());
                 Collections.sort(cachedChunks);
 
-                while (cachedChunks.size() >= capacity()) {
+                while (cachedChunks.size() > capacity()) {
                     Chunk chunkToDelete = cachedChunks.removeLast();
-                    // Prevent further updates to this chunk
-                    chunkToDelete.setCached(false);
                     // Write the chunk to disk (but do not remove it from the cache just now)
                     writeChunkToDisk(chunkToDelete);
                     // When the chunk is written, finally remove it from the cache
                     _chunkCache.values().remove(chunkToDelete);
+
                     chunkToDelete.dispose();
                 }
 
@@ -122,7 +115,6 @@ public final class ChunkCache {
      */
     public void saveAndDisposeAllChunks() {
         for (Chunk c : _chunkCache.values()) {
-            c.setCached(false);
             writeChunkToDisk(c);
         }
 

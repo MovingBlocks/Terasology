@@ -273,6 +273,7 @@ public final class World extends LocalWorldProvider {
 
         // Generate new VBOs if available
         _worldUpdateManager.updateVBOs();
+        _chunkCache.freeCacheSpace();
     }
 
     /**

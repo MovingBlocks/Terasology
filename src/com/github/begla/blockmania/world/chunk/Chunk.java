@@ -50,7 +50,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     protected static final
     Vector3f[] _lightDirections = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
     /* ------ */
-    protected boolean _dirty, _lightDirty, _fresh, _cached;
+    protected boolean _dirty, _lightDirty, _fresh;
     /* ------ */
     protected LocalWorldProvider _parent;
     /* ------ */
@@ -83,7 +83,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         _lightDirty = true;
         _dirty = true;
         _fresh = true;
-        _cached = false;
     }
 
     /**
@@ -385,9 +384,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @param type      The type of the light
      */
     public void setLight(int x, int y, int z, byte intensity, LIGHT_TYPE type) {
-        if (!isCached())
-            return;
-
         BlockmaniaSmartArray lSource;
         if (type == LIGHT_TYPE.SUN) {
             lSource = _sunlight;
@@ -444,9 +440,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @param type The block type
      */
     public void setBlock(int x, int y, int z, byte type) {
-        if (!isCached())
-            return;
-
         byte oldValue = _blocks.get(x, y, z);
         _blocks.set(x, y, z, type);
 
@@ -657,7 +650,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Generates the terrain mesh (creates the internal vertex arrays).
      */
     public void generateMesh() {
-        if (!isCached() || _fresh)
+        if (_fresh)
             return;
 
         setNewMesh(_meshGenerator.generateMesh());
@@ -669,9 +662,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Generates the display lists and swaps the old mesh with the current mesh.
      */
     public void generateVBOs() {
-        if (!isCached())
-            return;
-
         if (_newMesh != null) {
             _newMesh.generateVBOs();
         }
@@ -800,14 +790,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     void setLightDirty(boolean _lightDirty) {
         this._lightDirty = _lightDirty;
-    }
-
-    public void setCached(boolean b) {
-        _cached = b;
-    }
-
-    public boolean isCached() {
-        return _cached;
     }
 
     public void setPosition(Vector3f position) {
