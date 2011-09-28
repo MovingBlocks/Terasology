@@ -331,6 +331,7 @@ public final class Blockmania {
      * Executes updates.
      */
     private void update() {
+        _hud.update();
         _world.update();
     }
 

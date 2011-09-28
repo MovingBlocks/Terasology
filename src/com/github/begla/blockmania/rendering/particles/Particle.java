@@ -136,7 +136,7 @@ public abstract class Particle implements RenderableObject {
         return _parent;
     }
 
-    protected void dipose() {
+    protected void dispose() {
         if (_displayList != -1)
             glDeleteLists(_displayList, 1);
         _displayList = 0;
