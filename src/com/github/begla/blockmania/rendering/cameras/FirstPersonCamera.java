@@ -45,11 +45,7 @@ public class FirstPersonCamera extends Camera {
 
         Vector3f right = new Vector3f();
         Vector3f.cross(_viewingDirection, _up, right);
-
-        if (right.length() > 0) {
-            right.normalise();
-            right.scale((float) _bobbingOffsetFactor);
-        }
+        right.scale((float) _bobbingOffsetFactor);
 
         GLU.gluLookAt(_position.x + right.x, _position.y + right.y, _position.z + right.z, _position.x + _viewingDirection.x + right.x, _position.y + _viewingDirection.y + right.y, _position.z + _viewingDirection.z + right.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
 
