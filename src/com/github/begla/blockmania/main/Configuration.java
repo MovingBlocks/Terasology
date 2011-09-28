@@ -30,7 +30,7 @@ public final class Configuration {
     /**
      * Amount of VBO updates per frame.
      */
-    public static final int VBO_UPDATES_PER_FRAME  = 2;
+    public static final int VBO_UPDATES_PER_FRAME  = 4;
     /**
      * Sunrise/sunset duration
      */
@@ -70,8 +70,8 @@ public final class Configuration {
 
     /* LIGHTING */
     public static final byte MAX_LIGHT = 15;
-    public static final double OCCLUSION_AMOUNT_DEFAULT = 1.0 / 16.0;
-    public static final double OCCLUSION_AMOUNT_BILLBOARDS = OCCLUSION_AMOUNT_DEFAULT / 8.0;
+    public static final double OCCLUSION_AMOUNT_DEFAULT = 1.0 / 8.0;
+    public static final double OCCLUSION_AMOUNT_BILLBOARDS = OCCLUSION_AMOUNT_DEFAULT / 4.0;
 
     /* RESOURCES */
     public static final double PROB_COAL = -2;

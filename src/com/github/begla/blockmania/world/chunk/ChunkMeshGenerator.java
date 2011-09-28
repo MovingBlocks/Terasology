@@ -73,7 +73,7 @@ public class ChunkMeshGenerator {
 
     private void generateOptimizedBuffers(ChunkMesh mesh) {
         for (int j = 0; j < mesh._vertexElements.length; j++) {
-            mesh._vertexElements[j].vertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].quads.size() + mesh._vertexElements[j].tex.size() * 2 + mesh._vertexElements[j].color.size());
+            mesh._vertexElements[j].vertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].quads.size() * 2 + mesh._vertexElements[j].tex.size() + mesh._vertexElements[j].color.size());
             mesh._vertexElements[j].indices = BufferUtils.createIntBuffer(mesh._vertexElements[j].quads.size());
 
             int cTex = 0;
@@ -102,8 +102,9 @@ public class ChunkMeshGenerator {
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
 
                 double occlusionValue = getOcclusionValue(vertexPos);
-                mesh._vertexElements[j].vertices.put((float) (getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.SUN) * occlusionValue));
-                mesh._vertexElements[j].vertices.put((float) (getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.BLOCK) * occlusionValue));
+                mesh._vertexElements[j].vertices.put((float) (getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.SUN)));
+                mesh._vertexElements[j].vertices.put((float) (getLightForVertexPos(vertexPos, Chunk.LIGHT_TYPE.BLOCK)));
+                mesh._vertexElements[j].vertices.put((float) occlusionValue);
 
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor));
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 1));

@@ -681,6 +681,11 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void update() {
+        // Do not update the mesh if one of the VISIBLE neighbors is dirty
+        for (Chunk nc : loadOrCreateNeighbors())
+            if ((nc.isDirty() || nc.isLightDirty()) && nc.isVisible())
+                return;
+
         swapActiveMesh();
     }
 

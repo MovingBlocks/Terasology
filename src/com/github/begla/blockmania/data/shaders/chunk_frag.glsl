@@ -49,14 +49,15 @@ void main(){
     }
 
     // FETCH LIGHT VALUES
-    vec2 lightCoord = vec2(gl_TexCoord[1]);
+    vec3 lightCoord = vec3(gl_TexCoord[1]);
 
     // CALCULATE DAYLIGHT AND BLOCKLIGHT
     float daylightValue = clamp(daylightTrans + 0.2, 0.0, 1.0) * pow(0.86, (1.0-lightCoord.x)*15.0);
     float blocklightValue = lightCoord.y;
+    float occlusionValue = lightCoord.z;
 
-    vec3 daylightColorValue = vec3(daylightValue);
-    vec3 blocklightColorValue = vec3(blocklightValue);
+    vec3 daylightColorValue = vec3(daylightValue) * occlusionValue;
+    vec3 blocklightColorValue = vec3(blocklightValue) * occlusionValue;
 
     blocklightColorValue = clamp(blocklightColorValue,0.0,1.0);
     daylightColorValue = clamp(daylightColorValue, 0.0, 1.0);
