@@ -88,13 +88,15 @@ public final class World extends LocalWorldProvider {
      * Renders the world.
      */
     public void render() {
+        _player.getActiveCamera().loadProjectionMatrix();
+
         /* SKYSPHERE */
-        _player.applyNormalizedModelViewMatrix();
+        _player.getActiveCamera().loadNormalizedModelViewMatrix();
 
         _skysphere.render();
 
         /* WORLD RENDERING */
-        _player.applyPlayerModelViewMatrix();
+        _player.getActiveCamera().loadModelViewMatrix();
 
         _player.render();
         renderChunks();
@@ -357,7 +359,7 @@ public final class World extends LocalWorldProvider {
     }
 
     public boolean isChunkVisible(Chunk c) {
-        return _player.getViewFrustum().intersects(c.getAABB());
+        return _player.getActiveCamera().getViewFrustum().intersects(c.getAABB());
     }
 
     public double getDaylight() {

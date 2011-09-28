@@ -47,7 +47,7 @@ public abstract class MovableEntity extends Entity {
     protected World _parent;
 
     /* MOVEMENT */
-    protected double _walkingSpeed, _runningFactor, _jumpIntensity;
+    protected double _walkingSpeed, _runningFactor, _jumpIntensity, _stepCounter;
     protected double _activeWalkingSpeed, _yaw = 135d, _pitch, _gravity;
     protected final Vector3f _movementDirection = new Vector3f(), _velocity = new Vector3f(), _viewingDirection = new Vector3f();
     protected boolean _isSwimming = false, _headUnderWater = false, _touchingGround = false, _running = false, _godMode, _jump = false;
@@ -346,6 +346,8 @@ public abstract class MovableEntity extends Entity {
          */
         getPosition().x += _velocity.x;
         getPosition().z += _velocity.z;
+
+        _stepCounter += Math.max(Math.abs(_velocity.x), Math.abs(_velocity.z));
 
         /*
          * Check for horizontal collisions __after__ checking for vertical

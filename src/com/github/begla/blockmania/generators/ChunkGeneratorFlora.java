@@ -106,7 +106,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
     void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
 
-        if (c.getBlock(x, y, z) == 0x1) {
+        if (c.getBlock(x, y, z) == 0x1 && c.getBlock(x, y + 1, z) == 0x0) {
 
             double grassRand = (_rand.randomDouble() + 1.0) / 2.0;
             double grassProb = 1.0;
@@ -166,13 +166,10 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
         double r2 = _rand.standNormalDistrDouble();
         if (r2 > -2 && r2 < -1) {
-            c.setBlock(x, y + 1, z, (byte) 0x0);
             c.getParent().getObjectGenerator("pineTree").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
         } else if (r2 > 1 && r2 < 2) {
-            c.setBlock(x, y + 1, z, (byte) 0x0);
             c.getParent().getObjectGenerator("firTree").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
         } else {
-            c.setBlock(x, y + 1, z, (byte) 0x0);
             c.getParent().getObjectGenerator("tree").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
         }
     }

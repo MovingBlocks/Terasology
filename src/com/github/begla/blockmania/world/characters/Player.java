@@ -19,21 +19,17 @@ package com.github.begla.blockmania.world.characters;
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.datastructures.AABB;
-import com.github.begla.blockmania.datastructures.ViewFrustum;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.noise.PerlinNoise;
+import com.github.begla.blockmania.rendering.cameras.Camera;
+import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.Collections;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Extends the character class and provides support for player functionality. Also provides the
@@ -46,17 +42,17 @@ public final class Player extends Character {
     /* PROPERTIES */
     private byte _selectedBlockType = 1;
 
-    /* MOVEMENT */
-    private final PerlinNoise _pGen = new PerlinNoise(42);
-
-    /* VIEW FRUSTUM */
-    private final ViewFrustum _viewFrustum = new ViewFrustum();
+    /* CAMERA */
+    private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
+    private Camera _activeCamera = _firstPersonCamera;
 
     public Player(World parent) {
         super(parent, Configuration.getSettingNumeric("WALKING_SPEED"), Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
     }
 
     public void update() {
+        updateCameras();
+
         _godMode = Configuration.getSettingBoolean("GOD_MODE");
         _walkingSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
         _runningFactor = Configuration.getSettingNumeric("RUNNING_FACTOR");
@@ -80,40 +76,20 @@ public final class Player extends Character {
         super.render();
     }
 
-    /**
-     * Applies the modelview matrix from the player's point of view.
-     */
-    public void applyPlayerModelViewMatrix() {
-        glMatrixMode(GL11.GL_MODELVIEW);
-        glLoadIdentity();
+    public void updateCameras() {
+        _firstPersonCamera.getPosition().set(calcEyePosition());
 
-        if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
-
-            if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
-                double bobbing = _pGen.noise(getPosition().x * 0.5, 0, getPosition().z * 0.5);
-                glRotated(bobbing * Configuration.BOBBING_ANGLE, 0, 0, 1);
-            }
-
-            Vector3f eyePosition = calcEyePosition();
-            GLU.gluLookAt(eyePosition.x, eyePosition.y, eyePosition.z, eyePosition.x + _viewingDirection.x, eyePosition.y + _viewingDirection.y, eyePosition.z + _viewingDirection.z, 0, 1, 0);
-
-
+        if (!(Configuration.getSettingBoolean("GOD_MODE"))) {
+            _firstPersonCamera.setBobbingOffsetFactor(Math.sin(_stepCounter * 2.0) * 0.025);
         } else {
-            GLU.gluLookAt(getPosition().x, getPosition().y, getPosition().z, getPosition().x, 40, getPosition().z + 128, 0, 1, 0);
+            _firstPersonCamera.setBobbingOffsetFactor(0);
         }
-        // Update the current view frustum
-        _viewFrustum.updateFrustum();
-    }
-
-    /**
-     * Applies a modelview matrix which looks from the origin into the viewing direction of the player.
-     */
-    public void applyNormalizedModelViewMatrix() {
-        glMatrixMode(GL11.GL_MODELVIEW);
-        glLoadIdentity();
 
         if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
-            GLU.gluLookAt(0, 0, 0, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, 0, 1, 0);
+            _firstPersonCamera.getViewingDirection().set(getViewingDirection());
+        } else {
+            Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z + 128);
+            Vector3f.sub(viewingTarget, getPosition(), _firstPersonCamera.getViewingDirection());
         }
     }
 
@@ -124,7 +100,7 @@ public final class Player extends Character {
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 
-            getPosition().y += (maxHeight - getPosition().y) / 128f;
+            getPosition().y += (maxHeight - getPosition().y) / 64f;
 
             if (getPosition().y > 128)
                 getPosition().y = 128;
@@ -375,11 +351,11 @@ public final class Player extends Character {
         // Uh. A wall.
     }
 
-    public ViewFrustum getViewFrustum() {
-        return _viewFrustum;
-    }
-
     public byte getSelectedBlockType() {
         return _selectedBlockType;
+    }
+
+    public Camera getActiveCamera() {
+        return _activeCamera;
     }
 }

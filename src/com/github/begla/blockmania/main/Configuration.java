@@ -68,9 +68,6 @@ public final class Configuration {
      */
     public static final boolean FULLSCREEN = false;
 
-    /* PLAYER */
-    public static final double BOBBING_ANGLE = 2.5;
-
     /* LIGHTING */
     public static final byte MAX_LIGHT = 15;
     public static final double OCCLUSION_AMOUNT_DEFAULT = 1.0 / 16.0;

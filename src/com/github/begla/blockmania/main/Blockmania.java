@@ -258,7 +258,7 @@ public final class Blockmania {
         glFogf(GL_FOG_END, (float) viewingDistance);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        applyPerspective();
+        glLoadIdentity();
 
         // RENDER WORLD
         _world.render();
@@ -267,17 +267,6 @@ public final class Blockmania {
 
     private void resizeViewport() {
         glViewport(0, 0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight());
-    }
-
-    /**
-     * Resizes the viewport according to the chosen display width and height.
-     */
-    private void applyPerspective() {
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluPerspective(Configuration.getSettingNumeric("FOV").floatValue(), (float) Configuration.ASPECT_RATIO, 0.1f, 1024f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
     }
 
     /**
