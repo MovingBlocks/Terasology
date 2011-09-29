@@ -217,7 +217,7 @@ public final class Player extends Character {
                 }
 
                 _parent.getBlockParticleEmitter().setOrigin(blockPos);
-                _parent.getBlockParticleEmitter().emitParticles(128, currentBlockType);
+                _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
                 AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.4f, 0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false);
             }
         }

@@ -17,6 +17,7 @@ package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.rendering.RenderableObject;
 import javolution.util.FastList;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -35,11 +36,19 @@ public abstract class ParticleEmitter implements RenderableObject {
     protected Vector3f _origin = new Vector3f();
 
     public void render() {
+        glDisable(GL11.GL_CULL_FACE);
         glEnable(GL_TEXTURE_2D);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         for (FastList.Node<Particle> n = _particles.head(), end = _particles.tail(); (n = n.getNext()) != end; ) {
             n.getValue().render();
         }
-        glDisable(GL_TEXTURE_2D);
+
+        glDisable(GL_BLEND);
+        glDisable(GL11.GL_TEXTURE_2D);
+        glEnable(GL11.GL_CULL_FACE);
     }
 
     public void update() {
@@ -57,7 +66,6 @@ public abstract class ParticleEmitter implements RenderableObject {
 
             if (!p.isAlive()) {
                 _particles.remove(i);
-                p.dispose();
             }
         }
     }

@@ -33,6 +33,16 @@ public abstract class Camera {
     /* VIEW FRUSTUM */
     protected final ViewFrustum _viewFrustum = new ViewFrustum();
 
+    public void lookThrough() {
+        loadProjectionMatrix();
+        loadModelViewMatrix();
+    }
+
+    public void lookThroughNormalized() {
+        loadProjectionMatrix();
+        loadNormalizedModelViewMatrix();
+    }
+
     public abstract void loadProjectionMatrix();
 
     public abstract void loadModelViewMatrix();

@@ -88,15 +88,14 @@ public final class World extends LocalWorldProvider {
      * Renders the world.
      */
     public void render() {
-        _player.getActiveCamera().loadProjectionMatrix();
 
         /* SKYSPHERE */
-        _player.getActiveCamera().loadNormalizedModelViewMatrix();
+        _player.getActiveCamera().lookThroughNormalized();
 
         _skysphere.render();
 
         /* WORLD RENDERING */
-        _player.getActiveCamera().loadModelViewMatrix();
+        _player.getActiveCamera().lookThrough();
 
         _player.render();
         renderChunks();

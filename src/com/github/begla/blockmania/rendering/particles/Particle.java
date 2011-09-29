@@ -34,12 +34,12 @@ public abstract class Particle implements RenderableObject {
     protected ParticleEmitter _parent;
 
     protected final Vector3f _targetVelocity = new Vector3f(0.0f, -0.03f, 0.0f);
-    protected final Vector3f _velDecSpeed = new Vector3f(0.003f, 0.003f, 0.003f);
+    protected final Vector3f _velDecSpeed = new Vector3f(0.001f, 0.001f, 0.001f);
+
+    protected float _size = 0.01f;
 
     protected final Vector3f _position = new Vector3f();
     protected final Vector3f _velocity = new Vector3f();
-    protected int _orientation = 0;
-    protected int _displayList = -1;
 
     protected static final FastRandom _rand = new FastRandom();
 
@@ -47,9 +47,9 @@ public abstract class Particle implements RenderableObject {
 
     public Particle(int lifeTime, Vector3f position, ParticleEmitter parent) {
         _position.set(position);
-        _velocity.set((float) _rand.randomDouble() / 16f, (float) _rand.randomDouble() / 16f, (float) _rand.randomDouble() / 16f);
+        _velocity.set((float) (_rand.randomInt() % 32) * 0.001f, (float) (_rand.randomInt() % 32) * 0.001f, (float) (_rand.randomInt() % 32) * 0.001f);
+
         _lifetime = lifeTime;
-        _orientation = _rand.randomInt() % 360;
         _parent = parent;
     }
 
@@ -60,15 +60,8 @@ public abstract class Particle implements RenderableObject {
             glPushMatrix();
             glTranslatef(_position.x, _position.y, _position.z);
             applyOrientation();
-
-            if (_displayList == -1) {
-                glGenLists(_displayList);
-                renderParticle();
-                glEndList();
-            }
-
-            glCallList(_displayList);
-
+            glScalef(_size, _size, _size);
+            renderParticle();
             glPopMatrix();
         }
     }
@@ -79,7 +72,7 @@ public abstract class Particle implements RenderableObject {
         decLifetime();
     }
 
-    private void applyOrientation() {
+    protected void applyOrientation() {
         // Fetch the current modelview matrix
         final FloatBuffer model = BufferUtils.createFloatBuffer(16);
         GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, model);
@@ -98,29 +91,37 @@ public abstract class Particle implements RenderableObject {
     }
 
     protected void updateVelocity() {
-        if (_velocity.x > _targetVelocity.x)
-            _velocity.x -= _velDecSpeed.x;
-        if (_velocity.x < _targetVelocity.x)
-            _velocity.x += _velDecSpeed.x;
-        if (_velocity.y > _targetVelocity.y)
-            _velocity.y -= _velDecSpeed.y;
-        if (_velocity.y < _targetVelocity.y)
-            _velocity.y += _velDecSpeed.y;
-        if (_velocity.z > _targetVelocity.z)
-            _velocity.z -= _velDecSpeed.z;
-        if (_velocity.z < _targetVelocity.z)
-            _velocity.z += _velDecSpeed.z;
+        int dirX = (_velocity.x - _targetVelocity.x) >= 0 ? -1 : 1;
+        int dirY = (_velocity.y - _targetVelocity.y) >= 0 ? -1 : 1;
+        int dirZ = (_velocity.z - _targetVelocity.z) >= 0 ? -1 : 1;
+
+        if (Math.abs(_velocity.x - _targetVelocity.x) > 0.01)
+            _velocity.x += dirX * _velDecSpeed.x;
+        else
+            _velocity.x = _targetVelocity.x;
+
+        if (Math.abs(_velocity.y - _targetVelocity.y) > 0.01)
+            _velocity.y += dirY * _velDecSpeed.y;
+        else
+            _velocity.y = _targetVelocity.y;
+
+        if (Math.abs(_velocity.z - _targetVelocity.z) > 0.01)
+            _velocity.z += dirZ * _velDecSpeed.z;
+        else
+            _velocity.z = _targetVelocity.z;
     }
 
-    protected boolean canMove() {
+    protected boolean canMoveVertically() {
         return true;
     }
 
     protected void updatePosition() {
-        if (!canMove())
-            return;
+        Vector3f vel = new Vector3f(_velocity);
 
-        Vector3f.add(_position, _velocity, _position);
+        if (!canMoveVertically())
+            vel.y = 0;
+
+        Vector3f.add(_position, vel, _position);
     }
 
     protected void decLifetime() {
@@ -134,11 +135,5 @@ public abstract class Particle implements RenderableObject {
 
     protected ParticleEmitter getParent() {
         return _parent;
-    }
-
-    protected void dispose() {
-        if (_displayList != -1)
-            glDeleteLists(_displayList, 1);
-        _displayList = 0;
     }
 }
