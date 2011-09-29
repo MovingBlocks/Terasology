@@ -28,6 +28,10 @@ import org.lwjgl.util.vector.Vector3f;
 public final class Configuration {
 
     /**
+     * Maximum amount of worker threads to be created.
+     */
+    public static final int MAX_THREADS = Math.max(Runtime.getRuntime().availableProcessors() - 2, 1);
+    /**
      * Amount of VBO updates per frame.
      */
     public static final int VBO_UPDATES_PER_FRAME = 4;

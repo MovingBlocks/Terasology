@@ -37,6 +37,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,6 +54,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Blockmania {
 
+    private final ExecutorService _threadPool = Executors.newFixedThreadPool(Configuration.MAX_THREADS);
+    /* ------ */
     private static final int FRAME_SKIP_MAX_FRAMES = 10;
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
@@ -309,6 +314,13 @@ public final class Blockmania {
             _world.dispose();
         }
 
+        _threadPool.shutdown();
+
+        try {
+            _threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+        }
+
         Display.destroy();
     }
 
@@ -559,5 +571,9 @@ public final class Blockmania {
 
     public StringBuffer getConsoleInput() {
         return _consoleInput;
+    }
+
+    public ExecutorService getThreadPool() {
+        return _threadPool;
     }
 }
