@@ -367,6 +367,10 @@ public final class Blockmania {
                 toggleDebugConsole();
             }
 
+            if (key == Keyboard.KEY_F3 && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                Configuration.setSetting("DEBUG", !Configuration.getSettingBoolean("DEBUG"));
+            }
+
             if (_pauseGame) {
                 if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                     if (key == Keyboard.KEY_BACK) {
@@ -388,6 +392,7 @@ public final class Blockmania {
                     }
                 }
             } else {
+                // Pass input to the current player
                 _world.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
             }
         }
@@ -445,7 +450,7 @@ public final class Blockmania {
                     }
                 }
             } else if (parsingResult.get(0).equals("respawn")) {
-                _world.resetPlayer();
+                _world.getPlayer().respawn();
                 success = true;
             } else if (parsingResult.get(0).equals("goto")) {
                 int x = Integer.parseInt(parsingResult.get(1));
@@ -471,7 +476,7 @@ public final class Blockmania {
                 initNewWorldAndPlayer(worldSeed, worldSeed);
                 success = true;
             } else if (parsingResult.get(0).equals("set_spawn")) {
-                _world.setSpawningPointToPlayerPosition();
+                _world.getPlayer().setSpawningPoint();
                 success = true;
             }
         } catch (Exception e) {
@@ -514,9 +519,10 @@ public final class Blockmania {
             _world.dispose();
         }
 
-        // Init some world
+        // Init. a new world
         _world = new World(title, seed);
         _world.setPlayer(new Player(_world));
+
         // Reset the delta value
         _lastLoopTime = getTime();
     }

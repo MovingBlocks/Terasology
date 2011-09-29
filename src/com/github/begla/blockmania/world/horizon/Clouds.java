@@ -19,6 +19,7 @@ import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.World;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector2f;
@@ -150,7 +151,7 @@ public class Clouds implements RenderableObject {
         if (Blockmania.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
             _windDirection.x = (float) _parent.getRandom().randomDouble() / 4;
             _windDirection.y = (float) _parent.getRandom().randomDouble() / 4;
-            _nextWindUpdateInSeconds = (short) (Math.abs(_parent.getRandom().randomInt()) % 16 + 32);
+            _nextWindUpdateInSeconds = (short) (MathHelper.fastAbs(_parent.getRandom().randomInt()) % 16 + 32);
             _lastWindUpdate = Blockmania.getInstance().getTime();
         }
     }

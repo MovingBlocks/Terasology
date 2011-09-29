@@ -90,8 +90,8 @@ public class FastRandom {
         StringBuilder s = new StringBuilder();
 
         for (int i = 0; i < length / 2; i++) {
-            s.append((char) ('a' + Math.abs(randomDouble()) * 26d));
-            s.append((char) ('A' + Math.abs(randomDouble()) * 26d));
+            s.append((char) ('a' + MathHelper.fastAbs(randomDouble()) * 26d));
+            s.append((char) ('A' + MathHelper.fastAbs(randomDouble()) * 26d));
         }
 
         return s.toString();

@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 
 /**
@@ -29,8 +30,8 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
      * @param w
      * @param seed
      */
-    public ObjectGeneratorPineTree(LocalWorldProvider w, String seed) {
-        super(w, seed);
+    public ObjectGeneratorPineTree(LocalWorldProvider w) {
+        super(w);
     }
 
     /**
@@ -42,7 +43,7 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
      */
     @Override
     public void generate(int posX, int posY, int posZ, boolean update) {
-        int height = Math.abs(_rand.randomInt() % 4) + 8;
+        int height = MathHelper.fastAbs(_worldProvider.getRandom().randomInt() % 4) + 8;
 
         if (posY + height >= Configuration.CHUNK_DIMENSIONS.y) {
             return;

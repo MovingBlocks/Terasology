@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.noise;
 
 import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.utilities.MathHelper;
 
 /**
  * Improved Perlin noise based on the reference implementation by Ken Perlin.
@@ -26,11 +27,9 @@ public class PerlinNoise {
 
     private final int[] _noisePermutations, _noiseTable;
 
-    /**
-     * @param seed
-     */
     public PerlinNoise(int seed) {
         FastRandom rand = new FastRandom(seed);
+
         _noisePermutations = new int[512];
         _noiseTable = new int[256];
 
@@ -51,18 +50,12 @@ public class PerlinNoise {
 
     }
 
-    /**
-     * @param x
-     * @param y
-     * @param z
-     * @return
-     */
     public double noise(double x, double y, double z) {
-        int X = (int) Math.floor(x) & 255, Y = (int) Math.floor(y) & 255, Z = (int) Math.floor(z) & 255;
+        int X = (int) MathHelper.fastFloor(x) & 255, Y = (int) MathHelper.fastFloor(y) & 255, Z = (int) MathHelper.fastFloor(z) & 255;
 
-        x -= Math.floor(x);
-        y -= Math.floor(y);
-        z -= Math.floor(z);
+        x -= MathHelper.fastFloor(x);
+        y -= MathHelper.fastFloor(y);
+        z -= MathHelper.fastFloor(z);
 
         double u = fade(x), v = fade(y), w = fade(z);
         int A = _noisePermutations[X] + Y, AA = _noisePermutations[A] + Z, AB = _noisePermutations[(A + 1)] + Z,
@@ -78,46 +71,20 @@ public class PerlinNoise {
                                 grad(_noisePermutations[(BB + 1)], x - 1, y - 1, z - 1))));
     }
 
-    /**
-     * @param t
-     * @return
-     */
     private static double fade(double t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
-    /**
-     * @param t
-     * @param a
-     * @param b
-     * @return
-     */
     private static double lerp(double t, double a, double b) {
         return a + t * (b - a);
     }
 
-    /**
-     * @param hash
-     * @param x
-     * @param y
-     * @param z
-     * @return
-     */
     private static double grad(int hash, double x, double y, double z) {
         int h = hash & 15;
         double u = h < 8 ? x : y, v = h < 4 ? y : h == 12 || h == 14 ? x : z;
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
     }
 
-    /**
-     * @param x
-     * @param y
-     * @param z
-     * @param octaves
-     * @param lacunarity
-     * @param h
-     * @return
-     */
     public double fBm(double x, double y, double z, int octaves, double lacunarity, double h) {
         double result = 0.0;
 

@@ -18,6 +18,7 @@ package com.github.begla.blockmania.generators;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockStone;
 import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
@@ -30,8 +31,8 @@ public class ChunkGeneratorResources extends ChunkGeneratorTerrain {
     /**
      * @param seed
      */
-    public ChunkGeneratorResources(String seed) {
-        super(seed);
+    public ChunkGeneratorResources(LocalWorldProvider worldProvider) {
+        super(worldProvider);
     }
 
     /**
@@ -43,22 +44,22 @@ public class ChunkGeneratorResources extends ChunkGeneratorTerrain {
             for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
                 for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                     if (Block.getBlockForType(c.getBlock(x, y, z)).getClass() == BlockStone.class) {
-                        if (_rand.standNormalDistrDouble() < Configuration.PROB_COAL) {
+                        if (_worldProvider.getRandom().standNormalDistrDouble() < Configuration.PROB_COAL) {
                             c.setBlock(x, y, z, (byte) 0x14);
                         }
 
-                        if (_rand.standNormalDistrDouble() < Configuration.PROB_GOLD) {
+                        if (_worldProvider.getRandom().standNormalDistrDouble() < Configuration.PROB_GOLD) {
                             c.setBlock(x, y, z, (byte) 0x15);
                         }
 
-                        if (_rand.standNormalDistrDouble() < Configuration.PROB_DIAMOND) {
+                        if (_worldProvider.getRandom().standNormalDistrDouble() < Configuration.PROB_DIAMOND) {
                             c.setBlock(x, y, z, (byte) 35);
                         }
-                        if (_rand.standNormalDistrDouble() < Configuration.PROB_REDSTONE) {
+                        if (_worldProvider.getRandom().standNormalDistrDouble() < Configuration.PROB_REDSTONE) {
                             c.setBlock(x, y, z, (byte) 33);
                         }
 
-                        if (_rand.standNormalDistrDouble() < Configuration.PROB_SILVER) {
+                        if (_worldProvider.getRandom().standNormalDistrDouble() < Configuration.PROB_SILVER) {
                             c.setBlock(x, y, z, (byte) 34);
                         }
                     }

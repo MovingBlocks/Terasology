@@ -24,10 +24,9 @@ public class ObjectGeneratorCactus extends ObjectGenerator {
 
     /**
      * @param w
-     * @param seed
      */
-    public ObjectGeneratorCactus(LocalWorldProvider w, String seed) {
-        super(w, seed);
+    public ObjectGeneratorCactus(LocalWorldProvider w) {
+        super(w);
     }
 
     /**

@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
@@ -27,11 +28,9 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
     /**
      * Init. the forest generator.
-     *
-     * @param seed
      */
-    public ChunkGeneratorFlora(String seed) {
-        super(seed);
+    public ChunkGeneratorFlora(LocalWorldProvider worldProvider) {
+        super(worldProvider);
     }
 
     /**
@@ -57,7 +56,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
             for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x += 4) {
                 for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z += 4) {
 
-                    double rand = (_rand.randomDouble() + 1.0) / 2.0;
+                    double rand = (_worldProvider.getRandom().randomDouble() + 1.0) / 2.0;
                     double prob = 1.0;
 
                     BIOME_TYPE biome = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
@@ -83,8 +82,8 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                     }
 
                     if (rand > prob) {
-                        int randX = x + _rand.randomInt() % 12 + 6;
-                        int randZ = z + _rand.randomInt() % 12 + 6;
+                        int randX = x + _worldProvider.getRandom().randomInt() % 12 + 6;
+                        int randZ = z + _worldProvider.getRandom().randomInt() % 12 + 6;
 
                         if (temperature > 0.55 && humidity < 0.33 && (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17 || c.getBlock(randX, y, randZ) == 0x7))
                             c.getParent().getObjectGenerator("cactus").generate(c.getBlockWorldPosX(randX), y + 1, c.getBlockWorldPosZ(randZ), false);
@@ -108,7 +107,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
         if (c.getBlock(x, y, z) == 0x1 && c.getBlock(x, y + 1, z) == 0x0) {
 
-            double grassRand = (_rand.randomDouble() + 1.0) / 2.0;
+            double grassRand = (_worldProvider.getRandom().randomDouble() + 1.0) / 2.0;
             double grassProb = 1.0;
 
             BIOME_TYPE biome = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
@@ -129,7 +128,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                 /*
                  * Generate high grass.
                  */
-                double rand = _rand.standNormalDistrDouble();
+                double rand = _worldProvider.getRandom().standNormalDistrDouble();
                 if (rand > -0.4 && rand < 0.4) {
                     c.setBlock(x, y + 1, z, (byte) 0xB);
                 } else if (rand > -0.6 && rand < 0.6) {
@@ -141,8 +140,8 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                 /*
                  * Generate flowers.
                  */
-                if (_rand.standNormalDistrDouble() < -2) {
-                    if (_rand.randomBoolean()) {
+                if (_worldProvider.getRandom().standNormalDistrDouble() < -2) {
+                    if (_worldProvider.getRandom().randomBoolean()) {
                         c.setBlock(x, y + 1, z, (byte) 0x9);
                     } else {
                         c.setBlock(x, y + 1, z, (byte) 0xA);
@@ -164,7 +163,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
         if (!c.canBlockSeeTheSky(x, y + 1, z))
             return;
 
-        double r2 = _rand.standNormalDistrDouble();
+        double r2 = _worldProvider.getRandom().standNormalDistrDouble();
         if (r2 > -2 && r2 < -1) {
             c.getParent().getObjectGenerator("pineTree").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
         } else if (r2 > 1 && r2 < 2) {

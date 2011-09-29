@@ -23,6 +23,31 @@ package com.github.begla.blockmania.utilities;
 public class MathHelper {
 
     /**
+     * Returns the absolute value.
+     *
+     * @param i
+     * @return
+     */
+    public static int fastAbs(int i) {
+        return (i >= 0) ? i : -i;
+    }
+
+    /**
+     * Returns the absolute value.
+     *
+     * @param d
+     * @return
+     */
+    public static double fastAbs(double d) {
+        return (d >= 0) ? d : -d;
+    }
+
+    public static double fastFloor(double d) {
+        int i = (int) d;
+        return (d < 0 && d != i) ? i - 1 : i;
+    }
+
+    /**
      * Clamps a given value to be an element of [0..1].
      */
     public static double clamp(double value) {

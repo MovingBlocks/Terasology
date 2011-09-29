@@ -23,6 +23,7 @@ import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
@@ -175,7 +176,7 @@ public final class Player extends Character {
                 }
 
                 getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
-                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false);
+                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, 0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false);
             }
         }
     }
@@ -217,7 +218,7 @@ public final class Player extends Character {
 
                 _parent.getBlockParticleEmitter().setOrigin(blockPos);
                 _parent.getBlockParticleEmitter().emitParticles(128, currentBlockType);
-                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) Math.abs(_rand.randomDouble()) * 0.4f, 0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false);
+                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.4f, 0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false);
             }
         }
     }

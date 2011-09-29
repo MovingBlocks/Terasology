@@ -17,6 +17,7 @@ package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.MathHelper;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
@@ -33,8 +34,8 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         MOUNTAINS, SNOW, DESERT, FOREST, PLAINS
     }
 
-    public ChunkGeneratorTerrain(String seed) {
-        super(seed);
+    public ChunkGeneratorTerrain(LocalWorldProvider worldProvider) {
+        super(worldProvider);
     }
 
     @Override
@@ -279,12 +280,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             result += _pGen5.noise(x1 * freq[i] + perturb, y1 * freq[i] + perturb, z1 * freq[i] + perturb) * amp[i];
         }
 
-        return Math.abs(result);
+        return MathHelper.fastAbs(result);
     }
 
     public double calcLakeIntensity(double x, double z) {
         double result = _pGen2.fBm(x * 0.004, 0, 0.004 * z, 4, 2.1836171, 0.7631);
-        return Math.sqrt(Math.abs(result));
+        return Math.sqrt(MathHelper.fastAbs(result));
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {

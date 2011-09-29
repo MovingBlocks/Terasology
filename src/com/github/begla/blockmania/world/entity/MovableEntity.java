@@ -21,7 +21,7 @@ import com.github.begla.blockmania.blocks.BlockWater;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
@@ -36,8 +36,6 @@ import java.util.Collections;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class MovableEntity extends Entity {
-
-    protected final FastRandom _rand = new FastRandom();
 
     /* AUDIO */
     protected Audio _currentFootstepSound;
@@ -58,7 +56,7 @@ public abstract class MovableEntity extends Entity {
         _runningFactor = runningFactor;
         _jumpIntensity = jumpIntensity;
 
-        resetEntity();
+        reset();
         initAudio();
     }
 
@@ -104,6 +102,7 @@ public abstract class MovableEntity extends Entity {
 
         processMovement();
         updatePosition();
+        checkPosition();
         updateSwimStatus();
 
         _movementDirection.set(0, 0, 0);
@@ -111,15 +110,21 @@ public abstract class MovableEntity extends Entity {
         playMovementSound();
     }
 
+    private void checkPosition() {
+        if (!_godMode && _position.y < 0) {
+            _position.y = _parent.maxHeightAt((int) _position.x, (int) _position.y);
+        }
+    }
+
     private void playMovementSound() {
         if (_godMode)
             return;
 
-        if ((Math.abs(_velocity.x) > 0.01 || Math.abs(_velocity.z) > 0.01) && _touchingGround) {
+        if ((MathHelper.fastAbs(_velocity.x) > 0.01 || MathHelper.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
                 Vector3f playerDirection = directionOfOrigin();
-                _currentFootstepSound = _footstepSounds[Math.abs(_rand.randomInt()) % 5];
-                _currentFootstepSound.playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.1f + (float) Math.abs(_rand.randomDouble()) * 0.1f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+                _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getRandom().randomInt()) % 5];
+                _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, 0.1f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.1f, false, playerDirection.x, playerDirection.y, playerDirection.z);
             } else {
                 if (!_currentFootstepSound.isPlaying()) {
                     _currentFootstepSound = null;
@@ -128,11 +133,10 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
-
     /**
      * Resets the entity's attributes.
      */
-    public void resetEntity() {
+    public void reset() {
         _velocity.set(0, 0, 0);
         _movementDirection.set(0, 0, 0);
         _gravity = 0.0f;
@@ -258,23 +262,23 @@ public abstract class MovableEntity extends Entity {
         /*
          * Slowdown the speed of the entity each time this method is called.
          */
-        if (Math.abs(_velocity.y) > 0f) {
+        if (MathHelper.fastAbs(_velocity.y) > 0f) {
             _velocity.y += -1f * _velocity.y * Configuration.getSettingNumeric("FRICTION");
         }
 
-        if (Math.abs(_velocity.x) > 0f) {
+        if (MathHelper.fastAbs(_velocity.x) > 0f) {
             _velocity.x += -1f * _velocity.x * Configuration.getSettingNumeric("FRICTION");
         }
 
-        if (Math.abs(_velocity.z) > 0f) {
+        if (MathHelper.fastAbs(_velocity.z) > 0f) {
             _velocity.z += -1f * _velocity.z * Configuration.getSettingNumeric("FRICTION");
         }
 
         /*
          * Apply friction.
          */
-        if (Math.abs(_velocity.x) > _activeWalkingSpeed || Math.abs(_velocity.z) > _activeWalkingSpeed || Math.abs(_velocity.y) > _activeWalkingSpeed) {
-            double max = Math.max(Math.max(Math.abs(_velocity.x), Math.abs(_velocity.z)), Math.abs(_velocity.y));
+        if (MathHelper.fastAbs(_velocity.x) > _activeWalkingSpeed || MathHelper.fastAbs(_velocity.z) > _activeWalkingSpeed || MathHelper.fastAbs(_velocity.y) > _activeWalkingSpeed) {
+            double max = Math.max(Math.max(MathHelper.fastAbs(_velocity.x), MathHelper.fastAbs(_velocity.z)), MathHelper.fastAbs(_velocity.y));
             double div = max / _activeWalkingSpeed;
 
             _velocity.x /= div;
@@ -326,7 +330,7 @@ public abstract class MovableEntity extends Entity {
                     // Entity reaches the ground
                     if (_touchingGround == false) {
                         Vector3f playerDirection = directionOfOrigin();
-                        _footstepSounds[Math.abs(_rand.randomInt()) % 5].playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+                        _footstepSounds[MathHelper.fastAbs(_parent.getRandom().randomInt()) % 5].playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
                         _touchingGround = true;
                     }
                 } else {
@@ -350,7 +354,7 @@ public abstract class MovableEntity extends Entity {
         getPosition().x += _velocity.x;
         getPosition().z += _velocity.z;
 
-        _stepCounter += Math.max(Math.abs(_velocity.x), Math.abs(_velocity.z));
+        _stepCounter += Math.max(MathHelper.fastAbs(_velocity.x), MathHelper.fastAbs(_velocity.z));
 
         /*
          * Check for horizontal collisions __after__ checking for vertical

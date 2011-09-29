@@ -311,17 +311,12 @@ public final class World extends LocalWorldProvider {
      */
     public void setPlayer(Player p) {
         _player = p;
-        // Reset the player's position
-        resetPlayer();
+
+        _player.setSpawningPoint(nextRandomSpawningPoint());
+        _player.reset();
+        _player.respawn();
     }
 
-    /**
-     * Resets the player's attributes and respawns him.
-     */
-    public void resetPlayer() {
-        _player.resetEntity();
-        _player.setPosition(getSpawningPoint());
-    }
 
     /**
      * Writes all chunks to disk and disposes them.
@@ -341,13 +336,6 @@ public final class World extends LocalWorldProvider {
     @Override
     public String toString() {
         return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _chunkCache.size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _seed, _title);
-    }
-
-    /**
-     * Sets the current player position as spawning point.
-     */
-    public void setSpawningPointToPlayerPosition() {
-        _spawningPoint = new Vector3f(_player.getPosition());
     }
 
     public Player getPlayer() {
