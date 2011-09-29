@@ -30,7 +30,7 @@ public final class Configuration {
     /**
      * Amount of VBO updates per frame.
      */
-    public static final int VBO_UPDATES_PER_FRAME  = 4;
+    public static final int VBO_UPDATES_PER_FRAME = 4;
     /**
      * Sunrise/sunset duration
      */
@@ -62,7 +62,7 @@ public final class Configuration {
     /**
      * Aspect ratio.
      */
-    public static final double ASPECT_RATIO = 16.0/9.0;
+    public static final double ASPECT_RATIO = 16.0 / 9.0;
     /**
      * If set to true, the game is rendered as a full screen application.
      */

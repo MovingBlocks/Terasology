@@ -43,7 +43,6 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 /**
  * The heart and soul of Blockmania.

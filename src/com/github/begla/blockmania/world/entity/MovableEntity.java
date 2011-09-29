@@ -22,8 +22,8 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.world.LocalWorldProvider;
+import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.Audio;
@@ -72,8 +72,11 @@ public abstract class MovableEntity extends Entity {
     }
 
     public abstract void processMovement();
+
     protected abstract AABB generateAABBForPosition(Vector3f p);
+
     protected abstract void handleVerticalCollision();
+
     protected abstract void handleHorizontalCollision();
 
     public void render() {

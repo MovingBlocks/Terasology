@@ -30,7 +30,7 @@ import java.io.IOException;
  */
 public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
-    private static int zoomOut = 1;
+    private static int zoomOut = 8;
 
     /**
      * @param seed
