@@ -101,7 +101,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.6)
+                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.2)
                             GenerateInnerLayer(x, y, z, c, type);
 
                         continue;
