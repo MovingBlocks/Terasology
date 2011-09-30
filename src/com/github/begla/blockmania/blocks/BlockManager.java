@@ -68,13 +68,8 @@ public class BlockManager {
 
     private boolean loadBlocks() {
         try {
-            File f = new File(ResourceLoader.getResource("com/github/begla/blockmania/data/blocks/blocks.xml").toURI());
-
-            if (!f.exists())
-                return false;
-
             SAXBuilder builder = new SAXBuilder();
-            InputSource is = new InputSource(new FileInputStream(f));
+            InputSource is = new InputSource(ResourceLoader.getResource("com/github/begla/blockmania/data/blocks/blocks.xml").openStream());
             Document doc = builder.build(is);
             Element root = doc.getRootElement();
 
