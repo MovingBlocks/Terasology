@@ -39,7 +39,7 @@ public abstract class Particle implements RenderableObject {
     protected float _size = 0.01f;
 
     protected final Vector3f _position = new Vector3f();
-    protected final Vector3f _velocity = new Vector3f();
+    protected final Vector3f _initialVelocity = new Vector3f(), _velocity = new Vector3f();
 
     protected static final FastRandom _rand = new FastRandom();
 
@@ -47,7 +47,8 @@ public abstract class Particle implements RenderableObject {
 
     public Particle(int lifeTime, Vector3f position, ParticleEmitter parent) {
         _position.set(position);
-        _velocity.set((float) (_rand.randomInt() % 32) * 0.001f, (float) (_rand.randomInt() % 32) * 0.001f, (float) (_rand.randomInt() % 32) * 0.001f);
+        _initialVelocity.set((float) (_rand.randomInt() % 32) * 0.001f, (float) (_rand.randomInt() % 32) * 0.001f, (float) (_rand.randomInt() % 32) * 0.001f);
+        _velocity.set(_initialVelocity);
 
         _lifetime = lifeTime;
         _parent = parent;
@@ -116,12 +117,13 @@ public abstract class Particle implements RenderableObject {
     }
 
     protected void updatePosition() {
-        Vector3f vel = new Vector3f(_velocity);
+        if (!canMoveVertically()) {
+            _velocity.x += (_velocity.y / 2) * _initialVelocity.x;
+            _velocity.z += (_velocity.y / 2) * _initialVelocity.z;
+            _velocity.y = 0;
+        }
 
-        if (!canMoveVertically())
-            vel.y = 0;
-
-        Vector3f.add(_position, vel, _position);
+        Vector3f.add(_position, _velocity, _position);
     }
 
     protected void decLifetime() {

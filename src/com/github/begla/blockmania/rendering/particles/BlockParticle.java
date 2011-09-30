@@ -31,7 +31,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class BlockParticle extends Particle {
 
-    private float _texOffset, _lightOffset;
+    private float _texOffsetX, _texOffsetY, _lightOffset;
     private byte _blockType;
 
     private static final int[] _displayLists = new int[Block.getBlockCount()];
@@ -45,7 +45,8 @@ public class BlockParticle extends Particle {
         _size = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.05f + 0.05f;
 
         _lightOffset = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.05f + 0.95f;
-        _texOffset = (float) (((_rand.randomDouble() + 1.0) / 2.0) * (0.0624 - 0.02));
+        _texOffsetX = (float) (((_rand.randomDouble() + 1.0) / 2.0) * (0.0624 - 0.02));
+        _texOffsetY = (float) (((_rand.randomDouble() + 1.0) / 2.0) * (0.0624 - 0.02));
 
         _position.x += _rand.randomDouble() * 0.5;
         _position.y += _rand.randomDouble() * 0.5;
@@ -83,9 +84,11 @@ public class BlockParticle extends Particle {
         float lightValue = (float) Math.max(lightValueSun, lightValueBlock) * _lightOffset;
 
         int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("particle"), "light");
-        int texOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("particle"), "texOffset");
+        int texOffsetX = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("particle"), "texOffsetX");
+        int texOffsetY = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("particle"), "texOffsetY");
         GL20.glUniform1f(light, lightValue);
-        GL20.glUniform1f(texOffset, _texOffset);
+        GL20.glUniform1f(texOffsetX, _texOffsetX);
+        GL20.glUniform1f(texOffsetY, _texOffsetY);
 
         glCallList(_displayLists[_blockType]);
     }
