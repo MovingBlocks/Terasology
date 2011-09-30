@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -85,9 +86,9 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                         int randX = x + _worldProvider.getRandom().randomInt() % 12 + 6;
                         int randZ = z + _worldProvider.getRandom().randomInt() % 12 + 6;
 
-                        if (temperature > 0.55 && humidity < 0.33 && (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17 || c.getBlock(randX, y, randZ) == 0x7))
+                        if (temperature > 0.55 && humidity < 0.33 && (c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Snow").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Sand").getId()))
                             c.getParent().getObjectGenerator("cactus").generate(c.getBlockWorldPosX(randX), y + 1, c.getBlockWorldPosZ(randZ), false);
-                        else if (c.getBlock(randX, y, randZ) == 0x1 || c.getBlock(randX, y, randZ) == 0x17)
+                        else if (c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Snow").getId())
                             generateTree(c, randX, y, randZ);
                     }
                 }
@@ -105,7 +106,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
     void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
 
-        if (c.getBlock(x, y, z) == 0x1 && c.getBlock(x, y + 1, z) == 0x0) {
+        if (c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Grass").getId() && c.getBlock(x, y + 1, z) == 0x0) {
 
             double grassRand = (_worldProvider.getRandom().randomDouble() + 1.0) / 2.0;
             double grassProb = 1.0;
@@ -130,11 +131,11 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                  */
                 double rand = _worldProvider.getRandom().standNormalDistrDouble();
                 if (rand > -0.4 && rand < 0.4) {
-                    c.setBlock(x, y + 1, z, (byte) 0xB);
+                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("High grass").getId());
                 } else if (rand > -0.6 && rand < 0.6) {
-                    c.setBlock(x, y + 1, z, (byte) 0x24);
+                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("Medium high grass").getId());
                 } else {
-                    c.setBlock(x, y + 1, z, (byte) 0xC);
+                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("Large high grass").getId());
                 }
 
                 /*
@@ -142,9 +143,9 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                  */
                 if (_worldProvider.getRandom().standNormalDistrDouble() < -2) {
                     if (_worldProvider.getRandom().randomBoolean()) {
-                        c.setBlock(x, y + 1, z, (byte) 0x9);
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("Red flower").getId());
                     } else {
-                        c.setBlock(x, y + 1, z, (byte) 0xA);
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("Yellow flower").getId());
                     }
 
                 }

@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.gui;
 
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.rendering.FontManager;
@@ -56,7 +57,7 @@ public class HUD implements RenderableObject {
         glDisable(GL_DEPTH_TEST);
         gluLookAt(0, 0, -25, 8f, 4.5f, 0, 0, 1, 0);
         glRotated(_cubeRotation % 360, 0, 1, 1);
-        Block.getBlockForType(Blockmania.getInstance().getActiveWorld().getPlayer().getSelectedBlockType()).render();
+        BlockManager.getInstance().getBlock(Blockmania.getInstance().getActiveWorld().getPlayer().getSelectedBlockType()).render();
         glEnable(GL_DEPTH_TEST);
         glDisable(GL11.GL_BLEND);
 

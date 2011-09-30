@@ -20,6 +20,7 @@ import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.utilities.Helper;
+import org.jdom.Element;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -30,6 +31,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -37,63 +39,36 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class Block implements RenderableObject {
+public class Block implements RenderableObject {
+
+    protected byte _id = 0x0;
+    protected String _title = "Untitled block";
+    protected boolean _translucent, _invisible, _penetrable, _castsShadows, _noTesselation, _renderBoundingBox, _allowBlockAttachment, _bypassSelectionRay, _liquid;
+    protected BLOCK_FORM _blockForm;
+    protected COLOR_SOURCE _colorSource;
+    protected byte _luminance, _hardness;
+    protected Vector4f[] _colorOffset = new Vector4f[6];
+    protected Vector2f[] _textureAtlasPos = new Vector2f[6];
 
     /**
      * The six sides of a block.
      */
     public static enum SIDE {
-
-        /**
-         * Left side.
-         */
-        LEFT,
-        /**
-         * Right side.
-         */
-        RIGHT,
-        /**
-         * Top side.
-         */
-        TOP,
-        /**
-         * Bottom side.
-         */
-        BOTTOM,
-        /**
-         * Front side.
-         */
-        FRONT,
-        /**
-         * Back side.
-         */
-        BACK
+        LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK
     }
 
     /**
      * Possible forms of blocks.
      */
     public static enum BLOCK_FORM {
-        NORMAL, CACTUS, LOWERED_BOCK, BILLBOARD
+        DEFAULT, CACTUS, LOWERED_BOCK, BILLBOARD
+    }
+
+    public static enum COLOR_SOURCE {
+        DEFAULT, COLOR_LUT, FOLIAGE_LUT
     }
 
     private int _displayList = -1;
-
-    private static final Block[] _blocks = {
-            new BlockAir(), new BlockGrass(), new BlockDirt(), new BlockStone(), // 0-3
-            new BlockWater(), new BlockTreeTrunk(), new BlockLeaf(), new BlockSand(), // 4-7
-            new BlockHardStone(), new BlockRedFlower(), new BlockYellowFlower(), // 8-10
-            new BlockHighGrass(), new BlockLargeHighGrass(), new BlockTorch(), new BlockLava(), // 11-14
-            new BlockWood(), new BlockCobbleStone(), new BlockIce(), new BlockGlass(), new BlockBrick(), // 15-19
-            new BlockCoal(), new BlockGold(), new BlockDarkLeaf(), new BlockSnow(), new BlockCactus(), // 20-24
-            new BlockBookShelf(), new BlockColorBlack(), new BlockColorBlue(), new BlockColorBrown(), new BlockColorGreen(), // 25-29
-            new BlockColorPurple(), new BlockColorRed(), new BlockColorWhite(), new BlockRedStone(), new BlockSilver(), new BlockDiamond(), // 30-35
-            new BlockMediumHighGrass() // 36
-    };
-
-    private static final BlockNil NIL_BLOCK = new BlockNil();
-    private static final Vector4f _colorOffset = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-
     private static BufferedImage colorLut, foliageLut;
 
     static {
@@ -102,6 +77,104 @@ public abstract class Block implements RenderableObject {
             foliageLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/foliagecolor.png").openStream());
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+        }
+    }
+
+    public Block() {
+        _title = "Untitled block";
+
+        for (int i = 0; i < 6; i++) {
+            _colorOffset[i] = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+            _textureAtlasPos[i] = new Vector2f(0.0f, 0.0f);
+        }
+
+        _penetrable = false;
+        _allowBlockAttachment = true;
+        _bypassSelectionRay = false;
+        _blockForm = BLOCK_FORM.DEFAULT;
+        _colorSource = COLOR_SOURCE.DEFAULT;
+        _castsShadows = true;
+        _translucent = false;
+        _invisible = false;
+        _renderBoundingBox = true;
+        _hardness = 15;
+        _luminance = 0;
+        _noTesselation = false;
+        _liquid = false;
+    }
+
+    public Block(Element block) {
+        this();
+
+        try {
+            _title = block.getAttribute("title").getValue();
+            _id = Byte.parseByte(block.getAttribute("id").getValue());
+
+            List<Element> blockChildren = block.getChildren();
+
+            for (Element e : blockChildren) {
+                if (e.getName().equals("property")) {
+                    if (e.getAttributeValue("name").equals("colorOffset")) {
+                        for (int i = 0; i < 6; i++)
+                            _colorOffset[i] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
+                    } else if (e.getAttributeValue("name").equals("colorOffsetTop")) {
+                        _colorOffset[SIDE.TOP.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
+                    } else if (e.getAttributeValue("name").equals("colorOffsetBottom")) {
+                        _colorOffset[SIDE.BOTTOM.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
+                    } else if (e.getAttributeValue("name").equals("colorOffsetRight")) {
+                        _colorOffset[SIDE.RIGHT.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
+                    } else if (e.getAttributeValue("name").equals("colorOffsetLeft")) {
+                        _colorOffset[SIDE.LEFT.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
+                    } else if (e.getAttributeValue("name").equals("colorOffsetFront")) {
+                        _colorOffset[SIDE.FRONT.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
+                    } else if (e.getAttributeValue("name").equals("colorOffsetBack")) {
+                        _colorOffset[SIDE.BACK.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
+                    } else if (e.getAttributeValue("name").equals("textureOffset")) {
+                        for (int i = 0; i < 6; i++)
+                            _textureAtlasPos[i] = new Vector2f(e.getAttribute("x").getFloatValue(), e.getAttribute("y").getFloatValue());
+                    } else if (e.getAttributeValue("name").equals("textureOffsetTop")) {
+                        _textureAtlasPos[SIDE.TOP.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
+                    } else if (e.getAttributeValue("name").equals("textureOffsetBottom")) {
+                        _textureAtlasPos[SIDE.BOTTOM.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
+                    } else if (e.getAttributeValue("name").equals("textureOffsetRight")) {
+                        _textureAtlasPos[SIDE.RIGHT.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
+                    } else if (e.getAttributeValue("name").equals("textureOffsetLeft")) {
+                        _textureAtlasPos[SIDE.LEFT.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
+                    } else if (e.getAttributeValue("name").equals("textureOffsetFront")) {
+                        _textureAtlasPos[SIDE.FRONT.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
+                    } else if (e.getAttributeValue("name").equals("textureOffsetBack")) {
+                        _textureAtlasPos[SIDE.BACK.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
+                    } else if (e.getAttributeValue("name").equals("colorSource")) {
+                        _colorSource = COLOR_SOURCE.values()[Integer.parseInt(e.getValue())];
+                    } else if (e.getAttributeValue("name").equals("blockForm")) {
+                        _blockForm = BLOCK_FORM.values()[Integer.parseInt(e.getValue())];
+                    } else if (e.getAttributeValue("name").equals("hardness")) {
+                        _hardness = Byte.parseByte(e.getValue());
+                    } else if (e.getAttributeValue("name").equals("penetrable")) {
+                        _penetrable = Boolean.parseBoolean(e.getValue());
+                    } else if (e.getAttributeValue("name").equals("translucent")) {
+                        _translucent = Boolean.parseBoolean(e.getValue());
+                    } else if (e.getAttributeValue("name").equals("invisible")) {
+                        _invisible = Boolean.parseBoolean(e.getValue());
+                    } else if (e.getAttributeValue("name").equals("luminance")) {
+                        _luminance = Byte.parseByte(e.getValue());
+                    } else if (e.getAttributeValue("name").equals("noTessellation")) {
+                        _noTesselation = Boolean.parseBoolean(e.getValue());
+                    } else if (e.getAttributeValue("name").equals("castsShadows")) {
+                        _castsShadows = Boolean.parseBoolean(e.getValue());
+                    } else if (e.getAttributeValue("name").equals("bypassSelectionRay")) {
+                        _bypassSelectionRay = Boolean.parseBoolean(e.getValue());
+                    } else if (e.getAttributeValue("name").equals("renderBoundingBox")) {
+                        _renderBoundingBox = Boolean.parseBoolean(e.getValue());
+                    } else if (e.getAttributeValue("name").equals("allowBlockAttachment")) {
+                        _allowBlockAttachment = Boolean.parseBoolean(e.getValue());
+                    } else if (e.getAttributeValue("name").equals("liquid")) {
+                        _liquid = Boolean.parseBoolean(e.getValue());
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -136,35 +209,12 @@ public abstract class Block implements RenderableObject {
     }
 
     /**
-     * Returns the object for the given block type ID.
-     *
-     * @param type Block type ID
-     * @return The object for the given ID
-     */
-    public static Block getBlockForType(byte type) {
-        if (type < 0 || type >= _blocks.length) {
-            return NIL_BLOCK;
-        }
-
-        return _blocks[type];
-    }
-
-    /**
-     * Returns the amount of blocks available.
-     *
-     * @return Amount of blocks available
-     */
-    public static int getBlockCount() {
-        return _blocks.length;
-    }
-
-    /**
      * Returns true if a given block type is translucent.
      *
      * @return True if the block type is translucent
      */
     public boolean isBlockTypeTranslucent() {
-        return false;
+        return _translucent;
     }
 
     /**
@@ -177,7 +227,20 @@ public abstract class Block implements RenderableObject {
      * @return The color offset
      */
     public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
-        return _colorOffset;
+        Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+        if (_colorSource == COLOR_SOURCE.COLOR_LUT)
+            color.set(colorForTemperatureAndHumidity(temperature, humidity));
+        else if (_colorSource == COLOR_SOURCE.FOLIAGE_LUT) {
+            color.set(foliageColorForTemperatureAndHumidity(temperature, humidity));
+        }
+
+        color.x *= _colorOffset[side.ordinal()].x;
+        color.y *= _colorOffset[side.ordinal()].y;
+        color.z *= _colorOffset[side.ordinal()].z;
+        color.w *= _colorOffset[side.ordinal()].w;
+
+        return color;
     }
 
     /**
@@ -188,18 +251,7 @@ public abstract class Block implements RenderableObject {
      * @return The texture offset
      */
     public Vector2f getTextureOffsetFor(SIDE side) {
-        return Helper.calcOffsetForTextureAt(2, 0);
-    }
-
-    /**
-     * Calculates the texture offset for a given block type and a specific
-     * side of the block in the terrain texture atlas.
-     *
-     * @param side The side of the block
-     * @return The texture offset
-     */
-    public Vector2f getTerrainTextureOffsetFor(SIDE side) {
-        return getTextureOffsetFor(side);
+        return Helper.calcOffsetForTextureAt((int) _textureAtlasPos[side.ordinal()].x, (int) _textureAtlasPos[side.ordinal()].y);
     }
 
     /**
@@ -208,7 +260,7 @@ public abstract class Block implements RenderableObject {
      * @return True if invisible
      */
     public boolean isBlockInvisible() {
-        return false;
+        return _invisible;
     }
 
     /**
@@ -218,7 +270,7 @@ public abstract class Block implements RenderableObject {
      * @return True if penetrable
      */
     public boolean isPenetrable() {
-        return false;
+        return _penetrable;
     }
 
     /**
@@ -228,7 +280,7 @@ public abstract class Block implements RenderableObject {
      * @return True if casting shadows
      */
     public boolean isCastingShadows() {
-        return true;
+        return _castsShadows;
     }
 
     /**
@@ -237,7 +289,7 @@ public abstract class Block implements RenderableObject {
      * @return True if ignored while tessellating
      */
     public boolean doNotTessellate() {
-        return false;
+        return _noTesselation;
     }
 
     /**
@@ -246,7 +298,7 @@ public abstract class Block implements RenderableObject {
      * @return True if a bounding box should be rendered
      */
     public boolean shouldRenderBoundingBox() {
-        return true;
+        return _renderBoundingBox;
     }
 
     /**
@@ -255,16 +307,16 @@ public abstract class Block implements RenderableObject {
      * @return The luminance
      */
     public byte getLuminance() {
-        return 0;
+        return _luminance;
     }
 
     /**
-     * Returns true if the block can be removed by the player.
+     * Returns true if the block can be destroyed by the player.
      *
      * @return True if removable
      */
-    public boolean isRemovable() {
-        return true;
+    public boolean isDestructible() {
+        return _hardness >= 0;
     }
 
     /**
@@ -272,8 +324,24 @@ public abstract class Block implements RenderableObject {
      *
      * @return True if the player can attach blocks
      */
-    public boolean playerCanAttachBlocks() {
-        return (getBlockForm() == BLOCK_FORM.NORMAL);
+    public boolean allowsBlockAttachment() {
+        return _allowBlockAttachment;
+    }
+
+    /**
+     * @return True if this block is a liquid
+     */
+    public boolean isLiquid() {
+        return _liquid;
+    }
+
+    /**
+     * True if the selection ray can pass through the block.
+     *
+     * @return True if selection ray can pass
+     */
+    public boolean letsSelectionRayThrough() {
+        return _bypassSelectionRay;
     }
 
     /**
@@ -304,16 +372,18 @@ public abstract class Block implements RenderableObject {
      * @return The form of the block
      */
     public BLOCK_FORM getBlockForm() {
-        return BLOCK_FORM.NORMAL;
+        return _blockForm;
     }
 
     /**
-     * True if the selection ray can pass through the block.
-     *
-     * @return True if selection ray can pass
+     * @return The title of the block
      */
-    public boolean letSelectionRayThrough() {
-        return false;
+    public String getTitle() {
+        return _title;
+    }
+
+    public byte getId() {
+        return _id;
     }
 
     private void generateDisplayList() {
@@ -327,65 +397,65 @@ public abstract class Block implements RenderableObject {
         GL11.glColor3f(1.0f, 1.0f, 1.0f);
 
         // TOP
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.TOP).x, getTerrainTextureOffsetFor(SIDE.TOP).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x, getTextureOffsetFor(SIDE.TOP).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.TOP).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.TOP).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x + 0.0624f, getTextureOffsetFor(SIDE.TOP).y);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.TOP).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.TOP).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x + 0.0624f, getTextureOffsetFor(SIDE.TOP).y + 0.0624f);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.TOP).x, getTerrainTextureOffsetFor(SIDE.TOP).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x, getTextureOffsetFor(SIDE.TOP).y + 0.0624f);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 
         // LEFT
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.LEFT).x, getTerrainTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x, getTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.LEFT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x + 0.0624f, getTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.LEFT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.LEFT).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x + 0.0624f, getTextureOffsetFor(SIDE.LEFT).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.LEFT).x, getTerrainTextureOffsetFor(SIDE.LEFT).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x, getTextureOffsetFor(SIDE.LEFT).y);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 
 
         // BACK
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BACK).x, getTerrainTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x, getTextureOffsetFor(SIDE.BACK).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BACK).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x + 0.0624f, getTextureOffsetFor(SIDE.BACK).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BACK).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.BACK).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x + 0.0624f, getTextureOffsetFor(SIDE.BACK).y);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BACK).x, getTerrainTextureOffsetFor(SIDE.BACK).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x, getTextureOffsetFor(SIDE.BACK).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
 
         // RIGHT
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.RIGHT).x, getTerrainTextureOffsetFor(SIDE.RIGHT).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x, getTextureOffsetFor(SIDE.RIGHT).y);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.RIGHT).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, getTextureOffsetFor(SIDE.RIGHT).y);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, getTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.RIGHT).x, getTerrainTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x, getTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
 
         GL11.glColor3f(0.5f, 0.5f, 0.5f);
 
         // FRONT
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.FRONT).x, getTerrainTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x, getTextureOffsetFor(SIDE.FRONT).y);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.FRONT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x + 0.0624f, getTextureOffsetFor(SIDE.FRONT).y);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.FRONT).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x + 0.0624f, getTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.FRONT).x, getTerrainTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x, getTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
         // BOTTOM
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BOTTOM).x, getTerrainTextureOffsetFor(SIDE.BOTTOM).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x, getTextureOffsetFor(SIDE.BOTTOM).y);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.BOTTOM).y);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, getTextureOffsetFor(SIDE.BOTTOM).y);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, getTerrainTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, getTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTerrainTextureOffsetFor(SIDE.BOTTOM).x, getTerrainTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
+        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x, getTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
 
         GL11.glEnd();

@@ -17,6 +17,7 @@
 package com.github.begla.blockmania.intersections;
 
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
@@ -115,7 +116,7 @@ public class RayBlockIntersection {
         /*
          * Ignore invisible blocks.
          */
-        if (Block.getBlockForType(w.getBlock(x, y, z)).isBlockInvisible()) {
+        if (BlockManager.getInstance().getBlock(w.getBlock(x, y, z)).isBlockInvisible()) {
             return null;
         }
 

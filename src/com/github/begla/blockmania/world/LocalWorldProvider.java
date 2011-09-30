@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
@@ -129,7 +129,7 @@ public class LocalWorldProvider {
             byte oldBlock = c.getBlock(blockPosX, y, blockPosZ);
             byte newBlock;
 
-            if (Block.getBlockForType(c.getBlock(blockPosX, y, blockPosZ)).isRemovable()) {
+            if (BlockManager.getInstance().getBlock(c.getBlock(blockPosX, y, blockPosZ)).isDestructible()) {
                 c.setBlock(blockPosX, y, blockPosZ, type);
                 newBlock = type;
             } else {
@@ -150,7 +150,7 @@ public class LocalWorldProvider {
                     /*
                     * Spread light of block light sources.
                     */
-                    byte luminance = Block.getBlockForType(type).getLuminance();
+                    byte luminance = BlockManager.getInstance().getBlock(type).getLuminance();
 
                     // Set the block light value to the luminance of this block
                     c.setLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
@@ -505,7 +505,6 @@ public class LocalWorldProvider {
             InputSource is = new InputSource(new FileInputStream(f));
             Document doc = builder.build(is);
             Element root = doc.getRootElement();
-            Element spawningPoint = root.getChild("SpawningPoint");
 
             _seed = root.getAttribute("seed").getValue();
             _title = root.getAttributeValue("title");

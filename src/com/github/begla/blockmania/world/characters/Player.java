@@ -18,6 +18,7 @@ package com.github.begla.blockmania.world.characters;
 
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.main.Configuration;
@@ -68,7 +69,7 @@ public final class Player extends Character {
         // Display the block the player is aiming at
         if (Configuration.getSettingBoolean("PLACING_BOX")) {
             if (is != null) {
-                if (Block.getBlockForType(_parent.getBlockAtPosition(is.getBlockPosition())).shouldRenderBoundingBox()) {
+                if (BlockManager.getInstance().getBlock(_parent.getBlockAtPosition(is.getBlockPosition())).shouldRenderBoundingBox()) {
                     Block.AABBForBlockAt(is.getBlockPosition()).render();
                 }
             }
@@ -128,7 +129,7 @@ public final class Player extends Character {
                     byte blockType = _parent.getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
 
                     // Ignore special blocks
-                    if (Block.getBlockForType(blockType).letSelectionRayThrough()) {
+                    if (BlockManager.getInstance().getBlock(blockType).letsSelectionRayThrough()) {
                         continue;
                     }
 
@@ -162,9 +163,9 @@ public final class Player extends Character {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
-                Block centerBlock = Block.getBlockForType(getParent().getBlock((int) is.getBlockPosition().x, (int) is.getBlockPosition().y, (int) is.getBlockPosition().z));
+                Block centerBlock = BlockManager.getInstance().getBlock(getParent().getBlock((int) is.getBlockPosition().x, (int) is.getBlockPosition().y, (int) is.getBlockPosition().z));
 
-                if (!centerBlock.playerCanAttachBlocks()) {
+                if (!centerBlock.allowsBlockAttachment()) {
                     return;
                 }
 
@@ -212,7 +213,7 @@ public final class Player extends Character {
 
                 // Remove the upper block if it's a billboard
                 byte upperBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
-                if (Block.getBlockForType(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
+                if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
                     getParent().setBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z, (byte) 0x0, true, true);
                 }
 
@@ -312,10 +313,10 @@ public final class Player extends Character {
     void cycleBlockTypes(int upDown) {
         _selectedBlockType += upDown;
 
-        if (_selectedBlockType >= Block.getBlockCount()) {
+        if (_selectedBlockType >= BlockManager.getInstance().availableBlocksSize()) {
             _selectedBlockType = 1;
         } else if (_selectedBlockType < 1) {
-            _selectedBlockType = (byte) (Block.getBlockCount() - 1);
+            _selectedBlockType = (byte) (BlockManager.getInstance().availableBlocksSize() - 1);
         }
     }
 

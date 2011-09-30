@@ -16,9 +16,7 @@
 package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.blocks.BlockAir;
-import com.github.begla.blockmania.blocks.BlockLava;
-import com.github.begla.blockmania.blocks.BlockWater;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.noise.PerlinNoise;
 import org.lwjgl.BufferUtils;
@@ -50,14 +48,14 @@ public class ChunkMeshGenerator {
 
                 for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
                     byte blockType = _chunk.getBlock(x, y, z);
-                    Block block = Block.getBlockForType(blockType);
+                    Block block = BlockManager.getInstance().getBlock(blockType);
 
                     if (block.isBlockInvisible())
                         continue;
 
                     Block.BLOCK_FORM blockForm = block.getBlockForm();
 
-                    if (blockForm == Block.BLOCK_FORM.LOWERED_BOCK || blockForm == Block.BLOCK_FORM.CACTUS || blockForm == Block.BLOCK_FORM.NORMAL)
+                    if (blockForm == Block.BLOCK_FORM.LOWERED_BOCK || blockForm == Block.BLOCK_FORM.CACTUS || blockForm == Block.BLOCK_FORM.DEFAULT)
                         generateBlockVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
                     else if (blockForm == Block.BLOCK_FORM.BILLBOARD)
                         generateBillboardVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
@@ -158,7 +156,7 @@ public class ChunkMeshGenerator {
         blocks[3] = _chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f));
 
         for (int i = 0; i < 4; i++) {
-            Block b = Block.getBlockForType(blocks[i]);
+            Block b = BlockManager.getInstance().getBlock(blocks[i]);
             if (b.isCastingShadows() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) {
                 result -= Configuration.OCCLUSION_AMOUNT_DEFAULT;
             } else if (b.isCastingShadows() && b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
@@ -178,13 +176,14 @@ public class ChunkMeshGenerator {
      * @param z    Local block position on the z-axis
      */
     private void generateBillboardVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
-        byte block = _chunk.getBlock(x, y, z);
+        byte blockId = _chunk.getBlock(x, y, z);
+        Block block = BlockManager.getInstance().getBlock(blockId);
 
         /*
          * First side of the billboard
          */
-        Vector4f colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-        Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0);
+        Vector4f colorBillboardOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+        Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.FRONT).x, block.getTextureOffsetFor(Block.SIDE.FRONT).y, 0);
 
         Vector3f p1 = new Vector3f(-0.5f, -0.5f, 0.5f);
         Vector3f p2 = new Vector3f(0.5f, -0.5f, -0.5f);
@@ -200,8 +199,8 @@ public class ChunkMeshGenerator {
         /*
         * Second side of the billboard
         */
-        colorBillboardOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-        texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0);
+        colorBillboardOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+        texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.BACK).x, block.getTextureOffsetFor(Block.SIDE.BACK).y, 0);
 
         p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
         p2 = new Vector3f(0.5f, -0.5f, 0.5f);
@@ -216,54 +215,54 @@ public class ChunkMeshGenerator {
     }
 
     private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
-        byte block = _chunk.getBlock(x, y, z);
+        byte blockId = _chunk.getBlock(x, y, z);
+        Block block = BlockManager.getInstance().getBlock(blockId);
 
         /*
          * Determine the render process.
          */
         ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT;
 
-        if (!Block.getBlockForType(block).isBlockTypeTranslucent())
+        if (!block.isBlockTypeTranslucent())
             renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
-        if (Block.getBlockForType(block).getClass().equals(BlockWater.class))
+        if (block.getTitle().equals("Water"))
             renderType = ChunkMesh.RENDER_TYPE.WATER;
-        if (Block.getBlockForType(block).getClass().equals(BlockLava.class))
+        if (block.getTitle().equals("Lava"))
             renderType = ChunkMesh.RENDER_TYPE.LAVA;
-
 
         boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
 
-        byte blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
-        drawTop = isSideVisibleForBlockTypes(blockToCheck, block);
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y, _chunk.getBlockWorldPosZ(z - 1));
-        drawFront = isSideVisibleForBlockTypes(blockToCheck, block);
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y, _chunk.getBlockWorldPosZ(z + 1));
-        drawBack = isSideVisibleForBlockTypes(blockToCheck, block);
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), y, _chunk.getBlockWorldPosZ(z));
-        drawLeft = isSideVisibleForBlockTypes(blockToCheck, block);
-        blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y, _chunk.getBlockWorldPosZ(z));
-        drawRight = isSideVisibleForBlockTypes(blockToCheck, block);
+        byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
+        drawTop = isSideVisibleForBlockTypes(blockToCheckId, blockId);
+        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y, _chunk.getBlockWorldPosZ(z - 1));
+        drawFront = isSideVisibleForBlockTypes(blockToCheckId, blockId);
+        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y, _chunk.getBlockWorldPosZ(z + 1));
+        drawBack = isSideVisibleForBlockTypes(blockToCheckId, blockId);
+        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), y, _chunk.getBlockWorldPosZ(z));
+        drawLeft = isSideVisibleForBlockTypes(blockToCheckId, blockId);
+        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y, _chunk.getBlockWorldPosZ(z));
+        drawRight = isSideVisibleForBlockTypes(blockToCheckId, blockId);
 
         // Don't draw anything "below" the world
         if (y > 0) {
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
-            drawBottom = isSideVisibleForBlockTypes(blockToCheck, block);
+            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
+            drawBottom = isSideVisibleForBlockTypes(blockToCheckId, blockId);
         } else {
             drawBottom = false;
         }
 
-        Block.BLOCK_FORM blockForm = Block.getBlockForType(block).getBlockForm();
+        Block.BLOCK_FORM blockForm = block.getBlockForm();
 
         // If the block is lowered, some more faces have to be drawn
         if (blockForm == Block.BLOCK_FORM.LOWERED_BOCK) {
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z - 1));
-            drawFront = isSideVisibleForBlockTypes(blockToCheck, block) || drawFront;
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z + 1));
-            drawBack = isSideVisibleForBlockTypes(blockToCheck, block) || drawBack;
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), y - 1, _chunk.getBlockWorldPosZ(z));
-            drawLeft = isSideVisibleForBlockTypes(blockToCheck, block) || drawLeft;
-            blockToCheck = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y - 1, _chunk.getBlockWorldPosZ(z));
-            drawRight = isSideVisibleForBlockTypes(blockToCheck, block) || drawRight;
+            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z - 1));
+            drawFront = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawFront;
+            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z + 1));
+            drawBack = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawBack;
+            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), y - 1, _chunk.getBlockWorldPosZ(z));
+            drawLeft = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawLeft;
+            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y - 1, _chunk.getBlockWorldPosZ(z));
+            drawRight = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawRight;
         }
 
         if (drawTop) {
@@ -274,9 +273,9 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, 1, 0);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
+            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.TOP).x, block.getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
 
@@ -289,9 +288,9 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, 0, -1);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
+            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.FRONT).x, block.getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
 
@@ -303,9 +302,9 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, 0, 1);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
+            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.BACK).x, block.getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
 
@@ -317,9 +316,9 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(-1, 0, 0);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
+            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.LEFT).x, block.getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
 
@@ -331,9 +330,9 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(1, 0, 0);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
+            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.RIGHT).x,block.getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
 
@@ -345,9 +344,9 @@ public class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, -1, 0);
 
-            Vector4f colorOffset = Block.getBlockForType(block).getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).x, Block.getBlockForType(block).getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
+            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.BOTTOM).x, block.getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
     }
@@ -360,9 +359,11 @@ public class ChunkMeshGenerator {
                 vertexElements = mesh._vertexElements[1];
                 break;
             case WATER:
+                texOffset.set(0,0);
                 vertexElements = mesh._vertexElements[3];
                 break;
             case LAVA:
+                texOffset.set(0,0);
                 vertexElements = mesh._vertexElements[4];
                 break;
         }
@@ -397,8 +398,14 @@ public class ChunkMeshGenerator {
     }
 
     private void generateLoweredBlock(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm) {
+        byte topBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
         byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
-        boolean lowerBottom = Block.getBlockForType(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BOCK || bottomBlock == 0x0;
+
+        boolean lower = topBlock == 0x0 || BlockManager.getInstance().getBlock(topBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BOCK ;
+        boolean lowerBottom = BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BOCK || bottomBlock == 0x0;
+
+        if (!lower)
+            return;
 
         if (norm.x == 1.0f) {
             p1.y -= 0.25;
@@ -513,10 +520,10 @@ public class ChunkMeshGenerator {
      * @return True if the side is visible for the given block types
      */
     private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock) {
-        Block bCheck = Block.getBlockForType(blockToCheck);
-        Block cBlock = Block.getBlockForType(currentBlock);
+        Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
+        Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
 
-        return bCheck.getClass() == BlockAir.class || cBlock.doNotTessellate() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (Block.getBlockForType(blockToCheck).isBlockTypeTranslucent() && !Block.getBlockForType(currentBlock).isBlockTypeTranslucent());
+        return bCheck.getId() == 0x0 || cBlock.doNotTessellate() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (!cBlock.isBlockTypeTranslucent() && bCheck.isBlockTypeTranslucent()) || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BOCK);
     }
 
     public static int getVertexArrayUpdateCount() {

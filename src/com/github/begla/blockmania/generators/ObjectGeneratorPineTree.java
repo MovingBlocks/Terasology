@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
@@ -51,7 +52,7 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            _worldProvider.setBlock(posX, posY + i, posZ, (byte) 0x5, update, true);
+            _worldProvider.setBlock(posX, posY + i, posZ, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, true);
         }
 
         int stage = 2;
@@ -60,7 +61,7 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
             for (int x = -(stage / 2); x <= (stage / 2); x++) {
                 for (int z = -(stage / 2); z <= (stage / 2); z++) {
                     if (!(x == 0 && z == 0)) {
-                        _worldProvider.setBlock(posX + x, posY + y, posZ + z, (byte) 0x16, update, false);
+                        _worldProvider.setBlock(posX + x, posY + y, posZ + z, BlockManager.getInstance().getBlock("Dark leaf").getId(), update, false);
                         _worldProvider.refreshSunlightAt(posX + x, posZ + z, false, true);
                     }
                 }
@@ -69,6 +70,6 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
             stage++;
         }
 
-        _worldProvider.setBlock(posX, posY + height, posZ, (byte) 0x16, update, false);
+        _worldProvider.setBlock(posX, posY + height, posZ, BlockManager.getInstance().getBlock("Dark leaf").getId(), update, false);
     }
 }

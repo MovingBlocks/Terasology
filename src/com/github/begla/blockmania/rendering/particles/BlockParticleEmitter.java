@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.rendering.particles;
 
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.world.World;
@@ -27,7 +28,7 @@ import com.github.begla.blockmania.world.World;
 public class BlockParticleEmitter extends ParticleEmitter {
 
     private World _parent;
-    private byte _currentBlockType = 0x1;
+    private byte _currentBlockType = BlockManager.getInstance().getBlock("Dirt").getId();
 
     public BlockParticleEmitter(World parent) {
         _parent = parent;

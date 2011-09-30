@@ -17,7 +17,7 @@ package com.github.begla.blockmania.world.entity;
 
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.blocks.BlockWater;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.main.Configuration;
@@ -96,7 +96,6 @@ public abstract class MovableEntity extends Entity {
         else
             _activeWalkingSpeed = _walkingSpeed * _runningFactor;
 
-
         // Update the viewing direction
         setViewingDirection(_yaw, _pitch);
 
@@ -155,7 +154,7 @@ public abstract class MovableEntity extends Entity {
             byte blockType1 = _parent.getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
             AABB entityAABB = getAABB();
 
-            if (Block.getBlockForType(blockType1).isPenetrable() || !entityAABB.overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z)))
+            if (BlockManager.getInstance().getBlock(blockType1).isPenetrable() || !entityAABB.overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z)))
                 continue;
 
             double direction = origin.y - getPosition().y;
@@ -214,7 +213,7 @@ public abstract class MovableEntity extends Entity {
             byte blockType = _parent.getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
             AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
 
-            if (!Block.getBlockForType(blockType).isPenetrable()) {
+            if (!BlockManager.getInstance().getBlock(blockType).isPenetrable()) {
                 if (getAABB().overlaps(blockAABB)) {
                     result = true;
 
@@ -379,14 +378,14 @@ public abstract class MovableEntity extends Entity {
             byte blockType = _parent.getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
             AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
 
-            if (Block.getBlockForType(blockType).getClass().equals(BlockWater.class) && getAABB().overlaps(blockAABB)) {
+            if (BlockManager.getInstance().getBlock(blockType).isLiquid() && getAABB().overlaps(blockAABB)) {
                 swimming = true;
             }
 
             Vector3f eyePos = calcEyePosition();
             eyePos.y += 0.25;
 
-            if (Block.getBlockForType(blockType).getClass().equals(BlockWater.class) && blockAABB.contains(eyePos)) {
+            if (BlockManager.getInstance().getBlock(blockType).isLiquid() && blockAABB.contains(eyePos)) {
                 headUnderWater = true;
             }
         }

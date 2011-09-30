@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import org.lwjgl.opengl.GL11;
@@ -34,7 +35,7 @@ public class BlockParticle extends Particle {
     private float _texOffsetX, _texOffsetY, _lightOffset;
     private byte _blockType;
 
-    private static final int[] _displayLists = new int[Block.getBlockCount()];
+    private static final int[] _displayLists = new int[BlockManager.getInstance().availableBlocksSize()];
 
     public BlockParticle(int lifeTime, Vector3f position, byte blockType, BlockParticleEmitter parent) {
         super(lifeTime, position, parent);
@@ -94,7 +95,7 @@ public class BlockParticle extends Particle {
     }
 
     private void drawParticle() {
-        Block b = Block.getBlockForType(_blockType);
+        Block b = BlockManager.getInstance().getBlock(_blockType);
 
         glBegin(GL_QUADS);
         GL11.glTexCoord2f(b.getTextureOffsetFor(Block.SIDE.FRONT).x, b.getTextureOffsetFor(Block.SIDE.FRONT).y);
