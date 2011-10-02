@@ -56,7 +56,7 @@ public final class Blockmania {
 
     private final ExecutorService _threadPool = Executors.newFixedThreadPool(Configuration.MAX_THREADS);
     /* ------ */
-    private static final int FRAME_SKIP_MAX_FRAMES = 10;
+    private static final int FRAME_SKIP_MAX_FRAMES = 5;
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
     /* ------- */
@@ -234,11 +234,7 @@ public final class Blockmania {
          * Init. OpenGL
          */
         resizeViewport();
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
-        GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
-        glShadeModel(GL11.GL_SMOOTH);
+        setupOpenGL();
 
         // Generate a world with a random seed value
         String worldSeed = Configuration.DEFAULT_SEED;
@@ -250,10 +246,10 @@ public final class Blockmania {
         initNewWorldAndPlayer("World1", worldSeed);
     }
 
-    /**
-     * Renders the scene.
-     */
-    private void render() {
+    private void setupOpenGL() {
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
         glFogi(GL_FOG_MODE, GL_LINEAR);
         // Update the viewing distance
         double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
@@ -261,6 +257,14 @@ public final class Blockmania {
         glFogf(GL_FOG_START, (float) (viewingDistance * 0.25));
         glFogf(GL_FOG_END, (float) viewingDistance);
 
+        GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
+        glShadeModel(GL11.GL_SMOOTH);
+    }
+
+    /**
+     * Renders the scene.
+     */
+    private void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
@@ -484,6 +488,7 @@ public final class Blockmania {
         }
 
         if (success) {
+            setupOpenGL();
             Blockmania.getInstance().getLogger().log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
         } else {
             Blockmania.getInstance().getLogger().log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);

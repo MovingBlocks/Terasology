@@ -88,16 +88,15 @@ public final class World extends LocalWorldProvider {
      * Renders the world.
      */
     public void render() {
-
         /* SKYSPHERE */
         _player.getActiveCamera().lookThroughNormalized();
-
         _skysphere.render();
 
         /* WORLD RENDERING */
         _player.getActiveCamera().lookThrough();
 
         _player.render();
+
         renderChunks();
 
         /* CLOUDS */
@@ -181,31 +180,38 @@ public final class World extends LocalWorldProvider {
         int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
         int animationOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animationOffset");
         int animated = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animated");
+
         GL20.glUniform1f(daylight, (float) getDaylight());
-        GL20.glUniform1i(animated, 0);
         GL20.glUniform1i(swimming, _player.isHeadUnderWater() ? 1 : 0);
 
         FastList<Chunk> visibleChunks = fetchVisibleChunks();
 
         glEnable(GL_TEXTURE_2D);
 
+        GL20.glUniform1i(animated, 0);
+        TextureManager.getInstance().bindTexture("terrain");
+
         // OPAQUE ELEMENTS
         for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
             Chunk c = n.getValue();
 
-            GL20.glUniform1i(animated, 0);
-            TextureManager.getInstance().bindTexture("terrain");
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
 
-            // ANIMATED LAVA
-            GL20.glUniform1i(animated, 1);
-            GL20.glUniform1f(animationOffset, ((float) (_tick % 16)) * (1.0f / 16f));
-            TextureManager.getInstance().bindTexture("custom_lava_still");
-            visibleChunks.valueOf(n).render(ChunkMesh.RENDER_TYPE.LAVA);
 
             if (Configuration.getSettingBoolean("CHUNK_OUTLINES")) {
                 c.getAABB().render();
             }
+        }
+
+        // ANIMATED LAVA
+        GL20.glUniform1i(animated, 1);
+        TextureManager.getInstance().bindTexture("custom_lava_still");
+
+        GL20.glUniform1f(animationOffset, ((float) (_tick % 16)) * (1.0f / 16f));
+
+        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            Chunk c = n.getValue();
+            c.render(ChunkMesh.RENDER_TYPE.LAVA);
         }
 
         GL20.glUniform1i(animated, 0);

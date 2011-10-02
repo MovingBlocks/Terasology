@@ -31,7 +31,6 @@ import org.lwjgl.util.vector.Vector4f;
 public class ChunkMeshGenerator {
 
     private final Chunk _chunk;
-    private static final PerlinNoise _pGen = new PerlinNoise(0);
     private static int _statVertexArrayUpdateCount = 0;
 
     public ChunkMeshGenerator(Chunk chunk) {
