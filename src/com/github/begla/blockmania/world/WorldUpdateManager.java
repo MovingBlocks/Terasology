@@ -46,7 +46,7 @@ public final class WorldUpdateManager {
     public boolean queueChunkUpdate(Chunk c) {
         final Chunk chunkToProcess = c;
 
-        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < Configuration.MAX_THREADS || c.distanceToPlayer() < 8.0)) {
+        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < Configuration.MAX_THREADS - 1 || c.distanceToPlayer() < 8.0)) {
             _currentlyProcessedChunks.add(chunkToProcess);
 
             // ... create a new thread and start processing.
