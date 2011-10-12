@@ -1,4 +1,4 @@
 SAVED_WORLDS
-logs
-nbproject
-build
+logs/
+nbproject/
+build/
