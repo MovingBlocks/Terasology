@@ -53,7 +53,7 @@ public class ChunkMeshGenerator {
 
                     Block.BLOCK_FORM blockForm = block.getBlockForm();
 
-                    if (blockForm == Block.BLOCK_FORM.LOWERED_BOCK || blockForm == Block.BLOCK_FORM.CACTUS || blockForm == Block.BLOCK_FORM.DEFAULT)
+                    if (blockForm == Block.BLOCK_FORM.LOWERED_BLOCK || blockForm == Block.BLOCK_FORM.CACTUS || blockForm == Block.BLOCK_FORM.DEFAULT)
                         generateBlockVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
                     else if (blockForm == Block.BLOCK_FORM.BILLBOARD)
                         generateBillboardVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
@@ -252,7 +252,7 @@ public class ChunkMeshGenerator {
         Block.BLOCK_FORM blockForm = block.getBlockForm();
 
         // If the block is lowered, some more faces have to be drawn
-        if (blockForm == Block.BLOCK_FORM.LOWERED_BOCK) {
+        if (blockForm == Block.BLOCK_FORM.LOWERED_BLOCK) {
             blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z - 1));
             drawFront = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawFront;
             blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z + 1));
@@ -370,7 +370,7 @@ public class ChunkMeshGenerator {
             case CACTUS:
                 generateCactusSide(p1, p2, p3, p4, norm);
                 break;
-            case LOWERED_BOCK:
+            case LOWERED_BLOCK:
                 generateLoweredBlock(x, y, z, p1, p2, p3, p4, norm);
                 break;
         }
@@ -399,8 +399,8 @@ public class ChunkMeshGenerator {
         byte topBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
         byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
 
-        boolean lower = topBlock == 0x0 || BlockManager.getInstance().getBlock(topBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BOCK ;
-        boolean lowerBottom = BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BOCK || bottomBlock == 0x0;
+        boolean lower = topBlock == 0x0 || BlockManager.getInstance().getBlock(topBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK ;
+        boolean lowerBottom = BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0;
 
         if (!lower)
             return;
@@ -520,7 +520,7 @@ public class ChunkMeshGenerator {
         Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
 
-        return bCheck.getId() == 0x0 || cBlock.doNotTessellate() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (!cBlock.isTranslucent() && bCheck.isTranslucent()) || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BOCK);
+        return bCheck.getId() == 0x0 || cBlock.doNotTessellate() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (!cBlock.isTranslucent() && bCheck.isTranslucent()) || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
     }
 
     public static int getVertexArrayUpdateCount() {

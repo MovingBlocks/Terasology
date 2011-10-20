@@ -61,7 +61,7 @@ public class Block implements RenderableObject {
      * Possible forms of blocks.
      */
     public static enum BLOCK_FORM {
-        DEFAULT, CACTUS, LOWERED_BOCK, BILLBOARD
+        DEFAULT, CACTUS, LOWERED_BLOCK, BILLBOARD
     }
 
     public static enum COLOR_SOURCE {
