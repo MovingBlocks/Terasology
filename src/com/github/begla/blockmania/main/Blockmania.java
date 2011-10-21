@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.main;
 
+import com.github.begla.blockmania.groovy.GroovyManager;
 import com.github.begla.blockmania.gui.HUD;
 import com.github.begla.blockmania.rendering.FontManager;
 import com.github.begla.blockmania.rendering.ShaderManager;
@@ -80,6 +81,9 @@ public final class Blockmania {
     /* ------- */
     private final Logger _logger = Logger.getLogger("blockmania");
 
+    /** Groovy Manager handles all the Groovy-related stuff! */
+    private GroovyManager _groovyManager;
+
     // Singleton
     public static Blockmania getInstance() {
         if (_instance == null)
@@ -110,6 +114,7 @@ public final class Blockmania {
             blockmania.initDisplay();
             blockmania.initControls();
             blockmania.initGame();
+            blockmania.initGroovy();
 
             blockmania.startGame();
         } catch (LWJGLException e) {
@@ -262,6 +267,10 @@ public final class Blockmania {
         glShadeModel(GL11.GL_SMOOTH);
     }
 
+    private void initGroovy() {
+        _groovyManager = new GroovyManager();
+    }
+
     /**
      * Renders the scene.
      */
@@ -394,7 +403,7 @@ public final class Blockmania {
 
                     char c = Keyboard.getEventCharacter();
 
-                    if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.' || c == '!' || c == '-') {
+                    if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'Z' + 1 || c == ' ' || c == '_' || c == '.' || c == '!' || c == '-' || c == '(' || c == ')' || c == '"' || c == '\'' || c == ';' || c == '+') {
                         _consoleInput.append(c);
                     }
                 }
@@ -429,9 +438,10 @@ public final class Blockmania {
 
         // Try to parse the input
         try {
-            if (parsingResult.get(0).equals("place")) {
+            if (parsingResult.get(0).equals("groovy")) {
+                success = _groovyManager.runGroovyShell(_consoleInput.toString());
+            } else if (parsingResult.get(0).equals("place")) {
                 if (parsingResult.get(1).equals("block")) {
-                    _world.getPlayer().placeBlock(Byte.parseByte(parsingResult.get(2)));
                     success = true;
                 }
             } else if (parsingResult.get(0).equals("set")) {
