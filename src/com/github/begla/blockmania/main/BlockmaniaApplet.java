@@ -19,49 +19,18 @@ package com.github.begla.blockmania.main;
 import org.lwjgl.opengl.Display;
 
 import java.applet.Applet;
-import java.awt.*;
 
 /**
- * The heart and soul of the Blockmania Java applet.
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class BlockmaniaApplet extends Applet {
-
     private Blockmania _blockmania;
-    private Canvas _canvas;
     private Thread _gameThread;
 
     @Override
     public void init() {
-        setLayout(new BorderLayout());
-
-        _canvas = new Canvas() {
-            @Override
-            public void addNotify() {
-                super.addNotify();
-                startGame();
-            }
-
-            @Override
-            public void removeNotify() {
-                super.removeNotify();
-                _blockmania.stopGame();
-
-                try {
-                    _gameThread.join();
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-
-        _canvas.setSize(getWidth(), getHeight());
-
-        add(_canvas);
-
-        _canvas.setFocusable(true);
-        _canvas.requestFocus();
-        _canvas.setIgnoreRepaint(true);
+        startGame();
+        super.init();
     }
 
     private void startGame() {
@@ -71,14 +40,16 @@ public final class BlockmaniaApplet extends Applet {
                 try {
                     Configuration.loadSandboxed();
 
-                    Display.setParent(_canvas);
+                    Display.setParent(null);
+                    Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(1280, 720));
+                    Display.setTitle(Configuration.GAME_TITLE);
                     Display.create();
 
                     _blockmania = Blockmania.getInstance();
                     _blockmania.initControls();
+
                     _blockmania.initGame();
                     _blockmania.startGame();
-
                 } catch (Exception e) {
                     System.err.println(e);
                 }
@@ -90,15 +61,21 @@ public final class BlockmaniaApplet extends Applet {
 
     @Override
     public void start() {
+        _blockmania.unpauseGame();
+        super.start();
     }
 
     @Override
     public void stop() {
+        _blockmania.pauseGame();
+        super.stop();
     }
 
     @Override
     public void destroy() {
-        remove(_canvas);
+        if (_blockmania != null)
+            _blockmania.stopGame();
+
         super.destroy();
     }
 }
