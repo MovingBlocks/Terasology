@@ -70,6 +70,8 @@ public class ShaderManager {
         createFragShader("chunk_frag.glsl", "chunk");
         createVertexShader("cloud_vert.glsl", "cloud");
         createFragShader("cloud_frag.glsl", "cloud");
+        createVertexShader("stars_vert.glsl", "stars");
+        createFragShader("stars_frag.glsl", "stars");
 
         for (FastMap.Entry<String, Integer> e = _fragmentShader.head(), end = _fragmentShader.tail(); (e = e.getNext()) != end; ) {
             int shaderProgram = GL20.glCreateProgram();

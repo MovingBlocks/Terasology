@@ -16,12 +16,19 @@
 package com.github.begla.blockmania.world.horizon;
 
 import com.github.begla.blockmania.rendering.RenderableObject;
+import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.world.World;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -35,21 +42,26 @@ public class Skysphere implements RenderableObject {
     private float _turbidity = 10.0f, _sunPosAngle = 0.1f;
     private Sphere _sphere = new Sphere();
     private Vector3f _zenithColor = new Vector3f();
-
+    /*Stars*/
+    public static IntBuffer textureId = BufferUtils.createIntBuffer(1);
     private World _parent;
 
     public Skysphere(World parent) {
         _parent = parent;
+        loadStarTextures();
     }
 
     public void render() {
-        if (_parent.getPlayer().isHeadUnderWater() || !(_parent.getTime() >= 0.0f && _parent.getTime() <= 0.6))
+        if (_parent.getPlayer().isHeadUnderWater())
             return;
 
         _parent.getPlayer().applyNormalizedModelViewMatrix();
 
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
+        
+        glEnable(GL13.GL_TEXTURE_CUBE_MAP);
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
 
         //float sunPosInRadians = (float)Math.toRadians(180*(_time-0.075));
         _sunPosAngle = 5.3f * (float) _parent.getTime() - 1.4f;
@@ -63,6 +75,9 @@ public class Skysphere implements RenderableObject {
         int sunPos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunPos");
         GL20.glUniform4f(sunPos, 0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
 
+        int sunAngle = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunAngle");
+        GL20.glUniform1f(sunAngle, _sunPosAngle);
+        
         int turbidity = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "turbidity");
         GL20.glUniform1f(turbidity, _turbidity);
 
@@ -74,7 +89,7 @@ public class Skysphere implements RenderableObject {
         glPopMatrix();
 
         ShaderManager.getInstance().enableShader(null);
-
+        glDisable(GL13.GL_TEXTURE_CUBE_MAP);
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }
@@ -105,7 +120,7 @@ public class Skysphere implements RenderableObject {
     }
 
     public void update() {
-        _turbidity = 12.0f + (float) _parent.getActiveHumidity() * (float) _parent.getActiveTemperature();
+        _turbidity = 6.0f + (float) _parent.getActiveHumidity() * (float) _parent.getActiveTemperature();
     }
 
     public float getSunPosAngle() {
@@ -114,5 +129,31 @@ public class Skysphere implements RenderableObject {
 
     public float getTurbidity() {
         return _turbidity;
+    }
+    
+    private void loadStarTextures() {
+        int internalFormat = GL11.GL_RGBA8,
+                format = GL12.GL_BGRA;
+
+        GL11.glGenTextures(textureId);
+
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
+
+        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL12.GL_TEXTURE_WRAP_R, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+
+        for (int i = 0; i < 6; i++) {
+
+            byte[] data = TextureManager.getInstance().getTexture("stars" + (i + 1)).getTextureData();
+            ByteBuffer byteBuffer = BufferUtils.createByteBuffer(data.length);
+            byteBuffer.put(data);
+            byteBuffer.flip();
+
+            GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, 256, 256,
+                    0, format, GL11.GL_UNSIGNED_BYTE, byteBuffer);
+        }
     }
 }

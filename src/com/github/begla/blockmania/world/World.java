@@ -26,14 +26,23 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.horizon.Clouds;
 import com.github.begla.blockmania.world.horizon.Skysphere;
+import com.github.begla.blockmania.world.horizon.Stars;
 import javolution.util.FastList;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.glu.GLUtessellator;
+import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.Collections;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
+
+/*Test*/
+
 
 /**
  * The world of Blockmania. At its most basic the world contains chunks (consisting of a fixed amount of blocks)
@@ -68,6 +77,10 @@ public final class World extends LocalWorldProvider {
     private final WorldUpdateManager _worldUpdateManager;
     private int prevChunkPosX = 0, prevChunkPosZ = 0;
 
+    /* Test */
+    private Stars _stars;
+    private Sphere _sphere;
+
     /**
      * Initializes a new world for the single player mode.
      *
@@ -81,6 +94,11 @@ public final class World extends LocalWorldProvider {
         _clouds = new Clouds(this);
         _skysphere = new Skysphere(this);
 
+        /* Test */
+        //Stars _stars = new Stars();
+        //_stars.loadTextures();
+        _sphere = new Sphere();
+
         _worldUpdateManager = new WorldUpdateManager();
     }
 
@@ -89,16 +107,18 @@ public final class World extends LocalWorldProvider {
      */
     public void render() {
         /* SKYSPHERE */
-        _skysphere.render();
-
+        _skysphere.render();;
+        /* Test */
+        //renderStars();
+        //_stars.render();
         /* WORLD RENDERING */
         _player.applyPlayerModelViewMatrix();
         _player.render();
 
-        renderChunks();
+        //renderChunks();
 
         /* CLOUDS */
-        _clouds.render();
+        //_clouds.render();
 
         /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();

@@ -1,5 +1,8 @@
 varying	vec3 	colorYxy;
+varying vec3  skyVec;
 varying	vec4 	McPosition;
+varying	float lv;
+uniform samplerCube tex;
 
 vec4 	eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
@@ -36,7 +39,10 @@ void main ()
         vec3 ls                 = normalize ( vec3 (sunPos.x, sunPos.y-0.3, sunPos.z-0.3 ));
         float sunHighlight      = 0.8*pow(max(0.0, dot(ls, v)), 50.0);
         float largeSunHighlight = 0.3*pow(max(0.0, dot(ls, v)), 25.0);
-	gl_FragColor = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight + largeSunHighlight, 1.0 );
+        vec4	skyColor          = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight + largeSunHighlight, 1.0 );
+        float	alpha             = 0.2 * (1.0 - lv);
+        skyColor               += alpha*textureCube ( tex, skyVec );
+        gl_FragColor            = skyColor;
        }else{
         gl_FragColor = vec4	( 0.0, 0.0, 0.0, 1.0);
        }

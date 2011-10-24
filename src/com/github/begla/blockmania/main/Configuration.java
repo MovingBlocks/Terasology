@@ -42,7 +42,7 @@ public final class Configuration {
     /**
      * The string used to generate the default world. If not set, a random seed is used.
      */
-    public static final String DEFAULT_SEED = "waltterrr";
+    public static final String DEFAULT_SEED = "wwiiii";
     /**
      * The pixel format used to init. the display.
      */
@@ -50,7 +50,7 @@ public final class Configuration {
     /**
      * The display mode used for window mode.
      */
-    public static final DisplayMode DISPLAY_MODE = new DisplayMode(1280, 720);
+    public static final DisplayMode DISPLAY_MODE = new DisplayMode(380, 240);
     /**
      * If set to true, the game is rendered as a full screen application.
      */
