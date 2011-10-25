@@ -87,7 +87,7 @@ public class AudioManager {
      */
     public Audio loadMusic(String s) {
         try {
-            return AudioLoader.getStreamingAudio("OGG", ResourceLoader.getResource("com/github/begla/blockmania/data/music/" + s + ".ogg"));
+            return AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/music/" + s + ".ogg"));
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.getLocalizedMessage());
         }
