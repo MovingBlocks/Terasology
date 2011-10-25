@@ -27,6 +27,7 @@ import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.Audio;
+import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
 
@@ -123,7 +124,8 @@ public abstract class MovableEntity extends Entity {
             if (_currentFootstepSound == null) {
                 Vector3f playerDirection = directionOfOrigin();
                 _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getRandom().randomInt()) % 5];
-                _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, 0.1f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.1f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+
+                _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, 0.05f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.1f, false, playerDirection.x, playerDirection.y, playerDirection.z);
             } else {
                 if (!_currentFootstepSound.isPlaying()) {
                     _currentFootstepSound = null;

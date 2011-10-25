@@ -251,12 +251,11 @@ public final class Blockmania {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-        glFogi(GL_FOG_MODE, GL_LINEAR);
+
         // Update the viewing distance
-        double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z);
-        double viewingDistance = minDist / 2f;
-        glFogf(GL_FOG_START, (float) (viewingDistance * 0.25));
-        glFogf(GL_FOG_END, (float) viewingDistance);
+        double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z) / 2.0;
+        glFogf(GL_FOG_START, (float) (minDist * 0.5));
+        glFogf(GL_FOG_END, (float) minDist);
 
         GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
         glShadeModel(GL11.GL_SMOOTH);
@@ -269,7 +268,6 @@ public final class Blockmania {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
-        // RENDER WORLD
         _world.render();
         _hud.render();
     }

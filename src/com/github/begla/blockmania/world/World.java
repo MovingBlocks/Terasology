@@ -30,6 +30,7 @@ import com.github.begla.blockmania.world.horizon.Skysphere;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
+import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
 import java.util.logging.Level;
@@ -161,7 +162,8 @@ public final class World extends LocalWorldProvider {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.01, true) {
             @Override
             public void run() {
-                AudioManager.getInstance().getAudio("Sunrise").playAsMusic(1.0f, 0.5f, false);
+                SoundStore.get().setMusicVolume(0.2f);
+                AudioManager.getInstance().getAudio("Sunrise").playAsMusic(1.0f, 1.0f, false);
             }
         });
 
@@ -169,7 +171,8 @@ public final class World extends LocalWorldProvider {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.33, true) {
             @Override
             public void run() {
-                AudioManager.getInstance().getAudio("Afternoon").playAsMusic(1.0f, 0.5f, false);
+                SoundStore.get().setMusicVolume(0.2f);
+                AudioManager.getInstance().getAudio("Afternoon").playAsMusic(1.0f, 1.0f, false);
             }
         });
 
@@ -177,7 +180,8 @@ public final class World extends LocalWorldProvider {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.44, true) {
             @Override
             public void run() {
-                AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 0.5f, false);
+                SoundStore.get().setMusicVolume(0.2f);
+                AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 1.0f, false);
             }
         });
     }
