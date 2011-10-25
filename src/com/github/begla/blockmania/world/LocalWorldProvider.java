@@ -559,13 +559,13 @@ public class LocalWorldProvider {
         _creationTime = Blockmania.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
     }
 
-        /**
+    /**
      * Adds a time event to the list.
      *
      * @param e
      */
     public void addWorldTimeEvent(WorldTimeEvent e) {
-         _worldTimeEvents.add(e);
+        _worldTimeEvents.add(e);
     }
 
     /**
@@ -574,19 +574,17 @@ public class LocalWorldProvider {
      * @param e
      */
     public void removeWorldTimeEvent(WorldTimeEvent e) {
-         _worldTimeEvents.remove(e);
+        _worldTimeEvents.remove(e);
     }
 
     /**
      * Executes all time events which event times equal a specified delta value.
      */
     public void fireWorldTimeEvents() {
-        for (int i=_worldTimeEvents.size() - 1; i>=0; i--) {
-            WorldTimeEvent event = _worldTimeEvents.get(i);
+        for (int i = _worldTimeEvents.size() - 1; i >= 0; i--) {
+            final WorldTimeEvent event = _worldTimeEvents.get(i);
 
-            if (Math.abs(getTime() % 1.0 - event.getExecutionTime()) < 0.001) {
-                event.Execute();
-            }
+            event.Execute();
 
             if (!event.repeatingEvent)
                 _worldTimeEvents.remove(i);

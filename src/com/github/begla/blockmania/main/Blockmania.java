@@ -32,6 +32,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.openal.SoundStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -348,6 +349,9 @@ public final class Blockmania {
     private void update() {
         _hud.update();
         _world.update();
+
+        // Important for the streaming of audio
+        SoundStore.get().poll(0);
     }
 
     /*
