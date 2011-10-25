@@ -15,32 +15,42 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.main.Blockmania;
+
 /**
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class WorldTimeEvent {
 
-    double executionTime;
-    boolean repeatingEvent;
+    private double _executionTime;
+    private boolean _repeatingEvent, _canFire;
 
     public WorldTimeEvent(double executionTime, boolean repeatingEvent) {
-        this.executionTime = executionTime;
-        this.repeatingEvent = repeatingEvent;
+        _executionTime = executionTime;
+        _repeatingEvent = repeatingEvent;
     }
 
-    public abstract void Execute();
-
-    public void setExecutionTime(double executionTime) {
-           this.executionTime = executionTime;
+    public void execute() {
+        run();
     }
+
+    public abstract void run();
 
     public double getExecutionTime() {
-        return this.executionTime;
+        return _executionTime;
     }
 
-    public void setRepeatingEvent(boolean repeatingEvent) {
-        this.repeatingEvent = repeatingEvent;
+    public boolean isRepeatingEvent() {
+        return _repeatingEvent;
     }
 
+    public void setCanFire(boolean canFire) {
+        _canFire = canFire;
+    }
+
+    public boolean canFire() {
+        return _canFire;
+    }
 }

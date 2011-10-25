@@ -51,7 +51,7 @@ public final class World extends LocalWorldProvider {
     private Player _player;
 
     /* CHUNKS */
-    private FastList<Chunk> _chunksInProximity = new FastList();
+    private FastList<Chunk> _chunksInProximity = new FastList<Chunk>();
 
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
@@ -69,6 +69,9 @@ public final class World extends LocalWorldProvider {
     private final WorldUpdateManager _worldUpdateManager;
     private int prevChunkPosX = 0, prevChunkPosZ = 0;
 
+    /* EVENTS */
+    private final WorldTimeEventManager _worldTimeEventManager;
+
     /**
      * Initializes a new world for the single player mode.
      *
@@ -83,6 +86,7 @@ public final class World extends LocalWorldProvider {
         _skysphere = new Skysphere(this);
 
         _worldUpdateManager = new WorldUpdateManager();
+        _worldTimeEventManager = new WorldTimeEventManager(this);
 
         createMusicTimeEvents();
     }
@@ -154,25 +158,25 @@ public final class World extends LocalWorldProvider {
      */
     public void createMusicTimeEvents() {
         // SUNRISE
-        addWorldTimeEvent(new WorldTimeEvent(0.01, true) {
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.01, true) {
             @Override
-            public void Execute() {
+            public void run() {
                 AudioManager.getInstance().getAudio("Sunrise").playAsMusic(1.0f, 0.5f, false);
             }
         });
 
         // AFTERNOON
-        addWorldTimeEvent(new WorldTimeEvent(0.33, true) {
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.33, true) {
             @Override
-            public void Execute() {
+            public void run() {
                 AudioManager.getInstance().getAudio("Afternoon").playAsMusic(1.0f, 0.5f, false);
             }
         });
 
         // SUNSET
-        addWorldTimeEvent(new WorldTimeEvent(0.44, true) {
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.44, true) {
             @Override
-            public void Execute() {
+            public void run() {
                 AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 0.5f, false);
             }
         });
@@ -313,7 +317,7 @@ public final class World extends LocalWorldProvider {
 
         _chunkCache.freeCacheSpace();
 
-        fireWorldTimeEvents();
+        _worldTimeEventManager.fireWorldTimeEvents();
     }
 
     /**
