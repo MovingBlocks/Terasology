@@ -62,11 +62,11 @@ public abstract class MovableEntity extends Entity {
 
     private void initAudio() {
         _footstepSounds = new Audio[5];
-        _footstepSounds[0] = AudioManager.getInstance().loadAudio("FootGrass1");
-        _footstepSounds[1] = AudioManager.getInstance().loadAudio("FootGrass2");
-        _footstepSounds[2] = AudioManager.getInstance().loadAudio("FootGrass3");
-        _footstepSounds[3] = AudioManager.getInstance().loadAudio("FootGrass4");
-        _footstepSounds[4] = AudioManager.getInstance().loadAudio("FootGrass5");
+        _footstepSounds[0] = AudioManager.getInstance().loadSound("FootGrass1");
+        _footstepSounds[1] = AudioManager.getInstance().loadSound("FootGrass2");
+        _footstepSounds[2] = AudioManager.getInstance().loadSound("FootGrass3");
+        _footstepSounds[3] = AudioManager.getInstance().loadSound("FootGrass4");
+        _footstepSounds[4] = AudioManager.getInstance().loadSound("FootGrass5");
     }
 
     public abstract void processMovement();

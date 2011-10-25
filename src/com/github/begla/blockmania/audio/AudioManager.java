@@ -49,22 +49,45 @@ public class AudioManager {
     }
 
     private AudioManager() {
-        loadAudioFiles();
+        loadSound();
+        loadMusic();
     }
 
-    private void loadAudioFiles() {
-        _audioFiles.put("PlaceRemoveBlock", loadAudio("PlaceRemoveBlock"));
+    private void loadSound() {
+        _audioFiles.put("PlaceRemoveBlock", loadSound("PlaceRemoveBlock"));
+    }
+
+    private void loadMusic() {
+        _audioFiles.put("Sunrise", loadMusic("Sunrise"));
+        _audioFiles.put("Afternoon", loadMusic("Afternoon"));
+        _audioFiles.put("Sunset", loadMusic("Sunset"));
     }
 
     /**
-     * Loads the audio file with the given name.
+     * Loads the sound file with the given name.
      *
      * @param s The name of the audio file
      * @return The loaded audio file
      */
-    public Audio loadAudio(String s) {
+    public Audio loadSound(String s) {
         try {
             return AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/sounds/" + s + ".ogg"));
+        } catch (IOException e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.getLocalizedMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Loads the music file with the given name.
+     *
+     * @param s The name of the audio file
+     * @return The loaded audio file
+     */
+    public Audio loadMusic(String s) {
+        try {
+            return AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("com/github/begla/blockmania/data/music/" + s + ".ogg"));
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.getLocalizedMessage());
         }

@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
@@ -82,6 +83,8 @@ public final class World extends LocalWorldProvider {
         _skysphere = new Skysphere(this);
 
         _worldUpdateManager = new WorldUpdateManager();
+
+        createMusicTimeEvents();
     }
 
     /**
@@ -144,6 +147,35 @@ public final class World extends LocalWorldProvider {
         } else if (time >= 0.5 && time <= 1.0f) {
             _daylight = 0.0f;
         }
+    }
+
+    /**
+     * Creates the world time events to play the game's soundtrack at specific times.
+     */
+    public void createMusicTimeEvents() {
+        // SUNRISE
+        addWorldTimeEvent(new WorldTimeEvent(0.01, true) {
+            @Override
+            public void Execute() {
+                AudioManager.getInstance().getAudio("Sunrise").playAsMusic(1.0f, 0.5f, false);
+            }
+        });
+
+        // AFTERNOON
+        addWorldTimeEvent(new WorldTimeEvent(0.33, true) {
+            @Override
+            public void Execute() {
+                AudioManager.getInstance().getAudio("Afternoon").playAsMusic(1.0f, 0.5f, false);
+            }
+        });
+
+        // SUNSET
+        addWorldTimeEvent(new WorldTimeEvent(0.44, true) {
+            @Override
+            public void Execute() {
+                AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 0.5f, false);
+            }
+        });
     }
 
     /**
@@ -280,6 +312,8 @@ public final class World extends LocalWorldProvider {
         _worldUpdateManager.updateVBOs();
 
         _chunkCache.freeCacheSpace();
+
+        fireWorldTimeEvents();
     }
 
     /**

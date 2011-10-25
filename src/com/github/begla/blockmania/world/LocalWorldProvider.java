@@ -62,6 +62,9 @@ public class LocalWorldProvider {
     /* RANDOMNESS */
     protected final FastRandom _random;
 
+    /* TIME EVENT */
+    protected FastList<WorldTimeEvent> _worldTimeEvents = new FastList<WorldTimeEvent>();
+
     /**
      * Initializes a new world.
      *
@@ -72,13 +75,13 @@ public class LocalWorldProvider {
         if (title == null) {
             throw new IllegalArgumentException("No title provided.");
         } else if (title.isEmpty()) {
-            throw new IllegalArgumentException("No title provided.");
+            throw new IllegalArgumentException("Empty title provided.");
         }
 
         if (seed == null) {
             throw new IllegalArgumentException("No seed provided.");
         } else if (seed.isEmpty()) {
-            throw new IllegalArgumentException("No seed provided.");
+            throw new IllegalArgumentException("Empty seed provided.");
         }
 
         _title = title;
@@ -406,20 +409,6 @@ public class LocalWorldProvider {
     }
 
     /**
-     * @return True if its daytime
-     */
-    public boolean isDaytime() {
-        return getTime() > 0.075f && getTime() < 0.575;
-    }
-
-    /**
-     * @return True if its nighttime
-     */
-    public boolean isNighttime() {
-        return !isDaytime();
-    }
-
-    /**
      * Finds a spawning point.
      *
      * @return The spawning point.
@@ -568,6 +557,40 @@ public class LocalWorldProvider {
      */
     public void setTime(double time) {
         _creationTime = Blockmania.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
+    }
+
+        /**
+     * Adds a time event to the list.
+     *
+     * @param e
+     */
+    public void addWorldTimeEvent(WorldTimeEvent e) {
+         _worldTimeEvents.add(e);
+    }
+
+    /**
+     * Removes a time event from the list.
+     *
+     * @param e
+     */
+    public void removeWorldTimeEvent(WorldTimeEvent e) {
+         _worldTimeEvents.remove(e);
+    }
+
+    /**
+     * Executes all time events which event times equal a specified delta value.
+     */
+    public void fireWorldTimeEvents() {
+        for (int i=_worldTimeEvents.size() - 1; i>=0; i--) {
+            WorldTimeEvent event = _worldTimeEvents.get(i);
+
+            if (Math.abs(getTime() % 1.0 - event.getExecutionTime()) < 0.001) {
+                event.Execute();
+            }
+
+            if (!event.repeatingEvent)
+                _worldTimeEvents.remove(i);
+        }
     }
 
     public ChunkCache getChunkCache() {
