@@ -2,6 +2,7 @@
 varying	vec4 	McPosition;
 varying	vec3 	colorYxy;
 varying vec3    skyVec;
+varying vec3    cloudVec;
 varying float   lv;
 uniform	vec4 	  sunPos;
 uniform float	sunAngle;
@@ -56,7 +57,7 @@ void main(void)
   vec3 l               = normalize ( sunPos.xyz );
   lv                   = dot  ( l, v );
   skyVec               = r * v.xyz;
-
+  cloudVec             = 0.1*gl_Vertex.xyz;
   colorYxy             = allweatherSky ( turbidity, abs(v.y)+0.35, lv, l.y );
   McPosition           = gl_Vertex;
 	gl_Position          = gl_ModelViewProjectionMatrix * gl_Vertex;

@@ -30,7 +30,8 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-
+import java.util.Random;
+import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -51,6 +52,7 @@ public class Skysphere implements RenderableObject {
     /*Clouds*/
     private int _noiseMatrixSize    = 8;
     private Vector3f[] _noisePermutations;
+    private Random rand = new Random();
     //private final PerlinNoise _pGen = new PerlinNoise(7);
     
     
@@ -74,7 +76,7 @@ public class Skysphere implements RenderableObject {
         glEnable(GL12.GL_TEXTURE_3D);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
         GL11.glBindTexture(GL12.GL_TEXTURE_3D, textureCloudsId.get(0));
-        
+        //      GL11.glTexParameteri ( GL12.GL_TEXTURE_3D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, 8 );
         //float sunPosInRadians = (float)Math.toRadians(180*(_time-0.075));
         _sunPosAngle = 5.3f * (float) _parent.getTime() - 1.4f;
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
@@ -184,7 +186,7 @@ public class Skysphere implements RenderableObject {
       Vector3f tempVector = new Vector3f();
       
       _noisePermutations = new Vector3f [512];
-      FastRandom rand    = new FastRandom(42);
+   //   FastRandom rand    = new FastRandom(42);
 
       int j = 0;
       int i = 0;
@@ -193,19 +195,13 @@ public class Skysphere implements RenderableObject {
       {
         _noisePermutations[i] = new Vector3f();
 
-        j = rand.randomInt()%256;
-        j = (j < 0) ? -j : j;
-        _noisePermutations[i].x = j;
+        _noisePermutations[i].x = rnd();
 
-        j = rand.randomInt()%256;
-        j = (j < 0) ? -j : j;
-        _noisePermutations[i].y = j;
+        _noisePermutations[i].y = rnd();
 
-        j = rand.randomInt()%256;
-        j = (j < 0) ? -j : j;
-        _noisePermutations[i].z = j;
+        _noisePermutations[i].z = rnd();
         
-        System.out.println("Test array [" + i + "] " + _noisePermutations[i]);
+       // System.out.println("Test array [" + i + "] " + _noisePermutations[i]);
       }
 
       ByteBuffer image = BufferUtils.createByteBuffer(width*height*depth*3);
@@ -271,7 +267,7 @@ public class Skysphere implements RenderableObject {
         x &= _noiseMatrixSize - 1;
         y &= _noiseMatrixSize - 1;
         z &= _noiseMatrixSize - 1;
-        if(_counter<=256){
+        /*if(_counter<=256){
           System.out.println("Test coord " + x + " " + y + " " + z);
           System.out.println("Test index " + (z*_noiseMatrixSize*_noiseMatrixSize + y*_noiseMatrixSize + x));
           System.out.println("Test value " + (_noisePermutations [z*_noiseMatrixSize*_noiseMatrixSize + y*_noiseMatrixSize + x]));
@@ -280,9 +276,10 @@ public class Skysphere implements RenderableObject {
             System.out.println("Out");
           }
           _counter++;
-        }
+        }*/
+        Vector3f temp = new Vector3f(_noisePermutations[z*_noiseMatrixSize*_noiseMatrixSize + y*_noiseMatrixSize + x]);
         
-        return _noisePermutations[z*_noiseMatrixSize*_noiseMatrixSize + y*_noiseMatrixSize + x];
+        return temp;
     }
     
     private float drop ( float t ){
@@ -295,5 +292,8 @@ public class Skysphere implements RenderableObject {
         return 0.0f;
     }
     
-    private int _counter = 0;
+   private float rnd (){
+        return 2*(float) rand.nextDouble() - 1;
+   }
+
 }
