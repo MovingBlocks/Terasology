@@ -50,7 +50,7 @@ public final class Configuration {
     /**
      * The display mode used for window mode.
      */
-    public static final DisplayMode DISPLAY_MODE = new DisplayMode(380, 240);
+    public static final DisplayMode DISPLAY_MODE = new DisplayMode(1024, 768);
     /**
      * If set to true, the game is rendered as a full screen application.
      */

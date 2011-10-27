@@ -115,7 +115,7 @@ public final class World extends LocalWorldProvider {
         _player.applyPlayerModelViewMatrix();
         _player.render();
 
-        //renderChunks();
+        renderChunks();
 
         /* CLOUDS */
         //_clouds.render();

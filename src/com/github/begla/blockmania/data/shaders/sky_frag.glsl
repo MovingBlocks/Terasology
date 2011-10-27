@@ -55,7 +55,7 @@ void main ()
        const	vec4	cloudColor     = vec4 ( 1.0, 1.0, 1.0, 1.0 );
        vec3 v               = normalize ( McPosition.xyz );
        const	float	cloudDensity1  = 3.5;
-       vec3	n1  = clouds ( 0.6*cloudVec, 30.0*time, vec2 ( 0.29, 0.109 ) ); 
+       vec3	n1  = clouds ( 0.2*cloudVec, 30.0*time, vec2 ( 0.29, 0.109 ) ); 
        
        if(v.y>-0.35){
         vec3 l                  = normalize ( sunPos.xyz );
