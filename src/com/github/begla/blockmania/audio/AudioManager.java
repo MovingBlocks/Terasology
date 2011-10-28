@@ -96,6 +96,15 @@ public class AudioManager {
     }
 
     /**
+     * Stops all audio instances.
+     */
+    public void stopAllSounds() {
+       for (Audio a : _audioFiles.values()) {
+            a.stop();
+       }
+    }
+
+    /**
      * Returns the stored audio file with the given name.
      *
      * @param s The name of the audio file

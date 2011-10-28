@@ -374,6 +374,8 @@ public final class World extends LocalWorldProvider {
 
         saveMetaData();
         getChunkCache().saveAndDisposeAllChunks();
+
+        AudioManager.getInstance().stopAllSounds();
     }
 
     /**
@@ -424,7 +426,6 @@ public final class World extends LocalWorldProvider {
      * @return
      */
     public double getActiveHumidity() {
-
         return getHumidityAt((int) _player.getPosition().x, (int) _player.getPosition().z);
     }
 
