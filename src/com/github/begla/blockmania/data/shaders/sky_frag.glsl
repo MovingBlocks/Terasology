@@ -33,29 +33,37 @@ vec3	convertColor ()
 	return	vec3 ( dot ( rCoeffs, XYZ ), dot ( gCoeffs, XYZ ), dot ( bCoeffs, XYZ ));
 }
 
-vec3	clouds ( const vec3 tex, float t, const vec2 vel )
+vec4	density ( vec4 v, float d  )
 {
-  vec3 	dt   = vec3 ( vel, 0.061 ) * t;
-  vec3 	tex1 = tex + dt; 
-	vec3	n1   = texture3D ( noiseMap, tex1       ).xyz / 2.0;
-	vec3	n2   = texture3D ( noiseMap, tex1 * 2.0 ).xyz / 4.0;
-	vec3	n3   = texture3D ( noiseMap, tex1 * 4.0 ).xyz / 8.0;
-	vec3	n4   = texture3D ( noiseMap, tex1 * 8.0 ).xyz / 16.0;
-	
-	return (n1 + n2 + n3 + n4) / (0.5 + 0.25 + 0.125 + 0.0625 );		// return normalized sum
+        
+	return clamp ( vec4((1.0 + d)*pow ( v.x, 2.0 ) - 0.3,(1.0 + d)*pow ( v.y, 2.0 ) - 0.3,(1.0 + d)*pow ( v.z, 2.0 ) - 0.3,(1.0 + d)*pow ( v.a, 2.0 ) - 0.3),
+                        vec4( 0.0,0.0,0.0,0.0 ), vec4( 1.0,1.0,1.0,0.8 ) );
 }
 
-float	density ( float v, float d  )
+vec4	clouds ( const vec3 tex, float t, const vec3 vel )
 {
-	return clamp ( (1.0 + d)*pow ( v, 4.0 ) - 0.3, 0.0, 1.0 );
+    vec3 	dt   = vel * t;
+    vec3 	tex1 = tex + dt; 
+    vec4	n1   = texture3D ( noiseMap, tex1.xyz       ) / 2.0;
+    vec4	n2   = texture3D ( noiseMap, tex1.xyz * 2.0 ) / 4.0;
+    vec4	n3   = texture3D ( noiseMap, tex1.xyz * 4.0 ) / 8.0;
+    vec4	n4   = texture3D ( noiseMap, tex1.xyz * 8.0 ) / 16.0;
+    vec4	n5   = texture3D ( noiseMap, tex1.xyz * 16.0 ) / 32.0;
+
+    vec4 result = (n1 + n2 + n3 + n4 + n5 )/(0.8 );		// return normalized sum
+    const	float	cloudDensity1  = 2.5;
+
+    return mix ( vec4(0.0, 0.0, 0.0, 0.0), vec4(1.0, 1.0, 1.0, 1.0), density(result, cloudDensity1) );
+     
 }
+
+
 
 void main ()
 {
        const	vec4	cloudColor     = vec4 ( 1.0, 1.0, 1.0, 1.0 );
        vec3 v               = normalize ( McPosition.xyz );
-       const	float	cloudDensity1  = 3.5;
-       vec3	n1  = clouds ( 0.2*cloudVec, 30.0*time, vec2 ( 0.29, 0.109 ) ); 
+       
        
        if(v.y>-0.35){
         vec3 l                  = normalize ( sunPos.xyz );
@@ -65,9 +73,49 @@ void main ()
         vec4	skyColor          = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight + largeSunHighlight, 1.0 );
         float	alpha             = 0.75 * (1.2 - lv);
         //skyColor               += alpha*textureCube ( tex, skyVec );
-        gl_FragColor   =  texture3D ( noiseMap, cloudVec ); 
+        vec4	n1  = clouds ( 0.6112*cloudVec, time*0.05, vec3 ( 0.29987, 0.101123, 0.0 ) ); 
 
-	gl_FragColor = mix ( skyColor, cloudColor, density ( n1.x, cloudDensity1 ) );
+
+        float alphaCloud = n1.a;
+        vec4 ResColor = vec4(1.0, 1.0, 1.0, 1.0);
+        
+        if(sunPos.y<=0.5){
+            ResColor = mix(vec4(1.0,0.7,0.7, 1.0),vec4(1.0,1.0,1.0,1.0),sunPos.y*(1.0/0.5));
+        }else{
+            if(sunPos.y<=0.0){
+                ResColor = skyColor + vec4(0.1, 0.1, 0.1, 1.0);
+            }
+        }
+
+        //UNIFORM!!!
+        float hazeTopAltitude = 50.0;
+
+        alphaCloud = mix(alphaCloud/2.0, alphaCloud, alphaCloud);
+        
+        vec3 SunD=sunPos.xyz;
+
+/*Temprorery*/
+ //   vec3 	dt   = vec3 (  0.2, 0.1 , 0.061 ) * 30.0*time;
+  //  vec3 	tex1 = tex + dt; 
+
+        vec3 sunDirection   = normalize (SunD) ;
+    
+       /* vec3 absorption = skyColor.xyz+0.1;*/
+        vec4	n2;
+        for (float i=0.0; i<6.0; i+=1.0)
+        {
+            n2  += clouds ( ( 0.6112*cloudVec - sunDirection)*0.1*i , time*0.05,vec3 ( 0.29987, 0.101123, 0.0 )  ); 
+
+        }  
+
+  //      float Tmp = texture3D( noiseMap,  0.2*cloudVec+sunDirection).a;
+
+      /// vec4	n2  = clouds ( 0.6112*cloudVec - sunDirection, time*0.05, vec3 ( 0.0, 0.0, 0.0 )  ); 
+       float Tmp = n2.a*0.45;
+        vec4 attenuation = (1.0 - clamp ((1.0-skyColor*0.5) * Tmp, 0.0, 1.0));
+        ResColor *= attenuation;
+        //ResColor.xyz += absorption;
+	gl_FragColor = skyColor + ResColor;
        }else{
         gl_FragColor = vec4	( 0.0, 0.0, 0.0, 1.0);
        }

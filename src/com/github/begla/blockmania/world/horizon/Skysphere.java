@@ -33,6 +33,7 @@ import java.nio.IntBuffer;
 import java.util.Random;
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import static org.lwjgl.opengl.GL11.*;
+import com.github.begla.blockmania.noise.PerlinNoise;
 
 /**
  * @author Anthony Kireev <adeon.k87@gmail.com>
@@ -53,7 +54,7 @@ public class Skysphere implements RenderableObject {
     private int _noiseMatrixSize    = 8;
     private Vector3f[] _noisePermutations;
     private Random rand = new Random();
-    //private final PerlinNoise _pGen = new PerlinNoise(7);
+    private final PerlinNoise _pGen  = new PerlinNoise(7);
     
     
     public Skysphere(World parent) {
@@ -183,15 +184,15 @@ public class Skysphere implements RenderableObject {
       float   dx      = (float) _noiseMatrixSize / (float) width;
       float   dy      = (float) _noiseMatrixSize / (float) height;
       float   dz      = (float) _noiseMatrixSize / (float) depth;
-      Vector3f tempVector = new Vector3f();
+     // Vector3f tempVector = new Vector3f();
       
-      _noisePermutations = new Vector3f [512];
+    //  _noisePermutations = new Vector3f [512];
    //   FastRandom rand    = new FastRandom(42);
 
       int j = 0;
       int i = 0;
 
-      for ( i = 0; i < 512; i++ )
+    /*  for ( i = 0; i < 512; i++ )
       {
         _noisePermutations[i] = new Vector3f();
 
@@ -202,17 +203,19 @@ public class Skysphere implements RenderableObject {
         _noisePermutations[i].z = rnd();
         
        // System.out.println("Test array [" + i + "] " + _noisePermutations[i]);
-      }
+      }*/
 
-      ByteBuffer image = BufferUtils.createByteBuffer(width*height*depth*3);
+      ByteBuffer image = BufferUtils.createByteBuffer(width*height*depth*4);
 
       for ( i = 0; i < width; i++ ){
           for ( j = 0; j < height; j++ ){
               for ( int k = 0; k < depth; k++ ){
-                tempVector.set(noise3D(i * dx, j * dy, k * dz));
-                image.put((byte)((tempVector.x + 1)*0.5*255.0));
-                image.put((byte)((tempVector.y + 1)*0.5*255.0));
-                image.put((byte)((tempVector.z + 1)*0.5*255.0));
+               // tempVector.set(noise3D());
+                //tempVector.x = ;
+                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
+                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
+                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
+                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
               }
           }
       }
@@ -231,7 +234,7 @@ public class Skysphere implements RenderableObject {
 
       glPixelStorei   ( GL_UNPACK_ALIGNMENT, 1 );
 
-      GL12.glTexImage3D( GL12.GL_TEXTURE_3D, 0, GL_RGB, width, height, depth, 0, GL_RGB,
+      GL12.glTexImage3D( GL12.GL_TEXTURE_3D, 0, GL_RGBA, width, height, depth, 0, GL_RGBA,
                       GL_UNSIGNED_BYTE, image );
 
     }
