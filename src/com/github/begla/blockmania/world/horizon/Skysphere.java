@@ -33,6 +33,7 @@ import java.nio.IntBuffer;
 import java.util.Random;
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import static org.lwjgl.opengl.GL11.*;
+import com.github.begla.blockmania.noise.PerlinNoise;
 
 /**
  * @author Anthony Kireev <adeon.k87@gmail.com>
@@ -54,7 +55,7 @@ public class Skysphere implements RenderableObject {
     private int _noiseMatrixSize    = 8;
     private Vector3f[] _noisePermutations;
     private Random rand = new Random();
-    //private final PerlinNoise _pGen = new PerlinNoise(7);
+    private final PerlinNoise _pGen  = new PerlinNoise(7);
     
     
     public Skysphere(World parent) {
@@ -188,44 +189,23 @@ public class Skysphere implements RenderableObject {
         }
     }
     
-    private void generateCloudsTexture(){
-    
-    }
-    
     private void createCloudsTexture3D(int width, int height, int depth){
       float   dx      = (float) _noiseMatrixSize / (float) width;
       float   dy      = (float) _noiseMatrixSize / (float) height;
       float   dz      = (float) _noiseMatrixSize / (float) depth;
-      Vector3f tempVector = new Vector3f();
-      
-      _noisePermutations = new Vector3f [512];
-   //   FastRandom rand    = new FastRandom(42);
 
       int j = 0;
       int i = 0;
 
-      for ( i = 0; i < 512; i++ )
-      {
-        _noisePermutations[i] = new Vector3f();
-
-        _noisePermutations[i].x = rnd();
-
-        _noisePermutations[i].y = rnd();
-
-        _noisePermutations[i].z = rnd();
-        
-       // System.out.println("Test array [" + i + "] " + _noisePermutations[i]);
-      }
-
-      ByteBuffer image = BufferUtils.createByteBuffer(width*height*depth*3);
+      ByteBuffer image = BufferUtils.createByteBuffer(width*height*depth*4);
 
       for ( i = 0; i < width; i++ ){
           for ( j = 0; j < height; j++ ){
               for ( int k = 0; k < depth; k++ ){
-                tempVector.set(noise3D(i * dx, j * dy, k * dz));
-                image.put((byte)((tempVector.x + 1)*0.5*255.0));
-                image.put((byte)((tempVector.y + 1)*0.5*255.0));
-                image.put((byte)((tempVector.z + 1)*0.5*255.0));
+                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
+                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
+                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
+                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
               }
           }
       }
@@ -244,69 +224,8 @@ public class Skysphere implements RenderableObject {
 
       glPixelStorei   ( GL_UNPACK_ALIGNMENT, 1 );
 
-      GL12.glTexImage3D( GL12.GL_TEXTURE_3D, 0, GL_RGB, width, height, depth, 0, GL_RGB,
+      GL12.glTexImage3D( GL12.GL_TEXTURE_3D, 0, GL_RGBA, width, height, depth, 0, GL_RGBA,
                       GL_UNSIGNED_BYTE, image );
 
     }
-    
-    private Vector3f noise3D (float x, float y, float z ){
-        int ip  = (int) Math.floor( x );
-        int jp  = (int) Math.floor ( y );
-        int kp  = (int) Math.floor ( z );
-        Vector3f  sum     = new Vector3f();
-        Vector3f  tVector = new Vector3f();
-
-        for ( int i = ip; i <= ip + 1; i++ ){
-            for ( int j = jp; j <= jp + 1; j++ ){
-                for ( int k = kp; k <= kp + 1; k++ ){
-                    tVector = omega ( i, j, k, new Vector3f ( x - i, y - j, z - k));
-                    Vector3f.add(sum, tVector, sum);
-                }
-            }
-        }
-
-        return sum;
-    }
-    
-    private Vector3f omega ( int i, int j, int k, Vector3f pt ){
-       Vector3f temprorary = n2D ( i, j, k );
-       temprorary.scale(drop(pt.x));
-       temprorary.scale(drop(pt.y));
-       temprorary.scale(drop(pt.z));
-       return  temprorary;
-    }
-    
-    private Vector3f n2D(int x, int y, int z){
-        x &= _noiseMatrixSize - 1;
-        y &= _noiseMatrixSize - 1;
-        z &= _noiseMatrixSize - 1;
-        /*if(_counter<=256){
-          System.out.println("Test coord " + x + " " + y + " " + z);
-          System.out.println("Test index " + (z*_noiseMatrixSize*_noiseMatrixSize + y*_noiseMatrixSize + x));
-          System.out.println("Test value " + (_noisePermutations [z*_noiseMatrixSize*_noiseMatrixSize + y*_noiseMatrixSize + x]));
-
-          if((z*_noiseMatrixSize*_noiseMatrixSize + y*_noiseMatrixSize + x)>511){
-            System.out.println("Out");
-          }
-          _counter++;
-        }*/
-        Vector3f temp = new Vector3f(_noisePermutations[z*_noiseMatrixSize*_noiseMatrixSize + y*_noiseMatrixSize + x]);
-        
-        return temp;
-    }
-    
-    private float drop ( float t ){
-        float tA = (float) Math.abs ( t );
-
-        if ( tA <= 1 ){
-            return 1 - tA*tA*tA*(10 - 15*tA + 6*tA*tA);
-        }
-
-        return 0.0f;
-    }
-    
-   private float rnd (){
-        return 2*(float) rand.nextDouble() - 1;
-   }
-
 }
