@@ -429,16 +429,13 @@ public final class Blockmania {
         // Try to parse the input
         try {
             if (parsingResult.get(0).equals("place")) {
-                if (parsingResult.get(1).equals("tree")) {
-                    _world.getPlayer().plantTree(Integer.parseInt(parsingResult.get(2)));
-                    success = true;
-                } else if (parsingResult.get(1).equals("block")) {
+                if (parsingResult.get(1).equals("block")) {
                     _world.getPlayer().placeBlock(Byte.parseByte(parsingResult.get(2)));
                     success = true;
                 }
             } else if (parsingResult.get(0).equals("set")) {
                 if (parsingResult.get(1).equals("time")) {
-                    _world.setTime(Float.parseFloat(parsingResult.get(2)));
+                    _world.getWorldProvider().setTime(Float.parseFloat(parsingResult.get(2)));
                     success = true;
                     // Otherwise try lookup the given variable within the settings
                 } else {

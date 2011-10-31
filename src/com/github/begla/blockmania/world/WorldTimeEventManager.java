@@ -24,9 +24,9 @@ import javolution.util.FastList;
 public class WorldTimeEventManager {
 
     protected FastList<WorldTimeEvent> _worldTimeEvents = new FastList<WorldTimeEvent>();
-    protected LocalWorldProvider _parent;
+    protected WorldProvider _parent;
 
-    public WorldTimeEventManager(LocalWorldProvider parent) {
+    public WorldTimeEventManager(WorldProvider parent) {
         _parent = parent;
     }
 

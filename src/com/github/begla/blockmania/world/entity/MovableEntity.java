@@ -24,10 +24,10 @@ import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.WorldProvider;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.Audio;
-import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
 
@@ -123,9 +123,9 @@ public abstract class MovableEntity extends Entity {
         if ((MathHelper.fastAbs(_velocity.x) > 0.01 || MathHelper.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
                 Vector3f playerDirection = directionOfOrigin();
-                _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getRandom().randomInt()) % 5];
+                _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
 
-                _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, 0.05f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.1f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+                _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.05f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.1f, false, playerDirection.x, playerDirection.y, playerDirection.z);
             } else {
                 if (!_currentFootstepSound.isPlaying()) {
                     _currentFootstepSound = null;
@@ -153,7 +153,7 @@ public abstract class MovableEntity extends Entity {
         FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
         for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
-            byte blockType1 = _parent.getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
+            byte blockType1 = _parent.getWorldProvider().getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
             AABB entityAABB = getAABB();
 
             if (BlockManager.getInstance().getBlock(blockType1).isPenetrable() || !entityAABB.overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z)))
@@ -212,7 +212,7 @@ public abstract class MovableEntity extends Entity {
 
         // Check each block position for collision
         for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
-            byte blockType = _parent.getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
+            byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
             AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
 
             if (!BlockManager.getInstance().getBlock(blockType).isPenetrable()) {
@@ -331,7 +331,7 @@ public abstract class MovableEntity extends Entity {
                     // Entity reaches the ground
                     if (_touchingGround == false) {
                         Vector3f playerDirection = directionOfOrigin();
-                        _footstepSounds[MathHelper.fastAbs(_parent.getRandom().randomInt()) % 5].playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+                        _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5].playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
                         _touchingGround = true;
                     }
                 } else {
@@ -377,7 +377,7 @@ public abstract class MovableEntity extends Entity {
         boolean swimming = false, headUnderWater = false;
 
         for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
-            byte blockType = _parent.getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
+            byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
             AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
 
             if (BlockManager.getInstance().getBlock(blockType).isLiquid() && getAABB().overlaps(blockAABB)) {
@@ -527,7 +527,7 @@ public abstract class MovableEntity extends Entity {
         return _headUnderWater;
     }
 
-    public LocalWorldProvider getParent() {
+    public World getParent() {
         return _parent;
     }
 }
