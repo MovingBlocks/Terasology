@@ -360,17 +360,18 @@ public final class Blockmania {
     }
 
     /*
-     * Process mouse input.
+     * Process mouse input - nothing system-y, so just passing it to the Player class
      */
     private void processMouseInput() {
         while (Mouse.next()) {
             int button = Mouse.getEventButton();
-            _world.getPlayer().processMouseInput(button, Mouse.getEventButtonState());
+            int wheelMoved = Mouse.getEventDWheel();
+            _world.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
         }
     }
 
     /**
-     * Processes keyboard input.
+     * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
     private void processKeyboardInput() {
         while (Keyboard.next()) {

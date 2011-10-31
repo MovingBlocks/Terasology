@@ -40,7 +40,7 @@ public class HUD implements RenderableObject {
     }
 
     /**
-     * A small rotating cube that servers as a HUD element.
+     * A small rotating cube that serves as a HUD element.
      */
     private void drawRotatingBlock() {
         glMatrixMode(GL_PROJECTION);
@@ -58,6 +58,36 @@ public class HUD implements RenderableObject {
         gluLookAt(0, 0, -25, 8f, 4.5f, 0, 0, 1, 0);
         glRotated(_cubeRotation % 360, 0, 1, 1);
         BlockManager.getInstance().getBlock(Blockmania.getInstance().getActiveWorld().getPlayer().getSelectedBlockType()).render();
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL11.GL_BLEND);
+
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+    }
+
+    /**
+     * A small rotating cube that serves as a second HUD element.
+     * TODO: Get it right rather than mimic :D
+     */
+    private void drawRotatingBlock2() {
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluPerspective(25f, (float) Configuration.ASPECT_RATIO, 0.1f, 32f);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+
+        glEnable(GL11.GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glAlphaFunc(GL_GREATER, 0.1f);
+        glDisable(GL_DEPTH_TEST);
+        gluLookAt(0, 0, -25, -8f, 4.5f, 0, 0, 1, 0);
+        glRotated(_cubeRotation % 360, 0, 1, 1);
+        // This only works by happenstance - selected tool slot will always be between 1 and 10 which coincidentally match to blocks
+        BlockManager.getInstance().getBlock((Blockmania.getInstance().getActiveWorld().getPlayer().getSelectedTool())).render();
         glEnable(GL_DEPTH_TEST);
         glDisable(GL11.GL_BLEND);
 
@@ -124,6 +154,8 @@ public class HUD implements RenderableObject {
 
         if (Configuration.getSettingBoolean("ROTATING_BLOCK")) {
             drawRotatingBlock();
+            drawRotatingBlock2();
+            //_toolBelt.render();
         }
     }
 

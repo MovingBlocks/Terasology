@@ -20,7 +20,9 @@ import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.gui.ToolBelt;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
+import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
@@ -32,6 +34,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.Collections;
+import java.util.logging.Level;
 
 /**
  * Extends the character class and provides support for player functionality. Also provides the
@@ -47,6 +50,9 @@ public final class Player extends Character {
     /* CAMERA */
     private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
     private Camera _activeCamera = _firstPersonCamera;
+
+    /** The ToolBelt is how the player interacts with tool events from mouse or keyboard */
+    private ToolBelt _toolBelt = new ToolBelt(this);
 
     public Player(World parent) {
         super(parent, Configuration.getSettingNumeric("WALKING_SPEED"), Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
@@ -203,7 +209,7 @@ public final class Player extends Character {
     /**
      * Removes a block.
      */
-    void removeBlock() {
+    public void removeBlock() {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
@@ -258,20 +264,58 @@ public final class Player extends Character {
                     jump();
                 }
                 break;
+            // Hot keys for selecting a tool bar slot
+            case Keyboard.KEY_1:
+                _toolBelt.setSelectedTool((byte) 1);
+                break;
+            case Keyboard.KEY_2:
+                _toolBelt.setSelectedTool((byte) 2);
+                break;
+            case Keyboard.KEY_3:
+                _toolBelt.setSelectedTool((byte) 3);
+                break;
+            case Keyboard.KEY_4:
+                _toolBelt.setSelectedTool((byte) 4);
+                break;
+            case Keyboard.KEY_5:
+                _toolBelt.setSelectedTool((byte) 5);
+                break;
+            case Keyboard.KEY_6:
+                _toolBelt.setSelectedTool((byte) 6);
+                break;
+            case Keyboard.KEY_7:
+                _toolBelt.setSelectedTool((byte) 7);
+                break;
+            case Keyboard.KEY_8:
+                _toolBelt.setSelectedTool((byte) 8);
+                break;
+            case Keyboard.KEY_9:
+                _toolBelt.setSelectedTool((byte) 9);
+                break;
+            case Keyboard.KEY_0:
+                _toolBelt.setSelectedTool((byte) 10);
+                break;
         }
     }
 
     /**
      * Processes the mouse input.
      *
-     * @param button Pressed mouse button
-     * @param state  State of the mouse button
+     * @param button        Pressed mouse button
+     * @param state         State of the mouse button
+     * @param wheelMoved    Distance the mouse wheel moved since last
      */
-    public void processMouseInput(int button, boolean state) {
+    public void processMouseInput(int button, boolean state, int wheelMoved) {
         if (button == 0 && state) {
-            placeBlock(_selectedBlockType);
+            //placeBlock(_selectedBlockType);
+            _toolBelt.activateTool(true);
         } else if (button == 1 && state) {
-            removeBlock();
+            //removeBlock();
+            _toolBelt.activateTool(false);
+        }
+        else if (wheelMoved != 0) {
+            Blockmania.getInstance().getLogger().log(Level.INFO, "Mouse wheel moved " + wheelMoved + " for button " + button + ", state " + state);
+            _toolBelt.rollSelectedTool((byte) (wheelMoved / 120));
         }
     }
 
@@ -355,6 +399,10 @@ public final class Player extends Character {
 
     public byte getSelectedBlockType() {
         return _selectedBlockType;
+    }
+
+    public byte getSelectedTool() {
+        return _toolBelt.getSelectedTool();
     }
 
     public Camera getActiveCamera() {
