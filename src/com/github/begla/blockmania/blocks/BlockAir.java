@@ -16,34 +16,20 @@
 package com.github.begla.blockmania.blocks;
 
 /**
- * An air block.
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockAir extends Block {
+    public BlockAir() {
+        _title = "Air";
 
-    @Override
-    public boolean isBlockTypeTranslucent() {
-        return true;
-    }
-
-    @Override
-    public boolean isBlockInvisible() {
-        return true;
-    }
-
-    @Override
-    public boolean isPenetrable() {
-        return true;
-    }
-
-    @Override
-    public boolean isCastingShadows() {
-        return false;
-    }
-
-    @Override
-    public boolean shouldRenderBoundingBox() {
-        return false;
+        _invisible = true;
+        _bypassSelectionRay = true;
+        _noTesselation = true;
+        _renderBoundingBox = false;
+        _translucent = true;
+        _hardness = 0;
+        _penetrable = true;
+        _castsShadows = false;
+        _allowBlockAttachment = false;
     }
 }

@@ -38,12 +38,13 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Anthony Kireev <adeon.k87@gmail.com>
  */
 public class Skysphere implements RenderableObject {
+    private static int _displayListSphere = -1;
+    private static final float PI = 3.1415926f, PI2 = 2 * PI, PIHALF = PI / 2;
 
-    private static final float PI = 3.1415926f;
     /* SKY */
     private float _turbidity = 10.0f, _sunPosAngle = 0.1f;
-    private Sphere _sphere = new Sphere();
     private Vector3f _zenithColor = new Vector3f();
+
     /*Stars*/
     public static IntBuffer textureId       = BufferUtils.createIntBuffer(1);
     public static IntBuffer textureCloudsId = BufferUtils.createIntBuffer(1);
@@ -58,27 +59,41 @@ public class Skysphere implements RenderableObject {
     
     public Skysphere(World parent) {
         _parent = parent;
-        loadStarTextures();
+        //loadStarTextures();
        
-        createCloudsTexture3D(64, 64, 64);
+       // createCloudsTexture3D(64, 64, 64);
+    }
+
+    private void drawSphere() {
+        if (_displayListSphere == -1) {
+            _displayListSphere = glGenLists(1);
+
+            Sphere sphere = new Sphere();
+            glNewList(_displayListSphere, GL11.GL_COMPILE);
+
+            sphere.draw(16, 8, 8);
+
+            glEndList();
+        }
+
+        glCallList(_displayListSphere);
     }
 
     public void render() {
         if (_parent.getPlayer().isHeadUnderWater())
             return;
 
-        _parent.getPlayer().applyNormalizedModelViewMatrix();
-
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
-        
+       
         glEnable(GL13.GL_TEXTURE_CUBE_MAP);
         glEnable(GL12.GL_TEXTURE_3D);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
         GL11.glBindTexture(GL12.GL_TEXTURE_3D, textureCloudsId.get(0));
         //      GL11.glTexParameteri ( GL12.GL_TEXTURE_3D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, 8 );
         //float sunPosInRadians = (float)Math.toRadians(180*(_time-0.075));
-        _sunPosAngle = 5.3f * (float) _parent.getTime() - 1.4f;
+
+        _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getTime() - 90.0);
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         sunNormalise = sunNormalise.normalise(null);
 
@@ -101,9 +116,7 @@ public class Skysphere implements RenderableObject {
         int zenith = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "zenith");
         GL20.glUniform3f(zenith, _zenithColor.x, _zenithColor.y, _zenithColor.z);
 
-        glPushMatrix();
-        _sphere.draw(22, 80, 80);
-        glPopMatrix();
+        drawSphere();
 
         ShaderManager.getInstance().enableShader(null);
         glDisable(GL12.GL_TEXTURE_3D);

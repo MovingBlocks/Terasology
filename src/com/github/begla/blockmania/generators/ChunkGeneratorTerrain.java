@@ -15,8 +15,10 @@
  */
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.MathHelper;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
@@ -33,8 +35,8 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         MOUNTAINS, SNOW, DESERT, FOREST, PLAINS
     }
 
-    public ChunkGeneratorTerrain(String seed) {
-        super(seed);
+    public ChunkGeneratorTerrain(LocalWorldProvider worldProvider) {
+        super(worldProvider);
     }
 
     @Override
@@ -70,17 +72,17 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                 for (int y = (int) Configuration.CHUNK_DIMENSIONS.y; y >= 0; y--) {
 
                     if (y == 0) { // Hard stone ground layer
-                        c.setBlock(x, y, z, (byte) 0x8);
+                        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Hard stone").getId());
                         break;
                     }
 
                     if (y <= 32 && y > 0) { // Ocean
-                        c.setBlock(x, y, z, (byte) 0x4);
+                        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Water").getId());
 
                         if (y == 32) {
                             // Ice layer
                             if (type == BIOME_TYPE.SNOW)
-                                c.setBlock(x, y, z, (byte) 0x11);
+                                c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Ice").getId());
                         }
                     }
 
@@ -94,6 +96,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                         if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.6)
                             GenerateOuterLayer(x, y, z, firstBlockHeight, c, type);
+                        else
+                            c.setBlock(x, y, z, (byte) 0x0);
+
                         continue;
                     } else if (dens >= 64) {
 
@@ -101,8 +106,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.6)
+                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.2)
                             GenerateInnerLayer(x, y, z, c, type);
+                        else
+                            c.setBlock(x, y, z, (byte) 0x0);
 
                         continue;
                     }
@@ -135,7 +142,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     protected void GenerateInnerLayer(int x, int y, int z, Chunk c, BIOME_TYPE type) {
-        c.setBlock(x, y, z, (byte) 0x3);
+        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
     }
 
     protected void GenerateOuterLayer(int x, int y, int z, int firstBlockHeight, Chunk c, BIOME_TYPE type) {
@@ -148,16 +155,16 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             case MOUNTAINS:
                 // Beach
                 if (y >= 28 && y <= 34) {
-                    c.setBlock(x, y, z, (byte) 0x7);
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Sand").getId());
                 } else if (depth == 0 && y > 32) {
                     // Grass on top
-                    c.setBlock(x, y, z, (byte) 0x1);
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Grass").getId());
                 } else if (depth > 8) {
                     // Stone
-                    c.setBlock(x, y, z, (byte) 0x3);
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
                 } else {
                     // Dirt
-                    c.setBlock(x, y, z, (byte) 0x2);
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt").getId());
                 }
 
                 if (type == BIOME_TYPE.PLAINS || type == BIOME_TYPE.FOREST)
@@ -167,13 +174,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                 if (depth == 0.0 && y > 32) {
                     // Snow on top
-                    c.setBlock(x, y, z, (byte) 0x17);
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Snow").getId());
                 } else if (depth > 8) {
                     // Stone
-                    c.setBlock(x, y, z, (byte) 0x3);
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
                 } else {
                     // Dirt
-                    c.setBlock(x, y, z, (byte) 0x2);
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt").getId());
                 }
 
                 generateRiver(c, x, y, z, depth, type);
@@ -182,9 +189,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             case DESERT:
                 if (depth > 8) {
                     // Stone
-                    c.setBlock(x, y, z, (byte) 0x3);
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
                 } else {
-                    c.setBlock(x, y, z, (byte) 0x7);
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Sand").getId());
                 }
 
                 break;
@@ -203,9 +210,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             c.setBlock(x, y, z, (byte) 0x0);
         } else if (lakeIntens < 0.2 && depth >= 2 && depth < 8) {
             if (type == BIOME_TYPE.SNOW) {
-                c.setBlock(x, y, z, (byte) 0x11);
+                c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Ice").getId());
             } else {
-                c.setBlock(x, y, z, (byte) 0x04);
+                c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Water").getId());
             }
         }
     }
@@ -274,12 +281,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             result += _pGen5.noise(x1 * freq[i] + perturb, y1 * freq[i] + perturb, z1 * freq[i] + perturb) * amp[i];
         }
 
-        return Math.abs(result);
+        return MathHelper.fastAbs(result);
     }
 
     public double calcLakeIntensity(double x, double z) {
         double result = _pGen2.fBm(x * 0.004, 0, 0.004 * z, 4, 2.1836171, 0.7631);
-        return Math.sqrt(Math.abs(result));
+        return Math.sqrt(MathHelper.fastAbs(result));
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {

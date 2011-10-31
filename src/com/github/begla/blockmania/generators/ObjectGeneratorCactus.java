@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 
 /**
@@ -24,10 +25,9 @@ public class ObjectGeneratorCactus extends ObjectGenerator {
 
     /**
      * @param w
-     * @param seed
      */
-    public ObjectGeneratorCactus(LocalWorldProvider w, String seed) {
-        super(w, seed);
+    public ObjectGeneratorCactus(LocalWorldProvider w) {
+        super(w);
     }
 
     /**
@@ -40,7 +40,7 @@ public class ObjectGeneratorCactus extends ObjectGenerator {
     @Override
     public void generate(int posX, int posY, int posZ, boolean update) {
         for (int y = posY; y < posY + 3; y++) {
-            _worldProvider.setBlock(posX, y, posZ, (byte) 0x18, update, true);
+            _worldProvider.setBlock(posX, y, posZ, BlockManager.getInstance().getBlock("Cactus").getId(), update, true);
         }
     }
 }

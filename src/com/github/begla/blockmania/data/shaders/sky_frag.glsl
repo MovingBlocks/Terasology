@@ -10,11 +10,11 @@ uniform	sampler3D	noiseMap;
 vec4 	eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
 uniform	vec4 	sunPos;
-float	colorExp = 25.0;
+float	colorExp = 6.0;
 
 vec3	convertColor ()
 {
-	vec3	clrYxy = vec3 ( colorYxy );
+	vec3 clrYxy = vec3 ( colorYxy );
 
 	clrYxy [0] = 1.0 - exp ( -clrYxy [0] / colorExp );
 
@@ -52,6 +52,7 @@ float	density ( float v, float d  )
 
 void main ()
 {
+
        const	vec4	cloudColor     = vec4 ( 1.0, 1.0, 1.0, 1.0 );
        vec3 v               = normalize ( McPosition.xyz );
        const	float	cloudDensity1  = 3.5;
@@ -65,10 +66,10 @@ void main ()
         vec4	skyColor          = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight + largeSunHighlight, 1.0 );
         float	alpha             = 0.75 * (1.2 - lv);
         //skyColor               += alpha*textureCube ( tex, skyVec );
-        gl_FragColor   =  texture3D ( noiseMap, cloudVec ); 
+        //gl_FragColor   =  texture3D ( noiseMap, cloudVec ); 
 
-	gl_FragColor = mix ( skyColor, cloudColor, density ( n1.x, cloudDensity1 ) );
+        gl_FragColor = mix ( skyColor, cloudColor, density ( n1.x, cloudDensity1 ) );
        }else{
         gl_FragColor = vec4	( 0.0, 0.0, 0.0, 1.0);
-       }
+   }
 }

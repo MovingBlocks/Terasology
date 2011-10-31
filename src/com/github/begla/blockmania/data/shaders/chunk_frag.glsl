@@ -49,14 +49,15 @@ void main(){
     }
 
     // FETCH LIGHT VALUES
-    vec2 lightCoord = vec2(gl_TexCoord[1]);
+    vec3 lightCoord = vec3(gl_TexCoord[1]);
 
     // CALCULATE DAYLIGHT AND BLOCKLIGHT
-    float daylightValue = clamp(daylightTrans + 0.4, 0.0, 1.0) * pow(0.82, (1.0-lightCoord.x)*15.0);
+    float daylightValue = clamp(daylightTrans + 0.2, 0.0, 1.0) * pow(0.86, (1.0-lightCoord.x)*15.0);
     float blocklightValue = lightCoord.y;
+    float occlusionValue = lightCoord.z;
 
-    vec3 daylightColorValue = vec3(daylightValue);
-    vec3 blocklightColorValue = vec3(blocklightValue);
+    vec3 daylightColorValue = vec3(daylightValue) * occlusionValue;
+    vec3 blocklightColorValue = vec3(blocklightValue) * occlusionValue;
 
     blocklightColorValue = clamp(blocklightColorValue,0.0,1.0);
     daylightColorValue = clamp(daylightColorValue, 0.0, 1.0);
@@ -68,10 +69,10 @@ void main(){
     color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
     if (!swimming) {
-        gl_FragColor.rgb = linearToSrgb(color).rgb;
+        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.95,0.95,1.0,1.0) * daylightTrans, clamp(fog,0.0,0.125)).rgb;
         gl_FragColor.a = color.a;
     } else {
-        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.0,0.0,0.0,1.0) * daylightTrans, clamp(fog*16.0,0.0,1.0)).rgb;
+        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.0,0.0,0.0,1.0), fog*16.0).rgb;
         gl_FragColor.rg *= 0.4;
         gl_FragColor.b *= 0.7;
         gl_FragColor.a = 1.0;

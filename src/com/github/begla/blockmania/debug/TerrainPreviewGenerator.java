@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.debug;
 
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -30,17 +31,14 @@ import java.io.IOException;
  */
 public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
-    private static int zoomOut = 1;
+    private static int zoomOut = 8;
 
-    /**
-     * @param seed
-     */
-    public TerrainPreviewGenerator(String seed) {
-        super(seed);
+    public TerrainPreviewGenerator(LocalWorldProvider worldProvider) {
+        super(worldProvider);
     }
 
     public static void main(String[] args) {
-        TerrainPreviewGenerator gen = new TerrainPreviewGenerator("abcd");
+        TerrainPreviewGenerator gen = new TerrainPreviewGenerator(new LocalWorldProvider("World1", "abcde"));
         gen.generateBaseTerrainImage();
         gen.generateBiomeMap();
         gen.generateDensityImage();

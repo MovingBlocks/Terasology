@@ -52,7 +52,6 @@ public class TextureManager {
             _textures.put("custom_lava_flowing", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/custom_lava_flowing.png").openStream(), GL_NEAREST));
             _textures.put("custom_water_flowing", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/custom_water_flowing.png").openStream(), GL_NEAREST));
             _textures.put("terrain", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/terrain.png").openStream(), GL_NEAREST));
-            _textures.put("sun", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/sun.png").openStream(), GL_NEAREST));
             _textures.put("moon", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/moon.png").openStream(), GL_NEAREST));
             _textures.put("slime", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/slime.png").openStream(), GL_NEAREST));
 

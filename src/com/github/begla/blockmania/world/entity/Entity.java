@@ -27,7 +27,8 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public abstract class Entity implements RenderableObject {
 
-    protected Vector3f _position = new Vector3f();
+    protected final Vector3f _spawningPoint = new Vector3f();
+    protected final Vector3f _position = new Vector3f();
 
     /**
      * Returns the position of the entity.
@@ -45,6 +46,38 @@ public abstract class Entity implements RenderableObject {
      */
     public void setPosition(Vector3f position) {
         _position.set(position);
+    }
+
+    /**
+     * Sets the spawning point of the entity.
+     *
+     * @param spawningPoint The spawning point
+     */
+    public void setSpawningPoint(Vector3f spawningPoint) {
+        _spawningPoint.set(spawningPoint);
+    }
+
+    /**
+     * Returns the spawning point.
+     *
+     * @return The spawning point
+     */
+    public Vector3f getSpawningPoint() {
+        return _spawningPoint;
+    }
+
+    /**
+     * Sets the spawning point to the current position of the entity.
+     */
+    public void setSpawningPoint() {
+        _spawningPoint.set(_position);
+    }
+
+    /**
+     * Sets the position of the entity to the spawning point.
+     */
+    public void respawn() {
+        _position.set(_spawningPoint);
     }
 
     /**

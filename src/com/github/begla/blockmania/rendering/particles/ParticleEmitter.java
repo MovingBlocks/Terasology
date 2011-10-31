@@ -17,6 +17,7 @@ package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.rendering.RenderableObject;
 import javolution.util.FastList;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -28,18 +29,27 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public abstract class ParticleEmitter implements RenderableObject {
 
-    protected int _particlesToEmitPerTurn = 16;
+    protected static final int MAX_PARTICLES = 512;
+    protected static final int PARTICLES_PER_UPDATE = 16;
+    /* ------- */
     protected int _particlesToEmit;
 
     protected FastList<Particle> _particles = new FastList();
     protected Vector3f _origin = new Vector3f();
 
     public void render() {
+        glDisable(GL11.GL_CULL_FACE);
         glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         for (FastList.Node<Particle> n = _particles.head(), end = _particles.tail(); (n = n.getNext()) != end; ) {
             n.getValue().render();
         }
-        glDisable(GL_TEXTURE_2D);
+
+        glDisable(GL_BLEND);
+        glDisable(GL11.GL_TEXTURE_2D);
+        glEnable(GL11.GL_CULL_FACE);
     }
 
     public void update() {
@@ -55,15 +65,15 @@ public abstract class ParticleEmitter implements RenderableObject {
         for (int i = _particles.size() - 1; i >= 0; i--) {
             Particle p = _particles.get(i);
 
-            if (!p.isAlive()) {
+            if (!p.isAlive() || _particles.size() > MAX_PARTICLES) {
                 _particles.remove(i);
             }
         }
     }
 
     protected void emitParticles() {
-        for (int i = 0; i < _particlesToEmitPerTurn && _particlesToEmit > 0; i++) {
-            _particles.add(createParticle());
+        for (int i = 0; i < PARTICLES_PER_UPDATE && _particlesToEmit > 0; i++) {
+            _particles.addFirst(createParticle());
             _particlesToEmit--;
         }
     }

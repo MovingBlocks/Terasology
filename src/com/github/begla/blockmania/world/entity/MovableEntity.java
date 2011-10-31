@@ -17,16 +17,17 @@ package com.github.begla.blockmania.world.entity;
 
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.blocks.BlockWater;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
+import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.Audio;
+import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
 
@@ -37,8 +38,6 @@ import java.util.Collections;
  */
 public abstract class MovableEntity extends Entity {
 
-    protected final FastRandom _rand = new FastRandom();
-
     /* AUDIO */
     protected Audio _currentFootstepSound;
     protected Audio[] _footstepSounds;
@@ -47,7 +46,7 @@ public abstract class MovableEntity extends Entity {
     protected World _parent;
 
     /* MOVEMENT */
-    protected double _walkingSpeed, _runningFactor, _jumpIntensity;
+    protected double _walkingSpeed, _runningFactor, _jumpIntensity, _stepCounter;
     protected double _activeWalkingSpeed, _yaw = 135d, _pitch, _gravity;
     protected final Vector3f _movementDirection = new Vector3f(), _velocity = new Vector3f(), _viewingDirection = new Vector3f();
     protected boolean _isSwimming = false, _headUnderWater = false, _touchingGround = false, _running = false, _godMode, _jump = false;
@@ -58,22 +57,25 @@ public abstract class MovableEntity extends Entity {
         _runningFactor = runningFactor;
         _jumpIntensity = jumpIntensity;
 
-        resetEntity();
+        reset();
         initAudio();
     }
 
     private void initAudio() {
         _footstepSounds = new Audio[5];
-        _footstepSounds[0] = AudioManager.getInstance().loadAudio("FootGrass1");
-        _footstepSounds[1] = AudioManager.getInstance().loadAudio("FootGrass2");
-        _footstepSounds[2] = AudioManager.getInstance().loadAudio("FootGrass3");
-        _footstepSounds[3] = AudioManager.getInstance().loadAudio("FootGrass4");
-        _footstepSounds[4] = AudioManager.getInstance().loadAudio("FootGrass5");
+        _footstepSounds[0] = AudioManager.getInstance().loadSound("FootGrass1");
+        _footstepSounds[1] = AudioManager.getInstance().loadSound("FootGrass2");
+        _footstepSounds[2] = AudioManager.getInstance().loadSound("FootGrass3");
+        _footstepSounds[3] = AudioManager.getInstance().loadSound("FootGrass4");
+        _footstepSounds[4] = AudioManager.getInstance().loadSound("FootGrass5");
     }
 
     public abstract void processMovement();
+
     protected abstract AABB generateAABBForPosition(Vector3f p);
+
     protected abstract void handleVerticalCollision();
+
     protected abstract void handleHorizontalCollision();
 
     public void render() {
@@ -95,12 +97,12 @@ public abstract class MovableEntity extends Entity {
         else
             _activeWalkingSpeed = _walkingSpeed * _runningFactor;
 
-
         // Update the viewing direction
         setViewingDirection(_yaw, _pitch);
 
         processMovement();
         updatePosition();
+        checkPosition();
         updateSwimStatus();
 
         _movementDirection.set(0, 0, 0);
@@ -108,15 +110,22 @@ public abstract class MovableEntity extends Entity {
         playMovementSound();
     }
 
+    private void checkPosition() {
+        if (!_godMode && _position.y < 0) {
+            _position.y = _parent.maxHeightAt((int) _position.x, (int) _position.y);
+        }
+    }
+
     private void playMovementSound() {
         if (_godMode)
             return;
 
-        if ((Math.abs(_velocity.x) > 0.01 || Math.abs(_velocity.z) > 0.01) && _touchingGround) {
+        if ((MathHelper.fastAbs(_velocity.x) > 0.01 || MathHelper.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
                 Vector3f playerDirection = directionOfOrigin();
-                _currentFootstepSound = _footstepSounds[Math.abs(_rand.randomInt()) % 5];
-                _currentFootstepSound.playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+                _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getRandom().randomInt()) % 5];
+
+                _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, 0.05f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.1f, false, playerDirection.x, playerDirection.y, playerDirection.z);
             } else {
                 if (!_currentFootstepSound.isPlaying()) {
                     _currentFootstepSound = null;
@@ -125,11 +134,10 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
-
     /**
      * Resets the entity's attributes.
      */
-    public void resetEntity() {
+    public void reset() {
         _velocity.set(0, 0, 0);
         _movementDirection.set(0, 0, 0);
         _gravity = 0.0f;
@@ -148,7 +156,7 @@ public abstract class MovableEntity extends Entity {
             byte blockType1 = _parent.getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
             AABB entityAABB = getAABB();
 
-            if (Block.getBlockForType(blockType1).isPenetrable() || !entityAABB.overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z)))
+            if (BlockManager.getInstance().getBlock(blockType1).isPenetrable() || !entityAABB.overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z)))
                 continue;
 
             double direction = origin.y - getPosition().y;
@@ -207,7 +215,7 @@ public abstract class MovableEntity extends Entity {
             byte blockType = _parent.getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
             AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
 
-            if (!Block.getBlockForType(blockType).isPenetrable()) {
+            if (!BlockManager.getInstance().getBlock(blockType).isPenetrable()) {
                 if (getAABB().overlaps(blockAABB)) {
                     result = true;
 
@@ -255,23 +263,23 @@ public abstract class MovableEntity extends Entity {
         /*
          * Slowdown the speed of the entity each time this method is called.
          */
-        if (Math.abs(_velocity.y) > 0f) {
+        if (MathHelper.fastAbs(_velocity.y) > 0f) {
             _velocity.y += -1f * _velocity.y * Configuration.getSettingNumeric("FRICTION");
         }
 
-        if (Math.abs(_velocity.x) > 0f) {
+        if (MathHelper.fastAbs(_velocity.x) > 0f) {
             _velocity.x += -1f * _velocity.x * Configuration.getSettingNumeric("FRICTION");
         }
 
-        if (Math.abs(_velocity.z) > 0f) {
+        if (MathHelper.fastAbs(_velocity.z) > 0f) {
             _velocity.z += -1f * _velocity.z * Configuration.getSettingNumeric("FRICTION");
         }
 
         /*
          * Apply friction.
          */
-        if (Math.abs(_velocity.x) > _activeWalkingSpeed || Math.abs(_velocity.z) > _activeWalkingSpeed || Math.abs(_velocity.y) > _activeWalkingSpeed) {
-            double max = Math.max(Math.max(Math.abs(_velocity.x), Math.abs(_velocity.z)), Math.abs(_velocity.y));
+        if (MathHelper.fastAbs(_velocity.x) > _activeWalkingSpeed || MathHelper.fastAbs(_velocity.z) > _activeWalkingSpeed || MathHelper.fastAbs(_velocity.y) > _activeWalkingSpeed) {
+            double max = Math.max(Math.max(MathHelper.fastAbs(_velocity.x), MathHelper.fastAbs(_velocity.z)), MathHelper.fastAbs(_velocity.y));
             double div = max / _activeWalkingSpeed;
 
             _velocity.x /= div;
@@ -323,7 +331,7 @@ public abstract class MovableEntity extends Entity {
                     // Entity reaches the ground
                     if (_touchingGround == false) {
                         Vector3f playerDirection = directionOfOrigin();
-                        _footstepSounds[Math.abs(_rand.randomInt()) % 5].playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.2f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+                        _footstepSounds[MathHelper.fastAbs(_parent.getRandom().randomInt()) % 5].playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
                         _touchingGround = true;
                     }
                 } else {
@@ -346,6 +354,8 @@ public abstract class MovableEntity extends Entity {
          */
         getPosition().x += _velocity.x;
         getPosition().z += _velocity.z;
+
+        _stepCounter += Math.max(MathHelper.fastAbs(_velocity.x), MathHelper.fastAbs(_velocity.z));
 
         /*
          * Check for horizontal collisions __after__ checking for vertical
@@ -370,14 +380,14 @@ public abstract class MovableEntity extends Entity {
             byte blockType = _parent.getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
             AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
 
-            if (Block.getBlockForType(blockType).getClass().equals(BlockWater.class) && getAABB().overlaps(blockAABB)) {
+            if (BlockManager.getInstance().getBlock(blockType).isLiquid() && getAABB().overlaps(blockAABB)) {
                 swimming = true;
             }
 
             Vector3f eyePos = calcEyePosition();
             eyePos.y += 0.25;
 
-            if (Block.getBlockForType(blockType).getClass().equals(BlockWater.class) && blockAABB.contains(eyePos)) {
+            if (BlockManager.getInstance().getBlock(blockType).isLiquid() && blockAABB.contains(eyePos)) {
                 headUnderWater = true;
             }
         }

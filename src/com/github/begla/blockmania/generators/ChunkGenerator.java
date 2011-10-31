@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.noise.PerlinNoise;
-import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -29,21 +29,20 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public abstract class ChunkGenerator {
 
     protected final PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen6;
-    protected final FastRandom _rand;
+    protected final LocalWorldProvider _worldProvider;
 
     /**
      * Init. the generator with a given seed value.
-     *
-     * @param seed
      */
-    public ChunkGenerator(String seed) {
-        _rand = new FastRandom(seed.hashCode());
-        _pGen1 = new PerlinNoise(seed.hashCode());
-        _pGen2 = new PerlinNoise(seed.hashCode() + 1);
-        _pGen3 = new PerlinNoise(seed.hashCode() + 2);
-        _pGen4 = new PerlinNoise(seed.hashCode() + 3);
-        _pGen5 = new PerlinNoise(seed.hashCode() + 4);
-        _pGen6 = new PerlinNoise(seed.hashCode() + 5);
+    public ChunkGenerator(LocalWorldProvider worldProvider) {
+        _pGen1 = new PerlinNoise(worldProvider.getSeed().hashCode());
+        _pGen2 = new PerlinNoise(worldProvider.getSeed().hashCode() + 1);
+        _pGen3 = new PerlinNoise(worldProvider.getSeed().hashCode() + 2);
+        _pGen4 = new PerlinNoise(worldProvider.getSeed().hashCode() + 3);
+        _pGen5 = new PerlinNoise(worldProvider.getSeed().hashCode() + 4);
+        _pGen6 = new PerlinNoise(worldProvider.getSeed().hashCode() + 5);
+
+        _worldProvider = worldProvider;
     }
 
     /**

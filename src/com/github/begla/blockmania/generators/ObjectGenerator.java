@@ -16,7 +16,6 @@
 
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 
 /**
@@ -26,11 +25,9 @@ import com.github.begla.blockmania.world.LocalWorldProvider;
  */
 public abstract class ObjectGenerator {
 
-    final FastRandom _rand;
     final LocalWorldProvider _worldProvider;
 
-    ObjectGenerator(LocalWorldProvider w, String seed) {
-        _rand = new FastRandom(seed.hashCode());
+    ObjectGenerator(LocalWorldProvider w) {
         _worldProvider = w;
     }
 

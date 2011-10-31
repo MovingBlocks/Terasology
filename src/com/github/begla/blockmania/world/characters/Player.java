@@ -18,22 +18,20 @@ package com.github.begla.blockmania.world.characters;
 
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
-import com.github.begla.blockmania.datastructures.ViewFrustum;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.noise.PerlinNoise;
+import com.github.begla.blockmania.rendering.cameras.Camera;
+import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.Collections;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Extends the character class and provides support for player functionality. Also provides the
@@ -46,17 +44,17 @@ public final class Player extends Character {
     /* PROPERTIES */
     private byte _selectedBlockType = 1;
 
-    /* MOVEMENT */
-    private final PerlinNoise _pGen = new PerlinNoise(42);
-
-    /* VIEW FRUSTUM */
-    private final ViewFrustum _viewFrustum = new ViewFrustum();
+    /* CAMERA */
+    private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
+    private Camera _activeCamera = _firstPersonCamera;
 
     public Player(World parent) {
         super(parent, Configuration.getSettingNumeric("WALKING_SPEED"), Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
     }
 
     public void update() {
+        updateCameras();
+
         _godMode = Configuration.getSettingBoolean("GOD_MODE");
         _walkingSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
         _runningFactor = Configuration.getSettingNumeric("RUNNING_FACTOR");
@@ -71,7 +69,7 @@ public final class Player extends Character {
         // Display the block the player is aiming at
         if (Configuration.getSettingBoolean("PLACING_BOX")) {
             if (is != null) {
-                if (Block.getBlockForType(_parent.getBlockAtPosition(is.getBlockPosition())).shouldRenderBoundingBox()) {
+                if (BlockManager.getInstance().getBlock(_parent.getBlockAtPosition(is.getBlockPosition())).shouldRenderBoundingBox()) {
                     Block.AABBForBlockAt(is.getBlockPosition()).render();
                 }
             }
@@ -80,40 +78,20 @@ public final class Player extends Character {
         super.render();
     }
 
-    /**
-     * Applies the modelview matrix from the player's point of view.
-     */
-    public void applyPlayerModelViewMatrix() {
-        glMatrixMode(GL11.GL_MODELVIEW);
-        glLoadIdentity();
+    public void updateCameras() {
+        _firstPersonCamera.getPosition().set(calcEyePosition());
 
-        if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
-
-            if (Configuration.getSettingBoolean("BOBBING") && !Configuration.getSettingBoolean("GOD_MODE")) {
-                double bobbing = _pGen.noise(getPosition().x * 0.5, 0, getPosition().z * 0.5);
-                glRotated(bobbing * Configuration.BOBBING_ANGLE, 0, 0, 1);
-            }
-
-            Vector3f eyePosition = calcEyePosition();
-            GLU.gluLookAt(eyePosition.x, eyePosition.y, eyePosition.z, eyePosition.x + _viewingDirection.x, eyePosition.y + _viewingDirection.y, eyePosition.z + _viewingDirection.z, 0, 1, 0);
-
-
+        if (!(Configuration.getSettingBoolean("GOD_MODE"))) {
+            _firstPersonCamera.setBobbingOffsetFactor(Math.sin(_stepCounter * 2.0) * 0.025);
         } else {
-            GLU.gluLookAt(getPosition().x, getPosition().y, getPosition().z, getPosition().x, 40, getPosition().z + 128, 0, 1, 0);
+            _firstPersonCamera.setBobbingOffsetFactor(0);
         }
-        // Update the current view frustum
-        _viewFrustum.updateFrustum();
-    }
-
-    /**
-     * Applies a modelview matrix which looks from the origin into the viewing direction of the player.
-     */
-    public void applyNormalizedModelViewMatrix() {
-        glMatrixMode(GL11.GL_MODELVIEW);
-        glLoadIdentity();
 
         if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
-            GLU.gluLookAt(0, 0, 0, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, 0, 1, 0);
+            _firstPersonCamera.getViewingDirection().set(getViewingDirection());
+        } else {
+            Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z + 128);
+            Vector3f.sub(viewingTarget, getPosition(), _firstPersonCamera.getViewingDirection());
         }
     }
 
@@ -124,7 +102,7 @@ public final class Player extends Character {
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 
-            getPosition().y += (maxHeight - getPosition().y) / 128f;
+            getPosition().y += (maxHeight - getPosition().y) / 64f;
 
             if (getPosition().y > 128)
                 getPosition().y = 128;
@@ -151,7 +129,7 @@ public final class Player extends Character {
                     byte blockType = _parent.getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
 
                     // Ignore special blocks
-                    if (Block.getBlockForType(blockType).letSelectionRayThrough()) {
+                    if (BlockManager.getInstance().getBlock(blockType).letsSelectionRayThrough()) {
                         continue;
                     }
 
@@ -185,9 +163,9 @@ public final class Player extends Character {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
-                Block centerBlock = Block.getBlockForType(getParent().getBlock((int) is.getBlockPosition().x, (int) is.getBlockPosition().y, (int) is.getBlockPosition().z));
+                Block centerBlock = BlockManager.getInstance().getBlock(getParent().getBlock((int) is.getBlockPosition().x, (int) is.getBlockPosition().y, (int) is.getBlockPosition().z));
 
-                if (!centerBlock.playerCanAttachBlocks()) {
+                if (!centerBlock.allowsBlockAttachment()) {
                     return;
                 }
 
@@ -199,7 +177,7 @@ public final class Player extends Character {
                 }
 
                 getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
-                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, 0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false);
+                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false);
             }
         }
     }
@@ -235,13 +213,13 @@ public final class Player extends Character {
 
                 // Remove the upper block if it's a billboard
                 byte upperBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
-                if (Block.getBlockForType(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
+                if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
                     getParent().setBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z, (byte) 0x0, true, true);
                 }
 
                 _parent.getBlockParticleEmitter().setOrigin(blockPos);
-                _parent.getBlockParticleEmitter().emitParticles(128, currentBlockType);
-                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) Math.abs(_rand.randomDouble()) * 0.4f, 0.7f + (float) Math.abs(_rand.randomDouble()) * 0.3f, false);
+                _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
+                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false);
             }
         }
     }
@@ -335,10 +313,10 @@ public final class Player extends Character {
     void cycleBlockTypes(int upDown) {
         _selectedBlockType += upDown;
 
-        if (_selectedBlockType >= Block.getBlockCount()) {
+        if (_selectedBlockType >= BlockManager.getInstance().availableBlocksSize()) {
             _selectedBlockType = 1;
         } else if (_selectedBlockType < 1) {
-            _selectedBlockType = (byte) (Block.getBlockCount() - 1);
+            _selectedBlockType = (byte) (BlockManager.getInstance().availableBlocksSize() - 1);
         }
     }
 
@@ -375,11 +353,11 @@ public final class Player extends Character {
         // Uh. A wall.
     }
 
-    public ViewFrustum getViewFrustum() {
-        return _viewFrustum;
-    }
-
     public byte getSelectedBlockType() {
         return _selectedBlockType;
+    }
+
+    public Camera getActiveCamera() {
+        return _activeCamera;
     }
 }

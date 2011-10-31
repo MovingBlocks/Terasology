@@ -12,7 +12,6 @@ uniform vec3 zenith;
 
 #define	EPS	0.1
 
-
 vec3	allweather ( float t, float cosTheta, float cosGamma )
 {
 	float	gamma      = acos ( cosGamma );

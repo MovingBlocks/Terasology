@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
@@ -35,6 +36,7 @@ import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.glu.GLUtessellator;
 import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.vector.Vector3f;
+import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
 import java.util.logging.Level;
@@ -59,7 +61,7 @@ public final class World extends LocalWorldProvider {
     private Player _player;
 
     /* CHUNKS */
-    private FastList<Chunk> _chunksInProximity = new FastList();
+    private FastList<Chunk> _chunksInProximity = new FastList<Chunk>();
 
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
@@ -80,6 +82,8 @@ public final class World extends LocalWorldProvider {
     /* Test */
     private Stars _stars;
     private Sphere _sphere;
+    /* EVENTS */
+    private final WorldTimeEventManager _worldTimeEventManager;
 
     /**
      * Initializes a new world for the single player mode.
@@ -100,6 +104,9 @@ public final class World extends LocalWorldProvider {
         _sphere = new Sphere();
 
         _worldUpdateManager = new WorldUpdateManager();
+        _worldTimeEventManager = new WorldTimeEventManager(this);
+
+        createMusicTimeEvents();
     }
 
     /**
@@ -107,12 +114,12 @@ public final class World extends LocalWorldProvider {
      */
     public void render() {
         /* SKYSPHERE */
-        _skysphere.render();;
-        /* Test */
-        //renderStars();
-        //_stars.render();
+        _player.getActiveCamera().lookThroughNormalized();
+       // _skysphere.render();
+
         /* WORLD RENDERING */
-        _player.applyPlayerModelViewMatrix();
+        _player.getActiveCamera().lookThrough();
+
         _player.render();
 
         renderChunks();
@@ -147,19 +154,53 @@ public final class World extends LocalWorldProvider {
      * Updates the daylight value according to the current world time.
      */
     private void updateDaylight() {
+        double time = getTime() % 1;
+
         // Sunrise
-        if (getTime() < 0.1f && getTime() > 0.0f) {
-            _daylight = getTime() / 0.1f;
-        } else if (getTime() >= 0.1 && getTime() <= 0.5f) {
+        if (time < Configuration.SUN_RISE_SET_DURATION && time > 0.0f) {
+            _daylight = time / Configuration.SUN_RISE_SET_DURATION;
+        } else if (time >= Configuration.SUN_RISE_SET_DURATION && time <= 0.5f) {
             _daylight = 1.0f;
         }
 
         // Sunset
-        if (getTime() > 0.5f && getTime() < 0.6f) {
-            _daylight = 1.0f - (getTime() - 0.5f) / 0.1f;
-        } else if (getTime() >= 0.6f && getTime() <= 1.0f) {
+        if (time > 0.5 - Configuration.SUN_RISE_SET_DURATION && time < 0.5f) {
+            _daylight = (0.5f - time) / Configuration.SUN_RISE_SET_DURATION;
+        } else if (time >= 0.5 && time <= 1.0f) {
             _daylight = 0.0f;
         }
+    }
+
+    /**
+     * Creates the world time events to play the game's soundtrack at specific times.
+     */
+    public void createMusicTimeEvents() {
+        // SUNRISE
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.01, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.2f);
+                AudioManager.getInstance().getAudio("Sunrise").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
+
+        // AFTERNOON
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.33, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.2f);
+                AudioManager.getInstance().getAudio("Afternoon").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
+
+        // SUNSET
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.44, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.2f);
+                AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
     }
 
     /**
@@ -191,35 +232,43 @@ public final class World extends LocalWorldProvider {
      */
     private void renderChunks() {
         ShaderManager.getInstance().enableShader("chunk");
+
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
-        int swimmimg = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
+        int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
         int animationOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animationOffset");
         int animated = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animated");
+
         GL20.glUniform1f(daylight, (float) getDaylight());
-        GL20.glUniform1i(animated, 0);
-        GL20.glUniform1i(swimmimg, _player.isHeadUnderWater() ? 1 : 0);
+        GL20.glUniform1i(swimming, _player.isHeadUnderWater() ? 1 : 0);
 
         FastList<Chunk> visibleChunks = fetchVisibleChunks();
 
         glEnable(GL_TEXTURE_2D);
 
+        GL20.glUniform1i(animated, 0);
+        TextureManager.getInstance().bindTexture("terrain");
+
         // OPAQUE ELEMENTS
         for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
             Chunk c = n.getValue();
 
-            GL20.glUniform1i(animated, 0);
-            TextureManager.getInstance().bindTexture("terrain");
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
 
-            // ANIMATED LAVA
-            GL20.glUniform1i(animated, 1);
-            GL20.glUniform1f(animationOffset, ((float) (_tick % 16)) * (1.0f / 16f));
-            TextureManager.getInstance().bindTexture("custom_lava_still");
-            visibleChunks.valueOf(n).render(ChunkMesh.RENDER_TYPE.LAVA);
 
             if (Configuration.getSettingBoolean("CHUNK_OUTLINES")) {
                 c.getAABB().render();
             }
+        }
+
+        // ANIMATED LAVA
+        GL20.glUniform1i(animated, 1);
+        TextureManager.getInstance().bindTexture("custom_lava_still");
+
+        GL20.glUniform1f(animationOffset, ((float) (_tick % 16)) * (1.0f / 16f));
+
+        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
+            Chunk c = n.getValue();
+            c.render(ChunkMesh.RENDER_TYPE.LAVA);
         }
 
         GL20.glUniform1i(animated, 0);
@@ -232,6 +281,8 @@ public final class World extends LocalWorldProvider {
         }
 
         GL20.glUniform1i(animated, 1);
+        GL20.glUniform1f(animationOffset, ((float) (_tick / 2 % 12)) * (1.0f / 16f));
+        TextureManager.getInstance().bindTexture("custom_water_still");
 
         for (int i = 0; i < 2; i++) {
             // ANIMATED WATER
@@ -244,13 +295,12 @@ public final class World extends LocalWorldProvider {
                     glColorMask(true, true, true, true);
                 }
 
-                GL20.glUniform1f(animationOffset, ((float) (_tick / 2 % 12)) * (1.0f / 16f));
-                TextureManager.getInstance().bindTexture("custom_water_still");
                 c.render(ChunkMesh.RENDER_TYPE.WATER);
             }
         }
 
         ShaderManager.getInstance().enableShader(null);
+
         glDisable(GL_TEXTURE_2D);
     }
 
@@ -285,6 +335,10 @@ public final class World extends LocalWorldProvider {
 
         // Generate new VBOs if available
         _worldUpdateManager.updateVBOs();
+
+        _chunkCache.freeCacheSpace();
+
+        _worldTimeEventManager.fireWorldTimeEvents();
     }
 
     /**
@@ -322,17 +376,12 @@ public final class World extends LocalWorldProvider {
      */
     public void setPlayer(Player p) {
         _player = p;
-        // Reset the player's position
-        resetPlayer();
+
+        _player.setSpawningPoint(nextRandomSpawningPoint());
+        _player.reset();
+        _player.respawn();
     }
 
-    /**
-     * Resets the player's attributes and respawns him.
-     */
-    public void resetPlayer() {
-        _player.resetEntity();
-        _player.setPosition(getSpawningPoint());
-    }
 
     /**
      * Writes all chunks to disk and disposes them.
@@ -342,6 +391,8 @@ public final class World extends LocalWorldProvider {
 
         saveMetaData();
         getChunkCache().saveAndDisposeAllChunks();
+
+        AudioManager.getInstance().stopAllSounds();
     }
 
     /**
@@ -354,13 +405,6 @@ public final class World extends LocalWorldProvider {
         return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _chunkCache.size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _seed, _title);
     }
 
-    /**
-     * Sets the current player position as spawning point.
-     */
-    public void setSpawningPointToPlayerPosition() {
-        _spawningPoint = new Vector3f(_player.getPosition());
-    }
-
     public Player getPlayer() {
         return _player;
     }
@@ -371,7 +415,7 @@ public final class World extends LocalWorldProvider {
     }
 
     public boolean isChunkVisible(Chunk c) {
-        return _player.getViewFrustum().intersects(c.getAABB());
+        return _player.getActiveCamera().getViewFrustum().intersects(c.getAABB());
     }
 
     public double getDaylight() {
@@ -399,7 +443,6 @@ public final class World extends LocalWorldProvider {
      * @return
      */
     public double getActiveHumidity() {
-
         return getHumidityAt((int) _player.getPosition().x, (int) _player.getPosition().z);
     }
 

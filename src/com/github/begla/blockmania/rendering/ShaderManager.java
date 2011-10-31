@@ -55,7 +55,7 @@ public class ShaderManager {
     }
 
     private ShaderManager() {
-        initShader();
+        initShaders();
 
         Blockmania.getInstance().getLogger().log(Level.INFO, "Loading Blockmania shader manager...");
         Blockmania.getInstance().getLogger().log(Level.INFO, "GL_VERSION: {0}", GL11.glGetString(GL11.GL_VERSION));
@@ -63,15 +63,15 @@ public class ShaderManager {
         Blockmania.getInstance().getLogger().log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
     }
 
-    private void initShader() {
+    private void initShaders() {
         createVertexShader("sky_vert.glsl", "sky");
         createFragShader("sky_frag.glsl", "sky");
         createVertexShader("chunk_vert.glsl", "chunk");
         createFragShader("chunk_frag.glsl", "chunk");
         createVertexShader("cloud_vert.glsl", "cloud");
         createFragShader("cloud_frag.glsl", "cloud");
-        createVertexShader("stars_vert.glsl", "stars");
-        createFragShader("stars_frag.glsl", "stars");
+        createVertexShader("particle_vert.glsl", "particle");
+        createFragShader("particle_frag.glsl", "particle");
 
         for (FastMap.Entry<String, Integer> e = _fragmentShader.head(), end = _fragmentShader.tail(); (e = e.getNext()) != end; ) {
             int shaderProgram = GL20.glCreateProgram();

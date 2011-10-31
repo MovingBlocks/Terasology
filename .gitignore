@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 $text = "
 Nexen Winguard 231
@@ -1967,3 +1968,10 @@ echo '<pre>'.print_r($current,1).'</pre>';
 /nbproject/private/
 /.idea/
 /dist/
+=======
+SAVED_WORLDS
+logs
+out
+.DS_Store
+.idea/workspace.xml
+>>>>>>> 64b243e350f51d3fa8931e814c1601b0fa5a1e70

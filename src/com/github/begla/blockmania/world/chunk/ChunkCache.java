@@ -25,8 +25,6 @@ import org.lwjgl.util.vector.Vector3f;
 
 import java.io.*;
 import java.util.Collections;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 /**
@@ -36,7 +34,6 @@ import java.util.logging.Level;
  */
 public final class ChunkCache {
 
-    private static final ExecutorService _threadPool = Executors.newFixedThreadPool(1);
     private static boolean _running = false;
     /* ------ */
     private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>().shared();
@@ -60,8 +57,6 @@ public final class ChunkCache {
      * @return The chunk
      */
     public Chunk loadOrCreateChunk(int x, int z) {
-        freeCacheSpace();
-
         int chunkId = MathHelper.cantorize(MathHelper.mapToPositive(x), MathHelper.mapToPositive(z));
         // Try to load the chunk from the cache
         Chunk c = _chunkCache.get(chunkId);
@@ -80,16 +75,12 @@ public final class ChunkCache {
         }
 
         _chunkCache.put(chunkId, c);
-        c.setCached(true);
-
-        if (_chunkCache.size() > capacity())
-            freeCacheSpace();
 
         return c;
     }
 
-    private void freeCacheSpace() {
-        if (_running)
+    public void freeCacheSpace() {
+        if (_running || _chunkCache.size() <= capacity())
             return;
 
         _running = true;
@@ -99,14 +90,13 @@ public final class ChunkCache {
                 FastList<Chunk> cachedChunks = new FastList<Chunk>(_chunkCache.values());
                 Collections.sort(cachedChunks);
 
-                while (cachedChunks.size() >= capacity()) {
+                while (cachedChunks.size() > capacity()) {
                     Chunk chunkToDelete = cachedChunks.removeLast();
-                    // Prevent further updates to this chunk
-                    chunkToDelete.setCached(false);
                     // Write the chunk to disk (but do not remove it from the cache just now)
                     writeChunkToDisk(chunkToDelete);
                     // When the chunk is written, finally remove it from the cache
                     _chunkCache.values().remove(chunkToDelete);
+
                     chunkToDelete.dispose();
                 }
 
@@ -114,19 +104,25 @@ public final class ChunkCache {
             }
         };
 
-        _threadPool.submit(r);
+        Blockmania.getInstance().getThreadPool().submit(r);
     }
 
     /**
      * Writes all chunks to disk and disposes them.
      */
     public void saveAndDisposeAllChunks() {
-        for (Chunk c : _chunkCache.values()) {
-            c.setCached(false);
-            writeChunkToDisk(c);
-        }
+        Runnable r = new Runnable() {
+            public void run() {
+                for (Chunk c : _chunkCache.values()) {
+                    writeChunkToDisk(c);
+                    c.dispose();
+                }
 
-        _chunkCache.clear();
+                _chunkCache.clear();
+            }
+        };
+
+        Blockmania.getInstance().getThreadPool().submit(r);
     }
 
     private void writeChunkToDisk(Chunk c) {

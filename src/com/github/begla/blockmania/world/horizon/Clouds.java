@@ -19,6 +19,7 @@ import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.ShaderManager;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.World;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector2f;
@@ -38,8 +39,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Clouds implements RenderableObject {
 
-    private boolean[][] _clouds;
-    private int _dlClouds = -1;
+    private static boolean[][] _clouds;
+    private static int _dlClouds = -1;
 
     private final Vector2f _cloudOffset = new Vector2f(), _windDirection = new Vector2f(0.25f, 0);
     private short _nextWindUpdateInSeconds = 32;
@@ -49,10 +50,6 @@ public class Clouds implements RenderableObject {
 
     public Clouds(World parent) {
         _parent = parent;
-        _dlClouds = glGenLists(1);
-
-        generateClouds();
-        generateCloudDisplayList();
     }
 
     private void generateClouds() {
@@ -75,26 +72,34 @@ public class Clouds implements RenderableObject {
     /**
      * Generates the cloud display list.
      */
-    private void generateCloudDisplayList() {
-        glNewList(_dlClouds, GL_COMPILE);
-        glBegin(GL_QUADS);
+    private void drawClouds() {
+        if (_clouds == null)
+            generateClouds();
 
-        int length = _clouds.length;
+        if (_dlClouds == -1) {
+            _dlClouds = glGenLists(1);
+            glNewList(_dlClouds, GL_COMPILE);
+            glBegin(GL_QUADS);
 
-        for (int x = 0; x < length; x++) {
-            for (int y = 0; y < length; y++) {
-                if (_clouds[x][y]) {
-                    try {
-                        Primitives.drawCloud(16, 16, 16, x * 16f - (length / 2 * 16f), 0, y * 16f - (length / 2 * 16f), !_clouds[x - 1][y], !_clouds[x + 1][y], !_clouds[x][y + 1], !_clouds[x][y - 1]);
-                    } catch (Exception e) {
+            int length = _clouds.length;
 
+            for (int x = 0; x < length; x++) {
+                for (int y = 0; y < length; y++) {
+                    if (_clouds[x][y]) {
+                        try {
+                            Primitives.drawCloud(16, 16, 16, x * 16f - (length / 2 * 16f), 0, y * 16f - (length / 2 * 16f), !_clouds[x - 1][y], !_clouds[x + 1][y], !_clouds[x][y + 1], !_clouds[x][y - 1]);
+                        } catch (Exception e) {
+
+                        }
                     }
                 }
             }
+
+            glEnd();
+            glEndList();
         }
 
-        glEnd();
-        glEndList();
+        glCallList(_dlClouds);
     }
 
     public void render() {
@@ -109,6 +114,9 @@ public class Clouds implements RenderableObject {
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("cloud"), "daylight");
         GL20.glUniform1f(daylight, (float) _parent.getDaylight());
 
+        glPushMatrix();
+        glTranslatef(_parent.getPlayer().getPosition().x + _cloudOffset.x, 190f, _parent.getPlayer().getPosition().z + _cloudOffset.y);
+
         // Render two passes: The first one only writes to the depth buffer, the second one to the frame buffer
         for (int i = 0; i < 2; i++) {
             if (i == 0) {
@@ -117,17 +125,19 @@ public class Clouds implements RenderableObject {
                 glColorMask(true, true, true, true);
             }
 
-            glPushMatrix();
-            glTranslatef(_parent.getPlayer().getPosition().x + _cloudOffset.x, 190f, _parent.getPlayer().getPosition().z + _cloudOffset.y);
-            glCallList(_dlClouds);
-            glPopMatrix();
+            drawClouds();
         }
+
+        glPopMatrix();
 
         ShaderManager.getInstance().enableShader(null);
         glDisable(GL_BLEND);
     }
 
     public void update() {
+        if (_clouds == null)
+            return;
+
         // Move the clouds a bit each update
         _cloudOffset.x += _windDirection.x;
         _cloudOffset.y += _windDirection.y;
@@ -141,7 +151,7 @@ public class Clouds implements RenderableObject {
         if (Blockmania.getInstance().getTime() - _lastWindUpdate > _nextWindUpdateInSeconds * 1000) {
             _windDirection.x = (float) _parent.getRandom().randomDouble() / 4;
             _windDirection.y = (float) _parent.getRandom().randomDouble() / 4;
-            _nextWindUpdateInSeconds = (short) (Math.abs(_parent.getRandom().randomInt()) % 16 + 32);
+            _nextWindUpdateInSeconds = (short) (MathHelper.fastAbs(_parent.getRandom().randomInt()) % 16 + 32);
             _lastWindUpdate = Blockmania.getInstance().getTime();
         }
     }

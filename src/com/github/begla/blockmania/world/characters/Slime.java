@@ -20,7 +20,6 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.rendering.TextureManager;
-import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
@@ -36,7 +35,6 @@ public final class Slime extends Character {
 
     public static int _instanceCounter;
 
-    private FastRandom _rand = new FastRandom(Blockmania.getInstance().getTime() + _instanceCounter);
     private long _lastChangeOfDirectionAt = Blockmania.getInstance().getTime();
     private Vector3f _movementTarget = new Vector3f();
 
@@ -147,7 +145,7 @@ public final class Slime extends Character {
         }
 
         if (Blockmania.getInstance().getTime() - _lastChangeOfDirectionAt > 5000 || distanceToPlayer <= 5) {
-            _movementTarget.set((float) (getPosition().x + _rand.randomDouble() * 500), getPosition().y, (float) (getPosition().z + _rand.randomDouble() * 500));
+            _movementTarget.set((float) (getPosition().x + _parent.getRandom().randomDouble() * 500), getPosition().y, (float) (getPosition().z + _parent.getRandom().randomDouble() * 500));
             _lastChangeOfDirectionAt = Blockmania.getInstance().getTime();
         }
 
@@ -155,7 +153,7 @@ public final class Slime extends Character {
         lookAt(_movementTarget);
         walkForward();
 
-        if (_rand.randomDouble() < -0.94)
+        if (_parent.getRandom().randomDouble() < -0.94)
             jump();
     }
 

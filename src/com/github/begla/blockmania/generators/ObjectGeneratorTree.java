@@ -15,7 +15,9 @@
  */
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 
 /**
@@ -27,10 +29,9 @@ public class ObjectGeneratorTree extends ObjectGenerator {
 
     /**
      * @param w
-     * @param seed
      */
-    public ObjectGeneratorTree(LocalWorldProvider w, String seed) {
-        super(w, seed);
+    public ObjectGeneratorTree(LocalWorldProvider w) {
+        super(w);
     }
 
     /**
@@ -42,7 +43,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
      */
     @Override
     public void generate(int posX, int posY, int posZ, boolean update) {
-        int height = Math.abs(_rand.randomInt() % 4) + 6;
+        int height = MathHelper.fastAbs(_worldProvider.getRandom().randomInt() % 4) + 6;
 
         if (posY + height >= Configuration.CHUNK_DIMENSIONS.y) {
             return;
@@ -50,7 +51,7 @@ public class ObjectGeneratorTree extends ObjectGenerator {
 
         // Generate tree trunk
         for (int i = 0; i < height; i++) {
-            _worldProvider.setBlock(posX, posY + i, posZ, (byte) 0x5, update, true);
+            _worldProvider.setBlock(posX, posY + i, posZ, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, true);
         }
 
         // Generate the treetop
@@ -58,8 +59,8 @@ public class ObjectGeneratorTree extends ObjectGenerator {
             for (int x = -2; x < 3; x++) {
                 for (int z = -2; z < 3; z++) {
                     if (!(x == -2 && z == -2) && !(x == 2 && z == 2) && !(x == -2 && z == 2) && !(x == 2 && z == -2)) {
-                        if (_rand.randomDouble() <= 0.8) {
-                            _worldProvider.setBlock(posX + x, posY + y, posZ + z, (byte) 0x6, update, false);
+                        if (_worldProvider.getRandom().randomDouble() <= 0.8) {
+                            _worldProvider.setBlock(posX + x, posY + y, posZ + z, BlockManager.getInstance().getBlock("Leaf").getId(), update, false);
                             _worldProvider.refreshSunlightAt(posX + x, posZ + z, false, true);
                         }
                     }

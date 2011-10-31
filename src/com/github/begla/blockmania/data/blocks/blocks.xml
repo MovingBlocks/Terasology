@@ -1,0 +1,200 @@
+<blocks>
+    <block id="1" title="Dirt">
+        <property name="textureOffset" x="2" y="0"/>
+    </block>
+    <block id="2" title="Sand">
+        <property name="textureOffset" x="2" y="1"/>
+    </block>
+    <block id="3" title="Stone">
+        <property name="textureOffset" x="1" y="0"/>
+    </block>
+    <block id="4" title="Wood">
+        <property name="textureOffset" x="4" y="0"/>
+    </block>
+    <block id="5" title="Tree trunk">
+        <property name="textureOffsetTop" x="5" y="1"/>
+        <property name="textureOffsetBottom" x="5" y="1"/>
+        <property name="textureOffsetLeft" x="4" y="1"/>
+        <property name="textureOffsetRight" x="4" y="1"/>
+        <property name="textureOffsetFront" x="4" y="1"/>
+        <property name="textureOffsetBack" x="4" y="1"/>
+    </block>
+    <block id="6" title="Grass">
+        <property name="colorSource">1</property>
+        <property name="textureOffsetTop" x="0" y="0"/>
+        <property name="textureOffsetBottom" x="2" y="0"/>
+        <property name="textureOffsetLeft" x="3" y="0"/>
+        <property name="textureOffsetRight" x="3" y="0"/>
+        <property name="textureOffsetFront" x="3" y="0"/>
+        <property name="textureOffsetBack" x="3" y="0"/>
+    </block>
+    <block id="7" title="Snow">
+        <property name="textureOffsetTop" x="2" y="4"/>
+        <property name="textureOffsetBottom" x="2" y="0"/>
+        <property name="textureOffsetLeft" x="4" y="4"/>
+        <property name="textureOffsetRight" x="4" y="4"/>
+        <property name="textureOffsetFront" x="4" y="4"/>
+        <property name="textureOffsetBack" x="4" y="4"/>
+    </block>
+    <block id="8" title="Ice">
+        <property name="textureOffset" x="3" y="4"/>
+        <property name="translucent">true</property>
+        <property name="blockForm">2</property>
+    </block>
+    <block id="9" title="Water">
+        <property name="textureOffset" x="15" y="12"/>
+        <property name="blockForm">2</property>
+        <property name="hardness">-1</property>
+        <property name="penetrable">true</property>
+        <property name="renderBoundingBox">false</property>
+        <property name="bypassSelectionRay">true</property>
+		<property name="translucent">true</property>
+		<property name="castsShadows">false</property>
+		<property name="liquid">true</property>
+    </block>
+    <block id="10" title="Lava">
+        <property name="textureOffset" x="15" y="15"/>
+        <property name="luminance">15</property>
+        <property name="blockForm">2</property>
+        <property name="hardness">-1</property>
+        <property name="penetrable">true</property>
+		<property name="castsShadows">false</property>
+		<property name="liquid">true</property>
+    </block>
+    <block id="11" title="Leaf">
+		<property name="allowBlockAttachment">false</property>
+        <property name="textureOffset" x="4" y="3"/>
+        <property name="colorSource">2</property>
+        <property name="translucent">true</property>
+        <property name="noTessellation">true</property>
+    </block>
+	<block id="12" title="Dark leaf">
+		<property name="allowBlockAttachment">false</property>
+		<property name="colorOffset" r="0.8" g="0.8" b="0.8" a="1.0"/>
+        <property name="textureOffset" x="4" y="3"/>
+        <property name="colorSource">2</property>
+        <property name="translucent">true</property>
+        <property name="noTessellation">true</property>
+    </block>
+    <block id="13" title="High grass">
+		<property name="allowBlockAttachment">false</property>
+        <property name="colorSource">2</property>
+        <property name="blockForm">3</property>
+        <property name="renderBoundingBox">false</property>
+        <property name="translucent">true</property>
+        <property name="textureOffset" x="12" y="11"/>
+        <property name="penetrable">true</property>
+    </block>
+    <block id="14" title="Medium high grass">
+		<property name="allowBlockAttachment">false</property>
+        <property name="colorSource">2</property>
+        <property name="blockForm">3</property>
+        <property name="renderBoundingBox">false</property>
+        <property name="translucent">true</property>
+        <property name="textureOffset" x="13" y="11"/>
+        <property name="penetrable">true</property>
+    </block>
+    <block id="15" title="Large high grass">
+		<property name="allowBlockAttachment">false</property>
+        <property name="colorSource">2</property>
+        <property name="blockForm">3</property>
+        <property name="renderBoundingBox">false</property>
+        <property name="translucent">true</property>
+        <property name="textureOffset" x="14" y="11"/>
+        <property name="penetrable">true</property>
+    </block>
+    <block id="16" title="Red flower">
+		<property name="allowBlockAttachment">false</property>
+        <property name="colorSource">2</property>
+        <property name="blockForm">3</property>
+        <property name="renderBoundingBox">false</property>
+        <property name="translucent">true</property>
+        <property name="textureOffset" x="13" y="0"/>
+        <property name="penetrable">true</property>
+    </block>
+    <block id="17" title="Yellow flower">
+		<property name="allowBlockAttachment">false</property>
+        <property name="colorSource">2</property>
+        <property name="blockForm">3</property>
+        <property name="renderBoundingBox">false</property>
+        <property name="translucent">true</property>
+        <property name="textureOffset" x="12" y="0"/>
+        <property name="penetrable">true</property>
+    </block>
+    <block id="18" title="Hard stone">
+        <property name="hardness">-1</property>
+        <property name="textureOffset" x="1" y="1"/>
+    </block>
+    <block id="19" title="Cobble stone">
+        <property name="textureOffset" x="0" y="1"/>
+    </block>
+    <block id="20" title="Brick">
+        <property name="textureOffset" x="7" y="0"/>
+    </block>
+    <block id="21" title="Coal">
+        <property name="textureOffset" x="2" y="2"/>
+    </block>
+    <block id="22" title="Silver">
+        <property name="textureOffset" x="1" y="2"/>
+    </block>
+    <block id="23" title="Red stone">
+        <property name="textureOffset" x="3" y="3"/>
+    </block>
+    <block id="24" title="Gold">
+        <property name="textureOffset" x="0" y="2"/>
+    </block>
+    <block id="25" title="Diamond">
+        <property name="textureOffset" x="2" y="3"/>
+    </block>
+    <block id="26" title="Glass">
+        <property name="translucent">true</property>
+        <property name="textureOffset" x="1" y="3"/>
+    </block>
+    <block id="27" title="Bookshelf">
+        <property name="textureOffsetTop" x="6" y="5"/>
+        <property name="textureOffsetBottom" x="6" y="5"/>
+        <property name="textureOffsetLeft" x="3" y="2"/>
+        <property name="textureOffsetRight" x="3" y="2"/>
+        <property name="textureOffsetFront" x="3" y="2"/>
+        <property name="textureOffsetBack" x="3" y="2"/>
+    </block>
+    <block id="28" title="Cactus">
+        <property name="translucent">true</property>
+        <property name="noTessellation">true</property>
+        <property name="blockForm">1</property>
+        <property name="textureOffsetTop" x="5" y="4"/>
+        <property name="textureOffsetBottom" x="5" y="4"/>
+        <property name="textureOffsetLeft" x="6" y="4"/>
+        <property name="textureOffsetRight" x="6" y="4"/>
+        <property name="textureOffsetFront" x="6" y="4"/>
+        <property name="textureOffsetBack" x="6" y="4"/>
+    </block>
+    <block id="29" title="Color black">
+        <property name="textureOffset" x="1" y="7"/>
+    </block>
+    <block id="30" title="Color blue">
+        <property name="textureOffset" x="1" y="11"/>
+    </block>
+    <block id="31" title="Color brown">
+        <property name="textureOffset" x="1" y="10"/>
+    </block>
+    <block id="32" title="Color green">
+        <property name="textureOffset" x="1" y="9"/>
+    </block>
+    <block id="33" title="Color purple">
+        <property name="textureOffset" x="1" y="12"/>
+    </block>
+    <block id="34" title="Color red">
+        <property name="textureOffset" x="1" y="8"/>
+    </block>
+    <block id="35" title="Color white">
+        <property name="textureOffset" x="0" y="4"/>
+    </block>
+    <block id="36" title="Torch">
+		<property name="allowBlockAttachment">false</property>
+        <property name="textureOffset" x="0" y="5"/>
+        <property name="blockForm">3</property>
+        <property name="luminance">15</property>
+        <property name="translucent">true</property>
+    </block>
+</blocks>

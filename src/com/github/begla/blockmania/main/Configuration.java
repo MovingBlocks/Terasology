@@ -28,6 +28,18 @@ import org.lwjgl.util.vector.Vector3f;
 public final class Configuration {
 
     /**
+     * Maximum amount of worker threads to be created.
+     */
+    public static final int MAX_THREADS = Math.min(Math.max(Runtime.getRuntime().availableProcessors(), 1), 8);
+    /**
+     * Amount of VBO updates per frame.
+     */
+    public static final int VBO_UPDATES_PER_FRAME = 4;
+    /**
+     * Sunrise/sunset duration
+     */
+    public static final double SUN_RISE_SET_DURATION = 0.025;
+    /**
      * The mouse sensitivity.
      */
     public static final double MOUSE_SENS = 0.075;
@@ -50,19 +62,20 @@ public final class Configuration {
     /**
      * The display mode used for window mode.
      */
-    public static final DisplayMode DISPLAY_MODE = new DisplayMode(1024, 768);
+    public static final DisplayMode DISPLAY_MODE = new DisplayMode(320, 280);
+    /**
+     * Aspect ratio.
+     */
+    public static final double ASPECT_RATIO = 16.0 / 9.0;
     /**
      * If set to true, the game is rendered as a full screen application.
      */
     public static final boolean FULLSCREEN = false;
 
-    /* PLAYER */
-    public static final double BOBBING_ANGLE = 2.5;
-
     /* LIGHTING */
     public static final byte MAX_LIGHT = 15;
-    public static final double OCCLUSION_AMOUNT_DEFAULT = 1.0 / 16.0;
-    public static final double OCCLUSION_AMOUNT_BILLBOARDS = OCCLUSION_AMOUNT_DEFAULT / 8.0;
+    public static final double OCCLUSION_AMOUNT_DEFAULT = 1.0 / 8.0;
+    public static final double OCCLUSION_AMOUNT_BILLBOARDS = OCCLUSION_AMOUNT_DEFAULT / 4.0;
 
     /* RESOURCES */
     public static final double PROB_COAL = -2;

@@ -15,11 +15,12 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.blocks.Block;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkCache;
 import javolution.util.FastList;
@@ -61,9 +62,6 @@ public class LocalWorldProvider {
     /* RANDOMNESS */
     protected final FastRandom _random;
 
-    /* SPAWNING POINT */
-    protected Vector3f _spawningPoint;
-
     /**
      * Initializes a new world.
      *
@@ -74,13 +72,13 @@ public class LocalWorldProvider {
         if (title == null) {
             throw new IllegalArgumentException("No title provided.");
         } else if (title.isEmpty()) {
-            throw new IllegalArgumentException("No title provided.");
+            throw new IllegalArgumentException("Empty title provided.");
         }
 
         if (seed == null) {
             throw new IllegalArgumentException("No seed provided.");
         } else if (seed.isEmpty()) {
-            throw new IllegalArgumentException("No seed provided.");
+            throw new IllegalArgumentException("Empty seed provided.");
         }
 
         _title = title;
@@ -89,25 +87,17 @@ public class LocalWorldProvider {
         // Init. random generator
         _random = new FastRandom(seed.hashCode());
 
-        // Initial time
-        setTime(0.01);
-
         // Load the meta data of this world
         loadMetaData();
 
         // Init. generators
-        _chunkGenerators.put("terrain", new ChunkGeneratorTerrain(_seed));
-        _chunkGenerators.put("forest", new ChunkGeneratorFlora(_seed));
-        _chunkGenerators.put("resources", new ChunkGeneratorResources(_seed));
-        _objectGenerators.put("tree", new ObjectGeneratorTree(this, _seed));
-        _objectGenerators.put("pineTree", new ObjectGeneratorPineTree(this, _seed));
-        _objectGenerators.put("firTree", new ObjectGeneratorFirTree(this, _seed));
-        _objectGenerators.put("cactus", new ObjectGeneratorCactus(this, _seed));
-
-        // Find a new spawning point if none was loaded
-        if (_spawningPoint == null) {
-            _spawningPoint = findNewSpawningPoint();
-        }
+        _chunkGenerators.put("terrain", new ChunkGeneratorTerrain(this));
+        _chunkGenerators.put("forest", new ChunkGeneratorFlora(this));
+        _chunkGenerators.put("resources", new ChunkGeneratorResources(this));
+        _objectGenerators.put("tree", new ObjectGeneratorTree(this));
+        _objectGenerators.put("pineTree", new ObjectGeneratorPineTree(this));
+        _objectGenerators.put("firTree", new ObjectGeneratorFirTree(this));
+        _objectGenerators.put("cactus", new ObjectGeneratorCactus(this));
     }
 
     /**
@@ -139,7 +129,7 @@ public class LocalWorldProvider {
             byte oldBlock = c.getBlock(blockPosX, y, blockPosZ);
             byte newBlock;
 
-            if (Block.getBlockForType(c.getBlock(blockPosX, y, blockPosZ)).isRemovable()) {
+            if (BlockManager.getInstance().getBlock(c.getBlock(blockPosX, y, blockPosZ)).isDestructible()) {
                 c.setBlock(blockPosX, y, blockPosZ, type);
                 newBlock = type;
             } else {
@@ -160,7 +150,7 @@ public class LocalWorldProvider {
                     /*
                     * Spread light of block light sources.
                     */
-                    byte luminance = Block.getBlockForType(type).getLuminance();
+                    byte luminance = BlockManager.getInstance().getBlock(type).getLuminance();
 
                     // Set the block light value to the luminance of this block
                     c.setLight(blockPosX, y, blockPosZ, luminance, Chunk.LIGHT_TYPE.BLOCK);
@@ -381,7 +371,7 @@ public class LocalWorldProvider {
      * @return The X-coordinate of the block within the chunk
      */
     public int calcBlockPosX(int x1, int x2) {
-        return Math.abs(x1 - (x2 * (int) Configuration.CHUNK_DIMENSIONS.x));
+        return MathHelper.fastAbs(x1 - (x2 * (int) Configuration.CHUNK_DIMENSIONS.x));
     }
 
     /**
@@ -392,7 +382,7 @@ public class LocalWorldProvider {
      * @return The Z-coordinate of the block within the chunk
      */
     public int calcBlockPosZ(int z1, int z2) {
-        return Math.abs(z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
+        return MathHelper.fastAbs(z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
     }
 
     /**
@@ -416,25 +406,11 @@ public class LocalWorldProvider {
     }
 
     /**
-     * @return True if its daytime
-     */
-    public boolean isDaytime() {
-        return getTime() > 0.075f && getTime() < 0.575;
-    }
-
-    /**
-     * @return True if its nighttime
-     */
-    public boolean isNighttime() {
-        return !isDaytime();
-    }
-
-    /**
-     * Finds a new spawning point.
+     * Finds a spawning point.
      *
-     * @return The new spawning point.
+     * @return The spawning point.
      */
-    public Vector3f findNewSpawningPoint() {
+    public Vector3f nextRandomSpawningPoint() {
         for (; ; ) {
             int randX = (int) (_random.randomDouble() * 16000f);
             int randZ = (int) (_random.randomDouble() * 16000f);
@@ -442,7 +418,7 @@ public class LocalWorldProvider {
             double dens = ((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 32, randZ, ChunkGeneratorTerrain.BIOME_TYPE.PLAINS);
 
             if (dens >= 0.0 && dens < 64.0)
-                return new Vector3f(randX, 128, randZ);
+                return new Vector3f(randX, 32, randZ);
         }
     }
 
@@ -483,12 +459,6 @@ public class LocalWorldProvider {
         root.setAttribute("title", _title);
         root.setAttribute("time", Double.toString(getTime()));
 
-        Element spawningPoint = new Element("SpawningPoint");
-        spawningPoint.setAttribute("x", Float.toString(_spawningPoint.x));
-        spawningPoint.setAttribute("y", Float.toString(_spawningPoint.y));
-        spawningPoint.setAttribute("z", Float.toString(_spawningPoint.z));
-        root.addContent(spawningPoint);
-
         XMLOutputter outputter = new XMLOutputter();
         FileOutputStream output;
 
@@ -521,12 +491,10 @@ public class LocalWorldProvider {
             InputSource is = new InputSource(new FileInputStream(f));
             Document doc = builder.build(is);
             Element root = doc.getRootElement();
-            Element spawningPoint = root.getChild("SpawningPoint");
 
             _seed = root.getAttribute("seed").getValue();
             _title = root.getAttributeValue("title");
             setTime(Double.parseDouble(root.getAttributeValue("time")));
-            _spawningPoint = new Vector3f(Float.parseFloat(spawningPoint.getAttributeValue("x")), Float.parseFloat(spawningPoint.getAttributeValue("y")), Float.parseFloat(spawningPoint.getAttributeValue("z")));
 
             return true;
         } catch (Exception e) {
@@ -575,9 +543,8 @@ public class LocalWorldProvider {
      */
     public double getTime() {
         long milliSecsSinceCreation = Blockmania.getInstance().getTime() - _creationTime;
-        long wrappedTime = milliSecsSinceCreation % DAY_NIGHT_LENGTH_IN_MS;
 
-        return (double) wrappedTime / (double) DAY_NIGHT_LENGTH_IN_MS;
+        return (double) milliSecsSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
     }
 
     /**
@@ -611,9 +578,5 @@ public class LocalWorldProvider {
 
     public boolean isChunkVisible(Chunk c) {
         return true;
-    }
-
-    public Vector3f getSpawningPoint() {
-        return _spawningPoint;
     }
 }
