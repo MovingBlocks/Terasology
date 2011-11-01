@@ -213,7 +213,7 @@ public class Block implements RenderableObject {
      *
      * @return True if the block type is translucent
      */
-    public boolean isBlockTypeTranslucent() {
+    public boolean isTranslucent() {
         return _translucent;
     }
 
@@ -274,8 +274,7 @@ public class Block implements RenderableObject {
     }
 
     /**
-     * Returns true, if the block should be considered
-     * while calculating shadows.
+     * Returns true, if the block should be considered while calculating shadows.
      *
      * @return True if casting shadows
      */

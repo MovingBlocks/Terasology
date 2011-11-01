@@ -18,7 +18,6 @@ package com.github.begla.blockmania.world.chunk;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.noise.PerlinNoise;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -222,7 +221,7 @@ public class ChunkMeshGenerator {
          */
         ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT;
 
-        if (!block.isBlockTypeTranslucent())
+        if (!block.isTranslucent())
             renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
         if (block.getTitle().equals("Water"))
             renderType = ChunkMesh.RENDER_TYPE.WATER;
@@ -431,7 +430,6 @@ public class ChunkMeshGenerator {
                 p2.y -= 0.25;
             }
         } else if (norm.z == -1.0f) {
-
             p1.y -= 0.25;
             p2.y -= 0.25;
 
@@ -522,7 +520,7 @@ public class ChunkMeshGenerator {
         Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
 
-        return bCheck.getId() == 0x0 || cBlock.doNotTessellate() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (!cBlock.isBlockTypeTranslucent() && bCheck.isBlockTypeTranslucent()) || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BOCK);
+        return bCheck.getId() == 0x0 || cBlock.doNotTessellate() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (!cBlock.isTranslucent() && bCheck.isTranslucent()) || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BOCK);
     }
 
     public static int getVertexArrayUpdateCount() {
