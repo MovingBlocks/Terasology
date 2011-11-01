@@ -15,6 +15,8 @@
  */
 package com.github.begla.blockmania.utilities;
 
+import com.github.begla.blockmania.main.Configuration;
+
 /**
  * Collection of math functions.
  *
@@ -139,5 +141,55 @@ public class MathHelper {
     public static int cantorY(int c) {
         int j = (int) (Math.sqrt(0.25 + 2 * c) - 0.5);
         return c - j * (j + 1) / 2;
+    }
+
+    /**
+     * Returns the chunk position of a given coordinate.
+     *
+     * @param x The X-coordinate of the block
+     * @return The X-coordinate of the chunk
+     */
+    public static int calcChunkPosX(int x) {
+        // Offset for chunks with negative positions
+        if (x < 0)
+            x -= 15;
+
+        return (x / (int) Configuration.CHUNK_DIMENSIONS.x);
+    }
+
+    /**
+     * Returns the chunk position of a given coordinate.
+     *
+     * @param z The Z-coordinate of the block
+     * @return The Z-coordinate of the chunk
+     */
+    public static int calcChunkPosZ(int z) {
+        // Offset for chunks with negative positions
+        if (z < 0)
+            z -= 15;
+
+        return (z / (int) Configuration.CHUNK_DIMENSIONS.z);
+    }
+
+    /**
+     * Returns the internal position of a block within a chunk.
+     *
+     * @param x1 The X-coordinate of the block in the world
+     * @param x2 The X-coordinate of the chunk in the world
+     * @return The X-coordinate of the block within the chunk
+     */
+    public static int calcBlockPosX(int x1, int x2) {
+        return MathHelper.fastAbs(x1 - (x2 * (int) Configuration.CHUNK_DIMENSIONS.x));
+    }
+
+    /**
+     * Returns the internal position of a block within a chunk.
+     *
+     * @param z1 The Z-coordinate of the block in the world
+     * @param z2 The Z-coordinate of the chunk in the world
+     * @return The Z-coordinate of the block within the chunk
+     */
+    public static int calcBlockPosZ(int z1, int z2) {
+        return MathHelper.fastAbs(z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
     }
 }

@@ -32,7 +32,7 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class ChunkCache {
+public final class LocalChunkCache implements ChunkProvider{
 
     private static boolean _running = false;
     /* ------ */
@@ -42,7 +42,7 @@ public final class ChunkCache {
     /**
      * @param parent
      */
-    public ChunkCache(LocalWorldProvider parent) {
+    public LocalChunkCache(LocalWorldProvider parent) {
         _parent = parent;
     }
 
@@ -79,7 +79,7 @@ public final class ChunkCache {
         return c;
     }
 
-    public void freeCacheSpace() {
+    public void freeUnusedSpace() {
         if (_running || _chunkCache.size() <= capacity())
             return;
 
@@ -110,7 +110,7 @@ public final class ChunkCache {
     /**
      * Writes all chunks to disk and disposes them.
      */
-    public void saveAndDisposeAllChunks() {
+    public void dispose() {
         Runnable r = new Runnable() {
             public void run() {
                 for (Chunk c : _chunkCache.values()) {

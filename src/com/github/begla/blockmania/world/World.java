@@ -39,7 +39,6 @@ import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
-import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -55,7 +54,10 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class World extends LocalWorldProvider {
+public final class World {
+
+    /* WORLD PROVIDER */
+    private WorldProvider _worldProvider;
 
     /* PLAYER */
     private Player _player;
@@ -86,13 +88,13 @@ public final class World extends LocalWorldProvider {
     private final WorldTimeEventManager _worldTimeEventManager;
 
     /**
-     * Initializes a new world for the single player mode.
+     * Initializes a new (local) world for the single player mode.
      *
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
     public World(String title, String seed) {
-        super(title, seed);
+        _worldProvider = new LocalWorldProvider(title, seed);
 
         // Init. horizon
         _clouds = new Clouds(this);
@@ -104,7 +106,7 @@ public final class World extends LocalWorldProvider {
         _sphere = new Sphere();
 
         _worldUpdateManager = new WorldUpdateManager();
-        _worldTimeEventManager = new WorldTimeEventManager(this);
+        _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
 
         createMusicTimeEvents();
     }
@@ -131,7 +133,12 @@ public final class World extends LocalWorldProvider {
         _blockParticleEmitter.render();
     }
 
-    private void updateChunksInProximity() {
+    /**
+     * Updates the list of chunks around the player.
+     *
+     * @return True if the list was changed
+     */
+    private boolean updateChunksInProximity() {
         if (prevChunkPosX != calcPlayerChunkOffsetX() || prevChunkPosZ != calcPlayerChunkOffsetZ()) {
             prevChunkPosX = calcPlayerChunkOffsetX();
             prevChunkPosZ = calcPlayerChunkOffsetZ();
@@ -140,21 +147,24 @@ public final class World extends LocalWorldProvider {
 
             for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
                 for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
-                    Chunk c = getChunkCache().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
+                    Chunk c = _worldProvider.getChunkProvider().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
                     newChunksInProximity.add(c);
                 }
             }
 
             Collections.sort(newChunksInProximity);
             _chunksInProximity = newChunksInProximity;
+            return true;
         }
+
+        return false;
     }
 
     /**
      * Updates the daylight value according to the current world time.
      */
     private void updateDaylight() {
-        double time = getTime() % 1;
+        double time = _worldProvider.getTime() % 1;
 
         // Sunrise
         if (time < Configuration.SUN_RISE_SET_DURATION && time > 0.0f) {
@@ -305,15 +315,19 @@ public final class World extends LocalWorldProvider {
     }
 
     public void update() {
-        updateDaylight();
+        // Make sure the chunks near the player are generated first
+        _worldProvider.getRenderingOrigin().set(_player.getPosition());
+
+        // Update the texture animation tick
         updateTick();
 
+        // Update the horizon
+        updateDaylight();
         _skysphere.update();
+        _clouds.update();
 
         // Update the player
         _player.update();
-        // Update the clouds
-        _clouds.update();
 
         // Update the list of relevant chunks
         updateChunksInProximity();
@@ -336,8 +350,10 @@ public final class World extends LocalWorldProvider {
         // Generate new VBOs if available
         _worldUpdateManager.updateVBOs();
 
-        _chunkCache.freeCacheSpace();
+        // Free unused space
+        _worldProvider.getChunkProvider().freeUnusedSpace();
 
+        // And finally fire any active events
         _worldTimeEventManager.fireWorldTimeEvents();
     }
 
@@ -349,6 +365,22 @@ public final class World extends LocalWorldProvider {
             _tick++;
             _lastTick = Blockmania.getInstance().getTime();
         }
+    }
+
+    /**
+     * Returns the maximum height at a given position.
+     *
+     * @param x The X-coordinate
+     * @param z The Z-coordinate
+     * @return The maximum height
+     */
+    public final int maxHeightAt(int x, int z) {
+        for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
+            if (_worldProvider.getBlock(x, y, z) != 0x0)
+                return y;
+        }
+
+        return 0;
     }
 
     /**
@@ -377,39 +409,28 @@ public final class World extends LocalWorldProvider {
     public void setPlayer(Player p) {
         _player = p;
 
-        _player.setSpawningPoint(nextRandomSpawningPoint());
+        _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
         _player.reset();
         _player.respawn();
     }
 
-
     /**
-     * Writes all chunks to disk and disposes them.
+     * Disposes this world.
      */
     public void dispose() {
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Disposing world {0} and saving all chunks.", getTitle());
-
-        saveMetaData();
-        getChunkCache().saveAndDisposeAllChunks();
-
+        _worldProvider.dispose();
         AudioManager.getInstance().stopAllSounds();
     }
 
-    /**
-     * Displays some information about the world formatted as a string.
-     *
-     * @return String with world information
-     */
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _chunkCache.size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _seed, _title);
+        return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _worldProvider.getChunkProvider().size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {
         return _player;
     }
 
-    @Override
     public Vector3f getOrigin() {
         return _player.getPosition();
     }
@@ -422,36 +443,23 @@ public final class World extends LocalWorldProvider {
         return _daylight;
     }
 
-    public FastList<Chunk> getChunksInProximity() {
-        return _chunksInProximity;
-    }
-
     public BlockParticleEmitter getBlockParticleEmitter() {
         return _blockParticleEmitter;
     }
 
-    /**
-     * Returns the active biome at the player's position.
-     */
     public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome() {
-        return getActiveBiome((int) _player.getPosition().x, (int) _player.getPosition().z);
+        return _worldProvider.getActiveBiome((int) _player.getPosition().x, (int) _player.getPosition().z);
     }
 
-    /**
-     * Returns the humidity at the player's position.
-     *
-     * @return
-     */
     public double getActiveHumidity() {
-        return getHumidityAt((int) _player.getPosition().x, (int) _player.getPosition().z);
+        return _worldProvider.getHumidityAt((int) _player.getPosition().x, (int) _player.getPosition().z);
     }
 
-    /**
-     * Returns the temeperature at the player's position.
-     *
-     * @return
-     */
     public double getActiveTemperature() {
-        return getTemperatureAt((int) _player.getPosition().x, (int) _player.getPosition().z);
+        return _worldProvider.getTemperatureAt((int) _player.getPosition().x, (int) _player.getPosition().z);
+    }
+
+    public WorldProvider getWorldProvider() {
+        return _worldProvider;
     }
 }

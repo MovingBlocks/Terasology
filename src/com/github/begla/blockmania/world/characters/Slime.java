@@ -145,7 +145,7 @@ public final class Slime extends Character {
         }
 
         if (Blockmania.getInstance().getTime() - _lastChangeOfDirectionAt > 5000 || distanceToPlayer <= 5) {
-            _movementTarget.set((float) (getPosition().x + _parent.getRandom().randomDouble() * 500), getPosition().y, (float) (getPosition().z + _parent.getRandom().randomDouble() * 500));
+            _movementTarget.set((float) (getPosition().x + _parent.getWorldProvider().getRandom().randomDouble() * 500), getPosition().y, (float) (getPosition().z + _parent.getWorldProvider().getRandom().randomDouble() * 500));
             _lastChangeOfDirectionAt = Blockmania.getInstance().getTime();
         }
 
@@ -153,7 +153,7 @@ public final class Slime extends Character {
         lookAt(_movementTarget);
         walkForward();
 
-        if (_parent.getRandom().randomDouble() < -0.94)
+        if (_parent.getWorldProvider().getRandom().randomDouble() < -0.94)
             jump();
     }
 

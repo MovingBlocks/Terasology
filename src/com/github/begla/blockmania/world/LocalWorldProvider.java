@@ -22,7 +22,8 @@ import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
-import com.github.begla.blockmania.world.chunk.ChunkCache;
+import com.github.begla.blockmania.world.chunk.ChunkProvider;
+import com.github.begla.blockmania.world.chunk.LocalChunkCache;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 import org.jdom.Document;
@@ -43,7 +44,10 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class LocalWorldProvider {
+public class LocalWorldProvider implements WorldProvider {
+
+    /* CHUNK PROVIDER */
+    protected final ChunkProvider _chunkProvider = new LocalChunkCache(this);
 
     /* CONST */
     protected final long DAY_NIGHT_LENGTH_IN_MS = (60 * 1000) * 20; // 20 minutes in milliseconds
@@ -55,9 +59,7 @@ public class LocalWorldProvider {
     /* PROPERTIES */
     protected String _title, _seed;
     protected long _creationTime = Blockmania.getInstance().getTime();
-
-    /* CHUNK CACHE */
-    protected final ChunkCache _chunkCache = new ChunkCache(this);
+    public Vector3f _renderingOrigin = new Vector3f();
 
     /* RANDOMNESS */
     protected final FastRandom _random;
@@ -113,13 +115,13 @@ public class LocalWorldProvider {
      * @return True if a block was set/replaced
      */
     public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
-        int chunkPosX = calcChunkPosX(x);
-        int chunkPosZ = calcChunkPosZ(z);
+        int chunkPosX = MathHelper.calcChunkPosX(x);
+        int chunkPosZ = MathHelper.calcChunkPosZ(z);
 
-        int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
 
         if (c == null) {
             return false;
@@ -207,13 +209,13 @@ public class LocalWorldProvider {
      * @return The type of the block
      */
     public final byte getBlock(int x, int y, int z) {
-        int chunkPosX = calcChunkPosX(x);
-        int chunkPosZ = calcChunkPosZ(z);
+        int chunkPosX = MathHelper.calcChunkPosX(x);
+        int chunkPosZ = MathHelper.calcChunkPosZ(z);
 
-        int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         return c.getBlock(blockPosX, y, blockPosZ);
     }
 
@@ -227,13 +229,13 @@ public class LocalWorldProvider {
      * @return The light value
      */
     public final byte getLight(int x, int y, int z, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = calcChunkPosX(x);
-        int chunkPosZ = calcChunkPosZ(z);
+        int chunkPosX = MathHelper.calcChunkPosX(x);
+        int chunkPosZ = MathHelper.calcChunkPosZ(z);
 
-        int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         return c.getLight(blockPosX, y, blockPosZ, type);
     }
 
@@ -247,162 +249,14 @@ public class LocalWorldProvider {
      * @param type      The type of light
      */
     public void setLight(int x, int y, int z, byte intensity, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = calcChunkPosX(x);
-        int chunkPosZ = calcChunkPosZ(z);
+        int chunkPosX = MathHelper.calcChunkPosX(x);
+        int chunkPosZ = MathHelper.calcChunkPosZ(z);
 
-        int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         c.setLight(blockPosX, y, blockPosZ, intensity, type);
-    }
-
-    /**
-     * Refreshes sunlight vertically at a given global position.
-     *
-     * @param x               The X-coordinate
-     * @param z               The Z-coordinate
-     * @param spreadLight     If true sunlight gets spread
-     * @param refreshSunlight If true sunlight gets refreshed locally
-     */
-    public void refreshSunlightAt(int x, int z, boolean spreadLight, boolean refreshSunlight) {
-        int chunkPosX = calcChunkPosX(x);
-        int chunkPosZ = calcChunkPosZ(z);
-
-        int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, spreadLight, refreshSunlight);
-    }
-
-    /**
-     * "Unspreads" light recursively.
-     *
-     * @param x           The X-coordinate
-     * @param y           The Y-coordinate
-     * @param z           The Z-coordinate
-     * @param lightValue  The initial light value
-     * @param depth       The current depth of the recursion
-     * @param type        The type of light
-     * @param brightSpots List of bright spots found while unspreading the light
-     */
-    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, FastList<Vector3f> brightSpots) {
-        int chunkPosX = calcChunkPosX(x);
-        int chunkPosZ = calcChunkPosZ(z);
-
-        int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        c.unspreadLight(blockPosX, y, blockPosZ, lightValue, depth, type, brightSpots);
-    }
-
-    /**
-     * Propagates light recursively.
-     *
-     * @param x          The X-coordinate
-     * @param y          The Y-coordinate
-     * @param z          The Z-coordinate
-     * @param lightValue The initial light value
-     * @param depth      The current depth of the recursion
-     * @param type       The type of light
-     */
-    public void spreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = calcChunkPosX(x);
-        int chunkPosZ = calcChunkPosZ(z);
-
-        int blockPosX = calcBlockPosX(x, chunkPosX);
-        int blockPosZ = calcBlockPosZ(z, chunkPosZ);
-
-        Chunk c = _chunkCache.loadOrCreateChunk(calcChunkPosX(x), calcChunkPosZ(z));
-        c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
-    }
-
-    /**
-     * Returns the maximum height at a given position.
-     *
-     * @param x The X-coordinate
-     * @param z The Z-coordinate
-     * @return The maximum height
-     */
-    public final int maxHeightAt(int x, int z) {
-        for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
-            if (getBlock(x, y, z) != 0x0)
-                return y;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Returns the chunk position of a given coordinate.
-     *
-     * @param x The X-coordinate of the block
-     * @return The X-coordinate of the chunk
-     */
-    public int calcChunkPosX(int x) {
-        // Offset for chunks with negative positions
-        if (x < 0)
-            x -= 15;
-
-        return (x / (int) Configuration.CHUNK_DIMENSIONS.x);
-    }
-
-    /**
-     * Returns the chunk position of a given coordinate.
-     *
-     * @param z The Z-coordinate of the block
-     * @return The Z-coordinate of the chunk
-     */
-    public int calcChunkPosZ(int z) {
-        // Offset for chunks with negative positions
-        if (z < 0)
-            z -= 15;
-
-        return (z / (int) Configuration.CHUNK_DIMENSIONS.z);
-    }
-
-    /**
-     * Returns the internal position of a block within a chunk.
-     *
-     * @param x1 The X-coordinate of the block in the world
-     * @param x2 The X-coordinate of the chunk in the world
-     * @return The X-coordinate of the block within the chunk
-     */
-    public int calcBlockPosX(int x1, int x2) {
-        return MathHelper.fastAbs(x1 - (x2 * (int) Configuration.CHUNK_DIMENSIONS.x));
-    }
-
-    /**
-     * Returns the internal position of a block within a chunk.
-     *
-     * @param z1 The Z-coordinate of the block in the world
-     * @param z2 The Z-coordinate of the chunk in the world
-     * @return The Z-coordinate of the block within the chunk
-     */
-    public int calcBlockPosZ(int z1, int z2) {
-        return MathHelper.fastAbs(z1 - (z2 * (int) Configuration.CHUNK_DIMENSIONS.z));
-    }
-
-    /**
-     * Returns the object generator for the given title.
-     *
-     * @param s The title
-     * @return The object generator
-     */
-    public ObjectGenerator getObjectGenerator(String s) {
-        return _objectGenerators.get(s);
-    }
-
-    /**
-     * Returns the chunk generator for the given title.
-     *
-     * @param s The title
-     * @return The chunk generator
-     */
-    public ChunkGenerator getChunkGenerator(String s) {
-        return _chunkGenerators.get(s);
     }
 
     /**
@@ -410,7 +264,7 @@ public class LocalWorldProvider {
      *
      * @return The spawning point.
      */
-    public Vector3f nextRandomSpawningPoint() {
+    public Vector3f nextSpawningPoint() {
         for (; ; ) {
             int randX = (int) (_random.randomDouble() * 16000f);
             int randZ = (int) (_random.randomDouble() * 16000f);
@@ -420,6 +274,112 @@ public class LocalWorldProvider {
             if (dens >= 0.0 && dens < 64.0)
                 return new Vector3f(randX, 32, randZ);
         }
+    }
+
+    public void dispose() {
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Disposing local world \"{0}\" and saving all chunks.", getTitle());
+
+        saveMetaData();
+        getChunkProvider().dispose();
+    }
+
+    /**
+     * Returns the humidity at the given position.
+     *
+     * @param x The X-coordinate
+     * @param z The Z-coordinate
+     * @return The humidity
+     */
+    public double getHumidityAt(int x, int z) {
+        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcHumidityAtGlobalPosition(x, z);
+    }
+
+    /**
+     * Returns the temperature at the given position.
+     *
+     * @param x The X-coordinate
+     * @param z The Z-coordinate
+     * @return The temperature
+     */
+    public double getTemperatureAt(int x, int z) {
+        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcTemperatureAtGlobalPosition(x, z);
+    }
+
+    /*
+    * Returns the biome type at the given position.
+    */
+    public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome(int x, int z) {
+        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcBiomeTypeForGlobalPosition(x, z);
+    }
+
+    /**
+     * @return The save path of this world.
+     */
+    public String getWorldSavePath() {
+        return String.format("SAVED_WORLDS/%s", _title);
+    }
+
+    /**
+     * @return The current time
+     */
+    public double getTime() {
+        long milliSecsSinceCreation = Blockmania.getInstance().getTime() - _creationTime;
+
+        return (double) milliSecsSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
+    }
+
+    /**
+     * Sets the current time.
+     *
+     * @param time The time to set
+     */
+    public void setTime(double time) {
+        _creationTime = Blockmania.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
+    }
+
+    /**
+     * Returns the used chunk provider.
+     *
+     * @return
+     */
+    public ChunkProvider getChunkProvider() {
+        return _chunkProvider;
+    }
+
+    /**
+     * Returns the RNG used by this world provider.
+     *
+     * @return
+     */
+    public FastRandom getRandom() {
+        return _random;
+    }
+
+    /**
+     * Returns the title of this world.
+     *
+     * @return
+     */
+    public String getTitle() {
+        return _title;
+    }
+
+    /**
+     * Returns the seed of this world.
+     *
+     * @return
+     */
+    public String getSeed() {
+        return _seed;
+    }
+
+    /**
+     * Returns the rendering origin of this world.
+     *
+     * @return
+     */
+    public Vector3f getRenderingOrigin() {
+        return _renderingOrigin;
     }
 
     /**
@@ -503,80 +463,84 @@ public class LocalWorldProvider {
     }
 
     /**
-     * Returns the humidity at the given position.
+     * Refreshes sunlight vertically at a given global position.
      *
-     * @param x The X-coordinate
-     * @param z The Z-coordinate
-     * @return The humidity
+     * @param x               The X-coordinate
+     * @param z               The Z-coordinate
+     * @param spreadLight     If true sunlight gets spread
+     * @param refreshSunlight If true sunlight gets refreshed locally
      */
-    public double getHumidityAt(int x, int z) {
-        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcHumidityAtGlobalPosition(x, z);
+    public void refreshSunlightAt(int x, int z, boolean spreadLight, boolean refreshSunlight) {
+        int chunkPosX = MathHelper.calcChunkPosX(x);
+        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+
+        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, spreadLight, refreshSunlight);
     }
 
     /**
-     * Returns the temperature at the given position.
+     * "Unspreads" light recursively.
      *
-     * @param x The X-coordinate
-     * @param z The Z-coordinate
-     * @return The temperature
+     * @param x           The X-coordinate
+     * @param y           The Y-coordinate
+     * @param z           The Z-coordinate
+     * @param lightValue  The initial light value
+     * @param depth       The current depth of the recursion
+     * @param type        The type of light
+     * @param brightSpots List of bright spots found while unspreading the light
      */
-    public double getTemperatureAt(int x, int z) {
-        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcTemperatureAtGlobalPosition(x, z);
-    }
+    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, FastList<Vector3f> brightSpots) {
+        int chunkPosX = MathHelper.calcChunkPosX(x);
+        int chunkPosZ = MathHelper.calcChunkPosZ(z);
 
-    /*
-    * Returns the biome type at the given position.
-    */
-    public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome(int x, int z) {
-        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcBiomeTypeForGlobalPosition(x, z);
+        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        c.unspreadLight(blockPosX, y, blockPosZ, lightValue, depth, type, brightSpots);
     }
 
     /**
-     * @return The save path of this world.
-     */
-    public String getWorldSavePath() {
-        return String.format("SAVED_WORLDS/%s", _title);
-    }
-
-    /**
-     * @return The current time
-     */
-    public double getTime() {
-        long milliSecsSinceCreation = Blockmania.getInstance().getTime() - _creationTime;
-
-        return (double) milliSecsSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
-    }
-
-    /**
-     * Sets the current time.
+     * Propagates light recursively.
      *
-     * @param time The time to set
+     * @param x          The X-coordinate
+     * @param y          The Y-coordinate
+     * @param z          The Z-coordinate
+     * @param lightValue The initial light value
+     * @param depth      The current depth of the recursion
+     * @param type       The type of light
      */
-    public void setTime(double time) {
-        _creationTime = Blockmania.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
+    public void spreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type) {
+        int chunkPosX = MathHelper.calcChunkPosX(x);
+        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+
+        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
     }
 
-    public ChunkCache getChunkCache() {
-        return _chunkCache;
+    /**
+     * Returns the object generator for the given title.
+     *
+     * @param s The title
+     * @return The object generator
+     */
+    public ObjectGenerator getObjectGenerator(String s) {
+        return _objectGenerators.get(s);
     }
 
-    public FastRandom getRandom() {
-        return _random;
-    }
-
-    public String getTitle() {
-        return _title;
-    }
-
-    public String getSeed() {
-        return _seed;
-    }
-
-    public Vector3f getOrigin() {
-        return new Vector3f(0, 0, 0);
-    }
-
-    public boolean isChunkVisible(Chunk c) {
-        return true;
+    /**
+     * Returns the chunk generator for the given title.
+     *
+     * @param s The title
+     * @return The chunk generator
+     */
+    public ChunkGenerator getChunkGenerator(String s) {
+        return _chunkGenerators.get(s);
     }
 }

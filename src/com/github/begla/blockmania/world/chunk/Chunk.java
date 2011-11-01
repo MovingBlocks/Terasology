@@ -36,13 +36,11 @@ import java.util.logging.Level;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
- * determined its dimensions. Chunks are used to manage the world efficiently and
+ * determined by its dimensions. Chunks are used to manage the world efficiently and
  * to reduce the batch count within the render loop.
- * <p/>
- * Chunks are tessellated on creation and saved to vertex arrays. From those Vertex Buffer Objects are generated
+ *
+ * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated
  * which are then used for the actual rendering process.
- * <p/>
- * The default size of one chunk is 16x128x16 (32768) blocks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -459,7 +457,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @return The distance of the chunk to the player
      */
     public double distanceToPlayer() {
-        return Math.sqrt(Math.pow(getParent().getOrigin().x - getChunkWorldPosX(), 2) + Math.pow(getParent().getOrigin().z - getChunkWorldPosZ(), 2));
+        return Math.sqrt(Math.pow(getParent().getRenderingOrigin().x - getChunkWorldPosX(), 2) + Math.pow(getParent().getRenderingOrigin().z - getChunkWorldPosZ(), 2));
     }
 
     /**
@@ -470,14 +468,14 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public Chunk[] loadOrCreateNeighbors() {
         Chunk[] chunks = new Chunk[8];
 
-        chunks[0] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z);
-        chunks[1] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z);
-        chunks[2] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x, (int) _position.z + 1);
-        chunks[3] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x, (int) _position.z - 1);
-        chunks[4] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z + 1);
-        chunks[5] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z - 1);
-        chunks[6] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x - 1, (int) _position.z + 1);
-        chunks[7] = getParent().getChunkCache().loadOrCreateChunk((int) _position.x + 1, (int) _position.z - 1);
+        chunks[0] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x + 1, (int) _position.z);
+        chunks[1] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x - 1, (int) _position.z);
+        chunks[2] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x, (int) _position.z + 1);
+        chunks[3] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x, (int) _position.z - 1);
+        chunks[4] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x + 1, (int) _position.z + 1);
+        chunks[5] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x - 1, (int) _position.z - 1);
+        chunks[6] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x - 1, (int) _position.z + 1);
+        chunks[7] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x + 1, (int) _position.z - 1);
         return chunks;
     }
 
@@ -837,15 +835,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public boolean isVisible() {
         return _visible;
-    }
-
-    /**
-     * Returns true if this chunk was disposed.
-     *
-     * @return
-     */
-    public boolean isDisposed() {
-        return _disposed;
     }
 
     /**

@@ -69,7 +69,7 @@ public final class Player extends Character {
         // Display the block the player is aiming at
         if (Configuration.getSettingBoolean("PLACING_BOX")) {
             if (is != null) {
-                if (BlockManager.getInstance().getBlock(_parent.getBlockAtPosition(is.getBlockPosition())).shouldRenderBoundingBox()) {
+                if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition())).shouldRenderBoundingBox()) {
                     Block.AABBForBlockAt(is.getBlockPosition()).render();
                 }
             }
@@ -126,7 +126,7 @@ public final class Player extends Character {
         for (int x = -3; x <= 3; x++) {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -3; z <= 3; z++) {
-                    byte blockType = _parent.getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
+                    byte blockType = _parent.getWorldProvider().getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
 
                     // Ignore special blocks
                     if (BlockManager.getInstance().getBlock(blockType).letsSelectionRayThrough()) {
@@ -134,7 +134,7 @@ public final class Player extends Character {
                     }
 
                     // The ray originates from the "player's eye"
-                    FastList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent, (int) getPosition().x + x, (int) getPosition().y + y, (int) getPosition().z + z, calcEyePosition(), _viewingDirection);
+                    FastList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent.getWorldProvider(), (int) getPosition().x + x, (int) getPosition().y + y, (int) getPosition().z + z, calcEyePosition(), _viewingDirection);
 
                     if (iss != null) {
                         inters.addAll(iss);
@@ -163,7 +163,7 @@ public final class Player extends Character {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
-                Block centerBlock = BlockManager.getInstance().getBlock(getParent().getBlock((int) is.getBlockPosition().x, (int) is.getBlockPosition().y, (int) is.getBlockPosition().z));
+                Block centerBlock = BlockManager.getInstance().getBlock(getParent().getWorldProvider().getBlock((int) is.getBlockPosition().x, (int) is.getBlockPosition().y, (int) is.getBlockPosition().z));
 
                 if (!centerBlock.allowsBlockAttachment()) {
                     return;
@@ -176,26 +176,8 @@ public final class Player extends Character {
                     return;
                 }
 
-                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
-                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false);
-            }
-        }
-    }
-
-    /**
-     * Plants a tree of a given type in front of the player.
-     *
-     * @param type The type of the tree
-     */
-    public void plantTree(int type) {
-        RayBlockIntersection.Intersection is = calcSelectedBlock();
-        if (is != null) {
-            Vector3f blockPos = is.getBlockPosition();
-
-            if (type == 0) {
-                _parent.getObjectGenerator("tree").generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
-            } else {
-                _parent.getObjectGenerator("pineTree").generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
+                getParent().getWorldProvider().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
+                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
             }
         }
     }
@@ -208,18 +190,18 @@ public final class Player extends Character {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
                 Vector3f blockPos = is.getBlockPosition();
-                byte currentBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
-                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
+                byte currentBlockType = getParent().getWorldProvider().getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
+                getParent().getWorldProvider().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
 
                 // Remove the upper block if it's a billboard
-                byte upperBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
+                byte upperBlockType = getParent().getWorldProvider().getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
                 if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                    getParent().setBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z, (byte) 0x0, true, true);
+                    getParent().getWorldProvider().setBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z, (byte) 0x0, true, true);
                 }
 
                 _parent.getBlockParticleEmitter().setOrigin(blockPos);
                 _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
-                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false);
+                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
             }
         }
     }

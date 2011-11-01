@@ -39,7 +39,7 @@
     <block id="8" title="Ice">
         <property name="textureOffset" x="3" y="4"/>
         <property name="translucent">true</property>
-        <property name="blockForm">2</property>
+
     </block>
     <block id="9" title="Water">
         <property name="textureOffset" x="15" y="12"/>

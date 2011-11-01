@@ -61,7 +61,7 @@ public class BlockParticle extends Particle {
         BlockParticleEmitter pE = (BlockParticleEmitter) getParent();
 
         // Very simple "collision detection" for particles.
-        if (pE.getParent().getBlockAtPosition(new Vector3f(_position.x, _position.y + 2 * ((_velocity.y >= 0) ? _size : -_size), _position.z)) != 0x0) {
+        if (pE.getParent().getWorldProvider().getBlockAtPosition(new Vector3f(_position.x, _position.y + 2 * ((_velocity.y >= 0) ? _size : -_size), _position.z)) != 0x0) {
             return false;
         }
 
@@ -77,9 +77,9 @@ public class BlockParticle extends Particle {
         }
 
         BlockParticleEmitter pE = (BlockParticleEmitter) getParent();
-        double lightValueSun = ((double) pE.getParent().getLightAtPosition(_position, Chunk.LIGHT_TYPE.SUN));
+        double lightValueSun = ((double) pE.getParent().getWorldProvider().getLightAtPosition(_position, Chunk.LIGHT_TYPE.SUN));
         lightValueSun =  (lightValueSun / 15.0) * pE.getParent().getDaylight();
-        double lightValueBlock = pE.getParent().getLightAtPosition(_position, Chunk.LIGHT_TYPE.BLOCK);
+        double lightValueBlock = pE.getParent().getWorldProvider().getLightAtPosition(_position, Chunk.LIGHT_TYPE.BLOCK);
         lightValueBlock = lightValueBlock / 15.0;
 
         float lightValue = (float) Math.max(lightValueSun, lightValueBlock) * _lightOffset;

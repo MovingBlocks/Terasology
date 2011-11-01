@@ -94,7 +94,7 @@ public class Skysphere implements RenderableObject {
         //      GL11.glTexParameteri ( GL12.GL_TEXTURE_3D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, 8 );
         //float sunPosInRadians = (float)Math.toRadians(180*(_time-0.075));
 
-        _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getTime() - 90.0);
+        _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         sunNormalise = sunNormalise.normalise(null);
 
