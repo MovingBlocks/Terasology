@@ -55,7 +55,9 @@ public class TextureManager {
             _textures.put("moon", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/moon.png").openStream(), GL_NEAREST));
             _textures.put("slime", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/slime.png").openStream(), GL_NEAREST));
 
-            _textures.put("stars", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/stars.png").openStream(), GL_NEAREST));
+            for(int i=1; i<=6; i++){
+              _textures.put("stars" + i, TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/stars" + i +".png").openStream(), GL_NEAREST));
+            }
 
             Blockmania.getInstance().getLogger().log(Level.FINE, "Finished loading textures!");
         } catch (IOException ex) {

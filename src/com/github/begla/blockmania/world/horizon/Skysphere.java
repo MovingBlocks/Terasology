@@ -56,11 +56,11 @@ public class Skysphere implements RenderableObject {
     private Vector3f[] _noisePermutations;
     private Random rand = new Random();
     private final PerlinNoise _pGen  = new PerlinNoise(7);
-    
+    private float _showClouds = 0.0f;
     
     public Skysphere(World parent) {
         _parent = parent;
-        //loadStarTextures();
+        loadStarTextures();
        
        // createCloudsTexture3D(64, 64, 64);
     }
@@ -91,7 +91,7 @@ public class Skysphere implements RenderableObject {
         glEnable(GL12.GL_TEXTURE_3D);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
         GL11.glBindTexture(GL12.GL_TEXTURE_3D, textureCloudsId.get(0));
-        //      GL11.glTexParameteri ( GL12.GL_TEXTURE_3D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, 8 );
+        GL11.glTexParameteri ( GL12.GL_TEXTURE_3D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, 8 );
         //float sunPosInRadians = (float)Math.toRadians(180*(_time-0.075));
 
         _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
@@ -101,12 +101,15 @@ public class Skysphere implements RenderableObject {
         _zenithColor = getAllWeatherZenith(sunNormalise.y);
 
         ShaderManager.getInstance().enableShader("sky");
+        
+        /*int showClouds = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "showClouds");
+        GL20.glUniform1f(showClouds, _showClouds);*/
 
         int sunPos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunPos");
         GL20.glUniform4f(sunPos, 0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         
         int time = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "time");
-        GL20.glUniform1f(time, (float) _parent.getTime());
+        GL20.glUniform1f(time, (float) _parent.getWorldProvider().getTime());
 
         int sunAngle = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunAngle");
         GL20.glUniform1f(sunAngle, _sunPosAngle);
@@ -179,7 +182,7 @@ public class Skysphere implements RenderableObject {
 
         for (int i = 0; i < 6; i++) {
 
-            byte[] data = TextureManager.getInstance().getTexture("stars").getTextureData();
+            byte[] data = TextureManager.getInstance().getTexture("stars" + (i+1)).getTextureData();
             ByteBuffer byteBuffer = BufferUtils.createByteBuffer(data.length);
             byteBuffer.put(data);
             byteBuffer.flip();
@@ -227,5 +230,13 @@ public class Skysphere implements RenderableObject {
       GL12.glTexImage3D( GL12.GL_TEXTURE_3D, 0, GL_RGBA, width, height, depth, 0, GL_RGBA,
                       GL_UNSIGNED_BYTE, image );
 
+    }
+    
+    public void showClouds(boolean show){
+      if(show){
+        _showClouds = 1.0f;
+      }else{
+        _showClouds = 0.0f;
+      }
     }
 }

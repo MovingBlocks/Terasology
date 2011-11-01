@@ -52,7 +52,7 @@ void main(void)
 	float	ca  = cos ( sunAngle );
   mat3	r   = mat3 ( 1.0, 0.0, 0.0, 0.0, ca, -sa, 0.0, sa, ca );
 
-vec3 v               = normalize ( (gl_Vertex-eyePos).xyz );    
+  vec3 v               = normalize ( (gl_Vertex-eyePos).xyz );    
   vec3 l               = normalize ( sunPos.xyz );
   lv                   = dot  ( l, v );
   skyVec               = r * v.xyz;

@@ -27,7 +27,6 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.horizon.Clouds;
 import com.github.begla.blockmania.world.horizon.Skysphere;
-import com.github.begla.blockmania.world.horizon.Stars;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -81,9 +80,6 @@ public final class World {
     private final WorldUpdateManager _worldUpdateManager;
     private int prevChunkPosX = 0, prevChunkPosZ = 0;
 
-    /* Test */
-    private Stars _stars;
-    private Sphere _sphere;
     /* EVENTS */
     private final WorldTimeEventManager _worldTimeEventManager;
 
@@ -100,11 +96,6 @@ public final class World {
         _clouds = new Clouds(this);
         _skysphere = new Skysphere(this);
 
-        /* Test */
-        //Stars _stars = new Stars();
-        //_stars.loadTextures();
-        _sphere = new Sphere();
-
         _worldUpdateManager = new WorldUpdateManager();
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
 
@@ -117,14 +108,14 @@ public final class World {
     public void render() {
         /* SKYSPHERE */
         _player.getActiveCamera().lookThroughNormalized();
-       // _skysphere.render();
+        _skysphere.render();
 
         /* WORLD RENDERING */
         _player.getActiveCamera().lookThrough();
 
         _player.render();
 
-        renderChunks();
+       // renderChunks();
 
         /* CLOUDS */
         //_clouds.render();
@@ -324,7 +315,7 @@ public final class World {
         // Update the horizon
         updateDaylight();
         _skysphere.update();
-        _clouds.update();
+        //_clouds.update();
 
         // Update the player
         _player.update();
@@ -424,7 +415,7 @@ public final class World {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _worldProvider.getChunkProvider().size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _worldUpdateManager.getVboUpdatesSize(), _worldProvider.getChunkProvider().size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {
