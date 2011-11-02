@@ -40,6 +40,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -55,7 +56,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Blockmania {
 
-    private final ExecutorService _threadPool = Executors.newFixedThreadPool(Configuration.MAX_THREADS);
+    private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(32);
     /* ------ */
     private static final int FRAME_SKIP_MAX_FRAMES = 5;
     private static final int TICKS_PER_SECOND = 60;
@@ -583,7 +584,7 @@ public final class Blockmania {
         return _consoleInput;
     }
 
-    public ExecutorService getThreadPool() {
+    public ThreadPoolExecutor getThreadPool() {
         return _threadPool;
     }
 }

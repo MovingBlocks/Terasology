@@ -30,11 +30,11 @@ public final class Configuration {
     /**
      * Maximum amount of worker threads to be created.
      */
-    public static final int MAX_THREADS = Math.max(Runtime.getRuntime().availableProcessors() - 1, 2);
+    public static final int MAX_THREADS = Math.min(Runtime.getRuntime().availableProcessors()+1, 6);
     /**
      * Amount of VBO updates per frame.
      */
-    public static final int VBO_UPDATES_PER_FRAME = 4;
+    public static final int VBO_UPDATES_PER_FRAME = 2;
     /**
      * Sunrise/sunset duration
      */

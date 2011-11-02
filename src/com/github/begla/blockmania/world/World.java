@@ -25,6 +25,7 @@ import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
+import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.horizon.Clouds;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import javolution.util.FastList;
@@ -69,7 +70,7 @@ public final class World {
     private long _lastTick;
 
     /* UPDATING */
-    private final WorldUpdateManager _worldUpdateManager;
+    private final ChunkUpdateManager _chunkUpdateManager;
     private int prevChunkPosX = 0, prevChunkPosZ = 0;
 
     /* EVENTS */
@@ -88,7 +89,7 @@ public final class World {
         _clouds = new Clouds(this);
         _skysphere = new Skysphere(this);
 
-        _worldUpdateManager = new WorldUpdateManager();
+        _chunkUpdateManager = new ChunkUpdateManager();
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
 
         createMusicTimeEvents();
@@ -321,7 +322,7 @@ public final class World {
         for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
             // Queue dirty chunks for updating
             if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
-                _worldUpdateManager.queueChunkUpdate(n.getValue());
+                _chunkUpdateManager.queueChunkUpdate(n.getValue());
             }
 
             n.getValue().update();
@@ -331,7 +332,7 @@ public final class World {
         _blockParticleEmitter.update();
 
         // Generate new VBOs if available
-        _worldUpdateManager.updateVBOs();
+        _chunkUpdateManager.updateVBOs();
 
         // Free unused space
         _worldProvider.getChunkProvider().freeUnusedSpace();
@@ -407,7 +408,7 @@ public final class World {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _worldProvider.getChunkProvider().size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _chunkUpdateManager.getVboUpdatesSize(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration() / 1000d, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {

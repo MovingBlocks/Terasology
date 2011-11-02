@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.chunk;
 
+import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -27,7 +28,7 @@ import java.util.concurrent.PriorityBlockingQueue;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class WorldUpdateManager {
+public final class ChunkUpdateManager {
 
     /* CHUNK UPDATES */
     private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
@@ -46,7 +47,7 @@ public final class WorldUpdateManager {
     public boolean queueChunkUpdate(Chunk c) {
         final Chunk chunkToProcess = c;
 
-        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < Configuration.MAX_THREADS - 1 || c.distanceToPlayer() < 8.0)) {
+        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < Configuration.MAX_THREADS || c.distanceToPlayer() < 16.0)) {
             _currentlyProcessedChunks.add(chunkToProcess);
 
             // ... create a new thread and start processing.
