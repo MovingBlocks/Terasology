@@ -54,7 +54,7 @@ public final class Configuration {
     /**
      * The string used to generate the default world. If not set, a random seed is used.
      */
-    public static final String DEFAULT_SEED = "wwiiii";
+    public static final String DEFAULT_SEED = "friztztz";
     /**
      * The pixel format used to init. the display.
      */
