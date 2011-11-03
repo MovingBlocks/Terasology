@@ -17,9 +17,7 @@ package com.github.begla.blockmania.main;
 
 import com.github.begla.blockmania.groovy.GroovyManager;
 import com.github.begla.blockmania.gui.HUD;
-import com.github.begla.blockmania.rendering.FontManager;
-import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.rendering.VBOManager;
+import com.github.begla.blockmania.rendering.*;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.world.characters.Player;
@@ -39,7 +37,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +52,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Blockmania {
+public final class Blockmania extends RenderableScene {
 
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(32);
     /* ------ */
@@ -73,6 +70,8 @@ public final class Blockmania {
     private World _world;
     private HUD _hud;
     /* ------- */
+    private FastList<RenderableObject> _renderableObjects = new FastList();
+    /* ------- */
     private final FastRandom _rand = new FastRandom();
     /* ------- */
     private long _timerTicksPerSecond;
@@ -81,7 +80,9 @@ public final class Blockmania {
     /* ------- */
     private final Logger _logger = Logger.getLogger("blockmania");
 
-    /** Groovy Manager handles all the Groovy-related stuff! */
+    /**
+     * Groovy Manager handles all the Groovy-related stuff!
+     */
     private GroovyManager _groovyManager;
 
     // Singleton
@@ -169,21 +170,9 @@ public final class Blockmania {
     }
 
     /**
-     * Returns the system time in milliseconds.
-     *
-     * @return The system time in milliseconds.
-     */
-    public long getTime() {
-        if (_timerTicksPerSecond == 0)
-            return 0;
-
-        return (Sys.getTime() * 1000) / _timerTicksPerSecond;
-    }
-
-    /**
      * Init. the display.
      *
-     * @throws LWJGLException
+     * @throws LWJGLException Thrown when the LWJGL fails
      */
     public void initDisplay() throws LWJGLException {
         if (Configuration.FULLSCREEN) {
@@ -200,7 +189,7 @@ public final class Blockmania {
     /**
      * Init. keyboard and mouse input.
      *
-     * @throws LWJGLException
+     * @throws LWJGLException Thrown when the LWJGL fails
      */
     public void initControls() throws LWJGLException {
         // Keyboard
@@ -210,6 +199,27 @@ public final class Blockmania {
         // Mouse
         Mouse.setGrabbed(true);
         Mouse.create();
+    }
+
+    /**
+     * Prepares a new world with a given name and seed value.
+     *
+     * @param title Title of the world
+     * @param seed  Seed value used for the generators
+     */
+    private void initNewWorldAndPlayer(String title, String seed) {
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+
+        // Get rid of the old world
+        if (_world != null) {
+            _world.dispose();
+        }
+
+        // Init. a new world
+        _world = new World(title, seed);
+        _world.setPlayer(new Player(_world));
+        // Reset the delta value
+        _lastLoopTime = getTime();
     }
 
     /**
@@ -271,15 +281,30 @@ public final class Blockmania {
         _groovyManager = new GroovyManager();
     }
 
-    /**
-     * Renders the scene.
-     */
-    private void render() {
+    public void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
-        _world.render();
-        _hud.render();
+        if (_world != null)
+            _world.render();
+
+        super.render();
+
+        if (_hud != null)
+            _hud.render();
+    }
+
+    public void update() {
+        if (_world != null)
+            _world.update();
+
+        super.update();
+
+        if (_hud != null)
+            _hud.update();
+
+        // Important for the streaming of audio
+        SoundStore.get().poll(0);
     }
 
     private void resizeViewport() {
@@ -332,6 +357,7 @@ public final class Blockmania {
         try {
             _threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
+            getLogger().log(Level.SEVERE, e.toString(), e);
         }
 
         Display.destroy();
@@ -349,17 +375,6 @@ public final class Blockmania {
     public void unpauseGame() {
         _pauseGame = false;
         Mouse.setGrabbed(true);
-    }
-
-    /**
-     * Executes updates.
-     */
-    private void update() {
-        _hud.update();
-        _world.update();
-
-        // Important for the streaming of audio
-        SoundStore.get().poll(0);
     }
 
     /*
@@ -522,28 +537,6 @@ public final class Blockmania {
     }
 
     /**
-     * Prepares a new world with a given name and seed value.
-     *
-     * @param title Title of the world
-     * @param seed  Seed value used for the generators
-     */
-    private void initNewWorldAndPlayer(String title, String seed) {
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
-
-        // Get rid of the old world
-        if (_world != null) {
-            _world.dispose();
-        }
-
-        // Init. a new world
-        _world = new World(title, seed);
-        _world.setPlayer(new Player(_world));
-
-        // Reset the delta value
-        _lastLoopTime = getTime();
-    }
-
-    /**
      * Updates the game statistics like FPS and memory usage.
      */
     private void updateStatistics() {
@@ -589,6 +582,18 @@ public final class Blockmania {
 
     public World getActiveWorld() {
         return _world;
+    }
+
+    /**
+     * Returns the system time in milliseconds.
+     *
+     * @return The system time in milliseconds.
+     */
+    public long getTime() {
+        if (_timerTicksPerSecond == 0)
+            return 0;
+
+        return (Sys.getTime() * 1000) / _timerTicksPerSecond;
     }
 
     public StringBuffer getConsoleInput() {

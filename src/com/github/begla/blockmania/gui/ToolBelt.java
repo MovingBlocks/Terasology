@@ -16,6 +16,10 @@
 package com.github.begla.blockmania.gui;
 
 import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.tools.BlockPlacementRemovalTool;
+import com.github.begla.blockmania.tools.MultipleSelectionTool;
+import com.github.begla.blockmania.tools.RectangleSelectionTool;
+import com.github.begla.blockmania.tools.Tool;
 import com.github.begla.blockmania.world.characters.Player;
 import javolution.util.FastMap;
 
@@ -28,35 +32,67 @@ import java.util.logging.Level;
  * Plugin tools: 51-250     Plugin-based tools - more space for this as we might have more
  * Hotkey bar:              A mapping between 1-10 on the hot bar and the actual available tools via index key on _toolBinding
  * Eventually an inventory system will change what tools are assigned to the 10 available hot bar slots, for now we just pretend
+ *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class ToolBelt {
 
-    /** Map that contains simple native tool index values for a switch here */
-    private FastMap<Byte, Byte> _toolStore = new FastMap<Byte, Byte>();
+    /**
+     * Map that contains simple native tool index values for a switch here
+     */
+    private FastMap<Byte, Tool> _toolStore = new FastMap<Byte, Tool>();
 
-    /** Map that contains advanced plugin tool index values and an associated Groovy command script to execute on use */
+    /**
+     * Map that contains advanced plugin tool index values and an associated Groovy command script to execute on use
+     */
     private FastMap<Byte, String> _pluginStore = new FastMap<Byte, String>();
 
-    /** Map that will bind tool index values with hot keys 1-10 */
+    /**
+     * Map that will bind tool index values with hot keys 1-10
+     */
     private FastMap<Byte, Byte> _toolBinding = new FastMap<Byte, Byte>();
 
-    /** Which slot in the hot bar is the active tool */
+    /**
+     * Which slot in the hot bar is the active tool
+     */
     private byte _selectedTool = 1;
 
-    /** Reference back to the parent Player */
+    /**
+     * Reference back to the parent Player
+     */
     private Player _player;
 
-    /** Default constructor - would do some magic here to add native tools and look for plugin tools */
+    /**
+     * Default constructor - would do some magic here to add native tools and look for plugin tools
+     */
     public ToolBelt(Player parent) {
         _player = parent;
+
+        initNativeTools();
+    }
+
+    /**
+     * Initializes the native tools.
+     */
+    public void initNativeTools() {
+
         // Put the standard place/remove block "tool" in slot 1 (incidentally that corresponds to tool 1)
-        _toolBinding.put(new Byte((byte)1), new Byte((byte)1));
+        _toolBinding.put(new Byte((byte) 1), new Byte((byte) 1));
+        // ... and init. the corresponding tool object
+        _toolStore.put((byte) 1, new BlockPlacementRemovalTool(_player));
+
+        // Init. other native tools as before
+        _toolBinding.put(new Byte((byte) 2), new Byte((byte) 2));
+        _toolStore.put((byte) 2, new MultipleSelectionTool(_player));
+
+        _toolBinding.put(new Byte((byte) 3), new Byte((byte) 3));
+        _toolStore.put((byte) 3, new RectangleSelectionTool(_player));
     }
 
     /**
      * Puts a plugin-based Groovy tool into the _pluginStore
-     * @param groovyScript  String containing a valid Groovy script to execute upon activating the tool
+     *
+     * @param groovyScript String containing a valid Groovy script to execute upon activating the tool
      */
     public void mapPluginTool(String groovyScript) {
         // Nothing yet - assign the script a byte key we can then later bind to a hot bar slot
@@ -64,15 +100,17 @@ public class ToolBelt {
 
     /**
      * Sets _selectedTool to the supplied value, given by the keyboard listener caller
-     * @param toolBarSlotIndex  A 1-10 value corresponding to the slot in the tool bar being selected
+     *
+     * @param toolBarSlotIndex A 1-10 value corresponding to the slot in the tool bar being selected
      */
     public void setSelectedTool(byte toolBarSlotIndex) {
-         _selectedTool = toolBarSlotIndex;
+        _selectedTool = toolBarSlotIndex;
     }
 
     /**
      * Sets _selectedTool to the appropriate index value (the imaginary 10-slot tool belt / hot bar) - via mouse wheel
-     * @param wheelMotion   How many "notches" have the mouse wheel rolled
+     *
+     * @param wheelMotion How many "notches" have the mouse wheel rolled
      */
     public void rollSelectedTool(byte wheelMotion) {
         Blockmania.getInstance().getLogger().log(Level.INFO, "Rolling the selected tool by " + wheelMotion);
@@ -92,7 +130,8 @@ public class ToolBelt {
 
     /**
      * Activates the selected tool - checks _selectedTool against a switch containing both native tools and plugin tools
-     * @param leftMouse  if true then left mouse was used to trigger, otherwise it was right mouse
+     *
+     * @param leftMouse if true then left mouse was used to trigger, otherwise it was right mouse
      */
     public void activateTool(boolean leftMouse) {
         // First we dig out the Byte index that the value in _selectedTool references in the _toolBinding map
@@ -110,22 +149,19 @@ public class ToolBelt {
         }
         // For low range tools we look for the native tool and if it isn't found there's something wrong
         else {
-            switch (toolIndex) {
-                // Tool 1 is the built-in place / remove block mode and the default
-                case 1:
-                    if (leftMouse) {
-                        _player.placeBlock(_player.getSelectedBlockType());
-                    }
-                    else {
-                        _player.removeBlock();
-                    }
-                    break;
 
-                // None of the native tools are selected, what gives :-(
-                default:
-                    Blockmania.getInstance().getLogger().log(Level.WARNING, "Tool activation happened for an unrecognized tool: " + toolIndex);
-                    break;
+            if (_toolStore.containsKey(toolIndex)) {
+
+                // Execute the native tool
+                if (leftMouse)
+                    _toolStore.get(toolIndex).executeLeftClickAction();
+                else
+                    _toolStore.get(toolIndex).executeRightClickAction();
+
+            } else {
+                Blockmania.getInstance().getLogger().log(Level.WARNING, "Tool activation happened for an unrecognized tool: " + toolIndex);
             }
+
         }
     }
 

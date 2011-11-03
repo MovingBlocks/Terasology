@@ -19,6 +19,8 @@ import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.rendering.RenderableObject;
+import com.github.begla.blockmania.rendering.RenderableScene;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
@@ -31,6 +33,7 @@ import com.github.begla.blockmania.world.horizon.Skysphere;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
+import org.newdawn.slick.Renderable;
 import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
@@ -46,7 +49,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class World {
+public final class World extends RenderableScene {
 
     /* WORLD PROVIDER */
     private WorldProvider _worldProvider;
@@ -93,28 +96,6 @@ public final class World {
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
 
         createMusicTimeEvents();
-    }
-
-    /**
-     * Renders the world.
-     */
-    public void render() {
-        /* SKYSPHERE */
-        _player.getActiveCamera().lookThroughNormalized();
-        _skysphere.render();
-
-        /* WORLD RENDERING */
-        _player.getActiveCamera().lookThrough();
-
-        _player.render();
-
-        renderChunks();
-
-        /* CLOUDS */
-        _clouds.render();
-
-        /* PARTICLE EFFECTS */
-        _blockParticleEmitter.render();
     }
 
     /**
@@ -220,6 +201,30 @@ public final class World {
 
         return result;
     }
+
+    /**
+     * Renders the world.
+     */
+    public void render() {
+        /* SKYSPHERE */
+        _player.getActiveCamera().lookThroughNormalized();
+        _skysphere.render();
+
+        /* WORLD RENDERING */
+        _player.getActiveCamera().lookThrough();
+
+        _player.render();
+        renderChunks();
+
+        /* CLOUDS */
+        _clouds.render();
+
+        /* PARTICLE EFFECTS */
+        _blockParticleEmitter.render();
+
+        super.render();
+    }
+
 
     /**
      * Renders the chunks.
@@ -339,6 +344,8 @@ public final class World {
 
         // And finally fire any active events
         _worldTimeEventManager.fireWorldTimeEvents();
+
+        super.update();
     }
 
     /**

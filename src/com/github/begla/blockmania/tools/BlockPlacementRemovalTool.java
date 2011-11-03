@@ -13,25 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.rendering;
+package com.github.begla.blockmania.tools;
 
-import javolution.util.FastList;
+import com.github.begla.blockmania.world.characters.Player;
 
 /**
- * The base class of all renderable objects.
- *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * TODO
  */
-public interface RenderableObject {
+public class BlockPlacementRemovalTool implements Tool {
 
-    /**
-     * Rendering operations have to implement this method.
-     */
-    public void render();
+    private Player _player;
 
-    /**
-     * Updating operations have to implement this method.
-     */
-    public void update();
+    public BlockPlacementRemovalTool(Player player) {
+        _player = player;
+    }
 
+    public void executeLeftClickAction() {
+        _player.placeBlock(_player.getSelectedBlockType());
+    }
+
+    public void executeRightClickAction() {
+        _player.removeBlock();
+    }
 }

@@ -20,6 +20,7 @@ import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.gui.ToolBelt;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.main.Blockmania;
@@ -75,8 +76,8 @@ public final class Player extends Character {
         // Display the block the player is aiming at
         if (Configuration.getSettingBoolean("PLACING_BOX")) {
             if (is != null) {
-                if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition())).shouldRenderBoundingBox()) {
-                    Block.AABBForBlockAt(is.getBlockPosition()).render();
+                if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition().toVector3f())).shouldRenderBoundingBox()) {
+                    Block.AABBForBlockAt(is.getBlockPosition().toVector3f()).render();
                 }
             }
         }
@@ -133,7 +134,7 @@ public final class Player extends Character {
      *
      * @return Intersection point of the targeted block
      */
-    RayBlockIntersection.Intersection calcSelectedBlock() {
+    public RayBlockIntersection.Intersection calcSelectedBlock() {
         FastList<RayBlockIntersection.Intersection> inters = new FastList<RayBlockIntersection.Intersection>();
         for (int x = -3; x <= 3; x++) {
             for (int y = -3; y <= 3; y++) {
@@ -201,17 +202,17 @@ public final class Player extends Character {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
-                Vector3f blockPos = is.getBlockPosition();
-                byte currentBlockType = getParent().getWorldProvider().getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
-                getParent().getWorldProvider().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
+                BlockPosition blockPos = is.getBlockPosition();
+                byte currentBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y, blockPos.z);
+                getParent().getWorldProvider().setBlock( blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, true);
 
                 // Remove the upper block if it's a billboard
-                byte upperBlockType = getParent().getWorldProvider().getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
+                byte upperBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y + 1, blockPos.z);
                 if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                    getParent().getWorldProvider().setBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z, (byte) 0x0, true, true);
+                    getParent().getWorldProvider().setBlock( blockPos.x, blockPos.y + 1, blockPos.z, (byte) 0x0, true, true);
                 }
 
-                _parent.getBlockParticleEmitter().setOrigin(blockPos);
+                _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
                 _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
                 AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
             }

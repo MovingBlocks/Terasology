@@ -29,7 +29,13 @@ public final class BlockPosition implements Comparable<BlockPosition> {
     public final int x;
     public final int y;
     public final int z;
-    private final Vector3f _origin;
+    private Vector3f _origin;
+
+    public BlockPosition(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 
     public BlockPosition(int x, int y, int z, Vector3f origin) {
         this.x = x;
@@ -39,7 +45,26 @@ public final class BlockPosition implements Comparable<BlockPosition> {
     }
 
     double getDistance() {
+        if (_origin == null)
+            return 0;
+
         return new Vector3f(x - _origin.x, y - _origin.y, z - _origin.z).length();
+    }
+
+    public Vector3f toVector3f() {
+        return new Vector3f(x,y,z);
+    }
+
+    public boolean equals(Object o) {
+        if (o.getClass() != BlockPosition.class)
+            return false;
+
+        BlockPosition p = (BlockPosition) o;
+        return p.x == this.x && p.y == this.y && p.z == this.z;
+    }
+
+    public int hashCode() {
+        return (((x * 33) ^ y) * 17) ^ z;
     }
 
     public int compareTo(BlockPosition o) {

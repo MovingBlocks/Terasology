@@ -18,20 +18,40 @@ package com.github.begla.blockmania.rendering;
 import javolution.util.FastList;
 
 /**
- * The base class of all renderable objects.
+ * Scene that contains multiple renderable objects.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface RenderableObject {
+public abstract class RenderableScene implements RenderableObject {
+
+    private FastList<RenderableObject> _renderableObjects = FastList.newInstance();
+
+    public void render() {
+        for (RenderableObject ro : _renderableObjects)
+            ro.render();
+
+    }
+
+    public void update() {
+        for (RenderableObject ro : _renderableObjects)
+            ro.update();
+    }
 
     /**
-     * Rendering operations have to implement this method.
+     * Add a new renderable object.
+     *
+     * @param ro
      */
-    public void render();
+    public void addRenderableObject(RenderableObject ro) {
+        _renderableObjects.add(ro);
+    }
 
     /**
-     * Updating operations have to implement this method.
+     * Remove an existing renderable object.
+     *
+     * @param ro
      */
-    public void update();
-
+    public void removeRenderableObject(RenderableObject ro) {
+        _renderableObjects.remove(ro);
+    }
 }

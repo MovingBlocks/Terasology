@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.rendering;
-
-import javolution.util.FastList;
+package com.github.begla.blockmania.tools;
 
 /**
- * The base class of all renderable objects.
- *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * TODO
  */
-public interface RenderableObject {
+public interface Tool {
 
-    /**
-     * Rendering operations have to implement this method.
-     */
-    public void render();
-
-    /**
-     * Updating operations have to implement this method.
-     */
-    public void update();
+    public void executeLeftClickAction();
+    public void executeRightClickAction();
 
 }
