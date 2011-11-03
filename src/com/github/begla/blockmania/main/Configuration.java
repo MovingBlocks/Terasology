@@ -162,7 +162,7 @@ public final class Configuration {
         _settingsNumeric.put("JUMP_INTENSITY", 0.125);
         _settingsNumeric.put("MAX_GRAVITY", 0.7);
         _settingsNumeric.put("WALKING_SPEED", 0.03);
-        _settingsNumeric.put("RUNNING_FACTOR", 1.8);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.5);
         _settingsNumeric.put("GRAVITY", 0.006);
         _settingsNumeric.put("MAX_GRAVITY_SWIMMING", 0.01);
         _settingsNumeric.put("GRAVITY_SWIMMING", 0.0001);

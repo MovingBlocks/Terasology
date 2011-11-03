@@ -30,7 +30,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  */
 public class FirstPersonCamera extends Camera {
 
-    double _bobbingOffsetFactor = 0.0;
+    double _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0;
 
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
@@ -45,9 +45,11 @@ public class FirstPersonCamera extends Camera {
 
         Vector3f right = new Vector3f();
         Vector3f.cross(_viewingDirection, _up, right);
-        right.scale((float) _bobbingOffsetFactor);
+        right.scale((float) _bobbingRotationOffsetFactor);
 
-        GLU.gluLookAt(_position.x + right.x, _position.y + right.y, _position.z + right.z, _position.x + _viewingDirection.x + right.x, _position.y + _viewingDirection.y + right.y, _position.z + _viewingDirection.z + right.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
+        right.y += _bobbingVerticalOffsetFactor;
+
+        GLU.gluLookAt(_position.x + right.x, _position.y + (float) _bobbingVerticalOffsetFactor * 2.0f + right.y, _position.z + right.z, _position.x + _viewingDirection.x + right.x, _position.y + _viewingDirection.y  + (float) _bobbingVerticalOffsetFactor * 2.0f + right.y, _position.z + _viewingDirection.z + right.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
 
         _viewFrustum.updateFrustum();
     }
@@ -59,8 +61,12 @@ public class FirstPersonCamera extends Camera {
         GLU.gluLookAt(0, 0, 0, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x, _up.y, _up.z);
     }
 
-    public void setBobbingOffsetFactor(double f) {
-        _bobbingOffsetFactor = f;
+        public void setBobbingRotationOffsetFactor(double f) {
+        _bobbingRotationOffsetFactor = f;
+    }
+
+    public void setBobbingVerticalOffsetFactor(double f) {
+        _bobbingVerticalOffsetFactor = f;
     }
 
 }

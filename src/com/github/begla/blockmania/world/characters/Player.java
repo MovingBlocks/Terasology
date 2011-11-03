@@ -53,12 +53,12 @@ public final class Player extends Character {
     }
 
     public void update() {
-        updateCameras();
-
         _godMode = Configuration.getSettingBoolean("GOD_MODE");
-        _walkingSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
+        _walkingSpeed =  Configuration.getSettingNumeric("WALKING_SPEED") + Math.abs(calcBobbingOffset((float) Math.PI/2f, 0.005f, 2.0f));
         _runningFactor = Configuration.getSettingNumeric("RUNNING_FACTOR");
         _jumpIntensity = Configuration.getSettingNumeric("JUMP_INTENSITY");
+
+        updateCameras();
 
         super.update();
     }
@@ -78,13 +78,19 @@ public final class Player extends Character {
         super.render();
     }
 
+    public double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
+        return  Math.sin(_stepCounter * frequency + phaseOffset) * amplitude;
+    }
+
     public void updateCameras() {
         _firstPersonCamera.getPosition().set(calcEyePosition());
 
         if (!(Configuration.getSettingBoolean("GOD_MODE"))) {
-            _firstPersonCamera.setBobbingOffsetFactor(Math.sin(_stepCounter * 2.0) * 0.025);
+            _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.0f));
+            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI/4f, 0.025f, 2.75f));
         } else {
-            _firstPersonCamera.setBobbingOffsetFactor(0);
+            _firstPersonCamera.setBobbingRotationOffsetFactor(0.0);
+            _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);
         }
 
         if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
