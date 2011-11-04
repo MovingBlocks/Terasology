@@ -21,7 +21,8 @@ import javolution.util.FastSet;
 
 import java.util.concurrent.PriorityBlockingQueue;
 
-/**                                                            (byte) 0
+/**
+ * (byte) 0
  * Provides support for updating and generating chunks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -46,7 +47,7 @@ public final class ChunkUpdateManager {
         final Chunk chunkToProcess = c;
         final int maxThreads = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("System.maxThreads");
 
-        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < maxThreads || c.distanceToPlayer() < 16.0)) {
+        if (!_currentlyProcessedChunks.contains(chunkToProcess) && _currentlyProcessedChunks.size() < maxThreads) {
             _currentlyProcessedChunks.add(chunkToProcess);
 
             // ... create a new thread and start processing.

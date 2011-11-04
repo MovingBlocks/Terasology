@@ -99,9 +99,9 @@ public class AudioManager {
      * Stops all audio instances.
      */
     public void stopAllSounds() {
-       for (Audio a : _audioFiles.values()) {
+        for (Audio a : _audioFiles.values()) {
             a.stop();
-       }
+        }
     }
 
     /**

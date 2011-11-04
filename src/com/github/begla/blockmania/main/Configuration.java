@@ -30,7 +30,7 @@ public final class Configuration {
     /**
      * Maximum amount of worker threads to be created.
      */
-    public static final int MAX_THREADS = Math.min(Runtime.getRuntime().availableProcessors()+1, 6);
+    public static final int MAX_THREADS = Math.min(Runtime.getRuntime().availableProcessors() + 1, 6);
     /**
      * Amount of VBO updates per frame.
      */

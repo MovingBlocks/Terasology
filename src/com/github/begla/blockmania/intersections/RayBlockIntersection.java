@@ -19,7 +19,6 @@ package com.github.begla.blockmania.intersections;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
-import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.WorldProvider;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
@@ -129,7 +128,7 @@ public class RayBlockIntersection {
          * Fetch all vertices of the specified block.
          */
         Vector3f[] vertices = Block.AABBForBlockAt(x, y, z).getVertices();
-        BlockPosition blockPos = new BlockPosition(x,y,z);
+        BlockPosition blockPos = new BlockPosition(x, y, z);
 
         /*
          * Generate a new intersection for each side of the block.

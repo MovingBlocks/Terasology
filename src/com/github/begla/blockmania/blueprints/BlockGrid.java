@@ -33,14 +33,14 @@ public class BlockGrid implements RenderableObject {
     private FastList<BlockPosition> _gridPositions = FastList.newInstance();
 
     public void render() {
-       for (BlockPosition gp : _gridPositions) {
-           GL11.glPushMatrix();
+        for (BlockPosition gp : _gridPositions) {
+            GL11.glPushMatrix();
 
-           GL11.glTranslatef(gp.x, gp.y, gp.z);
-          _displayAABB.render();
+            GL11.glTranslatef(gp.x, gp.y, gp.z);
+            _displayAABB.render();
 
-           GL11.glPopMatrix();
-       }
+            GL11.glPopMatrix();
+        }
     }
 
     public void addGridPosition(BlockPosition gridPosition) {
@@ -48,7 +48,7 @@ public class BlockGrid implements RenderableObject {
     }
 
     public void removeGridPosition(BlockPosition gridPosition) {
-       _gridPositions.remove(gridPosition);
+        _gridPositions.remove(gridPosition);
     }
 
     public void clear() {
@@ -56,7 +56,7 @@ public class BlockGrid implements RenderableObject {
     }
 
     public void update() {
-       // Nothing to do.
+        // Nothing to do.
     }
 
 }

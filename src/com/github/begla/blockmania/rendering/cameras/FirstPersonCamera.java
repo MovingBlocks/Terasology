@@ -35,7 +35,11 @@ public class FirstPersonCamera extends Camera {
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective((Float) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.fov"), (Float) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.aspectRatio"), 0.1f, 1024f);
+
+        float fov = ((Double) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.fov")).floatValue();
+        float aspectRatio = ((Double) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.aspectRatio")).floatValue();
+        gluPerspective(fov, aspectRatio, 0.1f, 1024f);
+
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 
@@ -49,7 +53,7 @@ public class FirstPersonCamera extends Camera {
 
         right.y += _bobbingVerticalOffsetFactor;
 
-        GLU.gluLookAt(_position.x + right.x, _position.y + (float) _bobbingVerticalOffsetFactor * 2.0f + right.y, _position.z + right.z, _position.x + _viewingDirection.x + right.x, _position.y + _viewingDirection.y  + (float) _bobbingVerticalOffsetFactor * 2.0f + right.y, _position.z + _viewingDirection.z + right.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
+        GLU.gluLookAt(_position.x + right.x, _position.y + (float) _bobbingVerticalOffsetFactor * 2.0f + right.y, _position.z + right.z, _position.x + _viewingDirection.x + right.x, _position.y + _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f + right.y, _position.z + _viewingDirection.z + right.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
 
         _viewFrustum.updateFrustum();
     }
@@ -61,7 +65,7 @@ public class FirstPersonCamera extends Camera {
         GLU.gluLookAt(0, 0, 0, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x, _up.y, _up.z);
     }
 
-        public void setBobbingRotationOffsetFactor(double f) {
+    public void setBobbingRotationOffsetFactor(double f) {
         _bobbingRotationOffsetFactor = f;
     }
 

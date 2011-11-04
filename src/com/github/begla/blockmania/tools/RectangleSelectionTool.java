@@ -53,7 +53,7 @@ public class RectangleSelectionTool implements Tool {
         if (_currentBlueprint == null)
             addBlock(is.getBlockPosition());
         else
-           _currentBlueprint.build(_player.getParent().getWorldProvider(), is.getBlockPosition());
+            _currentBlueprint.build(_player.getParent().getWorldProvider(), is.getBlockPosition());
     }
 
     public void executeRightClickAction() {

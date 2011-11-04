@@ -48,9 +48,9 @@
         <property name="penetrable">true</property>
         <property name="renderBoundingBox">false</property>
         <property name="bypassSelectionRay">true</property>
-		<property name="translucent">true</property>
-		<property name="castsShadows">false</property>
-		<property name="liquid">true</property>
+        <property name="translucent">true</property>
+        <property name="castsShadows">false</property>
+        <property name="liquid">true</property>
     </block>
     <block id="10" title="Lava">
         <property name="textureOffset" x="15" y="15"/>
@@ -58,26 +58,26 @@
         <property name="blockForm">2</property>
         <property name="hardness">-1</property>
         <property name="penetrable">true</property>
-		<property name="castsShadows">false</property>
-		<property name="liquid">true</property>
+        <property name="castsShadows">false</property>
+        <property name="liquid">true</property>
     </block>
     <block id="11" title="Leaf">
-		<property name="allowBlockAttachment">false</property>
+        <property name="allowBlockAttachment">false</property>
         <property name="textureOffset" x="4" y="3"/>
         <property name="colorSource">2</property>
         <property name="translucent">true</property>
         <property name="noTessellation">true</property>
     </block>
-	<block id="12" title="Dark leaf">
-		<property name="allowBlockAttachment">false</property>
-		<property name="colorOffset" r="0.8" g="0.8" b="0.8" a="1.0"/>
+    <block id="12" title="Dark leaf">
+        <property name="allowBlockAttachment">false</property>
+        <property name="colorOffset" r="0.8" g="0.8" b="0.8" a="1.0"/>
         <property name="textureOffset" x="4" y="3"/>
         <property name="colorSource">2</property>
         <property name="translucent">true</property>
         <property name="noTessellation">true</property>
     </block>
     <block id="13" title="High grass">
-		<property name="allowBlockAttachment">false</property>
+        <property name="allowBlockAttachment">false</property>
         <property name="colorSource">2</property>
         <property name="blockForm">3</property>
         <property name="renderBoundingBox">false</property>
@@ -86,7 +86,7 @@
         <property name="penetrable">true</property>
     </block>
     <block id="14" title="Medium high grass">
-		<property name="allowBlockAttachment">false</property>
+        <property name="allowBlockAttachment">false</property>
         <property name="colorSource">2</property>
         <property name="blockForm">3</property>
         <property name="renderBoundingBox">false</property>
@@ -95,7 +95,7 @@
         <property name="penetrable">true</property>
     </block>
     <block id="15" title="Large high grass">
-		<property name="allowBlockAttachment">false</property>
+        <property name="allowBlockAttachment">false</property>
         <property name="colorSource">2</property>
         <property name="blockForm">3</property>
         <property name="renderBoundingBox">false</property>
@@ -104,7 +104,7 @@
         <property name="penetrable">true</property>
     </block>
     <block id="16" title="Red flower">
-		<property name="allowBlockAttachment">false</property>
+        <property name="allowBlockAttachment">false</property>
         <property name="colorSource">2</property>
         <property name="blockForm">3</property>
         <property name="renderBoundingBox">false</property>
@@ -113,7 +113,7 @@
         <property name="penetrable">true</property>
     </block>
     <block id="17" title="Yellow flower">
-		<property name="allowBlockAttachment">false</property>
+        <property name="allowBlockAttachment">false</property>
         <property name="colorSource">2</property>
         <property name="blockForm">3</property>
         <property name="renderBoundingBox">false</property>
@@ -191,7 +191,7 @@
         <property name="textureOffset" x="0" y="4"/>
     </block>
     <block id="36" title="Torch">
-		<property name="allowBlockAttachment">false</property>
+        <property name="allowBlockAttachment">false</property>
         <property name="textureOffset" x="0" y="5"/>
         <property name="blockForm">3</property>
         <property name="luminance">15</property>

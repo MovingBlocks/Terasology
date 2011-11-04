@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.audio.AudioManager;
+import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.BlockmaniaConfiguration;
@@ -103,6 +104,7 @@ public final class World extends RenderableScene {
      */
     private boolean updateChunksInProximity() {
         if (prevChunkPosX != calcPlayerChunkOffsetX() || prevChunkPosZ != calcPlayerChunkOffsetZ()) {
+
             prevChunkPosX = calcPlayerChunkOffsetX();
             prevChunkPosZ = calcPlayerChunkOffsetZ();
 
@@ -187,9 +189,9 @@ public final class World extends RenderableScene {
      */
     public FastList<Chunk> fetchVisibleChunks() {
         FastList<Chunk> result = new FastList<Chunk>();
-        FastList<Chunk> chunksInPromity = _chunksInProximity;
+        FastList<Chunk> chunksInProximity = _chunksInProximity;
 
-        for (FastList.Node<Chunk> n = chunksInPromity.head(), end = chunksInPromity.tail(); (n = n.getNext()) != end; ) {
+        for (FastList.Node<Chunk> n = chunksInProximity.head(), end = chunksInProximity.tail(); (n = n.getNext()) != end; ) {
             Chunk c = n.getValue();
 
             if (isChunkVisible(c)) {
@@ -322,17 +324,17 @@ public final class World extends RenderableScene {
 
         // Update the list of relevant chunks
         updateChunksInProximity();
-        // And fetch those chunks that are in sight of the player
-        FastList<Chunk> visibleChunks = fetchVisibleChunks();
 
-        // Update chunks
-        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            // Queue dirty chunks for updating
-            if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
-                _chunkUpdateManager.queueChunkUpdate(n.getValue());
+        // Update visible chunks
+        for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; ) {
+            if (n.getValue().isVisible()) {
+                if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
+                    _chunkUpdateManager.queueChunkUpdate(n.getValue());
+                    continue;
+                }
+
+                n.getValue().update();
             }
-
-            n.getValue().update();
         }
 
         // Update the particle emitters
@@ -417,7 +419,7 @@ public final class World extends RenderableScene {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _chunkUpdateManager.getVboUpdatesSize(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration() / 1000d, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fms, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _chunkUpdateManager.getVboUpdatesSize(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {

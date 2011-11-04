@@ -34,32 +34,40 @@ import java.util.logging.Level;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class GroovyManager {
-    /** The Binding allows us to keep variable references around where Groovy can play with them */
+    /**
+     * The Binding allows us to keep variable references around where Groovy can play with them
+     */
     private Binding _bind;
 
-    /** Directory where we keep "plugin" files (Groovy scripts we'll run - prolly move this setting elsewhere sometime) */
+    /**
+     * Directory where we keep "plugin" files (Groovy scripts we'll run - prolly move this setting elsewhere sometime)
+     */
     private final String pluginsPath = ResourceLoader.getResource("com/github/begla/blockmania/data/plugins/").getPath();
 
-    /** Initialize the GroovyManager and "share" the given World variable via the Binding */
+    /**
+     * Initialize the GroovyManager and "share" the given World variable via the Binding
+     */
     public GroovyManager() {
         _bind = new Binding();
-        _bind.setVariable("bm",  Blockmania.getInstance());
+        _bind.setVariable("bm", Blockmania.getInstance());
         _bind.setVariable("conf", BlockmaniaConfiguration.getInstance().getConfig());
 
         // Could execute plugins here that must go before the game starts (in a loop) etc
         initializePlugin("Hello");
     }
 
-    /** Method to initialize a plugin - a.k.a. execute a Groovy script in the plugin dir
-     * @param pluginName    Name of a particular plugin file to execute
+    /**
+     * Method to initialize a plugin - a.k.a. execute a Groovy script in the plugin dir
+     *
+     * @param pluginName Name of a particular plugin file to execute
      */
     public void initializePlugin(String pluginName) {
-         GroovyScriptEngine gse = null;
+        GroovyScriptEngine gse = null;
         try {
             // Create an engine tied to the dir we keep plugins in
             gse = new GroovyScriptEngine(pluginsPath);
         } catch (IOException ioe) {
-           Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to initialize plugin (IOException): " + pluginName + ", reason: " + ioe.toString(), ioe);
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to initialize plugin (IOException): " + pluginName + ", reason: " + ioe.toString(), ioe);
             ioe.printStackTrace();
         }
 
@@ -77,9 +85,11 @@ public class GroovyManager {
         }
     }
 
-    /** Executes the given command with Groovy (short the prefix "groovy "
-     *  @param      consoleString   Contains what the user entered into the console
-     *  @return                     boolean indicating command success or not
+    /**
+     * Executes the given command with Groovy (short the prefix "groovy "
+     *
+     * @param consoleString Contains what the user entered into the console
+     * @return boolean indicating command success or not
      */
     public boolean runGroovyShell(String consoleString) {
         Blockmania.getInstance().getLogger().log(Level.INFO, "Groovy console about to execute command: " + consoleString);
@@ -87,8 +97,7 @@ public class GroovyManager {
         try {
             shell.evaluate(consoleString);
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }

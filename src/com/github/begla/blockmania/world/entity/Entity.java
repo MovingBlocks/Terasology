@@ -56,7 +56,7 @@ public abstract class Entity implements RenderableObject {
      * @param z
      */
     public void setPosition(float x, float y, float z) {
-        _position.set(x,y,z);
+        _position.set(x, y, z);
     }
 
     /**

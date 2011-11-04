@@ -15,7 +15,6 @@
  */
 package com.github.begla.blockmania.blueprints;
 
-import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.world.WorldProvider;
@@ -57,7 +56,7 @@ public class BlueprintGenerator {
             BlockPosition newPos = new BlockPosition(pos.x - minX, pos.y - minY, pos.z - minZ);
 
             result.getBlockPositions().add(newPos);
-            result.getBlockTypes().put(newPos, BlockManager.getInstance().getBlock(provider.getBlock(pos.x,pos.y,pos.z)));
+            result.getBlockTypes().put(newPos, BlockManager.getInstance().getBlock(provider.getBlock(pos.x, pos.y, pos.z)));
         }
 
         return result;

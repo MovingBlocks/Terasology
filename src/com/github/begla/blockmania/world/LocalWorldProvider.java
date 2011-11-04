@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.BlockmaniaConfiguration;
@@ -44,13 +45,13 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class LocalWorldProvider implements WorldProvider {
+public class LocalWorldProvider extends WorldProvider {
 
     /* CHUNK PROVIDER */
     protected final ChunkProvider _chunkProvider = new LocalChunkCache(this);
 
     /* CONST */
-    protected final long DAY_NIGHT_LENGTH_IN_MS = (60 * 1000) * 20; // 20 minutes in milliseconds
+    protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) BlockmaniaConfiguration.getInstance().getConfig().get("World.dayNightLength");
 
     /* WORLD GENERATION */
     protected final FastMap<String, ChunkGenerator> _chunkGenerators = new FastMap<String, ChunkGenerator>(8);
@@ -104,7 +105,7 @@ public class LocalWorldProvider implements WorldProvider {
     }
 
     /**
-     * Places a block of a specific type at a given position and refreshes the
+     * Places a block of a specific type at a given position and optionally refreshes the
      * corresponding light values.
      *
      * @param x           The X-coordinate
@@ -135,6 +136,8 @@ public class LocalWorldProvider implements WorldProvider {
             if (BlockManager.getInstance().getBlock(c.getBlock(blockPosX, y, blockPosZ)).isDestructible()) {
                 c.setBlock(blockPosX, y, blockPosZ, type);
                 newBlock = type;
+
+                notifyObserversBlockChanged(c, new BlockPosition(blockPosX, y, blockPosZ));
             } else {
                 return false;
             }
@@ -258,6 +261,8 @@ public class LocalWorldProvider implements WorldProvider {
 
         Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         c.setLight(blockPosX, y, blockPosZ, intensity, type);
+
+        notifyObserversLightChanged(c, new BlockPosition(blockPosX, y, blockPosZ));
     }
 
     /**
@@ -266,7 +271,7 @@ public class LocalWorldProvider implements WorldProvider {
      * @return The spawning point.
      */
     public Vector3f nextSpawningPoint() {
-        for (; ; ) {
+        for (;;) {
             int randX = (int) (_random.randomDouble() * 16000f);
             int randZ = (int) (_random.randomDouble() * 16000f);
 

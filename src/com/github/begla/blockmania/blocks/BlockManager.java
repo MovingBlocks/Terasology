@@ -22,8 +22,6 @@ import org.jdom.input.SAXBuilder;
 import org.newdawn.slick.util.ResourceLoader;
 import org.xml.sax.InputSource;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
 
 /**

@@ -52,7 +52,7 @@ public final class BlockPosition implements Comparable<BlockPosition> {
     }
 
     public Vector3f toVector3f() {
-        return new Vector3f(x,y,z);
+        return new Vector3f(x, y, z);
     }
 
     public boolean equals(Object o) {

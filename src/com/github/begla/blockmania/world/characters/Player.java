@@ -177,7 +177,7 @@ public final class Player extends Character {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
-                Block centerBlock = BlockManager.getInstance().getBlock(getParent().getWorldProvider().getBlock((int) is.getBlockPosition().x, (int) is.getBlockPosition().y, (int) is.getBlockPosition().z));
+                Block centerBlock = BlockManager.getInstance().getBlock(getParent().getWorldProvider().getBlock(is.getBlockPosition().x, is.getBlockPosition().y, is.getBlockPosition().z));
 
                 if (!centerBlock.allowsBlockAttachment()) {
                     return;
@@ -333,11 +333,8 @@ public final class Player extends Character {
         if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
             strafeRight();
         }
-        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && _touchingGround) {
-            _running = true;
-        } else {
-            _running = false;
-        }
+
+        _running = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && _touchingGround;
     }
 
     /**
@@ -385,7 +382,7 @@ public final class Player extends Character {
 
     @Override
     protected void handleHorizontalCollision() {
-        // Uh. A wall.
+        // Nothing special to do.
     }
 
     public byte getSelectedBlockType() {

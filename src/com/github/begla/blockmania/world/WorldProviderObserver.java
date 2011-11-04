@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.rendering;
+package com.github.begla.blockmania.world;
+
+import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
- * The base class of all renderable objects.
+ * World provider observers are notified if something in the world changes.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface RenderableObject {
+public interface WorldProviderObserver {
 
-    /**
-     * Rendering operations have to implement this method.
-     */
-    public void render();
-
-    /**
-     * Updating operations have to implement this method.
-     */
-    public void update();
+    public void lightChanged(Chunk chunk, BlockPosition pos);
+    public void blockChanged(Chunk chunk, BlockPosition pos);
 
 }

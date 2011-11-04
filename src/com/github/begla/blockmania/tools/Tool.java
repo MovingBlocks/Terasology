@@ -21,6 +21,7 @@ package com.github.begla.blockmania.tools;
 public interface Tool {
 
     public void executeLeftClickAction();
+
     public void executeRightClickAction();
 
 }

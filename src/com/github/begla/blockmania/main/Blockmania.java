@@ -17,12 +17,14 @@ package com.github.begla.blockmania.main;
 
 import com.github.begla.blockmania.groovy.GroovyManager;
 import com.github.begla.blockmania.gui.HUD;
-import com.github.begla.blockmania.rendering.*;
+import com.github.begla.blockmania.rendering.FontManager;
+import com.github.begla.blockmania.rendering.RenderableScene;
+import com.github.begla.blockmania.rendering.ShaderManager;
+import com.github.begla.blockmania.rendering.VBOManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
-import javolution.util.FastList;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
