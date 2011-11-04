@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
@@ -41,9 +41,9 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
      */
     @Override
     public void generate(Chunk c) {
-        for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+        for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
+            for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
+                for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
                     generateGrassAndFlowers(c, x, y, z);
                 }
             }
@@ -53,9 +53,9 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
     }
 
     private void generateTreesAndCacti(Chunk c) {
-        for (int y = 32; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-            for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x += 4) {
-                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z += 4) {
+        for (int y = 32; y < Chunk.getChunkDimensionY(); y++) {
+            for (int x = 0; x < Chunk.getChunkDimensionX(); x += 4) {
+                for (int z = 0; z < Chunk.getChunkDimensionZ(); z += 4) {
 
                     double rand = (_worldProvider.getRandom().randomDouble() + 1.0) / 2.0;
                     double prob = 1.0;

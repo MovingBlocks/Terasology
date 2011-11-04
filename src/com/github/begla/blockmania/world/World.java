@@ -18,8 +18,7 @@ package com.github.begla.blockmania.world;
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.rendering.RenderableObject;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.rendering.RenderableScene;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
@@ -33,7 +32,6 @@ import com.github.begla.blockmania.world.horizon.Skysphere;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
-import org.newdawn.slick.Renderable;
 import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
@@ -110,8 +108,11 @@ public final class World extends RenderableScene {
 
             FastList<Chunk> newChunksInProximity = new FastList<Chunk>();
 
-            for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
-                for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
+            int viewingDistanceX = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceX");
+            int viewingDistanceZ = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceZ");
+
+            for (int x = -(viewingDistanceX / 2); x < (viewingDistanceX / 2); x++) {
+                for (int z = -(viewingDistanceZ / 2); z < (viewingDistanceZ / 2); z++) {
                     Chunk c = _worldProvider.getChunkProvider().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
                     newChunksInProximity.add(c);
                 }
@@ -130,17 +131,18 @@ public final class World extends RenderableScene {
      */
     private void updateDaylight() {
         double time = _worldProvider.getTime() % 1;
+        double sunRiseSetDuration = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.sunRiseSetDuration");
 
         // Sunrise
-        if (time < Configuration.SUN_RISE_SET_DURATION && time > 0.0f) {
-            _daylight = time / Configuration.SUN_RISE_SET_DURATION;
-        } else if (time >= Configuration.SUN_RISE_SET_DURATION && time <= 0.5f) {
+        if (time < sunRiseSetDuration && time > 0.0f) {
+            _daylight = time / sunRiseSetDuration;
+        } else if (time >= sunRiseSetDuration && time <= 0.5f) {
             _daylight = 1.0f;
         }
 
         // Sunset
-        if (time > 0.5 - Configuration.SUN_RISE_SET_DURATION && time < 0.5f) {
-            _daylight = (0.5f - time) / Configuration.SUN_RISE_SET_DURATION;
+        if (time > 0.5 - sunRiseSetDuration && time < 0.5f) {
+            _daylight = (0.5f - time) / sunRiseSetDuration;
         } else if (time >= 0.5 && time <= 1.0f) {
             _daylight = 0.0f;
         }
@@ -254,7 +256,7 @@ public final class World extends RenderableScene {
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
 
 
-            if (Configuration.getSettingBoolean("CHUNK_OUTLINES")) {
+            if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
                 c.getAABB().render();
             }
         }
@@ -366,7 +368,7 @@ public final class World extends RenderableScene {
      * @return The maximum height
      */
     public final int maxHeightAt(int x, int z) {
-        for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
+        for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
             if (_worldProvider.getBlock(x, y, z) != 0x0)
                 return y;
         }
@@ -380,7 +382,7 @@ public final class World extends RenderableScene {
      * @return The player offset on the x-axis
      */
     private int calcPlayerChunkOffsetX() {
-        return (int) (_player.getPosition().x / Configuration.CHUNK_DIMENSIONS.x);
+        return (int) (_player.getPosition().x / Chunk.getChunkDimensionX());
     }
 
     /**
@@ -389,7 +391,7 @@ public final class World extends RenderableScene {
      * @return The player offset on the z-axis
      */
     private int calcPlayerChunkOffsetZ() {
-        return (int) (_player.getPosition().z / Configuration.CHUNK_DIMENSIONS.z);
+        return (int) (_player.getPosition().z / Chunk.getChunkDimensionZ());
     }
 
     /**

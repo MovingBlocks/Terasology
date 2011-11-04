@@ -18,7 +18,7 @@ package com.github.begla.blockmania.world.characters;
 
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.world.World;
 import org.lwjgl.opengl.GL11;
@@ -39,7 +39,8 @@ public final class Slime extends Character {
     private Vector3f _movementTarget = new Vector3f();
 
     public Slime(World parent) {
-        super(parent, Configuration.getSettingNumeric("WALKING_SPEED") / 4, Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
+        // TODO: Load this from config
+        super(parent, 0.01, 1.5, 0.125);
         _instanceCounter++;
     }
 

@@ -19,7 +19,7 @@ package com.github.begla.blockmania.datastructures;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
- * Represents the position of a block. This class is used within the
+ * Represents the position of a block. This class is used mainly in the
  * collision detection process.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

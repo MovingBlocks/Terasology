@@ -18,6 +18,7 @@
       <entry name="?*.png" />
       <entry name="?*.ogg" />
       <entry name="?*.fnt" />
+      <entry name="?*.groovy" />
     </wildcardResourcePatterns>
     <annotationProcessing enabled="false" useClasspath="true" />
   </component>

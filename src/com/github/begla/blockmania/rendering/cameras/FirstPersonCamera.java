@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.rendering.cameras;
 
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Vector3f;
@@ -35,7 +35,7 @@ public class FirstPersonCamera extends Camera {
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(Configuration.getSettingNumeric("FOV").floatValue(), (float) Configuration.ASPECT_RATIO, 0.1f, 1024f);
+        gluPerspective((Float) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.fov"), (Float) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.aspectRatio"), 0.1f, 1024f);
         glMatrixMode(GL11.GL_MODELVIEW);
     }
 

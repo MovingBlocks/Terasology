@@ -17,7 +17,7 @@ package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -39,12 +39,12 @@ public class ChunkMeshGenerator {
     public ChunkMesh generateMesh() {
         ChunkMesh mesh = new ChunkMesh();
 
-        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+        for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
+            for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
                 double biomeTemp = _chunk.getParent().getTemperatureAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
                 double biomeHumidity = _chunk.getParent().getHumidityAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
 
-                for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
+                for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
                     byte blockType = _chunk.getBlock(x, y, z);
                     Block block = BlockManager.getInstance().getBlock(blockType);
 
@@ -156,9 +156,9 @@ public class ChunkMeshGenerator {
         for (int i = 0; i < 4; i++) {
             Block b = BlockManager.getInstance().getBlock(blocks[i]);
             if (b.isCastingShadows() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) {
-                result -= Configuration.OCCLUSION_AMOUNT_DEFAULT;
+                result -= (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Lighting.occlusionIntensDefault");
             } else if (b.isCastingShadows() && b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                result -= Configuration.OCCLUSION_AMOUNT_BILLBOARDS;
+                result -= (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Lighting.occlusionIntensBillboards");
             }
         }
 
@@ -384,9 +384,9 @@ public class ChunkMeshGenerator {
     }
 
     private Vector3f moveVectorToWorldSpace(int cPosX, int cPosY, int cPosZ, Vector3f offset) {
-        double offsetX = _chunk.getPosition().x * Configuration.CHUNK_DIMENSIONS.x;
-        double offsetY = _chunk.getPosition().y * Configuration.CHUNK_DIMENSIONS.y;
-        double offsetZ = _chunk.getPosition().z * Configuration.CHUNK_DIMENSIONS.z;
+        double offsetX = _chunk.getPosition().x * Chunk.getChunkDimensionX();
+        double offsetY = _chunk.getPosition().y * Chunk.getChunkDimensionY();
+        double offsetZ = _chunk.getPosition().z * Chunk.getChunkDimensionZ();
 
         offset.x += offsetX + cPosX;
         offset.y += offsetY + cPosY;

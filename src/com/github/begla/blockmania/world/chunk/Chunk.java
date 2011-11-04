@@ -21,7 +21,7 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.entity.StaticEntity;
@@ -38,7 +38,7 @@ import java.util.logging.Level;
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
  * determined by its dimensions. Chunks are used to manage the world efficiently and
  * to reduce the batch count within the render loop.
- *
+ * <p/>
  * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated
  * which are then used for the actual rendering process.
  *
@@ -75,13 +75,25 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public Chunk() {
         _meshGenerator = new ChunkMeshGenerator(this);
 
-        _blocks = new BlockmaniaArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
-        _sunlight = new BlockmaniaSmartArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
-        _light = new BlockmaniaSmartArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
+        _blocks = new BlockmaniaArray(getChunkDimensionX(), (int) getChunkDimensionY(), (int) getChunkDimensionZ());
+        _sunlight = new BlockmaniaSmartArray(getChunkDimensionX(), (int) getChunkDimensionY(), (int) getChunkDimensionZ());
+        _light = new BlockmaniaSmartArray(getChunkDimensionX(), (int) getChunkDimensionY(), (int) getChunkDimensionZ());
 
         _lightDirty = true;
         _dirty = true;
         _fresh = true;
+    }
+
+    public static int getChunkDimensionX() {
+        return (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionX");
+    }
+
+    public static int getChunkDimensionY() {
+        return (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionY");
+    }
+
+    public static int getChunkDimensionZ() {
+        return (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionZ");
     }
 
     /**
@@ -126,9 +138,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public void updateLight() {
         if (!_fresh) { // Do NOT update fresh chunks
-            for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
-                for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
-                    for (int y = 0; y < (int) Configuration.CHUNK_DIMENSIONS.y; y++) {
+            for (int x = 0; x < getChunkDimensionX(); x++) {
+                for (int z = 0; z < (int) getChunkDimensionZ(); z++) {
+                    for (int y = 0; y < (int) getChunkDimensionY(); y++) {
                         byte lightValue = getLight(x, y, z, LIGHT_TYPE.SUN);
 
                         // Spread the sunlight in translucent blocks with a light value greater than zero.
@@ -146,8 +158,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Generates the initial sunlight.
      */
     private void generateSunlight() {
-        for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
+        for (int x = 0; x < getChunkDimensionX(); x++) {
+            for (int z = 0; z < (int) getChunkDimensionZ(); z++) {
                 refreshSunlightAtLocalPos(x, z, false, false);
             }
         }
@@ -164,7 +176,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
         boolean covered = false;
 
-        for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
+        for (int y = (int) getChunkDimensionY() - 1; y >= 0; y--) {
             byte blockId = _blocks.get(x, y, z);
             Block b = BlockManager.getInstance().getBlock(blockId);
 
@@ -179,7 +191,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             // If the column is not covered...
             if (!covered) {
                 if (b.isBlockInvisible() || b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
-                    _sunlight.set(x, y, z, Configuration.MAX_LIGHT);
+                    _sunlight.set(x, y, z, (byte) 15);
                 else
                     _sunlight.set(x, y, z, (byte) 0x0);
 
@@ -423,7 +435,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public boolean canBlockSeeTheSky(int x, int y, int z) {
-        for (int y1 = y; y1 < Configuration.CHUNK_DIMENSIONS.y; y1++) {
+        for (int y1 = y; y1 < getChunkDimensionY(); y1++) {
             if (!BlockManager.getInstance().getBlock(getBlock(x, y1, z)).isTranslucent())
                 return false;
         }
@@ -493,7 +505,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             neighbors[1].setDirty(true);
         }
 
-        if (x == Configuration.CHUNK_DIMENSIONS.x - 1 && neighbors[0] != null) {
+        if (x == getChunkDimensionX() - 1 && neighbors[0] != null) {
             neighbors[0].setDirty(true);
         }
 
@@ -501,15 +513,15 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             neighbors[3].setDirty(true);
         }
 
-        if (z == Configuration.CHUNK_DIMENSIONS.z - 1 && neighbors[2] != null) {
+        if (z == getChunkDimensionZ() - 1 && neighbors[2] != null) {
             neighbors[2].setDirty(true);
         }
 
-        if (x == Configuration.CHUNK_DIMENSIONS.x - 1 && z == 0 && neighbors[7] != null) {
+        if (x == getChunkDimensionX() - 1 && z == 0 && neighbors[7] != null) {
             neighbors[7].setDirty(true);
         }
 
-        if (x == 0 && z == Configuration.CHUNK_DIMENSIONS.z - 1 && neighbors[6] != null) {
+        if (x == 0 && z == getChunkDimensionZ() - 1 && neighbors[6] != null) {
             neighbors[6].setDirty(true);
         }
 
@@ -517,7 +529,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             neighbors[5].setDirty(true);
         }
 
-        if (x == Configuration.CHUNK_DIMENSIONS.x - 1 && z == Configuration.CHUNK_DIMENSIONS.z - 1 && neighbors[4] != null) {
+        if (x == getChunkDimensionX() - 1 && z == getChunkDimensionZ() - 1 && neighbors[4] != null) {
             neighbors[4].setDirty(true);
         }
     }
@@ -549,7 +561,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public AABB getAABB() {
         if (_aabb == null) {
-            Vector3f dimensions = new Vector3f(Configuration.CHUNK_DIMENSIONS.x / 2, Configuration.CHUNK_DIMENSIONS.y / 2, Configuration.CHUNK_DIMENSIONS.z / 2);
+            Vector3f dimensions = new Vector3f(getChunkDimensionX() / 2, getChunkDimensionY() / 2, getChunkDimensionZ() / 2);
             Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX(), dimensions.getY(), getChunkWorldPosZ() + dimensions.getZ());
             _aabb = new AABB(position, dimensions);
         }
@@ -738,7 +750,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
 
     public int getChunkWorldPosX() {
-        return (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
+        return (int) _position.x * getChunkDimensionX();
     }
 
     /**
@@ -747,7 +759,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @return Thew world position
      */
     public int getChunkWorldPosZ() {
-        return (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
+        return (int) _position.z * (int) getChunkDimensionZ();
     }
 
     /**

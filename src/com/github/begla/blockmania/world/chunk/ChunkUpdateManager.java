@@ -15,10 +15,8 @@
  */
 package com.github.begla.blockmania.world.chunk;
 
-import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.world.chunk.Chunk;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import javolution.util.FastSet;
 
 import java.util.concurrent.PriorityBlockingQueue;
@@ -46,8 +44,9 @@ public final class ChunkUpdateManager {
      */
     public boolean queueChunkUpdate(Chunk c) {
         final Chunk chunkToProcess = c;
+        final int maxThreads = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("System.maxThreads");
 
-        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < Configuration.MAX_THREADS || c.distanceToPlayer() < 16.0)) {
+        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < maxThreads || c.distanceToPlayer() < 16.0)) {
             _currentlyProcessedChunks.add(chunkToProcess);
 
             // ... create a new thread and start processing.
@@ -77,7 +76,9 @@ public final class ChunkUpdateManager {
      * Updates the VBOs of all currently queued chunks.
      */
     public void updateVBOs() {
-        for (int i = 0; i < Configuration.VBO_UPDATES_PER_FRAME && _vboUpdates.size() > 0; i++) {
+        final int vboUpdatesPerFrame = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.vboUpdatesPerFrame");
+
+        for (int i = 0; i < vboUpdatesPerFrame && _vboUpdates.size() > 0; i++) {
             Chunk c = _vboUpdates.poll();
 
             if (c != null)

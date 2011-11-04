@@ -18,7 +18,7 @@ package com.github.begla.blockmania.world;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -71,16 +71,17 @@ public class LocalWorldProvider implements WorldProvider {
      * @param seed  The seed string used to generate the terrain
      */
     public LocalWorldProvider(String title, String seed) {
-        if (title == null) {
-            throw new IllegalArgumentException("No title provided.");
-        } else if (title.isEmpty()) {
-            throw new IllegalArgumentException("Empty title provided.");
-        }
 
         if (seed == null) {
             throw new IllegalArgumentException("No seed provided.");
         } else if (seed.isEmpty()) {
             throw new IllegalArgumentException("Empty seed provided.");
+        }
+
+        if (title == null) {
+            title = seed;
+        } else if (title.isEmpty()) {
+            title = seed;
         }
 
         _title = title;
@@ -388,7 +389,7 @@ public class LocalWorldProvider implements WorldProvider {
      * @return True if saving was successful
      */
     public boolean saveMetaData() {
-        if (Configuration.getSettingBoolean("SANDBOXED")) {
+        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.sandboxed")) {
             return false;
         }
 
@@ -437,7 +438,7 @@ public class LocalWorldProvider implements WorldProvider {
      * @return True if loading was successful
      */
     private boolean loadMetaData() {
-        if (Configuration.getSettingBoolean("SANDBOXED")) {
+        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.sandboxed")) {
             return false;
         }
 

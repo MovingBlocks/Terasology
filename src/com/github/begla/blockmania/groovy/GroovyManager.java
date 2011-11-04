@@ -17,11 +17,13 @@
 package com.github.begla.blockmania.groovy;
 
 import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
+import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -36,12 +38,14 @@ public class GroovyManager {
     private Binding _bind;
 
     /** Directory where we keep "plugin" files (Groovy scripts we'll run - prolly move this setting elsewhere sometime) */
-    private final String pluginsPath = "plugins";
+    private final String pluginsPath = ResourceLoader.getResource("com/github/begla/blockmania/data/plugins/").getPath();
 
     /** Initialize the GroovyManager and "share" the given World variable via the Binding */
     public GroovyManager() {
         _bind = new Binding();
-        _bind.setVariable("world",  Blockmania.getInstance().getActiveWorld());
+        _bind.setVariable("bm",  Blockmania.getInstance());
+        _bind.setVariable("conf", BlockmaniaConfiguration.getInstance().getConfig());
+
         // Could execute plugins here that must go before the game starts (in a loop) etc
         initializePlugin("Hello");
     }
@@ -78,11 +82,10 @@ public class GroovyManager {
      *  @return                     boolean indicating command success or not
      */
     public boolean runGroovyShell(String consoleString) {
-        String command = consoleString.substring(7).trim();
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Groovy console about to execute command: " + command);
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Groovy console about to execute command: " + consoleString);
         GroovyShell shell = new GroovyShell(_bind);
         try {
-            shell.evaluate(command);
+            shell.evaluate(consoleString);
             return true;
         }
         catch (Exception e) {
