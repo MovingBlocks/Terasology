@@ -53,7 +53,7 @@ public class GroovyManager {
         _bind.setVariable("conf", BlockmaniaConfiguration.getInstance().getConfig());
 
         // Could execute plugins here that must go before the game starts (in a loop) etc
-        initializePlugin("Hello");
+        initializePlugin("Slimer");
     }
 
     /**

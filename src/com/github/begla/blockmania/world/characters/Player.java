@@ -27,6 +27,7 @@ import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
+import com.github.begla.blockmania.tools.Tool;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
@@ -391,6 +392,11 @@ public final class Player extends Character {
 
     public byte getSelectedTool() {
         return _toolBelt.getSelectedTool();
+    }
+
+    public void addTool(Tool toolToAdd) {
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Player.addTool called to add tool: " + toolToAdd);
+        _toolBelt.mapPluginTool(toolToAdd);
     }
 
     public Camera getActiveCamera() {
