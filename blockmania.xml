@@ -57,6 +57,7 @@
         <include name="**/?*.png"/>
         <include name="**/?*.ogg"/>
         <include name="**/?*.fnt"/>
+        <include name="**/?*.groovy"/>
     </patternset>
 
 

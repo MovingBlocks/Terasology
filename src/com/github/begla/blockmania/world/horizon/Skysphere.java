@@ -64,7 +64,7 @@ public class Skysphere implements RenderableObject {
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
 
-        _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getTime() - 90.0);
+        _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         sunNormalise = sunNormalise.normalise(null);
 

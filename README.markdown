@@ -22,6 +22,11 @@ Core Team
 * Anton "small-jeeper" Kireev
 * Rasmus "Cervator" Praestholm
 
+Soundtrack
+----------------
+
+Composed by Karina Kireev.
+
 Additional Notes
 ----------------
 

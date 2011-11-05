@@ -49,6 +49,17 @@ public abstract class Entity implements RenderableObject {
     }
 
     /**
+     * Sets the position of the entity.
+     *
+     * @param x
+     * @param y
+     * @param z
+     */
+    public void setPosition(float x, float y, float z) {
+        _position.set(x, y, z);
+    }
+
+    /**
      * Sets the spawning point of the entity.
      *
      * @param spawningPoint The spawning point

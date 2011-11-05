@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -41,16 +40,16 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     @Override
     public void generate(Chunk c) {
-        double[][][] densityMap = new double[(int) Configuration.CHUNK_DIMENSIONS.x + 1][(int) Configuration.CHUNK_DIMENSIONS.y + 1][(int) Configuration.CHUNK_DIMENSIONS.z + 1];
+        double[][][] densityMap = new double[(int) Chunk.getChunkDimensionX() + 1][(int) Chunk.getChunkDimensionY() + 1][(int) Chunk.getChunkDimensionZ() + 1];
 
         /*
          * Create the density map at a lower sample rate.
          */
-        for (int x = 0; x <= Configuration.CHUNK_DIMENSIONS.x; x += SAMPLE_RATE_3D_HOR) {
-            for (int z = 0; z <= Configuration.CHUNK_DIMENSIONS.z; z += SAMPLE_RATE_3D_HOR) {
+        for (int x = 0; x <= Chunk.getChunkDimensionX(); x += SAMPLE_RATE_3D_HOR) {
+            for (int z = 0; z <= Chunk.getChunkDimensionZ(); z += SAMPLE_RATE_3D_HOR) {
                 BIOME_TYPE type = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
-                for (int y = 0; y <= Configuration.CHUNK_DIMENSIONS.y; y += SAMPLE_RATE_3D_VERT) {
+                for (int y = 0; y <= Chunk.getChunkDimensionY(); y += SAMPLE_RATE_3D_VERT) {
                     densityMap[x][y][z] = calcDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z), type);
                 }
             }
@@ -64,12 +63,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         /*
          * Generate the chunk from the density map.
          */
-        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+        for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
+            for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
                 BIOME_TYPE type = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
                 int firstBlockHeight = -1;
 
-                for (int y = (int) Configuration.CHUNK_DIMENSIONS.y; y >= 0; y--) {
+                for (int y = (int) Chunk.getChunkDimensionY(); y >= 0; y--) {
 
                     if (y == 0) { // Hard stone ground layer
                         c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Hard stone").getId());
@@ -218,9 +217,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     protected void triLerpDensityMap(double[][][] densityMap) {
-        for (int x = 0; x < Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int y = 0; y < Configuration.CHUNK_DIMENSIONS.y; y++) {
-                for (int z = 0; z < Configuration.CHUNK_DIMENSIONS.z; z++) {
+        for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
+            for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
+                for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
                     if (!(x % SAMPLE_RATE_3D_HOR == 0 && y % SAMPLE_RATE_3D_VERT == 0 && z % SAMPLE_RATE_3D_HOR == 0)) {
                         int offsetX = (x / SAMPLE_RATE_3D_HOR) * SAMPLE_RATE_3D_HOR;
                         int offsetY = (y / SAMPLE_RATE_3D_VERT) * SAMPLE_RATE_3D_VERT;

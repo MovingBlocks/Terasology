@@ -15,23 +15,27 @@
  */
 package com.github.begla.blockmania.world;
 
+import com.github.begla.blockmania.audio.AudioManager;
+import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.rendering.RenderableScene;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
+import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.horizon.Clouds;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
+import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
-import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -44,13 +48,16 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class World extends LocalWorldProvider {
+public final class World extends RenderableScene {
+
+    /* WORLD PROVIDER */
+    private WorldProvider _worldProvider;
 
     /* PLAYER */
     private Player _player;
 
     /* CHUNKS */
-    private FastList<Chunk> _chunksInProximity = new FastList();
+    private FastList<Chunk> _chunksInProximity = new FastList<Chunk>();
 
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
@@ -65,23 +72,138 @@ public final class World extends LocalWorldProvider {
     private long _lastTick;
 
     /* UPDATING */
-    private final WorldUpdateManager _worldUpdateManager;
+    private final ChunkUpdateManager _chunkUpdateManager;
     private int prevChunkPosX = 0, prevChunkPosZ = 0;
 
+    /* EVENTS */
+    private final WorldTimeEventManager _worldTimeEventManager;
+
     /**
-     * Initializes a new world for the single player mode.
+     * Initializes a new (local) world for the single player mode.
      *
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
     public World(String title, String seed) {
-        super(title, seed);
+        _worldProvider = new LocalWorldProvider(title, seed);
 
         // Init. horizon
         _clouds = new Clouds(this);
         _skysphere = new Skysphere(this);
 
-        _worldUpdateManager = new WorldUpdateManager();
+        _chunkUpdateManager = new ChunkUpdateManager();
+        _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
+
+        createMusicTimeEvents();
+    }
+
+    /**
+     * Updates the list of chunks around the player.
+     *
+     * @return True if the list was changed
+     */
+    private boolean updateChunksInProximity() {
+        if (prevChunkPosX != calcPlayerChunkOffsetX() || prevChunkPosZ != calcPlayerChunkOffsetZ()) {
+
+            prevChunkPosX = calcPlayerChunkOffsetX();
+            prevChunkPosZ = calcPlayerChunkOffsetZ();
+
+            FastList<Chunk> newChunksInProximity = new FastList<Chunk>();
+
+            int viewingDistanceX = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceX");
+            int viewingDistanceZ = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceZ");
+
+            for (int x = -(viewingDistanceX / 2); x < (viewingDistanceX / 2); x++) {
+                for (int z = -(viewingDistanceZ / 2); z < (viewingDistanceZ / 2); z++) {
+                    Chunk c = _worldProvider.getChunkProvider().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
+                    newChunksInProximity.add(c);
+                }
+            }
+
+            Collections.sort(newChunksInProximity);
+            _chunksInProximity = newChunksInProximity;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Updates the daylight value according to the current world time.
+     */
+    private void updateDaylight() {
+        double time = _worldProvider.getTime() % 1;
+        double sunRiseSetDuration = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.sunRiseSetDuration");
+
+        // Sunrise
+        if (time < sunRiseSetDuration && time > 0.0f) {
+            _daylight = time / sunRiseSetDuration;
+        } else if (time >= sunRiseSetDuration && time <= 0.5f) {
+            _daylight = 1.0f;
+        }
+
+        // Sunset
+        if (time > 0.5 - sunRiseSetDuration && time < 0.5f) {
+            _daylight = (0.5f - time) / sunRiseSetDuration;
+        } else if (time >= 0.5 && time <= 1.0f) {
+            _daylight = 0.0f;
+        }
+    }
+
+    /**
+     * Creates the world time events to play the game's soundtrack at specific times.
+     */
+    public void createMusicTimeEvents() {
+        // SUNRISE
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.01, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.2f);
+                AudioManager.getInstance().getAudio("Sunrise").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
+
+        // AFTERNOON
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.33, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.2f);
+                AudioManager.getInstance().getAudio("Afternoon").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
+
+        // SUNSET
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.44, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.2f);
+                AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
+    }
+
+    /**
+     * Fetches the currently visible chunks (in sight of the player).
+     *
+     * @return The visible chunks
+     */
+    public FastList<Chunk> fetchVisibleChunks() {
+        FastList<Chunk> result = new FastList<Chunk>();
+        FastList<Chunk> chunksInProximity = _chunksInProximity;
+
+        for (FastList.Node<Chunk> n = chunksInProximity.head(), end = chunksInProximity.tail(); (n = n.getNext()) != end; ) {
+            Chunk c = n.getValue();
+
+            if (isChunkVisible(c)) {
+                c.setVisible(true);
+                result.add(c);
+                continue;
+            }
+
+            c.setVisible(false);
+        }
+
+        return result;
     }
 
     /**
@@ -96,7 +218,6 @@ public final class World extends LocalWorldProvider {
         _player.getActiveCamera().lookThrough();
 
         _player.render();
-
         renderChunks();
 
         /* CLOUDS */
@@ -104,71 +225,10 @@ public final class World extends LocalWorldProvider {
 
         /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();
+
+        super.render();
     }
 
-    private void updateChunksInProximity() {
-        if (prevChunkPosX != calcPlayerChunkOffsetX() || prevChunkPosZ != calcPlayerChunkOffsetZ()) {
-            prevChunkPosX = calcPlayerChunkOffsetX();
-            prevChunkPosZ = calcPlayerChunkOffsetZ();
-
-            FastList<Chunk> newChunksInProximity = new FastList<Chunk>();
-
-            for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
-                for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
-                    Chunk c = getChunkCache().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
-                    newChunksInProximity.add(c);
-                }
-            }
-
-            Collections.sort(newChunksInProximity);
-            _chunksInProximity = newChunksInProximity;
-        }
-    }
-
-    /**
-     * Updates the daylight value according to the current world time.
-     */
-    private void updateDaylight() {
-        double time = getTime() % 1;
-
-        // Sunrise
-        if (time < Configuration.SUN_RISE_SET_DURATION && time > 0.0f) {
-            _daylight = time / Configuration.SUN_RISE_SET_DURATION;
-        } else if (time >= Configuration.SUN_RISE_SET_DURATION && time <= 0.5f) {
-            _daylight = 1.0f;
-        }
-
-        // Sunset
-        if (time > 0.5 - Configuration.SUN_RISE_SET_DURATION && time < 0.5f) {
-            _daylight = (0.5f - time) / Configuration.SUN_RISE_SET_DURATION;
-        } else if (time >= 0.5 && time <= 1.0f) {
-            _daylight = 0.0f;
-        }
-    }
-
-    /**
-     * Fetches the currently visible chunks (in sight of the player).
-     *
-     * @return The visible chunks
-     */
-    public FastList<Chunk> fetchVisibleChunks() {
-        FastList<Chunk> result = new FastList<Chunk>();
-        FastList<Chunk> chunksInPromity = _chunksInProximity;
-
-        for (FastList.Node<Chunk> n = chunksInPromity.head(), end = chunksInPromity.tail(); (n = n.getNext()) != end; ) {
-            Chunk c = n.getValue();
-
-            if (isChunkVisible(c)) {
-                c.setVisible(true);
-                result.add(c);
-                continue;
-            }
-
-            c.setVisible(false);
-        }
-
-        return result;
-    }
 
     /**
      * Renders the chunks.
@@ -198,7 +258,7 @@ public final class World extends LocalWorldProvider {
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
 
 
-            if (Configuration.getSettingBoolean("CHUNK_OUTLINES")) {
+            if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
                 c.getAABB().render();
             }
         }
@@ -248,38 +308,48 @@ public final class World extends LocalWorldProvider {
     }
 
     public void update() {
-        updateDaylight();
+        // Make sure the chunks near the player are generated first
+        _worldProvider.getRenderingOrigin().set(_player.getPosition());
+
+        // Update the texture animation tick
         updateTick();
 
+        // Update the horizon
+        updateDaylight();
         _skysphere.update();
+        _clouds.update();
 
         // Update the player
         _player.update();
-        // Update the clouds
-        _clouds.update();
 
         // Update the list of relevant chunks
         updateChunksInProximity();
-        // And fetch those chunks that are in sight of the player
-        FastList<Chunk> visibleChunks = fetchVisibleChunks();
 
-        // Update chunks
-        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            // Queue dirty chunks for updating
-            if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
-                _worldUpdateManager.queueChunkUpdate(n.getValue());
+        // Update visible chunks
+        for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; ) {
+            if (n.getValue().isVisible()) {
+                if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
+                    _chunkUpdateManager.queueChunkUpdate(n.getValue());
+                    continue;
+                }
+
+                n.getValue().update();
             }
-
-            n.getValue().update();
         }
 
         // Update the particle emitters
         _blockParticleEmitter.update();
 
         // Generate new VBOs if available
-        _worldUpdateManager.updateVBOs();
+        _chunkUpdateManager.updateVBOs();
 
-        _chunkCache.freeCacheSpace();
+        // Free unused space
+        _worldProvider.getChunkProvider().freeUnusedSpace();
+
+        // And finally fire any active events
+        _worldTimeEventManager.fireWorldTimeEvents();
+
+        super.update();
     }
 
     /**
@@ -293,12 +363,28 @@ public final class World extends LocalWorldProvider {
     }
 
     /**
+     * Returns the maximum height at a given position.
+     *
+     * @param x The X-coordinate
+     * @param z The Z-coordinate
+     * @return The maximum height
+     */
+    public final int maxHeightAt(int x, int z) {
+        for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
+            if (_worldProvider.getBlock(x, y, z) != 0x0)
+                return y;
+        }
+
+        return 0;
+    }
+
+    /**
      * Chunk position of the player.
      *
      * @return The player offset on the x-axis
      */
     private int calcPlayerChunkOffsetX() {
-        return (int) (_player.getPosition().x / Configuration.CHUNK_DIMENSIONS.x);
+        return (int) (_player.getPosition().x / Chunk.getChunkDimensionX());
     }
 
     /**
@@ -307,7 +393,7 @@ public final class World extends LocalWorldProvider {
      * @return The player offset on the z-axis
      */
     private int calcPlayerChunkOffsetZ() {
-        return (int) (_player.getPosition().z / Configuration.CHUNK_DIMENSIONS.z);
+        return (int) (_player.getPosition().z / Chunk.getChunkDimensionZ());
     }
 
     /**
@@ -318,37 +404,28 @@ public final class World extends LocalWorldProvider {
     public void setPlayer(Player p) {
         _player = p;
 
-        _player.setSpawningPoint(nextRandomSpawningPoint());
+        _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
         _player.reset();
         _player.respawn();
     }
 
-
     /**
-     * Writes all chunks to disk and disposes them.
+     * Disposes this world.
      */
     public void dispose() {
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Disposing world {0} and saving all chunks.", getTitle());
-
-        saveMetaData();
-        getChunkCache().saveAndDisposeAllChunks();
+        _worldProvider.dispose();
+        AudioManager.getInstance().stopAllSounds();
     }
 
-    /**
-     * Displays some information about the world formatted as a string.
-     *
-     * @return String with world information
-     */
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), getTime(), _skysphere.getSunPosAngle(), _worldUpdateManager.getVboUpdatesSize(), _chunkCache.size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _seed, _title);
+        return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fms, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _chunkUpdateManager.getVboUpdatesSize(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {
         return _player;
     }
 
-    @Override
     public Vector3f getOrigin() {
         return _player.getPosition();
     }
@@ -361,37 +438,23 @@ public final class World extends LocalWorldProvider {
         return _daylight;
     }
 
-    public FastList<Chunk> getChunksInProximity() {
-        return _chunksInProximity;
-    }
-
     public BlockParticleEmitter getBlockParticleEmitter() {
         return _blockParticleEmitter;
     }
 
-    /**
-     * Returns the active biome at the player's position.
-     */
     public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome() {
-        return getActiveBiome((int) _player.getPosition().x, (int) _player.getPosition().z);
+        return _worldProvider.getActiveBiome((int) _player.getPosition().x, (int) _player.getPosition().z);
     }
 
-    /**
-     * Returns the humidity at the player's position.
-     *
-     * @return
-     */
     public double getActiveHumidity() {
-
-        return getHumidityAt((int) _player.getPosition().x, (int) _player.getPosition().z);
+        return _worldProvider.getHumidityAt((int) _player.getPosition().x, (int) _player.getPosition().z);
     }
 
-    /**
-     * Returns the temeperature at the player's position.
-     *
-     * @return
-     */
     public double getActiveTemperature() {
-        return getTemperatureAt((int) _player.getPosition().x, (int) _player.getPosition().z);
+        return _worldProvider.getTemperatureAt((int) _player.getPosition().x, (int) _player.getPosition().z);
+    }
+
+    public WorldProvider getWorldProvider() {
+        return _worldProvider;
     }
 }

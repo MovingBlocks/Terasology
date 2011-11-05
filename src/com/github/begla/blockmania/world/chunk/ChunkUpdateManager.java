@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
-import com.github.begla.blockmania.world.chunk.Chunk;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import javolution.util.FastSet;
 
 import java.util.concurrent.PriorityBlockingQueue;
 
-/**                                                            (byte) 0
+/**
+ * (byte) 0
  * Provides support for updating and generating chunks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class WorldUpdateManager {
+public final class ChunkUpdateManager {
 
     /* CHUNK UPDATES */
     private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
@@ -45,8 +45,9 @@ public final class WorldUpdateManager {
      */
     public boolean queueChunkUpdate(Chunk c) {
         final Chunk chunkToProcess = c;
+        final int maxThreads = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("System.maxThreads");
 
-        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < Configuration.MAX_THREADS - 1 || c.distanceToPlayer() < 8.0)) {
+        if (!_currentlyProcessedChunks.contains(chunkToProcess) && _currentlyProcessedChunks.size() < maxThreads) {
             _currentlyProcessedChunks.add(chunkToProcess);
 
             // ... create a new thread and start processing.
@@ -76,7 +77,9 @@ public final class WorldUpdateManager {
      * Updates the VBOs of all currently queued chunks.
      */
     public void updateVBOs() {
-        for (int i = 0; i < Configuration.VBO_UPDATES_PER_FRAME && _vboUpdates.size() > 0; i++) {
+        final int vboUpdatesPerFrame = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.vboUpdatesPerFrame");
+
+        for (int i = 0; i < vboUpdatesPerFrame && _vboUpdates.size() > 0; i++) {
             Chunk c = _vboUpdates.poll();
 
             if (c != null)

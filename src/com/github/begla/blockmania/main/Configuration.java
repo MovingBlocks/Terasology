@@ -30,11 +30,11 @@ public final class Configuration {
     /**
      * Maximum amount of worker threads to be created.
      */
-    public static final int MAX_THREADS = Math.min(Math.max(Runtime.getRuntime().availableProcessors(), 1), 8);
+    public static final int MAX_THREADS = Math.min(Runtime.getRuntime().availableProcessors() + 1, 6);
     /**
      * Amount of VBO updates per frame.
      */
-    public static final int VBO_UPDATES_PER_FRAME = 4;
+    public static final int VBO_UPDATES_PER_FRAME = 2;
     /**
      * Sunrise/sunset duration
      */
@@ -54,7 +54,7 @@ public final class Configuration {
     /**
      * The string used to generate the default world. If not set, a random seed is used.
      */
-    public static final String DEFAULT_SEED = "wwiiii";
+    public static final String DEFAULT_SEED = "friztztz";
     /**
      * The pixel format used to init. the display.
      */
@@ -162,7 +162,7 @@ public final class Configuration {
         _settingsNumeric.put("JUMP_INTENSITY", 0.125);
         _settingsNumeric.put("MAX_GRAVITY", 0.7);
         _settingsNumeric.put("WALKING_SPEED", 0.03);
-        _settingsNumeric.put("RUNNING_FACTOR", 1.8);
+        _settingsNumeric.put("RUNNING_FACTOR", 1.5);
         _settingsNumeric.put("GRAVITY", 0.006);
         _settingsNumeric.put("MAX_GRAVITY_SWIMMING", 0.01);
         _settingsNumeric.put("GRAVITY_SWIMMING", 0.0001);

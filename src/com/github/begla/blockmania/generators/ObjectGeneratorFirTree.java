@@ -16,9 +16,9 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.main.Configuration;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
+import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
  * A strange thing that looks like a magic tree.
@@ -46,7 +46,7 @@ public class ObjectGeneratorFirTree extends ObjectGenerator {
     public void generate(int posX, int posY, int posZ, boolean update) {
         int height = MathHelper.fastAbs(_worldProvider.getRandom().randomInt() % 4) + 8;
 
-        if (posY + height >= Configuration.CHUNK_DIMENSIONS.y) {
+        if (posY + height >= Chunk.getChunkDimensionY()) {
             return;
         }
 
@@ -74,6 +74,6 @@ public class ObjectGeneratorFirTree extends ObjectGenerator {
             stage++;
         }
 
-        _worldProvider.setBlock(posX, posY + height, posZ,  BlockManager.getInstance().getBlock("Dark leaf").getId(), update, false);
+        _worldProvider.setBlock(posX, posY + height, posZ, BlockManager.getInstance().getBlock("Dark leaf").getId(), update, false);
     }
 }

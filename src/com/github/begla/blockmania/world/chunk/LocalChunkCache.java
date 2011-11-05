@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import javolution.util.FastList;
@@ -32,7 +32,7 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class ChunkCache {
+public final class LocalChunkCache implements ChunkProvider {
 
     private static boolean _running = false;
     /* ------ */
@@ -42,7 +42,7 @@ public final class ChunkCache {
     /**
      * @param parent
      */
-    public ChunkCache(LocalWorldProvider parent) {
+    public LocalChunkCache(LocalWorldProvider parent) {
         _parent = parent;
     }
 
@@ -79,7 +79,7 @@ public final class ChunkCache {
         return c;
     }
 
-    public void freeCacheSpace() {
+    public void freeUnusedSpace() {
         if (_running || _chunkCache.size() <= capacity())
             return;
 
@@ -110,7 +110,7 @@ public final class ChunkCache {
     /**
      * Writes all chunks to disk and disposes them.
      */
-    public void saveAndDisposeAllChunks() {
+    public void dispose() {
         Runnable r = new Runnable() {
             public void run() {
                 for (Chunk c : _chunkCache.values()) {
@@ -126,7 +126,7 @@ public final class ChunkCache {
     }
 
     private void writeChunkToDisk(Chunk c) {
-        if (Configuration.getSettingBoolean("SANDBOXED") || !Configuration.getSettingBoolean("SAVE_CHUNKS")) {
+        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.sandboxed") || !(Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.saveChunks")) {
             return;
         }
 
@@ -184,6 +184,9 @@ public final class ChunkCache {
     }
 
     public static int capacity() {
-        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue() + 512);
+        int viewingDistanceX = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceX");
+        int viewingDistanceZ = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceZ");
+
+        return (viewingDistanceX * viewingDistanceZ + 512);
     }
 }

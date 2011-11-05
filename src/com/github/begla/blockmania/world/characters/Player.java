@@ -20,10 +20,11 @@ import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.gui.ToolBelt;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
 import com.github.begla.blockmania.utilities.MathHelper;
@@ -51,21 +52,22 @@ public final class Player extends Character {
     private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
     private Camera _activeCamera = _firstPersonCamera;
 
-    /** The ToolBelt is how the player interacts with tool events from mouse or keyboard */
+    /**
+     * The ToolBelt is how the player interacts with tool events from mouse or keyboard
+     */
     private ToolBelt _toolBelt = new ToolBelt(this);
 
     public Player(World parent) {
-        super(parent, Configuration.getSettingNumeric("WALKING_SPEED"), Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
+        super(parent, (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.walkingSpeed"), (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.runningFactor"), (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.jumpIntensity"));
     }
 
     public void update() {
+        _godMode = (Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.godMode");
+        _walkingSpeed = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.walkingSpeed") + Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.005f, 2.0f));
+        _runningFactor = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.runningFactor");
+        _jumpIntensity = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.jumpIntensity");
+
         updateCameras();
-
-        _godMode = Configuration.getSettingBoolean("GOD_MODE");
-        _walkingSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
-        _runningFactor = Configuration.getSettingNumeric("RUNNING_FACTOR");
-        _jumpIntensity = Configuration.getSettingNumeric("JUMP_INTENSITY");
-
         super.update();
     }
 
@@ -73,10 +75,10 @@ public final class Player extends Character {
         RayBlockIntersection.Intersection is = calcSelectedBlock();
 
         // Display the block the player is aiming at
-        if (Configuration.getSettingBoolean("PLACING_BOX")) {
+        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("HUD.placingBox")) {
             if (is != null) {
-                if (BlockManager.getInstance().getBlock(_parent.getBlockAtPosition(is.getBlockPosition())).shouldRenderBoundingBox()) {
-                    Block.AABBForBlockAt(is.getBlockPosition()).render();
+                if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition().toVector3f())).shouldRenderBoundingBox()) {
+                    Block.AABBForBlockAt(is.getBlockPosition().toVector3f()).render();
                 }
             }
         }
@@ -84,16 +86,22 @@ public final class Player extends Character {
         super.render();
     }
 
+    public double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
+        return Math.sin(_stepCounter * frequency + phaseOffset) * amplitude;
+    }
+
     public void updateCameras() {
         _firstPersonCamera.getPosition().set(calcEyePosition());
 
-        if (!(Configuration.getSettingBoolean("GOD_MODE"))) {
-            _firstPersonCamera.setBobbingOffsetFactor(Math.sin(_stepCounter * 2.0) * 0.025);
+        if (!((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.godMode"))) {
+            _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.0f));
+            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f, 2.75f));
         } else {
-            _firstPersonCamera.setBobbingOffsetFactor(0);
+            _firstPersonCamera.setBobbingRotationOffsetFactor(0.0);
+            _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);
         }
 
-        if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
+        if (!((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.godMode"))) {
             _firstPersonCamera.getViewingDirection().set(getViewingDirection());
         } else {
             Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z + 128);
@@ -103,8 +111,8 @@ public final class Player extends Character {
 
     public void updatePosition() {
         // DEMO MODE
-        if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-            getPosition().z += Configuration.getSettingNumeric("WALKING_SPEED");
+        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.godMode")) {
+            getPosition().z += (Float) BlockmaniaConfiguration.getInstance().getConfig().get("Player.walkingSpeed");
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 
@@ -127,12 +135,12 @@ public final class Player extends Character {
      *
      * @return Intersection point of the targeted block
      */
-    RayBlockIntersection.Intersection calcSelectedBlock() {
+    public RayBlockIntersection.Intersection calcSelectedBlock() {
         FastList<RayBlockIntersection.Intersection> inters = new FastList<RayBlockIntersection.Intersection>();
         for (int x = -3; x <= 3; x++) {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -3; z <= 3; z++) {
-                    byte blockType = _parent.getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
+                    byte blockType = _parent.getWorldProvider().getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
 
                     // Ignore special blocks
                     if (BlockManager.getInstance().getBlock(blockType).letsSelectionRayThrough()) {
@@ -140,7 +148,7 @@ public final class Player extends Character {
                     }
 
                     // The ray originates from the "player's eye"
-                    FastList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent, (int) getPosition().x + x, (int) getPosition().y + y, (int) getPosition().z + z, calcEyePosition(), _viewingDirection);
+                    FastList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent.getWorldProvider(), (int) getPosition().x + x, (int) getPosition().y + y, (int) getPosition().z + z, calcEyePosition(), _viewingDirection);
 
                     if (iss != null) {
                         inters.addAll(iss);
@@ -169,7 +177,7 @@ public final class Player extends Character {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
-                Block centerBlock = BlockManager.getInstance().getBlock(getParent().getBlock((int) is.getBlockPosition().x, (int) is.getBlockPosition().y, (int) is.getBlockPosition().z));
+                Block centerBlock = BlockManager.getInstance().getBlock(getParent().getWorldProvider().getBlock(is.getBlockPosition().x, is.getBlockPosition().y, is.getBlockPosition().z));
 
                 if (!centerBlock.allowsBlockAttachment()) {
                     return;
@@ -182,26 +190,8 @@ public final class Player extends Character {
                     return;
                 }
 
-                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
-                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, 0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false);
-            }
-        }
-    }
-
-    /**
-     * Plants a tree of a given type in front of the player.
-     *
-     * @param type The type of the tree
-     */
-    public void plantTree(int type) {
-        RayBlockIntersection.Intersection is = calcSelectedBlock();
-        if (is != null) {
-            Vector3f blockPos = is.getBlockPosition();
-
-            if (type == 0) {
-                _parent.getObjectGenerator("tree").generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
-            } else {
-                _parent.getObjectGenerator("pineTree").generate((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, true);
+                getParent().getWorldProvider().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
+                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
             }
         }
     }
@@ -213,19 +203,19 @@ public final class Player extends Character {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
-                Vector3f blockPos = is.getBlockPosition();
-                byte currentBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
-                getParent().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
+                BlockPosition blockPos = is.getBlockPosition();
+                byte currentBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y, blockPos.z);
+                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, true);
 
                 // Remove the upper block if it's a billboard
-                byte upperBlockType = getParent().getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
+                byte upperBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y + 1, blockPos.z);
                 if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                    getParent().setBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z, (byte) 0x0, true, true);
+                    getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y + 1, blockPos.z, (byte) 0x0, true, true);
                 }
 
-                _parent.getBlockParticleEmitter().setOrigin(blockPos);
+                _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
                 _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
-                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.4f, 0.7f + (float) MathHelper.fastAbs(_parent.getRandom().randomDouble()) * 0.3f, false);
+                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
             }
         }
     }
@@ -301,9 +291,9 @@ public final class Player extends Character {
     /**
      * Processes the mouse input.
      *
-     * @param button        Pressed mouse button
-     * @param state         State of the mouse button
-     * @param wheelMoved    Distance the mouse wheel moved since last
+     * @param button     Pressed mouse button
+     * @param state      State of the mouse button
+     * @param wheelMoved Distance the mouse wheel moved since last
      */
     public void processMouseInput(int button, boolean state, int wheelMoved) {
         if (button == 0 && state) {
@@ -312,8 +302,7 @@ public final class Player extends Character {
         } else if (button == 1 && state) {
             //removeBlock();
             _toolBelt.activateTool(false);
-        }
-        else if (wheelMoved != 0) {
+        } else if (wheelMoved != 0) {
             Blockmania.getInstance().getLogger().log(Level.INFO, "Mouse wheel moved " + wheelMoved + " for button " + button + ", state " + state);
             _toolBelt.rollSelectedTool((byte) (wheelMoved / 120));
         }
@@ -327,8 +316,10 @@ public final class Player extends Character {
         double dx = Mouse.getDX();
         double dy = Mouse.getDY();
 
-        yaw(dx * Configuration.MOUSE_SENS);
-        pitch(dy * Configuration.MOUSE_SENS);
+        double mouseSens = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Controls.mouseSens");
+
+        yaw(dx * mouseSens);
+        pitch(dy * mouseSens);
 
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
             walkForward();
@@ -342,11 +333,8 @@ public final class Player extends Character {
         if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
             strafeRight();
         }
-        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && _touchingGround) {
-            _running = true;
-        } else {
-            _running = false;
-        }
+
+        _running = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && _touchingGround;
     }
 
     /**
@@ -394,7 +382,7 @@ public final class Player extends Character {
 
     @Override
     protected void handleHorizontalCollision() {
-        // Uh. A wall.
+        // Nothing special to do.
     }
 
     public byte getSelectedBlockType() {

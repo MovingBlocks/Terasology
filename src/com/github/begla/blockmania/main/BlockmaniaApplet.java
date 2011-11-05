@@ -38,11 +38,11 @@ public final class BlockmaniaApplet extends Applet {
             @Override
             public void run() {
                 try {
-                    Configuration.loadSandboxed();
+                    BlockmaniaConfiguration.getInstance().getConfig().put("System.sandboxed", true);
 
                     Display.setParent(null);
                     Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(1280, 720));
-                    Display.setTitle(Configuration.GAME_TITLE);
+                    Display.setTitle((String) BlockmaniaConfiguration.getInstance().getConfig().get("System.title"));
                     Display.create();
 
                     _blockmania = Blockmania.getInstance();
@@ -61,20 +61,20 @@ public final class BlockmaniaApplet extends Applet {
 
     @Override
     public void start() {
-        _blockmania.unpauseGame();
+        _blockmania.unpause();
         super.start();
     }
 
     @Override
     public void stop() {
-        _blockmania.pauseGame();
+        _blockmania.pause();
         super.stop();
     }
 
     @Override
     public void destroy() {
         if (_blockmania != null)
-            _blockmania.stopGame();
+            _blockmania.exitNoSaving();
 
         super.destroy();
     }
