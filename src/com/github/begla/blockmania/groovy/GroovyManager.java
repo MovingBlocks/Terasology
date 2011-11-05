@@ -86,7 +86,7 @@ public class GroovyManager {
     }
 
     /**
-     * Executes the given command with Groovy (short the prefix "groovy "
+     * Executes the given command with Groovy - short the prefix "groovy "
      *
      * @param consoleString Contains what the user entered into the console
      * @return boolean indicating command success or not

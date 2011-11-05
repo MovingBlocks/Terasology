@@ -29,7 +29,6 @@ public class ObjectGeneratorPineTree extends ObjectGenerator {
 
     /**
      * @param w
-     * @param seed
      */
     public ObjectGeneratorPineTree(LocalWorldProvider w) {
         super(w);
