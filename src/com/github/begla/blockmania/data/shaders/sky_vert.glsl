@@ -7,6 +7,7 @@ varying float   lv;
 uniform	vec4 	  sunPos;
 uniform float	sunAngle;
 vec4 	eyePos = vec4(0.0, 0.0, 0.0, 1.0);
+//uniform  vec3 playerPos;
 uniform	float	turbidity;
 uniform vec3 zenith;
 
@@ -48,6 +49,7 @@ vec3	allweatherSky ( float t, float cosTheta, float cosGamma, float cosThetaSun 
 
 void main(void)
 {
+   // eyePos.xyz = normalize(playerPos);
 	float	sa  = sin ( sunAngle );
 	float	ca  = cos ( sunAngle );
   mat3	r   = mat3 ( 1.0, 0.0, 0.0, 0.0, ca, -sa, 0.0, sa, ca );

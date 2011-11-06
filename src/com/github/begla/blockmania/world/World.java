@@ -68,7 +68,7 @@ public final class World {
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
 
     /* HORIZON */
-    private final Clouds _clouds;
+   // private final Clouds _clouds;
     private final Skysphere _skysphere;
     protected double _daylight;
 
@@ -93,7 +93,7 @@ public final class World {
         _worldProvider = new LocalWorldProvider(title, seed);
 
         // Init. horizon
-        _clouds = new Clouds(this);
+       // _clouds = new Clouds(this);
         _skysphere = new Skysphere(this);
 
         _worldUpdateManager = new WorldUpdateManager();
@@ -115,7 +115,7 @@ public final class World {
 
         _player.render();
 
-       // renderChunks();
+        renderChunks();
 
         /* CLOUDS */
         //_clouds.render();

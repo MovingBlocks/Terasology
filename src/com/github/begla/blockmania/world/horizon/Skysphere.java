@@ -62,7 +62,7 @@ public class Skysphere implements RenderableObject {
         _parent = parent;
         loadStarTextures();
        
-       // createCloudsTexture3D(64, 64, 64);
+        createCloudsTexture3D(64, 64, 64);
     }
 
     private void drawSphere() {
@@ -125,6 +125,8 @@ public class Skysphere implements RenderableObject {
         ShaderManager.getInstance().enableShader(null);
         glDisable(GL12.GL_TEXTURE_3D);
         glDisable(GL13.GL_TEXTURE_CUBE_MAP);
+
+        
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }

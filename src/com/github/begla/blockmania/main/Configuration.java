@@ -62,7 +62,7 @@ public final class Configuration {
     /**
      * The display mode used for window mode.
      */
-    public static final DisplayMode DISPLAY_MODE = new DisplayMode(320, 280);
+    public static final DisplayMode DISPLAY_MODE = new DisplayMode(1024, 768);
     /**
      * Aspect ratio.
      */
