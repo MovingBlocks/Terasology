@@ -80,10 +80,10 @@ void main (){
         vec4 ResColor = vec4(1.0,1.0,1.0, 1.0);
 
         if(sunPos.y<=0.5){
-            ResColor = mix(vec4(1.0,0.7,0.7, 1.0),vec4(1.0,1.0,1.0,1.0),sunPos.y*(1.0/0.5));
+            ResColor = mix(vec4(0.7,0.7,0.7, 1.0),vec4(1.0,1.0,1.0,1.0),sunPos.y*(1.0/0.5));
         }else{
             if(sunPos.y<=0.0){
-                ResColor = skyColor + vec4(0.1, 0.1, 0.1, 1.0);
+                ResColor = vec4(0.1, 0.1, 0.1, 1.0);
             }
         }
 
@@ -102,13 +102,13 @@ void main (){
         for (float i=0.0; i<6.0; i+=1.0){
             posParticleCloud = 0.2*(cloudVec + sunDirection)*i;
             n2  = clouds ( posParticleCloud, time*10.5, vec2 ( 0.03, 0.01 ) ); 
-            shadowCloud += 0.06*mix ( skyColor, vec4(1.0,1.0,1.0, 1.0), density ( n2.y, 3.5 ) );
+            shadowCloud += 0.07*mix ( skyColor, vec4(1.0,1.0,1.0, 1.0), density ( n2.y, 3.5 ) );
         }  
 
         /*CALCULATE CLOUDS WITH SHADOW*/
         ResColor = mix ( skyColor, vec4(clamp(ResColor.xyz*(ResColor.xyz - shadowCloud.xyz), 0.0, 1.0), 1.0), density ( n1.y, 3.5 ) );
 
-        //gl_FragColor = ResColor; not work 
+       // gl_FragColor = ResColor; //not work 
         gl_FragColor = skyColor;
     }else{
         gl_FragColor = vec4	( 0.0, 0.0, 0.0, 1.0);
