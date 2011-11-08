@@ -45,7 +45,7 @@ public class ToolBelt {
     /**
      * Map that contains advanced plugin tool index values and an associated Groovy command script to execute on use
      */
-    private FastMap<Byte, String> _pluginStore = new FastMap<Byte, String>();
+    private FastMap<Byte, Tool> _pluginStore = new FastMap<Byte, Tool>();
 
     /**
      * Map that will bind tool index values with hot keys 1-10
@@ -92,10 +92,13 @@ public class ToolBelt {
     /**
      * Puts a plugin-based Groovy tool into the _pluginStore
      *
-     * @param groovyScript String containing a valid Groovy script to execute upon activating the tool
+     * @param groovyTool A Tool supplied via Groovy class submitted by a Groovy script plugin
      */
-    public void mapPluginTool(String groovyScript) {
-        // Nothing yet - assign the script a byte key we can then later bind to a hot bar slot
+    public void mapPluginTool(Tool groovyTool) {
+        // Cheating with the hard coded index for now
+        _toolBinding.put(new Byte((byte)4), new Byte((byte)51));
+        _pluginStore.put((byte) 51, groovyTool);
+        Blockmania.getInstance().getLogger().log(Level.INFO, "ToolBelt.mapPluginTool called with Tool: " + groovyTool);
     }
 
     /**
@@ -145,7 +148,17 @@ public class ToolBelt {
 
         // If we're looking at a high-range tool it is from the groovyStore - so look there and execute what we find
         if (toolIndex >= 51) {
-            System.out.println("Nothing yet");
+            if (_pluginStore.containsKey(toolIndex)) {
+
+                // Execute the Groovy tool
+                if (leftMouse)
+                    _pluginStore.get(toolIndex).executeLeftClickAction();
+                else
+                    _pluginStore.get(toolIndex).executeRightClickAction();
+
+            } else {
+                Blockmania.getInstance().getLogger().log(Level.WARNING, "Tool activation happened for an unrecognized Groovy tool: " + toolIndex);
+            }
         }
         // For low range tools we look for the native tool and if it isn't found there's something wrong
         else {

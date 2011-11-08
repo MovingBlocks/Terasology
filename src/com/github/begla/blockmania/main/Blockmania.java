@@ -24,6 +24,7 @@ import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.VBOManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.characters.MobManager;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import org.lwjgl.LWJGLException;
@@ -88,6 +89,11 @@ public final class Blockmania extends RenderableScene {
      * Groovy Manager handles all the Groovy-related stuff!
      */
     private GroovyManager _groovyManager;
+
+    /**
+     * Mob Manager to deal with non-player character
+     */
+    private MobManager _mobManager;
 
     // Singleton
     public static Blockmania getInstance() {
@@ -274,6 +280,9 @@ public final class Blockmania extends RenderableScene {
         }
 
         initNewWorldAndPlayer("World1", worldSeed);
+
+        _mobManager = new MobManager(); // I suppose this could/should be a getInstance...
+        initGroovy();
     }
 
     public void resetOpenGLParameters() {
@@ -301,6 +310,8 @@ public final class Blockmania extends RenderableScene {
 
         if (_hud != null)
             _hud.render();
+
+        _mobManager.renderAll();
     }
 
     public void update() {
@@ -314,6 +325,8 @@ public final class Blockmania extends RenderableScene {
 
         // Important for the streaming of audio
         SoundStore.get().poll(0);
+
+        _mobManager.updateAll();
     }
 
     private void resizeViewport() {
@@ -509,5 +522,9 @@ public final class Blockmania extends RenderableScene {
 
     public FastRandom getRandom() {
         return _rand;
+    }
+
+    public MobManager getMobManager() {
+        return _mobManager;
     }
 }

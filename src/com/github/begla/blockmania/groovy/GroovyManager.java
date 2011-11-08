@@ -24,6 +24,8 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -51,8 +53,23 @@ public class GroovyManager {
         _bind.setVariable("bm", Blockmania.getInstance());
         _bind.setVariable("conf", BlockmaniaConfiguration.getInstance().getConfig());
 
-        // Could execute plugins here that must go before the game starts (in a loop) etc
-        initializePlugin("Hello");
+        loadAllPlugins();
+    }
+
+    private void loadAllPlugins() {
+        File pluginDir = new File("groovy/plugins");
+
+        File[] plugins = pluginDir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                if (file.getName().contains(".groovy"))
+                    return true;
+                return false;
+            }
+        });
+
+        for (File p : plugins) {
+            initializePlugin(p.getName());
+        }
     }
 
     /**
@@ -73,7 +90,7 @@ public class GroovyManager {
         if (gse != null) {
             try {
                 // Run the specified plugin
-                gse.run(pluginName + ".groovy", _bind);
+                gse.run(pluginName, _bind);
             } catch (ResourceException re) {
                 Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to execute plugin (ResourceException): " + pluginName + ", reason: " + re.toString(), re);
                 re.printStackTrace();
