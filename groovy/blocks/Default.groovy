@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks
-
 import com.github.begla.blockmania.blocks.Block
 import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
 import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE

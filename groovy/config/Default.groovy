@@ -90,7 +90,7 @@ Player {
 
 World {
 
-    defaultSeed = "wuXMgtFwt6kst6Rt"
+    defaultSeed = "nif0uiw4iBtMiiYs"
 
     sunRiseSetDuration = 0.025d
     dayNightLength = new Long((60 * 1000) * 20) // 20 minutes in ms
@@ -104,19 +104,4 @@ World {
         probDiamond = -4d
 
     }
-}
-
-environments {
-
-    applet {
-        Graphics {
-            viewingDistanceX = 8
-            viewingDistanceZ = 8
-        }
-
-        System {
-            sandboxed = true
-        }
-    }
-
 }
