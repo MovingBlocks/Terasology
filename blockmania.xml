@@ -215,6 +215,7 @@
             <zipfileset src="${basedir}/libs/slick.jar"/>
             <zipfileset src="${basedir}/libs/slick-util.jar"/>
             <zipfileset src="${basedir}/libs/trove-3.0.0.jar"/>
+            <zipfileset src="${basedir}/libs/groovy-all-1.8.2.jar"/>
         </jar>
         <copy file="${temp.jar.path.Blockmania.jar}" tofile="${artifact.temp.output.blockmania:jar}/Blockmania.jar"/>
     </target>
