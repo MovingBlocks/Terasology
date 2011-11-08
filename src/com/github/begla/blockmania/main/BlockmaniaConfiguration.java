@@ -17,10 +17,9 @@ package com.github.begla.blockmania.main;
 
 import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
-import org.newdawn.slick.util.ResourceLoader;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -31,9 +30,10 @@ import java.util.logging.Level;
  */
 public final class BlockmaniaConfiguration {
 
-    /* SINGLETON */
-
+    private static final String DEFAULT_CONFIG_PATH = "groovy/config/Default.groovy";
     private static BlockmaniaConfiguration _instance;
+
+    private Map _config;
 
     public static BlockmaniaConfiguration getInstance() {
         if (_instance == null)
@@ -42,30 +42,26 @@ public final class BlockmaniaConfiguration {
         return _instance;
     }
 
-    /* CONFIG SLURPER */
-
-    private Map _config;
-
     private BlockmaniaConfiguration() {
         loadConfigEnvironment(null);
     }
 
     public void loadConfigEnvironment(String environment) {
+        ConfigObject config = null;
+
         try {
-            ConfigObject config;
 
             if (environment != null)
-                config = new ConfigSlurper(environment).parse(ResourceLoader.getResource("com/github/begla/blockmania/data/config/Config.groovy").toURI().toURL());
+                config = new ConfigSlurper(environment).parse(new File(DEFAULT_CONFIG_PATH).toURI().toURL());
             else
-                config = new ConfigSlurper().parse(ResourceLoader.getResource("com/github/begla/blockmania/data/config/Config.groovy").toURI().toURL());
+                config = new ConfigSlurper().parse(new File(DEFAULT_CONFIG_PATH).toURI().toURL());
 
-            _config = config.flatten();
-
-        } catch (MalformedURLException e) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
-        } catch (URISyntaxException e) {
+        } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         }
+
+        if (config != null)
+            _config = config.flatten();
     }
 
     public Map getConfig() {

@@ -22,7 +22,6 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import javolution.util.FastMap;
-import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -32,14 +31,12 @@ import java.util.logging.Level;
  */
 public class BlockManager {
 
+    private static final String DEFAULT_SCRIPT_PATH = "groovy/blocks/";
+
     private Binding _binding;
-
-    private final String blockScriptPath = ResourceLoader.getResource("com/github/begla/blockmania/data/blocks/").getPath();
-
+    private static BlockManager _instance;
     private FastMap<String, Block> _blocksByTitle = new FastMap<String, Block>(128);
     private TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
-
-    private static BlockManager _instance;
 
     public static BlockManager getInstance() {
         if (_instance == null)
@@ -57,7 +54,7 @@ public class BlockManager {
 
     private void loadBlocks() {
         try {
-            GroovyScriptEngine scriptEngine = new GroovyScriptEngine(blockScriptPath);
+            GroovyScriptEngine scriptEngine = new GroovyScriptEngine(DEFAULT_SCRIPT_PATH);
             scriptEngine.run("Default.groovy", _binding);
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);

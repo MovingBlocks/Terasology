@@ -171,7 +171,7 @@
     </target>
 
     <target name="clean.artifact.blockmania" depends="init.artifacts" description="clean Blockmania artifact output">
-        <delete dir="${artifact.output.blockmania}"></delete>
+        <delete dir="${artifact.output.blockmania}"/>
     </target>
 
     <target name="artifact.blockmania" depends="init.artifacts, artifact.blockmania:jar"
@@ -187,11 +187,15 @@
         <copy todir="${artifact.output.blockmania}/natives">
             <fileset dir="${basedir}/natives"/>
         </copy>
+        <mkdir dir="${artifact.output.blockmania}/groovy"/>
+        <copy todir="${artifact.output.blockmania}/groovy">
+            <fileset dir="${basedir}/groovy"/>
+        </copy>
     </target>
 
     <target name="artifact.blockmania:zip" depends="artifact.blockmania" description="None">
-        <mkdir dir="${artifact.output.blockmania:zip}"></mkdir>
-        <zip basedir="${artifact.output.blockmania}" destfile="${artifact.output.blockmania:zip}/Blockmania.zip"></zip>
+        <mkdir dir="${artifact.output.blockmania:zip}"/>
+        <zip basedir="${artifact.output.blockmania}" destfile="${artifact.output.blockmania:zip}/Blockmania.zip"/>
     </target>
 
     <target name="artifact.blockmania:jar" depends="init.artifacts, compile.module.blockmania"

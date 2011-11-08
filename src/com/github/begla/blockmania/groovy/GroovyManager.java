@@ -23,7 +23,6 @@ import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
-import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -42,7 +41,7 @@ public class GroovyManager {
     /**
      * Directory where we keep "plugin" files (Groovy scripts we'll run - prolly move this setting elsewhere sometime)
      */
-    private final String pluginsPath = ResourceLoader.getResource("com/github/begla/blockmania/data/blocks/").getPath();
+    private final String _pluginsPath = "groovy/plugins";
 
     /**
      * Initialize the GroovyManager and "share" the given World variable via the Binding
@@ -65,7 +64,7 @@ public class GroovyManager {
         GroovyScriptEngine gse = null;
         try {
             // Create an engine tied to the dir we keep plugins in
-            gse = new GroovyScriptEngine(pluginsPath);
+            gse = new GroovyScriptEngine(_pluginsPath);
         } catch (IOException ioe) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to initialize plugin (IOException): " + pluginName + ", reason: " + ioe.toString(), ioe);
             ioe.printStackTrace();

@@ -123,6 +123,7 @@ public final class Blockmania extends RenderableScene {
             blockmania.initDisplay();
             blockmania.initControls();
             blockmania.initGame();
+            blockmania.initGroovy();
         } catch (LWJGLException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
         } catch (SlickException e) {
@@ -172,6 +173,10 @@ public final class Blockmania extends RenderableScene {
         final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
         newPaths[newPaths.length - 1] = s;
         usrPathsField.set(null, newPaths);
+    }
+
+    public void initGroovy() {
+        _groovyManager = new GroovyManager();
     }
 
     /**
@@ -495,10 +500,6 @@ public final class Blockmania extends RenderableScene {
     }
 
     public GroovyManager getGroovyManager() {
-        if (_groovyManager == null) {
-            _groovyManager = new GroovyManager();
-        }
-
         return _groovyManager;
     }
 
