@@ -106,3 +106,18 @@ World {
 
     }
 }
+
+environments {
+
+    applet {
+        Graphics {
+            viewingDistanceX = 8
+            viewingDistanceZ = 8
+        }
+
+        System {
+            sandboxed = true
+        }
+    }
+
+}

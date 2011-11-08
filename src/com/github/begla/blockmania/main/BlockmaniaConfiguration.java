@@ -47,8 +47,18 @@ public final class BlockmaniaConfiguration {
     private Map _config;
 
     private BlockmaniaConfiguration() {
+        loadConfigEnvironment(null);
+    }
+
+    public void loadConfigEnvironment(String environment) {
         try {
-            ConfigObject config = new ConfigSlurper().parse(ResourceLoader.getResource("com/github/begla/blockmania/data/config/Config.groovy").toURI().toURL());
+            ConfigObject config;
+
+            if (environment != null)
+                config = new ConfigSlurper(environment).parse(ResourceLoader.getResource("com/github/begla/blockmania/data/config/Config.groovy").toURI().toURL());
+            else
+                config = new ConfigSlurper().parse(ResourceLoader.getResource("com/github/begla/blockmania/data/config/Config.groovy").toURI().toURL());
+
             _config = config.flatten();
 
         } catch (MalformedURLException e) {

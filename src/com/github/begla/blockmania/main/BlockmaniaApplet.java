@@ -38,7 +38,7 @@ public final class BlockmaniaApplet extends Applet {
             @Override
             public void run() {
                 try {
-                    BlockmaniaConfiguration.getInstance().getConfig().put("System.sandboxed", true);
+                    BlockmaniaConfiguration.getInstance().loadConfigEnvironment("applet");
 
                     Display.setParent(null);
                     Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(1280, 720));
