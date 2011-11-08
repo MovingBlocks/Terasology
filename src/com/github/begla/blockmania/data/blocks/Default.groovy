@@ -10,7 +10,7 @@ import org.lwjgl.util.vector.Vector4f
 def BlockManager bm = blockManager;
 
 // The air we breathe
-bm.addBlock(new Block().setTitle("Air").setId((byte) 0).setDisableTesselation(true).setTranslucent(true).setInvisible(true).setBypassSelectionTray(true).setPenetrable(true).setCastsShadows(false).setRenderBoundingBox(false).setAllowBlockAttachment(false).setHardness((byte) 0))
+bm.addBlock(new Block().setTitle("Air").setId((byte) 0).setDisableTesselation(true).setTranslucent(true).setInvisible(true).setBypassSelectionRay(true).setPenetrable(true).setCastsShadows(false).setRenderBoundingBox(false).setAllowBlockAttachment(false).setHardness((byte) 0))
 // <--
 
 // Etc.
@@ -18,9 +18,9 @@ bm.addBlock(new Block().setTitle("Bookshelf").setId((byte) 27).setTextureAtlasPo
 // <--
 
 // Liquids
-bm.addBlock(new Block().setTitle("Water").setId((byte) 9).setTextureAtlasPos(new Vector2f(15, 12)).setTranslucent(true).setPenetrable(true).setRenderBoundingBox(false).setHardness((byte) -1).setAllowBlockAttachment(false).setBypassSelectionTray(true).setCastsShadows(false).setLiquid(true).setBlockForm(BLOCK_FORM.LOWERED_BLOCK))
+bm.addBlock(new Block().setTitle("Water").setId((byte) 9).setTextureAtlasPos(new Vector2f(15, 12)).setTranslucent(true).setPenetrable(true).setRenderBoundingBox(false).setHardness((byte) -1).setAllowBlockAttachment(false).setBypassSelectionRay(true).setCastsShadows(false).setLiquid(true).setBlockForm(BLOCK_FORM.LOWERED_BLOCK))
 
-bm.addBlock(new Block().setTitle("Lava").setId((byte) 10).setTextureAtlasPos(new Vector2f(15, 15)).setTranslucent(true).setPenetrable(true).setRenderBoundingBox(false).setHardness((byte) -1).setAllowBlockAttachment(false).setBypassSelectionTray(true).setCastsShadows(false).setLiquid(true).setBlockForm(BLOCK_FORM.LOWERED_BLOCK))
+bm.addBlock(new Block().setTitle("Lava").setId((byte) 10).setTextureAtlasPos(new Vector2f(15, 15)).setTranslucent(true).setPenetrable(true).setRenderBoundingBox(false).setHardness((byte) -1).setAllowBlockAttachment(false).setBypassSelectionRay(true).setCastsShadows(false).setLiquid(true).setBlockForm(BLOCK_FORM.LOWERED_BLOCK))
 // <--
 
 // Ice

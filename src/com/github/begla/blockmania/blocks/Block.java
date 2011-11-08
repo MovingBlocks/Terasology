@@ -103,7 +103,7 @@ public class Block implements RenderableObject {
 
         setPenetrable(false);
         setAllowBlockAttachment(true);
-        setBypassSelectionTray(false);
+        setBypassSelectionRay(false);
         setBlockForm(BLOCK_FORM.DEFAULT);
         setColorSource(COLOR_SOURCE.DEFAULT);
         setCastsShadows(true);
@@ -354,7 +354,7 @@ public class Block implements RenderableObject {
         return this;
     }
 
-    public Block setBypassSelectionTray(boolean bypassSelectionRay) {
+    public Block setBypassSelectionRay(boolean bypassSelectionRay) {
         _bypassSelectionRay = bypassSelectionRay;
         return this;
     }
