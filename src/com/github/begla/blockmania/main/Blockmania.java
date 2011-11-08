@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.main;
 
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.groovy.GroovyManager;
 import com.github.begla.blockmania.gui.HUD;
 import com.github.begla.blockmania.rendering.FontManager;
@@ -82,8 +83,6 @@ public final class Blockmania extends RenderableScene {
     private final Logger _logger = Logger.getLogger("blockmania");
     /* ------- */
     private final BlockmaniaConsole _console = new BlockmaniaConsole(this);
-    /* ------- */
-    private boolean _sandboxed = false;
 
     /**
      * Groovy Manager handles all the Groovy-related stuff!
@@ -95,6 +94,10 @@ public final class Blockmania extends RenderableScene {
         if (_instance == null)
             _instance = new Blockmania();
         return _instance;
+    }
+
+    private Blockmania() {
+        _hud = new HUD(this);
     }
 
     /**
@@ -120,18 +123,15 @@ public final class Blockmania extends RenderableScene {
             blockmania.initDisplay();
             blockmania.initControls();
             blockmania.initGame();
-            blockmania.initGroovy();
-
-            blockmania.startGame();
         } catch (LWJGLException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
         } catch (SlickException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
-        } finally {
-            if (blockmania != null) {
-                blockmania.destroy();
-            }
         }
+
+        // MAIN GAME LOOP
+        if (blockmania != null)
+            blockmania.startGame();
 
         System.exit(0);
     }
@@ -213,7 +213,6 @@ public final class Blockmania extends RenderableScene {
      * @param seed  Seed value used for the generators
      */
     public void initNewWorldAndPlayer(String title, String seed) {
-
         Blockmania.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Get rid of the old world
@@ -230,6 +229,7 @@ public final class Blockmania extends RenderableScene {
         // Init. a new world
         _world = new World(title, seed);
         _world.setPlayer(new Player(_world));
+
         // Reset the delta value
         _lastLoopTime = getTime();
     }
@@ -237,7 +237,7 @@ public final class Blockmania extends RenderableScene {
     /**
      * Clean up before exiting the application.
      */
-    public void destroy() {
+    private void destroy() {
         AL.destroy();
         Mouse.destroy();
         Keyboard.destroy();
@@ -248,22 +248,18 @@ public final class Blockmania extends RenderableScene {
         _timerTicksPerSecond = Sys.getTimerResolution();
 
         /*
-         * Init. GUI.
-         */
-        _hud = new HUD(this);
-
-        /*
          * Init. management classes.
          */
         ShaderManager.getInstance();
         VBOManager.getInstance();
         FontManager.getInstance();
+        BlockManager.getInstance();
 
         /*
          * Init. OpenGL
          */
         resizeViewport();
-        initOpenGLParams();
+        resetOpenGLParameters();
 
         // Generate a world with a random seed value
         String worldSeed = (String) BlockmaniaConfiguration.getInstance().getConfig().get("World.defaultSeed");
@@ -275,7 +271,7 @@ public final class Blockmania extends RenderableScene {
         initNewWorldAndPlayer("World1", worldSeed);
     }
 
-    public void initOpenGLParams() {
+    public void resetOpenGLParameters() {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
@@ -287,10 +283,6 @@ public final class Blockmania extends RenderableScene {
 
         GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
         glShadeModel(GL11.GL_SMOOTH);
-    }
-
-    private void initGroovy() {
-        _groovyManager = new GroovyManager();
     }
 
     public void render() {
@@ -372,7 +364,7 @@ public final class Blockmania extends RenderableScene {
             getLogger().log(Level.SEVERE, e.toString(), e);
         }
 
-        Display.destroy();
+        destroy();
     }
 
     public void pause() {
@@ -503,6 +495,10 @@ public final class Blockmania extends RenderableScene {
     }
 
     public GroovyManager getGroovyManager() {
+        if (_groovyManager == null) {
+            _groovyManager = new GroovyManager();
+        }
+
         return _groovyManager;
     }
 

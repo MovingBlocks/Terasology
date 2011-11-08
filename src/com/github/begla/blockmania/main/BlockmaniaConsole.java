@@ -97,7 +97,7 @@ public final class BlockmaniaConsole extends RenderableScene {
         }
 
         if (success) {
-            Blockmania.getInstance().initOpenGLParams();
+            Blockmania.getInstance().resetOpenGLParameters();
             Blockmania.getInstance().getLogger().log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
 
             addToRingBuffer();

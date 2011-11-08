@@ -19,6 +19,7 @@ package com.github.begla.blockmania.main;
 import org.lwjgl.opengl.Display;
 
 import java.applet.Applet;
+import java.util.logging.Level;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -51,7 +52,7 @@ public final class BlockmaniaApplet extends Applet {
                     _blockmania.initGame();
                     _blockmania.startGame();
                 } catch (Exception e) {
-                    System.err.println(e);
+                    Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
                 }
             }
         };
