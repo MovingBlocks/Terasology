@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.observer;
 
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
- * World provider observers are notified if something in the world changes.
+ * Block observers are notified if a block in the world changes.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface WorldProviderObserver {
+public interface BlockObserver {
 
     public void lightChanged(Chunk chunk, BlockPosition pos);
     public void blockChanged(Chunk chunk, BlockPosition pos);

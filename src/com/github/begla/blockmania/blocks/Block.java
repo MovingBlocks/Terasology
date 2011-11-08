@@ -20,7 +20,6 @@ import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.utilities.Helper;
-import org.jdom.Element;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -31,7 +30,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -41,14 +39,32 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class Block implements RenderableObject {
 
-    protected byte _id = 0x0;
-    protected String _title = "Untitled block";
-    protected boolean _translucent, _invisible, _penetrable, _castsShadows, _noTesselation, _renderBoundingBox, _allowBlockAttachment, _bypassSelectionRay, _liquid;
-    protected BLOCK_FORM _blockForm;
-    protected COLOR_SOURCE _colorSource;
-    protected byte _luminance, _hardness;
-    protected Vector4f[] _colorOffset = new Vector4f[6];
-    protected Vector2f[] _textureAtlasPos = new Vector2f[6];
+    private byte _id = 0x0;
+    private String _title = "Untitled block";
+
+    private boolean _translucent;
+    private boolean _invisible;
+    private boolean _penetrable;
+    private boolean _castsShadows;
+    private boolean _disableTesselation;
+    private boolean _renderBoundingBox;
+    private boolean _allowBlockAttachment;
+    private boolean _bypassSelectionRay;
+    private boolean _liquid;
+
+    private BLOCK_FORM _blockForm;
+    private COLOR_SOURCE _colorSource;
+
+    private byte _luminance;
+    private byte _hardness;
+
+    private Vector4f[] _colorOffset = new Vector4f[6];
+    private Vector2f[] _textureAtlasPos = new Vector2f[6];
+
+    private int _displayList = -1;
+    private static BufferedImage _colorLut;
+    private static BufferedImage _foliageLut;
+
 
     /**
      * The six sides of a block.
@@ -68,114 +84,36 @@ public class Block implements RenderableObject {
         DEFAULT, COLOR_LUT, FOLIAGE_LUT
     }
 
-    private int _displayList = -1;
-    private static BufferedImage colorLut, foliageLut;
-
     static {
         try {
-            colorLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/grasscolor.png").openStream());
-            foliageLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/foliagecolor.png").openStream());
+            _colorLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/grasscolor.png").openStream());
+            _foliageLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/foliagecolor.png").openStream());
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         }
     }
 
     public Block() {
-        _title = "Untitled block";
+        setTitle("Untitled block");
 
         for (int i = 0; i < 6; i++) {
-            _colorOffset[i] = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-            _textureAtlasPos[i] = new Vector2f(0.0f, 0.0f);
+            setTextureAtlasPos(SIDE.values()[i], new Vector2f(0.0f, 0.0f));
+            setColorOffset(SIDE.values()[i], new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         }
 
-        _penetrable = false;
-        _allowBlockAttachment = true;
-        _bypassSelectionRay = false;
-        _blockForm = BLOCK_FORM.DEFAULT;
-        _colorSource = COLOR_SOURCE.DEFAULT;
-        _castsShadows = true;
-        _translucent = false;
-        _invisible = false;
-        _renderBoundingBox = true;
-        _hardness = 15;
-        _luminance = 0;
-        _noTesselation = false;
-        _liquid = false;
-    }
-
-    public Block(Element block) {
-        this();
-
-        try {
-            _title = block.getAttribute("title").getValue();
-            _id = Byte.parseByte(block.getAttribute("id").getValue());
-
-            List<Element> blockChildren = block.getChildren();
-
-            for (Element e : blockChildren) {
-                if (e.getName().equals("property")) {
-                    if (e.getAttributeValue("name").equals("colorOffset")) {
-                        for (int i = 0; i < 6; i++)
-                            _colorOffset[i] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
-                    } else if (e.getAttributeValue("name").equals("colorOffsetTop")) {
-                        _colorOffset[SIDE.TOP.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
-                    } else if (e.getAttributeValue("name").equals("colorOffsetBottom")) {
-                        _colorOffset[SIDE.BOTTOM.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
-                    } else if (e.getAttributeValue("name").equals("colorOffsetRight")) {
-                        _colorOffset[SIDE.RIGHT.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
-                    } else if (e.getAttributeValue("name").equals("colorOffsetLeft")) {
-                        _colorOffset[SIDE.LEFT.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
-                    } else if (e.getAttributeValue("name").equals("colorOffsetFront")) {
-                        _colorOffset[SIDE.FRONT.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
-                    } else if (e.getAttributeValue("name").equals("colorOffsetBack")) {
-                        _colorOffset[SIDE.BACK.ordinal()] = new Vector4f(e.getAttribute("r").getFloatValue(), e.getAttribute("g").getFloatValue(), e.getAttribute("b").getFloatValue(), e.getAttribute("a").getFloatValue());
-                    } else if (e.getAttributeValue("name").equals("textureOffset")) {
-                        for (int i = 0; i < 6; i++)
-                            _textureAtlasPos[i] = new Vector2f(e.getAttribute("x").getFloatValue(), e.getAttribute("y").getFloatValue());
-                    } else if (e.getAttributeValue("name").equals("textureOffsetTop")) {
-                        _textureAtlasPos[SIDE.TOP.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
-                    } else if (e.getAttributeValue("name").equals("textureOffsetBottom")) {
-                        _textureAtlasPos[SIDE.BOTTOM.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
-                    } else if (e.getAttributeValue("name").equals("textureOffsetRight")) {
-                        _textureAtlasPos[SIDE.RIGHT.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
-                    } else if (e.getAttributeValue("name").equals("textureOffsetLeft")) {
-                        _textureAtlasPos[SIDE.LEFT.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
-                    } else if (e.getAttributeValue("name").equals("textureOffsetFront")) {
-                        _textureAtlasPos[SIDE.FRONT.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
-                    } else if (e.getAttributeValue("name").equals("textureOffsetBack")) {
-                        _textureAtlasPos[SIDE.BACK.ordinal()] = new Vector2f(e.getAttribute("x").getIntValue(), e.getAttribute("y").getIntValue());
-                    } else if (e.getAttributeValue("name").equals("colorSource")) {
-                        _colorSource = COLOR_SOURCE.values()[Integer.parseInt(e.getValue())];
-                    } else if (e.getAttributeValue("name").equals("blockForm")) {
-                        _blockForm = BLOCK_FORM.values()[Integer.parseInt(e.getValue())];
-                    } else if (e.getAttributeValue("name").equals("hardness")) {
-                        _hardness = Byte.parseByte(e.getValue());
-                    } else if (e.getAttributeValue("name").equals("penetrable")) {
-                        _penetrable = Boolean.parseBoolean(e.getValue());
-                    } else if (e.getAttributeValue("name").equals("translucent")) {
-                        _translucent = Boolean.parseBoolean(e.getValue());
-                    } else if (e.getAttributeValue("name").equals("invisible")) {
-                        _invisible = Boolean.parseBoolean(e.getValue());
-                    } else if (e.getAttributeValue("name").equals("luminance")) {
-                        _luminance = Byte.parseByte(e.getValue());
-                    } else if (e.getAttributeValue("name").equals("noTessellation")) {
-                        _noTesselation = Boolean.parseBoolean(e.getValue());
-                    } else if (e.getAttributeValue("name").equals("castsShadows")) {
-                        _castsShadows = Boolean.parseBoolean(e.getValue());
-                    } else if (e.getAttributeValue("name").equals("bypassSelectionRay")) {
-                        _bypassSelectionRay = Boolean.parseBoolean(e.getValue());
-                    } else if (e.getAttributeValue("name").equals("renderBoundingBox")) {
-                        _renderBoundingBox = Boolean.parseBoolean(e.getValue());
-                    } else if (e.getAttributeValue("name").equals("allowBlockAttachment")) {
-                        _allowBlockAttachment = Boolean.parseBoolean(e.getValue());
-                    } else if (e.getAttributeValue("name").equals("liquid")) {
-                        _liquid = Boolean.parseBoolean(e.getValue());
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-        }
+        setPenetrable(false);
+        setAllowBlockAttachment(true);
+        setBypassSelectionTray(false);
+        setBlockForm(BLOCK_FORM.DEFAULT);
+        setColorSource(COLOR_SOURCE.DEFAULT);
+        setCastsShadows(true);
+        setTranslucent(false);
+        setInvisible(false);
+        setRenderBoundingBox(true);
+        setHardness((byte) 15);
+        setLuminance((byte) 0);
+        setDisableTesselation(false);
+        setLiquid(false);
     }
 
     /**
@@ -187,7 +125,7 @@ public class Block implements RenderableObject {
      */
     public Vector4f colorForTemperatureAndHumidity(double temp, double hum) {
         hum *= temp;
-        int rgbValue = colorLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
+        int rgbValue = _colorLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
 
         Color c = new Color(rgbValue);
         return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
@@ -202,7 +140,7 @@ public class Block implements RenderableObject {
      */
     public Vector4f foliageColorForTemperatureAndHumidity(double temp, double hum) {
         hum *= temp;
-        int rgbValue = foliageLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
+        int rgbValue = _foliageLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
 
         Color c = new Color(rgbValue);
         return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
@@ -229,16 +167,16 @@ public class Block implements RenderableObject {
     public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
         Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-        if (_colorSource == COLOR_SOURCE.COLOR_LUT)
+        if (getColorSource() == COLOR_SOURCE.COLOR_LUT)
             color.set(colorForTemperatureAndHumidity(temperature, humidity));
-        else if (_colorSource == COLOR_SOURCE.FOLIAGE_LUT) {
+        else if (getColorSource() == COLOR_SOURCE.FOLIAGE_LUT) {
             color.set(foliageColorForTemperatureAndHumidity(temperature, humidity));
         }
 
-        color.x *= _colorOffset[side.ordinal()].x;
-        color.y *= _colorOffset[side.ordinal()].y;
-        color.z *= _colorOffset[side.ordinal()].z;
-        color.w *= _colorOffset[side.ordinal()].w;
+        color.x *= getColorOffset()[side.ordinal()].x;
+        color.y *= getColorOffset()[side.ordinal()].y;
+        color.z *= getColorOffset()[side.ordinal()].z;
+        color.w *= getColorOffset()[side.ordinal()].w;
 
         return color;
     }
@@ -251,96 +189,7 @@ public class Block implements RenderableObject {
      * @return The texture offset
      */
     public Vector2f getTextureOffsetFor(SIDE side) {
-        return Helper.calcOffsetForTextureAt((int) _textureAtlasPos[side.ordinal()].x, (int) _textureAtlasPos[side.ordinal()].y);
-    }
-
-    /**
-     * Returns true, if the block is invisible.
-     *
-     * @return True if invisible
-     */
-    public boolean isBlockInvisible() {
-        return _invisible;
-    }
-
-    /**
-     * Returns true, if the block should be ignored
-     * during collision checks.
-     *
-     * @return True if penetrable
-     */
-    public boolean isPenetrable() {
-        return _penetrable;
-    }
-
-    /**
-     * Returns true, if the block should be considered while calculating shadows.
-     *
-     * @return True if casting shadows
-     */
-    public boolean isCastingShadows() {
-        return _castsShadows;
-    }
-
-    /**
-     * Returns true if this block should be ignored in the tessellation process.
-     *
-     * @return True if ignored while tessellating
-     */
-    public boolean doNotTessellate() {
-        return _noTesselation;
-    }
-
-    /**
-     * Returns true if this block should render a bounding box when selected by the player.
-     *
-     * @return True if a bounding box should be rendered
-     */
-    public boolean shouldRenderBoundingBox() {
-        return _renderBoundingBox;
-    }
-
-    /**
-     * Returns the luminance of the block.
-     *
-     * @return The luminance
-     */
-    public byte getLuminance() {
-        return _luminance;
-    }
-
-    /**
-     * Returns true if the block can be destroyed by the player.
-     *
-     * @return True if removable
-     */
-    public boolean isDestructible() {
-        return _hardness >= 0;
-    }
-
-    /**
-     * True if the player is allowed to attach blocks to this block.
-     *
-     * @return True if the player can attach blocks
-     */
-    public boolean allowsBlockAttachment() {
-        return _allowBlockAttachment;
-    }
-
-    /**
-     * @return True if this block is a liquid
-     */
-    public boolean isLiquid() {
-        return _liquid;
-    }
-
-    /**
-     * True if the selection ray can pass through the block.
-     *
-     * @return True if selection ray can pass
-     */
-    public boolean letsSelectionRayThrough() {
-        return _bypassSelectionRay;
+        return Helper.calcOffsetForTextureAt((int) getTextureAtlasPos()[side.ordinal()].x, (int) getTextureAtlasPos()[side.ordinal()].y);
     }
 
     /**
@@ -363,26 +212,6 @@ public class Block implements RenderableObject {
      */
     public static AABB AABBForBlockAt(int x, int y, int z) {
         return new AABB(new Vector3f(x, y, z), new Vector3f(0.5f, 0.5f, 0.5f));
-    }
-
-    /**
-     * Returns the form of the block.
-     *
-     * @return The form of the block
-     */
-    public BLOCK_FORM getBlockForm() {
-        return _blockForm;
-    }
-
-    /**
-     * @return The title of the block
-     */
-    public String getTitle() {
-        return _title;
-    }
-
-    public byte getId() {
-        return _id;
     }
 
     private void generateDisplayList() {
@@ -462,7 +291,7 @@ public class Block implements RenderableObject {
     }
 
     public void render() {
-        if (isBlockInvisible())
+        if (isInvisible())
             return;
 
         if (_displayList == -1)
@@ -478,5 +307,243 @@ public class Block implements RenderableObject {
 
     public void update() {
         // Do nothing
+    }
+
+    public Block setId(byte id) {
+        _id = id;
+        return this;
+    }
+
+    public Block setTitle(String title) {
+        _title = title;
+        return this;
+    }
+
+    public Block setTranslucent(boolean translucent) {
+        _translucent = translucent;
+        return this;
+    }
+
+    public Block setInvisible(boolean invisible) {
+        _invisible = invisible;
+        return this;
+    }
+
+    public Block setPenetrable(boolean penetrable) {
+        _penetrable = penetrable;
+        return this;
+    }
+
+    public Block setCastsShadows(boolean castsShadows) {
+        _castsShadows = castsShadows;
+        return this;
+    }
+
+    public Block setDisableTesselation(boolean disableTesselation) {
+        _disableTesselation = disableTesselation;
+        return this;
+    }
+
+    public Block setRenderBoundingBox(boolean renderBoundingBox) {
+        _renderBoundingBox = renderBoundingBox;
+        return this;
+    }
+
+    public Block setAllowBlockAttachment(boolean allowBlockAttachment) {
+        _allowBlockAttachment = allowBlockAttachment;
+        return this;
+    }
+
+    public Block setBypassSelectionTray(boolean bypassSelectionRay) {
+        _bypassSelectionRay = bypassSelectionRay;
+        return this;
+    }
+
+    public Block setLiquid(boolean liquid) {
+        _liquid = liquid;
+        return this;
+    }
+
+    public Block setBlockForm(BLOCK_FORM blockForm) {
+        _blockForm = blockForm;
+        return this;
+    }
+
+    public COLOR_SOURCE getColorSource() {
+        return _colorSource;
+    }
+
+    public Block setColorSource(COLOR_SOURCE colorSource) {
+        _colorSource = colorSource;
+        return this;
+    }
+
+    public Block setLuminance(byte luminance) {
+        _luminance = luminance;
+        return this;
+    }
+
+    public byte getHardness() {
+        return _hardness;
+    }
+
+    public Block setHardness(byte hardness) {
+        _hardness = hardness;
+        return this;
+    }
+
+    public Vector4f[] getColorOffset() {
+        return _colorOffset;
+    }
+
+    public Block setColorOffset(SIDE side, Vector4f colorOffset) {
+        _colorOffset[side.ordinal()] = colorOffset;
+        return this;
+    }
+
+    public Block setColorOffset(Vector4f colorOffset) {
+        for (int i = 0; i < 6; i++) {
+            setColorOffset(SIDE.values()[i], colorOffset);
+        }
+        return this;
+    }
+
+    public Vector2f[] getTextureAtlasPos() {
+        return _textureAtlasPos;
+    }
+
+    public Block setTextureAtlasPos(SIDE side, Vector2f atlasPos) {
+        _textureAtlasPos[side.ordinal()] = atlasPos;
+        return this;
+    }
+
+    public Block setTextureAtlasPosTopBottom(Vector2f atlasPos) {
+        _textureAtlasPos[SIDE.TOP.ordinal()] = atlasPos;
+        _textureAtlasPos[SIDE.BOTTOM.ordinal()] = atlasPos;
+        return this;
+    }
+
+    public Block setTextureAtlasPos(Vector2f atlasPos) {
+        for (int i = 0; i < 6; i++) {
+            setTextureAtlasPos(SIDE.values()[i], atlasPos);
+        }
+        return this;
+    }
+
+    public Block setTextureAtlasPosMantle(Vector2f atlasPos) {
+        _textureAtlasPos[SIDE.LEFT.ordinal()] = atlasPos;
+        _textureAtlasPos[SIDE.RIGHT.ordinal()] = atlasPos;
+        _textureAtlasPos[SIDE.FRONT.ordinal()] = atlasPos;
+        _textureAtlasPos[SIDE.BACK.ordinal()] = atlasPos;
+        return this;
+    }
+
+    /**
+     * Returns the form of the block.
+     *
+     * @return The form of the block
+     */
+    public BLOCK_FORM getBlockForm() {
+        return _blockForm;
+    }
+
+    /**
+     * @return The title of the block
+     */
+    public String getTitle() {
+        return _title;
+    }
+
+    public byte getId() {
+        return _id;
+    }
+
+    /**
+     * Returns true, if the block is invisible.
+     *
+     * @return True if invisible
+     */
+    public boolean isInvisible() {
+        return _invisible;
+    }
+
+    /**
+     * Returns true, if the block should be ignored
+     * during collision checks.
+     *
+     * @return True if penetrable
+     */
+    public boolean isPenetrable() {
+        return _penetrable;
+    }
+
+    /**
+     * Returns true, if the block should be considered while calculating shadows.
+     *
+     * @return True if casting shadows
+     */
+    public boolean isCastsShadows() {
+        return _castsShadows;
+    }
+
+    /**
+     * Returns true if this block should be ignored in the tessellation process.
+     *
+     * @return True if ignored while tessellating
+     */
+    public boolean isDisableTesselation() {
+        return _disableTesselation;
+    }
+
+    /**
+     * Returns true if this block should render a bounding box when selected by the player.
+     *
+     * @return True if a bounding box should be rendered
+     */
+    public boolean isRenderBoundingBox() {
+        return _renderBoundingBox;
+    }
+
+    /**
+     * Returns the luminance of the block.
+     *
+     * @return The luminance
+     */
+    public byte getLuminance() {
+        return _luminance;
+    }
+
+    /**
+     * Returns true if the block can be destroyed by the player.
+     *
+     * @return True if removable
+     */
+    public boolean isDestructible() {
+        return getHardness() >= 0;
+    }
+
+    /**
+     * True if the player is allowed to attach blocks to this block.
+     *
+     * @return True if the player can attach blocks
+     */
+    public boolean isAllowBlockAttachment() {
+        return _allowBlockAttachment;
+    }
+
+    /**
+     * @return True if this block is a liquid
+     */
+    public boolean isLiquid() {
+        return _liquid;
+    }
+
+    /**
+     * True if the selection ray can pass through the block.
+     *
+     * @return True if selection ray can pass
+     */
+    public boolean isSelectionRayThrough() {
+        return _bypassSelectionRay;
     }
 }

@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.gui;
 
+import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.BlockmaniaConfiguration;
@@ -44,6 +45,11 @@ public class HUD implements RenderableObject {
      * A small rotating cube that serves as a HUD element.
      */
     private void drawRotatingBlock() {
+
+        Block b = BlockManager.getInstance().getBlock(_parent.getActiveWorld().getPlayer().getSelectedBlockType());
+        if (b == null)
+            return;
+
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
@@ -61,7 +67,9 @@ public class HUD implements RenderableObject {
         glDisable(GL_DEPTH_TEST);
         gluLookAt(0, 0, -25, 8f, 4.5f, 0, 0, 1, 0);
         glRotated(_cubeRotation % 360, 0, 1, 1);
-        BlockManager.getInstance().getBlock(_parent.getActiveWorld().getPlayer().getSelectedBlockType()).render();
+
+        b.render();
+
         glEnable(GL_DEPTH_TEST);
         glDisable(GL11.GL_BLEND);
 

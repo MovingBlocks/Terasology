@@ -27,7 +27,7 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
-    protected static final int SAMPLE_RATE_3D_HOR = 8;
+    protected static final int SAMPLE_RATE_3D_HOR = 4;
     protected static final int SAMPLE_RATE_3D_VERT = 8;
 
     public enum BIOME_TYPE {
@@ -40,7 +40,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     @Override
     public void generate(Chunk c) {
-        double[][][] densityMap = new double[(int) Chunk.getChunkDimensionX() + 1][(int) Chunk.getChunkDimensionY() + 1][(int) Chunk.getChunkDimensionZ() + 1];
+        double[][][] densityMap = new double[Chunk.getChunkDimensionX() + 1][Chunk.getChunkDimensionY() + 1][Chunk.getChunkDimensionZ() + 1];
 
         /*
          * Create the density map at a lower sample rate.
@@ -68,7 +68,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                 BIOME_TYPE type = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
                 int firstBlockHeight = -1;
 
-                for (int y = (int) Chunk.getChunkDimensionY(); y >= 0; y--) {
+                for (int y = Chunk.getChunkDimensionY(); y >= 0; y--) {
 
                     if (y == 0) { // Hard stone ground layer
                         c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Hard stone").getId());

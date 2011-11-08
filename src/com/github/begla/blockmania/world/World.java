@@ -92,6 +92,7 @@ public final class World extends RenderableScene {
         _skysphere = new Skysphere(this);
 
         _chunkUpdateManager = new ChunkUpdateManager();
+
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
 
         createMusicTimeEvents();
@@ -257,7 +258,6 @@ public final class World extends RenderableScene {
 
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
 
-
             if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
                 c.getAABB().render();
             }
@@ -329,7 +329,7 @@ public final class World extends RenderableScene {
         for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; ) {
             if (n.getValue().isVisible()) {
                 if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
-                    _chunkUpdateManager.queueChunkUpdate(n.getValue());
+                    _chunkUpdateManager.queueChunkUpdate(n.getValue(), false);
                     continue;
                 }
 
@@ -339,9 +339,6 @@ public final class World extends RenderableScene {
 
         // Update the particle emitters
         _blockParticleEmitter.update();
-
-        // Generate new VBOs if available
-        _chunkUpdateManager.updateVBOs();
 
         // Free unused space
         _worldProvider.getChunkProvider().freeUnusedSpace();
@@ -402,7 +399,12 @@ public final class World extends RenderableScene {
      * @param p The player
      */
     public void setPlayer(Player p) {
+        if (_player != null) {
+            _player.unregisterObserver(_chunkUpdateManager);
+        }
+
         _player = p;
+        _player.registerObserver(_chunkUpdateManager);
 
         _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
         _player.reset();
@@ -419,7 +421,7 @@ public final class World extends RenderableScene {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, sun: %f, vbo-updates: %d, cache: %d, cu-duration: %fms, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _chunkUpdateManager.getVboUpdatesSize(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %f, sun: %f, cache: %d, cu-duration: %fms, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {

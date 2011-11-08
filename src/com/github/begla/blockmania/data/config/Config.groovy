@@ -8,19 +8,18 @@ System {
     maxThreads = Math.min(Runtime.getRuntime().availableProcessors() + 1, 6)
 
     sandboxed = false
-
     saveChunks = true
 
     Debug {
 
-        debug = false;
+        debug = false
         debugCollision = false
 
         chunkOutlines = false
 
         demoFlight = false
 
-        godMode = false;
+        godMode = false
 
     }
 }
@@ -91,7 +90,7 @@ Player {
 
 World {
 
-    defaultSeed = "friztztz"
+    defaultSeed = "wuXMgtFwt6kst6Rt"
 
     sunRiseSetDuration = 0.025d
     dayNightLength = new Long((60 * 1000) * 20) // 20 minutes in ms

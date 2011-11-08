@@ -15,11 +15,11 @@
  */
 package com.github.begla.blockmania.world.chunk;
 
+import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.world.observer.BlockObserver;
 import javolution.util.FastSet;
-
-import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * (byte) 0
@@ -27,14 +27,12 @@ import java.util.concurrent.PriorityBlockingQueue;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class ChunkUpdateManager {
+public final class ChunkUpdateManager implements BlockObserver {
 
     /* CHUNK UPDATES */
     private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
     private double _averageUpdateDuration = 0.0;
 
-    /* VBO UPDATES */
-    private final PriorityBlockingQueue<Chunk> _vboUpdates = new PriorityBlockingQueue<Chunk>();
 
     /**
      * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
@@ -43,11 +41,11 @@ public final class ChunkUpdateManager {
      * @param c The chunk to update
      * @return True if a chunk update was executed
      */
-    public boolean queueChunkUpdate(Chunk c) {
+    public boolean queueChunkUpdate(Chunk c, boolean force) {
         final Chunk chunkToProcess = c;
         final int maxThreads = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("System.maxThreads");
 
-        if (!_currentlyProcessedChunks.contains(chunkToProcess) && _currentlyProcessedChunks.size() < maxThreads) {
+        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < maxThreads || force)) {
             _currentlyProcessedChunks.add(chunkToProcess);
 
             // ... create a new thread and start processing.
@@ -55,9 +53,7 @@ public final class ChunkUpdateManager {
                 public void run() {
                     long timeStart = Blockmania.getInstance().getTime();
 
-                    // If the chunk was changed, update the VBOs.
-                    if (chunkToProcess.processChunk())
-                        _vboUpdates.add(chunkToProcess);
+                    chunkToProcess.processChunk();
 
                     _currentlyProcessedChunks.remove(chunkToProcess);
 
@@ -73,25 +69,15 @@ public final class ChunkUpdateManager {
         return false;
     }
 
-    /**
-     * Updates the VBOs of all currently queued chunks.
-     */
-    public void updateVBOs() {
-        final int vboUpdatesPerFrame = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.vboUpdatesPerFrame");
-
-        for (int i = 0; i < vboUpdatesPerFrame && _vboUpdates.size() > 0; i++) {
-            Chunk c = _vboUpdates.poll();
-
-            if (c != null)
-                c.generateVBOs();
-        }
-    }
-
-    public int getVboUpdatesSize() {
-        return _vboUpdates.size();
-    }
-
     public double getAverageUpdateDuration() {
         return _averageUpdateDuration;
+    }
+
+    public void lightChanged(Chunk chunk, BlockPosition pos) {
+
+    }
+
+    public void blockChanged(Chunk chunk, BlockPosition pos) {
+        queueChunkUpdate(chunk, true);
     }
 }

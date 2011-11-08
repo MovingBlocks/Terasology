@@ -30,9 +30,6 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public abstract class WorldProvider {
 
-    /* WORLD OBSERVERS */
-    private FastList<WorldProviderObserver> _observers = new FastList<WorldProviderObserver>();
-
     /**
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.
@@ -179,23 +176,4 @@ public abstract class WorldProvider {
      * @return The rendering origin
      */
     public abstract Vector3f getRenderingOrigin();
-
-
-    public void registerObserver(WorldProviderObserver observer) {
-        _observers.add(observer);
-    }
-
-    public void unregisterObserver(WorldProviderObserver observer) {
-        _observers.remove(observer);
-    }
-
-    public void notifyObserversBlockChanged(Chunk chunk, BlockPosition pos) {
-        for (WorldProviderObserver ob : _observers)
-            ob.blockChanged(chunk, pos);
-    }
-
-    public void notifyObserversLightChanged(Chunk chunk, BlockPosition pos) {
-        for (WorldProviderObserver ob : _observers)
-            ob.lightChanged(chunk, pos);
-    }
 }

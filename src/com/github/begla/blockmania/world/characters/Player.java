@@ -28,7 +28,9 @@ import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
 import com.github.begla.blockmania.utilities.MathHelper;
+import com.github.begla.blockmania.world.observer.BlockObserver;
 import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.chunk.Chunk;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -44,6 +46,9 @@ import java.util.logging.Level;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class Player extends Character {
+
+    /* OBSERVERS */
+    private FastList<BlockObserver> _observers = new FastList<BlockObserver>();
 
     /* PROPERTIES */
     private byte _selectedBlockType = 1;
@@ -77,7 +82,7 @@ public final class Player extends Character {
         // Display the block the player is aiming at
         if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("HUD.placingBox")) {
             if (is != null) {
-                if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition().toVector3f())).shouldRenderBoundingBox()) {
+                if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition().toVector3f())).isRenderBoundingBox()) {
                     Block.AABBForBlockAt(is.getBlockPosition().toVector3f()).render();
                 }
             }
@@ -143,7 +148,7 @@ public final class Player extends Character {
                     byte blockType = _parent.getWorldProvider().getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
 
                     // Ignore special blocks
-                    if (BlockManager.getInstance().getBlock(blockType).letsSelectionRayThrough()) {
+                    if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
                         continue;
                     }
 
@@ -179,19 +184,23 @@ public final class Player extends Character {
             if (is != null) {
                 Block centerBlock = BlockManager.getInstance().getBlock(getParent().getWorldProvider().getBlock(is.getBlockPosition().x, is.getBlockPosition().y, is.getBlockPosition().z));
 
-                if (!centerBlock.allowsBlockAttachment()) {
+                if (!centerBlock.isAllowBlockAttachment()) {
                     return;
                 }
 
-                Vector3f blockPos = is.calcAdjacentBlockPos();
+                BlockPosition blockPos = is.calcAdjacentBlockPos();
 
                 // Prevent players from placing blocks inside their bounding boxes
                 if (Block.AABBForBlockAt((int) blockPos.x, (int) blockPos.y, (int) blockPos.z).overlaps(getAABB())) {
                     return;
                 }
 
-                getParent().getWorldProvider().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
+                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, false);
                 AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+
+                int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
+                int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
+                notifyObserversBlockChanged(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
             }
         }
     }
@@ -216,6 +225,10 @@ public final class Player extends Character {
                 _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
                 _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
                 AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+
+                int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
+                int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
+                notifyObserversBlockChanged(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
             }
         }
     }
@@ -395,5 +408,24 @@ public final class Player extends Character {
 
     public Camera getActiveCamera() {
         return _activeCamera;
+    }
+
+
+    public void registerObserver(BlockObserver observer) {
+        _observers.add(observer);
+    }
+
+    public void unregisterObserver(BlockObserver observer) {
+        _observers.remove(observer);
+    }
+
+    public void notifyObserversBlockChanged(Chunk chunk, BlockPosition pos) {
+        for (BlockObserver ob : _observers)
+            ob.blockChanged(chunk, pos);
+    }
+
+    public void notifyObserversLightChanged(Chunk chunk, BlockPosition pos) {
+        for (BlockObserver ob : _observers)
+            ob.lightChanged(chunk, pos);
     }
 }

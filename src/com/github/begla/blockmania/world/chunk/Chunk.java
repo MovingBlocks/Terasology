@@ -181,7 +181,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             Block b = BlockManager.getInstance().getBlock(blockId);
 
             // Remember if this "column" is covered
-            if ((!b.isBlockInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) && !covered) {
+            if ((!b.isInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) && !covered) {
                 covered = true;
             }
 
@@ -190,7 +190,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
             // If the column is not covered...
             if (!covered) {
-                if (b.isBlockInvisible() || b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
+                if (b.isInvisible() || b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
                     _sunlight.set(x, y, z, (byte) 15);
                 else
                     _sunlight.set(x, y, z, (byte) 0x0);
@@ -669,17 +669,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         setDirty(false);
     }
 
-
-    /**
-     * Generates the display lists and swaps the old mesh with the current mesh.
-     */
-    public void generateVBOs() {
-        if (_newMesh != null) {
-            _newMesh.generateVBOs();
-        }
-    }
-
-
     /**
      * Draws the opaque or translucent elements of a chunk.
      *
@@ -693,6 +682,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void update() {
+        if (_newMesh != null)
+            _newMesh.generateVBOs();
+
         swapActiveMesh();
     }
 

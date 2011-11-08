@@ -29,6 +29,9 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public final class ChunkMeshGenerator {
 
+    private static final Double OCCLUSION_INTENS_DEFAULT = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Lighting.occlusionIntensDefault");
+    private static final Double OCCLUSION_INTENS_BILLBOARDS = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Lighting.occlusionIntensBillboards");
+
     private final Chunk _chunk;
     private static int _statVertexArrayUpdateCount = 0;
 
@@ -48,7 +51,7 @@ public final class ChunkMeshGenerator {
                     byte blockType = _chunk.getBlock(x, y, z);
                     Block block = BlockManager.getInstance().getBlock(blockType);
 
-                    if (block.isBlockInvisible())
+                    if (block.isInvisible())
                         continue;
 
                     Block.BLOCK_FORM blockForm = block.getBlockForm();
@@ -164,10 +167,10 @@ public final class ChunkMeshGenerator {
             if (i < 4) {
                 Block b = BlockManager.getInstance().getBlock(blocks[i]);
 
-                if (b.isCastingShadows() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) {
-                    resultAmbientOcclusion -= (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Lighting.occlusionIntensDefault");
-                } else if (b.isCastingShadows() && b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                    resultAmbientOcclusion -= (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Lighting.occlusionIntensBillboards");
+                if (b.isCastsShadows() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) {
+                    resultAmbientOcclusion -= OCCLUSION_INTENS_DEFAULT;
+                } else if (b.isCastsShadows() && b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
+                    resultAmbientOcclusion -= OCCLUSION_INTENS_BILLBOARDS;
                 }
             }
         }
@@ -214,7 +217,7 @@ public final class ChunkMeshGenerator {
         addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p4));
         addBlockTextureData(mesh._vertexElements[2], texOffset, new Vector3f(0, 0, 1));
 
-       /*
+        /*
         * Second side of the billboard
         */
         colorBillboardOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
@@ -540,7 +543,7 @@ public final class ChunkMeshGenerator {
         Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
 
-        return bCheck.getId() == 0x0 || cBlock.doNotTessellate() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (!cBlock.isTranslucent() && bCheck.isTranslucent()) || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+        return bCheck.getId() == 0x0 || cBlock.isDisableTesselation() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (!cBlock.isTranslucent() && bCheck.isTranslucent()) || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
     }
 
     public static int getVertexArrayUpdateCount() {

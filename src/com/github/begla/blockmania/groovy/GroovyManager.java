@@ -42,7 +42,7 @@ public class GroovyManager {
     /**
      * Directory where we keep "plugin" files (Groovy scripts we'll run - prolly move this setting elsewhere sometime)
      */
-    private final String pluginsPath = ResourceLoader.getResource("com/github/begla/blockmania/data/plugins/").getPath();
+    private final String pluginsPath = ResourceLoader.getResource("com/github/begla/blockmania/data/blocks/").getPath();
 
     /**
      * Initialize the GroovyManager and "share" the given World variable via the Binding

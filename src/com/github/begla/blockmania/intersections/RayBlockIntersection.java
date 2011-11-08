@@ -82,8 +82,8 @@ public class RayBlockIntersection {
         /**
          * @return
          */
-        public Vector3f calcAdjacentBlockPos() {
-            return Vector3f.add(getBlockPosition().toVector3f(), getSurfaceNormal(), null);
+        public BlockPosition calcAdjacentBlockPos() {
+            return new BlockPosition(Vector3f.add(getBlockPosition().toVector3f(), getSurfaceNormal(), null));
         }
 
         /**
@@ -118,7 +118,7 @@ public class RayBlockIntersection {
         /*
          * Ignore invisible blocks.
          */
-        if (BlockManager.getInstance().getBlock(w.getBlock(x, y, z)).isBlockInvisible()) {
+        if (BlockManager.getInstance().getBlock(w.getBlock(x, y, z)).isInvisible()) {
             return null;
         }
 

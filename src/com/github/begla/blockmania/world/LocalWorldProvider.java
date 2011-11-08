@@ -136,8 +136,6 @@ public class LocalWorldProvider extends WorldProvider {
             if (BlockManager.getInstance().getBlock(c.getBlock(blockPosX, y, blockPosZ)).isDestructible()) {
                 c.setBlock(blockPosX, y, blockPosZ, type);
                 newBlock = type;
-
-                notifyObserversBlockChanged(c, new BlockPosition(blockPosX, y, blockPosZ));
             } else {
                 return false;
             }
@@ -261,8 +259,6 @@ public class LocalWorldProvider extends WorldProvider {
 
         Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         c.setLight(blockPosX, y, blockPosZ, intensity, type);
-
-        notifyObserversLightChanged(c, new BlockPosition(blockPosX, y, blockPosZ));
     }
 
     /**
