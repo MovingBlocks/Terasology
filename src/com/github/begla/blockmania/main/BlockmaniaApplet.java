@@ -61,13 +61,11 @@ public final class BlockmaniaApplet extends Applet {
 
     @Override
     public void start() {
-        _blockmania.unpause();
         super.start();
     }
 
     @Override
     public void stop() {
-        _blockmania.pause();
         super.stop();
     }
 
