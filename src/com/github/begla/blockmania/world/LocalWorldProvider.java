@@ -390,10 +390,6 @@ public class LocalWorldProvider extends WorldProvider {
      * @return True if saving was successful
      */
     public boolean saveMetaData() {
-        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.sandboxed")) {
-            return false;
-        }
-
         // Generate the save directory if needed
         File dir = new File(getWorldSavePath());
         if (!dir.exists()) {
@@ -439,10 +435,6 @@ public class LocalWorldProvider extends WorldProvider {
      * @return True if loading was successful
      */
     private boolean loadMetaData() {
-        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.sandboxed")) {
-            return false;
-        }
-
         File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));
 
         if (!f.exists())

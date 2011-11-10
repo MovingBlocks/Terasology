@@ -7,7 +7,6 @@ System {
 
     maxThreads = Math.min(Runtime.getRuntime().availableProcessors() + 1, 6)
 
-    sandboxed = false
     saveChunks = true
 
     Debug {

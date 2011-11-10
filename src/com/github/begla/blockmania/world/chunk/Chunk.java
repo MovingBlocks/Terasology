@@ -46,8 +46,11 @@ import java.util.logging.Level;
  */
 public class Chunk extends StaticEntity implements Comparable<Chunk>, Externalizable {
 
-    protected static final
-    Vector3f[] _lightDirections = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
+    /* CONSTANT VALUES */
+    private static final int CHUNK_DIMENSION_X = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionX");
+    private static final int CHUNK_DIMENSION_Y = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionY");
+    private static final int CHUNK_DIMENSION_Z = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionZ");
+    protected static final Vector3f[] LIGHT_DIRECTIONS = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
     /* ------ */
     protected boolean _dirty, _lightDirty, _fresh;
     /* ------ */
@@ -85,15 +88,15 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public static int getChunkDimensionX() {
-        return (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionX");
+        return CHUNK_DIMENSION_X;
     }
 
     public static int getChunkDimensionY() {
-        return (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionY");
+        return CHUNK_DIMENSION_Y;
     }
 
     public static int getChunkDimensionZ() {
-        return (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionZ");
+        return CHUNK_DIMENSION_Z;
     }
 
     /**
@@ -300,13 +303,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         for (int i = 0; i < 6; i++) {
 
-            byte neighborValue = getParent().getLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, type);
-            byte neighborType = getParent().getBlock(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z);
+            byte neighborValue = getParent().getLight(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z, type);
+            byte neighborType = getParent().getBlock(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z);
 
             if (neighborValue < lightValue && neighborValue > 0 && BlockManager.getInstance().getBlock(neighborType).isTranslucent()) {
-                getParent().unspreadLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+                getParent().unspreadLight(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
             } else if (neighborValue >= lightValue) {
-                brightSpots.add(new Vector3f(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z));
+                brightSpots.add(new Vector3f(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z));
             }
         }
     }
@@ -349,11 +352,11 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         getParent().setLight(blockPosX, y, blockPosZ, newLightValue, type);
 
         for (int i = 0; i < 6; i++) {
-            byte neighborValue = getParent().getLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, type);
-            byte neighborType = getParent().getBlock(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z);
+            byte neighborValue = getParent().getLight(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z, type);
+            byte neighborType = getParent().getBlock(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z);
 
             if (neighborValue < newLightValue - 1 && BlockManager.getInstance().getBlock(neighborType).isTranslucent()) {
-                getParent().spreadLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, lightValue, depth + 1, type);
+                getParent().spreadLight(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z, lightValue, depth + 1, type);
             }
         }
     }

@@ -126,10 +126,6 @@ public final class LocalChunkCache implements ChunkProvider {
     }
 
     private void writeChunkToDisk(Chunk c) {
-        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.sandboxed") || !(Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.saveChunks")) {
-            return;
-        }
-
         if (c.isFresh()) {
             return;
         }
