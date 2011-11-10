@@ -173,10 +173,10 @@ public class Block implements RenderableObject {
             color.set(foliageColorForTemperatureAndHumidity(temperature, humidity));
         }
 
-        color.x *= getColorOffset()[side.ordinal()].x;
-        color.y *= getColorOffset()[side.ordinal()].y;
-        color.z *= getColorOffset()[side.ordinal()].z;
-        color.w *= getColorOffset()[side.ordinal()].w;
+        color.x *= _colorOffset[side.ordinal()].x;
+        color.y *= _colorOffset[side.ordinal()].y;
+        color.z *= _colorOffset[side.ordinal()].z;
+        color.w *= _colorOffset[side.ordinal()].w;
 
         return color;
     }

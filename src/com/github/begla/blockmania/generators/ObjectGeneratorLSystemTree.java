@@ -97,7 +97,7 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
                 case 'G':
                 case 'F':
                     // Tree trunk
-                    _worldProvider.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, false);
+                    _worldProvider.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, true);
 
                     // Generate leafs
                     if (_stackOrientation.size() > 0 && _generateLeafBlocks) {

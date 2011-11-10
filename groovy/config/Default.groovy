@@ -32,11 +32,10 @@ Graphics {
 
     fullscreen = false;
 
-    vboUpdatesPerFrame = 2
-    fov = 70.0d
+    fov = 80.0d
 
-    viewingDistanceX = 32
-    viewingDistanceZ = 32
+    viewingDistanceX = 24
+    viewingDistanceZ = 24
 
 }
 
@@ -89,10 +88,49 @@ Player {
 
 World {
 
-    defaultSeed = "nif0uiw4iBtMiiYs"
+    defaultSeed = "nBbAbCqCrBfMcOnW"
 
     sunRiseSetDuration = 0.025d
     dayNightLength = new Long((60 * 1000) * 20) // 20 minutes in ms
+
+    Biomes {
+
+        Forest {
+
+            treeDensity = 0.1d
+            grassDensity = 0.3d
+
+        }
+
+        Plains {
+
+            treeDensity = 0.01d
+            grassDensity = 0.1d
+
+        }
+
+        Snow {
+
+            treeDensity = 0.05d
+            grassDensity = 0.001d
+
+        }
+
+        Mountains {
+
+            treeDensity = 0.05d
+            grassDensity = 0.2d
+
+        }
+
+        Desert {
+
+            treeDensity = 0.01d
+            grassDensity = 0.001d
+
+        }
+
+    }
 
     Resources {
 

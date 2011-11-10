@@ -28,7 +28,6 @@ import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
-import com.github.begla.blockmania.world.horizon.Clouds;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
@@ -63,7 +62,6 @@ public final class World extends RenderableScene {
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
 
     /* HORIZON */
-    private final Clouds _clouds;
     private final Skysphere _skysphere;
     protected double _daylight;
 
@@ -88,7 +86,6 @@ public final class World extends RenderableScene {
         _worldProvider = new LocalWorldProvider(title, seed);
 
         // Init. horizon
-        _clouds = new Clouds(this);
         _skysphere = new Skysphere(this);
 
         _chunkUpdateManager = new ChunkUpdateManager();
@@ -221,9 +218,6 @@ public final class World extends RenderableScene {
         _player.render();
         renderChunks();
 
-        /* CLOUDS */
-        _clouds.render();
-
         /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();
 
@@ -317,7 +311,6 @@ public final class World extends RenderableScene {
         // Update the horizon
         updateDaylight();
         _skysphere.update();
-        _clouds.update();
 
         // Update the player
         _player.update();

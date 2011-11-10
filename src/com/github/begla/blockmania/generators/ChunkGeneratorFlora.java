@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
@@ -65,19 +66,19 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
                     switch (biome) {
                         case PLAINS:
-                            prob = 0.95;
+                            prob = 1.0 - (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Biomes.Plains.treeDensity");
                             break;
                         case MOUNTAINS:
-                            prob = 0.9;
-                            break;
-                        case SNOW:
-                            prob = 0.85;
+                            prob = 1.0 - (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Biomes.Mountains.treeDensity");
                             break;
                         case FOREST:
-                            prob = 0.8;
+                            prob = 1.0 - (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Biomes.Forest.treeDensity");
+                            break;
+                        case SNOW:
+                            prob = 1.0 - (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Biomes.Snow.treeDensity");
                             break;
                         case DESERT:
-                            prob = 0.98;
+                            prob = 1.0 - (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Biomes.Desert.treeDensity");
                             break;
                     }
 
@@ -112,13 +113,19 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
             switch (biome) {
                 case PLAINS:
-                    grassProb = 0.7;
+                    grassProb = 1.0 - (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Biomes.Plains.grassDensity");
                     break;
                 case MOUNTAINS:
-                    grassProb = 0.8;
+                    grassProb = 1.0 - (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Biomes.Mountains.grassDensity");
                     break;
                 case FOREST:
-                    grassProb = 0.8;
+                    grassProb = 1.0 - (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Biomes.Forest.grassDensity");
+                    break;
+                case SNOW:
+                    grassProb = 1.0 - (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Biomes.Snow.grassDensity");
+                    break;
+                case DESERT:
+                    grassProb = 1.0 - (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Biomes.Desert.grassDensity");
                     break;
             }
 
@@ -157,9 +164,14 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
      * @param z
      */
     void generateTree(Chunk c, int x, int y, int z) {
-        if (_worldProvider.getRandom().randomBoolean())
+        if (!c.canBlockSeeTheSky(x, y + 1, z))
+            return;
+
+        double r2 = _worldProvider.getRandom().standNormalDistrDouble();
+
+        if (r2 > -1 && r2 < 1)
             c.getParent().getObjectGenerator("lindenTree1").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
         else
-             c.getParent().getObjectGenerator("lindenTree2").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
+            c.getParent().getObjectGenerator("lindenTree2").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
     }
 }

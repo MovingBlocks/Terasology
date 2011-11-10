@@ -108,7 +108,8 @@ public class LocalWorldProvider extends WorldProvider {
 
         // L-System tree 2
         rules = new HashMap<String, String>();
-        rules.put("A", "[&FFA]/////[&FFA]////[&FFA]");
+        rules.put("A", "[&FFA]////[&FFA]////[&FFA]//[&FFFFFFB]");
+        rules.put("B", "[&FFFFB][&FFB]////[&FFB]////[&FFB]");
 
         ObjectGeneratorLSystemTree t2 = new ObjectGeneratorLSystemTree(this, "FFFFFFFFA", rules);
         t2.setLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId());
@@ -285,7 +286,7 @@ public class LocalWorldProvider extends WorldProvider {
             int randX = (int) (_random.randomDouble() * 16000f);
             int randZ = (int) (_random.randomDouble() * 16000f);
 
-            double dens = ((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 32, randZ, ChunkGeneratorTerrain.BIOME_TYPE.PLAINS);
+            double dens = ((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 64, randZ, ChunkGeneratorTerrain.BIOME_TYPE.FOREST);
 
             if (dens >= 0.0 && dens < 64.0)
                 return new Vector3f(randX, 32, randZ);

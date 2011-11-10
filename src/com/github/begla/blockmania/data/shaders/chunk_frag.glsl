@@ -1,6 +1,9 @@
 #version 120
 
 uniform sampler2D textureAtlas;
+
+uniform float gamma = 1.8;
+
 uniform float daylight = 1.0;
 uniform bool swimming;
 uniform bool animated;
@@ -10,11 +13,11 @@ varying float fog;
 varying vec3 normal;
 
 vec4 srgbToLinear(vec4 color){
-    return pow(color, vec4(1.0 / 2.2));
+    return pow(color, vec4(1.0 / gamma));
 }
 
 vec4 linearToSrgb(vec4 color){
-    return pow(color, vec4(2.2));
+    return pow(color, vec4(gamma));
 }
 
 void main(){

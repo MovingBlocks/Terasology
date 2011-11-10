@@ -205,9 +205,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
         double lakeIntens = calcLakeIntensity(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
-        if (lakeIntens < 0.2 && depth < 2) {
+        if (lakeIntens < 0.15 && depth < 2) {
             c.setBlock(x, y, z, (byte) 0x0);
-        } else if (lakeIntens < 0.2 && depth >= 2 && depth < 8) {
+        } else if (lakeIntens < 0.15 && depth >= 2 && depth < 8) {
             if (type == BIOME_TYPE.SNOW) {
                 c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Ice").getId());
             } else {
@@ -239,19 +239,19 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
         if (type == BIOME_TYPE.DESERT) {
             freqY *= 1.0;
-            amp *= 0.3;
+            amp *= 0.4;
         } else if (type == BIOME_TYPE.PLAINS) {
             freqY *= 1.0;
-            amp *= 0.2;
+            amp *= 0.3;
         } else if (type == BIOME_TYPE.MOUNTAINS) {
             freqY *= 1.0;
-            amp *= 0.75;
+            amp *= 0.8;
         } else if (type == BIOME_TYPE.SNOW) {
             freqY *= 1.0;
-            amp *= 0.4;
+            amp *= 0.5;
         } else if (type == BIOME_TYPE.FOREST) {
             freqY *= 1.0;
-            amp *= 0.4;
+            amp *= 0.5;
         }
 
         double density = calcMountainDensity(x, y * freqY, z) * amp;
@@ -263,24 +263,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     public double calcMountainDensity(double x, double y, double z) {
-        double result = 0.0;
-
         double x1, y1, z1;
 
-        x1 = x * 0.0003;
-        y1 = y * 0.0003;
-        z1 = z * 0.0003;
+        x1 = x * 0.008;
+        y1 = y * 0.008;
+        z1 = z * 0.008;
 
-        double perturb = _pGen3.fBm(x * 0.004, y * 0.003, z * 0.004, 4, 2.217281, 0.6371);
-
-        double freq[] = {1.232, 2.0, 4.0, 8.4281, 16.371, 32.0, 64.0};
-        double amp[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
-
-        for (int i = 0; i < amp.length; i++) {
-            result += _pGen5.noise(x1 * freq[i] + perturb, y1 * freq[i] + perturb, z1 * freq[i] + perturb) * amp[i];
-        }
-
-        return MathHelper.fastAbs(result);
+        return MathHelper.fastAbs(_pGen5.fBm(x1, y1, z1, 9, 2.163721, 0.7));
     }
 
     public double calcLakeIntensity(double x, double z) {
@@ -289,17 +278,17 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
-        double result = _pGen4.fBm(x * 0.001, 0, 0.001 * z, 8, 2.12351, 0.91);
+        double result = _pGen4.fBm(x * 0.0008, 0, 0.0008 * z, 4, 2.12351, 0.91);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcHumidityAtGlobalPosition(double x, double z) {
-        double result = _pGen5.fBm(x * 0.001, 0, 0.001 * z, 8, 2.221312, 0.61);
+        double result = _pGen5.fBm(x * 0.0008, 0, 0.0008 * z, 4, 2.221312, 0.61);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcCaveDensity(double x, double y, double z) {
-        double result = _pGen6.fBm(x * 0.03, y * 0.03, z * 0.03, 3, 2.3719, 0.7);
+        double result = _pGen6.fBm(x * 0.02, y * 0.02, z * 0.02, 3, 2.3719, 0.7);
         return result;
     }
 }
