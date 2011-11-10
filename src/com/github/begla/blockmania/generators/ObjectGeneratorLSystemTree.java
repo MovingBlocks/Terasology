@@ -100,7 +100,7 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
                     _worldProvider.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, true);
 
                     // Generate leafs
-                    if (_stackOrientation.size() > 0 && _generateLeafBlocks) {
+                    if (_stackOrientation.size() > 2 && _generateLeafBlocks) {
                         int size = 1;
 
                         for (int x = -size; x <= size; x++) {
@@ -155,8 +155,8 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
     }
 
     private void beforeExecution() {
-        _angleInDegree = 20 + _worldProvider.getRandom().randomDouble() * 5;
-        _iterations = Math.abs(_worldProvider.getRandom().randomInt() % 4) + 2;
+        _angleInDegree = 20 + _worldProvider.getRandom().randomDouble() * 10;
+        _iterations = Math.abs(_worldProvider.getRandom().randomInt() % 2) + 4;
     }
 
     public void setLeafType(byte b) {
