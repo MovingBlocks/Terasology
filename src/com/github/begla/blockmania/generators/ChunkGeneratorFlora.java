@@ -65,19 +65,19 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
                     switch (biome) {
                         case PLAINS:
-                            prob = 0.9;
+                            prob = 0.95;
                             break;
                         case MOUNTAINS:
-                            prob = 0.8;
+                            prob = 0.9;
                             break;
                         case SNOW:
-                            prob = 0.8;
+                            prob = 0.85;
                             break;
                         case FOREST:
-                            prob = 0.1;
+                            prob = 0.8;
                             break;
                         case DESERT:
-                            prob = 0.9;
+                            prob = 0.98;
                             break;
                     }
 
@@ -95,7 +95,6 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
         }
     }
 
-
     /**
      * @param c
      * @param x
@@ -104,7 +103,6 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
      */
 
     void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
-
         if (c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Grass").getId() && c.getBlock(x, y + 1, z) == 0x0) {
 
             double grassRand = (_worldProvider.getRandom().randomDouble() + 1.0) / 2.0;
@@ -159,17 +157,9 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
      * @param z
      */
     void generateTree(Chunk c, int x, int y, int z) {
-        // Trees should only be placed in direct sunlight
-        if (!c.canBlockSeeTheSky(x, y + 1, z))
-            return;
-
-        double r2 = _worldProvider.getRandom().standNormalDistrDouble();
-        if (r2 > -2 && r2 < -1) {
-            c.getParent().getObjectGenerator("pineTree").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
-        } else if (r2 > 1 && r2 < 2) {
-            c.getParent().getObjectGenerator("firTree").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
-        } else {
-            c.getParent().getObjectGenerator("tree").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
-        }
+        if (_worldProvider.getRandom().randomBoolean())
+            c.getParent().getObjectGenerator("lindenTree1").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
+        else
+             c.getParent().getObjectGenerator("lindenTree2").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
     }
 }

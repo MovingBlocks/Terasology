@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.generators.*;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.BlockmaniaConfiguration;
@@ -38,6 +37,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 /**
@@ -98,9 +98,23 @@ public class LocalWorldProvider extends WorldProvider {
         _chunkGenerators.put("terrain", new ChunkGeneratorTerrain(this));
         _chunkGenerators.put("forest", new ChunkGeneratorFlora(this));
         _chunkGenerators.put("resources", new ChunkGeneratorResources(this));
-        _objectGenerators.put("tree", new ObjectGeneratorTree(this));
-        _objectGenerators.put("pineTree", new ObjectGeneratorPineTree(this));
-        _objectGenerators.put("firTree", new ObjectGeneratorFirTree(this));
+
+        // L-System tree 1
+        HashMap<String, String> rules = new HashMap<String, String>();
+        rules.put("A", "[&FFFA]////[&FFFA]////[&FFFA]");
+
+        ObjectGeneratorLSystemTree t1 = new ObjectGeneratorLSystemTree(this, "FFFFFFA", rules);
+        _objectGenerators.put("lindenTree1", t1);
+
+        // L-System tree 2
+        rules = new HashMap<String, String>();
+        rules.put("A", "[&FFA]/////[&FFA]////[&FFA]");
+
+        ObjectGeneratorLSystemTree t2 = new ObjectGeneratorLSystemTree(this, "FFFFFFFFA", rules);
+        t2.setLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId());
+
+        _objectGenerators.put("lindenTree2", t2);
+
         _objectGenerators.put("cactus", new ObjectGeneratorCactus(this));
     }
 
@@ -267,7 +281,7 @@ public class LocalWorldProvider extends WorldProvider {
      * @return The spawning point.
      */
     public Vector3f nextSpawningPoint() {
-        for (;;) {
+        for (; ; ) {
             int randX = (int) (_random.randomDouble() * 16000f);
             int randZ = (int) (_random.randomDouble() * 16000f);
 

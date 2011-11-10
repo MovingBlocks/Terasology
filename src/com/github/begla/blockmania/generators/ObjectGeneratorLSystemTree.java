@@ -21,6 +21,7 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import java.util.HashMap;
 import java.util.Stack;
 
 /**
@@ -30,10 +31,22 @@ import java.util.Stack;
  */
 public class ObjectGeneratorLSystemTree extends ObjectGenerator {
 
-    private static final int ITERATIONS = 5;
+    private int _iterations;
+    private String _initialAxiom;
+    private HashMap<String, String> _ruleSet;
+    private double _angleInDegree;
+    private boolean _generateLeafBlocks = true;
+    private byte _leafType;
 
-    public ObjectGeneratorLSystemTree(LocalWorldProvider w) {
+    public ObjectGeneratorLSystemTree(LocalWorldProvider w, String initialAxiom, HashMap<String, String> ruleSet) {
         super(w);
+
+        _angleInDegree = 20;
+        _iterations = 3;
+        _leafType = BlockManager.getInstance().getBlock("Dark leaf").getId();
+
+        _initialAxiom = initialAxiom;
+        _ruleSet = ruleSet;
     }
 
     /**
@@ -46,25 +59,23 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
     @Override
     public void generate(int posX, int posY, int posZ, boolean update) {
 
-        String axiom = "F";
+        String axiom = new String(_initialAxiom);
 
         Stack<Vector4f> _stackPosition = new Stack<Vector4f>();
         Stack<Matrix4f> _stackOrientation = new Stack<Matrix4f>();
 
-        for (int i = 0; i < ITERATIONS; i++) {
+        for (int i = 0; i < _iterations; i++) {
 
             String temp = "";
 
             for (int j = 0; j < axiom.length(); j++) {
                 char c = axiom.charAt(j);
 
-                switch (c) {
-                    case 'F':
-                        temp += "GG[+F][**+F][//+F]";
+                for (String a : _ruleSet.keySet()) {
+                    if (a.charAt(0) == c) {
+                        temp += _ruleSet.get(a);
                         continue;
-                    case 'G':
-                        temp += "GG";
-                        continue;
+                    }
                 }
 
                 temp += c;
@@ -77,20 +88,19 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
         Matrix4f rotation = new Matrix4f();
         rotation.rotate((float) Math.PI / 2, new Vector3f(0, 0, 1));
 
+        beforeExecution();
+
         for (int i = 0; i < axiom.length(); i++) {
             char c = axiom.charAt(i);
 
             switch (c) {
                 case 'G':
                 case 'F':
-                    byte blockType;
+                    // Tree trunk
+                    _worldProvider.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, false);
 
-                    blockType = BlockManager.getInstance().getBlock("Tree trunk").getId();
-                    _worldProvider.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, blockType, update, false);
-
-                    blockType = BlockManager.getInstance().getBlock("Dark leaf").getId();
-
-                    if (_stackOrientation.size() > 0) {
+                    // Generate leafs
+                    if (_stackOrientation.size() > 0 && _generateLeafBlocks) {
                         int size = 1;
 
                         for (int x = -size; x <= size; x++) {
@@ -99,8 +109,8 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
                                     if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size)
                                         continue;
 
-                                    if (_worldProvider.getBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z +(int) position.z) == 0x0)
-                                        _worldProvider.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z +(int) position.z , blockType, update, false);
+                                    if (_worldProvider.getBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z) == 0x0)
+                                        _worldProvider.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z, _leafType, update, false);
 
                                 }
                             }
@@ -123,24 +133,33 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
                     position = _stackPosition.pop();
                     break;
                 case '+':
-                    rotation.rotate((float) (Math.PI / 3), new Vector3f(0, 0, 1));
+                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(0, 0, 1));
                     break;
                 case '-':
-                    rotation.rotate((float) -(Math.PI / 3), new Vector3f(0, 0, 1));
+                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(0, 0, 1));
                     break;
                 case '&':
-                    rotation.rotate((float) (Math.PI / 3), new Vector3f(0, 1, 0));
+                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(0, 1, 0));
                     break;
                 case '^':
-                    rotation.rotate((float) -(Math.PI / 3), new Vector3f(0, 1, 0));
+                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(0, 1, 0));
                     break;
                 case '*':
-                    rotation.rotate((float) (Math.PI / 3), new Vector3f(1, 0, 0));
+                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(1, 0, 0));
                     break;
                 case '/':
-                    rotation.rotate((float) -(Math.PI / 3), new Vector3f(1, 0, 0));
+                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(1, 0, 0));
                     break;
             }
         }
+    }
+
+    private void beforeExecution() {
+        _angleInDegree = 20 + _worldProvider.getRandom().randomDouble() * 5;
+        _iterations = Math.abs(_worldProvider.getRandom().randomInt() % 4) + 2;
+    }
+
+    public void setLeafType(byte b) {
+        _leafType = b;
     }
 }
