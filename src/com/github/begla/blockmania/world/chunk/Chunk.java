@@ -123,9 +123,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             // Apply all generators to this chunk
             long timeStart = System.currentTimeMillis();
 
-            _parent.getChunkGenerator("terrain").generate(this);
-            _parent.getChunkGenerator("resources").generate(this);
-            _parent.getChunkGenerator("forest").generate(this);
+            _parent.getGeneratorManager().getChunkGenerator("terrain").generate(this);
+            _parent.getGeneratorManager().getChunkGenerator("resources").generate(this);
+            _parent.getGeneratorManager().getChunkGenerator("forest").generate(this);
 
             generateSunlight();
             _fresh = false;

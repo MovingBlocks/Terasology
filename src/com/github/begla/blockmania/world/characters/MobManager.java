@@ -58,7 +58,8 @@ public class MobManager {
 
     /**
      * Adds a mob to the manager
-     * @param mob   The provided mob
+     *
+     * @param mob The provided mob
      */
     public void addMob(MovableEntity mob) {
         _mobStore.add(mob);

@@ -16,8 +16,6 @@
 
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.world.LocalWorldProvider;
-
 /**
  * Object generators are used to generate objects like trees etc.
  *
@@ -25,10 +23,10 @@ import com.github.begla.blockmania.world.LocalWorldProvider;
  */
 public abstract class ObjectGenerator {
 
-    final LocalWorldProvider _worldProvider;
+    final GeneratorManager _generatorManager;
 
-    ObjectGenerator(LocalWorldProvider w) {
-        _worldProvider = w;
+    ObjectGenerator(GeneratorManager m) {
+        _generatorManager = m;
     }
 
     /**

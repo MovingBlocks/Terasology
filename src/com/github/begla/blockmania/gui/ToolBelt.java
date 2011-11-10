@@ -96,7 +96,7 @@ public class ToolBelt {
      */
     public void mapPluginTool(Tool groovyTool) {
         // Cheating with the hard coded index for now
-        _toolBinding.put(new Byte((byte)4), new Byte((byte)51));
+        _toolBinding.put(new Byte((byte) 4), new Byte((byte) 51));
         _pluginStore.put((byte) 51, groovyTool);
         Blockmania.getInstance().getLogger().log(Level.INFO, "ToolBelt.mapPluginTool called with Tool: " + groovyTool);
     }

@@ -15,12 +15,11 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
+import com.github.begla.blockmania.generators.GeneratorManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkProvider;
-import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -28,7 +27,7 @@ import org.lwjgl.util.vector.Vector3f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class WorldProvider {
+public interface WorldProvider {
 
     /**
      * Places a block of a specific type at a given position and refreshes the
@@ -42,7 +41,7 @@ public abstract class WorldProvider {
      * @param overwrite   If true currently present blocks get replaced
      * @return True if a block was set/replaced
      */
-    public abstract boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite);
+    public boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite);
 
     /**
      * Returns the block at the given position.
@@ -52,7 +51,7 @@ public abstract class WorldProvider {
      * @param z The Z-coordinate
      * @return The type of the block
      */
-    public abstract byte getBlock(int x, int y, int z);
+    public byte getBlock(int x, int y, int z);
 
     /**
      * Returns the light value at the given position.
@@ -63,7 +62,7 @@ public abstract class WorldProvider {
      * @param type The type of light
      * @return The light value
      */
-    public abstract byte getLight(int x, int y, int z, Chunk.LIGHT_TYPE type);
+    public byte getLight(int x, int y, int z, Chunk.LIGHT_TYPE type);
 
     /**
      * Sets the light value at the given position.
@@ -74,7 +73,7 @@ public abstract class WorldProvider {
      * @param intensity The light intensity value
      * @param type      The type of light
      */
-    public abstract void setLight(int x, int y, int z, byte intensity, Chunk.LIGHT_TYPE type);
+    public void setLight(int x, int y, int z, byte intensity, Chunk.LIGHT_TYPE type);
 
     /**
      * Returns the block value at the given position.
@@ -82,7 +81,7 @@ public abstract class WorldProvider {
      * @param pos The position
      * @return The block value at the given position
      */
-    public abstract byte getBlockAtPosition(Vector3f pos);
+    public byte getBlockAtPosition(Vector3f pos);
 
 
     /**
@@ -92,7 +91,7 @@ public abstract class WorldProvider {
      * @param type The type of light
      * @return The block value at the given position
      */
-    public abstract byte getLightAtPosition(Vector3f pos, Chunk.LIGHT_TYPE type);
+    public byte getLightAtPosition(Vector3f pos, Chunk.LIGHT_TYPE type);
 
 
     /**
@@ -102,7 +101,7 @@ public abstract class WorldProvider {
      * @param z The Z-coordinate
      * @return The humidity
      */
-    public abstract double getHumidityAt(int x, int z);
+    public double getHumidityAt(int x, int z);
 
     /**
      * Returns the temperature at the given position.
@@ -111,69 +110,76 @@ public abstract class WorldProvider {
      * @param z The Z-coordinate
      * @return The temperature
      */
-    public abstract double getTemperatureAt(int x, int z);
+    public double getTemperatureAt(int x, int z);
 
     /*
     * Returns the biome type at the given position.
     */
-    public abstract ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome(int x, int z);
+    public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome(int x, int z);
 
     /**
      * Returns the current time.
      *
      * @return The current time
      */
-    public abstract double getTime();
+    public double getTime();
 
     /**
      * Sets the current time of the world.
      *
      * @param time The current time
      */
-    public abstract void setTime(double time);
+    public void setTime(double time);
 
     /**
      * Returns the title of this world.
      *
      * @return
      */
-    public abstract String getTitle();
+    public String getTitle();
 
     /**
      * Returns the seed of this world.
      *
      * @return The seed value
      */
-    public abstract String getSeed();
+    public String getSeed();
 
     /**
      * Returns the chunk provider of this world.
      *
      * @return The chunk provider
      */
-    public abstract ChunkProvider getChunkProvider();
+    public ChunkProvider getChunkProvider();
+
+    /**
+     * Returns the generator manager of this world.
+     *
+     * @return The generator manager
+     */
+    public GeneratorManager getGeneratorManager();
 
     /**
      * Returns a new random spawning point.
      *
      * @return A new random spawning point
      */
-    public abstract Vector3f nextSpawningPoint();
+    public Vector3f nextSpawningPoint();
 
     /**
      * Disposes this world provider.
      */
-    public abstract void dispose();
+    public void dispose();
 
     /**
      * Returns the RNG for this world provider.
      *
      * @return The RNG
      */
-    public abstract FastRandom getRandom();
+    public FastRandom getRandom();
 
     /**
      * @return The rendering origin
      */
-    public abstract Vector3f getRenderingOrigin();
+    public Vector3f getRenderingOrigin();
 }

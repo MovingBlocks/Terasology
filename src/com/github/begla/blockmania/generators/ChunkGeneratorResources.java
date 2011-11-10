@@ -17,7 +17,6 @@ package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.main.BlockmaniaConfiguration;
-import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
@@ -27,8 +26,11 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorResources extends ChunkGeneratorTerrain {
 
-    public ChunkGeneratorResources(LocalWorldProvider worldProvider) {
-        super(worldProvider);
+    /**
+     * Init. the generator with a given seed value.
+     */
+    public ChunkGeneratorResources(GeneratorManager generatorManager) {
+        super(generatorManager);
     }
 
     /**
@@ -40,22 +42,22 @@ public class ChunkGeneratorResources extends ChunkGeneratorTerrain {
             for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
                 for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
                     if (BlockManager.getInstance().getBlock(c.getBlock(x, y, z)).getTitle().equals("Stone")) {
-                        if (_worldProvider.getRandom().standNormalDistrDouble() < (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Resources.probCoal")) {
+                        if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Resources.probCoal")) {
                             c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Coal").getId());
                         }
 
-                        if (_worldProvider.getRandom().standNormalDistrDouble() < (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Resources.probGold")) {
+                        if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Resources.probGold")) {
                             c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Gold").getId());
                         }
 
-                        if (_worldProvider.getRandom().standNormalDistrDouble() < (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Resources.probDiamond")) {
+                        if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Resources.probDiamond")) {
                             c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Diamond").getId());
                         }
-                        if (_worldProvider.getRandom().standNormalDistrDouble() < (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Resources.probRedstone")) {
+                        if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Resources.probRedstone")) {
                             c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Red stone").getId());
                         }
 
-                        if (_worldProvider.getRandom().standNormalDistrDouble() < (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Resources.probSilver")) {
+                        if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.Resources.probSilver")) {
                             c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Silver").getId());
                         }
                     }

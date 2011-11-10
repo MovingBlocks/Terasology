@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.world.LocalWorldProvider;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -38,8 +37,8 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
     private boolean _generateLeafBlocks = true;
     private byte _leafType;
 
-    public ObjectGeneratorLSystemTree(LocalWorldProvider w, String initialAxiom, HashMap<String, String> ruleSet) {
-        super(w);
+    public ObjectGeneratorLSystemTree(GeneratorManager manager, String initialAxiom, HashMap<String, String> ruleSet) {
+        super(manager);
 
         _angleInDegree = 20;
         _iterations = 3;
@@ -97,7 +96,7 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
                 case 'G':
                 case 'F':
                     // Tree trunk
-                    _worldProvider.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, true);
+                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, true);
 
                     // Generate leafs
                     if (_stackOrientation.size() > 2 && _generateLeafBlocks) {
@@ -109,8 +108,8 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
                                     if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size)
                                         continue;
 
-                                    if (_worldProvider.getBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z) == 0x0)
-                                        _worldProvider.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z, _leafType, update, false);
+                                    if (_generatorManager.getParent().getBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z) == 0x0)
+                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z, _leafType, update, false);
 
                                 }
                             }
@@ -155,8 +154,8 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
     }
 
     private void beforeExecution() {
-        _angleInDegree = 20 + _worldProvider.getRandom().randomDouble() * 10;
-        _iterations = Math.abs(_worldProvider.getRandom().randomInt() % 2) + 4;
+        _angleInDegree = 20 + _generatorManager.getParent().getRandom().randomDouble() * 10;
+        _iterations = Math.abs(_generatorManager.getParent().getRandom().randomInt() % 2) + 4;
     }
 
     public void setLeafType(byte b) {

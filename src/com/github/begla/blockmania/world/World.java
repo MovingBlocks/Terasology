@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.audio.AudioManager;
-import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.BlockmaniaConfiguration;

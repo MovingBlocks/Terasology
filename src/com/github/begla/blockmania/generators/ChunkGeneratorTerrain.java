@@ -17,7 +17,6 @@ package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
@@ -34,8 +33,11 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         MOUNTAINS, SNOW, DESERT, FOREST, PLAINS
     }
 
-    public ChunkGeneratorTerrain(LocalWorldProvider worldProvider) {
-        super(worldProvider);
+    /**
+     * Init. the generator with a given seed value.
+     */
+    public ChunkGeneratorTerrain(GeneratorManager generatorManager) {
+        super(generatorManager);
     }
 
     @Override
