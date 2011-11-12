@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.utilities.FastRandom;
 
 import java.util.Random;
 
@@ -29,7 +30,7 @@ public class TreeGeneratorCactus extends TreeGenerator {
     }
 
     @Override
-    public void generate(int posX, int posY, int posZ, boolean update) {
+    public void generate(FastRandom rand, int posX, int posY, int posZ, boolean update) {
         for (int y = posY; y < posY + 3; y++) {
             _generatorManager.getParent().setBlock(posX, y, posZ, BlockManager.getInstance().getBlock("Cactus").getId(), update, true);
         }

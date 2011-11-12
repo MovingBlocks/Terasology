@@ -21,7 +21,7 @@ import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
-import javolution.util.FastList;
+import javolution.util.FastMap;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class GeneratorManager {
 
     /* WORLD GENERATION */
     protected final ArrayList<ChunkGenerator> _chunkGenerators = new ArrayList<ChunkGenerator>(8);
-    protected final ArrayList<TreeGenerator> _treeGenerators = new ArrayList<TreeGenerator>(8);
+    protected final FastMap<ChunkGeneratorTerrain.BIOME_TYPE, ArrayList<TreeGenerator>> _treeGenerators = new FastMap<ChunkGeneratorTerrain.BIOME_TYPE, ArrayList<TreeGenerator>>(8);
 
     public GeneratorManager(WorldProvider parent) {
         _parent = parent;
@@ -48,7 +48,6 @@ public class GeneratorManager {
         _chunkGenerators.add(new ChunkGeneratorTerrain(this));
         _chunkGenerators.add(new ChunkGeneratorFlora(this));
         _chunkGenerators.add(new ChunkGeneratorResources(this));
-        _treeGenerators.add(new TreeGeneratorCactus(this));
 
         _binding = new Binding();
         _binding.setVariable("generatorManager", this);
@@ -69,13 +68,54 @@ public class GeneratorManager {
         }
     }
 
-    public ArrayList<TreeGenerator> getTreeGenerators() {
-        return _treeGenerators;
+    public ArrayList<TreeGenerator> getTreeGenerators(ChunkGeneratorTerrain.BIOME_TYPE type) {
+        return _treeGenerators.get(type);
     }
 
     public ArrayList<ChunkGenerator> getChunkGenerators() {
         return _chunkGenerators;
     }
+
+    public void addTreeGenerator(ChunkGeneratorTerrain.BIOME_TYPE type, TreeGenerator gen) {
+        ArrayList<TreeGenerator> list;
+
+        if (!_treeGenerators.containsKey(type)) {
+            list = new ArrayList<TreeGenerator>();
+            _treeGenerators.put(type, list);
+        } else {
+            list = _treeGenerators.get(type);
+        }
+
+        list.add(gen);
+    }
+
+    public void removeTreeGenerator(ChunkGeneratorTerrain.BIOME_TYPE type, TreeGenerator gen) {
+        ArrayList<TreeGenerator> list = _treeGenerators.get(type);
+
+        if (list == null)
+            return;
+
+        list.remove(gen);
+    }
+
+    public void removeTreeGenerator(ChunkGeneratorTerrain.BIOME_TYPE type, int id) {
+        ArrayList<TreeGenerator> list = _treeGenerators.get(type);
+
+        if (list == null)
+            return;
+
+        list.remove(id);
+    }
+
+    public TreeGenerator getTreeGenerator(ChunkGeneratorTerrain.BIOME_TYPE type, int id) {
+        ArrayList<TreeGenerator> list = _treeGenerators.get(type);
+
+        if (list == null)
+            return null;
+
+        return list.get(id);
+    }
+
 
     public WorldProvider getParent() {
         return _parent;

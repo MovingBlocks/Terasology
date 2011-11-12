@@ -20,7 +20,7 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
-import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.World;
 import javolution.util.FastList;
@@ -77,7 +77,7 @@ public abstract class MovableEntity extends Entity {
     protected abstract void handleHorizontalCollision();
 
     public void render() {
-        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.debugCollision")) {
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debugCollision")) {
             getAABB().render();
 
             FastList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());
@@ -258,7 +258,7 @@ public abstract class MovableEntity extends Entity {
         // Save the previous position before changing any of the values
         Vector3f oldPosition = new Vector3f(getPosition());
 
-        double friction = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.friction");
+        double friction = (Double) ConfigurationManager.getInstance().getConfig().get("Player.friction");
 
         /*
          * Slowdown the speed of the entity each time this method is called.
@@ -295,10 +295,10 @@ public abstract class MovableEntity extends Entity {
         _velocity.y += _movementDirection.y;
         _velocity.z += _movementDirection.z;
 
-        double maxGravity = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.maxGravity");
-        double maxGravitySwimming = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.maxGravitySwimming");
-        double gravitySwimming = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.gravitySwimming");
-        double gravity = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.gravity");
+        double maxGravity = (Double) ConfigurationManager.getInstance().getConfig().get("Player.maxGravity");
+        double maxGravitySwimming = (Double) ConfigurationManager.getInstance().getConfig().get("Player.maxGravitySwimming");
+        double gravitySwimming = (Double) ConfigurationManager.getInstance().getConfig().get("Player.gravitySwimming");
+        double gravity = (Double) ConfigurationManager.getInstance().getConfig().get("Player.gravity");
 
 
         // Normal gravity

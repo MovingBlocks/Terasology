@@ -95,10 +95,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.6)
-                            GenerateOuterLayer(x, y, z, firstBlockHeight, c, type);
-                        else
-                            c.setBlock(x, y, z, (byte) 0x0);
+                        GenerateOuterLayer(x, y, z, firstBlockHeight, c, type);
 
                         continue;
                     } else if (dens >= 64) {
@@ -126,17 +123,17 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double temp = calcTemperatureAtGlobalPosition(x, z);
         double humidity = calcHumidityAtGlobalPosition(x, z);
 
-        if (temp >= 0.6 && humidity < 0.3) {
+        if (temp >= 0.5 && humidity < 0.4) {
             return BIOME_TYPE.DESERT;
         }
-        if (temp >= 0.30 && temp < 0.6 && humidity < 0.4) {
-            return BIOME_TYPE.MOUNTAINS;
-        }
-        if (humidity > 0.30 && humidity < 0.8 && temp > 0.5) {
+        if (humidity >= 0.4 && humidity <= 0.6 && temp >= 0.5) {
             return BIOME_TYPE.PLAINS;
         }
-        if (temp < 0.3 && humidity < 0.4) {
+        if (temp <= 0.3 && humidity < 0.7) {
             return BIOME_TYPE.SNOW;
+        }
+        if (humidity >= 0.4 && humidity <= 0.6 && temp >= 0.25 && temp < 0.5) {
+            return BIOME_TYPE.MOUNTAINS;
         }
 
         return BIOME_TYPE.FOREST;
@@ -280,12 +277,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
-        double result = _pGen4.fBm(x * 0.0008, 0, 0.0008 * z, 4, 2.12351, 0.91);
+        double result = _pGen4.fBm(x * 0.0008, 0, 0.0008 * z, 3, 2.12351, 0.91);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcHumidityAtGlobalPosition(double x, double z) {
-        double result = _pGen5.fBm(x * 0.0008, 0, 0.0008 * z, 4, 2.221312, 0.61);
+        double result = _pGen5.fBm(x * 0.0008, 0, 0.0008 * z, 3, 2.221312, 0.91);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 

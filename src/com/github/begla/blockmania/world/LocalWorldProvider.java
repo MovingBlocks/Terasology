@@ -19,7 +19,7 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.GeneratorManager;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -52,11 +52,11 @@ public class LocalWorldProvider implements WorldProvider {
     /* CHUNK PROVIDER */
     protected final ChunkProvider _chunkProvider;
     /* CONST */
-    protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) BlockmaniaConfiguration.getInstance().getConfig().get("World.dayNightLength");
+    protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) ConfigurationManager.getInstance().getConfig().get("World.dayNightLength");
 
     /* PROPERTIES */
     protected String _title, _seed;
-    protected long _creationTime = Blockmania.getInstance().getTime();
+    protected long _creationTime = Blockmania.getInstance().getTime() - 10000;
     public Vector3f _renderingOrigin = new Vector3f();
 
     /* RANDOMNESS */
@@ -258,14 +258,26 @@ public class LocalWorldProvider implements WorldProvider {
      * @return The spawning point.
      */
     public Vector3f nextSpawningPoint() {
+        ChunkGeneratorTerrain tGen = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0));
+
         for (; ; ) {
-            int randX = (int) (_random.randomDouble() * 16000f);
-            int randZ = (int) (_random.randomDouble() * 16000f);
+            int randX = (int) (_random.randomDouble() * 32000f);
+            int randZ = (int) (_random.randomDouble() * 32000f);
 
-            double dens = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcDensity(randX, 64, randZ, ChunkGeneratorTerrain.BIOME_TYPE.FOREST);
+            ChunkGeneratorTerrain.BIOME_TYPE type = tGen.calcBiomeTypeForGlobalPosition(randX, randZ);
 
-            if (dens >= 0.0 && dens < 64.0)
-                return new Vector3f(randX, 32, randZ);
+            if (type == ChunkGeneratorTerrain.BIOME_TYPE.FOREST) {
+
+                for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
+
+                    double dens = tGen.calcDensity(randX, y, randZ, ChunkGeneratorTerrain.BIOME_TYPE.FOREST);
+
+                    if (dens >= 0 && dens < 64)
+                        return new Vector3f(randX, y, randZ);
+                }
+
+
+            }
         }
     }
 

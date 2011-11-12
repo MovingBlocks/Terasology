@@ -1,6 +1,8 @@
 import com.github.begla.blockmania.generators.TreeGeneratorLSystem
 import com.github.begla.blockmania.blocks.BlockManager
 import com.github.begla.blockmania.generators.GeneratorManager
+import com.github.begla.blockmania.generators.ChunkGeneratorTerrain.BIOME_TYPE
+import com.github.begla.blockmania.generators.TreeGeneratorCactus
 
 def GeneratorManager m = generatorManager;
 
@@ -8,21 +10,31 @@ def GeneratorManager m = generatorManager;
 HashMap<String, String> rules = new HashMap<String, String>();
 rules.put("A", "[&FFFA]////[&FFFA]////[&FFFA]");
 
-TreeGeneratorLSystem t1 = new TreeGeneratorLSystem(m, "FFFFFFA", rules).setGenProbability(1.0);
+TreeGeneratorLSystem t1 = new TreeGeneratorLSystem(m, "FFFFFFA", rules).withGenerationProbability(0.1);
 
 // ...and LARGE bushy tree
 rules = new HashMap<String, String>();
 rules.put("A", "[&FFFFFA]////[&FFFFFA]////[&FFFFFA]");
 
-TreeGeneratorLSystem t2 = new TreeGeneratorLSystem(m, "FFFFAFFFFFFFAFFFFA", rules).setLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId()).setGenProbability(0.1);
+TreeGeneratorLSystem t2 = new TreeGeneratorLSystem(m, "FFFFAFFFFFFFAFFFFA", rules).withLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId()).withGenerationProbability(0.01);
 
 // ...and some strange wobbly thingy
 rules = new HashMap<String, String>();
 rules.put("A", "[&FA]////[&FFA]////[&FFFA]");
 
-TreeGeneratorLSystem t3 = new TreeGeneratorLSystem(m, "FFAFAFFAFF", rules).setLeafType(BlockManager.getInstance().getBlock("Red leaf").getId()).setGenProbability(0.3);
+TreeGeneratorLSystem t3 = new TreeGeneratorLSystem(m, "FFAFAFFAFF", rules).withLeafType(BlockManager.getInstance().getBlock("Red leaf").getId()).withGenerationProbability(0.05);
 
-// Add the trees to the generator list
-m.getTreeGenerators().add(t3);
-m.getTreeGenerators().add(t2);
-m.getTreeGenerators().add(t1);
+TreeGeneratorCactus c1 = new TreeGeneratorCactus(m).withGenerationProbability(0.05);
+
+// Add the trees to the generator lists
+m.addTreeGenerator BIOME_TYPE.SNOW, t1
+m.addTreeGenerator BIOME_TYPE.FOREST, t1
+m.addTreeGenerator BIOME_TYPE.MOUNTAINS, t1
+m.addTreeGenerator BIOME_TYPE.SNOW, t2
+m.addTreeGenerator BIOME_TYPE.FOREST, t2
+m.addTreeGenerator BIOME_TYPE.MOUNTAINS, t2
+
+m.addTreeGenerator BIOME_TYPE.PLAINS, t3
+m.addTreeGenerator BIOME_TYPE.DESERT, t3
+m.addTreeGenerator BIOME_TYPE.PLAINS, c1
+m.addTreeGenerator BIOME_TYPE.DESERT, c1

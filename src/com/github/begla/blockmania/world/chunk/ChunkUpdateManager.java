@@ -17,7 +17,7 @@ package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.world.observer.BlockObserver;
 import javolution.util.FastSet;
 
@@ -43,7 +43,7 @@ public final class ChunkUpdateManager implements BlockObserver {
      */
     public boolean queueChunkUpdate(Chunk c, boolean force) {
         final Chunk chunkToProcess = c;
-        final int maxThreads = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("System.maxThreads");
+        final int maxThreads = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxThreads");
 
         if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < maxThreads || force)) {
             _currentlyProcessedChunks.add(chunkToProcess);

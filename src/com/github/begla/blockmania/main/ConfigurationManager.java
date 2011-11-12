@@ -28,21 +28,21 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class BlockmaniaConfiguration {
+public final class ConfigurationManager {
 
     private static final String DEFAULT_CONFIG_PATH = "groovy/config/Default.groovy";
-    private static BlockmaniaConfiguration _instance;
+    private static ConfigurationManager _instance;
 
     private Map _config;
 
-    public static BlockmaniaConfiguration getInstance() {
+    public static ConfigurationManager getInstance() {
         if (_instance == null)
-            _instance = new BlockmaniaConfiguration();
+            _instance = new ConfigurationManager();
 
         return _instance;
     }
 
-    private BlockmaniaConfiguration() {
+    private ConfigurationManager() {
         loadConfigEnvironment(null);
     }
 

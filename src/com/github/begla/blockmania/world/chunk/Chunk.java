@@ -22,8 +22,10 @@ import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.main.ConfigurationManager;
+import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.entity.StaticEntity;
 import javolution.util.FastList;
@@ -48,10 +50,12 @@ import java.util.logging.Level;
 public class Chunk extends StaticEntity implements Comparable<Chunk>, Externalizable {
 
     /* CONSTANT VALUES */
-    private static final int CHUNK_DIMENSION_X = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionX");
-    private static final int CHUNK_DIMENSION_Y = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionY");
-    private static final int CHUNK_DIMENSION_Z = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Chunk.dimensionZ");
+    private static final int CHUNK_DIMENSION_X = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionX");
+    private static final int CHUNK_DIMENSION_Y = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionY");
+    private static final int CHUNK_DIMENSION_Z = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionZ");
     protected static final Vector3f[] LIGHT_DIRECTIONS = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
+    /* ------ */
+    protected FastRandom _random;
     /* ------ */
     protected boolean _dirty, _lightDirty, _fresh;
     /* ------ */
@@ -76,18 +80,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         SUN
     }
 
-    public Chunk() {
-        _meshGenerator = new ChunkMeshGenerator(this);
-
-        _blocks = new BlockmaniaArray(getChunkDimensionX(), (int) getChunkDimensionY(), (int) getChunkDimensionZ());
-        _sunlight = new BlockmaniaSmartArray(getChunkDimensionX(), (int) getChunkDimensionY(), (int) getChunkDimensionZ());
-        _light = new BlockmaniaSmartArray(getChunkDimensionX(), (int) getChunkDimensionY(), (int) getChunkDimensionZ());
-
-        _lightDirty = true;
-        _dirty = true;
-        _fresh = true;
-    }
-
     public static int getChunkDimensionX() {
         return CHUNK_DIMENSION_X;
     }
@@ -98,6 +90,24 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public static int getChunkDimensionZ() {
         return CHUNK_DIMENSION_Z;
+    }
+
+    public static int getChunkIdForPosition(Vector3f position) {
+        return MathHelper.cantorize(MathHelper.mapToPositive((int) position.x), MathHelper.mapToPositive((int) position.z));
+    }
+
+    public Chunk() {
+        _meshGenerator = new ChunkMeshGenerator(this);
+
+        _blocks = new BlockmaniaArray(getChunkDimensionX(), getChunkDimensionY(), getChunkDimensionZ());
+        _sunlight = new BlockmaniaSmartArray(getChunkDimensionX(), getChunkDimensionY(), getChunkDimensionZ());
+        _light = new BlockmaniaSmartArray(getChunkDimensionX(), getChunkDimensionY(), getChunkDimensionZ());
+
+        _lightDirty = true;
+        _dirty = true;
+        _fresh = true;
+
+        _random = new FastRandom();
     }
 
     /**
@@ -111,6 +121,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         setPosition(position);
         _parent = p;
+
+        _random = new FastRandom((_parent.getSeed()).hashCode() + getChunkIdForPosition(position));
     }
 
     /**
@@ -143,8 +155,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public void updateLight() {
         if (!_fresh) { // Do NOT update fresh chunks
             for (int x = 0; x < getChunkDimensionX(); x++) {
-                for (int z = 0; z < (int) getChunkDimensionZ(); z++) {
-                    for (int y = 0; y < (int) getChunkDimensionY(); y++) {
+                for (int z = 0; z < getChunkDimensionZ(); z++) {
+                    for (int y = 0; y < getChunkDimensionY(); y++) {
                         byte lightValue = getLight(x, y, z, LIGHT_TYPE.SUN);
 
                         // Spread the sunlight in translucent blocks with a light value greater than zero.
@@ -163,7 +175,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     private void generateSunlight() {
         for (int x = 0; x < getChunkDimensionX(); x++) {
-            for (int z = 0; z < (int) getChunkDimensionZ(); z++) {
+            for (int z = 0; z < getChunkDimensionZ(); z++) {
                 refreshSunlightAtLocalPos(x, z, false, false);
             }
         }
@@ -180,7 +192,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
         boolean covered = false;
 
-        for (int y = (int) getChunkDimensionY() - 1; y >= 0; y--) {
+        for (int y = getChunkDimensionY() - 1; y >= 0; y--) {
             byte blockId = _blocks.get(x, y, z);
             Block b = BlockManager.getInstance().getBlock(blockId);
 
@@ -750,7 +762,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @return Thew world position
      */
     public int getChunkWorldPosZ() {
-        return (int) _position.z * (int) getChunkDimensionZ();
+        return (int) _position.z * getChunkDimensionZ();
     }
 
     /**
@@ -838,6 +850,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public boolean isVisible() {
         return _visible;
+    }
+
+    public FastRandom getRandom() {
+        return _random;
     }
 
     /**

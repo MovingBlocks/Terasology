@@ -17,7 +17,7 @@ package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -29,8 +29,8 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public final class ChunkMeshGenerator {
 
-    private static final Double OCCLUSION_INTENS_DEFAULT = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Lighting.occlusionIntensDefault");
-    private static final Double OCCLUSION_INTENS_BILLBOARDS = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Lighting.occlusionIntensBillboards");
+    private static final Double OCCLUSION_INTENS_DEFAULT = (Double) ConfigurationManager.getInstance().getConfig().get("Lighting.occlusionIntensDefault");
+    private static final Double OCCLUSION_INTENS_BILLBOARDS = (Double) ConfigurationManager.getInstance().getConfig().get("Lighting.occlusionIntensBillboards");
 
     private final Chunk _chunk;
     private static int _statVertexArrayUpdateCount = 0;

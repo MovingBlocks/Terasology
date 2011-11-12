@@ -18,7 +18,7 @@ package com.github.begla.blockmania.gui;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.rendering.FontManager;
 import com.github.begla.blockmania.rendering.RenderableObject;
 import com.github.begla.blockmania.world.chunk.ChunkMeshGenerator;
@@ -54,7 +54,7 @@ public class HUD implements RenderableObject {
         glPushMatrix();
         glLoadIdentity();
 
-        float aspectRatio = ((Double) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.aspectRatio")).floatValue();
+        float aspectRatio = ((Double) ConfigurationManager.getInstance().getConfig().get("Graphics.aspectRatio")).floatValue();
         gluPerspective(25f, aspectRatio, 0.1f, 32f);
 
         glMatrixMode(GL_MODELVIEW);
@@ -93,7 +93,7 @@ public class HUD implements RenderableObject {
 
         glDisable(GL_DEPTH_TEST);
         // Draw the crosshair
-        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("HUD.crosshair")) {
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.crosshair")) {
             glColor4f(1f, 1f, 1f, 1f);
             glLineWidth(2f);
 
@@ -111,10 +111,10 @@ public class HUD implements RenderableObject {
         /*
         * Draw debugging information.
         */
-        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.debug")) {
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug")) {
             double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
 
-            FontManager.getInstance().getFont("default").drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f)", BlockmaniaConfiguration.getInstance().getConfig().get("System.gameTitle"), Blockmania.getInstance().getAverageFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
+            FontManager.getInstance().getFont("default").drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f)", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"), Blockmania.getInstance().getAverageFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
             FontManager.getInstance().getFont("default").drawString(4, 22, String.format("%s", _parent.getActiveWorld().getPlayer()));
             FontManager.getInstance().getFont("default").drawString(4, 38, String.format("%s", _parent.getActiveWorld()));
             FontManager.getInstance().getFont("default").drawString(4, 54, String.format("total vus: %s", ChunkMeshGenerator.getVertexArrayUpdateCount()));
@@ -134,7 +134,7 @@ public class HUD implements RenderableObject {
         glMatrixMode(GL_MODELVIEW);
 
 
-        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("HUD.rotatingBlock"))
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.rotatingBlock"))
             drawRotatingBlock();
     }
 

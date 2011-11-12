@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.utilities.FastRandom;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -49,7 +50,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     }
 
     @Override
-    public void generate(int posX, int posY, int posZ, boolean update) {
+    public void generate(FastRandom rand, int posX, int posY, int posZ, boolean update) {
 
         String axiom = new String(_initialAxiom);
 
@@ -80,7 +81,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         Matrix4f rotation = new Matrix4f();
         rotation.rotate((float) Math.PI / 2, new Vector3f(0, 0, 1));
 
-        beforeExecution();
+        beforeExecution(rand);
 
         for (int i = 0; i < axiom.length(); i++) {
             char c = axiom.charAt(i);
@@ -146,12 +147,12 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         }
     }
 
-    private void beforeExecution() {
-        _angleInDegree = 30 + _generatorManager.getParent().getRandom().randomDouble() * 10;
-        _iterations = Math.abs(_generatorManager.getParent().getRandom().randomInt() % 2) + 4;
+    private void beforeExecution(FastRandom rand) {
+        _angleInDegree = 30 + rand.randomDouble() * 10;
+        _iterations = Math.abs(rand.randomInt() % 2) + 4;
     }
 
-    public TreeGenerator setLeafType(byte b) {
+    public TreeGenerator withLeafType(byte b) {
         _leafType = b;
 
         return this;

@@ -113,7 +113,7 @@ public final class Blockmania extends RenderableScene {
      */
     public static void main(String[] args) {
         initDefaultLogger();
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", BlockmaniaConfiguration.getInstance().getConfig().get("System.gameTitle"));
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"));
 
         try {
             loadNativeLibs();
@@ -191,15 +191,15 @@ public final class Blockmania extends RenderableScene {
      * @throws LWJGLException Thrown when the LWJGL fails
      */
     public void initDisplay() throws LWJGLException {
-        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.fullscreen")) {
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.fullscreen")) {
             Display.setDisplayMode(Display.getDesktopDisplayMode());
             Display.setFullscreen(true);
         } else {
-            Display.setDisplayMode((DisplayMode) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.displayMode"));
+            Display.setDisplayMode((DisplayMode) ConfigurationManager.getInstance().getConfig().get("Graphics.displayMode"));
         }
 
-        Display.setTitle((String) BlockmaniaConfiguration.getInstance().getConfig().get("System.gameTitle"));
-        Display.create((PixelFormat) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.pixelFormat"));
+        Display.setTitle((String) ConfigurationManager.getInstance().getConfig().get("System.gameTitle"));
+        Display.create((PixelFormat) ConfigurationManager.getInstance().getConfig().get("Graphics.pixelFormat"));
     }
 
     /**
@@ -273,7 +273,7 @@ public final class Blockmania extends RenderableScene {
         resetOpenGLParameters();
 
         // Generate a world with a random seed value
-        String worldSeed = (String) BlockmaniaConfiguration.getInstance().getConfig().get("World.defaultSeed");
+        String worldSeed = (String) ConfigurationManager.getInstance().getConfig().get("World.defaultSeed");
 
         if (worldSeed.length() == 0) {
             worldSeed = _rand.randomCharacterString(16);
@@ -291,7 +291,7 @@ public final class Blockmania extends RenderableScene {
         glDepthFunc(GL_LEQUAL);
 
         // Update the viewing distance
-        double minDist = Math.min((Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceX") * Chunk.getChunkDimensionX(), (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceZ") * Chunk.getChunkDimensionZ()) / 2.0;
+        double minDist = Math.min((Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX") * Chunk.getChunkDimensionX(), (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ") * Chunk.getChunkDimensionZ()) / 2.0;
         glFogf(GL_FOG_START, (float) (minDist * 0.5));
         glFogf(GL_FOG_END, (float) minDist);
 
@@ -429,7 +429,7 @@ public final class Blockmania extends RenderableScene {
                 }
 
                 if (key == Keyboard.KEY_F3 && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                    BlockmaniaConfiguration.getInstance().getConfig().put("System.Debug.debug", !(Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.debug"));
+                    ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", !(Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug"));
                 }
 
                 if (isGamePaused()) {

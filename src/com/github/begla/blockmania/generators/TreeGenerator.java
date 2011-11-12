@@ -16,6 +16,8 @@
 
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.utilities.FastRandom;
+
 /**
  * Object generators are used to generate objects like trees etc.
  *
@@ -38,13 +40,13 @@ public abstract class TreeGenerator {
      * @param posZ   Position on the z-axis
      * @param update If true, the chunk will be queued for updating
      */
-    public abstract void generate(int posX, int posY, int posZ, boolean update);
+    public abstract void generate(FastRandom rand, int posX, int posY, int posZ, boolean update);
 
     public double getGenProbability() {
         return _genProbability;
     }
 
-    public TreeGenerator setGenProbability(double genProbability) {
+    public TreeGenerator withGenerationProbability(double genProbability) {
         this._genProbability = genProbability;
 
         return this;

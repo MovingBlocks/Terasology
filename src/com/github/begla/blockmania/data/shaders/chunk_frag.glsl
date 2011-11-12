@@ -2,7 +2,7 @@
 
 uniform sampler2D textureAtlas;
 
-uniform float gamma = 1.8;
+uniform float gamma = 2.2;
 
 uniform float daylight = 1.0;
 uniform bool swimming;

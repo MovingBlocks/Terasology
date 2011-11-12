@@ -24,7 +24,7 @@ import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.gui.ToolBelt;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
 import com.github.begla.blockmania.tools.Tool;
@@ -64,14 +64,14 @@ public final class Player extends Character {
     private ToolBelt _toolBelt = new ToolBelt(this);
 
     public Player(World parent) {
-        super(parent, (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.walkingSpeed"), (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.runningFactor"), (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.jumpIntensity"));
+        super(parent, (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed"), (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor"), (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity"));
     }
 
     public void update() {
-        _godMode = (Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.godMode");
-        _walkingSpeed = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.walkingSpeed") + Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.005f, 2.0f));
-        _runningFactor = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.runningFactor");
-        _jumpIntensity = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Player.jumpIntensity");
+        _godMode = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
+        _walkingSpeed = (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed") + Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.005f, 2.0f));
+        _runningFactor = (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor");
+        _jumpIntensity = (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity");
 
         updateCameras();
         super.update();
@@ -81,7 +81,7 @@ public final class Player extends Character {
         RayBlockIntersection.Intersection is = calcSelectedBlock();
 
         // Display the block the player is aiming at
-        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("HUD.placingBox")) {
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox")) {
             if (is != null) {
                 if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition().toVector3f())).isRenderBoundingBox()) {
                     Block.AABBForBlockAt(is.getBlockPosition().toVector3f()).render();
@@ -99,7 +99,7 @@ public final class Player extends Character {
     public void updateCameras() {
         _firstPersonCamera.getPosition().set(calcEyePosition());
 
-        if (!((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.godMode"))) {
+        if (!((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode"))) {
             _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.0f));
             _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f, 2.75f));
         } else {
@@ -107,7 +107,7 @@ public final class Player extends Character {
             _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);
         }
 
-        if (!((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.godMode"))) {
+        if (!((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode"))) {
             _firstPersonCamera.getViewingDirection().set(getViewingDirection());
         } else {
             Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z + 128);
@@ -117,8 +117,8 @@ public final class Player extends Character {
 
     public void updatePosition() {
         // DEMO MODE
-        if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.godMode")) {
-            getPosition().z += (Float) BlockmaniaConfiguration.getInstance().getConfig().get("Player.walkingSpeed");
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode")) {
+            getPosition().z += (Float) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 
@@ -192,7 +192,7 @@ public final class Player extends Character {
                 BlockPosition blockPos = is.calcAdjacentBlockPos();
 
                 // Prevent players from placing blocks inside their bounding boxes
-                if (Block.AABBForBlockAt((int) blockPos.x, (int) blockPos.y, (int) blockPos.z).overlaps(getAABB())) {
+                if (Block.AABBForBlockAt(blockPos.x, blockPos.y, blockPos.z).overlaps(getAABB())) {
                     return;
                 }
 
@@ -330,7 +330,7 @@ public final class Player extends Character {
         double dx = Mouse.getDX();
         double dy = Mouse.getDY();
 
-        double mouseSens = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("Controls.mouseSens");
+        double mouseSens = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
 
         yaw(dx * mouseSens);
         pitch(dy * mouseSens);

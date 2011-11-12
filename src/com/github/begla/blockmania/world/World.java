@@ -18,7 +18,7 @@ package com.github.begla.blockmania.world;
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.rendering.RenderableScene;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
@@ -107,8 +107,8 @@ public final class World extends RenderableScene {
 
             FastList<Chunk> newChunksInProximity = new FastList<Chunk>();
 
-            int viewingDistanceX = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceX");
-            int viewingDistanceZ = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceZ");
+            int viewingDistanceX = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX");
+            int viewingDistanceZ = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ");
 
             for (int x = -(viewingDistanceX / 2); x < (viewingDistanceX / 2); x++) {
                 for (int z = -(viewingDistanceZ / 2); z < (viewingDistanceZ / 2); z++) {
@@ -130,7 +130,7 @@ public final class World extends RenderableScene {
      */
     private void updateDaylight() {
         double time = _worldProvider.getTime() % 1;
-        double sunRiseSetDuration = (Double) BlockmaniaConfiguration.getInstance().getConfig().get("World.sunRiseSetDuration");
+        double sunRiseSetDuration = (Double) ConfigurationManager.getInstance().getConfig().get("World.sunRiseSetDuration");
 
         // Sunrise
         if (time < sunRiseSetDuration && time > 0.0f) {
@@ -251,7 +251,7 @@ public final class World extends RenderableScene {
 
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
 
-            if ((Boolean) BlockmaniaConfiguration.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
+            if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
                 c.getAABB().render();
             }
         }

@@ -49,8 +49,8 @@ HUD {
 
 Lighting {
 
-    occlusionIntensDefault = 1.0d / 8.0d
-    occlusionIntensBillboards = occlusionIntensDefault / 4.0d
+    occlusionIntensDefault = 1.0d / 7.0d
+    occlusionIntensBillboards = occlusionIntensDefault / 3.0d
 
 }
 
@@ -88,7 +88,7 @@ Player {
 
 World {
 
-    defaultSeed = "nBbAbCqCrBfMcOnW"
+    defaultSeed = "TEST"
 
     sunRiseSetDuration = 0.025d
     dayNightLength = new Long((60 * 1000) * 20) // 20 minutes in ms
@@ -97,35 +97,30 @@ World {
 
         Forest {
 
-            treeDensity = 0.1d
             grassDensity = 0.3d
 
         }
 
         Plains {
 
-            treeDensity = 0.01d
             grassDensity = 0.1d
 
         }
 
         Snow {
 
-            treeDensity = 0.05d
             grassDensity = 0.001d
 
         }
 
         Mountains {
 
-            treeDensity = 0.05d
             grassDensity = 0.2d
 
         }
 
         Desert {
 
-            treeDensity = 0.01d
             grassDensity = 0.001d
 
         }

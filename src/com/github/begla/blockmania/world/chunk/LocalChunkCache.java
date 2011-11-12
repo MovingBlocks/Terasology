@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import javolution.util.FastList;
@@ -180,8 +180,8 @@ public final class LocalChunkCache implements ChunkProvider {
     }
 
     public static int capacity() {
-        int viewingDistanceX = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceX");
-        int viewingDistanceZ = (Integer) BlockmaniaConfiguration.getInstance().getConfig().get("Graphics.viewingDistanceZ");
+        int viewingDistanceX = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX");
+        int viewingDistanceZ = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ");
 
         return (viewingDistanceX * viewingDistanceZ + 512);
     }

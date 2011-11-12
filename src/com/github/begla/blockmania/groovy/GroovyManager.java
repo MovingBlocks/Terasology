@@ -17,7 +17,7 @@
 package com.github.begla.blockmania.groovy;
 
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.BlockmaniaConfiguration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
@@ -50,9 +50,6 @@ public class GroovyManager {
      */
     public GroovyManager() {
         _bind = new Binding();
-        _bind.setVariable("bm", Blockmania.getInstance());
-        _bind.setVariable("conf", BlockmaniaConfiguration.getInstance().getConfig());
-
         loadAllPlugins();
     }
 
@@ -90,6 +87,9 @@ public class GroovyManager {
         if (gse != null) {
             try {
                 // Run the specified plugin
+                _bind.setVariable("blockmania", Blockmania.getInstance());
+                _bind.setVariable("configuration", ConfigurationManager.getInstance());
+
                 gse.run(pluginName, _bind);
             } catch (ResourceException re) {
                 Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to execute plugin (ResourceException): " + pluginName + ", reason: " + re.toString(), re);

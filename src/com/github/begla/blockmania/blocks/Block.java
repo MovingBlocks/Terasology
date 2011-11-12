@@ -46,7 +46,7 @@ public class Block implements RenderableObject {
     private boolean _invisible;
     private boolean _penetrable;
     private boolean _castsShadows;
-    private boolean _disableTesselation;
+    private boolean _disableTessellation;
     private boolean _renderBoundingBox;
     private boolean _allowBlockAttachment;
     private boolean _bypassSelectionRay;
@@ -94,26 +94,26 @@ public class Block implements RenderableObject {
     }
 
     public Block() {
-        setTitle("Untitled block");
+        withTitle("Untitled block");
 
         for (int i = 0; i < 6; i++) {
-            setTextureAtlasPos(SIDE.values()[i], new Vector2f(0.0f, 0.0f));
-            setColorOffset(SIDE.values()[i], new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+            withTextureAtlasPos(SIDE.values()[i], new Vector2f(0.0f, 0.0f));
+            withColorOffset(SIDE.values()[i], new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         }
 
-        setPenetrable(false);
-        setAllowBlockAttachment(true);
-        setBypassSelectionRay(false);
-        setBlockForm(BLOCK_FORM.DEFAULT);
-        setColorSource(COLOR_SOURCE.DEFAULT);
-        setCastsShadows(true);
-        setTranslucent(false);
-        setInvisible(false);
-        setRenderBoundingBox(true);
-        setHardness((byte) 15);
-        setLuminance((byte) 0);
-        setDisableTesselation(false);
-        setLiquid(false);
+        withPenetrable(false);
+        withAllowBlockAttachment(true);
+        withBypassSelectionRay(false);
+        withBlockForm(BLOCK_FORM.DEFAULT);
+        withColorSource(COLOR_SOURCE.DEFAULT);
+        withCastsShadows(true);
+        withTranslucent(false);
+        withInvisible(false);
+        withRenderBoundingBox(true);
+        withHardness((byte) 15);
+        withLuminance((byte) 0);
+        withDisableTesselation(false);
+        withLiquid(false);
     }
 
     /**
@@ -309,63 +309,116 @@ public class Block implements RenderableObject {
         // Do nothing
     }
 
-    public Block setId(byte id) {
+    public Block withId(byte id) {
         _id = id;
         return this;
     }
 
-    public Block setTitle(String title) {
+    public Block withTitle(String title) {
         _title = title;
         return this;
     }
 
-    public Block setTranslucent(boolean translucent) {
+    public Block withTranslucent(boolean translucent) {
         _translucent = translucent;
         return this;
     }
 
-    public Block setInvisible(boolean invisible) {
+    public Block withInvisible(boolean invisible) {
         _invisible = invisible;
         return this;
     }
 
-    public Block setPenetrable(boolean penetrable) {
+    public Block withPenetrable(boolean penetrable) {
         _penetrable = penetrable;
         return this;
     }
 
-    public Block setCastsShadows(boolean castsShadows) {
+    public Block withCastsShadows(boolean castsShadows) {
         _castsShadows = castsShadows;
         return this;
     }
 
-    public Block setDisableTesselation(boolean disableTesselation) {
-        _disableTesselation = disableTesselation;
+    public Block withDisableTesselation(boolean disableTesselation) {
+        _disableTessellation = disableTesselation;
         return this;
     }
 
-    public Block setRenderBoundingBox(boolean renderBoundingBox) {
+    public Block withRenderBoundingBox(boolean renderBoundingBox) {
         _renderBoundingBox = renderBoundingBox;
         return this;
     }
 
-    public Block setAllowBlockAttachment(boolean allowBlockAttachment) {
+    public Block withAllowBlockAttachment(boolean allowBlockAttachment) {
         _allowBlockAttachment = allowBlockAttachment;
         return this;
     }
 
-    public Block setBypassSelectionRay(boolean bypassSelectionRay) {
+    public Block withBypassSelectionRay(boolean bypassSelectionRay) {
         _bypassSelectionRay = bypassSelectionRay;
         return this;
     }
 
-    public Block setLiquid(boolean liquid) {
+    public Block withLiquid(boolean liquid) {
         _liquid = liquid;
         return this;
     }
 
-    public Block setBlockForm(BLOCK_FORM blockForm) {
+    public Block withBlockForm(BLOCK_FORM blockForm) {
         _blockForm = blockForm;
+        return this;
+    }
+
+    public Block withColorSource(COLOR_SOURCE colorSource) {
+        _colorSource = colorSource;
+        return this;
+    }
+
+    public Block withLuminance(byte luminance) {
+        _luminance = luminance;
+        return this;
+    }
+
+    public Block withHardness(byte hardness) {
+        _hardness = hardness;
+        return this;
+    }
+
+    public Block withColorOffset(SIDE side, Vector4f colorOffset) {
+        _colorOffset[side.ordinal()] = colorOffset;
+        return this;
+    }
+
+    public Block withTextureAtlasPos(SIDE side, Vector2f atlasPos) {
+        _textureAtlasPos[side.ordinal()] = atlasPos;
+        return this;
+    }
+
+    public Block withTextureAtlasPosTopBottom(Vector2f atlasPos) {
+        _textureAtlasPos[SIDE.TOP.ordinal()] = atlasPos;
+        _textureAtlasPos[SIDE.BOTTOM.ordinal()] = atlasPos;
+        return this;
+    }
+
+    public Block withTextureAtlasPos(Vector2f atlasPos) {
+        for (int i = 0; i < 6; i++) {
+            withTextureAtlasPos(SIDE.values()[i], atlasPos);
+        }
+        return this;
+    }
+
+    public Block withTextureAtlasPosMantle(Vector2f atlasPos) {
+        _textureAtlasPos[SIDE.LEFT.ordinal()] = atlasPos;
+        _textureAtlasPos[SIDE.RIGHT.ordinal()] = atlasPos;
+        _textureAtlasPos[SIDE.FRONT.ordinal()] = atlasPos;
+        _textureAtlasPos[SIDE.BACK.ordinal()] = atlasPos;
+        return this;
+    }
+
+    public Block withColorOffset(Vector4f colorOffset) {
+        for (int i = 0; i < 6; i++) {
+            withColorOffset(SIDE.values()[i], colorOffset);
+        }
         return this;
     }
 
@@ -373,69 +426,16 @@ public class Block implements RenderableObject {
         return _colorSource;
     }
 
-    public Block setColorSource(COLOR_SOURCE colorSource) {
-        _colorSource = colorSource;
-        return this;
-    }
-
-    public Block setLuminance(byte luminance) {
-        _luminance = luminance;
-        return this;
-    }
-
     public byte getHardness() {
         return _hardness;
-    }
-
-    public Block setHardness(byte hardness) {
-        _hardness = hardness;
-        return this;
     }
 
     public Vector4f[] getColorOffset() {
         return _colorOffset;
     }
 
-    public Block setColorOffset(SIDE side, Vector4f colorOffset) {
-        _colorOffset[side.ordinal()] = colorOffset;
-        return this;
-    }
-
-    public Block setColorOffset(Vector4f colorOffset) {
-        for (int i = 0; i < 6; i++) {
-            setColorOffset(SIDE.values()[i], colorOffset);
-        }
-        return this;
-    }
-
     public Vector2f[] getTextureAtlasPos() {
         return _textureAtlasPos;
-    }
-
-    public Block setTextureAtlasPos(SIDE side, Vector2f atlasPos) {
-        _textureAtlasPos[side.ordinal()] = atlasPos;
-        return this;
-    }
-
-    public Block setTextureAtlasPosTopBottom(Vector2f atlasPos) {
-        _textureAtlasPos[SIDE.TOP.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.BOTTOM.ordinal()] = atlasPos;
-        return this;
-    }
-
-    public Block setTextureAtlasPos(Vector2f atlasPos) {
-        for (int i = 0; i < 6; i++) {
-            setTextureAtlasPos(SIDE.values()[i], atlasPos);
-        }
-        return this;
-    }
-
-    public Block setTextureAtlasPosMantle(Vector2f atlasPos) {
-        _textureAtlasPos[SIDE.LEFT.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.RIGHT.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.FRONT.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.BACK.ordinal()] = atlasPos;
-        return this;
     }
 
     /**
@@ -492,7 +492,7 @@ public class Block implements RenderableObject {
      * @return True if ignored while tessellating
      */
     public boolean isDisableTesselation() {
-        return _disableTesselation;
+        return _disableTessellation;
     }
 
     /**
