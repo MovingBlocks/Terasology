@@ -15,11 +15,17 @@
  */
 package com.github.begla.blockmania.generators;
 
-import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.world.WorldProvider;
-import javolution.util.FastMap;
+import groovy.lang.Binding;
+import groovy.util.GroovyScriptEngine;
+import groovy.util.ResourceException;
+import groovy.util.ScriptException;
+import javolution.util.FastList;
 
-import java.util.HashMap;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Level;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -28,56 +34,47 @@ public class GeneratorManager {
 
     private WorldProvider _parent;
 
+    private Binding _binding;
+    private static final String DEFAULT_SCRIPT_PATH = "groovy/generators/";
+
     /* WORLD GENERATION */
-    protected final FastMap<String, ChunkGenerator> _chunkGenerators = new FastMap<String, ChunkGenerator>(8);
-    protected final FastMap<String, ObjectGenerator> _objectGenerators = new FastMap<String, ObjectGenerator>(8);
+    protected final ArrayList<ChunkGenerator> _chunkGenerators = new ArrayList<ChunkGenerator>(8);
+    protected final ArrayList<TreeGenerator> _treeGenerators = new ArrayList<TreeGenerator>(8);
 
     public GeneratorManager(WorldProvider parent) {
         _parent = parent;
 
-        // Init. generators
-        _chunkGenerators.put("terrain", new ChunkGeneratorTerrain(this));
-        _chunkGenerators.put("forest", new ChunkGeneratorFlora(this));
-        _chunkGenerators.put("resources", new ChunkGeneratorResources(this));
+        // Init. static generators
+        _chunkGenerators.add(new ChunkGeneratorTerrain(this));
+        _chunkGenerators.add(new ChunkGeneratorFlora(this));
+        _chunkGenerators.add(new ChunkGeneratorResources(this));
+        _treeGenerators.add(new TreeGeneratorCactus(this));
 
-        // L-System tree 1
-        HashMap<String, String> rules = new HashMap<String, String>();
-        rules.put("A", "[&FFFA]////[&FFFA]////[&FFFA]");
-
-        ObjectGeneratorLSystemTree t1 = new ObjectGeneratorLSystemTree(this, "FFFFFFA", rules);
-        _objectGenerators.put("lindenTree1", t1);
-
-        // L-System tree 2
-        rules = new HashMap<String, String>();
-        rules.put("A", "[&FFA]////[&FFA]////[&FFA]//[&FFFFFFB]");
-        rules.put("B", "[&FFFFB][&FFB]////[&FFB]////[&FFB]");
-
-        ObjectGeneratorLSystemTree t2 = new ObjectGeneratorLSystemTree(this, "FFFFFFFFA", rules);
-        t2.setLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId());
-
-        _objectGenerators.put("lindenTree2", t2);
-
-        _objectGenerators.put("cactus", new ObjectGeneratorCactus(this));
+        _binding = new Binding();
+        _binding.setVariable("generatorManager", this);
+        loadTrees();
     }
 
-    /**
-     * Returns the object generator for the given title.
-     *
-     * @param s The title
-     * @return The object generator
-     */
-    public ObjectGenerator getObjectGenerator(String s) {
-        return _objectGenerators.get(s);
+    public void loadTrees() {
+        try {
+            GroovyScriptEngine scriptEngine = new GroovyScriptEngine(DEFAULT_SCRIPT_PATH);
+            scriptEngine.run("Default.groovy", _binding);
+        } catch (IOException e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+            e.printStackTrace();
+        } catch (ResourceException e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+        } catch (ScriptException e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+        }
     }
 
-    /**
-     * Returns the chunk generator for the given title.
-     *
-     * @param s The title
-     * @return The chunk generator
-     */
-    public ChunkGenerator getChunkGenerator(String s) {
-        return _chunkGenerators.get(s);
+    public ArrayList<TreeGenerator> getTreeGenerators() {
+        return _treeGenerators;
+    }
+
+    public ArrayList<ChunkGenerator> getChunkGenerators() {
+        return _chunkGenerators;
     }
 
     public WorldProvider getParent() {

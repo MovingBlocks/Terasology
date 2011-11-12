@@ -13,29 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.begla.blockmania.generators;
 
+import com.github.begla.blockmania.blocks.BlockManager;
+
+import java.util.Random;
+
 /**
- * Object generators are used to generate objects like trees etc.
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class ObjectGenerator {
+public class TreeGeneratorCactus extends TreeGenerator {
 
-    final GeneratorManager _generatorManager;
-
-    ObjectGenerator(GeneratorManager m) {
-        _generatorManager = m;
+    TreeGeneratorCactus(GeneratorManager m) {
+        super(m);
     }
 
-    /**
-     * Generates an object at the given position.
-     *
-     * @param posX   Position on the x-axis
-     * @param posY   Position on the y-axis
-     * @param posZ   Position on the z-axis
-     * @param update If true, the chunk will be queued for updating
-     */
-    public abstract void generate(int posX, int posY, int posZ, boolean update);
+    @Override
+    public void generate(int posX, int posY, int posZ, boolean update) {
+        for (int y = posY; y < posY + 3; y++) {
+            _generatorManager.getParent().setBlock(posX, y, posZ, BlockManager.getInstance().getBlock("Cactus").getId(), update, true);
+        }
+    }
 }

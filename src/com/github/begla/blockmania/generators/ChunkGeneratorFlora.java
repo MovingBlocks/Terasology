@@ -86,7 +86,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                         int randZ = z + _parent.getParent().getRandom().randomInt() % 12 + 6;
 
                         if (temperature > 0.55 && humidity < 0.33 && (c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Snow").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Sand").getId()))
-                            _parent.getObjectGenerator("cactus").generate(c.getBlockWorldPosX(randX), y + 1, c.getBlockWorldPosZ(randZ), false);
+                            _parent.getTreeGenerators().get(0).generate(c.getBlockWorldPosX(randX), y + 1, c.getBlockWorldPosZ(randZ), false);
                         else if (c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Snow").getId())
                             generateTree(c, randX, y, randZ);
                     }
@@ -166,11 +166,16 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
         if (!c.canBlockSeeTheSky(x, y + 1, z))
             return;
 
-        double r2 = _parent.getParent().getRandom().standNormalDistrDouble();
+        int randomGeneratorId = 1;
 
-        if (r2 > -1 && r2 < 1)
-            _parent.getObjectGenerator("lindenTree1").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
-        else
-            _parent.getObjectGenerator("lindenTree2").generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
+        if (_parent.getTreeGenerators().size() > 2) {
+            randomGeneratorId = 1 + Math.abs(_parent.getParent().getRandom().randomInt()) % (_parent.getTreeGenerators().size() - 1);
+        }
+
+        double rand = Math.abs(_parent.getParent().getRandom().randomDouble());
+        TreeGenerator treeGen = _parent.getTreeGenerators().get(randomGeneratorId);
+
+        if (rand < treeGen.getGenProbability())
+            treeGen.generate(c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
     }
 }

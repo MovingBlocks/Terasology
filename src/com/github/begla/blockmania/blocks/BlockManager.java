@@ -32,9 +32,10 @@ import java.util.logging.Level;
 public class BlockManager {
 
     private static final String DEFAULT_SCRIPT_PATH = "groovy/blocks/";
-
     private Binding _binding;
+
     private static BlockManager _instance;
+
     private FastMap<String, Block> _blocksByTitle = new FastMap<String, Block>(128);
     private TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
 

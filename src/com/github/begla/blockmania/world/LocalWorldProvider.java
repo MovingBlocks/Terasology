@@ -262,7 +262,7 @@ public class LocalWorldProvider implements WorldProvider {
             int randX = (int) (_random.randomDouble() * 16000f);
             int randZ = (int) (_random.randomDouble() * 16000f);
 
-            double dens = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerator("terrain")).calcDensity(randX, 64, randZ, ChunkGeneratorTerrain.BIOME_TYPE.FOREST);
+            double dens = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcDensity(randX, 64, randZ, ChunkGeneratorTerrain.BIOME_TYPE.FOREST);
 
             if (dens >= 0.0 && dens < 64.0)
                 return new Vector3f(randX, 32, randZ);
@@ -284,7 +284,7 @@ public class LocalWorldProvider implements WorldProvider {
      * @return The humidity
      */
     public double getHumidityAt(int x, int z) {
-        return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerator("terrain")).calcHumidityAtGlobalPosition(x, z);
+        return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcHumidityAtGlobalPosition(x, z);
     }
 
     /**
@@ -295,14 +295,14 @@ public class LocalWorldProvider implements WorldProvider {
      * @return The temperature
      */
     public double getTemperatureAt(int x, int z) {
-        return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerator("terrain")).calcTemperatureAtGlobalPosition(x, z);
+        return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcTemperatureAtGlobalPosition(x, z);
     }
 
     /*
     * Returns the biome type at the given position.
     */
     public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome(int x, int z) {
-        return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerator("terrain")).calcBiomeTypeForGlobalPosition(x, z);
+        return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcBiomeTypeForGlobalPosition(x, z);
     }
 
     /**

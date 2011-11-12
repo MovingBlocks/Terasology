@@ -28,7 +28,7 @@ import java.util.Stack;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ObjectGeneratorLSystemTree extends ObjectGenerator {
+public class TreeGeneratorLSystem extends TreeGenerator {
 
     private int _iterations;
     private String _initialAxiom;
@@ -37,24 +37,17 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
     private boolean _generateLeafBlocks = true;
     private byte _leafType;
 
-    public ObjectGeneratorLSystemTree(GeneratorManager manager, String initialAxiom, HashMap<String, String> ruleSet) {
+    public TreeGeneratorLSystem(GeneratorManager manager, String initialAxiom, HashMap<String, String> ruleSet) {
         super(manager);
 
         _angleInDegree = 20;
         _iterations = 3;
-        _leafType = BlockManager.getInstance().getBlock("Dark leaf").getId();
+        _leafType = BlockManager.getInstance().getBlock("Leaf").getId();
 
         _initialAxiom = initialAxiom;
         _ruleSet = ruleSet;
     }
 
-    /**
-     * Generates the tree.
-     *
-     * @param posX Origin on the x-axis
-     * @param posY Origin on the y-axis
-     * @param posZ Origin on the z-axis
-     */
     @Override
     public void generate(int posX, int posY, int posZ, boolean update) {
 
@@ -154,11 +147,13 @@ public class ObjectGeneratorLSystemTree extends ObjectGenerator {
     }
 
     private void beforeExecution() {
-        _angleInDegree = 20 + _generatorManager.getParent().getRandom().randomDouble() * 10;
+        _angleInDegree = 30 + _generatorManager.getParent().getRandom().randomDouble() * 10;
         _iterations = Math.abs(_generatorManager.getParent().getRandom().randomInt() % 2) + 4;
     }
 
-    public void setLeafType(byte b) {
+    public TreeGenerator setLeafType(byte b) {
         _leafType = b;
+
+        return this;
     }
 }

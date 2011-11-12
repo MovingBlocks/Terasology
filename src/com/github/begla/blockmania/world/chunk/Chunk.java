@@ -20,6 +20,7 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
+import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.BlockmaniaConfiguration;
 import com.github.begla.blockmania.utilities.Helper;
@@ -123,9 +124,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             // Apply all generators to this chunk
             long timeStart = System.currentTimeMillis();
 
-            _parent.getGeneratorManager().getChunkGenerator("terrain").generate(this);
-            _parent.getGeneratorManager().getChunkGenerator("resources").generate(this);
-            _parent.getGeneratorManager().getChunkGenerator("forest").generate(this);
+            for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators()) {
+                gen.generate(this);
+            }
 
             generateSunlight();
             _fresh = false;

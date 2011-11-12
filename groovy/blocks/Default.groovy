@@ -89,6 +89,6 @@ bm.addBlock(new Block().setTitle("Torch").setId((byte) 29).setTextureAtlasPos(ne
 
 // Leafs
 bm.addBlock(new Block().setTitle("Leaf").setId((byte) 11).setTextureAtlasPos(new Vector2f(4, 3)).setTranslucent(true).setDisableTesselation(true).setAllowBlockAttachment(false).setColorSource(COLOR_SOURCE.FOLIAGE_LUT))
-
-bm.addBlock(new Block().setTitle("Dark leaf").setId((byte) 12).setTextureAtlasPos(new Vector2f(4, 3)).setTranslucent(true).setDisableTesselation(true).setAllowBlockAttachment(false).setColorSource(COLOR_SOURCE.FOLIAGE_LUT).setColorOffset(new Vector4f(0.8f, 0.8f, 0.8f, 1.0f)))
+bm.addBlock(new Block().setTitle("Red leaf").setId((byte) 30).setTextureAtlasPos(new Vector2f(4, 3)).setTranslucent(true).setDisableTesselation(true).setAllowBlockAttachment(false).setColorSource(COLOR_SOURCE.FOLIAGE_LUT).setColorOffset(new Vector4f(1.0f, 0.8f, 0.8f, 1.0f)))
+bm.addBlock(new Block().setTitle("Dark leaf").setId((byte) 12).setTextureAtlasPos(new Vector2f(4, 3)).setTranslucent(true).setDisableTesselation(true).setAllowBlockAttachment(false).setColorSource(COLOR_SOURCE.FOLIAGE_LUT).setColorOffset(new Vector4f(0.5f, 0.5f, 0.5f, 1.0f)))
 // <--
