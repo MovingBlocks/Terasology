@@ -32,7 +32,7 @@ Graphics {
 
     fullscreen = false;
 
-    fov = 80.0d
+    fov = 60.0d
 
     viewingDistanceX = 24
     viewingDistanceZ = 24

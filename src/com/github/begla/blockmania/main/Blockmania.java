@@ -24,6 +24,7 @@ import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.VBOManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.WorldProvider;
 import com.github.begla.blockmania.world.characters.MobManager;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -37,7 +38,6 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.openal.SoundStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,15 +67,12 @@ public final class Blockmania extends RenderableScene {
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
     /* ------- */
     private long _lastLoopTime, _lastFpsTime;
+    private double _averageFps;
     private int _fps;
     private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
     /* ------- */
-    private double _averageFps;
-    /* ------- */
     private World _world;
     private HUD _hud;
-    /* ------- */
-    private final FastRandom _rand = new FastRandom();
     /* ------- */
     private long _timerTicksPerSecond;
     /* ------- */
@@ -113,27 +110,27 @@ public final class Blockmania extends RenderableScene {
      */
     public static void main(String[] args) {
         initDefaultLogger();
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"));
+        getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"));
 
         try {
             loadNativeLibs();
         } catch (Exception e) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Couldn't link static libraries. Sorry. " + e.toString(), e);
+            getInstance().getLogger().log(Level.SEVERE, "Couldn't link static libraries. Sorry. " + e.toString(), e);
         }
 
         Blockmania blockmania = null;
 
         try {
-            blockmania = Blockmania.getInstance();
+            blockmania = getInstance();
 
             blockmania.initDisplay();
             blockmania.initControls();
             blockmania.initGame();
             blockmania.initGroovy();
         } catch (LWJGLException e) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
+            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
         } catch (SlickException e) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
+            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
         }
 
         // MAIN GAME LOOP
@@ -152,7 +149,7 @@ public final class Blockmania extends RenderableScene {
             }
         }
 
-        Blockmania.getInstance().addLogFileHandler("logs/blockmania.log", Level.INFO);
+        getInstance().addLogFileHandler("logs/blockmania.log", Level.INFO);
     }
 
     private static void loadNativeLibs() throws Exception {
@@ -218,23 +215,33 @@ public final class Blockmania extends RenderableScene {
     }
 
     /**
+     * Init. a new random world.
+     */
+    public void initWorld() {
+        initWorld(null, null);
+    }
+
+    /**
      * Prepares a new world with a given name and seed value.
      *
      * @param title Title of the world
      * @param seed  Seed value used for the generators
      */
-    public void initNewWorldAndPlayer(String title, String seed) {
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+    public void initWorld(String title, String seed) {
+        final FastRandom random = new FastRandom();
+
+        getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Get rid of the old world
         if (_world != null) {
             _world.dispose();
+            _world = null;
         }
 
         if (seed == null) {
-            seed = _rand.randomCharacterString(16);
+            seed = random.randomCharacterString(16);
         } else if (seed.isEmpty()) {
-            seed = _rand.randomCharacterString(16);
+            seed = random.randomCharacterString(16);
         }
 
         // Init. a new world
@@ -275,11 +282,10 @@ public final class Blockmania extends RenderableScene {
         // Generate a world with a random seed value
         String worldSeed = (String) ConfigurationManager.getInstance().getConfig().get("World.defaultSeed");
 
-        if (worldSeed.length() == 0) {
-            worldSeed = _rand.randomCharacterString(16);
-        }
+        if (worldSeed.isEmpty())
+            worldSeed = null;
 
-        initNewWorldAndPlayer("World1", worldSeed);
+        initWorld("World1", worldSeed);
 
         _mobManager = new MobManager(); // I suppose this could/should be a getInstance...
         initGroovy();
@@ -299,55 +305,25 @@ public final class Blockmania extends RenderableScene {
         glShadeModel(GL11.GL_SMOOTH);
     }
 
-    public void render() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glLoadIdentity();
-
-        if (_world != null)
-            _world.render();
-
-        super.render();
-
-        if (_hud != null)
-            _hud.render();
-
-        _mobManager.renderAll();
-    }
-
-    public void update() {
-        if (_world != null)
-            _world.update();
-
-        super.update();
-
-        if (_hud != null)
-            _hud.update();
-
-        // Important for the streaming of audio
-        SoundStore.get().poll(0);
-
-        _mobManager.updateAll();
-    }
-
     private void resizeViewport() {
         glViewport(0, 0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight());
     }
 
     /**
-     * Starts the render loop.
+     * Starts the main game loop.
      */
     public void startGame() {
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Starting Blockmania...");
+        getInstance().getLogger().log(Level.INFO, "Starting Blockmania...");
         _lastLoopTime = getTime();
 
         double nextGameTick = getTime();
         int loopCounter;
 
         /*
-         * Blockmania game loop.
+         * GAME LOOP.
          */
         while (_runGame && !Display.isCloseRequested()) {
-            updateStatistics();
+            updateFPS();
             processKeyboardInput();
             processMouseInput();
 
@@ -385,6 +361,33 @@ public final class Blockmania extends RenderableScene {
         destroy();
     }
 
+    public void render() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+
+        if (_world != null)
+            _world.render();
+
+        super.render();
+
+        if (_hud != null)
+            _hud.render();
+
+        _mobManager.renderAll();
+    }
+
+    public void update() {
+        if (_world != null)
+            _world.update();
+
+        super.update();
+
+        if (_hud != null)
+            _hud.update();
+
+        _mobManager.updateAll();
+    }
+
     public void pause() {
         Mouse.setGrabbed(false);
         _pauseGame = true;
@@ -395,8 +398,8 @@ public final class Blockmania extends RenderableScene {
         Mouse.setGrabbed(true);
     }
 
-    public void exitNoSaving() {
-        _saveWorldOnExit = false;
+    public void exit(boolean saveWorld) {
+        _saveWorldOnExit = saveWorld;
         _runGame = false;
     }
 
@@ -444,10 +447,9 @@ public final class Blockmania extends RenderableScene {
     }
 
     /**
-     * Updates the game statistics like FPS and memory usage.
+     * Updates the FPS display.
      */
-
-    private void updateStatistics() {
+    private void updateFPS() {
         // Measure a delta value and the frames per second
         long delta = getTime() - _lastLoopTime;
         _lastLoopTime = getTime();
@@ -496,11 +498,10 @@ public final class Blockmania extends RenderableScene {
         return _world;
     }
 
-    /**
-     * Returns the system time in milliseconds.
-     *
-     * @return The system time in milliseconds.
-     */
+    public WorldProvider getActiveWorldProvider() {
+        return _world.getWorldProvider();
+    }
+
     public long getTime() {
         if (_timerTicksPerSecond == 0)
             return 0;
@@ -518,10 +519,6 @@ public final class Blockmania extends RenderableScene {
 
     public BlockmaniaConsole getConsole() {
         return _console;
-    }
-
-    public FastRandom getRandom() {
-        return _rand;
     }
 
     public MobManager getMobManager() {

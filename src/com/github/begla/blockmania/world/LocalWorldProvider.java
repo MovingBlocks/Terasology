@@ -408,14 +408,6 @@ public class LocalWorldProvider implements WorldProvider {
 
         File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));
 
-        try {
-            if (!f.createNewFile()) {
-                return false;
-            }
-        } catch (IOException ex) {
-            return false;
-        }
-
         Element root = new Element("World");
         Document doc = new Document(root);
 
