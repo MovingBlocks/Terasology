@@ -86,10 +86,8 @@ public class GroovyManager {
 
         if (gse != null) {
             try {
+                updateBinding();
                 // Run the specified plugin
-                _bind.setVariable("blockmania", Blockmania.getInstance());
-                _bind.setVariable("configuration", ConfigurationManager.getInstance());
-
                 gse.run(pluginName, _bind);
             } catch (ResourceException re) {
                 Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to execute plugin (ResourceException): " + pluginName + ", reason: " + re.toString(), re);
@@ -101,6 +99,11 @@ public class GroovyManager {
         }
     }
 
+    private void updateBinding() {
+        _bind.setVariable("blockmania", Blockmania.getInstance());
+        _bind.setVariable("configuration", ConfigurationManager.getInstance());
+    }
+
     /**
      * Executes the given command with Groovy - short the prefix "groovy "
      *
@@ -109,6 +112,7 @@ public class GroovyManager {
      */
     public boolean runGroovyShell(String consoleString) {
         Blockmania.getInstance().getLogger().log(Level.INFO, "Groovy console about to execute command: " + consoleString);
+        updateBinding();
         GroovyShell shell = new GroovyShell(_bind);
         try {
             shell.evaluate(consoleString);
