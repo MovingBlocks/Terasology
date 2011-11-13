@@ -1,16 +1,12 @@
 #version 120
 
 uniform sampler2D textureAtlas;
-
 uniform float gamma = 2.2;
-
 uniform float daylight = 1.0;
 uniform bool swimming;
 uniform bool animated;
 uniform float animationOffset;
-
 varying float fog;
-varying vec3 normal;
 
 vec4 srgbToLinear(vec4 color){
     return pow(color, vec4(1.0 / gamma));
@@ -72,10 +68,10 @@ void main(){
     color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
     if (!swimming) {
-        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.95,0.95,1.0,1.0) * daylightTrans, clamp(fog,0.0,0.125)).rgb;
+        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.6,0.6,0.65,1.0) * daylightTrans, fog).rgb;
         gl_FragColor.a = color.a;
     } else {
-        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.0,0.0,0.0,1.0), fog*16.0).rgb;
+        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.0,0.0,0.0,1.0), 0.85).rgb;
         gl_FragColor.rg *= 0.4;
         gl_FragColor.b *= 0.7;
         gl_FragColor.a = 1.0;

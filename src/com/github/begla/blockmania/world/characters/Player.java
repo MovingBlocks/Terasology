@@ -118,7 +118,7 @@ public final class Player extends Character {
     public void updatePosition() {
         // DEMO MODE
         if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode")) {
-            getPosition().z += (Float) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
+            getPosition().z += (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 

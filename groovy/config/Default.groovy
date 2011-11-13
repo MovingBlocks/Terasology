@@ -90,7 +90,7 @@ World {
 
     defaultSeed = "TEST"
 
-    sunRiseSetDuration = 0.025d
+    sunRiseSetDuration = 0.1d
     dayNightLength = new Long((60 * 1000) * 20) // 20 minutes in ms
 
     Biomes {

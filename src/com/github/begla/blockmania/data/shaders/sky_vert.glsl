@@ -1,4 +1,5 @@
 #version 120
+
 varying	vec4 	McPosition;
 varying	vec3 	colorYxy;
 uniform	vec4 	sunPos;
