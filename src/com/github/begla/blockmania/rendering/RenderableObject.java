@@ -21,13 +21,15 @@ package com.github.begla.blockmania.rendering;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public interface RenderableObject {
-    /**
-     * Rendering operations have to be placed here.
-     */
-    public abstract void render();
 
     /**
-     * Updating operations have to be placed here.
+     * Rendering operations have to implement this method.
      */
-    public abstract void update();
+    public void render();
+
+    /**
+     * Updating operations have to implement this method.
+     */
+    public void update();
+
 }

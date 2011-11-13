@@ -15,22 +15,27 @@
  */
 package com.github.begla.blockmania.main;
 
+import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.groovy.GroovyManager;
 import com.github.begla.blockmania.gui.HUD;
 import com.github.begla.blockmania.rendering.FontManager;
+import com.github.begla.blockmania.rendering.RenderableScene;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.VBOManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.characters.MobManager;
 import com.github.begla.blockmania.world.characters.Player;
-import javolution.util.FastList;
+import com.github.begla.blockmania.world.chunk.Chunk;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.opengl.PixelFormat;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.openal.SoundStore;
 
@@ -38,8 +43,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -53,9 +58,9 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Blockmania {
+public final class Blockmania extends RenderableScene {
 
-    private final ExecutorService _threadPool = Executors.newFixedThreadPool(Configuration.MAX_THREADS);
+    private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(32);
     /* ------ */
     private static final int FRAME_SKIP_MAX_FRAMES = 5;
     private static final int TICKS_PER_SECOND = 60;
@@ -63,7 +68,6 @@ public final class Blockmania {
     /* ------- */
     private long _lastLoopTime, _lastFpsTime;
     private int _fps;
-    private final StringBuffer _consoleInput = new StringBuffer();
     private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
     /* ------- */
     private double _averageFps;
@@ -78,12 +82,28 @@ public final class Blockmania {
     private static Blockmania _instance;
     /* ------- */
     private final Logger _logger = Logger.getLogger("blockmania");
+    /* ------- */
+    private final BlockmaniaConsole _console = new BlockmaniaConsole(this);
+
+    /**
+     * Groovy Manager handles all the Groovy-related stuff!
+     */
+    private GroovyManager _groovyManager;
+
+    /**
+     * Mob Manager to deal with non-player character
+     */
+    private MobManager _mobManager;
 
     // Singleton
     public static Blockmania getInstance() {
         if (_instance == null)
             _instance = new Blockmania();
         return _instance;
+    }
+
+    private Blockmania() {
+        _hud = new HUD(this);
     }
 
     /**
@@ -93,7 +113,7 @@ public final class Blockmania {
      */
     public static void main(String[] args) {
         initDefaultLogger();
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", Configuration.GAME_TITLE);
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"));
 
         try {
             loadNativeLibs();
@@ -109,17 +129,16 @@ public final class Blockmania {
             blockmania.initDisplay();
             blockmania.initControls();
             blockmania.initGame();
-
-            blockmania.startGame();
+            blockmania.initGroovy();
         } catch (LWJGLException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
         } catch (SlickException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
-        } finally {
-            if (blockmania != null) {
-                blockmania.destroy();
-            }
         }
+
+        // MAIN GAME LOOP
+        if (blockmania != null)
+            blockmania.startGame();
 
         System.exit(0);
     }
@@ -162,39 +181,31 @@ public final class Blockmania {
         usrPathsField.set(null, newPaths);
     }
 
-    /**
-     * Returns the system time in milliseconds.
-     *
-     * @return The system time in milliseconds.
-     */
-    public long getTime() {
-        if (_timerTicksPerSecond == 0)
-            return 0;
-
-        return (Sys.getTime() * 1000) / _timerTicksPerSecond;
+    public void initGroovy() {
+        _groovyManager = new GroovyManager();
     }
 
     /**
      * Init. the display.
      *
-     * @throws LWJGLException
+     * @throws LWJGLException Thrown when the LWJGL fails
      */
     public void initDisplay() throws LWJGLException {
-        if (Configuration.FULLSCREEN) {
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.fullscreen")) {
             Display.setDisplayMode(Display.getDesktopDisplayMode());
             Display.setFullscreen(true);
         } else {
-            Display.setDisplayMode(Configuration.DISPLAY_MODE);
+            Display.setDisplayMode((DisplayMode) ConfigurationManager.getInstance().getConfig().get("Graphics.displayMode"));
         }
 
-        Display.setTitle(Configuration.GAME_TITLE);
-        Display.create(Configuration.PIXEL_FORMAT);
+        Display.setTitle((String) ConfigurationManager.getInstance().getConfig().get("System.gameTitle"));
+        Display.create((PixelFormat) ConfigurationManager.getInstance().getConfig().get("Graphics.pixelFormat"));
     }
 
     /**
      * Init. keyboard and mouse input.
      *
-     * @throws LWJGLException
+     * @throws LWJGLException Thrown when the LWJGL fails
      */
     public void initControls() throws LWJGLException {
         // Keyboard
@@ -207,9 +218,37 @@ public final class Blockmania {
     }
 
     /**
+     * Prepares a new world with a given name and seed value.
+     *
+     * @param title Title of the world
+     * @param seed  Seed value used for the generators
+     */
+    public void initNewWorldAndPlayer(String title, String seed) {
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+
+        // Get rid of the old world
+        if (_world != null) {
+            _world.dispose();
+        }
+
+        if (seed == null) {
+            seed = _rand.randomCharacterString(16);
+        } else if (seed.isEmpty()) {
+            seed = _rand.randomCharacterString(16);
+        }
+
+        // Init. a new world
+        _world = new World(title, seed);
+        _world.setPlayer(new Player(_world));
+
+        // Reset the delta value
+        _lastLoopTime = getTime();
+    }
+
+    /**
      * Clean up before exiting the application.
      */
-    public void destroy() {
+    private void destroy() {
         AL.destroy();
         Mouse.destroy();
         Keyboard.destroy();
@@ -220,40 +259,39 @@ public final class Blockmania {
         _timerTicksPerSecond = Sys.getTimerResolution();
 
         /*
-         * Init. GUI.
-         */
-        _hud = new HUD();
-
-        /*
          * Init. management classes.
          */
         ShaderManager.getInstance();
         VBOManager.getInstance();
         FontManager.getInstance();
+        BlockManager.getInstance();
 
         /*
          * Init. OpenGL
          */
         resizeViewport();
-        setupOpenGL();
+        resetOpenGLParameters();
 
         // Generate a world with a random seed value
-        String worldSeed = Configuration.DEFAULT_SEED;
+        String worldSeed = (String) ConfigurationManager.getInstance().getConfig().get("World.defaultSeed");
 
         if (worldSeed.length() == 0) {
             worldSeed = _rand.randomCharacterString(16);
         }
 
         initNewWorldAndPlayer("World1", worldSeed);
+
+        _mobManager = new MobManager(); // I suppose this could/should be a getInstance...
+        initGroovy();
     }
 
-    private void setupOpenGL() {
+    public void resetOpenGLParameters() {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 
         // Update the viewing distance
-        double minDist = Math.min(Configuration.getSettingNumeric("V_DIST_X") * Configuration.CHUNK_DIMENSIONS.x, Configuration.getSettingNumeric("V_DIST_Z") * Configuration.CHUNK_DIMENSIONS.z) / 2.0;
+        double minDist = Math.min((Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX") * Chunk.getChunkDimensionX(), (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ") * Chunk.getChunkDimensionZ()) / 2.0;
         glFogf(GL_FOG_START, (float) (minDist * 0.5));
         glFogf(GL_FOG_END, (float) minDist);
 
@@ -261,15 +299,34 @@ public final class Blockmania {
         glShadeModel(GL11.GL_SMOOTH);
     }
 
-    /**
-     * Renders the scene.
-     */
-    private void render() {
+    public void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
-        _world.render();
-        _hud.render();
+        if (_world != null)
+            _world.render();
+
+        super.render();
+
+        if (_hud != null)
+            _hud.render();
+
+        _mobManager.renderAll();
+    }
+
+    public void update() {
+        if (_world != null)
+            _world.update();
+
+        super.update();
+
+        if (_hud != null)
+            _hud.update();
+
+        // Important for the streaming of audio
+        SoundStore.get().poll(0);
+
+        _mobManager.updateAll();
     }
 
     private void resizeViewport() {
@@ -322,218 +379,74 @@ public final class Blockmania {
         try {
             _threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
+            getLogger().log(Level.SEVERE, e.toString(), e);
         }
 
-        Display.destroy();
+        destroy();
     }
 
-    public void stopGame() {
-        _runGame = false;
-    }
-
-    public void pauseGame() {
+    public void pause() {
         Mouse.setGrabbed(false);
         _pauseGame = true;
     }
 
-    public void unpauseGame() {
+    public void unpause() {
         _pauseGame = false;
         Mouse.setGrabbed(true);
     }
 
-    /**
-     * Executes updates.
-     */
-    private void update() {
-        _hud.update();
-        _world.update();
+    public void exitNoSaving() {
+        _saveWorldOnExit = false;
+        _runGame = false;
+    }
 
-        // Important for the streaming of audio
-        SoundStore.get().poll(0);
+    public void exit() {
+        _saveWorldOnExit = true;
+        _runGame = false;
     }
 
     /*
-     * Process mouse input.
+     * Process mouse input - nothing system-y, so just passing it to the Player class
      */
     private void processMouseInput() {
         while (Mouse.next()) {
             int button = Mouse.getEventButton();
-            _world.getPlayer().processMouseInput(button, Mouse.getEventButtonState());
+            int wheelMoved = Mouse.getEventDWheel();
+            _world.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
         }
     }
 
     /**
-     * Processes keyboard input.
+     * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
     private void processKeyboardInput() {
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
 
-            if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                toggleDebugConsole();
-            }
-
-            if (key == Keyboard.KEY_F3 && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                Configuration.setSetting("DEBUG", !Configuration.getSettingBoolean("DEBUG"));
-            }
-
-            if (_pauseGame) {
-                if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                    if (key == Keyboard.KEY_BACK) {
-                        int length = _consoleInput.length() - 1;
-
-                        if (length < 0) {
-                            length = 0;
-                        }
-                        _consoleInput.setLength(length);
-
-                    } else if (key == Keyboard.KEY_RETURN) {
-                        processConsoleString();
-                    }
-
-                    char c = Keyboard.getEventCharacter();
-
-                    if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'A' + 1 || c == ' ' || c == '_' || c == '.' || c == '!' || c == '-') {
-                        _consoleInput.append(c);
-                    }
+            if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                    togglePauseGame();
                 }
-            } else {
-                // Pass input to the current player
+
+                if (key == Keyboard.KEY_F3 && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                    ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", !(Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug"));
+                }
+
+                if (isGamePaused()) {
+                    _console.processKeyboardInput(key);
+                }
+            }
+
+            // Pass input to the current player
+            if (!isGamePaused())
                 _world.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
-            }
         }
-    }
-
-    /**
-     * Parses the console string and executes the command.
-     */
-    private void processConsoleString() {
-        boolean success = false;
-
-        FastList<String> parsingResult = new FastList<String>();
-        String temp = "";
-
-        for (int i = 0; i < _consoleInput.length(); i++) {
-            char c = _consoleInput.charAt(i);
-
-            if (c != ' ') {
-                temp = temp.concat(String.valueOf(c));
-            }
-
-            if (c == ' ' || i == _consoleInput.length() - 1) {
-                parsingResult.add(temp);
-                temp = "";
-            }
-        }
-
-        // Try to parse the input
-        try {
-            if (parsingResult.get(0).equals("place")) {
-                if (parsingResult.get(1).equals("block")) {
-                    _world.getPlayer().placeBlock(Byte.parseByte(parsingResult.get(2)));
-                    success = true;
-                }
-            } else if (parsingResult.get(0).equals("set")) {
-                if (parsingResult.get(1).equals("time")) {
-                    _world.getWorldProvider().setTime(Float.parseFloat(parsingResult.get(2)));
-                    success = true;
-                    // Otherwise try lookup the given variable within the settings
-                } else {
-                    Boolean bRes = Configuration.getSettingBoolean(parsingResult.get(1).toUpperCase());
-
-                    if (bRes != null) {
-                        Configuration.setSetting(parsingResult.get(1).toUpperCase(), Boolean.parseBoolean(parsingResult.get(2)));
-                        success = true;
-                    } else {
-                        Double fRes = Configuration.getSettingNumeric(parsingResult.get(1).toUpperCase());
-                        if (fRes != null) {
-                            Configuration.setSetting(parsingResult.get(1).toUpperCase(), Double.parseDouble(parsingResult.get(2)));
-                            success = true;
-                        }
-                    }
-                }
-            } else if (parsingResult.get(0).equals("respawn")) {
-                _world.getPlayer().respawn();
-                success = true;
-            } else if (parsingResult.get(0).equals("goto")) {
-                int x = Integer.parseInt(parsingResult.get(1));
-                int y = Integer.parseInt(parsingResult.get(2));
-                int z = Integer.parseInt(parsingResult.get(3));
-                _world.getPlayer().setPosition(new Vector3f(x, y, z));
-                success = true;
-            } else if (parsingResult.get(0).equals("exit")) {
-                _saveWorldOnExit = true;
-                _runGame = false;
-                success = true;
-            } else if (parsingResult.get(0).equals("exit!")) {
-                _saveWorldOnExit = false;
-                _runGame = false;
-                success = true;
-            } else if (parsingResult.get(0).equals("load")) {
-                String worldSeed = _rand.randomCharacterString(16);
-
-                if (parsingResult.size() > 1) {
-                    worldSeed = parsingResult.get(1);
-                }
-
-                initNewWorldAndPlayer(worldSeed, worldSeed);
-                success = true;
-            } else if (parsingResult.get(0).equals("set_spawn")) {
-                _world.getPlayer().setSpawningPoint();
-                success = true;
-            }
-        } catch (Exception e) {
-            Blockmania.getInstance().getLogger().log(Level.INFO, e.getMessage());
-        }
-
-        if (success) {
-            setupOpenGL();
-            Blockmania.getInstance().getLogger().log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
-        } else {
-            Blockmania.getInstance().getLogger().log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
-        }
-
-        toggleDebugConsole();
-    }
-
-    /**
-     * Disables/enables the debug console.
-     */
-    private void toggleDebugConsole() {
-        if (!_pauseGame) {
-            pauseGame();
-            _consoleInput.setLength(0);
-
-        } else {
-            unpauseGame();
-        }
-    }
-
-    /**
-     * Prepares a new world with a given name and seed value.
-     *
-     * @param title Title of the world
-     * @param seed  Seed value used for the generators
-     */
-    private void initNewWorldAndPlayer(String title, String seed) {
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
-
-        // Get rid of the old world
-        if (_world != null) {
-            _world.dispose();
-        }
-
-        // Init. a new world
-        _world = new World(title, seed);
-        _world.setPlayer(new Player(_world));
-
-        // Reset the delta value
-        _lastLoopTime = getTime();
     }
 
     /**
      * Updates the game statistics like FPS and memory usage.
      */
+
     private void updateStatistics() {
         // Measure a delta value and the frames per second
         long delta = getTime() - _lastLoopTime;
@@ -567,6 +480,10 @@ public final class Blockmania {
         return _logger;
     }
 
+    public void togglePauseGame() {
+        _pauseGame = !_pauseGame;
+    }
+
     public boolean isGamePaused() {
         return _pauseGame;
     }
@@ -579,11 +496,35 @@ public final class Blockmania {
         return _world;
     }
 
-    public StringBuffer getConsoleInput() {
-        return _consoleInput;
+    /**
+     * Returns the system time in milliseconds.
+     *
+     * @return The system time in milliseconds.
+     */
+    public long getTime() {
+        if (_timerTicksPerSecond == 0)
+            return 0;
+
+        return (Sys.getTime() * 1000) / _timerTicksPerSecond;
     }
 
-    public ExecutorService getThreadPool() {
+    public ThreadPoolExecutor getThreadPool() {
         return _threadPool;
+    }
+
+    public GroovyManager getGroovyManager() {
+        return _groovyManager;
+    }
+
+    public BlockmaniaConsole getConsole() {
+        return _console;
+    }
+
+    public FastRandom getRandom() {
+        return _rand;
+    }
+
+    public MobManager getMobManager() {
+        return _mobManager;
     }
 }

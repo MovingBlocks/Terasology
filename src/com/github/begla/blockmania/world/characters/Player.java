@@ -20,18 +20,25 @@ import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.gui.ToolBelt;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
+import com.github.begla.blockmania.tools.Tool;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.chunk.Chunk;
+import com.github.begla.blockmania.world.observer.BlockObserver;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.Collections;
+import java.util.logging.Level;
 
 /**
  * Extends the character class and provides support for player functionality. Also provides the
@@ -41,6 +48,9 @@ import java.util.Collections;
  */
 public final class Player extends Character {
 
+    /* OBSERVERS */
+    private FastList<BlockObserver> _observers = new FastList<BlockObserver>();
+
     /* PROPERTIES */
     private byte _selectedBlockType = 1;
 
@@ -48,18 +58,22 @@ public final class Player extends Character {
     private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
     private Camera _activeCamera = _firstPersonCamera;
 
+    /**
+     * The ToolBelt is how the player interacts with tool events from mouse or keyboard
+     */
+    private ToolBelt _toolBelt = new ToolBelt(this);
+
     public Player(World parent) {
-        super(parent, Configuration.getSettingNumeric("WALKING_SPEED"), Configuration.getSettingNumeric("RUNNING_FACTOR"), Configuration.getSettingNumeric("JUMP_INTENSITY"));
+        super(parent, (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed"), (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor"), (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity"));
     }
 
     public void update() {
+        _godMode = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
+        _walkingSpeed = (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed") + Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.005f, 2.0f));
+        _runningFactor = (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor");
+        _jumpIntensity = (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity");
+
         updateCameras();
-
-        _godMode = Configuration.getSettingBoolean("GOD_MODE");
-        _walkingSpeed = Configuration.getSettingNumeric("WALKING_SPEED");
-        _runningFactor = Configuration.getSettingNumeric("RUNNING_FACTOR");
-        _jumpIntensity = Configuration.getSettingNumeric("JUMP_INTENSITY");
-
         super.update();
     }
 
@@ -67,10 +81,10 @@ public final class Player extends Character {
         RayBlockIntersection.Intersection is = calcSelectedBlock();
 
         // Display the block the player is aiming at
-        if (Configuration.getSettingBoolean("PLACING_BOX")) {
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox")) {
             if (is != null) {
-                if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition())).shouldRenderBoundingBox()) {
-                    Block.AABBForBlockAt(is.getBlockPosition()).render();
+                if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition().toVector3f())).isRenderBoundingBox()) {
+                    Block.AABBForBlockAt(is.getBlockPosition().toVector3f()).render();
                 }
             }
         }
@@ -78,16 +92,22 @@ public final class Player extends Character {
         super.render();
     }
 
+    public double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
+        return Math.sin(_stepCounter * frequency + phaseOffset) * amplitude;
+    }
+
     public void updateCameras() {
         _firstPersonCamera.getPosition().set(calcEyePosition());
 
-        if (!(Configuration.getSettingBoolean("GOD_MODE"))) {
-            _firstPersonCamera.setBobbingOffsetFactor(Math.sin(_stepCounter * 2.0) * 0.025);
+        if (!((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode"))) {
+            _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.0f));
+            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f, 2.75f));
         } else {
-            _firstPersonCamera.setBobbingOffsetFactor(0);
+            _firstPersonCamera.setBobbingRotationOffsetFactor(0.0);
+            _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);
         }
 
-        if (!(Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE"))) {
+        if (!((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode"))) {
             _firstPersonCamera.getViewingDirection().set(getViewingDirection());
         } else {
             Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z + 128);
@@ -97,8 +117,8 @@ public final class Player extends Character {
 
     public void updatePosition() {
         // DEMO MODE
-        if (Configuration.getSettingBoolean("DEMO_FLIGHT") && Configuration.getSettingBoolean("GOD_MODE")) {
-            getPosition().z += Configuration.getSettingNumeric("WALKING_SPEED");
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode")) {
+            getPosition().z += (Float) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 
@@ -121,7 +141,7 @@ public final class Player extends Character {
      *
      * @return Intersection point of the targeted block
      */
-    RayBlockIntersection.Intersection calcSelectedBlock() {
+    public RayBlockIntersection.Intersection calcSelectedBlock() {
         FastList<RayBlockIntersection.Intersection> inters = new FastList<RayBlockIntersection.Intersection>();
         for (int x = -3; x <= 3; x++) {
             for (int y = -3; y <= 3; y++) {
@@ -129,7 +149,7 @@ public final class Player extends Character {
                     byte blockType = _parent.getWorldProvider().getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
 
                     // Ignore special blocks
-                    if (BlockManager.getInstance().getBlock(blockType).letsSelectionRayThrough()) {
+                    if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
                         continue;
                     }
 
@@ -163,21 +183,25 @@ public final class Player extends Character {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
-                Block centerBlock = BlockManager.getInstance().getBlock(getParent().getWorldProvider().getBlock((int) is.getBlockPosition().x, (int) is.getBlockPosition().y, (int) is.getBlockPosition().z));
+                Block centerBlock = BlockManager.getInstance().getBlock(getParent().getWorldProvider().getBlock(is.getBlockPosition().x, is.getBlockPosition().y, is.getBlockPosition().z));
 
-                if (!centerBlock.allowsBlockAttachment()) {
+                if (!centerBlock.isAllowBlockAttachment()) {
                     return;
                 }
 
-                Vector3f blockPos = is.calcAdjacentBlockPos();
+                BlockPosition blockPos = is.calcAdjacentBlockPos();
 
                 // Prevent players from placing blocks inside their bounding boxes
-                if (Block.AABBForBlockAt((int) blockPos.x, (int) blockPos.y, (int) blockPos.z).overlaps(getAABB())) {
+                if (Block.AABBForBlockAt(blockPos.x, blockPos.y, blockPos.z).overlaps(getAABB())) {
                     return;
                 }
 
-                getParent().getWorldProvider().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, type, true, false);
-                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, false);
+                AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+
+                int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
+                int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
+                notifyObserversBlockChanged(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
             }
         }
     }
@@ -185,23 +209,27 @@ public final class Player extends Character {
     /**
      * Removes a block.
      */
-    void removeBlock() {
+    public void removeBlock() {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
-                Vector3f blockPos = is.getBlockPosition();
-                byte currentBlockType = getParent().getWorldProvider().getBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
-                getParent().getWorldProvider().setBlock((int) blockPos.x, (int) blockPos.y, (int) blockPos.z, (byte) 0x0, true, true);
+                BlockPosition blockPos = is.getBlockPosition();
+                byte currentBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y, blockPos.z);
+                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, true);
 
                 // Remove the upper block if it's a billboard
-                byte upperBlockType = getParent().getWorldProvider().getBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z);
+                byte upperBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y + 1, blockPos.z);
                 if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                    getParent().getWorldProvider().setBlock((int) blockPos.x, (int) blockPos.y + 1, (int) blockPos.z, (byte) 0x0, true, true);
+                    getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y + 1, blockPos.z, (byte) 0x0, true, true);
                 }
 
-                _parent.getBlockParticleEmitter().setOrigin(blockPos);
+                _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
                 _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
-                AudioManager.getInstance().getAudio("PlaceRemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+                AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+
+                int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
+                int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
+                notifyObserversBlockChanged(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
             }
         }
     }
@@ -240,20 +268,57 @@ public final class Player extends Character {
                     jump();
                 }
                 break;
+            // Hot keys for selecting a tool bar slot
+            case Keyboard.KEY_1:
+                _toolBelt.setSelectedTool((byte) 1);
+                break;
+            case Keyboard.KEY_2:
+                _toolBelt.setSelectedTool((byte) 2);
+                break;
+            case Keyboard.KEY_3:
+                _toolBelt.setSelectedTool((byte) 3);
+                break;
+            case Keyboard.KEY_4:
+                _toolBelt.setSelectedTool((byte) 4);
+                break;
+            case Keyboard.KEY_5:
+                _toolBelt.setSelectedTool((byte) 5);
+                break;
+            case Keyboard.KEY_6:
+                _toolBelt.setSelectedTool((byte) 6);
+                break;
+            case Keyboard.KEY_7:
+                _toolBelt.setSelectedTool((byte) 7);
+                break;
+            case Keyboard.KEY_8:
+                _toolBelt.setSelectedTool((byte) 8);
+                break;
+            case Keyboard.KEY_9:
+                _toolBelt.setSelectedTool((byte) 9);
+                break;
+            case Keyboard.KEY_0:
+                _toolBelt.setSelectedTool((byte) 10);
+                break;
         }
     }
 
     /**
      * Processes the mouse input.
      *
-     * @param button Pressed mouse button
-     * @param state  State of the mouse button
+     * @param button     Pressed mouse button
+     * @param state      State of the mouse button
+     * @param wheelMoved Distance the mouse wheel moved since last
      */
-    public void processMouseInput(int button, boolean state) {
+    public void processMouseInput(int button, boolean state, int wheelMoved) {
         if (button == 0 && state) {
-            placeBlock(_selectedBlockType);
+            //placeBlock(_selectedBlockType);
+            _toolBelt.activateTool(true);
         } else if (button == 1 && state) {
-            removeBlock();
+            //removeBlock();
+            _toolBelt.activateTool(false);
+        } else if (wheelMoved != 0) {
+            Blockmania.getInstance().getLogger().log(Level.INFO, "Mouse wheel moved " + wheelMoved + " for button " + button + ", state " + state);
+            _toolBelt.rollSelectedTool((byte) (wheelMoved / 120));
         }
     }
 
@@ -265,8 +330,10 @@ public final class Player extends Character {
         double dx = Mouse.getDX();
         double dy = Mouse.getDY();
 
-        yaw(dx * Configuration.MOUSE_SENS);
-        pitch(dy * Configuration.MOUSE_SENS);
+        double mouseSens = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
+
+        yaw(dx * mouseSens);
+        pitch(dy * mouseSens);
 
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
             walkForward();
@@ -280,11 +347,8 @@ public final class Player extends Character {
         if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
             strafeRight();
         }
-        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && _touchingGround) {
-            _running = true;
-        } else {
-            _running = false;
-        }
+
+        _running = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && _touchingGround;
     }
 
     /**
@@ -332,14 +396,42 @@ public final class Player extends Character {
 
     @Override
     protected void handleHorizontalCollision() {
-        // Uh. A wall.
+        // Nothing special to do.
     }
 
     public byte getSelectedBlockType() {
         return _selectedBlockType;
     }
 
+    public byte getSelectedTool() {
+        return _toolBelt.getSelectedTool();
+    }
+
+    public void addTool(Tool toolToAdd) {
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Player.addTool called to add tool: " + toolToAdd);
+        _toolBelt.mapPluginTool(toolToAdd);
+    }
+
     public Camera getActiveCamera() {
         return _activeCamera;
+    }
+
+
+    public void registerObserver(BlockObserver observer) {
+        _observers.add(observer);
+    }
+
+    public void unregisterObserver(BlockObserver observer) {
+        _observers.remove(observer);
+    }
+
+    public void notifyObserversBlockChanged(Chunk chunk, BlockPosition pos) {
+        for (BlockObserver ob : _observers)
+            ob.blockChanged(chunk, pos);
+    }
+
+    public void notifyObserversLightChanged(Chunk chunk, BlockPosition pos) {
+        for (BlockObserver ob : _observers)
+            ob.lightChanged(chunk, pos);
     }
 }

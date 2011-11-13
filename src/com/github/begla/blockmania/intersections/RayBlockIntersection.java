@@ -18,7 +18,7 @@ package com.github.begla.blockmania.intersections;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.world.LocalWorldProvider;
+import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.world.WorldProvider;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
@@ -41,9 +41,10 @@ public class RayBlockIntersection {
 
         private final double _d;
         private final double _t;
-        private final Vector3f _rayOrigin, _intersectionPoint, _surfaceNormal, _blockPosition, _rayDirection;
+        private final Vector3f _rayOrigin, _intersectionPoint, _surfaceNormal, _rayDirection;
+        private BlockPosition _blockPosition;
 
-        public Intersection(Vector3f blockPosition, Vector3f normal, double d, double t, Vector3f rayOrigin, Vector3f rayDirection, Vector3f intersectionPoint) {
+        public Intersection(BlockPosition blockPosition, Vector3f normal, double d, double t, Vector3f rayOrigin, Vector3f rayDirection, Vector3f intersectionPoint) {
             this._d = d;
             this._t = t;
             this._rayOrigin = rayOrigin;
@@ -81,14 +82,14 @@ public class RayBlockIntersection {
         /**
          * @return
          */
-        public Vector3f calcAdjacentBlockPos() {
-            return Vector3f.add(getBlockPosition(), getSurfaceNormal(), null);
+        public BlockPosition calcAdjacentBlockPos() {
+            return new BlockPosition(Vector3f.add(getBlockPosition().toVector3f(), getSurfaceNormal(), null));
         }
 
         /**
          * @return the blockPos
          */
-        public Vector3f getBlockPosition() {
+        public BlockPosition getBlockPosition() {
             return _blockPosition;
         }
 
@@ -117,7 +118,7 @@ public class RayBlockIntersection {
         /*
          * Ignore invisible blocks.
          */
-        if (BlockManager.getInstance().getBlock(w.getBlock(x, y, z)).isBlockInvisible()) {
+        if (BlockManager.getInstance().getBlock(w.getBlock(x, y, z)).isInvisible()) {
             return null;
         }
 
@@ -127,7 +128,7 @@ public class RayBlockIntersection {
          * Fetch all vertices of the specified block.
          */
         Vector3f[] vertices = Block.AABBForBlockAt(x, y, z).getVertices();
-        Vector3f blockPos = new Vector3f(x, y, z);
+        BlockPosition blockPos = new BlockPosition(x, y, z);
 
         /*
          * Generate a new intersection for each side of the block.
@@ -187,7 +188,7 @@ public class RayBlockIntersection {
      * @param ray      Direction of the intersection ray
      * @return Ray-face-intersection
      */
-    private static Intersection executeBlockFaceIntersection(Vector3f blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
+    private static Intersection executeBlockFaceIntersection(BlockPosition blockPos, Vector3f v0, Vector3f v1, Vector3f v2, Vector3f origin, Vector3f ray) {
 
         // Calculate the plane to intersect with
         Vector3f a = new Vector3f();

@@ -18,7 +18,6 @@ package com.github.begla.blockmania.world;
 import javolution.util.FastList;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class WorldTimeEventManager {

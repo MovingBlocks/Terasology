@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
+import com.github.begla.blockmania.generators.GeneratorManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkProvider;
@@ -74,7 +75,7 @@ public interface WorldProvider {
      */
     public void setLight(int x, int y, int z, byte intensity, Chunk.LIGHT_TYPE type);
 
-        /**
+    /**
      * Returns the block value at the given position.
      *
      * @param pos The position
@@ -150,6 +151,13 @@ public interface WorldProvider {
      * @return The chunk provider
      */
     public ChunkProvider getChunkProvider();
+
+    /**
+     * Returns the generator manager of this world.
+     *
+     * @return The generator manager
+     */
+    public GeneratorManager getGeneratorManager();
 
     /**
      * Returns a new random spawning point.

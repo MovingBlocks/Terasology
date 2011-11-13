@@ -47,8 +47,8 @@ vec3	allweatherSky ( float t, float cosTheta, float cosGamma, float cosThetaSun 
 
 void main(void)
 {
-    float	sa  = sin ( sunAngle );
-    float	ca  = cos ( sunAngle );
+    float	sa  = sin ( sunAngle + 0.35 );
+    float	ca  = cos ( sunAngle + 0.35 );
     mat3	r   = mat3 ( 1.0, 0.0, 0.0, 0.0, ca, -sa, 0.0, sa, ca );
 
     vec3 v          = normalize ( (gl_Vertex-eyePos).xyz );    

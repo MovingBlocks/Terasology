@@ -78,7 +78,7 @@ public class BlockParticle extends Particle {
 
         BlockParticleEmitter pE = (BlockParticleEmitter) getParent();
         double lightValueSun = ((double) pE.getParent().getWorldProvider().getLightAtPosition(_position, Chunk.LIGHT_TYPE.SUN));
-        lightValueSun =  (lightValueSun / 15.0) * pE.getParent().getDaylight();
+        lightValueSun = (lightValueSun / 15.0) * pE.getParent().getDaylight();
         double lightValueBlock = pE.getParent().getWorldProvider().getLightAtPosition(_position, Chunk.LIGHT_TYPE.BLOCK);
         lightValueBlock = lightValueBlock / 15.0;
 

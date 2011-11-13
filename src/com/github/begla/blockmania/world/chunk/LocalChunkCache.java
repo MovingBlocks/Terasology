@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import javolution.util.FastList;
@@ -32,7 +32,7 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class LocalChunkCache implements ChunkProvider{
+public final class LocalChunkCache implements ChunkProvider {
 
     private static boolean _running = false;
     /* ------ */
@@ -126,10 +126,6 @@ public final class LocalChunkCache implements ChunkProvider{
     }
 
     private void writeChunkToDisk(Chunk c) {
-        if (Configuration.getSettingBoolean("SANDBOXED") || !Configuration.getSettingBoolean("SAVE_CHUNKS")) {
-            return;
-        }
-
         if (c.isFresh()) {
             return;
         }
@@ -184,6 +180,9 @@ public final class LocalChunkCache implements ChunkProvider{
     }
 
     public static int capacity() {
-        return (Configuration.getSettingNumeric("V_DIST_X").intValue() * Configuration.getSettingNumeric("V_DIST_Z").intValue() + 512);
+        int viewingDistanceX = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX");
+        int viewingDistanceZ = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ");
+
+        return (viewingDistanceX * viewingDistanceZ + 512);
     }
 }

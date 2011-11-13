@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="blockmania" default="all">
-
-
     <property file="blockmania.properties"/>
-    <!-- Uncomment the following property if no tests compilation is needed -->
-    <!--
-   <property name="skip.tests" value="true"/>
-    -->
-
-    <!-- Compiler options -->
 
     <property name="compiler.debug" value="on"/>
     <property name="compiler.generate.no.warnings" value="off"/>
@@ -57,6 +49,7 @@
         <include name="**/?*.png"/>
         <include name="**/?*.ogg"/>
         <include name="**/?*.fnt"/>
+        <include name="**/?*.groovy"/>
     </patternset>
 
 
@@ -170,7 +163,7 @@
     </target>
 
     <target name="clean.artifact.blockmania" depends="init.artifacts" description="clean Blockmania artifact output">
-        <delete dir="${artifact.output.blockmania}"></delete>
+        <delete dir="${artifact.output.blockmania}"/>
     </target>
 
     <target name="artifact.blockmania" depends="init.artifacts, artifact.blockmania:jar"
@@ -186,34 +179,37 @@
         <copy todir="${artifact.output.blockmania}/natives">
             <fileset dir="${basedir}/natives"/>
         </copy>
+        <mkdir dir="${artifact.output.blockmania}/groovy"/>
+        <copy todir="${artifact.output.blockmania}/groovy">
+            <fileset dir="${basedir}/groovy"/>
+        </copy>
     </target>
 
     <target name="artifact.blockmania:zip" depends="artifact.blockmania" description="None">
-        <mkdir dir="${artifact.output.blockmania:zip}"></mkdir>
-        <zip basedir="${artifact.output.blockmania}" destfile="${artifact.output.blockmania:zip}/Blockmania.zip"></zip>
+        <mkdir dir="${artifact.output.blockmania:zip}"/>
+        <zip basedir="${artifact.output.blockmania}" destfile="${artifact.output.blockmania:zip}/Blockmania.zip"/>
     </target>
 
     <target name="artifact.blockmania:jar" depends="init.artifacts, compile.module.blockmania"
             description="Build &apos;Blockmania:jar&apos; artifact">
         <property name="artifact.temp.output.blockmania:jar" value="${artifacts.temp.dir}/Blockmania_jar"/>
         <mkdir dir="${artifact.temp.output.blockmania:jar}"/>
-        <jar destfile="${temp.jar.path.Blockmania.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
-            <zipfileset file="${basedir}/src/META-INF/MANIFEST.MF" prefix="META-INF"/>
+        <jar destfile="${temp.jar.path.Blockmania.jar}" duplicate="add" manifest="${basedir}/src/META-INF/MANIFEST.MF" filesetmanifest="skip">
             <zipfileset dir="${blockmania.output.dir}"/>
             <zipfileset src="${basedir}/libs/annotations.jar"/>
             <zipfileset src="${basedir}/libs/AppleJavaExtensions.jar"/>
             <zipfileset src="${basedir}/libs/javolution-5.5.1.jar"/>
             <zipfileset src="${basedir}/libs/jogg-0.0.7.jar"/>
             <zipfileset src="${basedir}/libs/jorbis-0.0.15.jar"/>
-            <zipfileset src="${basedir}/libs/jdom.jar"/>
             <zipfileset src="${basedir}/libs/jinput.jar"/>
-            <zipfileset src="${basedir}/libs/junit-dep-4.9.jar"/>
             <zipfileset src="${basedir}/libs/lwjgl.jar"/>
             <zipfileset src="${basedir}/libs/lwjgl_util.jar"/>
             <zipfileset src="${basedir}/libs/lzma.jar"/>
             <zipfileset src="${basedir}/libs/slick.jar"/>
             <zipfileset src="${basedir}/libs/slick-util.jar"/>
             <zipfileset src="${basedir}/libs/trove-3.0.0.jar"/>
+            <zipfileset src="${basedir}/libs/groovy-all-1.8.2.jar"/>
+            <zipfileset src="${basedir}/libs/jdom.jar"/>
         </jar>
         <copy file="${temp.jar.path.Blockmania.jar}" tofile="${artifact.temp.output.blockmania:jar}/Blockmania.jar"/>
     </target>

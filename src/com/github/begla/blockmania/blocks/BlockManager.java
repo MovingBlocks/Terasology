@@ -15,32 +15,56 @@
  */
 package com.github.begla.blockmania.blocks;
 
+import com.github.begla.blockmania.main.Blockmania;
+import gnu.trove.map.hash.TByteObjectHashMap;
+import groovy.lang.Binding;
+import groovy.util.GroovyScriptEngine;
+import groovy.util.ResourceException;
+import groovy.util.ScriptException;
 import javolution.util.FastMap;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.newdawn.slick.util.ResourceLoader;
-import org.xml.sax.InputSource;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.List;
+import java.io.IOException;
+import java.util.logging.Level;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockManager {
 
-    private FastMap<String, Block> _blocksByTitle = new FastMap<String, Block>();
-    private FastMap<Byte, Block> _blocksById = new FastMap<Byte, Block>();
-    /* ------- */
+    private static final String DEFAULT_SCRIPT_PATH = "groovy/blocks/";
+    private Binding _binding;
+
     private static BlockManager _instance;
+
+    private FastMap<String, Block> _blocksByTitle = new FastMap<String, Block>(128);
+    private TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
 
     public static BlockManager getInstance() {
         if (_instance == null)
             _instance = new BlockManager();
 
         return _instance;
+    }
+
+    private BlockManager() {
+        _binding = new Binding();
+        _binding.setVariable("blockManager", this);
+
+        loadBlocks();
+    }
+
+    private void loadBlocks() {
+        try {
+            GroovyScriptEngine scriptEngine = new GroovyScriptEngine(DEFAULT_SCRIPT_PATH);
+            scriptEngine.run("Default.groovy", _binding);
+        } catch (IOException e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+            e.printStackTrace();
+        } catch (ResourceException e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+        } catch (ScriptException e) {
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+        }
     }
 
     public Block getBlock(String title) {
@@ -55,35 +79,13 @@ public class BlockManager {
         return _blocksById.size();
     }
 
-    private BlockManager() {
-        createAirBlock();
-        loadBlocks();
+    public void addBlock(Block block) {
+        _blocksById.put(block.getId(), block);
+        _blocksByTitle.put(block.getTitle(), block);
     }
 
-    private void createAirBlock() {
-        BlockAir airBlock = new BlockAir();
-        _blocksById.put((byte) 0x0, airBlock);
-        _blocksByTitle.put(airBlock.getTitle(), airBlock);
-    }
-
-    private boolean loadBlocks() {
-        try {
-            SAXBuilder builder = new SAXBuilder();
-            InputSource is = new InputSource(ResourceLoader.getResource("com/github/begla/blockmania/data/blocks/blocks.xml").openStream());
-            Document doc = builder.build(is);
-            Element root = doc.getRootElement();
-
-            List<Element> content = root.getChildren();
-
-            for (Element e : content) {
-                Block b = new Block(e);
-                _blocksById.put(b.getId(), b);
-                _blocksByTitle.put(b.getTitle(), b);
-            }
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public void removeBlock(Block block) {
+        _blocksById.remove(block.getId());
+        _blocksByTitle.remove(block.getTitle());
     }
 }

@@ -15,11 +15,7 @@
  */
 package com.github.begla.blockmania.world;
 
-import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.main.Blockmania;
-
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class WorldTimeEvent {

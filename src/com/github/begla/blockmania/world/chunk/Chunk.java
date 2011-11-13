@@ -20,9 +20,12 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
+import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.ConfigurationManager;
+import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.entity.StaticEntity;
 import javolution.util.FastList;
@@ -38,7 +41,7 @@ import java.util.logging.Level;
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
  * determined by its dimensions. Chunks are used to manage the world efficiently and
  * to reduce the batch count within the render loop.
- *
+ * <p/>
  * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated
  * which are then used for the actual rendering process.
  *
@@ -46,8 +49,13 @@ import java.util.logging.Level;
  */
 public class Chunk extends StaticEntity implements Comparable<Chunk>, Externalizable {
 
-    protected static final
-    Vector3f[] _lightDirections = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
+    /* CONSTANT VALUES */
+    private static final int CHUNK_DIMENSION_X = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionX");
+    private static final int CHUNK_DIMENSION_Y = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionY");
+    private static final int CHUNK_DIMENSION_Z = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionZ");
+    protected static final Vector3f[] LIGHT_DIRECTIONS = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
+    /* ------ */
+    protected FastRandom _random;
     /* ------ */
     protected boolean _dirty, _lightDirty, _fresh;
     /* ------ */
@@ -72,16 +80,34 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         SUN
     }
 
+    public static int getChunkDimensionX() {
+        return CHUNK_DIMENSION_X;
+    }
+
+    public static int getChunkDimensionY() {
+        return CHUNK_DIMENSION_Y;
+    }
+
+    public static int getChunkDimensionZ() {
+        return CHUNK_DIMENSION_Z;
+    }
+
+    public static int getChunkIdForPosition(Vector3f position) {
+        return MathHelper.cantorize(MathHelper.mapToPositive((int) position.x), MathHelper.mapToPositive((int) position.z));
+    }
+
     public Chunk() {
         _meshGenerator = new ChunkMeshGenerator(this);
 
-        _blocks = new BlockmaniaArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
-        _sunlight = new BlockmaniaSmartArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
-        _light = new BlockmaniaSmartArray((int) Configuration.CHUNK_DIMENSIONS.x, (int) Configuration.CHUNK_DIMENSIONS.y, (int) Configuration.CHUNK_DIMENSIONS.z);
+        _blocks = new BlockmaniaArray(getChunkDimensionX(), getChunkDimensionY(), getChunkDimensionZ());
+        _sunlight = new BlockmaniaSmartArray(getChunkDimensionX(), getChunkDimensionY(), getChunkDimensionZ());
+        _light = new BlockmaniaSmartArray(getChunkDimensionX(), getChunkDimensionY(), getChunkDimensionZ());
 
         _lightDirty = true;
         _dirty = true;
         _fresh = true;
+
+        _random = new FastRandom();
     }
 
     /**
@@ -95,6 +121,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         setPosition(position);
         _parent = p;
+
+        _random = new FastRandom((_parent.getSeed()).hashCode() + getChunkIdForPosition(position));
     }
 
     /**
@@ -108,9 +136,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             // Apply all generators to this chunk
             long timeStart = System.currentTimeMillis();
 
-            _parent.getChunkGenerator("terrain").generate(this);
-            _parent.getChunkGenerator("resources").generate(this);
-            _parent.getChunkGenerator("forest").generate(this);
+            for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators()) {
+                gen.generate(this);
+            }
 
             generateSunlight();
             _fresh = false;
@@ -126,13 +154,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public void updateLight() {
         if (!_fresh) { // Do NOT update fresh chunks
-            for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
-                for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
-                    for (int y = 0; y < (int) Configuration.CHUNK_DIMENSIONS.y; y++) {
+            for (int x = 0; x < getChunkDimensionX(); x++) {
+                for (int z = 0; z < getChunkDimensionZ(); z++) {
+                    for (int y = 0; y < getChunkDimensionY(); y++) {
                         byte lightValue = getLight(x, y, z, LIGHT_TYPE.SUN);
 
                         // Spread the sunlight in translucent blocks with a light value greater than zero.
-                        if (lightValue > 0 && BlockManager.getInstance().getBlock(getBlock(x, y, z)).isBlockTypeTranslucent()) {
+                        if (lightValue > 0 && BlockManager.getInstance().getBlock(getBlock(x, y, z)).isTranslucent()) {
                             spreadLight(x, y, z, lightValue, LIGHT_TYPE.SUN);
                         }
                     }
@@ -146,8 +174,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Generates the initial sunlight.
      */
     private void generateSunlight() {
-        for (int x = 0; x < (int) Configuration.CHUNK_DIMENSIONS.x; x++) {
-            for (int z = 0; z < (int) Configuration.CHUNK_DIMENSIONS.z; z++) {
+        for (int x = 0; x < getChunkDimensionX(); x++) {
+            for (int z = 0; z < getChunkDimensionZ(); z++) {
                 refreshSunlightAtLocalPos(x, z, false, false);
             }
         }
@@ -164,12 +192,12 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
         boolean covered = false;
 
-        for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
+        for (int y = getChunkDimensionY() - 1; y >= 0; y--) {
             byte blockId = _blocks.get(x, y, z);
             Block b = BlockManager.getInstance().getBlock(blockId);
 
             // Remember if this "column" is covered
-            if ((!b.isBlockInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) && !covered) {
+            if ((!b.isInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) && !covered) {
                 covered = true;
             }
 
@@ -178,8 +206,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
             // If the column is not covered...
             if (!covered) {
-                if (b.isBlockInvisible() || b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
-                    _sunlight.set(x, y, z, Configuration.MAX_LIGHT);
+                if (b.isInvisible() || b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
+                    _sunlight.set(x, y, z, (byte) 15);
                 else
                     _sunlight.set(x, y, z, (byte) 0x0);
 
@@ -223,7 +251,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         byte bType = getBlock(x, y, z);
 
         // If a block was just placed, remove the light value at this point
-        if (!BlockManager.getInstance().getBlock(bType).isBlockTypeTranslucent()) {
+        if (!BlockManager.getInstance().getBlock(bType).isTranslucent()) {
             setLight(x, y, z, (byte) 0, type);
         } else {
             // If the block was removed: Find the brightest neighbor and
@@ -288,13 +316,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         for (int i = 0; i < 6; i++) {
 
-            byte neighborValue = getParent().getLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, type);
-            byte neighborType = getParent().getBlock(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z);
+            byte neighborValue = getParent().getLight(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z, type);
+            byte neighborType = getParent().getBlock(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z);
 
-            if (neighborValue < lightValue && neighborValue > 0 && BlockManager.getInstance().getBlock(neighborType).isBlockTypeTranslucent()) {
-                getParent().unspreadLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
+            if (neighborValue < lightValue && neighborValue > 0 && BlockManager.getInstance().getBlock(neighborType).isTranslucent()) {
+                getParent().unspreadLight(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z, (byte) (lightValue - 1), depth + 1, type, brightSpots);
             } else if (neighborValue >= lightValue) {
-                brightSpots.add(new Vector3f(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z));
+                brightSpots.add(new Vector3f(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z));
             }
         }
     }
@@ -337,11 +365,11 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         getParent().setLight(blockPosX, y, blockPosZ, newLightValue, type);
 
         for (int i = 0; i < 6; i++) {
-            byte neighborValue = getParent().getLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, type);
-            byte neighborType = getParent().getBlock(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z);
+            byte neighborValue = getParent().getLight(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z, type);
+            byte neighborType = getParent().getBlock(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z);
 
-            if (neighborValue < newLightValue - 1 && BlockManager.getInstance().getBlock(neighborType).isBlockTypeTranslucent()) {
-                getParent().spreadLight(blockPosX + (int) _lightDirections[i].x, y + (int) _lightDirections[i].y, blockPosZ + (int) _lightDirections[i].z, lightValue, depth + 1, type);
+            if (neighborValue < newLightValue - 1 && BlockManager.getInstance().getBlock(neighborType).isTranslucent()) {
+                getParent().spreadLight(blockPosX + (int) LIGHT_DIRECTIONS[i].x, y + (int) LIGHT_DIRECTIONS[i].y, blockPosZ + (int) LIGHT_DIRECTIONS[i].z, lightValue, depth + 1, type);
             }
         }
     }
@@ -423,8 +451,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public boolean canBlockSeeTheSky(int x, int y, int z) {
-        for (int y1 = y; y1 < Configuration.CHUNK_DIMENSIONS.y; y1++) {
-            if (!BlockManager.getInstance().getBlock(getBlock(x, y1, z)).isBlockTypeTranslucent())
+        for (int y1 = y; y1 < getChunkDimensionY(); y1++) {
+            if (!BlockManager.getInstance().getBlock(getBlock(x, y1, z)).isTranslucent())
                 return false;
         }
 
@@ -493,7 +521,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             neighbors[1].setDirty(true);
         }
 
-        if (x == Configuration.CHUNK_DIMENSIONS.x - 1 && neighbors[0] != null) {
+        if (x == getChunkDimensionX() - 1 && neighbors[0] != null) {
             neighbors[0].setDirty(true);
         }
 
@@ -501,15 +529,15 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             neighbors[3].setDirty(true);
         }
 
-        if (z == Configuration.CHUNK_DIMENSIONS.z - 1 && neighbors[2] != null) {
+        if (z == getChunkDimensionZ() - 1 && neighbors[2] != null) {
             neighbors[2].setDirty(true);
         }
 
-        if (x == Configuration.CHUNK_DIMENSIONS.x - 1 && z == 0 && neighbors[7] != null) {
+        if (x == getChunkDimensionX() - 1 && z == 0 && neighbors[7] != null) {
             neighbors[7].setDirty(true);
         }
 
-        if (x == 0 && z == Configuration.CHUNK_DIMENSIONS.z - 1 && neighbors[6] != null) {
+        if (x == 0 && z == getChunkDimensionZ() - 1 && neighbors[6] != null) {
             neighbors[6].setDirty(true);
         }
 
@@ -517,7 +545,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             neighbors[5].setDirty(true);
         }
 
-        if (x == Configuration.CHUNK_DIMENSIONS.x - 1 && z == Configuration.CHUNK_DIMENSIONS.z - 1 && neighbors[4] != null) {
+        if (x == getChunkDimensionX() - 1 && z == getChunkDimensionZ() - 1 && neighbors[4] != null) {
             neighbors[4].setDirty(true);
         }
     }
@@ -549,7 +577,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public AABB getAABB() {
         if (_aabb == null) {
-            Vector3f dimensions = new Vector3f(Configuration.CHUNK_DIMENSIONS.x / 2, Configuration.CHUNK_DIMENSIONS.y / 2, Configuration.CHUNK_DIMENSIONS.z / 2);
+            Vector3f dimensions = new Vector3f(getChunkDimensionX() / 2, getChunkDimensionY() / 2, getChunkDimensionZ() / 2);
             Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX(), dimensions.getY(), getChunkWorldPosZ() + dimensions.getZ());
             _aabb = new AABB(position, dimensions);
         }
@@ -657,17 +685,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         setDirty(false);
     }
 
-
-    /**
-     * Generates the display lists and swaps the old mesh with the current mesh.
-     */
-    public void generateVBOs() {
-        if (_newMesh != null) {
-            _newMesh.generateVBOs();
-        }
-    }
-
-
     /**
      * Draws the opaque or translucent elements of a chunk.
      *
@@ -681,10 +698,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void update() {
-        // Do not update the mesh if one of the VISIBLE neighbors is dirty
-        for (Chunk nc : loadOrCreateNeighbors())
-            if ((nc.isDirty() || nc.isLightDirty()) && nc.isVisible())
-                return;
+        if (_newMesh != null)
+            _newMesh.generateVBOs();
 
         swapActiveMesh();
     }
@@ -738,7 +753,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
 
     public int getChunkWorldPosX() {
-        return (int) _position.x * (int) Configuration.CHUNK_DIMENSIONS.x;
+        return (int) _position.x * getChunkDimensionX();
     }
 
     /**
@@ -747,7 +762,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @return Thew world position
      */
     public int getChunkWorldPosZ() {
-        return (int) _position.z * (int) Configuration.CHUNK_DIMENSIONS.z;
+        return (int) _position.z * getChunkDimensionZ();
     }
 
     /**
@@ -835,6 +850,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public boolean isVisible() {
         return _visible;
+    }
+
+    public FastRandom getRandom() {
+        return _random;
     }
 
     /**

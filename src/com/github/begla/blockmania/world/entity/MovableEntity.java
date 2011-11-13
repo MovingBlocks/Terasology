@@ -20,11 +20,9 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.World;
-import com.github.begla.blockmania.world.WorldProvider;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.Audio;
@@ -79,7 +77,7 @@ public abstract class MovableEntity extends Entity {
     protected abstract void handleHorizontalCollision();
 
     public void render() {
-        if (Configuration.getSettingBoolean("DEBUG_COLLISION")) {
+        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debugCollision")) {
             getAABB().render();
 
             FastList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());
@@ -260,19 +258,21 @@ public abstract class MovableEntity extends Entity {
         // Save the previous position before changing any of the values
         Vector3f oldPosition = new Vector3f(getPosition());
 
+        double friction = (Double) ConfigurationManager.getInstance().getConfig().get("Player.friction");
+
         /*
          * Slowdown the speed of the entity each time this method is called.
          */
         if (MathHelper.fastAbs(_velocity.y) > 0f) {
-            _velocity.y += -1f * _velocity.y * Configuration.getSettingNumeric("FRICTION");
+            _velocity.y += -1f * _velocity.y * friction;
         }
 
         if (MathHelper.fastAbs(_velocity.x) > 0f) {
-            _velocity.x += -1f * _velocity.x * Configuration.getSettingNumeric("FRICTION");
+            _velocity.x += -1f * _velocity.x * friction;
         }
 
         if (MathHelper.fastAbs(_velocity.z) > 0f) {
-            _velocity.z += -1f * _velocity.z * Configuration.getSettingNumeric("FRICTION");
+            _velocity.z += -1f * _velocity.z * friction;
         }
 
         /*
@@ -295,22 +295,28 @@ public abstract class MovableEntity extends Entity {
         _velocity.y += _movementDirection.y;
         _velocity.z += _movementDirection.z;
 
+        double maxGravity = (Double) ConfigurationManager.getInstance().getConfig().get("Player.maxGravity");
+        double maxGravitySwimming = (Double) ConfigurationManager.getInstance().getConfig().get("Player.maxGravitySwimming");
+        double gravitySwimming = (Double) ConfigurationManager.getInstance().getConfig().get("Player.gravitySwimming");
+        double gravity = (Double) ConfigurationManager.getInstance().getConfig().get("Player.gravity");
+
+
         // Normal gravity
-        if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY") && !_godMode && !_isSwimming) {
-            _gravity -= Configuration.getSettingNumeric("GRAVITY");
+        if (_gravity > -maxGravity && !_godMode && !_isSwimming) {
+            _gravity -= gravity;
         }
 
-        if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY") && !_godMode && !_isSwimming) {
-            _gravity = -Configuration.getSettingNumeric("MAX_GRAVITY");
+        if (_gravity < -maxGravity && !_godMode && !_isSwimming) {
+            _gravity = -maxGravity;
         }
 
         // Gravity under water
-        if (_gravity > -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING") && !_godMode && _isSwimming) {
-            _gravity -= Configuration.getSettingNumeric("GRAVITY_SWIMMING");
+        if (_gravity > -maxGravitySwimming && !_godMode && _isSwimming) {
+            _gravity -= gravitySwimming;
         }
 
-        if (_gravity < -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING") && !_godMode && _isSwimming) {
-            _gravity = -Configuration.getSettingNumeric("MAX_GRAVITY_SWIMMING");
+        if (_gravity < -maxGravitySwimming && !_godMode && _isSwimming) {
+            _gravity = -maxGravitySwimming;
         }
 
         getPosition().y += _velocity.y;

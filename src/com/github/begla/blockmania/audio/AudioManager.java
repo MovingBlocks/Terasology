@@ -54,7 +54,8 @@ public class AudioManager {
     }
 
     private void loadSound() {
-        _audioFiles.put("PlaceRemoveBlock", loadSound("PlaceRemoveBlock"));
+        _audioFiles.put("PlaceBlock", loadSound("PlaceBlock"));
+        _audioFiles.put("RemoveBlock", loadSound("RemoveBlock"));
     }
 
     private void loadMusic() {
@@ -99,9 +100,9 @@ public class AudioManager {
      * Stops all audio instances.
      */
     public void stopAllSounds() {
-       for (Audio a : _audioFiles.values()) {
+        for (Audio a : _audioFiles.values()) {
             a.stop();
-       }
+        }
     }
 
     /**

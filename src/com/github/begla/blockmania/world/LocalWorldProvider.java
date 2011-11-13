@@ -16,16 +16,16 @@
 package com.github.begla.blockmania.world;
 
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.generators.*;
+import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
+import com.github.begla.blockmania.generators.GeneratorManager;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkProvider;
 import com.github.begla.blockmania.world.chunk.LocalChunkCache;
 import javolution.util.FastList;
-import javolution.util.FastMap;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -46,19 +46,17 @@ import java.util.logging.Level;
  */
 public class LocalWorldProvider implements WorldProvider {
 
-    /* CHUNK PROVIDER */
-    protected final ChunkProvider _chunkProvider = new LocalChunkCache(this);
-
-    /* CONST */
-    protected final long DAY_NIGHT_LENGTH_IN_MS = (60 * 1000) * 20; // 20 minutes in milliseconds
-
     /* WORLD GENERATION */
-    protected final FastMap<String, ChunkGenerator> _chunkGenerators = new FastMap<String, ChunkGenerator>(8);
-    protected final FastMap<String, ObjectGenerator> _objectGenerators = new FastMap<String, ObjectGenerator>(8);
+    protected final GeneratorManager _generatorManager;
+
+    /* CHUNK PROVIDER */
+    protected final ChunkProvider _chunkProvider;
+    /* CONST */
+    protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) ConfigurationManager.getInstance().getConfig().get("World.dayNightLength");
 
     /* PROPERTIES */
     protected String _title, _seed;
-    protected long _creationTime = Blockmania.getInstance().getTime();
+    protected long _creationTime = Blockmania.getInstance().getTime() - 10000;
     public Vector3f _renderingOrigin = new Vector3f();
 
     /* RANDOMNESS */
@@ -71,16 +69,17 @@ public class LocalWorldProvider implements WorldProvider {
      * @param seed  The seed string used to generate the terrain
      */
     public LocalWorldProvider(String title, String seed) {
-        if (title == null) {
-            throw new IllegalArgumentException("No title provided.");
-        } else if (title.isEmpty()) {
-            throw new IllegalArgumentException("Empty title provided.");
-        }
 
         if (seed == null) {
             throw new IllegalArgumentException("No seed provided.");
         } else if (seed.isEmpty()) {
             throw new IllegalArgumentException("Empty seed provided.");
+        }
+
+        if (title == null) {
+            title = seed;
+        } else if (title.isEmpty()) {
+            title = seed;
         }
 
         _title = title;
@@ -92,18 +91,12 @@ public class LocalWorldProvider implements WorldProvider {
         // Load the meta data of this world
         loadMetaData();
 
-        // Init. generators
-        _chunkGenerators.put("terrain", new ChunkGeneratorTerrain(this));
-        _chunkGenerators.put("forest", new ChunkGeneratorFlora(this));
-        _chunkGenerators.put("resources", new ChunkGeneratorResources(this));
-        _objectGenerators.put("tree", new ObjectGeneratorTree(this));
-        _objectGenerators.put("pineTree", new ObjectGeneratorPineTree(this));
-        _objectGenerators.put("firTree", new ObjectGeneratorFirTree(this));
-        _objectGenerators.put("cactus", new ObjectGeneratorCactus(this));
+        _generatorManager = new GeneratorManager(this);
+        _chunkProvider = new LocalChunkCache(this);
     }
 
     /**
-     * Places a block of a specific type at a given position and refreshes the
+     * Places a block of a specific type at a given position and optionally refreshes the
      * corresponding light values.
      *
      * @param x           The X-coordinate
@@ -265,14 +258,26 @@ public class LocalWorldProvider implements WorldProvider {
      * @return The spawning point.
      */
     public Vector3f nextSpawningPoint() {
+        ChunkGeneratorTerrain tGen = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0));
+
         for (; ; ) {
-            int randX = (int) (_random.randomDouble() * 16000f);
-            int randZ = (int) (_random.randomDouble() * 16000f);
+            int randX = (int) (_random.randomDouble() * 32000f);
+            int randZ = (int) (_random.randomDouble() * 32000f);
 
-            double dens = ((ChunkGeneratorTerrain) getChunkGenerator("terrain")).calcDensity(randX, 32, randZ, ChunkGeneratorTerrain.BIOME_TYPE.PLAINS);
+            ChunkGeneratorTerrain.BIOME_TYPE type = tGen.calcBiomeTypeForGlobalPosition(randX, randZ);
 
-            if (dens >= 0.0 && dens < 64.0)
-                return new Vector3f(randX, 32, randZ);
+            if (type == ChunkGeneratorTerrain.BIOME_TYPE.FOREST) {
+
+                for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
+
+                    double dens = tGen.calcDensity(randX, y, randZ, ChunkGeneratorTerrain.BIOME_TYPE.FOREST);
+
+                    if (dens >= 0 && dens < 64)
+                        return new Vector3f(randX, y, randZ);
+                }
+
+
+            }
         }
     }
 
@@ -291,7 +296,7 @@ public class LocalWorldProvider implements WorldProvider {
      * @return The humidity
      */
     public double getHumidityAt(int x, int z) {
-        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcHumidityAtGlobalPosition(x, z);
+        return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcHumidityAtGlobalPosition(x, z);
     }
 
     /**
@@ -302,14 +307,14 @@ public class LocalWorldProvider implements WorldProvider {
      * @return The temperature
      */
     public double getTemperatureAt(int x, int z) {
-        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcTemperatureAtGlobalPosition(x, z);
+        return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcTemperatureAtGlobalPosition(x, z);
     }
 
     /*
     * Returns the biome type at the given position.
     */
     public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome(int x, int z) {
-        return ((ChunkGeneratorTerrain) _chunkGenerators.get("terrain")).calcBiomeTypeForGlobalPosition(x, z);
+        return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcBiomeTypeForGlobalPosition(x, z);
     }
 
     /**
@@ -344,6 +349,10 @@ public class LocalWorldProvider implements WorldProvider {
      */
     public ChunkProvider getChunkProvider() {
         return _chunkProvider;
+    }
+
+    public GeneratorManager getGeneratorManager() {
+        return _generatorManager;
     }
 
     /**
@@ -388,10 +397,6 @@ public class LocalWorldProvider implements WorldProvider {
      * @return True if saving was successful
      */
     public boolean saveMetaData() {
-        if (Configuration.getSettingBoolean("SANDBOXED")) {
-            return false;
-        }
-
         // Generate the save directory if needed
         File dir = new File(getWorldSavePath());
         if (!dir.exists()) {
@@ -437,10 +442,6 @@ public class LocalWorldProvider implements WorldProvider {
      * @return True if loading was successful
      */
     private boolean loadMetaData() {
-        if (Configuration.getSettingBoolean("SANDBOXED")) {
-            return false;
-        }
-
         File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));
 
         if (!f.exists())
@@ -522,25 +523,5 @@ public class LocalWorldProvider implements WorldProvider {
 
         Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
-    }
-
-    /**
-     * Returns the object generator for the given title.
-     *
-     * @param s The title
-     * @return The object generator
-     */
-    public ObjectGenerator getObjectGenerator(String s) {
-        return _objectGenerators.get(s);
-    }
-
-    /**
-     * Returns the chunk generator for the given title.
-     *
-     * @param s The title
-     * @return The chunk generator
-     */
-    public ChunkGenerator getChunkGenerator(String s) {
-        return _chunkGenerators.get(s);
     }
 }

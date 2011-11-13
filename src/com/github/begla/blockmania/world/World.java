@@ -18,14 +18,15 @@ package com.github.begla.blockmania.world;
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.Configuration;
+import com.github.begla.blockmania.main.ConfigurationManager;
+import com.github.begla.blockmania.rendering.RenderableScene;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
-import com.github.begla.blockmania.world.horizon.Clouds;
+import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL11;
@@ -53,7 +54,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class World {
+public final class World extends RenderableScene {
 
     /* WORLD PROVIDER */
     private WorldProvider _worldProvider;
@@ -68,7 +69,6 @@ public final class World {
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
 
     /* HORIZON */
-    private final Clouds _clouds;
     private final Skysphere _skysphere;
     protected double _daylight;
 
@@ -77,7 +77,7 @@ public final class World {
     private long _lastTick;
 
     /* UPDATING */
-    private final WorldUpdateManager _worldUpdateManager;
+    private final ChunkUpdateManager _chunkUpdateManager;
     private int prevChunkPosX = 0, prevChunkPosZ = 0;
 
     /* EVENTS */
@@ -93,35 +93,13 @@ public final class World {
         _worldProvider = new LocalWorldProvider(title, seed);
 
         // Init. horizon
-        _clouds = new Clouds(this);
         _skysphere = new Skysphere(this);
 
-        _worldUpdateManager = new WorldUpdateManager();
+        _chunkUpdateManager = new ChunkUpdateManager();
+
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
 
         createMusicTimeEvents();
-    }
-
-    /**
-     * Renders the world.
-     */
-    public void render() {
-        /* SKYSPHERE */
-        _player.getActiveCamera().lookThroughNormalized();
-        _skysphere.render();
-
-        /* WORLD RENDERING */
-        _player.getActiveCamera().lookThrough();
-
-        _player.render();
-
-        renderChunks();
-
-        /* CLOUDS */
-        _clouds.render();
-
-        /* PARTICLE EFFECTS */
-       _blockParticleEmitter.render();
     }
 
     /**
@@ -131,13 +109,17 @@ public final class World {
      */
     private boolean updateChunksInProximity() {
         if (prevChunkPosX != calcPlayerChunkOffsetX() || prevChunkPosZ != calcPlayerChunkOffsetZ()) {
+
             prevChunkPosX = calcPlayerChunkOffsetX();
             prevChunkPosZ = calcPlayerChunkOffsetZ();
 
             FastList<Chunk> newChunksInProximity = new FastList<Chunk>();
 
-            for (int x = -(Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x < (Configuration.getSettingNumeric("V_DIST_X").intValue() / 2); x++) {
-                for (int z = -(Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z < (Configuration.getSettingNumeric("V_DIST_Z").intValue() / 2); z++) {
+            int viewingDistanceX = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX");
+            int viewingDistanceZ = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ");
+
+            for (int x = -(viewingDistanceX / 2); x < (viewingDistanceX / 2); x++) {
+                for (int z = -(viewingDistanceZ / 2); z < (viewingDistanceZ / 2); z++) {
                     Chunk c = _worldProvider.getChunkProvider().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
                     newChunksInProximity.add(c);
                 }
@@ -156,17 +138,18 @@ public final class World {
      */
     private void updateDaylight() {
         double time = _worldProvider.getTime() % 1;
+        double sunRiseSetDuration = (Double) ConfigurationManager.getInstance().getConfig().get("World.sunRiseSetDuration");
 
         // Sunrise
-        if (time < Configuration.SUN_RISE_SET_DURATION && time > 0.0f) {
-            _daylight = time / Configuration.SUN_RISE_SET_DURATION;
-        } else if (time >= Configuration.SUN_RISE_SET_DURATION && time <= 0.5f) {
+        if (time < sunRiseSetDuration && time > 0.0f) {
+            _daylight = time / sunRiseSetDuration;
+        } else if (time >= sunRiseSetDuration && time <= 0.5f) {
             _daylight = 1.0f;
         }
 
         // Sunset
-        if (time > 0.5 - Configuration.SUN_RISE_SET_DURATION && time < 0.5f) {
-            _daylight = (0.5f - time) / Configuration.SUN_RISE_SET_DURATION;
+        if (time > 0.5 - sunRiseSetDuration && time < 0.5f) {
+            _daylight = (0.5f - time) / sunRiseSetDuration;
         } else if (time >= 0.5 && time <= 1.0f) {
             _daylight = 0.0f;
         }
@@ -211,9 +194,9 @@ public final class World {
      */
     public FastList<Chunk> fetchVisibleChunks() {
         FastList<Chunk> result = new FastList<Chunk>();
-        FastList<Chunk> chunksInPromity = _chunksInProximity;
+        FastList<Chunk> chunksInProximity = _chunksInProximity;
 
-        for (FastList.Node<Chunk> n = chunksInPromity.head(), end = chunksInPromity.tail(); (n = n.getNext()) != end; ) {
+        for (FastList.Node<Chunk> n = chunksInProximity.head(), end = chunksInProximity.tail(); (n = n.getNext()) != end; ) {
             Chunk c = n.getValue();
 
             if (isChunkVisible(c)) {
@@ -227,6 +210,27 @@ public final class World {
 
         return result;
     }
+
+    /**
+     * Renders the world.
+     */
+    public void render() {
+        /* SKYSPHERE */
+        _player.getActiveCamera().lookThroughNormalized();
+        _skysphere.render();
+
+        /* WORLD RENDERING */
+        _player.getActiveCamera().lookThrough();
+
+        _player.render();
+        renderChunks();
+
+        /* PARTICLE EFFECTS */
+        _blockParticleEmitter.render();
+
+        super.render();
+    }
+
 
     /**
      * Renders the chunks.
@@ -255,8 +259,7 @@ public final class World {
 
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
 
-
-            if (Configuration.getSettingBoolean("CHUNK_OUTLINES")) {
+            if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
                 c.getAABB().render();
             }
         }
@@ -315,37 +318,35 @@ public final class World {
         // Update the horizon
         updateDaylight();
         _skysphere.update();
-        _clouds.update();
 
         // Update the player
         _player.update();
 
         // Update the list of relevant chunks
         updateChunksInProximity();
-        // And fetch those chunks that are in sight of the player
-        FastList<Chunk> visibleChunks = fetchVisibleChunks();
 
-        // Update chunks
-        for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
-            // Queue dirty chunks for updating
-            if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
-                _worldUpdateManager.queueChunkUpdate(n.getValue());
+        // Update visible chunks
+        for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; ) {
+            if (n.getValue().isVisible()) {
+                if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
+                    _chunkUpdateManager.queueChunkUpdate(n.getValue(), false);
+                    continue;
+                }
+
+                n.getValue().update();
             }
-
-            n.getValue().update();
         }
 
         // Update the particle emitters
         _blockParticleEmitter.update();
-
-        // Generate new VBOs if available
-        _worldUpdateManager.updateVBOs();
 
         // Free unused space
         _worldProvider.getChunkProvider().freeUnusedSpace();
 
         // And finally fire any active events
         _worldTimeEventManager.fireWorldTimeEvents();
+
+        super.update();
     }
 
     /**
@@ -366,7 +367,7 @@ public final class World {
      * @return The maximum height
      */
     public final int maxHeightAt(int x, int z) {
-        for (int y = (int) Configuration.CHUNK_DIMENSIONS.y - 1; y >= 0; y--) {
+        for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
             if (_worldProvider.getBlock(x, y, z) != 0x0)
                 return y;
         }
@@ -380,7 +381,7 @@ public final class World {
      * @return The player offset on the x-axis
      */
     private int calcPlayerChunkOffsetX() {
-        return (int) (_player.getPosition().x / Configuration.CHUNK_DIMENSIONS.x);
+        return (int) (_player.getPosition().x / Chunk.getChunkDimensionX());
     }
 
     /**
@@ -389,7 +390,7 @@ public final class World {
      * @return The player offset on the z-axis
      */
     private int calcPlayerChunkOffsetZ() {
-        return (int) (_player.getPosition().z / Configuration.CHUNK_DIMENSIONS.z);
+        return (int) (_player.getPosition().z / Chunk.getChunkDimensionZ());
     }
 
     /**
@@ -398,7 +399,12 @@ public final class World {
      * @param p The player
      */
     public void setPlayer(Player p) {
+        if (_player != null) {
+            _player.unregisterObserver(_chunkUpdateManager);
+        }
+
         _player = p;
+        _player.registerObserver(_chunkUpdateManager);
 
         _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
         _player.reset();
@@ -415,7 +421,7 @@ public final class World {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, vbo-updates: %d, cache: %d, cu-duration: %fs, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _worldUpdateManager.getVboUpdatesSize(), _worldProvider.getChunkProvider().size(), _worldUpdateManager.getAverageUpdateDuration() / 1000d, _worldProvider.getSeed(), _worldProvider.getTitle());
+    return String.format("world (biome: %s, time: %f, sun: %f, cache: %d, cu-duration: %fms, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {
