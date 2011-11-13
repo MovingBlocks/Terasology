@@ -16,15 +16,24 @@
 package com.github.begla.blockmania.world.horizon;
 
 import com.github.begla.blockmania.rendering.RenderableObject;
+import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.rendering.ShaderManager;
+import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
-
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.Random;
+import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import static org.lwjgl.opengl.GL11.*;
+import com.github.begla.blockmania.noise.PerlinNoise;
 
 /**
  * @author Anthony Kireev <adeon.k87@gmail.com>
@@ -36,10 +45,14 @@ public class Skysphere implements RenderableObject {
     /* SKY */
     private float _turbidity = 10.0f, _sunPosAngle = 0.1f;
     private Vector3f _zenithColor = new Vector3f();
-    private World _parent;
 
+    /*Stars*/
+    public static IntBuffer textureId       = BufferUtils.createIntBuffer(1);
+    private World _parent;
+    
     public Skysphere(World parent) {
         _parent = parent;
+        loadStarTextures();
     }
 
     private void drawSphere() {
@@ -62,8 +75,9 @@ public class Skysphere implements RenderableObject {
             return;
 
         glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
-
+        glDisable(GL_DEPTH_TEST); 
+        glEnable(GL13.GL_TEXTURE_CUBE_MAP);
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
         _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         sunNormalise = sunNormalise.normalise(null);
@@ -71,20 +85,24 @@ public class Skysphere implements RenderableObject {
         _zenithColor = getAllWeatherZenith(sunNormalise.y);
 
         ShaderManager.getInstance().enableShader("sky");
-
+        
         int sunPos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunPos");
         GL20.glUniform4f(sunPos, 0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
+        
+        int time = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "time");
+        GL20.glUniform1f(time, (float) _parent.getWorldProvider().getTime());
 
+        int sunAngle = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunAngle");
+        GL20.glUniform1f(sunAngle, _sunPosAngle);
+        
         int turbidity = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "turbidity");
         GL20.glUniform1f(turbidity, _turbidity);
 
         int zenith = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "zenith");
         GL20.glUniform3f(zenith, _zenithColor.x, _zenithColor.y, _zenithColor.z);
-
         drawSphere();
-
         ShaderManager.getInstance().enableShader(null);
-
+        glDisable(GL13.GL_TEXTURE_CUBE_MAP);
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }
@@ -124,5 +142,31 @@ public class Skysphere implements RenderableObject {
 
     public float getTurbidity() {
         return _turbidity;
+    }
+    
+    private void loadStarTextures() {
+        int internalFormat = GL11.GL_RGBA8,
+                format = GL12.GL_BGRA;
+
+        GL11.glGenTextures(textureId);
+
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
+
+        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL12.GL_TEXTURE_WRAP_R, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+
+        for (int i = 0; i < 6; i++) {
+
+            byte[] data = TextureManager.getInstance().getTexture("stars" + (i+1)).getTextureData();
+            ByteBuffer byteBuffer = BufferUtils.createByteBuffer(data.length);
+            byteBuffer.put(data);
+            byteBuffer.flip();
+
+            GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, 256, 256,
+                    0, format, GL11.GL_UNSIGNED_BYTE, byteBuffer);
+        }
     }
 }

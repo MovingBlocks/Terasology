@@ -29,13 +29,21 @@ import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import javolution.util.FastList;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.glu.GLUtessellator;
+import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
 
 import static org.lwjgl.opengl.GL11.*;
+
+/*Test*/
+
 
 /**
  * The world of Blockmania. At its most basic the world contains chunks (consisting of a fixed amount of blocks)
@@ -413,7 +421,7 @@ public final class World extends RenderableScene {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, sun: %f, cache: %d, cu-duration: %fms, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _worldProvider.getSeed(), _worldProvider.getTitle());
+    return String.format("world (biome: %s, time: %f, sun: %f, cache: %d, cu-duration: %fms, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {

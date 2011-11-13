@@ -1,5 +1,1977 @@
+<<<<<<< HEAD
+<?php
+$text = "
+Nexen Winguard 231
+Sava Eskimo S3 MS
+Tigar Winter 1
+Tigar Sigura
+Tigar Sigura Stud
+Sava Intensa HP
+Nexen Winguard SUV
+Sumo Firenza ST-08
+Tigar Hitris
+Nexen Winguard SPORT
+Нижнекамскшина Кама-Евро-129
+Sava Intensa UHP
+Westlake Tyres SU307
+Roadstone N2000
+Tri Ace Formula 1
+Tigar CargoSpeed
+Tigar CargoSpeed Winter
+Roadstone Roadian HP (SUV)
+Nexen Roadian HP SUV
+Nexen Winguard
+Tigar Prima
+Sava Trenta
+Tigar Syneris
+Нижнекамскшина Кама-Евро-519
+Triangle Group TR968
+Roadstone N3000
+Nexen N2000
+Triangle Group TR918
+Nitto NT555
+Sonar SX-1 EVO
+Vredestein Wintrac Xtreme
+Sava Eskimo HP
+Sava Perfecta
+Sava Adapto HP
+Sumo Akina ST-09
+Triangle Group TR777
+Uniroyal Rallye 4x4 Street
+Sailun Ice Blazer WST1
+Sava Intensa
+Sava Eskimo ICE
+Triangle Group TR258
+Uniroyal MS Plus 66
+Nitto SN 2 Winter
+Sumo Firenza ST-05A
+Нижнекамскшина Кама-204
+Nexen Roadian H/T(SUV)
+Sonny SU-800
+Nankang Snow Viva SV-1
+Roadstone Winguard 231
+Нижнекамскшина Кама-Евро-236
+Нижнекамскшина Кама-505
+Нижнекамскшина Kама-Euro LCV-131
+Pro Comp Firenza ST-07
+Sailun Atrezzo SH402
+Nitto Neo Gen
+Nitto Invo
+Roadstone Winguard SUV
+Vredestein Ultrac Sessanta
+Tunga Extreme Contact
+Roadstone Winguard SPORT
+Triangle Group TR978
+Westlake Tyres SW601
+Triangle Group TR928
+Vredestein Sportrac 3
+Roadstone Winguard
+Roadstone N9000
+Nexen N9000
+Vredestein Hi-Trac
+Vredestein Ultrac
+Roadstone N5000
+Westlake Tyres SA05
+Нижнекамскшина Кама-515
+Uniroyal RainSport 2
+Nankang SN-1
+Vredestein Ultrac Cento
+Vredestein Quatrac 3
+Vredestein T-Trac
+Uniroyal MS Plus 6
+Thunderer Mach III
+Vredestein SnowTrac 2
+Нижнекамскшина Кама-218
+Nankang SV-2
+Uniroyal MS Plus 55
+Vredestein Wintrac 4 Xtreme
+Vredestein SnowTrac 3
+Nankang SW-7
+Sonar SX-1
+Nitto NT420S
+Нижнекамскшина Кама-Flame
+Westlake Tyres SW602
+Roadstone Roadian HT (SUV)
+Uniroyal MS Plus 5
+Uniroyal Laredo AWT
+Nankang NS-1
+Uniroyal RainExpert
+Westlake Tyres SP06
+Uniroyal Snow Max
+Sonny SU-810
+Sava Trenta M+S
+Semperit Speed Comfort
+Wanli S-1088
+Nankang XR-611
+Nexen EURO-WIN 650
+Sonny Majrois M5
+Wanli S-1086
+Нижнекамскшина Кама-217
+Mickey Thompson Baja MTZ Radial
+Nankang N-990
+Nankang SP-7
+Sailun Commercio VXI
+Nexen EURO-WIN 700
+Vredestein Ultrac SUV Sessanta
+Tigar TG 621
+Нижнекамскшина И-520
+Sumitomo HTR Z II
+Uniroyal Radial A-S
+Vredestein Comtrac
+VSP C001
+Нижнекамскшина Кама-205
+Viatti Brina V-521
+Нижнекамскшина Кама-230
+Vredestein Sportrac 2
+Thunderer Mach I
+Rosava WQ-102
+Нижнекамскшина И-511
+Нижнекамскшина Кама-Евро-518
+Нижнекамскшина Кама-301
+Нижнекамскшина Кама-Евро-224
+Нижнекамскшина Кама-503
+Нижнекамскшина Кама-214
+Wanli Snowgrip
+Vredestein Quatrac 3 SUV
+Nexen N5000
+Нижнекамскшина Кама-208
+Mickey Thompson Baja ATZ Radial Plus
+Nexen EURO-WIN 550
+Sonny Ingens A1
+Nankang SW-5
+Rosava SQ-201
+Westlake Tyres SV308
+Mickey Thompson Baja ATZ Radial
+Нижнекамскшина Я-245-1
+SUNNY SN3860
+Нижнекамскшина Кама-232
+Vredestein Nord-Trac
+VSP W001
+Zeetex Ice-Plus S-100
+Волтайр Вл-54
+Нижнекамскшина Кама-231
+Нижнекамскшина Кама-219
+Vredestein ArcTrac
+Pro Comp All Terrain
+Sumo Firenza SV-053
+Triangle Group TR645
+Roadstone Classe Premiere
+Trayal T-200
+Nexen EURO-WIN 600
+Nankang NS-2
+Нижнекамскшина И-502
+Нижнекамскшина И-359
+Uniroyal RainSport 1
+Triangle Group TR643
+Uniroyal Touring Trak A/S
+Nexen Classe Premiere 661
+Волтайр ВлИ-5
+Nexen Winguard Ice
+Nexen Classe Premiere
+Нижнекамскшина Кама-Евро-517
+Vredestein Nord-Trac Xtreme
+Нижнекамскшина Кама-Евро-228
+Волтайр VS-22
+Rosava WQ-101
+Sonar SX-2
+Нижнекамскшина Кама-221
+Nexen N7000
+ЯШЗ Я-555
+Нижнекамскшина Kама-Euro LCV-520
+Sportiva Snow Win
+ЯШЗ Я-380
+Sava Intensa SUV
+Нижнекамскшина Кама-234
+Nexen Roadian 542
+Roadstone EURO-WIN 550
+Roadstone SB-702
+Мастер-Спорт HP-2000
+Vredestein Sprint Classic
+Uniroyal MS Plus 44
+SilverStone ESTIVA X5
+Нижнекамскшина Кама-235
+Vredestein Icetrac
+Mickey Thompson Baja Claw Radial
+ЯШЗ Я-435А
+Sava Eskimo SUV
+Nexen N6000
+ZETA ZTR10
+Nitto NT850
+Neuton NT5000
+Minerva Stud
+Sumitomo HTR 200
+Sagitar P307
+Roadstone Classe Premiere 661
+Vredestein Quatrac 2
+Uniroyal Rallye 550
+Thunderer Ranger 007 R601
+Wanli S-1063
+Premiorri Solazo
+Wanli S-1200
+Sonny WOT 18
+Tunga Master
+Днепрошина Samurai
+Uniroyal Rallye 680
+ЯШЗ Я-462
+Nexen Classe Premiere 321
+SilverStone AT-117 Special
+Roadstone EURO-WIN 600
+Rosava BC-49
+Starfire RS-C 2.0
+SilverStone Synergy M3
+Nexen Classe Premiere 662
+ЯШЗ Я-538
+Pro Comp Mud Terrain
+Nankang SP-5
+ЯШЗ Я-400
+Rosava BC-40
+ZETA ZTR20
+ЯШЗ Я-512
+Nexen SB702
+Zeetex HP102
+Uniroyal RainMax
+Roadstone Classe Premiere 641
+Nankang CX-668
+Westlake Tyres H600
+Roadstone Roadian M/T
+Sportiva T70
+Sonny SU-832
+Rotex H2000
+Nexen SB602
+Sava Effecta
+Nexen N8000
+Nexen SB650
+Wanli S-1097
+Wanli S-1015
+КШЗ К-181 Баргузин
+Волтайр VS-1
+Нижнекамскшина Кама-Евро-127*
+Нижнекамскшина Кама-Nikola
+Омскшина Я-192
+Омскшина Я-245
+Nankang SL-6
+Nexen SB802
+Nitto Terra Grappler
+Nexen Classe Premiere 521
+Nitto NT05
+КШЗ К-161
+Wanli S-2023
+Roadstone SV820
+Rosava WQ-103
+ЯШЗ Я-569
+Днепрошина Pioneer
+Nexen Radial A/T(RV)
+Uniroyal Rallye 440
+PointS Winterstar
+Nankang N-810
+VSP P001
+Milestone Revolution
+Sonny SMT A8
+Vredestein Comtrac Winter
+Sumitomo SC910
+Rosava BC-44
+Nitto NT01
+МШЗ М-288 Buran
+КШЗ К-156-1
+Белшина БИ-391
+Rosava Бц-20
+КШЗ К-156
+Белшина БИ-308
+КШЗ К-202
+Белшина Бел-109
+Волтайр VS-5
+Белшина БИ-522
+КШЗ К-153
+Rosava Бц-1
+Rosava Бц-48
+КШЗ К-151
+КШЗ К-175
+Tigar TG 725
+КШЗ К-214
+Rosava Бц-11
+Vredestein Comtrac Ice
+Белшина Бел-100
+Roadstone Winguard Ice
+КШЗ К-192
+Nexen Roadian 571
+Sava Eskimo S2 MS
+Белшина Бел-99
+Rosava Бц-24
+Уралшина К-135
+КШЗ К-174
+Uniroyal Rallye 380
+Sagitar P607
+Белшина Бел-121
+Nankang S-600
+Rosava Бц-10
+Nexen Roadian A/T
+Воронеж-шина ВИ-12
+Волтайр ВлИ-391
+Nankang FT-4
+Roadstone Roadian A/T II
+Nitto NT555 Extreme ZR
+Rosava Бц-43
+Pro Comp Xterrain Radial
+Roadstone EURO-WIN 700
+Sonny Sierra S6
+Vredestein Snowtrac
+Rosava BC-52 Winter Sprint
+Нижнекамскшина Кама-Евро-225
+Rosava Бц-6
+Nexen SB652
+Rosava BC-11
+Nexen EURO-WIN 800
+SilverStone HT-778
+Wanli S-2010
+Westlake Tyres H110
+Nexen DH II-60
+Westlake Tyres H550
+SilverStone Powerblitz 1800
+Омскшина МР-51
+Roadstone Classe Premiere 321
+Wanli S-1099
+Sportiva W70
+Starfire RS-C 1.0
+Rosava Бц-46
+Roadstone SB-650
+Sava Eskimo S2 ICE
+Milestone Revo Plus
+Milestone Revo Sport
+Winter Tact WT 90
+Sportiva Z65
+Viking Pro-Tech II
+Rosava BC-46 Ledokol
+Nankang S-900
+Roadstone N7000
+Nankang CW-20
+Rotex Cargo Master 2
+Westlake Tyres H660
+Sportiva Z55
+Tracmax F101
+Нижнекамскшина Кама-518
+Roadstone EURO-WIN 650
+VSP V001
+Wanli S-2022
+Medeo Summer
+Minerva S210
+Nankang AS-1
+ЯШЗ Я-458
+Sumitomo HTR T4
+ЯШЗ Я-427
+Wanli S-1023
+Nitto Dura Grappler
+МШЗ М-234 Taganca
+Vredestein Wintrac H
+Rosava Бц-9
+Tigar Winter A
+Rosava BC-2
+Белшина БИ-555
+Белшина Бел-143
+Белшина Бел-127
+Алтайский шинный комбинат ВлИ-10
+Алтайский шинный комбинат ВлИ-5
+Белшина БИ-395
+Roadstone SB802
+Белшина Бел-137
+Rosava BC-54
+Nitto NT555R
+Белшина Бел-97
+Tigar TG 635
+Rosava Бц-23
+Tri Ace AT1
+Белшина Бел-113
+Rosava ОИ-297, С-1
+КШЗ К-176
+Алтайский шинный комбинат АИ-168У
+SilverStone MT-117 Sport
+Roadstone Dark Horse II-60
+Rosava LTW-301
+Белшина Бел-105
+Rosava BC-51 Orbita
+Алтайский шинный комбинат БР-102
+Rosava Бц-26
+Белшина Л5-1
+Westlake Tyres RVH680
+Rosava Я-245-1
+КШЗ К-189
+Белшина ОИ-297С-1
+Semperit Van Life
+Westlake Tyres H170
+Белшина Бел-24
+Белшина Бел-228
+Rotex V 2000
+Roadstone Roadian A/T
+Roadstone Dark Horse II-65
+Белшина Бел-177
+Sonny Fortis T5
+Winter Tact WT 80
+Winter Tact UG 4
+Winter Tact Snow + Ice
+PointS Summerstar 1
+Semperit IceGrip 2
+Sumitomo HTR H4
+Uniroyal MS plus Nordic
+Уралшина C-142*
+Roadstone EURO-WIN 800
+ЯШЗ Я-520
+Sportiva Z60
+Rosava BC-56
+Белшина Я-288Бел
+Rosava BC-55
+Rosava BC-53
+Sportiva G65 H
+Белшина НИИШП-Ралли
+Rosava Бц-18
+Sportiva T65
+Rosava BC-50
+Rosava BC-41
+КШЗ K-182A
+Roadstone SB-652
+Омскшина О-151
+Омскшина О-144
+Roadstone N6000
+Minerva Ecowinter SUV
+Омскшина О-158
+Pro Comp Xtreme M/T Radial
+Westlake Tyres H200
+SUNNY SN3890
+Rosava Бц-44
+Мастер-Спорт И-545 L
+Rosava BC-43
+Rosava Бц-19
+Мастер-Спорт И-292 МС-18
+Мастер-Спорт КХ-46
+Волтайр TVL-1
+Волтайр Вл-53
+Medeo All season
+ЯШЗ Я-553
+Nankang EX-601
+Nankang N-850
+Белшина Бел-117
+ЯШЗ Я-700
+Viking Stop 5000
+ЯШЗ Я-484
+Starperformer TNG HP
+Semperit Van Grip
+КШЗ К-158
+Омскшина O-132 Optima
+Белшина Бел-107
+SilverStone MT-117 Xtreme
+SilverStone Powerblitz 2000
+SilverStone Synergy M5
+Winter Tact WT 80+
+Winter Tact WT 70
+Wanli S-1031
+КШЗ К-178 Баргузин-2
+Нижнекамскшина Кама-578
+Омскшина Ои-506
+Semperit Ice Grip 3
+Sonny Mud Digger
+Syron Everest 1
+Westlake Tyres H700
+Мастер-Спорт BХ-65 МС-9
+Мастер-Спорт КХ-45 МС-8
+Белшина БИ-359
+Мастер-Спорт И-545 R
+Мастер-Спорт КХ-20 МС-4
+КШЗ К-201 Самсон
+Мастер-Спорт КХ-40 МС-5
+Wanli Winter Challenger S-2090
+Мастер-Спорт КХ-25 МС-6
+Нижнекамскшина Кама-501
+Белшина Бел-167
+Wanli S-1032
+Белшина Бел-171
+Wanli S-1093
+Мастер-Спорт КХ-35 МС-7
+КШЗ К-197
+Белшина Бел-11
+Rosava Бц-4
+Белшина БИ-508
+Rosava Бц-16
+Белшина Бел-123
+Sportiva Van Snow
+ЯШЗ Я-457
+Волтайр Я-245
+Nexen Roadian A/T II
+Rosava Бц-15
+Rosava Бц-40
+Белшина Бел-103
+Белшина Бел-24-1
+Алтайский шинный комбинат БС-1
+Nexen Classe Premiere 641
+Zeetex ZT 101
+Sonny SU-830
+Viking SnowTech
+Белшина Бел-81
+КШЗ К-196
+Белшина Л-5-Бел
+Волтайр О-147
+Nexen Roadian M/T
+Белшина Бел-78
+Белшина Бел-94
+ЯШЗ Я-411
+Sportiva Van
+Tunga Road
+Белшина Бел-119
+Roadstone N8000
+Sumitomo SC890
+Rosava Бц-49
+КШЗ К-152
+Белшина Бел-391
+Nankang FT-7
+Nankang N-890
+Nexen SV820
+Roadstone Radial A/T (Neo)
+Белшина Бел-157
+Nankang RX-615
+КШЗ K-139
+SUNNY SN3630
+КШЗ К-170
+SUNNY SN3830
+Nexen Radial A/T(4x4)
+Волтайр С-156
+Westlake Tyres SC301
+Tri Ace Steady-33
+Sava Adapto
+Simex Extreme Trekker
+Diplomat MS 
+Bridgestone Ice Cruiser 7000 
+Bridgestone Blizzak DM-V1 
+Bridgestone Blizzak Revo GZ
+Bridgestone Blizzak Revo2 
+Bridgestone Blizzak WS-60 
+Bridgestone Ice Cruiser 5000 
+Bridgestone Potenza RE001 Adrenalin
+Bridgestone Potenza S001 
+Bridgestone Dueler H/P Sport 
+Bridgestone Potenza RE050A 
+Bridgestone Dueler A/T D694 
+Bridgestone Turanza ER300  
+Bridgestone Blizzak DM-Z3 
+Bridgestone Sports Tourer MY-01  
+Bridgestone B250 
+Bridgestone Potenza RE050 
+Bridgestone Turanza ER30
+Bridgestone Dueler H/T D689  
+Bridgestone Blizzak WS-70
+Bridgestone Blizzak WS-70
+Bridgestone Dueler H/P D680 
+Bridgestone Blizzak Revo1 
+Bridgestone Blizzak LM-60
+Bridgestone Dueler H/T D687 
+Bridgestone Dueler H/T D684  
+Bridgestone RD713
+Bridgestone Blizzak WS-50
+Bridgestone Noranza 
+Bridgestone Dueler A/T 695 
+Bridgestone Dueler H/T D840 
+Bridgestone Noranza 2  
+Bridgestone Blizzak Nordic
+Bridgestone Blizzak RFT  
+Bridgestone Blizzak LM-25 
+Bridgestone Potenza RE92 
+Bridgestone Ecopia EP100A 
+Bridgestone Blizzak W800
+Bridgestone RD613 Steel 
+Bridgestone WT14 
+Bridgestone Potenza RE760 Sport 
+Bridgestone Blizzak LM-80
+Bridgestone Blizzak LM-30 
+Bridgestone Turanza ER33 
+Bridgestone R623
+Bridgestone Duravis R630  
+Bridgestone Dueler H/L 400
+Bridgestone Potenza G019 Grid  
+Bridgestone Blizzak LM-25 4x4 
+Bridgestone Ecopia EP100 
+Bridgestone Potenza RE031  
+Bridgestone Noranza Van  
+Bridgestone Blizzak LM-32 
+Bridgestone Blizzak LM-20
+Bridgestone Ecopia EP150 
+Bridgestone B381 
+Bridgestone B700AQ 
+Bridgestone Potenza S03 
+Bridgestone Dueler M/T D673  
+Bridgestone Blizzak LM-18
+Bridgestone Blizzak MZ-03
+Bridgestone Turanza EL42
+Bridgestone Blizzak LM-22 
+Bridgestone Dueler H/L Alenza
+Bridgestone Blizzak W965  
+Bridgestone B330
+Bridgestone Dueler HTS D686 
+Bridgestone Insignia SE200 
+Bridgestone B650AQ
+Bridgestone Turanza EL400 
+Bridgestone M723
+Bridgestone Potenza GIII  
+Bridgestone Winter Dueler DM-Z2
+Bridgestone Turanza ER-50 S&S AQ 
+Bridgestone WT17
+Bridgestone Winterforce  
+Bridgestone B390 
+Bridgestone Potenza RE080 
+Bridgestone Turanza ER42
+Bridgestone B340 
+Bridgestone B371 
+Bridgestone Potenza RE750  
+Bridgestone Potenza S02  
+Bridgestone Expedia S-01  
+Bridgestone Dueler H/L D683
+Bridgestone Potenza RE950  
+Bridgestone B391
+Bridgestone Dueler H/T 684II 
+Bridgestone Turanza GR80 
+Bridgestone Turanza EL41  
+Bridgestone Potenza RE11  
+Bridgestone Potenza RE88 
+Bridgestone Potenza RE010  
+Bridgestone SF-226
+Bridgestone B70 
+Bridgestone WT12 
+Bridgestone ER3XZ 
+Bridgestone Dueler A/T RH-S 
+Bridgestone Dueler H/T D688 
+Bridgestone Dueler H/T 470  
+Bridgestone Blizzak LM-50  
+Bridgestone Dueler DM-01  
+Bridgestone Blizzak LM-35
+Bridgestone Potenza RE070
+
+Continental ContiIceContact
+Continental ContiVikingContact 
+Continental ContiPremiumContact 
+Continental ContiSportContact 
+Continental ContiCrossContact Winter
+Continental ContiCrossContact UHP
+Continental ContiWinterContact TS 810
+Continental ContiSportContact 2 
+Continental ContiCrossContact Viking 
+Continental ContiWinterViking 2 
+Continental Conti4x4Contact 
+Continental ContiCrossContact LX 
+Continental Conti4x4WinterContact  
+Continental ContiVikingContact 3 
+Continental ContiEcoContact 3 
+Continental ContiWinterContact TS 830 P 
+Continental ContiPremiumContact 
+Continental ContiWinterContact TS 830 
+Continental ContiWinterContact TS 790 
+Continental VancoIceContact  
+Continental ContiSportContact 
+Continental ContiWinterContact TS 800 
+Continental ContiCrossContact AT
+Continental ContiSportContact 5 
+Continental ExtremeWinterContact
+Continental Vanco 2  
+Continental Conti4x4IceContact 
+Continental ExtremeContact DWS 
+Continental Vanco 
+Continental Conti4x4SportContact 
+Continental VancoWinter 2 
+Continental ContiWinterContact TS 780 
+Continental VancoViking
+Continental ComfortContact - 1  
+Continental ContiCrossContact LX Sport 
+Continental ContiSportContact 5P
+Continental ContiEcoContact 5 
+Continental Vanco Four Season
+Continental Vanco 
+Continental ContiEcoContactEP 
+Continental VancoContact
+Continental VancoFourSeason 2 
+Continental VancoEco 
+Continental VancoVikingContact  
+Continental ExtremeContact DW  
+Continental VancoVikingContact 2 
+Continental ContiWinterContact TS760  
+Continental ContiPremiorriProContact
+Continental VancoContact 2 
+Continental VancoWinterContact  
+Continental ContiWinterContact TS 790v
+Continental ContiTrac SUV
+Continental ContiExtremeContact  
+Continental VancoCamper 
+Continental ContiEcoContactCP  
+Continental ContiSportContact M3
+Continental ContiWinterContact TS 770 
+Continental ContiTrac
+Continental Vanco 6  
+Continental ContiPremierContact  
+Continental ContiWinterContact TS 750 
+Continental Vanco 10 
+Continental ContiTrac AT 
+Continental ContiWinterContact TS 810 Sport 
+Continental ContiWinterViking 1 
+Continental Contrans RT 750 
+Continental ContiWorldContact  
+Continental LMS70  
+Continental ContiVancoContact 
+Continental Contrans LS23 
+Continental Contrans LS22 
+Dunlop Graspic DS3 
+Dunlop SP Winter ICE 01 
+Dunlop Grandtrek SJ6
+Dunlop SP Winter Sport 400
+Dunlop SP Winter Sport 3D 
+Dunlop SP Sport LM703
+Dunlop SP Sport Maxx
+Dunlop SP Sport Maxx TT 
+Dunlop SP Sport 9000 
+Dunlop Grandtrek AT3
+Dunlop Direzza DZ101
+Dunlop SP Winter Sport M3
+Dunlop SP Winter Response
+Dunlop Grandtrek PT2 
+Dunlop Grandtrek SJ5
+Dunlop SP Sport FastResponse
+Dunlop Graspic DS2 
+Dunlop Eco EC 201 
+Dunlop SP Winter Sport 4D  
+Dunlop SP Sport 01
+Dunlop SP Sport 270 
+Dunlop SP Sport Maxx GT  
+Dunlop Grandtrek ST20
+Dunlop Grandtrek AT20 
+Dunlop Grandtrek AT2
+Dunlop SP QuattroMaxx 
+Dunlop SP Sport 2050 
+Dunlop SP StreetResponse  
+Dunlop Grandtrek Touring A/S
+Dunlop Grandtrek MT2 
+Dunlop Grandtrek PT1  
+Dunlop SP Sport 230 
+Dunlop Grandtrek WT M3 
+Dunlop SP Sport Maxx A1
+Dunlop Grandtrek AT22 
+Dunlop SP Winter Sport M2
+Dunlop SP Sport LM702 
+Dunlop Grandtrek SJ4
+Dunlop SP Sport FM901
+Dunlop SP 490  
+Dunlop SP 31 
+Dunlop SP Sport 2030 
+Dunlop Grandtrek ST 8000 
+Dunlop SP Sport 5000
+Dunlop SP Sport 300  
+Dunlop Grandtrek MT1
+Dunlop SP Sport 200 
+Dunlop SP Sport 01A
+Dunlop SP Sport 2000 
+Dunlop Grandtrek AT23
+Dunlop SP LT 5 
+Dunlop SP LT 30  
+Dunlop SP Ice Response
+Dunlop SP Sport 3000 
+Dunlop SP Sport 7000
+Dunlop Grandtrek ST30
+Dunlop SP Sport 601
+Dunlop Grandtrek ST1
+Dunlop SP Sport 600
+Dunlop Grandtrek PT 4000 
+Dunlop Grandtrek PT 9000
+Dunlop SP Sport 3000A 
+Dunlop Graspic DS1
+Dunlop SP LT 60  
+Dunlop SP Sport LM701
+Dunlop Rover A/T
+Dunlop Grandtrek WT M2
+Dunlop Grandtrek TG28 
+Dunlop SP Sport 8000 
+Dunlop SP Sport Maxx A  
+Dunlop SP LT 800 
+Dunlop Direzza Sport Z1 Star Spec
+Dunlop SP All Season M2
+Dunlop SP 175  
+Dunlop SP 4 All Seasons 
+Dunlop SP Snow 99
+Dunlop Dignos D-01
+Dunlop SP 30  
+Dunlop SP Sport 7000 A/S 
+Dunlop SP Sport Signature 
+Dunlop SP 65 
+Dunlop Grandtrek TG30 
+Dunlop Grandtrek TG4 
+Dunlop Grandtrek TG29
+Dunlop LM J-CINQ 
+Dunlop Grandtrek TG32
+Dunlop SP RV-Major TG 3  
+Dunlop SP Sport 2000E 
+Dunlop SP LT 8 
+Dunlop Grandtrek AT21 
+Dunlop SP Sport 2020E 
+Dunlop SP 10
+Goodyear Ultra Grip Extreme
+Goodyear UltraGrip Ice+
+Goodyear Ultra Grip 500 
+Goodyear EfficientGrip 
+Goodyear Ultra Grip 
+Goodyear Ultra Grip Performance 
+Goodyear Vector 4Seasons
+Goodyear Ice Navi Zea
+Goodyear Ultra Grip 8 
+Goodyear OptiGrip 
+Goodyear Eagle UG GW-3 
+Goodyear Eagle F1 GS-D3 
+Goodyear Excellence 
+Goodyear Wrangler HP All Weather 
+Goodyear Eagle F1 Asymmetric 
+Goodyear Cargo Ultra Grip
+Goodyear Ultra Grip Ice Navi Zea
+Goodyear Duragrip  
+Goodyear Wrangler AT/SA 
+Goodyear Wrangler HP 
+Goodyear Ultra Grip Performance 2  
+Goodyear Wrangler SilentArmor
+Goodyear Wrangler Ultra Grip 
+Goodyear Eagle LS 2  
+Goodyear Wrangler F1
+Goodyear Wrangler DuraTrac 
+Goodyear Wrangler AT/R 
+Goodyear Eagle F1 Asymmetric 2  
+Goodyear Ice Navi NH
+Goodyear Ultra Grip 7 plus 
+Goodyear Wrangler F1 WRL-2 
+Goodyear Eagle NCT5 
+Goodyear Fortera TripleTred
+Goodyear Cargo Ultra Grip 2
+Goodyear Cargo Marathon 
+Goodyear Eagle RS-A 
+Goodyear Cargo Vector 2 
+Goodyear Cargo Vector 
+Goodyear Vector 5 plus 
+Goodyear Ultra Grip Ice 
+Goodyear Wrangler MT/R  
+Goodyear Vector 5  
+Goodyear GT 3  
+Goodyear Cargo G26  
+Goodyear Ultra Grip 7 
+Goodyear Eagle Ventura 
+Goodyear Cargo G91
+Goodyear Integrity  
+Goodyear Cargo G28 
+Goodyear Eagle GT 
+Goodyear Ultra Grip Ice Navi Neo 
+Goodyear Eagle GT2 
+Goodyear Eagle Ultra Grip 
+Goodyear Eagle F1 Asymmetric SUV  
+Goodyear Eagle UG GW-2
+Goodyear Eagle GS-C
+Goodyear Wrangler SR/A  
+Goodyear Eagle LS 
+Goodyear Eagle Vector EV-2 
+Goodyear Assurance Fuel Max 
+Goodyear GT 2 
+Goodyear Wrangler ST 
+Goodyear Ultra Grip 6 
+Goodyear Eagle F1 A/S-C
+Goodyear Fortera HL  
+Goodyear Duraplus 
+Goodyear Ultra Grip 5  
+Goodyear Wrangler RT/S
+Goodyear Eagle F1 GS-D2
+Goodyear Cargo Ultra Grip G124 
+Goodyear HydraGrip 
+Goodyear Eagle ResponsEdge 
+Goodyear Wrangler S4 
+Goodyear Wrangler TD
+Goodyear Wrangler Radial
+Goodyear Assurance ComforTred 
+Goodyear Viva 2 
+Goodyear Eagle F1 All Season  
+Goodyear Eagle ZR Gatorback 
+Goodyear Wrangler AT/S
+Goodyear Eagle F1 Supercar
+Hankook Winter i*Pike W409 
+Hankook I Cept W605 
+Hankook Ventus V12 evo K110
+Hankook Ventus ST RH06
+Hankook Dynapro HP RA23 
+Hankook i*pike RW11 
+Hankook Ventus Prime K105
+Hankook Winter I*Cept Evo W310 
+Hankook DynaPro ATM RF10 
+Hankook Ventus S1 evo K107 
+Hankook Optimo K715 
+Hankook Optimo K415 
+Hankook Optimo 4S H730 
+Hankook DynaPro i*cept RW08
+Hankook Icebear W300
+Hankook Winter RW06 
+Hankook Radial RA08 
+Hankook Icebear W440
+Hankook Dynapro MT RT03 
+Hankook Ventus R-S3 Z222 
+Hankook Ventus AS RH07 
+Hankook Ventus R-S2 Z212
+Hankook Zovac HP W401 
+Hankook Dynapro HL RA25
+Hankook Winter i*Pike LT RW09 
+Hankook Optimo H724
+Hankook DynaPro AT RF08
+Hankook Ventus V2 Concept H437 
+Hankook IceBear W604
+Hankook Centum K702
+Hankook Optimo K406 
+Hankook DynaPro AT-A RF09 
+Hankook Centum H720 
+Hankook Ventus Sport K104
+Hankook Ventus HR II H405 
+Hankook Winter Radial W404 
+Hankook Ventus V4 ES H105
+Hankook Radial RA14 
+Hankook Radial RA10
+Hankook Winter Radial W400
+Hankook Icebear W300A  
+Hankook Optimo Kinergy Eco K425
+Hankook Ventus K102 
+Hankook Radial K106 
+Hankook Radial K701
+Hankook Radial RA07
+Kumho I'Zen KW22 
+Kumho I'Zen XW KW17
+Kumho Ecsta SPT KU31 
+Kumho Ice Power KW21
+Kumho I'Zen KC15 
+Kumho Solus KH17
+Kumho I'Zen WIS KW19
+Kumho I'Zen KW23
+Kumho Ecsta STX KL12 
+Kumho Power Grip KC11 
+Kumho RoadVenture APT KL51 
+Kumho I'Zen KW27 
+Kumho I'Zen Stud KW11
+Kumho Ecsta LE Sport KU39 
+Kumho I'Zen KW31 
+Kumho I'Zen RV Stud KC16 
+Kumho Solus KH15 
+Kumho Radial 857 
+Kumho Road Venture M/T KL71  в 
+Kumho Ecsta X3 KL17
+Kumho Road Venture SAT KL61
+Kumho Ecsta AST KU25 
+Kumho RoadVenture AT KL78 
+Kumho Solus KH25
+Kumho Ecsta HM KH31
+Kumho Ecsta KH11 
+Kumho Steel Radial 798 
+Kumho Ecsta KU19 
+Kumho Solus KR21 
+Kumho Solus KH16 
+Kumho Power Grip 749P
+Kumho RoadVenture AT 825
+Kumho Ecsta XS KU36
+Kumho eco Solus KL21  
+Kumho Ecsta MX KU15 
+Kumho 722
+Kumho Radial 798 Plus 
+Kumho Steel Radial 856 
+Kumho Power Max 769 
+Kumho RoadVenture ST KL16 
+Kumho Solus Vier KH21  
+Kumho Power Star 758 
+Kumho Ecsta ASX KU21
+Kumho KW7400  
+Kumho Ecsta XT KU37 
+Kumho KH18
+Kumho Ecsta Supra 712
+Kumho KWN7401
+Kumho Solus KH14 
+Kumho Ecsta Seven KU23 
+Kumho RoadVenture MT 834
+Kumho Touring A/S 791
+Kumho Power Racer II 727  
+Kumho Solus KH23
+Kumho Ecsta RV KU32
+Kumho Ecsta 711
+Kumho I'Zen XW KW17 XRP
+Kumho RoadVenture AT KL41 
+Kumho RoadVenture ST KL11  
+Kumho Touring A/S 795
+Kumho Power Guard 821 
+Kumho Ecsta W700 
+Kumho Solus KH19
+Kumho Gripmax 745  
+Kumho 954  
+Kumho I'Zen KW15 
+Kumho Marshal KW21  
+Maxxis MA-SPW Presa Spike 
+Maxxis MASUW  
+Maxxis AT-771  
+Maxxis MA-P1 
+Maxxis MA-STL  
+Maxxis MA-SLW
+Maxxis MA-PW Presa Snow
+Maxxis MA-Z4S Victra 
+Maxxis MA-S2 Marauder II 
+Maxxis MA-Z1 Victra 
+Maxxis MA-SW Victra Snow SUV  
+Maxxis Waltz MS-800 
+Maxxis MA-V1
+Maxxis MA-1 
+Maxxis M35 Victra Asymmet 
+Maxxis MA-W2 Wintermaxx 
+Maxxis Victra M-36
+Maxxis MALAS 
+Maxxis MT-754 Buckshot Mudder
+Maxxis MT-762 Bighorn 
+Maxxis MA-656 
+Maxxis MA-S1 Marauder 
+Maxxis Cheng Shin-735
+Maxxis MA-T1 Escapade
+Maxxis M8060 Trepador
+Maxxis MA-751 Bravo 
+Maxxis HT-750 Bravo
+Maxxis UE168 (N) 
+Maxxis MA i-Pro Victra i-Pro
+Maxxis MS300 Waltz  
+Maxxis UA-603  
+Maxxis MA-510 Victra 
+Maxxis MA-SAS  
+Maxxis MA-E1  
+Maxxis SS-01 Presa SUV
+Maxxis HP-600 
+Maxxis MA-W1 Wintermaxx
+Maxxis MA-AS  
+Maxxis UE-103  
+Maxxis MA-651 
+Maxxis MT-753 Bravo
+Maxxis M8080 Mudzilla 
+Maxxis MA-703  
+Maxxis MT-764 BIGHORN 
+Michelin X-Ice Xi2 
+Michelin X-Ice North XIN2
+Michelin Primacy HP 
+Michelin Pilot Sport PS2 
+Michelin Alpin A4  
+Michelin Energy Saver 
+Michelin Latitude X-ICE North 
+Michelin Latitude Tour HP 
+Michelin Latitude Alpin 
+Michelin Pilot Alpin PA3 
+Michelin X-Ice North 
+Michelin Pilot Sport 3 
+Michelin Latitude X-ICE 
+Michelin Primacy Alpin PA3 
+Michelin Pilot Exalto PE2 
+Michelin Latitude Cross 
+Michelin Latitude X-Ice Xi2  
+Michelin Alpin A3  
+Michelin Pilot Alpin PA2
+Michelin Latitude X-Ice North 2 
+Michelin Pilot Primacy
+Michelin Agilis 
+Michelin Pilot Super Sport
+Michelin Energy E3A 
+Michelin Agilis X-ICE North
+Michelin Latitude Diamaris 
+Michelin X-Ice 
+Michelin Pilot Sport 
+Michelin Agilis Alpin 
+Michelin 4x4 Diamaris 
+Michelin Latitude Sport 
+Michelin Alpin 
+Michelin Pilot Alpin 
+Michelin Latitude Alpin HP  
+Michelin Pilot Sport Cup 
+Michelin Agilis 81 Snow-Ice
+Michelin Agilis 51
+Michelin Agilis 51 Snow-Ice 
+Michelin 4x4 Synchrone 
+Michelin Energy E3B 
+Michelin Primacy MXV4 
+Michelin Latitude Tour 
+Michelin Cross Terrain SUV
+Michelin Primacy LC 
+Michelin Pilot Sport Cup + 
+Michelin X Radial  
+Michelin Vivacy 
+Michelin Pilot MXM4
+Michelin 4x4 Alpin 
+Michelin Destiny  
+Michelin Weatherwise II 
+Michelin Agilis 41
+Michelin Alpin A2 
+Michelin Agilis 81 
+Michelin Certis  
+Michelin Agilis Camping
+Michelin Energy XM1+ 
+Michelin Pilot HX MXM
+Michelin Pilot Exalto
+Michelin Pilot Preceda PP2 
+Michelin LTX A/T  
+Michelin Pilot Primacy G1
+Michelin LTX M/S
+Michelin Maxi Ice 
+Michelin Ivalo I2  
+Michelin XCD 
+Michelin Pilot Preceda 
+Michelin Energy XT2 
+Michelin Agilis 
+Michelin Energy Saver A/S
+Michelin Pilot Sport A/S 
+Michelin Energy MXV8
+Michelin Agilis 41 Snow-Ice 
+Michelin LTX A/S 
+Michelin Energy MXV4
+Michelin Energy LX4 
+Michelin Energy MXV4 S8 
+Michelin Pilot LTX
+Michelin Energy XM1
+Michelin Energy XV1 
+Michelin Primacy MXM4 
+Michelin 4x4 O/R XZL 
+Michelin Arctic Alpin 
+Michelin Harmony 
+Michelin 4x4 XPC
+Michelin XC LT4 
+Michelin Weatherwise  
+Michelin Pilot Sport N1 
+Michelin Agilis 61 Snow-Ice
+Michelin Vanpix
+Michelin XC Camping
+Michelin MX4 
+Michelin Pilot XGT H4
+Michelin Pilot XGT Z4
+Michelin 4x4 A/T XTT 
+Michelin Energy MXV4 Plus 
+Michelin MXTE  
+Michelin HydroEdge
+Michelin Energy XT1
+Nokian Hakkapeliitta 7  
+Nokian Hakkapeliitta R 
+Nokian Hakkapeliitta 5  
+Nokian Hakkapeliitta R SUV 
+Nokian Hakkapeliitta SUV 5 
+Nokian WR G2  
+Nokian Hakkapeliitta 7 SUV 
+Nokian WR G2 SUV  
+Nokian Nordman 4 
+Nokian Hakka Z  
+Nokian Hakka SUV 
+Nokian Hakka V 
+Nokian Hakka Green 
+Nokian Nordman RS 
+Nokian WR D3  
+Nokian Hakka Z SUV  
+Nokian Nordman SUV 
+Nokian WR
+Nokian Hakkapeliitta C Van 
+Nokian Z 
+Nokian WR A3  
+Nokian Hakkapeliitta 4  
+Nokian Hakka C Van
+Nokian Hakka C Cargo
+Nokian Hakkapeliitta C Cargo
+Nokian Hakkapeliitta CR Cargo 
+Nokian Hakkapeliitta CR Van 
+Nokian WR C Van 
+Nokian Hakkapeliitta RSi 
+Nokian WR C Cargo
+Nokian Hakkapeliitta SUV
+Nokian Nordman+
+Nokian Nordman SX 
+Nokian Hakkapeliitta LT
+Nokian Z G2 
+Nokian Hakka H
+Nokian WR SUV 
+Nokian Hakkapeliitta C2
+Nokian eNTYRE  
+Nokian NRY
+Nokian Hakkapeliitta 2 
+Nokian i3 
+Nokian All Weather+
+Nokian HT SUV
+Nokian Vatiiva M/T  
+Nokian NRVi SUV 
+Nokian W 
+Nokian NRC 
+Nokian Z SUV 
+Nokian NRHi 
+Nokian Hakka i3
+Nokian Hakkapeliitta NRW  
+Nokian NRC 2 
+Nokian NRVi
+Nokian Hakkapeliitta Q  
+Nokian NRT 2  
+Nokian Hakkapeliitta 1 
+Nokian Hakkapeliitta CS  
+Nokian NRe 
+Nokian Hakkapeliitta CQ  
+Nokian H 
+Nokian NRH 2  
+Nokian W+ 
+Nokian Nordman 2 
+Pirelli Scorpion Ice&Snow
+Pirelli Winter Sottozero 
+Pirelli Winter Carving Edge 
+Pirelli Winter Sottozero II  
+Pirelli Winter Carving 
+Pirelli Winter SnowControl II 
+Pirelli P Zero
+Pirelli Winter Snowsport
+Pirelli Winter SnowControl
+Pirelli Scorpion STR 
+Pirelli Chrono
+Pirelli Chrono Winter 
+Pirelli PZero Rosso 
+Pirelli PZero Nero 
+Pirelli Cinturato P6
+Pirelli Scorpion Zero  
+Pirelli Cinturato P4 
+Pirelli PZero Rosso Asimmetrico 
+Pirelli Scorpion Zero Asimmetrico 
+Pirelli Cinturato P7 
+Pirelli P7 
+Pirelli Scorpion ATR
+Pirelli P6 
+Pirelli PZero Asimmetrico
+Pirelli P6000
+Pirelli Cinturato P1 
+Pirelli PZero Direzionale  
+Pirelli P3000 Energy 
+Pirelli Dragon
+Pirelli P6 Four Seasons 
+Pirelli P2500 Euro 
+Pirelli P6000 Powergy 
+Pirelli Winter Ice Storm
+Pirelli P7000
+Pirelli Winter Studdable Plus 
+Pirelli Eufori@ 
+Pirelli Scorpion S/T
+Pirelli Winter Ice Storm 3 
+Pirelli Scorpion STR A
+Pirelli PZero Rosso Direzionale 
+Pirelli Winter Ice Sport 
+Pirelli Scorpion Verde
+Pirelli P4000 
+Pirelli Citynet Winter Plus  
+Pirelli P5000 Drago 
+Pirelli Winter Asimmetrico  
+Pirelli P400 Aquamile 
+Pirelli PZero Corsa  
+Pirelli Citynet L4  
+Pirelli P400 Touring
+Pirelli Citynet
+Pirelli Cinturato P3000 
+Pirelli Citynet All Weather
+Pirelli Scorpion MUD
+Pirelli Cinturato P5 
+Pirelli P4000 Super Touring  
+Pirelli Scorpion A/T 
+Pirelli PZero Corsa Direzionale 
+T Proxes T1-R  
+Toyo Observe Garit G4
+Toyo Tranpath S1 
+Toyo Open Country W/T
+Toyo Proxes ST II 
+Toyo Proxes S/T  
+Toyo Proxes CF1  
+Toyo Open Country I/T 
+Toyo Observe G2S 
+Toyo Open Country All-Terrain  
+Toyo TYDRB 
+Toyo Snowprox S953
+Toyo Proxes T1 Sport 
+Toyo Open Country H/T 
+Toyo H09 
+Toyo Observe Garit KX  
+Toyo Proxes C1S  
+Toyo Snowprox S942 
+Toyo H08 
+Toyo Proxes R888 
+Toyo Snowprox S952 
+Toyo Proxes 4 
+Toyo Proxes T1-S
+Toyo Proxes CF1 SUV 
+Toyo 350 
+Toyo Observe Garit G30 
+Toyo Vario V2  
+Toyo Snowprox S941
+Toyo Versado LX  
+Toyo Versado CUV
+Toyo Proxes CT1 
+Toyo 600-F5
+Toyo Tranpath S/U 
+Toyo Extensa A/S  
+Toyo Extensa HP  
+Toyo 310 
+Toyo Vario V1 
+Toyo Proxes R1R 
+Toyo Open Country M/T 
+Toyo Spectrum 
+Toyo Observe G1S Plus 
+Toyo Observe Garit G1S 
+Toyo Open Country G-02 Plus  
+Toyo Proxes NE  
+Toyo 330 
+Toyo Proxes TPT 
+Toyo Proxes 4E 
+Toyo Teo Plus 
+Toyo 785
+Toyo 600-F8 
+Toyo Proxes FZ4  
+Toyo Roadpro R610 
+Toyo Snowprox S950 
+Toyo Observe G-02 Plus
+Yokohama Ice Guard IG30
+Yokohama F700Z  
+Yokohama W.Drive V902
+Yokohama ADVAN Sport V103  
+Yokohama Geolandar I/T-S G073 
+Yokohama Ice Guard IG35
+Yokohama Geolandar I/T G072 
+Yokohama Geolandar A/T-S G012  
+Yokohama Ice Guard Black IG20
+Yokohama ADVAN ST V802  
+Yokohama AC01 C.Drive 
+Yokohama Geolandar H/T-S G051 
+Yokohama Guardex F700S  
+Yokohama S.Drive AS01
+Yokohama Parada Spec-X 
+Yokohama A.Drive AA01 
+Yokohama Y354
+Yokohama AVS Decibel V550 
+Yokohama RY818  
+Yokohama AVS Sport V102
+Yokohama Parada Spec-2 
+Yokohama AVS Winter V901  
+Yokohama AVS S/T type-1 V801  
+Yokohama AC02 C.Drive 2 
+Yokohama W.drive
+Yokohama F700
+Yokohama A539  
+Yokohama Geolandar M/T G001 
+Yokohama ADVAN Neova AD08 
+Yokohama ADVAN A048
+Yokohama Avid TRZ S316 
+Yokohama A520  
+Yokohama Avid T4 
+Yokohama Avid SUV 
+Yokohama A349  
+Yokohama Avid Touring S 
+Yokohama Avs S1-z V100 
+Yokohama Geolandar G95A  
+Yokohama A460  
+Yokohama Winter T F601 
+Yokohama A043  
+Yokohama Geolandar G91A 
+Yokohama E70D  
+Yokohama A349A
+Yokohama Geolandar G94B 
+Yokohama Y356  
+Yokohama Geolandar G035 
+Yokohama Guardex F700P  
+Yokohama Geolandar G039  
+Yokohama S71  
+Yokohama A348 
+Yokohama S306
+Yokohama Ice Guard IG721 
+Yokohama Geolandar I/T+ G071 
+Yokohama ADVAN Neova AD07
+Yokohama Geolandar G033 
+Yokohama AVS Decibel V500
+Yokohama Advan A10E
+Yokohama F600  
+Yokohama Geolandar A/T G011 
+Yokohama G95 
+Yokohama Advan A11A 
+Yokohama AVID ENVigor
+Yokohama A345  
+Yokohama Y376  
+Yokohama Geolandar G902  
+Yokohama Geolandar G900  
+Yokohama Avid Touring S310 
+Yokohama AVS ES100
+Yokohama A345A 
+Yokohama Advan A10A 
+Yokohama Advan A10B
+Yokohama Super Van Y355C 
+Yokohama IG10  
+Yokohama Geolandar G900A
+Yokohama AVS Sport V102A
+Yokohama Advan A046
+Yokohama S760  
+Yokohama Advan A10F
+Yokohama Aspec A345 
+Yokohama Geolandar H/T-S G052 
+Yokohama ADVAN S.4  
+Yokohama A300  
+Yokohama AS430 
+Yokohama W.Drive V903 
+Yokohama Avid H4s/V4s S315
+Yokohama Geolandar H/T G038G 
+Yokohama Geolandar G091  
+Yokohama Guardex F600 
+Yokohama Geolandar H/T G031
+Yokohama V141  
+Yokohama A352 
+Yokohama SY109 
+Yokohama Geolandar H/T G91A
+Yokohama Y376M 
+Yokohama Avid W4S 
+Gislaved Nord Frost V
+Cooper Discoverer M+S  
+Cooper Discoverer ATR  
+Cooper Weather-Master S/T 2 
+BFGoodrich All-Terrain T/A 
+Federal Himalaya WS2 
+ Barum Bravuris 2 
+Gislaved Soft Frost 3 
+Falken Ziex ZE-912
+BFGoodrich Winter Slalom KSI  
+Cooper Discoverer STT  
+Falken FK-452 
+Cooper Discoverer M+S Sport
+Cooper Discoverer H/T  
+Firestone Winterforce 
+Cooper Discoverer S/T
+Barum Bravuris  
+Cooper Zeon 2XS 
+Cordiant Sno-Max 
+Federal Couragia S/U 
+BFGoodrich g-Force Profiler 
+Cordiant Polar 
+Barum Vanis
+BFGoodrich Mud-Terrain T/A KM2 
+Barum Polaris 2  
+BFGoodrich g-Grip 
+Lassa Snoways Era 
+Barum Bravuris 4x4
+BFGoodrich g-Force Winter  
+Amtel Planet T-301 
+Federal SS595  
+Matador MP 51
+Amtel NordMaster ST-310
+BFGoodrich Macadam T/A 
+Barum Brillantis 
+Barum SnoVanis  
+GT Radial Champiro WinterPro
+Falken Ziex S/TZ04 
+Cordiant Sport 
+Gislaved Nord Frost Van 
+Cordiant Polar 2 
+Barum Brillantis 2  
+Cordiant Comfort 
+Gislaved Nord Frost C 
+Cooper Zeon Sport A/S  
+BFGoodrich g-Force T/A KDW  
+Cooper CS4 Touring T  
+Amtel NordMaster ST  
+Cooper Zeon CS6 
+Cooper Discoverer H/T Plus
+Amtel NordMaster CL
+BFGoodrich Activan 
+BFGoodrich g-Force Stud 
+BFGoodrich Touring
+General Tire Altimax Arctic 
+Infinity Tyres INF-049 
+Marangoni Meteo HP 
+Cooper Zeon XST 
+BFGoodrich Long Trail T/A Tour 
+Barum Norpolaris 
+Cooper Zeon XST-A 
+Cooper Discoverer M+S2  
+Amtel Planet 
+Amtel Planet 2P
+Federal Himalaya SUV
+Federal Formoza FD1 
+Amtel Planet 3 
+Cooper Cobra radial G/T
+Infinity Tyres INF-050 
+Cooper Discoverer CTS  
+Kleber Krisalp HP
+Cooper Zeon LTZ
+Matador MP 21 
+BFGoodrich Winter Slalom 
+Falken Ziex ZE-522 
+Hercules Terra Trac A/T  
+Cooper Zeon ZPT  
+Cooper Trendsetter SE 
+Federal Formoza FD2
+Federal Couragia A/T 
+Kleber Hydraxer  
+Kleber Krisalp HP2
+BFGoodrich Profiler 2 
+Federal 595EVO  
+Kleber Dynaxer HP2
+Amtel NordMaster 
+Amtel Кобра 
+Cooper Weather-Master Snow 
+BFGoodrich Winter G 
+Cooper Zeon 4XS 
+Cordiant Sport 2 
+Cooper Zeon XTC 
+Fulda Kristall Montero
+Gislaved Nord Frost III 
+Fulda Carat Progresso
+Falken Ziex ZE-512 
+Cordiant Polar SL
+Federal Himalaya WS1 
+Infinity Tyres INF-200
+Amtel Planet FT-501 
+BFGoodrich Activan Winter 
+Cordiant Standart 
+GT Radial Champiro 328
+Lassa Transway 
+Daewoo DW 131 Kratus  
+Amtel Planet DC
+Marshal Matrac STX KL12
+Lassa Snoways II Plus
+Falken Ziex ZE-322
+Lassa Competus A/T 
+Marshal Matrac TX KU17
+Hercules Raptis WR1
+Matador MP 14 Prima 
+GT Radial Champiro HPY
+Falken Ziex S/TZ01 
+Cordiant Off Road
+Falken Eurowinter HS-439 
+Marshal I'Zen RV KC15 
+GT Radial Champiro 128
+Cooper Lifeliner GLS 
+Cordiant Business CS 
+Fulda EcoControl 
+Barum Polaris 3  
+GT Radial Savero WT 
+Matador MP 58 M+S Silika
+Kleber Transpro 
+Hercules Avalanche X-Treme Passenger
+Cooper Discoverer A/T 
+Amtel Cargo LT 
+Matador MP 91 - Nordicca 4x4 M+S 
+Cooper Discoverer AST II
+Infinity Tyres INF-100
+Lassa Wintus
+Hercules Ultra Touring TR
+Marshal I'Zen KW15
+Marangoni 4 ICE E+
+Marshal KH35
+Kelly ST
+Debica Frigo 2 
+AVON ZV5
+BFGoodrich Mud-Terrain T/A 
+Federal Ecovan ER-01 
+Amtel NordMaster 2
+Hercules All Trac A/T 
+Matador MPS 115 Variant M+S 
+Marshal I'Zen WIS KW19
+Matador MP 95
+Matador MP 52 Nordicca Basic 
+Infinity Tyres INF-040
+Hercules Raptis VR1
+Kelly HP 
+Lassa Impetus Revo 
+Cooper Lifeliner Touring SLE 
+Falken Ziex ZE-502
+Debica Passio  
+Goodride SU307 
+AVON Ice Touring  
+Amtel Баргузин 
+Hercules Power CV 
+Firestone Winterhawk
+Kleber Kapnor 5
+Barum Quartaris  
+Cooper Avalanche X-Treme
+Lassa Competus H/L 
+Fulda Carat Exelero 
+Marshal Matrac FX MU11
+Amtel Семь холмов
+Matador MP 95 Yermak
+Lassa Snoways 2C
+Cooper Weather-Master S/A 2 
+Gislaved Speed 616
+Marshal Ice King KW21
+Matador MPS 125 Variant All Weather 
+Falken LA/AT
+Kleber Viaxer
+Federal 595RS-R
+AVON ZZ3
+Goodride SP06  
+GT Radial Adventuro A/T
+Gislaved Speed C 
+Fulda Kristall Montero 2
+Marshal Steel Radial KR11
+Cordiant Business CW
+Gislaved Speed 606
+Marangoni Meteo HP SUV
+Lassa Impetus Sport
+CEAT Formula Winter
+Amtel Метелица
+Matador MP 16 Stella 2
+Federal SS657
+Cooper CS4 Touring H/V
+Matador MP 43 Aquilla Evo
+Infinity Tyres INF-059 Winter King
+Firestone Destination ST
+Diplomat MS
+Fulda 4X4 Road
+Matador MP 42 Elite 2
+Matador MPS 510 Van M+S
+Cordiant Comfort PS-400*
+GT Radial Champiro BAX2
+CEAT Formula VAN
+Kleber Dynaxer DR
+Interstate Touring IST-1
+Matador MP 59 Nordicca M+S
+Federal SS535
+Federal MS357 Highway/Road
+Matador MP 46 Hectorra 2
+Debica Furio
+Cooper VanMaster M+S
+Matador MP 76 Bogatyr
+Fulda Kristall Montero 3
+Marangoni Mythos
+Durun A2000
+Goodride SA05
+Matador MP 71 Izzarda
+Firestone Multihawk
+Maloya Cresta 220
+Debica Navigator 2
+Lassa LC/R
+CEAT Artic III
+Lassa Atracta
+GT Radial Savero H/T
+Ironman iMove
+Marshal Power Grip KC11
+Matador MP 41
+Amtel К-151
+Mastercraft Glacier-Grip II
+Matador MPS 520 Nordicca Van M+S
+Fulda Kristall Control HP
+Marangoni Verso
+Falken Sincera Touring SN-211
+Matador MP 115
+Debica Frigo Directional
+Cooper Discoverer Sport HP
+Matador MP 81 Conquerra
+GT Radial Champiro HPX
+Matador MP 57
+Fulda Kristall Supremo
+Federal Couragia M/T
+Matador MP 12*
+Firestone VanHawk
+Matador MP 85 Hectorra 4x4
+Fulda Kristall 4x4
+KingStar W411
+AVON Ice Touring ST
+AVON CR322
+Federal MS327
+Mabor Street Jet
+Hercules Raptis HR1
+Falken LA/CT03
+Kleber Transalp 2
+Gislaved EuroFrost 3 Silica
+Fulda Conveo Tour
+Barum OR 56 Cargo
+Debica Navigator
+Infinity Tyres INF-030
+Lassa Miratta
+Aurora Tire W602
+BFGoodrich Touring T/A
+Cooper CS2
+General Tire Grabber UHP
+Mastercraft Courser MT
+America Salt Lake City SLC 202
+Kenex CP661
+Cordiant Sport W1
+Hercules Ultra Touring HR/VR
+Marangoni 4 Winter E+
+Lassa Winterra
+Marshal Road Venture AT KL78
+GT Radial Savero HP
+Accelera Snow
+Falken Eurowinter HS-435
+Cooper Cobra VHP
+Maxtrek Sierra S6
+Kleber Dynaxer HP3
+Amtel Rapid river
+Goodride H600
+Marangoni Vanto
+Fulda Conveo Trac
+Achilles Platinum
+Gislaved Speed 506
+Maloya Cresta 300
+GreenDiamond C790
+Marangoni Maxo M+S
+Dayton D320
+Federal MR295
+Kleber CT100
+Lassa Impetus 2
+Cooper SRM II Radial LT
+Amtel К-153
+Marangoni Meteo Grip E+
+Amtel Planet FT-705
+GT Radial Savero HT Plus
+Fulda Tramp 4x4 Mix
+Gislaved C 400
+Debica Passio 2
+Mastercraft Courser MSR
+Falken Radial A/P
+Cooper Discoverer Radial AST II
+Amtel Cargo AS
+KingStar SK 70
+Marshal I'Zen Stud KW11
+Matador MPS 320 Maxilla
+Marshal I'Zen RV Stud KC16
+Cooper SportMaster GLE
+Matador MP 44 Elite 3
+BFGoodrich Scorcher T/A
+Cooper Discoverer Radial STT
+Cooper Discoverer Radial LT
+Marshal Radial 857
+Hercules G5000Z
+Barum OR 59 Cargo M+S
+AVON Ranger Ice
+Goodride H500
+Mastercraft A/S IV
+Autoguard SA 602
+Marangoni E-Logic
+Mastercraft Courser C/T
+Hercules H/P 4000
+Cooper Weather-Master SiO2
+BFGoodrich Traction T/A
+Amtel Самсон
+BFGoodrich Radial Long Trail T/A
+Federal 595RPM
+Cooper Weather-Master WSC
+Ironman Radial A/P
+Amtel КС-4
+Matador MP 55
+Amtel Баргузин-4*
+Amtel Быстрица
+Amtel К-190М
+Marangoni Meteo Esc2+
+Matador MP 7
+GT Radial Champiro 70
+Fulda Diadem Linero
+GT Radial Maxmiler WT
+Fulda Kristall Iglu
+Fulda Carat Attiro
+Hercules G3000H
+Fulda Carat Extremo
+Dextero DWT-1
+Mastercraft Avenger G/T
+Fulda Tramp 4x4 H
+Austone Athena SP-7
+General Tire Altimax Winter
+AVON Avanza AV4
+AVON ZT5
+AVON Ranger
+Fuzion XTi
+AVON ZZ1
+Marangoni Trio
+Fulda Multistar M
+Firestone Vanhawk Winter
+KingStar SW40
+Marshal Power Racer II 719
+Matador MP 15 Stella
+General Tire Altimax UHP
+BFGoodrich Advantage T-A
+Amtel К-196
+Cordiant 4x4
+Goodride SW601
+BFGoodrich g-Force T/A Drag Radial
+Kelly Winter Ice
+Fulda Conveo Trans
+Amtel Баргузин-2
+Interco TrXus STS
+GT Radial Champiro WT-55
+Amtel Cargo S
+Hercules Avalanche X-Treme SUV
+Fullrun HS299
+Kleber CT300
+Gislaved Soft Frost 2
+AVON ZV3
+Daewoo DW 151 Briareus
+Goodride SV308
+Matador MP 56
+Marangoni Zeta Linea
+Altenzo Sport Comforter
+AVON CR75
+Cooper Discoverer AST
+Firestone FW930
+Matador MP 57 Sibir
+KingStar RW07
+Federal SS731
+Goodride CR857
+Falken Eurowinter HS-437
+BFGoodrich Rugged Trail T/A
+BFGoodrich Touring G
+Marangoni Meteo Esc E+
+Firestone Firehawk TZ100
+Goodride RV-H680
+Fulda Tramp 4x4 Yukon
+Mastercraft Courser HTR
+Amtel Баргузин-3
+Amtel Вираж
+General Tire Altimax HP
+Marshal Road Venture AT 825
+Debica Frigo S-30
+Accelera Epsilon
+Gislaved EuroFrost 2
+Falken Espia EPZ
+Fullrun HP199
+AVON VanMaster M+S
+Barum Brillant OR 57
+Mayrun MR800
+Kinforest MR 800
+General Tire Snow Grabber
+BFGoodrich g-Force T/A KDWS
+Interco TrXus MT
+Fulda Kristall Ice
+Fuzion HRi
+General Tire XP 2000 Winter
+Federal SS791 Plus
+Kormoran SnowPro
+KingStar W410
+Dayton DW700S
+Dean Tires EQUUS LSI
+Kleber Krisalp 3
+Matador MP 58 VAN
+Dayton D110
+Kleber C100
+Mabor Sport Jet
+Falken FK-451
+BFGoodrich Profiler
+Aurora Tire Radial RH08
+Firestone Winterforce LT
+BFGoodrich g-Force Sport
+Aurora Tire RA20
+Matador MP 61 Adhessa M+S
+Mastercraft Courser A/T
+Falken FK/AT
+Fulda SportControl
+Fulda Kristall Rotego
+AVON CR85
+Falken Sincera SN-828
+Mastercraft Courser A/T 2
+GT Radial Champiro 728
+Falken Azenis ST-115
+Falken Azenis RT-615
+Aurora Tire Radial RH04
+Marshal Matrac MH11
+Matador MPS 310 Master
+Cooper Lifeliner SLE Sport
+GT Radial Champiro WT-65
+Fortio WN-01
+Goodride H550
+Goodride CR861
+Goodride H210
+Fulda Diadem Dirigo
+Kormoran VanPro
+Fulda Conveo Star
+Arctic Claw Winter Xsi M+S
+ESA-Tecar Super Grip 7
+Mabor Van Jet
+Firestone Firehawk GTA-02
+AVON Ranger TSE
+Kormoran Impulser
+Fulda Carat Assuro
+Dean Tires Wildcat Radial A/T
+Goodride H280
+Fate Advance AR-550
+Dean Tires Stinger Radial GTS
+Goodride H150
+KingStar Radial RA17
+Matador MP 15
+Accelera 651
+AVON Avanza AV9
+Kinforest KF 660
+Matador MP 300
+Fate Sentiva AR-360
+Fate Antartika AR-270
+AVON Ranger Sport
+BFGoodrich Premier Touring
+Kleber Dynaxer HP
+LingLong LM A8
+America Los Angeles LA 866
+Matador MP 15 Van
+Matador MP 55 Plus Silika
+General Tire Grabber TR
+Goodride H110
+AVON Ranger A-T
+CEAT Spider
+BFGoodrich Winter 2 T/A
+Autoguard SA 902
+Matador MP 45 Hectorra
+General Tire AmeriTrac
+Dayton D210
+Kenex SB 702
+General Tire Eurovan
+Mastercraft Avenger LSR
+Durun F-One
+Mastercraft Avenger Touring LSR (T)
+GT Radial Champiro 50
+Mabor Sport Jet 2
+Contyre Arctic Ice
+General Tire Grabber HTS
+Lassa Snoways II
+Marangoni E-Comm
+Accelera Alpha
+Falken High Country A/T
+GT Radial Adventuro M/T
+BFGoodrich g-Force R1
+Kleber Viaxer AS
+General Tire Exclaim UHP
+Goodride H170
+BFGoodrich g-Force T/A KD
+Mabor Winter Jet
+General Tire Grabber AT2
+Goodride SC301
+Daewoo DW 171 Cotus
+Falken Sincera SN816
+Falken Ziex ZE-326
+General Tire Altimax RT
+Contyre Megapolis
+Hercules Terra Trac Suv
+GT Radial Maxmiler X
+Cooper Wintermaster Plus
+Cooper Weather-Master S/T
+GT Radial Maxmiler EX
+Hercules Trail Digger M/T
+GT Radial Champiro 228
+Maxtrek Ingens A1
+GT Radial Champiro ECO
+";
+
+include '/var/www/auto/www/init.php';
+include '/var/www/auto/catalog_shina/include/CShinaFirm.php';
+include '/var/www/auto/catalog_shina/include/CShinaModel.php';
+
+$select = 'SELECT m.id as model_id, m.name as model_name, f.name as firm_name FROM catalog_shina.shina_models m LEFT JOIN catalog_shina.shina_firms f ON f.id=m.firm_id';
+
+$res = our_mysql_query($select);
+
+$firm_models = array();
+
+while($rowF = mysql_fetch_assoc($res)){
+  $firm_models[] = $rowF['firm_name'].' '.$rowF['model_name'];
+}
+
+$current = explode("\n", $text);
+
+foreach($current as $key => $cur){
+  if(in_array(trim($cur), $firm_models)){
+    unset($current[$key]);
+  }
+  
+}
+
+
+echo '<pre>'.print_r($current,1).'</pre>';
+
+?>
+/build/
+/nbproject/private/
+/.idea/
+/dist/
+=======
 SAVED_WORLDS
 logs
 out
 .DS_Store
 .idea/workspace.xml
+>>>>>>> 64b243e350f51d3fa8931e814c1601b0fa5a1e70
