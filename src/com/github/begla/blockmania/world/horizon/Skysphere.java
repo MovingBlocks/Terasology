@@ -48,21 +48,11 @@ public class Skysphere implements RenderableObject {
 
     /*Stars*/
     public static IntBuffer textureId       = BufferUtils.createIntBuffer(1);
-    public static IntBuffer textureCloudsId = BufferUtils.createIntBuffer(1);
     private World _parent;
-    
-    /*Clouds*/
-    private int _noiseMatrixSize    = 8;
-    private Vector3f[] _noisePermutations;
-    private Random rand = new Random();
-    private final PerlinNoise _pGen  = new PerlinNoise(7);
-    private float _showClouds = 0.0f;
     
     public Skysphere(World parent) {
         _parent = parent;
         loadStarTextures();
-       
-        createCloudsTexture3D(64, 64, 64);
     }
 
     private void drawSphere() {
@@ -85,15 +75,9 @@ public class Skysphere implements RenderableObject {
             return;
 
         glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
-       
+        glDisable(GL_DEPTH_TEST); 
         glEnable(GL13.GL_TEXTURE_CUBE_MAP);
-        glEnable(GL12.GL_TEXTURE_3D);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
-        GL11.glBindTexture(GL12.GL_TEXTURE_3D, textureCloudsId.get(0));
-        GL11.glTexParameteri ( GL12.GL_TEXTURE_3D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, 8 );
-        //float sunPosInRadians = (float)Math.toRadians(180*(_time-0.075));
-
         _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         sunNormalise = sunNormalise.normalise(null);
@@ -102,9 +86,6 @@ public class Skysphere implements RenderableObject {
 
         ShaderManager.getInstance().enableShader("sky");
         
-        /*int showClouds = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "showClouds");
-        GL20.glUniform1f(showClouds, _showClouds);*/
-
         int sunPos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunPos");
         GL20.glUniform4f(sunPos, 0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         
@@ -119,14 +100,9 @@ public class Skysphere implements RenderableObject {
 
         int zenith = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "zenith");
         GL20.glUniform3f(zenith, _zenithColor.x, _zenithColor.y, _zenithColor.z);
-
         drawSphere();
-
         ShaderManager.getInstance().enableShader(null);
-        glDisable(GL12.GL_TEXTURE_3D);
         glDisable(GL13.GL_TEXTURE_CUBE_MAP);
-
-        
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }
@@ -192,53 +168,5 @@ public class Skysphere implements RenderableObject {
             GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, 256, 256,
                     0, format, GL11.GL_UNSIGNED_BYTE, byteBuffer);
         }
-    }
-    
-    private void createCloudsTexture3D(int width, int height, int depth){
-      float   dx      = (float) _noiseMatrixSize / (float) width;
-      float   dy      = (float) _noiseMatrixSize / (float) height;
-      float   dz      = (float) _noiseMatrixSize / (float) depth;
-
-      int j = 0;
-      int i = 0;
-
-      ByteBuffer image = BufferUtils.createByteBuffer(width*height*depth*4);
-
-      for ( i = 0; i < width; i++ ){
-          for ( j = 0; j < height; j++ ){
-              for ( int k = 0; k < depth; k++ ){
-                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
-                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
-                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
-                image.put((byte)(((float)_pGen.noise(i * dx, j * dy, k * dz)*255.0*0.5)));
-              }
-          }
-      }
-      
-      image.rewind();
-
-      GL11.glGenTextures(textureCloudsId);
-
-      GL11.glBindTexture(GL12.GL_TEXTURE_3D, textureCloudsId.get(0));
-
-      GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_WRAP_S, GL_REPEAT);
-      GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_WRAP_R, GL_REPEAT);
-      GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_WRAP_T, GL_REPEAT);
-      GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-      glPixelStorei   ( GL_UNPACK_ALIGNMENT, 1 );
-
-      GL12.glTexImage3D( GL12.GL_TEXTURE_3D, 0, GL_RGBA, width, height, depth, 0, GL_RGBA,
-                      GL_UNSIGNED_BYTE, image );
-
-    }
-    
-    public void showClouds(boolean show){
-      if(show){
-        _showClouds = 1.0f;
-      }else{
-        _showClouds = 0.0f;
-      }
     }
 }

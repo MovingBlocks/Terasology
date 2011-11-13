@@ -2,12 +2,10 @@
 varying	vec4 	McPosition;
 varying	vec3 	colorYxy;
 varying vec3    skyVec;
-varying vec3    cloudVec;
 varying float   lv;
 uniform	vec4 	  sunPos;
 uniform float	sunAngle;
 vec4 	eyePos = vec4(0.0, 0.0, 0.0, 1.0);
-//uniform  vec3 playerPos;
 uniform	float	turbidity;
 uniform vec3 zenith;
 
@@ -49,18 +47,16 @@ vec3	allweatherSky ( float t, float cosTheta, float cosGamma, float cosThetaSun 
 
 void main(void)
 {
-   // eyePos.xyz = normalize(playerPos);
-	float	sa  = sin ( sunAngle );
-	float	ca  = cos ( sunAngle );
-  mat3	r   = mat3 ( 1.0, 0.0, 0.0, 0.0, ca, -sa, 0.0, sa, ca );
+    float	sa  = sin ( sunAngle );
+    float	ca  = cos ( sunAngle );
+    mat3	r   = mat3 ( 1.0, 0.0, 0.0, 0.0, ca, -sa, 0.0, sa, ca );
 
-  vec3 v               = normalize ( (gl_Vertex-eyePos).xyz );    
-  vec3 l               = normalize ( sunPos.xyz );
-  lv                   = dot  ( l, v );
-  skyVec               = r * v.xyz;
-  cloudVec             = 0.1*gl_Vertex.xyz;
-  colorYxy             = allweatherSky ( turbidity, abs(v.y)+0.35, lv, l.y );
-  McPosition           = gl_Vertex;
-	gl_Position          = gl_ModelViewProjectionMatrix * gl_Vertex;
-	gl_TexCoord [0]      = gl_MultiTexCoord0;
+    vec3 v          = normalize ( (gl_Vertex-eyePos).xyz );    
+    vec3 l          = normalize ( sunPos.xyz );
+    lv              = dot  ( l, v );
+    skyVec          = r * v.xyz;
+    colorYxy        = allweatherSky ( turbidity, abs(v.y)+0.35, lv, l.y );
+    McPosition      = gl_Vertex;
+    gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_TexCoord [0] = gl_MultiTexCoord0;
 }

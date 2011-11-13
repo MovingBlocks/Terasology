@@ -70,6 +70,8 @@ public class ShaderManager {
         createFragShader("chunk_frag.glsl", "chunk");
         createVertexShader("cloud_vert.glsl", "cloud");
         createFragShader("cloud_frag.glsl", "cloud");
+        createVertexShader("cloud_vert2.glsl", "cl");
+        createFragShader("cloud_frag2.glsl", "cl");
         createVertexShader("particle_vert.glsl", "particle");
         createFragShader("particle_frag.glsl", "particle");
 
