@@ -34,12 +34,6 @@ public class FontManager {
     private final FastMap<String, AngelCodeFont> _fonts = new FastMap<String, AngelCodeFont>();
     private static FontManager _instance = null;
 
-    /**
-     * Returns (and creates – if necessary) the static instance
-     * of this helper class.
-     *
-     * @return The instance
-     */
     public static FontManager getInstance() {
         if (_instance == null) {
             _instance = new FontManager();

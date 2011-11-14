@@ -22,7 +22,6 @@ import com.github.begla.blockmania.world.observer.BlockObserver;
 import javolution.util.FastSet;
 
 /**
- * (byte) 0
  * Provides support for updating and generating chunks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -33,6 +32,7 @@ public final class ChunkUpdateManager implements BlockObserver {
     private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
     private double _averageUpdateDuration = 0.0;
 
+    private static final int MAX_THREADS = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxThreads");
 
     /**
      * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
@@ -43,12 +43,11 @@ public final class ChunkUpdateManager implements BlockObserver {
      */
     public boolean queueChunkUpdate(Chunk c, boolean force) {
         final Chunk chunkToProcess = c;
-        final int maxThreads = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxThreads");
 
-        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < maxThreads || force)) {
+        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < MAX_THREADS || force)) {
             _currentlyProcessedChunks.add(chunkToProcess);
 
-            // ... create a new thread and start processing.
+            // ... create a new thread and start processing
             Runnable r = new Runnable() {
                 public void run() {
                     long timeStart = Blockmania.getInstance().getTime();

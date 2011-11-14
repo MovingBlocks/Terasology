@@ -21,7 +21,7 @@ import com.github.begla.blockmania.gui.HUD;
 import com.github.begla.blockmania.rendering.FontManager;
 import com.github.begla.blockmania.rendering.RenderableScene;
 import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.rendering.VBOManager;
+import com.github.begla.blockmania.rendering.VertexBufferObjectManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.World;
 import com.github.begla.blockmania.world.WorldProvider;
@@ -62,19 +62,18 @@ public final class Blockmania extends RenderableScene {
 
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(32);
     /* ------ */
-    private static final int FRAME_SKIP_MAX_FRAMES = 5;
+    private static final int FRAME_SKIP_MAX_FRAMES = 10;
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
     /* ------- */
     private long _lastLoopTime, _lastFpsTime;
     private double _averageFps;
     private int _fps;
+    private long _timerTicksPerSecond;
     private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
     /* ------- */
     private World _world;
     private HUD _hud;
-    /* ------- */
-    private long _timerTicksPerSecond;
     /* ------- */
     private static Blockmania _instance;
     /* ------- */
@@ -149,7 +148,7 @@ public final class Blockmania extends RenderableScene {
             }
         }
 
-        getInstance().addLogFileHandler("logs/blockmania.log", Level.INFO);
+        getInstance().addLogFileHandler("LOGS/blockmania.log", Level.INFO);
     }
 
     private static void loadNativeLibs() throws Exception {
@@ -269,7 +268,7 @@ public final class Blockmania extends RenderableScene {
          * Init. management classes.
          */
         ShaderManager.getInstance();
-        VBOManager.getInstance();
+        VertexBufferObjectManager.getInstance();
         FontManager.getInstance();
         BlockManager.getInstance();
 
@@ -319,9 +318,7 @@ public final class Blockmania extends RenderableScene {
         double nextGameTick = getTime();
         int loopCounter;
 
-        /*
-         * GAME LOOP.
-         */
+        // MAIN GAME LOOP
         while (_runGame && !Display.isCloseRequested()) {
             updateFPS();
             processKeyboardInput();
@@ -450,7 +447,7 @@ public final class Blockmania extends RenderableScene {
      * Updates the FPS display.
      */
     private void updateFPS() {
-        // Measure a delta value and the frames per second
+        // Measure the delta value and the frames per second
         long delta = getTime() - _lastLoopTime;
         _lastLoopTime = getTime();
         _lastFpsTime += delta;

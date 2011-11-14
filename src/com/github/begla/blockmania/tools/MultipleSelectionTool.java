@@ -25,7 +25,7 @@ import javolution.util.FastList;
 import java.util.logging.Level;
 
 /**
- * TODO
+ * Simple selection tool. Can be used to select multiple blocks at once.
  */
 public class MultipleSelectionTool implements Tool {
 

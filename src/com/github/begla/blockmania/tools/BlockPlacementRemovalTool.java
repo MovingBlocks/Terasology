@@ -18,7 +18,7 @@ package com.github.begla.blockmania.tools;
 import com.github.begla.blockmania.world.characters.Player;
 
 /**
- * TODO
+ * The basic tool used for block interaction. Can be used to place and remove blocks.
  */
 public class BlockPlacementRemovalTool implements Tool {
 

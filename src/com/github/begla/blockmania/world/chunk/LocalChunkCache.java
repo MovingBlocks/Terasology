@@ -92,7 +92,7 @@ public final class LocalChunkCache implements ChunkProvider {
 
                 while (cachedChunks.size() > capacity()) {
                     Chunk chunkToDelete = cachedChunks.removeLast();
-                    // Write the chunk to disk (but do not remove it from the cache just now)
+                    // Write the chunk to disk (but do not remove it from the cache just jet)
                     writeChunkToDisk(chunkToDelete);
                     // When the chunk is written, finally remove it from the cache
                     _chunkCache.values().remove(chunkToDelete);
@@ -104,7 +104,7 @@ public final class LocalChunkCache implements ChunkProvider {
             }
         };
 
-        Blockmania.getInstance().getThreadPool().submit(r);
+        Blockmania.getInstance().getThreadPool().execute(r);
     }
 
     /**
@@ -126,7 +126,7 @@ public final class LocalChunkCache implements ChunkProvider {
     }
 
     private void writeChunkToDisk(Chunk c) {
-        if (c.isFresh()) {
+        if (c.isFresh() || (Boolean) ConfigurationManager.getInstance().getConfig().get("System.saveChunks")) {
             return;
         }
 

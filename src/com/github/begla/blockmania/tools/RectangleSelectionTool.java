@@ -27,7 +27,7 @@ import javolution.util.FastList;
 import java.util.logging.Level;
 
 /**
- * TODO
+ * Simple rectangle block selection tool. Can be used to generate and paste blueprints.
  */
 public class RectangleSelectionTool implements Tool {
 

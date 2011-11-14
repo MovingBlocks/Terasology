@@ -21,6 +21,8 @@ import com.github.begla.blockmania.utilities.FastRandom;
 import java.util.Random;
 
 /**
+ * Cactus generator.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class TreeGeneratorCactus extends TreeGenerator {

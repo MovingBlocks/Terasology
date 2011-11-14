@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.tools;
 
 /**
- * TODO
+ * Basic interface for tools.
  */
 public interface Tool {
 

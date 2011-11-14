@@ -21,7 +21,6 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.generators.ChunkGenerator;
-import com.github.begla.blockmania.main.Blockmania;
 import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
@@ -35,7 +34,6 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.logging.Level;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -133,17 +131,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public boolean generate() {
         if (_fresh) {
-            // Apply all generators to this chunk
-            long timeStart = System.currentTimeMillis();
-
             for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators()) {
                 gen.generate(this);
             }
 
             generateSunlight();
-            _fresh = false;
 
-            Blockmania.getInstance().getLogger().log(Level.FINEST, "Chunk ({1}) generated ({0}s).", new Object[]{(System.currentTimeMillis() - timeStart) / 1000d, this});
+            _fresh = false;
             return true;
         }
         return false;
@@ -153,21 +147,23 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Updates the light of this chunk.
      */
     public void updateLight() {
-        if (!_fresh) { // Do NOT update fresh chunks
-            for (int x = 0; x < getChunkDimensionX(); x++) {
-                for (int z = 0; z < getChunkDimensionZ(); z++) {
-                    for (int y = 0; y < getChunkDimensionY(); y++) {
-                        byte lightValue = getLight(x, y, z, LIGHT_TYPE.SUN);
+        if (_fresh)
+            return;
 
-                        // Spread the sunlight in translucent blocks with a light value greater than zero.
-                        if (lightValue > 0 && BlockManager.getInstance().getBlock(getBlock(x, y, z)).isTranslucent()) {
-                            spreadLight(x, y, z, lightValue, LIGHT_TYPE.SUN);
-                        }
+        for (int x = 0; x < getChunkDimensionX(); x++) {
+            for (int z = 0; z < getChunkDimensionZ(); z++) {
+                for (int y = 0; y < getChunkDimensionY(); y++) {
+                    byte lightValue = getLight(x, y, z, LIGHT_TYPE.SUN);
+
+                    // Spread the sunlight in translucent blocks with a light value greater than zero.
+                    if (lightValue > 0 && BlockManager.getInstance().getBlock(getBlock(x, y, z)).isTranslucent()) {
+                        spreadLight(x, y, z, lightValue, LIGHT_TYPE.SUN);
                     }
                 }
             }
-            setLightDirty(false);
         }
+
+        setLightDirty(false);
     }
 
     /**
@@ -327,7 +323,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
     }
 
-
     /**
      * Recursive light calculation.
      *
@@ -485,7 +480,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @return The distance of the chunk to the player
      */
     public double distanceToPlayer() {
-        return Math.sqrt(Math.pow(getParent().getRenderingOrigin().x - getChunkWorldPosX(), 2) + Math.pow(getParent().getRenderingOrigin().z - getChunkWorldPosZ(), 2));
+        return Math.sqrt(Math.pow(getParent().getRenderingReferencePoint().x - getChunkWorldPosX(), 2) + Math.pow(getParent().getRenderingReferencePoint().z - getChunkWorldPosZ(), 2));
     }
 
     /**
@@ -698,14 +693,14 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void update() {
-        if (_newMesh != null)
+        if (_newMesh != null) {
             _newMesh.generateVBOs();
+        }
 
         swapActiveMesh();
     }
 
     public void render() {
-        // Nothing to do
     }
 
     private void setNewMesh(ChunkMesh newMesh) {

@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Stack;
 
 /**
- * Allows generation of complex trees based on Lindenmayer-Systems.
+ * Allows the generation of complex trees based on L-Systems.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -154,7 +154,6 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
     public TreeGenerator withLeafType(byte b) {
         _leafType = b;
-
         return this;
     }
 }

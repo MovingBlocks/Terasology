@@ -56,7 +56,7 @@ bm.addBlock(new Block().withTitle("Brick").withId((byte) 20).withTextureAtlasPos
 // <--
 
 // Billboards
-bm.addBlock(new Block().withTitle("Red flower").withId((byte) 16).withTextureAtlasPos(new Vector2f(13, 0)).withTranslucent(true).withPenetrable(true).withTranslucent(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD))
+bm.addBlock(new Block().withTitle("Red flower").withId((byte) 16).withTextureAtlasPos(new Vector2f(13, 0)).withTranslucent(true).withPenetrable(true).withTranslucent(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
 
 bm.addBlock(new Block().withTitle("Yellow flower").withId((byte) 17).withTextureAtlasPos(new Vector2f(12, 0)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
 
@@ -88,7 +88,7 @@ bm.addBlock(new Block().withTitle("Torch").withId((byte) 29).withTextureAtlasPos
 // <--
 
 // Leafs
-bm.addBlock(new Block().withTitle("Leaf").withId((byte) 11).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withDisableTesselation(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT))
-bm.addBlock(new Block().withTitle("Red leaf").withId((byte) 30).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withDisableTesselation(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(1.0f, 0.8f, 0.8f, 1.0f)))
-bm.addBlock(new Block().withTitle("Dark leaf").withId((byte) 12).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withDisableTesselation(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(0.5f, 0.5f, 0.5f, 1.0f)))
+bm.addBlock(new Block().withTitle("Leaf").withId((byte) 11).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT))
+bm.addBlock(new Block().withTitle("Red leaf").withId((byte) 30).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(1.0f, 0.8f, 0.8f, 1.0f)))
+bm.addBlock(new Block().withTitle("Dark leaf").withId((byte) 12).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(0.5f, 0.5f, 0.5f, 1.0f)))
 // <--

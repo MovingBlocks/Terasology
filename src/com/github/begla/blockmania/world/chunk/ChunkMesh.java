@@ -1,6 +1,6 @@
 package com.github.begla.blockmania.world.chunk;
 
-import com.github.begla.blockmania.rendering.VBOManager;
+import com.github.begla.blockmania.rendering.VertexBufferObjectManager;
 import gnu.trove.list.array.TFloatArrayList;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -62,10 +62,10 @@ public class ChunkMesh {
     /**
      * Generates the display lists from the pre calculated arrays.
      */
-    public void generateVBOs() {
+    public boolean generateVBOs() {
         // IMPORTANT: A mesh can only be generated once.
         if (_generated || _disposed)
-            return;
+            return false;
 
         for (int i = 0; i < _vertexBuffers.length; i++)
             generateVBO(i);
@@ -73,6 +73,8 @@ public class ChunkMesh {
         _vertexElements = null;
         // Make sure this mesh can not be generated again
         _generated = true;
+
+        return true;
     }
 
     private void generateVBO(int id) {
@@ -81,12 +83,12 @@ public class ChunkMesh {
                 return;
             }
 
-            _vertexBuffers[id] = VBOManager.getInstance().getVboId();
-            _idxBuffers[id] = VBOManager.getInstance().getVboId();
+            _vertexBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
+            _idxBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
             _idxBufferCount[id] = _vertexElements[id].indices.limit();
 
-            VBOManager.getInstance().bufferVboElementData(_idxBuffers[id], _vertexElements[id].indices, GL15.GL_STATIC_DRAW);
-            VBOManager.getInstance().bufferVboData(_vertexBuffers[id], _vertexElements[id].vertices, GL15.GL_STATIC_DRAW);
+            VertexBufferObjectManager.getInstance().bufferVboElementData(_idxBuffers[id], _vertexElements[id].indices, GL15.GL_STATIC_DRAW);
+            VertexBufferObjectManager.getInstance().bufferVboData(_vertexBuffers[id], _vertexElements[id].vertices, GL15.GL_STATIC_DRAW);
         }
     }
 
@@ -164,12 +166,12 @@ public class ChunkMesh {
             for (int i = 0; i < _vertexBuffers.length; i++) {
                 int id = _vertexBuffers[i];
 
-                VBOManager.getInstance().putVboId(id);
+                VertexBufferObjectManager.getInstance().putVboId(id);
                 _vertexBuffers[i] = 0;
 
                 id = _idxBuffers[i];
 
-                VBOManager.getInstance().putVboId(id);
+                VertexBufferObjectManager.getInstance().putVboId(id);
                 _idxBuffers[i] = 0;
             }
 

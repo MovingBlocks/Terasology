@@ -27,20 +27,17 @@ import java.nio.IntBuffer;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class VBOManager {
+public class VertexBufferObjectManager {
 
-    private static VBOManager _instance = null;
+    private static VertexBufferObjectManager _instance = null;
     private TIntArrayList _vertexBufferObjectPool = new TIntArrayList();
 
-    public static VBOManager getInstance() {
+    public static VertexBufferObjectManager getInstance() {
         if (_instance == null) {
-            _instance = new VBOManager();
+            _instance = new VertexBufferObjectManager();
         }
 
         return _instance;
-    }
-
-    public VBOManager() {
     }
 
     private IntBuffer createVbos(int size) {

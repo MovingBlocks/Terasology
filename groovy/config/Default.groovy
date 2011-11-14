@@ -5,8 +5,7 @@ System {
 
     gameTitle = "Blockmania Pre Alpha"
 
-    maxThreads = Math.min(Runtime.getRuntime().availableProcessors() + 1, 6)
-
+    maxThreads = Runtime.getRuntime().availableProcessors() + 1;
     saveChunks = true
 
     Debug {
@@ -17,7 +16,6 @@ System {
         chunkOutlines = false
 
         demoFlight = false
-
         godMode = false
 
     }
@@ -34,8 +32,8 @@ Graphics {
 
     fov = 60.0d
 
-    viewingDistanceX = 24
-    viewingDistanceZ = 24
+    viewingDistanceX = 32
+    viewingDistanceZ = 32
 
 }
 
@@ -90,8 +88,10 @@ World {
 
     defaultSeed = "TEST"
 
-    sunRiseSetDuration = 0.1d
-    dayNightLength = new Long((60 * 1000) * 20) // 20 minutes in ms
+    sunRiseSetDuration = 0.05d
+
+    dayNightLengthInMs = new Long((60 * 1000) * 20) // 20 minutes in ms
+    initialTimeOffsetInMs = new Long(30 * 1000) // 30 seconds in ms
 
     Biomes {
 

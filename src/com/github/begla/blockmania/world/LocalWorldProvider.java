@@ -36,7 +36,6 @@ import org.xml.sax.InputSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.logging.Level;
 
 /**
@@ -51,13 +50,14 @@ public class LocalWorldProvider implements WorldProvider {
 
     /* CHUNK PROVIDER */
     protected final ChunkProvider _chunkProvider;
+
     /* CONST */
-    protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) ConfigurationManager.getInstance().getConfig().get("World.dayNightLength");
+    protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) ConfigurationManager.getInstance().getConfig().get("World.dayNightLengthInMs");
 
     /* PROPERTIES */
     protected String _title, _seed;
-    protected long _creationTime = Blockmania.getInstance().getTime() - 10000;
-    public Vector3f _renderingOrigin = new Vector3f();
+    protected long _creationTime = Blockmania.getInstance().getTime() - (Long) ConfigurationManager.getInstance().getConfig().get("World.initialTimeOffsetInMs");
+    public Vector3f _renderingReferencePoint = new Vector3f();
 
     /* RANDOMNESS */
     protected final FastRandom _random;
@@ -317,36 +317,18 @@ public class LocalWorldProvider implements WorldProvider {
         return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcBiomeTypeForGlobalPosition(x, z);
     }
 
-    /**
-     * @return The save path of this world.
-     */
     public String getWorldSavePath() {
         return String.format("SAVED_WORLDS/%s", _title);
     }
-
-    /**
-     * @return The current time
-     */
-    public double getTime() {
-        long milliSecsSinceCreation = Blockmania.getInstance().getTime() - _creationTime;
-
-        return (double) milliSecsSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
-    }
-
-    /**
-     * Sets the current time.
-     *
-     * @param time The time to set
-     */
     public void setTime(double time) {
         _creationTime = Blockmania.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
     }
 
-    /**
-     * Returns the used chunk provider.
-     *
-     * @return
-     */
+    public double getTime() {
+        long msSinceCreation = Blockmania.getInstance().getTime() - _creationTime;
+        return (double) msSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
+    }
+
     public ChunkProvider getChunkProvider() {
         return _chunkProvider;
     }
@@ -355,40 +337,23 @@ public class LocalWorldProvider implements WorldProvider {
         return _generatorManager;
     }
 
-    /**
-     * Returns the RNG used by this world provider.
-     *
-     * @return
-     */
     public FastRandom getRandom() {
         return _random;
     }
 
-    /**
-     * Returns the title of this world.
-     *
-     * @return
-     */
     public String getTitle() {
         return _title;
     }
 
-    /**
-     * Returns the seed of this world.
-     *
-     * @return
-     */
     public String getSeed() {
         return _seed;
     }
 
     /**
-     * Returns the rendering origin of this world.
-     *
-     * @return
+     * Returns the rendering reference point of this world.
      */
-    public Vector3f getRenderingOrigin() {
-        return _renderingOrigin;
+    public Vector3f getRenderingReferencePoint() {
+        return _renderingReferencePoint;
     }
 
     /**
@@ -453,25 +418,6 @@ public class LocalWorldProvider implements WorldProvider {
         } catch (Exception e) {
             return false;
         }
-    }
-
-    /**
-     * Refreshes sunlight vertically at a given global position.
-     *
-     * @param x               The X-coordinate
-     * @param z               The Z-coordinate
-     * @param spreadLight     If true sunlight gets spread
-     * @param refreshSunlight If true sunlight gets refreshed locally
-     */
-    public void refreshSunlightAt(int x, int z, boolean spreadLight, boolean refreshSunlight) {
-        int chunkPosX = MathHelper.calcChunkPosX(x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(z);
-
-        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
-
-        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
-        c.refreshSunlightAtLocalPos(blockPosX, blockPosZ, spreadLight, refreshSunlight);
     }
 
     /**

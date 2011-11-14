@@ -22,7 +22,7 @@ import org.lwjgl.util.vector.Vector3f;
 import java.nio.FloatBuffer;
 
 /**
- * View frustum class which can be used for frustum culling.
+ * View frustum class usable for frustum culling.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

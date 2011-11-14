@@ -167,11 +167,6 @@ public interface WorldProvider {
     public Vector3f nextSpawningPoint();
 
     /**
-     * Disposes this world provider.
-     */
-    public void dispose();
-
-    /**
      * Returns the RNG for this world provider.
      *
      * @return The RNG
@@ -181,5 +176,10 @@ public interface WorldProvider {
     /**
      * @return The rendering origin
      */
-    public Vector3f getRenderingOrigin();
+    public Vector3f getRenderingReferencePoint();
+
+    /**
+     * Disposes this world provider.
+     */
+    public void dispose();
 }
