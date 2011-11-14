@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 /**
+ * Provides access to blocks by block id or block title
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockManager {
@@ -59,7 +61,6 @@ public class BlockManager {
             scriptEngine.run("Default.groovy", _binding);
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
-            e.printStackTrace();
         } catch (ResourceException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         } catch (ScriptException e) {

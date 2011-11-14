@@ -20,29 +20,47 @@ import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.world.WorldProvider;
 import javolution.util.FastList;
 import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
- * TODO
+ * A very simple prototype of the blueprint prototype.
+ * <p/>
+ * Blueprints are currently a collection of block positions and block types
+ * that can be used to create replicas in the world.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Blueprint {
 
-    private FastList<BlockPosition> _blockPositions = FastList.newInstance();
+    private FastSet<BlockPosition> _blockPositions = FastSet.newInstance();
     private FastMap<BlockPosition, Block> _blockTypes = FastMap.newInstance();
 
-    public Blueprint() {
-
-    }
-
+    /**
+     * Builds the blueprint in the given world at the given position.
+     *
+     * @param provider The world the blueprint should be build in
+     * @param position The position the blueprint should be build
+     */
     public void build(WorldProvider provider, BlockPosition position) {
         for (BlockPosition bp : _blockPositions) {
             provider.setBlock(bp.x + position.x, bp.y + position.y, bp.z + position.z, _blockTypes.get(bp).getId(), true, true);
         }
     }
 
-    public FastList<BlockPosition> getBlockPositions() {
+    /**
+     * Returns the list of block positions.
+     *
+     * @return The list
+     */
+    public FastSet<BlockPosition> getBlockPositions() {
         return _blockPositions;
     }
 
+    /**
+     * Returns the map assigning block types to block positions.
+     *
+     * @return The map
+     */
     public FastMap<BlockPosition, Block> getBlockTypes() {
         return _blockTypes;
     }

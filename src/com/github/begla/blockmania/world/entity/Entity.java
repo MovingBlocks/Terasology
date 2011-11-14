@@ -17,7 +17,10 @@ package com.github.begla.blockmania.world.entity;
 
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.rendering.RenderableObject;
+import org.lwjgl.util.vector.Matrix3f;
+import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 /**
  * Entities are renderable objects in the world. Entities provide a
@@ -27,8 +30,9 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public abstract class Entity implements RenderableObject {
 
-    protected final Vector3f _spawningPoint = new Vector3f();
-    protected final Vector3f _position = new Vector3f();
+    private final Vector3f _spawningPoint = new Vector3f();
+    private final Vector3f _position = new Vector3f();
+    public final Vector3f _offset = new Vector3f();
 
     /**
      * Returns the position of the entity.

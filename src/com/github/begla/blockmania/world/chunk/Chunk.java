@@ -28,6 +28,7 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.LocalWorldProvider;
 import com.github.begla.blockmania.world.entity.StaticEntity;
 import javolution.util.FastList;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.io.Externalizable;
@@ -61,8 +62,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     /* ------ */
     protected final BlockmaniaArray _blocks;
     protected final BlockmaniaSmartArray _sunlight, _light;
-    /* ------ */
-    protected AABB _aabb;
     /* ------ */
     private ChunkMesh _activeMesh;
     private ChunkMesh _newMesh;
@@ -491,14 +490,14 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public Chunk[] loadOrCreateNeighbors() {
         Chunk[] chunks = new Chunk[8];
 
-        chunks[0] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x + 1, (int) _position.z);
-        chunks[1] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x - 1, (int) _position.z);
-        chunks[2] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x, (int) _position.z + 1);
-        chunks[3] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x, (int) _position.z - 1);
-        chunks[4] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x + 1, (int) _position.z + 1);
-        chunks[5] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x - 1, (int) _position.z - 1);
-        chunks[6] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x - 1, (int) _position.z + 1);
-        chunks[7] = getParent().getChunkProvider().loadOrCreateChunk((int) _position.x + 1, (int) _position.z - 1);
+        chunks[0] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x + 1, (int) getPosition().z);
+        chunks[1] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x - 1, (int) getPosition().z);
+        chunks[2] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x, (int) getPosition().z + 1);
+        chunks[3] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x, (int) getPosition().z - 1);
+        chunks[4] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x + 1, (int) getPosition().z + 1);
+        chunks[5] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x - 1, (int) getPosition().z - 1);
+        chunks[6] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x - 1, (int) getPosition().z + 1);
+        chunks[7] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x + 1, (int) getPosition().z - 1);
         return chunks;
     }
 
@@ -547,7 +546,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     @Override
     public String toString() {
-        return String.format("Chunk at %s.", _position);
+        return String.format("Chunk at %s.", getPosition());
     }
 
     /**
@@ -571,12 +570,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public AABB getAABB() {
-        if (_aabb == null) {
-            Vector3f dimensions = new Vector3f(getChunkDimensionX() / 2, getChunkDimensionY() / 2, getChunkDimensionZ() / 2);
-            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX(), dimensions.getY(), getChunkWorldPosZ() + dimensions.getZ());
-            _aabb = new AABB(position, dimensions);
-        }
-        return _aabb;
+        Vector3f dimensions = new Vector3f(getChunkDimensionX() / 2, getChunkDimensionY() / 2, getChunkDimensionZ() / 2);
+        Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX() + _offset.x, dimensions.getY() + _offset.y, getChunkWorldPosZ() + dimensions.getZ() + _offset.z);
+        return new AABB(position, dimensions);
     }
 
     public boolean processChunk() {
@@ -625,8 +621,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeInt((int) _position.getX());
-        out.writeInt((int) _position.getZ());
+        out.writeInt((int) getPosition().getX());
+        out.writeInt((int) getPosition().getZ());
 
         // Save flags...
         byte flags = 0x0;
@@ -648,8 +644,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        _position.setX(in.readInt());
-        _position.setZ(in.readInt());
+        getPosition().setX(in.readInt());
+        getPosition().setZ(in.readInt());
 
         // The first byte contains the flags...
         byte flags = in.readByte();
@@ -686,10 +682,15 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @param type The type of vertices to render
      */
     public void render(ChunkMesh.RENDER_TYPE type) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef(getPosition().x * getChunkDimensionX() + _offset.x, getPosition().y * getChunkDimensionY() + _offset.y, getPosition().z * getChunkDimensionZ() + _offset.z);
+
         // Render the generated chunk mesh
         if (_activeMesh != null) {
             _activeMesh.render(type);
         }
+
+        GL11.glPopMatrix();
     }
 
     public void update() {
@@ -748,7 +749,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
 
     public int getChunkWorldPosX() {
-        return (int) _position.x * getChunkDimensionX();
+        return (int) getPosition().x * getChunkDimensionX();
     }
 
     /**
@@ -757,7 +758,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @return Thew world position
      */
     public int getChunkWorldPosZ() {
-        return (int) _position.z * getChunkDimensionZ();
+        return (int) getPosition().z * getChunkDimensionZ();
     }
 
     /**
@@ -827,11 +828,11 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public String getChunkSavePath() {
-        return Chunk.getChunkSavePathForPosition(_position);
+        return Chunk.getChunkSavePathForPosition(getPosition());
     }
 
     public String getChunkFileName() {
-        return Chunk.getChunkFileNameForPosition(_position);
+        return Chunk.getChunkFileNameForPosition(getPosition());
     }
 
     public void setVisible(boolean visible) {

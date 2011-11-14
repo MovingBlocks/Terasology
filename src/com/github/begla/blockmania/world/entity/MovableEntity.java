@@ -109,8 +109,8 @@ public abstract class MovableEntity extends Entity {
     }
 
     private void checkPosition() {
-        if (!_godMode && _position.y < 0) {
-            _position.y = _parent.maxHeightAt((int) _position.x, (int) _position.y);
+        if (!_godMode && getPosition().y < 0) {
+            getPosition().y = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().y);
         }
     }
 
@@ -502,10 +502,12 @@ public abstract class MovableEntity extends Entity {
     }
 
     protected Vector3f calcEyePosition() {
-        AABB aabb = getAABB();
-        Vector3f eyePosition = new Vector3f(aabb.getPosition());
-        eyePosition.y += aabb.getDimensions().y - 0.2;
-        return eyePosition;
+        Vector3f eyePosition = new Vector3f(getPosition());
+        return Vector3f.add(eyePosition, calcEyeOffset(), eyePosition);
+    }
+
+    protected Vector3f calcEyeOffset() {
+        return new Vector3f(0.0f, getAABB().getDimensions().y - 0.2f, 0.0f);
     }
 
     public Vector3f getViewingDirection() {

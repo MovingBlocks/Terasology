@@ -52,7 +52,7 @@ public final class Slime extends Character {
 
         glPushMatrix();
 
-        glTranslatef(getPosition().x, getPosition().y, getPosition().z);
+        glTranslatef(getPosition().x - _parent.getWorldProvider().getRenderingReferencePoint().x, getPosition().y - _parent.getWorldProvider().getRenderingReferencePoint().y, getPosition().z - _parent.getWorldProvider().getRenderingReferencePoint().z);
         glRotatef((float) _yaw, 0f, 1f, 0f);
 
         glEnable(GL_TEXTURE_2D);

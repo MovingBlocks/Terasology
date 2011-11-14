@@ -35,6 +35,8 @@ import java.util.logging.Level;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
+ * Stores all information for a specific block type in the world.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Block implements RenderableObject {
@@ -65,7 +67,6 @@ public class Block implements RenderableObject {
     private static BufferedImage _colorLut;
     private static BufferedImage _foliageLut;
 
-
     /**
      * The six sides of a block.
      */
@@ -80,6 +81,9 @@ public class Block implements RenderableObject {
         DEFAULT, CACTUS, LOWERED_BLOCK, BILLBOARD
     }
 
+    /**
+     * Different color sources for blocks.
+     */
     public static enum COLOR_SOURCE {
         DEFAULT, COLOR_LUT, FOLIAGE_LUT
     }
@@ -101,6 +105,7 @@ public class Block implements RenderableObject {
             withColorOffset(SIDE.values()[i], new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         }
 
+        // Load the default settings
         withPenetrable(false);
         withAllowBlockAttachment(true);
         withBypassSelectionRay(false);
@@ -123,7 +128,7 @@ public class Block implements RenderableObject {
      * @param hum  The humidity
      * @return The color value
      */
-    public Vector4f colorForTemperatureAndHumidity(double temp, double hum) {
+    public Vector4f calcColorForTemperatureAndHumidity(double temp, double hum) {
         hum *= temp;
         int rgbValue = _colorLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
 
@@ -138,21 +143,12 @@ public class Block implements RenderableObject {
      * @param hum  The humidity
      * @return The color value
      */
-    public Vector4f foliageColorForTemperatureAndHumidity(double temp, double hum) {
+    public Vector4f calcFoliageColorForTemperatureAndHumidity(double temp, double hum) {
         hum *= temp;
         int rgbValue = _foliageLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
 
         Color c = new Color(rgbValue);
         return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
-    }
-
-    /**
-     * Returns true if a given block type is translucent.
-     *
-     * @return True if the block type is translucent
-     */
-    public boolean isTranslucent() {
-        return _translucent;
     }
 
     /**
@@ -164,13 +160,13 @@ public class Block implements RenderableObject {
      * @param humidity    The humidity
      * @return The color offset
      */
-    public Vector4f getColorOffsetFor(SIDE side, double temperature, double humidity) {
+    public Vector4f calcColorOffsetFor(SIDE side, double temperature, double humidity) {
         Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         if (getColorSource() == COLOR_SOURCE.COLOR_LUT)
-            color.set(colorForTemperatureAndHumidity(temperature, humidity));
+            color.set(calcColorForTemperatureAndHumidity(temperature, humidity));
         else if (getColorSource() == COLOR_SOURCE.FOLIAGE_LUT) {
-            color.set(foliageColorForTemperatureAndHumidity(temperature, humidity));
+            color.set(calcFoliageColorForTemperatureAndHumidity(temperature, humidity));
         }
 
         color.x *= _colorOffset[side.ordinal()].x;
@@ -182,13 +178,13 @@ public class Block implements RenderableObject {
     }
 
     /**
-     * Calculates the texture offset for a given block type and a specific
-     * side of the block in the actual texture used for world rendering.
+     * Calculates the texture atlas offset for a given block type and a specific
+     * side.
      *
      * @param side The side of the block
      * @return The texture offset
      */
-    public Vector2f getTextureOffsetFor(SIDE side) {
+    public Vector2f calcTextureOffsetFor(SIDE side) {
         return Helper.calcOffsetForTextureAt((int) getTextureAtlasPos()[side.ordinal()].x, (int) getTextureAtlasPos()[side.ordinal()].y);
     }
 
@@ -214,88 +210,12 @@ public class Block implements RenderableObject {
         return new AABB(new Vector3f(x, y, z), new Vector3f(0.5f, 0.5f, 0.5f));
     }
 
-    private void generateDisplayList() {
-        if (_displayList > 0)
-            return;
-
-        _displayList = glGenLists(1);
-
-        glNewList(_displayList, GL11.GL_COMPILE);
-        glBegin(GL_QUADS);
-        GL11.glColor3f(1.0f, 1.0f, 1.0f);
-
-        // TOP
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x, getTextureOffsetFor(SIDE.TOP).y);
-        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x + 0.0624f, getTextureOffsetFor(SIDE.TOP).y);
-        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x + 0.0624f, getTextureOffsetFor(SIDE.TOP).y + 0.0624f);
-        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.TOP).x, getTextureOffsetFor(SIDE.TOP).y + 0.0624f);
-        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-
-        // LEFT
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x, getTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
-        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x + 0.0624f, getTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
-        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x + 0.0624f, getTextureOffsetFor(SIDE.LEFT).y);
-        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.LEFT).x, getTextureOffsetFor(SIDE.LEFT).y);
-        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-
-
-        // BACK
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x, getTextureOffsetFor(SIDE.BACK).y + 0.0624f);
-        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x + 0.0624f, getTextureOffsetFor(SIDE.BACK).y + 0.0624f);
-        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x + 0.0624f, getTextureOffsetFor(SIDE.BACK).y);
-        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BACK).x, getTextureOffsetFor(SIDE.BACK).y);
-        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-
-        // RIGHT
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x, getTextureOffsetFor(SIDE.RIGHT).y);
-        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, getTextureOffsetFor(SIDE.RIGHT).y);
-        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, getTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
-        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.RIGHT).x, getTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
-        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-
-        GL11.glColor3f(0.5f, 0.5f, 0.5f);
-
-        // FRONT
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x, getTextureOffsetFor(SIDE.FRONT).y);
-        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x + 0.0624f, getTextureOffsetFor(SIDE.FRONT).y);
-        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x + 0.0624f, getTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
-        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.FRONT).x, getTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
-        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        // BOTTOM
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x, getTextureOffsetFor(SIDE.BOTTOM).y);
-        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, getTextureOffsetFor(SIDE.BOTTOM).y);
-        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, getTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
-        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(getTextureOffsetFor(SIDE.BOTTOM).x, getTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
-        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-
-        GL11.glEnd();
-        glEndList();
-    }
-
     public void render() {
         if (isInvisible())
             return;
 
         if (_displayList == -1)
-            generateDisplayList();
+            _displayList = generateDisplayList();
 
         glEnable(GL_TEXTURE_2D);
         TextureManager.getInstance().bindTexture("terrain");
@@ -438,18 +358,10 @@ public class Block implements RenderableObject {
         return _textureAtlasPos;
     }
 
-    /**
-     * Returns the form of the block.
-     *
-     * @return The form of the block
-     */
     public BLOCK_FORM getBlockForm() {
         return _blockForm;
     }
 
-    /**
-     * @return The title of the block
-     */
     public String getTitle() {
         return _title;
     }
@@ -458,92 +370,122 @@ public class Block implements RenderableObject {
         return _id;
     }
 
-    /**
-     * Returns true, if the block is invisible.
-     *
-     * @return True if invisible
-     */
     public boolean isInvisible() {
         return _invisible;
     }
 
-    /**
-     * Returns true, if the block should be ignored
-     * during collision checks.
-     *
-     * @return True if penetrable
-     */
     public boolean isPenetrable() {
         return _penetrable;
     }
 
-    /**
-     * Returns true, if the block should be considered while calculating shadows.
-     *
-     * @return True if casting shadows
-     */
     public boolean isCastsShadows() {
         return _castsShadows;
     }
 
-    /**
-     * Returns true if this block should be ignored in the tessellation process.
-     *
-     * @return True if ignored while tessellating
-     */
     public boolean isDisableTesselation() {
         return _disableTessellation;
     }
 
-    /**
-     * Returns true if this block should render a bounding box when selected by the player.
-     *
-     * @return True if a bounding box should be rendered
-     */
     public boolean isRenderBoundingBox() {
         return _renderBoundingBox;
     }
 
-    /**
-     * Returns the luminance of the block.
-     *
-     * @return The luminance
-     */
     public byte getLuminance() {
         return _luminance;
     }
 
-    /**
-     * Returns true if the block can be destroyed by the player.
-     *
-     * @return True if removable
-     */
     public boolean isDestructible() {
         return getHardness() >= 0;
     }
 
-    /**
-     * True if the player is allowed to attach blocks to this block.
-     *
-     * @return True if the player can attach blocks
-     */
     public boolean isAllowBlockAttachment() {
         return _allowBlockAttachment;
     }
 
-    /**
-     * @return True if this block is a liquid
-     */
     public boolean isLiquid() {
         return _liquid;
     }
 
-    /**
-     * True if the selection ray can pass through the block.
-     *
-     * @return True if selection ray can pass
-     */
     public boolean isSelectionRayThrough() {
         return _bypassSelectionRay;
+    }
+
+    public boolean isTranslucent() {
+        return _translucent;
+    }
+
+    private int generateDisplayList() {
+        int id = glGenLists(1);
+
+        glNewList(id, GL11.GL_COMPILE);
+        glBegin(GL_QUADS);
+        GL11.glColor3f(1.0f, 1.0f, 1.0f);
+
+        // TOP
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x, calcTextureOffsetFor(SIDE.TOP).y);
+        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x + 0.0624f, calcTextureOffsetFor(SIDE.TOP).y);
+        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x + 0.0624f, calcTextureOffsetFor(SIDE.TOP).y + 0.0624f);
+        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x, calcTextureOffsetFor(SIDE.TOP).y + 0.0624f);
+        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
+
+        // LEFT
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + 0.0624f, calcTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + 0.0624f, calcTextureOffsetFor(SIDE.LEFT).y);
+        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y);
+        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
+
+
+        // BACK
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + 0.0624f, calcTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + 0.0624f, calcTextureOffsetFor(SIDE.BACK).y);
+        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y);
+        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
+
+        // RIGHT
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x, calcTextureOffsetFor(SIDE.RIGHT).y);
+        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, calcTextureOffsetFor(SIDE.RIGHT).y);
+        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, calcTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
+        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x, calcTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
+        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
+
+        GL11.glColor3f(0.5f, 0.5f, 0.5f);
+
+        // FRONT
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + 0.0624f, calcTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + 0.0624f, calcTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
+        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
+        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
+        // BOTTOM
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x, calcTextureOffsetFor(SIDE.BOTTOM).y);
+        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, calcTextureOffsetFor(SIDE.BOTTOM).y);
+        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, calcTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
+        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x, calcTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
+        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
+
+        GL11.glEnd();
+        glEndList();
+
+        return id;
     }
 }

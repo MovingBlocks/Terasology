@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 /**
- * Simple managing class for loading and storing audio files.
+ * Simple managing class for loading and accessing audio files.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -34,12 +34,6 @@ public class AudioManager {
     private FastMap<String, Audio> _audioFiles = new FastMap();
     private static AudioManager _instance = null;
 
-    /**
-     * Returns (and creates – if necessary) the static instance
-     * of this helper class.
-     *
-     * @return The instance
-     */
     public static AudioManager getInstance() {
         if (_instance == null) {
             _instance = new AudioManager();
@@ -83,8 +77,8 @@ public class AudioManager {
     /**
      * Loads the music file with the given name.
      *
-     * @param s The name of the audio file
-     * @return The loaded audio file
+     * @param s The name of the music file
+     * @return The loaded music file
      */
     public Audio loadMusic(String s) {
         try {
@@ -97,7 +91,7 @@ public class AudioManager {
     }
 
     /**
-     * Stops all audio instances.
+     * Stops all playback.
      */
     public void stopAllSounds() {
         for (Audio a : _audioFiles.values()) {
@@ -106,7 +100,7 @@ public class AudioManager {
     }
 
     /**
-     * Returns the stored audio file with the given name.
+     * Returns the loaded audio file with the given name.
      *
      * @param s The name of the audio file
      * @return The loaded audio file

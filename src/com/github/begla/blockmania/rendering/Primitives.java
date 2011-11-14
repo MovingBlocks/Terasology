@@ -18,6 +18,8 @@ package com.github.begla.blockmania.rendering;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector4f;
 
+import static org.lwjgl.opengl.GL11.glGenLists;
+
 /**
  * A collection of some basic primitives.
  *
@@ -25,96 +27,57 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public class Primitives {
 
-    private static final Vector4f CLOUD_COLOR_1 = new Vector4f(0.96f, 0.96f, 0.96f, 0.70f);
-    private static final Vector4f CLOUD_COLOR_2 = new Vector4f(1.0f, 1.0f, 1.0f, 0.70f);
+    public static int generateColoredBlock(Vector4f color, float size) {
+        int id = glGenLists(1);
 
-    /**
-     * @param scaleX    Scale along the x-axis
-     * @param scaleY    Scale along the y-axis
-     * @param scaleZ    Scale along the z-axis
-     * @param x         Position on the x-axis
-     * @param y         Position on the y-axis
-     * @param z         Position on the z-axis
-     * @param drawLeft
-     * @param drawRight
-     * @param drawFront
-     * @param drawBack
-     */
-    public static void drawCloud(double scaleX, double scaleY, double scaleZ, double x, double y, double z, boolean drawLeft, boolean drawRight, boolean drawFront, boolean drawBack) {
+        GL11.glNewList(id, GL11.GL_COMPILE);
+        GL11.glBegin(GL11.GL_QUADS);
 
-        // Top Face
-        GL11.glColor4f(CLOUD_COLOR_2.x, CLOUD_COLOR_2.y, CLOUD_COLOR_2.z, CLOUD_COLOR_2.w);
-        GL11.glTexCoord2f(0.0f, 0.5f);
-        GL11.glVertex3d(-0.5 * scaleX + x, 0.5 * scaleY + y, -0.5 * scaleZ + z);
-        GL11.glTexCoord2f(0.0f, 0.0f);
-        GL11.glVertex3d(-0.5 * scaleX + x, 0.5 * scaleY + y, 0.5 * scaleZ + z);
-        GL11.glTexCoord2f(0.5f, 0.0f);
-        GL11.glVertex3d(0.5 * scaleX + x, 0.5 * scaleY + y, 0.5 * scaleZ + z);
-        GL11.glTexCoord2f(0.5f, 0.5f);
-        GL11.glVertex3d(0.5 * scaleX + x, 0.5 * scaleY + y, -0.5 * scaleZ + z);
+        GL11.glColor4f(color.x, color.y, color.z, color.w);
 
-        // Back Face
-        if (drawBack) {
-            GL11.glColor4f(CLOUD_COLOR_2.x, CLOUD_COLOR_2.y, CLOUD_COLOR_2.z, CLOUD_COLOR_2.w);
-            GL11.glTexCoord2f(0.5f, 0.0f);
-            GL11.glVertex3d(-0.5 * scaleX + x, -0.5 * scaleY + y, -0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.5f, 0.5f);
-            GL11.glVertex3d(-0.5 * scaleX + x, 0.5 * scaleY + y, -0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.0f, 0.5f);
-            GL11.glVertex3d(0.5 * scaleX + x, 0.5 * scaleY + y, -0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.0f, 0.0f);
-            GL11.glVertex3d(0.5 * scaleX + x, -0.5 * scaleY + y, -0.5 * scaleZ + z);
-        }
+        float sHalf = size / 2;
 
+        // TOP
+        GL11.glVertex3f(-sHalf, sHalf, sHalf);
+        GL11.glVertex3f(sHalf, sHalf, sHalf);
+        GL11.glVertex3f(sHalf, sHalf, -sHalf);
+        GL11.glVertex3f(-sHalf, sHalf, -sHalf);
 
-        // Left Face
-        if (drawLeft) {
-            GL11.glColor4f(CLOUD_COLOR_2.x, CLOUD_COLOR_2.y, CLOUD_COLOR_2.z, CLOUD_COLOR_2.w);
-            GL11.glTexCoord2f(0.0f, 0.0f);
-            GL11.glVertex3d(-0.5 * scaleX + x, -0.5 * scaleY + y, -0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.5f, 0.0f);
-            GL11.glVertex3d(-0.5 * scaleX + x, -0.5 * scaleY + y, 0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.5f, 0.5f);
-            GL11.glVertex3d(-0.5 * scaleX + x, 0.5 * scaleY + y, 0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.0f, 0.5f);
-            GL11.glVertex3d(-0.5 * scaleX + x, 0.5 * scaleY + y, -0.5 * scaleZ + z);
-        }
-        // Right face
-        if (drawRight) {
-            GL11.glColor4f(CLOUD_COLOR_2.x, CLOUD_COLOR_2.y, CLOUD_COLOR_2.z, CLOUD_COLOR_2.w);
-            GL11.glTexCoord2f(0.5f, 0.0f);
-            GL11.glVertex3d(0.5 * scaleX + x, -0.5 * scaleY + y, -0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.5f, 0.5f);
-            GL11.glVertex3d(0.5 * scaleX + x, 0.5 * scaleY + y, -0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.0f, 0.5f);
-            GL11.glVertex3d(0.5 * scaleX + x, 0.5 * scaleY + y, 0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.0f, 0.0f);
-            GL11.glVertex3d(0.5 * scaleX + x, -0.5 * scaleY + y, 0.5 * scaleZ + z);
-        }
+        // LEFT
+        GL11.glVertex3f(-sHalf, -sHalf, -sHalf);
+        GL11.glVertex3f(-sHalf, -sHalf, sHalf);
+        GL11.glVertex3f(-sHalf, sHalf, sHalf);
+        GL11.glVertex3f(-sHalf, sHalf, -sHalf);
 
+        // RIGHT
+        GL11.glVertex3f(sHalf, sHalf, -sHalf);
+        GL11.glVertex3f(sHalf, sHalf, sHalf);
+        GL11.glVertex3f(sHalf, -sHalf, sHalf);
+        GL11.glVertex3f(sHalf, -sHalf, -sHalf);
 
-        // Front face
-        if (drawFront) {
-            GL11.glColor4f(CLOUD_COLOR_2.x, CLOUD_COLOR_2.y, CLOUD_COLOR_2.z, CLOUD_COLOR_2.w);
-            GL11.glTexCoord2f(0.5f, 0.0f);
-            GL11.glVertex3d(-0.5 * scaleX + x, -0.5 * scaleY + y, 0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.5f, 0.0f);
-            GL11.glVertex3d(0.5 * scaleX + x, -0.5 * scaleY + y, 0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.5f, 0.5f);
-            GL11.glVertex3d(0.5 * scaleX + x, 0.5 * scaleY + y, 0.5 * scaleZ + z);
-            GL11.glTexCoord2f(0.0f, 0.5f);
-            GL11.glVertex3d(-0.5 * scaleX + x, 0.5 * scaleY + y, 0.5 * scaleZ + z);
-        }
+        GL11.glColor4f(0.85f * color.x, 0.85f * color.y, 0.85f * color.z, 0.85f * color.w);
 
-        // Bottom Face
-        GL11.glColor4f(CLOUD_COLOR_1.x, CLOUD_COLOR_1.y, CLOUD_COLOR_1.z, CLOUD_COLOR_1.w);
-        GL11.glTexCoord2f(0.5f, 0.5f);
-        GL11.glVertex3d(-0.5 * scaleX + x, -0.5 * scaleY + y, -0.5 * scaleZ + z);
-        GL11.glTexCoord2f(0.0f, 0.5f);
-        GL11.glVertex3d(0.5 * scaleX + x, -0.5 * scaleY + y, -0.5 * scaleZ + z);
-        GL11.glTexCoord2f(0.0f, 0.0f);
-        GL11.glVertex3d(0.5 * scaleX + x, -0.5 * scaleY + y, 0.5 * scaleZ + z);
-        GL11.glTexCoord2f(0.5f, 0.0f);
-        GL11.glVertex3d(-0.5 * scaleX + x, -0.5 * scaleY + y, 0.5 * scaleZ + z);
+        // FRONT
+        GL11.glVertex3f(-sHalf, sHalf, -sHalf);
+        GL11.glVertex3f(sHalf, sHalf, -sHalf);
+        GL11.glVertex3f(sHalf, -sHalf, -sHalf);
+        GL11.glVertex3f(-sHalf, -sHalf, -sHalf);
+
+        // BACK
+        GL11.glVertex3f(-sHalf, -sHalf, sHalf);
+        GL11.glVertex3f(sHalf, -sHalf, sHalf);
+        GL11.glVertex3f(sHalf, sHalf, sHalf);
+        GL11.glVertex3f(-sHalf, sHalf, sHalf);
+
+        // BOTTOM
+        GL11.glVertex3f(-sHalf, -sHalf, -sHalf);
+        GL11.glVertex3f(sHalf, -sHalf, -sHalf);
+        GL11.glVertex3f(sHalf, -sHalf, sHalf);
+        GL11.glVertex3f(-sHalf, -sHalf, sHalf);
+
+        GL11.glEnd();
+        GL11.glEndList();
+
+        return id;
     }
 }

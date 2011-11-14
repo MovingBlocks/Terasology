@@ -15,42 +15,56 @@
  */
 package com.github.begla.blockmania.blueprints;
 
-import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.rendering.Primitives;
 import com.github.begla.blockmania.rendering.RenderableObject;
-import javolution.util.FastList;
+import javolution.util.FastSet;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 /**
- * TODO
+ * Renderable block grid. Can be used for displaying collections of selected blocks.
+ * <p/>
+ * TODO: Optimize!
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockGrid implements RenderableObject {
 
-    private AABB _displayAABB = new AABB(new Vector3f(), new Vector3f(0.5f, 0.5f, 0.5f));
-    private FastList<BlockPosition> _gridPositions = FastList.newInstance();
+    private static int _blockDisplayList = Primitives.generateColoredBlock(new Vector4f(0.25f, 0.25f, 1.0f, 1.0f), 1.005f);
+    private FastSet<BlockPosition> _gridPositions = FastSet.newInstance();
 
     public void render() {
         for (BlockPosition gp : _gridPositions) {
             GL11.glPushMatrix();
-
-            GL11.glTranslatef(gp.x, gp.y, gp.z);
-            _displayAABB.render();
-
+            GL11.glTranslatef(gp.x - Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint().x, gp.y - Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint().y, gp.z - Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint().z);
+            GL11.glCallList(_blockDisplayList);
             GL11.glPopMatrix();
         }
     }
 
+    /**
+     * Adds a block position to the grid.
+     *
+     * @param gridPosition The block position to add
+     */
     public void addGridPosition(BlockPosition gridPosition) {
         _gridPositions.add(gridPosition);
     }
 
+    /**
+     * Removes a block position from the grid.
+     *
+     * @param gridPosition The block position to remove
+     */
     public void removeGridPosition(BlockPosition gridPosition) {
         _gridPositions.remove(gridPosition);
     }
 
+    /**
+     * Removes all block positions from the grid.
+     */
     public void clear() {
         _gridPositions.clear();
     }

@@ -98,16 +98,16 @@ public class BlockParticle extends Particle {
         Block b = BlockManager.getInstance().getBlock(_blockType);
 
         glBegin(GL_QUADS);
-        GL11.glTexCoord2f(b.getTextureOffsetFor(Block.SIDE.FRONT).x, b.getTextureOffsetFor(Block.SIDE.FRONT).y);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x, b.calcTextureOffsetFor(Block.SIDE.FRONT).y);
         GL11.glVertex3f(-0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(Block.SIDE.FRONT).x + 0.02f, b.getTextureOffsetFor(Block.SIDE.FRONT).y);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x + 0.02f, b.calcTextureOffsetFor(Block.SIDE.FRONT).y);
         GL11.glVertex3f(0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(Block.SIDE.FRONT).x + 0.02f, b.getTextureOffsetFor(Block.SIDE.FRONT).y + 0.02f);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x + 0.02f, b.calcTextureOffsetFor(Block.SIDE.FRONT).y + 0.02f);
         GL11.glVertex3f(0.5f, 0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.getTextureOffsetFor(Block.SIDE.FRONT).x, b.getTextureOffsetFor(Block.SIDE.FRONT).y + 0.02f);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x, b.calcTextureOffsetFor(Block.SIDE.FRONT).y + 0.02f);
         GL11.glVertex3f(-0.5f, 0.5f, 0.0f);
         glEnd();
 

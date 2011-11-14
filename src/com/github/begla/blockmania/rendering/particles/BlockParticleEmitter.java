@@ -19,6 +19,7 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.rendering.ShaderManager;
 import com.github.begla.blockmania.rendering.TextureManager;
 import com.github.begla.blockmania.world.World;
+import org.lwjgl.opengl.GL11;
 
 /**
  * Emits block particles.
@@ -43,7 +44,10 @@ public class BlockParticleEmitter extends ParticleEmitter {
         TextureManager.getInstance().bindTexture("terrain");
 
         ShaderManager.getInstance().enableShader("particle");
+        GL11.glPushMatrix();
+        GL11.glTranslatef(-_parent.getWorldProvider().getRenderingReferencePoint().x,-_parent.getWorldProvider().getRenderingReferencePoint().y, -_parent.getWorldProvider().getRenderingReferencePoint().z);
         super.render();
+        GL11.glPopMatrix();
         ShaderManager.getInstance().enableShader(null);
     }
 

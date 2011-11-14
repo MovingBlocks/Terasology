@@ -19,17 +19,18 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.world.WorldProvider;
 import javolution.util.FastList;
+import javolution.util.FastSet;
+
+import java.util.Collection;
 
 /**
- * TODO
+ * Provides the functionality to generate blueprints from a list of block positions.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlueprintGenerator {
 
     public static BlueprintGenerator _instance;
-
-    private BlueprintGenerator() {
-
-    }
 
     public static BlueprintGenerator getInstance() {
         if (_instance == null)
@@ -38,7 +39,14 @@ public class BlueprintGenerator {
         return _instance;
     }
 
-    public Blueprint generateBlueprint(WorldProvider provider, FastList<BlockPosition> blockPositions) {
+    /**
+     * Generates a blueprint from a set of blocks in the given world.
+     *
+     * @param provider The world
+     * @param blockPositions List of block positions
+     * @return The final blueprint
+     */
+    public Blueprint generateBlueprint(WorldProvider provider, Collection<BlockPosition> blockPositions) {
         Blueprint result = new Blueprint();
 
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;

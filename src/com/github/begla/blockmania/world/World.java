@@ -215,6 +215,7 @@ public final class World extends RenderableScene {
         _player.getActiveCamera().lookThrough();
 
         _player.render();
+
         renderChunks();
 
         /* PARTICLE EFFECTS */
@@ -319,6 +320,8 @@ public final class World extends RenderableScene {
 
         // Update visible chunks
         for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; ) {
+            n.getValue()._offset.set(-getWorldProvider().getRenderingReferencePoint().x, -getWorldProvider().getRenderingReferencePoint().y, -getWorldProvider().getRenderingReferencePoint().z);
+
             if (n.getValue().isVisible()) {
                 if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
                     _chunkUpdateManager.queueChunkUpdate(n.getValue(), false);

@@ -84,7 +84,13 @@ public final class Player extends Character {
         if ((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox")) {
             if (is != null) {
                 if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition().toVector3f())).isRenderBoundingBox()) {
-                    Block.AABBForBlockAt(is.getBlockPosition().toVector3f()).render();
+
+                    Vector3f v = is.getBlockPosition().toVector3f();
+                    v.x -= _parent.getWorldProvider().getRenderingReferencePoint().x;
+                    v.y -= _parent.getWorldProvider().getRenderingReferencePoint().y;
+                    v.z -= _parent.getWorldProvider().getRenderingReferencePoint().z;
+
+                    Block.AABBForBlockAt(v).render();
                 }
             }
         }
@@ -97,7 +103,7 @@ public final class Player extends Character {
     }
 
     public void updateCameras() {
-        _firstPersonCamera.getPosition().set(calcEyePosition());
+        _firstPersonCamera.getPosition().set(calcEyeOffset());
 
         if (!((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode"))) {
             _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.0f));

@@ -123,30 +123,32 @@ public final class ChunkMeshGenerator {
         double[] blockLights = new double[8];
         byte[] blocks = new byte[8];
 
-        blocks[0] = _chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f));
-        blocks[1] = _chunk.getParent().getBlock((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f));
-        blocks[2] = _chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f));
-        blocks[3] = _chunk.getParent().getBlock((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f));
+        Vector3f vertexWorldPos = moveVectorFromChunkSpaceToWorldSpace(vertexPos);
 
-        lights[0] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[1] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[2] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[3] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
+        blocks[0] = _chunk.getParent().getBlock((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f));
+        blocks[1] = _chunk.getParent().getBlock((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f));
+        blocks[2] = _chunk.getParent().getBlock((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f));
+        blocks[3] = _chunk.getParent().getBlock((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f));
 
-        lights[4] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[5] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[6] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[7] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
+        lights[0] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
+        lights[1] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
+        lights[2] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
+        lights[3] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
 
-        blockLights[0] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[1] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[2] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[3] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y + 0.5f), (int) (vertexPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+        lights[4] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
+        lights[5] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
+        lights[6] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
+        lights[7] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
 
-        blockLights[4] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[5] = _chunk.getParent().getLight((int) (vertexPos.x + 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[6] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[7] = _chunk.getParent().getLight((int) (vertexPos.x - 0.5f), (int) (vertexPos.y - 0.5f), (int) (vertexPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[0] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[1] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[2] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[3] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+
+        blockLights[4] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[5] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[6] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[7] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
 
         double resultAmbientOcclusion = 1.0;
         double resultLight = 0;
@@ -176,16 +178,16 @@ public final class ChunkMeshGenerator {
         }
 
         if (counterLight == 0)
-            output[0] = new Double(0);
+            output[0] = (double) 0;
         else
-            output[0] = new Double(resultLight / counterLight) / 15f;
+            output[0] = resultLight / counterLight / 15f;
 
         if (counterBlockLight == 0)
-            output[1] = new Double(0);
+            output[1] = (double) 0;
         else
-            output[1] = new Double(resultBlockLight / counterBlockLight) / 15f;
+            output[1] = resultBlockLight / counterBlockLight / 15f;
 
-        output[2] = new Double(resultAmbientOcclusion);
+        output[2] = resultAmbientOcclusion;
     }
 
     /**
@@ -203,35 +205,35 @@ public final class ChunkMeshGenerator {
         /*
          * First side of the billboard
          */
-        Vector4f colorBillboardOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-        Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.FRONT).x, block.getTextureOffsetFor(Block.SIDE.FRONT).y, 0);
+        Vector4f colorBillboardOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+        Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.FRONT).x, block.calcTextureOffsetFor(Block.SIDE.FRONT).y, 0);
 
         Vector3f p1 = new Vector3f(-0.5f, -0.5f, 0.5f);
         Vector3f p2 = new Vector3f(0.5f, -0.5f, -0.5f);
         Vector3f p3 = new Vector3f(0.5f, 0.5f, -0.5f);
         Vector3f p4 = new Vector3f(-0.5f, 0.5f, 0.5f);
 
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p1));
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p2));
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p3));
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p4));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4));
         addBlockTextureData(mesh._vertexElements[2], texOffset, new Vector3f(0, 0, 1));
 
         /*
         * Second side of the billboard
         */
-        colorBillboardOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-        texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.BACK).x, block.getTextureOffsetFor(Block.SIDE.BACK).y, 0);
+        colorBillboardOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+        texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.BACK).x, block.calcTextureOffsetFor(Block.SIDE.BACK).y, 0);
 
         p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
         p2 = new Vector3f(0.5f, -0.5f, 0.5f);
         p3 = new Vector3f(0.5f, 0.5f, 0.5f);
         p4 = new Vector3f(-0.5f, 0.5f, -0.5f);
 
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p1));
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p2));
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p3));
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToWorldSpace(x, y, z, p4));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4));
         addBlockTextureData(mesh._vertexElements[2], texOffset, new Vector3f(0, 0, 1));
     }
 
@@ -294,9 +296,9 @@ public final class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, 1, 0);
 
-            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.TOP).x, block.getTextureOffsetFor(Block.SIDE.TOP).y, 0f);
+            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.TOP).x, block.calcTextureOffsetFor(Block.SIDE.TOP).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
 
@@ -309,9 +311,9 @@ public final class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, 0, -1);
 
-            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.FRONT).x, block.getTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
+            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.FRONT).x, block.calcTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
 
@@ -323,9 +325,9 @@ public final class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, 0, 1);
 
-            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.BACK).x, block.getTextureOffsetFor(Block.SIDE.BACK).y, 0f);
+            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.BACK).x, block.calcTextureOffsetFor(Block.SIDE.BACK).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
 
@@ -337,9 +339,9 @@ public final class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(-1, 0, 0);
 
-            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.LEFT).x, block.getTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
+            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.LEFT).x, block.calcTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
 
@@ -351,9 +353,9 @@ public final class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(1, 0, 0);
 
-            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.RIGHT).x, block.getTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
+            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.RIGHT).x, block.calcTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
 
@@ -365,9 +367,9 @@ public final class ChunkMeshGenerator {
 
             Vector3f norm = new Vector3f(0, -1, 0);
 
-            Vector4f colorOffset = block.getColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
 
-            Vector3f texOffset = new Vector3f(block.getTextureOffsetFor(Block.SIDE.BOTTOM).x, block.getTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
+            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.BOTTOM).x, block.calcTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
     }
@@ -400,20 +402,28 @@ public final class ChunkMeshGenerator {
 
         addBlockTextureData(vertexElements, texOffset, norm);
 
-        addBlockVertexData(vertexElements, colorOffset, moveVectorToWorldSpace(x, y, z, p1));
-        addBlockVertexData(vertexElements, colorOffset, moveVectorToWorldSpace(x, y, z, p2));
-        addBlockVertexData(vertexElements, colorOffset, moveVectorToWorldSpace(x, y, z, p3));
-        addBlockVertexData(vertexElements, colorOffset, moveVectorToWorldSpace(x, y, z, p4));
+        addBlockVertexData(vertexElements, colorOffset, moveVectorToChunkSpace(x, y, z, p1));
+        addBlockVertexData(vertexElements, colorOffset, moveVectorToChunkSpace(x, y, z, p2));
+        addBlockVertexData(vertexElements, colorOffset, moveVectorToChunkSpace(x, y, z, p3));
+        addBlockVertexData(vertexElements, colorOffset, moveVectorToChunkSpace(x, y, z, p4));
     }
 
-    private Vector3f moveVectorToWorldSpace(int cPosX, int cPosY, int cPosZ, Vector3f offset) {
+    private Vector3f moveVectorFromChunkSpaceToWorldSpace(Vector3f offset) {
         double offsetX = _chunk.getPosition().x * Chunk.getChunkDimensionX();
         double offsetY = _chunk.getPosition().y * Chunk.getChunkDimensionY();
         double offsetZ = _chunk.getPosition().z * Chunk.getChunkDimensionZ();
 
-        offset.x += offsetX + cPosX;
-        offset.y += offsetY + cPosY;
-        offset.z += offsetZ + cPosZ;
+        offset.x += offsetX;
+        offset.y += offsetY;
+        offset.z += offsetZ;
+
+        return offset;
+    }
+
+    private Vector3f moveVectorToChunkSpace(int cPosX, int cPosY, int cPosZ, Vector3f offset) {
+        offset.x += cPosX;
+        offset.y += cPosY;
+        offset.z += cPosZ;
 
         return offset;
     }
