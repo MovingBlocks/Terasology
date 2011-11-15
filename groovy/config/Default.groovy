@@ -89,8 +89,6 @@ World {
 
     defaultSeed = "TEST"
 
-    sunRiseSetDuration = 0.05d
-
     dayNightLengthInMs = new Long((60 * 1000) * 20) // 20 minutes in ms
     initialTimeOffsetInMs = new Long(30 * 1000) // 30 seconds in ms
 
