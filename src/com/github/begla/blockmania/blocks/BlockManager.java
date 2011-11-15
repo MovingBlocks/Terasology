@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.blocks;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;

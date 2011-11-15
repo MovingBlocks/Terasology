@@ -17,15 +17,15 @@ package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.generators.ChunkGenerator;
-import com.github.begla.blockmania.main.ConfigurationManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.LocalWorldProvider;
+import com.github.begla.blockmania.world.main.LocalWorldProvider;
 import com.github.begla.blockmania.world.entity.StaticEntity;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL11;
@@ -571,7 +571,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public AABB getAABB() {
         Vector3f dimensions = new Vector3f(getChunkDimensionX() / 2, getChunkDimensionY() / 2, getChunkDimensionZ() / 2);
-        Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX() + _offset.x, dimensions.getY() + _offset.y, getChunkWorldPosZ() + dimensions.getZ() + _offset.z);
+        Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX() - _parent.getRenderingReferencePoint().x, dimensions.getY() - _parent.getRenderingReferencePoint().y, getChunkWorldPosZ() + dimensions.getZ() - _parent.getRenderingReferencePoint().z);
         return new AABB(position, dimensions);
     }
 
@@ -683,7 +683,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public void render(ChunkMesh.RENDER_TYPE type) {
         GL11.glPushMatrix();
-        GL11.glTranslatef(getPosition().x * getChunkDimensionX() + _offset.x, getPosition().y * getChunkDimensionY() + _offset.y, getPosition().z * getChunkDimensionZ() + _offset.z);
+        GL11.glTranslatef(getPosition().x * getChunkDimensionX() - _parent.getRenderingReferencePoint().x, getPosition().y * getChunkDimensionY() - _parent.getRenderingReferencePoint().y, getPosition().z * getChunkDimensionZ() - _parent.getRenderingReferencePoint().z);
 
         // Render the generated chunk mesh
         if (_activeMesh != null) {

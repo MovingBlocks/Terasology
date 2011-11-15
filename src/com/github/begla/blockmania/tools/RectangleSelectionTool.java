@@ -15,12 +15,11 @@
  */
 package com.github.begla.blockmania.tools;
 
-import com.github.begla.blockmania.blueprints.BlockGrid;
 import com.github.begla.blockmania.blueprints.Blueprint;
 import com.github.begla.blockmania.blueprints.BlueprintGenerator;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.world.characters.Player;
 import javolution.util.FastList;
 
@@ -34,14 +33,11 @@ public class RectangleSelectionTool implements Tool {
     private Player _player;
 
     private FastList<BlockPosition> _selectedBlocks = new FastList<BlockPosition>();
-    private BlockGrid _blockGrid = new BlockGrid();
 
     private Blueprint _currentBlueprint = null;
 
     public RectangleSelectionTool(Player player) {
         _player = player;
-
-        Blockmania.getInstance().addRenderableObject(_blockGrid);
     }
 
     public void executeLeftClickAction() {
@@ -63,10 +59,10 @@ public class RectangleSelectionTool implements Tool {
     private void addBlock(BlockPosition blockPosition) {
         if (_selectedBlocks.size() >= 2) {
             _selectedBlocks.clear();
-            _blockGrid.clear();
+            Blockmania.getInstance().getActiveWorld().getBlockGrid().clear();
         }
 
-        _blockGrid.addGridPosition(blockPosition);
+        Blockmania.getInstance().getActiveWorld().getBlockGrid().addGridPosition(blockPosition);
         _selectedBlocks.add(blockPosition);
 
         if (_selectedBlocks.size() == 2)
@@ -93,7 +89,7 @@ public class RectangleSelectionTool implements Tool {
                         BlockPosition bp = new BlockPosition(x, y, z);
 
                         _selectedBlocks.add(bp);
-                        _blockGrid.addGridPosition(bp);
+                        Blockmania.getInstance().getActiveWorld().getBlockGrid().addGridPosition(bp);
                     }
                 }
             }
@@ -105,6 +101,6 @@ public class RectangleSelectionTool implements Tool {
     private void reset() {
         _currentBlueprint = null;
         _selectedBlocks.clear();
-        _blockGrid.clear();
+        Blockmania.getInstance().getActiveWorld().getBlockGrid().clear();
     }
 }

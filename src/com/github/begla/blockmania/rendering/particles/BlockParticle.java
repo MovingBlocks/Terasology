@@ -17,7 +17,7 @@ package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.rendering.ShaderManager;
+import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;

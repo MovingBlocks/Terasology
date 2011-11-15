@@ -17,10 +17,10 @@ package com.github.begla.blockmania.gui;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.ConfigurationManager;
-import com.github.begla.blockmania.rendering.FontManager;
-import com.github.begla.blockmania.rendering.RenderableObject;
+import com.github.begla.blockmania.configuration.ConfigurationManager;
+import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.rendering.manager.FontManager;
+import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.world.chunk.ChunkMeshGenerator;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;

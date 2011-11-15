@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.rendering.cameras;
 
-import com.github.begla.blockmania.main.ConfigurationManager;
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Vector3f;

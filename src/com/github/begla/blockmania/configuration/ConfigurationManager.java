@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.main;
+package com.github.begla.blockmania.configuration;
 
+import com.github.begla.blockmania.game.Blockmania;
 import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
 

@@ -17,7 +17,7 @@ package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.main.ConfigurationManager;
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;

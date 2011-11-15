@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.main;
+package com.github.begla.blockmania.game;
 
-import com.github.begla.blockmania.rendering.RenderableScene;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 
@@ -23,8 +22,10 @@ import java.util.logging.Level;
 
 /**
  * The debug console of Blockmania.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class BlockmaniaConsole extends RenderableScene {
+public final class BlockmaniaConsole {
 
     private final StringBuffer _consoleInput = new StringBuffer();
     private Blockmania _parent;

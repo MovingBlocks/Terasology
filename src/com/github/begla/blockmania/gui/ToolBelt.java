@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.gui;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.tools.BlockPlacementRemovalTool;
 import com.github.begla.blockmania.tools.MultipleSelectionTool;
 import com.github.begla.blockmania.tools.RectangleSelectionTool;

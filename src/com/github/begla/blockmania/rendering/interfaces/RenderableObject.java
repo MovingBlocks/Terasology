@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.rendering;
+package com.github.begla.blockmania.rendering.interfaces;
 
 /**
  * The base class of all renderable objects.

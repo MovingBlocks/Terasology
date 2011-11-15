@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.rendering;
+package com.github.begla.blockmania.rendering.helper;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector4f;
@@ -55,7 +55,7 @@ public class Primitives {
         GL11.glVertex3f(sHalf, -sHalf, sHalf);
         GL11.glVertex3f(sHalf, -sHalf, -sHalf);
 
-        GL11.glColor4f(0.85f * color.x, 0.85f * color.y, 0.85f * color.z, 0.85f * color.w);
+        GL11.glColor4f(0.85f * color.x, 0.85f * color.y, 0.85f * color.z, color.w);
 
         // FRONT
         GL11.glVertex3f(-sHalf, sHalf, -sHalf);

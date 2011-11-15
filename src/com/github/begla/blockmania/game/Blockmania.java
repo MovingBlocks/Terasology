@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.main;
+package com.github.begla.blockmania.game;
 
 import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.groovy.GroovyManager;
 import com.github.begla.blockmania.gui.HUD;
-import com.github.begla.blockmania.rendering.FontManager;
-import com.github.begla.blockmania.rendering.RenderableScene;
-import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.rendering.VertexBufferObjectManager;
+import com.github.begla.blockmania.rendering.manager.FontManager;
+import com.github.begla.blockmania.rendering.manager.ShaderManager;
+import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.World;
-import com.github.begla.blockmania.world.WorldProvider;
+import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldProvider;
 import com.github.begla.blockmania.world.characters.MobManager;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -58,7 +58,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Blockmania extends RenderableScene {
+public final class Blockmania {
 
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(32);
     /* ------ */
@@ -365,8 +365,6 @@ public final class Blockmania extends RenderableScene {
         if (_world != null)
             _world.render();
 
-        super.render();
-
         if (_hud != null)
             _hud.render();
 
@@ -376,8 +374,6 @@ public final class Blockmania extends RenderableScene {
     public void update() {
         if (_world != null)
             _world.update();
-
-        super.update();
 
         if (_hud != null)
             _hud.update();

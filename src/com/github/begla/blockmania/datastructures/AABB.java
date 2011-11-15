@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.datastructures;
 
-import com.github.begla.blockmania.rendering.RenderableObject;
+import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import javolution.util.FastList;
 import org.lwjgl.util.vector.Vector3f;
 

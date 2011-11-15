@@ -17,9 +17,9 @@
 package com.github.begla.blockmania.world.characters;
 
 import com.github.begla.blockmania.datastructures.AABB;
-import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.rendering.TextureManager;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.rendering.manager.TextureManager;
+import com.github.begla.blockmania.world.main.World;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 

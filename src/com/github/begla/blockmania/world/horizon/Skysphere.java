@@ -15,41 +15,39 @@
  */
 package com.github.begla.blockmania.world.horizon;
 
-import com.github.begla.blockmania.rendering.RenderableObject;
-import com.github.begla.blockmania.rendering.TextureManager;
-import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
+import com.github.begla.blockmania.rendering.manager.ShaderManager;
+import com.github.begla.blockmania.rendering.manager.TextureManager;
+import com.github.begla.blockmania.world.main.World;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Random;
-import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
+
 import static org.lwjgl.opengl.GL11.*;
-import com.github.begla.blockmania.noise.PerlinNoise;
 
 /**
  * @author Anthony Kireev <adeon.k87@gmail.com>
  */
 public class Skysphere implements RenderableObject {
     private static int _displayListSphere = -1;
-    private static final float PI = 3.1415926f, PI2 = 2 * PI, PIHALF = PI / 2;
+    private static final float PI = 3.1415926f;
 
     /* SKY */
-    private float _turbidity = 10.0f, _sunPosAngle = 0.1f;
+    private float _turbidity = 12.0f, _sunPosAngle = 0.1f;
     private Vector3f _zenithColor = new Vector3f();
 
     /*Stars*/
-    public static IntBuffer textureId       = BufferUtils.createIntBuffer(1);
+    public static IntBuffer textureId = BufferUtils.createIntBuffer(1);
     private World _parent;
-    
+
     public Skysphere(World parent) {
         _parent = parent;
         loadStarTextures();
@@ -62,7 +60,7 @@ public class Skysphere implements RenderableObject {
             Sphere sphere = new Sphere();
             glNewList(_displayListSphere, GL11.GL_COMPILE);
 
-            sphere.draw(4, 4, 128);
+            sphere.draw(4, 4, 4);
 
             glEndList();
         }
@@ -75,7 +73,7 @@ public class Skysphere implements RenderableObject {
             return;
 
         glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST); 
+        glDisable(GL_DEPTH_TEST);
         glEnable(GL13.GL_TEXTURE_CUBE_MAP);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
         _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
@@ -85,16 +83,16 @@ public class Skysphere implements RenderableObject {
         _zenithColor = getAllWeatherZenith(sunNormalise.y);
 
         ShaderManager.getInstance().enableShader("sky");
-        
+
         int sunPos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunPos");
         GL20.glUniform4f(sunPos, 0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
-        
+
         int time = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "time");
         GL20.glUniform1f(time, (float) _parent.getWorldProvider().getTime());
 
         int sunAngle = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunAngle");
         GL20.glUniform1f(sunAngle, _sunPosAngle);
-        
+
         int turbidity = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "turbidity");
         GL20.glUniform1f(turbidity, _turbidity);
 
@@ -143,7 +141,11 @@ public class Skysphere implements RenderableObject {
     public float getTurbidity() {
         return _turbidity;
     }
-    
+
+    public float getDaylight() {
+        return (float) Math.min(Math.max(Math.cos(_sunPosAngle),0.0f) + 0.3f, 1.0f);
+    }
+
     private void loadStarTextures() {
         int internalFormat = GL11.GL_RGBA8,
                 format = GL12.GL_BGRA;
@@ -160,7 +162,7 @@ public class Skysphere implements RenderableObject {
 
         for (int i = 0; i < 6; i++) {
 
-            byte[] data = TextureManager.getInstance().getTexture("stars" + (i+1)).getTextureData();
+            byte[] data = TextureManager.getInstance().getTexture("stars" + (i + 1)).getTextureData();
             ByteBuffer byteBuffer = BufferUtils.createByteBuffer(data.length);
             byteBuffer.put(data);
             byteBuffer.flip();

@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.audio;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import javolution.util.FastMap;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;

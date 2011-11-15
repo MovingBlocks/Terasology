@@ -16,10 +16,9 @@
 package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.rendering.TextureManager;
-import com.github.begla.blockmania.world.World;
-import org.lwjgl.opengl.GL11;
+import com.github.begla.blockmania.rendering.manager.ShaderManager;
+import com.github.begla.blockmania.rendering.manager.TextureManager;
+import com.github.begla.blockmania.world.main.World;
 
 /**
  * Emits block particles.
@@ -28,11 +27,10 @@ import org.lwjgl.opengl.GL11;
  */
 public class BlockParticleEmitter extends ParticleEmitter {
 
-    private World _parent;
     private byte _currentBlockType = BlockManager.getInstance().getBlock("Dirt").getId();
 
     public BlockParticleEmitter(World parent) {
-        _parent = parent;
+        super(parent);
     }
 
     public void emitParticles(int amount, byte blockType) {
@@ -44,15 +42,8 @@ public class BlockParticleEmitter extends ParticleEmitter {
         TextureManager.getInstance().bindTexture("terrain");
 
         ShaderManager.getInstance().enableShader("particle");
-        GL11.glPushMatrix();
-        GL11.glTranslatef(-_parent.getWorldProvider().getRenderingReferencePoint().x,-_parent.getWorldProvider().getRenderingReferencePoint().y, -_parent.getWorldProvider().getRenderingReferencePoint().z);
         super.render();
-        GL11.glPopMatrix();
         ShaderManager.getInstance().enableShader(null);
-    }
-
-    public World getParent() {
-        return _parent;
     }
 
     @Override

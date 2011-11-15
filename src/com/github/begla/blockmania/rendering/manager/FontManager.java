@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.rendering;
+package com.github.begla.blockmania.rendering.manager;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import javolution.util.FastMap;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.SlickException;

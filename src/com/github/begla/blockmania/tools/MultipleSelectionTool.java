@@ -15,10 +15,9 @@
  */
 package com.github.begla.blockmania.tools;
 
-import com.github.begla.blockmania.blueprints.BlockGrid;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.world.characters.Player;
 import javolution.util.FastList;
 
@@ -31,12 +30,9 @@ public class MultipleSelectionTool implements Tool {
 
     private Player _player;
     private FastList<BlockPosition> _vertexBlocks = new FastList<BlockPosition>();
-    private BlockGrid _blockGrid = new BlockGrid();
 
     public MultipleSelectionTool(Player player) {
         _player = player;
-
-        Blockmania.getInstance().addRenderableObject(_blockGrid);
     }
 
     public void executeLeftClickAction() {
@@ -45,7 +41,7 @@ public class MultipleSelectionTool implements Tool {
         if (is == null)
             return;
 
-        AddBlock(is.getBlockPosition());
+        addBlock(is.getBlockPosition());
     }
 
     public void executeRightClickAction() {
@@ -54,19 +50,19 @@ public class MultipleSelectionTool implements Tool {
         if (is == null)
             return;
 
-        RemoveBlock(is.getBlockPosition());
+        removeBlock(is.getBlockPosition());
     }
 
-    private void AddBlock(BlockPosition blockPosition) {
+    private void addBlock(BlockPosition blockPosition) {
         _vertexBlocks.add(blockPosition);
-        _blockGrid.addGridPosition(blockPosition);
+        Blockmania.getInstance().getActiveWorld().getBlockGrid().addGridPosition(blockPosition);
 
         Blockmania.getInstance().getLogger().log(Level.INFO, "Added block at: " + blockPosition);
     }
 
-    private void RemoveBlock(BlockPosition blockPosition) {
+    private void removeBlock(BlockPosition blockPosition) {
         _vertexBlocks.remove(blockPosition);
-        _blockGrid.removeGridPosition(blockPosition);
+        Blockmania.getInstance().getActiveWorld().getBlockGrid().removeGridPosition(blockPosition);
 
         Blockmania.getInstance().getLogger().log(Level.INFO, "Removed block at: " + blockPosition);
     }

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.main;
 
 import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.GeneratorManager;
-import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.ConfigurationManager;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;

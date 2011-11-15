@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.rendering.particles;
 
-import com.github.begla.blockmania.rendering.RenderableObject;
+import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.utilities.FastRandom;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -59,10 +59,14 @@ public abstract class Particle implements RenderableObject {
     public void render() {
         if (isAlive()) {
             glPushMatrix();
-            glTranslatef(_position.x, _position.y, _position.z);
+
+            Vector3f r = getParent().getParent().getWorldProvider().getRenderingReferencePoint();
+            glTranslatef(_position.x - r.x, _position.y - r.y, _position.z - r.z);
             applyOrientation();
             glScalef(_size, _size, _size);
+
             renderParticle();
+
             glPopMatrix();
         }
     }

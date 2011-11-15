@@ -16,12 +16,15 @@
 package com.github.begla.blockmania.blueprints;
 
 import com.github.begla.blockmania.datastructures.BlockPosition;
-import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.rendering.Primitives;
-import com.github.begla.blockmania.rendering.RenderableObject;
+import com.github.begla.blockmania.rendering.helper.Primitives;
+import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
+import com.github.begla.blockmania.world.main.World;
 import javolution.util.FastSet;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Renderable block grid. Can be used for displaying collections of selected blocks.
@@ -32,16 +35,39 @@ import org.lwjgl.util.vector.Vector4f;
  */
 public class BlockGrid implements RenderableObject {
 
-    private static int _blockDisplayList = Primitives.generateColoredBlock(new Vector4f(0.25f, 0.25f, 1.0f, 1.0f), 1.005f);
+    private static int _blockDisplayList = Primitives.generateColoredBlock(new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f);
     private FastSet<BlockPosition> _gridPositions = FastSet.newInstance();
 
+    private World _parent;
+
+    public BlockGrid(World parent) {
+        _parent = parent;
+    }
+
     public void render() {
-        for (BlockPosition gp : _gridPositions) {
-            GL11.glPushMatrix();
-            GL11.glTranslatef(gp.x - Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint().x, gp.y - Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint().y, gp.z - Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint().z);
-            GL11.glCallList(_blockDisplayList);
-            GL11.glPopMatrix();
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        for (int i = 0; i < 2; i++) {
+            if (i == 0) {
+                glColorMask(false, false, false, false);
+            } else {
+                glColorMask(true, true, true, true);
+            }
+
+            for (BlockPosition gp : _gridPositions) {
+                GL11.glPushMatrix();
+
+                Vector3f r = _parent.getWorldProvider().getRenderingReferencePoint();
+
+                GL11.glTranslatef(gp.x - r.x, gp.y - r.y, gp.z - r.z);
+                GL11.glCallList(_blockDisplayList);
+
+                GL11.glPopMatrix();
+            }
         }
+
+        glDisable(GL11.GL_BLEND);
     }
 
     /**

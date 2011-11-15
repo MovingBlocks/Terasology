@@ -16,7 +16,7 @@
  */
 package com.github.begla.blockmania.world.characters;
 
-import com.github.begla.blockmania.world.World;
+import com.github.begla.blockmania.world.main.World;
 import com.github.begla.blockmania.world.entity.MovableEntity;
 
 /**

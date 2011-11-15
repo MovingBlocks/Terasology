@@ -17,9 +17,7 @@ package com.github.begla.blockmania.blueprints;
 
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
-import com.github.begla.blockmania.world.WorldProvider;
-import javolution.util.FastList;
-import javolution.util.FastSet;
+import com.github.begla.blockmania.world.main.WorldProvider;
 
 import java.util.Collection;
 

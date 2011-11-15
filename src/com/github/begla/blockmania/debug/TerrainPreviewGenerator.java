@@ -17,7 +17,7 @@ package com.github.begla.blockmania.debug;
 
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.GeneratorManager;
-import com.github.begla.blockmania.world.LocalWorldProvider;
+import com.github.begla.blockmania.world.main.LocalWorldProvider;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

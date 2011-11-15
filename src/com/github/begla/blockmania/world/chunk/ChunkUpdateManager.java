@@ -15,10 +15,10 @@
  */
 package com.github.begla.blockmania.world.chunk;
 
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
-import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.ConfigurationManager;
-import com.github.begla.blockmania.world.observer.BlockObserver;
+import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.world.interfaces.BlockObserver;
 import javolution.util.FastSet;
 
 /**

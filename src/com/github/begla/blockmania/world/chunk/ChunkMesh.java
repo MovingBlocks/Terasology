@@ -1,6 +1,6 @@
 package com.github.begla.blockmania.world.chunk;
 
-import com.github.begla.blockmania.rendering.VertexBufferObjectManager;
+import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
 import gnu.trove.list.array.TFloatArrayList;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;

@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world;
+package com.github.begla.blockmania.world.main;
 
 import com.github.begla.blockmania.audio.AudioManager;
+import com.github.begla.blockmania.blueprints.BlockGrid;
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
-import com.github.begla.blockmania.main.Blockmania;
-import com.github.begla.blockmania.main.ConfigurationManager;
-import com.github.begla.blockmania.rendering.RenderableScene;
-import com.github.begla.blockmania.rendering.ShaderManager;
-import com.github.begla.blockmania.rendering.TextureManager;
+import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
+import com.github.begla.blockmania.rendering.manager.ShaderManager;
+import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -46,7 +47,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class World extends RenderableScene {
+public final class World implements RenderableObject {
 
     /* WORLD PROVIDER */
     private WorldProvider _worldProvider;
@@ -74,6 +75,9 @@ public final class World extends RenderableScene {
 
     /* EVENTS */
     private final WorldTimeEventManager _worldTimeEventManager;
+
+    /* BLOCK GRID */
+    private final BlockGrid _blockGrid = new BlockGrid(this);
 
     /**
      * Initializes a new (local) world for the single player mode.
@@ -123,28 +127,6 @@ public final class World extends RenderableScene {
         }
 
         return false;
-    }
-
-    /**
-     * Updates the daylight value according to the current world time.
-     */
-    private void updateDaylight() {
-        double time = _worldProvider.getTime() % 1;
-        double sunRiseSetDuration = (Double) ConfigurationManager.getInstance().getConfig().get("World.sunRiseSetDuration");
-
-        // Sunrise
-        if (time < sunRiseSetDuration && time > 0.0f) {
-            _daylight = time / sunRiseSetDuration;
-        } else if (time >= sunRiseSetDuration && time <= 0.5f) {
-            _daylight = 1.0f;
-        }
-
-        // Sunset
-        if (time > 0.5 - sunRiseSetDuration && time < 0.5f) {
-            _daylight = (0.5f - time) / sunRiseSetDuration;
-        } else if (time >= 0.5 && time <= 1.0f) {
-            _daylight = 0.0f;
-        }
     }
 
     /**
@@ -220,8 +202,7 @@ public final class World extends RenderableScene {
 
         /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();
-
-        super.render();
+        _blockGrid.render();
     }
 
 
@@ -236,7 +217,7 @@ public final class World extends RenderableScene {
         int animationOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animationOffset");
         int animated = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animated");
 
-        GL20.glUniform1f(daylight, (float) getDaylight());
+        GL20.glUniform1f(daylight, getDaylight());
         GL20.glUniform1i(swimming, _player.isHeadUnderWater() ? 1 : 0);
 
         FastList<Chunk> visibleChunks = fetchVisibleChunks();
@@ -309,7 +290,6 @@ public final class World extends RenderableScene {
         updateTick();
 
         // Update the horizon
-        updateDaylight();
         _skysphere.update();
 
         // Update the player
@@ -320,8 +300,6 @@ public final class World extends RenderableScene {
 
         // Update visible chunks
         for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; ) {
-            n.getValue()._offset.set(-getWorldProvider().getRenderingReferencePoint().x, -getWorldProvider().getRenderingReferencePoint().y, -getWorldProvider().getRenderingReferencePoint().z);
-
             if (n.getValue().isVisible()) {
                 if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
                     _chunkUpdateManager.queueChunkUpdate(n.getValue(), false);
@@ -341,7 +319,8 @@ public final class World extends RenderableScene {
         // And finally fire any active events
         _worldTimeEventManager.fireWorldTimeEvents();
 
-        super.update();
+        // Does nothing at the moment
+        //_blockGrid.update();
     }
 
     /**
@@ -431,8 +410,8 @@ public final class World extends RenderableScene {
         return _player.getActiveCamera().getViewFrustum().intersects(c.getAABB());
     }
 
-    public double getDaylight() {
-        return _daylight;
+    public float getDaylight() {
+        return _skysphere.getDaylight();
     }
 
     public BlockParticleEmitter getBlockParticleEmitter() {
@@ -453,5 +432,9 @@ public final class World extends RenderableScene {
 
     public WorldProvider getWorldProvider() {
         return _worldProvider;
+    }
+
+    public BlockGrid getBlockGrid() {
+        return _blockGrid;
     }
 }
