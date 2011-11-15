@@ -397,8 +397,7 @@ public final class Blockmania {
     }
 
     public void exit() {
-        _saveWorldOnExit = true;
-        _runGame = false;
+        exit(true);
     }
 
     /*

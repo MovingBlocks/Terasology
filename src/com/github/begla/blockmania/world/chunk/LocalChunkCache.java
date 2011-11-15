@@ -127,7 +127,7 @@ public final class LocalChunkCache implements ChunkProvider {
     }
 
     private void writeChunkToDisk(Chunk c) {
-        if (c.isFresh() || (Boolean) ConfigurationManager.getInstance().getConfig().get("System.saveChunks")) {
+        if (c.isFresh() || !(Boolean) ConfigurationManager.getInstance().getConfig().get("System.saveChunks")) {
             return;
         }
 
