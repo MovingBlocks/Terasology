@@ -23,11 +23,11 @@ import com.github.begla.blockmania.rendering.manager.FontManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.main.World;
-import com.github.begla.blockmania.world.main.WorldProvider;
 import com.github.begla.blockmania.world.characters.MobManager;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
+import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldProvider;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -391,6 +391,11 @@ public final class Blockmania {
         Mouse.setGrabbed(true);
     }
 
+    public void togglePauseGame() {
+        _pauseGame = !_pauseGame;
+        Mouse.setGrabbed(!_pauseGame);
+    }
+
     public void exit(boolean saveWorld) {
         _saveWorldOnExit = saveWorld;
         _runGame = false;
@@ -472,10 +477,6 @@ public final class Blockmania {
 
     public Logger getLogger() {
         return _logger;
-    }
-
-    public void togglePauseGame() {
-        _pauseGame = !_pauseGame;
     }
 
     public boolean isGamePaused() {
