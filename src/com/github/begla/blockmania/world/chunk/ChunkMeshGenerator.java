@@ -161,7 +161,7 @@ public final class ChunkMeshGenerator {
                 resultLight += lights[i];
                 counterLight++;
             }
-            if (lights[i] > 0) {
+            if (blockLights[i] > 0) {
                 resultBlockLight += blockLights[i];
                 counterBlockLight++;
             }

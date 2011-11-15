@@ -25,8 +25,8 @@ import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.main.LocalWorldProvider;
 import com.github.begla.blockmania.world.entity.StaticEntity;
+import com.github.begla.blockmania.world.main.LocalWorldProvider;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
@@ -146,7 +146,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Updates the light of this chunk.
      */
     public void updateLight() {
-        if (_fresh)
+        if (isFresh() || !isLightDirty())
             return;
 
         for (int x = 0; x < getChunkDimensionX(); x++) {
@@ -498,6 +498,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         chunks[5] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x - 1, (int) getPosition().z - 1);
         chunks[6] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x - 1, (int) getPosition().z + 1);
         chunks[7] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x + 1, (int) getPosition().z - 1);
+
         return chunks;
     }
 
@@ -575,8 +576,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return new AABB(position, dimensions);
     }
 
-    public boolean processChunk() {
-        /*
+    public void processChunk() {
+       /*
         * Generate the chunk...
         */
         generate();
@@ -596,28 +597,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             }
         }
 
-        /*
-        * If the light of this chunk is marked as dirty...
-        */
-        if (isLightDirty()) {
-            /*
-            * ... propagate light into adjacent chunks...
-            */
-            updateLight();
-        }
-
-        /*
-        * Check if this chunk was changed...
-        */
-        if (isDirty() && !isLightDirty() && !isFresh()) {
-            /*
-            * ... if yes, regenerate the vertex arrays
-            */
-            generateMesh();
-            return true;
-        }
-
-        return false;
+        updateLight();
+        generateMesh();
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {
@@ -669,7 +650,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Generates the terrain mesh (creates the internal vertex arrays).
      */
     public void generateMesh() {
-        if (_fresh)
+        if (isFresh() || isLightDirty())
             return;
 
         setNewMesh(_meshGenerator.generateMesh());

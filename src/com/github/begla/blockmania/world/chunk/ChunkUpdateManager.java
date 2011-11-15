@@ -45,10 +45,10 @@ public final class ChunkUpdateManager implements BlockObserver {
      * @param c The chunk to update
      * @return True if a chunk update was executed
      */
-    public boolean queueChunkUpdate(Chunk c, boolean force) {
+    public boolean queueChunkUpdate(Chunk c, final boolean force) {
         final Chunk chunkToProcess = c;
 
-        if ((Blockmania.getInstance().getTime() - _lastChunkUpdate < UPDATE_GAP)) {
+        if ((Blockmania.getInstance().getTime() - _lastChunkUpdate < UPDATE_GAP) && !force) {
             return false;
         }
 
@@ -61,6 +61,14 @@ public final class ChunkUpdateManager implements BlockObserver {
             Runnable r = new Runnable() {
                 public void run() {
                     long timeStart = Blockmania.getInstance().getTime();
+
+                    if (force) {
+                        Chunk[] cs = chunkToProcess.loadOrCreateNeighbors();
+
+                        for (Chunk c : cs) {
+                            c.processChunk();
+                        }
+                    }
 
                     chunkToProcess.processChunk();
 

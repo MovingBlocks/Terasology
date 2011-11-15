@@ -22,7 +22,7 @@ System {
         chunkOutlines = false
 
         demoFlight = false
-        godMode = false
+        godMode = true
 
     }
 }
@@ -84,7 +84,7 @@ Player {
 
     friction = 0.08d
 
-    walkingSpeed = 0.03d
+    walkingSpeed = 0.1d
     runningFactor = 1.8d
     jumpIntensity = 0.125d
 
