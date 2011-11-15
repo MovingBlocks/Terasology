@@ -18,8 +18,8 @@ package com.github.begla.blockmania.world.main;
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.blueprints.BlockGrid;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
-import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
@@ -49,6 +49,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class World implements RenderableObject {
 
+    private static final long UPDATE_GAP = 1000 / (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkRequestsPerSecond");
+
     /* WORLD PROVIDER */
     private WorldProvider _worldProvider;
 
@@ -57,6 +59,7 @@ public final class World implements RenderableObject {
 
     /* CHUNKS */
     private FastList<Chunk> _chunksInProximity = new FastList<Chunk>();
+    private long _lastChunkUpdate = Blockmania.getInstance().getTime();
 
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
@@ -104,6 +107,12 @@ public final class World implements RenderableObject {
      * @return True if the list was changed
      */
     private boolean updateChunksInProximity() {
+        if ((Blockmania.getInstance().getTime() - _lastChunkUpdate < UPDATE_GAP)) {
+            return false;
+        }
+
+        _lastChunkUpdate = Blockmania.getInstance().getTime();
+
         if (prevChunkPosX != calcPlayerChunkOffsetX() || prevChunkPosZ != calcPlayerChunkOffsetZ()) {
 
             prevChunkPosX = calcPlayerChunkOffsetX();
