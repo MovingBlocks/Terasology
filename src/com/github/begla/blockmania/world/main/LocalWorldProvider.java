@@ -23,7 +23,7 @@ import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
-import com.github.begla.blockmania.world.chunk.ChunkProvider;
+import com.github.begla.blockmania.world.interfaces.ChunkProvider;
 import com.github.begla.blockmania.world.chunk.LocalChunkCache;
 import javolution.util.FastList;
 import org.jdom.Document;

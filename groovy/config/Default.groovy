@@ -5,7 +5,8 @@ System {
 
     gameTitle = "Blockmania Pre Alpha"
 
-    maxThreads = Runtime.getRuntime().availableProcessors() + 1;
+    chunkUpdatesPerSecond = 20
+    maxThreads = Runtime.getRuntime().availableProcessors() + 1
     saveChunks = true
 
     Debug {

@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world.chunk;
+package com.github.begla.blockmania.world.interfaces;
+
+import com.github.begla.blockmania.world.chunk.Chunk;
 
 /**
  * Basic interface for anything providing chunks.

@@ -18,6 +18,7 @@ package com.github.begla.blockmania.world.chunk;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.utilities.MathHelper;
+import com.github.begla.blockmania.world.interfaces.ChunkProvider;
 import com.github.begla.blockmania.world.main.LocalWorldProvider;
 import javolution.util.FastList;
 import javolution.util.FastMap;

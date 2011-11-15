@@ -19,7 +19,7 @@ import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.GeneratorManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.chunk.Chunk;
-import com.github.begla.blockmania.world.chunk.ChunkProvider;
+import com.github.begla.blockmania.world.interfaces.ChunkProvider;
 import org.lwjgl.util.vector.Vector3f;
 
 /**

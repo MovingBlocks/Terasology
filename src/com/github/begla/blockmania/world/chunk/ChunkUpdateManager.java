@@ -32,7 +32,11 @@ public final class ChunkUpdateManager implements BlockObserver {
     private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
     private double _averageUpdateDuration = 0.0;
 
+    private long _lastChunkUpdate = Blockmania.getInstance().getTime();
+
     private static final int MAX_THREADS = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxThreads");
+
+    private static final long UPDATE_GAP = 1000 / (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkUpdatesPerSecond");
 
     /**
      * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
@@ -43,6 +47,12 @@ public final class ChunkUpdateManager implements BlockObserver {
      */
     public boolean queueChunkUpdate(Chunk c, boolean force) {
         final Chunk chunkToProcess = c;
+
+        if ((Blockmania.getInstance().getTime() - _lastChunkUpdate < UPDATE_GAP)) {
+            return false;
+        }
+
+        _lastChunkUpdate = Blockmania.getInstance().getTime();
 
         if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < MAX_THREADS || force)) {
             _currentlyProcessedChunks.add(chunkToProcess);
