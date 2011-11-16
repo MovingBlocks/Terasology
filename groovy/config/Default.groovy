@@ -67,7 +67,7 @@ Controls {
 Chunk {
 
     dimensionX = 16
-    dimensionY = 256
+    dimensionY = 128
     dimensionZ = 16
 
 }
@@ -95,7 +95,7 @@ World {
     defaultSeed = "TEST"
 
     dayNightLengthInMs = new Long((60 * 1000) * 20) // 20 minutes in ms
-    initialTimeOffsetInMs = new Long(30 * 1000) // 30 seconds in ms
+    initialTimeOffsetInMs = new Long(120 * 1000) // 120 seconds in ms
 
     Biomes {
 
