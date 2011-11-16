@@ -45,9 +45,9 @@ Graphics {
 
 HUD {
 
-    crosshair = true
-    rotatingBlock = true
-    placingBox = true
+    crosshair = false
+    rotatingBlock = false
+    placingBox = false
 
 }
 

@@ -60,19 +60,12 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                     int randX = x + c.getRandom().randomInt() % 12 + 6;
                     int randZ = z + c.getRandom().randomInt() % 12 + 6;
 
-                    if (c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Snow").getId())
+                    if (c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Snow").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Sand").getId())
                         generateTree(c, biome, randX, y, randZ);
                 }
             }
         }
     }
-
-    /**
-     * @param c
-     * @param x
-     * @param y
-     * @param z
-     */
 
     void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
         if (c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Grass").getId() && c.getBlock(x, y + 1, z) == 0x0) {
@@ -101,6 +94,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
             }
 
             if (grassRand > grassProb) {
+
                 /*
                  * Generate high grass.
                  */
@@ -128,12 +122,6 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
         }
     }
 
-    /**
-     * @param c
-     * @param x
-     * @param y
-     * @param z
-     */
     void generateTree(Chunk c, BIOME_TYPE type, int x, int y, int z) {
         if (!c.canBlockSeeTheSky(x, y + 1, z))
             return;
