@@ -25,17 +25,26 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * Blockmania's global settings.
+ * Manages and provides access to the global settings of the game.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ConfigurationManager {
 
+    /* CONST */
     private static final String DEFAULT_CONFIG_PATH = "groovy/config/Default.groovy";
+
+    /* SINGLETON */
     private static ConfigurationManager _instance;
 
+    /* CONFIGURATION */
     private Map _config;
 
+    /**
+     * Returns the currently active instance.
+     *
+     * @return The instance
+     */
     public static ConfigurationManager getInstance() {
         if (_instance == null)
             _instance = new ConfigurationManager();
@@ -43,15 +52,22 @@ public final class ConfigurationManager {
         return _instance;
     }
 
+    /**
+     * Init. a new configuration manager.
+     */
     private ConfigurationManager() {
         loadConfigEnvironment(null);
     }
 
+    /**
+     * Loads a configuration environment.
+     *
+     * @param environment The environment (nullable)
+     */
     public void loadConfigEnvironment(String environment) {
         ConfigObject config = null;
 
         try {
-
             if (environment != null)
                 config = new ConfigSlurper(environment).parse(new File(DEFAULT_CONFIG_PATH).toURI().toURL());
             else

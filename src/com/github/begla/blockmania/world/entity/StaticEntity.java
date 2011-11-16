@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.world.entity;
 
 /**
- * TODO: Fill with functionality.
+ * TODO: Somehow does not do anything special? :-/
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

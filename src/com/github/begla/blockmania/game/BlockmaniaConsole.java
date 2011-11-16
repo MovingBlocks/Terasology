@@ -27,20 +27,26 @@ import java.util.logging.Level;
  */
 public final class BlockmaniaConsole {
 
-    private final StringBuffer _consoleInput = new StringBuffer();
     private Blockmania _parent;
+
+    private final StringBuffer _consoleInput = new StringBuffer();
     private FastList<String> _ringBuffer = new FastList<String>();
     private int _ringBufferPos = -1;
 
     /**
      * Init. a new Blockmania console.
      *
-     * @param parent
+     * @param parent The parent
      */
     public BlockmaniaConsole(Blockmania parent) {
         _parent = parent;
     }
 
+    /**
+     * Processes the given keyboard input.
+     *
+     * @param key The key
+     */
     protected void processKeyboardInput(int key) {
         if (key == Keyboard.KEY_BACK) {
             int length = _consoleInput.length() - 1;
@@ -64,6 +70,11 @@ public final class BlockmaniaConsole {
         }
     }
 
+    /**
+     * Rotates the ring buffer in the given direction.
+     *
+     * @param dir The direction
+     */
     public void rotateRingBuffer(int dir) {
         if (_ringBuffer.isEmpty())
             return;
@@ -79,6 +90,9 @@ public final class BlockmaniaConsole {
         _consoleInput.append(_ringBuffer.get(_ringBufferPos));
     }
 
+    /**
+     * Adds a new string to the ring buffer.
+     */
     public void addToRingBuffer() {
         _ringBufferPos = -1;
         _ringBuffer.addFirst(_consoleInput.toString());
@@ -87,7 +101,6 @@ public final class BlockmaniaConsole {
     /**
      * Parses the console string and executes the command.
      */
-
     public void processConsoleString() {
         boolean success = false;
 
@@ -113,7 +126,7 @@ public final class BlockmaniaConsole {
     }
 
     /**
-     * Disables/enables the debug console.
+     * Resets the debug console.
      */
     public void resetDebugConsole() {
         _consoleInput.setLength(0);

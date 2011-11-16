@@ -553,7 +553,7 @@ public final class ChunkMeshGenerator {
         Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
 
-        return bCheck.getId() == 0x0 || cBlock.isDisableTesselation() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (!cBlock.isTranslucent() && bCheck.isTranslucent()) || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+        return bCheck.getId() == 0x0 || cBlock.isDisableTessellation() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (!cBlock.isTranslucent() && bCheck.isTranslucent()) || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
     }
 
     public static int getVertexArrayUpdateCount() {

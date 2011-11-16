@@ -31,13 +31,23 @@ import java.util.Stack;
  */
 public class TreeGeneratorLSystem extends TreeGenerator {
 
+    /* SETTINGS */
     private int _iterations;
-    private String _initialAxiom;
-    private HashMap<String, String> _ruleSet;
     private double _angleInDegree;
     private boolean _generateLeafBlocks = true;
     private byte _leafType;
 
+    /* RULES */
+    private String _initialAxiom;
+    private HashMap<String, String> _ruleSet;
+
+    /**
+     * Init. a new L-System based tree generator.
+     *
+     * @param manager      The generator manager
+     * @param initialAxiom The initial axiom to use
+     * @param ruleSet      The rule set to use
+     */
     public TreeGeneratorLSystem(GeneratorManager manager, String initialAxiom, HashMap<String, String> ruleSet) {
         super(manager);
 

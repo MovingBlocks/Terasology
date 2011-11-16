@@ -26,16 +26,17 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
+    /* CONST */
     protected static final int SAMPLE_RATE_3D_HOR = 4;
     protected static final int SAMPLE_RATE_3D_VERT = 8;
 
+    /**
+     * Available types of biomes.
+     */
     public enum BIOME_TYPE {
         MOUNTAINS, SNOW, DESERT, FOREST, PLAINS
     }
 
-    /**
-     * Init. the generator with a given seed value.
-     */
     public ChunkGeneratorTerrain(GeneratorManager generatorManager) {
         super(generatorManager);
     }
@@ -119,6 +120,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
+    /**
+     * Returns the biome type for the given global position in the world.
+     *
+     * @param x Position on the x-axis
+     * @param z Position on the z-axis
+     * @return The biome type
+     */
     public BIOME_TYPE calcBiomeTypeForGlobalPosition(int x, int z) {
         double temp = calcTemperatureAtGlobalPosition(x, z);
         double humidity = calcHumidityAtGlobalPosition(x, z);

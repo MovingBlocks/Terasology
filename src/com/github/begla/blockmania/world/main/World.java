@@ -24,6 +24,7 @@ import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
+import com.github.begla.blockmania.world.characters.MobManager;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
@@ -31,7 +32,6 @@ import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.SoundStore;
 
 import java.util.Collections;
@@ -61,12 +61,14 @@ public final class World implements RenderableObject {
     private FastList<Chunk> _chunksInProximity = new FastList<Chunk>();
     private long _lastChunkUpdate = Blockmania.getInstance().getTime();
 
+    /* MOBS */
+    private MobManager _mobManager;
+
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
 
     /* HORIZON */
     private final Skysphere _skysphere;
-    protected double _daylight;
 
     /* WATER AND LAVA ANIMATION */
     private int _tick = 0;
@@ -80,7 +82,7 @@ public final class World implements RenderableObject {
     private final WorldTimeEventManager _worldTimeEventManager;
 
     /* BLOCK GRID */
-    private final BlockGrid _blockGrid = new BlockGrid(this);
+    private final BlockGrid _blockGrid;
 
     /**
      * Initializes a new (local) world for the single player mode.
@@ -90,13 +92,11 @@ public final class World implements RenderableObject {
      */
     public World(String title, String seed) {
         _worldProvider = new LocalWorldProvider(title, seed);
-
-        // Init. horizon
         _skysphere = new Skysphere(this);
-
         _chunkUpdateManager = new ChunkUpdateManager();
-
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
+        _mobManager = new MobManager();
+        _blockGrid = new BlockGrid(this);
 
         createMusicTimeEvents();
     }
@@ -206,8 +206,8 @@ public final class World implements RenderableObject {
         _player.getActiveCamera().lookThrough();
 
         _player.render();
-
         renderChunks();
+        _mobManager.renderAll();
 
         /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();
@@ -216,7 +216,7 @@ public final class World implements RenderableObject {
 
 
     /**
-     * Renders the chunks.
+     * Renders all chunks that are currently in the player's field of view.
      */
     private void renderChunks() {
         ShaderManager.getInstance().enableShader("chunk");
@@ -295,14 +295,11 @@ public final class World implements RenderableObject {
         // Make sure the chunks near the player are generated first
         _worldProvider.getRenderingReferencePoint().set(_player.getPosition());
 
-        // Update the texture animation tick
         updateTick();
 
-        // Update the horizon
         _skysphere.update();
-
-        // Update the player
         _player.update();
+        _mobManager.updateAll();
 
         // Update the list of relevant chunks
         updateChunksInProximity();
@@ -311,7 +308,7 @@ public final class World implements RenderableObject {
         for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; ) {
             if (n.getValue().isVisible()) {
                 if (n.getValue().isDirty() || n.getValue().isLightDirty()) {
-                    _chunkUpdateManager.queueChunkUpdate(n.getValue(), false);
+                    _chunkUpdateManager.queueChunkUpdate(n.getValue(), ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
                     continue;
                 }
 
@@ -323,7 +320,7 @@ public final class World implements RenderableObject {
         _blockParticleEmitter.update();
 
         // Free unused space
-        _worldProvider.getChunkProvider().freeUnusedSpace();
+        _worldProvider.getChunkProvider().flushCache();
 
         // And finally fire any active events
         _worldTimeEventManager.fireWorldTimeEvents();
@@ -411,10 +408,6 @@ public final class World implements RenderableObject {
         return _player;
     }
 
-    public Vector3f getOrigin() {
-        return _player.getPosition();
-    }
-
     public boolean isChunkVisible(Chunk c) {
         return _player.getActiveCamera().getViewFrustum().intersects(c.getAABB());
     }
@@ -445,5 +438,9 @@ public final class World implements RenderableObject {
 
     public BlockGrid getBlockGrid() {
         return _blockGrid;
+    }
+
+    public MobManager getMobManager() {
+        return _mobManager;
     }
 }

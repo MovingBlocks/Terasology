@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.datastructures;
 
 /**
- * A fast array wrapper.
+ * A fast 3D array wrapper.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -26,6 +26,9 @@ public class BlockmaniaArray {
     private final int _lX, _lY, _lZ;
     private final int _size;
 
+    /**
+     * Init. a new 3D array with the given dimensions.
+     */
     public BlockmaniaArray(int x, int y, int z) {
         _lX = x;
         _lY = y;
@@ -35,6 +38,9 @@ public class BlockmaniaArray {
         _array = new byte[_size];
     }
 
+    /**
+     * Returns the byte value at the given position.
+     */
     public byte get(int x, int y, int z) {
 
         int pos = (x * _lX * _lY) + (y * _lX) + z;
@@ -45,6 +51,9 @@ public class BlockmaniaArray {
         return _array[pos];
     }
 
+    /**
+     * Sets the byte value for the given position.
+     */
     public void set(int x, int y, int z, byte b) {
         int pos = (x * _lX * _lY) + (y * _lX) + z;
 
@@ -54,15 +63,24 @@ public class BlockmaniaArray {
         _array[pos] = b;
     }
 
+    /**
+     * Returns the raw byte at the given index.
+     */
     public byte getRawByte(int i) {
         return _array[i];
     }
 
+    /**
+     * Sets the raw byte for the given index.
+     */
     public void setRawByte(int i, byte b) {
         _array[i] = b;
     }
 
-    public int getSize() {
+    /**
+     * Returns the size of this array.
+     */
+    public int size() {
         return _size;
     }
 }

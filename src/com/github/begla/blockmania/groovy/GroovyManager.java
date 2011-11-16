@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 /**
- * Manages everything related to using Groovy from within Java
+ * Manages everything related to using Groovy from within Java.
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
@@ -105,7 +105,7 @@ public class GroovyManager {
     }
 
     /**
-     * Executes the given command with Groovy - short the prefix "groovy "
+     * Executes the given command with Groovy.
      *
      * @param consoleString Contains what the user entered into the console
      * @return boolean indicating command success or not

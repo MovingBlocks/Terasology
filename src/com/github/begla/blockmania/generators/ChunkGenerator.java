@@ -20,8 +20,7 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
- * Generators are used to generate the terrain, to generate caves
- * and to populate the surface.
+ * Generators are used to generate the terrain, to generate caves and to populate the surface.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -32,6 +31,7 @@ public abstract class ChunkGenerator {
 
     /**
      * Init. the generator with a given seed value.
+     * @param generatorManager The generator manager
      */
     public ChunkGenerator(GeneratorManager generatorManager) {
         _pGen1 = new PerlinNoise(generatorManager.getParent().getSeed().hashCode());

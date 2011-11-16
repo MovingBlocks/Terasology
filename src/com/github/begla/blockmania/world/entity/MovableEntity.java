@@ -30,7 +30,7 @@ import org.newdawn.slick.openal.Audio;
 import java.util.Collections;
 
 /**
- * Movable entities extend normal entities to support collision detection, basic physics, movement and audio.
+ * Movable entities extend normal entities to support collision detection, basic physics, movement and the playback of sound clips.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -49,6 +49,14 @@ public abstract class MovableEntity extends Entity {
     protected final Vector3f _movementDirection = new Vector3f(), _velocity = new Vector3f(), _viewingDirection = new Vector3f();
     protected boolean _isSwimming = false, _headUnderWater = false, _touchingGround = false, _running = false, _godMode, _jump = false;
 
+    /**
+     * Init. a new movable entity.
+     *
+     * @param parent The parent world
+     * @param walkingSpeed The walking speed
+     * @param runningFactor The running factor
+     * @param jumpIntensity The jump intensity
+     */
     public MovableEntity(World parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
         _parent = parent;
         _walkingSpeed = walkingSpeed;
@@ -69,11 +77,8 @@ public abstract class MovableEntity extends Entity {
     }
 
     public abstract void processMovement();
-
     protected abstract AABB generateAABBForPosition(Vector3f p);
-
     protected abstract void handleVerticalCollision();
-
     protected abstract void handleHorizontalCollision();
 
     public void render() {
@@ -120,7 +125,7 @@ public abstract class MovableEntity extends Entity {
 
         if ((MathHelper.fastAbs(_velocity.x) > 0.01 || MathHelper.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
-                Vector3f playerDirection = directionOfOrigin();
+                Vector3f playerDirection = directionOfReferencePoint();
                 _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
 
                 _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.05f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.1f, false, playerDirection.x, playerDirection.y, playerDirection.z);
@@ -171,10 +176,12 @@ public abstract class MovableEntity extends Entity {
     }
 
     /**
-     * @param origin The originating entity position
+     * Gathers all adjacent block positions for a given block position.
+     *
+     * @param origin The block position
      * @return A list of adjacent block positions
      */
-    protected FastList<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
+    private FastList<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
         /*
          * Gather the surrounding block positions
          * and order those by the distance to the originating point.
@@ -335,8 +342,8 @@ public abstract class MovableEntity extends Entity {
                     }
 
                     // Entity reaches the ground
-                    if (_touchingGround == false) {
-                        Vector3f playerDirection = directionOfOrigin();
+                    if (!_touchingGround) {
+                        Vector3f playerDirection = directionOfReferencePoint();
                         _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5].playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false, playerDirection.x, playerDirection.y, playerDirection.z);
                         _touchingGround = true;
                     }
@@ -377,7 +384,7 @@ public abstract class MovableEntity extends Entity {
     /**
      * Updates the status if the entity is currently swimming (in water).
      */
-    protected void updateSwimStatus() {
+    private void updateSwimStatus() {
         FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(getPosition());
 
         boolean swimming = false, headUnderWater = false;
@@ -408,7 +415,7 @@ public abstract class MovableEntity extends Entity {
      *
      * @param diff Amount of yawing to be applied.
      */
-    protected void yaw(double diff) {
+    public void yaw(double diff) {
         double nYaw = (_yaw + diff) % 360;
         if (nYaw < 0) {
             nYaw += 360;
@@ -421,7 +428,7 @@ public abstract class MovableEntity extends Entity {
      *
      * @param diff Amount of pitching to be applied.
      */
-    protected void pitch(double diff) {
+    public void pitch(double diff) {
         double nPitch = (_pitch - diff);
 
         if (nPitch > 89)
@@ -432,7 +439,7 @@ public abstract class MovableEntity extends Entity {
         _pitch = nPitch;
     }
 
-    protected void walkForward() {
+    public void walkForward() {
         if (!_godMode && !_isSwimming) {
             _movementDirection.x += _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw));
             _movementDirection.z -= _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw));
@@ -447,7 +454,7 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
-    protected void walkBackwards() {
+    public void walkBackwards() {
         if (!_godMode && !_isSwimming) {
             _movementDirection.x -= _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw));
             _movementDirection.z += _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw));
@@ -462,34 +469,34 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
-    protected void strafeLeft() {
+    public void strafeLeft() {
         _movementDirection.x += _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw - 90));
         _movementDirection.z -= _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw - 90));
     }
 
-    protected void strafeRight() {
+    public void strafeRight() {
         _movementDirection.x += _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw + 90));
         _movementDirection.z -= _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw + 90));
     }
 
-    protected void jump() {
+    public void jump() {
         if (_touchingGround) {
             _jump = true;
         }
     }
 
-    protected Vector3f directionOfOrigin() {
-        return Vector3f.sub(_parent.getOrigin(), getPosition(), null);
+    public Vector3f directionOfReferencePoint() {
+        return Vector3f.sub(_parent.getWorldProvider().getRenderingReferencePoint(), getPosition(), null);
     }
 
-    protected double distanceSquaredTo(Vector3f target) {
+    public double distanceSquaredTo(Vector3f target) {
         Vector3f targetDirection = new Vector3f();
         Vector3f.sub(target, getPosition(), targetDirection);
 
         return targetDirection.lengthSquared();
     }
 
-    protected void lookAt(Vector3f target) {
+    public void lookAt(Vector3f target) {
         Vector3f targetDirection = new Vector3f();
         Vector3f.sub(target, getPosition(), targetDirection);
         targetDirection.normalise();
@@ -501,12 +508,12 @@ public abstract class MovableEntity extends Entity {
         return generateAABBForPosition(getPosition());
     }
 
-    protected Vector3f calcEyePosition() {
+    public Vector3f calcEyePosition() {
         Vector3f eyePosition = new Vector3f(getPosition());
         return Vector3f.add(eyePosition, calcEyeOffset(), eyePosition);
     }
 
-    protected Vector3f calcEyeOffset() {
+    public Vector3f calcEyeOffset() {
         return new Vector3f(0.0f, getAABB().getDimensions().y - 0.2f, 0.0f);
     }
 

@@ -34,7 +34,10 @@ import java.nio.IntBuffer;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
+ * Skysphere based on the Perez all weather luminance model.
+ *
  * @author Anthony Kireev <adeon.k87@gmail.com>
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Skysphere implements RenderableObject {
     private static int _displayListSphere = -1;
@@ -44,7 +47,7 @@ public class Skysphere implements RenderableObject {
     private float _turbidity = 12.0f, _sunPosAngle = 0.1f;
     private Vector3f _zenithColor = new Vector3f();
 
-    /*Stars*/
+    /* STARS */
     public static IntBuffer textureId = BufferUtils.createIntBuffer(1);
     private World _parent;
 
@@ -143,12 +146,11 @@ public class Skysphere implements RenderableObject {
     }
 
     public float getDaylight() {
-        return (float) Math.min(Math.max(Math.cos(_sunPosAngle),0.0f) + 0.3f, 1.0f);
+        return (float) Math.min(Math.max(Math.cos(_sunPosAngle), 0.0f) + 0.3f, 1.0f);
     }
 
     private void loadStarTextures() {
-        int internalFormat = GL11.GL_RGBA8,
-                format = GL12.GL_BGRA;
+        int internalFormat = GL11.GL_RGBA8, format = GL12.GL_BGRA;
 
         GL11.glGenTextures(textureId);
 

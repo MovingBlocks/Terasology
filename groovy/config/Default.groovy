@@ -8,7 +8,7 @@ System {
     // Defines how often the list of chunks around the player gets updated per second
     chunkRequestsPerSecond = 8
     // Defines how many chunk update can be processed/queued each second
-    chunkUpdatesPerSecond = 20
+    chunkUpdatesPerSecond = 64
     // Defines the maximum amount of threads used for chunk generation
     maxThreads = Runtime.getRuntime().availableProcessors() + 1
     // Enable/or disable the persisting of chunks
@@ -45,9 +45,9 @@ Graphics {
 
 HUD {
 
-    crosshair = false
-    rotatingBlock = false
-    placingBox = false
+    crosshair = true
+    rotatingBlock = true
+    placingBox = true
 
 }
 

@@ -28,6 +28,7 @@ import java.util.Collection;
  */
 public class BlueprintGenerator {
 
+    /* SINGLETON */
     public static BlueprintGenerator _instance;
 
     public static BlueprintGenerator getInstance() {
@@ -49,6 +50,7 @@ public class BlueprintGenerator {
 
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
 
+        // Locate the origin of the rectangle
         for (BlockPosition pos : blockPositions) {
             if (pos.x < minX)
                 minX = pos.x;
@@ -58,6 +60,7 @@ public class BlueprintGenerator {
                 minZ = pos.z;
         }
 
+        // Finally generate the blueprint
         for (BlockPosition pos : blockPositions) {
             BlockPosition newPos = new BlockPosition(pos.x - minX, pos.y - minY, pos.z - minZ);
 

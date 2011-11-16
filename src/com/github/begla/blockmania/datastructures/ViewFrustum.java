@@ -22,22 +22,29 @@ import org.lwjgl.util.vector.Vector3f;
 import java.nio.FloatBuffer;
 
 /**
- * View frustum class usable for frustum culling.
+ * View frustum usable for frustum culling.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ViewFrustum {
 
     private final FrustumPlane[] _planes = new FrustumPlane[6];
+
     private final FloatBuffer _proj = BufferUtils.createFloatBuffer(16);
     private final FloatBuffer _model = BufferUtils.createFloatBuffer(16);
     private final FloatBuffer _clip = BufferUtils.createFloatBuffer(16);
 
+    /**
+     * Init. a new view frustum.
+     */
     public ViewFrustum() {
         for (int i = 0; i < 6; i++)
             _planes[i] = new FrustumPlane();
     }
 
+    /**
+     * Updates the view frustum using the currently active modelview and projection matrices.
+     */
     public void updateFrustum() {
         GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, _proj);
         GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, _model);
@@ -105,6 +112,9 @@ public class ViewFrustum {
         _planes[5].normalize();
     }
 
+    /**
+     * Returns true if the given point intersects the view frustum.
+     */
     public boolean intersects(double x, double y, double z) {
         for (int i = 0; i < 6; i++) {
             if (_planes[i].getA() * x + _planes[i].getB() * y + _planes[i].getC() * z + _planes[i].getD() <= 0) {
@@ -114,6 +124,9 @@ public class ViewFrustum {
         return true;
     }
 
+    /**
+     * Returns true if this view frustum intersects the given AABB.
+     */
     public boolean intersects(AABB aabb) {
 
         Vector3f[] aabbVertices = aabb.getVertices();

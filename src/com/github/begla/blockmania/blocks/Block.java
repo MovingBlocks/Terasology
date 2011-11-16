@@ -35,12 +35,13 @@ import java.util.logging.Level;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * Stores all information for a specific block type in the world.
+ * Stores all information for a specific block type.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Block implements RenderableObject {
 
+    /* PROPERTIES */
     private byte _id = 0x0;
     private String _title = "Untitled block";
 
@@ -63,7 +64,10 @@ public class Block implements RenderableObject {
     private Vector4f[] _colorOffset = new Vector4f[6];
     private Vector2f[] _textureAtlasPos = new Vector2f[6];
 
+    /* RENDERING */
     private int _displayList = -1;
+
+    /* LUTs */
     private static BufferedImage _colorLut;
     private static BufferedImage _foliageLut;
 
@@ -88,6 +92,9 @@ public class Block implements RenderableObject {
         DEFAULT, COLOR_LUT, FOLIAGE_LUT
     }
 
+    /**
+     * Init. the LUTs.
+     */
     static {
         try {
             _colorLut = ImageIO.read(ResourceLoader.getResource("com/github/begla/blockmania/data/textures/grasscolor.png").openStream());
@@ -97,6 +104,9 @@ public class Block implements RenderableObject {
         }
     }
 
+    /**
+     * Init. a new block with default properties in place.
+     */
     public Block() {
         withTitle("Untitled block");
 
@@ -117,7 +127,7 @@ public class Block implements RenderableObject {
         withRenderBoundingBox(true);
         withHardness((byte) 15);
         withLuminance((byte) 0);
-        withDisableTesselation(false);
+        withDisableTessellation(false);
         withLiquid(false);
     }
 
@@ -188,28 +198,6 @@ public class Block implements RenderableObject {
         return Helper.calcOffsetForTextureAt((int) getTextureAtlasPos()[side.ordinal()].x, (int) getTextureAtlasPos()[side.ordinal()].y);
     }
 
-    /**
-     * Returns the AABB for a block at the given position.
-     *
-     * @param pos The position
-     * @return The AABB
-     */
-    public static AABB AABBForBlockAt(Vector3f pos) {
-        return new AABB(pos, new Vector3f(0.5f, 0.5f, 0.5f));
-    }
-
-    /**
-     * Returns the AABB for a block at the given position.
-     *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
-     * @return The AABB
-     */
-    public static AABB AABBForBlockAt(int x, int y, int z) {
-        return new AABB(new Vector3f(x, y, z), new Vector3f(0.5f, 0.5f, 0.5f));
-    }
-
     public void render() {
         if (isInvisible())
             return;
@@ -259,8 +247,8 @@ public class Block implements RenderableObject {
         return this;
     }
 
-    public Block withDisableTesselation(boolean disableTesselation) {
-        _disableTessellation = disableTesselation;
+    public Block withDisableTessellation(boolean disableTessellation) {
+        _disableTessellation = disableTessellation;
         return this;
     }
 
@@ -382,7 +370,7 @@ public class Block implements RenderableObject {
         return _castsShadows;
     }
 
-    public boolean isDisableTesselation() {
+    public boolean isDisableTessellation() {
         return _disableTessellation;
     }
 
@@ -414,6 +402,11 @@ public class Block implements RenderableObject {
         return _translucent;
     }
 
+    /**
+     * Generates the display list used for rendering the block.
+     *
+     * @return The id of the display list
+     */
     private int generateDisplayList() {
         int id = glGenLists(1);
 
@@ -487,5 +480,27 @@ public class Block implements RenderableObject {
         glEndList();
 
         return id;
+    }
+
+    /**
+     * Returns the AABB for a block at the given position.
+     *
+     * @param pos The position
+     * @return The AABB
+     */
+    public static AABB AABBForBlockAt(Vector3f pos) {
+        return new AABB(pos, new Vector3f(0.5f, 0.5f, 0.5f));
+    }
+
+    /**
+     * Returns the AABB for a block at the given position.
+     *
+     * @param x Position on the x-axis
+     * @param y Position on the y-axis
+     * @param z Position on the z-axis
+     * @return The AABB
+     */
+    public static AABB AABBForBlockAt(int x, int y, int z) {
+        return new AABB(new Vector3f(x, y, z), new Vector3f(0.5f, 0.5f, 0.5f));
     }
 }

@@ -38,7 +38,7 @@ import java.io.ObjectOutput;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
- * determined by its dimensions. Chunks are used to manage the world efficiently and
+ * determined by its dimensions. They are used to manage the world efficiently and
  * to reduce the batch count within the render loop.
  * <p/>
  * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated
@@ -52,8 +52,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     private static final int CHUNK_DIMENSION_X = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionX");
     private static final int CHUNK_DIMENSION_Y = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionY");
     private static final int CHUNK_DIMENSION_Z = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionZ");
-    protected static final Vector3f[] LIGHT_DIRECTIONS = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
-    /* ------ */
+    private static final Vector3f[] LIGHT_DIRECTIONS = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
+
     protected FastRandom _random;
     /* ------ */
     protected boolean _dirty, _lightDirty, _fresh;
@@ -577,7 +577,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void processChunk() {
-       /*
+        /*
         * Generate the chunk...
         */
         generate();
@@ -589,7 +589,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         /*
         * Before starting the illumination process, make sure that the neighbor chunks
-        * are present and generated.
+        * are present and fully generated.
         */
         for (int i = 0; i < neighbors.length; i++) {
             if (neighbors[i] != null) {
@@ -597,6 +597,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             }
         }
 
+        // Finally update the light and generate the mesh
         updateLight();
         generateMesh();
     }
@@ -614,13 +615,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         // The flags are stored within the first byte of the file...
         out.writeByte(flags);
 
-        for (int i = 0; i < _blocks.getSize(); i++)
+        for (int i = 0; i < _blocks.size(); i++)
             out.writeByte(_blocks.getRawByte(i));
 
-        for (int i = 0; i < _sunlight.getPackedSize(); i++)
+        for (int i = 0; i < _sunlight.sizePacked(); i++)
             out.writeByte(_sunlight.getRawByte(i));
 
-        for (int i = 0; i < _light.getPackedSize(); i++)
+        for (int i = 0; i < _light.sizePacked(); i++)
             out.writeByte(_light.getRawByte(i));
     }
 
@@ -633,13 +634,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         // Parse the flags...
         _lightDirty = Helper.isFlagSet(flags, (short) 0);
 
-        for (int i = 0; i < _blocks.getSize(); i++)
+        for (int i = 0; i < _blocks.size(); i++)
             _blocks.setRawByte(i, in.readByte());
 
-        for (int i = 0; i < _sunlight.getPackedSize(); i++)
+        for (int i = 0; i < _sunlight.sizePacked(); i++)
             _sunlight.setRawByte(i, in.readByte());
 
-        for (int i = 0; i < _light.getPackedSize(); i++)
+        for (int i = 0; i < _light.sizePacked(); i++)
             _light.setRawByte(i, in.readByte());
 
         _fresh = false;
@@ -708,7 +709,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
                 return;
 
             if (_newMesh != null) {
-                if (!_newMesh.isGenerated() || _newMesh.isDisposed())
+                if (_newMesh.isDisposed() || !_newMesh.isGenerated())
                     return;
 
                 ChunkMesh newMesh = _newMesh;

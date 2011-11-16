@@ -20,7 +20,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 /**
  * Represents the position of a block. This class is used mainly in the
- * collision detection process.
+ * collision detection processes.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

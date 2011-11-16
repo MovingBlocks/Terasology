@@ -12,13 +12,13 @@ rules.put("A", "[&FFFA]////[&FFFA]////[&FFFA]");
 
 TreeGeneratorLSystem t1 = new TreeGeneratorLSystem(m, "FFFFFFA", rules).withGenerationProbability(0.1);
 
-// ...and LARGE bushy tree
+// ...and a LARGE bushy tree
 rules = new HashMap<String, String>();
 rules.put("A", "[&FFFFFA]////[&FFFFFA]////[&FFFFFA]");
 
 TreeGeneratorLSystem t2 = new TreeGeneratorLSystem(m, "FFFFAFFFFFFFAFFFFA", rules).withLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId()).withGenerationProbability(0.01);
 
-// ...and some strange wobbly thingy
+// ...and some strange wobbly thingies
 rules = new HashMap<String, String>();
 rules.put("A", "[&FA]////[&FFA]////[&FFFA]");
 

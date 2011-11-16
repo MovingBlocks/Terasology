@@ -8,7 +8,7 @@ import org.lwjgl.util.vector.Vector4f
 def BlockManager bm = blockManager;
 
 // The air we breathe
-bm.addBlock(new Block().withTitle("Air").withId((byte) 0).withDisableTesselation(true).withTranslucent(true).withInvisible(true).withBypassSelectionRay(true).withPenetrable(true).withCastsShadows(false).withRenderBoundingBox(false).withAllowBlockAttachment(false).withHardness((byte) 0))
+bm.addBlock(new Block().withTitle("Air").withId((byte) 0).withDisableTessellation(true).withTranslucent(true).withInvisible(true).withBypassSelectionRay(true).withPenetrable(true).withCastsShadows(false).withRenderBoundingBox(false).withAllowBlockAttachment(false).withHardness((byte) 0))
 // <--
 
 // Etc.
@@ -68,7 +68,7 @@ bm.addBlock(new Block().withTitle("Large high grass").withId((byte) 15).withText
 // <--
 
 // Cacti
-bm.addBlock(new Block().withTitle("Cactus").withId((byte) 28).withTextureAtlasPosTopBottom(new Vector2f(5, 4)).withTextureAtlasPosMantle(new Vector2f(6, 4)).withBlockForm(BLOCK_FORM.CACTUS).withDisableTesselation(true).withTranslucent(true))
+bm.addBlock(new Block().withTitle("Cactus").withId((byte) 28).withTextureAtlasPosTopBottom(new Vector2f(5, 4)).withTextureAtlasPosMantle(new Vector2f(6, 4)).withBlockForm(BLOCK_FORM.CACTUS).withDisableTessellation(true).withTranslucent(true))
 // <--
 
 // Minerals

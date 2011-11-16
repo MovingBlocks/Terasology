@@ -27,15 +27,22 @@ public class PerlinNoise {
 
     private final int[] _noisePermutations, _noiseTable;
 
+    /**
+     * Init. a new generator with a given seed value.
+     *
+     * @param seed The seed value
+     */
     public PerlinNoise(int seed) {
         FastRandom rand = new FastRandom(seed);
 
         _noisePermutations = new int[512];
         _noiseTable = new int[256];
 
+        // Init. the noise table
         for (int i = 0; i < 256; i++)
             _noiseTable[i] = i;
 
+        // Shuffle the array
         for (int i = 0; i < 256; i++) {
             int j = rand.randomInt() % 256;
             j = (j < 0) ? -j : j;
@@ -45,11 +52,20 @@ public class PerlinNoise {
             _noiseTable[j] = swap;
         }
 
+        // Finally replicate the noise permutations in the remaining 256 index positions
         for (int i = 0; i < 256; i++)
             _noisePermutations[i] = _noisePermutations[i + 256] = _noiseTable[i];
 
     }
 
+    /**
+     * Returns the noise value at the given position.
+     *
+     * @param x Position on the x-axis
+     * @param y Position on the y-axis
+     * @param z Position on the z-axis
+     * @return The noise value
+     */
     public double noise(double x, double y, double z) {
         int X = (int) MathHelper.fastFloor(x) & 255, Y = (int) MathHelper.fastFloor(y) & 255, Z = (int) MathHelper.fastFloor(z) & 255;
 
@@ -71,20 +87,17 @@ public class PerlinNoise {
                                 grad(_noisePermutations[(BB + 1)], x - 1, y - 1, z - 1))));
     }
 
-    private static double fade(double t) {
-        return t * t * t * (t * (t * 6 - 15) + 10);
-    }
-
-    private static double lerp(double t, double a, double b) {
-        return a + t * (b - a);
-    }
-
-    private static double grad(int hash, double x, double y, double z) {
-        int h = hash & 15;
-        double u = h < 8 ? x : y, v = h < 4 ? y : h == 12 || h == 14 ? x : z;
-        return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
-    }
-
+    /**
+     * Returns Fractional Brownian Motion at the given position.
+     *
+     * @param x Position on the x-axis
+     * @param y Position on the y-axis
+     * @param z Position on the z-axis
+     * @param octaves Amount of octaves to apply
+     * @param lacunarity The lacunarity
+     * @param h The fractal dimension
+     * @return The noise value
+     */
     public double fBm(double x, double y, double z, int octaves, double lacunarity, double h) {
         double result = 0.0;
 
@@ -97,5 +110,19 @@ public class PerlinNoise {
         }
 
         return result;
+    }
+
+    private static double fade(double t) {
+        return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+
+    private static double lerp(double t, double a, double b) {
+        return a + t * (b - a);
+    }
+
+    private static double grad(int hash, double x, double y, double z) {
+        int h = hash & 15;
+        double u = h < 8 ? x : y, v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+        return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
     }
 }

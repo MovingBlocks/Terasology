@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.datastructures;
 
 /**
- * A fast 3D array for efficient storage of byte values.
+ * A fast 3D array for efficient storage of 4-bit values.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -26,6 +26,9 @@ public class BlockmaniaSmartArray {
     private final int _lX, _lY, _lZ;
     private final int _size, _halfSize;
 
+    /**
+     * Init. a new 3D array with the given dimensions.
+     */
     public BlockmaniaSmartArray(int x, int y, int z) {
         _lX = x;
         _lY = y;
@@ -35,6 +38,9 @@ public class BlockmaniaSmartArray {
         _array = new byte[_halfSize = _size / 2];
     }
 
+    /**
+     * Returns the byte value at the given position.
+     */
     public byte get(int x, int y, int z) {
 
         int pos = (x * _lX * _lY) + (y * _lX) + z;
@@ -51,6 +57,9 @@ public class BlockmaniaSmartArray {
         return (byte) (bArray >> 4);
     }
 
+    /**
+     * Sets the byte value for the given position.
+     */
     public void set(int x, int y, int z, byte b) {
         int pos = (x * _lX * _lY) + (y * _lX) + z;
 
@@ -69,19 +78,31 @@ public class BlockmaniaSmartArray {
         _array[pos % _halfSize] = (byte) ((bArray & 0x0F) | (bInput << 4) & 0xFF);
     }
 
+    /**
+     * Returns the raw byte at the given index.
+     */
     public byte getRawByte(int i) {
         return _array[i];
     }
 
+    /**
+     * Sets the raw byte for the given index.
+     */
     public void setRawByte(int i, byte b) {
         _array[i] = b;
     }
 
-    public int getSize() {
+    /**
+     * Returns the size of this array.
+     */
+    public int size() {
         return _size;
     }
 
-    public int getPackedSize() {
+    /**
+     * Returns the packed size of this array.
+     */
+    public int sizePacked() {
         return _halfSize;
     }
 }

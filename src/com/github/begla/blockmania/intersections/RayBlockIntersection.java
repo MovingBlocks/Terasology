@@ -54,10 +54,6 @@ public class RayBlockIntersection {
             this._blockPosition = blockPosition;
         }
 
-        /**
-         * @param o
-         * @return
-         */
         public int compareTo(Intersection o) {
             if (o == null) {
                 return 0;
@@ -72,30 +68,18 @@ public class RayBlockIntersection {
             return distance2 > distance ? -1 : 1;
         }
 
-        /**
-         * @return
-         */
         Vector3f getSurfaceNormal() {
             return _surfaceNormal;
         }
 
-        /**
-         * @return
-         */
         public BlockPosition calcAdjacentBlockPos() {
             return new BlockPosition(Vector3f.add(getBlockPosition().toVector3f(), getSurfaceNormal(), null));
         }
 
-        /**
-         * @return the blockPos
-         */
         public BlockPosition getBlockPosition() {
             return _blockPosition;
         }
 
-        /**
-         * @return
-         */
         @Override
         public String toString() {
             return String.format("x: %.2f y: %.2f z: %.2f", _blockPosition.x, _blockPosition.y, _blockPosition.z);
@@ -106,13 +90,12 @@ public class RayBlockIntersection {
      * Calculates the intersection of a given ray originating from a specified point with
      * a block. Returns a list of intersections ordered by the distance to the player.
      *
-     * @param w
-     * @param x
-     * @param y
-     * @param z
-     * @param rayOrigin
-     * @param rayDirection
-     * @return Distance-ordered list of ray-face-intersections
+     * @param w            The world provider
+     * @param x            The block's position on the x-axis
+     * @param y            The block's position on the y-axis
+     * @param z            The block's position on the z-axis
+     * @param rayOrigin    The origin of the ray
+     * @param rayDirection The direction of the ray
      */
     public static FastList<Intersection> executeIntersection(WorldProvider w, int x, int y, int z, Vector3f rayOrigin, Vector3f rayDirection) {
         /*
@@ -170,15 +153,13 @@ public class RayBlockIntersection {
             result.add(is);
         }
 
-        /*
-         * Sort the intersections by distance.
-         */
+        // Sort the intersections by distance to the player
         Collections.sort(result);
         return result;
     }
 
     /**
-     * Calculates an intersection with the face of a block defined by 3 points.
+     * Calculates an intersection with the face of a block defined by three points.
      *
      * @param blockPos The position of the block to intersect with
      * @param v0       Point 1
@@ -205,6 +186,7 @@ public class RayBlockIntersection {
          */
         double t = -(norm.x * origin.x + norm.y * origin.y + norm.z * origin.z + d) / (Vector3f.dot(ray, norm));
 
+        // No intersection possible
         if (t < 0)
             return null;
 
@@ -214,10 +196,14 @@ public class RayBlockIntersection {
         Vector3f intersectPoint = new Vector3f((float) (ray.x * t), (float) (ray.y * t), (float) (ray.z * t));
         Vector3f.add(intersectPoint, origin, intersectPoint);
 
+        /**
+         * Check if the point lies on block's face.
+         */
         if (intersectPoint.x >= v0.x && intersectPoint.x <= Math.max(v1.x, v2.x) && intersectPoint.y >= v0.y && intersectPoint.y <= Math.max(v1.y, v2.y) && intersectPoint.z >= v0.z && intersectPoint.z <= Math.max(v1.z, v2.z)) {
             return new Intersection(blockPos, norm, d, t, origin, ray, intersectPoint);
         }
 
+        // Point of intersection was NOT lying on the block's face
         return null;
     }
 }

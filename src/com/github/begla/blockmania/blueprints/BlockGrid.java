@@ -27,17 +27,16 @@ import org.lwjgl.util.vector.Vector4f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * Renderable block grid. Can be used for displaying collections of selected blocks.
- * <p/>
- * TODO: Optimize!
+ * Renderable block grid. Can be used for displaying a set of block selection boxes.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockGrid implements RenderableObject {
 
-    private static int _blockDisplayList = Primitives.generateColoredBlock(new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f);
-    private FastSet<BlockPosition> _gridPositions = FastSet.newInstance();
+    /* CONST */
+    private static final int _blockDisplayList = Primitives.generateColoredBlock(new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f);
 
+    private FastSet<BlockPosition> _gridPositions = FastSet.newInstance();
     private World _parent;
 
     public BlockGrid(World parent) {

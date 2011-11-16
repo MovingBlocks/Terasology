@@ -22,9 +22,9 @@ import javolution.util.FastMap;
 import javolution.util.FastSet;
 
 /**
- * A very simple prototype of the blueprint prototype.
+ * A very simple prototype of the blueprint concept.
  * <p/>
- * Blueprints are currently a collection of block positions and block types
+ * Blueprints are currently a set of block positions and block types
  * that can be used to create replicas in the world.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

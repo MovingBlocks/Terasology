@@ -11,7 +11,7 @@ class SlimeTool implements Tool {
         s.setSpawningPoint(Blockmania.getInstance().getActiveWorld().getPlayer().getPosition())
         s.respawn()
 
-        Blockmania.getInstance().getMobManager().addMob(s)
+        Blockmania.getInstance().getActiveWorld().getMobManager().addMob(s)
     }
 
     public void executeRightClickAction() {

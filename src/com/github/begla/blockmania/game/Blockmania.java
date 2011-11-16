@@ -23,7 +23,6 @@ import com.github.begla.blockmania.rendering.manager.FontManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.characters.MobManager;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.main.World;
@@ -60,57 +59,59 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Blockmania {
 
+    /* THREADING */
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(32);
-    /* ------ */
+
+    /* CONST */
     private static final int FRAME_SKIP_MAX_FRAMES = 10;
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-    /* ------- */
+
+    /* STATISTICS */
     private long _lastLoopTime, _lastFpsTime;
     private double _averageFps;
     private int _fps;
     private long _timerTicksPerSecond;
+
+    /* GAME LOOP */
     private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
-    /* ------- */
+
+    /* RENDERING */
     private World _world;
     private HUD _hud;
-    /* ------- */
-    private static Blockmania _instance;
-    /* ------- */
-    private final Logger _logger = Logger.getLogger("blockmania");
-    /* ------- */
-    private final BlockmaniaConsole _console = new BlockmaniaConsole(this);
 
-    /**
-     * Groovy Manager handles all the Groovy-related stuff!
-     */
+    /* SINGLETON */
+    private static Blockmania _instance;
+
+    /* LOGGING */
+    private final Logger _logger;
+
+    /* CONSOLE */
+    private final BlockmaniaConsole _console;
+
+    /* GROOVY */
     private GroovyManager _groovyManager;
 
     /**
-     * Mob Manager to deal with non-player character
+     * Returns the static instance of Blockmania.
+     *
+     * @return The instance
      */
-    private MobManager _mobManager;
-
-    // Singleton
     public static Blockmania getInstance() {
         if (_instance == null)
             _instance = new Blockmania();
         return _instance;
     }
 
-    private Blockmania() {
-        _hud = new HUD(this);
-    }
-
     /**
      * Entry point of the application.
      *
-     * @param args Arguments
+     * @param args The arguments
      */
     public static void main(String[] args) {
-        initDefaultLogger();
         getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"));
 
+        // Make sure to load the native libraries for current OS first
         try {
             loadNativeLibs();
         } catch (Exception e) {
@@ -127,28 +128,17 @@ public final class Blockmania {
             blockmania.initGame();
             blockmania.initGroovy();
         } catch (LWJGLException e) {
-            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
+            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm so sorry: " + e.toString(), e);
+            System.exit(0);
         } catch (SlickException e) {
-            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm sorry. " + e.toString(), e);
+            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm so sorry: " + e.toString(), e);
+            System.exit(0);
         }
 
-        // MAIN GAME LOOP
-        if (blockmania != null)
-            blockmania.startGame();
+        // START THE MAIN GAME LOOP
+        blockmania.startGame();
 
         System.exit(0);
-    }
-
-    private static void initDefaultLogger() {
-        File dirPath = new File("logs");
-
-        if (!dirPath.exists()) {
-            if (!dirPath.mkdirs()) {
-                return;
-            }
-        }
-
-        getInstance().addLogFileHandler("LOGS/blockmania.log", Level.INFO);
     }
 
     private static void loadNativeLibs() throws Exception {
@@ -177,6 +167,18 @@ public final class Blockmania {
         usrPathsField.set(null, newPaths);
     }
 
+    /**
+     * Init. a new instance of Blockmania.
+     */
+    private Blockmania() {
+        _hud = new HUD(this);
+        _console = new BlockmaniaConsole(this);
+        _logger = Logger.getLogger("blockmania");
+    }
+
+    /**
+     * Init. the Groovy manager.
+     */
     public void initGroovy() {
         _groovyManager = new GroovyManager();
     }
@@ -285,8 +287,6 @@ public final class Blockmania {
             worldSeed = null;
 
         initWorld("World1", worldSeed);
-
-        _mobManager = new MobManager(); // I suppose this could/should be a getInstance...
         initGroovy();
     }
 
@@ -367,8 +367,6 @@ public final class Blockmania {
 
         if (_hud != null)
             _hud.render();
-
-        _mobManager.renderAll();
     }
 
     public void update() {
@@ -377,8 +375,6 @@ public final class Blockmania {
 
         if (_hud != null)
             _hud.update();
-
-        _mobManager.updateAll();
     }
 
     public void pause() {
@@ -449,11 +445,12 @@ public final class Blockmania {
     private void updateFPS() {
         // Measure the delta value and the frames per second
         long delta = getTime() - _lastLoopTime;
+
         _lastLoopTime = getTime();
         _lastFpsTime += delta;
         _fps++;
 
-        // Update the FPS and calculate the average
+        // Update the FPS and calculate the average FPS
         if (_lastFpsTime >= 1000) {
             _lastFpsTime = 0;
 
@@ -473,6 +470,18 @@ public final class Blockmania {
         } catch (IOException ex) {
             _logger.log(Level.WARNING, ex.toString(), ex);
         }
+    }
+
+    private void initDefaultLogger() {
+        File dirPath = new File("logs");
+
+        if (!dirPath.exists()) {
+            if (!dirPath.mkdirs()) {
+                return;
+            }
+        }
+
+        addLogFileHandler("LOGS/blockmania.log", Level.INFO);
     }
 
     public Logger getLogger() {
@@ -495,6 +504,11 @@ public final class Blockmania {
         return _world.getWorldProvider();
     }
 
+    /**
+     * Returns the system time in ms.
+     *
+     * @return The system time in ms
+     */
     public long getTime() {
         if (_timerTicksPerSecond == 0)
             return 0;
@@ -512,9 +526,5 @@ public final class Blockmania {
 
     public BlockmaniaConsole getConsole() {
         return _console;
-    }
-
-    public MobManager getMobManager() {
-        return _mobManager;
     }
 }

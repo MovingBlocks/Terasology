@@ -29,19 +29,21 @@ import java.util.Collections;
 import java.util.logging.Level;
 
 /**
- * Provides a dynamic cache for caching chunks.
+ * Provides a dynamic cache for accessing chunks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class LocalChunkCache implements ChunkProvider {
 
     private static boolean _running = false;
-    /* ------ */
+
     private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>().shared();
     private final LocalWorldProvider _parent;
 
     /**
-     * @param parent
+     * Init. a new local chunk cache.
+     *
+     * @param parent The parent
      */
     public LocalChunkCache(LocalWorldProvider parent) {
         _parent = parent;
@@ -59,6 +61,7 @@ public final class LocalChunkCache implements ChunkProvider {
      */
     public Chunk loadOrCreateChunk(int x, int z) {
         int chunkId = MathHelper.cantorize(MathHelper.mapToPositive(x), MathHelper.mapToPositive(z));
+
         // Try to load the chunk from the cache
         Chunk c = _chunkCache.get(chunkId);
 
@@ -67,20 +70,28 @@ public final class LocalChunkCache implements ChunkProvider {
             return c;
         }
 
+        // Okay, seems like we've got some more stuff to do...
         Vector3f chunkPos = new Vector3f(x, 0, z);
-        // Init a new chunk
+
+        // Try to load the chunk from the disk
         c = loadChunkFromDisk(chunkPos);
 
+        // Check if chunk has been loaded, otherwise create fresh chunk from scratch
         if (c == null) {
             c = new Chunk(_parent, chunkPos);
         }
 
+        // Cache the chunk...
         _chunkCache.put(chunkId, c);
 
+        // ... and finally return it
         return c;
     }
 
-    public void freeUnusedSpace() {
+    /**
+     * Removes old chunks from the cache if the size limit has been reached.
+     */
+    public void flushCache() {
         if (_running || _chunkCache.size() <= capacity())
             return;
 
@@ -126,6 +137,11 @@ public final class LocalChunkCache implements ChunkProvider {
         Blockmania.getInstance().getThreadPool().submit(r);
     }
 
+    /**
+     * Writes a given chunk to the disk.
+     *
+     * @param c The chunk to save
+     */
     private void writeChunkToDisk(Chunk c) {
         if (c.isFresh() || !(Boolean) ConfigurationManager.getInstance().getConfig().get("System.saveChunks")) {
             return;
@@ -152,6 +168,12 @@ public final class LocalChunkCache implements ChunkProvider {
         }
     }
 
+    /**
+     * Tries to load a chunk at the given position from disk.
+     *
+     * @param chunkPos The position of the chunk
+     * @return The loaded chunk, null if none was found
+     */
     private Chunk loadChunkFromDisk(Vector3f chunkPos) {
         File f = new File(_parent.getWorldSavePath() + "/" + Chunk.getChunkSavePathForPosition(chunkPos) + "/" + Chunk.getChunkFileNameForPosition(chunkPos));
 
@@ -176,10 +198,20 @@ public final class LocalChunkCache implements ChunkProvider {
         return null;
     }
 
+    /**
+     * Returns the amount of cached chunks available in the cache.
+     *
+     * @return The amount of chunks
+     */
     public int size() {
         return _chunkCache.size();
     }
 
+    /**
+     * Returns the cache capacity based on the viewing distance defined in the configuration.
+     *
+     * @return The capacity
+     */
     public static int capacity() {
         int viewingDistanceX = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX");
         int viewingDistanceZ = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ");

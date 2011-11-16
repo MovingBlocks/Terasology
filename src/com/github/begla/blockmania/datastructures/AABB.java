@@ -175,7 +175,9 @@ public class AABB implements RenderableObject {
     }
 
     /**
-     * Renders the AABB (SLOW!).
+     * Renders this AABB.
+     *
+     * TODO: SLOW!
      */
     public void render() {
         double offset = 0.01;

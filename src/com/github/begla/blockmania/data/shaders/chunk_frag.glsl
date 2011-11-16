@@ -27,7 +27,7 @@ void main(){
         texCoord.y += animationOffset;
     }
 
-    float daylightTrans = pow(0.82, (1.0-daylight)*15.0);
+    float daylightTrans = pow(0.86, (1.0-daylight)*15.0);
 
     vec4 color = texture2D(textureAtlas, vec2(texCoord));
     color = srgbToLinear(color);
@@ -51,7 +51,7 @@ void main(){
     vec3 lightCoord = vec3(gl_TexCoord[1]);
 
     // CALCULATE DAYLIGHT AND BLOCKLIGHT
-    float daylightValue = clamp(daylightTrans + 0.2, 0.0, 1.0) * pow(0.86, (1.0-lightCoord.x)*15.0);
+    float daylightValue = clamp(daylightTrans, 0.0, 1.0) * pow(0.92, (1.0-lightCoord.x)*15.0);
     float blocklightValue = lightCoord.y;
     float occlusionValue = lightCoord.z;
 

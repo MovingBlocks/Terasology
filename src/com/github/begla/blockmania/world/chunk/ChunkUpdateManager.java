@@ -22,68 +22,88 @@ import com.github.begla.blockmania.world.interfaces.BlockObserver;
 import javolution.util.FastSet;
 
 /**
- * Provides support for updating and generating chunks.
+ * Provides the mechanism for updating and generating chunks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ChunkUpdateManager implements BlockObserver {
 
+    public enum UPDATE_TYPE {
+        DEFAULT, PLAYER_PLACED, PLAYER_REMOVED
+    }
+
+    /* CONST */
+    private static final int MAX_THREADS = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxThreads");
+    private static final long UPDATE_GAP = 1000 / (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkUpdatesPerSecond");
+
     /* CHUNK UPDATES */
     private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
-    private double _averageUpdateDuration = 0.0;
-
     private long _lastChunkUpdate = Blockmania.getInstance().getTime();
 
-    private static final int MAX_THREADS = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxThreads");
-
-    private static final long UPDATE_GAP = 1000 / (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkUpdatesPerSecond");
+    /* STATISTICS */
+    private double _averageUpdateDuration = 0.0;
 
     /**
      * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
-     * is reached, the chunk update is ignored.
+     * is reached, the chunk update is ignored. Chunk updates can be forced though.
      *
-     * @param c The chunk to update
+     * @param chunk The chunk to update
      * @return True if a chunk update was executed
      */
-    public boolean queueChunkUpdate(Chunk c, final boolean force) {
-        final Chunk chunkToProcess = c;
+    public boolean queueChunkUpdate(Chunk chunk, final UPDATE_TYPE type) {
+        final Chunk chunkToProcess = chunk;
 
-        if ((Blockmania.getInstance().getTime() - _lastChunkUpdate < UPDATE_GAP) && !force) {
+        if ((Blockmania.getInstance().getTime() - _lastChunkUpdate < UPDATE_GAP) && type == UPDATE_TYPE.DEFAULT) {
             return false;
         }
 
         _lastChunkUpdate = Blockmania.getInstance().getTime();
 
-        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < MAX_THREADS || force)) {
-            _currentlyProcessedChunks.add(chunkToProcess);
+        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < MAX_THREADS || type != UPDATE_TYPE.DEFAULT)) {
+            boolean processed = false;
 
-            // ... create a new thread and start processing
-            Runnable r = new Runnable() {
-                public void run() {
-                    long timeStart = Blockmania.getInstance().getTime();
+            // Order the update of center chunks and its neighbor
+            if (type == UPDATE_TYPE.PLAYER_PLACED) {
+                processed = true;
+                executeChunkUpdate(chunk);
 
-                    if (force) {
-                        Chunk[] cs = chunkToProcess.loadOrCreateNeighbors();
-
-                        for (Chunk c : cs) {
-                            c.processChunk();
-                        }
-                    }
-
-                    chunkToProcess.processChunk();
-
-                    _currentlyProcessedChunks.remove(chunkToProcess);
-
-                    _averageUpdateDuration += Blockmania.getInstance().getTime() - timeStart;
-                    _averageUpdateDuration /= 2;
+                Chunk[] cs = chunkToProcess.loadOrCreateNeighbors();
+                for (Chunk nc : cs) {
+                    executeChunkUpdate(nc);
                 }
-            };
+            } else if (type == UPDATE_TYPE.PLAYER_REMOVED) {
+                Chunk[] cs = chunkToProcess.loadOrCreateNeighbors();
+                for (Chunk nc : cs) {
+                    executeChunkUpdate(nc);
+                }
+            }
 
-            Blockmania.getInstance().getThreadPool().execute(r);
+            if (!processed)
+                executeChunkUpdate(chunk);
+
             return true;
         }
 
         return false;
+    }
+
+    private void executeChunkUpdate(final Chunk c) {
+        _currentlyProcessedChunks.add(c);
+
+        // Create a new thread and start processing
+        Runnable r = new Runnable() {
+            public void run() {
+                long timeStart = Blockmania.getInstance().getTime();
+                c.processChunk();
+
+                _currentlyProcessedChunks.remove(c);
+
+                _averageUpdateDuration += Blockmania.getInstance().getTime() - timeStart;
+                _averageUpdateDuration /= 2;
+            }
+        };
+
+        Blockmania.getInstance().getThreadPool().execute(r);
     }
 
     public double getAverageUpdateDuration() {
@@ -94,7 +114,12 @@ public final class ChunkUpdateManager implements BlockObserver {
 
     }
 
-    public void blockChanged(Chunk chunk, BlockPosition pos) {
-        queueChunkUpdate(chunk, true);
+    public void blockPlaced(Chunk chunk, BlockPosition pos) {
+        queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_PLACED);
     }
+
+    public void blockRemoved(Chunk chunk, BlockPosition pos) {
+        queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_REMOVED);
+    }
+
 }

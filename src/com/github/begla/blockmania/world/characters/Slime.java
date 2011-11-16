@@ -133,10 +133,6 @@ public final class Slime extends Character {
         glPopMatrix();
     }
 
-    public void updatePosition() {
-        super.updatePosition();
-    }
-
     public void processMovement() {
         double distanceToPlayer = distanceSquaredTo(_parent.getPlayer().getPosition());
 

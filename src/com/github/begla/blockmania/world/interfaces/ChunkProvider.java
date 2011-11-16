@@ -23,19 +23,20 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public interface ChunkProvider {
+
     /**
      * Returns the chunk at the given position.
      *
-     * @param x
-     * @param z
-     * @return
+     * @param x The chunk position on the x-axis
+     * @param z The chunk position on the z-axis
+     * @return The chunk
      */
     public Chunk loadOrCreateChunk(int x, int z);
 
     /**
      * Frees obsolete chunks.
      */
-    public void freeUnusedSpace();
+    public void flushCache();
 
     /**
      * Disposes all chunks managed by this chunk provider.
@@ -45,7 +46,7 @@ public interface ChunkProvider {
     /**
      * Returns the amount of chunks managed by this chunk provider.
      *
-     * @return
+     * @return The amount of managed chunks
      */
     public int size();
 }

@@ -30,19 +30,28 @@ import static org.lwjgl.util.glu.GLU.gluLookAt;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 /**
+ * HUD displayed on the user's screen.
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class HUD implements RenderableObject {
 
+    /* ANIMATION */
     private double _cubeRotation;
+
     private Blockmania _parent;
 
+    /**
+     * Init. the HUD.
+     *
+     * @param parent The parent
+     */
     public HUD(Blockmania parent) {
         _parent = parent;
     }
 
     /**
-     * A small rotating cube that serves as a HUD element.
+     * A small rotating cube that serves as indicator for the currently selected block type.
      */
     private void drawRotatingBlock() {
 
@@ -139,6 +148,7 @@ public class HUD implements RenderableObject {
     }
 
     public void update() {
+        // Rotate the block indicator
         _cubeRotation += 0.5;
     }
 }

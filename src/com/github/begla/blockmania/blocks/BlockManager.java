@@ -27,17 +27,22 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 /**
- * Provides access to blocks by block id or block title
+ * Provides access to blocks by block id or block title.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockManager {
 
+    /* CONST */
     private static final String DEFAULT_SCRIPT_PATH = "groovy/blocks/";
-    private Binding _binding;
 
+    /* SINGLETON */
     private static BlockManager _instance;
 
+    /* GROOVY */
+    private Binding _binding;
+
+    /* BLOCKS */
     private FastMap<String, Block> _blocksByTitle = new FastMap<String, Block>(128);
     private TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
 

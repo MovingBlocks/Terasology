@@ -28,6 +28,11 @@ public abstract class TreeGenerator {
     protected final GeneratorManager _generatorManager;
     private double _genProbability = 1.0;
 
+    /**
+     * Init. a new tree generator.
+     *
+     * @param m The generator manager
+     */
     TreeGenerator(GeneratorManager m) {
         _generatorManager = m;
     }
@@ -48,7 +53,6 @@ public abstract class TreeGenerator {
 
     public TreeGenerator withGenerationProbability(double genProbability) {
         this._genProbability = genProbability;
-
         return this;
     }
 }

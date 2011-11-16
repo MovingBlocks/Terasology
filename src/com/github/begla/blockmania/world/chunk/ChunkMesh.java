@@ -13,11 +13,15 @@ import java.nio.IntBuffer;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * Stores the vertex data of a tessellated chunk.
+ * Chunk meshes are used to store the vertex data of tessellated chunks.
  */
 public class ChunkMesh {
 
+    /**
+     * Data structure for storing vertex data. Abused like a "struct" in C++. Just sad.
+     */
     public class VertexElements {
+
         public VertexElements() {
             quads = new TFloatArrayList();
             tex = new TFloatArrayList();
@@ -32,24 +36,27 @@ public class ChunkMesh {
         public IntBuffer indices;
     }
 
+    /**
+     * Possible rendering types.
+     */
     public enum RENDER_TYPE {
         OPAQUE, BILLBOARD_AND_TRANSLUCENT, WATER, LAVA
     }
 
+    /* CONST */
     private static final int STRIDE = (3 + 3 + 2 + 4) * 4;
     private static final int OFFSET_VERTEX = 0;
     private static final int OFFSET_TEX_0 = (3 * 4);
     private static final int OFFSET_TEX_1 = ((2 + 3) * 4);
     private static final int OFFSET_COLOR = ((2 + 3 + 3) * 4);
 
-    /* ------ */
-
+    /* VERTEX DATA */
     private final int[] _vertexBuffers = new int[5];
     private final int[] _idxBuffers = new int[5];
     private final int[] _idxBufferCount = new int[5];
     public VertexElements[] _vertexElements = new VertexElements[5];
 
-    private boolean _generated, _disposed = false;
+    private boolean _disposed = false;
 
     public ChunkMesh() {
         _vertexElements[0] = new VertexElements();
@@ -64,15 +71,14 @@ public class ChunkMesh {
      */
     public boolean generateVBOs() {
         // IMPORTANT: A mesh can only be generated once.
-        if (_generated || _disposed)
+        if (_vertexElements == null || _disposed)
             return false;
 
         for (int i = 0; i < _vertexBuffers.length; i++)
             generateVBO(i);
 
+        // Free unused space on the heap
         _vertexElements = null;
-        // Make sure this mesh can not be generated again
-        _generated = true;
 
         return true;
     }
@@ -176,12 +182,12 @@ public class ChunkMesh {
             }
 
             _disposed = true;
-            _generated = false;
+            _vertexElements = null;
         }
     }
 
     public boolean isGenerated() {
-        return _generated;
+        return _vertexElements == null;
     }
 
     public boolean isDisposed() {

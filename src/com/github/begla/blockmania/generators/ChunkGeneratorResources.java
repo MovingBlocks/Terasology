@@ -26,16 +26,10 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorResources extends ChunkGeneratorTerrain {
 
-    /**
-     * Init. the generator with a given seed value.
-     */
     public ChunkGeneratorResources(GeneratorManager generatorManager) {
         super(generatorManager);
     }
 
-    /**
-     * @param c
-     */
     @Override
     public void generate(Chunk c) {
         for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {

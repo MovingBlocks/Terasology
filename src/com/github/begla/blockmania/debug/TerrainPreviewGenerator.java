@@ -32,7 +32,8 @@ import java.io.IOException;
  */
 public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
-    private static int zoomOut = 8;
+    /* CONST */
+    private static final int ZOOM_FACTOR = 8;
 
     /**
      * Init. the generator with a given seed value.
@@ -50,13 +51,16 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
         gen.generateDensityImage();
     }
 
+    /**
+     * Generates a colored biome map.
+     */
     public void generateBiomeMap() {
         BufferedImage image = new BufferedImage(1024, 1024, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
 
         for (int x = -512; x < 512; x++) {
             for (int y = -512; y < 512; y++) {
-                BIOME_TYPE n = calcBiomeTypeForGlobalPosition(x * zoomOut, y * zoomOut);
+                BIOME_TYPE n = calcBiomeTypeForGlobalPosition(x * ZOOM_FACTOR, y * ZOOM_FACTOR);
 
                 Color color = Color.BLACK;
 
@@ -90,13 +94,16 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
         }
     }
 
+    /**
+     * Plots a gray scale 2D slice of the mountain volume.
+     */
     public void generateDensityImage() {
         BufferedImage image = new BufferedImage(1024, 1024, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
 
         for (int x = -512; x < 512; x++) {
             for (int y = -512; y < 512; y++) {
-                double n = calcMountainDensity(x * zoomOut, 64, y * zoomOut);
+                double n = calcMountainDensity(x * ZOOM_FACTOR, 64, y * ZOOM_FACTOR);
 
                 int color = (int) (n * 255.0);
                 color = (color > 255) ? 255 : color;
@@ -114,13 +121,16 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
         }
     }
 
+    /**
+     * Generates an gray scale image of the base terrain.
+     */
     public void generateBaseTerrainImage() {
         BufferedImage image = new BufferedImage(1024, 1024, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
 
         for (int x = -512; x < 512; x++) {
             for (int y = -512; y < 512; y++) {
-                double n = calcBaseTerrain(x * zoomOut, y * zoomOut);
+                double n = calcBaseTerrain(x * ZOOM_FACTOR, y * ZOOM_FACTOR);
 
                 int color = (int) (n * 255.0);
                 color = (color > 255) ? 255 : color;

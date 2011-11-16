@@ -26,18 +26,10 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
-    /**
-     * Init. the generator with a given seed value.
-     */
     public ChunkGeneratorFlora(GeneratorManager generatorManager) {
         super(generatorManager);
     }
 
-    /**
-     * Apply the generation process to the given chunk.
-     *
-     * @param c
-     */
     @Override
     public void generate(Chunk c) {
         for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
@@ -51,6 +43,11 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
         generateTrees(c);
     }
 
+    /**
+     * Generates trees on the given chunk.
+     *
+     * @param c The chunk
+     */
     private void generateTrees(Chunk c) {
         for (int y = 32; y < Chunk.getChunkDimensionY(); y++) {
             for (int x = 0; x < Chunk.getChunkDimensionX(); x += 4) {
@@ -67,7 +64,15 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
         }
     }
 
-    void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
+    /**
+     * Generates grass or a flower on the given chunk.
+     *
+     * @param c The chunk
+     * @param x Position on the x-axis
+     * @param y Position on the y-axis
+     * @param z Position on the z-axis
+     */
+    private void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
         if (c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Grass").getId() && c.getBlock(x, y + 1, z) == 0x0) {
 
             double grassRand = (c.getRandom().randomDouble() + 1.0) / 2.0;
@@ -94,7 +99,6 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
             }
 
             if (grassRand > grassProb) {
-
                 /*
                  * Generate high grass.
                  */
@@ -116,13 +120,21 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                     } else {
                         c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("Yellow flower").getId());
                     }
-
                 }
             }
         }
     }
 
-    void generateTree(Chunk c, BIOME_TYPE type, int x, int y, int z) {
+    /**
+     * Generates a tree on the given chunk.
+     *
+     * @param c The chunk
+     * @param type The biome type
+     * @param x Position on the x-axis
+     * @param y Position on the y-axis
+     * @param z Position on the z-axis
+     */
+    private void generateTree(Chunk c, BIOME_TYPE type, int x, int y, int z) {
         if (!c.canBlockSeeTheSky(x, y + 1, z))
             return;
 

@@ -33,22 +33,25 @@ public abstract class Camera {
     /* VIEW FRUSTUM */
     protected final ViewFrustum _viewFrustum = new ViewFrustum();
 
+    /**
+     * Applies the projection and modelview matrix.
+     */
     public void lookThrough() {
         loadProjectionMatrix();
         loadModelViewMatrix();
     }
 
+    /**
+     * Applies the projection and the normalized modelview matrix (positioned at the origin without any offset like bobbing) .
+     */
     public void lookThroughNormalized() {
         loadProjectionMatrix();
         loadNormalizedModelViewMatrix();
     }
 
     public abstract void loadProjectionMatrix();
-
     public abstract void loadModelViewMatrix();
-
     public abstract void loadNormalizedModelViewMatrix();
-
 
     public Vector3f getPosition() {
         return _position;

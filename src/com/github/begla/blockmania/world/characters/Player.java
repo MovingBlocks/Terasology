@@ -22,16 +22,16 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.gui.ToolBelt;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
-import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
 import com.github.begla.blockmania.tools.Tool;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.main.World;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
+import com.github.begla.blockmania.world.main.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -207,7 +207,7 @@ public final class Player extends Character {
 
                 int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
                 int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
-                notifyObserversBlockChanged(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
+                notifyObserversBlockPlaced(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
             }
         }
     }
@@ -235,7 +235,7 @@ public final class Player extends Character {
 
                 int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
                 int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
-                notifyObserversBlockChanged(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
+                notifyObserversBlockRemoved(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
             }
         }
     }
@@ -431,9 +431,14 @@ public final class Player extends Character {
         _observers.remove(observer);
     }
 
-    public void notifyObserversBlockChanged(Chunk chunk, BlockPosition pos) {
+    public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos) {
         for (BlockObserver ob : _observers)
-            ob.blockChanged(chunk, pos);
+            ob.blockPlaced(chunk, pos);
+    }
+
+    public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos) {
+        for (BlockObserver ob : _observers)
+            ob.blockRemoved(chunk, pos);
     }
 
     public void notifyObserversLightChanged(Chunk chunk, BlockPosition pos) {

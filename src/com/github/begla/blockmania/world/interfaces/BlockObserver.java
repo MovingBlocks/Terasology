@@ -26,6 +26,6 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 public interface BlockObserver {
 
     public void lightChanged(Chunk chunk, BlockPosition pos);
-    public void blockChanged(Chunk chunk, BlockPosition pos);
-
+    public void blockPlaced(Chunk chunk, BlockPosition pos);
+    public void blockRemoved(Chunk chunk, BlockPosition pos);
 }
