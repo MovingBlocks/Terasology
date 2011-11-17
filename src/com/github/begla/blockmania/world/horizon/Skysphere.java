@@ -63,7 +63,7 @@ public class Skysphere implements RenderableObject {
             Sphere sphere = new Sphere();
             glNewList(_displayListSphere, GL11.GL_COMPILE);
 
-            sphere.draw(4, 4, 4);
+            sphere.draw(16, 16, 128);
 
             glEndList();
         }

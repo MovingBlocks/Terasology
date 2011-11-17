@@ -4,11 +4,12 @@ varying	vec4 	McPosition;
 varying	vec3 	colorYxy;
 varying vec3    skyVec;
 varying float   lv;
-uniform	vec4 	  sunPos;
+uniform	vec4 	sunPos;
 uniform float	sunAngle;
-vec4 	eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 uniform	float	turbidity;
-uniform vec3 zenith;
+uniform vec3    zenith;
+
+vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
 #define	EPS	0.1
 
@@ -59,5 +60,5 @@ void main(void)
     colorYxy        = allweatherSky ( turbidity, abs(v.y)+0.35, lv, l.y );
     McPosition      = gl_Vertex;
     gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_TexCoord [0] = gl_MultiTexCoord0;
+    gl_TexCoord[0]  = gl_MultiTexCoord0;
 }
