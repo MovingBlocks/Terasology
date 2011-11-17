@@ -421,6 +421,10 @@ public final class Blockmania {
 
             if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                 if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                    exit();
+                }
+
+                if (key == Keyboard.KEY_TAB && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                     togglePauseGame();
                 }
 
