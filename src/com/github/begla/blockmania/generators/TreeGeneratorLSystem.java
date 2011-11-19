@@ -99,7 +99,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, true);
 
                     // Generate leafs
-                    if (_stackOrientation.size() > 2 && _generateLeafBlocks) {
+                    if (_stackOrientation.size() > 1 && _generateLeafBlocks) {
                         int size = 1;
 
                         for (int x = -size; x <= size; x++) {

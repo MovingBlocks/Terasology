@@ -172,6 +172,7 @@
         <copy todir="${artifact.output.blockmania}">
             <fileset dir="${artifact.temp.output.blockmania:jar}"/>
         </copy>
+        <copy file="${basedir}/README.markdown" tofile="${artifact.output.blockmania}/README.markdown"/>
         <copy file="${basedir}/scripts/run_linux.sh" tofile="${artifact.output.blockmania}/run_linux.sh"/>
         <copy file="${basedir}/scripts/run_macosx.command" tofile="${artifact.output.blockmania}/run_macosx.command"/>
         <copy file="${basedir}/scripts/run_windows.bat" tofile="${artifact.output.blockmania}/run_windows.bat"/>

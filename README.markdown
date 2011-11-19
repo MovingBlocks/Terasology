@@ -15,19 +15,50 @@ If you're interested in joining up as a contributor register for our [forum](htt
 
 You can also fork the project on [GitHub](https://github.com/begla/Blockmania)
 
+Controls
+--------
+
+<W,A,S,D>               Walking
+<Space>                 Jump
+<Shift>                 Hold for running
+<Up, Down>              Switch active block
+<Left click>            Activate left click tool action (default = place block)
+<Right click>           Active right click tool action (default = remove block)
+<Mouse wheel up/down>   Cycle through the tool slots
+<1,...,0>               Change active tool slot
+<Tab>                   Toggle developer console (pauses/unpauses the game)
+<F3>                    Show debug information
+<Escape>                Save the current world and exit the game
+
+Tools
+-----
+<Slot1> Default block placement/removal tool
+<Slot2> Multiple block selection tool
+<Slot3> Rectangle block selection tool / blueprint prototype tool
+<Slot4> Slime example plugin tool (left click to spawn a slimy slime buddy)
+
+Example console commands
+------------------------
+
+"blockmania.initWorld();"                               Init. a new random world
+"blockmania.getActiveWorldProvider().setTime(0.0);"     Set the world time
+
+Credits
+=======
+
 Core Team
-----------------
+---------
 
 * Benjamin "begla" Glatzel
 * Anton "small-jeeper" Kireev
 * Rasmus "Cervator" Praestholm
 
 Soundtrack
-----------------
+----------
 
 Composed by Karina Kireev.
 
 Additional Notes
-----------------
+================
 
 Blockmania's base graphics use the awesome <strong><a href="http://www.carrotcakestudios.co.uk/gmcraft/">Good Morning Craft!</a></strong> texture pack by Louis Durrant. Make sure to visit his <a href="http://www.carrotcakestudios.co.uk/">homepage</a> and support his work.
