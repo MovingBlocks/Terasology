@@ -15,33 +15,40 @@ If you're interested in joining up as a contributor register for our [forum](htt
 
 You can also fork the project on [GitHub](https://github.com/begla/Blockmania)
 
+Setup
+-----
+
+Blockmania requires the latest Version of Oracle's [Java Virtual Machine (JVM)](http://www.java.com/de/download/). Also make sure that your graphics card drivers are up to date.
+
+You can use one of the default launch scripts to start Blockmania. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly ("chmod +x name_of_the_script.sh").
+
 Controls
 --------
 
-<W,A,S,D>               Walking
-<Space>                 Jump
-<Shift>                 Hold for running
-<Up, Down>              Switch active block
-<Left click>            Activate left click tool action (default = place block)
-<Right click>           Active right click tool action (default = remove block)
-<Mouse wheel up/down>   Cycle through the tool slots
-<1,...,0>               Change active tool slot
-<Tab>                   Toggle developer console (pauses/unpauses the game)
-<F3>                    Show debug information
-<Escape>                Save the current world and exit the game
+* <W,A,S,D>               Walking
+* <Space>                 Jump
+* <Shift>                 Hold for running
+* <Up, Down>              Switch active block
+* <Left click>            Activate left click tool action (default = place block)
+* <Right click>           Active right click tool action (default = remove block)
+* <Mouse wheel up/down>   Cycle through the tool slots
+* <1,...,0>               Change active tool slot
+* <Tab>                   Toggle developer console (pauses/unpauses the game)
+* <F3>                    Show debug information
+* <Escape>                Save the current world and exit the game
 
 Tools
 -----
-<Slot1> Default block placement/removal tool
-<Slot2> Multiple block selection tool
-<Slot3> Rectangle block selection tool / blueprint prototype tool
-<Slot4> Slime example plugin tool (left click to spawn a slimy slime buddy)
+* <Slot1> Default block placement/removal tool
+* <Slot2> Multiple block selection tool
+* <Slot3> Rectangle block selection tool / blueprint prototype tool
+* <Slot4> Slime example plugin tool (left click to spawn a slimy slime buddy)
 
 Example console commands
 ------------------------
 
-"blockmania.initWorld();"                               Init. a new random world
-"blockmania.getActiveWorldProvider().setTime(0.0);"     Set the world time
+* "blockmania.initWorld();"                               Init. a new random world
+* "blockmania.getActiveWorldProvider().setTime(0.0);"     Set the world time
 
 Credits
 =======
