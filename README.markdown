@@ -20,29 +20,29 @@ Setup
 
 Blockmania requires the latest Version of Oracle's [Java Virtual Machine (JVM)](http://www.java.com/de/download/). Also make sure that your graphics card drivers are up to date.
 
-You can use one of the default launch scripts to start Blockmania. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly ("chmod +x name_of_the_script.sh").
+You can use one of the default launch scripts to start Blockmania. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x name_of_the_script.sh".
 
 Controls
 --------
 
-* <W,A,S,D>               Walking
-* <Space>                 Jump
-* <Shift>                 Hold for running
-* <Up, Down>              Switch active block
-* <Left click>            Activate left click tool action (default = place block)
-* <Right click>           Active right click tool action (default = remove block)
-* <Mouse wheel up/down>   Cycle through the tool slots
-* <1,...,0>               Change active tool slot
-* <Tab>                   Toggle developer console (pauses/unpauses the game)
-* <F3>                    Show debug information
-* <Escape>                Save the current world and exit the game
+* &lt;W,A,S,D>               Walking
+* &lt;Space>                 Jump
+* &lt;Shift>                 Hold for running
+* &lt;Up, Down>              Switch active block
+* &lt;Left click>            Activate left click tool action (default = place block)
+* &lt;Right click>           Active right click tool action (default = remove block)
+* &lt;Mouse wheel up/down>   Cycle through the tool slots
+* &lt;1,...,0>               Change active tool slot
+* &lt;Tab>                   Toggle developer console (pauses/unpauses the game)
+* &lt;F3>                    Show debug information
+* &lt;Escape>                Save the current world and exit the game
 
 Tools
 -----
-* <Slot1> Default block placement/removal tool
-* <Slot2> Multiple block selection tool
-* <Slot3> Rectangle block selection tool / blueprint prototype tool
-* <Slot4> Slime example plugin tool (left click to spawn a slimy slime buddy)
+* &lt;Slot1> Default block placement/removal tool
+* &lt;Slot2> Multiple block selection tool
+* &lt;Slot3> Rectangle block selection tool / blueprint prototype tool
+* &lt;Slot4> Slime example plugin tool (left click to spawn a slimy slime buddy)
 
 Example console commands
 ------------------------
