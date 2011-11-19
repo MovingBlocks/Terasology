@@ -52,7 +52,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         super(manager);
 
         _angleInDegree = 20;
-        _iterations = 3;
+        _iterations = 6;
         _leafType = BlockManager.getInstance().getBlock("Leaf").getId();
 
         _initialAxiom = initialAxiom;
@@ -72,16 +72,12 @@ public class TreeGeneratorLSystem extends TreeGenerator {
             String temp = "";
 
             for (int j = 0; j < axiom.length(); j++) {
-                char c = axiom.charAt(j);
+                String c = String.valueOf(axiom.charAt(j));
 
-                for (String a : _ruleSet.keySet()) {
-                    if (a.charAt(0) == c) {
-                        temp += _ruleSet.get(a);
-                        continue;
-                    }
-                }
-
-                temp += c;
+                if (_ruleSet.containsKey(c))
+                    temp += _ruleSet.get(c);
+                else
+                    temp += c;
             }
 
             axiom = temp;
