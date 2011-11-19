@@ -25,24 +25,25 @@ You can use one of the default launch scripts to start Blockmania. The scripts w
 Controls
 --------
 
-[W,A,S,D]               Walking
-[Space]                 Jump
-[Shift]                 Hold for running
-[Up, Down]              Switch active block
-[Left click]            Activate left click tool action (default = place block)
-[Right click]           Active right click tool action (default = remove block)
-[Mouse wheel up/down]   Cycle through the tool slots
-[1,...,0]               Change active tool slot
-[Tab]                   Toggle developer console (pauses/unpauses the game)
-[F3]                    Show debug information
-[Escape]                Save the current world and exit the game
+* [W,A,S,D]               Walking
+* [Space]                 Jump
+* [Shift]                 Hold for running
+* [Up, Down]              Switch active block
+* [Left click]            Activate left click tool action (default = place block)
+* [Right click]           Active right click tool action (default = remove block)
+* [Mouse wheel up/down]   Cycle through the tool slots
+* [1,...,0]               Change active tool slot
+* [Tab]                   Toggle developer console (pauses/unpauses the game)
+* [F3]                    Show debug information
+* [Escape]                Save the current world and exit the game
 
 Tools
 -----
-[Slot1] Default block placement/removal tool
-[Slot2] Multiple block selection tool
-[Slot3] Rectangle block selection tool / blueprint prototype tool
-[Slot4] Slime example plugin tool (left click to spawn a slimy slime buddy)
+
+* [Slot1] Default block placement/removal tool
+* [Slot2] Multiple block selection tool
+* [Slot3] Rectangle block selection tool / blueprint prototype tool
+* [Slot4] Slime example plugin tool (left click to spawn a slimy slime buddy)
 
 Example console commands
 ------------------------
