@@ -72,9 +72,6 @@ public class Skysphere implements RenderableObject {
     }
 
     public void render() {
-        if (_parent.getPlayer().isHeadUnderWater())
-            return;
-
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
         glEnable(GL13.GL_TEXTURE_CUBE_MAP);

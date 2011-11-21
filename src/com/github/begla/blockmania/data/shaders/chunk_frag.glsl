@@ -70,12 +70,12 @@ void main(){
     color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
     if (!swimming) {
-        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.5,0.5,0.52,0.5) * daylightTrans, fog).rgb;
+        gl_FragColor.rgb = linearToSrgb(mix(color, vec4(0.5,0.5,0.52,0.5) * daylightTrans, fog)).rgb;
         gl_FragColor.a = color.a;
     } else {
-        gl_FragColor.rgb = mix(linearToSrgb(color), vec4(0.0,0.0,0.0,1.0), 0.85).rgb;
-        gl_FragColor.rg *= 0.4;
-        gl_FragColor.b *= 0.7;
-        gl_FragColor.a = 1.0;
+        color.rg *= 0.6;
+        color.b *= 0.9;
+        gl_FragColor.rgb = linearToSrgb(color).rgb;
+        gl_FragColor.a = color.a;
     }
 }
