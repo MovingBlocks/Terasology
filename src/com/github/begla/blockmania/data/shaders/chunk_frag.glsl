@@ -1,11 +1,15 @@
 #version 120
 
 uniform sampler2D textureAtlas;
-uniform float gamma = 2.2;
+
+uniform float tick;
+uniform float animationOffset;
+
+const float gamma = 2.2;
 uniform float daylight = 1.0;
 uniform bool swimming;
 uniform bool animated;
-uniform float animationOffset;
+
 varying float fog;
 
 vec4 srgbToLinear(vec4 color){
@@ -17,6 +21,7 @@ vec4 linearToSrgb(vec4 color){
 }
 
 void main(){
+    const vec4 grassCoordinate = vec4(0.0625 * 3, 0.0625 * 4, 0.0625 * 0, 0.0625 * 1);
     vec4 texCoord = gl_TexCoord[0];
 
     // TEXTURE ANIMATION
@@ -36,7 +41,7 @@ void main(){
         discard;
 
     // APPLY TEXTURE OFFSET
-    if (!(texCoord.x >= 0.0625 * 3 && texCoord.x < 0.0625 * 4 && texCoord.y >= 0.0625 * 0 && texCoord.y < 0.0625 * 1)) {
+    if (!(texCoord.x >= grassCoordinate.x && texCoord.x < grassCoordinate.y && texCoord.y >= grassCoordinate.z && texCoord.y < grassCoordinate.w)) {
         color.rgb *= gl_Color.rgb;
         color.a *= gl_Color.a;
     } else {
@@ -47,13 +52,10 @@ void main(){
         }
     }
 
-    // FETCH LIGHT VALUES
-    vec3 lightCoord = vec3(gl_TexCoord[1]);
-
     // CALCULATE DAYLIGHT AND BLOCKLIGHT
-    float daylightValue = clamp(daylightTrans, 0.0, 1.0) * pow(0.92, (1.0-lightCoord.x)*15.0);
-    float blocklightValue = lightCoord.y;
-    float occlusionValue = lightCoord.z;
+    float daylightValue = clamp(daylightTrans, 0.0, 1.0) * pow(0.92, (1.0-gl_TexCoord[1].x)*15.0);
+    float blocklightValue = gl_TexCoord[1].y;
+    float occlusionValue = gl_TexCoord[1].z;
 
     vec3 daylightColorValue = vec3(daylightValue) * occlusionValue;
     vec3 blocklightColorValue = vec3(blocklightValue) * occlusionValue;

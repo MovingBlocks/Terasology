@@ -224,8 +224,10 @@ public final class World implements RenderableObject {
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
         int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
         int animationOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animationOffset");
+        int tick = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "tick");
         int animated = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animated");
 
+        GL20.glUniform1f(tick, _tick);
         GL20.glUniform1f(daylight, getDaylight());
         GL20.glUniform1i(swimming, _player.isHeadUnderWater() ? 1 : 0);
 
@@ -251,7 +253,7 @@ public final class World implements RenderableObject {
         GL20.glUniform1i(animated, 1);
         TextureManager.getInstance().bindTexture("custom_lava_still");
 
-        GL20.glUniform1f(animationOffset, ((float) (_tick % 16)) * (1.0f / 16f));
+        GL20.glUniform1f(animationOffset, ((float) (_tick / 32 % 16)) * (1.0f / 16f));
 
         for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
             Chunk c = n.getValue();
@@ -268,7 +270,7 @@ public final class World implements RenderableObject {
         }
 
         GL20.glUniform1i(animated, 1);
-        GL20.glUniform1f(animationOffset, ((float) (_tick / 2 % 12)) * (1.0f / 16f));
+        GL20.glUniform1f(animationOffset, ((float) (_tick / 32 % 12)) * (1.0f / 16f));
         TextureManager.getInstance().bindTexture("custom_water_still");
 
         for (int i = 0; i < 2; i++) {
@@ -333,10 +335,7 @@ public final class World implements RenderableObject {
      * Updates the tick value used for animating the textures.
      */
     private void updateTick() {
-        if (Blockmania.getInstance().getTime() - _lastTick >= 100) {
-            _tick++;
-            _lastTick = Blockmania.getInstance().getTime();
-        }
+        _tick++;
     }
 
     /**
