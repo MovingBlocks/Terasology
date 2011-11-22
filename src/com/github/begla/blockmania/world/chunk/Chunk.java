@@ -29,8 +29,8 @@ import com.github.begla.blockmania.world.entity.StaticEntity;
 import com.github.begla.blockmania.world.main.LocalWorldProvider;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector3f;
 
+import javax.vecmath.Vector3f;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -572,7 +572,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public AABB getAABB() {
         Vector3f dimensions = new Vector3f(getChunkDimensionX() / 2, getChunkDimensionY() / 2, getChunkDimensionZ() / 2);
-        Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.getX() - _parent.getRenderingReferencePoint().x, dimensions.getY() - _parent.getRenderingReferencePoint().y, getChunkWorldPosZ() + dimensions.getZ() - _parent.getRenderingReferencePoint().z);
+        Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - _parent.getRenderingReferencePoint().x, dimensions.y - _parent.getRenderingReferencePoint().y, getChunkWorldPosZ() + dimensions.z - _parent.getRenderingReferencePoint().z);
         return new AABB(position, dimensions);
     }
 
@@ -603,8 +603,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeInt((int) getPosition().getX());
-        out.writeInt((int) getPosition().getZ());
+        out.writeInt((int) getPosition().x);
+        out.writeInt((int) getPosition().z);
 
         // Save flags...
         byte flags = 0x0;
@@ -626,8 +626,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        getPosition().setX(in.readInt());
-        getPosition().setZ(in.readInt());
+        getPosition().x = in.readInt();
+        getPosition().z = in.readInt();
 
         // The first byte contains the flags...
         byte flags = in.readByte();

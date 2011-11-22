@@ -16,7 +16,8 @@
 package com.github.begla.blockmania.rendering.helper;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector4f;
+
+import javax.vecmath.Vector4f;
 
 import static org.lwjgl.opengl.GL11.glGenLists;
 

@@ -19,8 +19,9 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
+
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 
 /**
  * Generates tessellated chunk meshes from chunks.
@@ -382,11 +383,11 @@ public final class ChunkMeshGenerator {
                 vertexElements = mesh._vertexElements[1];
                 break;
             case WATER:
-                texOffset.set(0, 0);
+                texOffset.set(0,0,0);
                 vertexElements = mesh._vertexElements[3];
                 break;
             case LAVA:
-                texOffset.set(0, 0);
+                texOffset.set(0,0,0);
                 vertexElements = mesh._vertexElements[4];
                 break;
         }

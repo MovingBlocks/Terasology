@@ -35,8 +35,8 @@ import com.github.begla.blockmania.world.main.World;
 import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.util.vector.Vector3f;
 
+import javax.vecmath.Vector3f;
 import java.util.Collections;
 import java.util.logging.Level;
 
@@ -117,7 +117,7 @@ public final class Player extends Character {
             _firstPersonCamera.getViewingDirection().set(getViewingDirection());
         } else {
             Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z + 128);
-            Vector3f.sub(viewingTarget, getPosition(), _firstPersonCamera.getViewingDirection());
+            _firstPersonCamera.getViewingDirection().sub(viewingTarget, getPosition());
         }
     }
 

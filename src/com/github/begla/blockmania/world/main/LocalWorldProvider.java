@@ -30,9 +30,9 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.lwjgl.util.vector.Vector3f;
 import org.xml.sax.InputSource;
 
+import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

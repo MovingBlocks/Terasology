@@ -21,7 +21,8 @@ import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.util.vector.Vector3f;
+
+import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 

@@ -17,7 +17,8 @@ package com.github.begla.blockmania.datastructures;
 
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import javolution.util.FastList;
-import org.lwjgl.util.vector.Vector3f;
+
+import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -114,7 +115,10 @@ public class AABB implements RenderableObject {
         Vector3f closestNormal = new Vector3f();
 
         for (FastList.Node<Vector3f> n = normals.head(), end = normals.tail(); (n = n.getNext()) != end; ) {
-            double distance = Vector3f.sub(centerPointForNormal(n.getValue()), origin, null).length();
+            Vector3f diff = new Vector3f(centerPointForNormal(n.getValue()));
+            diff.sub(origin);
+
+            float distance = diff.length();
 
             if (distance < minDistance) {
                 minDistance = distance;

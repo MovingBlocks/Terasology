@@ -2,8 +2,8 @@ import com.github.begla.blockmania.blocks.Block
 import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
 import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE
 import com.github.begla.blockmania.blocks.BlockManager
-import org.lwjgl.util.vector.Vector2f
-import org.lwjgl.util.vector.Vector4f
+import javax.vecmath.Vector2f
+import javax.vecmath.Vector4f
 
 def BlockManager bm = blockManager;
 

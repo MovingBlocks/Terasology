@@ -16,7 +16,8 @@
 package com.github.begla.blockmania.rendering.cameras;
 
 import com.github.begla.blockmania.datastructures.ViewFrustum;
-import org.lwjgl.util.vector.Vector3f;
+
+import javax.vecmath.Vector3f;
 
 /**
  * Provides global access to fonts.

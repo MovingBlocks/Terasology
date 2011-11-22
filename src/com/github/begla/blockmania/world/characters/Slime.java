@@ -21,7 +21,8 @@ import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.world.main.World;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector3f;
+
+import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 

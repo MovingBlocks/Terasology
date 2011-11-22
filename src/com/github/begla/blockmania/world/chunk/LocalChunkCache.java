@@ -22,8 +22,8 @@ import com.github.begla.blockmania.world.interfaces.ChunkProvider;
 import com.github.begla.blockmania.world.main.LocalWorldProvider;
 import javolution.util.FastList;
 import javolution.util.FastMap;
-import org.lwjgl.util.vector.Vector3f;
 
+import javax.vecmath.Vector3f;
 import java.io.*;
 import java.util.Collections;
 import java.util.logging.Level;

@@ -18,7 +18,8 @@ package com.github.begla.blockmania.rendering.cameras;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-import org.lwjgl.util.vector.Vector3f;
+
+import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
@@ -48,7 +49,7 @@ public class FirstPersonCamera extends Camera {
         glLoadIdentity();
 
         Vector3f right = new Vector3f();
-        Vector3f.cross(_viewingDirection, _up, right);
+        right.cross(_viewingDirection, _up);
         right.scale((float) _bobbingRotationOffsetFactor);
 
         right.y += _bobbingVerticalOffsetFactor;

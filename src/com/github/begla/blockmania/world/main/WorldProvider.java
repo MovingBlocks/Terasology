@@ -20,7 +20,8 @@ import com.github.begla.blockmania.generators.GeneratorManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.ChunkProvider;
-import org.lwjgl.util.vector.Vector3f;
+
+import javax.vecmath.Vector3f;
 
 /**
  * Provides the basic interface for all world providers.

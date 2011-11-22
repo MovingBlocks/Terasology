@@ -24,9 +24,9 @@ import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.main.World;
 import javolution.util.FastList;
-import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.Audio;
 
+import javax.vecmath.Vector3f;
 import java.util.Collections;
 
 /**
@@ -239,10 +239,10 @@ public abstract class MovableEntity extends Entity {
                     Vector3f slideVector = new Vector3f(planeNormal.z, 0, -planeNormal.x);
                     Vector3f pushBack = new Vector3f();
 
-                    Vector3f.sub(blockPoi, entityPoi, pushBack);
+                    pushBack.sub(blockPoi, entityPoi);
 
                     // Calculate the intensity of the diversion alongside the block
-                    double length = Vector3f.dot(slideVector, direction);
+                    double length = slideVector.dot(direction);
 
                     Vector3f newPosition = new Vector3f();
                     newPosition.z = (float) (origin.z + pushBack.z * 0.2 + length * slideVector.z);
@@ -486,20 +486,23 @@ public abstract class MovableEntity extends Entity {
     }
 
     public Vector3f directionOfReferencePoint() {
-        return Vector3f.sub(_parent.getWorldProvider().getRenderingReferencePoint(), getPosition(), null);
+        Vector3f result = new Vector3f();
+        result.sub(_parent.getWorldProvider().getRenderingReferencePoint(), getPosition());
+
+        return result;
     }
 
     public double distanceSquaredTo(Vector3f target) {
         Vector3f targetDirection = new Vector3f();
-        Vector3f.sub(target, getPosition(), targetDirection);
+        targetDirection.sub(target, getPosition());
 
         return targetDirection.lengthSquared();
     }
 
     public void lookAt(Vector3f target) {
         Vector3f targetDirection = new Vector3f();
-        Vector3f.sub(target, getPosition(), targetDirection);
-        targetDirection.normalise();
+        targetDirection.sub(target, getPosition());
+        targetDirection.normalize();
 
         setPitchYawFromVector(targetDirection);
     }
@@ -510,7 +513,9 @@ public abstract class MovableEntity extends Entity {
 
     public Vector3f calcEyePosition() {
         Vector3f eyePosition = new Vector3f(getPosition());
-        return Vector3f.add(eyePosition, calcEyeOffset(), eyePosition);
+        eyePosition.add(calcEyeOffset());
+
+        return eyePosition;
     }
 
     public Vector3f calcEyeOffset() {
@@ -523,11 +528,11 @@ public abstract class MovableEntity extends Entity {
 
     public void setViewingDirection(double yaw, double pitch) {
         _viewingDirection.set((float) (Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch))), (float) -Math.sin(Math.toRadians(pitch)), (float) (-Math.cos(Math.toRadians(pitch)) * Math.cos(Math.toRadians(yaw))));
-        _viewingDirection.normalise(_viewingDirection);
+        _viewingDirection.normalize(_viewingDirection);
     }
 
     public void setPitchYawFromVector(Vector3f v) {
-        _pitch = Math.toDegrees(-Math.asin(v.getY()));
+        _pitch = Math.toDegrees(-Math.asin(v.y));
         _yaw = Math.toDegrees(Math.atan2(v.x, -v.z));
 
         if (_yaw < 0)

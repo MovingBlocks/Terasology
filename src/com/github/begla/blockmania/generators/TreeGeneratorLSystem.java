@@ -17,10 +17,8 @@ package com.github.begla.blockmania.generators;
 
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.utilities.FastRandom;
-import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
+import javax.vecmath.*;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -64,7 +62,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
         String axiom = new String(_initialAxiom);
 
-        Stack<Vector4f> _stackPosition = new Stack<Vector4f>();
+        Stack<Vector3f> _stackPosition = new Stack<Vector3f>();
         Stack<Matrix4f> _stackOrientation = new Stack<Matrix4f>();
 
         for (int i = 0; i < _iterations; i++) {
@@ -83,14 +81,19 @@ public class TreeGeneratorLSystem extends TreeGenerator {
             axiom = temp;
         }
 
-        Vector4f position = new Vector4f(0, 0, 0, 1);
+        Vector3f position = new Vector3f(0, 0, 0);
+
         Matrix4f rotation = new Matrix4f();
-        rotation.rotate((float) Math.PI / 2, new Vector3f(0, 0, 1));
+        rotation.setIdentity();
+        rotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.PI / 2));
 
         beforeExecution(rand);
 
         for (int i = 0; i < axiom.length(); i++) {
             char c = axiom.charAt(i);
+
+            Matrix4f tempRotation = new Matrix4f();
+            tempRotation.setIdentity();
 
             switch (c) {
                 case 'G':
@@ -116,38 +119,48 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                         }
                     }
 
-                    Vector4f dir = new Vector4f(1, 0, 0, 1);
-                    Matrix4f.transform(rotation, dir, dir);
+                    Vector3f dir = new Vector3f(1, 0, 0);
+                    rotation.transform(dir);
 
-                    position.x += dir.x;
-                    position.y += dir.y;
-                    position.z += dir.z;
+                    position.add(dir);
                     break;
                 case '[':
                     _stackOrientation.push(new Matrix4f(rotation));
-                    _stackPosition.push(new Vector4f(position));
+                    _stackPosition.push(new Vector3f(position));
                     break;
                 case ']':
                     rotation = _stackOrientation.pop();
                     position = _stackPosition.pop();
                     break;
                 case '+':
-                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(0, 0, 1));
+                    tempRotation.setIdentity();
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.toRadians(_angleInDegree)));
+                    rotation.mul(tempRotation);
                     break;
                 case '-':
-                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(0, 0, 1));
+                    tempRotation.setIdentity();
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, -1), (float) Math.toRadians(_angleInDegree)));
+                    rotation.mul(tempRotation);
                     break;
                 case '&':
-                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(0, 1, 0));
+                    tempRotation.setIdentity();
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 1, 0), (float) Math.toRadians(_angleInDegree)));
+                    rotation.mul(tempRotation);
                     break;
                 case '^':
-                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(0, 1, 0));
+                    tempRotation.setIdentity();
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, -1, 0), (float) Math.toRadians(_angleInDegree)));
+                    rotation.mul(tempRotation);
                     break;
                 case '*':
-                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(1, 0, 0));
+                    tempRotation.setIdentity();
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(1, 0, 0), (float) Math.toRadians(_angleInDegree)));
+                    rotation.mul(tempRotation);
                     break;
                 case '/':
-                    rotation.rotate((float) Math.toRadians(_angleInDegree), new Vector3f(1, 0, 0));
+                    tempRotation.setIdentity();
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(-1, 0, 0), (float) Math.toRadians(_angleInDegree)));
+                    rotation.mul(tempRotation);
                     break;
             }
         }

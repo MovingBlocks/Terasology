@@ -17,7 +17,8 @@ package com.github.begla.blockmania.world.entity;
 
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
-import org.lwjgl.util.vector.Vector3f;
+
+import javax.vecmath.Vector3f;
 
 /**
  * Entities are renderable objects in the world. Entities provide a position and a AABB.

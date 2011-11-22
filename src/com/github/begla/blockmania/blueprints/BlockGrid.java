@@ -21,8 +21,9 @@ import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.world.main.World;
 import javolution.util.FastSet;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
+
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 

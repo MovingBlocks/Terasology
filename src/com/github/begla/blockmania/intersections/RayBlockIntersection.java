@@ -21,8 +21,8 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.world.main.WorldProvider;
 import javolution.util.FastList;
-import org.lwjgl.util.vector.Vector3f;
 
+import javax.vecmath.Vector3f;
 import java.util.Collections;
 
 /**
@@ -73,7 +73,10 @@ public class RayBlockIntersection {
         }
 
         public BlockPosition calcAdjacentBlockPos() {
-            return new BlockPosition(Vector3f.add(getBlockPosition().toVector3f(), getSurfaceNormal(), null));
+            Vector3f pos = getBlockPosition().toVector3f();
+            pos.add(getSurfaceNormal());
+
+            return new BlockPosition(pos);
         }
 
         public BlockPosition getBlockPosition() {
@@ -173,18 +176,18 @@ public class RayBlockIntersection {
 
         // Calculate the plane to intersect with
         Vector3f a = new Vector3f();
-        Vector3f.sub(v1, v0, a);
+        a.sub(v1, v0);
         Vector3f b = new Vector3f();
-        Vector3f.sub(v2, v0, b);
+        b.sub(v2, v0);
         Vector3f norm = new Vector3f();
-        Vector3f.cross(a, b, norm);
+        norm.cross(a, b);
 
         double d = -(norm.x * v0.x + norm.y * v0.y + norm.z * v0.z);
 
         /**
          * Calculate the distance on the ray, where the intersection occurs.
          */
-        double t = -(norm.x * origin.x + norm.y * origin.y + norm.z * origin.z + d) / (Vector3f.dot(ray, norm));
+        double t = -(norm.x * origin.x + norm.y * origin.y + norm.z * origin.z + d) / ray.dot(norm);
 
         // No intersection possible
         if (t < 0)
@@ -194,7 +197,7 @@ public class RayBlockIntersection {
          * Calc. the point of intersection.
          */
         Vector3f intersectPoint = new Vector3f((float) (ray.x * t), (float) (ray.y * t), (float) (ray.z * t));
-        Vector3f.add(intersectPoint, origin, intersectPoint);
+        intersectPoint.add(intersectPoint, origin);
 
         /**
          * Check if the point lies on block's face.

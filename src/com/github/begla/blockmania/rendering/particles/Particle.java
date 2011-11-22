@@ -19,8 +19,8 @@ import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.utilities.FastRandom;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector3f;
 
+import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -127,7 +127,7 @@ public abstract class Particle implements RenderableObject {
             _velocity.y = 0;
         }
 
-        Vector3f.add(_position, _velocity, _position);
+        _position.add(_velocity);
     }
 
     protected void decLifetime() {
