@@ -16,10 +16,7 @@
 package com.github.begla.blockmania.gui;
 
 import com.github.begla.blockmania.game.Blockmania;
-import com.github.begla.blockmania.tools.BlockPlacementRemovalTool;
-import com.github.begla.blockmania.tools.MultipleSelectionTool;
-import com.github.begla.blockmania.tools.RectangleSelectionTool;
-import com.github.begla.blockmania.tools.Tool;
+import com.github.begla.blockmania.tools.*;
 import com.github.begla.blockmania.world.characters.Player;
 import javolution.util.FastMap;
 
@@ -87,6 +84,9 @@ public class ToolBelt {
 
         _toolBinding.put(new Byte((byte) 3), new Byte((byte) 3));
         _toolStore.put((byte) 3, new RectangleSelectionTool(_player));
+
+        _toolBinding.put(new Byte((byte) 4), new Byte((byte) 4));
+        _toolStore.put((byte) 4, new RigidBlockRemovalTool(_player));
     }
 
     /**
@@ -96,7 +96,7 @@ public class ToolBelt {
      */
     public void mapPluginTool(Tool groovyTool) {
         // Cheating with the hard coded index for now
-        _toolBinding.put(new Byte((byte) 4), new Byte((byte) 51));
+        _toolBinding.put(new Byte((byte) 5), new Byte((byte) 51));
         _pluginStore.put((byte) 51, groovyTool);
         Blockmania.getInstance().getLogger().log(Level.INFO, "ToolBelt.mapPluginTool called with Tool: " + groovyTool);
     }

@@ -1,5 +1,7 @@
 package com.github.begla.blockmania.world.chunk;
 
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.TriangleMeshShape;
 import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
 import gnu.trove.list.array.TFloatArrayList;
 import org.lwjgl.opengl.GL11;
@@ -54,7 +56,13 @@ public class ChunkMesh {
     private final int[] _vertexBuffers = new int[5];
     private final int[] _idxBuffers = new int[5];
     private final int[] _idxBufferCount = new int[5];
+
+    /* TEMPORARY DATA */
     public VertexElements[] _vertexElements = new VertexElements[5];
+
+    /* BULLET PHYSICS */
+    public TriangleMeshShape _bulletMeshShape;
+
 
     private boolean _disposed = false;
 

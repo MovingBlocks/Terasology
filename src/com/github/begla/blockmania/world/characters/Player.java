@@ -215,7 +215,7 @@ public final class Player extends Character {
     /**
      * Removes a block.
      */
-    public void removeBlock() {
+    public void removeBlock(boolean createPhysBlock) {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
@@ -232,6 +232,11 @@ public final class Player extends Character {
                 _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
                 _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
                 AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+
+                if (createPhysBlock) {
+                    Vector3f pos = blockPos.toVector3f();
+                    _parent.getRigidBlocksRenderer().addBlock(pos, currentBlockType);
+                }
 
                 int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
                 int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
@@ -256,7 +261,7 @@ public final class Player extends Character {
                 break;
             case Keyboard.KEY_Q:
                 if (state && !repeatEvent) {
-                    removeBlock();
+                    removeBlock(false);
                 }
                 break;
             case Keyboard.KEY_UP:

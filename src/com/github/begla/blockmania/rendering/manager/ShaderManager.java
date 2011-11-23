@@ -70,6 +70,8 @@ public class ShaderManager {
         createFragShader("chunk_frag.glsl", "chunk");
         createVertexShader("particle_vert.glsl", "particle");
         createFragShader("particle_frag.glsl", "particle");
+        createVertexShader("block_vert.glsl", "block");
+        createFragShader("block_frag.glsl", "block");
 
         for (FastMap.Entry<String, Integer> e = _fragmentShader.head(), end = _fragmentShader.tail(); (e = e.getNext()) != end; ) {
             int shaderProgram = GL20.glCreateProgram();

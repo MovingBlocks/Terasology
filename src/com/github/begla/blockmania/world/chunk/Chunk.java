@@ -851,4 +851,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             _disposed = true;
         }
     }
+
+    public ChunkMesh getActiveChunkMesh() {
+        return _activeMesh;
+    }
 }

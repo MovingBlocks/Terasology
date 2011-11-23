@@ -30,10 +30,12 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.horizon.Skysphere;
+import com.github.begla.blockmania.world.physics.RigidBlocksRendered;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
 
+import javax.vecmath.Vector3f;
 import java.util.Collections;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -81,6 +83,9 @@ public final class World implements RenderableObject {
     /* EVENTS */
     private final WorldTimeEventManager _worldTimeEventManager;
 
+    /* PHYSICS */
+    private RigidBlocksRendered _rigidBlocksRenderer;
+
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
 
@@ -97,6 +102,7 @@ public final class World implements RenderableObject {
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
         _mobManager = new MobManager();
         _blockGrid = new BlockGrid(this);
+        _rigidBlocksRenderer = new RigidBlocksRendered(this);
 
         createMusicTimeEvents();
     }
@@ -206,8 +212,7 @@ public final class World implements RenderableObject {
         _player.getActiveCamera().lookThrough();
 
         _player.render();
-        renderChunks();
-        _mobManager.renderAll();
+        renderChunksAndEntities();
 
         /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();
@@ -218,7 +223,7 @@ public final class World implements RenderableObject {
     /**
      * Renders all chunks that are currently in the player's field of view.
      */
-    private void renderChunks() {
+    private void renderChunksAndEntities() {
         ShaderManager.getInstance().enableShader("chunk");
 
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
@@ -248,6 +253,12 @@ public final class World implements RenderableObject {
                 c.getAABB().render();
             }
         }
+
+        _mobManager.renderAll();
+
+        ShaderManager.getInstance().enableShader("block");
+        _rigidBlocksRenderer.render();
+        ShaderManager.getInstance().enableShader("chunk");
 
         // ANIMATED LAVA
         GL20.glUniform1i(animated, 1);
@@ -303,8 +314,28 @@ public final class World implements RenderableObject {
         _player.update();
         _mobManager.updateAll();
 
+        _rigidBlocksRenderer.resetChunks();
+
+
         // Update the list of relevant chunks
         updateChunksInProximity();
+
+        for (int i = 0; i < 16 && i < _chunksInProximity.size(); i++) {
+            /* PHYSICS */
+            if (_chunksInProximity.get(i).getActiveChunkMesh() != null) {
+                if (_chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape != null) {
+                    Vector3f position = new Vector3f(_chunksInProximity.get(i).getPosition());
+                    position.x *= Chunk.getChunkDimensionX();
+                    position.y *= Chunk.getChunkDimensionY();
+                    position.z *= Chunk.getChunkDimensionZ();
+
+                    _rigidBlocksRenderer.addStaticChunk(position, _chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape);
+                }
+            }
+            /* ------ */
+        }
+
+        _rigidBlocksRenderer.update();
 
         // Update visible chunks
         for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; ) {
@@ -380,10 +411,12 @@ public final class World implements RenderableObject {
     public void setPlayer(Player p) {
         if (_player != null) {
             _player.unregisterObserver(_chunkUpdateManager);
+            _player.unregisterObserver(_rigidBlocksRenderer);
         }
 
         _player = p;
         _player.registerObserver(_chunkUpdateManager);
+        _player.registerObserver(_rigidBlocksRenderer);
 
         _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
         _player.reset();
@@ -441,5 +474,9 @@ public final class World implements RenderableObject {
 
     public MobManager getMobManager() {
         return _mobManager;
+    }
+
+    public RigidBlocksRendered getRigidBlocksRenderer() {
+        return _rigidBlocksRenderer;
     }
 }

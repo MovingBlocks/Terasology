@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world.chunk;
 
+import com.bulletphysics.collision.shapes.*;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
@@ -22,6 +23,7 @@ import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.nio.ByteBuffer;
 
 /**
  * Generates tessellated chunk meshes from chunks.
@@ -72,6 +74,17 @@ public final class ChunkMeshGenerator {
     }
 
     private void generateOptimizedBuffers(ChunkMesh mesh) {
+        /* BULLET PHYSICS */
+        IndexedMesh indexMesh = new IndexedMesh();
+        indexMesh.vertexBase = ByteBuffer.allocate(mesh._vertexElements[0].quads.size() * 4);
+        indexMesh.triangleIndexBase = ByteBuffer.allocate(mesh._vertexElements[0].quads.size() * 4);
+        indexMesh.triangleIndexStride = 12;
+        indexMesh.vertexStride = 12;
+        indexMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
+        indexMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
+        indexMesh.indexType = ScalarType.INTEGER;
+        /* ------------- */
+
         for (int j = 0; j < mesh._vertexElements.length; j++) {
             mesh._vertexElements[j].vertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].quads.size() * 2 + mesh._vertexElements[j].tex.size() + mesh._vertexElements[j].color.size());
             mesh._vertexElements[j].indices = BufferUtils.createIntBuffer(mesh._vertexElements[j].quads.size());
@@ -89,6 +102,19 @@ public final class ChunkMeshGenerator {
                     mesh._vertexElements[j].indices.put(cIndex + 2);
                     mesh._vertexElements[j].indices.put(cIndex + 3);
                     mesh._vertexElements[j].indices.put(cIndex);
+
+                    /* BULLET PHYSICS */
+                    if (j == 0) {
+                        indexMesh.triangleIndexBase.putInt(cIndex);
+                        indexMesh.triangleIndexBase.putInt(cIndex + 1);
+                        indexMesh.triangleIndexBase.putInt(cIndex + 2);
+
+                        indexMesh.triangleIndexBase.putInt(cIndex + 2);
+                        indexMesh.triangleIndexBase.putInt(cIndex + 3);
+                        indexMesh.triangleIndexBase.putInt(cIndex);
+                    }
+                    /* ------------- */
+
                     cIndex += 4;
                 }
 
@@ -97,6 +123,14 @@ public final class ChunkMeshGenerator {
                 mesh._vertexElements[j].vertices.put(vertexPos.x);
                 mesh._vertexElements[j].vertices.put(vertexPos.y);
                 mesh._vertexElements[j].vertices.put(vertexPos.z);
+
+                /* BULLET PHYSICS */
+                if (j == 0) {
+                    indexMesh.vertexBase.putFloat(vertexPos.x);
+                    indexMesh.vertexBase.putFloat(vertexPos.y);
+                    indexMesh.vertexBase.putFloat(vertexPos.z);
+                }
+                /* ------------ */
 
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex));
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
@@ -117,6 +151,16 @@ public final class ChunkMeshGenerator {
             mesh._vertexElements[j].vertices.flip();
             mesh._vertexElements[j].indices.flip();
         }
+
+        indexMesh.triangleIndexBase.flip();
+        indexMesh.vertexBase.flip();
+
+        /* BULLET PHYSICS */
+        TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+        vertexArray.addIndexedMesh(indexMesh);
+
+        mesh._bulletMeshShape = new BvhTriangleMeshShape(vertexArray, true);
+        /* -------------- */
     }
 
     private void calcLightingValuesForVertexPos(Vector3f vertexPos, Double[] output) {
@@ -383,11 +427,11 @@ public final class ChunkMeshGenerator {
                 vertexElements = mesh._vertexElements[1];
                 break;
             case WATER:
-                texOffset.set(0,0,0);
+                texOffset.set(0, 0, 0);
                 vertexElements = mesh._vertexElements[3];
                 break;
             case LAVA:
-                texOffset.set(0,0,0);
+                texOffset.set(0, 0, 0);
                 vertexElements = mesh._vertexElements[4];
                 break;
         }

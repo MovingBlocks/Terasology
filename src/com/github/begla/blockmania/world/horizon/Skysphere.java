@@ -25,9 +25,9 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Sphere;
-import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
@@ -78,7 +78,7 @@ public class Skysphere implements RenderableObject {
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
         _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
-        sunNormalise = sunNormalise.normalise(null);
+        sunNormalise.normalize();
 
         _zenithColor = getAllWeatherZenith(sunNormalise.y);
 
@@ -124,8 +124,8 @@ public class Skysphere implements RenderableObject {
         Vector4f theta = new Vector4f(1, thetaSun, (float) Math.pow(thetaSun, 2), (float) Math.pow(thetaSun, 3));
 
         float Y = (4.0453f * _turbidity - 4.9710f) * (float) Math.tan(chi) - 0.2155f * _turbidity + 2.4192f;
-        float x = t2 * Vector4f.dot(cx1, theta) + _turbidity * Vector4f.dot(cx2, theta) + Vector4f.dot(cx3, theta);
-        float y = t2 * Vector4f.dot(cy1, theta) + _turbidity * Vector4f.dot(cy2, theta) + Vector4f.dot(cy3, theta);
+        float x = t2 * cx1.dot(theta) + _turbidity * cx2.dot(theta) + cx3.dot(theta);
+        float y = t2 * cy1.dot(theta) + _turbidity * cy2.dot(theta) + cy3.dot(theta);
 
         return new Vector3f(Y, x, y);
     }
