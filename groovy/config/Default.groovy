@@ -67,7 +67,7 @@ Controls {
 Chunk {
 
     dimensionX = 16
-    dimensionY = 128
+    dimensionY = 256
     dimensionZ = 16
 
 }
