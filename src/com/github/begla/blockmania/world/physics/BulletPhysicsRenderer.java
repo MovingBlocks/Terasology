@@ -51,7 +51,7 @@ import java.nio.FloatBuffer;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class RigidBlocksRenderer implements RenderableObject, BlockObserver {
+public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
 
     private class BlockRigidBody extends RigidBody {
         private byte _type;
@@ -79,7 +79,7 @@ public class RigidBlocksRenderer implements RenderableObject, BlockObserver {
 
     World _parent;
 
-    public RigidBlocksRenderer(World parent) {
+    public BulletPhysicsRenderer(World parent) {
         _parent = parent;
 
         _broadphase = new DbvtBroadphase();
@@ -193,7 +193,7 @@ public class RigidBlocksRenderer implements RenderableObject, BlockObserver {
 
     public void explode() {
         for (BlockRigidBody b : _blocks) {
-            b.applyCentralImpulse(new Vector3f(0, 25f, 0));
+            b.applyCentralImpulse(new Vector3f(0, 50f, 0));
         }
     }
 

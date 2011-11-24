@@ -9,7 +9,7 @@ uniform	vec4  sunPos;
 uniform samplerCube texCube;
 
 vec4 	eyePos   = vec4(0.0, 0.0, 0.0, 1.0);
-float	colorExp = 8.0;
+float	colorExp = 6.0;
 
 vec3 convertColor (){
     vec3 clrYxy = vec3 ( colorYxy );
@@ -51,7 +51,7 @@ void main (){
 
         vec4 skyColor = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight, 1.0 );
 
-        skyColor += alpha*textureCube ( texCube, skyVec );
+        skyColor += alpha * textureCube (texCube, skyVec);
 
         gl_FragColor = skyColor;
     } else {

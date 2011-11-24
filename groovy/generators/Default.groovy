@@ -10,7 +10,7 @@ def GeneratorManager m = generatorManager;
 HashMap<String, String> rules = new HashMap<String, String>();
 rules.put("A", "[&FFFA]////[&FFFA]////[&FFFA]");
 
-TreeGeneratorLSystem t1 = new TreeGeneratorLSystem(m, "FFFFFFA", rules).withGenerationProbability(0.1);
+TreeGeneratorLSystem t1 = new TreeGeneratorLSystem(m, "FFFFFFA", rules).withGenerationProbability(0.4);
 
 // ...and a LARGE bushy tree
 rules = new HashMap<String, String>();

@@ -237,13 +237,14 @@ public final class Player extends Character {
                         if (currentBlockType != 0x0) {
                             getParent().getWorldProvider().setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, true);
 
-                            if (BlockManager.getInstance().getBlock(currentBlockType).getBlockForm() == Block.BLOCK_FORM.DEFAULT)
+                            if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent())
                                 _parent.getRigidBlocksRenderer().addBlock(target, currentBlockType);
                         }
                     }
                 }
 
                 _parent.getRigidBlocksRenderer().explode();
+                AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
             }
         }
     }
@@ -271,7 +272,7 @@ public final class Player extends Character {
                 _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
                 AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
 
-                if (createPhysBlock && BlockManager.getInstance().getBlock(currentBlockType).getBlockForm() == Block.BLOCK_FORM.DEFAULT) {
+                if (createPhysBlock && !BlockManager.getInstance().getBlock(currentBlockType).isTranslucent()) {
                     Vector3f pos = blockPos.toVector3f();
                     _parent.getRigidBlocksRenderer().addBlock(pos, currentBlockType);
                 }

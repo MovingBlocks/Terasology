@@ -3,12 +3,10 @@
 uniform sampler2D textureAtlas;
 
 uniform float tick;
-uniform float animationOffset;
 
 const float gamma = 2.2;
 uniform float daylight = 1.0;
 uniform bool swimming;
-uniform bool animated;
 
 varying float fog;
 
@@ -22,17 +20,30 @@ vec4 linearToSrgb(vec4 color){
 
 void main(){
     const vec4 grassCoordinate = vec4(0.0625 * 3, 0.0625 * 4, 0.0625 * 0, 0.0625 * 1);
+    const vec4 waterCoordinate = vec4(0.0625 * 15, 0.0625 * 16, 0.0625 * 12, 0.0625 * 13);
+    const vec4 lavaCoordinate = vec4(0.0625 * 15, 0.0625 * 16, 0.0625 * 15, 0.0625 * 16);
+
     vec4 texCoord = gl_TexCoord[0];
 
-    // TEXTURE ANIMATION
-    if (animated) {
-        texCoord.x *= 16;
-        texCoord.y /= 4;
-
-        texCoord.y += animationOffset;
-    }
-
     float daylightTrans = pow(0.86, (1.0-daylight)*15.0);
+
+    if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.y && texCoord.y >= waterCoordinate.z && texCoord.y < waterCoordinate.w) {
+        texCoord.x -= waterCoordinate.x;
+        texCoord.x *= 16;
+        texCoord.y -= waterCoordinate.z;
+        texCoord.y *= 16;
+        texCoord.y /= 64;
+
+        texCoord.y += mod(tick,48) * 1/64;
+    } else if (texCoord.x >= lavaCoordinate.x && texCoord.x < lavaCoordinate.y && texCoord.y >= lavaCoordinate.z && texCoord.y < lavaCoordinate.w) {
+        texCoord.x -= lavaCoordinate.x;
+        texCoord.x *= 16;
+        texCoord.y -= lavaCoordinate.z;
+        texCoord.y *= 16;
+        texCoord.y /= 128;
+
+        texCoord.y += mod(tick,100) * 1/128;
+    }
 
     vec4 color = texture2D(textureAtlas, vec2(texCoord));
     color = srgbToLinear(color);
@@ -70,7 +81,7 @@ void main(){
     color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
 
     if (!swimming) {
-        gl_FragColor.rgb = linearToSrgb(mix(color, vec4(0.5,0.5,0.52,0.5) * daylightTrans, fog)).rgb;
+        gl_FragColor.rgb = linearToSrgb(mix(color, vec4(0.89,0.945,1.0,1.0) * daylightTrans, clamp(fog, 0.0, 0.95))).rgb;
         gl_FragColor.a = color.a;
     } else {
         color.rg *= 0.6;

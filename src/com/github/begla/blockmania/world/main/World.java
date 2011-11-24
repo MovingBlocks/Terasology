@@ -30,7 +30,7 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.horizon.Skysphere;
-import com.github.begla.blockmania.world.physics.RigidBlocksRenderer;
+import com.github.begla.blockmania.world.physics.BulletPhysicsRenderer;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
@@ -84,7 +84,7 @@ public final class World implements RenderableObject {
     private final WorldTimeEventManager _worldTimeEventManager;
 
     /* PHYSICS */
-    private RigidBlocksRenderer _rigidBlocksRenderer;
+    private BulletPhysicsRenderer _bulletPhysicsRenderer;
 
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
@@ -102,7 +102,7 @@ public final class World implements RenderableObject {
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
         _mobManager = new MobManager();
         _blockGrid = new BlockGrid(this);
-        _rigidBlocksRenderer = new RigidBlocksRenderer(this);
+        _bulletPhysicsRenderer = new BulletPhysicsRenderer(this);
 
         createMusicTimeEvents();
     }
@@ -228,9 +228,7 @@ public final class World implements RenderableObject {
 
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
         int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
-        int animationOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animationOffset");
         int tick = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "tick");
-        int animated = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "animated");
 
         GL20.glUniform1f(tick, _tick);
         GL20.glUniform1f(daylight, getDaylight());
@@ -240,7 +238,6 @@ public final class World implements RenderableObject {
 
         glEnable(GL_TEXTURE_2D);
 
-        GL20.glUniform1i(animated, 0);
         TextureManager.getInstance().bindTexture("terrain");
 
         // OPAQUE ELEMENTS
@@ -257,21 +254,19 @@ public final class World implements RenderableObject {
         _mobManager.renderAll();
 
         ShaderManager.getInstance().enableShader("block");
-        _rigidBlocksRenderer.render();
+        _bulletPhysicsRenderer.render();
         ShaderManager.getInstance().enableShader("chunk");
 
         // ANIMATED LAVA
-        GL20.glUniform1i(animated, 1);
         TextureManager.getInstance().bindTexture("custom_lava_still");
 
-        GL20.glUniform1f(animationOffset, ((float) (_tick / 32 % 16)) * (1.0f / 16f));
+        //GL20.glUniform1f(animationOffset, ((float) (_tick / 32 % 16)) * (1.0f / 16f));
 
         for (FastList.Node<Chunk> n = visibleChunks.head(), end = visibleChunks.tail(); (n = n.getNext()) != end; ) {
             Chunk c = n.getValue();
             c.render(ChunkMesh.RENDER_TYPE.LAVA);
         }
 
-        GL20.glUniform1i(animated, 0);
         TextureManager.getInstance().bindTexture("terrain");
 
         // BILLBOARDS AND TRANSLUCENT ELEMENTS
@@ -280,8 +275,6 @@ public final class World implements RenderableObject {
             c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
         }
 
-        GL20.glUniform1i(animated, 1);
-        GL20.glUniform1f(animationOffset, ((float) (_tick / 32 % 12)) * (1.0f / 16f));
         TextureManager.getInstance().bindTexture("custom_water_still");
 
         for (int i = 0; i < 2; i++) {
@@ -314,7 +307,7 @@ public final class World implements RenderableObject {
         _player.update();
         _mobManager.updateAll();
 
-        _rigidBlocksRenderer.resetChunks();
+        _bulletPhysicsRenderer.resetChunks();
 
         // Update the list of relevant chunks
         updateChunksInProximity();
@@ -328,13 +321,13 @@ public final class World implements RenderableObject {
                     position.y *= Chunk.getChunkDimensionY();
                     position.z *= Chunk.getChunkDimensionZ();
 
-                    _rigidBlocksRenderer.addStaticChunk(position, _chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape);
+                    _bulletPhysicsRenderer.addStaticChunk(position, _chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape);
                 }
             }
             /* ------ */
         }
 
-        _rigidBlocksRenderer.update();
+        _bulletPhysicsRenderer.update();
 
         // Update visible chunks
         for (FastList.Node<Chunk> n = _chunksInProximity.head(), end = _chunksInProximity.tail(); (n = n.getNext()) != end; ) {
@@ -410,12 +403,12 @@ public final class World implements RenderableObject {
     public void setPlayer(Player p) {
         if (_player != null) {
             _player.unregisterObserver(_chunkUpdateManager);
-            _player.unregisterObserver(_rigidBlocksRenderer);
+            _player.unregisterObserver(_bulletPhysicsRenderer);
         }
 
         _player = p;
         _player.registerObserver(_chunkUpdateManager);
-        _player.registerObserver(_rigidBlocksRenderer);
+        _player.registerObserver(_bulletPhysicsRenderer);
 
         _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
         _player.reset();
@@ -475,7 +468,7 @@ public final class World implements RenderableObject {
         return _mobManager;
     }
 
-    public RigidBlocksRenderer getRigidBlocksRenderer() {
-        return _rigidBlocksRenderer;
+    public BulletPhysicsRenderer getRigidBlocksRenderer() {
+        return _bulletPhysicsRenderer;
     }
 }

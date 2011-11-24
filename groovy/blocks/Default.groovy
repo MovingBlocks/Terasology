@@ -62,9 +62,9 @@ bm.addBlock(new Block().withTitle("Yellow flower").withId((byte) 17).withTexture
 
 bm.addBlock(new Block().withTitle("High grass").withId((byte) 13).withTextureAtlasPos(new Vector2f(12, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
 
-bm.addBlock(new Block().withTitle("Medium high grass").withId((byte) 14).withTextureAtlasPos(new Vector2f(13, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
+bm.addBlock(new Block().withTitle("Medium high grass").withId((byte) 14).withTextureAtlasPos(new Vector2f(13, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withColorOffset(new Vector4f(0.7f, 0.7f, 0.7f, 1.0f)).withAllowBlockAttachment(false))
 
-bm.addBlock(new Block().withTitle("Large high grass").withId((byte) 15).withTextureAtlasPos(new Vector2f(14, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
+bm.addBlock(new Block().withTitle("Large high grass").withId((byte) 15).withTextureAtlasPos(new Vector2f(14, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withColorOffset(new Vector4f(0.9f, 0.9f, 0.9f, 1.0f)).withAllowBlockAttachment(false))
 // <--
 
 // Cacti
@@ -90,5 +90,5 @@ bm.addBlock(new Block().withTitle("Torch").withId((byte) 29).withTextureAtlasPos
 // Leafs
 bm.addBlock(new Block().withTitle("Leaf").withId((byte) 11).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT))
 bm.addBlock(new Block().withTitle("Red leaf").withId((byte) 30).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(1.0f, 0.8f, 0.8f, 1.0f)))
-bm.addBlock(new Block().withTitle("Dark leaf").withId((byte) 12).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(0.5f, 0.5f, 0.5f, 1.0f)))
+bm.addBlock(new Block().withTitle("Dark leaf").withId((byte) 12).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(0.7f, 0.7f, 0.7f, 1.0f)))
 // <--

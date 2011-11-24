@@ -427,11 +427,9 @@ public final class ChunkMeshGenerator {
                 vertexElements = mesh._vertexElements[1];
                 break;
             case WATER:
-                texOffset.set(0, 0, 0);
                 vertexElements = mesh._vertexElements[3];
                 break;
             case LAVA:
-                texOffset.set(0, 0, 0);
                 vertexElements = mesh._vertexElements[4];
                 break;
         }
