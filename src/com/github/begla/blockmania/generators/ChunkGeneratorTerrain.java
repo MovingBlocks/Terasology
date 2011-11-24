@@ -27,8 +27,8 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /* CONST */
-    protected static final int SAMPLE_RATE_3D_HOR = 4;
-    protected static final int SAMPLE_RATE_3D_VERT = 8;
+    protected static final int SAMPLE_RATE_3D_HOR = 2;
+    protected static final int SAMPLE_RATE_3D_VERT = 16;
 
     /**
      * Available types of biomes.
@@ -90,22 +90,25 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                     double dens = densityMap[x][y][z];
 
-                    if ((dens >= 0 && dens < 32)) {
+                    if ((dens >= 0 && dens < 16)) {
 
                         // Some block was set...
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
 
-                        GenerateOuterLayer(x, y, z, firstBlockHeight, c, type);
+                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.6)
+                            GenerateOuterLayer(x, y, z, firstBlockHeight, c, type);
+                        else
+                            c.setBlock(x, y, z, (byte) 0);
 
                         continue;
-                    } else if (dens >= 32) {
+                    } else if (dens >= 16) {
 
                         // Some block was set...
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.2)
+                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.4)
                             GenerateInnerLayer(x, y, z, c, type);
                         else
                             c.setBlock(x, y, z, (byte) 0);
@@ -165,9 +168,6 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                 } else if (depth == 0 && y > 32) {
                     // Grass on top
                     c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Grass").getId());
-                } else if (depth > 8) {
-                    // Stone
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
                 } else {
                     // Dirt
                     c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt").getId());
@@ -252,10 +252,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double x1, y1, z1;
 
         x1 = x * 0.008;
-        y1 = y * 0.005;
+        y1 = y * 0.01;
         z1 = z * 0.008;
 
-        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.4, y1 + _pGen1.noise(x1, y1, z1) * 0.2, z1 + _pGen1.noise(x1, y1, z1) * 0.4, 9, 2.03782819, 0.838181);
+        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.1, y1 + _pGen1.noise(x1, y1, z1) * 0.1, z1 + _pGen1.noise(x1, y1, z1) * 0.1, 12, 2.03782819, 0.91181);
 
         return result > 0 ? result : 0;
     }
@@ -271,7 +271,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     public double calcCaveDensity(double x, double y, double z) {
-        double result = _pGen6.fBm(x * 0.01, y * 0.01, z * 0.01, 9, 2.03719, 0.9);
+        double result = _pGen6.fBm(x * 0.04, y * 0.04, z * 0.04, 4, 2.03719, 0.733819283);
         return result;
     }
 }

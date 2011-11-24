@@ -92,7 +92,7 @@ Player {
 
 World {
 
-    defaultSeed = "TEST"
+    defaultSeed = "nPuXlZhIiLoApInO"
 
     dayNightLengthInMs = new Long((60 * 1000) * 20) // 20 minutes in ms
     initialTimeOffsetInMs = new Long(60 * 1000) // 120 seconds in ms
