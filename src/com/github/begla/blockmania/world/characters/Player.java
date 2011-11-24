@@ -149,9 +149,9 @@ public final class Player extends Character {
      */
     public RayBlockIntersection.Intersection calcSelectedBlock() {
         FastList<RayBlockIntersection.Intersection> inters = new FastList<RayBlockIntersection.Intersection>();
-        for (int x = -16; x <= 16; x++) {
+        for (int x = -3; x <= 3; x++) {
             for (int y = -3; y <= 3; y++) {
-                for (int z = -16; z <= 16; z++) {
+                for (int z = -3; z <= 3; z++) {
                     byte blockType = _parent.getWorldProvider().getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
 
                     // Ignore special blocks

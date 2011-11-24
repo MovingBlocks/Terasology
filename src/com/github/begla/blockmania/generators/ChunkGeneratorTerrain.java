@@ -131,10 +131,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double temp = calcTemperatureAtGlobalPosition(x, z);
         double humidity = calcHumidityAtGlobalPosition(x, z);
 
-        if (temp >= 0.5 && humidity < 0.4) {
+        if (temp >= 0.5 && humidity < 0.2) {
             return BIOME_TYPE.DESERT;
         }
-        if (humidity >= 0.4 && humidity <= 0.6 && temp >= 0.5) {
+        if (humidity >= 0.2 && humidity <= 0.6 && temp >= 0.5) {
             return BIOME_TYPE.PLAINS;
         }
         if (temp <= 0.3 && humidity < 0.7) {
@@ -231,7 +231,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
             amp *= 0.1;
         } else if (type == BIOME_TYPE.MOUNTAINS) {
             freqY *= 1.0;
-            amp *= 0.8;
+            amp *= 1.0;
         } else if (type == BIOME_TYPE.SNOW) {
             freqY *= 1.0;
             amp *= 0.3;
@@ -241,7 +241,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
 
         double density = calcMountainDensity(x, y * freqY, z) * amp;
-        return -y + ((height * 48.0 + 16.0) + density * 128.0);
+        return -y + ((height * 64.0 + 16.0) + (density * height) * 256.0);
     }
 
     public double calcBaseTerrain(double x, double z) {
@@ -252,21 +252,21 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double x1, y1, z1;
 
         x1 = x * 0.008;
-        y1 = y * 0.0035;
+        y1 = y * 0.005;
         z1 = z * 0.008;
 
-        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.4, y1, z1 + _pGen1.noise(x1, y1, z1) * 0.4, 9, 2.03782819, 0.838181);
+        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.4, y1 + _pGen1.noise(x1, y1, z1) * 0.2, z1 + _pGen1.noise(x1, y1, z1) * 0.4, 9, 2.03782819, 0.838181);
 
         return result > 0 ? result : 0;
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
-        double result = _pGen4.fBm(x * 0.0002, 0, 0.0002 * z, 8, 2.037291, 0.9138210);
+        double result = _pGen4.fBm(x * 0.0008, 0, 0.0008 * z, 4, 2.037291, 0.8138210);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcHumidityAtGlobalPosition(double x, double z) {
-        double result = _pGen5.fBm(x * 0.0002, 0, 0.0002 * z, 8, 2.037291, 0.918398191);
+        double result = _pGen5.fBm(x * 0.0008, 0, 0.0008 * z, 4, 2.037291, 0.718398191);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 

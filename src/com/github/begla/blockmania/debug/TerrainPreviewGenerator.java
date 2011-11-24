@@ -33,7 +33,7 @@ import java.io.IOException;
 public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
     /* CONST */
-    private static final int ZOOM_FACTOR = 1;
+    private static final int ZOOM_FACTOR = 8;
 
     /**
      * Init. the generator with a given seed value.
