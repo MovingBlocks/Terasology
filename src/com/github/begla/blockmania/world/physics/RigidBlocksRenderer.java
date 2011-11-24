@@ -51,7 +51,7 @@ import java.nio.FloatBuffer;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class RigidBlocksRendered implements RenderableObject, BlockObserver {
+public class RigidBlocksRenderer implements RenderableObject, BlockObserver {
 
     private class BlockRigidBody extends RigidBody {
         private byte _type;
@@ -79,7 +79,7 @@ public class RigidBlocksRendered implements RenderableObject, BlockObserver {
 
     World _parent;
 
-    public RigidBlocksRendered(World parent) {
+    public RigidBlocksRenderer(World parent) {
         _parent = parent;
 
         _broadphase = new DbvtBroadphase();
@@ -124,6 +124,7 @@ public class RigidBlocksRendered implements RenderableObject, BlockObserver {
         BlockRigidBody block = new BlockRigidBody(blockCI, type);
 
         _discreteDynamicsWorld.addRigidBody(block);
+
         _blocks.add(block);
     }
 
@@ -180,6 +181,20 @@ public class RigidBlocksRendered implements RenderableObject, BlockObserver {
     }
 
     public void lightChanged(Chunk chunk, BlockPosition pos) {
+    }
+
+    public void removeAllBlocks() {
+        for (BlockRigidBody b : _blocks) {
+            _discreteDynamicsWorld.removeRigidBody(b);
+        }
+
+        _blocks.clear();
+    }
+
+    public void explode() {
+        for (BlockRigidBody b : _blocks) {
+            b.applyCentralImpulse(new Vector3f(0, 25f, 0));
+        }
     }
 
     public void blockPlaced(Chunk chunk, BlockPosition pos) {

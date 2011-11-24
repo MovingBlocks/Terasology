@@ -30,7 +30,7 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.horizon.Skysphere;
-import com.github.begla.blockmania.world.physics.RigidBlocksRendered;
+import com.github.begla.blockmania.world.physics.RigidBlocksRenderer;
 import javolution.util.FastList;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
@@ -84,7 +84,7 @@ public final class World implements RenderableObject {
     private final WorldTimeEventManager _worldTimeEventManager;
 
     /* PHYSICS */
-    private RigidBlocksRendered _rigidBlocksRenderer;
+    private RigidBlocksRenderer _rigidBlocksRenderer;
 
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
@@ -102,7 +102,7 @@ public final class World implements RenderableObject {
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
         _mobManager = new MobManager();
         _blockGrid = new BlockGrid(this);
-        _rigidBlocksRenderer = new RigidBlocksRendered(this);
+        _rigidBlocksRenderer = new RigidBlocksRenderer(this);
 
         createMusicTimeEvents();
     }
@@ -316,7 +316,6 @@ public final class World implements RenderableObject {
 
         _rigidBlocksRenderer.resetChunks();
 
-
         // Update the list of relevant chunks
         updateChunksInProximity();
 
@@ -476,7 +475,7 @@ public final class World implements RenderableObject {
         return _mobManager;
     }
 
-    public RigidBlocksRendered getRigidBlocksRenderer() {
+    public RigidBlocksRenderer getRigidBlocksRenderer() {
         return _rigidBlocksRenderer;
     }
 }

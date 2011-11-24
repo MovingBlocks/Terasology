@@ -87,6 +87,9 @@ public class ToolBelt {
 
         _toolBinding.put(new Byte((byte) 4), new Byte((byte) 4));
         _toolStore.put((byte) 4, new RigidBlockRemovalTool(_player));
+
+        _toolBinding.put(new Byte((byte) 5), new Byte((byte) 5));
+        _toolStore.put((byte) 5, new ExplosionTool(_player));
     }
 
     /**
@@ -96,7 +99,7 @@ public class ToolBelt {
      */
     public void mapPluginTool(Tool groovyTool) {
         // Cheating with the hard coded index for now
-        _toolBinding.put(new Byte((byte) 5), new Byte((byte) 51));
+        _toolBinding.put(new Byte((byte) 6), new Byte((byte) 51));
         _pluginStore.put((byte) 51, groovyTool);
         Blockmania.getInstance().getLogger().log(Level.INFO, "ToolBelt.mapPluginTool called with Tool: " + groovyTool);
     }

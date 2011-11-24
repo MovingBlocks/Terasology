@@ -149,9 +149,9 @@ public final class Player extends Character {
      */
     public RayBlockIntersection.Intersection calcSelectedBlock() {
         FastList<RayBlockIntersection.Intersection> inters = new FastList<RayBlockIntersection.Intersection>();
-        for (int x = -3; x <= 3; x++) {
+        for (int x = -16; x <= 16; x++) {
             for (int y = -3; y <= 3; y++) {
-                for (int z = -3; z <= 3; z++) {
+                for (int z = -16; z <= 16; z++) {
                     byte blockType = _parent.getWorldProvider().getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
 
                     // Ignore special blocks
@@ -212,10 +212,48 @@ public final class Player extends Character {
         }
     }
 
+    public void explode() {
+        _parent.getRigidBlocksRenderer().removeAllBlocks();
+
+        if (getParent() != null) {
+            RayBlockIntersection.Intersection is = calcSelectedBlock();
+            if (is != null) {
+                BlockPosition blockPos = is.getBlockPosition();
+                Vector3f origin = blockPos.toVector3f();
+
+                for (int i = 0; i < 1024; i++) {
+                    Vector3f direction = new Vector3f((float) _parent.getWorldProvider().getRandom().randomDouble(), (float) _parent.getWorldProvider().getRandom().randomDouble(), (float) _parent.getWorldProvider().getRandom().randomDouble());
+                    direction.normalize();
+
+                    for (int j = 0; j < 5; j++) {
+                        Vector3f target = new Vector3f(origin);
+
+                        target.x += direction.x * j;
+                        target.y += direction.y * j;
+                        target.z += direction.z * j;
+
+                        byte currentBlockType = getParent().getWorldProvider().getBlock((int) target.x, (int) target.y, (int) target.z);
+
+                        if (currentBlockType != 0x0) {
+                            getParent().getWorldProvider().setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, true);
+
+                            if (BlockManager.getInstance().getBlock(currentBlockType).getBlockForm() == Block.BLOCK_FORM.DEFAULT)
+                                _parent.getRigidBlocksRenderer().addBlock(target, currentBlockType);
+                        }
+                    }
+                }
+
+                _parent.getRigidBlocksRenderer().explode();
+            }
+        }
+    }
+
     /**
      * Removes a block.
      */
-    public void removeBlock(boolean createPhysBlock) {
+    public void removeBlock
+    (
+            boolean createPhysBlock) {
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
@@ -233,7 +271,7 @@ public final class Player extends Character {
                 _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
                 AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
 
-                if (createPhysBlock) {
+                if (createPhysBlock && BlockManager.getInstance().getBlock(currentBlockType).getBlockForm() == Block.BLOCK_FORM.DEFAULT) {
                     Vector3f pos = blockPos.toVector3f();
                     _parent.getRigidBlocksRenderer().addBlock(pos, currentBlockType);
                 }
@@ -252,7 +290,11 @@ public final class Player extends Character {
      * @param state       The state of the key
      * @param repeatEvent True if repeat event
      */
-    public void processKeyboardInput(int key, boolean state, boolean repeatEvent) {
+    public void processKeyboardInput
+    (
+            int key,
+            boolean state,
+            boolean repeatEvent) {
         switch (key) {
             case Keyboard.KEY_E:
                 if (state && !repeatEvent) {
@@ -320,7 +362,11 @@ public final class Player extends Character {
      * @param state      State of the mouse button
      * @param wheelMoved Distance the mouse wheel moved since last
      */
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
+    public void processMouseInput
+    (
+            int button,
+            boolean state,
+            int wheelMoved) {
         if (button == 0 && state) {
             //placeBlock(_selectedBlockType);
             _toolBelt.activateTool(true);
@@ -337,7 +383,8 @@ public final class Player extends Character {
      * Checks for pressed keys and mouse movement and executes the respective movement
      * command.
      */
-    public void processMovement() {
+    public void processMovement
+    () {
         double dx = Mouse.getDX();
         double dy = Mouse.getDY();
 
@@ -367,7 +414,9 @@ public final class Player extends Character {
      *
      * @param upDown Cycling direction
      */
-    void cycleBlockTypes(int upDown) {
+    void cycleBlockTypes
+    (
+            int upDown) {
         _selectedBlockType += upDown;
 
         if (_selectedBlockType >= BlockManager.getInstance().availableBlocksSize()) {
@@ -383,11 +432,14 @@ public final class Player extends Character {
      * @return The string
      */
     @Override
-    public String toString() {
+    public String toString
+    () {
         return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z: %.2f)", getPosition().x, getPosition().y, getPosition().z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _selectedBlockType, _gravity, _movementDirection.x, _movementDirection.y, _movementDirection.z);
     }
 
-    protected AABB generateAABBForPosition(Vector3f p) {
+    protected AABB generateAABBForPosition
+            (Vector3f
+                     p) {
         return new AABB(p, new Vector3f(.3f, 0.8f, .3f));
     }
 
@@ -396,57 +448,78 @@ public final class Player extends Character {
      *
      * @return The AABB
      */
-    public AABB getAABB() {
+    public AABB getAABB
+    () {
         return generateAABBForPosition(getPosition());
     }
 
     @Override
-    protected void handleVerticalCollision() {
+    protected void handleVerticalCollision
+            () {
         // Nothing special to do.
     }
 
     @Override
-    protected void handleHorizontalCollision() {
+    protected void handleHorizontalCollision
+            () {
         // Nothing special to do.
     }
 
-    public byte getSelectedBlockType() {
+    public byte getSelectedBlockType
+            () {
         return _selectedBlockType;
     }
 
-    public byte getSelectedTool() {
+    public byte getSelectedTool
+            () {
         return _toolBelt.getSelectedTool();
     }
 
-    public void addTool(Tool toolToAdd) {
+    public void addTool
+            (Tool
+                     toolToAdd) {
         Blockmania.getInstance().getLogger().log(Level.INFO, "Player.addTool called to add tool: " + toolToAdd);
         _toolBelt.mapPluginTool(toolToAdd);
     }
 
-    public Camera getActiveCamera() {
+    public Camera getActiveCamera
+            () {
         return _activeCamera;
     }
 
 
-    public void registerObserver(BlockObserver observer) {
+    public void registerObserver
+            (BlockObserver
+                     observer) {
         _observers.add(observer);
     }
 
-    public void unregisterObserver(BlockObserver observer) {
+    public void unregisterObserver
+            (BlockObserver
+                     observer) {
         _observers.remove(observer);
     }
 
-    public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos) {
+    public void notifyObserversBlockPlaced
+            (Chunk
+                     chunk, BlockPosition
+                    pos) {
         for (BlockObserver ob : _observers)
             ob.blockPlaced(chunk, pos);
     }
 
-    public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos) {
+    public void notifyObserversBlockRemoved
+            (Chunk
+                     chunk, BlockPosition
+                    pos) {
         for (BlockObserver ob : _observers)
             ob.blockRemoved(chunk, pos);
     }
 
-    public void notifyObserversLightChanged(Chunk chunk, BlockPosition pos) {
+    public void notifyObserversLightChanged
+            (Chunk
+                     chunk, BlockPosition
+                    pos) {
         for (BlockObserver ob : _observers)
             ob.lightChanged(chunk, pos);
     }
