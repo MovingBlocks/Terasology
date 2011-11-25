@@ -50,10 +50,8 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
          */
         for (int x = 0; x <= Chunk.getChunkDimensionX(); x += SAMPLE_RATE_3D_HOR) {
             for (int z = 0; z <= Chunk.getChunkDimensionZ(); z += SAMPLE_RATE_3D_HOR) {
-                BIOME_TYPE type = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
-
                 for (int y = 0; y <= Chunk.getChunkDimensionY(); y += SAMPLE_RATE_3D_VERT) {
-                    densityMap[x][y][z] = calcDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z), type);
+                    densityMap[x][y][z] = calcDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z));
                 }
             }
         }
@@ -217,31 +215,19 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    public double calcDensity(double x, double y, double z, BIOME_TYPE type) {
+    public double calcDensity(double x, double y, double z) {
         double height = calcBaseTerrain(x, z);
 
-        double freqY = 1.0;
-        double amp = 1.0;
+        double temp = calcTemperatureAtGlobalPosition(x, y);
+        double hum = calcHumidityAtGlobalPosition(x,y);
 
-        if (type == BIOME_TYPE.DESERT) {
-            freqY *= 1.0;
-            amp *= 0.0;
-        } else if (type == BIOME_TYPE.PLAINS) {
-            freqY *= 1.0;
-            amp *= 0.0;
-        } else if (type == BIOME_TYPE.MOUNTAINS) {
-            freqY *= 1.0;
-            amp *= 1.0;
-        } else if (type == BIOME_TYPE.SNOW) {
-            freqY *= 1.0;
-            amp *= 0.9;
-        } else if (type == BIOME_TYPE.FOREST) {
-            freqY *= 1.0;
-            amp *= 0.9;
-        }
+        double dT = Math.abs(temp - 0.5);
+        double dH = Math.abs(hum - 0.4);
 
-        double density = calcMountainDensity(x, y * freqY, z) * amp;
-        return -y + ((height * 64.0 + 16.0) + density * 64.0);
+        double mIntens = MathHelper.clamp(1.0 - (dT + dH) * 5.0) + 0.1;
+
+        double density = calcMountainDensity(x, y, z) * mIntens;
+        return -y + ((height * 64.0 + 16.0) + density * 128.0);
     }
 
     public double calcBaseTerrain(double x, double z) {
@@ -252,21 +238,21 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double x1, y1, z1;
 
         x1 = x * 0.008;
-        y1 = y * 0.01;
+        y1 = y * 0.008;
         z1 = z * 0.008;
 
-        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.1, y1 + _pGen1.noise(x1, y1, z1) * 0.1, z1 + _pGen1.noise(x1, y1, z1) * 0.1, 12, 2.03782819, 0.91181);
+        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.4, y1 + _pGen1.noise(x1, y1, z1) * 0.4, z1 + _pGen1.noise(x1, y1, z1) * 0.4, 6, 2.03782819, 0.91181);
 
         return result > 0 ? result : 0;
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
-        double result = _pGen4.fBm(x * 0.0008, 0, 0.0008 * z, 4, 2.037291, 0.8138210);
+        double result = _pGen4.fBm(x * 0.002, 0, 0.002 * z, 4, 2.037291, 0.8138210);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcHumidityAtGlobalPosition(double x, double z) {
-        double result = _pGen5.fBm(x * 0.0008, 0, 0.0008 * z, 4, 2.037291, 0.718398191);
+        double result = _pGen5.fBm(x * 0.002, 0, 0.002 * z, 4, 2.037291, 0.718398191);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 

@@ -12,6 +12,11 @@ rules.put("A", "[&FFFA]////[&FFFA]////[&FFFA]");
 
 TreeGeneratorLSystem t1 = new TreeGeneratorLSystem(m, "FFFFFFA", rules).withGenerationProbability(0.4);
 
+rules = new HashMap<String, String>();
+rules.put("A", "[&FFFA]////[&FFFA]////[&FFFA]");
+
+TreeGeneratorLSystem t4 = new TreeGeneratorLSystem(m, "FFFFFFFFFFFAFFFFFAFFFFFA", rules).withLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId()).withGenerationProbability(0.01);
+
 // ...and a LARGE bushy tree
 rules = new HashMap<String, String>();
 rules.put("A", "[&FFFFFA]////[&FFFFFA]////[&FFFFFA]");
@@ -27,12 +32,12 @@ TreeGeneratorLSystem t3 = new TreeGeneratorLSystem(m, "FFAFAFFAFF", rules).withL
 TreeGeneratorCactus c1 = new TreeGeneratorCactus(m).withGenerationProbability(0.05);
 
 // Add the trees to the generator lists
-m.addTreeGenerator BIOME_TYPE.SNOW, t1
 m.addTreeGenerator BIOME_TYPE.FOREST, t1
 m.addTreeGenerator BIOME_TYPE.MOUNTAINS, t1
-m.addTreeGenerator BIOME_TYPE.SNOW, t2
 m.addTreeGenerator BIOME_TYPE.FOREST, t2
 m.addTreeGenerator BIOME_TYPE.MOUNTAINS, t2
+
+m.addTreeGenerator BIOME_TYPE.SNOW, t4
 
 m.addTreeGenerator BIOME_TYPE.PLAINS, t3
 m.addTreeGenerator BIOME_TYPE.DESERT, t3

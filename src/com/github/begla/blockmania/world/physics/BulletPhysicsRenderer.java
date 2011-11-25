@@ -31,11 +31,13 @@ import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
 import com.github.begla.blockmania.world.main.World;
+import javolution.util.FastList;
 import javolution.util.FastSet;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -66,7 +68,7 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
         }
     }
 
-    FastSet<BlockRigidBody> _blocks = new FastSet<BlockRigidBody>();
+    FastList<BlockRigidBody> _blocks = new FastList<BlockRigidBody>();
     FastSet<RigidBody> _chunks = new FastSet<RigidBody>();
 
     CollisionShape _blockShape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
@@ -76,6 +78,8 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     DefaultCollisionConfiguration _defaultCollisionConfiguration;
     SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     DiscreteDynamicsWorld _discreteDynamicsWorld;
+
+    long _lastCleanUp = 0;
 
     World _parent;
 
@@ -177,7 +181,27 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     }
 
     public void update() {
+        cleanUp();
+
         _discreteDynamicsWorld.stepSimulation(1 / 60f, 5);
+    }
+
+    private void cleanUp() {
+        if (Blockmania.getInstance().getTime() - _lastCleanUp > 100) {
+
+            if (_blocks.isEmpty())
+                return;
+
+            BlockRigidBody b = _blocks.removeFirst();;
+
+            if (b.isActive()) {
+                _blocks.add(b);
+                return;
+            }
+
+            _discreteDynamicsWorld.removeRigidBody(b);
+            _lastCleanUp = Blockmania.getInstance().getTime();
+        }
     }
 
     public void lightChanged(Chunk chunk, BlockPosition pos) {
@@ -193,7 +217,7 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
 
     public void explode() {
         for (BlockRigidBody b : _blocks) {
-            b.applyCentralImpulse(new Vector3f(0, 50f, 0));
+            b.applyCentralImpulse(new Vector3f(0, 25f, 0));
         }
     }
 

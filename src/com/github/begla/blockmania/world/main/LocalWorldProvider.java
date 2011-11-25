@@ -270,7 +270,7 @@ public class LocalWorldProvider implements WorldProvider {
 
                 for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
 
-                    double dens = tGen.calcDensity(randX, y, randZ, ChunkGeneratorTerrain.BIOME_TYPE.FOREST);
+                    double dens = tGen.calcDensity(randX, y, randZ);
 
                     if (dens >= 0 && dens < 64)
                         return new Vector3f(randX, y, randZ);

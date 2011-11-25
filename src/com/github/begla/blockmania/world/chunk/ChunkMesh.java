@@ -1,6 +1,5 @@
 package com.github.begla.blockmania.world.chunk;
 
-import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
 import com.bulletphysics.collision.shapes.TriangleMeshShape;
 import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
 import gnu.trove.list.array.TFloatArrayList;

@@ -213,14 +213,13 @@ public final class Player extends Character {
     }
 
     public void explode() {
-        _parent.getRigidBlocksRenderer().removeAllBlocks();
-
         if (getParent() != null) {
             RayBlockIntersection.Intersection is = calcSelectedBlock();
             if (is != null) {
                 BlockPosition blockPos = is.getBlockPosition();
                 Vector3f origin = blockPos.toVector3f();
 
+                int counter = 0;
                 for (int i = 0; i < 1024; i++) {
                     Vector3f direction = new Vector3f((float) _parent.getWorldProvider().getRandom().randomDouble(), (float) _parent.getWorldProvider().getRandom().randomDouble(), (float) _parent.getWorldProvider().getRandom().randomDouble());
                     direction.normalize();
@@ -237,8 +236,10 @@ public final class Player extends Character {
                         if (currentBlockType != 0x0) {
                             getParent().getWorldProvider().setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, true);
 
-                            if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent())
+                            if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent() && counter % 4 == 0)
                                 _parent.getRigidBlocksRenderer().addBlock(target, currentBlockType);
+
+                            counter++;
                         }
                     }
                 }
