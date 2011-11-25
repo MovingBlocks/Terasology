@@ -43,7 +43,9 @@ Tools
 * [Slot1] Default block placement/removal tool
 * [Slot2] Multiple block selection tool
 * [Slot3] Rectangle block selection tool / blueprint prototype tool
-* [Slot4] Slime example plugin tool (left click to spawn a slimy slime buddy)
+* [Slot4] Physics enabled block removal tool
+* [Slot5] Physics enabled explosion tool
+* [Slot6] Slime example plugin tool (left click to spawn a slimy slime buddy)
 
 Example console commands
 ------------------------
