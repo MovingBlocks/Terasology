@@ -166,6 +166,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                 } else if (depth == 0 && y > 32) {
                     // Grass on top
                     c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Grass").getId());
+                } else if (depth > 8) {
+                    // Stone
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
                 } else {
                     // Dirt
                     c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt").getId());
@@ -219,12 +222,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double height = calcBaseTerrain(x, z);
 
         double temp = calcTemperatureAtGlobalPosition(x, y);
-        double hum = calcHumidityAtGlobalPosition(x,y);
+        double hum = calcHumidityAtGlobalPosition(x, y);
 
         double dT = Math.abs(temp - 0.5);
         double dH = Math.abs(hum - 0.4);
 
-        double mIntens = MathHelper.clamp(1.0 - (dT + dH) * 5.0) + 0.1;
+        double mIntens = MathHelper.clamp(1.0 - (dT + dH) * 5.0) + 0.3;
 
         double density = calcMountainDensity(x, y, z) * mIntens;
         return -y + ((height * 64.0 + 16.0) + density * 128.0);
@@ -238,10 +241,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double x1, y1, z1;
 
         x1 = x * 0.008;
-        y1 = y * 0.008;
+        y1 = y * 0.006;
         z1 = z * 0.008;
 
-        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.4, y1 + _pGen1.noise(x1, y1, z1) * 0.4, z1 + _pGen1.noise(x1, y1, z1) * 0.4, 6, 2.03782819, 0.91181);
+        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.2, y1 + _pGen1.noise(x1, y1, z1) * 0.2, z1 + _pGen1.noise(x1, y1, z1) * 0.2, 7, 2.03782819, 0.91181);
 
         return result > 0 ? result : 0;
     }

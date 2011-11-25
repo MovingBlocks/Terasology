@@ -2,6 +2,7 @@
 
 varying float fog;
 uniform float tick;
+varying vec4 vertexWorldPos;
 
 float fogEyeRadial(vec4 eyePos) {
     return length(eyePos / eyePos.w);
@@ -51,4 +52,5 @@ void main()
     }
 
     gl_Position = vertexPos;
+    vertexWorldPos = vertexPos;
 }

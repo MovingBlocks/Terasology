@@ -228,11 +228,13 @@ public final class World implements RenderableObject {
 
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
         int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
+        int playerPosition = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "playerPosition");
         int tick = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "tick");
 
         GL20.glUniform1f(tick, _tick);
         GL20.glUniform1f(daylight, getDaylight());
         GL20.glUniform1i(swimming, _player.isHeadUnderWater() ? 1 : 0);
+        GL20.glUniform4f(playerPosition, _player.getPosition().x, _player.getPosition().y, _player.getPosition().z, 1.0f);
 
         FastList<Chunk> visibleChunks = fetchVisibleChunks();
 

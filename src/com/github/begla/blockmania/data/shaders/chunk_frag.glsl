@@ -8,6 +8,10 @@ const float gamma = 2.2;
 uniform float daylight = 1.0;
 uniform bool swimming;
 
+varying vec4 vertexWorldPos;
+
+uniform vec4 playerPosition;
+
 varying float fog;
 
 vec4 srgbToLinear(vec4 color){
@@ -64,12 +68,14 @@ void main(){
     }
 
     // CALCULATE DAYLIGHT AND BLOCKLIGHT
+    float torchDistance = abs(length(vertexWorldPos));
+
     float daylightValue = clamp(daylightTrans, 0.0, 1.0) * pow(0.92, (1.0-gl_TexCoord[1].x)*15.0);
     float blocklightValue = gl_TexCoord[1].y;
     float occlusionValue = gl_TexCoord[1].z;
 
     vec3 daylightColorValue = vec3(daylightValue) * occlusionValue;
-    vec3 blocklightColorValue = vec3(blocklightValue) * occlusionValue;
+    vec3 blocklightColorValue = vec3(blocklightValue  + clamp(1.0-(torchDistance / 10), 0.0, 1.0) * (1.0-daylightTrans)) * occlusionValue;
 
     blocklightColorValue = clamp(blocklightColorValue,0.0,1.0);
     daylightColorValue = clamp(daylightColorValue, 0.0, 1.0);
@@ -78,7 +84,7 @@ void main(){
     blocklightColorValue.y *= 1.1;
     blocklightColorValue.z *= 0.7;
 
-    color.xyz *= daylightColorValue + blocklightColorValue * (1.0-daylightValue);
+    color.xyz *= clamp(daylightColorValue + blocklightColorValue * (1.0-daylightValue), 0, 1);
 
     if (!swimming) {
         gl_FragColor.rgb = linearToSrgb(mix(color, vec4(0.89,0.945,1.0,1.0) * daylightTrans, clamp(fog, 0.0, 0.95))).rgb;
