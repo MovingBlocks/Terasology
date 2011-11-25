@@ -37,6 +37,8 @@ public final class LocalChunkCache implements ChunkProvider {
 
     private static boolean _running = false;
 
+    private static final int CACHE_SIZE = (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkCacheSize");
+
     private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>().shared();
     private final LocalWorldProvider _parent;
 
@@ -92,7 +94,7 @@ public final class LocalChunkCache implements ChunkProvider {
      * Removes old chunks from the cache if the size limit has been reached.
      */
     public void flushCache() {
-        if (_running || _chunkCache.size() <= capacity())
+        if (_running || _chunkCache.size() <= CACHE_SIZE)
             return;
 
         _running = true;
@@ -102,7 +104,7 @@ public final class LocalChunkCache implements ChunkProvider {
                 FastList<Chunk> cachedChunks = new FastList<Chunk>(_chunkCache.values());
                 Collections.sort(cachedChunks);
 
-                while (cachedChunks.size() > capacity()) {
+                while (cachedChunks.size() > CACHE_SIZE) {
                     Chunk chunkToDelete = cachedChunks.removeLast();
                     // Write the chunk to disk (but do not remove it from the cache just jet)
                     writeChunkToDisk(chunkToDelete);
@@ -205,17 +207,5 @@ public final class LocalChunkCache implements ChunkProvider {
      */
     public int size() {
         return _chunkCache.size();
-    }
-
-    /**
-     * Returns the cache capacity based on the viewing distance defined in the configuration.
-     *
-     * @return The capacity
-     */
-    public static int capacity() {
-        int viewingDistanceX = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX");
-        int viewingDistanceZ = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ");
-
-        return (viewingDistanceX * viewingDistanceZ + 512);
     }
 }

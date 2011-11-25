@@ -14,6 +14,8 @@ System {
     // Enable/or disable the persisting of chunks
     saveChunks = true
 
+    chunkCacheSize = 1024
+
     Debug {
 
         debug = false
@@ -38,8 +40,8 @@ Graphics {
 
     fov = 64.0d
 
-    viewingDistanceX = 32
-    viewingDistanceZ = 32
+    viewingDistanceX = 25
+    viewingDistanceZ = 25
 
 }
 

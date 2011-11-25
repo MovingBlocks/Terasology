@@ -297,7 +297,7 @@ public final class Blockmania {
 
         // Update the viewing distance
         double minDist = Math.min((Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX") * Chunk.getChunkDimensionX(), (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ") * Chunk.getChunkDimensionZ()) / 2.0;
-        glFogf(GL_FOG_START, (float) (minDist * 0.1));
+        glFogf(GL_FOG_START, (float) (minDist * 0.8));
         glFogf(GL_FOG_END, (float) minDist);
 
         GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
