@@ -34,6 +34,7 @@ void main (){
     vec3 v = normalize ( McPosition.xyz );
 
     if (v.y > -0.35) {
+
         vec3 l                  = normalize ( sunPos.xyz );
         float sunHighlight      = 0.6 * pow(max(0.0, dot(l, v)), 94.0);
         float posSunY           = 0.0;
@@ -52,6 +53,10 @@ void main (){
         vec4 skyColor = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight, 1.0 );
 
         skyColor += alpha * textureCube (texCube, skyVec);
+
+
+        float intens = clamp((1.0 - ((v.y+0.2)/0.4)), 0, 1);
+        skyColor = mix(skyColor, vec4(0.89,0.945,1.0,1.0), clamp(intens * posSunY, 0.0, 1.0));
 
         gl_FragColor = skyColor;
     } else {
