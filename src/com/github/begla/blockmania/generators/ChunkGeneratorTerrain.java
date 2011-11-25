@@ -241,10 +241,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double x1, y1, z1;
 
         x1 = x * 0.008;
-        y1 = y * 0.006;
+        y1 = y * 0.009;
         z1 = z * 0.008;
 
-        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.2, y1 + _pGen1.noise(x1, y1, z1) * 0.2, z1 + _pGen1.noise(x1, y1, z1) * 0.2, 7, 2.03782819, 0.91181);
+        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.4, y1 + _pGen1.noise(x1, y1, z1) * 0.4, z1 + _pGen1.noise(x1, y1, z1) * 0.4, 7, 2.03782819, 0.91181);
 
         return result > 0 ? result : 0;
     }
