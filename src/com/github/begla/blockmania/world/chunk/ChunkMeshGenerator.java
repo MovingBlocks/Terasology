@@ -15,7 +15,10 @@
  */
 package com.github.begla.blockmania.world.chunk;
 
-import com.bulletphysics.collision.shapes.*;
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.ScalarType;
+import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
@@ -331,6 +334,8 @@ public final class ChunkMeshGenerator {
             drawLeft = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawLeft;
             blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y - 1, _chunk.getBlockWorldPosZ(z));
             drawRight = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawRight;
+            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
+            drawTop = (BlockManager.getInstance().getBlock(blockToCheckId).getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK) || drawTop;
         }
 
         if (drawTop) {
@@ -419,7 +424,7 @@ public final class ChunkMeshGenerator {
         }
     }
 
-    private void  generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, ChunkMesh.RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
+    private void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, ChunkMesh.RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
         ChunkMesh.VertexElements vertexElements = mesh._vertexElements[0];
 
         switch (renderType) {
@@ -475,11 +480,7 @@ public final class ChunkMeshGenerator {
         byte topBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
         byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
 
-        boolean lower = topBlock == 0x0 || BlockManager.getInstance().getBlock(topBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK;
         boolean lowerBottom = BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0;
-
-        if (!lower)
-            return;
 
         if (norm.x == 1.0f) {
             p1.y -= 0.25;
@@ -596,7 +597,7 @@ public final class ChunkMeshGenerator {
         Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
 
-        return bCheck.getId() == 0x0 || cBlock.isDisableTessellation() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || (!cBlock.isTranslucent() && bCheck.isTranslucent()) || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+        return bCheck.getId() == 0x0 || cBlock.isDisableTessellation() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || !cBlock.isTranslucent() && bCheck.isTranslucent() || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
     }
 
     public static int getVertexArrayUpdateCount() {
