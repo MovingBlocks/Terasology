@@ -190,6 +190,7 @@ public class ChunkMesh {
 
             _disposed = true;
             _vertexElements = null;
+            _bulletMeshShape = null;
         }
     }
 

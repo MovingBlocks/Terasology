@@ -130,7 +130,7 @@ public class HUD implements RenderableObject {
             FontManager.getInstance().getFont("default").drawString(4, 4, String.format("%s (fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f)", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"), Blockmania.getInstance().getAverageFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
             FontManager.getInstance().getFont("default").drawString(4, 22, String.format("%s", _parent.getActiveWorld().getPlayer()));
             FontManager.getInstance().getFont("default").drawString(4, 38, String.format("%s", _parent.getActiveWorld()));
-            FontManager.getInstance().getFont("default").drawString(4, 54, String.format("total vus: %s", ChunkMeshGenerator.getVertexArrayUpdateCount()));
+            FontManager.getInstance().getFont("default").drawString(4, 54, String.format("total vus: %s | active threads: %s", ChunkMeshGenerator.getVertexArrayUpdateCount(), _parent.getThreadPool().getActiveCount()));
         }
 
         if (Blockmania.getInstance().isGamePaused()) {
