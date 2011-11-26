@@ -17,6 +17,7 @@ package com.github.begla.blockmania.rendering.manager;
 
 import com.github.begla.blockmania.game.Blockmania;
 import javolution.util.FastMap;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Provides support for loading and applying textures.
@@ -55,8 +57,8 @@ public class TextureManager {
             _textures.put("moon", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/moon.png").openStream(), GL_NEAREST));
             _textures.put("slime", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/slime.png").openStream(), GL_NEAREST));
 
-            for(int i=1; i<=6; i++){
-              _textures.put("stars" + i, TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/stars" + i +".png").openStream(), GL_NEAREST));
+            for (int i = 1; i <= 6; i++) {
+                _textures.put("stars" + i, TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/stars" + i + ".png").openStream(), GL_NEAREST));
             }
 
             Blockmania.getInstance().getLogger().log(Level.FINE, "Finished loading textures!");
@@ -66,11 +68,11 @@ public class TextureManager {
     }
 
     public void bindTexture(String s) {
-        _textures.get(s).bind();
+        glBindTexture(GL11.GL_TEXTURE_2D, _textures.get(s).getTextureID());
     }
-    
+
     /*Test*/
-    public Texture getTexture(String s){
-        return  _textures.get(s);
+    public Texture getTexture(String s) {
+        return _textures.get(s);
     }
 }

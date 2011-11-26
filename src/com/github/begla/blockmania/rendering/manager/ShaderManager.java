@@ -166,7 +166,7 @@ public class ShaderManager {
     /**
      * @param s Name of the shader to activate
      */
-    public void enableShader(@org.jetbrains.annotations.Nullable String s) {
+    public void enableShader(String s) {
         if (s == null) {
             GL20.glUseProgram(0);
             return;

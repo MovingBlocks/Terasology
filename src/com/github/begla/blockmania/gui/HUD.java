@@ -19,8 +19,9 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
-import com.github.begla.blockmania.rendering.manager.FontManager;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
+import com.github.begla.blockmania.rendering.manager.FontManager;
+import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.world.chunk.ChunkMeshGenerator;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -117,6 +118,9 @@ public class HUD implements RenderableObject {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        // HACK: Make sure Slick binds a new texture...
+        TextureManager.getInstance().getTexture("terrain").bind();
+
         /*
         * Draw debugging information.
         */
@@ -133,6 +137,9 @@ public class HUD implements RenderableObject {
             // Display the console input text
             FontManager.getInstance().getFont("default").drawString(4, Display.getDisplayMode().getHeight() - 16 - 4, String.format("%s_", _parent.getConsole()));
         }
+
+        // HACK: Disable the texture mode Slick activated...
+        glDisable(GL11.GL_TEXTURE_2D);
 
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);

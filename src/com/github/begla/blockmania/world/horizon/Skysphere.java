@@ -15,9 +15,13 @@
  */
 package com.github.begla.blockmania.world.horizon;
 
+import com.github.begla.blockmania.configuration.ConfigurationManager;
+import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.noise.PerlinNoise;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.main.World;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -47,12 +51,21 @@ public class Skysphere implements RenderableObject {
     private float _turbidity = 12.0f, _sunPosAngle = 0.1f;
     private Vector3f _zenithColor = new Vector3f();
 
-    /* STARS */
-    public static IntBuffer textureId = BufferUtils.createIntBuffer(1);
+    /* CLOUDS */
+    private static final long CLOUD_UPDATE_INTERVAL = (Integer) ConfigurationManager.getInstance().getConfig().get("System.cloudUpdateInterval");
+    private static IntBuffer _textureIds;
+
+    private final PerlinNoise _noiseGenerator;
+    private long _lastCloudUpdate = Blockmania.getInstance().getTime();
+    ByteBuffer _cloudByteBuffer = null;
+
     private World _parent;
 
     public Skysphere(World parent) {
         _parent = parent;
+        _noiseGenerator = new PerlinNoise(_parent.getWorldProvider().getSeed().hashCode());
+
+        initTextures();
         loadStarTextures();
     }
 
@@ -71,11 +84,86 @@ public class Skysphere implements RenderableObject {
         glCallList(_displayListSphere);
     }
 
+    private void generateNewClouds() {
+
+        // Generate some new clouds according to the current time
+        ByteBuffer clouds = ByteBuffer.allocateDirect(128 * 128 * 3);
+
+        for (int i = 0; i < 128; i++) {
+            for (int j = 0; j < 128; j++) {
+                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime() * 50f, 9, 2.0, 0.73218);
+                byte value = (byte) ((MathHelper.clamp(noise)) * 255);
+
+                clouds.put(value);
+                clouds.put(value);
+                clouds.put(value);
+            }
+        }
+
+        _cloudByteBuffer = clouds;
+        _cloudByteBuffer.flip();
+    }
+
+    private void updateClouds() {
+        if (_cloudByteBuffer != null) {
+            glBindTexture(GL_TEXTURE_2D, _textureIds.get(1));
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, _cloudByteBuffer);
+
+            _cloudByteBuffer = null;
+        }
+    }
+
+    private void initTextures() {
+        if (_textureIds == null) {
+            _textureIds = BufferUtils.createIntBuffer(2);
+            GL11.glGenTextures(_textureIds);
+        }
+    }
+
+    private void drawClouds() {
+        glEnable(GL11.GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, _textureIds.get(1));
+
+        glPushMatrix();
+        glTranslatef(0, 8.0f, 0);
+        glScalef(256f, 1.0f, 256f);
+
+        glBegin(GL_QUADS);
+
+        glTexCoord2d(1, 1);
+        glVertex3f(0.5f, 0.0f, 0.5f);
+        glTexCoord2d(0, 1);
+        glVertex3f(-0.5f, 0.0f, 0.5f);
+        glTexCoord2d(0, 0);
+        glVertex3f(-0.5f, 0.0f, -0.5f);
+        glTexCoord2d(1, 0);
+        glVertex3f(0.5f, 0.0f, -0.5f);
+
+        glEnd();
+
+        glPopMatrix();
+
+        glDisable(GL_BLEND);
+        glDisable(GL11.GL_TEXTURE_2D);
+    }
+
     public void render() {
+        updateClouds();
+
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
+
         glEnable(GL13.GL_TEXTURE_CUBE_MAP);
-        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(0));
         _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         sunNormalise.normalize();
@@ -98,9 +186,16 @@ public class Skysphere implements RenderableObject {
 
         int zenith = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "zenith");
         GL20.glUniform3f(zenith, _zenithColor.x, _zenithColor.y, _zenithColor.z);
+
+        // DRAW THE SKYSPHERE
         drawSphere();
+
         ShaderManager.getInstance().enableShader(null);
         glDisable(GL13.GL_TEXTURE_CUBE_MAP);
+
+        // DRAW THE CLOUDS
+        drawClouds();
+
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }
@@ -131,7 +226,17 @@ public class Skysphere implements RenderableObject {
     }
 
     public void update() {
-        _turbidity = 6.0f + (float) _parent.getActiveHumidity() * (float) _parent.getActiveTemperature();
+        if (_cloudByteBuffer == null && Blockmania.getInstance().getTime() - _lastCloudUpdate >= CLOUD_UPDATE_INTERVAL) {
+            _lastCloudUpdate = Blockmania.getInstance().getTime();
+
+            Blockmania.getInstance().getThreadPool().execute(new Runnable() {
+                public void run() {
+                    generateNewClouds();
+                }
+            });
+        }
+
+        _turbidity = 6.0f + ((float) _parent.getActiveHumidity() * (float) _parent.getActiveTemperature()) * 6.0f;
     }
 
     public float getSunPosAngle() {
@@ -149,9 +254,7 @@ public class Skysphere implements RenderableObject {
     private void loadStarTextures() {
         int internalFormat = GL11.GL_RGBA8, format = GL12.GL_BGRA;
 
-        GL11.glGenTextures(textureId);
-
-        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId.get(0));
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(0));
 
         GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL12.GL_TEXTURE_WRAP_R, GL12.GL_CLAMP_TO_EDGE);
