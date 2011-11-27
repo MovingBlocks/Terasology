@@ -252,6 +252,9 @@ public final class Blockmania {
 
         // Reset the delta value
         _lastLoopTime = getTime();
+        
+        // Create the first Portal if it doesn't exist yet
+        _world.initPortal();
     }
 
     /**

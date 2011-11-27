@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.blueprints;
+package com.github.begla.blockmania.game.blueprints;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.datastructures.BlockPosition;
