@@ -14,11 +14,12 @@
  *  limitations under the License.
  *
  */
-package com.github.begla.blockmania.world.characters;
+package com.github.begla.blockmania.game.mobs;
 
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
+import com.github.begla.blockmania.world.characters.Character;
 import com.github.begla.blockmania.world.main.World;
 import org.lwjgl.opengl.GL11;
 
