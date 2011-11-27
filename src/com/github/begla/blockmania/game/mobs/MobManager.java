@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.begla.blockmania.world.characters;
+package com.github.begla.blockmania.game.mobs;
 
 import com.github.begla.blockmania.world.entity.MovableEntity;
 import javolution.util.FastSet;
@@ -38,6 +38,14 @@ public class MobManager {
 
     }
 
+     /**
+     * Acts on a tick to consider AI actions that involve multiple mobs at once (individual AI is the mob's responsibility)
+     */
+    public void tickAI() {
+        // Nothing yet - first example might be identifying when 2+ mobs are close enough to encourage them to do something
+        // Actions to maybe take: group up (slimes could even merge), start an NPC construction, etc
+    }
+    
     /**
      * Loops through all mobs in the Set and calls their update() method
      */

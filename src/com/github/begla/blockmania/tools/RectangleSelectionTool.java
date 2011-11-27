@@ -15,8 +15,8 @@
  */
 package com.github.begla.blockmania.tools;
 
-import com.github.begla.blockmania.blueprints.Blueprint;
-import com.github.begla.blockmania.blueprints.BlueprintGenerator;
+import com.github.begla.blockmania.game.blueprints.Blueprint;
+import com.github.begla.blockmania.game.blueprints.BlueprintGenerator;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.game.Blockmania;

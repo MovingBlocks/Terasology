@@ -92,3 +92,7 @@ bm.addBlock(new Block().withTitle("Leaf").withId((byte) 11).withTextureAtlasPos(
 bm.addBlock(new Block().withTitle("Red leaf").withId((byte) 30).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(1.0f, 0.8f, 0.8f, 1.0f)))
 bm.addBlock(new Block().withTitle("Dark leaf").withId((byte) 12).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(0.7f, 0.7f, 0.7f, 1.0f)))
 // <--
+
+// Portal block - Indestructible
+bm.addBlock(new Block().withTitle("Portal").withId((byte) 30).withTextureAtlasPos(new Vector2f(14, 9)).withHardness((byte) -1))
+

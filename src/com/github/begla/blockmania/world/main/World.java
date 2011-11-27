@@ -16,7 +16,8 @@
 package com.github.begla.blockmania.world.main;
 
 import com.github.begla.blockmania.audio.AudioManager;
-import com.github.begla.blockmania.blueprints.BlockGrid;
+import com.github.begla.blockmania.game.PortalManager;
+import com.github.begla.blockmania.game.blueprints.BlockGrid;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
@@ -24,7 +25,7 @@ import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
-import com.github.begla.blockmania.world.characters.MobManager;
+import com.github.begla.blockmania.game.mobs.MobManager;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
@@ -37,6 +38,7 @@ import org.newdawn.slick.openal.SoundStore;
 
 import javax.vecmath.Vector3f;
 import java.util.Collections;
+import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.glColorMask;
 
@@ -63,7 +65,8 @@ public final class World implements RenderableObject {
     private FastList<Chunk> _chunksInProximity = new FastList<Chunk>();
     private long _lastChunkUpdate = Blockmania.getInstance().getTime();
 
-    /* MOBS */
+    /* CORE GAME OBJECTS */
+    private PortalManager _portalManager;
     private MobManager _mobManager;
 
     /* PARTICLE EMITTERS */
@@ -74,6 +77,7 @@ public final class World implements RenderableObject {
 
     /* WATER AND LAVA ANIMATION */
     private int _tick = 0;
+    private int _tickTock = 0;
     private long _lastTick;
 
     /* UPDATING */
@@ -100,6 +104,7 @@ public final class World implements RenderableObject {
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager();
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
+        _portalManager = new PortalManager();
         _mobManager = new MobManager();
         _blockGrid = new BlockGrid(this);
         _bulletPhysicsRenderer = new BulletPhysicsRenderer(this);
@@ -349,11 +354,30 @@ public final class World implements RenderableObject {
         //_blockGrid.update();
     }
 
-    /**
-     * Updates the tick value used for animating the textures.
+     /**
+     * Performs and maintains tick-based logic. If the game is paused this logic is not executed
+     * First effect: update the _tick variable that animation is based on
+     * Secondary effect: Trigger spawning (via PortalManager) once every second
+     * Tertiary effect: Trigger socializing (via MobManager) once every 10 seconds
      */
     private void updateTick() {
+        // Update the animation tick
         _tick++;
+
+        // This block is based on seconds or less frequent timings
+        if (Blockmania.getInstance().getTime() - _lastTick >= 1000) {
+            _tickTock++;
+            _lastTick = Blockmania.getInstance().getTime();
+
+            // PortalManager ticks for spawning once a second
+            _portalManager.tickSpawn();
+
+
+            // MobManager ticks for AI every 10 seconds
+            if (_tickTock % 10 == 0) {
+                _mobManager.tickAI();
+            }
+        }
     }
 
     /**
@@ -410,6 +434,19 @@ public final class World implements RenderableObject {
         _player.respawn();
     }
 
+     /**
+     * Creates the first Portal if it doesn't exist yet
+     */
+    public void initPortal() {
+        if (!_portalManager.hasPortal()) {
+            // the y is hard coded because it always gets set to 32, deep underground
+            Vector3f loc = new Vector3f(_player.getPosition().x - 4, 73, _player.getPosition().z);
+            Blockmania.getInstance().getLogger().log(Level.INFO, "Portal location is" + loc);
+            _worldProvider.setBlock((int)loc.x-1, 73, (int)loc.z, (byte) 30, false, true);
+            _portalManager.addPortal(loc);
+        }
+    }
+    
     /**
      * Disposes this world.
      */

@@ -6,7 +6,7 @@ System {
     gameTitle = "Blockmania Pre Alpha"
 
     // Cloud update interval in ms
-    cloudUpdateInterval = 1
+    cloudUpdateInterval = 10
     // Defines how often the list of chunks around the player gets updated per second
     chunkRequestsPerSecond = 8
     // Defines how many chunk update can be processed/queued each second
