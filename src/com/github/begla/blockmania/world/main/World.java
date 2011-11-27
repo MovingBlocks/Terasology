@@ -16,20 +16,21 @@
 package com.github.begla.blockmania.world.main;
 
 import com.github.begla.blockmania.audio.AudioManager;
-import com.github.begla.blockmania.game.PortalManager;
-import com.github.begla.blockmania.game.blueprints.BlockGrid;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.game.PortalManager;
+import com.github.begla.blockmania.game.blueprints.BlockGrid;
+import com.github.begla.blockmania.game.mobs.MobManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
-import com.github.begla.blockmania.game.mobs.MobManager;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
+import com.github.begla.blockmania.world.entity.Entity;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import com.github.begla.blockmania.world.physics.BulletPhysicsRenderer;
 import javolution.util.FastList;
@@ -104,8 +105,8 @@ public final class World implements RenderableObject {
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager();
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
-        _portalManager = new PortalManager();
-        _mobManager = new MobManager();
+        _portalManager = new PortalManager(this);
+        _mobManager = new MobManager(this);
         _blockGrid = new BlockGrid(this);
         _bulletPhysicsRenderer = new BulletPhysicsRenderer(this);
 
@@ -147,6 +148,15 @@ public final class World implements RenderableObject {
         }
 
         return false;
+    }
+
+    public boolean isInRange(Vector3f pos) {
+        Vector3f dist = new Vector3f();
+        dist.sub(_player.getPosition(), pos);
+
+        float distLength = dist.length();
+
+        return distLength < Math.max((Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX"), (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ")) * 8.0;
     }
 
     /**
@@ -354,7 +364,7 @@ public final class World implements RenderableObject {
         //_blockGrid.update();
     }
 
-     /**
+    /**
      * Performs and maintains tick-based logic. If the game is paused this logic is not executed
      * First effect: update the _tick variable that animation is based on
      * Secondary effect: Trigger spawning (via PortalManager) once every second
@@ -434,19 +444,19 @@ public final class World implements RenderableObject {
         _player.respawn();
     }
 
-     /**
+    /**
      * Creates the first Portal if it doesn't exist yet
      */
     public void initPortal() {
         if (!_portalManager.hasPortal()) {
             // the y is hard coded because it always gets set to 32, deep underground
-            Vector3f loc = new Vector3f(_player.getPosition().x - 4, 73, _player.getPosition().z);
+            Vector3f loc = new Vector3f(_player.getPosition().x - 4, _player.getPosition().y + 8, _player.getPosition().z);
             Blockmania.getInstance().getLogger().log(Level.INFO, "Portal location is" + loc);
-            _worldProvider.setBlock((int)loc.x-1, 73, (int)loc.z, (byte) 30, false, true);
+            _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, (byte) 30, false, true);
             _portalManager.addPortal(loc);
         }
     }
-    
+
     /**
      * Disposes this world.
      */
@@ -466,6 +476,10 @@ public final class World implements RenderableObject {
 
     public boolean isChunkVisible(Chunk c) {
         return _player.getActiveCamera().getViewFrustum().intersects(c.getAABB());
+    }
+
+    public boolean isEntityVisible(Entity e) {
+        return _player.getActiveCamera().getViewFrustum().intersects(e.getAABB());
     }
 
     public float getDaylight() {
@@ -502,5 +516,9 @@ public final class World implements RenderableObject {
 
     public BulletPhysicsRenderer getRigidBlocksRenderer() {
         return _bulletPhysicsRenderer;
+    }
+
+    public int getTick() {
+        return _tick;
     }
 }

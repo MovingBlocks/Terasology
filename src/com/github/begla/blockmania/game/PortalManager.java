@@ -16,11 +16,12 @@
 
 package com.github.begla.blockmania.game;
 
-import com.github.begla.blockmania.game.mobs.Slime;
+import com.github.begla.blockmania.game.mobs.GelatinousCube;
 import com.github.begla.blockmania.utilities.FastRandom;
+import com.github.begla.blockmania.world.main.World;
 import javolution.util.FastSet;
-import javax.vecmath.Vector3f;
 
+import javax.vecmath.Vector3f;
 import java.util.logging.Level;
 
 /**
@@ -36,6 +37,11 @@ public class PortalManager {
     private FastSet<Portal> _portalStore = new FastSet<Portal>();
 
     private final FastRandom _random = new FastRandom();
+    private World _parent;
+
+    public PortalManager(World parent) {
+        _parent = parent;
+    }
 
     /**
      * Acts on a tick to consider spawning a mob within the range of one or more Portals
@@ -50,43 +56,52 @@ public class PortalManager {
 
     /**
      * Has a chance to spawn something locally to Portal p
-     * @param   p the portal we're possibly spawning something nearby
-     * @return  boolean indicating if something spawned
+     *
+     * @param p the portal we're possibly spawning something nearby
+     * @return boolean indicating if something spawned
      */
     private boolean spawnLocal(Portal p) {
+        if (_parent.getMobManager().getActiveMobAmount() > 32)
+            return false;
+
         // 25% change something will spawn locally to the portal - will get fancier later
         boolean spawn = _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
-            Slime s = new Slime(Blockmania.getInstance().getActiveWorld());
+            GelatinousCube s = new GelatinousCube(_parent);
             s.setSpawningPoint(new Vector3f(p.getBlockLocation().x, p.getBlockLocation().y - 1, p.getBlockLocation().z));
             s.respawn();
             Blockmania.getInstance().getLogger().log(Level.INFO, "Spawning local slime at " + s.getSpawningPoint());
-            Blockmania.getInstance().getActiveWorld().getMobManager().addMob(s);
+            _parent.getMobManager().addMob(s);
         }
         return spawn;
     }
 
     /**
      * Has a chance to spawn something in the "wild" around Portal p
-     * @param   p the portal we're possibly spawning something nearby
-     * @return  boolean indicating if something spawned
+     *
+     * @param p the portal we're possibly spawning something nearby
+     * @return boolean indicating if something spawned
      */
     private boolean spawnWild(Portal p) {
+        if (_parent.getMobManager().getActiveMobAmount() > 32)
+            return false;
+
         // 25% change something will spawn in the wild around the portal - will get fancier later
         boolean spawn = _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
-            Slime s = new Slime(Blockmania.getInstance().getActiveWorld());
+            GelatinousCube s = new GelatinousCube(_parent);
             s.setSpawningPoint(new Vector3f(p.getBlockLocation().x, p.getBlockLocation().y + 1, p.getBlockLocation().z));
             s.respawn();
             Blockmania.getInstance().getLogger().log(Level.INFO, "Spawning wild slime at " + s.getSpawningPoint());
-            Blockmania.getInstance().getActiveWorld().getMobManager().addMob(s);
+            _parent.getMobManager().addMob(s);
         }
         return spawn;
     }
 
     /**
      * A check for whether a new Portal is needed for a new world
-     * @return  boolean indicating whether or not a portal exists somewhere
+     *
+     * @return boolean indicating whether or not a portal exists somewhere
      */
     public boolean hasPortal() {
 

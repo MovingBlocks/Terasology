@@ -572,7 +572,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public AABB getAABB() {
         Vector3f dimensions = new Vector3f(getChunkDimensionX() / 2, getChunkDimensionY() / 2, getChunkDimensionZ() / 2);
-        Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - _parent.getRenderingReferencePoint().x, dimensions.y - _parent.getRenderingReferencePoint().y, getChunkWorldPosZ() + dimensions.z - _parent.getRenderingReferencePoint().z);
+        Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x, dimensions.y, getChunkWorldPosZ() + dimensions.z);
         return new AABB(position, dimensions);
     }
 

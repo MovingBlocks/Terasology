@@ -1,13 +1,13 @@
 import com.github.begla.blockmania.tools.Tool
-import com.github.begla.blockmania.game.mobs.Slime
+import com.github.begla.blockmania.game.mobs.GelatinousCube
 import com.github.begla.blockmania.game.Blockmania
 
 class SlimeTool implements Tool {
 
     public void executeLeftClickAction() {
-        println "Executing left click! Going to spawn a Slime"
+        println "Executing left click! Going to spawn a Gelatinous Cube"
 
-        Slime s = new Slime(Blockmania.getInstance().getActiveWorld())
+        GelatinousCube s = new GelatinousCube(Blockmania.getInstance().getActiveWorld())
         s.setSpawningPoint(Blockmania.getInstance().getActiveWorld().getPlayer().getPosition())
         s.respawn()
 

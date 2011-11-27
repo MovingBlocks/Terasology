@@ -84,13 +84,7 @@ public final class Player extends Character {
         if ((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox")) {
             if (is != null) {
                 if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition().toVector3f())).isRenderBoundingBox()) {
-
-                    Vector3f v = is.getBlockPosition().toVector3f();
-                    v.x -= _parent.getWorldProvider().getRenderingReferencePoint().x;
-                    v.y -= _parent.getWorldProvider().getRenderingReferencePoint().y;
-                    v.z -= _parent.getWorldProvider().getRenderingReferencePoint().z;
-
-                    Block.AABBForBlockAt(v).render();
+                    Block.AABBForBlockAt(is.getBlockPosition().toVector3f()).render();
                 }
             }
         }
@@ -439,9 +433,7 @@ public final class Player extends Character {
         return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z: %.2f)", getPosition().x, getPosition().y, getPosition().z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _selectedBlockType, _gravity, _movementDirection.x, _movementDirection.y, _movementDirection.z);
     }
 
-    protected AABB generateAABBForPosition
-            (Vector3f
-                     p) {
+    protected AABB generateAABBForPosition(Vector3f p) {
         return new AABB(p, new Vector3f(.3f, 0.8f, .3f));
     }
 

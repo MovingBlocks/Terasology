@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.datastructures;
 
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import javolution.util.FastList;
 
@@ -180,14 +181,15 @@ public class AABB implements RenderableObject {
 
     /**
      * Renders this AABB.
-     *
+     * <p/>
      * TODO: SLOW!
      */
     public void render() {
         double offset = 0.01;
 
         glPushMatrix();
-        glTranslatef(getPosition().x, getPosition().y, getPosition().z);
+        Vector3f rp = Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint();
+        glTranslatef(getPosition().x - rp.x, getPosition().y - rp.y, getPosition().z - rp.z);
 
         glLineWidth(6f);
         glColor4f(0.0f, 0.0f, 0.0f, 1.0f);

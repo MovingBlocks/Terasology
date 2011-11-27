@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.datastructures;
 
+import com.github.begla.blockmania.game.Blockmania;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -130,23 +131,24 @@ public class ViewFrustum {
     public boolean intersects(AABB aabb) {
 
         Vector3f[] aabbVertices = aabb.getVertices();
+        Vector3f rp = Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint();
 
         for (int i = 0; i < 6; i++) {
-            if (_planes[i].getA() * aabbVertices[0].x + _planes[i].getB() * aabbVertices[0].y + _planes[i].getC() * aabbVertices[0].z + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[0].x - rp.x) + _planes[i].getB() * (aabbVertices[0].y - rp.y) + _planes[i].getC() * (aabbVertices[0].z - rp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * aabbVertices[1].x + _planes[i].getB() * aabbVertices[1].y + _planes[i].getC() * aabbVertices[1].z + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[1].x - rp.x) + _planes[i].getB() * (aabbVertices[1].y - rp.y) + _planes[i].getC() * (aabbVertices[1].z - rp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * aabbVertices[2].x + _planes[i].getB() * aabbVertices[2].y + _planes[i].getC() * aabbVertices[2].z + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[2].x - rp.x) + _planes[i].getB() * (aabbVertices[2].y - rp.y) + _planes[i].getC() * (aabbVertices[2].z - rp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * aabbVertices[3].x + _planes[i].getB() * aabbVertices[3].y + _planes[i].getC() * aabbVertices[3].z + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[3].x - rp.x) + _planes[i].getB() * (aabbVertices[3].y - rp.y) + _planes[i].getC() * (aabbVertices[3].z - rp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * aabbVertices[4].x + _planes[i].getB() * aabbVertices[4].y + _planes[i].getC() * aabbVertices[4].z + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[4].x - rp.x) + _planes[i].getB() * (aabbVertices[4].y - rp.y) + _planes[i].getC() * (aabbVertices[4].z - rp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * aabbVertices[5].x + _planes[i].getB() * aabbVertices[5].y + _planes[i].getC() * aabbVertices[5].z + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[5].x - rp.x) + _planes[i].getB() * (aabbVertices[5].y - rp.y) + _planes[i].getC() * (aabbVertices[5].z - rp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * aabbVertices[6].x + _planes[i].getB() * aabbVertices[6].y + _planes[i].getC() * aabbVertices[6].z + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[6].x - rp.x) + _planes[i].getB() * (aabbVertices[6].y - rp.y) + _planes[i].getC() * (aabbVertices[6].z - rp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * aabbVertices[7].x + _planes[i].getB() * aabbVertices[7].y + _planes[i].getC() * aabbVertices[7].z + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[7].x - rp.x) + _planes[i].getB() * (aabbVertices[7].y - rp.y) + _planes[i].getC() * (aabbVertices[7].z - rp.z) + _planes[i].getD() > 0)
                 continue;
             return false;
         }
