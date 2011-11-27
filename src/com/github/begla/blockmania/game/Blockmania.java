@@ -109,6 +109,7 @@ public final class Blockmania {
      * @param args The arguments
      */
     public static void main(String[] args) {
+        getInstance().initDefaultLogger();
         getInstance().getLogger().log(Level.INFO, "Welcome to {0}!", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"));
 
         // Make sure to load the native libraries for current OS first
@@ -477,7 +478,7 @@ public final class Blockmania {
     }
 
     private void initDefaultLogger() {
-        File dirPath = new File("logs");
+        File dirPath = new File("LOGS");
 
         if (!dirPath.exists()) {
             if (!dirPath.mkdirs()) {

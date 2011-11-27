@@ -249,6 +249,7 @@ public final class World implements RenderableObject {
             }
         }
 
+        ShaderManager.getInstance().enableShader(null);
         _mobManager.renderAll();
 
         ShaderManager.getInstance().enableShader("block");
