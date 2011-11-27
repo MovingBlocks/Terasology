@@ -61,7 +61,7 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnLocal(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 32)
+        if (_parent.getMobManager().getActiveMobAmount() > 64)
             return false;
 
         // 25% change something will spawn locally to the portal - will get fancier later
@@ -83,14 +83,19 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnWild(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 32)
+        if (_parent.getMobManager().getActiveMobAmount() > 128)
             return false;
 
         // 25% change something will spawn in the wild around the portal - will get fancier later
         boolean spawn = _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
             GelatinousCube s = new GelatinousCube(_parent);
-            s.setSpawningPoint(new Vector3f(p.getBlockLocation().x, p.getBlockLocation().y + 1, p.getBlockLocation().z));
+
+            // Spawn some Gel. Cubes in the wilderness!
+            Vector3f randomOffset = new Vector3f((float) _parent.getWorldProvider().getRandom().randomDouble(), 0 ,(float) _parent.getWorldProvider().getRandom().randomDouble());
+            randomOffset.scale(64);
+
+            s.setSpawningPoint(new Vector3f(p.getBlockLocation().x + randomOffset.x, p.getBlockLocation().y + 1, p.getBlockLocation().z + randomOffset.z));
             s.respawn();
             Blockmania.getInstance().getLogger().log(Level.INFO, "Spawning wild slime at " + s.getSpawningPoint());
             _parent.getMobManager().addMob(s);
