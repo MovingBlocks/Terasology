@@ -8,9 +8,9 @@ System {
     // Cloud update interval in ms
     cloudUpdateInterval = 10
     // Defines how often the list of chunks around the player gets updated per second
-    chunkRequestsPerSecond = 256
+    chunkRequestsPerSecond = 8
     // Defines how many chunk update can be processed/queued each second
-    chunkUpdatesPerSecond = 512
+    chunkUpdatesPerSecond = 4
     // Defines the maximum amount of threads used for chunk generation
     maxThreads = 4
     // Enable/or disable the persisting of chunks
