@@ -21,10 +21,10 @@ import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
-import javolution.util.FastMap;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 /**
@@ -39,7 +39,7 @@ public class GeneratorManager {
 
     /* WORLD GENERATION */
     protected final ArrayList<ChunkGenerator> _chunkGenerators = new ArrayList<ChunkGenerator>(8);
-    protected final FastMap<ChunkGeneratorTerrain.BIOME_TYPE, ArrayList<TreeGenerator>> _treeGenerators = new FastMap<ChunkGeneratorTerrain.BIOME_TYPE, ArrayList<TreeGenerator>>(8);
+    protected final HashMap<ChunkGeneratorTerrain.BIOME_TYPE, ArrayList<TreeGenerator>> _treeGenerators = new HashMap<ChunkGeneratorTerrain.BIOME_TYPE, ArrayList<TreeGenerator>>(8);
 
     public GeneratorManager(WorldProvider parent) {
         _parent = parent;

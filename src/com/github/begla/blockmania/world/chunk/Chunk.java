@@ -27,7 +27,6 @@ import com.github.begla.blockmania.utilities.Helper;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.entity.StaticEntity;
 import com.github.begla.blockmania.world.main.LocalWorldProvider;
-import javolution.util.FastList;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector3f;
@@ -35,6 +34,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -283,7 +283,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @param type       The type of the light
      */
     public void unspreadLight(int x, int y, int z, byte lightValue, LIGHT_TYPE type) {
-        FastList<Vector3f> brightSpots = new FastList<Vector3f>();
+        ArrayList<Vector3f> brightSpots = new ArrayList<Vector3f>();
         unspreadLight(x, y, z, lightValue, 0, type, brightSpots);
 
         for (Vector3f pos : brightSpots) {
@@ -302,7 +302,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @param type        The type of the light
      * @param brightSpots Log of light spots, which where brighter than the current light node
      */
-    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type, FastList<Vector3f> brightSpots) {
+    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type, ArrayList<Vector3f> brightSpots) {
         int blockPosX = getBlockWorldPosX(x);
         int blockPosZ = getBlockWorldPosZ(z);
 

@@ -18,7 +18,8 @@ package com.github.begla.blockmania.game.mobs;
 
 import com.github.begla.blockmania.world.entity.MovableEntity;
 import com.github.begla.blockmania.world.main.World;
-import javolution.util.FastSet;
+
+import java.util.HashSet;
 
 /**
  * MobManager handles non-player entities that do stuff in the world
@@ -30,7 +31,7 @@ public class MobManager {
     /**
      * Set that contains mobs
      */
-    private FastSet<MovableEntity> _mobStore = new FastSet<MovableEntity>();
+    private HashSet<MovableEntity> _mobStore = new HashSet<MovableEntity>();
     private World _parent;
 
     /**
@@ -63,7 +64,7 @@ public class MobManager {
      */
     public void renderAll() {
         for (MovableEntity mob : _mobStore) {
-            if (_parent.isEntityVisible(mob))
+            if (_parent.isEntityVisible(mob) && _parent.isInRange(mob.getPosition()))
                 mob.render();
         }
     }

@@ -17,9 +17,10 @@ package com.github.begla.blockmania.datastructures;
 
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
-import javolution.util.FastList;
 
 import javax.vecmath.Vector3f;
+
+import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -103,7 +104,7 @@ public class AABB implements RenderableObject {
      * @return
      */
     public Vector3f normalForPlaneClosestToOrigin(Vector3f pointOnAABB, Vector3f origin, boolean testX, boolean testY, boolean testZ) {
-        FastList<Vector3f> normals = new FastList<Vector3f>();
+        ArrayList<Vector3f> normals = new ArrayList<Vector3f>();
 
         if (pointOnAABB.z == minZ() && testZ) normals.add(new Vector3f(0, 0, -1));
         if (pointOnAABB.z == maxZ() && testZ) normals.add(new Vector3f(0, 0, 1));
@@ -115,15 +116,17 @@ public class AABB implements RenderableObject {
         double minDistance = Double.MAX_VALUE;
         Vector3f closestNormal = new Vector3f();
 
-        for (FastList.Node<Vector3f> n = normals.head(), end = normals.tail(); (n = n.getNext()) != end; ) {
-            Vector3f diff = new Vector3f(centerPointForNormal(n.getValue()));
+        for (int i=0; i<normals.size(); i++) {
+            Vector3f n = normals.get(i);
+
+            Vector3f diff = new Vector3f(centerPointForNormal(n));
             diff.sub(origin);
 
             float distance = diff.length();
 
             if (distance < minDistance) {
                 minDistance = distance;
-                closestNormal = n.getValue();
+                closestNormal = n;
             }
         }
 

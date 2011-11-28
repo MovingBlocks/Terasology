@@ -19,7 +19,8 @@ import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
-import javolution.util.FastSet;
+
+import java.util.HashSet;
 
 /**
  * Provides the mechanism for updating and generating chunks.
@@ -37,7 +38,7 @@ public final class ChunkUpdateManager implements BlockObserver {
     private static final long UPDATE_GAP = 1000 / (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkUpdatesPerSecond");
 
     /* CHUNK UPDATES */
-    private static final FastSet<Chunk> _currentlyProcessedChunks = new FastSet<Chunk>();
+    private static final HashSet<Chunk> _currentlyProcessedChunks = new HashSet<Chunk>();
     private long _lastChunkUpdate = Blockmania.getInstance().getTime();
 
     /* STATISTICS */

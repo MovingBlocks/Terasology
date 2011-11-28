@@ -21,9 +21,9 @@ import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
-import javolution.util.FastMap;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 /**
@@ -43,7 +43,7 @@ public class BlockManager {
     private Binding _binding;
 
     /* BLOCKS */
-    private FastMap<String, Block> _blocksByTitle = new FastMap<String, Block>(128);
+    private HashMap<String, Block> _blocksByTitle = new HashMap<String, Block>(128);
     private TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
 
     public static BlockManager getInstance() {

@@ -16,12 +16,12 @@
 package com.github.begla.blockmania.rendering.manager;
 
 import com.github.begla.blockmania.game.Blockmania;
-import javolution.util.FastMap;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 /**
@@ -31,7 +31,7 @@ import java.util.logging.Level;
  */
 public class FontManager {
 
-    private final FastMap<String, AngelCodeFont> _fonts = new FastMap<String, AngelCodeFont>();
+    private final HashMap<String, AngelCodeFont> _fonts = new HashMap<String, AngelCodeFont>();
     private static FontManager _instance = null;
 
     public static FontManager getInstance() {

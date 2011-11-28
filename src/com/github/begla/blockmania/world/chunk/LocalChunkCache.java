@@ -20,12 +20,12 @@ import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.interfaces.ChunkProvider;
 import com.github.begla.blockmania.world.main.LocalWorldProvider;
-import javolution.util.FastList;
-import javolution.util.FastMap;
 
 import javax.vecmath.Vector3f;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
@@ -39,7 +39,7 @@ public final class LocalChunkCache implements ChunkProvider {
 
     private static final int CACHE_SIZE = (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkCacheSize");
 
-    private final FastMap<Integer, Chunk> _chunkCache = new FastMap<Integer, Chunk>().shared();
+    private final ConcurrentHashMap<Integer, Chunk> _chunkCache = new ConcurrentHashMap<Integer, Chunk>();
     private final LocalWorldProvider _parent;
 
     /**
@@ -101,17 +101,19 @@ public final class LocalChunkCache implements ChunkProvider {
 
         Runnable r = new Runnable() {
             public void run() {
-                FastList<Chunk> cachedChunks = new FastList<Chunk>(_chunkCache.values());
+                ArrayList<Chunk> cachedChunks = new ArrayList<Chunk>(_chunkCache.values());
                 Collections.sort(cachedChunks);
 
-                while (cachedChunks.size() > CACHE_SIZE) {
-                    Chunk chunkToDelete = cachedChunks.removeLast();
-                    // Write the chunk to disk (but do not remove it from the cache just jet)
-                    writeChunkToDisk(chunkToDelete);
-                    // When the chunk is written, finally remove it from the cache
-                    _chunkCache.values().remove(chunkToDelete);
+                synchronized (_chunkCache) {
+                    while (cachedChunks.size() > CACHE_SIZE) {
+                        Chunk chunkToDelete = cachedChunks.remove(cachedChunks.size() - 1);
+                        // Write the chunk to disk (but do not remove it from the cache just jet)
+                        writeChunkToDisk(chunkToDelete);
+                        // When the chunk is written, finally remove it from the cache
+                        _chunkCache.values().remove(chunkToDelete);
 
-                    chunkToDelete.dispose();
+                        chunkToDelete.dispose();
+                    }
                 }
 
                 _running = false;

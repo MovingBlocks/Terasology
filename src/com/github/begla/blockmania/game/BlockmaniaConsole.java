@@ -15,9 +15,9 @@
  */
 package com.github.begla.blockmania.game;
 
-import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 /**
@@ -30,7 +30,7 @@ public final class BlockmaniaConsole {
     private Blockmania _parent;
 
     private final StringBuffer _consoleInput = new StringBuffer();
-    private FastList<String> _ringBuffer = new FastList<String>();
+    private ArrayList<String> _ringBuffer = new ArrayList<String>();
     private int _ringBufferPos = -1;
 
     /**
@@ -95,7 +95,7 @@ public final class BlockmaniaConsole {
      */
     public void addToRingBuffer() {
         _ringBufferPos = -1;
-        _ringBuffer.addFirst(_consoleInput.toString());
+        _ringBuffer.add(0,_consoleInput.toString());
     }
 
     /**

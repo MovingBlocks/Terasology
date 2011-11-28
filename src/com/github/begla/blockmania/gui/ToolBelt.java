@@ -18,8 +18,8 @@ package com.github.begla.blockmania.gui;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.tools.*;
 import com.github.begla.blockmania.world.characters.Player;
-import javolution.util.FastMap;
 
+import java.util.HashMap;
 import java.util.logging.Level;
 
 /**
@@ -37,17 +37,17 @@ public class ToolBelt {
     /**
      * Map that contains simple native tool index values for a switch here
      */
-    private FastMap<Byte, Tool> _toolStore = new FastMap<Byte, Tool>();
+    private HashMap<Byte, Tool> _toolStore = new HashMap<Byte, Tool>();
 
     /**
      * Map that contains advanced plugin tool index values and an associated Groovy command script to execute on use
      */
-    private FastMap<Byte, Tool> _pluginStore = new FastMap<Byte, Tool>();
+    private HashMap<Byte, Tool> _pluginStore = new HashMap<Byte, Tool>();
 
     /**
      * Map that will bind tool index values with hot keys 1-10
      */
-    private FastMap<Byte, Byte> _toolBinding = new FastMap<Byte, Byte>();
+    private HashMap<Byte, Byte> _toolBinding = new HashMap<Byte, Byte>();
 
     /**
      * Which slot in the hot bar is the active tool

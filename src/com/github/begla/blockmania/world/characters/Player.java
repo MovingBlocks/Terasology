@@ -32,11 +32,11 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
 import com.github.begla.blockmania.world.main.World;
-import javolution.util.FastList;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
 
@@ -49,7 +49,7 @@ import java.util.logging.Level;
 public final class Player extends Character {
 
     /* OBSERVERS */
-    private FastList<BlockObserver> _observers = new FastList<BlockObserver>();
+    private ArrayList<BlockObserver> _observers = new ArrayList<BlockObserver>();
 
     /* PROPERTIES */
     private byte _selectedBlockType = 1;
@@ -142,7 +142,8 @@ public final class Player extends Character {
      * @return Intersection point of the targeted block
      */
     public RayBlockIntersection.Intersection calcSelectedBlock() {
-        FastList<RayBlockIntersection.Intersection> inters = new FastList<RayBlockIntersection.Intersection>();
+        ArrayList<RayBlockIntersection.Intersection> inters = new ArrayList<RayBlockIntersection.Intersection>();
+
         for (int x = -3; x <= 3; x++) {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -3; z <= 3; z++) {
@@ -154,7 +155,7 @@ public final class Player extends Character {
                     }
 
                     // The ray originates from the "player's eye"
-                    FastList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent.getWorldProvider(), (int) getPosition().x + x, (int) getPosition().y + y, (int) getPosition().z + z, calcEyePosition(), _viewingDirection);
+                    ArrayList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent.getWorldProvider(), (int) getPosition().x + x, (int) getPosition().y + y, (int) getPosition().z + z, calcEyePosition(), _viewingDirection);
 
                     if (iss != null) {
                         inters.addAll(iss);

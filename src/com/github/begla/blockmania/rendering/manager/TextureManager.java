@@ -16,13 +16,13 @@
 package com.github.begla.blockmania.rendering.manager;
 
 import com.github.begla.blockmania.game.Blockmania;
-import javolution.util.FastMap;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
@@ -36,7 +36,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 public class TextureManager {
 
     private static TextureManager _instance;
-    private final FastMap<String, Texture> _textures = new FastMap<String, Texture>();
+    private final HashMap<String, Texture> _textures = new HashMap<String, Texture>();
 
     public static TextureManager getInstance() {
         if (_instance == null)

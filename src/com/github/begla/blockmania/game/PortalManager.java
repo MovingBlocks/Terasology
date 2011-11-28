@@ -19,9 +19,9 @@ package com.github.begla.blockmania.game;
 import com.github.begla.blockmania.game.mobs.GelatinousCube;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.main.World;
-import javolution.util.FastSet;
 
 import javax.vecmath.Vector3f;
+import java.util.HashSet;
 import java.util.logging.Level;
 
 /**
@@ -34,7 +34,7 @@ public class PortalManager {
     /**
      * Set that contains Portals
      */
-    private FastSet<Portal> _portalStore = new FastSet<Portal>();
+    private HashSet<Portal> _portalStore = new HashSet<Portal>();
 
     private final FastRandom _random = new FastRandom();
     private World _parent;

@@ -17,10 +17,10 @@ package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.world.main.World;
-import javolution.util.FastList;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -36,7 +36,7 @@ public abstract class ParticleEmitter implements RenderableObject {
     /* ------- */
     protected int _particlesToEmit;
 
-    protected FastList<Particle> _particles = new FastList();
+    protected ArrayList<Particle> _particles = new ArrayList();
     protected Vector3f _origin = new Vector3f();
 
     protected World _parent;
@@ -51,8 +51,9 @@ public abstract class ParticleEmitter implements RenderableObject {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        for (FastList.Node<Particle> n = _particles.head(), end = _particles.tail(); (n = n.getNext()) != end; ) {
-            n.getValue().render();
+        for (int i = 0; i < _particles.size(); i++) {
+            Particle p = _particles.get(i);
+            p.render();
         }
 
         glDisable(GL_BLEND);
@@ -64,8 +65,9 @@ public abstract class ParticleEmitter implements RenderableObject {
         removeDeadParticles();
         emitParticles();
 
-        for (FastList.Node<Particle> n = _particles.head(), end = _particles.tail(); (n = n.getNext()) != end; ) {
-            n.getValue().update();
+        for (int i = 0; i < _particles.size(); i++) {
+            Particle p = _particles.get(i);
+            p.update();
         }
     }
 
@@ -81,7 +83,7 @@ public abstract class ParticleEmitter implements RenderableObject {
 
     protected void emitParticles() {
         for (int i = 0; i < PARTICLES_PER_UPDATE && _particlesToEmit > 0; i++) {
-            _particles.addFirst(createParticle());
+            _particles.add(createParticle());
             _particlesToEmit--;
         }
     }

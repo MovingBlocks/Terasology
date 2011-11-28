@@ -37,8 +37,6 @@ import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
 import com.github.begla.blockmania.world.main.World;
-import javolution.util.FastList;
-import javolution.util.FastSet;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -47,6 +45,8 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Renders blocks using the Bullet physics library.
@@ -68,8 +68,8 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
         }
     }
 
-    FastList<BlockRigidBody> _blocks = new FastList<BlockRigidBody>();
-    FastSet<RigidBody> _chunks = new FastSet<RigidBody>();
+    ArrayList<BlockRigidBody> _blocks = new ArrayList<BlockRigidBody>();
+    HashSet<RigidBody> _chunks = new HashSet<RigidBody>();
 
     CollisionShape _blockShape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
 
@@ -192,7 +192,7 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
             if (_blocks.isEmpty())
                 return;
 
-            BlockRigidBody b = _blocks.removeFirst();;
+            BlockRigidBody b = _blocks.remove(0);
 
             if (b.isActive()) {
                 _blocks.add(b);

@@ -25,7 +25,6 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.ChunkProvider;
 import com.github.begla.blockmania.world.chunk.LocalChunkCache;
-import javolution.util.FastList;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -36,6 +35,7 @@ import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 /**
@@ -431,7 +431,7 @@ public class LocalWorldProvider implements WorldProvider {
      * @param type        The type of light
      * @param brightSpots List of bright spots found while unspreading the light
      */
-    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, FastList<Vector3f> brightSpots) {
+    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, ArrayList<Vector3f> brightSpots) {
         int chunkPosX = MathHelper.calcChunkPosX(x);
         int chunkPosZ = MathHelper.calcChunkPosZ(z);
 

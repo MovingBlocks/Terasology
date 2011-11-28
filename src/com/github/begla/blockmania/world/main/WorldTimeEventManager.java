@@ -15,14 +15,14 @@
  */
 package com.github.begla.blockmania.world.main;
 
-import javolution.util.FastList;
+import java.util.ArrayList;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class WorldTimeEventManager {
 
-    protected FastList<WorldTimeEvent> _worldTimeEvents = new FastList<WorldTimeEvent>();
+    protected ArrayList<WorldTimeEvent> _worldTimeEvents = new ArrayList<WorldTimeEvent>();
     protected WorldProvider _parent;
 
     public WorldTimeEventManager(WorldProvider parent) {

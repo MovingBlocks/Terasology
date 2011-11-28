@@ -16,12 +16,12 @@
 package com.github.begla.blockmania.audio;
 
 import com.github.begla.blockmania.game.Blockmania;
-import javolution.util.FastMap;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 /**
@@ -31,7 +31,7 @@ import java.util.logging.Level;
  */
 public class AudioManager {
 
-    private FastMap<String, Audio> _audioFiles = new FastMap();
+    private HashMap<String, Audio> _audioFiles = new HashMap();
     private static AudioManager _instance = null;
 
     public static AudioManager getInstance() {

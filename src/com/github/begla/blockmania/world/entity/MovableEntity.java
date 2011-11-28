@@ -23,10 +23,10 @@ import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.main.World;
-import javolution.util.FastList;
 import org.newdawn.slick.openal.Audio;
 
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -52,8 +52,8 @@ public abstract class MovableEntity extends Entity {
     /**
      * Init. a new movable entity.
      *
-     * @param parent The parent world
-     * @param walkingSpeed The walking speed
+     * @param parent        The parent world
+     * @param walkingSpeed  The walking speed
      * @param runningFactor The running factor
      * @param jumpIntensity The jump intensity
      */
@@ -77,18 +77,22 @@ public abstract class MovableEntity extends Entity {
     }
 
     public abstract void processMovement();
+
     protected abstract AABB generateAABBForPosition(Vector3f p);
+
     protected abstract void handleVerticalCollision();
+
     protected abstract void handleHorizontalCollision();
 
     public void render() {
         if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debugCollision")) {
             getAABB().render();
 
-            FastList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());
+            ArrayList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());
 
-            for (FastList.Node<BlockPosition> n = blocks.head(), end = blocks.tail(); (n = n.getNext()) != end; ) {
-                AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
+            for (int i = 0; i < blocks.size(); i++) {
+                BlockPosition p = blocks.get(i);
+                AABB blockAABB = Block.AABBForBlockAt(p.x, p.y, p.z);
                 blockAABB.render();
             }
         }
@@ -153,21 +157,23 @@ public abstract class MovableEntity extends Entity {
      * @return True if a vertical collision was detected
      */
     private boolean verticalHitTest(Vector3f origin) {
-        FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
+        ArrayList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
-        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
-            byte blockType1 = _parent.getWorldProvider().getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
+        for (int i = 0; i < blockPositions.size(); i++) {
+            BlockPosition p = blockPositions.get(i);
+
+            byte blockType1 = _parent.getWorldProvider().getBlockAtPosition(new Vector3f(p.x, p.y, p.z));
             AABB entityAABB = getAABB();
 
-            if (BlockManager.getInstance().getBlock(blockType1).isPenetrable() || !entityAABB.overlaps(Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z)))
+            if (BlockManager.getInstance().getBlock(blockType1).isPenetrable() || !entityAABB.overlaps(Block.AABBForBlockAt(p.x, p.y, p.z)))
                 continue;
 
             double direction = origin.y - getPosition().y;
 
             if (direction >= 0)
-                getPosition().y = n.getValue().y + 0.50001f + entityAABB.getDimensions().y;
+                getPosition().y = p.y + 0.50001f + entityAABB.getDimensions().y;
             else
-                getPosition().y = n.getValue().y - 0.50001f - entityAABB.getDimensions().y;
+                getPosition().y = p.y - 0.50001f - entityAABB.getDimensions().y;
 
             return true;
         }
@@ -181,12 +187,12 @@ public abstract class MovableEntity extends Entity {
      * @param origin The block position
      * @return A list of adjacent block positions
      */
-    private FastList<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
+    private ArrayList<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
         /*
          * Gather the surrounding block positions
          * and order those by the distance to the originating point.
          */
-        FastList<BlockPosition> blockPositions = new FastList<BlockPosition>();
+        ArrayList<BlockPosition> blockPositions = new ArrayList<BlockPosition>();
 
         for (int x = -1; x < 2; x++) {
             for (int z = -1; z < 2; z++) {
@@ -213,12 +219,13 @@ public abstract class MovableEntity extends Entity {
      */
     private boolean horizontalHitTest(Vector3f origin) {
         boolean result = false;
-        FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
+        ArrayList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
         // Check each block position for collision
-        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
-            byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
-            AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
+        for (int i = 0; i < blockPositions.size(); i++) {
+            BlockPosition p = blockPositions.get(i);
+            byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3f(p.x, p.y, p.z));
+            AABB blockAABB = Block.AABBForBlockAt(p.x, p.y, p.z);
 
             if (!BlockManager.getInstance().getBlock(blockType).isPenetrable()) {
                 if (getAABB().overlaps(blockAABB)) {
@@ -385,13 +392,14 @@ public abstract class MovableEntity extends Entity {
      * Updates the status if the entity is currently swimming (in water).
      */
     private void updateSwimStatus() {
-        FastList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(getPosition());
+        ArrayList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(getPosition());
 
         boolean swimming = false, headUnderWater = false;
 
-        for (FastList.Node<BlockPosition> n = blockPositions.head(), end = blockPositions.tail(); (n = n.getNext()) != end; ) {
-            byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3f(n.getValue().x, n.getValue().y, n.getValue().z));
-            AABB blockAABB = Block.AABBForBlockAt(n.getValue().x, n.getValue().y, n.getValue().z);
+        for (int i = 0; i < blockPositions.size(); i++) {
+            BlockPosition p = blockPositions.get(i);
+            byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3f(p.x, p.y, p.z));
+            AABB blockAABB = Block.AABBForBlockAt(p.x, p.y, p.z);
 
             if (BlockManager.getInstance().getBlock(blockType).isLiquid() && getAABB().overlaps(blockAABB)) {
                 swimming = true;

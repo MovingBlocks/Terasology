@@ -21,8 +21,8 @@ import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.world.characters.Player;
-import javolution.util.FastList;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 /**
@@ -32,7 +32,7 @@ public class RectangleSelectionTool implements Tool {
 
     private Player _player;
 
-    private FastList<BlockPosition> _selectedBlocks = new FastList<BlockPosition>();
+    private ArrayList<BlockPosition> _selectedBlocks = new ArrayList<BlockPosition>();
 
     private Blueprint _currentBlueprint = null;
 

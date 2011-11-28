@@ -20,9 +20,9 @@ import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.world.main.WorldProvider;
-import javolution.util.FastList;
 
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -100,7 +100,7 @@ public class RayBlockIntersection {
      * @param rayOrigin    The origin of the ray
      * @param rayDirection The direction of the ray
      */
-    public static FastList<Intersection> executeIntersection(WorldProvider w, int x, int y, int z, Vector3f rayOrigin, Vector3f rayDirection) {
+    public static ArrayList<Intersection> executeIntersection(WorldProvider w, int x, int y, int z, Vector3f rayOrigin, Vector3f rayDirection) {
         /*
          * Ignore invisible blocks.
          */
@@ -108,7 +108,7 @@ public class RayBlockIntersection {
             return null;
         }
 
-        FastList<Intersection> result = new FastList<Intersection>();
+        ArrayList<Intersection> result = new ArrayList<Intersection>();
 
         /*
          * Fetch all vertices of the specified block.

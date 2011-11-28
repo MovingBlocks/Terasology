@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.rendering.manager;
 
 import com.github.begla.blockmania.game.Blockmania;
-import javolution.util.FastMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -26,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 /**
@@ -35,9 +35,9 @@ import java.util.logging.Level;
  */
 public class ShaderManager {
 
-    private final FastMap<String, Integer> _shaderPrograms = new FastMap<String, Integer>(32);
-    private final FastMap<String, Integer> _fragmentShader = new FastMap<String, Integer>(32);
-    private final FastMap<String, Integer> _vertexShader = new FastMap<String, Integer>(32);
+    private final HashMap<String, Integer> _shaderPrograms = new HashMap<String, Integer>(32);
+    private final HashMap<String, Integer> _fragmentShader = new HashMap<String, Integer>(32);
+    private final HashMap<String, Integer> _vertexShader = new HashMap<String, Integer>(32);
     private static ShaderManager _instance = null;
 
     /**
@@ -75,15 +75,15 @@ public class ShaderManager {
         createVertexShader("gelatinousCube_vert.glsl", "gelatinousCube");
         createFragShader("gelatinousCube_frag.glsl", "gelatinousCube");
 
-        for (FastMap.Entry<String, Integer> e = _fragmentShader.head(), end = _fragmentShader.tail(); (e = e.getNext()) != end; ) {
+        for (String s : _fragmentShader.keySet()) {
             int shaderProgram = GL20.glCreateProgram();
 
-            GL20.glAttachShader(shaderProgram, _fragmentShader.get(e.getKey()));
-            GL20.glAttachShader(shaderProgram, _vertexShader.get(e.getKey()));
+            GL20.glAttachShader(shaderProgram, _fragmentShader.get(s));
+            GL20.glAttachShader(shaderProgram, _vertexShader.get(s));
             GL20.glLinkProgram(shaderProgram);
             GL20.glValidateProgram(shaderProgram);
 
-            _shaderPrograms.put(e.getKey(), shaderProgram);
+            _shaderPrograms.put(s, shaderProgram);
         }
     }
 

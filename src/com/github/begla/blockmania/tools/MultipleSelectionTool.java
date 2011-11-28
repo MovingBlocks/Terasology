@@ -19,8 +19,8 @@ import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.world.characters.Player;
-import javolution.util.FastList;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 /**
@@ -29,7 +29,7 @@ import java.util.logging.Level;
 public class MultipleSelectionTool implements Tool {
 
     private Player _player;
-    private FastList<BlockPosition> _vertexBlocks = new FastList<BlockPosition>();
+    private ArrayList<BlockPosition> _vertexBlocks = new ArrayList<BlockPosition>();
 
     public MultipleSelectionTool(Player player) {
         _player = player;
