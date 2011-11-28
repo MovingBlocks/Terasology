@@ -61,11 +61,11 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnLocal(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 64)
+        if (_parent.getMobManager().getActiveMobAmount() > 16)
             return false;
 
         // 25% change something will spawn locally to the portal - will get fancier later
-        boolean spawn = _random.randomBoolean() && _random.randomBoolean();
+        boolean spawn = _random.randomBoolean() && _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
             GelatinousCube s = new GelatinousCube(_parent);
             s.setSpawningPoint(new Vector3f(p.getBlockLocation().x, p.getBlockLocation().y - 1, p.getBlockLocation().z));
@@ -83,7 +83,7 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnWild(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 128)
+        if (_parent.getMobManager().getActiveMobAmount() > 16)
             return false;
 
         // 25% change something will spawn in the wild around the portal - will get fancier later

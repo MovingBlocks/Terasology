@@ -30,6 +30,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Sphere;
 
+import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
@@ -44,6 +45,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Skysphere implements RenderableObject {
+
     private static int _displayListSphere = -1;
     private static final float PI = 3.1415926f;
 
@@ -52,6 +54,7 @@ public class Skysphere implements RenderableObject {
     private Vector3f _zenithColor = new Vector3f();
 
     /* CLOUDS */
+    private static final Vector2f CLOUD_RESOLUTION = (Vector2f) ConfigurationManager.getInstance().getConfig().get("System.cloudResolution");
     private static final long CLOUD_UPDATE_INTERVAL = (Integer) ConfigurationManager.getInstance().getConfig().get("System.cloudUpdateInterval");
     private static IntBuffer _textureIds;
 
@@ -87,11 +90,11 @@ public class Skysphere implements RenderableObject {
     private void generateNewClouds() {
 
         // Generate some new clouds according to the current time
-        ByteBuffer clouds = ByteBuffer.allocateDirect(128 * 128 * 3);
+        ByteBuffer clouds = ByteBuffer.allocateDirect((int) CLOUD_RESOLUTION.x * (int) CLOUD_RESOLUTION.y * 3);
 
-        for (int i = 0; i < 128; i++) {
-            for (int j = 0; j < 128; j++) {
-                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime() * 50f, 9, 2.0, 0.73218);
+        for (int i = 0; i < (int) CLOUD_RESOLUTION.x; i++) {
+            for (int j = 0; j < (int) CLOUD_RESOLUTION.y; j++) {
+                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime() * 5f, 6, 2.0, 0.73218);
                 byte value = (byte) ((MathHelper.clamp(noise)) * 255);
 
                 clouds.put(value);
@@ -113,7 +116,7 @@ public class Skysphere implements RenderableObject {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, _cloudByteBuffer);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (int) CLOUD_RESOLUTION.x, (int) CLOUD_RESOLUTION.y, 0, GL_RGB, GL_UNSIGNED_BYTE, _cloudByteBuffer);
 
             _cloudByteBuffer = null;
         }
@@ -128,14 +131,13 @@ public class Skysphere implements RenderableObject {
 
     private void drawClouds() {
         glEnable(GL11.GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, _textureIds.get(1));
 
         glPushMatrix();
         glTranslatef(0, 8.0f, 0);
-        glScalef(256f, 1.0f, 256f);
+        glScalef(128f, 1.0f, 128f);
 
         glBegin(GL_QUADS);
 
@@ -190,11 +192,12 @@ public class Skysphere implements RenderableObject {
         // DRAW THE SKYSPHERE
         drawSphere();
 
-        ShaderManager.getInstance().enableShader(null);
         glDisable(GL13.GL_TEXTURE_CUBE_MAP);
 
+        ShaderManager.getInstance().enableShader("clouds");
         // DRAW THE CLOUDS
         drawClouds();
+        ShaderManager.getInstance().enableShader(null);
 
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);

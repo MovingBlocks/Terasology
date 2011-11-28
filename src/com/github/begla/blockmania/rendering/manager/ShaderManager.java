@@ -74,6 +74,8 @@ public class ShaderManager {
         createFragShader("block_frag.glsl", "block");
         createVertexShader("gelatinousCube_vert.glsl", "gelatinousCube");
         createFragShader("gelatinousCube_frag.glsl", "gelatinousCube");
+        createVertexShader("clouds_vert.glsl", "clouds");
+        createFragShader("clouds_frag.glsl", "clouds");
 
         for (String s : _fragmentShader.keySet()) {
             int shaderProgram = GL20.glCreateProgram();

@@ -1,21 +1,25 @@
 import org.lwjgl.opengl.DisplayMode
 import org.lwjgl.opengl.PixelFormat
+import javax.vecmath.Vector2f
 
 System {
 
     gameTitle = "Blockmania Pre Alpha"
 
+    // Size of the dynamic cloud texture
+    cloudResolution = new Vector2f(64, 64)
     // Cloud update interval in ms
-    cloudUpdateInterval = 10
+    cloudUpdateInterval = (Integer) 1000
     // Defines how often the list of chunks around the player gets updated per second
     chunkRequestsPerSecond = 8
     // Defines how many chunk update can be processed/queued each second
     chunkUpdatesPerSecond = 4
     // Defines the maximum amount of threads used for chunk generation
-    maxThreads = 4
+    maxThreads = 2
     // Enable/or disable the persisting of chunks
     saveChunks = true
 
+    // Size of the chunk cache
     chunkCacheSize = 1024
 
     Debug {
