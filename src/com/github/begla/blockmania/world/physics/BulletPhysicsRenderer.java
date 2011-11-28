@@ -79,8 +79,6 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     DiscreteDynamicsWorld _discreteDynamicsWorld;
 
-    long _lastCleanUp = 0;
-
     World _parent;
 
     public BulletPhysicsRenderer(World parent) {
@@ -187,21 +185,17 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     }
 
     private void cleanUp() {
-        if (Blockmania.getInstance().getTime() - _lastCleanUp > 100) {
+        if (_blocks.isEmpty())
+            return;
 
-            if (_blocks.isEmpty())
-                return;
+        BlockRigidBody b = _blocks.remove(0);
 
-            BlockRigidBody b = _blocks.remove(0);
-
-            if (b.isActive()) {
-                _blocks.add(b);
-                return;
-            }
-
-            _discreteDynamicsWorld.removeRigidBody(b);
-            _lastCleanUp = Blockmania.getInstance().getTime();
+        if (b.isActive() && _blocks.size() < 64) {
+            _blocks.add(b);
+            return;
         }
+
+        _discreteDynamicsWorld.removeRigidBody(b);
     }
 
     public void lightChanged(Chunk chunk, BlockPosition pos) {
@@ -213,12 +207,6 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
         }
 
         _blocks.clear();
-    }
-
-    public void explode() {
-        for (BlockRigidBody b : _blocks) {
-            b.applyCentralImpulse(new Vector3f(0, 25f, 0));
-        }
     }
 
     public void blockPlaced(Chunk chunk, BlockPosition pos) {

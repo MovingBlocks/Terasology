@@ -215,7 +215,7 @@ public final class Player extends Character {
                 Vector3f origin = blockPos.toVector3f();
 
                 int counter = 0;
-                for (int i = 0; i < 1024; i++) {
+                for (int i = 0; i < 512; i++) {
                     Vector3f direction = new Vector3f((float) _parent.getWorldProvider().getRandom().randomDouble(), (float) _parent.getWorldProvider().getRandom().randomDouble(), (float) _parent.getWorldProvider().getRandom().randomDouble());
                     direction.normalize();
 
@@ -239,7 +239,6 @@ public final class Player extends Character {
                     }
                 }
 
-                _parent.getRigidBlocksRenderer().explode();
                 AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
             }
         }

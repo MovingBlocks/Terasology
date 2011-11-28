@@ -13,7 +13,7 @@ System {
     // Cloud update interval in ms
     cloudUpdateInterval = (Integer) 1000
     // Defines the maximum amount of threads used for chunk generation
-    maxThreads = 2
+    maxThreads = 4
     // Enable/or disable the persisting of chunks
     saveChunks = true
 
