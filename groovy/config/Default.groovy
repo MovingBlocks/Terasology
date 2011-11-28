@@ -6,14 +6,12 @@ System {
 
     gameTitle = "Blockmania Pre Alpha"
 
+    // Max amount of particles
+    maxParticles = 128
     // Size of the dynamic cloud texture
     cloudResolution = new Vector2f(64, 64)
     // Cloud update interval in ms
     cloudUpdateInterval = (Integer) 1000
-    // Defines how often the list of chunks around the player gets updated per second
-    chunkRequestsPerSecond = 8
-    // Defines how many chunk update can be processed/queued each second
-    chunkUpdatesPerSecond = 4
     // Defines the maximum amount of threads used for chunk generation
     maxThreads = 2
     // Enable/or disable the persisting of chunks

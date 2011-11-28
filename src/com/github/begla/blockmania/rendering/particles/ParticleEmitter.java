@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.rendering.particles;
 
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.world.main.World;
 import org.lwjgl.opengl.GL11;
@@ -31,7 +32,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public abstract class ParticleEmitter implements RenderableObject {
 
-    protected static final int MAX_PARTICLES = 512;
+    protected static final int MAX_PARTICLES = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxParticles");;
     protected static final int PARTICLES_PER_UPDATE = 16;
     /* ------- */
     protected int _particlesToEmit;
@@ -83,7 +84,7 @@ public abstract class ParticleEmitter implements RenderableObject {
 
     protected void emitParticles() {
         for (int i = 0; i < PARTICLES_PER_UPDATE && _particlesToEmit > 0; i++) {
-            _particles.add(createParticle());
+            _particles.add(0, createParticle());
             _particlesToEmit--;
         }
     }

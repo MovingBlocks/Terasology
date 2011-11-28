@@ -265,7 +265,7 @@ public final class Player extends Character {
                 }
 
                 _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
-                _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
+                _parent.getBlockParticleEmitter().emitParticles(128, currentBlockType);
                 AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
 
                 if (createPhysBlock && !BlockManager.getInstance().getBlock(currentBlockType).isTranslucent()) {

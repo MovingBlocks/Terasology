@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.world.main.World;

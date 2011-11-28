@@ -35,11 +35,9 @@ public final class ChunkUpdateManager implements BlockObserver {
 
     /* CONST */
     private static final int MAX_THREADS = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxThreads");
-    private static final long UPDATE_GAP = 1000 / (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkUpdatesPerSecond");
 
     /* CHUNK UPDATES */
     private static final HashSet<Chunk> _currentlyProcessedChunks = new HashSet<Chunk>();
-    private long _lastChunkUpdate = Blockmania.getInstance().getTime();
 
     /* STATISTICS */
     private double _averageUpdateDuration = 0.0;
@@ -54,34 +52,11 @@ public final class ChunkUpdateManager implements BlockObserver {
     public boolean queueChunkUpdate(Chunk chunk, final UPDATE_TYPE type) {
         final Chunk chunkToProcess = chunk;
 
-        if ((Blockmania.getInstance().getTime() - _lastChunkUpdate < UPDATE_GAP) && type == UPDATE_TYPE.DEFAULT) {
-            return false;
-        }
-
-        _lastChunkUpdate = Blockmania.getInstance().getTime();
-
         if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < MAX_THREADS || type != UPDATE_TYPE.DEFAULT)) {
-            boolean processed = false;
-
-            // Order the update of center chunks and its neighbor
-            if (type == UPDATE_TYPE.PLAYER_PLACED) {
-                processed = true;
+            if (type != UPDATE_TYPE.DEFAULT)
+                chunk.processChunk();
+            else
                 executeChunkUpdate(chunk);
-
-                Chunk[] cs = chunkToProcess.loadOrCreateNeighbors();
-                for (Chunk nc : cs) {
-                    executeChunkUpdate(nc);
-                }
-            } else if (type == UPDATE_TYPE.PLAYER_REMOVED) {
-                Chunk[] cs = chunkToProcess.loadOrCreateNeighbors();
-                for (Chunk nc : cs) {
-                    executeChunkUpdate(nc);
-                }
-            }
-
-            if (!processed)
-                executeChunkUpdate(chunk);
-
             return true;
         }
 

@@ -54,8 +54,6 @@ import static org.lwjgl.opengl.GL11.glColorMask;
  */
 public final class World implements RenderableObject {
 
-    private static final long UPDATE_GAP = 1000 / (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkRequestsPerSecond");
-
     /* WORLD PROVIDER */
     private WorldProvider _worldProvider;
 
@@ -64,7 +62,6 @@ public final class World implements RenderableObject {
 
     /* CHUNKS */
     private ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>(), _visibleChunks = new ArrayList<Chunk>();
-    private long _lastChunkUpdate = Blockmania.getInstance().getTime();
 
     /* CORE GAME OBJECTS */
     private PortalManager _portalManager;
@@ -118,11 +115,6 @@ public final class World implements RenderableObject {
      * @return True if the list was changed
      */
     private boolean updateChunksInProximity() {
-        if ((Blockmania.getInstance().getTime() - _lastChunkUpdate < UPDATE_GAP)) {
-            return false;
-        }
-
-        _lastChunkUpdate = Blockmania.getInstance().getTime();
         _chunksInProximity.clear();
 
         int viewingDistanceX = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX");

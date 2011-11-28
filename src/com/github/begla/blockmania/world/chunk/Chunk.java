@@ -701,9 +701,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     private void swapActiveMesh() {
-        if (isDirty() || isFresh() || isLightDirty())
-            return;
-
         synchronized (this) {
             if (_disposed)
                 return;
