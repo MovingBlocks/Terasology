@@ -29,8 +29,8 @@ System {
 
         chunkOutlines = false
 
-        demoFlight = true
-        godMode = true
+        demoFlight = false
+        godMode = false
 
     }
 }
