@@ -110,7 +110,7 @@ public final class Player extends Character {
         if (!((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode"))) {
             _firstPersonCamera.getViewingDirection().set(getViewingDirection());
         } else {
-            Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z + 128);
+            Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z - 128);
             _firstPersonCamera.getViewingDirection().sub(viewingTarget, getPosition());
         }
     }
@@ -118,7 +118,7 @@ public final class Player extends Character {
     public void updatePosition() {
         // DEMO MODE
         if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode")) {
-            getPosition().z += (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
+            getPosition().z -= 0.2f;
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 

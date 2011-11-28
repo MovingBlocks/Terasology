@@ -15,7 +15,7 @@ System {
     // Cloud update interval in ms
     cloudUpdateInterval = (Integer) 1000
     // Defines the maximum amount of threads used for chunk generation
-    maxThreads = 4
+    maxThreads = Runtime.getRuntime().availableProcessors() <= 2 ? 1 : 2;
     // Enable/or disable the persisting of chunks
     saveChunks = true
 
@@ -29,8 +29,8 @@ System {
 
         chunkOutlines = false
 
-        demoFlight = false
-        godMode = false
+        demoFlight = true
+        godMode = true
 
     }
 }
