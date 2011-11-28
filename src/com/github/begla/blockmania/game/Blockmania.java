@@ -60,7 +60,7 @@ import static org.lwjgl.opengl.GL11.*;
 public final class Blockmania {
 
     /* THREADING */
-    private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(32);
+    private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
 
     /* CONST */
     private static final int FRAME_SKIP_MAX_FRAMES = 10;
