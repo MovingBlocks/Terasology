@@ -54,6 +54,8 @@ import static org.lwjgl.opengl.GL11.glColorMask;
  */
 public final class World implements RenderableObject {
 
+    private static final int MAX_CHUNK_UPDATES_PER_ITERATION = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxChunkUpdatesPerIteration");
+
     /* WORLD PROVIDER */
     private WorldProvider _worldProvider;
 
@@ -316,6 +318,7 @@ public final class World implements RenderableObject {
 
         _bulletPhysicsRenderer.update();
 
+        int updateCounter = 0;
         // Update visible chunks
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
@@ -326,10 +329,16 @@ public final class World implements RenderableObject {
                         continue;
                     }
 
-                    break;
+                    continue;
                 }
 
-                c.update();
+                if (updateCounter < MAX_CHUNK_UPDATES_PER_ITERATION) {
+                    if (c.generateVBOs()) {
+                        updateCounter++;
+                    }
+
+                    c.update();
+                }
             }
         }
 

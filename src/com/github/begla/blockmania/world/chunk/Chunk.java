@@ -675,15 +675,20 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         GL11.glPopMatrix();
     }
 
-    public void update() {
+    public boolean generateVBOs() {
         if (_newMesh != null) {
-            _newMesh.generateVBOs();
+            return _newMesh.generateVBOs();
         }
 
-        swapActiveMesh();
+        return false;
     }
 
     public void render() {
+
+    }
+
+    public void update() {
+        swapActiveMesh();
     }
 
     private void setNewMesh(ChunkMesh newMesh) {
@@ -700,14 +705,14 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
     }
 
-    private void swapActiveMesh() {
+    private boolean swapActiveMesh() {
         synchronized (this) {
             if (_disposed)
-                return;
+                return false;
 
             if (_newMesh != null) {
                 if (_newMesh.isDisposed() || !_newMesh.isGenerated())
-                    return;
+                    return false;
 
                 ChunkMesh newMesh = _newMesh;
                 _newMesh = null;
@@ -717,8 +722,12 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
                 if (oldActiveMesh != null)
                     oldActiveMesh.dispose();
+
+                return true;
             }
         }
+
+        return false;
     }
 
     /**

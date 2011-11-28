@@ -6,6 +6,8 @@ System {
 
     gameTitle = "Blockmania Pre Alpha"
 
+    // Maximum amount of chunk updates per iteration
+    maxChunkUpdatesPerIteration = 2
     // Max amount of particles
     maxParticles = 128
     // Size of the dynamic cloud texture
