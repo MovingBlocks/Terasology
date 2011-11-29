@@ -46,8 +46,8 @@ Graphics {
 
     fov = 64.0d
 
-    viewingDistanceX = 25
-    viewingDistanceZ = 25
+    viewingDistanceX = 28
+    viewingDistanceZ = 28
 
 }
 

@@ -35,8 +35,8 @@ import java.nio.ByteBuffer;
  */
 public final class ChunkMeshGenerator {
 
-    private static final Double OCCLUSION_INTENS_DEFAULT = (Double) ConfigurationManager.getInstance().getConfig().get("Lighting.occlusionIntensDefault");
-    private static final Double OCCLUSION_INTENS_BILLBOARDS = (Double) ConfigurationManager.getInstance().getConfig().get("Lighting.occlusionIntensBillboards");
+    private static final double OCCLUSION_INTENS_DEFAULT = (Double) ConfigurationManager.getInstance().getConfig().get("Lighting.occlusionIntensDefault");
+    private static final double OCCLUSION_INTENS_BILLBOARDS = (Double) ConfigurationManager.getInstance().getConfig().get("Lighting.occlusionIntensBillboards");
 
     private final Chunk _chunk;
     private static int _statVertexArrayUpdateCount = 0;

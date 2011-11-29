@@ -18,7 +18,7 @@ bm.addBlock(new Block().withTitle("Bookshelf").withId((byte) 27).withTextureAtla
 // Liquids
 bm.addBlock(new Block().withTitle("Water").withId((byte) 9).withTextureAtlasPos(new Vector2f(15, 12)).withTranslucent(true).withPenetrable(true).withRenderBoundingBox(false).withHardness((byte) -1).withAllowBlockAttachment(false).withBypassSelectionRay(true).withCastsShadows(false).withLiquid(true).withBlockForm(BLOCK_FORM.LOWERED_BLOCK))
 
-bm.addBlock(new Block().withTitle("Lava").withId((byte) 10).withTextureAtlasPos(new Vector2f(15, 15)).withTranslucent(true).withPenetrable(true).withRenderBoundingBox(false).withHardness((byte) -1).withAllowBlockAttachment(false).withBypassSelectionRay(true).withCastsShadows(false).withLiquid(true).withBlockForm(BLOCK_FORM.LOWERED_BLOCK))
+bm.addBlock(new Block().withTitle("Lava").withId((byte) 10).withTextureAtlasPos(new Vector2f(15, 15)).withTranslucent(true).withPenetrable(true).withRenderBoundingBox(false).withHardness((byte) -1).withAllowBlockAttachment(false).withBypassSelectionRay(true).withCastsShadows(false).withLiquid(true).withBlockForm(BLOCK_FORM.LOWERED_BLOCK).withLuminance((byte) 8))
 // <--
 
 // Ice

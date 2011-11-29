@@ -61,7 +61,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     protected LocalWorldProvider _parent;
     /* ------ */
     protected final BlockmaniaArray _blocks;
-    protected final BlockmaniaSmartArray _sunlight, _light;
+    protected final BlockmaniaSmartArray _sunlight, _light, _states;
     /* ------ */
     private ChunkMesh _activeMesh;
     private ChunkMesh _newMesh;
@@ -99,6 +99,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         _blocks = new BlockmaniaArray(getChunkDimensionX(), getChunkDimensionY(), getChunkDimensionZ());
         _sunlight = new BlockmaniaSmartArray(getChunkDimensionX(), getChunkDimensionY(), getChunkDimensionZ());
         _light = new BlockmaniaSmartArray(getChunkDimensionX(), getChunkDimensionY(), getChunkDimensionZ());
+        _states = new BlockmaniaSmartArray(getChunkDimensionX(), getChunkDimensionY(), getChunkDimensionZ());
 
         _lightDirty = true;
         _dirty = true;
@@ -444,6 +445,18 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return 0;
     }
 
+    /**
+     * Returns the state at a given local block position.
+     *
+     * @param x Local block position on the x-axis
+     * @param y Local block position on the y-axis
+     * @param z Local block position on the z-axis
+     * @return The block type
+     */
+    public byte getState(int x, int y, int z) {
+        return _states.get(x, y, z);
+    }
+
     public boolean canBlockSeeTheSky(int x, int y, int z) {
         for (int y1 = y; y1 < getChunkDimensionY(); y1++) {
             if (!BlockManager.getInstance().getBlock(getBlock(x, y1, z)).isTranslucent())
@@ -471,6 +484,18 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             // Mark the neighbors as dirty
             markNeighborsDirty(x, z);
         }
+    }
+
+    /**
+     * Sets the state value at the given position.
+     *
+     * @param x    Local block position on the x-axis
+     * @param y    Local block position on the y-axis
+     * @param z    Local block position on the z-axis
+     * @param type The block type
+     */
+    public void setState(int x, int y, int z, byte type) {
+        _states.set(x, y, z, type);
     }
 
     /**
@@ -623,6 +648,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         for (int i = 0; i < _light.sizePacked(); i++)
             out.writeByte(_light.getRawByte(i));
+
+        for (int i = 0; i < _states.sizePacked(); i++)
+            out.writeByte(_states.getRawByte(i));
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
@@ -642,6 +670,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         for (int i = 0; i < _light.sizePacked(); i++)
             _light.setRawByte(i, in.readByte());
+
+        for (int i = 0; i < _states.sizePacked(); i++)
+            _states.setRawByte(i, in.readByte());
 
         _fresh = false;
         _dirty = true;

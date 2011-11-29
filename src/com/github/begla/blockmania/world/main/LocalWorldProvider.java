@@ -17,14 +17,16 @@ package com.github.begla.blockmania.world.main;
 
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
+import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.GeneratorManager;
-import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
-import com.github.begla.blockmania.world.interfaces.ChunkProvider;
 import com.github.begla.blockmania.world.chunk.LocalChunkCache;
+import com.github.begla.blockmania.world.interfaces.ChunkProvider;
+import com.github.begla.blockmania.world.simulators.LiquidSimulator;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -58,6 +60,9 @@ public class LocalWorldProvider implements WorldProvider {
     protected String _title, _seed;
     protected long _creationTime = Blockmania.getInstance().getTime() - (Long) ConfigurationManager.getInstance().getConfig().get("World.initialTimeOffsetInMs");
     public Vector3f _renderingReferencePoint = new Vector3f();
+
+    /* SIMULATORS */
+    private LiquidSimulator _liquidSimulator;
 
     /* RANDOMNESS */
     protected final FastRandom _random;
@@ -93,6 +98,7 @@ public class LocalWorldProvider implements WorldProvider {
 
         _generatorManager = new GeneratorManager(this);
         _chunkProvider = new LocalChunkCache(this);
+        _liquidSimulator = new LiquidSimulator(this);
     }
 
     /**
@@ -103,11 +109,11 @@ public class LocalWorldProvider implements WorldProvider {
      * @param y           The Y-coordinate
      * @param z           The Z-coordinate
      * @param type        The type of the block to set
-     * @param updateLight If set the affected chunk is queued for updating
+     * @param updateLight
      * @param overwrite   If true currently present blocks get replaced
      * @return True if a block was set/replaced
      */
-    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
+    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean simulate, boolean overwrite) {
         int chunkPosX = MathHelper.calcChunkPosX(x);
         int chunkPosZ = MathHelper.calcChunkPosZ(z);
 
@@ -129,6 +135,14 @@ public class LocalWorldProvider implements WorldProvider {
                 newBlock = type;
             } else {
                 return false;
+            }
+
+            /* LIQUID SIMULATION */
+            if (BlockManager.getInstance().getBlock(newBlock).isLiquid()) {
+                c.setState(blockPosX, y, blockPosZ, (byte) 7);
+
+                if (simulate)
+                    _liquidSimulator.addBlockPosition(new BlockPosition(c.getBlockWorldPosX(blockPosX), y, c.getBlockWorldPosZ(blockPosZ)));
             }
 
             if (updateLight) {
@@ -171,6 +185,17 @@ public class LocalWorldProvider implements WorldProvider {
         return true;
     }
 
+    public void setState(int x, int y, int z, byte state) {
+        int chunkPosX = MathHelper.calcChunkPosX(x);
+        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+
+        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        c.setState(blockPosX, y, blockPosZ, state);
+    }
+
     /**
      * Returns the block value at the given position.
      *
@@ -180,7 +205,6 @@ public class LocalWorldProvider implements WorldProvider {
     public final byte getBlockAtPosition(Vector3f pos) {
         return getBlock((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)));
     }
-
 
     /**
      * Returns the light value at the given position.
@@ -210,6 +234,17 @@ public class LocalWorldProvider implements WorldProvider {
 
         Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         return c.getBlock(blockPosX, y, blockPosZ);
+    }
+
+    public byte getState(int x, int y, int z) {
+        int chunkPosX = MathHelper.calcChunkPosX(x);
+        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+
+        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        return c.getState(blockPosX, y, blockPosZ);
     }
 
     /**
@@ -288,6 +323,10 @@ public class LocalWorldProvider implements WorldProvider {
         getChunkProvider().dispose();
     }
 
+    public void simulate() {
+        _liquidSimulator.simulate();
+    }
+
     /**
      * Returns the humidity at the given position.
      *
@@ -320,6 +359,7 @@ public class LocalWorldProvider implements WorldProvider {
     public String getWorldSavePath() {
         return String.format("SAVED_WORLDS/%s", _title);
     }
+
     public void setTime(double time) {
         _creationTime = Blockmania.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
     }
@@ -462,4 +502,6 @@ public class LocalWorldProvider implements WorldProvider {
         Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
     }
+
+
 }

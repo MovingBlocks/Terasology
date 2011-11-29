@@ -314,7 +314,6 @@ public abstract class MovableEntity extends Entity {
         double gravitySwimming = (Double) ConfigurationManager.getInstance().getConfig().get("Player.gravitySwimming");
         double gravity = (Double) ConfigurationManager.getInstance().getConfig().get("Player.gravity");
 
-
         // Normal gravity
         if (_gravity > -maxGravity && !_godMode && !_isSwimming) {
             _gravity -= gravity;

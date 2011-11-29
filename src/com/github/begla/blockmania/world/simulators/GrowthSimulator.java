@@ -13,28 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.generators;
+package com.github.begla.blockmania.world.simulators;
 
-import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.utilities.FastRandom;
-
-import java.util.Random;
+import com.github.begla.blockmania.world.main.WorldProvider;
 
 /**
- * Cactus generator.
+ * TODO
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class TreeGeneratorCactus extends TreeGenerator {
+public class GrowthSimulator extends Simulator{
 
-    TreeGeneratorCactus(GeneratorManager m) {
-        super(m);
+    public GrowthSimulator(WorldProvider parent) {
+        super(parent);
     }
 
     @Override
-    public void generate(FastRandom rand, int posX, int posY, int posZ, boolean update) {
-        for (int y = posY; y < posY + 3; y++) {
-            _generatorManager.getParent().setBlock(posX, y, posZ, BlockManager.getInstance().getBlock("Cactus").getId(), update, false, true);
-        }
+    public void simulate() {
+       // Nothing yet
     }
 }

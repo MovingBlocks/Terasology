@@ -48,6 +48,11 @@ import java.util.logging.Level;
  */
 public final class Player extends Character {
 
+    private static final double MOUSE_SENS = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
+    private static final boolean DEMO_FLIGHT = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight");
+    private static final boolean GOD_MODE = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
+    private static final double WALKING_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
+
     /* OBSERVERS */
     private ArrayList<BlockObserver> _observers = new ArrayList<BlockObserver>();
 
@@ -68,10 +73,8 @@ public final class Player extends Character {
     }
 
     public void update() {
-        _godMode = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
-        _walkingSpeed = (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed") + Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.005f, 2.0f));
-        _runningFactor = (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor");
-        _jumpIntensity = (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity");
+        _godMode = GOD_MODE;
+        _walkingSpeed = WALKING_SPEED + Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.005f, 2.0f));
 
         updateCameras();
         super.update();
@@ -99,7 +102,7 @@ public final class Player extends Character {
     public void updateCameras() {
         _firstPersonCamera.getPosition().set(calcEyeOffset());
 
-        if (!((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode"))) {
+        if (!GOD_MODE) {
             _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.0f));
             _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f, 2.75f));
         } else {
@@ -107,7 +110,7 @@ public final class Player extends Character {
             _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);
         }
 
-        if (!((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode"))) {
+        if (!(DEMO_FLIGHT && GOD_MODE)) {
             _firstPersonCamera.getViewingDirection().set(getViewingDirection());
         } else {
             Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z - 128);
@@ -117,7 +120,7 @@ public final class Player extends Character {
 
     public void updatePosition() {
         // DEMO MODE
-        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight") && (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode")) {
+        if (DEMO_FLIGHT && GOD_MODE) {
             getPosition().z -= 0.2f;
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
@@ -197,7 +200,7 @@ public final class Player extends Character {
                     return;
                 }
 
-                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, false);
+                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, true, false);
                 AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
 
                 int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
@@ -229,7 +232,7 @@ public final class Player extends Character {
                         byte currentBlockType = getParent().getWorldProvider().getBlock((int) target.x, (int) target.y, (int) target.z);
 
                         if (currentBlockType != 0x0) {
-                            getParent().getWorldProvider().setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, true);
+                            getParent().getWorldProvider().setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, false, true);
 
                             if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent() && counter % 4 == 0)
                                 _parent.getRigidBlocksRenderer().addBlock(target, currentBlockType);
@@ -255,12 +258,12 @@ public final class Player extends Character {
             if (is != null) {
                 BlockPosition blockPos = is.getBlockPosition();
                 byte currentBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y, blockPos.z);
-                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, true);
+                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, false, true);
 
                 // Remove the upper block if it's a billboard
                 byte upperBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y + 1, blockPos.z);
                 if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                    getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y + 1, blockPos.z, (byte) 0x0, true, true);
+                    getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y + 1, blockPos.z, (byte) 0x0, true, false, true);
                 }
 
                 _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
@@ -384,10 +387,8 @@ public final class Player extends Character {
         double dx = Mouse.getDX();
         double dy = Mouse.getDY();
 
-        double mouseSens = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
-
-        yaw(dx * mouseSens);
-        pitch(dy * mouseSens);
+        yaw(dx * MOUSE_SENS);
+        pitch(dy * MOUSE_SENS);
 
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
             walkForward();

@@ -39,16 +39,16 @@ void main()
     for (int i=0; i < 5; i++) {
        if (gl_TexCoord[0].x >= grassCoordinates[i].x && gl_TexCoord[0].x < grassCoordinates[i].y && gl_TexCoord[0].y >= grassCoordinates[i].z && gl_TexCoord[0].y < grassCoordinates[i].w) {
            if (gl_TexCoord[0].y < grassCoordinates[i].w - 0.0625 / 2) {
-               vertexPos.x += sin(tick*0.05 + vertexPos.x) * 0.2;
-               vertexPos.y += cos(tick*0.01 + vertexPos.x) * 0.15;
+               vertexPos.x += sin(tick*0.05 + vertexPos.x + 1.437291) * 0.2;
+               vertexPos.y += sin(tick*0.01 + vertexPos.x) * 0.15;
            }
        }
    }
 
    if (gl_TexCoord[0].x >= waterCoordinate.x && gl_TexCoord[0].x < waterCoordinate.y && gl_TexCoord[0].y >= waterCoordinate.z && gl_TexCoord[0].y < waterCoordinate.w) {
-        vertexPos.y += cos(tick*0.1 + vertexPos.x) * 0.05;
+        vertexPos.y += sin(tick*0.1 + vertexPos.x) * 0.05;
     } else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.y && gl_TexCoord[0].y >= lavaCoordinate.z && gl_TexCoord[0].y < lavaCoordinate.w) {
-        vertexPos.y += cos(tick*0.1 + vertexPos.x) * 0.05;
+        vertexPos.y += sin(tick*0.1 + vertexPos.x) * 0.05;
     }
 
     gl_Position = vertexPos;

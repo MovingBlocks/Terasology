@@ -33,6 +33,7 @@ import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.entity.Entity;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import com.github.begla.blockmania.world.physics.BulletPhysicsRenderer;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
 
@@ -54,6 +55,7 @@ import static org.lwjgl.opengl.GL11.glColorMask;
  */
 public final class World implements RenderableObject {
 
+    private static final int MAX_VDIST_IN_BLOCKS = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX") * 8;
     private static final int MAX_CHUNK_UPDATES_PER_ITERATION = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxChunkUpdatesPerIteration");
 
     /* WORLD PROVIDER */
@@ -91,6 +93,9 @@ public final class World implements RenderableObject {
 
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
+
+    /* SIMULATION */
+    private long _lastSimulationStep = Blockmania.getInstance().getTime();
 
     /**
      * Initializes a new (local) world for the single player mode.
@@ -139,7 +144,7 @@ public final class World implements RenderableObject {
 
         float distLength = dist.length();
 
-        return distLength < Math.max((Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX"), (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ")) * 8.0;
+        return distLength < MAX_VDIST_IN_BLOCKS;
     }
 
     /**
@@ -221,10 +226,24 @@ public final class World implements RenderableObject {
     private void renderChunksAndEntities() {
 
         ShaderManager.getInstance().enableShader("chunk");
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE1);
+        TextureManager.getInstance().bindTexture("custom_lava_still");
+        GL13.glActiveTexture(GL13.GL_TEXTURE2);
+        TextureManager.getInstance().bindTexture("custom_water_still");
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("terrain");
 
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
         int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
+
+        int lavaTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureLava");
+        int waterTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureWater");
+        int textureAtlas = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureAtlas");
+        GL20.glUniform1i(lavaTexture, 1);
+        GL20.glUniform1i(waterTexture, 2);
+        GL20.glUniform1i(textureAtlas, 0);
+
         int tick = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "tick");
 
         GL20.glUniform1f(tick, _tick);
@@ -236,6 +255,7 @@ public final class World implements RenderableObject {
             Chunk c = _visibleChunks.get(i);
 
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
+            c.render(ChunkMesh.RENDER_TYPE.LAVA);
 
             if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
                 c.getAABB().render();
@@ -243,29 +263,20 @@ public final class World implements RenderableObject {
         }
 
         ShaderManager.getInstance().enableShader(null);
+
         _mobManager.renderAll();
 
         ShaderManager.getInstance().enableShader("block");
         _bulletPhysicsRenderer.render();
         ShaderManager.getInstance().enableShader("chunk");
-
-        // ANIMATED LAVA
-        TextureManager.getInstance().bindTexture("custom_lava_still");
-
-        for (int i = 0; i < _visibleChunks.size(); i++) {
-            Chunk c = _visibleChunks.get(i);
-            c.render(ChunkMesh.RENDER_TYPE.LAVA);
-        }
-
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("terrain");
 
-        // BILLBOARDS AND TRANSLUCENT ELEMENTS
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
+
             c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
         }
-
-        TextureManager.getInstance().bindTexture("custom_water_still");
 
         for (int j = 0; j < 2; j++) {
             // ANIMATED WATER
@@ -353,6 +364,12 @@ public final class World implements RenderableObject {
 
         // Does nothing at the moment
         //_blockGrid.update();
+
+        /* SIMULATE! */
+        if (Blockmania.getInstance().getTime() - _lastSimulationStep > 1000) {
+            _worldProvider.simulate();
+            _lastSimulationStep = Blockmania.getInstance().getTime();
+        }
     }
 
     /**
@@ -443,7 +460,7 @@ public final class World implements RenderableObject {
             // the y is hard coded because it always gets set to 32, deep underground
             Vector3f loc = new Vector3f(_player.getPosition().x - 4, _player.getPosition().y + 8, _player.getPosition().z);
             Blockmania.getInstance().getLogger().log(Level.INFO, "Portal location is" + loc);
-            _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, (byte) 30, false, true);
+            _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, (byte) 30, false, false, true);
             _portalManager.addPortal(loc);
         }
     }

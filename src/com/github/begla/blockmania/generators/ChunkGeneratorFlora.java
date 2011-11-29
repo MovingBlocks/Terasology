@@ -26,6 +26,12 @@ import com.github.begla.blockmania.world.chunk.Chunk;
  */
 public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
+    private static final double DESERT_GRASS_DENSITY = (Double) ConfigurationManager.getInstance().getConfig().get("World.Biomes.Desert.grassDensity");
+    private static final double FOREST_GRASS_DENSITY = (Double) ConfigurationManager.getInstance().getConfig().get("World.Biomes.Forest.grassDensity");
+    private static final double PLAINS_GRASS_DENSITY = (Double) ConfigurationManager.getInstance().getConfig().get("World.Biomes.Plains.grassDensity");
+    private static final double SNOW_GRASS_DENSITY = (Double) ConfigurationManager.getInstance().getConfig().get("World.Biomes.Snow.grassDensity");
+    private static final double MOUNTAINS_GRASS_DENSITY = (Double) ConfigurationManager.getInstance().getConfig().get("World.Biomes.Mountains.grassDensity");
+
     public ChunkGeneratorFlora(GeneratorManager generatorManager) {
         super(generatorManager);
     }
@@ -82,19 +88,19 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
             switch (biome) {
                 case PLAINS:
-                    grassProb = 1.0 - (Double) ConfigurationManager.getInstance().getConfig().get("World.Biomes.Plains.grassDensity");
+                    grassProb = 1.0 - PLAINS_GRASS_DENSITY;
                     break;
                 case MOUNTAINS:
-                    grassProb = 1.0 - (Double) ConfigurationManager.getInstance().getConfig().get("World.Biomes.Mountains.grassDensity");
+                    grassProb = 1.0 - MOUNTAINS_GRASS_DENSITY;
                     break;
                 case FOREST:
-                    grassProb = 1.0 - (Double) ConfigurationManager.getInstance().getConfig().get("World.Biomes.Forest.grassDensity");
+                    grassProb = 1.0 - FOREST_GRASS_DENSITY;
                     break;
                 case SNOW:
-                    grassProb = 1.0 - (Double) ConfigurationManager.getInstance().getConfig().get("World.Biomes.Snow.grassDensity");
+                    grassProb = 1.0 - SNOW_GRASS_DENSITY;
                     break;
                 case DESERT:
-                    grassProb = 1.0 - (Double) ConfigurationManager.getInstance().getConfig().get("World.Biomes.Desert.grassDensity");
+                    grassProb = 1.0 - DESERT_GRASS_DENSITY;
                     break;
             }
 
@@ -128,16 +134,13 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
     /**
      * Generates a tree on the given chunk.
      *
-     * @param c The chunk
+     * @param c    The chunk
      * @param type The biome type
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
+     * @param x    Position on the x-axis
+     * @param y    Position on the y-axis
+     * @param z    Position on the z-axis
      */
     private void generateTree(Chunk c, BIOME_TYPE type, int x, int y, int z) {
-        if (!c.canBlockSeeTheSky(x, y + 1, z))
-            return;
-
         int randomGeneratorId = 0;
         int size = _parent.getTreeGenerators(type).size();
 

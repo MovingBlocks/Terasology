@@ -1,6 +1,8 @@
 #version 120
 
 uniform sampler2D textureAtlas;
+uniform sampler2D textureWater;
+uniform sampler2D textureLava;
 
 uniform float tick;
 
@@ -30,6 +32,7 @@ void main(){
     vec4 texCoord = gl_TexCoord[0];
 
     float daylightTrans = pow(0.86, (1.0-daylight)*15.0);
+    vec4 color;
 
     if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.y && texCoord.y >= waterCoordinate.z && texCoord.y < waterCoordinate.w) {
         texCoord.x -= waterCoordinate.x;
@@ -39,6 +42,8 @@ void main(){
         texCoord.y /= 64;
 
         texCoord.y += mod(tick,48) * 1/64;
+
+        color = texture2D(textureWater, vec2(texCoord));
     } else if (texCoord.x >= lavaCoordinate.x && texCoord.x < lavaCoordinate.y && texCoord.y >= lavaCoordinate.z && texCoord.y < lavaCoordinate.w) {
         texCoord.x -= lavaCoordinate.x;
         texCoord.x *= 16;
@@ -47,9 +52,13 @@ void main(){
         texCoord.y /= 128;
 
         texCoord.y += mod(tick,100) * 1/128;
+
+        color = texture2D(textureLava, vec2(texCoord));
+    } else {
+        color = texture2D(textureAtlas, vec2(texCoord));
     }
 
-    vec4 color = texture2D(textureAtlas, vec2(texCoord));
+
     color = srgbToLinear(color);
 
     if (color.a < 0.1)

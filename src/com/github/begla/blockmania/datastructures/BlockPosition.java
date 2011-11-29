@@ -26,10 +26,14 @@ import javax.vecmath.Vector3f;
  */
 public final class BlockPosition implements Comparable<BlockPosition> {
 
-    public final int x;
-    public final int y;
-    public final int z;
+    public int x;
+    public int y;
+    public int z;
     private Vector3f _origin;
+
+    public BlockPosition() {
+
+    }
 
     public BlockPosition(Vector3f v) {
         this.x = (int) v.x;

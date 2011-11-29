@@ -38,11 +38,20 @@ public interface WorldProvider {
      * @param y           The Y-coordinate
      * @param z           The Z-coordinate
      * @param type        The type of the block to set
-     * @param updateLight If set the affected chunk is queued for updating
+     * @param updateLight
      * @param overwrite   If true currently present blocks get replaced
      * @return True if a block was set/replaced
      */
-    public boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite);
+    public boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean simulate, boolean overwrite);
+
+    /**
+     * Sets the given state at the given position.
+     *
+     * @param x The X-coordinate
+     * @param y The Y-coordinate
+     * @param z The Z-coordinate
+     */
+    public void setState(int x, int y, int z, byte state);
 
     /**
      * Returns the block at the given position.
@@ -53,6 +62,16 @@ public interface WorldProvider {
      * @return The type of the block
      */
     public byte getBlock(int x, int y, int z);
+
+    /**
+     * Returns the state at the given position.
+     *
+     * @param x The X-coordinate
+     * @param y The Y-coordinate
+     * @param z The Z-coordinate
+     * @return The type of the block
+     */
+    public byte getState(int x, int y, int z);
 
     /**
      * Returns the light value at the given position.
@@ -183,4 +202,9 @@ public interface WorldProvider {
      * Disposes this world provider.
      */
     public void dispose();
+
+    /**
+     * Simulates changes of the environment.
+     */
+    public void simulate();
 }

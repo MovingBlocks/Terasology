@@ -35,9 +35,10 @@ import java.util.logging.Level;
  */
 public final class LocalChunkCache implements ChunkProvider {
 
-    private static boolean _running = false;
-
+    private static final boolean SAVE_CHUNKS = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.saveChunks");
     private static final int CACHE_SIZE = (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkCacheSize");
+
+    private static boolean _running = false;
 
     private final ConcurrentHashMap<Integer, Chunk> _chunkCache = new ConcurrentHashMap<Integer, Chunk>();
     private final LocalWorldProvider _parent;
@@ -146,8 +147,8 @@ public final class LocalChunkCache implements ChunkProvider {
      *
      * @param c The chunk to save
      */
-    private void writeChunkToDisk(Chunk c) {
-        if (c.isFresh() || !(Boolean) ConfigurationManager.getInstance().getConfig().get("System.saveChunks")) {
+    private synchronized void writeChunkToDisk(Chunk c) {
+        if (c.isFresh() || !SAVE_CHUNKS) {
             return;
         }
 
@@ -178,7 +179,7 @@ public final class LocalChunkCache implements ChunkProvider {
      * @param chunkPos The position of the chunk
      * @return The loaded chunk, null if none was found
      */
-    private Chunk loadChunkFromDisk(Vector3f chunkPos) {
+    private synchronized Chunk loadChunkFromDisk(Vector3f chunkPos) {
         File f = new File(_parent.getWorldSavePath() + "/" + Chunk.getChunkSavePathForPosition(chunkPos) + "/" + Chunk.getChunkFileNameForPosition(chunkPos));
 
         if (!f.exists())
