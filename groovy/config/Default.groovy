@@ -51,7 +51,7 @@ Graphics {
 
     aspectRatio = 16.0d / 9.0d
 
-    fullscreen = true;
+    fullscreen = false
 
     fov = 64.0d
 
