@@ -7,15 +7,20 @@ System {
     gameTitle = "Blockmania Pre Alpha"
 
     // Maximum amount of chunk updates per iteration
-    maxChunkUpdatesPerIteration = 2
+    maxChunkUpdatesPerIteration = 1
+
     // Max amount of particles
     maxParticles = 128
+
     // Size of the dynamic cloud texture
     cloudResolution = new Vector2f(64, 64)
+
     // Cloud update interval in ms
     cloudUpdateInterval = (Integer) 1000
+
     // Defines the maximum amount of threads used for chunk generation
     maxThreads = Runtime.getRuntime().availableProcessors() <= 2 ? 1 : 2;
+
     // Enable/or disable the persisting of chunks
     saveChunks = true
 
@@ -37,17 +42,23 @@ System {
 
 Graphics {
 
+    gamma = 2.2d
+
+    advancedEffects = true
+
     pixelFormat = new PixelFormat().withDepthBits(24)
     displayMode = new DisplayMode(1280, 720)
 
     aspectRatio = 16.0d / 9.0d
 
-    fullscreen = false;
+    fullscreen = true;
 
     fov = 64.0d
 
-    viewingDistanceX = 28
-    viewingDistanceZ = 28
+    viewingDistanceNear = 8
+    viewingDistanceModerate = 16
+    viewingDistanceFar = 24
+    viewingDistanceUltra = 28
 
 }
 
@@ -69,14 +80,6 @@ Lighting {
 Controls {
 
     mouseSens = 0.075d
-
-}
-
-Chunk {
-
-    dimensionX = 16
-    dimensionY = 256
-    dimensionZ = 16
 
 }
 

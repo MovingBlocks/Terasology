@@ -49,9 +49,10 @@ import java.util.ArrayList;
 public class Chunk extends StaticEntity implements Comparable<Chunk>, Externalizable {
 
     /* CONSTANT VALUES */
-    private static final int CHUNK_DIMENSION_X = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionX");
-    private static final int CHUNK_DIMENSION_Y = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionY");
-    private static final int CHUNK_DIMENSION_Z = (Integer) ConfigurationManager.getInstance().getConfig().get("Chunk.dimensionZ");
+    private static final int CHUNK_DIMENSION_X = 16;
+    private static final int CHUNK_DIMENSION_Y = 256;
+    private static final int CHUNK_DIMENSION_Z = 16;
+
     private static final Vector3f[] LIGHT_DIRECTIONS = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
 
     protected FastRandom _random;

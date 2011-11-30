@@ -24,7 +24,6 @@ import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.characters.Player;
-import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.main.World;
 import com.github.begla.blockmania.world.main.WorldProvider;
 import org.lwjgl.LWJGLException;
@@ -58,6 +57,13 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class Blockmania {
+
+    /* VIEWING DISTANCE */
+    private static final int[] VIEWING_DISTANCES = {(Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceNear"),
+            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceModerate"),
+            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceFar"),
+            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceUltra")};
+    private int _activeViewingDistance = 0;
 
     /* THREADING */
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
@@ -252,9 +258,10 @@ public final class Blockmania {
 
         // Reset the delta value
         _lastLoopTime = getTime();
-        
+
         // Create the first Portal if it doesn't exist yet
         _world.initPortal();
+        _world.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
     }
 
     /**
@@ -300,7 +307,7 @@ public final class Blockmania {
         glDepthFunc(GL_LEQUAL);
 
         // Update the viewing distance
-        double minDist = Math.min((Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX") * Chunk.getChunkDimensionX(), (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ") * Chunk.getChunkDimensionZ()) / 2.0;
+        double minDist = VIEWING_DISTANCES[_activeViewingDistance] * 8.0f;
         glFogf(GL_FOG_START, (float) (minDist * 0.8));
         glFogf(GL_FOG_END, (float) minDist);
 
@@ -436,6 +443,10 @@ public final class Blockmania {
                     ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", !(Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug"));
                 }
 
+                if (key == Keyboard.KEY_F && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                    toggleViewingDistance();
+                }
+
                 if (isGamePaused()) {
                     _console.processKeyboardInput(key);
                 }
@@ -534,5 +545,10 @@ public final class Blockmania {
 
     public BlockmaniaConsole getConsole() {
         return _console;
+    }
+
+    public void toggleViewingDistance() {
+        _activeViewingDistance = (_activeViewingDistance + 1) % 4;
+        _world.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
     }
 }

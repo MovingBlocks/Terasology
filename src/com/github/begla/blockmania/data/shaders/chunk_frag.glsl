@@ -6,7 +6,7 @@ uniform sampler2D textureLava;
 
 uniform float tick;
 
-const float gamma = 2.2;
+uniform float gamma = 2.2;
 uniform float daylight = 1.0;
 uniform bool swimming;
 
@@ -96,7 +96,7 @@ void main(){
     color.xyz *= clamp(daylightColorValue + blocklightColorValue * (1.0-daylightValue), 0, 1);
 
     if (!swimming) {
-        gl_FragColor.rgb = linearToSrgb(mix(color, vec4(0.89,0.945,1.0,1.0) * daylightTrans, clamp(fog, 0.0, 0.80))).rgb;
+        gl_FragColor.rgb = linearToSrgb(mix(color, vec4(1.0,1.0,1.0,1.0) * daylightTrans, clamp(fog, 0.0, 0.5))).rgb;
         gl_FragColor.a = color.a;
     } else {
         color.rg *= 0.6;

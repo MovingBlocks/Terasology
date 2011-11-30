@@ -230,7 +230,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double mIntens = MathHelper.clamp(1.0 - (dT + dH) * 5.0) + 0.3;
 
         double density = calcMountainDensity(x, y, z) * mIntens;
-        return -y + ((height * 64.0 + 16.0) + density * 128.0);
+        return -y + (((height * 32.0 - 16.0f) + 32.0) + density * 256.0);
     }
 
     public double calcBaseTerrain(double x, double z) {
@@ -241,10 +241,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double x1, y1, z1;
 
         x1 = x * 0.008;
-        y1 = y * 0.009;
+        y1 = y * 0.01;
         z1 = z * 0.008;
 
-        double result = _pGen5.fBm(x1 + _pGen1.noise(x1, y1, z1) * 0.4, y1 + _pGen1.noise(x1, y1, z1) * 0.4, z1 + _pGen1.noise(x1, y1, z1) * 0.4, 7, 2.03782819, 0.91181);
+        double result = _pGen5.fBm(x1, y1, z1, 4, 2.03782819, 0.71181);
 
         return result > 0 ? result : 0;
     }

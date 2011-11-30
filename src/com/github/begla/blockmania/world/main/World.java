@@ -55,8 +55,11 @@ import static org.lwjgl.opengl.GL11.glColorMask;
  */
 public final class World implements RenderableObject {
 
-    private static final int MAX_VDIST_IN_BLOCKS = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX") * 8;
+    private static final double GAMMA = (Double) ConfigurationManager.getInstance().getConfig().get("Graphics.gamma");
     private static final int MAX_CHUNK_UPDATES_PER_ITERATION = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxChunkUpdatesPerIteration");
+
+    /* VIEWING DISTANCE */
+    private int _viewingDistance = 8;
 
     /* WORLD PROVIDER */
     private WorldProvider _worldProvider;
@@ -124,11 +127,8 @@ public final class World implements RenderableObject {
     private boolean updateChunksInProximity() {
         _chunksInProximity.clear();
 
-        int viewingDistanceX = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceX");
-        int viewingDistanceZ = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceZ");
-
-        for (int x = -(viewingDistanceX / 2); x < (viewingDistanceX / 2); x++) {
-            for (int z = -(viewingDistanceZ / 2); z < (viewingDistanceZ / 2); z++) {
+        for (int x = -(_viewingDistance / 2); x < (_viewingDistance / 2); x++) {
+            for (int z = -(_viewingDistance / 2); z < (_viewingDistance / 2); z++) {
                 Chunk c = _worldProvider.getChunkProvider().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
                 _chunksInProximity.add(c);
             }
@@ -144,7 +144,7 @@ public final class World implements RenderableObject {
 
         float distLength = dist.length();
 
-        return distLength < MAX_VDIST_IN_BLOCKS;
+        return distLength < (_viewingDistance * 8);
     }
 
     /**
@@ -187,12 +187,30 @@ public final class World implements RenderableObject {
     public void updateVisibleChunks() {
         _visibleChunks.clear();
 
+        int updateCounter = 0;
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
 
             if (isChunkVisible(c)) {
                 c.setVisible(true);
                 _visibleChunks.add(c);
+
+                if (c.isDirty() || c.isLightDirty()) {
+                    if (_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT)) {
+                        continue;
+                    }
+
+                    continue;
+                }
+
+                if (updateCounter < MAX_CHUNK_UPDATES_PER_ITERATION) {
+                    if (c.generateVBOs()) {
+                        updateCounter++;
+                    }
+
+                    c.update();
+                }
+
                 continue;
             }
 
@@ -235,6 +253,10 @@ public final class World implements RenderableObject {
         TextureManager.getInstance().bindTexture("terrain");
 
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
+
+        int gamma = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "gamma");
+        GL20.glUniform1f(gamma, (float) GAMMA);
+
         int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
 
         int lavaTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureLava");
@@ -262,15 +284,6 @@ public final class World implements RenderableObject {
             }
         }
 
-        ShaderManager.getInstance().enableShader(null);
-
-        _mobManager.renderAll();
-
-        ShaderManager.getInstance().enableShader("block");
-        _bulletPhysicsRenderer.render();
-        ShaderManager.getInstance().enableShader("chunk");
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        TextureManager.getInstance().bindTexture("terrain");
 
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
@@ -292,6 +305,11 @@ public final class World implements RenderableObject {
                 c.render(ChunkMesh.RENDER_TYPE.WATER);
             }
         }
+
+        _mobManager.renderAll();
+
+        ShaderManager.getInstance().enableShader("block");
+        _bulletPhysicsRenderer.render();
 
         ShaderManager.getInstance().enableShader(null);
     }
@@ -328,30 +346,6 @@ public final class World implements RenderableObject {
         }
 
         _bulletPhysicsRenderer.update();
-
-        int updateCounter = 0;
-        // Update visible chunks
-        for (int i = 0; i < _chunksInProximity.size(); i++) {
-            Chunk c = _chunksInProximity.get(i);
-
-            if (c.isVisible()) {
-                if (c.isDirty() || c.isLightDirty()) {
-                    if (_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT)) {
-                        continue;
-                    }
-
-                    continue;
-                }
-
-                if (updateCounter < MAX_CHUNK_UPDATES_PER_ITERATION) {
-                    if (c.generateVBOs()) {
-                        updateCounter++;
-                    }
-
-                    c.update();
-                }
-            }
-        }
 
         // Update the particle emitters
         _blockParticleEmitter.update();
@@ -528,5 +522,14 @@ public final class World implements RenderableObject {
 
     public int getTick() {
         return _tick;
+    }
+
+    public int getViewingDistance() {
+        return _viewingDistance;
+    }
+
+    public void setViewingDistance(int distance) {
+        _viewingDistance = distance;
+        Blockmania.getInstance().resetOpenGLParameters();
     }
 }

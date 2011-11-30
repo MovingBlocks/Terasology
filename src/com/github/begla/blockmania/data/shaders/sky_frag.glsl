@@ -56,7 +56,7 @@ void main (){
 
 
         float intens = clamp((1.0 - ((v.y+0.2)/0.4)), 0, 1);
-        skyColor = mix(skyColor, vec4(0.89,0.945,1.0,1.0), clamp(intens * posSunY, 0.0, 1.0));
+        skyColor = mix(skyColor, vec4(1.0,1.0,1.0,1.0), clamp(intens * posSunY, 0.0, 1.0));
 
         gl_FragColor = skyColor;
     } else {

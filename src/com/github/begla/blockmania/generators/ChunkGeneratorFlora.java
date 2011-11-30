@@ -141,6 +141,9 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
      * @param z    Position on the z-axis
      */
     private void generateTree(Chunk c, BIOME_TYPE type, int x, int y, int z) {
+        if (!c.canBlockSeeTheSky(x, y + 1, z))
+            return;
+
         int randomGeneratorId = 0;
         int size = _parent.getTreeGenerators(type).size();
 
