@@ -43,8 +43,7 @@ System {
 Graphics {
 
     gamma = 2.2d
-
-    advancedEffects = true
+    animatedWaterAndGrass = true
 
     pixelFormat = new PixelFormat().withDepthBits(24)
     displayMode = new DisplayMode(1280, 720)

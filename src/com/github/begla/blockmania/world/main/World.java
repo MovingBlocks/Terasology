@@ -55,7 +55,6 @@ import static org.lwjgl.opengl.GL11.glColorMask;
  */
 public final class World implements RenderableObject {
 
-    private static final double GAMMA = (Double) ConfigurationManager.getInstance().getConfig().get("Graphics.gamma");
     private static final int MAX_CHUNK_UPDATES_PER_ITERATION = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxChunkUpdatesPerIteration");
 
     /* VIEWING DISTANCE */
@@ -253,10 +252,6 @@ public final class World implements RenderableObject {
         TextureManager.getInstance().bindTexture("terrain");
 
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
-
-        int gamma = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "gamma");
-        GL20.glUniform1f(gamma, (float) GAMMA);
-
         int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
 
         int lavaTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureLava");
@@ -452,7 +447,7 @@ public final class World implements RenderableObject {
     public void initPortal() {
         if (!_portalManager.hasPortal()) {
             // the y is hard coded because it always gets set to 32, deep underground
-            Vector3f loc = new Vector3f(_player.getPosition().x - 4, _player.getPosition().y + 8, _player.getPosition().z);
+            Vector3f loc = new Vector3f(_player.getPosition().x, _player.getPosition().y + 4, _player.getPosition().z);
             Blockmania.getInstance().getLogger().log(Level.INFO, "Portal location is" + loc);
             _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, (byte) 30, false, false, true);
             _portalManager.addPortal(loc);

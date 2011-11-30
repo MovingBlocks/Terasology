@@ -1,12 +1,8 @@
-#version 120
-
 uniform sampler2D textureAtlas;
 uniform sampler2D textureWater;
 uniform sampler2D textureLava;
 
 uniform float tick;
-
-uniform float gamma = 2.2;
 uniform float daylight = 1.0;
 uniform bool swimming;
 
@@ -17,11 +13,11 @@ uniform vec4 playerPosition;
 varying float fog;
 
 vec4 srgbToLinear(vec4 color){
-    return pow(color, vec4(1.0 / gamma));
+    return pow(color, vec4(1.0 / GAMMA));
 }
 
 vec4 linearToSrgb(vec4 color){
-    return pow(color, vec4(gamma));
+    return pow(color, vec4(GAMMA));
 }
 
 void main(){

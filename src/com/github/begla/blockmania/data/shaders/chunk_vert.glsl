@@ -1,7 +1,3 @@
-#version 120
-
-const bool advancedEffects = true;
-
 varying vec4 vertexWorldPos;
 varying float fog;
 uniform float tick;
@@ -37,7 +33,7 @@ void main()
 
     fog = clamp(1.0 - fog,0.0,1.0);
 
-    if (advancedEffects) {
+#ifdef ANIMATED_WATER_AND_GRASS
        // GRASS ANIMATION
        for (int i=0; i < 5; i++) {
            if (gl_TexCoord[0].x >= grassCoordinates[i].x && gl_TexCoord[0].x < grassCoordinates[i].y && gl_TexCoord[0].y >= grassCoordinates[i].z && gl_TexCoord[0].y < grassCoordinates[i].w) {
@@ -53,8 +49,7 @@ void main()
         } else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.y && gl_TexCoord[0].y >= lavaCoordinate.z && gl_TexCoord[0].y < lavaCoordinate.w) {
             vertexPos.y += sin(tick*0.1 + vertexPos.x) * 0.05;
         }
-
-    }
+#endif
 
     gl_Position = vertexPos;
     vertexWorldPos = vertexPos;

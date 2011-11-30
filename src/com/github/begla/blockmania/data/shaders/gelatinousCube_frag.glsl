@@ -1,17 +1,14 @@
-#version 120
-
 uniform sampler2D texture;
 uniform vec4 colorOffset;
 
 uniform float light = 1.0;
 
-
 vec4 srgbToLinear(vec4 color){
-    return pow(color, vec4(1.0 / 2.2));
+    return pow(color, vec4(1.0 / GAMMA));
 }
 
 vec4 linearToSrgb(vec4 color){
-    return pow(color, vec4(2.2));
+    return pow(color, vec4(GAMMA));
 }
 
 void main(){

@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.rendering.manager;
 
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -40,6 +41,8 @@ public class ShaderManager {
     private final HashMap<String, Integer> _vertexShader = new HashMap<String, Integer>(32);
     private static ShaderManager _instance = null;
 
+    private String _preProcessorPreamble = "#version 120 \n";
+
     /**
      * Returns (and creates – if necessary) the static instance
      * of this helper class.
@@ -55,27 +58,31 @@ public class ShaderManager {
     }
 
     private ShaderManager() {
-        initShaders();
-
         Blockmania.getInstance().getLogger().log(Level.INFO, "Loading Blockmania shader manager...");
         Blockmania.getInstance().getLogger().log(Level.INFO, "GL_VERSION: {0}", GL11.glGetString(GL11.GL_VERSION));
         Blockmania.getInstance().getLogger().log(Level.INFO, "SHADING_LANGUAGE VERSION: {0}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
         Blockmania.getInstance().getLogger().log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
+
+        initShaders();
     }
 
     private void initShaders() {
-        createVertexShader("sky_vert.glsl", "sky");
-        createFragShader("sky_frag.glsl", "sky");
-        createVertexShader("chunk_vert.glsl", "chunk");
-        createFragShader("chunk_frag.glsl", "chunk");
-        createVertexShader("particle_vert.glsl", "particle");
-        createFragShader("particle_frag.glsl", "particle");
-        createVertexShader("block_vert.glsl", "block");
-        createFragShader("block_frag.glsl", "block");
-        createVertexShader("gelatinousCube_vert.glsl", "gelatinousCube");
-        createFragShader("gelatinousCube_frag.glsl", "gelatinousCube");
-        createVertexShader("clouds_vert.glsl", "clouds");
-        createFragShader("clouds_frag.glsl", "clouds");
+        _preProcessorPreamble += ((Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.animatedWaterAndGrass")) ? "#define ANIMATED_WATER_AND_GRASS \n" : "";
+        _preProcessorPreamble += "#define GAMMA " + ConfigurationManager.getInstance().getConfig().get("Graphics.gamma").toString() + "\n";
+
+
+        createShader("sky_vert.glsl", "sky", GL20.GL_VERTEX_SHADER);
+        createShader("sky_frag.glsl", "sky", GL20.GL_FRAGMENT_SHADER);
+        createShader("chunk_vert.glsl", "chunk", GL20.GL_VERTEX_SHADER);
+        createShader("chunk_frag.glsl", "chunk", GL20.GL_FRAGMENT_SHADER);
+        createShader("particle_vert.glsl", "particle", GL20.GL_VERTEX_SHADER);
+        createShader("particle_frag.glsl", "particle", GL20.GL_FRAGMENT_SHADER);
+        createShader("block_vert.glsl", "block", GL20.GL_VERTEX_SHADER);
+        createShader("block_frag.glsl", "block", GL20.GL_FRAGMENT_SHADER);
+        createShader("gelatinousCube_vert.glsl", "gelatinousCube", GL20.GL_VERTEX_SHADER);
+        createShader("gelatinousCube_frag.glsl", "gelatinousCube", GL20.GL_FRAGMENT_SHADER);
+        createShader("clouds_vert.glsl", "clouds", GL20.GL_VERTEX_SHADER);
+        createShader("clouds_frag.glsl", "clouds", GL20.GL_FRAGMENT_SHADER);
 
         for (String s : _fragmentShader.keySet()) {
             int shaderProgram = GL20.glCreateProgram();
@@ -89,15 +96,26 @@ public class ShaderManager {
         }
     }
 
-    private int createFragShader(String filename, String title) {
+    private int createShader(String filename, String title, int type) {
+        Blockmania.getInstance().getLogger().log(Level.INFO, "Loading shader {0} ({1}, type = {2})", new String[]{title, filename, String.valueOf(type)});
 
-        _fragmentShader.put(title, GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER));
+        HashMap<String, Integer> shaders;
 
-        if (_fragmentShader.get(title) == 0) {
+        if (type == GL20.GL_FRAGMENT_SHADER) {
+            shaders = _fragmentShader;
+        } else if (type == GL20.GL_VERTEX_SHADER) {
+            shaders = _vertexShader;
+        } else {
             return 0;
         }
 
-        String fragCode = "";
+        shaders.put(title, GL20.glCreateShader(type));
+
+        if (shaders.get(title) == 0) {
+            return 0;
+        }
+
+        String fragCode = _preProcessorPreamble + "\n";
         String line;
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/data/shaders/" + filename).openStream()));
@@ -105,44 +123,16 @@ public class ShaderManager {
                 fragCode += line + "\n";
             }
         } catch (Exception e) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to read fragment shader.");
+            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to read shader.");
             return 0;
         }
 
-        GL20.glShaderSource(_fragmentShader.get(title), fragCode);
-        GL20.glCompileShader(_fragmentShader.get(title));
+        GL20.glShaderSource(shaders.get(title), fragCode);
+        GL20.glCompileShader(shaders.get(title));
 
-        printLogInfo(_fragmentShader.get(title));
+        printLogInfo(shaders.get(title));
 
-        return _fragmentShader.get(title);
-    }
-
-    private int createVertexShader(String filename, String title) {
-
-        _vertexShader.put(title, GL20.glCreateShader(GL20.GL_VERTEX_SHADER));
-
-        if (_vertexShader.get(title) == 0) {
-            return 0;
-        }
-
-        String fragCode = "";
-        String line;
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("com/github/begla/blockmania/data/shaders/" + filename).openStream()));
-            while ((line = reader.readLine()) != null) {
-                fragCode += line + "\n";
-            }
-        } catch (Exception e) {
-            Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to read vertex shader.");
-            return 0;
-        }
-
-        GL20.glShaderSource(_vertexShader.get(title), fragCode);
-        GL20.glCompileShader(_vertexShader.get(title));
-
-        printLogInfo(_vertexShader.get(title));
-
-        return _vertexShader.get(title);
+        return shaders.get(title);
     }
 
     private static void printLogInfo(int obj) {

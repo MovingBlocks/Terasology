@@ -90,12 +90,12 @@ public class PerlinNoise {
     /**
      * Returns Fractional Brownian Motion at the given position.
      *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
-     * @param octaves Amount of octaves to apply
+     * @param x          Position on the x-axis
+     * @param y          Position on the y-axis
+     * @param z          Position on the z-axis
+     * @param octaves    Amount of octaves to apply
      * @param lacunarity The lacunarity
-     * @param h The fractal dimension
+     * @param h          The fractal dimension
      * @return The noise value
      */
     public double fBm(double x, double y, double z, int octaves, double lacunarity, double h) {

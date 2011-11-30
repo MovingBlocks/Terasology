@@ -1,5 +1,3 @@
-#version 120
-
 varying	vec3 colorYxy;
 varying vec3 skyVec;
 varying	vec4 McPosition;

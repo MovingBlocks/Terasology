@@ -1,5 +1,3 @@
-#version 120
-
 uniform float tick;
 
 void main()
