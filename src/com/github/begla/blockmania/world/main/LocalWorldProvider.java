@@ -143,7 +143,7 @@ public class LocalWorldProvider implements WorldProvider {
                 c.setState(blockPosX, y, blockPosZ, (byte) 7);
 
                 if (simulate)
-                    _liquidSimulator.addBlockPosition(new BlockPosition(c.getBlockWorldPosX(blockPosX), y, c.getBlockWorldPosZ(blockPosZ)));
+                    _liquidSimulator.addActiveBlock(new BlockPosition(c.getBlockWorldPosX(blockPosX), y, c.getBlockWorldPosZ(blockPosZ)));
             }
 
             if (updateLight) {

@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world.simulators;
 
+import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.main.WorldProvider;
 
 /**
@@ -22,7 +23,7 @@ import com.github.begla.blockmania.world.main.WorldProvider;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class GrowthSimulator extends Simulator{
+public class GrowthSimulator extends Simulator {
 
     public GrowthSimulator(WorldProvider parent) {
         super(parent);
@@ -30,6 +31,23 @@ public class GrowthSimulator extends Simulator{
 
     @Override
     public void simulate() {
-       // Nothing yet
+        // Apply simulator to all active chunks
+        for (int i = 0; i < _activeChunks.size(); i++) {
+            growGrass(_activeChunks.get(i));
+        }
     }
+
+    private void growGrass(Chunk c) {
+        for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
+            for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
+
+                for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
+
+                }
+
+            }
+        }
+    }
+
 }
+

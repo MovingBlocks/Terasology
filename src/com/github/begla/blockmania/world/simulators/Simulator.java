@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.world.simulators;
 
 import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.main.WorldProvider;
 
 import java.util.ArrayList;
@@ -29,13 +30,18 @@ public abstract class Simulator {
 
     protected WorldProvider _parent;
     protected ArrayList<BlockPosition> _activeBlocks = new ArrayList<BlockPosition>(16);
+    protected ArrayList<Chunk> _activeChunks = new ArrayList<Chunk>(16);
 
     public Simulator(WorldProvider parent) {
         _parent = parent;
     }
 
-    public void addBlockPosition(BlockPosition bp) {
+    public void addActiveBlock(BlockPosition bp) {
         _activeBlocks.add(bp);
+    }
+
+    public void addActiveChunk(Chunk c) {
+        _activeChunks.add(c);
     }
 
     public abstract void simulate();

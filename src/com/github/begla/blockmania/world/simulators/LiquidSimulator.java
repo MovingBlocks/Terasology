@@ -15,10 +15,7 @@
  */
 package com.github.begla.blockmania.world.simulators;
 
-import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.world.main.WorldProvider;
-
-import javax.vecmath.Vector3f;
 
 /**
  * TODO
@@ -27,24 +24,12 @@ import javax.vecmath.Vector3f;
  */
 public class LiquidSimulator extends Simulator {
 
-    private static final Vector3f[] NEIGHBORS = {new Vector3f(0, -1, 0), new Vector3f(-1, 0, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
-
     public LiquidSimulator(WorldProvider parent) {
         super(parent);
     }
 
+    @Override
     public void simulate() {
-        for (int i = _activeBlocks.size() - 1; i >= 0; i--) {
-            BlockPosition bp = _activeBlocks.get(i);
-            byte state = _parent.getState(bp.x, bp.y, bp.z);
-            byte type = _parent.getBlock(bp.x, bp.y, bp.z);
-            byte stateAbove = _parent.getState(bp.x, bp.y + 1, bp.z);
-            byte typeAbove = _parent.getBlock(bp.x, bp.y + 1, bp.z);
-
-            if (state == 7) {
-
-
-            }
-        }
+        // Implement me!
     }
 }
