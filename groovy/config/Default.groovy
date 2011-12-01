@@ -102,6 +102,8 @@ Player {
 
 World {
 
+    spawnOrigin = new Vector2f(-24429, 20547)
+
     defaultSeed = "nXhTnOmGgLsZmWhO"
 
     dayNightLengthInMs = new Long((60 * 1000) * 20) // 20 minutes in ms

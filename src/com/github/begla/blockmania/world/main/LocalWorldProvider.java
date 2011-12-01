@@ -33,6 +33,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.InputSource;
 
+import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,6 +56,7 @@ public class LocalWorldProvider implements WorldProvider {
 
     /* CONST */
     protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) ConfigurationManager.getInstance().getConfig().get("World.dayNightLengthInMs");
+    protected final Vector2f SPAWN_ORIGIN = (Vector2f) ConfigurationManager.getInstance().getConfig().get("World.spawnOrigin");
 
     /* PROPERTIES */
     protected String _title, _seed;
@@ -105,12 +107,11 @@ public class LocalWorldProvider implements WorldProvider {
      * Places a block of a specific type at a given position and optionally refreshes the
      * corresponding light values.
      *
-     * @param x           The X-coordinate
-     * @param y           The Y-coordinate
-     * @param z           The Z-coordinate
-     * @param type        The type of the block to set
-     * @param updateLight
-     * @param overwrite   If true currently present blocks get replaced
+     * @param x         The X-coordinate
+     * @param y         The Y-coordinate
+     * @param z         The Z-coordinate
+     * @param type      The type of the block to set
+     * @param overwrite If true currently present blocks get replaced
      * @return True if a block was set/replaced
      */
     public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean simulate, boolean overwrite) {
@@ -295,23 +296,18 @@ public class LocalWorldProvider implements WorldProvider {
     public Vector3f nextSpawningPoint() {
         ChunkGeneratorTerrain tGen = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0));
 
+        FastRandom nRandom = new FastRandom(Blockmania.getInstance().getTime());
+
         for (; ; ) {
-            int randX = (int) (_random.randomDouble() * 32000f);
-            int randZ = (int) (_random.randomDouble() * 32000f);
+            int randX = (int) (nRandom.randomDouble() * 128f);
+            int randZ = (int) (nRandom.randomDouble() * 128f);
 
-            ChunkGeneratorTerrain.BIOME_TYPE type = tGen.calcBiomeTypeForGlobalPosition(randX, randZ);
+            for (int y = Chunk.getChunkDimensionY() - 1; y >= 32; y--) {
 
-            if (type == ChunkGeneratorTerrain.BIOME_TYPE.FOREST) {
+                double dens = tGen.calcDensity(randX + SPAWN_ORIGIN.x, y, randZ + SPAWN_ORIGIN.y);
 
-                for (int y = Chunk.getChunkDimensionY() - 1; y >= 32; y--) {
-
-                    double dens = tGen.calcDensity(randX, y, randZ);
-
-                    if (dens >= 0 && dens < 16)
-                        return new Vector3f(randX, y, randZ);
-                }
-
-
+                if (dens >= 0)
+                    return new Vector3f(randX + SPAWN_ORIGIN.x, y, randZ + SPAWN_ORIGIN.y);
             }
         }
     }
