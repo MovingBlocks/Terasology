@@ -10,7 +10,7 @@ System {
     maxChunkUpdatesPerIteration = 1
 
     // Max amount of particles
-    maxParticles = 128
+    maxParticles = 256
 
     // Size of the dynamic cloud texture
     cloudResolution = new Vector2f(64, 64)
@@ -57,7 +57,7 @@ Graphics {
     viewingDistanceNear = 8
     viewingDistanceModerate = 16
     viewingDistanceFar = 24
-    viewingDistanceUltra = 28
+    viewingDistanceUltra = 30
 
 }
 
@@ -86,7 +86,7 @@ Player {
 
     bobbing = true
 
-    maxGravity = 0.7d
+    maxGravity = 1.0d
     maxGravitySwimming = 0.01d
 
     gravity = 0.006d

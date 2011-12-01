@@ -16,10 +16,12 @@
 package com.github.begla.blockmania.world.simulators;
 
 import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.world.chunk.Chunk;
-import com.github.begla.blockmania.world.main.WorldProvider;
+import com.github.begla.blockmania.world.interfaces.WorldProvider;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * TODO
@@ -28,12 +30,20 @@ import java.util.ArrayList;
  */
 public abstract class Simulator {
 
+    protected final long _updateInterval;
+    protected long _lastUpdate = Blockmania.getInstance().getTime();
+
     protected WorldProvider _parent;
     protected ArrayList<BlockPosition> _activeBlocks = new ArrayList<BlockPosition>(16);
-    protected ArrayList<Chunk> _activeChunks = new ArrayList<Chunk>(16);
+    protected HashSet<Chunk> _activeChunks = new HashSet<Chunk>(16);
+
+    public Simulator(WorldProvider parent, long updateInterval) {
+        _updateInterval = updateInterval;
+        _parent = parent;
+    }
 
     public Simulator(WorldProvider parent) {
-        _parent = parent;
+        this(parent, 1000);
     }
 
     public void addActiveBlock(BlockPosition bp) {
@@ -44,5 +54,14 @@ public abstract class Simulator {
         _activeChunks.add(c);
     }
 
-    public abstract void simulate();
+    public void simulate() {
+        long currentTime = Blockmania.getInstance().getTime();
+
+        if (currentTime > _lastUpdate + _updateInterval) {
+            executeSimulation();
+            _lastUpdate = currentTime;
+        }
+    }
+
+    protected abstract void executeSimulation();
 }

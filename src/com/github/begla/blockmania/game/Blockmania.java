@@ -24,17 +24,14 @@ import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.characters.Player;
+import com.github.begla.blockmania.world.interfaces.WorldProvider;
 import com.github.begla.blockmania.world.main.World;
-import com.github.begla.blockmania.world.main.WorldProvider;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.openal.AL;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.PixelFormat;
+import org.lwjgl.opengl.*;
 import org.newdawn.slick.SlickException;
 
 import java.io.File;
@@ -307,12 +304,9 @@ public final class Blockmania {
         glDepthFunc(GL_LEQUAL);
 
         // Update the viewing distance
-        double minDist = VIEWING_DISTANCES[_activeViewingDistance] * 8.0f;
-        glFogf(GL_FOG_START, (float) (minDist * 0.8));
+        double minDist = (VIEWING_DISTANCES[_activeViewingDistance] / 2) * 16.0f;
+        glFogf(GL_FOG_START, (float) (minDist * 0.01));
         glFogf(GL_FOG_END, (float) minDist);
-
-        GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
-        glShadeModel(GL11.GL_SMOOTH);
     }
 
     private void resizeViewport() {

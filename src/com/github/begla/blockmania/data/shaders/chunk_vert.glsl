@@ -1,10 +1,6 @@
 varying vec4 vertexWorldPos;
-varying float fog;
-uniform float tick;
 
-float fogEyeRadial(vec4 eyePos) {
-    return length(eyePos / eyePos.w);
-}
+uniform float tick;
 
 void main()
 {
@@ -24,14 +20,6 @@ void main()
 	gl_TexCoord[0] = gl_MultiTexCoord0;
     gl_TexCoord[1] = gl_MultiTexCoord1;
     gl_FrontColor = gl_Color;
-
-    // FOG
-    gl_FogFragCoord = fogEyeRadial(gl_ModelViewMatrix  * gl_Vertex);
-
-    float fogScale = 1.0 / (gl_Fog.end - gl_Fog.start);
-    fog = (gl_Fog.end - gl_FogFragCoord) * fogScale;
-
-    fog = clamp(1.0 - fog,0.0,1.0);
 
 #ifdef ANIMATED_WATER_AND_GRASS
        // GRASS ANIMATION
@@ -53,4 +41,8 @@ void main()
 
     gl_Position = vertexPos;
     vertexWorldPos = vertexPos;
+
+    // Linear fog
+    vec4 eyePos = gl_ModelViewMatrix * gl_Vertex;
+    gl_FogFragCoord = abs(eyePos.z/eyePos.w);
 }

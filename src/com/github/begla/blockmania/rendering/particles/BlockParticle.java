@@ -50,9 +50,9 @@ public class BlockParticle extends Particle {
         _texOffsetX = (float) (((_rand.randomDouble() + 1.0) / 2.0) * (0.0624 - 0.02));
         _texOffsetY = (float) (((_rand.randomDouble() + 1.0) / 2.0) * (0.0624 - 0.02));
 
-        _position.x += _rand.randomDouble() * 0.5;
-        _position.y += _rand.randomDouble() * 0.5;
-        _position.z += _rand.randomDouble() * 0.5;
+        _position.x += _rand.randomDouble() * 0.3;
+        _position.y += _rand.randomDouble() * 0.3;
+        _position.z += _rand.randomDouble() * 0.3;
 
         _lifetime *= (_rand.randomDouble() + 1.0) / 2.0;
     }

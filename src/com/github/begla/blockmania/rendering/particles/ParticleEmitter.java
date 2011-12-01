@@ -33,7 +33,7 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class ParticleEmitter implements RenderableObject {
 
     protected static final int MAX_PARTICLES = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxParticles");;
-    protected static final int PARTICLES_PER_UPDATE = 16;
+    protected static final int PARTICLES_PER_UPDATE = 32;
     /* ------- */
     protected int _particlesToEmit;
 

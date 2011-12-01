@@ -41,7 +41,7 @@ public class ChunkMesh {
      * Possible rendering types.
      */
     public enum RENDER_TYPE {
-        OPAQUE, BILLBOARD_AND_TRANSLUCENT, WATER, LAVA
+        OPAQUE, BILLBOARD_AND_TRANSLUCENT, WATER_AND_ICE
     }
 
     /* CONST */
@@ -52,12 +52,12 @@ public class ChunkMesh {
     private static final int OFFSET_COLOR = ((2 + 3 + 3) * 4);
 
     /* VERTEX DATA */
-    private final int[] _vertexBuffers = new int[5];
-    private final int[] _idxBuffers = new int[5];
-    private final int[] _idxBufferCount = new int[5];
+    private final int[] _vertexBuffers = new int[4];
+    private final int[] _idxBuffers = new int[4];
+    private final int[] _idxBufferCount = new int[4];
 
     /* TEMPORARY DATA */
-    public VertexElements[] _vertexElements = new VertexElements[5];
+    public VertexElements[] _vertexElements = new VertexElements[4];
 
     /* BULLET PHYSICS */
     public TriangleMeshShape _bulletMeshShape;
@@ -70,7 +70,6 @@ public class ChunkMesh {
         _vertexElements[1] = new VertexElements();
         _vertexElements[2] = new VertexElements();
         _vertexElements[3] = new VertexElements();
-        _vertexElements[4] = new VertexElements();
     }
 
     /**
@@ -157,8 +156,7 @@ public class ChunkMesh {
                 glEnable(GL_CULL_FACE);
                 glDisable(GL_BLEND);
                 break;
-            case WATER:
-            case LAVA:
+            case WATER_AND_ICE:
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 glDisable(GL_CULL_FACE);

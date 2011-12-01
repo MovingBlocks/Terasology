@@ -19,7 +19,7 @@ package com.github.begla.blockmania.intersections;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
-import com.github.begla.blockmania.world.main.WorldProvider;
+import com.github.begla.blockmania.world.interfaces.WorldProvider;
 
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;

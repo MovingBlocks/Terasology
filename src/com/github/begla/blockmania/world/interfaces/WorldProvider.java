@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.world.main;
+package com.github.begla.blockmania.world.interfaces;
 
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.GeneratorManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.chunk.Chunk;
-import com.github.begla.blockmania.world.interfaces.ChunkProvider;
 
 import javax.vecmath.Vector3f;
 
@@ -197,6 +196,8 @@ public interface WorldProvider {
      * @return The rendering origin
      */
     public Vector3f getRenderingReferencePoint();
+
+    public void setRenderingReferencePoint(Vector3f point);
 
     /**
      * Disposes this world provider.

@@ -296,10 +296,8 @@ public final class ChunkMeshGenerator {
 
         if (!block.isTranslucent())
             renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
-        if (block.getTitle().equals("Water"))
-            renderType = ChunkMesh.RENDER_TYPE.WATER;
-        if (block.getTitle().equals("Lava"))
-            renderType = ChunkMesh.RENDER_TYPE.LAVA;
+        if (block.getTitle().equals("Water") || block.getTitle().equals("Ice"))
+            renderType = ChunkMesh.RENDER_TYPE.WATER_AND_ICE;
 
         boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
 
@@ -431,11 +429,8 @@ public final class ChunkMeshGenerator {
             case BILLBOARD_AND_TRANSLUCENT:
                 vertexElements = mesh._vertexElements[1];
                 break;
-            case WATER:
+            case WATER_AND_ICE:
                 vertexElements = mesh._vertexElements[3];
-                break;
-            case LAVA:
-                vertexElements = mesh._vertexElements[4];
                 break;
         }
 

@@ -15,25 +15,35 @@
  */
 package com.github.begla.blockmania.world.simulators;
 
+import com.github.begla.blockmania.blocks.BlockManager;
+import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
-import com.github.begla.blockmania.world.main.WorldProvider;
+import com.github.begla.blockmania.world.interfaces.WorldProvider;
 
 /**
- * TODO
+ * Grows grass, flowers and high grass.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class GrowthSimulator extends Simulator {
 
+    private static final byte DIRT_TYPE = BlockManager.getInstance().getBlock("Dirt").getId();
+    private static final byte GRASS_TYPE = BlockManager.getInstance().getBlock("Grass").getId();
+
     public GrowthSimulator(WorldProvider parent) {
-        super(parent);
+        super(parent, 100);
     }
 
     @Override
-    public void simulate() {
-        // Apply simulator to all active chunks
-        for (int i = 0; i < _activeChunks.size(); i++) {
-            growGrass(_activeChunks.get(i));
+    public void executeSimulation() {
+        int offsetX = Math.abs(_parent.getRandom().randomInt()) % 16;
+        int offsetZ = Math.abs(_parent.getRandom().randomInt()) % 16;
+        growGrass(_parent.getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX((int) _parent.getRenderingReferencePoint().x) + offsetX, MathHelper.calcChunkPosZ((int) _parent.getRenderingReferencePoint().z) + offsetZ));
+
+        for (Chunk c : _activeChunks) {
+            growGrass(c);
         }
     }
 
@@ -43,9 +53,34 @@ public class GrowthSimulator extends Simulator {
 
                 for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
 
-                }
+                    byte type = _parent.getBlock(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z));
+                    BlockPosition pos = new BlockPosition(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z));
 
+                    if (type == DIRT_TYPE) {
+
+                        ChunkGeneratorTerrain.BIOME_TYPE biome = _parent.getActiveBiome(pos.x, pos.z);
+
+                        if (biome != ChunkGeneratorTerrain.BIOME_TYPE.SNOW) {
+
+                            byte bLeft = _parent.getBlock(pos.x + 1, pos.y, pos.z);
+                            byte bRight = _parent.getBlock(pos.x - 1, pos.y, pos.z);
+                            byte bUp = _parent.getBlock(pos.x, pos.y, pos.z + 1);
+                            byte bDown = _parent.getBlock(pos.x, pos.y, pos.z - 1);
+
+                            if (bLeft == GRASS_TYPE || bRight == GRASS_TYPE || bDown == GRASS_TYPE || bUp == GRASS_TYPE) {
+                                _parent.setBlock(pos.x, pos.y, pos.z, GRASS_TYPE, false, false, true);
+                                _activeChunks.add(c);
+                                return;
+                            }
+                        }
+                    } else if (type != 0x0) {
+                        break;
+                    }
+
+                }
             }
+
+            _activeChunks.remove(c);
         }
     }
 

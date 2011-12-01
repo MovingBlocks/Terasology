@@ -34,7 +34,7 @@ public abstract class Particle implements RenderableObject {
     protected ParticleEmitter _parent;
 
     protected final Vector3f _targetVelocity = new Vector3f(0.0f, -0.03f, 0.0f);
-    protected final Vector3f _velDecSpeed = new Vector3f(0.001f, 0.001f, 0.001f);
+    protected final Vector3f _velDecSpeed = new Vector3f(0.003f, 0.003f, 0.003f);
 
     protected float _size = 0.01f;
 
@@ -47,7 +47,7 @@ public abstract class Particle implements RenderableObject {
 
     public Particle(int lifeTime, Vector3f position, ParticleEmitter parent) {
         _position.set(position);
-        _initialVelocity.set((float) (_rand.randomInt() % 32) * 0.001f, (float) (_rand.randomInt() % 32) * 0.001f, (float) (_rand.randomInt() % 32) * 0.001f);
+        _initialVelocity.set((float) (_rand.randomInt() % 32) * 0.003f, (float) (_rand.randomInt() % 32) * 0.003f, (float) (_rand.randomInt() % 32) * 0.003f);
         _velocity.set(_initialVelocity);
 
         _lifetime = lifeTime;

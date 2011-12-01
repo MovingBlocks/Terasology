@@ -15,6 +15,8 @@
  */
 package com.github.begla.blockmania.world.main;
 
+import com.github.begla.blockmania.world.interfaces.WorldProvider;
+
 import java.util.ArrayList;
 
 /**

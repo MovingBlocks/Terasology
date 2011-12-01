@@ -10,8 +10,6 @@ varying vec4 vertexWorldPos;
 
 uniform vec4 playerPosition;
 
-varying float fog;
-
 vec4 srgbToLinear(vec4 color){
     return pow(color, vec4(1.0 / GAMMA));
 }
@@ -91,8 +89,11 @@ void main(){
 
     color.xyz *= clamp(daylightColorValue + blocklightColorValue * (1.0-daylightValue), 0, 1);
 
+    float fog = 1.0 - ((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale);
+    fog /= 1.5;
+
     if (!swimming) {
-        gl_FragColor.rgb = linearToSrgb(mix(color, vec4(1.0,1.0,1.0,1.0) * daylightTrans, clamp(fog, 0.0, 0.5))).rgb;
+        gl_FragColor.rgb = linearToSrgb(mix(color, vec4(1.0,1.0,1.0,1.0) * daylightTrans, fog)).rgb;
         gl_FragColor.a = color.a;
     } else {
         color.rg *= 0.6;

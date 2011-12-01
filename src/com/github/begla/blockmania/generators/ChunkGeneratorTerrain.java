@@ -233,7 +233,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     public double calcBaseTerrain(double x, double z) {
-        double result = (_pGen2.fBm(0.0001 * x, 0, 0.0001 * z, 4, 1.7, 0.9171) + 1.0) / 2.0;
+        double result = (_pGen2.fBm(0.00008 * x, 0, 0.00008 * z, 7, 1.7, 0.9171) + 1.0) / 2.0;
 
         double river = Math.sqrt(Math.abs(_pGen3.fBm(0.002 * x, 0, 0.002 * z, 8, 2.08371, 0.7471)));
 

@@ -32,6 +32,7 @@ import com.github.begla.blockmania.world.chunk.ChunkMesh;
 import com.github.begla.blockmania.world.chunk.ChunkUpdateManager;
 import com.github.begla.blockmania.world.entity.Entity;
 import com.github.begla.blockmania.world.horizon.Skysphere;
+import com.github.begla.blockmania.world.interfaces.WorldProvider;
 import com.github.begla.blockmania.world.physics.BulletPhysicsRenderer;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -68,6 +69,7 @@ public final class World implements RenderableObject {
 
     /* CHUNKS */
     private ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>(), _visibleChunks = new ArrayList<Chunk>();
+    private int _chunkPosX, _chunkPosZ;
 
     /* CORE GAME OBJECTS */
     private PortalManager _portalManager;
@@ -96,9 +98,6 @@ public final class World implements RenderableObject {
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
 
-    /* SIMULATION */
-    private long _lastSimulationStep = Blockmania.getInstance().getTime();
-
     /**
      * Initializes a new (local) world for the single player mode.
      *
@@ -123,18 +122,30 @@ public final class World implements RenderableObject {
      *
      * @return True if the list was changed
      */
-    private boolean updateChunksInProximity() {
-        _chunksInProximity.clear();
+    public boolean updateChunksInProximity(boolean force) {
 
-        for (int x = -(_viewingDistance / 2); x < (_viewingDistance / 2); x++) {
-            for (int z = -(_viewingDistance / 2); z < (_viewingDistance / 2); z++) {
-                Chunk c = _worldProvider.getChunkProvider().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
-                _chunksInProximity.add(c);
+        int newChunkPosX = calcPlayerChunkOffsetX();
+        int newChunkPosZ = calcPlayerChunkOffsetZ();
+
+        if (_chunkPosX != newChunkPosX || _chunkPosZ != newChunkPosZ || force) {
+
+            _chunksInProximity.clear();
+
+            for (int x = -(_viewingDistance / 2); x < (_viewingDistance / 2); x++) {
+                for (int z = -(_viewingDistance / 2); z < (_viewingDistance / 2); z++) {
+                    Chunk c = _worldProvider.getChunkProvider().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
+                    _chunksInProximity.add(c);
+                }
             }
+
+            _chunkPosX = newChunkPosX;
+            _chunkPosZ = newChunkPosZ;
+
+            Collections.sort(_chunksInProximity);
+            return true;
         }
 
-        Collections.sort(_chunksInProximity);
-        return true;
+        return false;
     }
 
     public boolean isInRange(Vector3f pos) {
@@ -272,22 +283,13 @@ public final class World implements RenderableObject {
             Chunk c = _visibleChunks.get(i);
 
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
-            c.render(ChunkMesh.RENDER_TYPE.LAVA);
 
             if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
                 c.getAABB().render();
             }
         }
 
-
-        for (int i = 0; i < _visibleChunks.size(); i++) {
-            Chunk c = _visibleChunks.get(i);
-
-            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
-        }
-
         for (int j = 0; j < 2; j++) {
-            // ANIMATED WATER
             for (int i = 0; i < _visibleChunks.size(); i++) {
                 Chunk c = _visibleChunks.get(i);
 
@@ -297,7 +299,8 @@ public final class World implements RenderableObject {
                     glColorMask(true, true, true, true);
                 }
 
-                c.render(ChunkMesh.RENDER_TYPE.WATER);
+                c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
+                c.render(ChunkMesh.RENDER_TYPE.WATER_AND_ICE);
             }
         }
 
@@ -310,23 +313,19 @@ public final class World implements RenderableObject {
     }
 
     public void update() {
-        // Make sure the chunks near the player are generated first
-        _worldProvider.getRenderingReferencePoint().set(_player.getPosition());
-
         updateTick();
 
         _skysphere.update();
         _player.update();
         _mobManager.updateAll();
 
-        _bulletPhysicsRenderer.resetChunks();
-
         // Update the list of relevant chunks
-        updateChunksInProximity();
+        updateChunksInProximity(false);
         updateVisibleChunks();
 
+        /* BULLET PHYSICS */
+        _bulletPhysicsRenderer.resetChunks();
         for (int i = 0; i < 16 && i < _chunksInProximity.size(); i++) {
-            /* PHYSICS */
             if (_chunksInProximity.get(i).getActiveChunkMesh() != null) {
                 if (_chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape != null) {
                     Vector3f position = new Vector3f(_chunksInProximity.get(i).getPosition());
@@ -337,7 +336,6 @@ public final class World implements RenderableObject {
                     _bulletPhysicsRenderer.addStaticChunk(position, _chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape);
                 }
             }
-            /* ------ */
         }
 
         _bulletPhysicsRenderer.update();
@@ -355,10 +353,7 @@ public final class World implements RenderableObject {
         //_blockGrid.update();
 
         /* SIMULATE! */
-        if (Blockmania.getInstance().getTime() - _lastSimulationStep > 1000) {
-            _worldProvider.simulate();
-            _lastSimulationStep = Blockmania.getInstance().getTime();
-        }
+        _worldProvider.simulate();
     }
 
     /**
@@ -436,9 +431,13 @@ public final class World implements RenderableObject {
         _player.registerObserver(_chunkUpdateManager);
         _player.registerObserver(_bulletPhysicsRenderer);
 
+        _worldProvider.setRenderingReferencePoint(_player.getPosition());
+
         _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
         _player.reset();
         _player.respawn();
+
+        updateChunksInProximity(true);
     }
 
     /**
@@ -525,6 +524,7 @@ public final class World implements RenderableObject {
 
     public void setViewingDistance(int distance) {
         _viewingDistance = distance;
+        updateChunksInProximity(true);
         Blockmania.getInstance().resetOpenGLParameters();
     }
 }

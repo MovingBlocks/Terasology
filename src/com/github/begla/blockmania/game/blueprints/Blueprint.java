@@ -17,7 +17,7 @@ package com.github.begla.blockmania.game.blueprints;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.datastructures.BlockPosition;
-import com.github.begla.blockmania.world.main.WorldProvider;
+import com.github.begla.blockmania.world.interfaces.WorldProvider;
 
 import java.util.HashMap;
 import java.util.HashSet;

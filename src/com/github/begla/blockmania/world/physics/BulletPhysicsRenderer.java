@@ -131,6 +131,9 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     }
 
     public void addStaticChunk(Vector3f position, TriangleMeshShape chunkShape) {
+        if (chunkShape == null)
+            return;
+
         Matrix3f rot = new Matrix3f();
         rot.setIdentity();
 
