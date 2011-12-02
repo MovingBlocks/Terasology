@@ -25,7 +25,7 @@ System {
     saveChunks = true
 
     // Size of the chunk cache
-    chunkCacheSize = 1024
+    chunkCacheSize = 1024 + 512;
 
     Debug {
 
@@ -57,7 +57,7 @@ Graphics {
     viewingDistanceNear = 8
     viewingDistanceModerate = 16
     viewingDistanceFar = 24
-    viewingDistanceUltra = 30
+    viewingDistanceUltra = 32
 
 }
 

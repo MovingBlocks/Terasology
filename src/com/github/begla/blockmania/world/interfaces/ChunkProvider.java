@@ -17,6 +17,8 @@ package com.github.begla.blockmania.world.interfaces;
 
 import com.github.begla.blockmania.world.chunk.Chunk;
 
+import java.util.Collection;
+
 /**
  * Basic interface for anything providing chunks.
  *
@@ -49,4 +51,11 @@ public interface ChunkProvider {
      * @return The amount of managed chunks
      */
     public int size();
+
+    /**
+     * Returns the cached chunks as an array.
+     *
+     * @return
+     */
+    public Collection<Chunk> getChunks();
 }

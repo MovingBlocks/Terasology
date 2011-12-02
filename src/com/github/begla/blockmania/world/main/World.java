@@ -289,6 +289,11 @@ public final class World implements RenderableObject {
             }
         }
 
+        for (int i = 0; i < _visibleChunks.size(); i++) {
+            Chunk c = _visibleChunks.get(i);
+            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
+        }
+
         for (int j = 0; j < 2; j++) {
             for (int i = 0; i < _visibleChunks.size(); i++) {
                 Chunk c = _visibleChunks.get(i);
@@ -299,7 +304,6 @@ public final class World implements RenderableObject {
                     glColorMask(true, true, true, true);
                 }
 
-                c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
                 c.render(ChunkMesh.RENDER_TYPE.WATER_AND_ICE);
             }
         }
@@ -323,7 +327,6 @@ public final class World implements RenderableObject {
         updateChunksInProximity(false);
         updateVisibleChunks();
 
-        /* BULLET PHYSICS */
         _bulletPhysicsRenderer.resetChunks();
         for (int i = 0; i < 16 && i < _chunksInProximity.size(); i++) {
             if (_chunksInProximity.get(i).getActiveChunkMesh() != null) {

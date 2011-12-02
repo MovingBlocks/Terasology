@@ -24,6 +24,7 @@ import com.github.begla.blockmania.world.main.LocalWorldProvider;
 import javax.vecmath.Vector3f;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -210,5 +211,9 @@ public final class LocalChunkCache implements ChunkProvider {
      */
     public int size() {
         return _chunkCache.size();
+    }
+
+    public Collection<Chunk> getChunks() {
+        return _chunkCache.values();
     }
 }

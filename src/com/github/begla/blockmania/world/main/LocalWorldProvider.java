@@ -335,6 +335,7 @@ public class LocalWorldProvider implements WorldProvider {
      * @param z The Z-coordinate
      * @return The humidity
      */
+
     public double getHumidityAt(int x, int z) {
         return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcHumidityAtGlobalPosition(x, z);
     }
@@ -508,5 +509,7 @@ public class LocalWorldProvider implements WorldProvider {
         c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
     }
 
-
+    GrowthSimulator getGrowthSimulator() {
+        return _growthSimulator;
+    }
 }

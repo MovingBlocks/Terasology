@@ -32,7 +32,7 @@ public class LiquidSimulator extends Simulator {
     private static final Vector3f[] NEIGHBORS6 = {new Vector3f(0, -1, 0), new Vector3f(0, 1, 0), new Vector3f(-1, 0, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
 
     public LiquidSimulator(WorldProvider parent) {
-        super(parent, 1000);
+        super(parent, 500);
     }
 
     @Override

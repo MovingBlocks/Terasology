@@ -22,7 +22,7 @@ bm.addBlock(new Block().withTitle("Lava").withId((byte) 10).withTextureAtlasPos(
 // <--
 
 // Ice
-bm.addBlock(new Block().withTitle("Ice").withId((byte) 8).withTextureAtlasPos(new Vector2f(3,4)).withTranslucent(true))
+bm.addBlock(new Block().withTitle("Ice").withId((byte) 8).withTextureAtlasPos(new Vector2f(3,4)).withTranslucent(true).withBlockForm(BLOCK_FORM.LOWERED_BLOCK).withCastsShadows(false))
 // <--
 
 // Glass

@@ -22,6 +22,8 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.WorldProvider;
 
+import java.util.Collection;
+
 /**
  * Grows grass, flowers and high grass.
  *
@@ -33,56 +35,54 @@ public class GrowthSimulator extends Simulator {
     private static final byte GRASS_TYPE = BlockManager.getInstance().getBlock("Grass").getId();
 
     public GrowthSimulator(WorldProvider parent) {
-        super(parent, 100);
+        super(parent, 1000);
     }
 
     @Override
     public void executeSimulation() {
-        int offsetX = Math.abs(_parent.getRandom().randomInt()) % 16;
-        int offsetZ = Math.abs(_parent.getRandom().randomInt()) % 16;
-        growGrass(_parent.getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX((int) _parent.getRenderingReferencePoint().x) + offsetX, MathHelper.calcChunkPosZ((int) _parent.getRenderingReferencePoint().z) + offsetZ));
-
-        for (Chunk c : _activeChunks) {
-            growGrass(c);
-        }
+        // TODO
     }
 
     private void growGrass(Chunk c) {
-        for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
-            for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
+        for (int i = 0; i < 256; i++) {
 
-                for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
+            int x = Math.abs(_parent.getRandom().randomInt()) % Chunk.getChunkDimensionX();
+            int z = Math.abs(_parent.getRandom().randomInt()) % Chunk.getChunkDimensionZ();
 
-                    byte type = _parent.getBlock(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z));
-                    BlockPosition pos = new BlockPosition(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z));
+            for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
 
-                    if (type == DIRT_TYPE) {
+                byte type = _parent.getBlock(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z));
+                BlockPosition pos = new BlockPosition(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z));
 
-                        ChunkGeneratorTerrain.BIOME_TYPE biome = _parent.getActiveBiome(pos.x, pos.z);
+                if (type == DIRT_TYPE) {
 
-                        if (biome != ChunkGeneratorTerrain.BIOME_TYPE.SNOW) {
+                    ChunkGeneratorTerrain.BIOME_TYPE biome = _parent.getActiveBiome(pos.x, pos.z);
 
-                            byte bLeft = _parent.getBlock(pos.x + 1, pos.y, pos.z);
-                            byte bRight = _parent.getBlock(pos.x - 1, pos.y, pos.z);
-                            byte bUp = _parent.getBlock(pos.x, pos.y, pos.z + 1);
-                            byte bDown = _parent.getBlock(pos.x, pos.y, pos.z - 1);
+                    if (biome != ChunkGeneratorTerrain.BIOME_TYPE.SNOW) {
 
-                            if (bLeft == GRASS_TYPE || bRight == GRASS_TYPE || bDown == GRASS_TYPE || bUp == GRASS_TYPE) {
-                                _parent.setBlock(pos.x, pos.y, pos.z, GRASS_TYPE, false, false, true);
-                                _activeChunks.add(c);
-                                return;
+                        byte bLeft = _parent.getBlock(pos.x + 1, pos.y, pos.z);
+                        byte bRight = _parent.getBlock(pos.x - 1, pos.y, pos.z);
+                        byte bUp = _parent.getBlock(pos.x, pos.y, pos.z + 1);
+                        byte bDown = _parent.getBlock(pos.x, pos.y, pos.z - 1);
+
+                        if (bLeft == GRASS_TYPE || bRight == GRASS_TYPE || bDown == GRASS_TYPE || bUp == GRASS_TYPE) {
+                            _parent.setBlock(pos.x, pos.y, pos.z, GRASS_TYPE, false, false, true);
+
+                            _activeChunks.add(c);
+                            for (Chunk n : c.loadOrCreateNeighbors()) {
+                                _activeChunks.add(n);
                             }
+                            return;
                         }
-                    } else if (type != 0x0) {
-                        break;
                     }
-
+                } else if (type != 0x0) {
+                    break;
                 }
+
             }
-
-            _activeChunks.remove(c);
         }
-    }
 
+        _activeChunks.remove(c);
+    }
 }
 
