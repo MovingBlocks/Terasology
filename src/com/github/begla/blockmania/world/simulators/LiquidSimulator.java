@@ -15,7 +15,9 @@
  */
 package com.github.begla.blockmania.world.simulators;
 
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.WorldProvider;
 
 import javax.vecmath.Vector3f;
@@ -32,76 +34,92 @@ public class LiquidSimulator extends Simulator {
     private static final Vector3f[] NEIGHBORS6 = {new Vector3f(0, -1, 0), new Vector3f(0, 1, 0), new Vector3f(-1, 0, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
 
     public LiquidSimulator(WorldProvider parent) {
-        super(parent, 500);
+        super(parent, 200);
     }
 
     @Override
     public void executeSimulation() {
-        for (int i = _activeBlocks.size() - 1; i >= 0; i--) {
+        if (_activeBlocks.isEmpty())
+            return;
 
-            BlockPosition bp = _activeBlocks.get(i);
-            byte state = _parent.getState(bp.x, bp.y, bp.z);
-            byte type = _parent.getBlock(bp.x, bp.y, bp.z);
-            byte stateAbove = _parent.getState(bp.x, bp.y + 1, bp.z);
-            byte typeAbove = _parent.getBlock(bp.x, bp.y + 1, bp.z);
-            byte stateBelow = _parent.getState(bp.x, bp.y - 1, bp.z);
-            byte typeBelow = _parent.getBlock(bp.x, bp.y - 1, bp.z);
+        BlockPosition bp = _activeBlocks.iterator().next();
+        _activeBlocks.remove(bp);
 
-            // Inward flow
-            if (type == typeAbove) {
-                state = 1;
-            } else if (state > 1) {
-                int minState = Integer.MAX_VALUE;
+        byte state = _parent.getState(bp.x, bp.y, bp.z);
+        byte type = _parent.getBlock(bp.x, bp.y, bp.z);
+        byte typeAbove = _parent.getBlock(bp.x, bp.y + 1, bp.z);
+        byte typeBelow = _parent.getBlock(bp.x, bp.y - 1, bp.z);
 
-                for (int j = 0; j < 6; j++) {
-                    byte nType = _parent.getBlock((int) NEIGHBORS6[j].x * j + bp.x, (int) NEIGHBORS6[j].y * j + bp.y, (int) NEIGHBORS6[j].z * j + bp.z);
-                    byte nState = _parent.getState((int) NEIGHBORS6[j].x * j + bp.x, (int) NEIGHBORS6[j].y * j + bp.y, (int) NEIGHBORS6[j].z * j + bp.z);
+        // Inward flow
+        if (type == typeAbove) {
+            state = 1;
+        } else if (state > 1) {
+            int minState = Integer.MAX_VALUE;
 
-                    if (nType == type) {
-                        if (nState < minState)
-                            minState = nState;
-                    }
+            for (int j = 0; j < 6; j++) {
+                byte nType = _parent.getBlock((int) NEIGHBORS6[j].x * j + bp.x, (int) NEIGHBORS6[j].y * j + bp.y, (int) NEIGHBORS6[j].z * j + bp.z);
+                byte nState = _parent.getState((int) NEIGHBORS6[j].x * j + bp.x, (int) NEIGHBORS6[j].y * j + bp.y, (int) NEIGHBORS6[j].z * j + bp.z);
+
+                if (nType == type) {
+                    if (nState < minState)
+                        minState = nState;
                 }
-
-                if (minState + 1 > state) {
-                    state--;
-                } else if (minState + 1 < state)
-                    state++;
             }
 
-            _parent.setState(bp.x, bp.y, bp.z, state);
-
-            if (state > 7) {
-                type = 0x0;
-                _parent.setBlock(bp.x, bp.y, bp.z, type, true, true, true);
-                return;
-            }
-
-            if (typeBelow == 0x0) {
-                _parent.setBlock(bp.x, bp.y - 1, bp.z, type, true, true, true);
-                _parent.setState(bp.x, bp.y - 1, bp.z, (byte) (state + 1));
-                break;
-            }
-
-            boolean[] invalid = new boolean[4];
-
-            // Outward flow
-            for (int j = 1; j < 5; j++) {
-
-                boolean set = false;
-                for (int k = 0; k < 4; k++) {
-                    if (_parent.getBlock((int) NEIGHBORS4[k].x * j + bp.x, bp.y, (int) NEIGHBORS4[k].z * j + bp.z) != 0) {
-                        invalid[k] = true;
-                    } else if (!invalid[k]) {
-                        _parent.setBlock((int) NEIGHBORS4[k].x * j + bp.x, bp.y, (int) NEIGHBORS4[k].z * j + bp.z, type, true, true, true);
-                        _parent.setState((int) NEIGHBORS4[k].x * j + bp.x, bp.y, (int) NEIGHBORS4[k].z * j + bp.z, (byte) (state + 1));
-                        set = true;
-                    }
-                }
-
-                if (set)
-                    return;
-            }
+            if (minState + 1 > state) {
+                state--;
+            } else if (minState + 1 < state)
+                state++;
         }
+
+        _parent.setState(bp.x, bp.y, bp.z, state);
+
+        if (state > 7) {
+            type = 0x0;
+            _parent.setBlock(bp.x, bp.y, bp.z, type, true, true);
+            return;
+        }
+
+        if (typeBelow == 0x0) {
+            _parent.setBlock(bp.x, bp.y - 1, bp.z, type, true, true);
+            _parent.setState(bp.x, bp.y - 1, bp.z, (byte) (state + 1));
+            return;
+        }
+
+        boolean[] invalid = new boolean[4];
+
+        // Outward flow
+        for (int j = 1; j < 5; j++) {
+
+            boolean set = false;
+            for (int k = 0; k < 4; k++) {
+                BlockPosition nBp = new BlockPosition((int) NEIGHBORS4[k].x * j + bp.x, bp.y, (int) NEIGHBORS4[k].z * j + bp.z);
+
+                if (_parent.getBlock(nBp.x, nBp.y, nBp.z) != 0) {
+                    invalid[k] = true;
+                } else if (!invalid[k]) {
+                    _parent.setBlock(nBp.x, nBp.y, nBp.z, type, true, true);
+                    _parent.setState(nBp.x, nBp.y, nBp.z, (byte) (state + 1));
+                    addActiveBlock(nBp);
+                    set = true;
+                }
+            }
+
+            if (set)
+                return;
+        }
+    }
+
+    public void lightChanged(Chunk chunk, BlockPosition pos) {
+    }
+
+    public void blockPlaced(Chunk chunk, BlockPosition pos) {
+        if (BlockManager.getInstance().getBlock(_parent.getBlock(pos.x, pos.y, pos.z)).isLiquid()) {
+            chunk.setState(pos.x, pos.y, pos.z, (byte) 7);
+            addActiveBlock(pos);
+        }
+    }
+
+    public void blockRemoved(Chunk chunk, BlockPosition pos) {
     }
 }

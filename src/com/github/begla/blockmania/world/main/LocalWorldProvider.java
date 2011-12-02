@@ -17,7 +17,6 @@ package com.github.begla.blockmania.world.main;
 
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
-import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.GeneratorManager;
@@ -27,8 +26,6 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.LocalChunkCache;
 import com.github.begla.blockmania.world.interfaces.ChunkProvider;
 import com.github.begla.blockmania.world.interfaces.WorldProvider;
-import com.github.begla.blockmania.world.simulators.GrowthSimulator;
-import com.github.begla.blockmania.world.simulators.LiquidSimulator;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -65,10 +62,6 @@ public class LocalWorldProvider implements WorldProvider {
     protected long _creationTime = Blockmania.getInstance().getTime() - (Long) ConfigurationManager.getInstance().getConfig().get("World.initialTimeOffsetInMs");
     public Vector3f _renderingReferencePoint = new Vector3f();
 
-    /* SIMULATORS */
-    private LiquidSimulator _liquidSimulator;
-    private GrowthSimulator _growthSimulator;
-
     /* RANDOMNESS */
     protected final FastRandom _random;
 
@@ -103,8 +96,6 @@ public class LocalWorldProvider implements WorldProvider {
 
         _generatorManager = new GeneratorManager(this);
         _chunkProvider = new LocalChunkCache(this);
-        _liquidSimulator = new LiquidSimulator(this);
-        _growthSimulator = new GrowthSimulator(this);
     }
 
     /**
@@ -118,7 +109,7 @@ public class LocalWorldProvider implements WorldProvider {
      * @param overwrite If true currently present blocks get replaced
      * @return True if a block was set/replaced
      */
-    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean simulate, boolean overwrite) {
+    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
         int chunkPosX = MathHelper.calcChunkPosX(x);
         int chunkPosZ = MathHelper.calcChunkPosZ(z);
 
@@ -140,14 +131,6 @@ public class LocalWorldProvider implements WorldProvider {
                 newBlock = type;
             } else {
                 return false;
-            }
-
-            /* LIQUID SIMULATION */
-            if (BlockManager.getInstance().getBlock(newBlock).isLiquid()) {
-                c.setState(blockPosX, y, blockPosZ, (byte) 7);
-
-                if (simulate)
-                    _liquidSimulator.addActiveBlock(new BlockPosition(c.getBlockWorldPosX(blockPosX), y, c.getBlockWorldPosZ(blockPosZ)));
             }
 
             if (updateLight) {
@@ -241,6 +224,17 @@ public class LocalWorldProvider implements WorldProvider {
         return c.getBlock(blockPosX, y, blockPosZ);
     }
 
+    public final boolean canBlockSeeTheSky(int x, int y, int z) {
+        int chunkPosX = MathHelper.calcChunkPosX(x);
+        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+
+        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
+    }
+
     public byte getState(int x, int y, int z) {
         int chunkPosX = MathHelper.calcChunkPosX(x);
         int chunkPosZ = MathHelper.calcChunkPosZ(z);
@@ -321,11 +315,6 @@ public class LocalWorldProvider implements WorldProvider {
 
         saveMetaData();
         getChunkProvider().dispose();
-    }
-
-    public void simulate() {
-        _liquidSimulator.simulate();
-        _growthSimulator.simulate();
     }
 
     /**
@@ -507,9 +496,5 @@ public class LocalWorldProvider implements WorldProvider {
 
         Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
-    }
-
-    GrowthSimulator getGrowthSimulator() {
-        return _growthSimulator;
     }
 }

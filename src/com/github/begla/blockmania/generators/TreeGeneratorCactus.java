@@ -34,7 +34,7 @@ public class TreeGeneratorCactus extends TreeGenerator {
     @Override
     public void generate(FastRandom rand, int posX, int posY, int posZ, boolean update) {
         for (int y = posY; y < posY + 3; y++) {
-            _generatorManager.getParent().setBlock(posX, y, posZ, BlockManager.getInstance().getBlock("Cactus").getId(), update, false, true);
+            _generatorManager.getParent().setBlock(posX, y, posZ, BlockManager.getInstance().getBlock("Cactus").getId(), update, true);
         }
     }
 }

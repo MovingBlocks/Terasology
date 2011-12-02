@@ -18,11 +18,10 @@ package com.github.begla.blockmania.world.simulators;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
-import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.WorldProvider;
 
-import java.util.Collection;
+import javax.vecmath.Vector3f;
 
 /**
  * Grows grass, flowers and high grass.
@@ -31,6 +30,7 @@ import java.util.Collection;
  */
 public class GrowthSimulator extends Simulator {
 
+    private static final Vector3f[] NEIGHBORS6 = {new Vector3f(0, -1, 0), new Vector3f(0, 1, 0), new Vector3f(-1, 0, 0), new Vector3f(1, 0, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
     private static final byte DIRT_TYPE = BlockManager.getInstance().getBlock("Dirt").getId();
     private static final byte GRASS_TYPE = BlockManager.getInstance().getBlock("Grass").getId();
 
@@ -40,49 +40,72 @@ public class GrowthSimulator extends Simulator {
 
     @Override
     public void executeSimulation() {
-        // TODO
-    }
 
-    private void growGrass(Chunk c) {
-        for (int i = 0; i < 256; i++) {
+        if (_activeBlocks.isEmpty())
+            return;
 
-            int x = Math.abs(_parent.getRandom().randomInt()) % Chunk.getChunkDimensionX();
-            int z = Math.abs(_parent.getRandom().randomInt()) % Chunk.getChunkDimensionZ();
+        BlockPosition pos = _activeBlocks.iterator().next();
+        _activeBlocks.remove(pos);
 
-            for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
+        if (!_parent.canBlockSeeTheSky(pos.x, pos.y, pos.z))
+            return;
 
-                byte type = _parent.getBlock(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z));
-                BlockPosition pos = new BlockPosition(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z));
+        ChunkGeneratorTerrain.BIOME_TYPE biome = _parent.getActiveBiome(pos.x, pos.z);
 
-                if (type == DIRT_TYPE) {
+        if (biome != ChunkGeneratorTerrain.BIOME_TYPE.SNOW) {
+            byte bLeft = _parent.getBlock(pos.x - 1, pos.y, pos.z);
+            byte bRight = _parent.getBlock(pos.x + 1, pos.y, pos.z);
+            byte bUp = _parent.getBlock(pos.x, pos.y, pos.z + 1);
+            byte bDown = _parent.getBlock(pos.x, pos.y, pos.z - 1);
 
-                    ChunkGeneratorTerrain.BIOME_TYPE biome = _parent.getActiveBiome(pos.x, pos.z);
+            if (bLeft == GRASS_TYPE || bRight == GRASS_TYPE || bDown == GRASS_TYPE || bUp == GRASS_TYPE) {
+                _parent.setBlock(pos.x, pos.y, pos.z, GRASS_TYPE, false, true);
+            }
 
-                    if (biome != ChunkGeneratorTerrain.BIOME_TYPE.SNOW) {
+            if (bLeft == DIRT_TYPE) {
+                addActiveBlock(new BlockPosition(pos.x - 1, pos.y, pos.z));
+            }
 
-                        byte bLeft = _parent.getBlock(pos.x + 1, pos.y, pos.z);
-                        byte bRight = _parent.getBlock(pos.x - 1, pos.y, pos.z);
-                        byte bUp = _parent.getBlock(pos.x, pos.y, pos.z + 1);
-                        byte bDown = _parent.getBlock(pos.x, pos.y, pos.z - 1);
+            if (bRight == DIRT_TYPE) {
+                addActiveBlock(new BlockPosition(pos.x + 1, pos.y, pos.z));
+            }
 
-                        if (bLeft == GRASS_TYPE || bRight == GRASS_TYPE || bDown == GRASS_TYPE || bUp == GRASS_TYPE) {
-                            _parent.setBlock(pos.x, pos.y, pos.z, GRASS_TYPE, false, false, true);
+            if (bUp == DIRT_TYPE) {
+                addActiveBlock(new BlockPosition(pos.x, pos.y, pos.z + 1));
+            }
 
-                            _activeChunks.add(c);
-                            for (Chunk n : c.loadOrCreateNeighbors()) {
-                                _activeChunks.add(n);
-                            }
-                            return;
-                        }
-                    }
-                } else if (type != 0x0) {
-                    break;
-                }
-
+            if (bDown == DIRT_TYPE) {
+                addActiveBlock(new BlockPosition(pos.x, pos.y, pos.z - 1));
             }
         }
+    }
 
-        _activeChunks.remove(c);
+    public void lightChanged(Chunk chunk, BlockPosition pos) {
+
+    }
+
+    public void blockPlaced(Chunk chunk, BlockPosition pos) {
+        if (_parent.getBlock(pos.x, pos.y, pos.z) == DIRT_TYPE) {
+            addActiveBlock(pos);
+        }
+
+        for (int i = 0; i < 6; i++) {
+            BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].x, pos.z + (int) NEIGHBORS6[i].z);
+
+            if (_parent.getBlock(nBp.x, nBp.y, nBp.z) == DIRT_TYPE) {
+                addActiveBlock(nBp);
+            }
+        }
+    }
+
+    public void blockRemoved(Chunk chunk, BlockPosition pos) {
+        for (int i = 0; i < 6; i++) {
+            BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].x, pos.z + (int) NEIGHBORS6[i].z);
+
+            if (_parent.getBlock(nBp.x, nBp.y, nBp.z) == DIRT_TYPE) {
+                addActiveBlock(nBp);
+            }
+        }
     }
 }
 

@@ -43,7 +43,7 @@ public class Blueprint {
      */
     public void build(WorldProvider provider, BlockPosition position) {
         for (BlockPosition bp : _blockPositions) {
-            provider.setBlock(bp.x + position.x, bp.y + position.y, bp.z + position.z, _blockTypes.get(bp).getId(), true, false, true);
+            provider.setBlock(bp.x + position.x, bp.y + position.y, bp.z + position.z, _blockTypes.get(bp).getId(), true, true);
         }
     }
 

@@ -200,7 +200,7 @@ public final class Player extends Character {
                     return;
                 }
 
-                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, true, false);
+                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, false);
                 AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
 
                 int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
@@ -232,7 +232,7 @@ public final class Player extends Character {
                         byte currentBlockType = getParent().getWorldProvider().getBlock((int) target.x, (int) target.y, (int) target.z);
 
                         if (currentBlockType != 0x0) {
-                            getParent().getWorldProvider().setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, false, true);
+                            getParent().getWorldProvider().setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, true);
 
                             if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent() && counter % 4 == 0)
                                 _parent.getRigidBlocksRenderer().addBlock(target, currentBlockType);
@@ -256,12 +256,12 @@ public final class Player extends Character {
             if (is != null) {
                 BlockPosition blockPos = is.getBlockPosition();
                 byte currentBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y, blockPos.z);
-                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, false, true);
+                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, true);
 
                 // Remove the upper block if it's a billboard
                 byte upperBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y + 1, blockPos.z);
                 if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                    getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y + 1, blockPos.z, (byte) 0x0, true, false, true);
+                    getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y + 1, blockPos.z, (byte) 0x0, true, true);
                 }
 
                 _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());

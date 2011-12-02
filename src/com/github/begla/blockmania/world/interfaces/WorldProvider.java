@@ -41,7 +41,7 @@ public interface WorldProvider {
      * @param overwrite   If true currently present blocks get replaced
      * @return True if a block was set/replaced
      */
-    public boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean simulate, boolean overwrite);
+    public boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite);
 
     /**
      * Sets the given state at the given position.
@@ -61,6 +61,8 @@ public interface WorldProvider {
      * @return The type of the block
      */
     public byte getBlock(int x, int y, int z);
+
+    public boolean canBlockSeeTheSky(int x, int y, int z);
 
     /**
      * Returns the state at the given position.
@@ -203,9 +205,4 @@ public interface WorldProvider {
      * Disposes this world provider.
      */
     public void dispose();
-
-    /**
-     * Simulates changes of the environment.
-     */
-    public void simulate();
 }

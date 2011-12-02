@@ -17,7 +17,6 @@ package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
@@ -459,7 +458,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public boolean canBlockSeeTheSky(int x, int y, int z) {
-        for (int y1 = y; y1 < getChunkDimensionY(); y1++) {
+        for (int y1 = y + 1; y1 < getChunkDimensionY(); y1++) {
             if (!BlockManager.getInstance().getBlock(getBlock(x, y1, z)).isTranslucent())
                 return false;
         }

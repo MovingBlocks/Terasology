@@ -34,6 +34,8 @@ import com.github.begla.blockmania.world.entity.Entity;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import com.github.begla.blockmania.world.interfaces.WorldProvider;
 import com.github.begla.blockmania.world.physics.BulletPhysicsRenderer;
+import com.github.begla.blockmania.world.simulators.GrowthSimulator;
+import com.github.begla.blockmania.world.simulators.LiquidSimulator;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
@@ -81,6 +83,10 @@ public final class World implements RenderableObject {
     /* HORIZON */
     private final Skysphere _skysphere;
 
+    /* SIMULATORS */
+    private LiquidSimulator _liquidSimulator;
+    private GrowthSimulator _growthSimulator;
+
     /* WATER AND LAVA ANIMATION */
     private int _tick = 0;
     private int _tickTock = 0;
@@ -113,6 +119,9 @@ public final class World implements RenderableObject {
         _mobManager = new MobManager(this);
         _blockGrid = new BlockGrid(this);
         _bulletPhysicsRenderer = new BulletPhysicsRenderer(this);
+
+        _liquidSimulator = new LiquidSimulator(_worldProvider);
+        _growthSimulator = new GrowthSimulator(_worldProvider);
 
         createMusicTimeEvents();
     }
@@ -356,7 +365,12 @@ public final class World implements RenderableObject {
         //_blockGrid.update();
 
         /* SIMULATE! */
-        _worldProvider.simulate();
+        simulate();
+    }
+
+    private void simulate() {
+        _liquidSimulator.simulate();
+        _growthSimulator.simulate();
     }
 
     /**
@@ -428,11 +442,15 @@ public final class World implements RenderableObject {
         if (_player != null) {
             _player.unregisterObserver(_chunkUpdateManager);
             _player.unregisterObserver(_bulletPhysicsRenderer);
+            _player.unregisterObserver(_liquidSimulator);
+            _player.unregisterObserver(_growthSimulator);
         }
 
         _player = p;
         _player.registerObserver(_chunkUpdateManager);
         _player.registerObserver(_bulletPhysicsRenderer);
+        _player.registerObserver(_liquidSimulator);
+        _player.registerObserver(_growthSimulator);
 
         _worldProvider.setRenderingReferencePoint(_player.getPosition());
 
@@ -451,7 +469,7 @@ public final class World implements RenderableObject {
             // the y is hard coded because it always gets set to 32, deep underground
             Vector3f loc = new Vector3f(_player.getPosition().x, _player.getPosition().y + 4, _player.getPosition().z);
             Blockmania.getInstance().getLogger().log(Level.INFO, "Portal location is" + loc);
-            _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, (byte) 30, false, false, true);
+            _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, (byte) 30, false, true);
             _portalManager.addPortal(loc);
         }
     }

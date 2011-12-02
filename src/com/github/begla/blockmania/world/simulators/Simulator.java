@@ -17,10 +17,9 @@ package com.github.begla.blockmania.world.simulators;
 
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.game.Blockmania;
-import com.github.begla.blockmania.world.chunk.Chunk;
+import com.github.begla.blockmania.world.interfaces.BlockObserver;
 import com.github.begla.blockmania.world.interfaces.WorldProvider;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -28,14 +27,13 @@ import java.util.HashSet;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class Simulator {
+public abstract class Simulator implements BlockObserver {
 
     protected final long _updateInterval;
     protected long _lastUpdate = Blockmania.getInstance().getTime();
 
     protected WorldProvider _parent;
-    protected ArrayList<BlockPosition> _activeBlocks = new ArrayList<BlockPosition>(16);
-    protected HashSet<Chunk> _activeChunks = new HashSet<Chunk>(16);
+    protected HashSet<BlockPosition> _activeBlocks = new HashSet<BlockPosition>(16);
 
     public Simulator(WorldProvider parent, long updateInterval) {
         _updateInterval = updateInterval;
@@ -48,10 +46,6 @@ public abstract class Simulator {
 
     public void addActiveBlock(BlockPosition bp) {
         _activeBlocks.add(bp);
-    }
-
-    public void addActiveChunk(Chunk c) {
-        _activeChunks.add(c);
     }
 
     public void simulate() {
