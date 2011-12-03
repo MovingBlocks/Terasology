@@ -52,12 +52,12 @@ public class ChunkMesh {
     private static final int OFFSET_COLOR = ((2 + 3 + 3) * 4);
 
     /* VERTEX DATA */
-    private final int[] _vertexBuffers = new int[4];
-    private final int[] _idxBuffers = new int[4];
-    private final int[] _idxBufferCount = new int[4];
+    private final int[] _vertexBuffers = new int[9];
+    private final int[] _idxBuffers = new int[9];
+    private final int[] _idxBufferCount = new int[9];
 
     /* TEMPORARY DATA */
-    public VertexElements[] _vertexElements = new VertexElements[4];
+    public VertexElements[] _vertexElements = new VertexElements[9];
 
     /* BULLET PHYSICS */
     public TriangleMeshShape _bulletMeshShape;
@@ -66,14 +66,23 @@ public class ChunkMesh {
     private boolean _disposed = false;
 
     public ChunkMesh() {
+        // Opaque elements assigned by sides
         _vertexElements[0] = new VertexElements();
         _vertexElements[1] = new VertexElements();
         _vertexElements[2] = new VertexElements();
         _vertexElements[3] = new VertexElements();
+        _vertexElements[4] = new VertexElements();
+        _vertexElements[5] = new VertexElements();
+
+        _vertexElements[6] = new VertexElements();
+        _vertexElements[7] = new VertexElements();
+        _vertexElements[8] = new VertexElements();
     }
 
     /**
      * Generates the display lists from the pre calculated arrays.
+     *
+     * @return True if something was generated
      */
     public boolean generateVBOs() {
         // IMPORTANT: A mesh can only be generated once.
@@ -137,35 +146,26 @@ public class ChunkMesh {
         }
     }
 
-    public void render(RENDER_TYPE type) {
+    public void render(RENDER_TYPE type, boolean distantChunk, int side) {
         switch (type) {
             case OPAQUE:
-                renderVbo(type.ordinal());
+                renderVbo(side);
                 break;
             case BILLBOARD_AND_TRANSLUCENT:
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-                renderVbo(type.ordinal());
+                renderVbo(7);
 
-                glDisable(GL_CULL_FACE);
-
-                // BILLBOARDS
-                renderVbo(type.ordinal() + 1);
-
-                glEnable(GL_CULL_FACE);
-                glDisable(GL_BLEND);
+                // Chunk is far away from the player
+                if (!distantChunk) {
+                    glDisable(GL_CULL_FACE);
+                    // BILLBOARDS
+                    renderVbo(6);
+                    glEnable(GL_CULL_FACE);
+                }
                 break;
             case WATER_AND_ICE:
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glDisable(GL_CULL_FACE);
-                renderVbo(type.ordinal() + 1);
-                glEnable(GL_CULL_FACE);
-                glDisable(GL_BLEND);
+                renderVbo(8);
                 break;
-            default:
-                return;
         }
     }
 
@@ -201,6 +201,6 @@ public class ChunkMesh {
     }
 
     public int countTriangles() {
-        return (_idxBufferCount[0] + _idxBufferCount[1] + _idxBufferCount[2] + _idxBufferCount[3]) / 3;
+        return (_idxBufferCount[0] + _idxBufferCount[1] + _idxBufferCount[2] + _idxBufferCount[3] + _idxBufferCount[4] + _idxBufferCount[5] + _idxBufferCount[6] + _idxBufferCount[7] + _idxBufferCount[8]) / 3;
     }
 }

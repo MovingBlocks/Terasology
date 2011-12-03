@@ -18,8 +18,6 @@ package com.github.begla.blockmania.generators;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 
-import java.util.Random;
-
 /**
  * Cactus generator.
  *
@@ -27,7 +25,7 @@ import java.util.Random;
  */
 public class TreeGeneratorCactus extends TreeGenerator {
 
-    TreeGeneratorCactus(GeneratorManager m) {
+    public TreeGeneratorCactus(GeneratorManager m) {
         super(m);
     }
 

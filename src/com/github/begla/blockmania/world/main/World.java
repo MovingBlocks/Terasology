@@ -45,7 +45,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
 
-import static org.lwjgl.opengl.GL11.glColorMask;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
 
 /**
  * The world of Blockmania. At its most basic the world contains chunks (consisting of a fixed amount of blocks)
@@ -103,7 +104,7 @@ public final class World implements RenderableObject {
 
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
-    
+
     /* STATISTICS */
     private int _visibleTriangles = 0;
 
@@ -132,6 +133,7 @@ public final class World implements RenderableObject {
     /**
      * Updates the list of chunks around the player.
      *
+     * @param force Forces the update
      * @return True if the list was changed
      */
     public boolean updateChunksInProximity(boolean force) {
@@ -202,9 +204,7 @@ public final class World implements RenderableObject {
     }
 
     /**
-     * Fetches the currently visible chunks (in sight of the player).
-     *
-     * @return The visible chunks
+     * Updates the currently visible chunks (in sight of the player).
      */
     public void updateVisibleChunks() {
         _visibleChunks.clear();
@@ -230,17 +230,14 @@ public final class World implements RenderableObject {
             if (isChunkVisible(c)) {
                 c.setVisible(true);
                 _visibleChunks.add(c);
-                
+
                 if (c.getActiveChunkMesh() != null) {
                     _visibleTriangles += c.getActiveChunkMesh().countTriangles();
                 }
 
                 if (c.isDirty() || c.isLightDirty()) {
-                    if (_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT)) {
+                    if (!_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT))
                         continue;
-                    }
-
-                    continue;
                 }
 
                 if (updateCounter < MAX_CHUNK_UPDATES_PER_ITERATION) {
@@ -319,10 +316,15 @@ public final class World implements RenderableObject {
             }
         }
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
         }
+
+        glDisable(GL_CULL_FACE);
 
         for (int j = 0; j < 2; j++) {
             for (int i = 0; i < _visibleChunks.size(); i++) {
@@ -337,6 +339,11 @@ public final class World implements RenderableObject {
                 c.render(ChunkMesh.RENDER_TYPE.WATER_AND_ICE);
             }
         }
+
+        glEnable(GL_CULL_FACE);
+        glDisable(GL_BLEND);
+
+        ShaderManager.getInstance().enableShader(null);
 
         _mobManager.renderAll();
 
@@ -367,9 +374,6 @@ public final class World implements RenderableObject {
 
         // And finally fire any active events
         _worldTimeEventManager.fireWorldTimeEvents();
-
-        // Does nothing at the moment
-        //_blockGrid.update();
 
         /* SIMULATE! */
         simulate();

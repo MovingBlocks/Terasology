@@ -27,8 +27,8 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /* CONST */
-    protected static final int SAMPLE_RATE_3D_HOR = 2;
-    protected static final int SAMPLE_RATE_3D_VERT = 16;
+    protected static final int SAMPLE_RATE_3D_HOR = 4;
+    protected static final int SAMPLE_RATE_3D_VERT = 32;
 
     /**
      * Available types of biomes.
@@ -106,7 +106,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                         if (firstBlockHeight == -1)
                             firstBlockHeight = y;
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.4)
+                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.7)
                             GenerateInnerLayer(x, y, z, c, type);
                         else
                             c.setBlock(x, y, z, (byte) 0);
@@ -270,7 +270,6 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     public double calcCaveDensity(double x, double y, double z) {
-        double result = _pGen6.fBm(x * 0.04, y * 0.04, z * 0.04, 4, 2.03719, 0.733819283);
-        return result;
+        return _pGen6.fBm(x * 0.04, y * 0.04, z * 0.04, 4, 2.03719, 0.733819283);
     }
 }

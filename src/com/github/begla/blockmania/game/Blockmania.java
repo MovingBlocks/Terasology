@@ -63,10 +63,10 @@ public final class Blockmania {
     private int _activeViewingDistance = 0;
 
     /* THREADING */
-    private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+    private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(12);
 
     /* CONST */
-    private static final int FRAME_SKIP_MAX_FRAMES = 1;
+    private static final int FRAME_SKIP_MAX_FRAMES = 5;
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 

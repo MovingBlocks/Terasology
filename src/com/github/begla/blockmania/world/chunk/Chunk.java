@@ -20,6 +20,7 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
@@ -53,6 +54,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     private static final int CHUNK_DIMENSION_Z = 16;
 
     private static final Vector3f[] LIGHT_DIRECTIONS = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
+    private static final Vector3f[] SIDE_NORMALS = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
 
     protected FastRandom _random;
     /* ------ */
@@ -708,23 +710,45 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @param type The type of vertices to render
      */
     public void render(ChunkMesh.RENDER_TYPE type) {
-        GL11.glPushMatrix();
-        GL11.glTranslatef(getPosition().x * getChunkDimensionX() - _parent.getRenderingReferencePoint().x, getPosition().y * getChunkDimensionY() - _parent.getRenderingReferencePoint().y, getPosition().z * getChunkDimensionZ() - _parent.getRenderingReferencePoint().z);
-
         // Render the generated chunk mesh
         if (_activeMesh != null) {
-            _activeMesh.render(type);
-        }
 
-        GL11.glPopMatrix();
+            GL11.glPushMatrix();
+            GL11.glTranslatef(getPosition().x * getChunkDimensionX() - _parent.getRenderingReferencePoint().x, getPosition().y * getChunkDimensionY() - _parent.getRenderingReferencePoint().y, getPosition().z * getChunkDimensionZ() - _parent.getRenderingReferencePoint().z);
+
+            // Remove billboards too far away from the player's position
+            boolean distanceChunk = (distanceToPlayer() > 128);
+
+            // Remove opaque quads that can not actually be seen by the player
+            if (type == ChunkMesh.RENDER_TYPE.OPAQUE) {
+                Vector3f pV = new Vector3f();
+                Vector3f playerPos = Blockmania.getInstance().getActiveWorld().getPlayer().getPosition();
+
+                pV.sub(playerPos, new Vector3f(getPosition().x * getChunkDimensionX(), 0, getPosition().z * getChunkDimensionZ()));
+                pV.normalize();
+
+                for (int i = 0; i < 6; i++) {
+                    if (i < 4 && (MathHelper.calcChunkPosX((int) playerPos.x) != getPosition().x && MathHelper.calcChunkPosX((int) playerPos.z) != getPosition().z)) {
+                        if (pV.dot(SIDE_NORMALS[i]) > 0) {
+                            _activeMesh.render(type, distanceChunk, i);
+                        }
+                    } else {
+                        _activeMesh.render(type, distanceChunk, i);
+                    }
+                }
+
+                GL11.glPopMatrix();
+                return;
+            }
+
+            _activeMesh.render(type, distanceChunk, 0);
+            GL11.glPopMatrix();
+        }
     }
 
     public boolean generateVBOs() {
-        if (_newMesh != null) {
-            return _newMesh.generateVBOs();
-        }
+        return _newMesh != null && _newMesh.generateVBOs();
 
-        return false;
     }
 
     public void render() {
@@ -881,7 +905,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     /**
      * Returns true if this chunk is currently visible.
      *
-     * @return
+     * @return True if the chunk is currently visible
      */
     public boolean isVisible() {
         return _visible;
