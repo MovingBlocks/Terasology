@@ -103,6 +103,9 @@ public final class World implements RenderableObject {
 
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
+    
+    /* STATISTICS */
+    private int _visibleTriangles = 0;
 
     /**
      * Initializes a new (local) world for the single player mode.
@@ -207,6 +210,8 @@ public final class World implements RenderableObject {
         _visibleChunks.clear();
         _bulletPhysicsRenderer.resetChunks();
 
+        _visibleTriangles = 0;
+
         int updateCounter = 0;
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
@@ -225,6 +230,10 @@ public final class World implements RenderableObject {
             if (isChunkVisible(c)) {
                 c.setVisible(true);
                 _visibleChunks.add(c);
+                
+                if (c.getActiveChunkMesh() != null) {
+                    _visibleTriangles += c.getActiveChunkMesh().countTriangles();
+                }
 
                 if (c.isDirty() || c.isLightDirty()) {
                     if (_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT)) {
@@ -482,7 +491,7 @@ public final class World implements RenderableObject {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, sun: %f, cache: %d, cu-duration: %fms, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %f, sun: %f, cache: %d, cu-duration: %fms, triangles: %d, vis-chunks: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _visibleTriangles, _visibleChunks.size(), _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {

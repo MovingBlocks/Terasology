@@ -199,4 +199,8 @@ public class ChunkMesh {
     public boolean isDisposed() {
         return _disposed;
     }
+
+    public int countTriangles() {
+        return (_idxBufferCount[0] + _idxBufferCount[1] + _idxBufferCount[2] + _idxBufferCount[3]) / 3;
+    }
 }
