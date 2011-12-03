@@ -71,6 +71,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     private boolean _visible = false;
     /* ------ */
     private boolean _disposed = false;
+    /* ----- */
+    private AABB _aabb = null;
 
     public enum LIGHT_TYPE {
         BLOCK,
@@ -600,9 +602,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public AABB getAABB() {
-        Vector3f dimensions = new Vector3f(getChunkDimensionX() / 2, getChunkDimensionY() / 2, getChunkDimensionZ() / 2);
-        Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x, dimensions.y, getChunkWorldPosZ() + dimensions.z);
-        return new AABB(position, dimensions);
+        if (_aabb == null) {
+            Vector3f dimensions = new Vector3f(getChunkDimensionX() / 2, getChunkDimensionY() / 2, getChunkDimensionZ() / 2);
+            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
+            _aabb = new AABB(position, dimensions);
+        }
+
+        return _aabb;
     }
 
     public void processChunk() {
