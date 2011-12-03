@@ -59,7 +59,7 @@ import static org.lwjgl.opengl.GL11.GL_BLEND;
  */
 public final class World implements RenderableObject {
 
-    private static final int MAX_CHUNK_UPDATES_PER_ITERATION = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxChunkUpdatesPerIteration");
+    private static final int VBO_UPDATE_GAP = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.vboUpdateGap");
 
     /* VIEWING DISTANCE */
     private int _viewingDistance = 8;
@@ -73,6 +73,7 @@ public final class World implements RenderableObject {
     /* CHUNKS */
     private ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>(), _visibleChunks = new ArrayList<Chunk>();
     private int _chunkPosX, _chunkPosZ;
+    private long _lastVboUpdate;
 
     /* CORE GAME OBJECTS */
     private PortalManager _portalManager;
@@ -240,9 +241,10 @@ public final class World implements RenderableObject {
                         continue;
                 }
 
-                if (updateCounter < MAX_CHUNK_UPDATES_PER_ITERATION) {
+                if (Blockmania.getInstance().getTime() - _lastVboUpdate > VBO_UPDATE_GAP) {
                     if (c.generateVBOs()) {
                         updateCounter++;
+                        _lastVboUpdate = Blockmania.getInstance().getTime();
                     }
 
                     c.update();

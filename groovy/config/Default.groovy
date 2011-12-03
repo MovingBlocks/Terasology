@@ -6,9 +6,6 @@ System {
 
     gameTitle = "Blockmania Pre Alpha"
 
-    // Maximum amount of chunk updates per iteration
-    maxChunkUpdatesPerIteration = 1
-
     // Max amount of particles
     maxParticles = 256
 
@@ -44,6 +41,8 @@ Graphics {
 
     gamma = 2.2d
     animatedWaterAndGrass = true
+
+    vboUpdateGap = 1 // ms
 
     pixelFormat = new PixelFormat().withDepthBits(24)
     displayMode = new DisplayMode(1280, 720)
