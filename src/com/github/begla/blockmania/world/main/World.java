@@ -205,10 +205,22 @@ public final class World implements RenderableObject {
      */
     public void updateVisibleChunks() {
         _visibleChunks.clear();
+        _bulletPhysicsRenderer.resetChunks();
 
         int updateCounter = 0;
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
+
+            if (c.getActiveChunkMesh() != null) {
+                if (c.getActiveChunkMesh()._bulletMeshShape != null) {
+                    Vector3f position = new Vector3f(c.getPosition());
+                    position.x *= Chunk.getChunkDimensionX();
+                    position.y *= Chunk.getChunkDimensionY();
+                    position.z *= Chunk.getChunkDimensionZ();
+
+                    _bulletPhysicsRenderer.addStaticChunk(position, _chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape);
+                }
+            }
 
             if (isChunkVisible(c)) {
                 c.setVisible(true);
@@ -335,20 +347,6 @@ public final class World implements RenderableObject {
         // Update the list of relevant chunks
         updateChunksInProximity(false);
         updateVisibleChunks();
-
-        _bulletPhysicsRenderer.resetChunks();
-        for (int i = 0; i < 16 && i < _chunksInProximity.size(); i++) {
-            if (_chunksInProximity.get(i).getActiveChunkMesh() != null) {
-                if (_chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape != null) {
-                    Vector3f position = new Vector3f(_chunksInProximity.get(i).getPosition());
-                    position.x *= Chunk.getChunkDimensionX();
-                    position.y *= Chunk.getChunkDimensionY();
-                    position.z *= Chunk.getChunkDimensionZ();
-
-                    _bulletPhysicsRenderer.addStaticChunk(position, _chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape);
-                }
-            }
-        }
 
         _bulletPhysicsRenderer.update();
 

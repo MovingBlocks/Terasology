@@ -83,6 +83,25 @@ bm.addBlock(new Block().withTitle("Red stone").withId((byte) 23).withTextureAtla
 bm.addBlock(new Block().withTitle("Silver").withId((byte) 22).withTextureAtlasPos(new Vector2f(1, 2)))
 // <--
 
+// Colored blocks
+bm.addBlock(new Block().withTitle("Color white").withId((byte) 32).withTextureAtlasPos(new Vector2f(0, 4)))
+bm.addBlock(new Block().withTitle("Color black").withId((byte) 33).withTextureAtlasPos(new Vector2f(1, 7)))
+bm.addBlock(new Block().withTitle("Color red").withId((byte) 34).withTextureAtlasPos(new Vector2f(1, 8)))
+bm.addBlock(new Block().withTitle("Color dark green").withId((byte) 35).withTextureAtlasPos(new Vector2f(1, 9)))
+bm.addBlock(new Block().withTitle("Color brown").withId((byte) 36).withTextureAtlasPos(new Vector2f(1, 10)))
+bm.addBlock(new Block().withTitle("Color dark blue").withId((byte) 37).withTextureAtlasPos(new Vector2f(1, 11)))
+bm.addBlock(new Block().withTitle("Color purple").withId((byte) 38).withTextureAtlasPos(new Vector2f(1, 12)))
+bm.addBlock(new Block().withTitle("Color turquoise").withId((byte) 39).withTextureAtlasPos(new Vector2f(1, 13)))
+bm.addBlock(new Block().withTitle("Color gray").withId((byte) 40).withTextureAtlasPos(new Vector2f(1, 14)))
+bm.addBlock(new Block().withTitle("Color dark gray").withId((byte) 41).withTextureAtlasPos(new Vector2f(2, 7)))
+bm.addBlock(new Block().withTitle("Color pink").withId((byte) 42).withTextureAtlasPos(new Vector2f(2, 8)))
+bm.addBlock(new Block().withTitle("Color green").withId((byte) 43).withTextureAtlasPos(new Vector2f(2, 9)))
+bm.addBlock(new Block().withTitle("Color orange").withId((byte) 44).withTextureAtlasPos(new Vector2f(2, 10)))
+bm.addBlock(new Block().withTitle("Color blue").withId((byte) 45).withTextureAtlasPos(new Vector2f(2, 11)))
+bm.addBlock(new Block().withTitle("Color lavender").withId((byte) 46).withTextureAtlasPos(new Vector2f(2, 12)))
+bm.addBlock(new Block().withTitle("Color dark orange").withId((byte) 47).withTextureAtlasPos(new Vector2f(2, 13)))
+// <--
+
 // Light sources
 bm.addBlock(new Block().withTitle("Torch").withId((byte) 29).withTextureAtlasPos(new Vector2f(0, 5)).withTranslucent(true).withPenetrable(true).withBlockForm(BLOCK_FORM.BILLBOARD).withLuminance((byte) 15).withAllowBlockAttachment(false))
 // <--

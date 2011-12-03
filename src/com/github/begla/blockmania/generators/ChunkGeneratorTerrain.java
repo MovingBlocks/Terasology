@@ -27,8 +27,8 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /* CONST */
-    protected static final int SAMPLE_RATE_3D_HOR = 2;
-    protected static final int SAMPLE_RATE_3D_VERT = 8;
+    protected static final int SAMPLE_RATE_3D_HOR = 4;
+    protected static final int SAMPLE_RATE_3D_VERT = 32;
 
     /**
      * Available types of biomes.
@@ -229,13 +229,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double mIntens = MathHelper.clamp(1.0 - (dT + dH) * 5.0) + 0.3;
 
         double density = calcMountainDensity(x, y, z) * mIntens * height;
-        return -y + (((height * 80.0) + 16.0) + density * 512.0);
+        return -y + (((height * 80.0) + 16.0) + density * 1024.0);
     }
 
     public double calcBaseTerrain(double x, double z) {
-        double result = (_pGen2.fBm(0.00008 * x, 0, 0.00008 * z, 7, 1.7, 0.9171) + 1.0) / 2.0;
+        double result = (_pGen2.fBm(0.00004 * x, 0, 0.00004 * z, 8, 1.7, 0.9171) + 1.0) / 2.0;
 
-        double river = Math.sqrt(Math.abs(_pGen3.fBm(0.002 * x, 0, 0.002 * z, 8, 2.08371, 0.7471)));
+        double river = Math.sqrt(Math.abs(_pGen3.fBm(0.001 * x, 0, 0.001 * z, 8, 2.08371, 0.7471)));
 
         river -= 0.1;
 
@@ -250,9 +250,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     public double calcMountainDensity(double x, double y, double z) {
         double x1, y1, z1;
 
-        x1 = x * 0.008;
-        y1 = y * 0.006;
-        z1 = z * 0.008;
+        x1 = x * 0.006;
+        y1 = y * 0.003;
+        z1 = z * 0.006;
 
         double result = _pGen5.fBm(x1, y1, z1, 9, 1.99782819, 0.8581);
 

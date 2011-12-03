@@ -504,7 +504,11 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @return The distance of the chunk to the player
      */
     public double distanceToPlayer() {
-        return Math.sqrt(Math.pow(getParent().getRenderingReferencePoint().x - getChunkWorldPosX(), 2) + Math.pow(getParent().getRenderingReferencePoint().z - getChunkWorldPosZ(), 2));
+        Vector3f result = new Vector3f(getPosition().x * getChunkDimensionX(), 0, getPosition().z * getChunkDimensionZ());
+        Vector3f referencePoint = new Vector3f(_parent.getRenderingReferencePoint().x, 0, _parent.getRenderingReferencePoint().z);
+        result.sub(referencePoint);
+
+        return result.length();
     }
 
     /**
@@ -685,7 +689,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (isFresh() || isLightDirty())
             return;
 
-        setNewMesh(_meshGenerator.generateMesh());
+        double distance = distanceToPlayer();
+        boolean createPhysicsMesh = distance < 64.0;
+
+        setNewMesh(_meshGenerator.generateMesh(createPhysicsMesh));
         setDirty(false);
     }
 
@@ -720,6 +727,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public void update() {
         swapActiveMesh();
+
+        // Free some space
+        if (distanceToPlayer() > 64.0) {
+            if (_activeMesh != null) {
+                _activeMesh._bulletMeshShape = null;
+            }
+        }
     }
 
     private void setNewMesh(ChunkMesh newMesh) {

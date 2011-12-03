@@ -45,7 +45,7 @@ public final class ChunkMeshGenerator {
         _chunk = chunk;
     }
 
-    public ChunkMesh generateMesh() {
+    public ChunkMesh generateMesh(boolean createPhysicsMesh) {
         ChunkMesh mesh = new ChunkMesh();
 
         for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
@@ -70,22 +70,26 @@ public final class ChunkMeshGenerator {
             }
         }
 
-        generateOptimizedBuffers(mesh);
+        generateOptimizedBuffers(mesh, createPhysicsMesh);
         _statVertexArrayUpdateCount++;
 
         return mesh;
     }
 
-    private void generateOptimizedBuffers(ChunkMesh mesh) {
+    private void generateOptimizedBuffers(ChunkMesh mesh, boolean createPhysicsMesh) {
         /* BULLET PHYSICS */
-        IndexedMesh indexMesh = new IndexedMesh();
-        indexMesh.vertexBase = ByteBuffer.allocate(mesh._vertexElements[0].quads.size() * 4);
-        indexMesh.triangleIndexBase = ByteBuffer.allocate(mesh._vertexElements[0].quads.size() * 4);
-        indexMesh.triangleIndexStride = 12;
-        indexMesh.vertexStride = 12;
-        indexMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
-        indexMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
-        indexMesh.indexType = ScalarType.INTEGER;
+        IndexedMesh indexMesh = null;
+
+        if (createPhysicsMesh) {
+            indexMesh = new IndexedMesh();
+            indexMesh.vertexBase = ByteBuffer.allocate(mesh._vertexElements[0].quads.size() * 4);
+            indexMesh.triangleIndexBase = ByteBuffer.allocate(mesh._vertexElements[0].quads.size() * 4);
+            indexMesh.triangleIndexStride = 12;
+            indexMesh.vertexStride = 12;
+            indexMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
+            indexMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
+            indexMesh.indexType = ScalarType.INTEGER;
+        }
         /* ------------- */
 
         for (int j = 0; j < mesh._vertexElements.length; j++) {
@@ -107,7 +111,7 @@ public final class ChunkMeshGenerator {
                     mesh._vertexElements[j].indices.put(cIndex);
 
                     /* BULLET PHYSICS */
-                    if (j == 0) {
+                    if (j == 0 && indexMesh != null) {
                         indexMesh.triangleIndexBase.putInt(cIndex);
                         indexMesh.triangleIndexBase.putInt(cIndex + 1);
                         indexMesh.triangleIndexBase.putInt(cIndex + 2);
@@ -128,7 +132,7 @@ public final class ChunkMeshGenerator {
                 mesh._vertexElements[j].vertices.put(vertexPos.z);
 
                 /* BULLET PHYSICS */
-                if (j == 0) {
+                if (j == 0 && indexMesh != null) {
                     indexMesh.vertexBase.putFloat(vertexPos.x);
                     indexMesh.vertexBase.putFloat(vertexPos.y);
                     indexMesh.vertexBase.putFloat(vertexPos.z);
@@ -155,14 +159,16 @@ public final class ChunkMeshGenerator {
             mesh._vertexElements[j].indices.flip();
         }
 
-        indexMesh.triangleIndexBase.flip();
-        indexMesh.vertexBase.flip();
-
         /* BULLET PHYSICS */
-        TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
-        vertexArray.addIndexedMesh(indexMesh);
+        if (indexMesh != null) {
+            indexMesh.triangleIndexBase.flip();
+            indexMesh.vertexBase.flip();
 
-        mesh._bulletMeshShape = new BvhTriangleMeshShape(vertexArray, true);
+            TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+            vertexArray.addIndexedMesh(indexMesh);
+
+            mesh._bulletMeshShape = new BvhTriangleMeshShape(vertexArray, false);
+        }
         /* -------------- */
     }
 

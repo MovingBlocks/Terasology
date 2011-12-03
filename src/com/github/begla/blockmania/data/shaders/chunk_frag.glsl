@@ -92,6 +92,8 @@ void main(){
     float fog = 1.0 - ((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale);
     fog /= 1.5;
 
+    fog = clamp(fog, 0.0, 1.0);
+
     if (!swimming) {
         gl_FragColor.rgb = linearToSrgb(mix(color, vec4(1.0,1.0,1.0,1.0) * daylightTrans, fog)).rgb;
         gl_FragColor.a = color.a;
