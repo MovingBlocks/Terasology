@@ -20,9 +20,9 @@ import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.game.PortalManager;
 import com.github.begla.blockmania.game.blueprints.BlockGrid;
-import com.github.begla.blockmania.rendering.manager.MobManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
+import com.github.begla.blockmania.rendering.manager.MobManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
@@ -46,7 +46,6 @@ import java.util.Collections;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
 
 /**
  * The world of Blockmania. At its most basic the world contains chunks (consisting of a fixed amount of blocks)
@@ -213,7 +212,6 @@ public final class World implements RenderableObject {
 
         _visibleTriangles = 0;
 
-        int updateCounter = 0;
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
 
@@ -243,7 +241,6 @@ public final class World implements RenderableObject {
 
                 if (Blockmania.getInstance().getTime() - _lastVboUpdate > VBO_UPDATE_GAP) {
                     if (c.generateVBOs()) {
-                        updateCounter++;
                         _lastVboUpdate = Blockmania.getInstance().getTime();
                     }
 
@@ -560,5 +557,16 @@ public final class World implements RenderableObject {
         _viewingDistance = distance;
         updateChunksInProximity(true);
         Blockmania.getInstance().resetOpenGLParameters();
+    }
+
+    public void standaloneGenerateChunks() {
+        for (int i = 0; i < _chunksInProximity.size(); i++) {
+            Chunk c = _chunksInProximity.get(i);
+            c.generateVBOs();
+
+            if (c.isDirty() || c.isLightDirty()) {
+                _chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
+            }
+        }
     }
 }

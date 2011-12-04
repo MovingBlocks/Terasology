@@ -116,6 +116,9 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
     public void render() {
         super.render();
 
+        if (!isVisible())
+            return;
+
         if ((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.rotatingBlock"))
             drawRotatingBlock();
     }

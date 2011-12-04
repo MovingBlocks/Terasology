@@ -30,7 +30,7 @@ import java.util.HashSet;
 public final class ChunkUpdateManager implements BlockObserver {
 
     public enum UPDATE_TYPE {
-        DEFAULT, PLAYER_PLACED, PLAYER_REMOVED
+        DEFAULT, PLAYER_TRIGGERED
     }
 
     /* CONST */
@@ -88,11 +88,11 @@ public final class ChunkUpdateManager implements BlockObserver {
     }
 
     public void blockPlaced(Chunk chunk, BlockPosition pos) {
-        queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_PLACED);
+        queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_TRIGGERED);
     }
 
     public void blockRemoved(Chunk chunk, BlockPosition pos) {
-        queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_REMOVED);
+        queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_TRIGGERED);
     }
 
 }

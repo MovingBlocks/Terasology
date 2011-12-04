@@ -19,6 +19,7 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.groovy.GroovyManager;
 import com.github.begla.blockmania.gui.menus.UIHeadsUpDisplay;
+import com.github.begla.blockmania.gui.menus.UILoadingScreen;
 import com.github.begla.blockmania.gui.menus.UIPauseMenu;
 import com.github.begla.blockmania.rendering.manager.FontManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
@@ -88,6 +89,7 @@ public final class Blockmania {
     /* GUI */
     private UIHeadsUpDisplay _hud;
     private UIPauseMenu _pauseMenu;
+    private UILoadingScreen _loadingScreen;
 
     /* SINGLETON */
     private static Blockmania _instance;
@@ -255,12 +257,39 @@ public final class Blockmania {
         _world = new World(title, seed);
         _world.setPlayer(new Player(_world));
 
-        // Reset the delta value
-        _lastLoopTime = getTime();
-
         // Create the first Portal if it doesn't exist yet
         _world.initPortal();
         _world.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+
+        simulateWorld(4000);
+    }
+
+    private void simulateWorld(int duration) {
+        long timeBefore = getTime();
+
+        _loadingScreen.setVisible(true);
+        _hud.setVisible(false);
+
+        float diff = 0;
+
+        for (; diff < duration; ) {
+            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
+
+            renderUserInterface();
+            updateUserInterface();
+
+            getActiveWorld().standaloneGenerateChunks();
+
+            Display.update();
+
+            diff = getTime() - timeBefore;
+        }
+
+        // Reset the delta value
+        _lastLoopTime = getTime();
+
+        _loadingScreen.setVisible(false);
+        _hud.setVisible(true);
     }
 
     /**
@@ -288,6 +317,7 @@ public final class Blockmania {
         _hud.setVisible(true);
 
         _pauseMenu = new UIPauseMenu();
+        _loadingScreen = new UILoadingScreen();
 
         /*
          * Init. OpenGL
@@ -392,11 +422,13 @@ public final class Blockmania {
     private void renderUserInterface() {
         _hud.render();
         _pauseMenu.render();
+        _loadingScreen.render();
     }
 
     private void updateUserInterface() {
         _hud.update();
         _pauseMenu.update();
+        _loadingScreen.update();
     }
 
 

@@ -62,7 +62,7 @@ public class UIButton extends UIDisplayContainer {
         if (intersects(mousePos)) {
 
             if (!_clickSoundPlayed) {
-                AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(1.0f, 1.0f, false);
+                AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(1.0f, 0.5f, false);
                 _clickSoundPlayed = true;
             }
 
@@ -104,8 +104,6 @@ public class UIButton extends UIDisplayContainer {
     }
 
     public void clicked() {
-        System.out.println("TEST");
-
         for (int i = 0; i < _clickListeners.size(); i++) {
             _clickListeners.get(i).clicked(this);
         }
@@ -121,5 +119,9 @@ public class UIButton extends UIDisplayContainer {
 
     public void removeClickListener(UIClickListener listener) {
         _clickListeners.remove(listener);
+    }
+
+    public Vector2f calcCenterPosition() {
+        return new Vector2f(Display.getWidth() / 2 - getSize().x / 2, Display.getHeight() / 2 - getSize().y / 2);
     }
 }

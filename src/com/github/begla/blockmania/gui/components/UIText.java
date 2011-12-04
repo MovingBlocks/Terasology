@@ -18,6 +18,7 @@ package com.github.begla.blockmania.gui.components;
 import com.github.begla.blockmania.gui.framework.UIDisplayElement;
 import com.github.begla.blockmania.rendering.manager.FontManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
@@ -121,5 +122,9 @@ public class UIText extends UIDisplayElement {
 
     public int getTextWidth() {
         return _font.getWidth(_text);
+    }
+    
+    public Vector2f calcCenterPosition() {
+       return new Vector2f(Display.getWidth() / 2 - getTextWidth() / 2, Display.getHeight() / 2 - getTextHeight());
     }
 }

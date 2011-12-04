@@ -66,8 +66,8 @@ public class UIPauseMenu extends UIDisplayRenderer {
 
         _newWorldButton.addClickListener(new UIClickListener() {
             public void clicked(UIDisplayElement element) {
-                Blockmania.getInstance().initWorld();
                 setVisible(false);
+                Blockmania.getInstance().initWorld();
             }
         });
 
@@ -77,8 +77,8 @@ public class UIPauseMenu extends UIDisplayRenderer {
 
         _respawnButton.addClickListener(new UIClickListener() {
             public void clicked(UIDisplayElement element) {
-                Blockmania.getInstance().getActiveWorld().getPlayer().respawn();
                 setVisible(false);
+                Blockmania.getInstance().getActiveWorld().getPlayer().respawn();
             }
         });
 
@@ -99,12 +99,12 @@ public class UIPauseMenu extends UIDisplayRenderer {
     public void update() {
         super.update();
 
-        _version.setPosition(new Vector2f(Display.getWidth() / 2 - _version.getTextWidth() / 2, 230f));
+        _version.setPosition(new Vector2f(_version.calcCenterPosition().x, 230f));
 
-        _respawnButton.setPosition(new Vector2f(Display.getWidth() / 2 - 128f, 300f));
-        _newWorldButton.setPosition(new Vector2f(Display.getWidth() / 2 - 128f, 300f + 32f + 8f));
+        _respawnButton.setPosition(new Vector2f(_respawnButton.calcCenterPosition().x, 300f));
+        _newWorldButton.setPosition(new Vector2f(_newWorldButton.calcCenterPosition().x, 300f + 32f + 8f));
 
-        _exitButton.setPosition(new Vector2f(Display.getWidth() / 2 - 128f, 300f + 2 * 32f + 32f));
+        _exitButton.setPosition(new Vector2f(_exitButton.calcCenterPosition().x, 300f + 2 * 32f + 32f));
 
         _title.setPosition(new Vector2f(Display.getWidth() / 2 - 256f, 128f));
     }
