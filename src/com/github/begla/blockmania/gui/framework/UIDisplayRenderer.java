@@ -24,7 +24,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class BlockmaniaDisplayRenderer extends BlockmaniaDisplayContainer {
+public abstract class UIDisplayRenderer extends UIDisplayContainer {
 
     @Override
     protected void renderElement() {
@@ -41,6 +41,7 @@ public abstract class BlockmaniaDisplayRenderer extends BlockmaniaDisplayContain
         glPushMatrix();
         glLoadIdentity();
 
+        glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -49,6 +50,7 @@ public abstract class BlockmaniaDisplayRenderer extends BlockmaniaDisplayContain
 
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
 
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);

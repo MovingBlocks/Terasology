@@ -18,8 +18,8 @@ package com.github.begla.blockmania.game;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.groovy.GroovyManager;
-import com.github.begla.blockmania.gui.implementation.UIDebugConsole;
-import com.github.begla.blockmania.gui.implementation.UIHeadsUpDisplay;
+import com.github.begla.blockmania.gui.menus.UIHeadsUpDisplay;
+import com.github.begla.blockmania.gui.menus.UIPauseMenu;
 import com.github.begla.blockmania.rendering.manager.FontManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
@@ -87,6 +87,7 @@ public final class Blockmania {
 
     /* GUI */
     private UIHeadsUpDisplay _hud;
+    private UIPauseMenu _pauseMenu;
 
     /* SINGLETON */
     private static Blockmania _instance;
@@ -284,6 +285,9 @@ public final class Blockmania {
         BlockManager.getInstance();
 
         _hud = new UIHeadsUpDisplay();
+        _hud.setVisible(true);
+
+        _pauseMenu = new UIPauseMenu();
 
         /*
          * Init. OpenGL
@@ -374,9 +378,12 @@ public final class Blockmania {
     }
 
     public void update() {
-        if (!_pauseGame) {
+        if (!_pauseGame && !_hud.getDebugConsole().isVisible() && !_pauseMenu.isVisible()) {
             if (_world != null)
                 _world.update();
+            Mouse.setGrabbed(true);
+        } else {
+            Mouse.setGrabbed(false);
         }
 
         updateUserInterface();
@@ -384,26 +391,33 @@ public final class Blockmania {
 
     private void renderUserInterface() {
         _hud.render();
+        _pauseMenu.render();
     }
 
     private void updateUserInterface() {
         _hud.update();
+        _pauseMenu.update();
     }
 
 
     public void pause() {
-        Mouse.setGrabbed(false);
         _pauseGame = true;
     }
 
     public void unpause() {
         _pauseGame = false;
-        Mouse.setGrabbed(true);
     }
 
     public void togglePauseGame() {
-        _pauseGame = !_pauseGame;
-        Mouse.setGrabbed(!_pauseGame);
+        if (_pauseGame) {
+            unpause();
+        } else {
+            pause();
+        }
+    }
+
+    public void togglePauseMenu() {
+        _pauseMenu.setVisible(!_pauseMenu.isVisible());
     }
 
     public void exit(boolean saveWorld) {
@@ -422,7 +436,12 @@ public final class Blockmania {
         while (Mouse.next()) {
             int button = Mouse.getEventButton();
             int wheelMoved = Mouse.getEventDWheel();
-            _world.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+
+            if (!isGamePaused())
+                _world.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+
+            _hud.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+            _pauseMenu.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
         }
     }
 
@@ -435,10 +454,10 @@ public final class Blockmania {
 
             if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                 if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                    exit();
+                    togglePauseMenu();
                 }
 
-                if (key == Keyboard.KEY_TAB && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_P && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                     togglePauseGame();
                 }
 
@@ -452,6 +471,7 @@ public final class Blockmania {
 
                 // Pass the pressed key on to the GUI
                 _hud.processKeyboardInput(key);
+                _pauseMenu.processKeyboardInput(key);
             }
 
             // Pass input to the current player

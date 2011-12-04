@@ -13,21 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.gui.implementation;
+package com.github.begla.blockmania.gui.components;
 
-import com.github.begla.blockmania.gui.framework.BlockmaniaDisplayElement;
+import com.github.begla.blockmania.gui.framework.UIDisplayElement;
 
-import javax.vecmath.Vector2f;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
- * TODO
+ * Composition of multiple display elements.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class UIButton extends BlockmaniaDisplayElement {
+public class UICrosshair extends UIDisplayElement {
 
-    public UIButton(Vector2f position, Vector2f size) {
-        super(position, size);
+    public void render() {
+        glColor4f(1f, 1f, 1f, 1f);
+        glLineWidth(2f);
+
+        glBegin(GL_LINES);
+        glVertex2f(-8f, 0f);
+        glVertex2f(8f, 0f);
+        glVertex2f(0f, -8f);
+        glVertex2f(0f, 8f);
+        glEnd();
     }
 
+    @Override
+    public void update() {
+    }
 }

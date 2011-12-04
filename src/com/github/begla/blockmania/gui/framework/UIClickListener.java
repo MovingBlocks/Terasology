@@ -13,34 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.gui.implementation;
-
-import com.github.begla.blockmania.gui.framework.BlockmaniaDisplayElement;
-
-import javax.vecmath.Vector2f;
-
-import static org.lwjgl.opengl.GL11.*;
+package com.github.begla.blockmania.gui.framework;
 
 /**
- * Composition of multiple display elements.
+ * TODO
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UICrosshair extends BlockmaniaDisplayElement {
+public interface UIClickListener {
 
-    public void render() {
-        glColor4f(1f, 1f, 1f, 1f);
-        glLineWidth(2f);
+    public void clicked(UIDisplayElement element);
 
-        glBegin(GL_LINES);
-        glVertex2d(-8f, 0f);
-        glVertex2d(8f, 0f);
-        glVertex2d(0f, -8f);
-        glVertex2d(0f, 8f);
-        glEnd();
-    }
-
-    @Override
-    public void update() {
-    }
 }

@@ -15,32 +15,44 @@
  */
 package com.github.begla.blockmania.gui.framework;
 
+import javax.vecmath.Vector2f;
 import java.util.ArrayList;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Composition of multiple display elements.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class BlockmaniaDisplayContainer extends BlockmaniaDisplayElement {
+public abstract class UIDisplayContainer extends UIDisplayElement {
 
-    ArrayList<BlockmaniaDisplayElement> _displayElements = new ArrayList<BlockmaniaDisplayElement>();
+    ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
+
+    public UIDisplayContainer() {
+        super();
+    }
+
+    public UIDisplayContainer(Vector2f position) {
+        super(position);
+    }
+
+    public UIDisplayContainer(Vector2f position, Vector2f size) {
+        super(position, size);
+    }
 
     public void render() {
-        glPushMatrix();
-        glTranslatef(getPosition().x, getPosition().y, 0);
+        if (!isVisible())
+            return;
 
         // Render all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
             _displayElements.get(i).renderElement();
         }
-
-        glPopMatrix();
     }
 
     public void update() {
+        if (!isVisible())
+            return;
+
         // Update all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
             _displayElements.get(i).update();
@@ -49,21 +61,37 @@ public abstract class BlockmaniaDisplayContainer extends BlockmaniaDisplayElemen
 
     @Override
     public void processKeyboardInput(int key) {
+        if (!isVisible())
+            return;
+
         // Pass the pressed key to all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
             _displayElements.get(i).processKeyboardInput(key);
         }
     }
 
-    public void addDisplayElement(BlockmaniaDisplayElement element) {
+    @Override
+    public void processMouseInput(int button, boolean state, int wheelMoved) {
+        if (!isVisible())
+            return;
+
+        // Pass the mouse event to all display elements
+        for (int i = 0; i < _displayElements.size(); i++) {
+            _displayElements.get(i).processMouseInput(button, state, wheelMoved);
+        }
+    }
+
+    public void addDisplayElement(UIDisplayElement element) {
         _displayElements.add(element);
+        element.setParent(this);
     }
 
-    public void removeDisplayElement(BlockmaniaDisplayElement element) {
+    public void removeDisplayElement(UIDisplayElement element) {
         _displayElements.remove(element);
+        element.setParent(null);
     }
 
-    public ArrayList<BlockmaniaDisplayElement> getDisplayElements() {
+    public ArrayList<UIDisplayElement> getDisplayElements() {
         return _displayElements;
     }
 }

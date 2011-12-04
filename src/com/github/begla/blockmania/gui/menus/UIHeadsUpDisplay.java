@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.gui.implementation;
+package com.github.begla.blockmania.gui.menus;
 
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
-import com.github.begla.blockmania.gui.framework.BlockmaniaDisplayRenderer;
+import com.github.begla.blockmania.gui.components.UIButton;
+import com.github.begla.blockmania.gui.components.UICrosshair;
+import com.github.begla.blockmania.gui.components.UIText;
+import com.github.begla.blockmania.gui.framework.UIDisplayRenderer;
 import com.github.begla.blockmania.world.chunk.ChunkMeshGenerator;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
@@ -35,7 +39,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIHeadsUpDisplay extends BlockmaniaDisplayRenderer {
+public class UIHeadsUpDisplay extends UIDisplayRenderer {
 
     /* ANIMATION */
     private double _cubeRotation;
@@ -44,6 +48,8 @@ public class UIHeadsUpDisplay extends BlockmaniaDisplayRenderer {
     private UICrosshair _crosshair;
     private UIText _debugLine1, _debugLine2, _debugLine3, _debugLine4;
     private UIDebugConsole _console;
+
+    private UIButton _testButton;
 
     /**
      * Init. the HUD.
@@ -117,7 +123,6 @@ public class UIHeadsUpDisplay extends BlockmaniaDisplayRenderer {
     public void update() {
         super.update();
 
-        _console.setVisible(Blockmania.getInstance().isGamePaused());
         _crosshair.setVisible((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.crosshair"));
         _crosshair.setPosition(new Vector2f(Display.getDisplayMode().getWidth() / 2, Display.getDisplayMode().getHeight() / 2));
 
@@ -134,7 +139,19 @@ public class UIHeadsUpDisplay extends BlockmaniaDisplayRenderer {
         _debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkMeshGenerator.getVertexArrayUpdateCount(), Blockmania.getInstance().getThreadPool().getActiveCount()));
 
         // Rotate the block indicator
-        _cubeRotation += 0.5;
+        _cubeRotation += 0.6;
+    }
+
+    @Override
+    public void processKeyboardInput(int key) {
+        super.processKeyboardInput(key);
+
+        if (!isVisible())
+            return;
+
+        if (key == Keyboard.KEY_TAB) {
+            _console.setVisible(!_console.isVisible());
+        }
     }
 
     public UIDebugConsole getDebugConsole() {

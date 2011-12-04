@@ -46,22 +46,32 @@ public class TextureManager {
     }
 
     public TextureManager() {
+        Blockmania.getInstance().getLogger().log(Level.FINE, "Loading textures...");
+
+        loadDefaultTextures();
+
+        Blockmania.getInstance().getLogger().log(Level.FINE, "Finished loading textures!");
+    }
+
+    public void loadDefaultTextures() {
+        loadTexture("terrain");
+        loadTexture("button");
+        loadTexture("custom_lava_still");
+        loadTexture("custom_water_still");
+        loadTexture("custom_lava_flowing");
+        loadTexture("custom_water_flowing");
+        loadTexture("blockmania");
+
+        loadTexture("slime");
+
+        for (int i = 1; i <= 6; i++) {
+            loadTexture("stars" + i);
+        }
+    }
+
+    public void loadTexture(String title) {
         try {
-            Blockmania.getInstance().getLogger().log(Level.FINE, "Loading textures...");
-
-            _textures.put("custom_lava_still", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/custom_lava_still.png").openStream(), GL_NEAREST));
-            _textures.put("custom_water_still", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/custom_water_still.png").openStream(), GL_NEAREST));
-            _textures.put("custom_lava_flowing", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/custom_lava_flowing.png").openStream(), GL_NEAREST));
-            _textures.put("custom_water_flowing", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/custom_water_flowing.png").openStream(), GL_NEAREST));
-            _textures.put("terrain", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/terrain.png").openStream(), GL_NEAREST));
-            _textures.put("moon", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/moon.png").openStream(), GL_NEAREST));
-            _textures.put("slime", TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/slime.png").openStream(), GL_NEAREST));
-
-            for (int i = 1; i <= 6; i++) {
-                _textures.put("stars" + i, TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/stars" + i + ".png").openStream(), GL_NEAREST));
-            }
-
-            Blockmania.getInstance().getLogger().log(Level.FINE, "Finished loading textures!");
+            _textures.put(title, TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/" + title + ".png").openStream(), GL_NEAREST));
         } catch (IOException ex) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
@@ -71,7 +81,6 @@ public class TextureManager {
         glBindTexture(GL11.GL_TEXTURE_2D, _textures.get(s).getTextureID());
     }
 
-    /*Test*/
     public Texture getTexture(String s) {
         return _textures.get(s);
     }

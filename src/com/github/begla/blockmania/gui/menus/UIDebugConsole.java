@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.gui.implementation;
+package com.github.begla.blockmania.gui.menus;
 
 import com.github.begla.blockmania.game.Blockmania;
-import com.github.begla.blockmania.gui.framework.BlockmaniaDisplayContainer;
+import com.github.begla.blockmania.gui.components.UIText;
+import com.github.begla.blockmania.gui.framework.UIDisplayContainer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
@@ -29,7 +30,7 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class UIDebugConsole extends BlockmaniaDisplayContainer {
+public final class UIDebugConsole extends UIDisplayContainer {
 
     private UIText _consoleText;
 
@@ -53,28 +54,30 @@ public final class UIDebugConsole extends BlockmaniaDisplayContainer {
      * @param key The key
      */
     public void processKeyboardInput(int key) {
-        // Do nothing if the console is hidden
-        if (isVisible()) {
-            if (key == Keyboard.KEY_BACK) {
-                int length = _consoleInput.length() - 1;
+        super.processKeyboardInput(key);
 
-                if (length < 0) {
-                    length = 0;
-                }
-                _consoleInput.setLength(length);
-            } else if (key == Keyboard.KEY_RETURN) {
-                processConsoleString();
-            } else if (key == Keyboard.KEY_UP) {
-                rotateRingBuffer(1);
-            } else if (key == Keyboard.KEY_DOWN) {
-                rotateRingBuffer(-1);
+        if (!isVisible())
+            return;
+
+        if (key == Keyboard.KEY_BACK) {
+            int length = _consoleInput.length() - 1;
+
+            if (length < 0) {
+                length = 0;
             }
+            _consoleInput.setLength(length);
+        } else if (key == Keyboard.KEY_RETURN) {
+            processConsoleString();
+        } else if (key == Keyboard.KEY_UP) {
+            rotateRingBuffer(1);
+        } else if (key == Keyboard.KEY_DOWN) {
+            rotateRingBuffer(-1);
+        }
 
-            char c = Keyboard.getEventCharacter();
+        char c = Keyboard.getEventCharacter();
 
-            if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'Z' + 1 || c == ' ' || c == '_' || c == '.' || c == ',' || c == '!' || c == '-' || c == '(' || c == ')' || c == '"' || c == '\'' || c == ';' || c == '+') {
-                _consoleInput.append(c);
-            }
+        if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'Z' + 1 || c == ' ' || c == '_' || c == '.' || c == ',' || c == '!' || c == '-' || c == '(' || c == ')' || c == '"' || c == '\'' || c == ';' || c == '+') {
+            _consoleInput.append(c);
         }
     }
 

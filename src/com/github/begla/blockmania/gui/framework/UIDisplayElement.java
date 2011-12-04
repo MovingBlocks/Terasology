@@ -24,42 +24,46 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class BlockmaniaDisplayElement {
+public abstract class UIDisplayElement {
 
     private boolean _visible = false;
 
     private Vector2f _position = new Vector2f(0, 0);
-    private Vector2f _scale = new Vector2f(1, 1);
+    private Vector2f _size = new Vector2f(1, 1);
 
-    public BlockmaniaDisplayElement() {
+    private UIDisplayElement _parent;
+
+    public UIDisplayElement() {
     }
 
-    public BlockmaniaDisplayElement(Vector2f position) {
+    public UIDisplayElement(Vector2f position) {
         _position.set(position);
     }
 
-    public BlockmaniaDisplayElement(Vector2f position, Vector2f size) {
+    public UIDisplayElement(Vector2f position, Vector2f scale) {
         _position.set(position);
-        _scale.set(size);
+        _size.set(scale);
     }
 
     protected void renderElement() {
-        glPushMatrix();
-        glTranslatef(getPosition().x, getPosition().y, 0);
-        glScalef(getScale().x, getScale().y, 0);
-
         if (isVisible()) {
+            glPushMatrix();
+            glTranslatef(getPosition().x, getPosition().y, 0);
             render();
+            glPopMatrix();
         }
-
-        glPopMatrix();
     }
 
     public void processKeyboardInput(int key) {
 
     }
 
+    public void processMouseInput(int button, boolean state, int wheelMoved) {
+
+    }
+
     public abstract void render();
+
     public abstract void update();
 
     public Vector2f getPosition() {
@@ -70,12 +74,12 @@ public abstract class BlockmaniaDisplayElement {
         _position.set(position);
     }
 
-    public Vector2f getScale() {
-        return _scale;
+    public Vector2f getSize() {
+        return _size;
     }
 
-    public void setScale(Vector2f size) {
-        _scale.set(size);
+    public void setSize(Vector2f scale) {
+        _size.set(scale);
     }
 
     public void setVisible(boolean visible) {
@@ -84,6 +88,18 @@ public abstract class BlockmaniaDisplayElement {
 
     public boolean isVisible() {
         return _visible;
+    }
+
+    public UIDisplayElement getParent() {
+        return _parent;
+    }
+
+    public void setParent(UIDisplayElement parent) {
+        _parent = parent;
+    }
+
+    public boolean intersects(Vector2f point) {
+        return (point.x >= getPosition().x && point.y >= getPosition().y && point.x <= getPosition().x + getSize().x && point.y <= getPosition().y + getSize().y);
     }
 
 }
