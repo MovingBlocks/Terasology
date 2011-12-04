@@ -31,7 +31,9 @@ import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.openal.AL;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.PixelFormat;
 import org.newdawn.slick.SlickException;
 
 import java.io.File;
@@ -66,7 +68,7 @@ public final class Blockmania {
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(12);
 
     /* CONST */
-    private static final int FRAME_SKIP_MAX_FRAMES = 5;
+    private static final int FRAME_SKIP_MAX_FRAMES = 10;
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 
@@ -329,9 +331,9 @@ public final class Blockmania {
             processKeyboardInput();
             processMouseInput();
 
-            // Pause the game while the debug console is being shown
             loopCounter = 0;
             while (getTime() > nextGameTick && loopCounter < FRAME_SKIP_MAX_FRAMES) {
+                // Pause the game while the debug console is being shown
                 if (!_pauseGame) {
                     update();
                 }

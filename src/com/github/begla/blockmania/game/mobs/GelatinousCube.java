@@ -28,6 +28,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -40,7 +41,7 @@ public final class GelatinousCube extends Character {
 
     private static final float WIDTH_HALF = 0.5f, HEIGHT_HALF = 0.5f;
     private static int _displayListOuterBody = -1, _displayListInnerBody = -1;
-    private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(1.0f, 0.75f, 0.75f), new Vector3f(0.75f, 1.0f, 0.75f), new Vector3f(1.0f, 1.0f, 0.75f)};
+    private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 0.2f), new Vector3f(1.0f, 0.2f, 0.2f), new Vector3f(0.2f, 1.0f, 0.2f), new Vector3f(1.0f, 1.0f, 0.2f)};
 
     private long _lastChangeOfDirectionAt = Blockmania.getInstance().getTime();
     private Vector3f _movementTarget = new Vector3f();
@@ -51,7 +52,7 @@ public final class GelatinousCube extends Character {
     public GelatinousCube(World parent) {
         super(parent, 0.01, 1.5, 0.125);
 
-        _randomSize = (float) MathHelper.clamp((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0 + 0.5);
+        _randomSize = (float) MathHelper.clamp((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0 + 0.15);
         _randomColorId = Math.abs(_parent.getWorldProvider().getRandom().randomInt()) % COLORS.length;
     }
 
@@ -66,10 +67,6 @@ public final class GelatinousCube extends Character {
 
         glTranslatef(getPosition().x - _parent.getWorldProvider().getRenderingReferencePoint().x, getPosition().y - _parent.getWorldProvider().getRenderingReferencePoint().y, getPosition().z - _parent.getWorldProvider().getRenderingReferencePoint().z);
         glRotatef((float) _yaw, 0f, 1f, 0f);
-
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         TextureManager.getInstance().bindTexture("slime");
 
@@ -86,14 +83,17 @@ public final class GelatinousCube extends Character {
             generateDisplayList();
         }
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glPushMatrix();
         glScalef(_randomSize, _randomSize, _randomSize);
         glCallList(_displayListInnerBody);
+
         glCallList(_displayListOuterBody);
         glPopMatrix();
 
-        glDisable(GL11.GL_TEXTURE_2D);
-        glDisable(GL_BLEND);
+        //glDisable(GL_BLEND);
 
         ShaderManager.getInstance().enableShader(null);
 
@@ -116,70 +116,8 @@ public final class GelatinousCube extends Character {
         glNewList(_displayListOuterBody, GL_COMPILE);
 
         glBegin(GL_QUADS);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
 
-        // TOP
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, HEIGHT_HALF, WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, HEIGHT_HALF, WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, HEIGHT_HALF, -WIDTH_HALF);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, HEIGHT_HALF, -WIDTH_HALF);
-
-        // LEFT
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, -HEIGHT_HALF, -WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, -HEIGHT_HALF, WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, HEIGHT_HALF, WIDTH_HALF);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, HEIGHT_HALF, -WIDTH_HALF);
-
-
-        // BACK
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, -HEIGHT_HALF, WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, -HEIGHT_HALF, WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, HEIGHT_HALF, WIDTH_HALF);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, HEIGHT_HALF, WIDTH_HALF);
-
-        // RIGHT
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, HEIGHT_HALF, -WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, HEIGHT_HALF, WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, -HEIGHT_HALF, WIDTH_HALF);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, -HEIGHT_HALF, -WIDTH_HALF);
-
-        GL11.glColor4f(0.8f, 0.8f, 0.8f, 0.8f);
-
-        // FRONT
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, HEIGHT_HALF, -WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, HEIGHT_HALF, -WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, -HEIGHT_HALF, -WIDTH_HALF);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, -HEIGHT_HALF, -WIDTH_HALF);
-
-        // BOTTOM
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, -HEIGHT_HALF, -WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, -HEIGHT_HALF, -WIDTH_HALF);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF, -HEIGHT_HALF, WIDTH_HALF);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF, -HEIGHT_HALF, WIDTH_HALF);
+        drawCubeBody(new Vector4f(1.0f, 1.0f, 1.0f, 0.8f), 1.0f);
 
         GL11.glEnd();
         GL11.glEndList();
@@ -187,73 +125,91 @@ public final class GelatinousCube extends Character {
         glNewList(_displayListInnerBody, GL_COMPILE);
 
         glBegin(GL_QUADS);
-        GL11.glColor4f(0.8f, 0.8f, 0.8f, 1.0f);
 
-        // TOP
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, HEIGHT_HALF / 2, WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, HEIGHT_HALF / 2, WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-
-        // LEFT
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, -HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, -HEIGHT_HALF / 2, WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, HEIGHT_HALF / 2, WIDTH_HALF / 2);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-
-
-        // BACK
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, -HEIGHT_HALF / 2, WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, -HEIGHT_HALF / 2, WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, HEIGHT_HALF / 2, WIDTH_HALF / 2);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, HEIGHT_HALF / 2, WIDTH_HALF / 2);
-
-        // RIGHT
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, HEIGHT_HALF / 2, WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, -HEIGHT_HALF / 2, WIDTH_HALF / 2);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, -HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-
-        GL11.glColor4f(0.6f, 0.6f, 0.6f, 1.0f);
-
-        // FRONT
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, -HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, -HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-
-        // BOTTOM
-        GL11.glTexCoord2f(0f / 64f, 28f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, -HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 28f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, -HEIGHT_HALF / 2, -WIDTH_HALF / 2);
-        GL11.glTexCoord2f(6f / 64f, 22f / 32f);
-        GL11.glVertex3f(WIDTH_HALF / 2, -HEIGHT_HALF / 2, WIDTH_HALF / 2);
-        GL11.glTexCoord2f(0f / 64f, 22f / 32f);
-        GL11.glVertex3f(-WIDTH_HALF / 2, -HEIGHT_HALF / 2, WIDTH_HALF / 2);
+        drawCubeBody(new Vector4f(0.75f, 0.75f, 0.75f, 0.9f), 0.5f);
 
         GL11.glEnd();
         GL11.glEndList();
+    }
+
+    private void drawCubeBody(Vector4f color, float size) {
+        GL11.glColor4f(color.x, color.y, color.z, color.w);
+
+        // TOP
+        GL11.glNormal3f(0, 1, 0);
+
+        GL11.glTexCoord2f(0.0f, 0.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, HEIGHT_HALF * size, WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 0.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, HEIGHT_HALF * size, WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 1.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, HEIGHT_HALF * size, -WIDTH_HALF * size);
+        GL11.glTexCoord2f(0.0f, 1.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, HEIGHT_HALF * size, -WIDTH_HALF * size);
+
+        GL11.glNormal3f(-1, 0, 0);
+
+        // LEFT
+        GL11.glTexCoord2f(0.0f, 0.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, -HEIGHT_HALF * size, -WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 0.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, -HEIGHT_HALF * size, WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 1.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, HEIGHT_HALF * size, WIDTH_HALF * size);
+        GL11.glTexCoord2f(0.0f, 1.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, HEIGHT_HALF * size, -WIDTH_HALF * size);
+
+        GL11.glNormal3f(0, 0, -1);
+
+        // BACK
+        GL11.glTexCoord2f(0.0f, 0.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, -HEIGHT_HALF * size, WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 0.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, -HEIGHT_HALF * size, WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 1.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, HEIGHT_HALF * size, WIDTH_HALF * size);
+        GL11.glTexCoord2f(0.0f, 1.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, HEIGHT_HALF * size, WIDTH_HALF * size);
+
+        GL11.glNormal3f(0, -1, 0);
+
+        // BOTTOM
+        GL11.glTexCoord2f(0.0f, 0.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, -HEIGHT_HALF * size, -WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 0.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, -HEIGHT_HALF * size, -WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 1.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, -HEIGHT_HALF * size, WIDTH_HALF * size);
+        GL11.glTexCoord2f(0.0f, 1.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, -HEIGHT_HALF * size, WIDTH_HALF * size);
+
+
+        GL11.glColor4f(color.x * 0.75f, color.y * 0.75f, color.z * 0.75f, color.w);
+
+        GL11.glNormal3f(0, 0, 1);
+
+        // FRONT
+        GL11.glTexCoord2f(0.0f, 0.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, HEIGHT_HALF * size, -WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 0.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, HEIGHT_HALF * size, -WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 1.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, -HEIGHT_HALF * size, -WIDTH_HALF * size);
+        GL11.glTexCoord2f(0.0f, 1.0f);
+        GL11.glVertex3f(-WIDTH_HALF * size, -HEIGHT_HALF * size, -WIDTH_HALF * size);
+
+        GL11.glNormal3f(1, 0, 0);
+
+        // RIGHT
+        GL11.glTexCoord2f(0.0f, 0.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, HEIGHT_HALF * size, -WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 0.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, HEIGHT_HALF * size, WIDTH_HALF * size);
+        GL11.glTexCoord2f(1.0f, 1.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, -HEIGHT_HALF * size, WIDTH_HALF * size);
+        GL11.glTexCoord2f(0.0f, 1.0f);
+        GL11.glVertex3f(WIDTH_HALF * size, -HEIGHT_HALF * size, -WIDTH_HALF * size);
+
     }
 
     public void processMovement() {

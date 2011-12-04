@@ -6,7 +6,7 @@ void main()
     gl_TexCoord[0] = gl_MultiTexCoord0;
     gl_FrontColor = gl_Color;
 
-    vertexPos.y += cos(tick*0.25 + vertexPos.x) * 0.2;
+    vertexPos.y += cos(tick*0.25 + vertexPos.x * 0.25) * 0.2;
 
     gl_Position = vertexPos;
 }

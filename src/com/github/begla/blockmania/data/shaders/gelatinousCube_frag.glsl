@@ -14,7 +14,7 @@ vec4 linearToSrgb(vec4 color){
 void main(){
     vec4 color = srgbToLinear(texture2D(texture, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y)));
 
-    color.rgb *= clamp(gl_Color.rgb*1.5, 0.0, 1.0) * colorOffset.rgb;
+    color.rgb *= clamp(gl_Color.rgb, 0.0, 1.0) * colorOffset.rgb;
     color.rgb *= pow(0.86, (1.0-light)*15.0);
     color.a = gl_Color.a;
 
