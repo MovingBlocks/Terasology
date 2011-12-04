@@ -116,7 +116,7 @@ public class LocalWorldProvider implements WorldProvider {
         int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
         int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ);
 
         if (c == null) {
             return false;
