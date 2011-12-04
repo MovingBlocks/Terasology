@@ -23,7 +23,7 @@ import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.game.Blockmania;
-import com.github.begla.blockmania.gui.ToolBelt;
+import com.github.begla.blockmania.tools.ToolBelt;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;

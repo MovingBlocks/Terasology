@@ -20,7 +20,7 @@ import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.game.PortalManager;
 import com.github.begla.blockmania.game.blueprints.BlockGrid;
-import com.github.begla.blockmania.game.mobs.MobManager;
+import com.github.begla.blockmania.rendering.manager.MobManager;
 import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;

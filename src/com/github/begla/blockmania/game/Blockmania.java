@@ -18,7 +18,8 @@ package com.github.begla.blockmania.game;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.groovy.GroovyManager;
-import com.github.begla.blockmania.gui.HUD;
+import com.github.begla.blockmania.gui.implementation.UIDebugConsole;
+import com.github.begla.blockmania.gui.implementation.UIHeadsUpDisplay;
 import com.github.begla.blockmania.rendering.manager.FontManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
@@ -83,7 +84,9 @@ public final class Blockmania {
 
     /* RENDERING */
     private World _world;
-    private HUD _hud;
+
+    /* GUI */
+    private UIHeadsUpDisplay _hud;
 
     /* SINGLETON */
     private static Blockmania _instance;
@@ -91,8 +94,6 @@ public final class Blockmania {
     /* LOGGING */
     private final Logger _logger;
 
-    /* CONSOLE */
-    private final BlockmaniaConsole _console;
 
     /* GROOVY */
     private GroovyManager _groovyManager;
@@ -177,8 +178,6 @@ public final class Blockmania {
      * Init. a new instance of Blockmania.
      */
     private Blockmania() {
-        _hud = new HUD(this);
-        _console = new BlockmaniaConsole(this);
         _logger = Logger.getLogger("blockmania");
     }
 
@@ -284,6 +283,8 @@ public final class Blockmania {
         FontManager.getInstance();
         BlockManager.getInstance();
 
+        _hud = new UIHeadsUpDisplay();
+
         /*
          * Init. OpenGL
          */
@@ -333,10 +334,7 @@ public final class Blockmania {
 
             loopCounter = 0;
             while (getTime() > nextGameTick && loopCounter < FRAME_SKIP_MAX_FRAMES) {
-                // Pause the game while the debug console is being shown
-                if (!_pauseGame) {
-                    update();
-                }
+                update();
                 nextGameTick += SKIP_TICKS;
                 loopCounter++;
             }
@@ -372,17 +370,26 @@ public final class Blockmania {
         if (_world != null)
             _world.render();
 
-        if (_hud != null)
-            _hud.render();
+        renderUserInterface();
     }
 
     public void update() {
-        if (_world != null)
-            _world.update();
+        if (!_pauseGame) {
+            if (_world != null)
+                _world.update();
+        }
 
-        if (_hud != null)
-            _hud.update();
+        updateUserInterface();
     }
+
+    private void renderUserInterface() {
+        _hud.render();
+    }
+
+    private void updateUserInterface() {
+        _hud.update();
+    }
+
 
     public void pause() {
         Mouse.setGrabbed(false);
@@ -443,9 +450,8 @@ public final class Blockmania {
                     toggleViewingDistance();
                 }
 
-                if (isGamePaused()) {
-                    _console.processKeyboardInput(key);
-                }
+                // Pass the pressed key on to the GUI
+                _hud.processKeyboardInput(key);
             }
 
             // Pass input to the current player
@@ -537,10 +543,6 @@ public final class Blockmania {
 
     public GroovyManager getGroovyManager() {
         return _groovyManager;
-    }
-
-    public BlockmaniaConsole getConsole() {
-        return _console;
     }
 
     public void toggleViewingDistance() {

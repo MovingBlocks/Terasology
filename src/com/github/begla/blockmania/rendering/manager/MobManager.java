@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.begla.blockmania.game.mobs;
+package com.github.begla.blockmania.rendering.manager;
 
 import com.github.begla.blockmania.world.entity.MovableEntity;
 import com.github.begla.blockmania.world.main.World;

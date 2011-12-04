@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package com.github.begla.blockmania.game.mobs;
+package com.github.begla.blockmania.world.characters.mobs;
 
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.game.Blockmania;

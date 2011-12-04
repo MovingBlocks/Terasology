@@ -16,7 +16,7 @@
 
 package com.github.begla.blockmania.game;
 
-import com.github.begla.blockmania.game.mobs.GelatinousCube;
+import com.github.begla.blockmania.world.characters.mobs.GelatinousCube;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.main.World;
 

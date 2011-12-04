@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.game;
+package com.github.begla.blockmania.gui.implementation;
 
+import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.gui.framework.BlockmaniaDisplayContainer;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
 
+import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -25,9 +29,9 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class BlockmaniaConsole {
+public final class UIDebugConsole extends BlockmaniaDisplayContainer {
 
-    private Blockmania _parent;
+    private UIText _consoleText;
 
     private final StringBuffer _consoleInput = new StringBuffer();
     private ArrayList<String> _ringBuffer = new ArrayList<String>();
@@ -35,11 +39,12 @@ public final class BlockmaniaConsole {
 
     /**
      * Init. a new Blockmania console.
-     *
-     * @param parent The parent
      */
-    public BlockmaniaConsole(Blockmania parent) {
-        _parent = parent;
+    public UIDebugConsole() {
+        _consoleText = new UIText();
+        _consoleText.setVisible(true);
+
+        addDisplayElement(_consoleText);
     }
 
     /**
@@ -47,26 +52,29 @@ public final class BlockmaniaConsole {
      *
      * @param key The key
      */
-    protected void processKeyboardInput(int key) {
-        if (key == Keyboard.KEY_BACK) {
-            int length = _consoleInput.length() - 1;
+    public void processKeyboardInput(int key) {
+        // Do nothing if the console is hidden
+        if (isVisible()) {
+            if (key == Keyboard.KEY_BACK) {
+                int length = _consoleInput.length() - 1;
 
-            if (length < 0) {
-                length = 0;
+                if (length < 0) {
+                    length = 0;
+                }
+                _consoleInput.setLength(length);
+            } else if (key == Keyboard.KEY_RETURN) {
+                processConsoleString();
+            } else if (key == Keyboard.KEY_UP) {
+                rotateRingBuffer(1);
+            } else if (key == Keyboard.KEY_DOWN) {
+                rotateRingBuffer(-1);
             }
-            _consoleInput.setLength(length);
-        } else if (key == Keyboard.KEY_RETURN) {
-            processConsoleString();
-        } else if (key == Keyboard.KEY_UP) {
-            rotateRingBuffer(1);
-        } else if (key == Keyboard.KEY_DOWN) {
-            rotateRingBuffer(-1);
-        }
 
-        char c = Keyboard.getEventCharacter();
+            char c = Keyboard.getEventCharacter();
 
-        if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'Z' + 1 || c == ' ' || c == '_' || c == '.' || c == ',' || c == '!' || c == '-' || c == '(' || c == ')' || c == '"' || c == '\'' || c == ';' || c == '+') {
-            _consoleInput.append(c);
+            if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'Z' + 1 || c == ' ' || c == '_' || c == '.' || c == ',' || c == '!' || c == '-' || c == '(' || c == ')' || c == '"' || c == '\'' || c == ';' || c == '+') {
+                _consoleInput.append(c);
+            }
         }
     }
 
@@ -95,7 +103,7 @@ public final class BlockmaniaConsole {
      */
     public void addToRingBuffer() {
         _ringBufferPos = -1;
-        _ringBuffer.add(0,_consoleInput.toString());
+        _ringBuffer.add(0, _consoleInput.toString());
     }
 
     /**
@@ -105,7 +113,7 @@ public final class BlockmaniaConsole {
         boolean success = false;
 
         try {
-            success = _parent.getGroovyManager().runGroovyShell(_consoleInput.toString());
+            success = Blockmania.getInstance().getGroovyManager().runGroovyShell(_consoleInput.toString());
         } catch (Exception e) {
             Blockmania.getInstance().getLogger().log(Level.INFO, e.getMessage());
         }
@@ -132,4 +140,11 @@ public final class BlockmaniaConsole {
         _consoleInput.setLength(0);
     }
 
+    @Override
+    public void update() {
+        super.update();
+
+        _consoleText.setText(String.format("%s_", this));
+        _consoleText.setPosition(new Vector2f(4, Display.getDisplayMode().getHeight() - 16 - 4));
+    }
 }
