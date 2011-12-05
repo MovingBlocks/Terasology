@@ -17,6 +17,7 @@ package com.github.begla.blockmania.world.main;
 
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
+import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.game.PortalManager;
 import com.github.begla.blockmania.game.blueprints.BlockGrid;
@@ -36,7 +37,9 @@ import com.github.begla.blockmania.world.interfaces.WorldProvider;
 import com.github.begla.blockmania.world.physics.BulletPhysicsRenderer;
 import com.github.begla.blockmania.world.simulators.GrowthSimulator;
 import com.github.begla.blockmania.world.simulators.LiquidSimulator;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
 
@@ -95,6 +98,7 @@ public final class World implements RenderableObject {
 
     /* UPDATING */
     private final ChunkUpdateManager _chunkUpdateManager;
+    private int _testQuery = 0;
 
     /* EVENTS */
     private final WorldTimeEventManager _worldTimeEventManager;
@@ -207,6 +211,15 @@ public final class World implements RenderableObject {
      * Updates the currently visible chunks (in sight of the player).
      */
     public void updateVisibleChunks() {
+
+        boolean updateOcclusionQueries = false;
+        int result = GL15.glGetQueryObjectui(_testQuery, GL15.GL_QUERY_RESULT_AVAILABLE);
+
+        if (result == GL11.GL_TRUE) {
+            updateOcclusionQueries = true;
+            _testQuery = 0;
+        }
+
         _visibleChunks.clear();
         _bulletPhysicsRenderer.resetChunks();
 
@@ -215,24 +228,12 @@ public final class World implements RenderableObject {
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
 
-            if (c.getActiveChunkMesh() != null) {
-                if (c.getActiveChunkMesh()._bulletMeshShape != null) {
-                    Vector3f position = new Vector3f(c.getPosition());
-                    position.x *= Chunk.getChunkDimensionX();
-                    position.y *= Chunk.getChunkDimensionY();
-                    position.z *= Chunk.getChunkDimensionZ();
-
-                    _bulletPhysicsRenderer.addStaticChunk(position, _chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape);
-                }
-            }
-
             if (isChunkVisible(c)) {
-                c.setVisible(true);
-                _visibleChunks.add(c);
-
-                if (c.getActiveChunkMesh() != null) {
-                    _visibleTriangles += c.getActiveChunkMesh().countTriangles();
+                if (updateOcclusionQueries) {
+                    c.applyOcclusionQueries();
                 }
+                _visibleChunks.add(c);
+                c.setCulled(false);
 
                 if (c.isDirty() || c.isLightDirty()) {
                     if (!_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT))
@@ -250,7 +251,35 @@ public final class World implements RenderableObject {
                 continue;
             }
 
-            c.setVisible(false);
+            c.setCulled(true);
+        }
+    }
+
+    public void removeOccludedSubChunks() {
+        if (_testQuery == 0) {
+            GL11.glColorMask(false, false, false, false);
+            GL11.glDepthMask(false);
+
+            for (int i = 0; i < _visibleChunks.size(); i++) {
+                Chunk c = _visibleChunks.get(i);
+                AABB[] subChunksAABBs = c.getSubChunkAABBs();
+
+                for (int j = 0; j < 8; j++) {
+                    if (c._queries[j] == 0) {
+
+                        int query = GL15.glGenQueries();
+                        GL15.glBeginQuery(GL15.GL_SAMPLES_PASSED, query);
+                        subChunksAABBs[j].render();
+                        GL15.glEndQuery(GL15.GL_SAMPLES_PASSED);
+
+                        c._queries[j] = query;
+                        _testQuery = query;
+                    }
+                }
+            }
+
+            GL11.glColorMask(true, true, true, true);
+            GL11.glDepthMask(true);
         }
     }
 
@@ -311,7 +340,10 @@ public final class World implements RenderableObject {
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
 
             if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
-                c.getAABB().render();
+                for (int j = 0; j < 8; j++) {
+                    AABB[] subChunkAABBs = c.getSubChunkAABBs();
+                    subChunkAABBs[j].render();
+                }
             }
         }
 
@@ -323,7 +355,12 @@ public final class World implements RenderableObject {
             c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
         }
 
-        glDisable(GL_CULL_FACE);
+
+        ShaderManager.getInstance().enableShader("block");
+        _bulletPhysicsRenderer.render();
+        _mobManager.renderAll();
+
+        ShaderManager.getInstance().enableShader("chunk");
 
         for (int j = 0; j < 2; j++) {
             for (int i = 0; i < _visibleChunks.size(); i++) {
@@ -339,15 +376,7 @@ public final class World implements RenderableObject {
             }
         }
 
-        glEnable(GL_CULL_FACE);
         glDisable(GL_BLEND);
-
-        ShaderManager.getInstance().enableShader(null);
-
-        _mobManager.renderAll();
-
-        ShaderManager.getInstance().enableShader("block");
-        _bulletPhysicsRenderer.render();
 
         ShaderManager.getInstance().enableShader(null);
     }
@@ -376,6 +405,8 @@ public final class World implements RenderableObject {
 
         /* SIMULATE! */
         simulate();
+
+        removeOccludedSubChunks();
     }
 
     private void simulate() {
@@ -503,6 +534,30 @@ public final class World implements RenderableObject {
 
     public boolean isChunkVisible(Chunk c) {
         return _player.getActiveCamera().getViewFrustum().intersects(c.getAABB());
+    }
+
+    public boolean[] calcVisibleSubChunks(Chunk c) {
+        AABB[] subChunkAABBs = c.getSubChunkAABBs();
+        ChunkMesh[] activeMeshes = c.getActiveMeshes();
+
+        boolean[] result = new boolean[8];
+
+        for (int i = 0; i < 8; i++) {
+            boolean empty = false;
+
+            if (activeMeshes != null) {
+                ChunkMesh mesh = activeMeshes[i];
+                empty = mesh.countTriangles() == 0;
+            }
+
+            if (!empty)
+                result[i] = getPlayer().getActiveCamera().getViewFrustum().intersects(subChunkAABBs[i]);
+            else {
+                result[i] = false;
+            }
+        }
+
+        return result;
     }
 
     public boolean isEntityVisible(Entity e) {

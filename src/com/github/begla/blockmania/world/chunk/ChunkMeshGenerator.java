@@ -45,7 +45,7 @@ public final class ChunkMeshGenerator {
         _chunk = chunk;
     }
 
-    public ChunkMesh generateMesh(boolean createPhysicsMesh) {
+    public ChunkMesh generateMesh(int meshHeight, int verticalOffset) {
         ChunkMesh mesh = new ChunkMesh();
 
         for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
@@ -53,7 +53,7 @@ public final class ChunkMeshGenerator {
                 double biomeTemp = _chunk.getParent().getTemperatureAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
                 double biomeHumidity = _chunk.getParent().getHumidityAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
 
-                for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
+                for (int y = verticalOffset; y < verticalOffset + meshHeight; y++) {
                     byte blockType = _chunk.getBlock(x, y, z);
                     Block block = BlockManager.getInstance().getBlock(blockType);
 
@@ -70,32 +70,13 @@ public final class ChunkMeshGenerator {
             }
         }
 
-        generateOptimizedBuffers(mesh, createPhysicsMesh);
+        generateOptimizedBuffers(mesh);
         _statVertexArrayUpdateCount++;
 
         return mesh;
     }
 
-    private void generateOptimizedBuffers(ChunkMesh mesh, boolean createPhysicsMesh) {
-        /* BULLET PHYSICS */
-        IndexedMesh[] indexMesh = null;
-
-        if (createPhysicsMesh) {
-            indexMesh = new IndexedMesh[6];
-
-            for (int i = 0; i < 6; i++) {
-                indexMesh[i] = new IndexedMesh();
-                indexMesh[i].vertexBase = ByteBuffer.allocate(mesh._vertexElements[i].quads.size() * 4);
-                indexMesh[i].triangleIndexBase = ByteBuffer.allocate(mesh._vertexElements[i].quads.size() * 4);
-                indexMesh[i].triangleIndexStride = 12;
-                indexMesh[i].vertexStride = 12;
-                indexMesh[i].numVertices = mesh._vertexElements[i].quads.size() / 3;
-                indexMesh[i].numTriangles = mesh._vertexElements[i].quads.size() / 6;
-                indexMesh[i].indexType = ScalarType.INTEGER;
-            }
-        }
-        /* ------------- */
-
+    private void generateOptimizedBuffers(ChunkMesh mesh) {
         for (int j = 0; j < mesh._vertexElements.length; j++) {
             mesh._vertexElements[j].vertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].quads.size() * 2 + mesh._vertexElements[j].tex.size() + mesh._vertexElements[j].color.size());
             mesh._vertexElements[j].indices = BufferUtils.createIntBuffer(mesh._vertexElements[j].quads.size());
@@ -114,18 +95,6 @@ public final class ChunkMeshGenerator {
                     mesh._vertexElements[j].indices.put(cIndex + 3);
                     mesh._vertexElements[j].indices.put(cIndex);
 
-                    /* BULLET PHYSICS */
-                    if (j < 6 && createPhysicsMesh) {
-                        indexMesh[j].triangleIndexBase.putInt(cIndex);
-                        indexMesh[j].triangleIndexBase.putInt(cIndex + 1);
-                        indexMesh[j].triangleIndexBase.putInt(cIndex + 2);
-
-                        indexMesh[j].triangleIndexBase.putInt(cIndex + 2);
-                        indexMesh[j].triangleIndexBase.putInt(cIndex + 3);
-                        indexMesh[j].triangleIndexBase.putInt(cIndex);
-                    }
-                    /* ------------- */
-
                     cIndex += 4;
                 }
 
@@ -134,15 +103,6 @@ public final class ChunkMeshGenerator {
                 mesh._vertexElements[j].vertices.put(vertexPos.x);
                 mesh._vertexElements[j].vertices.put(vertexPos.y);
                 mesh._vertexElements[j].vertices.put(vertexPos.z);
-
-                /* BULLET PHYSICS */
-                if (j < 6 && createPhysicsMesh) {
-                    indexMesh[j].vertexBase.putFloat(vertexPos.x);
-                    indexMesh[j].vertexBase.putFloat(vertexPos.y);
-                    indexMesh[j].vertexBase.putFloat(vertexPos.z);
-                }
-                /* ------------ */
-
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex));
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
 
@@ -161,22 +121,6 @@ public final class ChunkMeshGenerator {
 
             mesh._vertexElements[j].vertices.flip();
             mesh._vertexElements[j].indices.flip();
-        }
-
-        /* BULLET PHYSICS */
-        TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
-
-        if (createPhysicsMesh) {
-            for (int i = 0; i < 6; i++) {
-                indexMesh[i].triangleIndexBase.flip();
-                indexMesh[i].vertexBase.flip();
-
-
-                vertexArray.addIndexedMesh(indexMesh[i]);
-            }
-
-            mesh._bulletMeshShape = new BvhTriangleMeshShape(vertexArray, false);
-
         }
     }
 
@@ -277,11 +221,11 @@ public final class ChunkMeshGenerator {
         Vector3f p3 = new Vector3f(0.5f, 0.5f, -0.5f);
         Vector3f p4 = new Vector3f(-0.5f, 0.5f, 0.5f);
 
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4));
-        addBlockTextureData(mesh._vertexElements[6], texOffset, new Vector3f(0, 0, 1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4));
+        addBlockTextureData(mesh._vertexElements[2], texOffset, new Vector3f(0, 0, 1));
 
         /*
         * Second side of the billboard
@@ -294,11 +238,11 @@ public final class ChunkMeshGenerator {
         p3 = new Vector3f(0.5f, 0.5f, 0.5f);
         p4 = new Vector3f(-0.5f, 0.5f, -0.5f);
 
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4));
-        addBlockTextureData(mesh._vertexElements[6], texOffset, new Vector3f(0, 0, 1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4));
+        addBlockTextureData(mesh._vertexElements[2], texOffset, new Vector3f(0, 0, 1));
     }
 
     private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
@@ -443,28 +387,11 @@ public final class ChunkMeshGenerator {
 
         switch (renderType) {
             case BILLBOARD_AND_TRANSLUCENT:
-                vertexElementsId = 7;
+                vertexElementsId = 1;
                 break;
             case WATER_AND_ICE:
-                vertexElementsId = 8;
-                break;
-        }
-
-        // Assign the opaque vertices by the side of the chunk to different vertex element arrays
-        if (vertexElementsId == 0) {
-            if (norm.x == 1 && norm.y == 0 && norm.z == 0) {
-                vertexElementsId = 0;
-            } else if (norm.x == -1 && norm.y == 0 && norm.z == 0) {
-                vertexElementsId = 1;
-            } else if (norm.x == 0 && norm.y == 0 && norm.z == 1) {
-                vertexElementsId = 2;
-            } else if (norm.x == 0 && norm.y == 0 && norm.z == -1) {
                 vertexElementsId = 3;
-            } else if (norm.x == 0 && norm.y == 1 && norm.z == 0) {
-                vertexElementsId = 4;
-            } else if (norm.x == 0 && norm.y == -1 && norm.z == 0) {
-                vertexElementsId = 5;
-            }
+                break;
         }
 
         switch (blockForm) {
