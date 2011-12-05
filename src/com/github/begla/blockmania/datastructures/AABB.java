@@ -36,8 +36,8 @@ public class AABB implements RenderableObject {
     private final Vector3f _dimensions;
     private Vector3f[] _vertices;
 
-    private int _displayListWire = -1;
-    private int _displayListSolid = -1;
+    private static int _displayListWire = -1;
+    private static int _displayListSolid = -1;
 
     /**
      * Creates a new AABB at the given position with the given dimensions.
@@ -208,7 +208,7 @@ public class AABB implements RenderableObject {
         Vector3f rp = Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint();
         glTranslatef(getPosition().x - rp.x, getPosition().y - rp.y, getPosition().z - rp.z);
 
-        if (_displayListWire == -1) {
+        if (_displayListSolid == -1) {
             generateDisplayListSolid();
         }
 
@@ -218,12 +218,12 @@ public class AABB implements RenderableObject {
     }
 
     private void generateDisplayListSolid() {
-
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         _displayListSolid = glGenLists(1);
 
         glNewList(_displayListSolid, GL11.GL_COMPILE);
         glBegin(GL_QUADS);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
         GL11.glVertex3f(-_dimensions.x, _dimensions.y, _dimensions.z);
         GL11.glVertex3f(_dimensions.x, _dimensions.y, _dimensions.z);
         GL11.glVertex3f(_dimensions.x, _dimensions.y, -_dimensions.z);

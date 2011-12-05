@@ -49,9 +49,11 @@ import java.util.ArrayList;
 public class Chunk extends StaticEntity implements Comparable<Chunk>, Externalizable {
 
     /* CONSTANT VALUES */
-    private static final int CHUNK_DIMENSION_X = 16;
-    private static final int CHUNK_DIMENSION_Y = 256;
-    private static final int CHUNK_DIMENSION_Z = 16;
+    public static final int CHUNK_DIMENSION_X = 16;
+    public static final int CHUNK_DIMENSION_Y = 256;
+    public static final int CHUNK_DIMENSION_Z = 16;
+    
+    public static final int VERTICAL_SEGMENTS = 2;
 
     private static final Vector3f[] LIGHT_DIRECTIONS = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
 
@@ -69,9 +71,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     /* ------ */
     private final ChunkMeshGenerator _meshGenerator;
     /* ------ */
-    private boolean[] _occlusionCulled = new boolean[8];
+    public boolean[] _occlusionCulled = new boolean[VERTICAL_SEGMENTS];
     private boolean _culled = true;
-    public int[] _queries = new int[8];
+    public int[] _queries = new int[VERTICAL_SEGMENTS];
+    public boolean _waitingForResult;
     /* ------ */
     private boolean _disposed = false;
     /* ----- */
@@ -617,10 +620,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public AABB[] getSubChunkAABBs() {
         if (_subChunkAABB == null) {
-            _subChunkAABB = new AABB[8];
+            _subChunkAABB = new AABB[VERTICAL_SEGMENTS];
 
             for (int i = 0; i < _subChunkAABB.length; i++) {
-                Vector3f dimensions = new Vector3f(8, 16, 8);
+                Vector3f dimensions = new Vector3f(8, CHUNK_DIMENSION_Y/VERTICAL_SEGMENTS/2, 8);
                 Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - 0.5f, i * 32 + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
                 _subChunkAABB[i] = new AABB(position, dimensions);
             }
@@ -713,11 +716,11 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (isFresh() || isLightDirty())
             return;
 
-        ChunkMesh[] newMeshes = new ChunkMesh[8];
+        ChunkMesh[] newMeshes = new ChunkMesh[VERTICAL_SEGMENTS];
 
         // TODO: Should be dynamic
-        for (int i = 0; i < 8; i++) {
-            newMeshes[i] = _meshGenerator.generateMesh(32, i * 32);
+        for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
+            newMeshes[i] = _meshGenerator.generateMesh(CHUNK_DIMENSION_Y/VERTICAL_SEGMENTS, i * (CHUNK_DIMENSION_Y/VERTICAL_SEGMENTS));
         }
 
         setNewMesh(newMeshes);
@@ -733,16 +736,16 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (_culled)
             return;
 
+        applyOcclusionQueries();
+
         GL11.glPushMatrix();
         GL11.glTranslatef(getPosition().x * getChunkDimensionX() - _parent.getRenderingReferencePoint().x, getPosition().y * getChunkDimensionY() - _parent.getRenderingReferencePoint().y, getPosition().z * getChunkDimensionZ() - _parent.getRenderingReferencePoint().z);
 
         if (_activeMeshes != null) {
-            for (int i = 0; i < 8; i++) {
-                if (_occlusionCulled[i])
+            for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
+                if (!_occlusionCulled[i] && !isCulled())
                     _activeMeshes[i].render(type);
             }
-
-
         }
 
         GL11.glPopMatrix();
@@ -765,23 +768,54 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void update() {
-        swapActiveMesh();
+        if (!isCulled()) {
+            generateVBOs();
+            swapActiveMesh();
+        }
     }
 
-    public void applyOcclusionQueries() {
-        for (int i = 0; i < 8; i++) {
+    public void executeOcclusionQuery() {
+        AABB[] subChunksAABBs = getSubChunkAABBs();
 
-            int result = GL15.glGetQueryObjectui(_queries[i], GL15.GL_QUERY_RESULT);
+        if (!_waitingForResult) {
+            for (int j = 0; j < VERTICAL_SEGMENTS; j++) {
+                if (_queries[j] == 0) {
+                    _queries[j] = GL15.glGenQueries();
+                }
 
-            if (result > 0) {
-                _occlusionCulled[i] = true;
-            } else {
-                _occlusionCulled[i] = false;
+                GL15.glBeginQuery(GL15.GL_SAMPLES_PASSED, _queries[j]);
+                subChunksAABBs[j].renderSolid();
+                GL15.glEndQuery(GL15.GL_SAMPLES_PASSED);
             }
 
-            GL15.glDeleteQueries(_queries[i]);
-            _queries[i] = 0;
+            _waitingForResult = true;
         }
+    }
+
+    public int applyOcclusionQueries() {
+        int counter = 0;
+        if (_waitingForResult) {
+            for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
+                int result = GL15.glGetQueryObjectui(_queries[i], GL15.GL_QUERY_RESULT_AVAILABLE);
+
+                if (result == GL11.GL_TRUE) {
+
+                    result = GL15.glGetQueryObjectui(_queries[i], GL15.GL_QUERY_RESULT);
+
+                    if (result > 0) {
+                        _occlusionCulled[i] = false;
+                    } else {
+                        _occlusionCulled[i] = true;
+                    }
+
+                    counter++;
+                }
+            }
+
+            _waitingForResult = false;
+        }
+
+        return counter;
     }
 
     private void setNewMesh(ChunkMesh[] newMesh) {

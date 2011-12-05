@@ -22,7 +22,7 @@ System {
     saveChunks = true
 
     // Size of the chunk cache
-    chunkCacheSize = 1024 + 512;
+    chunkCacheSize = 4096;
 
     Debug {
 
@@ -42,8 +42,6 @@ Graphics {
     gamma = 2.2d
     animatedWaterAndGrass = true
 
-    vboUpdateGap = 1 // ms
-
     pixelFormat = new PixelFormat().withDepthBits(24)
     displayMode = new DisplayMode(1280, 720)
 
@@ -56,7 +54,7 @@ Graphics {
     viewingDistanceNear = 8
     viewingDistanceModerate = 16
     viewingDistanceFar = 24
-    viewingDistanceUltra = 32
+    viewingDistanceUltra = 46
 
 }
 

@@ -37,9 +37,9 @@ import com.github.begla.blockmania.world.interfaces.WorldProvider;
 import com.github.begla.blockmania.world.physics.BulletPhysicsRenderer;
 import com.github.begla.blockmania.world.simulators.GrowthSimulator;
 import com.github.begla.blockmania.world.simulators.LiquidSimulator;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
 
@@ -61,8 +61,6 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class World implements RenderableObject {
 
-    private static final int VBO_UPDATE_GAP = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.vboUpdateGap");
-
     /* VIEWING DISTANCE */
     private int _viewingDistance = 8;
 
@@ -75,8 +73,6 @@ public final class World implements RenderableObject {
     /* CHUNKS */
     private ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>(), _visibleChunks = new ArrayList<Chunk>();
     private int _chunkPosX, _chunkPosZ;
-    private long _lastVboUpdate;
-
     /* CORE GAME OBJECTS */
     private PortalManager _portalManager;
     private MobManager _mobManager;
@@ -98,7 +94,6 @@ public final class World implements RenderableObject {
 
     /* UPDATING */
     private final ChunkUpdateManager _chunkUpdateManager;
-    private int _testQuery = 0;
 
     /* EVENTS */
     private final WorldTimeEventManager _worldTimeEventManager;
@@ -211,27 +206,12 @@ public final class World implements RenderableObject {
      * Updates the currently visible chunks (in sight of the player).
      */
     public void updateVisibleChunks() {
-
-        boolean updateOcclusionQueries = false;
-        int result = GL15.glGetQueryObjectui(_testQuery, GL15.GL_QUERY_RESULT_AVAILABLE);
-
-        if (result == GL11.GL_TRUE) {
-            updateOcclusionQueries = true;
-            _testQuery = 0;
-        }
-
         _visibleChunks.clear();
-        _bulletPhysicsRenderer.resetChunks();
-
-        _visibleTriangles = 0;
 
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
 
             if (isChunkVisible(c)) {
-                if (updateOcclusionQueries) {
-                    c.applyOcclusionQueries();
-                }
                 _visibleChunks.add(c);
                 c.setCulled(false);
 
@@ -240,14 +220,7 @@ public final class World implements RenderableObject {
                         continue;
                 }
 
-                if (Blockmania.getInstance().getTime() - _lastVboUpdate > VBO_UPDATE_GAP) {
-                    if (c.generateVBOs()) {
-                        _lastVboUpdate = Blockmania.getInstance().getTime();
-                    }
-
-                    c.update();
-                }
-
+                c.update();
                 continue;
             }
 
@@ -255,44 +228,40 @@ public final class World implements RenderableObject {
         }
     }
 
-    public void removeOccludedSubChunks() {
-        if (_testQuery == 0) {
-            GL11.glColorMask(false, false, false, false);
-            GL11.glDepthMask(false);
+    public void executeOcclusionQueries() {
+        GL11.glColorMask(false, false, false, false);
+        GL11.glDepthMask(false);
 
-            for (int i = 0; i < _visibleChunks.size(); i++) {
-                Chunk c = _visibleChunks.get(i);
-                AABB[] subChunksAABBs = c.getSubChunkAABBs();
+        for (int i = 0; i < _visibleChunks.size(); i++) {
+            Chunk c = _visibleChunks.get(i);
 
-                for (int j = 0; j < 8; j++) {
-                    if (c._queries[j] == 0) {
-
-                        int query = GL15.glGenQueries();
-                        GL15.glBeginQuery(GL15.GL_SAMPLES_PASSED, query);
-                        subChunksAABBs[j].render();
-                        GL15.glEndQuery(GL15.GL_SAMPLES_PASSED);
-
-                        c._queries[j] = query;
-                        _testQuery = query;
-                    }
-                }
+            if (i > 8) {
+                c.executeOcclusionQuery();
+            }  else {
+                c._occlusionCulled = new boolean[Chunk.VERTICAL_SEGMENTS];
             }
-
-            GL11.glColorMask(true, true, true, true);
-            GL11.glDepthMask(true);
         }
+
+        GL11.glColorMask(true, true, true, true);
+        GL11.glDepthMask(true);
     }
 
     /**
      * Renders the world.
      */
     public void render() {
+        // Update the list of relevant chunks
+        updateChunksInProximity(false);
+        updateVisibleChunks();
+
         /* SKYSPHERE */
         _player.getActiveCamera().lookThroughNormalized();
         _skysphere.render();
 
         /* WORLD RENDERING */
         _player.getActiveCamera().lookThrough();
+
+        executeOcclusionQueries();
 
         _player.render();
         renderChunksAndEntities();
@@ -333,31 +302,25 @@ public final class World implements RenderableObject {
         GL20.glUniform1f(daylight, getDaylight());
         GL20.glUniform1i(swimming, _player.isHeadUnderWater() ? 1 : 0);
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         // OPAQUE ELEMENTS
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
 
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
+            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
 
             if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
-                for (int j = 0; j < 8; j++) {
+                for (int j = 0; j < Chunk.VERTICAL_SEGMENTS; j++) {
                     AABB[] subChunkAABBs = c.getSubChunkAABBs();
                     subChunkAABBs[j].render();
                 }
             }
         }
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        for (int i = 0; i < _visibleChunks.size(); i++) {
-            Chunk c = _visibleChunks.get(i);
-            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
-        }
-
-
         ShaderManager.getInstance().enableShader("block");
-        _bulletPhysicsRenderer.render();
         _mobManager.renderAll();
 
         ShaderManager.getInstance().enableShader("chunk");
@@ -388,12 +351,6 @@ public final class World implements RenderableObject {
         _player.update();
         _mobManager.updateAll();
 
-        // Update the list of relevant chunks
-        updateChunksInProximity(false);
-        updateVisibleChunks();
-
-        _bulletPhysicsRenderer.update();
-
         // Update the particle emitters
         _blockParticleEmitter.update();
 
@@ -405,8 +362,6 @@ public final class World implements RenderableObject {
 
         /* SIMULATE! */
         simulate();
-
-        removeOccludedSubChunks();
     }
 
     private void simulate() {
@@ -534,30 +489,6 @@ public final class World implements RenderableObject {
 
     public boolean isChunkVisible(Chunk c) {
         return _player.getActiveCamera().getViewFrustum().intersects(c.getAABB());
-    }
-
-    public boolean[] calcVisibleSubChunks(Chunk c) {
-        AABB[] subChunkAABBs = c.getSubChunkAABBs();
-        ChunkMesh[] activeMeshes = c.getActiveMeshes();
-
-        boolean[] result = new boolean[8];
-
-        for (int i = 0; i < 8; i++) {
-            boolean empty = false;
-
-            if (activeMeshes != null) {
-                ChunkMesh mesh = activeMeshes[i];
-                empty = mesh.countTriangles() == 0;
-            }
-
-            if (!empty)
-                result[i] = getPlayer().getActiveCamera().getViewFrustum().intersects(subChunkAABBs[i]);
-            else {
-                result[i] = false;
-            }
-        }
-
-        return result;
     }
 
     public boolean isEntityVisible(Entity e) {
