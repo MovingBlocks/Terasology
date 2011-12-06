@@ -41,6 +41,7 @@ public class BlockManager {
 
     /* GROOVY */
     private Binding _binding;
+    private BlockManifestor _manifestor;
 
     /* BLOCKS */
     private HashMap<String, Block> _blocksByTitle = new HashMap<String, Block>(128);
@@ -56,7 +57,7 @@ public class BlockManager {
     private BlockManager() {
         _binding = new Binding();
         _binding.setVariable("blockManager", this);
-
+        _manifestor = new BlockManifestor();
         loadBlocks();
     }
 
@@ -64,6 +65,8 @@ public class BlockManager {
         try {
             GroovyScriptEngine scriptEngine = new GroovyScriptEngine(DEFAULT_SCRIPT_PATH);
             scriptEngine.run("Default.groovy", _binding);
+            _manifestor.loadConfig();
+
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         } catch (ResourceException e) {

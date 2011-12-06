@@ -38,38 +38,39 @@ import static org.lwjgl.opengl.GL11.*;
  * Stores all information for a specific block type.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class Block implements RenderableObject {
 
     /* PROPERTIES */
-    private byte _id = 0x0;
-    private String _title = "Untitled block";
+    protected byte _id = 0x0;
+    protected String _title = "Untitled block";
 
-    private boolean _translucent;
-    private boolean _invisible;
-    private boolean _penetrable;
-    private boolean _castsShadows;
-    private boolean _disableTessellation;
-    private boolean _renderBoundingBox;
-    private boolean _allowBlockAttachment;
-    private boolean _bypassSelectionRay;
-    private boolean _liquid;
+    protected boolean _translucent;
+    protected boolean _invisible;
+    protected boolean _penetrable;
+    protected boolean _castsShadows;
+    protected boolean _disableTessellation;
+    protected boolean _renderBoundingBox;
+    protected boolean _allowBlockAttachment;
+    protected boolean _bypassSelectionRay;
+    protected boolean _liquid;
 
-    private BLOCK_FORM _blockForm;
-    private COLOR_SOURCE _colorSource;
+    protected BLOCK_FORM _blockForm;
+    protected COLOR_SOURCE _colorSource;
 
-    private byte _luminance;
-    private byte _hardness;
+    protected byte _luminance;
+    protected byte _hardness;
 
-    private Vector4f[] _colorOffset = new Vector4f[6];
-    private Vector2f[] _textureAtlasPos = new Vector2f[6];
+    protected Vector4f[] _colorOffset = new Vector4f[6];
+    protected Vector2f[] _textureAtlasPos = new Vector2f[6];
 
     /* RENDERING */
-    private int _displayList = -1;
+    protected int _displayList = -1;
 
     /* LUTs */
-    private static BufferedImage _colorLut;
-    private static BufferedImage _foliageLut;
+    protected static BufferedImage _colorLut;
+    protected static BufferedImage _foliageLut;
 
     /**
      * The six sides of a block.
