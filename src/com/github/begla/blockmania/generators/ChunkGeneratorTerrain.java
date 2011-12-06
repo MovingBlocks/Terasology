@@ -28,7 +28,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /* CONST */
     protected static final int SAMPLE_RATE_3D_HOR = 4;
-    protected static final int SAMPLE_RATE_3D_VERT = 32;
+    protected static final int SAMPLE_RATE_3D_VERT = 8;
 
     /**
      * Available types of biomes.
@@ -228,8 +228,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
         double mIntens = MathHelper.clamp(1.0 - (dT + dH) * 5.0) + 0.3;
 
-        double density = calcMountainDensity(x, y, z) * mIntens * height;
-        return -y + (((height * 80.0) + 16.0) + density * 1024.0);
+        double densityMountains = calcMountainDensity(x, y, z) * mIntens * height;
+        double densityHills = (calcHillDensity(x, y, z) * height);
+
+        return -y + (((height * 80.0) + 16.0) + densityMountains * 512.0 + densityHills * 256);
     }
 
     public double calcBaseTerrain(double x, double z) {
@@ -251,10 +253,22 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double x1, y1, z1;
 
         x1 = x * 0.006;
-        y1 = y * 0.003;
+        y1 = y * 0.002;
         z1 = z * 0.006;
 
         double result = _pGen5.fBm(x1, y1, z1, 9, 1.99782819, 0.8581);
+
+        return result > 0 ? result : 0;
+    }
+
+    public double calcHillDensity(double x, double y, double z) {
+        double x1, y1, z1;
+
+        x1 = x * 0.008;
+        y1 = y * 0.008;
+        z1 = z * 0.008;
+
+        double result = _pGen2.fBm(x1, y1, z1, 7, 1.99782819, 0.8581);
 
         return result > 0 ? result : 0;
     }

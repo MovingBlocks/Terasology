@@ -70,8 +70,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     /* ------ */
     private final ChunkMeshGenerator _meshGenerator;
     /* ------ */
-    private boolean _visible = false;
-    /* ------ */
     private boolean _disposed = false;
     /* ----- */
     private AABB _aabb = null;
@@ -896,19 +894,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public String getChunkFileName() {
         return Chunk.getChunkFileNameForPosition(getPosition());
-    }
-
-    public void setVisible(boolean visible) {
-        _visible = visible;
-    }
-
-    /**
-     * Returns true if this chunk is currently visible.
-     *
-     * @return True if the chunk is currently visible
-     */
-    public boolean isVisible() {
-        return _visible;
     }
 
     public FastRandom getRandom() {

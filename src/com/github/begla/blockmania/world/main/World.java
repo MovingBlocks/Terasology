@@ -36,6 +36,7 @@ import com.github.begla.blockmania.world.interfaces.WorldProvider;
 import com.github.begla.blockmania.world.physics.BulletPhysicsRenderer;
 import com.github.begla.blockmania.world.simulators.GrowthSimulator;
 import com.github.begla.blockmania.world.simulators.LiquidSimulator;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
@@ -227,7 +228,6 @@ public final class World implements RenderableObject {
             }
 
             if (isChunkVisible(c)) {
-                c.setVisible(true);
                 _visibleChunks.add(c);
 
                 if (c.getActiveChunkMesh() != null) {
@@ -249,8 +249,6 @@ public final class World implements RenderableObject {
 
                 continue;
             }
-
-            c.setVisible(false);
         }
     }
 
@@ -258,6 +256,10 @@ public final class World implements RenderableObject {
      * Renders the world.
      */
     public void render() {
+        // Update the list of relevant chunks
+        updateChunksInProximity(false);
+        updateVisibleChunks();
+
         /* SKYSPHERE */
         _player.getActiveCamera().lookThroughNormalized();
         _skysphere.render();
@@ -304,26 +306,22 @@ public final class World implements RenderableObject {
         GL20.glUniform1f(daylight, getDaylight());
         GL20.glUniform1i(swimming, _player.isHeadUnderWater() ? 1 : 0);
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         // OPAQUE ELEMENTS
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
 
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
+            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
 
             if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
                 c.getAABB().render();
             }
         }
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        for (int i = 0; i < _visibleChunks.size(); i++) {
-            Chunk c = _visibleChunks.get(i);
-            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
-        }
-
-        glDisable(GL_CULL_FACE);
+        glDisable(GL11.GL_CULL_FACE);
 
         for (int j = 0; j < 2; j++) {
             for (int i = 0; i < _visibleChunks.size(); i++) {
@@ -339,7 +337,7 @@ public final class World implements RenderableObject {
             }
         }
 
-        glEnable(GL_CULL_FACE);
+        glEnable(GL11.GL_CULL_FACE);
         glDisable(GL_BLEND);
 
         ShaderManager.getInstance().enableShader(null);
@@ -358,10 +356,6 @@ public final class World implements RenderableObject {
         _skysphere.update();
         _player.update();
         _mobManager.updateAll();
-
-        // Update the list of relevant chunks
-        updateChunksInProximity(false);
-        updateVisibleChunks();
 
         _bulletPhysicsRenderer.update();
 
