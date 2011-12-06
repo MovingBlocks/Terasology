@@ -23,6 +23,7 @@ import com.github.begla.blockmania.gui.components.UIButton;
 import com.github.begla.blockmania.gui.components.UICrosshair;
 import com.github.begla.blockmania.gui.components.UIText;
 import com.github.begla.blockmania.gui.framework.UIDisplayRenderer;
+import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.world.chunk.ChunkMeshGenerator;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -81,6 +82,10 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         if (b == null)
             return;
 
+
+        glEnable(GL_TEXTURE_2D);
+        TextureManager.getInstance().bindTexture("terrain");
+
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
@@ -108,6 +113,8 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
+
+        glDisable(GL_TEXTURE_2D);
     }
 
     /**

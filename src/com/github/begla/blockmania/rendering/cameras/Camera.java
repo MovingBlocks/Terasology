@@ -51,7 +51,9 @@ public abstract class Camera {
     }
 
     public abstract void loadProjectionMatrix();
+
     public abstract void loadModelViewMatrix();
+
     public abstract void loadNormalizedModelViewMatrix();
 
     public Vector3f getPosition() {

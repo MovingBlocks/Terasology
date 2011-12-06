@@ -154,7 +154,7 @@ public class MathHelper {
         if (x < 0)
             x -= 15;
 
-        return (x / Chunk.getChunkDimensionX());
+        return (x / Chunk.CHUNK_DIMENSION_X);
     }
 
     /**
@@ -168,7 +168,7 @@ public class MathHelper {
         if (z < 0)
             z -= 15;
 
-        return (z / Chunk.getChunkDimensionZ());
+        return (z / Chunk.CHUNK_DIMENSION_Z);
     }
 
     /**
@@ -179,7 +179,7 @@ public class MathHelper {
      * @return The X-coordinate of the block within the chunk
      */
     public static int calcBlockPosX(int x1, int x2) {
-        return MathHelper.fastAbs(x1 - (x2 * Chunk.getChunkDimensionX()));
+        return MathHelper.fastAbs(x1 - (x2 * Chunk.CHUNK_DIMENSION_X));
     }
 
     /**
@@ -190,6 +190,6 @@ public class MathHelper {
      * @return The Z-coordinate of the block within the chunk
      */
     public static int calcBlockPosZ(int z1, int z2) {
-        return MathHelper.fastAbs(z1 - (z2 * Chunk.getChunkDimensionZ()));
+        return MathHelper.fastAbs(z1 - (z2 * Chunk.CHUNK_DIMENSION_Z));
     }
 }

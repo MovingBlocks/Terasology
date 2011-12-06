@@ -15,17 +15,12 @@
  */
 package com.github.begla.blockmania.gui.menus;
 
-import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.gui.components.UIText;
 import com.github.begla.blockmania.gui.components.UITransparentOverlay;
 import com.github.begla.blockmania.gui.framework.UIDisplayRenderer;
-import com.github.begla.blockmania.gui.framework.UIGraphicsElement;
-import org.lwjgl.opengl.Display;
-
-import javax.vecmath.Vector2f;
 
 /**
- * HUD displayed on the user's screen.
+ * Simple loading screen.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

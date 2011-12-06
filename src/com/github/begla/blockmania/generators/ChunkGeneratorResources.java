@@ -32,9 +32,9 @@ public class ChunkGeneratorResources extends ChunkGeneratorTerrain {
 
     @Override
     public void generate(Chunk c) {
-        for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
-            for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
-                for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
+        for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
+            for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z++) {
+                for (int y = 0; y < Chunk.CHUNK_DIMENSION_Y; y++) {
                     if (BlockManager.getInstance().getBlock(c.getBlock(x, y, z)).getTitle().equals("Stone")) {
                         if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) ConfigurationManager.getInstance().getConfig().get("World.Resources.probCoal")) {
                             c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Coal").getId());

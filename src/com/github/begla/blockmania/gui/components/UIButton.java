@@ -26,7 +26,7 @@ import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 
 /**
- * TODO
+ * Simple button.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -91,15 +91,13 @@ public class UIButton extends UIDisplayContainer {
 
     @Override
     public void processMouseInput(int button, boolean state, int wheelMoved) {
-        if (button == 0 && state == true && !_mouseUp) {
+        if (button == 0 && state && !_mouseUp) {
             _mouseDown = true;
             _mouseUp = false;
             _clickSoundPlayed = false;
-            return;
-        } else if (button == 0 && state == false && _mouseDown) {
+        } else if (button == 0 && !state && _mouseDown) {
             _mouseUp = true;
             _mouseDown = false;
-            return;
         }
     }
 

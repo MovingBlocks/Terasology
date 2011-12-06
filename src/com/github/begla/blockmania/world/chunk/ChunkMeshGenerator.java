@@ -35,6 +35,8 @@ import java.nio.ByteBuffer;
  */
 public final class ChunkMeshGenerator {
 
+    private static final boolean GENERATE_PHYSICS_MESHES = (Boolean) ConfigurationManager.getInstance().getConfig().get("Physics.generatePhysicsMeshes");
+
     private static final double OCCLUSION_INTENS_DEFAULT = (Double) ConfigurationManager.getInstance().getConfig().get("Lighting.occlusionIntensDefault");
     private static final double OCCLUSION_INTENS_BILLBOARDS = (Double) ConfigurationManager.getInstance().getConfig().get("Lighting.occlusionIntensBillboards");
 
@@ -45,15 +47,15 @@ public final class ChunkMeshGenerator {
         _chunk = chunk;
     }
 
-    public ChunkMesh generateMesh(boolean createPhysicsMesh) {
+    public ChunkMesh generateMesh(int meshHeight, int verticalOffset) {
         ChunkMesh mesh = new ChunkMesh();
 
-        for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
-            for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
+        for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
+            for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z++) {
                 double biomeTemp = _chunk.getParent().getTemperatureAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
                 double biomeHumidity = _chunk.getParent().getHumidityAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
 
-                for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
+                for (int y = verticalOffset; y < verticalOffset + meshHeight; y++) {
                     byte blockType = _chunk.getBlock(x, y, z);
                     Block block = BlockManager.getInstance().getBlock(blockType);
 
@@ -70,29 +72,25 @@ public final class ChunkMeshGenerator {
             }
         }
 
-        generateOptimizedBuffers(mesh, createPhysicsMesh);
+        generateOptimizedBuffers(mesh);
         _statVertexArrayUpdateCount++;
 
         return mesh;
     }
 
-    private void generateOptimizedBuffers(ChunkMesh mesh, boolean createPhysicsMesh) {
+    private void generateOptimizedBuffers(ChunkMesh mesh) {
         /* BULLET PHYSICS */
-        IndexedMesh[] indexMesh = null;
+        IndexedMesh indexMesh = null;
 
-        if (createPhysicsMesh) {
-            indexMesh = new IndexedMesh[6];
-
-            for (int i = 0; i < 6; i++) {
-                indexMesh[i] = new IndexedMesh();
-                indexMesh[i].vertexBase = ByteBuffer.allocate(mesh._vertexElements[i].quads.size() * 4);
-                indexMesh[i].triangleIndexBase = ByteBuffer.allocate(mesh._vertexElements[i].quads.size() * 4);
-                indexMesh[i].triangleIndexStride = 12;
-                indexMesh[i].vertexStride = 12;
-                indexMesh[i].numVertices = mesh._vertexElements[i].quads.size() / 3;
-                indexMesh[i].numTriangles = mesh._vertexElements[i].quads.size() / 6;
-                indexMesh[i].indexType = ScalarType.INTEGER;
-            }
+        if (mesh._vertexElements[0].quads.size() > 0 && GENERATE_PHYSICS_MESHES) {
+            indexMesh = new IndexedMesh();
+            indexMesh.vertexBase = ByteBuffer.allocate(mesh._vertexElements[0].quads.size() * 4);
+            indexMesh.triangleIndexBase = ByteBuffer.allocate(mesh._vertexElements[0].quads.size() * 4);
+            indexMesh.triangleIndexStride = 12;
+            indexMesh.vertexStride = 12;
+            indexMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
+            indexMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
+            indexMesh.indexType = ScalarType.INTEGER;
         }
         /* ------------- */
 
@@ -115,14 +113,14 @@ public final class ChunkMeshGenerator {
                     mesh._vertexElements[j].indices.put(cIndex);
 
                     /* BULLET PHYSICS */
-                    if (j < 6 && createPhysicsMesh) {
-                        indexMesh[j].triangleIndexBase.putInt(cIndex);
-                        indexMesh[j].triangleIndexBase.putInt(cIndex + 1);
-                        indexMesh[j].triangleIndexBase.putInt(cIndex + 2);
+                    if (j == 0 && indexMesh != null) {
+                        indexMesh.triangleIndexBase.putInt(cIndex);
+                        indexMesh.triangleIndexBase.putInt(cIndex + 1);
+                        indexMesh.triangleIndexBase.putInt(cIndex + 2);
 
-                        indexMesh[j].triangleIndexBase.putInt(cIndex + 2);
-                        indexMesh[j].triangleIndexBase.putInt(cIndex + 3);
-                        indexMesh[j].triangleIndexBase.putInt(cIndex);
+                        indexMesh.triangleIndexBase.putInt(cIndex + 2);
+                        indexMesh.triangleIndexBase.putInt(cIndex + 3);
+                        indexMesh.triangleIndexBase.putInt(cIndex);
                     }
                     /* ------------- */
 
@@ -136,10 +134,10 @@ public final class ChunkMeshGenerator {
                 mesh._vertexElements[j].vertices.put(vertexPos.z);
 
                 /* BULLET PHYSICS */
-                if (j < 6 && createPhysicsMesh) {
-                    indexMesh[j].vertexBase.putFloat(vertexPos.x);
-                    indexMesh[j].vertexBase.putFloat(vertexPos.y);
-                    indexMesh[j].vertexBase.putFloat(vertexPos.z);
+                if (j == 0 && indexMesh != null) {
+                    indexMesh.vertexBase.putFloat(vertexPos.x);
+                    indexMesh.vertexBase.putFloat(vertexPos.y);
+                    indexMesh.vertexBase.putFloat(vertexPos.z);
                 }
                 /* ------------ */
 
@@ -164,19 +162,13 @@ public final class ChunkMeshGenerator {
         }
 
         /* BULLET PHYSICS */
-        TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+        if (indexMesh != null) {
+            TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+            indexMesh.triangleIndexBase.flip();
+            indexMesh.vertexBase.flip();
 
-        if (createPhysicsMesh) {
-            for (int i = 0; i < 6; i++) {
-                indexMesh[i].triangleIndexBase.flip();
-                indexMesh[i].vertexBase.flip();
-
-
-                vertexArray.addIndexedMesh(indexMesh[i]);
-            }
-
+            vertexArray.addIndexedMesh(indexMesh);
             mesh._bulletMeshShape = new BvhTriangleMeshShape(vertexArray, false);
-
         }
     }
 
@@ -277,11 +269,11 @@ public final class ChunkMeshGenerator {
         Vector3f p3 = new Vector3f(0.5f, 0.5f, -0.5f);
         Vector3f p4 = new Vector3f(-0.5f, 0.5f, 0.5f);
 
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4));
-        addBlockTextureData(mesh._vertexElements[6], texOffset, new Vector3f(0, 0, 1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4));
+        addBlockTextureData(mesh._vertexElements[2], texOffset, new Vector3f(0, 0, 1));
 
         /*
         * Second side of the billboard
@@ -294,11 +286,11 @@ public final class ChunkMeshGenerator {
         p3 = new Vector3f(0.5f, 0.5f, 0.5f);
         p4 = new Vector3f(-0.5f, 0.5f, -0.5f);
 
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3));
-        addBlockVertexData(mesh._vertexElements[6], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4));
-        addBlockTextureData(mesh._vertexElements[6], texOffset, new Vector3f(0, 0, 1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3));
+        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4));
+        addBlockTextureData(mesh._vertexElements[2], texOffset, new Vector3f(0, 0, 1));
     }
 
     private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
@@ -443,28 +435,11 @@ public final class ChunkMeshGenerator {
 
         switch (renderType) {
             case BILLBOARD_AND_TRANSLUCENT:
-                vertexElementsId = 7;
+                vertexElementsId = 1;
                 break;
             case WATER_AND_ICE:
-                vertexElementsId = 8;
-                break;
-        }
-
-        // Assign the opaque vertices by the side of the chunk to different vertex element arrays
-        if (vertexElementsId == 0) {
-            if (norm.x == 1 && norm.y == 0 && norm.z == 0) {
-                vertexElementsId = 0;
-            } else if (norm.x == -1 && norm.y == 0 && norm.z == 0) {
-                vertexElementsId = 1;
-            } else if (norm.x == 0 && norm.y == 0 && norm.z == 1) {
-                vertexElementsId = 2;
-            } else if (norm.x == 0 && norm.y == 0 && norm.z == -1) {
                 vertexElementsId = 3;
-            } else if (norm.x == 0 && norm.y == 1 && norm.z == 0) {
-                vertexElementsId = 4;
-            } else if (norm.x == 0 && norm.y == -1 && norm.z == 0) {
-                vertexElementsId = 5;
-            }
+                break;
         }
 
         switch (blockForm) {
@@ -485,9 +460,9 @@ public final class ChunkMeshGenerator {
     }
 
     private Vector3f moveVectorFromChunkSpaceToWorldSpace(Vector3f offset) {
-        double offsetX = _chunk.getPosition().x * Chunk.getChunkDimensionX();
-        double offsetY = _chunk.getPosition().y * Chunk.getChunkDimensionY();
-        double offsetZ = _chunk.getPosition().z * Chunk.getChunkDimensionZ();
+        double offsetX = _chunk.getPosition().x * Chunk.CHUNK_DIMENSION_X;
+        double offsetY = _chunk.getPosition().y * Chunk.CHUNK_DIMENSION_Y;
+        double offsetZ = _chunk.getPosition().z * Chunk.CHUNK_DIMENSION_Z;
 
         offset.x += offsetX;
         offset.y += offsetY;

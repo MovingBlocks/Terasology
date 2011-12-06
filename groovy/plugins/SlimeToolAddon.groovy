@@ -1,6 +1,6 @@
+import com.github.begla.blockmania.game.Blockmania
 import com.github.begla.blockmania.tools.Tool
 import com.github.begla.blockmania.world.characters.mobs.GelatinousCube
-import com.github.begla.blockmania.game.Blockmania
 
 class SlimeTool implements Tool {
 

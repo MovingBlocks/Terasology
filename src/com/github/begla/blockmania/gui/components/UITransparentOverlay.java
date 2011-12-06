@@ -24,7 +24,7 @@ import javax.vecmath.Vector2f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * TODO
+ * Transparent fullscreen overlay.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

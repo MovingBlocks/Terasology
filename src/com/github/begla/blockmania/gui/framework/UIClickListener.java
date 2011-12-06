@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.gui.framework;
 
 /**
- * TODO
+ * Notified on click events.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

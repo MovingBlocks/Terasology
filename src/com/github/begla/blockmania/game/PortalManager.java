@@ -16,9 +16,9 @@
 
 package com.github.begla.blockmania.game;
 
-import com.github.begla.blockmania.world.characters.mobs.GelatinousCube;
 import com.github.begla.blockmania.utilities.FastRandom;
-import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.characters.mobs.GelatinousCube;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 
 import javax.vecmath.Vector3f;
 import java.util.HashSet;
@@ -37,9 +37,9 @@ public class PortalManager {
     private HashSet<Portal> _portalStore = new HashSet<Portal>();
 
     private final FastRandom _random = new FastRandom();
-    private World _parent;
+    private WorldRenderer _parent;
 
-    public PortalManager(World parent) {
+    public PortalManager(WorldRenderer parent) {
         _parent = parent;
     }
 
@@ -92,7 +92,7 @@ public class PortalManager {
             GelatinousCube s = new GelatinousCube(_parent);
 
             // Spawn some Gel. Cubes in the wilderness!
-            Vector3f randomOffset = new Vector3f((float) _parent.getWorldProvider().getRandom().randomDouble(), 0 ,(float) _parent.getWorldProvider().getRandom().randomDouble());
+            Vector3f randomOffset = new Vector3f((float) _parent.getWorldProvider().getRandom().randomDouble(), 0, (float) _parent.getWorldProvider().getRandom().randomDouble());
             randomOffset.scale(64);
 
             s.setSpawningPoint(new Vector3f(p.getBlockLocation().x + randomOffset.x, p.getBlockLocation().y + 1, p.getBlockLocation().z + randomOffset.z));

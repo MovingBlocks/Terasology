@@ -28,7 +28,7 @@ import javax.vecmath.Vector2f;
 import static org.lwjgl.opengl.GL11.glDisable;
 
 /**
- * Composition of multiple display elements.
+ * Simple text element supporting text shadowing.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -123,8 +123,8 @@ public class UIText extends UIDisplayElement {
     public int getTextWidth() {
         return _font.getWidth(_text);
     }
-    
+
     public Vector2f calcCenterPosition() {
-       return new Vector2f(Display.getWidth() / 2 - getTextWidth() / 2, Display.getHeight() / 2 - getTextHeight());
+        return new Vector2f(Display.getWidth() / 2 - getTextWidth() / 2, Display.getHeight() / 2 - getTextHeight());
     }
 }

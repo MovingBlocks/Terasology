@@ -18,7 +18,9 @@ package com.github.begla.blockmania.generators;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 
-import javax.vecmath.*;
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3f;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -99,7 +101,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                 case 'G':
                 case 'F':
                     // Tree trunk
-                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("Tree trunk").getId(), update,  true);
+                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, true);
 
                     // Generate leafs
                     if (_stackOrientation.size() > 1 && _generateLeafBlocks) {

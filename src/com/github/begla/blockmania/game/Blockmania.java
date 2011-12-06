@@ -27,7 +27,7 @@ import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.interfaces.WorldProvider;
-import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -64,6 +64,7 @@ public final class Blockmania {
             (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceModerate"),
             (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceFar"),
             (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceUltra")};
+
     private int _activeViewingDistance = 0;
 
     /* THREADING */
@@ -84,7 +85,7 @@ public final class Blockmania {
     private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
 
     /* RENDERING */
-    private World _world;
+    private WorldRenderer _worldRenderer;
 
     /* GUI */
     private UIHeadsUpDisplay _hud;
@@ -242,9 +243,9 @@ public final class Blockmania {
         getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Get rid of the old world
-        if (_world != null) {
-            _world.dispose();
-            _world = null;
+        if (_worldRenderer != null) {
+            _worldRenderer.dispose();
+            _worldRenderer = null;
         }
 
         if (seed == null) {
@@ -254,12 +255,12 @@ public final class Blockmania {
         }
 
         // Init. a new world
-        _world = new World(title, seed);
-        _world.setPlayer(new Player(_world));
+        _worldRenderer = new WorldRenderer(title, seed);
+        _worldRenderer.setPlayer(new Player(_worldRenderer));
 
         // Create the first Portal if it doesn't exist yet
-        _world.initPortal();
-        _world.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+        _worldRenderer.initPortal();
+        _worldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
 
         simulateWorld(4000);
     }
@@ -383,7 +384,7 @@ public final class Blockmania {
          * Save the world and exit the application.
          */
         if (_saveWorldOnExit) {
-            _world.dispose();
+            _worldRenderer.dispose();
         }
 
         _threadPool.shutdown();
@@ -401,16 +402,16 @@ public final class Blockmania {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
-        if (_world != null)
-            _world.render();
+        if (_worldRenderer != null)
+            _worldRenderer.render();
 
         renderUserInterface();
     }
 
     public void update() {
         if (!_pauseGame && !_hud.getDebugConsole().isVisible() && !_pauseMenu.isVisible()) {
-            if (_world != null)
-                _world.update();
+            if (_worldRenderer != null)
+                _worldRenderer.update();
             Mouse.setGrabbed(true);
         } else {
             Mouse.setGrabbed(false);
@@ -470,7 +471,7 @@ public final class Blockmania {
             int wheelMoved = Mouse.getEventDWheel();
 
             if (!isGamePaused())
-                _world.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+                _worldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
 
             _hud.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
             _pauseMenu.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
@@ -508,7 +509,7 @@ public final class Blockmania {
 
             // Pass input to the current player
             if (!isGamePaused())
-                _world.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
+                _worldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
         }
     }
 
@@ -569,12 +570,12 @@ public final class Blockmania {
         return _averageFps;
     }
 
-    public World getActiveWorld() {
-        return _world;
+    public WorldRenderer getActiveWorld() {
+        return _worldRenderer;
     }
 
     public WorldProvider getActiveWorldProvider() {
-        return _world.getWorldProvider();
+        return _worldRenderer.getWorldProvider();
     }
 
     /**
@@ -599,6 +600,6 @@ public final class Blockmania {
 
     public void toggleViewingDistance() {
         _activeViewingDistance = (_activeViewingDistance + 1) % 4;
-        _world.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+        _worldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
     }
 }

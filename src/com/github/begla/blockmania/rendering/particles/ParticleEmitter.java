@@ -17,7 +17,7 @@ package com.github.begla.blockmania.rendering.particles;
 
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
-import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector3f;
@@ -32,7 +32,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public abstract class ParticleEmitter implements RenderableObject {
 
-    protected static final int MAX_PARTICLES = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxParticles");;
+    protected static final int MAX_PARTICLES = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxParticles");
+    ;
     protected static final int PARTICLES_PER_UPDATE = 32;
     /* ------- */
     protected int _particlesToEmit;
@@ -40,9 +41,9 @@ public abstract class ParticleEmitter implements RenderableObject {
     protected ArrayList<Particle> _particles = new ArrayList();
     protected Vector3f _origin = new Vector3f();
 
-    protected World _parent;
+    protected WorldRenderer _parent;
 
-    public ParticleEmitter(World parent) {
+    public ParticleEmitter(WorldRenderer parent) {
         _parent = parent;
     }
 
@@ -97,7 +98,7 @@ public abstract class ParticleEmitter implements RenderableObject {
         _particlesToEmit = amount;
     }
 
-    public World getParent() {
+    public WorldRenderer getParent() {
         return _parent;
     }
 

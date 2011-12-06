@@ -38,9 +38,9 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
     @Override
     public void generate(Chunk c) {
-        for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
-            for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
-                for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
+        for (int y = 0; y < Chunk.CHUNK_DIMENSION_Y; y++) {
+            for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
+                for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z++) {
                     generateGrassAndFlowers(c, x, y, z);
                 }
             }
@@ -55,9 +55,9 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
      * @param c The chunk
      */
     private void generateTrees(Chunk c) {
-        for (int y = 32; y < Chunk.getChunkDimensionY(); y++) {
-            for (int x = 0; x < Chunk.getChunkDimensionX(); x += 4) {
-                for (int z = 0; z < Chunk.getChunkDimensionZ(); z += 4) {
+        for (int y = 32; y < Chunk.CHUNK_DIMENSION_Y; y++) {
+            for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x += 4) {
+                for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z += 4) {
                     BIOME_TYPE biome = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
                     int randX = x + c.getRandom().randomInt() % 12 + 6;

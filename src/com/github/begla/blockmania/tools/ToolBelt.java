@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.tools;
 
 import com.github.begla.blockmania.game.Blockmania;
-import com.github.begla.blockmania.tools.*;
 import com.github.begla.blockmania.world.characters.Player;
 
 import java.util.HashMap;
@@ -74,21 +73,21 @@ public class ToolBelt {
     public void initNativeTools() {
 
         // Put the standard place/remove block "tool" in slot 1 (incidentally that corresponds to tool 1)
-        _toolBinding.put(new Byte((byte) 1), new Byte((byte) 1));
+        _toolBinding.put((byte) 1, (byte) 1);
         // ... and init. the corresponding tool object
         _toolStore.put((byte) 1, new BlockPlacementRemovalTool(_player));
 
         // Init. other native tools as before
-        _toolBinding.put(new Byte((byte) 2), new Byte((byte) 2));
+        _toolBinding.put((byte) 2, (byte) 2);
         _toolStore.put((byte) 2, new MultipleSelectionTool(_player));
 
-        _toolBinding.put(new Byte((byte) 3), new Byte((byte) 3));
+        _toolBinding.put((byte) 3, (byte) 3);
         _toolStore.put((byte) 3, new RectangleSelectionTool(_player));
 
-        _toolBinding.put(new Byte((byte) 4), new Byte((byte) 4));
+        _toolBinding.put((byte) 4, (byte) 4);
         _toolStore.put((byte) 4, new RigidBlockRemovalTool(_player));
 
-        _toolBinding.put(new Byte((byte) 5), new Byte((byte) 5));
+        _toolBinding.put((byte) 5, (byte) 5);
         _toolStore.put((byte) 5, new ExplosionTool(_player));
     }
 

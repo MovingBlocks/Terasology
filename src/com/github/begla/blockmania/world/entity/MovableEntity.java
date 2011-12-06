@@ -22,7 +22,7 @@ import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.newdawn.slick.openal.Audio;
 
 import javax.vecmath.Vector3f;
@@ -41,7 +41,7 @@ public abstract class MovableEntity extends Entity {
     protected Audio[] _footstepSounds;
 
     /* PARENT WORLD */
-    protected World _parent;
+    protected WorldRenderer _parent;
 
     /* MOVEMENT */
     protected double _walkingSpeed, _runningFactor, _jumpIntensity, _stepCounter;
@@ -57,7 +57,7 @@ public abstract class MovableEntity extends Entity {
      * @param runningFactor The running factor
      * @param jumpIntensity The jump intensity
      */
-    public MovableEntity(World parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
+    public MovableEntity(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
         _parent = parent;
         _walkingSpeed = walkingSpeed;
         _runningFactor = runningFactor;
@@ -554,7 +554,7 @@ public abstract class MovableEntity extends Entity {
         return _headUnderWater;
     }
 
-    public World getParent() {
+    public WorldRenderer getParent() {
         return _parent;
     }
 }

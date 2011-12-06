@@ -20,7 +20,7 @@ import com.github.begla.blockmania.gui.framework.UIDisplayElement;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * Composition of multiple display elements.
+ * A crosshair.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

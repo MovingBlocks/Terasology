@@ -23,7 +23,7 @@ import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.characters.Character;
 import com.github.begla.blockmania.world.chunk.Chunk;
-import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
@@ -49,7 +49,7 @@ public final class GelatinousCube extends Character {
     public int _randomColorId;
     public float _randomSize = 1.0f;
 
-    public GelatinousCube(World parent) {
+    public GelatinousCube(WorldRenderer parent) {
         super(parent, 0.01, 1.5, 0.125);
 
         _randomSize = (float) MathHelper.clamp((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0 + 0.15);

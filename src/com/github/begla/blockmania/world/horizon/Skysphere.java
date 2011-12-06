@@ -22,7 +22,7 @@ import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.utilities.MathHelper;
-import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -62,9 +62,9 @@ public class Skysphere implements RenderableObject {
     private long _lastCloudUpdate = Blockmania.getInstance().getTime();
     ByteBuffer _cloudByteBuffer = null;
 
-    private World _parent;
+    private WorldRenderer _parent;
 
-    public Skysphere(World parent) {
+    public Skysphere(WorldRenderer parent) {
         _parent = parent;
         _noiseGenerator = new PerlinNoise(_parent.getWorldProvider().getSeed().hashCode());
 

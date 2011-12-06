@@ -31,6 +31,7 @@ public abstract class ChunkGenerator {
 
     /**
      * Init. the generator with a given seed value.
+     *
      * @param generatorManager The generator manager
      */
     public ChunkGenerator(GeneratorManager generatorManager) {

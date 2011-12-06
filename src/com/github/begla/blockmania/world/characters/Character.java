@@ -16,8 +16,8 @@
  */
 package com.github.begla.blockmania.world.characters;
 
-import com.github.begla.blockmania.world.main.World;
 import com.github.begla.blockmania.world.entity.MovableEntity;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 
 /**
  * TODO: Fill with functionality.
@@ -26,7 +26,7 @@ import com.github.begla.blockmania.world.entity.MovableEntity;
  */
 public abstract class Character extends MovableEntity {
 
-    public Character(World parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
+    public Character(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
         super(parent, walkingSpeed, runningFactor, jumpIntensity);
     }
 }

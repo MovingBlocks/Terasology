@@ -20,7 +20,7 @@ import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * Extends display container to transparently init. OpenGL to allow 2D rendering.
+ * Extends display container to transparently init. OpenGL for 2D rendering.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

@@ -1,6 +1,6 @@
+import javax.vecmath.Vector2f
 import org.lwjgl.opengl.DisplayMode
 import org.lwjgl.opengl.PixelFormat
-import javax.vecmath.Vector2f
 
 System {
 
@@ -16,20 +16,20 @@ System {
     cloudUpdateInterval = (Integer) 1000
 
     // Defines the maximum amount of threads used for chunk generation
-    maxThreads = Runtime.getRuntime().availableProcessors() <= 2 ? 1 : 2;
+    maxThreads = Runtime.getRuntime().availableProcessors() <= 2 ? 1 : 2
 
     // Enable/or disable the persisting of chunks
     saveChunks = true
 
     // Size of the chunk cache
-    chunkCacheSize = 1024 + 512;
+    chunkCacheSize = 1024
 
     Debug {
 
         debug = false
         debugCollision = false
 
-        chunkOutlines = false
+        renderChunkBoundingBoxes = false
 
         demoFlight = false
         godMode = false
@@ -41,8 +41,6 @@ Graphics {
 
     gamma = 2.2d
     animatedWaterAndGrass = true
-
-    vboUpdateGap = 1 // ms
 
     pixelFormat = new PixelFormat().withDepthBits(24)
     displayMode = new DisplayMode(1280, 720)
@@ -56,8 +54,21 @@ Graphics {
     viewingDistanceNear = 8
     viewingDistanceModerate = 16
     viewingDistanceFar = 24
-    viewingDistanceUltra = 32
+    viewingDistanceUltra = 28
 
+    OcclusionCulling {
+
+        enabled = false
+        verticalChunkMeshSegments = 16
+
+    }
+
+}
+
+Physics {
+    // REQUIRES A LOT OF MEMORY DEPENDING
+    // ON THE ACTIVE VIEWING DISTANCE AND SIZE OF THE CHUNK CACHE
+    generatePhysicsMeshes = false
 }
 
 HUD {

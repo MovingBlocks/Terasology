@@ -17,9 +17,9 @@ package com.github.begla.blockmania.datastructures;
 
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
+import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector3f;
-
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -32,9 +32,14 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class AABB implements RenderableObject {
 
+    private static final float RENDER_LINE_WIDTH = 8f;
+
     private final Vector3f _position = new Vector3f();
     private final Vector3f _dimensions;
     private Vector3f[] _vertices;
+
+    private int _displayListWire = -1;
+    private int _displayListSolid = -1;
 
     /**
      * Creates a new AABB at the given position with the given dimensions.
@@ -116,7 +121,7 @@ public class AABB implements RenderableObject {
         double minDistance = Double.MAX_VALUE;
         Vector3f closestNormal = new Vector3f();
 
-        for (int i=0; i<normals.size(); i++) {
+        for (int i = 0; i < normals.size(); i++) {
             Vector3f n = normals.get(i);
 
             Vector3f diff = new Vector3f(centerPointForNormal(n));
@@ -185,16 +190,84 @@ public class AABB implements RenderableObject {
     /**
      * Renders this AABB.
      * <p/>
-     * TODO: SLOW!
      */
     public void render() {
-        double offset = 0.01;
+        glLineWidth(RENDER_LINE_WIDTH);
 
         glPushMatrix();
         Vector3f rp = Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint();
         glTranslatef(getPosition().x - rp.x, getPosition().y - rp.y, getPosition().z - rp.z);
 
-        glLineWidth(6f);
+        if (_displayListWire == -1) {
+            generateDisplayListWire();
+        }
+
+        glCallList(_displayListWire);
+
+        glPopMatrix();
+    }
+
+    public void renderSolid() {
+        glPushMatrix();
+        Vector3f rp = Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint();
+        glTranslatef(getPosition().x - rp.x, getPosition().y - rp.y, getPosition().z - rp.z);
+
+        if (_displayListSolid == -1) {
+            generateDisplayListSolid();
+        }
+
+        glCallList(_displayListSolid);
+
+        glPopMatrix();
+    }
+
+    private void generateDisplayListSolid() {
+        _displayListSolid = glGenLists(1);
+
+        glNewList(_displayListSolid, GL11.GL_COMPILE);
+        glBegin(GL_QUADS);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+        GL11.glVertex3f(-_dimensions.x, _dimensions.y, _dimensions.z);
+        GL11.glVertex3f(_dimensions.x, _dimensions.y, _dimensions.z);
+        GL11.glVertex3f(_dimensions.x, _dimensions.y, -_dimensions.z);
+        GL11.glVertex3f(-_dimensions.x, _dimensions.y, -_dimensions.z);
+
+        GL11.glVertex3f(-_dimensions.x, -_dimensions.y, -_dimensions.z);
+        GL11.glVertex3f(-_dimensions.x, -_dimensions.y, _dimensions.z);
+        GL11.glVertex3f(-_dimensions.x, _dimensions.y, _dimensions.z);
+        GL11.glVertex3f(-_dimensions.x, _dimensions.y, -_dimensions.z);
+
+        GL11.glVertex3f(-_dimensions.x, -_dimensions.y, _dimensions.z);
+        GL11.glVertex3f(_dimensions.x, -_dimensions.y, _dimensions.z);
+        GL11.glVertex3f(_dimensions.x, _dimensions.y, _dimensions.z);
+        GL11.glVertex3f(-_dimensions.x, _dimensions.y, _dimensions.z);
+
+        GL11.glVertex3f(_dimensions.x, _dimensions.y, -_dimensions.z);
+        GL11.glVertex3f(_dimensions.x, _dimensions.y, _dimensions.z);
+        GL11.glVertex3f(_dimensions.x, -_dimensions.y, _dimensions.z);
+        GL11.glVertex3f(_dimensions.x, -_dimensions.y, -_dimensions.z);
+
+        GL11.glVertex3f(-_dimensions.x, _dimensions.y, -_dimensions.z);
+        GL11.glVertex3f(_dimensions.x, _dimensions.y, -_dimensions.z);
+        GL11.glVertex3f(_dimensions.x, -_dimensions.y, -_dimensions.z);
+        GL11.glVertex3f(-_dimensions.x, -_dimensions.y, -_dimensions.z);
+
+        GL11.glVertex3f(-_dimensions.x, -_dimensions.y, -_dimensions.z);
+        GL11.glVertex3f(_dimensions.x, -_dimensions.y, -_dimensions.z);
+        GL11.glVertex3f(_dimensions.x, -_dimensions.y, _dimensions.z);
+        GL11.glVertex3f(-_dimensions.x, -_dimensions.y, _dimensions.z);
+        glEnd();
+        glEndList();
+
+    }
+
+    private void generateDisplayListWire() {
+        double offset = 0.001;
+
+        _displayListWire = glGenLists(1);
+
+        glNewList(_displayListWire, GL11.GL_COMPILE);
         glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 
         // FRONT
@@ -244,7 +317,7 @@ public class AABB implements RenderableObject {
         glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
         glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
         glEnd();
-        glPopMatrix();
+        glEndList();
     }
 
     public void update() {

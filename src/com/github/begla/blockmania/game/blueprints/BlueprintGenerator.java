@@ -41,7 +41,7 @@ public class BlueprintGenerator {
     /**
      * Generates a blueprint from a set of blocks in the given world.
      *
-     * @param provider The world
+     * @param provider       The world
      * @param blockPositions List of block positions
      * @return The final blueprint
      */

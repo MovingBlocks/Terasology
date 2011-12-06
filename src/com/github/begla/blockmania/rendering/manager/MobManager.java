@@ -17,7 +17,7 @@
 package com.github.begla.blockmania.rendering.manager;
 
 import com.github.begla.blockmania.world.entity.MovableEntity;
-import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 
 import java.util.HashSet;
 
@@ -32,12 +32,12 @@ public class MobManager {
      * Set that contains mobs
      */
     private HashSet<MovableEntity> _mobStore = new HashSet<MovableEntity>();
-    private World _parent;
+    private WorldRenderer _parent;
 
     /**
      * Default constructor - doesn't do anything yet
      */
-    public MobManager(World parent) {
+    public MobManager(WorldRenderer parent) {
         _parent = parent;
     }
 

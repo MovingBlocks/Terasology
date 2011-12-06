@@ -18,12 +18,11 @@ package com.github.begla.blockmania.game.blueprints;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.rendering.helper.Primitives;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
-import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-
 import java.util.HashSet;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -39,9 +38,9 @@ public class BlockGrid implements RenderableObject {
     private static final int _blockDisplayList = Primitives.generateColoredBlock(new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f);
 
     private HashSet<BlockPosition> _gridPositions = new HashSet<BlockPosition>();
-    private World _parent;
+    private WorldRenderer _parent;
 
-    public BlockGrid(World parent) {
+    public BlockGrid(WorldRenderer parent) {
         _parent = parent;
     }
 

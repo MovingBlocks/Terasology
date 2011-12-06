@@ -300,7 +300,7 @@ public class LocalWorldProvider implements WorldProvider {
             int randX = (int) (nRandom.randomDouble() * 128f);
             int randZ = (int) (nRandom.randomDouble() * 128f);
 
-            for (int y = Chunk.getChunkDimensionY() - 1; y >= 32; y--) {
+            for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 32; y--) {
 
                 double dens = tGen.calcDensity(randX + SPAWN_ORIGIN.x, y, randZ + SPAWN_ORIGIN.y);
 

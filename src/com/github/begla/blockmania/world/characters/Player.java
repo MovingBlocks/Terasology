@@ -23,15 +23,15 @@ import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.game.Blockmania;
-import com.github.begla.blockmania.tools.ToolBelt;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
 import com.github.begla.blockmania.tools.Tool;
+import com.github.begla.blockmania.tools.ToolBelt;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
-import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -52,6 +52,9 @@ public final class Player extends Character {
     private static final boolean DEMO_FLIGHT = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight");
     private static final boolean GOD_MODE = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
     private static final double WALKING_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
+    private static final boolean SHOW_PLACING_BOX = (Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox");
+    private static final double RUNNING_FACTOR = (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor");
+    private static final double JUMP_INTENSITY = (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity");
 
     /* OBSERVERS */
     private ArrayList<BlockObserver> _observers = new ArrayList<BlockObserver>();
@@ -68,8 +71,8 @@ public final class Player extends Character {
      */
     private ToolBelt _toolBelt = new ToolBelt(this);
 
-    public Player(World parent) {
-        super(parent, (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed"), (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor"), (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity"));
+    public Player(WorldRenderer parent) {
+        super(parent, WALKING_SPEED, RUNNING_FACTOR, JUMP_INTENSITY);
     }
 
     public void update() {
@@ -84,7 +87,7 @@ public final class Player extends Character {
         RayBlockIntersection.Intersection is = calcSelectedBlock();
 
         // Display the block the player is aiming at
-        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox")) {
+        if (SHOW_PLACING_BOX) {
             if (is != null) {
                 if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition().toVector3f())).isRenderBoundingBox()) {
                     Block.AABBForBlockAt(is.getBlockPosition().toVector3f()).render();
@@ -110,7 +113,7 @@ public final class Player extends Character {
             _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);
         }
 
-        if (!(DEMO_FLIGHT && GOD_MODE)) {
+        if (!(DEMO_FLIGHT)) {
             _firstPersonCamera.getViewingDirection().set(getViewingDirection());
         } else {
             Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z - 128);
@@ -120,7 +123,7 @@ public final class Player extends Character {
 
     public void updatePosition() {
         // DEMO MODE
-        if (DEMO_FLIGHT && GOD_MODE) {
+        if (DEMO_FLIGHT) {
             getPosition().z -= 0.2f;
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
@@ -235,7 +238,7 @@ public final class Player extends Character {
                             getParent().getWorldProvider().setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, true);
 
                             if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent() && counter % 4 == 0)
-                                _parent.getRigidBlocksRenderer().addBlock(target, currentBlockType);
+                                _parent.getBulletPhysicsRenderer().addBlock(target, currentBlockType);
 
                             counter++;
                         }
@@ -270,7 +273,7 @@ public final class Player extends Character {
 
                 if (createPhysBlock && !BlockManager.getInstance().getBlock(currentBlockType).isTranslucent()) {
                     Vector3f pos = blockPos.toVector3f();
-                    _parent.getRigidBlocksRenderer().addBlock(pos, currentBlockType);
+                    _parent.getBulletPhysicsRenderer().addBlock(pos, currentBlockType);
                 }
 
                 int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);

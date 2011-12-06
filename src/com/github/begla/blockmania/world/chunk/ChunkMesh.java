@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class ChunkMesh {
 
     /**
-     * Data structure for storing vertex data. Abused like a "struct" in C++. Just sad.
+     * Data structure for storing vertex data. Abused like a "struct" in C/C++. Just sad.
      */
     public class VertexElements {
 
@@ -52,12 +52,14 @@ public class ChunkMesh {
     private static final int OFFSET_COLOR = ((2 + 3 + 3) * 4);
 
     /* VERTEX DATA */
-    private final int[] _vertexBuffers = new int[9];
-    private final int[] _idxBuffers = new int[9];
-    private final int[] _idxBufferCount = new int[9];
+    private final int[] _vertexBuffers = new int[4];
+    private final int[] _idxBuffers = new int[4];
+    private final int[] _idxBufferCount = new int[4];
+
+    private int _triangles = -1;
 
     /* TEMPORARY DATA */
-    public VertexElements[] _vertexElements = new VertexElements[9];
+    public VertexElements[] _vertexElements = new VertexElements[4];
 
     /* BULLET PHYSICS */
     public TriangleMeshShape _bulletMeshShape;
@@ -71,12 +73,6 @@ public class ChunkMesh {
         _vertexElements[1] = new VertexElements();
         _vertexElements[2] = new VertexElements();
         _vertexElements[3] = new VertexElements();
-        _vertexElements[4] = new VertexElements();
-        _vertexElements[5] = new VertexElements();
-
-        _vertexElements[6] = new VertexElements();
-        _vertexElements[7] = new VertexElements();
-        _vertexElements[8] = new VertexElements();
     }
 
     /**
@@ -94,6 +90,7 @@ public class ChunkMesh {
 
         // Free unused space on the heap
         _vertexElements = null;
+        _triangles = (_idxBufferCount[0] + _idxBufferCount[1] + _idxBufferCount[2] + _idxBufferCount[3]) / 3;
 
         return true;
     }
@@ -146,25 +143,21 @@ public class ChunkMesh {
         }
     }
 
-    public void render(RENDER_TYPE type, boolean distantChunk, int side) {
+    public void render(RENDER_TYPE type) {
         switch (type) {
             case OPAQUE:
-                renderVbo(side);
+                renderVbo(0);
                 break;
             case BILLBOARD_AND_TRANSLUCENT:
+                renderVbo(1);
 
-                renderVbo(7);
-
-                // Chunk is far away from the player
-                if (!distantChunk) {
-                    glDisable(GL_CULL_FACE);
-                    // BILLBOARDS
-                    renderVbo(6);
-                    glEnable(GL_CULL_FACE);
-                }
+                // BILLBOARDS
+                glDisable(GL_CULL_FACE);
+                renderVbo(2);
+                glEnable(GL_CULL_FACE);
                 break;
             case WATER_AND_ICE:
-                renderVbo(8);
+                renderVbo(3);
                 break;
         }
     }
@@ -201,6 +194,10 @@ public class ChunkMesh {
     }
 
     public int countTriangles() {
-        return (_idxBufferCount[0] + _idxBufferCount[1] + _idxBufferCount[2] + _idxBufferCount[3] + _idxBufferCount[4] + _idxBufferCount[5] + _idxBufferCount[6] + _idxBufferCount[7] + _idxBufferCount[8]) / 3;
+        return _triangles;
+    }
+
+    public boolean isEmpty() {
+        return _triangles == 0;
     }
 }

@@ -18,7 +18,6 @@ package com.github.begla.blockmania.blocks;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
-import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
@@ -205,12 +204,7 @@ public class Block implements RenderableObject {
         if (_displayList == -1)
             _displayList = generateDisplayList();
 
-        glEnable(GL_TEXTURE_2D);
-        TextureManager.getInstance().bindTexture("terrain");
-
         glCallList(_displayList);
-
-        glDisable(GL11.GL_TEXTURE_2D);
     }
 
     public void update() {

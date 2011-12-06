@@ -43,14 +43,14 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     @Override
     public void generate(Chunk c) {
-        double[][][] densityMap = new double[Chunk.getChunkDimensionX() + 1][Chunk.getChunkDimensionY() + 1][Chunk.getChunkDimensionZ() + 1];
+        double[][][] densityMap = new double[Chunk.CHUNK_DIMENSION_X + 1][Chunk.CHUNK_DIMENSION_Y + 1][Chunk.CHUNK_DIMENSION_Z + 1];
 
         /*
          * Create the density map at a lower sample rate.
          */
-        for (int x = 0; x <= Chunk.getChunkDimensionX(); x += SAMPLE_RATE_3D_HOR) {
-            for (int z = 0; z <= Chunk.getChunkDimensionZ(); z += SAMPLE_RATE_3D_HOR) {
-                for (int y = 0; y <= Chunk.getChunkDimensionY(); y += SAMPLE_RATE_3D_VERT) {
+        for (int x = 0; x <= Chunk.CHUNK_DIMENSION_X; x += SAMPLE_RATE_3D_HOR) {
+            for (int z = 0; z <= Chunk.CHUNK_DIMENSION_Z; z += SAMPLE_RATE_3D_HOR) {
+                for (int y = 0; y <= Chunk.CHUNK_DIMENSION_Y; y += SAMPLE_RATE_3D_VERT) {
                     densityMap[x][y][z] = calcDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z));
                 }
             }
@@ -64,12 +64,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         /*
          * Generate the chunk from the density map.
          */
-        for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
-            for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
+        for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
+            for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z++) {
                 BIOME_TYPE type = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
                 int firstBlockHeight = -1;
 
-                for (int y = Chunk.getChunkDimensionY(); y >= 0; y--) {
+                for (int y = Chunk.CHUNK_DIMENSION_Y; y >= 0; y--) {
 
                     if (y == 0) { // Hard stone ground layer
                         c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Hard stone").getId());
@@ -203,9 +203,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     protected void triLerpDensityMap(double[][][] densityMap) {
-        for (int x = 0; x < Chunk.getChunkDimensionX(); x++) {
-            for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
-                for (int z = 0; z < Chunk.getChunkDimensionZ(); z++) {
+        for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
+            for (int y = 0; y < Chunk.CHUNK_DIMENSION_Y; y++) {
+                for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z++) {
                     if (!(x % SAMPLE_RATE_3D_HOR == 0 && y % SAMPLE_RATE_3D_VERT == 0 && z % SAMPLE_RATE_3D_HOR == 0)) {
                         int offsetX = (x / SAMPLE_RATE_3D_HOR) * SAMPLE_RATE_3D_HOR;
                         int offsetY = (y / SAMPLE_RATE_3D_VERT) * SAMPLE_RATE_3D_VERT;

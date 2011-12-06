@@ -31,12 +31,11 @@ import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
-import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
-import com.github.begla.blockmania.world.main.World;
+import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -79,9 +78,9 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     DiscreteDynamicsWorld _discreteDynamicsWorld;
 
-    World _parent;
+    WorldRenderer _parent;
 
-    public BulletPhysicsRenderer(World parent) {
+    public BulletPhysicsRenderer(WorldRenderer parent) {
         _parent = parent;
 
         _broadphase = new DbvtBroadphase();

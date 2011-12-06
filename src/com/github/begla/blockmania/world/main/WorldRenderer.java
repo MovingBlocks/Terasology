@@ -17,6 +17,7 @@ package com.github.begla.blockmania.world.main;
 
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
+import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.game.PortalManager;
 import com.github.begla.blockmania.game.blueprints.BlockGrid;
@@ -57,9 +58,10 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class World implements RenderableObject {
+public final class WorldRenderer implements RenderableObject {
 
-    private static final int VBO_UPDATE_GAP = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.vboUpdateGap");
+    private static boolean BOUNDING_BOXES_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.renderChunkBoundingBoxes");
+    private static boolean OCCLUSION_CULLING_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.enabled");
 
     /* VIEWING DISTANCE */
     private int _viewingDistance = 8;
@@ -73,8 +75,6 @@ public final class World implements RenderableObject {
     /* CHUNKS */
     private ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>(), _visibleChunks = new ArrayList<Chunk>();
     private int _chunkPosX, _chunkPosZ;
-    private long _lastVboUpdate;
-
     /* CORE GAME OBJECTS */
     private PortalManager _portalManager;
     private MobManager _mobManager;
@@ -107,7 +107,8 @@ public final class World implements RenderableObject {
     private final BlockGrid _blockGrid;
 
     /* STATISTICS */
-    private int _visibleTriangles = 0;
+    private int _statVisibleTriangles = 0;
+    private int _statOcclusionCulled, _statSubMeshCulled, _statEmpty;
 
     /**
      * Initializes a new (local) world for the single player mode.
@@ -115,7 +116,7 @@ public final class World implements RenderableObject {
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
-    public World(String title, String seed) {
+    public WorldRenderer(String title, String seed) {
         _worldProvider = new LocalWorldProvider(title, seed);
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager();
@@ -128,7 +129,7 @@ public final class World implements RenderableObject {
         _liquidSimulator = new LiquidSimulator(_worldProvider);
         _growthSimulator = new GrowthSimulator(_worldProvider);
 
-        createMusicTimeEvents();
+        initTimeEvents();
     }
 
     /**
@@ -175,7 +176,7 @@ public final class World implements RenderableObject {
     /**
      * Creates the world time events to play the game's soundtrack at specific times.
      */
-    public void createMusicTimeEvents() {
+    public void initTimeEvents() {
         // SUNRISE
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.01, true) {
             @Override
@@ -211,43 +212,31 @@ public final class World implements RenderableObject {
         _visibleChunks.clear();
         _bulletPhysicsRenderer.resetChunks();
 
-        _visibleTriangles = 0;
-
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
 
-            if (c.getActiveChunkMesh() != null) {
-                if (c.getActiveChunkMesh()._bulletMeshShape != null) {
-                    Vector3f position = new Vector3f(c.getPosition());
-                    position.x *= Chunk.getChunkDimensionX();
-                    position.y *= Chunk.getChunkDimensionY();
-                    position.z *= Chunk.getChunkDimensionZ();
+            for (int j = 0; j < Chunk.VERTICAL_SEGMENTS; j++) {
+                if (c.isReadyForRendering()) {
+                    if (c.getActiveSubMesh(j)._bulletMeshShape != null) {
+                        Vector3f position = new Vector3f(c.getPosition());
+                        position.x *= Chunk.CHUNK_DIMENSION_X;
+                        position.y *= Chunk.CHUNK_DIMENSION_Y;
+                        position.z *= Chunk.CHUNK_DIMENSION_Z;
 
-                    _bulletPhysicsRenderer.addStaticChunk(position, _chunksInProximity.get(i).getActiveChunkMesh()._bulletMeshShape);
+                        _bulletPhysicsRenderer.addStaticChunk(position, c.getActiveSubMesh(j)._bulletMeshShape);
+                    }
                 }
             }
 
             if (isChunkVisible(c)) {
                 _visibleChunks.add(c);
 
-                if (c.getActiveChunkMesh() != null) {
-                    _visibleTriangles += c.getActiveChunkMesh().countTriangles();
-                }
-
                 if (c.isDirty() || c.isLightDirty()) {
                     if (!_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT))
                         continue;
                 }
 
-                if (Blockmania.getInstance().getTime() - _lastVboUpdate > VBO_UPDATE_GAP) {
-                    if (c.generateVBOs()) {
-                        _lastVboUpdate = Blockmania.getInstance().getTime();
-                    }
-
-                    c.update();
-                }
-
-                continue;
+                c.update();
             }
         }
     }
@@ -256,16 +245,15 @@ public final class World implements RenderableObject {
      * Renders the world.
      */
     public void render() {
-        // Update the list of relevant chunks
-        updateChunksInProximity(false);
-        updateVisibleChunks();
-
         /* SKYSPHERE */
         _player.getActiveCamera().lookThroughNormalized();
         _skysphere.render();
 
         /* WORLD RENDERING */
         _player.getActiveCamera().lookThrough();
+
+        updateChunksInProximity(false);
+        updateVisibleChunks();
 
         _player.render();
         renderChunksAndEntities();
@@ -309,20 +297,57 @@ public final class World implements RenderableObject {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // OPAQUE ELEMENTS
+        _statOcclusionCulled = 0;
+        _statSubMeshCulled = 0;
+        _statEmpty = 0;
+        _statVisibleTriangles = 0;
+
+        /*
+         * FIRST RENDER PASS: OPAQUE ELEMENTS
+         */
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
+            c.applyOcclusionQueries();
 
-            c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
-            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
+            if (i > 8 && OCCLUSION_CULLING_ENABLED) {
+                c.executeOcclusionQuery();
+            } else {
+                c.resetOcclusionCulled();
+            }
 
-            if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.chunkOutlines")) {
-                c.getAABB().render();
+            GL11.glPushMatrix();
+            GL11.glTranslatef(c.getPosition().x * Chunk.CHUNK_DIMENSION_X - _worldProvider.getRenderingReferencePoint().x, c.getPosition().y * Chunk.CHUNK_DIMENSION_Y - _worldProvider.getRenderingReferencePoint().y, c.getPosition().z * Chunk.CHUNK_DIMENSION_Z - _worldProvider.getRenderingReferencePoint().z);
+
+            for (int j = 0; j < Chunk.VERTICAL_SEGMENTS; j++) {
+                if (!c.isSubMeshOcclusionCulled(j)) {
+                    if (isAABBVisible(c.getSubMeshAABB(j))) {
+                        _statEmpty += c.render(ChunkMesh.RENDER_TYPE.OPAQUE, j) ? 0 : 1;
+                        c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT, j);
+                        c.setSubMeshCulled(j, false);
+                    } else {
+                        c.setSubMeshCulled(j, true);
+                        _statSubMeshCulled++;
+                    }
+                } else {
+                    _statOcclusionCulled++;
+                }
+            }
+
+            glPopMatrix();
+
+            if (BOUNDING_BOXES_ENABLED) {
+                c.renderAABBs(false);
             }
         }
 
-        glDisable(GL11.GL_CULL_FACE);
+        _mobManager.renderAll();
 
+        ShaderManager.getInstance().enableShader("chunk");
+        TextureManager.getInstance().bindTexture("terrain");
+
+        /*
+        * SECOND RENDER PASS: OPAQUE ELEMENTS
+        */
         for (int j = 0; j < 2; j++) {
             for (int i = 0; i < _visibleChunks.size(); i++) {
                 Chunk c = _visibleChunks.get(i);
@@ -333,16 +358,23 @@ public final class World implements RenderableObject {
                     glColorMask(true, true, true, true);
                 }
 
-                c.render(ChunkMesh.RENDER_TYPE.WATER_AND_ICE);
+                GL11.glPushMatrix();
+                GL11.glTranslatef(c.getPosition().x * Chunk.CHUNK_DIMENSION_X - _worldProvider.getRenderingReferencePoint().x, c.getPosition().y * Chunk.CHUNK_DIMENSION_Y - _worldProvider.getRenderingReferencePoint().y, c.getPosition().z * Chunk.CHUNK_DIMENSION_Z - _worldProvider.getRenderingReferencePoint().z);
+
+                for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
+                    if (!c.isSubMeshOcclusionCulled(k)) {
+                        if (!c.isSubMeshCulled(k)) {
+                            c.render(ChunkMesh.RENDER_TYPE.WATER_AND_ICE, k);
+                        }
+                    }
+                }
+
+                glPopMatrix();
             }
+
         }
 
-        glEnable(GL11.GL_CULL_FACE);
         glDisable(GL_BLEND);
-
-        ShaderManager.getInstance().enableShader(null);
-
-        _mobManager.renderAll();
 
         ShaderManager.getInstance().enableShader("block");
         _bulletPhysicsRenderer.render();
@@ -411,7 +443,7 @@ public final class World implements RenderableObject {
      * @return The maximum height
      */
     public final int maxHeightAt(int x, int z) {
-        for (int y = Chunk.getChunkDimensionY() - 1; y >= 0; y--) {
+        for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 0; y--) {
             if (_worldProvider.getBlock(x, y, z) != 0x0)
                 return y;
         }
@@ -425,7 +457,7 @@ public final class World implements RenderableObject {
      * @return The player offset on the x-axis
      */
     private int calcPlayerChunkOffsetX() {
-        return (int) (_player.getPosition().x / Chunk.getChunkDimensionX());
+        return (int) (_player.getPosition().x / Chunk.CHUNK_DIMENSION_X);
     }
 
     /**
@@ -434,7 +466,7 @@ public final class World implements RenderableObject {
      * @return The player offset on the z-axis
      */
     private int calcPlayerChunkOffsetZ() {
-        return (int) (_player.getPosition().z / Chunk.getChunkDimensionZ());
+        return (int) (_player.getPosition().z / Chunk.CHUNK_DIMENSION_Z);
     }
 
     /**
@@ -488,11 +520,15 @@ public final class World implements RenderableObject {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %f, sun: %f, cache: %d, cu-duration: %fms, triangles: %d, vis-chunks: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _visibleTriangles, _visibleChunks.size(), _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %.2f, sun: %.2f, cache: %d, cu: %.2fms, triangles: %d, vcs: %d, seed: \"%s\", title: \"%s\", ocul: %d, smcul: %d, ec: %d)", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _statVisibleTriangles, _visibleChunks.size(), _worldProvider.getSeed(), _worldProvider.getTitle(), _statOcclusionCulled, _statSubMeshCulled, _statEmpty);
     }
 
     public Player getPlayer() {
         return _player;
+    }
+
+    public boolean isAABBVisible(AABB aabb) {
+        return _player.getActiveCamera().getViewFrustum().intersects(aabb);
     }
 
     public boolean isChunkVisible(Chunk c) {
@@ -535,7 +571,7 @@ public final class World implements RenderableObject {
         return _mobManager;
     }
 
-    public BulletPhysicsRenderer getRigidBlocksRenderer() {
+    public BulletPhysicsRenderer getBulletPhysicsRenderer() {
         return _bulletPhysicsRenderer;
     }
 
