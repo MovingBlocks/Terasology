@@ -32,8 +32,8 @@ public abstract class Simulator implements BlockObserver {
     protected final long _updateInterval;
     protected long _lastUpdate = Blockmania.getInstance().getTime();
 
-    protected WorldProvider _parent;
-    protected HashSet<BlockPosition> _activeBlocks = new HashSet<BlockPosition>(16);
+    protected final WorldProvider _parent;
+    protected final HashSet<BlockPosition> _activeBlocks = new HashSet<BlockPosition>(16);
 
     public Simulator(WorldProvider parent, long updateInterval) {
         _updateInterval = updateInterval;

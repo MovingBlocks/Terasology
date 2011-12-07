@@ -57,19 +57,19 @@ public final class Player extends Character {
     private static final double JUMP_INTENSITY = (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity");
 
     /* OBSERVERS */
-    private ArrayList<BlockObserver> _observers = new ArrayList<BlockObserver>();
+    private final ArrayList<BlockObserver> _observers = new ArrayList<BlockObserver>();
 
     /* PROPERTIES */
     private byte _selectedBlockType = 1;
 
     /* CAMERA */
     private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
-    private Camera _activeCamera = _firstPersonCamera;
+    private final Camera _activeCamera = _firstPersonCamera;
 
     /**
      * The ToolBelt is how the player interacts with tool events from mouse or keyboard
      */
-    private ToolBelt _toolBelt = new ToolBelt(this);
+    private final ToolBelt _toolBelt = new ToolBelt(this);
 
     public Player(WorldRenderer parent) {
         super(parent, WALKING_SPEED, RUNNING_FACTOR, JUMP_INTENSITY);

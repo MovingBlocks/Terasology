@@ -72,7 +72,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     /* ------ */
     private boolean[] _occlusionCulled = new boolean[VERTICAL_SEGMENTS];
     private boolean[] _subMeshCulled = new boolean[VERTICAL_SEGMENTS];
-    private int[] _queries = new int[VERTICAL_SEGMENTS];
+    private final int[] _queries = new int[VERTICAL_SEGMENTS];
     /* ------ */
     private boolean _disposed = false;
     /* ----- */
@@ -778,11 +778,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
                     result = GL15.glGetQueryObjectui(_queries[i], GL15.GL_QUERY_RESULT);
 
-                    if (result > 0) {
-                        _occlusionCulled[i] = false;
-                    } else {
-                        _occlusionCulled[i] = true;
-                    }
+                    _occlusionCulled[i] = result <= 0;
 
                     GL15.glDeleteQueries(_queries[i]);
                     _queries[i] = 0;

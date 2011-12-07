@@ -60,25 +60,26 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class WorldRenderer implements RenderableObject {
 
-    private static boolean BOUNDING_BOXES_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.renderChunkBoundingBoxes");
-    private static boolean OCCLUSION_CULLING_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.enabled");
-    private static double OCCLUSION_CULLING_DISTANCE_OFFSET = (Double) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.distanceOffset");
+    private static final boolean BOUNDING_BOXES_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.renderChunkBoundingBoxes");
+    private static final boolean OCCLUSION_CULLING_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.enabled");
+    private static final double OCCLUSION_CULLING_DISTANCE_OFFSET = (Double) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.distanceOffset");
 
     /* VIEWING DISTANCE */
     private int _viewingDistance = 8;
 
     /* WORLD PROVIDER */
-    private WorldProvider _worldProvider;
+    private final WorldProvider _worldProvider;
 
     /* PLAYER */
     private Player _player;
 
     /* CHUNKS */
-    private ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>(), _visibleChunks = new ArrayList<Chunk>();
+    private final ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>();
+    private final ArrayList<Chunk> _visibleChunks = new ArrayList<Chunk>();
     private int _chunkPosX, _chunkPosZ;
     /* CORE GAME OBJECTS */
-    private PortalManager _portalManager;
-    private MobManager _mobManager;
+    private final PortalManager _portalManager;
+    private final MobManager _mobManager;
 
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
@@ -87,8 +88,8 @@ public final class WorldRenderer implements RenderableObject {
     private final Skysphere _skysphere;
 
     /* SIMULATORS */
-    private LiquidSimulator _liquidSimulator;
-    private GrowthSimulator _growthSimulator;
+    private final LiquidSimulator _liquidSimulator;
+    private final GrowthSimulator _growthSimulator;
 
     /* WATER AND LAVA ANIMATION */
     private int _tick = 0;
@@ -102,7 +103,7 @@ public final class WorldRenderer implements RenderableObject {
     private final WorldTimeEventManager _worldTimeEventManager;
 
     /* PHYSICS */
-    private BulletPhysicsRenderer _bulletPhysicsRenderer;
+    private final BulletPhysicsRenderer _bulletPhysicsRenderer;
 
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
@@ -538,7 +539,6 @@ public final class WorldRenderer implements RenderableObject {
      */
     public void initPortal() {
         if (!_portalManager.hasPortal()) {
-            // the y is hard coded because it always gets set to 32, deep underground
             Vector3f loc = new Vector3f(_player.getPosition().x, _player.getPosition().y + 4, _player.getPosition().z);
             Blockmania.getInstance().getLogger().log(Level.INFO, "Portal location is" + loc);
             _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, (byte) 30, false, true);

@@ -38,12 +38,12 @@ public class GroovyManager {
     /**
      * The Binding allows us to keep variable references around where Groovy can play with them
      */
-    private Binding _bind;
+    private final Binding _bind;
 
     /**
      * Directory where we keep "plugin" files (Groovy scripts we'll run - prolly move this setting elsewhere sometime)
      */
-    private final String _pluginsPath = "groovy/plugins";
+    private static final String PLUGINS_PATH = "groovy/plugins";
 
     /**
      * Initialize the GroovyManager and "share" the given World variable via the Binding
@@ -58,9 +58,7 @@ public class GroovyManager {
 
         File[] plugins = pluginDir.listFiles(new FileFilter() {
             public boolean accept(File file) {
-                if (file.getName().contains(".groovy"))
-                    return true;
-                return false;
+                return file.getName().contains(".groovy");
             }
         });
 
@@ -78,7 +76,7 @@ public class GroovyManager {
         GroovyScriptEngine gse = null;
         try {
             // Create an engine tied to the dir we keep plugins in
-            gse = new GroovyScriptEngine(_pluginsPath);
+            gse = new GroovyScriptEngine(PLUGINS_PATH);
         } catch (IOException ioe) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, "Failed to initialize plugin (IOException): " + pluginName + ", reason: " + ioe.toString(), ioe);
             ioe.printStackTrace();

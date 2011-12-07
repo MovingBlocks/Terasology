@@ -32,10 +32,10 @@ import java.util.logging.Level;
  */
 public final class UIDebugConsole extends UIDisplayContainer {
 
-    private UIText _consoleText;
+    private final UIText _consoleText;
 
     private final StringBuffer _consoleInput = new StringBuffer();
-    private ArrayList<String> _ringBuffer = new ArrayList<String>();
+    private final ArrayList<String> _ringBuffer = new ArrayList<String>();
     private int _ringBufferPos = -1;
 
     /**

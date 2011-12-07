@@ -34,10 +34,10 @@ public class PortalManager {
     /**
      * Set that contains Portals
      */
-    private HashSet<Portal> _portalStore = new HashSet<Portal>();
+    private final HashSet<Portal> _portalStore = new HashSet<Portal>();
 
     private final FastRandom _random = new FastRandom();
-    private WorldRenderer _parent;
+    private final WorldRenderer _parent;
 
     public PortalManager(WorldRenderer parent) {
         _parent = parent;

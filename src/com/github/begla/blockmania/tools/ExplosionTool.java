@@ -22,7 +22,7 @@ import com.github.begla.blockmania.world.characters.Player;
  */
 public class ExplosionTool implements Tool {
 
-    private Player _player;
+    private final Player _player;
 
     public ExplosionTool(Player player) {
         _player = player;

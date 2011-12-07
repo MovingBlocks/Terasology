@@ -28,8 +28,8 @@ public abstract class UIDisplayElement {
 
     private boolean _visible = false;
 
-    private Vector2f _position = new Vector2f(0, 0);
-    private Vector2f _size = new Vector2f(1, 1);
+    private final Vector2f _position = new Vector2f(0, 0);
+    private final Vector2f _size = new Vector2f(1, 1);
 
     private UIDisplayElement _parent;
 

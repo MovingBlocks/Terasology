@@ -25,7 +25,7 @@ import com.github.begla.blockmania.utilities.MathHelper;
  */
 public class PerlinNoise {
 
-    private final int[] _noisePermutations, _noiseTable;
+    private final int[] _noisePermutations;
 
     /**
      * Init. a new generator with a given seed value.
@@ -36,7 +36,7 @@ public class PerlinNoise {
         FastRandom rand = new FastRandom(seed);
 
         _noisePermutations = new int[512];
-        _noiseTable = new int[256];
+        int[] _noiseTable = new int[256];
 
         // Init. the noise table
         for (int i = 0; i < 256; i++)

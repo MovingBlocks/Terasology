@@ -24,8 +24,8 @@ import java.util.ArrayList;
  */
 public class WorldTimeEventManager {
 
-    protected ArrayList<WorldTimeEvent> _worldTimeEvents = new ArrayList<WorldTimeEvent>();
-    protected WorldProvider _parent;
+    protected final ArrayList<WorldTimeEvent> _worldTimeEvents = new ArrayList<WorldTimeEvent>();
+    protected final WorldProvider _parent;
 
     public WorldTimeEventManager(WorldProvider parent) {
         _parent = parent;

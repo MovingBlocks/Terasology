@@ -36,7 +36,6 @@ import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
-import org.newdawn.slick.SlickException;
 
 import java.io.File;
 import java.io.IOException;
@@ -139,9 +138,6 @@ public final class Blockmania {
             blockmania.initGame();
             blockmania.initGroovy();
         } catch (LWJGLException e) {
-            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm so sorry: " + e.toString(), e);
-            System.exit(0);
-        } catch (SlickException e) {
             getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm so sorry: " + e.toString(), e);
             System.exit(0);
         }
@@ -303,7 +299,7 @@ public final class Blockmania {
         Display.destroy();
     }
 
-    public void initGame() throws SlickException {
+    public void initGame() {
         _timerTicksPerSecond = Sys.getTimerResolution();
 
         /*
@@ -340,6 +336,7 @@ public final class Blockmania {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
+        glShadeModel(GL_FLAT);
 
         // Update the viewing distance
         double minDist = (VIEWING_DISTANCES[_activeViewingDistance] / 2) * 16.0f;

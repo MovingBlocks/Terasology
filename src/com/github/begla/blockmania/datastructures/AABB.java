@@ -318,10 +318,6 @@ public class AABB {
         glEndList();
     }
 
-    public void update() {
-        // Do nothing. Really.
-    }
-
     public double minX() {
         return (getPosition().x - _dimensions.x);
     }

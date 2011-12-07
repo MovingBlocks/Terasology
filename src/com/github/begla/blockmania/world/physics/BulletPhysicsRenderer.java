@@ -55,7 +55,7 @@ import java.util.HashSet;
 public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
 
     private class BlockRigidBody extends RigidBody {
-        private byte _type;
+        private final byte _type;
 
         public BlockRigidBody(RigidBodyConstructionInfo constructionInfo, byte type) {
             super(constructionInfo);
@@ -67,18 +67,18 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
         }
     }
 
-    ArrayList<BlockRigidBody> _blocks = new ArrayList<BlockRigidBody>();
-    HashSet<RigidBody> _chunks = new HashSet<RigidBody>();
+    final ArrayList<BlockRigidBody> _blocks = new ArrayList<BlockRigidBody>();
+    final HashSet<RigidBody> _chunks = new HashSet<RigidBody>();
 
-    CollisionShape _blockShape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
+    final CollisionShape _blockShape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
 
-    CollisionDispatcher _dispatcher;
-    BroadphaseInterface _broadphase;
-    DefaultCollisionConfiguration _defaultCollisionConfiguration;
-    SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
-    DiscreteDynamicsWorld _discreteDynamicsWorld;
+    final CollisionDispatcher _dispatcher;
+    final BroadphaseInterface _broadphase;
+    final DefaultCollisionConfiguration _defaultCollisionConfiguration;
+    final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
+    final DiscreteDynamicsWorld _discreteDynamicsWorld;
 
-    WorldRenderer _parent;
+    final WorldRenderer _parent;
 
     public BulletPhysicsRenderer(WorldRenderer parent) {
         _parent = parent;

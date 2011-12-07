@@ -51,7 +51,6 @@ public class Skysphere implements RenderableObject {
 
     /* SKY */
     private float _turbidity = 12.0f, _sunPosAngle = 0.1f;
-    private Vector3f _zenithColor = new Vector3f();
 
     /* CLOUDS */
     private static final Vector2f CLOUD_RESOLUTION = (Vector2f) ConfigurationManager.getInstance().getConfig().get("System.cloudResolution");
@@ -62,7 +61,7 @@ public class Skysphere implements RenderableObject {
     private long _lastCloudUpdate = Blockmania.getInstance().getTime();
     ByteBuffer _cloudByteBuffer = null;
 
-    private WorldRenderer _parent;
+    private final WorldRenderer _parent;
 
     public Skysphere(WorldRenderer parent) {
         _parent = parent;
@@ -170,7 +169,7 @@ public class Skysphere implements RenderableObject {
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
         sunNormalise.normalize();
 
-        _zenithColor = getAllWeatherZenith(sunNormalise.y);
+        Vector3f _zenithColor = getAllWeatherZenith(sunNormalise.y);
 
         ShaderManager.getInstance().enableShader("sky");
 

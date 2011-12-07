@@ -42,7 +42,7 @@ public class RayBlockIntersection {
         private final double _d;
         private final double _t;
         private final Vector3f _rayOrigin, _intersectionPoint, _surfaceNormal, _rayDirection;
-        private BlockPosition _blockPosition;
+        private final BlockPosition _blockPosition;
 
         public Intersection(BlockPosition blockPosition, Vector3f normal, double d, double t, Vector3f rayOrigin, Vector3f rayDirection, Vector3f intersectionPoint) {
             this._d = d;
@@ -85,7 +85,7 @@ public class RayBlockIntersection {
 
         @Override
         public String toString() {
-            return String.format("x: %.2f y: %.2f z: %.2f", _blockPosition.x, _blockPosition.y, _blockPosition.z);
+            return String.format("x: %.2d y: %.2d z: %.2d", _blockPosition.x, _blockPosition.y, _blockPosition.z);
         }
     }
 

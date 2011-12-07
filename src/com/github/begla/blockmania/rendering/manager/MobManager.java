@@ -31,8 +31,8 @@ public class MobManager {
     /**
      * Set that contains mobs
      */
-    private HashSet<MovableEntity> _mobStore = new HashSet<MovableEntity>();
-    private WorldRenderer _parent;
+    private final HashSet<MovableEntity> _mobStore = new HashSet<MovableEntity>();
+    private final WorldRenderer _parent;
 
     /**
      * Default constructor - doesn't do anything yet

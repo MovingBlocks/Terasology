@@ -36,17 +36,17 @@ public class ToolBelt {
     /**
      * Map that contains simple native tool index values for a switch here
      */
-    private HashMap<Byte, Tool> _toolStore = new HashMap<Byte, Tool>();
+    private final HashMap<Byte, Tool> _toolStore = new HashMap<Byte, Tool>();
 
     /**
      * Map that contains advanced plugin tool index values and an associated Groovy command script to execute on use
      */
-    private HashMap<Byte, Tool> _pluginStore = new HashMap<Byte, Tool>();
+    private final HashMap<Byte, Tool> _pluginStore = new HashMap<Byte, Tool>();
 
     /**
      * Map that will bind tool index values with hot keys 1-10
      */
-    private HashMap<Byte, Byte> _toolBinding = new HashMap<Byte, Byte>();
+    private final HashMap<Byte, Byte> _toolBinding = new HashMap<Byte, Byte>();
 
     /**
      * Which slot in the hot bar is the active tool
@@ -56,7 +56,7 @@ public class ToolBelt {
     /**
      * Reference back to the parent Player
      */
-    private Player _player;
+    private final Player _player;
 
     /**
      * Default constructor - would do some magic here to add native tools and look for plugin tools
@@ -98,7 +98,7 @@ public class ToolBelt {
      */
     public void mapPluginTool(Tool groovyTool) {
         // Cheating with the hard coded index for now
-        _toolBinding.put(new Byte((byte) 6), new Byte((byte) 51));
+        _toolBinding.put((byte) 6, (byte) 51);
         _pluginStore.put((byte) 51, groovyTool);
         Blockmania.getInstance().getLogger().log(Level.INFO, "ToolBelt.mapPluginTool called with Tool: " + groovyTool);
     }

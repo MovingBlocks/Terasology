@@ -60,8 +60,8 @@ public class Block implements RenderableObject {
     private byte _luminance;
     private byte _hardness;
 
-    private Vector4f[] _colorOffset = new Vector4f[6];
-    private Vector2f[] _textureAtlasPos = new Vector2f[6];
+    private final Vector4f[] _colorOffset = new Vector4f[6];
+    private final Vector2f[] _textureAtlasPos = new Vector2f[6];
 
     /* RENDERING */
     private int _displayList = -1;

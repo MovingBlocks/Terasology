@@ -46,9 +46,12 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
     private double _cubeRotation;
 
     /* DISPLAY ELEMENTS */
-    private UICrosshair _crosshair;
-    private UIText _debugLine1, _debugLine2, _debugLine3, _debugLine4;
-    private UIDebugConsole _console;
+    private final UICrosshair _crosshair;
+    private final UIText _debugLine1;
+    private final UIText _debugLine2;
+    private final UIText _debugLine3;
+    private final UIText _debugLine4;
+    private final UIDebugConsole _console;
 
     private UIButton _testButton;
 

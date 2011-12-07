@@ -37,8 +37,8 @@ public class BlockGrid implements RenderableObject {
     /* CONST */
     private static final int _blockDisplayList = Primitives.generateColoredBlock(new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f);
 
-    private HashSet<BlockPosition> _gridPositions = new HashSet<BlockPosition>();
-    private WorldRenderer _parent;
+    private final HashSet<BlockPosition> _gridPositions = new HashSet<BlockPosition>();
+    private final WorldRenderer _parent;
 
     public BlockGrid(WorldRenderer parent) {
         _parent = parent;

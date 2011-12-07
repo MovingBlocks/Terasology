@@ -32,8 +32,8 @@ import java.util.HashSet;
  */
 public class Blueprint {
 
-    private HashSet<BlockPosition> _blockPositions = new HashSet();
-    private HashMap<BlockPosition, Block> _blockTypes = new HashMap();
+    private final HashSet<BlockPosition> _blockPositions = new HashSet<BlockPosition>();
+    private final HashMap<BlockPosition, Block> _blockTypes = new HashMap<BlockPosition, Block>();
 
     /**
      * Builds the blueprint in the given world at the given position.

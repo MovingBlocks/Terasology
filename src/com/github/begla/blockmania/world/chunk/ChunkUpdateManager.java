@@ -50,9 +50,8 @@ public final class ChunkUpdateManager implements BlockObserver {
      * @return True if a chunk update was executed
      */
     public boolean queueChunkUpdate(Chunk chunk, final UPDATE_TYPE type) {
-        final Chunk chunkToProcess = chunk;
 
-        if (!_currentlyProcessedChunks.contains(chunkToProcess) && (_currentlyProcessedChunks.size() < MAX_THREADS || type != UPDATE_TYPE.DEFAULT)) {
+        if (!_currentlyProcessedChunks.contains(chunk) && (_currentlyProcessedChunks.size() < MAX_THREADS || type != UPDATE_TYPE.DEFAULT)) {
             executeChunkUpdate(chunk);
             return true;
         }

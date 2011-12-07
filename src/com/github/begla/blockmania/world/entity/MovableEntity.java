@@ -41,10 +41,13 @@ public abstract class MovableEntity extends Entity {
     protected Audio[] _footstepSounds;
 
     /* PARENT WORLD */
-    protected WorldRenderer _parent;
+    protected final WorldRenderer _parent;
 
     /* MOVEMENT */
-    protected double _walkingSpeed, _runningFactor, _jumpIntensity, _stepCounter;
+    protected double _walkingSpeed;
+    protected final double _runningFactor;
+    protected final double _jumpIntensity;
+    protected double _stepCounter;
     protected double _activeWalkingSpeed, _yaw = 135d, _pitch, _gravity;
     protected final Vector3f _movementDirection = new Vector3f(), _velocity = new Vector3f(), _viewingDirection = new Vector3f();
     protected boolean _isSwimming = false, _headUnderWater = false, _touchingGround = false, _running = false, _godMode, _jump = false;

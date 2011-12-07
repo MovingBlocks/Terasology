@@ -20,8 +20,9 @@ package com.github.begla.blockmania.world.main;
  */
 public abstract class WorldTimeEvent {
 
-    private double _executionTime;
-    private boolean _repeatingEvent, _canFire;
+    private final double _executionTime;
+    private final boolean _repeatingEvent;
+    private boolean _canFire;
 
     public WorldTimeEvent(double executionTime, boolean repeatingEvent) {
         _executionTime = executionTime;

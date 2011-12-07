@@ -44,9 +44,9 @@ public final class GelatinousCube extends Character {
     private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 0.2f), new Vector3f(1.0f, 0.2f, 0.2f), new Vector3f(0.2f, 1.0f, 0.2f), new Vector3f(1.0f, 1.0f, 0.2f)};
 
     private long _lastChangeOfDirectionAt = Blockmania.getInstance().getTime();
-    private Vector3f _movementTarget = new Vector3f();
+    private final Vector3f _movementTarget = new Vector3f();
 
-    public int _randomColorId;
+    public final int _randomColorId;
     public float _randomSize = 1.0f;
 
     public GelatinousCube(WorldRenderer parent) {

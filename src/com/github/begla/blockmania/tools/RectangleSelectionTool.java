@@ -30,9 +30,9 @@ import java.util.logging.Level;
  */
 public class RectangleSelectionTool implements Tool {
 
-    private Player _player;
+    private final Player _player;
 
-    private ArrayList<BlockPosition> _selectedBlocks = new ArrayList<BlockPosition>();
+    private final ArrayList<BlockPosition> _selectedBlocks = new ArrayList<BlockPosition>();
 
     private Blueprint _currentBlueprint = null;
 

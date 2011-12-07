@@ -42,7 +42,7 @@ public class UIText extends UIDisplayElement {
     private AngelCodeFont _font = FontManager.getInstance().getFont("default");
     private boolean _shadowed = true;
 
-    private Vector2f _shadowOffset = new Vector2f(-1, 0);
+    private final Vector2f _shadowOffset = new Vector2f(-1, 0);
 
     public UIText() {
         super();

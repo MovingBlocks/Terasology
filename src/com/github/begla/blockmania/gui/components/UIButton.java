@@ -32,13 +32,13 @@ import java.util.ArrayList;
  */
 public class UIButton extends UIDisplayContainer {
 
-    private ArrayList<UIClickListener> _clickListeners = new ArrayList<UIClickListener>();
+    private final ArrayList<UIClickListener> _clickListeners = new ArrayList<UIClickListener>();
 
     private boolean _clickSoundPlayed = false;
     private boolean _mouseDown = false, _mouseUp = false;
 
-    private UIGraphicsElement _defaultTexture;
-    private UIText _label;
+    private final UIGraphicsElement _defaultTexture;
+    private final UIText _label;
 
     public UIButton(Vector2f size) {
         setSize(size);

@@ -35,12 +35,14 @@ import javax.vecmath.Vector2f;
  */
 public class UIPauseMenu extends UIDisplayRenderer {
 
-    UITransparentOverlay _overlay;
-    UIGraphicsElement _title;
+    final UITransparentOverlay _overlay;
+    final UIGraphicsElement _title;
 
-    UIButton _exitButton, _newWorldButton, _respawnButton;
+    final UIButton _exitButton;
+    final UIButton _newWorldButton;
+    final UIButton _respawnButton;
 
-    UIText _version;
+    final UIText _version;
 
     public UIPauseMenu() {
         _title = new UIGraphicsElement("blockmania");

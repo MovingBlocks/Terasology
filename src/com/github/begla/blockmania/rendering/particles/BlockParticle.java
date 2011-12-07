@@ -33,8 +33,10 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class BlockParticle extends Particle {
 
-    private float _texOffsetX, _texOffsetY, _lightOffset;
-    private byte _blockType;
+    private final float _texOffsetX;
+    private final float _texOffsetY;
+    private final float _lightOffset;
+    private final byte _blockType;
 
     private static final int[] _displayLists = new int[BlockManager.getInstance().availableBlocksSize()];
 
@@ -60,13 +62,8 @@ public class BlockParticle extends Particle {
     @Override
     public boolean canMoveVertically() {
         BlockParticleEmitter pE = (BlockParticleEmitter) getParent();
-
         // Very simple "collision detection" for particles.
-        if (pE.getParent().getWorldProvider().getBlockAtPosition(new Vector3f(_position.x, _position.y + 2 * ((_velocity.y >= 0) ? _size : -_size), _position.z)) != 0x0) {
-            return false;
-        }
-
-        return true;
+        return pE.getParent().getWorldProvider().getBlockAtPosition(new Vector3f(_position.x, _position.y + 2 * ((_velocity.y >= 0) ? _size : -_size), _position.z)) == 0x0;
     }
 
     protected void renderParticle() {

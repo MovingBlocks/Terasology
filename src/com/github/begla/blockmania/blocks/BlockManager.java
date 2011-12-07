@@ -40,11 +40,11 @@ public class BlockManager {
     private static BlockManager _instance;
 
     /* GROOVY */
-    private Binding _binding;
+    private final Binding _binding;
 
     /* BLOCKS */
-    private HashMap<String, Block> _blocksByTitle = new HashMap<String, Block>(128);
-    private TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
+    private final HashMap<String, Block> _blocksByTitle = new HashMap<String, Block>(128);
+    private final TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
 
     public static BlockManager getInstance() {
         if (_instance == null)

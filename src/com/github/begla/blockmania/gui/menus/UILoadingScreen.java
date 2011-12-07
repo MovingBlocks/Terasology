@@ -26,8 +26,8 @@ import com.github.begla.blockmania.gui.framework.UIDisplayRenderer;
  */
 public class UILoadingScreen extends UIDisplayRenderer {
 
-    UITransparentOverlay _overlay;
-    UIText _status;
+    final UITransparentOverlay _overlay;
+    final UIText _status;
 
     public UILoadingScreen() {
         _status = new UIText("Loading...");

@@ -30,7 +30,7 @@ import java.nio.IntBuffer;
 public class VertexBufferObjectManager {
 
     private static VertexBufferObjectManager _instance = null;
-    private TIntArrayList _vertexBufferObjectPool = new TIntArrayList();
+    private final TIntArrayList _vertexBufferObjectPool = new TIntArrayList();
 
     public static VertexBufferObjectManager getInstance() {
         if (_instance == null) {

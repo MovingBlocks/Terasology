@@ -5,8 +5,6 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import org.junit.Test;
 
 public class TestMathHelper extends junit.framework.TestCase {
-
-    @Test
     public void testCantor() throws Exception {
         int test1 = MathHelper.mapToPositive(22);
         assertEquals(22, MathHelper.redoMapToPositive(test1));

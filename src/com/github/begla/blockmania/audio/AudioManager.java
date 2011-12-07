@@ -31,7 +31,7 @@ import java.util.logging.Level;
  */
 public class AudioManager {
 
-    private HashMap<String, Audio> _audioFiles = new HashMap();
+    private final HashMap<String, Audio> _audioFiles = new HashMap<String, Audio>();
     private static AudioManager _instance = null;
 
     public static AudioManager getInstance() {

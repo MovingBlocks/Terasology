@@ -29,10 +29,10 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class UIGraphicsElement extends UIDisplayElement {
-    private String _textureName;
+    private final String _textureName;
 
-    private Vector2f _textureOrigin = new Vector2f(0.0f, 0.0f);
-    private Vector2f _textureSize = new Vector2f(1.0f, 1.0f);
+    private final Vector2f _textureOrigin = new Vector2f(0.0f, 0.0f);
+    private final Vector2f _textureSize = new Vector2f(1.0f, 1.0f);
 
     public UIGraphicsElement(String textureName) {
         _textureName = textureName;

@@ -28,8 +28,8 @@ import java.util.logging.Level;
  */
 public class MultipleSelectionTool implements Tool {
 
-    private Player _player;
-    private ArrayList<BlockPosition> _vertexBlocks = new ArrayList<BlockPosition>();
+    private final Player _player;
+    private final ArrayList<BlockPosition> _vertexBlocks = new ArrayList<BlockPosition>();
 
     public MultipleSelectionTool(Player player) {
         _player = player;

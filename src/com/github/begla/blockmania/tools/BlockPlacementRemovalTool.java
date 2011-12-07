@@ -22,7 +22,7 @@ import com.github.begla.blockmania.world.characters.Player;
  */
 public class BlockPlacementRemovalTool implements Tool {
 
-    private Player _player;
+    private final Player _player;
 
     public BlockPlacementRemovalTool(Player player) {
         _player = player;

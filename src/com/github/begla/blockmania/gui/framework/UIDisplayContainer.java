@@ -25,7 +25,7 @@ import java.util.ArrayList;
  */
 public abstract class UIDisplayContainer extends UIDisplayElement {
 
-    ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
+    final ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
 
     public UIDisplayContainer() {
         super();

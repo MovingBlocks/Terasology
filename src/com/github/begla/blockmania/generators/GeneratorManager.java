@@ -32,9 +32,9 @@ import java.util.logging.Level;
  */
 public class GeneratorManager {
 
-    private WorldProvider _parent;
+    private final WorldProvider _parent;
 
-    private Binding _binding;
+    private final Binding _binding;
     private static final String DEFAULT_SCRIPT_PATH = "groovy/generators/";
 
     /* WORLD GENERATION */

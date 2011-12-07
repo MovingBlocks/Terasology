@@ -31,7 +31,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class Particle implements RenderableObject {
-    protected ParticleEmitter _parent;
+    protected final ParticleEmitter _parent;
 
     protected final Vector3f _targetVelocity = new Vector3f(0.0f, -0.03f, 0.0f);
     protected final Vector3f _velDecSpeed = new Vector3f(0.003f, 0.003f, 0.003f);

@@ -25,7 +25,7 @@ import javax.vecmath.Vector3f;
  */
 public class Portal {
 
-    private Vector3f _blockLocation;
+    private final Vector3f _blockLocation;
 
     public Portal(Vector3f loc) {
         _blockLocation = loc;
