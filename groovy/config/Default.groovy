@@ -63,7 +63,7 @@ Graphics {
 
         // Occlusion culling is currently disabled by default
         enabled = false
-        // The last 10 % of the visible chunks will be culled using occlusion queries
+        // The last 60 % of the visible chunks will be culled using occlusion queries
         distanceOffset = 0.4d
         // Minimum time gap between queries and checks for available results
         timeGap = 100l // ms
