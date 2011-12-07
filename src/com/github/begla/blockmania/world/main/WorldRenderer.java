@@ -63,6 +63,7 @@ public final class WorldRenderer implements RenderableObject {
     private static final boolean BOUNDING_BOXES_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.renderChunkBoundingBoxes");
     private static final boolean OCCLUSION_CULLING_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.enabled");
     private static final double OCCLUSION_CULLING_DISTANCE_OFFSET = (Double) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.distanceOffset");
+    private static final long OCCLUSION_CULLING_GAP = (Long) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.timeGap");
 
     /* VIEWING DISTANCE */
     private int _viewingDistance = 8;
@@ -114,6 +115,7 @@ public final class WorldRenderer implements RenderableObject {
 
     /* RENDERING */
     private boolean _occlusionQueryToggle = false;
+    private long _occlusionLastUpdate = 0;
 
     /**
      * Initializes a new (local) world for the single player mode.
@@ -273,7 +275,6 @@ public final class WorldRenderer implements RenderableObject {
      * Renders all chunks that are currently in the player's field of view.
      */
     private void renderChunksAndEntities() {
-
         ShaderManager.getInstance().enableShader("chunk");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
@@ -416,7 +417,11 @@ public final class WorldRenderer implements RenderableObject {
 
         ShaderManager.getInstance().enableShader(null);
 
-        _occlusionQueryToggle = !_occlusionQueryToggle;
+        long now = Blockmania.getInstance().getTime();
+        if (now - _occlusionLastUpdate > OCCLUSION_CULLING_GAP) {
+            _occlusionQueryToggle = !_occlusionQueryToggle;
+            _occlusionLastUpdate = now;
+        }
     }
 
     public void update() {
