@@ -15,10 +15,18 @@
  */
 package com.github.begla.blockmania.world.entity;
 
+import com.github.begla.blockmania.datastructures.AABB;
+
 /**
  * TODO: Somehow does not do anything special? :-/
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class StaticEntity extends Entity {
+
+    public void render() {
+    }
+
+    public void update() {
+    }
 }

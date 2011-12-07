@@ -90,7 +90,7 @@ public final class Player extends Character {
         if (SHOW_PLACING_BOX) {
             if (is != null) {
                 if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(is.getBlockPosition().toVector3f())).isRenderBoundingBox()) {
-                    Block.AABBForBlockAt(is.getBlockPosition().toVector3f()).render();
+                    Block.AABBForBlockAt(is.getBlockPosition().toVector3f()).render(8f);
                 }
             }
         }

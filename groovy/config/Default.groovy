@@ -22,7 +22,7 @@ System {
     saveChunks = true
 
     // Size of the chunk cache
-    chunkCacheSize = 1024
+    chunkCacheSize = 1024+512
 
     Debug {
 
@@ -53,13 +53,18 @@ Graphics {
 
     viewingDistanceNear = 8
     viewingDistanceModerate = 16
-    viewingDistanceFar = 24
-    viewingDistanceUltra = 28
+    viewingDistanceFar = 26
+    viewingDistanceUltra = 32
+
+    // Splits chunk meshes into multiple sub-meshes to support frustum and occlusion culling techniques
+    verticalChunkMeshSegments = 2
 
     OcclusionCulling {
 
+        // Occlusion culling is currently disabled by default
         enabled = false
-        verticalChunkMeshSegments = 16
+        // The last 10 % of the visible chunks will be culled using occlusion queries
+        distanceOffset = 0.9d
 
     }
 

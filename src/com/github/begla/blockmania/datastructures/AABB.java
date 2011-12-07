@@ -30,9 +30,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class AABB implements RenderableObject {
-
-    private static final float RENDER_LINE_WIDTH = 8f;
+public class AABB {
 
     private final Vector3f _position = new Vector3f();
     private final Vector3f _dimensions;
@@ -191,8 +189,8 @@ public class AABB implements RenderableObject {
      * Renders this AABB.
      * <p/>
      */
-    public void render() {
-        glLineWidth(RENDER_LINE_WIDTH);
+    public void render(float lineThickness) {
+        glLineWidth(lineThickness);
 
         glPushMatrix();
         Vector3f rp = Blockmania.getInstance().getActiveWorldProvider().getRenderingReferencePoint();

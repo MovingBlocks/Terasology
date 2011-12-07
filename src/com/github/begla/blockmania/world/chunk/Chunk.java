@@ -53,7 +53,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public static final int CHUNK_DIMENSION_X = 16;
     public static final int CHUNK_DIMENSION_Y = 256;
     public static final int CHUNK_DIMENSION_Z = 16;
-    public static final int VERTICAL_SEGMENTS = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.verticalChunkMeshSegments");
+    public static final int VERTICAL_SEGMENTS = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.verticalChunkMeshSegments");
     private static final Vector3f[] LIGHT_DIRECTIONS = {new Vector3f(1, 0, 0), new Vector3f(-1, 0, 0), new Vector3f(0, 1, 0), new Vector3f(0, -1, 0), new Vector3f(0, 0, 1), new Vector3f(0, 0, -1)};
 
     protected FastRandom _random;
@@ -706,7 +706,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         ChunkMesh[] newMeshes = new ChunkMesh[VERTICAL_SEGMENTS];
 
-        // TODO: Should be dynamic
         for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
             newMeshes[i] = _meshGenerator.generateMesh(CHUNK_DIMENSION_Y / VERTICAL_SEGMENTS, i * (CHUNK_DIMENSION_Y / VERTICAL_SEGMENTS));
         }
@@ -741,10 +740,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
 
         return false;
-    }
-
-    public void render() {
-
     }
 
     public void update() {
@@ -992,7 +987,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {
                     if (!solid)
-                        getSubMeshAABB(i).render();
+                        getSubMeshAABB(i).render(2f);
                     else
                         getSubMeshAABB(i).renderSolid();
                 }

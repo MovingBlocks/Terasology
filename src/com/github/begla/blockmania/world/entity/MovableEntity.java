@@ -86,14 +86,14 @@ public abstract class MovableEntity extends Entity {
 
     public void render() {
         if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debugCollision")) {
-            getAABB().render();
+            getAABB().render(2f);
 
             ArrayList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());
 
             for (int i = 0; i < blocks.size(); i++) {
                 BlockPosition p = blocks.get(i);
                 AABB blockAABB = Block.AABBForBlockAt(p.x, p.y, p.z);
-                blockAABB.render();
+                blockAABB.render(2f);
             }
         }
     }

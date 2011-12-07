@@ -231,7 +231,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double densityMountains = calcMountainDensity(x, y, z) * mIntens * height;
         double densityHills = (calcHillDensity(x, y, z) * height);
 
-        return -y + (((height * 80.0) + 16.0) + densityMountains * 512.0 + densityHills * 256);
+        return -y + (((height * 80.0) + 16.0) + densityMountains * 1024.0 + densityHills * 256);
     }
 
     public double calcBaseTerrain(double x, double z) {
