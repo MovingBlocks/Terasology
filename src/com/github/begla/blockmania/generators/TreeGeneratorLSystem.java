@@ -39,6 +39,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     /* RULES */
     private final String _initialAxiom;
     private final HashMap<String, String> _ruleSet;
+    private final HashMap<String, Double> _probabilities;
 
     /**
      * Init. a new L-System based tree generator.
@@ -47,15 +48,16 @@ public class TreeGeneratorLSystem extends TreeGenerator {
      * @param initialAxiom The initial axiom to use
      * @param ruleSet      The rule set to use
      */
-    public TreeGeneratorLSystem(GeneratorManager manager, String initialAxiom, HashMap<String, String> ruleSet) {
+    public TreeGeneratorLSystem(GeneratorManager manager, String initialAxiom, HashMap<String, String> ruleSet, HashMap<String, Double> probabilities, int iterations, int angle) {
         super(manager);
 
-        _angleInDegree = 20;
-        _iterations = 6;
+        _angleInDegree = angle;
+        _iterations = iterations;
         _leafType = BlockManager.getInstance().getBlock("Leaf").getId();
 
         _initialAxiom = initialAxiom;
         _ruleSet = ruleSet;
+        _probabilities = probabilities;
     }
 
     @Override
@@ -73,7 +75,9 @@ public class TreeGeneratorLSystem extends TreeGenerator {
             for (int j = 0; j < axiom.length(); j++) {
                 String c = String.valueOf(axiom.charAt(j));
 
-                if (_ruleSet.containsKey(c))
+                double rValue = (rand.randomDouble() + 1.0) / 2.0;
+
+                if (_ruleSet.containsKey(c) && _probabilities.get(c) > (1.0 - rValue))
                     temp += _ruleSet.get(c);
                 else
                     temp += c;
@@ -87,8 +91,6 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         Matrix4f rotation = new Matrix4f();
         rotation.setIdentity();
         rotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.PI / 2));
-
-        beforeExecution(rand);
 
         for (int i = 0; i < axiom.length(); i++) {
             char c = axiom.charAt(i);
@@ -165,11 +167,6 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     break;
             }
         }
-    }
-
-    private void beforeExecution(FastRandom rand) {
-        _angleInDegree = 30 + rand.randomDouble() * 10;
-        _iterations = Math.abs(rand.randomInt() % 2) + 4;
     }
 
     public TreeGenerator withLeafType(byte b) {

@@ -6,28 +6,33 @@ import com.github.begla.blockmania.generators.TreeGeneratorLSystem
 
 def GeneratorManager m = generatorManager;
 
+HashMap<String, String> probabilities = new HashMap<String, Double>();
+probabilities.put("A", 0.7d);
+probabilities.put("B", 0.6d);
+
 // Create a bushy L-System based tree
 HashMap<String, String> rules = new HashMap<String, String>();
-rules.put("A", "[&FFFA]////[&FFFA]////[&FFFA]");
+rules.put("A", "[&FFBFA]////[&BFFFA]////[&FBFFA]");
+rules.put("B", "[&FFFA]////[&FFFA]////[&FFFA]");
 
-def t1 = new TreeGeneratorLSystem(m, "FFFFFFA", rules).withGenerationProbability(0.2);
+def t1 = new TreeGeneratorLSystem(m, "FFFFFFA", rules, probabilities, 6, 30).withGenerationProbability(0.2);
 
 rules = new HashMap<String, String>();
-rules.put("A", "[&FFFA]////[&FFFA]////[&FFFA]");
+rules.put("A", "[&FFBFA]////[&FBFFA]////[&FFBFA]");
 
-def t4 = new TreeGeneratorLSystem(m, "FFFFFFFFFFFAFFFFFAFFFFFA", rules).withLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId()).withGenerationProbability(0.01);
+def t4 = new TreeGeneratorLSystem(m, "FFFFFFFFFFFAFFFFFAFFFFFA", rules, probabilities, 6, 40).withLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId()).withGenerationProbability(0.01);
 
 // ...and a LARGE bushy tree
 rules = new HashMap<String, String>();
-rules.put("A", "[&FFFFFA]////[&FFFFFA]////[&FFFFFA]");
+rules.put("A", "[&FFFBFFA]////[&FFFFBFA]////[&FFFBFFA]");
 
-def t2 = new TreeGeneratorLSystem(m, "FFFFAFFFFFFFAFFFFA", rules).withLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId()).withGenerationProbability(0.01);
+def t2 = new TreeGeneratorLSystem(m, "FFFFAFFFFFFFAFFFFA", rules, probabilities, 6, 20).withLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId()).withGenerationProbability(0.01);
 
 // ...and some strange wobbly thingies
 rules = new HashMap<String, String>();
-rules.put("A", "[&FA]////[&FFA]////[&FFFA]");
+rules.put("A", "[&BFA]////[&FFBA]////[&FFBFA]");
 
-def t3 = new TreeGeneratorLSystem(m, "FFAFAFFAFF", rules).withLeafType(BlockManager.getInstance().getBlock("Red leaf").getId()).withGenerationProbability(0.05);
+def t3 = new TreeGeneratorLSystem(m, "FFAFAFFAFF", rules, probabilities, 6, 30).withLeafType(BlockManager.getInstance().getBlock("Red leaf").getId()).withGenerationProbability(0.05);
 
 def c1 = new TreeGeneratorCactus(m).withGenerationProbability(0.05);
 

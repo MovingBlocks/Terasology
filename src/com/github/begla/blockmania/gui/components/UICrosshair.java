@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.gui.components;
 
 import com.github.begla.blockmania.gui.framework.UIDisplayElement;
+import org.lwjgl.opengl.GL11;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -26,16 +27,29 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class UICrosshair extends UIDisplayElement {
 
+    private static int _displayList = -1;
+
     public void render() {
-        glColor4f(1f, 1f, 1f, 1f);
         glLineWidth(2f);
 
+        if (_displayList == -1)
+            generateDisplayList();
+
+        glCallList(_displayList);
+    }
+
+    private void generateDisplayList() {
+        _displayList = glGenLists(1);
+
+        glNewList(_displayList, GL11.GL_COMPILE);
         glBegin(GL_LINES);
+        glColor3f(1.0f, 1.0f, 1.0f);
         glVertex2f(-8f, 0f);
         glVertex2f(8f, 0f);
         glVertex2f(0f, -8f);
         glVertex2f(0f, 8f);
         glEnd();
+        glEndList();
     }
 
     @Override

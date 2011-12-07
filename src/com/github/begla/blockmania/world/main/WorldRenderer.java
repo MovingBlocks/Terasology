@@ -219,6 +219,7 @@ public final class WorldRenderer implements RenderableObject {
         _visibleChunks.clear();
         _bulletPhysicsRenderer.resetChunks();
 
+        boolean noMoreUpdates = false;
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
 
@@ -238,9 +239,11 @@ public final class WorldRenderer implements RenderableObject {
             if (isChunkVisible(c)) {
                 _visibleChunks.add(c);
 
-                if (c.isDirty() || c.isLightDirty()) {
-                    if (!_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT))
+                if ((c.isDirty() || c.isLightDirty()) && !noMoreUpdates) {
+                    if (!_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT)) {
+                        noMoreUpdates = true;
                         continue;
+                    }
                 }
 
                 c.update();

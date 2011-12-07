@@ -90,7 +90,7 @@ void main(){
     color.xyz *= clamp(daylightColorValue + blocklightColorValue * (1.0-daylightValue), 0, 1);
 
     float fog = 1.0 - ((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale);
-    fog /= 1.5;
+    fog /= 2.0;
 
     fog = clamp(fog, 0.0, 1.0);
 
