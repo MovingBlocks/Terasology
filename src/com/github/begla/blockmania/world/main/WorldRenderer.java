@@ -341,11 +341,7 @@ public final class WorldRenderer implements RenderableObject {
 
                         if (rendered) {
                             // Chunk was rendered
-                            glEnable(GL_BLEND);
-                            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT, j);
                             c.setSubMeshCulled(j, false);
-                            glDisable(GL_BLEND);
                         } else {
                             // Chunk was empty -> No second rendering pass needed
                             c.setSubMeshCulled(j, true);
@@ -368,6 +364,32 @@ public final class WorldRenderer implements RenderableObject {
             }
         }
 
+        /*
+         * SECOND RENDER PASS: BILLBOARDS
+         */
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        for (int i = 0; i < _visibleChunks.size(); i++) {
+            Chunk c = _visibleChunks.get(i);
+
+            GL11.glPushMatrix();
+            GL11.glTranslatef(c.getPosition().x * Chunk.CHUNK_DIMENSION_X - _worldProvider.getRenderingReferencePoint().x, c.getPosition().y * Chunk.CHUNK_DIMENSION_Y - _worldProvider.getRenderingReferencePoint().y, c.getPosition().z * Chunk.CHUNK_DIMENSION_Z - _worldProvider.getRenderingReferencePoint().z);
+
+            for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
+                if (!c.isSubMeshOcclusionCulled(k)) {
+                    if (!c.isSubMeshCulled(k)) {
+                        c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT, k);
+                    }
+                }
+            }
+
+            glPopMatrix();
+        }
+
+        glDisable(GL11.GL_BLEND);
+
+
         _mobManager.renderAll();
 
         ShaderManager.getInstance().enableShader("chunk");
@@ -379,19 +401,20 @@ public final class WorldRenderer implements RenderableObject {
         }
 
         /*
-        * SECOND RENDER PASS: OPAQUE ELEMENTS
+        * THIRD RENDER PASS: WATER AND ICE
         */
         for (int j = 0; j < 2; j++) {
+            if (j == 0) {
+                glColorMask(false, false, false, false);
+            } else {
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glColorMask(true, true, true, true);
+            }
+
+
             for (int i = 0; i < _visibleChunks.size(); i++) {
                 Chunk c = _visibleChunks.get(i);
-
-                if (j == 0) {
-                    glColorMask(false, false, false, false);
-                } else {
-                    glEnable(GL_BLEND);
-                    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                    glColorMask(true, true, true, true);
-                }
 
                 GL11.glPushMatrix();
                 GL11.glTranslatef(c.getPosition().x * Chunk.CHUNK_DIMENSION_X - _worldProvider.getRenderingReferencePoint().x, c.getPosition().y * Chunk.CHUNK_DIMENSION_Y - _worldProvider.getRenderingReferencePoint().y, c.getPosition().z * Chunk.CHUNK_DIMENSION_Z - _worldProvider.getRenderingReferencePoint().z);
@@ -404,13 +427,10 @@ public final class WorldRenderer implements RenderableObject {
                     }
                 }
 
-                if (j == 0) {
-                    glDisable(GL_BLEND);
-                }
-
                 glPopMatrix();
             }
 
+            glDisable(GL_BLEND);
         }
 
         glEnable(GL11.GL_CULL_FACE);

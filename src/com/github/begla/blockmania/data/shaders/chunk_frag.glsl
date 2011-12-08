@@ -55,7 +55,7 @@ void main(){
 
     color = srgbToLinear(color);
 
-    if (color.a < 0.1)
+    if (color.a < 0.5)
         discard;
 
     // APPLY TEXTURE OFFSET
@@ -64,9 +64,11 @@ void main(){
         color.a *= gl_Color.a;
     } else {
         // MASK GRASS
-        if (texture2D(textureAtlas, vec2(texCoord.x + 3*0.0625, texCoord.y + 2*0.0625)).a > 0) {
-            color.rgb *= gl_Color.rgb;
-            color.a *= gl_Color.a;
+        vec4 maskColor = texture2D(textureAtlas, vec2(texCoord.x + 3*0.0625, texCoord.y + 2*0.0625));
+        if (maskColor.a > 0) {
+            if (gl_Color.rgb != vec3(0,0,0)) {
+                color.rgb *= gl_Color.rgb;
+            }
         }
     }
 

@@ -15,13 +15,19 @@
  */
 package com.github.begla.blockmania.rendering.manager;
 
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.util.glu.MipMap;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.logging.Level;
 
@@ -34,6 +40,9 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class TextureManager {
+
+    private static final boolean MIP_MAPPING = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.mipMapping");
+    private static final int ANISOTROPIC_FILTERING = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.anisotropicFiltering");
 
     private static TextureManager _instance;
     private final HashMap<String, Texture> _textures = new HashMap<String, Texture>();
@@ -54,24 +63,56 @@ public class TextureManager {
     }
 
     public void loadDefaultTextures() {
-        loadTexture("terrain");
-        loadTexture("button");
-        loadTexture("custom_lava_still");
-        loadTexture("custom_water_still");
-        loadTexture("custom_lava_flowing");
-        loadTexture("custom_water_flowing");
-        loadTexture("blockmania");
+        loadTexture("terrain", true);
+        loadTexture("custom_lava_still", false);
+        loadTexture("custom_water_still", false);
+        loadTexture("custom_lava_flowing", false);
+        loadTexture("custom_water_flowing", false);
 
-        loadTexture("slime");
+        /* UI */
+        loadTexture("button", false);
+        loadTexture("blockmania", false);
+
+        /* MOBS */
+        loadTexture("slime", false);
 
         for (int i = 1; i <= 6; i++) {
-            loadTexture("stars" + i);
+            loadTexture("stars" + i, false);
         }
     }
 
-    public void loadTexture(String title) {
+    private void updateTextureParams(Texture tex, boolean generateMipMap) {
+        if (MIP_MAPPING && generateMipMap) {
+            glBindTexture(GL11.GL_TEXTURE_2D, tex.getTextureID());
+
+            int width = tex.getImageWidth();
+            int height = tex.getImageHeight();
+
+            byte[] texbytes = tex.getTextureData();
+            int components = texbytes.length / (width * height);
+
+            ByteBuffer texdata = BufferUtils.createByteBuffer(texbytes.length);
+            texdata.put(texbytes);
+            texdata.rewind();
+
+            MipMap.gluBuild2DMipmaps(GL11.GL_TEXTURE_2D, components, width, height, components == 3 ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, texdata);
+
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST_MIPMAP_NEAREST);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 2);
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
+        }
+
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
+    }
+
+    public void loadTexture(String title, boolean generateMipMap) {
         try {
-            _textures.put(title, TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/" + title + ".png").openStream(), GL_NEAREST));
+            Texture tex = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/" + title + ".png").openStream(), GL_NEAREST);
+            _textures.put(title, tex);
+
+            updateTextureParams(tex, generateMipMap);
         } catch (IOException ex) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }

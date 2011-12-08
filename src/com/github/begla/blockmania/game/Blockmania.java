@@ -409,9 +409,11 @@ public final class Blockmania {
         if (!_pauseGame && !_hud.getDebugConsole().isVisible() && !_pauseMenu.isVisible()) {
             if (_worldRenderer != null)
                 _worldRenderer.update();
-            Mouse.setGrabbed(true);
+            if (!Mouse.isGrabbed())
+                Mouse.setGrabbed(true);
         } else {
-            Mouse.setGrabbed(false);
+            if (Mouse.isGrabbed())
+                Mouse.setGrabbed(false);
         }
 
         updateUserInterface();
@@ -485,10 +487,6 @@ public final class Blockmania {
             if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                 if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                     togglePauseMenu();
-                }
-
-                if (key == Keyboard.KEY_P && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                    togglePauseGame();
                 }
 
                 if (key == Keyboard.KEY_F3 && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {

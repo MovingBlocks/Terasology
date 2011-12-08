@@ -42,6 +42,9 @@ Graphics {
     gamma = 2.2d
     animatedWaterAndGrass = true
 
+    mipMapping = true
+    anisotropicFiltering = 1
+
     pixelFormat = new PixelFormat().withDepthBits(24)
     displayMode = new DisplayMode(1280, 720)
 

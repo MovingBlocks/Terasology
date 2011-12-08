@@ -231,7 +231,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double densityMountains = calcMountainDensity(x, y, z) * mIntens * height;
         double densityHills = (calcHillDensity(x, y, z) * height);
 
-        return -y + (((height * 80.0) + 16.0) + densityMountains * 1024.0 + densityHills * 256);
+        int plateauArea = (int) (Chunk.CHUNK_DIMENSION_Y * 0.10);
+        double flatten = MathHelper.clamp(((Chunk.CHUNK_DIMENSION_Y - 16) - y) / plateauArea);
+
+        return -y + (((height * 80.0) + 16.0) + densityMountains * 2048.0 + densityHills * 256) * flatten;
     }
 
     public double calcBaseTerrain(double x, double z) {

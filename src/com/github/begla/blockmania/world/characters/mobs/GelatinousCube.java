@@ -117,7 +117,7 @@ public final class GelatinousCube extends Character {
 
         glBegin(GL_QUADS);
 
-        drawCubeBody(new Vector4f(1.0f, 1.0f, 1.0f, 0.8f), 1.0f);
+        drawCubeBody(new Vector4f(1.0f, 1.0f, 1.0f, 0.9f), 1.0f);
 
         GL11.glEnd();
         GL11.glEndList();

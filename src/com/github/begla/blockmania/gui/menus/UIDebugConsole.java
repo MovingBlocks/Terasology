@@ -127,6 +127,7 @@ public final class UIDebugConsole extends UIDisplayContainer {
 
             addToRingBuffer();
             resetDebugConsole();
+            setVisible(false);
         } else {
             Blockmania.getInstance().getLogger().log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
         }
