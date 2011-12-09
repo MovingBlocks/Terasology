@@ -35,8 +35,8 @@ Controls
 * [1,...,0]               Change active tool slot
 * [F]                     Toggle viewing distance (near, moderate, far, ultra)
 * [Tab]                   Toggle developer console (pauses/unpauses the game)
-* [F3]                    Show debug information
-* [Escape]                Save the current world and exit the game
+* [F3]                    Toggle debug information
+* [Escape]                Show/hide the pause menu screen
 
 Tools
 -----
