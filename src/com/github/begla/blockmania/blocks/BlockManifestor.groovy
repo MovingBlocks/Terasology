@@ -21,30 +21,39 @@ package com.github.begla.blockmania.blocks
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
  * a set of block definitions and a saved world in Serialized state
+ * It is only used on game-startup, leaving on-going activity to BlockManager et al
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 class BlockManifestor {
 
-    // This may or may not make sne
-    //def _config
-
-    public BlockManifestor() {
-
+    /** The path this Manifestor loads from */
+    protected getPath() {
+        return "com/github/begla/blockmania/data/blocks"
     }
 
     /**
-     * On world startup this should be called to either load an existing config file or generate a new one
+     * On game startup we need to load Block configuration regardless. Block IDs depend on existing or new world
      * Later on this class could also review an existing world's version level and make any needed upgrades
      * (the "version" prop is in all the files as an example, but a complete system would take some work)
      */
     public loadConfig() {
-        println "Yay!"
-        // IF a manifest exists, load it, else call generate. Can't load just yet, need to save something first!
+        // See if we have an existing block manifest in a saved world
         if (false) {
-            // Load
-        } else {
-            generateManifest()
+            // Load Block manifest IDs from the existing block manifest file
+        }
+
+        // We always load the block definitions, the manifest IDs just may already exist if using a saved world
+        loadBlockDefinitions()
+
+        // Load block definitions from Block sub-classes
+        new PlantBlockManifestor().loadBlockDefinitions()
+        // Trees
+        // Liquids
+
+        // We do the same check once again - this time to see if we need to write the first-time block manifest
+        if (false) {
+            saveManifest()
         }
 
         // Hacky hacky hack hack!
@@ -52,22 +61,30 @@ class BlockManifestor {
     }
 
     /**
-     * Generates a brand-new block manifest from available internal Groovy classes and external addon Groovy scripts
+     * Loads block definitions from available internal Groovy classes and external addon Groovy scripts
      * Populates the stuff that groovy/blocks/Default.groovy used to load, with dynamic IDs
+     * Is also used by sub-classes where BLOCK_PATH must be separately defined along with instantiateBlock
      */
-    public generateManifest() {
-        // this is specific to vanilla blocks, no subtypes here
-        getClassesAt("com/github/begla/blockmania/data/blocks/plant").each { c ->
+    public loadBlockDefinitions() {
+        // First identify what plain Block definitions we've got at the appropriate path and loop over what we get
+        getClassesAt(getPath()).each { c ->
             //println ("Got back the following class: " + c)
-            def blockConfig = new ConfigSlurper().parse((Class) c)
+
+            // Prepare to load properties from the Groovy definition via ConfigSlurper
+            ConfigObject blockConfig = new ConfigSlurper().parse((Class) c)
             println "Loaded block config for Class " + c + ": " + blockConfig
-            // Create a Block class here and call another utility method to overwrite any defaults specified
-            // Put the final class and any related info (ID look-ups) in the right spots in BlockManager
+
+            // Prepare a Block from the stuff we load from the Groovy definition
+            Block b = instantiateBlock(blockConfig)
+
+            // Optionally use the Class object we loaded to execute any custom Groovy scripting (rare?)
+            // An example would be if the Block wants to be registered as a specific type (dirt, plant, mineral..)
+
+            // Add the finished Block to BlockManager (mockups below)
+            // BlockManager.addBlock(b) // This adds the instantiated class itself with all values set for game usage
+            // if (!BlockManager.hasManifested(b)) {    // Check if we already loaded a manifest ID for the Block
+                // BlockManager.addBlockManifest(b, BlockManager.nextID)    // If not then create an ID for it
         }
-
-        // Do the same thing here for Block subtypes - Plants, Trees, Liquids, etc...
-
-        // saveManifest
     }
 
     /**
@@ -78,15 +95,15 @@ class BlockManifestor {
      * @param path  target path to load stuff from
      * @return      instanced Groovy classes
      */
-    private getClassesAt(String path) {
+    protected getClassesAt(String path) {
         def allClasses = []
 
         URL u = getClass().getClassLoader().getResource(path);
         path = path.replace('/', '.')
-        println "Going to use class base path: " + path
+        println "*** Going to get Blocks from classpath: " + path
 
         new File(u.toURI()).list().each { i ->
-            println "Checking filename/dir: " + i
+            //println "Checking filename/dir: " + i
             // Ignore directories and compiled inner classes (closures)
             if (!i.contains('$') && i.endsWith(".class")) {
                 def className = i[0..-7]
@@ -98,11 +115,43 @@ class BlockManifestor {
     }
 
     /**
+     * The Block class this Manifestor loads & prepares (so BlockManifestor.loadBlockDefinitions can be generic)
+     * @return the instantiated and prepared class
+     */
+    private instantiateBlock(ConfigObject blockConfig) {
+        // Construct the class - this loads the Block-level defaults
+        Block b = new Block()
+
+        // Now apply Block-level details from Groovy (which may overwrite constructor defaults)
+        prepareBlock(b, blockConfig)
+
+        // Return the prepared class
+        return b
+    }
+
+    /**
+     * This method prepares an instantiated Block (or child class) with values loaded from its Groovy definition
+     * This allows sub-type Manifestors to call super() to fill values relevant to whatever is one level up
+     * @param b             The Block we're preparing with values loaded at this level
+     * @param blockConfig   The ConfigSlurper-produced props from the Groovy definition
+     * @return              The finished Block object we'll store in the BlockManager (returned via reference)
+     */
+    protected prepareBlock(Block b, ConfigObject blockConfig) {
+        // Load Block details from Groovy, which may overwrite defaults from Block's Constructor
+
+    }
+
+    /**
      *  After all the block data and such has been loaded into class objects and the assorted Collections,
      *  we save the manifest needed to reload the world in a file in the save dir
      *  We also dynamically create a terrain.png to go with the manifest out of all the block textures in order
      */
     public saveManifest() {
+        println "saveManifest says hi"
+
+        // The manifest can be written out purely using plain Block classes, ignoring any potential subtypes
+        // All the manifest and terrain.png needs to know is the ID and textures from faces (a Block feature)
+
         /*String s = Blockmania.getInstance().getActiveWorldProvider().getWorldSavePath() + "/BlockManifest.groovy"
         println "Manifest string is " + s
         File f = new File(s)

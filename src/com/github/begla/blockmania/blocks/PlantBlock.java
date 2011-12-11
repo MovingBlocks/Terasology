@@ -37,13 +37,13 @@ public class PlantBlock extends Block {
         // Inherit defaults
         super();
 
-        // Override some defaults
+        // Override some Block defaults with PlantBlock-level defaults
         _title = "Untitled plant block";
-        _allowBlockAttachment = false;      // Generally can't attach stuff to plants
+        _allowBlockAttachment = false;      // Generally can't attach stuff to plants!
 
-        // Define plant-specific defaults
-        _requiresSunlight = true;           // Most plants like sunlight
-        //_blockCondition = "Dirt" // Need to flesh this one out more, how are we storing it?
+        // Define PlantBlock-unique defaults
+        _requiresSunlight = true;           // Most plants like sunlight (but not necessarily all!)
+        //_blockCondition = "Dirt"          // Need to flesh this one out more, how are we storing it?
 
     }
 
