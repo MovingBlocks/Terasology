@@ -1,7 +1,6 @@
 package com.github.begla.blockmania.data.blocks.plant
 
 import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE
-import com.github.begla.blockmania.data.blocks.Dirt
 
 /**
  * Grass is a little more interesting as its faces differ.
