@@ -20,7 +20,8 @@ import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import java.awt.Graphics
 import org.newdawn.slick.util.ResourceLoader
-import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.game.Blockmania
+import javax.vecmath.Vector2f;
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -30,6 +31,12 @@ import com.github.begla.blockmania.game.Blockmania;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 class BlockManifestor {
+
+    /** Holds BufferedImages during the loading process */
+    private Map<String,BufferedImage> _images = [:]
+
+    /** Holds image index values during the loading process. These values are persisted in the Manifest */
+    protected static Map<String,Integer> _imageIndex = [:]
 
     /** The path this Manifestor loads from */
     protected getPath() {
@@ -43,15 +50,21 @@ class BlockManifestor {
      */
     public loadConfig() {
 
-        Map<String,BufferedImage> images = [:]
         // See if we have an existing block manifest in a saved world
         if (false) {
-            // Load Block manifest IDs from the existing block manifest file
+            // Load values for _imageIndex from the Manifest
+            // Load stored BlockID byte values from the Manifest
         } else {
             // If we don't have a saved world we'll need to load raw block textures
-            images = getInternalImages("com/github/begla/blockmania/data/textures/blocks")
-            //images.flatten()
-            images.each { println it }
+            _images = getInternalImages("com/github/begla/blockmania/data/textures/blocks")
+
+            println "Loaded fresh images - here's some logging!"
+            _images.eachWithIndex { key, value, index ->
+                //println "Image " + index + " is for " + key + " and looks like: " + value
+                _imageIndex.put(key, index)
+            }
+
+            println "The image index now looks like this: " + _imageIndex
         }
 
         // We always load the block definitions, the manifest IDs just may already exist if using a saved world
@@ -65,7 +78,7 @@ class BlockManifestor {
         // We do the same check once again - this time to see if we need to write the first-time block manifest
         if (true) {
             // Saving a manifest includes splicing all available Block textures together into a new images
-            saveManifest(images)
+            saveManifest()
         }
 
         // Hacky hacky hack hack!
@@ -149,11 +162,32 @@ class BlockManifestor {
      * @param blockConfig   The ConfigSlurper-produced props from the Groovy definition
      * @return              The finished Block object we'll store in the BlockManager (returned via reference)
      */
-    protected prepareBlock(Block b, ConfigObject blockConfig) {
+    protected prepareBlock(Block b, ConfigObject c) {
         // Load Block details from Groovy, which may overwrite defaults from Block's Constructor
-        println "Preparing block with name " + blockConfig.name
+        println "Preparing block with name " + c.name
 
-        // Faces
+        // Faces - note how these are _not_ persisted in the Manifest, instead the texture name index values are
+        // In theory this allows Blocks to change their faces without impacting the saved state of a world
+        // First just set all 6 faces to the default for that block (its name for a png file)
+        b.withTextureAtlasPos(new Vector2f(_imageIndex.get(c.name), 0))
+
+        // Then look for each more specific assignment and overwrite defaults where needed
+        if (c.block.faces.sides != [:]) {
+            println "Setting Block " + c.name + " to " + c.block.faces.sides + " for sides"
+            b.withTextureAtlasPosMantle(new Vector2f(_imageIndex.get(c.block.faces.sides), 0))
+        }
+        if (c.block.faces.topbottom != [:]) {
+            println "Setting Block " + c.name + " to " + c.block.faces.topbottom + " for topbottom"
+            b.withTextureAtlasPosTopBottom(new Vector2f(_imageIndex.get(c.block.faces.topbottom), 0))
+        }
+        if (c.block.faces.bottom != [:]) {
+            println "Setting Block " + c.name + " to " + c.block.faces.bottom + " for bottom"
+            b.withTextureAtlasPos(Block.SIDE.BOTTOM, new Vector2f(_imageIndex.get(c.block.faces.bottom), 0))
+        }
+
+        // top, bottom, left, right, front, back...
+
+        println b.getTextureAtlasPos()
         
     }
 
@@ -191,7 +225,7 @@ class BlockManifestor {
      *  we save the manifest needed to reload the world in a file in the save dir
      *  We also dynamically create a terrain.png to go with the manifest out of all the block textures in order
      */
-    public saveManifest(Map<String,BufferedImage> images) {
+    public saveManifest() {
 
         // The manifest can be written out purely using plain Block classes, ignoring any potential subtypes
         // All the manifest and terrain.png needs to know is the ID and textures from faces (a Block feature)
@@ -206,14 +240,14 @@ class BlockManifestor {
 
         // Loop through loaded classes and figure out width + height (or just use width only)
 
-        int width = images.size() * 16
-        println "We've got " + images.size() + " images total, so the width of the final image will be " + width
+        int width = _images.size() * 16
+        println "We've got " + _images.size() + " images total, so the width of the final image will be " + width
         int x = 0
 
         BufferedImage result = new BufferedImage(width, 16, BufferedImage.TYPE_INT_RGB)
         Graphics g = result.getGraphics()
 
-        images.each {
+        _images.each {
             g.drawImage(it.value, x, 0, null)
             x += 16
         }
