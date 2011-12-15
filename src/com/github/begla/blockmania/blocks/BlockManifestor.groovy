@@ -58,7 +58,7 @@ class BlockManifestor {
             // If we don't have a saved world we'll need to load raw block textures
             _images = getInternalImages("com/github/begla/blockmania/data/textures/blocks")
 
-            println "Loaded fresh images - here's some logging!"
+            //println "Loaded fresh images - here's some logging!"
             _images.eachWithIndex { key, value, index ->
                 //println "Image " + index + " is for " + key + " and looks like: " + value
                 _imageIndex.put(key, index)
@@ -159,7 +159,7 @@ class BlockManifestor {
      * This method prepares an instantiated Block (or child class) with values loaded from its Groovy definition
      * This allows sub-type Manifestors to call super() to fill values relevant to whatever is one level up
      * @param b             The Block we're preparing with values loaded at this level
-     * @param blockConfig   The ConfigSlurper-produced props from the Groovy definition
+     * @param c             ConfigObject holding the ConfigSlurper-produced props from the Groovy definition
      * @return              The finished Block object we'll store in the BlockManager (returned via reference)
      */
     protected prepareBlock(Block b, ConfigObject c) {
@@ -169,26 +169,47 @@ class BlockManifestor {
         // Faces - note how these are _not_ persisted in the Manifest, instead the texture name index values are
         // In theory this allows Blocks to change their faces without impacting the saved state of a world
         // First just set all 6 faces to the default for that block (its name for a png file)
+        // This can return null if there's no default texture for a block, is ok if everything is set below
+        // TODO: Might want to add some validation that all six sides have valid assignments at the end?
+        //println "Default image returns: " + _imageIndex.get(c.name)
         b.withTextureAtlasPos(new Vector2f(_imageIndex.get(c.name), 0))
 
         // Then look for each more specific assignment and overwrite defaults where needed
         if (c.block.faces.sides != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.sides + " for sides"
+            //println "Setting Block " + c.name + " to " + c.block.faces.sides + " for sides"
             b.withTextureAtlasPosMantle(new Vector2f(_imageIndex.get(c.block.faces.sides), 0))
         }
         if (c.block.faces.topbottom != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.topbottom + " for topbottom"
+            //println "Setting Block " + c.name + " to " + c.block.faces.topbottom + " for topbottom"
             b.withTextureAtlasPosTopBottom(new Vector2f(_imageIndex.get(c.block.faces.topbottom), 0))
         }
+        // Top, Bottom, Left, Right, Front, Back - probably a way to do that in a loop...
+        if (c.block.faces.top != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.top + " for top"
+            b.withTextureAtlasPos(Block.SIDE.TOP, new Vector2f(_imageIndex.get(c.block.faces.top), 0))
+        }
         if (c.block.faces.bottom != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.bottom + " for bottom"
+            //println "Setting Block " + c.name + " to " + c.block.faces.bottom + " for bottom"
             b.withTextureAtlasPos(Block.SIDE.BOTTOM, new Vector2f(_imageIndex.get(c.block.faces.bottom), 0))
         }
+        if (c.block.faces.left != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.left + " for left"
+            b.withTextureAtlasPos(Block.SIDE.LEFT, new Vector2f(_imageIndex.get(c.block.faces.left), 0))
+        }
+        if (c.block.faces.right != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.right + " for right"
+            b.withTextureAtlasPos(Block.SIDE.RIGHT, new Vector2f(_imageIndex.get(c.block.faces.right), 0))
+        }
+        if (c.block.faces.front != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.front + " for front"
+            b.withTextureAtlasPos(Block.SIDE.FRONT, new Vector2f(_imageIndex.get(c.block.faces.front), 0))
+        }
+        if (c.block.faces.back != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.back + " for back"
+            b.withTextureAtlasPos(Block.SIDE.BACK, new Vector2f(_imageIndex.get(c.block.faces.back), 0))
+        }
 
-        // top, bottom, left, right, front, back...
-
-        println b.getTextureAtlasPos()
-        
+        println "Faces are (L, R, T, B, F, B): " + b.getTextureAtlasPos()
     }
 
     /**
