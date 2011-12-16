@@ -20,7 +20,7 @@ block {
         bottom = "Dirt"         // Since we add all images to the same map we don't need to worry about dir levels
     }
 
-    // This one might be more interesting - what will it return as, an enum?
+    // Works as an Enum :-)
     colorsource = COLOR_SOURCE.COLOR_LUT
 
     // Plant stuff! Helps guide growth and if "evolve" is present a maxed plant may transform type

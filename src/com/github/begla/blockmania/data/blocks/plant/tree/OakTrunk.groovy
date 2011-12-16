@@ -13,8 +13,6 @@ block {
     // Graphics
     faces {
         sides = "OakBark"
-        top = "OakTrunk"
-        bottom = "OakTrunk"
     }
 
     // Plant characteristics. Trees only world-gen atm so they "rarely grow" on dirt and spring instantly to full size
@@ -34,7 +32,8 @@ block {
     tree {
         // Trees have leaves!
         leaves {
-            block = "OakLeaf"        // Reference to the block we use as leaves for this tree
+            block = "GreenLeaf"        // Reference to the block we use as leaves for this tree
+            // Since color offsets make other colors, maybe any one tree can have different colors?
         }
 
         // We could probably put L-system generation stats here per tree type?

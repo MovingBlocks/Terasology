@@ -21,7 +21,10 @@ import java.awt.image.BufferedImage
 import java.awt.Graphics
 import org.newdawn.slick.util.ResourceLoader
 import com.github.begla.blockmania.game.Blockmania
-import javax.vecmath.Vector2f;
+import javax.vecmath.Vector2f
+import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE
+import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
+import javax.vecmath.Vector4f;
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -37,11 +40,6 @@ class BlockManifestor {
 
     /** Holds image index values during the loading process. These values are persisted in the Manifest */
     protected static Map<String,Integer> _imageIndex = [:]
-
-    /** The path this Manifestor loads from */
-    protected getPath() {
-        return "com/github/begla/blockmania/data/blocks"
-    }
 
     /**
      * On game startup we need to load Block configuration regardless. Block IDs depend on existing or new world
@@ -68,12 +66,16 @@ class BlockManifestor {
         }
 
         // We always load the block definitions, the manifest IDs just may already exist if using a saved world
-        loadBlockDefinitions()
+        loadBlockDefinitions("com/github/begla/blockmania/data/blocks")
 
         // Load block definitions from Block sub-classes
-        new PlantBlockManifestor().loadBlockDefinitions()
+        new PlantBlockManifestor().loadBlockDefinitions("com/github/begla/blockmania/data/blocks/plant")
         // Trees
         // Liquids
+
+        // We can also re-use manifestors for sub dirs if we just put stuff there for a "human-friendly" grouping
+        loadBlockDefinitions("com/github/begla/blockmania/data/blocks/furniture")
+        new PlantBlockManifestor().loadBlockDefinitions("com/github/begla/blockmania/data/blocks/plant/leaf")
 
         // We do the same check once again - this time to see if we need to write the first-time block manifest
         if (true) {
@@ -90,9 +92,9 @@ class BlockManifestor {
      * Populates the stuff that groovy/blocks/Default.groovy used to load, with dynamic IDs
      * Is also used by sub-classes where BLOCK_PATH must be separately defined along with instantiateBlock
      */
-    public loadBlockDefinitions() {
+    public loadBlockDefinitions(String path) {
         // First identify what plain Block definitions we've got at the appropriate path and loop over what we get
-        getClassesAt(getPath()).each { c ->
+        getClassesAt(path).each { c ->
             //println ("Got back the following class: " + c)
 
             // Prepare to load properties from the Groovy definition via ConfigSlurper
@@ -166,7 +168,7 @@ class BlockManifestor {
         // Load Block details from Groovy, which may overwrite defaults from Block's Constructor
         println "Preparing block with name " + c.name
 
-        // Faces - note how these are _not_ persisted in the Manifest, instead the texture name index values are
+        // *** FACES - note how these are _not_ persisted in the Manifest, instead the texture name index values are
         // In theory this allows Blocks to change their faces without impacting the saved state of a world
         // First just set all 6 faces to the default for that block (its name for a png file)
         // This can return null if there's no default texture for a block, is ok if everything is set below
@@ -175,6 +177,10 @@ class BlockManifestor {
         b.withTextureAtlasPos(new Vector2f(_imageIndex.get(c.name), 0))
 
         // Then look for each more specific assignment and overwrite defaults where needed
+        if (c.block.faces.all != [:]) {
+            println "Setting Block " + c.name + " to texture " + c.block.faces.all + " for all"
+            b.withTextureAtlasPos(new Vector2f(_imageIndex.get(c.block.faces.all), 0))
+        }
         if (c.block.faces.sides != [:]) {
             //println "Setting Block " + c.name + " to " + c.block.faces.sides + " for sides"
             b.withTextureAtlasPosMantle(new Vector2f(_imageIndex.get(c.block.faces.sides), 0))
@@ -208,8 +214,76 @@ class BlockManifestor {
             //println "Setting Block " + c.name + " to " + c.block.faces.back + " for back"
             b.withTextureAtlasPos(Block.SIDE.BACK, new Vector2f(_imageIndex.get(c.block.faces.back), 0))
         }
-
         println "Faces are (L, R, T, B, F, B): " + b.getTextureAtlasPos()
+
+        // *** BLOCK_FORM and COLOR_SOURCE enums
+        if (c.block.blockform != [:]) {
+            //println "Setting BLOCK_FORM enum to: " + c.block.blockform
+            b.withBlockForm(c.block.blockform)
+        }
+        if (c.block.colorsource != [:]) {
+            //println "Setting COLOR_SOURCE enum to: " + c.block.colorsource
+            b.withColorSource(c.block.colorsource)
+        }
+        //println "Block has form " + b.getBlockForm() + ", and color source " + b.getColorSource()
+
+        // *** BOOLEANS - IntelliJ may warn about "null" about here but it works alright
+        // Casting to (boolean) removes the warning but is functionally unnecessary
+        if (c.block.translucent != [:]) {
+            //println "Setting translucent boolean to: " + c.block.translucent
+            b.withTranslucent(c.block.translucent)
+        }
+        if (c.block.invisible != [:]) {
+            //println "Setting invisible boolean to: " + c.block.invisible
+            b.withInvisible(c.block.invisible)
+        }
+       if (c.block.penetrable != [:]) {
+            //println "Setting penetrable boolean to: " + c.block.penetrable
+            b.withPenetrable(c.block.penetrable)
+        }
+       if (c.block.castsShadows != [:]) {
+            //println "Setting castsShadows boolean to: " + c.block.castsShadows
+            b.withCastsShadows(c.block.castsShadows)
+        }
+       if (c.block.disableTessellation != [:]) {
+            //println "Setting disableTessellation boolean to: " + c.block.disableTessellation
+            b.withDisableTessellation(c.block.disableTessellation)
+        }
+       if (c.block.renderBoundingBox != [:]) {
+            //println "Setting renderBoundingBox boolean to: " + c.block.renderBoundingBox
+            b.withRenderBoundingBox(c.block.renderBoundingBox)
+        }
+       if (c.block.allowBlockAttachment != [:]) {
+            //println "Setting allowBlockAttachment boolean to: " + c.block.allowBlockAttachment
+            b.withAllowBlockAttachment(c.block.allowBlockAttachment)
+        }
+       if (c.block.bypassSelectionRay != [:]) {
+            //println "Setting bypassSelectionRay boolean to: " + c.block.bypassSelectionRay
+            b.withBypassSelectionRay(c.block.bypassSelectionRay)
+        }
+        //TODO: Move liquid to LiquidBlock rather than a Block boolean? Tho might be nice to have all basics in Block
+       if (c.block.liquid != [:]) {
+            println "Setting liquid boolean to: " + c.block.liquid
+            b.withLiquid(c.block.liquid)
+        }
+
+        // *** MISC
+       if (c.block.luminance != [:]) {
+            //println "Setting luminance to: " + c.block.luminance
+            b.withLuminance((byte)c.block.luminance)
+        }
+       if (c.block.hardness != [:]) {
+            //println "Setting hardness to: " + c.block.hardness
+            b.withLuminance((byte)c.block.hardness)
+        }
+
+        // *** COLOR OFFSET (4 values) - this might need error handling
+       if (c.block.colorOffset != [:]) {
+            println "Setting colorOffset to: " + c.block.colorOffset + " (after making it a Vector4f)"
+            b.withColorOffset(new Vector4f(c.block.colorOffset[0], c.block.colorOffset[1], c.block.colorOffset[2], c.block.colorOffset[3]))
+           println "The Vector4f instantiated is" + b.getColorOffset()
+        }
+
     }
 
     /**

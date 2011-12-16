@@ -25,11 +25,6 @@ package com.github.begla.blockmania.blocks
  */
 class PlantBlockManifestor extends BlockManifestor {
 
-    // The path this Manifestor loads from
-    protected getPath() {
-        return "com/github/begla/blockmania/data/blocks/plant"
-    }
-
     /**
      * The Block class this Manifestor loads & prepares (so BlockManifestor.loadBlockDefinitions can be generic)
      * @return the instantiated and prepared class
