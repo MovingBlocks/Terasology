@@ -41,6 +41,12 @@ class BlockManifestor {
     /** Holds image index values during the loading process. These values are persisted in the Manifest */
     protected static Map<String,Integer> _imageIndex = [:]
 
+    /** Holds Block ID index values during the loading process - also persisted in the Manifest */
+    protected static Map<Byte,Block> _blockIndex = [:]
+
+    /** Holds the Byte value for the next Block ID */
+    protected static byte _nextByte = (byte) 0
+
     /**
      * On game startup we need to load Block configuration regardless. Block IDs depend on existing or new world
      * Later on this class could also review an existing world's version level and make any needed upgrades
@@ -77,6 +83,9 @@ class BlockManifestor {
         loadBlockDefinitions("com/github/begla/blockmania/data/blocks/furniture")
         new PlantBlockManifestor().loadBlockDefinitions("com/github/begla/blockmania/data/blocks/plant/leaf")
 
+        println "Done loading blocks - _nextByte made it to " + _nextByte
+        println "Final map that'll be passed to BlockManager is: " + _blockIndex
+        
         // We do the same check once again - this time to see if we need to write the first-time block manifest
         if (true) {
             // Saving a manifest includes splicing all available Block textures together into a new images
@@ -108,7 +117,12 @@ class BlockManifestor {
             // Optionally use the Class object we loaded to execute any custom Groovy scripting (rare?)
             // An example would be if the Block wants to be registered as a specific type (dirt, plant, mineral..)
 
-            // Add the finished Block to BlockManager (mockups below)
+            // Make up a dynamic ID and add the finished Block to BlockManager
+            // The local _blockIndex might be excessive? Could add directly. Temp var anyway.
+            b.withTitle(c.getSimpleName())
+            b.withId(_nextByte)
+            _blockIndex.put(_nextByte, b)
+            _nextByte++
             // BlockManager.addBlock(b) // This adds the instantiated class itself with all values set for game usage
             // if (!BlockManager.hasManifested(b)) {    // Check if we already loaded a manifest ID for the Block
                 // BlockManager.addBlockManifest(b, BlockManager.nextID)    // If not then create an ID for it

@@ -3,7 +3,7 @@ package com.github.begla.blockmania.data.blocks
 import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
 
 /**
- * Glass is all see-throughey and stuff
+ * Torches catch on fire and stuff. On purpose!
  */
 block {
     version = 1
