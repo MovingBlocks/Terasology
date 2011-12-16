@@ -20,7 +20,11 @@ import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import java.awt.Graphics
 import org.newdawn.slick.util.ResourceLoader
-import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.game.Blockmania
+import javax.vecmath.Vector2f
+import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE
+import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
+import javax.vecmath.Vector4f;
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -31,10 +35,17 @@ import com.github.begla.blockmania.game.Blockmania;
  */
 class BlockManifestor {
 
-    /** The path this Manifestor loads from */
-    protected getPath() {
-        return "com/github/begla/blockmania/data/blocks"
-    }
+    /** Holds BufferedImages during the loading process */
+    private Map<String,BufferedImage> _images = [:]
+
+    /** Holds image index values during the loading process. These values are persisted in the Manifest */
+    protected static Map<String,Integer> _imageIndex = [:]
+
+    /** Holds Block ID index values during the loading process - also persisted in the Manifest */
+    protected static Map<Byte,Block> _blockIndex = [:]
+
+    /** Holds the Byte value for the next Block ID */
+    protected static byte _nextByte = (byte) 0
 
     /**
      * On game startup we need to load Block configuration regardless. Block IDs depend on existing or new world
@@ -43,29 +54,42 @@ class BlockManifestor {
      */
     public loadConfig() {
 
-        Map<String,BufferedImage> images = [:]
         // See if we have an existing block manifest in a saved world
         if (false) {
-            // Load Block manifest IDs from the existing block manifest file
+            // Load values for _imageIndex from the Manifest
+            // Load stored BlockID byte values from the Manifest
         } else {
             // If we don't have a saved world we'll need to load raw block textures
-            images = getInternalImages("com/github/begla/blockmania/data/textures/blocks")
-            //images.flatten()
-            images.each { println it }
+            _images = getInternalImages("com/github/begla/blockmania/data/textures/blocks")
+
+            //println "Loaded fresh images - here's some logging!"
+            _images.eachWithIndex { key, value, index ->
+                //println "Image " + index + " is for " + key + " and looks like: " + value
+                _imageIndex.put(key, index)
+            }
+
+            println "The image index now looks like this: " + _imageIndex
         }
 
         // We always load the block definitions, the manifest IDs just may already exist if using a saved world
-        loadBlockDefinitions()
+        loadBlockDefinitions("com/github/begla/blockmania/data/blocks")
 
         // Load block definitions from Block sub-classes
-        new PlantBlockManifestor().loadBlockDefinitions()
+        new PlantBlockManifestor().loadBlockDefinitions("com/github/begla/blockmania/data/blocks/plant")
         // Trees
         // Liquids
 
+        // We can also re-use manifestors for sub dirs if we just put stuff there for a "human-friendly" grouping
+        loadBlockDefinitions("com/github/begla/blockmania/data/blocks/furniture")
+        new PlantBlockManifestor().loadBlockDefinitions("com/github/begla/blockmania/data/blocks/plant/leaf")
+
+        println "Done loading blocks - _nextByte made it to " + _nextByte
+        println "Final map that'll be passed to BlockManager is: " + _blockIndex
+        
         // We do the same check once again - this time to see if we need to write the first-time block manifest
         if (true) {
             // Saving a manifest includes splicing all available Block textures together into a new images
-            saveManifest(images)
+            saveManifest()
         }
 
         // Hacky hacky hack hack!
@@ -77,9 +101,9 @@ class BlockManifestor {
      * Populates the stuff that groovy/blocks/Default.groovy used to load, with dynamic IDs
      * Is also used by sub-classes where BLOCK_PATH must be separately defined along with instantiateBlock
      */
-    public loadBlockDefinitions() {
+    public loadBlockDefinitions(String path) {
         // First identify what plain Block definitions we've got at the appropriate path and loop over what we get
-        getClassesAt(getPath()).each { c ->
+        getClassesAt(path).each { c ->
             //println ("Got back the following class: " + c)
 
             // Prepare to load properties from the Groovy definition via ConfigSlurper
@@ -93,7 +117,12 @@ class BlockManifestor {
             // Optionally use the Class object we loaded to execute any custom Groovy scripting (rare?)
             // An example would be if the Block wants to be registered as a specific type (dirt, plant, mineral..)
 
-            // Add the finished Block to BlockManager (mockups below)
+            // Make up a dynamic ID and add the finished Block to BlockManager
+            // The local _blockIndex might be excessive? Could add directly. Temp var anyway.
+            b.withTitle(c.getSimpleName())
+            b.withId(_nextByte)
+            _blockIndex.put(_nextByte, b)
+            _nextByte++
             // BlockManager.addBlock(b) // This adds the instantiated class itself with all values set for game usage
             // if (!BlockManager.hasManifested(b)) {    // Check if we already loaded a manifest ID for the Block
                 // BlockManager.addBlockManifest(b, BlockManager.nextID)    // If not then create an ID for it
@@ -146,15 +175,129 @@ class BlockManifestor {
      * This method prepares an instantiated Block (or child class) with values loaded from its Groovy definition
      * This allows sub-type Manifestors to call super() to fill values relevant to whatever is one level up
      * @param b             The Block we're preparing with values loaded at this level
-     * @param blockConfig   The ConfigSlurper-produced props from the Groovy definition
+     * @param c             ConfigObject holding the ConfigSlurper-produced props from the Groovy definition
      * @return              The finished Block object we'll store in the BlockManager (returned via reference)
      */
-    protected prepareBlock(Block b, ConfigObject blockConfig) {
+    protected prepareBlock(Block b, ConfigObject c) {
         // Load Block details from Groovy, which may overwrite defaults from Block's Constructor
-        println "Preparing block with name " + blockConfig.name
+        println "Preparing block with name " + c.name
 
-        // Faces
-        
+        // *** FACES - note how these are _not_ persisted in the Manifest, instead the texture name index values are
+        // In theory this allows Blocks to change their faces without impacting the saved state of a world
+        // First just set all 6 faces to the default for that block (its name for a png file)
+        // This can return null if there's no default texture for a block, is ok if everything is set below
+        // TODO: Might want to add some validation that all six sides have valid assignments at the end?
+        //println "Default image returns: " + _imageIndex.get(c.name)
+        b.withTextureAtlasPos(new Vector2f(_imageIndex.get(c.name), 0))
+
+        // Then look for each more specific assignment and overwrite defaults where needed
+        if (c.block.faces.all != [:]) {
+            println "Setting Block " + c.name + " to texture " + c.block.faces.all + " for all"
+            b.withTextureAtlasPos(new Vector2f(_imageIndex.get(c.block.faces.all), 0))
+        }
+        if (c.block.faces.sides != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.sides + " for sides"
+            b.withTextureAtlasPosMantle(new Vector2f(_imageIndex.get(c.block.faces.sides), 0))
+        }
+        if (c.block.faces.topbottom != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.topbottom + " for topbottom"
+            b.withTextureAtlasPosTopBottom(new Vector2f(_imageIndex.get(c.block.faces.topbottom), 0))
+        }
+        // Top, Bottom, Left, Right, Front, Back - probably a way to do that in a loop...
+        if (c.block.faces.top != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.top + " for top"
+            b.withTextureAtlasPos(Block.SIDE.TOP, new Vector2f(_imageIndex.get(c.block.faces.top), 0))
+        }
+        if (c.block.faces.bottom != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.bottom + " for bottom"
+            b.withTextureAtlasPos(Block.SIDE.BOTTOM, new Vector2f(_imageIndex.get(c.block.faces.bottom), 0))
+        }
+        if (c.block.faces.left != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.left + " for left"
+            b.withTextureAtlasPos(Block.SIDE.LEFT, new Vector2f(_imageIndex.get(c.block.faces.left), 0))
+        }
+        if (c.block.faces.right != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.right + " for right"
+            b.withTextureAtlasPos(Block.SIDE.RIGHT, new Vector2f(_imageIndex.get(c.block.faces.right), 0))
+        }
+        if (c.block.faces.front != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.front + " for front"
+            b.withTextureAtlasPos(Block.SIDE.FRONT, new Vector2f(_imageIndex.get(c.block.faces.front), 0))
+        }
+        if (c.block.faces.back != [:]) {
+            //println "Setting Block " + c.name + " to " + c.block.faces.back + " for back"
+            b.withTextureAtlasPos(Block.SIDE.BACK, new Vector2f(_imageIndex.get(c.block.faces.back), 0))
+        }
+        println "Faces are (L, R, T, B, F, B): " + b.getTextureAtlasPos()
+
+        // *** BLOCK_FORM and COLOR_SOURCE enums
+        if (c.block.blockform != [:]) {
+            //println "Setting BLOCK_FORM enum to: " + c.block.blockform
+            b.withBlockForm(c.block.blockform)
+        }
+        if (c.block.colorsource != [:]) {
+            //println "Setting COLOR_SOURCE enum to: " + c.block.colorsource
+            b.withColorSource(c.block.colorsource)
+        }
+        //println "Block has form " + b.getBlockForm() + ", and color source " + b.getColorSource()
+
+        // *** BOOLEANS - IntelliJ may warn about "null" about here but it works alright
+        // Casting to (boolean) removes the warning but is functionally unnecessary
+        if (c.block.translucent != [:]) {
+            //println "Setting translucent boolean to: " + c.block.translucent
+            b.withTranslucent(c.block.translucent)
+        }
+        if (c.block.invisible != [:]) {
+            //println "Setting invisible boolean to: " + c.block.invisible
+            b.withInvisible(c.block.invisible)
+        }
+       if (c.block.penetrable != [:]) {
+            //println "Setting penetrable boolean to: " + c.block.penetrable
+            b.withPenetrable(c.block.penetrable)
+        }
+       if (c.block.castsShadows != [:]) {
+            //println "Setting castsShadows boolean to: " + c.block.castsShadows
+            b.withCastsShadows(c.block.castsShadows)
+        }
+       if (c.block.disableTessellation != [:]) {
+            //println "Setting disableTessellation boolean to: " + c.block.disableTessellation
+            b.withDisableTessellation(c.block.disableTessellation)
+        }
+       if (c.block.renderBoundingBox != [:]) {
+            //println "Setting renderBoundingBox boolean to: " + c.block.renderBoundingBox
+            b.withRenderBoundingBox(c.block.renderBoundingBox)
+        }
+       if (c.block.allowBlockAttachment != [:]) {
+            //println "Setting allowBlockAttachment boolean to: " + c.block.allowBlockAttachment
+            b.withAllowBlockAttachment(c.block.allowBlockAttachment)
+        }
+       if (c.block.bypassSelectionRay != [:]) {
+            //println "Setting bypassSelectionRay boolean to: " + c.block.bypassSelectionRay
+            b.withBypassSelectionRay(c.block.bypassSelectionRay)
+        }
+        //TODO: Move liquid to LiquidBlock rather than a Block boolean? Tho might be nice to have all basics in Block
+       if (c.block.liquid != [:]) {
+            println "Setting liquid boolean to: " + c.block.liquid
+            b.withLiquid(c.block.liquid)
+        }
+
+        // *** MISC
+       if (c.block.luminance != [:]) {
+            //println "Setting luminance to: " + c.block.luminance
+            b.withLuminance((byte)c.block.luminance)
+        }
+       if (c.block.hardness != [:]) {
+            //println "Setting hardness to: " + c.block.hardness
+            b.withLuminance((byte)c.block.hardness)
+        }
+
+        // *** COLOR OFFSET (4 values) - this might need error handling
+       if (c.block.colorOffset != [:]) {
+            println "Setting colorOffset to: " + c.block.colorOffset + " (after making it a Vector4f)"
+            b.withColorOffset(new Vector4f(c.block.colorOffset[0], c.block.colorOffset[1], c.block.colorOffset[2], c.block.colorOffset[3]))
+           println "The Vector4f instantiated is" + b.getColorOffset()
+        }
+
     }
 
     /**
@@ -191,7 +334,7 @@ class BlockManifestor {
      *  we save the manifest needed to reload the world in a file in the save dir
      *  We also dynamically create a terrain.png to go with the manifest out of all the block textures in order
      */
-    public saveManifest(Map<String,BufferedImage> images) {
+    public saveManifest() {
 
         // The manifest can be written out purely using plain Block classes, ignoring any potential subtypes
         // All the manifest and terrain.png needs to know is the ID and textures from faces (a Block feature)
@@ -206,14 +349,14 @@ class BlockManifestor {
 
         // Loop through loaded classes and figure out width + height (or just use width only)
 
-        int width = images.size() * 16
-        println "We've got " + images.size() + " images total, so the width of the final image will be " + width
+        int width = _images.size() * 16
+        println "We've got " + _images.size() + " images total, so the width of the final image will be " + width
         int x = 0
 
         BufferedImage result = new BufferedImage(width, 16, BufferedImage.TYPE_INT_RGB)
         Graphics g = result.getGraphics()
 
-        images.each {
+        _images.each {
             g.drawImage(it.value, x, 0, null)
             x += 16
         }

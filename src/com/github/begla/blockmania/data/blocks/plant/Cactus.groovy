@@ -7,6 +7,7 @@ package com.github.begla.blockmania.data.blocks.plant
 block {
     version=1
     faces {
-        topbottom = "CactusTopBottom" // Top + Bottom in a single prop - might be goofy
+        top = "CactusTop"
+        bottom = "CactusBottom"
     }
 }

@@ -14,13 +14,13 @@ block {
 
     // Graphics
     faces {                     // "faces" being present means we'll override some with a different graphic
-        // top = "Grass"        // This one is not needed as it is the default (image matching own name)
-        bottom = "Dirt"         // NOTE: This image is actually at ../Dirt from the Plant texture dir...
         sides = "DirtGrass"     // sides means all four (not top/bottom) and can itself be overridden
         // left = DirtierGrass  // Example of how you could make one side differ without writing all 4
+        // top = "Grass"        // This one is not needed as it is the default (image matching own name)
+        bottom = "Dirt"         // Since we add all images to the same map we don't need to worry about dir levels
     }
 
-    // This one might be more interesting - what will it return as, an enum?
+    // Works as an Enum :-)
     colorsource = COLOR_SOURCE.COLOR_LUT
 
     // Plant stuff! Helps guide growth and if "evolve" is present a maxed plant may transform type

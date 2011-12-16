@@ -504,4 +504,8 @@ public class Block implements RenderableObject {
     public static AABB AABBForBlockAt(int x, int y, int z) {
         return new AABB(new Vector3f(x, y, z), new Vector3f(0.5f, 0.5f, 0.5f));
     }
+
+    public String toString() {
+        return this.getClass().getSimpleName() + ":" + _title + ";id:" + _id;
+    }
 }
