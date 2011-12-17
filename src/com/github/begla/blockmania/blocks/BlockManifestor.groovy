@@ -32,7 +32,7 @@ import javax.vecmath.Vector4f;
  */
 class BlockManifestor {
 
-    /** Holds BufferedImages during the loading process */
+    /** Holds BufferedImages during the loading process (not persisted) */
     private Map<String,BufferedImage> _images = [:]
 
     /** Holds image index values during the loading process. These values are persisted in the Manifest */
@@ -41,29 +41,30 @@ class BlockManifestor {
     /** Holds Block ID index values during the loading process - also persisted in the Manifest */
     protected static Map<Byte,Block> _blockIndex = [:]
 
-    /** Smaller version of _blockIndex only used for loading */
-    protected static Map<Byte,String> _blockStringIndex = [:]
+    /** Smaller version of _blockIndex only used for loading IDs */
+    protected static Map<String, Byte> _blockStringIndex = [:]
 
-    /** Holds the Byte value for the next Block ID */
+    /** Holds the Byte value for the next Block ID - persisted but not sure if needed */
     protected static byte _nextByte = (byte) 0
 
-    /** Temp Manifest references */
-    File _blockManifest = new File('BlockManifest.groovy')
-    File _imageManifest = new File('ImageManifest.png')
+    /** Temp Manifest references - need to tie these to each saved world instead (or fail to find any, then create) */
+    File _blockManifest = new File('SAVED_WORLDS/BlockManifest.groovy')
+    File _imageManifest = new File('SAVED_WORLDS/ImageManifest.png')
 
     /**
-     * On game startup we need to load Block configuration regardless. Block IDs depend on existing or new world
+     * On game startup we need to load Block configuration. Exact Block IDs depend on existing or new world
      * Later on this class could also review an existing world's version level and make any needed upgrades
      * (the "version" prop is in all the files as an example, but a complete system would take some work)
      */
     public loadConfig() {
+        boolean worldExists = _blockManifest.exists() && _imageManifest.exists()
 
-        // See if we have an existing block manifest in a saved world
-        if (_blockManifest.exists() && _imageManifest.exists() && false) {
-            // Load values for _imageIndex from the Manifest
-            // Load stored BlockID byte values from the Manifest
+        // Check if we've got a manifest - later this would base on / trigger when user selects world load / create (GUI)
+        if (worldExists) {
+            loadManifest()
+            // Load the ImageManifest into TextureManager as the "terrain" reference of old
         } else {
-            // If we don't have a saved world we'll need to load raw block textures
+            // If we don't have a saved world we'll need to build a new ImageManifest from raw block textures
             _images = getInternalImages("com/github/begla/blockmania/data/textures/blocks")
 
             //println "Loaded fresh images - here's some logging!"
@@ -72,10 +73,10 @@ class BlockManifestor {
                 _imageIndex.put(key, index)
             }
 
-            println "The image index now looks like this: " + _imageIndex
+            println "The image index (ImageManifest not yet saved) now looks like this: " + _imageIndex
         }
 
-        // We always load the block definitions, the manifest IDs just may already exist if using a saved world
+        // We always load the block definitions, the block IDs just may already exist in the manifest if using a saved world
         loadBlockDefinitions("com/github/begla/blockmania/data/blocks")
 
         // Load block definitions from Block sub-classes
@@ -87,14 +88,14 @@ class BlockManifestor {
         loadBlockDefinitions("com/github/begla/blockmania/data/blocks/furniture")
         new PlantBlockManifestor().loadBlockDefinitions("com/github/begla/blockmania/data/blocks/plant/leaf")
 
+        // _nextByte may not make sense if we're loading a world - until it is possible to upgrade / add stuff anyway
         println "Done loading blocks - _nextByte made it to " + _nextByte
         println "Final map that'll be passed to BlockManager is: " + _blockIndex
         
-        // We do the same check once again - this time to see if we need to write the first-time block manifest
-        if (true) {
+        // We do the same check once again - this time to see if we need to write the first-time manifest
+        if (!worldExists) {
             // Saving a manifest includes splicing all available Block textures together into a new images
             saveManifest()
-            loadManifest()
         }
 
         // Hacky hacky hack hack!
@@ -122,13 +123,21 @@ class BlockManifestor {
             // Optionally use the Class object we loaded to execute any custom Groovy scripting (rare?)
             // An example would be if the Block wants to be registered as a specific type (dirt, plant, mineral..)
 
-            // Make up a dynamic ID and add the finished Block to BlockManager
-            // The local _blockIndex might be excessive? Could add directly. Temp var anyway.
+            // Make up or load a dynamic ID and add the finished Block to our local block index (prep for BlockManager)
             b.withTitle(c.getSimpleName())
-            b.withId(_nextByte)
-            _blockIndex.put(_nextByte, b)
-            _blockStringIndex.put(_nextByte, b.getTitle())
-            _nextByte++
+            // See if have an ID for this block already (we should if we loaded an existing manifest)
+            if (_blockStringIndex.containsKey(b.getTitle())) {
+                println "Found an existing block ID value, assigning it to Block " + b.getTitle()
+                b.withId((byte)_blockStringIndex.get(b.getTitle()))
+            } else {
+                println "We don't have an existing ID for " + b.getTitle() + " so assigning _nextByte " + _nextByte
+                b.withId(_nextByte)
+                _blockStringIndex.put(b.getTitle(), _nextByte)
+                _nextByte++
+            }
+
+            _blockIndex.put(b.getId(), b)
+
             // BlockManager.addBlock(b) // This adds the instantiated class itself with all values set for game usage
             // if (!BlockManager.hasManifested(b)) {    // Check if we already loaded a manifest ID for the Block
                 // BlockManager.addBlockManifest(b, BlockManager.nextID)    // If not then create an ID for it
@@ -360,6 +369,7 @@ class BlockManifestor {
 
         // Later need to use Blockmania.getInstance().getActiveWorldProvider().getWorldSavePath() or something
         println "Saving merged Block texture file to " + _imageManifest.absolutePath
+        _imageManifest.mkdirs()
         ImageIO.write(result,"png",_imageManifest)
 
         // Save the BlockManifest - again we use the spiffy power of ConfigObject / ConfigSlurper
@@ -375,14 +385,18 @@ class BlockManifestor {
         }
     }
 
+    /**
+     * Loads an existing World Manifest from a save directory into instance variables
+     */
     private loadManifest() {
         def manifest = new ConfigSlurper().parse(_blockManifest.toURL())
-        Map<String,Integer> testImageIndex = manifest.imageIndex
-        Map<Byte,String> testBlockStringIndex = manifest.blockIndex
-        byte testNextByte = manifest.nextByte
 
-        println "LOADED imageIndex: " + testImageIndex
-        println "LOADED blockIndex: " + testBlockStringIndex
-        println "LOADED nextByte: " + testNextByte
+        _imageIndex = manifest.imageIndex
+        _blockStringIndex = manifest.blockIndex
+        _nextByte = manifest.nextByte
+
+        println "LOADED imageIndex: " + _imageIndex
+        println "LOADED blockIndex: " + _blockStringIndex
+        println "LOADED nextByte: " + _nextByte
     }
 }
