@@ -41,8 +41,15 @@ class BlockManifestor {
     /** Holds Block ID index values during the loading process - also persisted in the Manifest */
     protected static Map<Byte,Block> _blockIndex = [:]
 
+    /** Smaller version of _blockIndex only used for loading */
+    protected static Map<Byte,String> _blockStringIndex = [:]
+
     /** Holds the Byte value for the next Block ID */
     protected static byte _nextByte = (byte) 0
+
+    /** Temp Manifest references */
+    File _blockManifest = new File('BlockManifest.groovy')
+    File _imageManifest = new File('ImageManifest.png')
 
     /**
      * On game startup we need to load Block configuration regardless. Block IDs depend on existing or new world
@@ -52,7 +59,7 @@ class BlockManifestor {
     public loadConfig() {
 
         // See if we have an existing block manifest in a saved world
-        if (false) {
+        if (_blockManifest.exists() && _imageManifest.exists() && false) {
             // Load values for _imageIndex from the Manifest
             // Load stored BlockID byte values from the Manifest
         } else {
@@ -120,6 +127,7 @@ class BlockManifestor {
             b.withTitle(c.getSimpleName())
             b.withId(_nextByte)
             _blockIndex.put(_nextByte, b)
+            _blockStringIndex.put(_nextByte, b.getTitle())
             _nextByte++
             // BlockManager.addBlock(b) // This adds the instantiated class itself with all values set for game usage
             // if (!BlockManager.hasManifested(b)) {    // Check if we already loaded a manifest ID for the Block
@@ -328,23 +336,20 @@ class BlockManifestor {
     }
 
     /**
-     *  After all the block data and such has been loaded into class objects and the assorted Collections,
-     *  we save the manifest needed to reload the world in a file in the save dir
-     *  We also dynamically create a terrain.png to go with the manifest out of all the block textures in order
+     * For a new world we'll need to store block and image information in "Manifest" files to go with the world save
+     * At some point maybe it will be possible to update a stored manifest as well (world update / new blocks)
+     * If an existing world is being loaded instead we shouldn't need to save anything
      */
     public saveManifest() {
 
-        // The manifest can be written out purely using plain Block classes, ignoring any potential subtypes
-        // All the manifest and terrain.png needs to know is the ID and textures from faces (a Block feature)
-
         //String s = Blockmania.getInstance().getActiveWorldProvider().getWorldSavePath() + "/BlockManifest.groovy"
 
-        // Loop through loaded classes and figure out width + height (or just use width only)
-
+        // Currently the image manifest is simply 16 pixels high and as wide as we have textures
         int width = _images.size() * 16
         println "We've got " + _images.size() + " images total, so the width of the final block manifest image will be " + width
         int x = 0
 
+        // Do we need a different type to be able to get transparency right?
         BufferedImage result = new BufferedImage(width, 16, BufferedImage.TYPE_INT_RGB)
         Graphics g = result.getGraphics()
 
@@ -353,37 +358,31 @@ class BlockManifestor {
             x += 16
         }
 
-        //String pngSave = Blockmania.getInstance().getActiveWorldProvider().getWorldSavePath() + "/terrain.png"
-        File pngSave = new File("terrain.png")
-        println "Saving merged Block texture file to " + pngSave.absolutePath
-        ImageIO.write(result,"png",pngSave)
+        // Later need to use Blockmania.getInstance().getActiveWorldProvider().getWorldSavePath() or something
+        println "Saving merged Block texture file to " + _imageManifest.absolutePath
+        ImageIO.write(result,"png",_imageManifest)
 
-        // Save the BlockManifest with spiffy Groovy. ' instead of " to force normal Strings, not GStrings
-        File manifestFile = new File("BlockManifest.txt")
-        println "Saving block IDs and image atlas (index) positions to " + manifestFile.absolutePath
-        manifestFile.withWriter{ writer ->
-            writer << '# Warning: Editing this file may do crazy things to your saved world!\r\n'
-            _blockIndex.each {
-                writer << it.key + ':' + it.value.getTitle() + ','
-            }
-            writer << '\r\n'
-            _imageIndex.each {
-                writer << it.key + ':' + it.value + ','
-            }
-            writer << '\r\n'
-            writer << _nextByte + '\r\n'
+        // Save the BlockManifest - again we use the spiffy power of ConfigObject / ConfigSlurper
+        def manifest = new ConfigObject()
+        manifest.blockIndex = _blockStringIndex
+        manifest.imageIndex = _imageIndex
+        manifest.nextByte = _nextByte
+
+        println "Saving block IDs and image atlas (index) positions to " + _blockManifest.absolutePath
+        _blockManifest.withWriter{ writer ->
+            writer << '// Warning: Editing this file may do crazy things to your saved world!\r\n'
+            manifest.writeTo( writer )
         }
     }
 
     private loadManifest() {
-        File manifestFile = new File("BlockManifest.txt")
-        manifestFile.eachLine { line ->
-            // If the line started with # then ignore it as a comment
-            if(line =~ /^#/) {
-                println "Ignoring comment: " + line
-            } else {
-                println line
-            }
-        }
+        def manifest = new ConfigSlurper().parse(_blockManifest.toURL())
+        Map<String,Integer> testImageIndex = manifest.imageIndex
+        Map<Byte,String> testBlockStringIndex = manifest.blockIndex
+        byte testNextByte = manifest.nextByte
+
+        println "LOADED imageIndex: " + testImageIndex
+        println "LOADED blockIndex: " + testBlockStringIndex
+        println "LOADED nextByte: " + testNextByte
     }
 }
