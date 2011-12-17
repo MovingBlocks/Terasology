@@ -109,14 +109,14 @@ Player {
     maxGravity = 1.0d
     maxGravitySwimming = 0.01d
 
-    gravity = 0.006d
+    gravity = 0.008d
     gravitySwimming = gravity * 2d;
 
     friction = 0.08d
 
     walkingSpeed = 0.03d
     runningFactor = 1.8d
-    jumpIntensity = 0.125d
+    jumpIntensity = 0.14d
 
 }
 
