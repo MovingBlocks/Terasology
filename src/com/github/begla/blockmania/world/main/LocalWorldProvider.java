@@ -26,6 +26,8 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.LocalChunkCache;
 import com.github.begla.blockmania.world.interfaces.ChunkProvider;
 import com.github.begla.blockmania.world.interfaces.WorldProvider;
+import com.github.begla.blockmania.world.simulators.GrowthSimulator;
+import com.github.begla.blockmania.world.simulators.LiquidSimulator;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -62,6 +64,10 @@ public class LocalWorldProvider implements WorldProvider {
     protected long _creationTime = Blockmania.getInstance().getTime() - (Long) ConfigurationManager.getInstance().getConfig().get("World.initialTimeOffsetInMs");
     public Vector3f _renderingReferencePoint = new Vector3f();
 
+        /* SIMULATORS */
+    private final LiquidSimulator _liquidSimulator;
+    private final GrowthSimulator _growthSimulator;
+
     /* RANDOMNESS */
     protected final FastRandom _random;
 
@@ -96,6 +102,9 @@ public class LocalWorldProvider implements WorldProvider {
 
         _generatorManager = new GeneratorManager(this);
         _chunkProvider = new LocalChunkCache(this);
+
+        _liquidSimulator = new LiquidSimulator(this);
+        _growthSimulator = new GrowthSimulator(this);
     }
 
     /**
@@ -366,6 +375,14 @@ public class LocalWorldProvider implements WorldProvider {
 
     public GeneratorManager getGeneratorManager() {
         return _generatorManager;
+    }
+
+    public LiquidSimulator getLiquidSimulator() {
+        return _liquidSimulator;
+    }
+
+    public GrowthSimulator getGrowthSimulator() {
+        return _growthSimulator;
     }
 
     public FastRandom getRandom() {

@@ -88,10 +88,6 @@ public final class WorldRenderer implements RenderableObject {
     /* HORIZON */
     private final Skysphere _skysphere;
 
-    /* SIMULATORS */
-    private final LiquidSimulator _liquidSimulator;
-    private final GrowthSimulator _growthSimulator;
-
     /* WATER AND LAVA ANIMATION */
     private int _tick = 0;
     private int _tickTock = 0;
@@ -132,9 +128,6 @@ public final class WorldRenderer implements RenderableObject {
         _mobManager = new MobManager(this);
         _blockGrid = new BlockGrid(this);
         _bulletPhysicsRenderer = new BulletPhysicsRenderer(this);
-
-        _liquidSimulator = new LiquidSimulator(_worldProvider);
-        _growthSimulator = new GrowthSimulator(_worldProvider);
 
         initTimeEvents();
     }
@@ -470,8 +463,8 @@ public final class WorldRenderer implements RenderableObject {
     }
 
     private void simulate() {
-        _liquidSimulator.simulate();
-        _growthSimulator.simulate();
+        _worldProvider.getLiquidSimulator().simulate();
+        _worldProvider.getGrowthSimulator().simulate();
     }
 
     /**
@@ -543,15 +536,15 @@ public final class WorldRenderer implements RenderableObject {
         if (_player != null) {
             _player.unregisterObserver(_chunkUpdateManager);
             _player.unregisterObserver(_bulletPhysicsRenderer);
-            _player.unregisterObserver(_liquidSimulator);
-            _player.unregisterObserver(_growthSimulator);
+            _player.unregisterObserver(_worldProvider.getGrowthSimulator());
+            _player.unregisterObserver(_worldProvider.getLiquidSimulator());
         }
 
         _player = p;
         _player.registerObserver(_chunkUpdateManager);
         _player.registerObserver(_bulletPhysicsRenderer);
-        _player.registerObserver(_liquidSimulator);
-        _player.registerObserver(_growthSimulator);
+        _player.registerObserver(_worldProvider.getGrowthSimulator());
+        _player.registerObserver(_worldProvider.getLiquidSimulator());
 
         _worldProvider.setRenderingReferencePoint(_player.getPosition());
 

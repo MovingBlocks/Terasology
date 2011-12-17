@@ -19,6 +19,8 @@ import com.github.begla.blockmania.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.generators.GeneratorManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.world.chunk.Chunk;
+import com.github.begla.blockmania.world.simulators.GrowthSimulator;
+import com.github.begla.blockmania.world.simulators.LiquidSimulator;
 
 import javax.vecmath.Vector3f;
 
@@ -179,6 +181,20 @@ public interface WorldProvider {
      * @return The generator manager
      */
     public GeneratorManager getGeneratorManager();
+
+    /**
+     * Returns the liquid simulator.
+     *
+     * @return The liquid simulator
+     */
+    public LiquidSimulator getLiquidSimulator();
+
+    /**
+     * Returns the growth simulator.
+     *
+     * @return The growth simulator
+     */
+    public GrowthSimulator getGrowthSimulator();
 
     /**
      * Returns a new random spawning point.
