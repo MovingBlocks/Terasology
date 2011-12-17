@@ -93,7 +93,7 @@ public final class GelatinousCube extends Character {
         glCallList(_displayListOuterBody);
         glPopMatrix();
 
-        //glDisable(GL_BLEND);
+        glDisable(GL_BLEND);
 
         ShaderManager.getInstance().enableShader(null);
 

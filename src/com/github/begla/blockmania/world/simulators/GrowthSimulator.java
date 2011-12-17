@@ -90,7 +90,7 @@ public class GrowthSimulator extends Simulator {
         }
 
         for (int i = 0; i < 6; i++) {
-            BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].x, pos.z + (int) NEIGHBORS6[i].z);
+            BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].y, pos.z + (int) NEIGHBORS6[i].z);
 
             if (_parent.getBlock(nBp.x, nBp.y, nBp.z) == DIRT_TYPE) {
                 addActiveBlock(nBp);
@@ -100,7 +100,7 @@ public class GrowthSimulator extends Simulator {
 
     public void blockRemoved(Chunk chunk, BlockPosition pos) {
         for (int i = 0; i < 6; i++) {
-            BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].x, pos.z + (int) NEIGHBORS6[i].z);
+            BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].y, pos.z + (int) NEIGHBORS6[i].z);
 
             if (_parent.getBlock(nBp.x, nBp.y, nBp.z) == DIRT_TYPE) {
                 addActiveBlock(nBp);
