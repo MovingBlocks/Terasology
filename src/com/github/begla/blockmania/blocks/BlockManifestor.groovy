@@ -20,10 +20,7 @@ import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import java.awt.Graphics
 import org.newdawn.slick.util.ResourceLoader
-import com.github.begla.blockmania.game.Blockmania
 import javax.vecmath.Vector2f
-import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE
-import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
 import javax.vecmath.Vector4f;
 
 /**
@@ -90,6 +87,7 @@ class BlockManifestor {
         if (true) {
             // Saving a manifest includes splicing all available Block textures together into a new images
             saveManifest()
+            loadManifest()
         }
 
         // Hacky hacky hack hack!
@@ -230,7 +228,7 @@ class BlockManifestor {
         }
         println "Faces are (L, R, T, B, F, B): " + b.getTextureAtlasPos()
 
-        // *** BLOCK_FORM and COLOR_SOURCE enums
+        // *** BLOCK_FORM and COLOR_SOURCE enums (defined explicitly in block definition, not needed here)
         if (c.block.blockform != [:]) {
             //println "Setting BLOCK_FORM enum to: " + c.block.blockform
             b.withBlockForm(c.block.blockform)
@@ -245,40 +243,40 @@ class BlockManifestor {
         // Casting to (boolean) removes the warning but is functionally unnecessary
         if (c.block.translucent != [:]) {
             //println "Setting translucent boolean to: " + c.block.translucent
-            b.withTranslucent(c.block.translucent)
+            b.withTranslucent((boolean)c.block.translucent)
         }
         if (c.block.invisible != [:]) {
             //println "Setting invisible boolean to: " + c.block.invisible
-            b.withInvisible(c.block.invisible)
+            b.withInvisible((boolean)c.block.invisible)
         }
        if (c.block.penetrable != [:]) {
             //println "Setting penetrable boolean to: " + c.block.penetrable
-            b.withPenetrable(c.block.penetrable)
+            b.withPenetrable((boolean)c.block.penetrable)
         }
        if (c.block.castsShadows != [:]) {
             //println "Setting castsShadows boolean to: " + c.block.castsShadows
-            b.withCastsShadows(c.block.castsShadows)
+            b.withCastsShadows((boolean)c.block.castsShadows)
         }
        if (c.block.disableTessellation != [:]) {
             //println "Setting disableTessellation boolean to: " + c.block.disableTessellation
-            b.withDisableTessellation(c.block.disableTessellation)
+            b.withDisableTessellation((boolean)c.block.disableTessellation)
         }
        if (c.block.renderBoundingBox != [:]) {
             //println "Setting renderBoundingBox boolean to: " + c.block.renderBoundingBox
-            b.withRenderBoundingBox(c.block.renderBoundingBox)
+            b.withRenderBoundingBox((boolean)c.block.renderBoundingBox)
         }
        if (c.block.allowBlockAttachment != [:]) {
             //println "Setting allowBlockAttachment boolean to: " + c.block.allowBlockAttachment
-            b.withAllowBlockAttachment(c.block.allowBlockAttachment)
+            b.withAllowBlockAttachment((boolean)c.block.allowBlockAttachment)
         }
        if (c.block.bypassSelectionRay != [:]) {
             //println "Setting bypassSelectionRay boolean to: " + c.block.bypassSelectionRay
-            b.withBypassSelectionRay(c.block.bypassSelectionRay)
+            b.withBypassSelectionRay((boolean)c.block.bypassSelectionRay)
         }
         //TODO: Move liquid to LiquidBlock rather than a Block boolean? Tho might be nice to have all basics in Block
        if (c.block.liquid != [:]) {
             println "Setting liquid boolean to: " + c.block.liquid
-            b.withLiquid(c.block.liquid)
+            b.withLiquid((boolean)c.block.liquid)
         }
 
         // *** MISC
@@ -294,7 +292,7 @@ class BlockManifestor {
         // *** COLOR OFFSET (4 values) - this might need error handling
        if (c.block.colorOffset != [:]) {
             println "Setting colorOffset to: " + c.block.colorOffset + " (after making it a Vector4f)"
-            b.withColorOffset(new Vector4f(c.block.colorOffset[0], c.block.colorOffset[1], c.block.colorOffset[2], c.block.colorOffset[3]))
+            b.withColorOffset(new Vector4f((float)c.block.colorOffset[0], (float)c.block.colorOffset[1], (float)c.block.colorOffset[2], (float)c.block.colorOffset[3]))
            println "The Vector4f instantiated is" + b.getColorOffset()
         }
 
@@ -339,18 +337,12 @@ class BlockManifestor {
         // The manifest can be written out purely using plain Block classes, ignoring any potential subtypes
         // All the manifest and terrain.png needs to know is the ID and textures from faces (a Block feature)
 
-        /*String s = Blockmania.getInstance().getActiveWorldProvider().getWorldSavePath() + "/BlockManifest.groovy"
-        println "Manifest string is " + s
-        File f = new File(s)
-        f.withWriter { writer ->
-            // loop through everything, look up block images and build terrain.png, save config stuff
-        }*/
-        // Save the final terrain.png
+        //String s = Blockmania.getInstance().getActiveWorldProvider().getWorldSavePath() + "/BlockManifest.groovy"
 
         // Loop through loaded classes and figure out width + height (or just use width only)
 
         int width = _images.size() * 16
-        println "We've got " + _images.size() + " images total, so the width of the final image will be " + width
+        println "We've got " + _images.size() + " images total, so the width of the final block manifest image will be " + width
         int x = 0
 
         BufferedImage result = new BufferedImage(width, 16, BufferedImage.TYPE_INT_RGB)
@@ -366,6 +358,32 @@ class BlockManifestor {
         println "Saving merged Block texture file to " + pngSave.absolutePath
         ImageIO.write(result,"png",pngSave)
 
+        // Save the BlockManifest with spiffy Groovy. ' instead of " to force normal Strings, not GStrings
+        File manifestFile = new File("BlockManifest.txt")
+        println "Saving block IDs and image atlas (index) positions to " + manifestFile.absolutePath
+        manifestFile.withWriter{ writer ->
+            writer << '# Warning: Editing this file may do crazy things to your saved world!\r\n'
+            _blockIndex.each {
+                writer << it.key + ':' + it.value.getTitle() + ','
+            }
+            writer << '\r\n'
+            _imageIndex.each {
+                writer << it.key + ':' + it.value + ','
+            }
+            writer << '\r\n'
+            writer << _nextByte + '\r\n'
+        }
     }
-    
+
+    private loadManifest() {
+        File manifestFile = new File("BlockManifest.txt")
+        manifestFile.eachLine { line ->
+            // If the line started with # then ignore it as a comment
+            if(line =~ /^#/) {
+                println "Ignoring comment: " + line
+            } else {
+                println line
+            }
+        }
+    }
 }
