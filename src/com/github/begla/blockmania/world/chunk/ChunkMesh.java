@@ -150,7 +150,6 @@ public class ChunkMesh {
                 break;
             case BILLBOARD_AND_TRANSLUCENT:
                 renderVbo(1);
-
                 // BILLBOARDS
                 glDisable(GL_CULL_FACE);
                 renderVbo(2);

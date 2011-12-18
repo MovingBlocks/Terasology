@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.world.simulators;
 
+import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.world.chunk.Chunk;
@@ -77,7 +78,7 @@ public class LiquidSimulator extends Simulator {
 
             _parent.setState(bp.x, bp.y, bp.z, state);
 
-            if (typeBelow == 0x0) {
+            if ((typeBelow == 0 || BlockManager.getInstance().getBlock(typeBelow).getBlockForm() == Block.BLOCK_FORM.BILLBOARD)) {
                 _parent.setBlock(bpd.x, bpd.y, bpd.z, type, true, true);
                 _parent.setState(bpd.x, bpd.y, bpd.z, (byte) 1);
                 addActiveBlock(bpd);
@@ -85,15 +86,16 @@ public class LiquidSimulator extends Simulator {
             }
 
             if (state > 7) {
-                _parent.setBlock(bpd.x, bpd.y, bpd.z, (byte) 0, true, true);
-                _parent.setState(bpd.x, bpd.y, bpd.z, (byte) 0);
+                _parent.setBlock(bp.x, bp.y, bp.z, (byte) 0, true, true);
+                _parent.setState(bp.x, bp.y, bp.z, (byte) 0);
                 continue;
             }
 
             for (int k = 0; k < 4; k++) {
                 BlockPosition nBp = new BlockPosition((int) NEIGHBORS4[k].x + bp.x, bp.y, (int) NEIGHBORS4[k].z + bp.z);
+                byte nBpType = _parent.getBlock(nBp.x, nBp.y, nBp.z);
 
-                if (_parent.getBlock(nBp.x, nBp.y, nBp.z) == 0 && _parent.getBlock(nBp.x, nBp.y - 1, nBp.z) != type) {
+                if ((nBpType == 0 || BlockManager.getInstance().getBlock(nBpType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) && _parent.getBlock(nBp.x, nBp.y - 1, nBp.z) != type) {
                     _parent.setBlock(nBp.x, nBp.y, nBp.z, type, true, true);
                     _parent.setState(nBp.x, nBp.y, nBp.z, (byte) (state + 1));
                     addActiveBlock(nBp);

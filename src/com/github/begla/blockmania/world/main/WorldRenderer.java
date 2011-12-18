@@ -463,8 +463,8 @@ public final class WorldRenderer implements RenderableObject {
     }
 
     private void simulate() {
-        _worldProvider.getLiquidSimulator().simulate();
-        _worldProvider.getGrowthSimulator().simulate();
+        _worldProvider.getLiquidSimulator().simulate(false);
+        _worldProvider.getGrowthSimulator().simulate(false);
     }
 
     /**

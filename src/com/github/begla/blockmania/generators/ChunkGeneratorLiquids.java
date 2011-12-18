@@ -18,9 +18,11 @@ package com.github.begla.blockmania.generators;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
 import com.github.begla.blockmania.world.chunk.Chunk;
+import com.github.begla.blockmania.world.simulators.LiquidSimulator;
 
 /**
- * First draft to generate procedurally generated liquid streams.
+ * First draft to generate procedurally generated liquid streams. The source blocks are currently
+ * determined arbitrarily – but this can be extended very easily.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -32,7 +34,10 @@ public class ChunkGeneratorLiquids extends ChunkGeneratorTerrain {
 
     @Override
     public void generate(Chunk c) {
-        if (_parent.getParent().getRandom().randomDouble() > 0.75) {
+        if (_parent.getParent().getRandom().randomDouble() > 0.95) {
+
+            LiquidSimulator liquidSimulator = new LiquidSimulator(_parent.getParent());
+
             for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 0; y--) {
                 String title = BlockManager.getInstance().getBlock(c.getBlock(8, y, 8)).getTitle();
 
@@ -43,7 +48,12 @@ public class ChunkGeneratorLiquids extends ChunkGeneratorTerrain {
                     else
                         c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Water").getId());
 
-                    _parent.getParent().getLiquidSimulator().addActiveBlock(new BlockPosition(c.getBlockWorldPosX(8), y, c.getBlockWorldPosZ(8)));
+                    liquidSimulator.addActiveBlock(new BlockPosition(c.getBlockWorldPosX(8), y, c.getBlockWorldPosZ(8)));
+
+                    for (int i=0; i<256; i++) {
+                        liquidSimulator.simulate(true);
+                    }
+
                     return;
                 }
             }
