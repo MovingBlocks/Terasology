@@ -701,9 +701,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Generates the terrain mesh (creates the internal vertex arrays).
      */
     public void generateMeshes() {
-        if (isFresh() || isLightDirty())
+        if (isFresh() || isLightDirty() || !isDirty())
             return;
 
+        setDirty(false);
         ChunkMesh[] newMeshes = new ChunkMesh[VERTICAL_SEGMENTS];
 
         for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
@@ -711,7 +712,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
 
         setNewMesh(newMeshes);
-        setDirty(false);
     }
 
     /**
