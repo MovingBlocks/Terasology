@@ -44,8 +44,8 @@ class BlockManifestor {
     /** Smaller version of _blockIndex only used for loading IDs */
     protected static Map<String, Byte> _blockStringIndex = [:]
 
-    /** Holds the Byte value for the next Block ID - persisted but not sure if needed */
-    protected static byte _nextByte = (byte) 0
+    /** Holds the Byte value for the next Block ID - starts at 1 since Air is always 0 */
+    protected static byte _nextByte = (byte) 1
 
     /** Temp Manifest references - need to tie these to each saved world instead (or fail to find any, then create) */
     File _blockManifest = new File('SAVED_WORLDS/BlockManifest.groovy')
@@ -63,6 +63,7 @@ class BlockManifestor {
         if (worldExists) {
             loadManifest()
             // Load the ImageManifest into TextureManager as the "terrain" reference of old
+            // TODO: Could actually both load existing textures and added ones and update the manifest files fairly easily
         } else {
             // If we don't have a saved world we'll need to build a new ImageManifest from raw block textures
             _images = getInternalImages("com/github/begla/blockmania/data/textures/blocks")
@@ -130,10 +131,17 @@ class BlockManifestor {
                 println "Found an existing block ID value, assigning it to Block " + b.getTitle()
                 b.withId((byte)_blockStringIndex.get(b.getTitle()))
             } else {
-                println "We don't have an existing ID for " + b.getTitle() + " so assigning _nextByte " + _nextByte
-                b.withId(_nextByte)
-                _blockStringIndex.put(b.getTitle(), _nextByte)
-                _nextByte++
+                // We have a single special case - the Air block (aka "empty") is ALWAYS id 0
+                if (b.getTitle() == "Air") {
+                    println "Hit the Air block - assigning this one the magic zero value a.k.a. 'empty'"
+                    b.withId((byte) 0)
+                    _blockStringIndex.put(b.getTitle(), (byte) 0)
+                } else {
+                    println "We don't have an existing ID for " + b.getTitle() + " so assigning _nextByte " + _nextByte
+                    b.withId(_nextByte)
+                    _blockStringIndex.put(b.getTitle(), _nextByte)
+                    _nextByte++
+                }
             }
 
             _blockIndex.put(b.getId(), b)
@@ -201,7 +209,7 @@ class BlockManifestor {
         // In theory this allows Blocks to change their faces without impacting the saved state of a world
         // First just set all 6 faces to the default for that block (its name for a png file)
         // This can return null if there's no default texture for a block, is ok if everything is set below
-        // TODO: Might want to add some validation that all six sides have valid assignments at the end?
+        // TODO: Might want to add some validation that all six sides have valid assignments at the end? Air gets all 0?
         //println "Default image returns: " + _imageIndex.get(c.name)
         b.withTextureAtlasPos(new Vector2f(_imageIndex.get(c.name), 0))
 

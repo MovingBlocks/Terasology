@@ -71,8 +71,8 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                 for (int y = Chunk.getChunkDimensionY(); y >= 0; y--) {
 
-                    if (y == 0) { // Hard stone ground layer
-                        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Hard stone").getId());
+                    if (y == 0) { // The very deepest layer of the world is an indestructible mantle
+                        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("MantleStone").getId());
                         break;
                     }
 

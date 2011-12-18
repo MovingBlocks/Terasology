@@ -146,9 +146,9 @@ World {
     Resources {
 
         probCoal = -2d
+        probIron = -2.5d
+        probCopper = -3d
         probGold = -3d
-        probSilver = -2.5d
-        probRedstone = -3d
         probDiamond = -4d
 
     }

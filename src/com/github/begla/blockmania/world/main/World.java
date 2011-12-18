@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.world.main;
 
 import com.github.begla.blockmania.audio.AudioManager;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.game.PortalManager;
@@ -449,7 +450,7 @@ public final class World implements RenderableObject {
             // the y is hard coded because it always gets set to 32, deep underground
             Vector3f loc = new Vector3f(_player.getPosition().x, _player.getPosition().y + 4, _player.getPosition().z);
             Blockmania.getInstance().getLogger().log(Level.INFO, "Portal location is" + loc);
-            _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, (byte) 30, false, false, true);
+            _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, BlockManager.getInstance().getBlock("Portal").getId(), false, false, true);
             _portalManager.addPortal(loc);
         }
     }

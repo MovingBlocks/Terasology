@@ -37,22 +37,22 @@ public class ChunkGeneratorResources extends ChunkGeneratorTerrain {
                 for (int y = 0; y < Chunk.getChunkDimensionY(); y++) {
                     if (BlockManager.getInstance().getBlock(c.getBlock(x, y, z)).getTitle().equals("Stone")) {
                         if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) ConfigurationManager.getInstance().getConfig().get("World.Resources.probCoal")) {
-                            c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Coal").getId());
+                            c.setBlock(x, y, z, BlockManager.getInstance().getBlock("CoalOre").getId());
                         }
 
                         if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) ConfigurationManager.getInstance().getConfig().get("World.Resources.probGold")) {
-                            c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Gold").getId());
+                            c.setBlock(x, y, z, BlockManager.getInstance().getBlock("GoldOre").getId());
                         }
 
                         if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) ConfigurationManager.getInstance().getConfig().get("World.Resources.probDiamond")) {
-                            c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Diamond").getId());
+                            c.setBlock(x, y, z, BlockManager.getInstance().getBlock("DiamondOre").getId());
                         }
-                        if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) ConfigurationManager.getInstance().getConfig().get("World.Resources.probRedstone")) {
-                            c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Red stone").getId());
+                        if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) ConfigurationManager.getInstance().getConfig().get("World.Resources.probCopper")) {
+                            c.setBlock(x, y, z, BlockManager.getInstance().getBlock("CopperOre").getId());
                         }
 
-                        if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) ConfigurationManager.getInstance().getConfig().get("World.Resources.probSilver")) {
-                            c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Silver").getId());
+                        if (_parent.getParent().getRandom().standNormalDistrDouble() < (Double) ConfigurationManager.getInstance().getConfig().get("World.Resources.probIron")) {
+                            c.setBlock(x, y, z, BlockManager.getInstance().getBlock("IronOre").getId());
                         }
                     }
                 }

@@ -65,7 +65,9 @@ public class BlockManager {
         try {
             GroovyScriptEngine scriptEngine = new GroovyScriptEngine(DEFAULT_SCRIPT_PATH);
             scriptEngine.run("Default.groovy", _binding);
-            _manifestor.loadConfig();
+            System.out.println("Blocks by title: " + _blocksByTitle);
+            System.out.println("Blocks by id: " + _blocksById);
+            _manifestor.loadConfig(); // Might have to catch plain Exception also for this step
 
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);

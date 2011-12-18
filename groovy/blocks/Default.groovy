@@ -50,7 +50,7 @@ bm.addBlock(new Block().withTitle("Stone").withId((byte) 3).withTextureAtlasPos(
 
 bm.addBlock(new Block().withTitle("Cobble stone").withId((byte) 19).withTextureAtlasPos(new Vector2f(0, 1)))
 
-bm.addBlock(new Block().withTitle("Hard stone").withId((byte) 18).withTextureAtlasPos(new Vector2f(1, 1)).withHardness((byte) -1))
+bm.addBlock(new Block().withTitle("MantleStone").withId((byte) 18).withTextureAtlasPos(new Vector2f(1, 1)).withHardness((byte) -1))
 
 bm.addBlock(new Block().withTitle("Brick").withId((byte) 20).withTextureAtlasPos(new Vector2f(7, 0)))
 // <--
@@ -72,15 +72,15 @@ bm.addBlock(new Block().withTitle("Cactus").withId((byte) 28).withTextureAtlasPo
 // <--
 
 // Minerals
-bm.addBlock(new Block().withTitle("Coal").withId((byte) 21).withTextureAtlasPos(new Vector2f(2, 2)))
+bm.addBlock(new Block().withTitle("CoalOre").withId((byte) 21).withTextureAtlasPos(new Vector2f(2, 2)))
 
-bm.addBlock(new Block().withTitle("Diamond").withId((byte) 25).withTextureAtlasPos(new Vector2f(2, 3)))
+bm.addBlock(new Block().withTitle("DiamondOre").withId((byte) 25).withTextureAtlasPos(new Vector2f(2, 3)))
 
-bm.addBlock(new Block().withTitle("Gold").withId((byte) 24).withTextureAtlasPos(new Vector2f(0, 2)))
+bm.addBlock(new Block().withTitle("GoldOre").withId((byte) 24).withTextureAtlasPos(new Vector2f(0, 2)))
 
-bm.addBlock(new Block().withTitle("Red stone").withId((byte) 23).withTextureAtlasPos(new Vector2f(3, 3)))
+bm.addBlock(new Block().withTitle("CopperOre").withId((byte) 23).withTextureAtlasPos(new Vector2f(3, 3)))
 
-bm.addBlock(new Block().withTitle("Silver").withId((byte) 22).withTextureAtlasPos(new Vector2f(1, 2)))
+bm.addBlock(new Block().withTitle("IronOre").withId((byte) 22).withTextureAtlasPos(new Vector2f(1, 2)))
 // <--
 
 // Light sources
