@@ -6,6 +6,7 @@ package com.github.begla.blockmania.data.blocks.plant.tree
  * L-system generation stat sets could also go here (or in their own separate thing?)
  * Entirely separate trees would have their own tree + leaf block definitions (rename the plain "Tree" then)
  */
+// TODO: Trees, wood, bark, planks, leaves, etc could use some more exact definition thoughts
 block {
     // Serialization
     version = 1
@@ -41,9 +42,9 @@ block {
             lstuff = "Goes here"
         }
 
-        // Details on what kind of wood _processing_ this tree produces
+        // Details on what kind of wood _processing_ this tree produces (not implemented yet)
         wood {
-            block = "OakWood"
+            block = "Plank"
         }
     }
 

@@ -12,7 +12,6 @@ block {
     faces.all = "GreenLeaf"
 
     translucent = true
-    allowBlockAttachment = false
 
     colorsource = COLOR_SOURCE.COLOR_LUT
     colorOffset = [1.0f, 0.8f, 0.8f, 1.0f]

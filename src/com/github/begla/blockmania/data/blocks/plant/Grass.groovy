@@ -12,11 +12,12 @@ block {
     // Serialization (if it ever makes sense)
     version = 1
 
+    // Grass is actually a solid grass-covered block, so it is OK to attach stuff to it
+    allowBlockAttachment = true
+
     // Graphics
     faces {                     // "faces" being present means we'll override some with a different graphic
-        sides = "DirtGrass"     // sides means all four (not top/bottom) and can itself be overridden
-        // left = DirtierGrass  // Example of how you could make one side differ without writing all 4
-        // top = "Grass"        // This one is not needed as it is the default (image matching own name)
+        sides = "GrassSide"     // sides means all four (not top/bottom) and can itself be overridden
         bottom = "Dirt"         // Since we add all images to the same map we don't need to worry about dir levels
     }
 

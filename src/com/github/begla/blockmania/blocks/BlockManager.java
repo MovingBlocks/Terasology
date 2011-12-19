@@ -24,6 +24,7 @@ import groovy.util.ScriptException;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -55,27 +56,39 @@ public class BlockManager {
     }
 
     private BlockManager() {
-        _binding = new Binding();
-        _binding.setVariable("blockManager", this);
-        _manifestor = new BlockManifestor();
+        //_binding = new Binding();
+        //_binding.setVariable("blockManager", this);
+        _manifestor = new BlockManifestor(this);
         loadBlocks();
     }
 
     private void loadBlocks() {
+
+        try {
+            _manifestor.loadConfig(); // Might have to catch plain Exception also for this step
+            System.out.println("Blocks by title: " + _blocksByTitle);
+            System.out.println("Blocks by id: " + _blocksById);
+        }
+        catch (Exception e) {
+            // TODO: Totally placeholder error handling, needs to be fancier
+            System.out.println("Exception loading blocks. Sad :-(");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        /*
         try {
             GroovyScriptEngine scriptEngine = new GroovyScriptEngine(DEFAULT_SCRIPT_PATH);
             scriptEngine.run("Default.groovy", _binding);
             System.out.println("Blocks by title: " + _blocksByTitle);
             System.out.println("Blocks by id: " + _blocksById);
-            _manifestor.loadConfig(); // Might have to catch plain Exception also for this step
-
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         } catch (ResourceException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         } catch (ScriptException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
-        }
+        } */
     }
 
     public Block getBlock(String title) {
@@ -98,5 +111,12 @@ public class BlockManager {
     public void removeBlock(Block block) {
         _blocksById.remove(block.getId());
         _blocksByTitle.remove(block.getTitle());
+    }
+
+    public void addAllBlocks(Map<Byte,Block> blocks) {
+        _blocksById.putAll(blocks);
+        for (Block b : blocks.values()) {
+            _blocksByTitle.put(b.getTitle(), b);
+        }
     }
 }

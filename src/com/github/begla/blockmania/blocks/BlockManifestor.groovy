@@ -21,7 +21,8 @@ import java.awt.image.BufferedImage
 import java.awt.Graphics
 import org.newdawn.slick.util.ResourceLoader
 import javax.vecmath.Vector2f
-import javax.vecmath.Vector4f;
+import javax.vecmath.Vector4f
+import com.github.begla.blockmania.rendering.manager.TextureManager;
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -31,6 +32,8 @@ import javax.vecmath.Vector4f;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 class BlockManifestor {
+
+    private static BlockManager _bm;
 
     /** Holds BufferedImages during the loading process (not persisted) */
     private Map<String,BufferedImage> _images = [:]
@@ -51,12 +54,19 @@ class BlockManifestor {
     File _blockManifest = new File('SAVED_WORLDS/BlockManifest.groovy')
     File _imageManifest = new File('SAVED_WORLDS/ImageManifest.png')
 
+    // Empty default constructor for child classes
+    public BlockManifestor() {}
+
+    public BlockManifestor(BlockManager bm) {
+        _bm = bm
+    }
+
     /**
      * On game startup we need to load Block configuration. Exact Block IDs depend on existing or new world
      * Later on this class could also review an existing world's version level and make any needed upgrades
      * (the "version" prop is in all the files as an example, but a complete system would take some work)
      */
-    public loadConfig() {
+    public loadConfig() throws Exception{
         boolean worldExists = _blockManifest.exists() && _imageManifest.exists()
 
         // Check if we've got a manifest - later this would base on / trigger when user selects world load / create (GUI)
@@ -82,11 +92,12 @@ class BlockManifestor {
 
         // Load block definitions from Block sub-classes
         new PlantBlockManifestor().loadBlockDefinitions("com/github/begla/blockmania/data/blocks/plant")
-        // Trees
-        // Liquids
+        new TreeBlockManifestor().loadBlockDefinitions("com/github/begla/blockmania/data/blocks/plant/tree")
+        new LiquidBlockManifestor().loadBlockDefinitions("com/github/begla/blockmania/data/blocks/liquid")
 
         // We can also re-use manifestors for sub dirs if we just put stuff there for a "human-friendly" grouping
         loadBlockDefinitions("com/github/begla/blockmania/data/blocks/furniture")
+        loadBlockDefinitions("com/github/begla/blockmania/data/blocks/mineral")
         new PlantBlockManifestor().loadBlockDefinitions("com/github/begla/blockmania/data/blocks/plant/leaf")
 
         // _nextByte may not make sense if we're loading a world - until it is possible to upgrade / add stuff anyway
@@ -99,8 +110,12 @@ class BlockManifestor {
             saveManifest()
         }
 
+        _bm.addAllBlocks(_blockIndex)
+        println "_imageManifest file: " + _imageManifest.getAbsolutePath()
+        TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath())
+
         // Hacky hacky hack hack!
-        System.exit(0)
+        //System.exit(0)
     }
 
     /**

@@ -12,7 +12,7 @@ bm.addBlock(new Block().withTitle("Air").withId((byte) 0).withDisableTessellatio
 // <--
 
 // Etc.
-bm.addBlock(new Block().withTitle("Bookshelf").withId((byte) 27).withTextureAtlasPosTopBottom(new Vector2f(6, 5)).withTextureAtlasPosMantle(new Vector2f(3, 2)))
+bm.addBlock(new Block().withTitle("Bookcase").withId((byte) 27).withTextureAtlasPosTopBottom(new Vector2f(6, 5)).withTextureAtlasPosMantle(new Vector2f(3, 2)))
 // <--
 
 // Liquids
@@ -26,7 +26,7 @@ bm.addBlock(new Block().withTitle("Ice").withId((byte) 8).withTextureAtlasPos(ne
 // <--
 
 // Glass
-bm.addBlock(new Block().withTitle("Glass").withId((byte) 26).withTextureAtlasPos(new Vector2f(2, 2)).withTranslucent(true))
+bm.addBlock(new Block().withTitle("Glass").withId((byte) 26).withTextureAtlasPos(new Vector2f(1, 3)).withTranslucent(true))
 // <--
 
 // Soil
@@ -40,9 +40,9 @@ bm.addBlock(new Block().withTitle("Sand").withId((byte) 2).withTextureAtlasPos(n
 // <--
 
 // Wood
-bm.addBlock(new Block().withTitle("Wood").withId((byte) 4).withTextureAtlasPos(new Vector2f(4, 0)))
+bm.addBlock(new Block().withTitle("OakWood").withId((byte) 4).withTextureAtlasPos(new Vector2f(4, 0)))
 
-bm.addBlock(new Block().withTitle("Tree trunk").withId((byte) 5).withTextureAtlasPosTopBottom(new Vector2f(5, 1)).withTextureAtlasPosMantle(new Vector2f(4, 1)))
+bm.addBlock(new Block().withTitle("OakTrunk").withId((byte) 5).withTextureAtlasPosTopBottom(new Vector2f(5, 1)).withTextureAtlasPosMantle(new Vector2f(4, 1)))
 // <--
 
 // Stone
@@ -56,15 +56,15 @@ bm.addBlock(new Block().withTitle("Brick").withId((byte) 20).withTextureAtlasPos
 // <--
 
 // Billboards
-bm.addBlock(new Block().withTitle("Red flower").withId((byte) 16).withTextureAtlasPos(new Vector2f(13, 0)).withTranslucent(true).withPenetrable(true).withTranslucent(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
+bm.addBlock(new Block().withTitle("RedFlower").withId((byte) 16).withTextureAtlasPos(new Vector2f(13, 0)).withTranslucent(true).withPenetrable(true).withTranslucent(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
 
-bm.addBlock(new Block().withTitle("Yellow flower").withId((byte) 17).withTextureAtlasPos(new Vector2f(12, 0)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
+bm.addBlock(new Block().withTitle("YellowFlower").withId((byte) 17).withTextureAtlasPos(new Vector2f(12, 0)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
 
-bm.addBlock(new Block().withTitle("High grass").withId((byte) 13).withTextureAtlasPos(new Vector2f(12, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
+bm.addBlock(new Block().withTitle("TallGrass1").withId((byte) 13).withTextureAtlasPos(new Vector2f(12, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withAllowBlockAttachment(false))
 
-bm.addBlock(new Block().withTitle("Medium high grass").withId((byte) 14).withTextureAtlasPos(new Vector2f(13, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withColorOffset(new Vector4f(0.7f, 0.7f, 0.7f, 1.0f)).withAllowBlockAttachment(false))
+bm.addBlock(new Block().withTitle("TallGrass2").withId((byte) 14).withTextureAtlasPos(new Vector2f(13, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withColorOffset(new Vector4f(0.7f, 0.7f, 0.7f, 1.0f)).withAllowBlockAttachment(false))
 
-bm.addBlock(new Block().withTitle("Large high grass").withId((byte) 15).withTextureAtlasPos(new Vector2f(14, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withColorOffset(new Vector4f(0.9f, 0.9f, 0.9f, 1.0f)).withAllowBlockAttachment(false))
+bm.addBlock(new Block().withTitle("TallGrass3").withId((byte) 15).withTextureAtlasPos(new Vector2f(14, 11)).withTranslucent(true).withPenetrable(true).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withBlockForm(BLOCK_FORM.BILLBOARD).withColorOffset(new Vector4f(0.9f, 0.9f, 0.9f, 1.0f)).withAllowBlockAttachment(false))
 // <--
 
 // Cacti
@@ -88,11 +88,11 @@ bm.addBlock(new Block().withTitle("Torch").withId((byte) 29).withTextureAtlasPos
 // <--
 
 // Leafs
-bm.addBlock(new Block().withTitle("Leaf").withId((byte) 11).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT))
-bm.addBlock(new Block().withTitle("Red leaf").withId((byte) 31).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(1.0f, 0.8f, 0.8f, 1.0f)))
-bm.addBlock(new Block().withTitle("Dark leaf").withId((byte) 12).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(0.7f, 0.7f, 0.7f, 1.0f)))
+bm.addBlock(new Block().withTitle("GreenLeaf").withId((byte) 11).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT))
+bm.addBlock(new Block().withTitle("RedLeaf").withId((byte) 31).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(1.0f, 0.8f, 0.8f, 1.0f)))
+bm.addBlock(new Block().withTitle("DarkLeaf").withId((byte) 12).withTextureAtlasPos(new Vector2f(4, 3)).withTranslucent(true).withAllowBlockAttachment(false).withColorSource(COLOR_SOURCE.FOLIAGE_LUT).withColorOffset(new Vector4f(0.7f, 0.7f, 0.7f, 1.0f)))
 // <--
 
 // Portal block - Indestructible
-bm.addBlock(new Block().withTitle("Portal").withId((byte) 30).withTextureAtlasPos(new Vector2f(14, 9)).withHardness((byte) -1))
+bm.addBlock(new Block().withTitle("PortalBlock").withId((byte) 30).withTextureAtlasPos(new Vector2f(14, 9)).withHardness((byte) -1))
 

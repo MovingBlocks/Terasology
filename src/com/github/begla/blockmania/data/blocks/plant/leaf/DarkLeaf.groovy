@@ -9,7 +9,10 @@ import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE
 block {
     version = 1
 
+    faces.all = "GreenLeaf"
+
     translucent = true
 
     colorsource = COLOR_SOURCE.COLOR_LUT
+    colorOffset = [0.7f, 0.7f, 0.7f, 1.0f]
 }

@@ -55,7 +55,7 @@ public class HUD implements RenderableObject {
      * A small rotating cube that serves as indicator for the currently selected block type.
      */
     private void drawRotatingBlock() {
-
+        // TODO: The color shifted leaf blocks seem to appear without color shifting on this rotating block (and Cactus looks funny)
         Block b = BlockManager.getInstance().getBlock(_parent.getActiveWorld().getPlayer().getSelectedBlockType());
         if (b == null)
             return;

@@ -51,7 +51,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
         _angleInDegree = 20;
         _iterations = 6;
-        _leafType = BlockManager.getInstance().getBlock("Leaf").getId();
+        _leafType = BlockManager.getInstance().getBlock("GreenLeaf").getId();
 
         _initialAxiom = initialAxiom;
         _ruleSet = ruleSet;
@@ -99,9 +99,9 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                 case 'G':
                 case 'F':
                     // Tree trunk
-                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("Tree trunk").getId(), update, false,  true);
+                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("OakTrunk").getId(), update, false,  true);
 
-                    // Generate leafs
+                    // Generate leaves
                     if (_stackOrientation.size() > 1 && _generateLeafBlocks) {
                         int size = 1;
 
