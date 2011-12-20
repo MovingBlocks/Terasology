@@ -27,8 +27,8 @@ import com.github.begla.blockmania.world.chunk.Chunk;
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /* CONST */
-    protected static final int SAMPLE_RATE_3D_HOR = 2;
-    protected static final int SAMPLE_RATE_3D_VERT = 4;
+    protected static final int SAMPLE_RATE_3D_HOR = 4;
+    protected static final int SAMPLE_RATE_3D_VERT = 8;
 
     /**
      * Available types of biomes.
@@ -132,13 +132,16 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double temp = calcTemperatureAtGlobalPosition(x, z);
         double humidity = calcHumidityAtGlobalPosition(x, z);
 
-        if (temp >= 0.5 && humidity < 0.3) {
+        if (temp >= 0.5 && humidity < 0.2) {
             return BIOME_TYPE.DESERT;
-        } else if (humidity >= 0.3 && humidity <= 0.6 && temp >= 0.5) {
+        }
+        if (humidity >= 0.2 && humidity <= 0.6 && temp >= 0.5) {
             return BIOME_TYPE.PLAINS;
-        } else if (temp <= 0.3 && humidity > 0.5) {
+        }
+        if (temp <= 0.3 && humidity < 0.7) {
             return BIOME_TYPE.SNOW;
-        } else if (humidity >= 0.2 && humidity <= 0.6 && temp < 0.5) {
+        }
+        if (humidity >= 0.4 && humidity <= 0.6 && temp >= 0.25 && temp < 0.5) {
             return BIOME_TYPE.MOUNTAINS;
         }
 
@@ -218,20 +221,24 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double height = calcBaseTerrain(x, z);
 
         double temp = calcTemperatureAtGlobalPosition(x, y);
+        double hum = calcHumidityAtGlobalPosition(x, y);
 
         double dT = Math.abs(temp - 0.5);
+        double dH = Math.abs(hum - 0.4);
 
-        double mIntens = MathHelper.clamp(1.0 - dT * 5.0);
-        double densityMountains = calcMountainDensity(x, y, z) * mIntens * MathHelper.clamp(height);
+        double mIntens = MathHelper.clamp(1.0 - (dT + dH) * 5.0) + 0.3;
+
+        double densityMountains = calcMountainDensity(x, y, z) * mIntens * height;
+        double densityHills = (calcHillDensity(x, y, z) * height);
 
         int plateauArea = (int) (Chunk.CHUNK_DIMENSION_Y * 0.10);
         double flatten = MathHelper.clamp(((Chunk.CHUNK_DIMENSION_Y - 16) - y) / plateauArea);
 
-        return -y + (((height * 128.0) + 16.0) + densityMountains * 2048.0 + calcHillDensity(x,y,z) * 128.0) * flatten;
+        return -y + (((height * 80.0) + 16.0) + densityMountains * 2048.0 + densityHills * 256) * flatten;
     }
 
     public double calcBaseTerrain(double x, double z) {
-        double result = (_pGen2.fBm(0.0004 * x, 0, 0.0004 * z, 8, 1.7, 0.9171) + 1.0) / 2.0;
+        double result = (_pGen2.fBm(0.00004 * x, 0, 0.00004 * z, 8, 1.7, 0.9171) + 1.0) / 2.0;
 
         double river = Math.sqrt(Math.abs(_pGen3.fBm(0.001 * x, 0, 0.001 * z, 8, 2.08371, 0.7471)));
 
@@ -248,34 +255,34 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     public double calcMountainDensity(double x, double y, double z) {
         double x1, y1, z1;
 
-        x1 = x * 0.002;
-        y1 = y * 0.001;
-        z1 = z * 0.002;
+        x1 = x * 0.006;
+        y1 = y * 0.002;
+        z1 = z * 0.006;
 
-        double result = _pGen5.fBm(x1, y1, z1, 12, 1.99782819, 0.8581);
+        double result = _pGen5.fBm(x1, y1, z1, 9, 1.99782819, 0.8581);
 
         return result > 0 ? result : 0;
     }
 
-        public double calcHillDensity(double x, double y, double z) {
+    public double calcHillDensity(double x, double y, double z) {
         double x1, y1, z1;
 
-        x1 = x * 0.004;
-        y1 = y * 0.002;
-        z1 = z * 0.004;
+        x1 = x * 0.008;
+        y1 = y * 0.008;
+        z1 = z * 0.008;
 
-        double result = _pGen2.fBm(x1, y1, z1, 6, 1.99782819, 0.8581);
+        double result = _pGen2.fBm(x1, y1, z1, 7, 1.99782819, 0.8581);
 
-        return result > 0.2 ? result : 0;
+        return result > 0 ? result : 0;
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
-        double result = _pGen4.fBm(x * 0.0005, 0, 0.0005 * z, 6, 2.037291, 0.8138210);
+        double result = _pGen4.fBm(x * 0.001, 0, 0.001 * z, 4, 2.037291, 0.8138210);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcHumidityAtGlobalPosition(double x, double z) {
-        double result = _pGen5.fBm(x * 0.0005, 0, 0.0005 * z, 6, 2.037291, 0.718398191);
+        double result = _pGen5.fBm(x * 0.003, 0, 0.003 * z, 4, 2.037291, 0.718398191);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 

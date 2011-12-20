@@ -33,7 +33,7 @@ import java.io.IOException;
 public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
     /* CONST */
-    private static final int ZOOM_FACTOR = 8    ;
+    private static final int ZOOM_FACTOR = 1;
 
     /**
      * Init. the generator with a given seed value.
@@ -103,7 +103,7 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
         for (int x = -512; x < 512; x++) {
             for (int y = -512; y < 512; y++) {
-                double n = calcMountainDensity(x * ZOOM_FACTOR, 64, y * ZOOM_FACTOR) + calcHillDensity(x * ZOOM_FACTOR, 64, y * ZOOM_FACTOR);
+                double n = calcMountainDensity(x * ZOOM_FACTOR, 64, y * ZOOM_FACTOR);
 
                 int color = (int) (n * 255.0);
                 color = (color > 255) ? 255 : color;
