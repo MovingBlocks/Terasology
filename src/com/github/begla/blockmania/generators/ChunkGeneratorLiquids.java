@@ -50,7 +50,7 @@ public class ChunkGeneratorLiquids extends ChunkGeneratorTerrain {
 
                     liquidSimulator.addActiveBlock(new BlockPosition(c.getBlockWorldPosX(8), y, c.getBlockWorldPosZ(8)));
 
-                    for (int i=0; i<256; i++) {
+                    for (int i = 0; i < 256; i++) {
                         liquidSimulator.simulate(true);
                     }
 

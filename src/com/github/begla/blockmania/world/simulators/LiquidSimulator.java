@@ -23,7 +23,6 @@ import com.github.begla.blockmania.world.interfaces.WorldProvider;
 
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Rough draft of Minecraft-like behavior of liquids. Will be replaced with some

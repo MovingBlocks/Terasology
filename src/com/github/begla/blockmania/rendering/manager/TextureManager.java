@@ -75,6 +75,7 @@ public class TextureManager {
 
         /* MOBS */
         loadTexture("slime", false);
+        loadTexture("char", false);
 
         for (int i = 1; i <= 6; i++) {
             loadTexture("stars" + i, false);

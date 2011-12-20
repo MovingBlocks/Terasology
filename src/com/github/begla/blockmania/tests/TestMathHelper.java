@@ -2,7 +2,6 @@ package com.github.begla.blockmania.tests;
 
 
 import com.github.begla.blockmania.utilities.MathHelper;
-import org.junit.Test;
 
 public class TestMathHelper extends junit.framework.TestCase {
     public void testCantor() throws Exception {

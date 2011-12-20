@@ -35,8 +35,6 @@ import com.github.begla.blockmania.world.entity.Entity;
 import com.github.begla.blockmania.world.horizon.Skysphere;
 import com.github.begla.blockmania.world.interfaces.WorldProvider;
 import com.github.begla.blockmania.world.physics.BulletPhysicsRenderer;
-import com.github.begla.blockmania.world.simulators.GrowthSimulator;
-import com.github.begla.blockmania.world.simulators.LiquidSimulator;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -264,6 +262,13 @@ public final class WorldRenderer implements RenderableObject {
         /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();
         _blockGrid.render();
+
+        glPushMatrix();
+        glLoadIdentity();
+        glDisable(GL11.GL_DEPTH_TEST);
+        _player.renderHand();
+        glEnable(GL11.GL_DEPTH_TEST);
+        glPopMatrix();
     }
 
 

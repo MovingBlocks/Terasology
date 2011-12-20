@@ -26,6 +26,7 @@ import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
+import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.tools.Tool;
 import com.github.begla.blockmania.tools.ToolBelt;
 import com.github.begla.blockmania.utilities.MathHelper;
@@ -34,11 +35,14 @@ import com.github.begla.blockmania.world.interfaces.BlockObserver;
 import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Extends the character class and provides support for player functionality. Also provides the
@@ -98,18 +102,67 @@ public final class Player extends Character {
         super.render();
     }
 
+    /**
+     * TODO: Should not be rendered using immediate mode!
+     */
+    public void renderHand() {
+        glEnable(GL11.GL_TEXTURE_2D);
+        TextureManager.getInstance().bindTexture("char");
+
+        glPushMatrix();
+        glTranslatef(0.5f, -0.5f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f), -1.0f);
+        glRotatef(-45f, 1.0f, 0.0f, 0.0f);
+        glRotatef(30f, 0.0f, 1.0f, 0.0f);
+        glScalef(0.25f, 0.5f, 0.25f);
+
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GL11.glBegin(GL11.GL_QUADS);
+
+        GL11.glNormal3f(-1, 0, 0);
+
+        // LEFT
+        GL11.glTexCoord2f(40.0f * 0.015625f, 20.0f * 0.03125f);
+        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
+        GL11.glTexCoord2f(44.0f * 0.015625f, 20.0f * 0.03125f);
+        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
+        GL11.glTexCoord2f(44.0f * 0.015625f, 1.0f);
+        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
+        GL11.glTexCoord2f(40.0f * 0.015625f, 1.0f);
+        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
+
+        GL11.glNormal3f(0, 0, -1);
+
+        // BACK
+        GL11.glTexCoord2f(44.0f * 0.015625f, 20.0f * 0.03125f);
+        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
+        GL11.glTexCoord2f(48.0f * 0.015625f, 20.0f * 0.03125f);
+        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
+        GL11.glTexCoord2f(48.0f * 0.015625f, 1.0f);
+        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
+        GL11.glTexCoord2f(44.0f * 0.015625f, 1.0f);
+        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
+
+        GL11.glEnd();
+        glPopMatrix();
+
+        glDisable(GL11.GL_TEXTURE_2D);
+    }
+
     public double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
-        return Math.sin(_stepCounter * frequency + phaseOffset) * amplitude;
+        float speedFactor = 1.0f;
+
+        if (_activeWalkingSpeed > 0)
+            speedFactor = (float) MathHelper.clamp(Math.max(Math.abs(_velocity.x), Math.abs(_velocity.z)) / _activeWalkingSpeed);
+
+        return Math.sin(_stepCounter * frequency + phaseOffset) * amplitude * speedFactor;
     }
 
     public void updateCameras() {
         _firstPersonCamera.getPosition().set(calcEyeOffset());
 
         if (!GOD_MODE) {
-            float speedFactor = (float) MathHelper.clamp(Math.max(Math.abs(_velocity.x), Math.abs(_velocity.z)) / _activeWalkingSpeed);
-
-            _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.02f * speedFactor, 1.75f));
-            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f * speedFactor, 3.0f));
+            _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.2f));
+            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f, 4.4f));
         } else {
             _firstPersonCamera.setBobbingRotationOffsetFactor(0.0);
             _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);

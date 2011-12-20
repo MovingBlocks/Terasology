@@ -35,7 +35,7 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
     /* CONST */
     private static final int ZOOM_FACTOR = 8;
-    private static final Vector2f POSITION = new Vector2f(-24575.82f,20786.54f);
+    private static final Vector2f POSITION = new Vector2f(-24575.82f, 20786.54f);
 
     /**
      * Init. the generator with a given seed value.
@@ -85,9 +85,9 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
                     if (n >= 0) {
                         if (height > 32)
-                            g.setColor(new Color(Math.min(height+color.getRed(), 255), Math.min(height+color.getGreen(), 255), Math.min(height+color.getBlue(), 255)));
+                            g.setColor(new Color(Math.min(height + color.getRed(), 255), Math.min(height + color.getGreen(), 255), Math.min(height + color.getBlue(), 255)));
                         else
-                            g.setColor(new Color(0,0,(int) (255.0*(32.0-(32.0-height))/32.0)));
+                            g.setColor(new Color(0, 0, (int) (255.0 * (32.0 - (32.0 - height)) / 32.0)));
 
                         g.fillRect(x + 128, z + 128, 1, 1);
                         break;

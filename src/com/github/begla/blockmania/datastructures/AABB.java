@@ -16,7 +16,6 @@
 package com.github.begla.blockmania.datastructures;
 
 import com.github.begla.blockmania.game.Blockmania;
-import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector3f;

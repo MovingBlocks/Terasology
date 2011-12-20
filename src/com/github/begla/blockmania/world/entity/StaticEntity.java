@@ -15,8 +15,6 @@
  */
 package com.github.begla.blockmania.world.entity;
 
-import com.github.begla.blockmania.datastructures.AABB;
-
 /**
  * TODO: Somehow does not do anything special? :-/
  *
