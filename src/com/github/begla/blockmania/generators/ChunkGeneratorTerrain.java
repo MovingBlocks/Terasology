@@ -19,8 +19,6 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
-import javax.vecmath.Vector2f;
-
 /**
  * Generates the terrain of the world using a hybrid voxel-/heightmap-based approach.
  *
@@ -219,18 +217,17 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     public double calcDensity(double x, double y, double z) {
         double height = calcBaseTerrain(x, z);
 
-        float temp = (float) calcTemperatureAtGlobalPosition(x, y);
-        float humidity = (float) calcHumidityAtGlobalPosition(x, y);
+        double temp = calcTemperatureAtGlobalPosition(x, y);
 
-        Vector2f distanceToMountainBiome = new Vector2f(temp - 0.25f, humidity - 0.35f);
+        double dT = Math.abs(temp - 0.5);
 
-        double mIntens = MathHelper.clamp(1.0 - distanceToMountainBiome.length());
+        double mIntens = MathHelper.clamp(1.0 - dT * 5.0);
         double densityMountains = calcMountainDensity(x, y, z) * mIntens * MathHelper.clamp(height);
 
         int plateauArea = (int) (Chunk.CHUNK_DIMENSION_Y * 0.10);
         double flatten = MathHelper.clamp(((Chunk.CHUNK_DIMENSION_Y - 16) - y) / plateauArea);
 
-        return -y + (((height * 128.0) + 16.0) + densityMountains * 3000.0 + calcHillDensity(x, y, z) * 128.0) * flatten;
+        return -y + (((height * 128.0) + 16.0) + densityMountains * 2048.0 + calcHillDensity(x,y,z) * 128.0) * flatten;
     }
 
     public double calcBaseTerrain(double x, double z) {
@@ -260,16 +257,16 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         return result > 0 ? result : 0;
     }
 
-    public double calcHillDensity(double x, double y, double z) {
+        public double calcHillDensity(double x, double y, double z) {
         double x1, y1, z1;
 
         x1 = x * 0.004;
-        y1 = y * 0.003;
+        y1 = y * 0.002;
         z1 = z * 0.004;
 
-        double result = _pGen2.fBm(x1, y1, z1, 6, 1.99782819, 0.7581) - 0.2;
+        double result = _pGen2.fBm(x1, y1, z1, 6, 1.99782819, 0.8581);
 
-        return result > 0.0 ? result : 0;
+        return result > 0.2 ? result : 0;
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
