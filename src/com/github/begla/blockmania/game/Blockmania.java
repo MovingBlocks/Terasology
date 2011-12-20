@@ -236,8 +236,6 @@ public final class Blockmania {
     public void initWorld(String title, String seed) {
         final FastRandom random = new FastRandom();
 
-        getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
-
         // Get rid of the old world
         if (_worldRenderer != null) {
             _worldRenderer.dispose();
@@ -249,6 +247,8 @@ public final class Blockmania {
         } else if (seed.isEmpty()) {
             seed = random.randomCharacterString(16);
         }
+
+        getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
         _worldRenderer = new WorldRenderer(title, seed);

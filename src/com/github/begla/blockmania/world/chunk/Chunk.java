@@ -704,6 +704,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (isFresh() || isLightDirty())
             return;
 
+        setDirty(false);
         ChunkMesh[] newMeshes = new ChunkMesh[VERTICAL_SEGMENTS];
 
         for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
@@ -711,7 +712,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
 
         setNewMesh(newMeshes);
-        setDirty(false);
     }
 
     /**

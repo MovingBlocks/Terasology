@@ -64,7 +64,7 @@ public class LocalWorldProvider implements WorldProvider {
     protected long _creationTime = Blockmania.getInstance().getTime() - (Long) ConfigurationManager.getInstance().getConfig().get("World.initialTimeOffsetInMs");
     public Vector3f _renderingReferencePoint = new Vector3f();
 
-        /* SIMULATORS */
+    /* SIMULATORS */
     private final LiquidSimulator _liquidSimulator;
     private final GrowthSimulator _growthSimulator;
 
@@ -182,6 +182,13 @@ public class LocalWorldProvider implements WorldProvider {
         return true;
     }
 
+    /**
+     * Sets the block state value at the given position.
+     *
+     * @param x The X-coordinate
+     * @param y The Y-coordinate
+     * @param z The Z-coordinate
+     */
     public void setState(int x, int y, int z, byte state) {
         int chunkPosX = MathHelper.calcChunkPosX(x);
         int chunkPosZ = MathHelper.calcChunkPosZ(z);
@@ -313,8 +320,10 @@ public class LocalWorldProvider implements WorldProvider {
 
                 double dens = tGen.calcDensity(randX + SPAWN_ORIGIN.x, y, randZ + SPAWN_ORIGIN.y);
 
-                if (dens >= 0)
+                if (dens >= 0 && y < 64)
                     return new Vector3f(randX + SPAWN_ORIGIN.x, y, randZ + SPAWN_ORIGIN.y);
+                else if (dens >= 0 && y >= 64)
+                    break;
             }
         }
     }
