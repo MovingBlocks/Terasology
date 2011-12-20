@@ -55,6 +55,8 @@ public final class Player extends Character {
     private static final double MOUSE_SENS = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
     private static final boolean DEMO_FLIGHT = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight");
     private static final boolean GOD_MODE = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
+    private static final boolean CAMERA_BOBBING = (Boolean) ConfigurationManager.getInstance().getConfig().get("Player.cameraBobbing");
+
     private static final double WALKING_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
     private static final boolean SHOW_PLACING_BOX = (Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox");
     private static final double RUNNING_FACTOR = (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor");
@@ -70,6 +72,9 @@ public final class Player extends Character {
     private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
     private final Camera _activeCamera = _firstPersonCamera;
 
+    /* HAND */
+    private float _handMovementAnimationOffset = 0.0f;
+
     /**
      * The ToolBelt is how the player interacts with tool events from mouse or keyboard
      */
@@ -83,8 +88,18 @@ public final class Player extends Character {
         _godMode = GOD_MODE;
         _walkingSpeed = WALKING_SPEED - Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.01f, 2.5f));
 
+        if (_handMovementAnimationOffset > 0) {
+            _handMovementAnimationOffset -= 0.04;
+        } else if (_handMovementAnimationOffset < 0) {
+            _handMovementAnimationOffset = 0;
+        }
+
         super.update();
         updateCameras();
+    }
+
+    public void poke() {
+        _handMovementAnimationOffset = 0.5f;
     }
 
     public void render() {
@@ -110,9 +125,10 @@ public final class Player extends Character {
         TextureManager.getInstance().bindTexture("char");
 
         glPushMatrix();
-        glTranslatef(0.5f, -0.5f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f), -1.0f);
-        glRotatef(-45f, 1.0f, 0.0f, 0.0f);
-        glRotatef(30f, 0.0f, 1.0f, 0.0f);
+        glTranslatef(0.8f, -0.75f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.0f - _handMovementAnimationOffset * 0.5f);
+        glRotatef(-45f - _handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(35f, 0.0f, 1.0f, 0.0f);
+        glTranslatef(0f, 0.25f, 0f);
         glScalef(0.25f, 0.5f, 0.25f);
 
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -160,7 +176,7 @@ public final class Player extends Character {
     public void updateCameras() {
         _firstPersonCamera.getPosition().set(calcEyeOffset());
 
-        if (!GOD_MODE) {
+        if (!GOD_MODE && CAMERA_BOBBING) {
             _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.2f));
             _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f, 4.4f));
         } else {
@@ -260,6 +276,7 @@ public final class Player extends Character {
 
                 getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, false);
                 AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+                poke();
 
                 int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
                 int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
@@ -301,6 +318,7 @@ public final class Player extends Character {
                 }
 
                 AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+                poke();
             }
         }
     }
@@ -325,6 +343,7 @@ public final class Player extends Character {
                 _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
                 _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
                 AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+                poke();
 
                 if (createPhysBlock && !BlockManager.getInstance().getBlock(currentBlockType).isTranslucent()) {
                     Vector3f pos = blockPos.toVector3f();

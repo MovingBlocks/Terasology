@@ -104,7 +104,7 @@ Controls {
 
 Player {
 
-    bobbing = true
+    cameraBobbing = true
 
     maxGravity = 1.0d
     maxGravitySwimming = 0.01d
