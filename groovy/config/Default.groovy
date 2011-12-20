@@ -114,9 +114,9 @@ Player {
 
     friction = 0.08d
 
-    walkingSpeed = 0.03d
+    walkingSpeed = 0.04d
     runningFactor = 1.8d
-    jumpIntensity = 0.14d
+    jumpIntensity = 0.16d
 
 }
 

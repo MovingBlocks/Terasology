@@ -21,6 +21,7 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.newdawn.slick.openal.Audio;
@@ -37,6 +38,7 @@ import java.util.Collections;
 public abstract class MovableEntity extends Entity {
 
     /* AUDIO */
+    protected long _lastFootStepSoundPlayed = 0;
     protected Audio _currentFootstepSound;
     protected Audio[] _footstepSounds;
 
@@ -135,9 +137,12 @@ public abstract class MovableEntity extends Entity {
                 Vector3f playerDirection = directionOfReferencePoint();
                 _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
 
-                _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.05f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.1f, false, playerDirection.x, playerDirection.y, playerDirection.z);
+                _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, false, playerDirection.x, playerDirection.y, playerDirection.z);
             } else {
-                if (!_currentFootstepSound.isPlaying()) {
+                long timeDiff = Blockmania.getInstance().getTime() - _lastFootStepSoundPlayed;
+
+                if (!_currentFootstepSound.isPlaying() && timeDiff > 400 / (_activeWalkingSpeed / _walkingSpeed)) {
+                    _lastFootStepSoundPlayed = Blockmania.getInstance().getTime();
                     _currentFootstepSound = null;
                 }
             }

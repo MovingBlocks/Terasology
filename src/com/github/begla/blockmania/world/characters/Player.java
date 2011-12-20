@@ -77,10 +77,10 @@ public final class Player extends Character {
 
     public void update() {
         _godMode = GOD_MODE;
-        _walkingSpeed = WALKING_SPEED + Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.005f, 2.0f));
+        _walkingSpeed = WALKING_SPEED - Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.01f, 2.5f));
 
-        updateCameras();
         super.update();
+        updateCameras();
     }
 
     public void render() {
@@ -106,8 +106,10 @@ public final class Player extends Character {
         _firstPersonCamera.getPosition().set(calcEyeOffset());
 
         if (!GOD_MODE) {
-            _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.0f));
-            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f, 2.75f));
+            float speedFactor = (float) MathHelper.clamp(Math.max(Math.abs(_velocity.x), Math.abs(_velocity.z)) / _activeWalkingSpeed);
+
+            _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.02f * speedFactor, 1.75f));
+            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f * speedFactor, 3.0f));
         } else {
             _firstPersonCamera.setBobbingRotationOffsetFactor(0.0);
             _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);
