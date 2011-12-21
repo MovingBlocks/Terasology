@@ -7,11 +7,11 @@ class SlimeTool implements Tool {
     public void executeLeftClickAction() {
         println "Executing left click! Going to spawn a Gelatinous Cube"
 
-        GelatinousCube s = new GelatinousCube(Blockmania.getInstance().getActiveWorld())
-        s.setSpawningPoint(Blockmania.getInstance().getActiveWorld().getPlayer().getPosition())
+        GelatinousCube s = new GelatinousCube(Blockmania.getInstance().getActiveWorldRenderer())
+        s.setSpawningPoint(Blockmania.getInstance().getActiveWorldRenderer().getPlayer().getPosition())
         s.respawn()
 
-        Blockmania.getInstance().getActiveWorld().getMobManager().addMob(s)
+        Blockmania.getInstance().getActiveWorldRenderer().getMobManager().addMob(s)
     }
 
     public void executeRightClickAction() {
@@ -22,4 +22,4 @@ class SlimeTool implements Tool {
 def slimeGun = new SlimeTool()
 
 println "SlimeToolAddon.groovy is trying to add the slimeGun tool"
-blockmania.getActiveWorld().getPlayer().addTool(slimeGun)
+blockmania.getActiveWorldRenderer().getPlayer().addTool(slimeGun)

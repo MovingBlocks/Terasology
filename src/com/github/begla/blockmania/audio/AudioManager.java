@@ -50,6 +50,7 @@ public class AudioManager {
     private void loadSound() {
         _audioFiles.put("PlaceBlock", loadSound("PlaceBlock"));
         _audioFiles.put("RemoveBlock", loadSound("RemoveBlock"));
+        _audioFiles.put("Dig", loadSound("Dig"));
     }
 
     private void loadMusic() {

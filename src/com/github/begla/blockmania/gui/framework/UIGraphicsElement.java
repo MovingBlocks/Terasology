@@ -17,9 +17,11 @@ package com.github.begla.blockmania.gui.framework;
 
 
 import com.github.begla.blockmania.rendering.manager.TextureManager;
+import com.github.begla.blockmania.utilities.FastRandom;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -34,17 +36,24 @@ public class UIGraphicsElement extends UIDisplayElement {
     private final Vector2f _textureOrigin = new Vector2f(0.0f, 0.0f);
     private final Vector2f _textureSize = new Vector2f(1.0f, 1.0f);
 
+    private static final FastRandom _debugRand = new FastRandom(42);
+    private final Vector3f _debugColor = new Vector3f();
+
     public UIGraphicsElement(String textureName) {
         _textureName = textureName;
+
+        _debugColor.set((float) Math.abs(_debugRand.randomDouble()),(float) Math.abs(_debugRand.randomDouble()), (float) Math.abs(_debugRand.randomDouble()));
     }
 
     @Override
     public void render() {
         TextureManager.getInstance().bindTexture(_textureName);
 
+
         glEnable(GL11.GL_TEXTURE_2D);
         glBegin(GL11.GL_QUADS);
 
+        //glColor4f(_debugColor.x,_debugColor.y, _debugColor.z, 1.0f);
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         glTexCoord2f(_textureOrigin.x, _textureOrigin.y);

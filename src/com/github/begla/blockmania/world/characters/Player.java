@@ -27,6 +27,7 @@ import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
+import com.github.begla.blockmania.tools.BlockPlacementRemovalTool;
 import com.github.begla.blockmania.tools.Tool;
 import com.github.begla.blockmania.tools.ToolBelt;
 import com.github.begla.blockmania.utilities.MathHelper;
@@ -77,8 +78,11 @@ public final class Player extends Character {
 
     /* INTERACTIONS */
     private long _lastInteraction = 0;
-    private RayBlockIntersection.Intersection _selectedBlock, _prevSelectedBlock;
     private byte _extractionCounter = 0;
+    private RayBlockIntersection.Intersection _selectedBlock, _prevSelectedBlock;
+
+    /* RESPAWNING */
+    private long _timeOfDeath = -1;
 
     /**
      * The ToolBelt is how the player interacts with tool events from mouse or keyboard
@@ -94,7 +98,6 @@ public final class Player extends Character {
         _walkingSpeed = WALKING_SPEED - Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.01f, 2.5f));
 
         processInteractions(-1);
-        _selectedBlock = calcSelectedBlock();
 
         if (_handMovementAnimationOffset > 0) {
             _handMovementAnimationOffset -= 0.04;
@@ -104,9 +107,23 @@ public final class Player extends Character {
 
         super.update();
         updateCameras();
+
+        _selectedBlock = calcSelectedBlock();
+
+        /*
+         * RESPAWNING!
+         */
+        if (isDead() && _timeOfDeath == -1) {
+            _timeOfDeath = Blockmania.getInstance().getTime();
+        } else if (isDead() && Blockmania.getInstance().getTime() - _timeOfDeath > 1000) {
+            revive();
+            respawn();
+            _timeOfDeath = -1;
+        }
     }
 
     private void processInteractions(int button) {
+        // Throttle interactions
         if (Blockmania.getInstance().getTime() - _lastInteraction < 200) {
             return;
         }
@@ -137,10 +154,56 @@ public final class Player extends Character {
             }
         }
 
+        calcSelectedBlock();
+
         super.render();
     }
 
+    public void renderFirstPersonViewElements() {
+        Tool activeTool = _toolBelt.getSelectedTool();
+
+        if (activeTool == null)
+            renderHand();
+        else if (activeTool != null && !BlockPlacementRemovalTool.class.isInstance(activeTool))
+            renderHand();
+        else
+            renderSelectedBlock();
+    }
+
     /**
+     * Renders the actively selected block in the front of the player's fir person perspective.
+     */
+    public void renderSelectedBlock() {
+        Block b = BlockManager.getInstance().getBlock(Blockmania.getInstance().getActiveWorldRenderer().getPlayer().getSelectedBlockType());
+
+        if (b == null)
+            return;
+
+        glEnable(GL_TEXTURE_2D);
+        TextureManager.getInstance().bindTexture("terrain");
+
+        glEnable(GL11.GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glAlphaFunc(GL_GREATER, 0.1f);
+
+        glPushMatrix();
+
+        glTranslatef(1.0f, -1.15f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.5f - _handMovementAnimationOffset * 0.5f);
+        glRotatef(-25f - _handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(35f, 0.0f, 1.0f, 0.0f);
+        glTranslatef(0f, 0.25f, 0f);
+
+        b.render();
+
+        glPopMatrix();
+
+        glDisable(GL11.GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    }
+
+    /**
+     * Renders a simple hand displayed in front of the player's first person perspective.
+     *
      * TODO: Should not be rendered using immediate mode!
      */
     public void renderHand() {
@@ -187,6 +250,15 @@ public final class Player extends Character {
         glDisable(GL11.GL_TEXTURE_2D);
     }
 
+    /**
+     * Calculates the bobbing offset factor using sine/cosine functions. The offset adjusted linearly to
+     * the player's movement speed.
+     *
+     * @param phaseOffset
+     * @param amplitude
+     * @param frequency
+     * @return
+     */
     public double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
         float speedFactor = 1.0f;
 
@@ -244,10 +316,17 @@ public final class Player extends Character {
     public RayBlockIntersection.Intersection calcSelectedBlock() {
         ArrayList<RayBlockIntersection.Intersection> inters = new ArrayList<RayBlockIntersection.Intersection>();
 
+        int blockPosX, blockPosY, blockPosZ;
+
         for (int x = -3; x <= 3; x++) {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -3; z <= 3; z++) {
-                    byte blockType = _parent.getWorldProvider().getBlock((int) (getPosition().x + x), (int) (getPosition().y + y), (int) (getPosition().z + z));
+                    // Make sure the correct block positions are calculated relatively to the position of the player
+                    blockPosX = (int) (getPosition().x + (getPosition().x >= 0 ? 0.5f : -0.5f)) + x;
+                    blockPosY = (int) (getPosition().y + (getPosition().y >= 0 ? 0.5f : -0.5f)) + y;
+                    blockPosZ = (int) (getPosition().z + (getPosition().z >= 0 ? 0.5f : -0.5f)) + z;
+
+                    byte blockType = _parent.getWorldProvider().getBlock(blockPosX, blockPosY, blockPosZ);
 
                     // Ignore special blocks
                     if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
@@ -255,7 +334,7 @@ public final class Player extends Character {
                     }
 
                     // The ray originates from the "player's eye"
-                    ArrayList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent.getWorldProvider(), (int) getPosition().x + x, (int) getPosition().y + y, (int) getPosition().z + z, calcEyePosition(), _viewingDirection);
+                    ArrayList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent.getWorldProvider(), blockPosX, blockPosY, blockPosZ, calcEyePosition(), _viewingDirection);
 
                     if (iss != null) {
                         inters.addAll(iss);
@@ -355,18 +434,23 @@ public final class Player extends Character {
         if (getParent() != null) {
             if (_selectedBlock != null) {
 
+                // Check if this block was "poked" before
                 if (_prevSelectedBlock != null) {
                     if (_prevSelectedBlock.equals(_selectedBlock)) {
+                        // If so increase the extraction counter
                         _extractionCounter++;
                     } else {
+                        // If another block was touched in between...
                         resetExtraction();
                         _extractionCounter++;
                     }
                 } else {
+                    // This block was "poked" for the first time
                     _prevSelectedBlock = _selectedBlock;
                     _extractionCounter++;
                 }
 
+                // Enough pokes... Remove the block!
                 if (_extractionCounter >= 3) {
                     BlockPosition blockPos = _selectedBlock.getBlockPosition();
                     byte currentBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y, blockPos.z);
@@ -392,9 +476,11 @@ public final class Player extends Character {
                     notifyObserversBlockRemoved(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
 
                     resetExtraction();
+                    return;
                 }
 
-                AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+                // Play digging sound if the block was not removed
+                AudioManager.getInstance().getAudio("Dig").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
             }
         }
     }
@@ -412,6 +498,9 @@ public final class Player extends Character {
                 if (!repeatEvent && state) {
                     cycleBlockTypes(1);
                 }
+                break;
+            case Keyboard.KEY_K:
+                damage(9999);
                 break;
             case Keyboard.KEY_DOWN:
                 if (!repeatEvent && state) {
@@ -451,9 +540,6 @@ public final class Player extends Character {
             case Keyboard.KEY_9:
                 _toolBelt.setSelectedTool((byte) 9);
                 break;
-            case Keyboard.KEY_0:
-                _toolBelt.setSelectedTool((byte) 10);
-                break;
         }
     }
 
@@ -465,6 +551,9 @@ public final class Player extends Character {
      * @param wheelMoved Distance the mouse wheel moved since last
      */
     public void processMouseInput(int button, boolean state, int wheelMoved) {
+        if (isDead())
+            return;
+
         if (wheelMoved != 0) {
             Blockmania.getInstance().getLogger().log(Level.INFO, "Mouse wheel moved " + wheelMoved + " for button " + button + ", state " + state);
             _toolBelt.rollSelectedTool((byte) (wheelMoved / 120));
@@ -478,6 +567,9 @@ public final class Player extends Character {
      * command.
      */
     public void processMovement() {
+        if (isDead())
+            return;
+
         double dx = Mouse.getDX();
         double dy = Mouse.getDY();
 
@@ -538,22 +630,12 @@ public final class Player extends Character {
         return generateAABBForPosition(getPosition());
     }
 
-    @Override
-    protected void handleVerticalCollision() {
-        // Nothing special to do.
-    }
-
-    @Override
-    protected void handleHorizontalCollision() {
-        // Nothing special to do.
-    }
-
     public byte getSelectedBlockType() {
         return _activeBlockType;
     }
 
     public byte getSelectedTool() {
-        return _toolBelt.getSelectedTool();
+        return _toolBelt.getSelectedToolId();
     }
 
     public void addTool(Tool toolToAdd) {
@@ -584,10 +666,7 @@ public final class Player extends Character {
             ob.blockRemoved(chunk, pos);
     }
 
-    public void notifyObserversLightChanged
-            (Chunk
-                     chunk, BlockPosition
-                    pos) {
+    public void notifyObserversLightChanged(Chunk chunk, BlockPosition pos) {
         for (BlockObserver ob : _observers)
             ob.lightChanged(chunk, pos);
     }

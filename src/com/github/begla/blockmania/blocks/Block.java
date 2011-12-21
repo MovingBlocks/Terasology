@@ -64,7 +64,8 @@ public class Block implements RenderableObject {
     private final Vector2f[] _textureAtlasPos = new Vector2f[6];
 
     /* RENDERING */
-    private int _displayList = -1;
+    private int _displayListBlock = -1;
+    private int _displayListBillboard = -1;
 
     /* LUTs */
     private static BufferedImage _colorLut;
@@ -201,10 +202,20 @@ public class Block implements RenderableObject {
         if (isInvisible())
             return;
 
-        if (_displayList == -1)
-            _displayList = generateDisplayList();
+        if (_displayListBlock == -1)
+            _displayListBlock = generateDisplayList();
 
-        glCallList(_displayList);
+        if (_displayListBillboard == -1)
+            _displayListBillboard = generateDisplayListBillboard();
+
+        if (getBlockForm() != BLOCK_FORM.BILLBOARD) {
+            glCallList(_displayListBlock);
+        } else {
+            glDisable(GL11.GL_CULL_FACE);
+            glCallList(_displayListBillboard);
+            glEnable(GL11.GL_CULL_FACE);
+        }
+
     }
 
     public void update() {
@@ -428,6 +439,17 @@ public class Block implements RenderableObject {
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 
+        // FRONT
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + 0.0624f, calcTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + 0.0624f, calcTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
+        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
+        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
+
+        GL11.glColor3f(0.5f, 0.5f, 0.5f);
 
         // BACK
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y + 0.0624f);
@@ -449,17 +471,7 @@ public class Block implements RenderableObject {
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x, calcTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
 
-        GL11.glColor3f(0.5f, 0.5f, 0.5f);
 
-        // FRONT
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y);
-        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + 0.0624f, calcTextureOffsetFor(SIDE.FRONT).y);
-        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + 0.0624f, calcTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
-        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
-        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
         // BOTTOM
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x, calcTextureOffsetFor(SIDE.BOTTOM).y);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
@@ -469,6 +481,44 @@ public class Block implements RenderableObject {
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x, calcTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
+
+        GL11.glEnd();
+        glEndList();
+
+        return id;
+    }
+
+    /**
+     * Generates the display list used for rendering the block.
+     *
+     * @return The id of the display list
+     */
+    private int generateDisplayListBillboard() {
+        int id = glGenLists(1);
+
+        glNewList(id, GL11.GL_COMPILE);
+        glBegin(GL_QUADS);
+        GL11.glColor3f(1.0f, 1.0f, 1.0f);
+
+        // LEFT
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glVertex3f(0f, -0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + 0.0624f, calcTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glVertex3f(0f, -0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + 0.0624f, calcTextureOffsetFor(SIDE.LEFT).y);
+        GL11.glVertex3f(0f, 0.5f, 0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y);
+        GL11.glVertex3f(0f, 0.5f, -0.5f);
+
+        // BACK
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glVertex3f(-0.5f, -0.5f, 0f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + 0.0624f, calcTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glVertex3f(0.5f, -0.5f, 0f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + 0.0624f, calcTextureOffsetFor(SIDE.BACK).y);
+        GL11.glVertex3f(0.5f, 0.5f, 0f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y);
+        GL11.glVertex3f(-0.5f, 0.5f, 0f);
 
         GL11.glEnd();
         glEndList();

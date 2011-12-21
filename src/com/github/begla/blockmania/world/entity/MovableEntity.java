@@ -345,6 +345,8 @@ public abstract class MovableEntity extends Entity {
 
         if (!_godMode) {
             if (verticalHitTest(oldPosition)) {
+                handleVerticalCollision();
+
                 double oldGravity = _gravity;
                 _gravity = 0;
 
@@ -364,8 +366,6 @@ public abstract class MovableEntity extends Entity {
                 } else {
                     _touchingGround = false;
                 }
-
-                handleVerticalCollision();
             } else {
                 _touchingGround = false;
             }

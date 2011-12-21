@@ -125,6 +125,7 @@ public class UIText extends UIDisplayElement {
     }
 
     public Vector2f calcCenterPosition() {
+        // This has to be calculated separately since the width of the text depends on the selected font
         return new Vector2f(Display.getWidth() / 2 - getTextWidth() / 2, Display.getHeight() / 2 - getTextHeight());
     }
 }

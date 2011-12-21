@@ -34,29 +34,34 @@ public class ChunkGeneratorLiquids extends ChunkGeneratorTerrain {
 
     @Override
     public void generate(Chunk c) {
-        if (_parent.getParent().getRandom().randomDouble() > 0.95) {
-
             LiquidSimulator liquidSimulator = new LiquidSimulator(_parent.getParent());
 
-            for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 0; y--) {
+
+            boolean grassGenerated = false, lavaGenerated = false;
+            for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 0; y --) {
                 String title = BlockManager.getInstance().getBlock(c.getBlock(8, y, 8)).getTitle();
 
-                if (title.equals("Grass") || title.equals("Snow") || title.equals("Stone")) {
+                boolean set = false;
+                if ((title.equals("Grass") || title.equals("Snow")) && !grassGenerated && y >= 32 && _parent.getParent().getRandom().randomDouble() > 0.8) {
+                    c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Water").getId());
+                    set = true;
+                    grassGenerated = true;
+                } else if (title.equals("Stone") && !lavaGenerated && c.getBlock(8, y + 1, 8) == 0x0) {
+                    c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Lava").getId());
+                    set = true;
+                    lavaGenerated = true;
+                }
 
-                    if (_parent.getParent().getRandom().randomDouble() > 0.75)
-                        c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Lava").getId());
-                    else
-                        c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Water").getId());
-
+                if (set) {
                     liquidSimulator.addActiveBlock(new BlockPosition(c.getBlockWorldPosX(8), y, c.getBlockWorldPosZ(8)));
 
                     for (int i = 0; i < 256; i++) {
                         liquidSimulator.simulate(true);
                     }
-
-                    return;
                 }
+
+                if (lavaGenerated)
+                    return;
             }
-        }
     }
 }

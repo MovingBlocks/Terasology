@@ -59,10 +59,10 @@ public class RectangleSelectionTool implements Tool {
     private void addBlock(BlockPosition blockPosition) {
         if (_selectedBlocks.size() >= 2) {
             _selectedBlocks.clear();
-            Blockmania.getInstance().getActiveWorld().getBlockGrid().clear();
+            Blockmania.getInstance().getActiveWorldRenderer().getBlockGrid().clear();
         }
 
-        Blockmania.getInstance().getActiveWorld().getBlockGrid().addGridPosition(blockPosition);
+        Blockmania.getInstance().getActiveWorldRenderer().getBlockGrid().addGridPosition(blockPosition);
         _selectedBlocks.add(blockPosition);
 
         if (_selectedBlocks.size() == 2)
@@ -89,7 +89,7 @@ public class RectangleSelectionTool implements Tool {
                         BlockPosition bp = new BlockPosition(x, y, z);
 
                         _selectedBlocks.add(bp);
-                        Blockmania.getInstance().getActiveWorld().getBlockGrid().addGridPosition(bp);
+                        Blockmania.getInstance().getActiveWorldRenderer().getBlockGrid().addGridPosition(bp);
                     }
                 }
             }
@@ -101,6 +101,6 @@ public class RectangleSelectionTool implements Tool {
     private void reset() {
         _currentBlueprint = null;
         _selectedBlocks.clear();
-        Blockmania.getInstance().getActiveWorld().getBlockGrid().clear();
+        Blockmania.getInstance().getActiveWorldRenderer().getBlockGrid().clear();
     }
 }

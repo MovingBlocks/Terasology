@@ -266,7 +266,7 @@ public final class WorldRenderer implements RenderableObject {
         glPushMatrix();
         glLoadIdentity();
         glDisable(GL11.GL_DEPTH_TEST);
-        _player.renderHand();
+        _player.renderFirstPersonViewElements();
         glEnable(GL11.GL_DEPTH_TEST);
         glPopMatrix();
     }

@@ -84,7 +84,6 @@ Physics {
 HUD {
 
     crosshair = true
-    rotatingBlock = true
     placingBox = true
 
 }

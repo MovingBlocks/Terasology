@@ -29,7 +29,7 @@ import org.lwjgl.opengl.Display;
 import javax.vecmath.Vector2f;
 
 /**
- * HUD displayed on the user's screen.
+ * Simple pause menu providing buttons for respawning the player and creating a new world.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -80,7 +80,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _respawnButton.addClickListener(new UIClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
-                Blockmania.getInstance().getActiveWorld().getPlayer().respawn();
+                Blockmania.getInstance().getActiveWorldRenderer().getPlayer().respawn();
             }
         });
 

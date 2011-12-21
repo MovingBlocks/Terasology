@@ -15,6 +15,8 @@
  */
 package com.github.begla.blockmania.gui.framework;
 
+import org.lwjgl.opengl.Display;
+
 import javax.vecmath.Vector2f;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -55,15 +57,14 @@ public abstract class UIDisplayElement {
     }
 
     public void processKeyboardInput(int key) {
-
+        // Nothing to do here
     }
 
     public void processMouseInput(int button, boolean state, int wheelMoved) {
-
+        // Nothing to do here
     }
 
     public abstract void render();
-
     public abstract void update();
 
     public Vector2f getPosition() {
@@ -98,8 +99,22 @@ public abstract class UIDisplayElement {
         _parent = parent;
     }
 
+    /**
+     * Returns true if the given point intersects the display element.
+     *
+     * @param point The point to test
+     * @return True if intersecting
+     */
     public boolean intersects(Vector2f point) {
         return (point.x >= getPosition().x && point.y >= getPosition().y && point.x <= getPosition().x + getSize().x && point.y <= getPosition().y + getSize().y);
     }
 
+    /**
+     * Calculates the center position on the screen based on the active resolution and size of the display element.
+     *
+     * @return The center position
+     */
+    public Vector2f calcCenterPosition() {
+        return new Vector2f(Display.getWidth() / 2 - getSize().x / 2, Display.getHeight() / 2 - getSize().y / 2);
+    }
 }

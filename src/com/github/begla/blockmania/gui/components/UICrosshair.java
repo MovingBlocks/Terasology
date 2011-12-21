@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * A crosshair.
+ * A simple crosshair.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

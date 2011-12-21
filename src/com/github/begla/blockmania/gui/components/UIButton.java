@@ -26,7 +26,7 @@ import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 
 /**
- * Simple button.
+ * A simple graphical button usable for creating user interface.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -43,7 +43,7 @@ public class UIButton extends UIDisplayContainer {
     public UIButton(Vector2f size) {
         setSize(size);
 
-        _defaultTexture = new UIGraphicsElement("button");
+        _defaultTexture = new UIGraphicsElement("gui_menu");
         _defaultTexture.setVisible(true);
         _defaultTexture.getTextureSize().set(new Vector2f(256f / 512f, 30f / 512f));
         addDisplayElement(_defaultTexture);
@@ -117,9 +117,5 @@ public class UIButton extends UIDisplayContainer {
 
     public void removeClickListener(UIClickListener listener) {
         _clickListeners.remove(listener);
-    }
-
-    public Vector2f calcCenterPosition() {
-        return new Vector2f(Display.getWidth() / 2 - getSize().x / 2, Display.getHeight() / 2 - getSize().y / 2);
     }
 }

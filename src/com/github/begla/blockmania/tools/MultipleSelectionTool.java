@@ -55,14 +55,14 @@ public class MultipleSelectionTool implements Tool {
 
     private void addBlock(BlockPosition blockPosition) {
         _vertexBlocks.add(blockPosition);
-        Blockmania.getInstance().getActiveWorld().getBlockGrid().addGridPosition(blockPosition);
+        Blockmania.getInstance().getActiveWorldRenderer().getBlockGrid().addGridPosition(blockPosition);
 
         Blockmania.getInstance().getLogger().log(Level.INFO, "Added block at: " + blockPosition);
     }
 
     private void removeBlock(BlockPosition blockPosition) {
         _vertexBlocks.remove(blockPosition);
-        Blockmania.getInstance().getActiveWorld().getBlockGrid().removeGridPosition(blockPosition);
+        Blockmania.getInstance().getActiveWorldRenderer().getBlockGrid().removeGridPosition(blockPosition);
 
         Blockmania.getInstance().getLogger().log(Level.INFO, "Removed block at: " + blockPosition);
     }

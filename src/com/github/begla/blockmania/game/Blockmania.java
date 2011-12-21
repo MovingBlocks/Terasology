@@ -19,7 +19,7 @@ import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.groovy.GroovyManager;
 import com.github.begla.blockmania.gui.menus.UIHeadsUpDisplay;
-import com.github.begla.blockmania.gui.menus.UILoadingScreen;
+import com.github.begla.blockmania.gui.menus.UIStatusScreen;
 import com.github.begla.blockmania.gui.menus.UIPauseMenu;
 import com.github.begla.blockmania.rendering.manager.FontManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
@@ -84,12 +84,12 @@ public final class Blockmania {
     private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
 
     /* RENDERING */
-    private WorldRenderer _worldRenderer;
+    private WorldRenderer _activeWorldRenderer;
 
     /* GUI */
     private UIHeadsUpDisplay _hud;
     private UIPauseMenu _pauseMenu;
-    private UILoadingScreen _loadingScreen;
+    private UIStatusScreen _statusScreen;
 
     /* SINGLETON */
     private static Blockmania _instance;
@@ -237,9 +237,9 @@ public final class Blockmania {
         final FastRandom random = new FastRandom();
 
         // Get rid of the old world
-        if (_worldRenderer != null) {
-            _worldRenderer.dispose();
-            _worldRenderer = null;
+        if (_activeWorldRenderer != null) {
+            _activeWorldRenderer.dispose();
+            _activeWorldRenderer = null;
         }
 
         if (seed == null) {
@@ -251,12 +251,12 @@ public final class Blockmania {
         getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        _worldRenderer = new WorldRenderer(title, seed);
-        _worldRenderer.setPlayer(new Player(_worldRenderer));
+        _activeWorldRenderer = new WorldRenderer(title, seed);
+        _activeWorldRenderer.setPlayer(new Player(_activeWorldRenderer));
 
         // Create the first Portal if it doesn't exist yet
-        _worldRenderer.initPortal();
-        _worldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+        _activeWorldRenderer.initPortal();
+        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
 
         simulateWorld(4000);
     }
@@ -264,18 +264,18 @@ public final class Blockmania {
     private void simulateWorld(int duration) {
         long timeBefore = getTime();
 
-        _loadingScreen.setVisible(true);
+        _statusScreen.setVisible(true);
         _hud.setVisible(false);
 
         float diff = 0;
 
         for (; diff < duration; ) {
-            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
+            _statusScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
 
             renderUserInterface();
             updateUserInterface();
 
-            getActiveWorld().standaloneGenerateChunks();
+            getActiveWorldRenderer().standaloneGenerateChunks();
 
             Display.update();
 
@@ -285,7 +285,7 @@ public final class Blockmania {
         // Reset the delta value
         _lastLoopTime = getTime();
 
-        _loadingScreen.setVisible(false);
+        _statusScreen.setVisible(false);
         _hud.setVisible(true);
     }
 
@@ -314,7 +314,7 @@ public final class Blockmania {
         _hud.setVisible(true);
 
         _pauseMenu = new UIPauseMenu();
-        _loadingScreen = new UILoadingScreen();
+        _statusScreen = new UIStatusScreen();
 
         /*
          * Init. OpenGL
@@ -381,7 +381,7 @@ public final class Blockmania {
          * Save the world and exit the application.
          */
         if (_saveWorldOnExit) {
-            _worldRenderer.dispose();
+            _activeWorldRenderer.dispose();
         }
 
         _threadPool.shutdown();
@@ -399,21 +399,31 @@ public final class Blockmania {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
-        if (_worldRenderer != null)
-            _worldRenderer.render();
+        if (_activeWorldRenderer != null)
+            _activeWorldRenderer.render();
 
         renderUserInterface();
     }
 
     public void update() {
         if (!_pauseGame && !_hud.getDebugConsole().isVisible() && !_pauseMenu.isVisible()) {
-            if (_worldRenderer != null)
-                _worldRenderer.update();
+            if (_activeWorldRenderer != null)
+                _activeWorldRenderer.update();
             if (!Mouse.isGrabbed())
                 Mouse.setGrabbed(true);
         } else {
             if (Mouse.isGrabbed())
                 Mouse.setGrabbed(false);
+        }
+
+        if (_activeWorldRenderer != null) {
+            if (_activeWorldRenderer.getPlayer().isDead()) {
+                _statusScreen.setVisible(true);
+                _statusScreen.updateStatus("Sorry. You've died. :-(");
+            } else {
+                _statusScreen.setVisible(false);
+            }
+
         }
 
         updateUserInterface();
@@ -422,13 +432,13 @@ public final class Blockmania {
     private void renderUserInterface() {
         _hud.render();
         _pauseMenu.render();
-        _loadingScreen.render();
+        _statusScreen.render();
     }
 
     private void updateUserInterface() {
         _hud.update();
         _pauseMenu.update();
-        _loadingScreen.update();
+        _statusScreen.update();
     }
 
 
@@ -470,7 +480,7 @@ public final class Blockmania {
             int wheelMoved = Mouse.getEventDWheel();
 
             if (!_pauseGame && !_hud.getDebugConsole().isVisible() && !_pauseMenu.isVisible())
-                _worldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+                _activeWorldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
 
             _hud.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
             _pauseMenu.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
@@ -503,8 +513,8 @@ public final class Blockmania {
             }
 
             // Pass input to the current player
-            if (!isGamePaused())
-                _worldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
+            if (!_pauseGame && !_hud.getDebugConsole().isVisible() && !_pauseMenu.isVisible())
+                _activeWorldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
         }
     }
 
@@ -565,12 +575,12 @@ public final class Blockmania {
         return _averageFps;
     }
 
-    public WorldRenderer getActiveWorld() {
-        return _worldRenderer;
+    public WorldRenderer getActiveWorldRenderer() {
+        return _activeWorldRenderer;
     }
 
     public WorldProvider getActiveWorldProvider() {
-        return _worldRenderer.getWorldProvider();
+        return _activeWorldRenderer.getWorldProvider();
     }
 
     /**
@@ -595,6 +605,6 @@ public final class Blockmania {
 
     public void toggleViewingDistance() {
         _activeViewingDistance = (_activeViewingDistance + 1) % 4;
-        _worldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
     }
 }

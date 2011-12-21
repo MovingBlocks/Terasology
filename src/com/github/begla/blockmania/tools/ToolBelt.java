@@ -139,48 +139,49 @@ public class ToolBelt {
      * @param leftMouse if true then left mouse was used to trigger, otherwise it was right mouse
      */
     public void activateTool(boolean leftMouse) {
+        String mouse = leftMouse ? "Left" : "Right";
+
         // First we dig out the Byte index that the value in _selectedTool references in the _toolBinding map
         Byte toolIndex = _toolBinding.get(new Byte(_selectedTool));
-        String mouse = leftMouse ? "Left" : "Right";
-        Blockmania.getInstance().getLogger().log(Level.INFO, mouse + " button tool activation happened for slot " + _selectedTool + ", which is tool " + toolIndex);
+        Tool activeTool = getToolForIndex(toolIndex);
+
+        if (activeTool != null) {
+            Blockmania.getInstance().getLogger().log(Level.INFO, mouse + " button tool activation happened for slot " + _selectedTool + ", which is tool " + toolIndex);
+
+            if (leftMouse)
+                activeTool.executeLeftClickAction();
+            else
+                activeTool.executeRightClickAction();
+        }
+    }
+
+    public Tool getToolForIndex(Byte toolIndex) {
         if (toolIndex == null) {
-            Blockmania.getInstance().getLogger().log(Level.WARNING, mouse + " button tool activation happened for an 'empty slot' " + toolIndex);
-            return;
+            return null;
         }
 
-        // If we're looking at a high-range tool it is from the groovyStore - so look there and execute what we find
+        // If we're looking at a high-range tool it is from the groovyStore - so look there and return what we find
         if (toolIndex >= 51) {
             if (_pluginStore.containsKey(toolIndex)) {
-
-                // Execute the Groovy tool
-                if (leftMouse)
-                    _pluginStore.get(toolIndex).executeLeftClickAction();
-                else
-                    _pluginStore.get(toolIndex).executeRightClickAction();
-
-            } else {
-                Blockmania.getInstance().getLogger().log(Level.WARNING, "Tool activation happened for an unrecognized Groovy tool: " + toolIndex);
+                return _pluginStore.get(toolIndex);
             }
         }
         // For low range tools we look for the native tool and if it isn't found there's something wrong
         else {
-
             if (_toolStore.containsKey(toolIndex)) {
-
-                // Execute the native tool
-                if (leftMouse)
-                    _toolStore.get(toolIndex).executeLeftClickAction();
-                else
-                    _toolStore.get(toolIndex).executeRightClickAction();
-
-            } else {
-                Blockmania.getInstance().getLogger().log(Level.WARNING, "Tool activation happened for an unrecognized tool: " + toolIndex);
+                return _toolStore.get(toolIndex);
             }
-
         }
+
+        return null;
     }
 
-    public byte getSelectedTool() {
+    public byte getSelectedToolId() {
         return _selectedTool;
+    }
+
+    public Tool getSelectedTool() {
+        Byte toolIndex = _toolBinding.get(new Byte(_selectedTool));
+        return getToolForIndex(toolIndex);
     }
 }

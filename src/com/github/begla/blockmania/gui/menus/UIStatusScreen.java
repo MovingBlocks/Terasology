@@ -20,16 +20,16 @@ import com.github.begla.blockmania.gui.components.UITransparentOverlay;
 import com.github.begla.blockmania.gui.framework.UIDisplayRenderer;
 
 /**
- * Simple loading screen.
+ * Simple status screen with one sole text label usable for status notifications.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UILoadingScreen extends UIDisplayRenderer {
+public class UIStatusScreen extends UIDisplayRenderer {
 
     final UITransparentOverlay _overlay;
     final UIText _status;
 
-    public UILoadingScreen() {
+    public UIStatusScreen() {
         _status = new UIText("Loading...");
         _status.setVisible(true);
 
