@@ -469,7 +469,7 @@ public final class Blockmania {
             int button = Mouse.getEventButton();
             int wheelMoved = Mouse.getEventDWheel();
 
-            if (!isGamePaused())
+            if (!_pauseGame && !_hud.getDebugConsole().isVisible() && !_pauseMenu.isVisible())
                 _worldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
 
             _hud.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);

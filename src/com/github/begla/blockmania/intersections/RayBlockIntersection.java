@@ -68,6 +68,14 @@ public class RayBlockIntersection {
             return distance2 > distance ? -1 : 1;
         }
 
+        public boolean equals(Object o) {
+            if (o.getClass() != Intersection.class)
+                return false;
+
+            Intersection i = (Intersection) o;
+            return this._blockPosition.equals(i.getBlockPosition());
+        }
+
         Vector3f getSurfaceNormal() {
             return _surfaceNormal;
         }
