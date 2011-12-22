@@ -6,7 +6,7 @@ import com.github.begla.blockmania.generators.TreeGeneratorLSystem
 
 def GeneratorManager m = generatorManager;
 
-HashMap<String, String> probabilities = new HashMap<String, Double>();
+HashMap<String, Double> probabilities = new HashMap<String, Double>();
 probabilities.put("A", 0.7d);
 probabilities.put("B", 0.6d);
 

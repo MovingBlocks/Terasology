@@ -235,7 +235,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         int plateauArea = (int) (Chunk.CHUNK_DIMENSION_Y * 0.10);
         double flatten = MathHelper.clamp(((Chunk.CHUNK_DIMENSION_Y - 16) - y) / plateauArea);
 
-        return -y + (((32.0 + height * 32.0) * MathHelper.clamp(river + 0.25) * MathHelper.clamp(ocean + 0.25)) + densityMountains * 512.0 + densityHills * 128.0) * flatten;
+        return -y + (((32.0 + height * 32.0) * MathHelper.clamp(river + 0.25) * MathHelper.clamp(ocean + 0.25)) + densityMountains * 1024.0 + densityHills * 128.0) * flatten;
     }
 
     public double calcBaseTerrain(double x, double z) {
@@ -254,10 +254,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double x1, y1, z1;
 
         x1 = x * 0.006;
-        y1 = y * 0.004;
+        y1 = y * 0.002;
         z1 = z * 0.006;
 
-        double result = _pGen5.fBm(x1, y1, z1);
+        double result = _pGen4.fBm(x1, y1, z1);
 
         return result > 0.0 ? result : 0;
     }
@@ -269,22 +269,22 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         y1 = y * 0.008;
         z1 = z * 0.01;
 
-        double result = _pGen2.fBm(x1, y1, z1) - 0.5;
+        double result = _pGen5.fBm(x1, y1, z1) - 0.5;
 
         return result > 0.0 ? result : 0;
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
-        double result = _pGen4.fBm(x * 0.0005, 0, 0.0005 * z);
+        double result = _pGen6.fBm(x * 0.0005, 0, 0.0005 * z);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcHumidityAtGlobalPosition(double x, double z) {
-        double result = _pGen5.fBm(x * 0.0005, 0, 0.0005 * z);
+        double result = _pGen7.fBm(x * 0.0005, 0, 0.0005 * z);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcCaveDensity(double x, double y, double z) {
-        return _pGen6.fBm(x * 0.02, y * 0.02, z * 0.02);
+        return _pGen8.fBm(x * 0.02, y * 0.02, z * 0.02);
     }
 }

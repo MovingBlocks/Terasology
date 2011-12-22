@@ -26,12 +26,13 @@ import com.github.begla.blockmania.utilities.MathHelper;
 public class PerlinNoise {
 
     private static final double LACUNARITY = 1.9379201;
-    private static final int OCTAVES = 5;
     private static final double H = 0.736281;
 
-    private static double[] _spectralWeights;
+    private double[] _spectralWeights;
 
     private final int[] _noisePermutations;
+    private boolean _recomputeSpectralWeights = true;
+    private int _octaves = 5;
 
     /**
      * Init. a new generator with a given seed value.
@@ -102,15 +103,18 @@ public class PerlinNoise {
      * @return The noise value
      */
     public double fBm(double x, double y, double z) {
-        double result  = 0.0;
+        double result = 0.0;
 
-        if (_spectralWeights == null) {
-            _spectralWeights = new double[OCTAVES];
+        if (_recomputeSpectralWeights) {
+            _spectralWeights = new double[_octaves];
 
-            for (int i = 0; i < OCTAVES; i++)
+            for (int i = 0; i < _octaves; i++)
                 _spectralWeights[i] = Math.pow(LACUNARITY, -H * i);
+
+            _recomputeSpectralWeights = false;
         }
-        for (int i = 0; i < OCTAVES; i++) {
+
+        for (int i = 0; i < _octaves; i++) {
             result += noise(x, y, z) * _spectralWeights[i];
 
             x *= LACUNARITY;
@@ -133,5 +137,14 @@ public class PerlinNoise {
         int h = hash & 15;
         double u = h < 8 ? x : y, v = h < 4 ? y : h == 12 || h == 14 ? x : z;
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+    }
+
+    public void setOctaves(int octaves) {
+        _octaves = octaves;
+        _recomputeSpectralWeights = true;
+    }
+
+    public int getOctaves() {
+        return _octaves;
     }
 }

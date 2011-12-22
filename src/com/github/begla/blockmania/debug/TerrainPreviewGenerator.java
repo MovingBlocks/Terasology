@@ -34,7 +34,7 @@ import java.io.IOException;
 public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
     /* CONST */
-    private static final int ZOOM_FACTOR = 8;
+    private static final int ZOOM_FACTOR = 4;
     private static final Vector2f POSITION = new Vector2f(-24575.82f, 20786.54f);
 
     /**

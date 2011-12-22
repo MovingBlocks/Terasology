@@ -60,7 +60,6 @@ public class GeneratorManager {
             scriptEngine.run("Default.groovy", _binding);
         } catch (IOException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
-            e.printStackTrace();
         } catch (ResourceException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         } catch (ScriptException e) {

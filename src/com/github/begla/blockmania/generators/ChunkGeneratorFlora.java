@@ -66,10 +66,10 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                     if (c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Snow").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Sand").getId()) {
                         double rand = Math.abs(c.getRandom().randomDouble());
 
-                        int randomGeneratorId = 0;
+                        int randomGeneratorId;
                         int size = _parent.getTreeGenerators(biome).size();
 
-                        if (size > 1) {
+                        if (size > 0) {
                             randomGeneratorId = Math.abs(c.getRandom().randomInt()) % size;
 
                             TreeGenerator treeGen = _parent.getTreeGenerator(biome, randomGeneratorId);
@@ -93,7 +93,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
      * @param z Position on the z-axis
      */
     private void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
-        if (c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Grass").getId() && c.getBlock(x, y + 1, z) == 0x0) {
+        if ((c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Sand").getId() || c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Snow").getId()) && c.getBlock(x, y + 1, z) == 0x0) {
 
             double grassRand = (c.getRandom().randomDouble() + 1.0) / 2.0;
             double grassProb = 1.0;
