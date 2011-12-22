@@ -21,7 +21,6 @@ import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
-import com.github.begla.blockmania.debug.BlockmaniaProfiler;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
@@ -999,5 +998,15 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
                 }
             }
         }
+    }
+
+    public int triangleCount() {
+        int result = 0;
+
+        for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
+            result += _activeMeshes[i].triangleCount();
+        }
+
+        return result;
     }
 }

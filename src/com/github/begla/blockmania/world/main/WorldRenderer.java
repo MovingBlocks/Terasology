@@ -387,6 +387,7 @@ public final class WorldRenderer implements RenderableObject {
             for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
                 if (!c.isSubMeshOcclusionCulled(k)) {
                     if (!c.isSubMeshCulled(k)) {
+                        _statVisibleTriangles += c.triangleCount();
                         c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT, k);
                     }
                 }

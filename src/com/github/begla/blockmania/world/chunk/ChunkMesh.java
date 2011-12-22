@@ -192,7 +192,7 @@ public class ChunkMesh {
         return _disposed;
     }
 
-    public int countTriangles() {
+    public int triangleCount() {
         return _triangles;
     }
 
