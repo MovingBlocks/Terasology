@@ -18,6 +18,7 @@ package com.github.begla.blockmania.world.main;
 import com.github.begla.blockmania.audio.AudioManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
+import com.github.begla.blockmania.debug.BlockmaniaProfiler;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.game.PortalManager;
 import com.github.begla.blockmania.game.blueprints.BlockGrid;
@@ -249,19 +250,27 @@ public final class WorldRenderer implements RenderableObject {
         /* SKYSPHERE */
         _player.getActiveCamera().lookThroughNormalized();
         _skysphere.render();
+        BlockmaniaProfiler.log("Render skysphere");
 
         /* WORLD RENDERING */
         _player.getActiveCamera().lookThrough();
 
         updateChunksInProximity(false);
         updateVisibleChunks();
+        BlockmaniaProfiler.log("Chunk list updates");
 
         _player.render();
+        BlockmaniaProfiler.log("Render player");
+
         renderChunksAndEntities();
+        BlockmaniaProfiler.log("Render chunks and entities");
 
         /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();
+        BlockmaniaProfiler.log("Render particles");
+
         _blockGrid.render();
+        BlockmaniaProfiler.log("Render block grid");
 
         glPushMatrix();
         glLoadIdentity();
@@ -269,6 +278,7 @@ public final class WorldRenderer implements RenderableObject {
         _player.renderFirstPersonViewElements();
         glEnable(GL11.GL_DEPTH_TEST);
         glPopMatrix();
+        BlockmaniaProfiler.log("Render player first person view");
     }
 
 
@@ -449,27 +459,31 @@ public final class WorldRenderer implements RenderableObject {
         updateTick();
 
         _skysphere.update();
+        BlockmaniaProfiler.log("Update skysphere");
         _player.update();
+        BlockmaniaProfiler.log("Update player");
         _mobManager.updateAll();
+        BlockmaniaProfiler.log("Update mobs");
 
         _bulletPhysicsRenderer.update();
+        BlockmaniaProfiler.log("Update physics");
 
         // Update the particle emitters
         _blockParticleEmitter.update();
+        BlockmaniaProfiler.log("Update particles");
 
         // Free unused space
         _worldProvider.getChunkProvider().flushCache();
+        BlockmaniaProfiler.log("Flush cache");
 
         // And finally fire any active events
         _worldTimeEventManager.fireWorldTimeEvents();
+        BlockmaniaProfiler.log("Time events");
 
-        /* SIMULATE! */
-        simulate();
-    }
-
-    private void simulate() {
+        // Simulate world
         _worldProvider.getLiquidSimulator().simulate(false);
         _worldProvider.getGrowthSimulator().simulate(false);
+        BlockmaniaProfiler.log("Simulation");
     }
 
     /**
@@ -582,7 +596,7 @@ public final class WorldRenderer implements RenderableObject {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %.2f, sun: %.2f, cache: %d, cu: %.2fms, triangles: %d, vcs: %d, seed: \"%s\", title: \"%s\", ocul: %d, smcul: %d, ec: %d)", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _chunkUpdateManager.getAverageUpdateDuration(), _statVisibleTriangles, _visibleChunks.size(), _worldProvider.getSeed(), _worldProvider.getTitle(), _statOcclusionCulled, _statSubMeshCulled, _statEmpty);
+        return String.format("world (biome: %s, time: %.2f, sun: %.2f, cache: %d, triangles: %d, vcs: %d, seed: \"%s\", title: \"%s\", ocul: %d, smcul: %d, ec: %d)", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _statVisibleTriangles, _visibleChunks.size(), _worldProvider.getSeed(), _worldProvider.getTitle(), _statOcclusionCulled, _statSubMeshCulled, _statEmpty);
     }
 
     public Player getPlayer() {

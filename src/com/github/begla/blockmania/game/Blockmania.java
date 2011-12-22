@@ -17,10 +17,11 @@ package com.github.begla.blockmania.game;
 
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
+import com.github.begla.blockmania.debug.BlockmaniaProfiler;
 import com.github.begla.blockmania.groovy.GroovyManager;
 import com.github.begla.blockmania.gui.menus.UIHeadsUpDisplay;
-import com.github.begla.blockmania.gui.menus.UIStatusScreen;
 import com.github.begla.blockmania.gui.menus.UIPauseMenu;
+import com.github.begla.blockmania.gui.menus.UIStatusScreen;
 import com.github.begla.blockmania.rendering.manager.FontManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.VertexBufferObjectManager;
@@ -358,6 +359,8 @@ public final class Blockmania {
         double nextGameTick = getTime();
         int loopCounter;
 
+        BlockmaniaProfiler.begin("GAME LOOP");
+
         // MAIN GAME LOOP
         while (_runGame && !Display.isCloseRequested()) {
             updateFPS();
@@ -391,6 +394,8 @@ public final class Blockmania {
         } catch (InterruptedException e) {
             getLogger().log(Level.SEVERE, e.toString(), e);
         }
+
+        BlockmaniaProfiler.end();
 
         destroy();
     }

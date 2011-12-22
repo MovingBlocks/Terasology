@@ -17,6 +17,7 @@ package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
+import com.github.begla.blockmania.debug.BlockmaniaProfiler;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
 
@@ -38,9 +39,6 @@ public final class ChunkUpdateManager implements BlockObserver {
 
     /* CHUNK UPDATES */
     private static final HashSet<Chunk> _currentlyProcessedChunks = new HashSet<Chunk>();
-
-    /* STATISTICS */
-    private double _averageUpdateDuration = 0.0;
 
     /**
      * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
@@ -65,21 +63,12 @@ public final class ChunkUpdateManager implements BlockObserver {
         // Create a new thread and start processing
         Runnable r = new Runnable() {
             public void run() {
-                long timeStart = Blockmania.getInstance().getTime();
                 c.processChunk();
-
                 _currentlyProcessedChunks.remove(c);
-
-                _averageUpdateDuration += Blockmania.getInstance().getTime() - timeStart;
-                _averageUpdateDuration /= 2;
             }
         };
 
         Blockmania.getInstance().getThreadPool().execute(r);
-    }
-
-    public double getAverageUpdateDuration() {
-        return _averageUpdateDuration;
     }
 
     public void lightChanged(Chunk chunk, BlockPosition pos) {

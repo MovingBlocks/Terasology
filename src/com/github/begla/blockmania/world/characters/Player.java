@@ -188,7 +188,7 @@ public final class Player extends Character {
 
         glPushMatrix();
 
-        glTranslatef(1.0f, -1.15f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.5f - _handMovementAnimationOffset * 0.5f);
+        glTranslatef(1.0f, -1.3f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.5f - _handMovementAnimationOffset * 0.5f);
         glRotatef(-25f - _handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
         glTranslatef(0f, 0.25f, 0f);
@@ -211,7 +211,7 @@ public final class Player extends Character {
         TextureManager.getInstance().bindTexture("char");
 
         glPushMatrix();
-        glTranslatef(0.8f, -0.75f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.0f - _handMovementAnimationOffset * 0.5f);
+        glTranslatef(0.8f, -1.1f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.0f - _handMovementAnimationOffset * 0.5f);
         glRotatef(-45f - _handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
         glTranslatef(0f, 0.25f, 0f);

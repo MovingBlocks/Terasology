@@ -36,9 +36,8 @@ public class ChunkGeneratorLiquids extends ChunkGeneratorTerrain {
     public void generate(Chunk c) {
             LiquidSimulator liquidSimulator = new LiquidSimulator(_parent.getParent());
 
-
             boolean grassGenerated = false, lavaGenerated = false;
-            for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 0; y --) {
+            for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 0; y-=2) {
                 String title = BlockManager.getInstance().getBlock(c.getBlock(8, y, 8)).getTitle();
 
                 boolean set = false;

@@ -16,7 +16,7 @@ System {
     cloudUpdateInterval = (Integer) 1000
 
     // Defines the maximum amount of threads used for chunk generation
-    maxThreads = Runtime.getRuntime().availableProcessors() <= 2 ? 1 : 2
+    maxThreads = 2
 
     // Enable/or disable the persisting of chunks
     saveChunks = true
@@ -52,7 +52,7 @@ Graphics {
 
     fullscreen = false
 
-    fov = 64.0d
+    fov = 80.0d
 
     viewingDistanceNear = 8
     viewingDistanceModerate = 16
@@ -159,16 +159,6 @@ World {
             grassDensity = 0.001d
 
         }
-
-    }
-
-    Resources {
-
-        probCoal = -2d
-        probGold = -3d
-        probSilver = -2.5d
-        probRedstone = -3d
-        probDiamond = -4d
 
     }
 }

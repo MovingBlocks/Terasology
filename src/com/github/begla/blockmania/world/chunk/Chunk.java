@@ -21,6 +21,7 @@ import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.datastructures.BlockmaniaArray;
 import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
+import com.github.begla.blockmania.debug.BlockmaniaProfiler;
 import com.github.begla.blockmania.generators.ChunkGenerator;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.Helper;
@@ -96,9 +97,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         _light = new BlockmaniaSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
         _states = new BlockmaniaSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
 
-        _lightDirty = true;
-        _dirty = true;
-        _fresh = true;
+        setLightDirty(true);
+        setDirty(true);
+        setFresh(true);
 
         _random = new FastRandom();
     }
@@ -125,14 +126,14 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @return True if a generation has been executed
      */
     public boolean generate() {
-        if (_fresh) {
+        if (isFresh()) {
+            setFresh(false);
+
             for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators()) {
                 gen.generate(this);
             }
 
             generateSunlight();
-
-            _fresh = false;
             return true;
         }
         return false;
@@ -147,11 +148,16 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         for (int x = 0; x < CHUNK_DIMENSION_X; x++) {
             for (int z = 0; z < CHUNK_DIMENSION_Z; z++) {
-                for (int y = 0; y < CHUNK_DIMENSION_Y; y++) {
+                for (int y = CHUNK_DIMENSION_Y - 1; y >= 0; y--) {
+                    byte blockValue = getBlock(x, y, z);
                     byte lightValue = getLight(x, y, z, LIGHT_TYPE.SUN);
 
+                    if (!BlockManager.getInstance().getBlock(blockValue).isTranslucent()) {
+                        continue;
+                    }
+
                     // Spread the sunlight in translucent blocks with a light value greater than zero.
-                    if (lightValue > 0 && BlockManager.getInstance().getBlock(getBlock(x, y, z)).isTranslucent()) {
+                    if (lightValue > 0) {
                         spreadLight(x, y, z, lightValue, LIGHT_TYPE.SUN);
                     }
                 }
@@ -641,7 +647,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             }
         }
 
-        // Finally update the light and generate the mesh
+        // Finally update the light and generate the meshes
         updateLight();
         generateMeshes();
     }
@@ -652,7 +658,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         // Save flags...
         byte flags = 0x0;
-        if (_lightDirty) {
+        if (isLightDirty()) {
             flags = Helper.setFlag(flags, (short) 0);
         }
 
@@ -679,7 +685,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         // The first byte contains the flags...
         byte flags = in.readByte();
         // Parse the flags...
-        _lightDirty = Helper.isFlagSet(flags, (short) 0);
+        setLightDirty(Helper.isFlagSet(flags, (short) 0));
 
         for (int i = 0; i < _blocks.size(); i++)
             _blocks.setRawByte(i, in.readByte());
@@ -693,15 +699,15 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         for (int i = 0; i < _states.sizePacked(); i++)
             _states.setRawByte(i, in.readByte());
 
-        _fresh = false;
-        _dirty = true;
+        setFresh(false);
+        setDirty(true);
     }
 
     /**
      * Generates the terrain mesh (creates the internal vertex arrays).
      */
     public void generateMeshes() {
-        if (isFresh() || isLightDirty())
+        if (isFresh() || isLightDirty() || !isDirty())
             return;
 
         setDirty(false);
@@ -871,24 +877,28 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return _parent;
     }
 
-    public boolean isDirty() {
+    public synchronized boolean isDirty() {
         return _dirty;
     }
 
-    public boolean isFresh() {
+    public synchronized boolean isFresh() {
         return _fresh;
     }
 
-    public boolean isLightDirty() {
+    public synchronized boolean isLightDirty() {
         return _lightDirty;
     }
 
-    void setDirty(boolean _dirty) {
-        this._dirty = _dirty;
+    public synchronized void setFresh(boolean fresh) {
+        _fresh = fresh;
     }
 
-    void setLightDirty(boolean _lightDirty) {
-        this._lightDirty = _lightDirty;
+    public synchronized void setDirty(boolean dirty) {
+        _dirty = dirty;
+    }
+
+    public synchronized void setLightDirty(boolean lightDirty) {
+        _lightDirty = lightDirty;
     }
 
     public void setPosition(Vector3f position) {

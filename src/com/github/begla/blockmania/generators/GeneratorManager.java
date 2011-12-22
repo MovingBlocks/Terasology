@@ -47,7 +47,6 @@ public class GeneratorManager {
         // Init. static generators
         _chunkGenerators.add(new ChunkGeneratorTerrain(this));
         _chunkGenerators.add(new ChunkGeneratorFlora(this));
-        _chunkGenerators.add(new ChunkGeneratorResources(this));
         _chunkGenerators.add(new ChunkGeneratorLiquids(this));
 
         _binding = new Binding();

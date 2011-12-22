@@ -63,8 +63,22 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                     int randX = x + c.getRandom().randomInt() % 12 + 6;
                     int randZ = z + c.getRandom().randomInt() % 12 + 6;
 
-                    if (c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Snow").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Sand").getId())
-                        generateTree(c, biome, randX, y, randZ);
+                    if (c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Snow").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Sand").getId()) {
+                        double rand = Math.abs(c.getRandom().randomDouble());
+
+                        int randomGeneratorId = 0;
+                        int size = _parent.getTreeGenerators(biome).size();
+
+                        if (size > 1) {
+                            randomGeneratorId = Math.abs(c.getRandom().randomInt()) % size;
+
+                            TreeGenerator treeGen = _parent.getTreeGenerator(biome, randomGeneratorId);
+
+                            if (rand < treeGen.getGenProbability()) {
+                                generateTree(c, treeGen, randX, y, randZ);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -134,27 +148,16 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
     /**
      * Generates a tree on the given chunk.
      *
-     * @param c    The chunk
-     * @param type The biome type
-     * @param x    Position on the x-axis
-     * @param y    Position on the y-axis
-     * @param z    Position on the z-axis
+     * @param c       The chunk
+     * @param treeGen The tree generator
+     * @param x       Position on the x-axis
+     * @param y       Position on the y-axis
+     * @param z       Position on the z-axis
      */
-    private void generateTree(Chunk c, BIOME_TYPE type, int x, int y, int z) {
+    private void generateTree(Chunk c, TreeGenerator treeGen, int x, int y, int z) {
         if (!c.canBlockSeeTheSky(x, y + 1, z))
             return;
 
-        int randomGeneratorId = 0;
-        int size = _parent.getTreeGenerators(type).size();
-
-        if (size > 1) {
-            randomGeneratorId = Math.abs(c.getRandom().randomInt()) % size;
-        }
-
-        double rand = Math.abs(c.getRandom().randomDouble());
-        TreeGenerator treeGen = _parent.getTreeGenerator(type, randomGeneratorId);
-
-        if (rand < treeGen.getGenProbability())
-            treeGen.generate(c.getRandom(), c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
+        treeGen.generate(c.getRandom(), c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
     }
 }

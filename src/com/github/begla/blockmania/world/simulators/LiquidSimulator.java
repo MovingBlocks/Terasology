@@ -44,7 +44,7 @@ public class LiquidSimulator extends Simulator {
         ArrayList<BlockPosition> currentActiveBlocks = new ArrayList<BlockPosition>(_activeBlocks);
 
         int counter = 0;
-        for (int i = currentActiveBlocks.size() - 1; i >= 0 && counter < 16; i--, counter++) {
+        for (int i = currentActiveBlocks.size() - 1; i >= 0 && counter < 4; i--, counter++) {
 
             BlockPosition bp = currentActiveBlocks.get(i);
             BlockPosition bpd = new BlockPosition(bp.x, bp.y - 1, bp.z);
