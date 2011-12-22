@@ -25,6 +25,12 @@ import com.github.begla.blockmania.utilities.MathHelper;
  */
 public class PerlinNoise {
 
+    private static final double LACUNARITY = 1.9379201;
+    private static final int OCTAVES = 5;
+    private static final double H = 0.736281;
+
+    private static double[] _spectralWeights;
+
     private final int[] _noisePermutations;
 
     /**
@@ -90,23 +96,26 @@ public class PerlinNoise {
     /**
      * Returns Fractional Brownian Motion at the given position.
      *
-     * @param x          Position on the x-axis
-     * @param y          Position on the y-axis
-     * @param z          Position on the z-axis
-     * @param octaves    Amount of octaves to apply
-     * @param lacunarity The lacunarity
-     * @param h          The fractal dimension
+     * @param x Position on the x-axis
+     * @param y Position on the y-axis
+     * @param z Position on the z-axis
      * @return The noise value
      */
-    public double fBm(double x, double y, double z, int octaves, double lacunarity, double h) {
-        double result = 0.0;
+    public double fBm(double x, double y, double z) {
+        double result  = 0.0;
 
-        for (int i = 0; i < octaves; i++) {
-            result += noise(x, y, z) * Math.pow(lacunarity, -h * i);
+        if (_spectralWeights == null) {
+            _spectralWeights = new double[OCTAVES];
 
-            x *= lacunarity;
-            y *= lacunarity;
-            z *= lacunarity;
+            for (int i = 0; i < OCTAVES; i++)
+                _spectralWeights[i] = Math.pow(LACUNARITY, -H * i);
+        }
+        for (int i = 0; i < OCTAVES; i++) {
+            result += noise(x, y, z) * _spectralWeights[i];
+
+            x *= LACUNARITY;
+            y *= LACUNARITY;
+            z *= LACUNARITY;
         }
 
         return result;

@@ -34,33 +34,35 @@ public class ChunkGeneratorLiquids extends ChunkGeneratorTerrain {
 
     @Override
     public void generate(Chunk c) {
-            LiquidSimulator liquidSimulator = new LiquidSimulator(_parent.getParent());
+        LiquidSimulator liquidSimulator = new LiquidSimulator(_parent.getParent());
 
-            boolean grassGenerated = false, lavaGenerated = false;
-            for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 0; y-=2) {
-                String title = BlockManager.getInstance().getBlock(c.getBlock(8, y, 8)).getTitle();
+        boolean grassGenerated = false, lavaGenerated = false;
+        for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 0; y -= 2) {
+            String title = BlockManager.getInstance().getBlock(c.getBlock(8, y, 8)).getTitle();
 
-                boolean set = false;
-                if ((title.equals("Grass") || title.equals("Snow")) && !grassGenerated && y >= 32 && _parent.getParent().getRandom().randomDouble() > 0.8) {
-                    c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Water").getId());
-                    set = true;
-                    grassGenerated = true;
-                } else if (title.equals("Stone") && !lavaGenerated && c.getBlock(8, y + 1, 8) == 0x0) {
-                    c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Lava").getId());
-                    set = true;
-                    lavaGenerated = true;
-                }
+            boolean set = false;
+            if ((title.equals("Grass") || title.equals("Snow")) && !grassGenerated && y >= 32 && _parent.getParent().getRandom().randomDouble() > 0.8) {
+                c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Water").getId());
+                set = true;
+                grassGenerated = true;
+            } else if (title.equals("Stone") && !lavaGenerated && c.getBlock(8, y + 1, 8) == 0x0) {
+                c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Lava").getId());
+                set = true;
+                lavaGenerated = true;
+            }
 
-                if (set) {
-                    liquidSimulator.addActiveBlock(new BlockPosition(c.getBlockWorldPosX(8), y, c.getBlockWorldPosZ(8)));
+            if (set) {
+                liquidSimulator.addActiveBlock(new BlockPosition(c.getBlockWorldPosX(8), y, c.getBlockWorldPosZ(8)));
 
-                    for (int i = 0; i < 256; i++) {
-                        liquidSimulator.simulate(true);
+                for (int i = 0; i < 256; i++) {
+                    if (!liquidSimulator.simulate(true)) {
+                        break;
                     }
                 }
-
-                if (lavaGenerated)
-                    return;
             }
+
+            if (lavaGenerated)
+                return;
+        }
     }
 }

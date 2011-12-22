@@ -215,7 +215,7 @@ public final class Player extends Character {
         glRotatef(-45f - _handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
         glTranslatef(0f, 0.25f, 0f);
-        glScalef(0.25f, 0.5f, 0.25f);
+        glScalef(0.3f, 0.6f, 0.3f);
 
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         GL11.glBegin(GL11.GL_QUADS);

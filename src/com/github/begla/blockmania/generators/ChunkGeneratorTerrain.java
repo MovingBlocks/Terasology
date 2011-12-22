@@ -20,6 +20,8 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 import javax.vecmath.Vector2f;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Generates the terrain of the world using a hybrid voxel-/heightmap-based approach.
@@ -29,8 +31,8 @@ import javax.vecmath.Vector2f;
 public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /* CONST */
-    protected static final int SAMPLE_RATE_3D_HOR = 2;
-    protected static final int SAMPLE_RATE_3D_VERT = 4;
+    protected static final int SAMPLE_RATE_3D_HOR = 4;
+    protected static final int SAMPLE_RATE_3D_VERT = 8;
 
     /**
      * Available types of biomes.
@@ -216,7 +218,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         }
     }
 
-    public double calcDensity(double x, double y, double z) {
+    public double calcDensity(int x, int y, int z) {
         double height = calcBaseTerrain(x, z);
         double ocean = calcOceanTerrain(x, z);
         double river = calcRiverTerrain(x, z);
@@ -237,15 +239,15 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     public double calcBaseTerrain(double x, double z) {
-        return MathHelper.clamp((_pGen1.fBm(0.004 * x, 0, 0.004 * z, 12, 1.93123, 0.8171) + 1.0) / 2.0);
+        return MathHelper.clamp((_pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
     }
 
     public double calcOceanTerrain(double x, double z) {
-        return MathHelper.clamp(_pGen2.fBm(0.0009 * x, 0, 0.0009 * z, 12, 1.9323891, 0.7531) * 8.0);
+        return MathHelper.clamp(_pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0);
     }
 
     public double calcRiverTerrain(double x, double z) {
-        return MathHelper.clamp((Math.sqrt(Math.abs(_pGen3.fBm(0.0008 * x, 0, 0.0008 * z, 8, 2.08371, 0.8471))) - 0.1) * 7.0);
+        return MathHelper.clamp((Math.sqrt(Math.abs(_pGen3.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
     }
 
     public double calcMountainDensity(double x, double y, double z) {
@@ -255,7 +257,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         y1 = y * 0.004;
         z1 = z * 0.006;
 
-        double result = _pGen5.fBm(x1, y1, z1, 6, 1.99782819, 0.9281);
+        double result = _pGen5.fBm(x1, y1, z1);
 
         return result > 0.0 ? result : 0;
     }
@@ -267,22 +269,22 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         y1 = y * 0.008;
         z1 = z * 0.01;
 
-        double result = _pGen2.fBm(x1, y1, z1, 6, 1.99782819, 0.9281) - 0.5;
+        double result = _pGen2.fBm(x1, y1, z1) - 0.5;
 
         return result > 0.0 ? result : 0;
     }
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
-        double result = _pGen4.fBm(x * 0.0005, 0, 0.0005 * z, 8, 2.037291, 0.8138210);
+        double result = _pGen4.fBm(x * 0.0005, 0, 0.0005 * z);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcHumidityAtGlobalPosition(double x, double z) {
-        double result = _pGen5.fBm(x * 0.0005, 0, 0.0005 * z, 8, 2.037291, 0.718398191);
+        double result = _pGen5.fBm(x * 0.0005, 0, 0.0005 * z);
         return MathHelper.clamp((result + 1.0) / 2.0);
     }
 
     public double calcCaveDensity(double x, double y, double z) {
-        return _pGen6.fBm(x * 0.02, y * 0.02, z * 0.02, 8, 2.03719, 0.833819283);
+        return _pGen6.fBm(x * 0.02, y * 0.02, z * 0.02);
     }
 }

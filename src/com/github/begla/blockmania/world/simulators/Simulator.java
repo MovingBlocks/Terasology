@@ -48,18 +48,23 @@ public abstract class Simulator implements BlockObserver {
         _activeBlocks.add(bp);
     }
 
-    public void simulate(boolean force) {
+    public boolean simulate(boolean force) {
         long currentTime = Blockmania.getInstance().getTime();
 
+        boolean simulated = false;
         if (currentTime > _lastUpdate + _updateInterval || force) {
-            executeSimulation();
+            if (executeSimulation()) {
+                simulated = true;
+            }
             _lastUpdate = currentTime;
         }
+
+        return simulated;
     }
 
     public void clear() {
         _activeBlocks.clear();
     }
 
-    protected abstract void executeSimulation();
+    protected abstract boolean executeSimulation();
 }

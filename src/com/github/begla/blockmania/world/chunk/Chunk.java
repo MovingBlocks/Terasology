@@ -416,7 +416,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             return;
         }
 
-
         byte oldValue = lSource.get(x, y, z);
         lSource.set(x, y, z, intensity);
 

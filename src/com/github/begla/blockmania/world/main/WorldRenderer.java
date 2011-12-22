@@ -106,7 +106,7 @@ public final class WorldRenderer implements RenderableObject {
 
     /* STATISTICS */
     private int _statVisibleTriangles = 0;
-    private int _statOcclusionCulled, _statSubMeshCulled, _statEmpty;
+    private int _statOcclusionCulled, _statSubMeshCulled, _statEmpty, _statDirty;
 
     /* RENDERING */
     private boolean _occlusionQueryToggle = false;
@@ -210,6 +210,7 @@ public final class WorldRenderer implements RenderableObject {
     public void updateVisibleChunks() {
         _visibleChunks.clear();
         _bulletPhysicsRenderer.resetChunks();
+        _statDirty = 0;
 
         boolean noMoreUpdates = false;
         for (int i = 0; i < _chunksInProximity.size(); i++) {
@@ -230,15 +231,17 @@ public final class WorldRenderer implements RenderableObject {
 
             if (isChunkVisible(c)) {
                 _visibleChunks.add(c);
+                c.update();
+                
+                if (c.isDirty())
+                    _statDirty++;
 
-                if ((c.isDirty() || c.isLightDirty()) && !noMoreUpdates) {
+                if ((c.isDirty() || c.isLightDirty() || c.isFresh()) && !noMoreUpdates) {
                     if (!_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT)) {
                         noMoreUpdates = true;
                         continue;
                     }
                 }
-
-                c.update();
             }
         }
     }
@@ -597,7 +600,7 @@ public final class WorldRenderer implements RenderableObject {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %.2f, sun: %.2f, cache: %d, triangles: %d, vcs: %d, seed: \"%s\", title: \"%s\", ocul: %d, smcul: %d, ec: %d)", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _statVisibleTriangles, _visibleChunks.size(), _worldProvider.getSeed(), _worldProvider.getTitle(), _statOcclusionCulled, _statSubMeshCulled, _statEmpty);
+        return String.format("world (biome: %s, time: %.2f, sun: %.2f, cache: %d, triangles: %d, dcs: %d, vcs: %d, seed: \"%s\", title: \"%s\", ocul: %d, smcul: %d, ec: %d)", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _statVisibleTriangles, _statDirty, _visibleChunks.size(), _worldProvider.getSeed(), _worldProvider.getTitle(), _statOcclusionCulled, _statSubMeshCulled, _statEmpty);
     }
 
     public Player getPlayer() {

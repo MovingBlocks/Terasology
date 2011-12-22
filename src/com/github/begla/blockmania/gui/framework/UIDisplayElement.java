@@ -42,9 +42,9 @@ public abstract class UIDisplayElement {
         _position.set(position);
     }
 
-    public UIDisplayElement(Vector2f position, Vector2f scale) {
+    public UIDisplayElement(Vector2f position, Vector2f size) {
         _position.set(position);
-        _size.set(scale);
+        _size.set(size);
     }
 
     protected void renderElement() {

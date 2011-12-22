@@ -65,6 +65,9 @@ public final class Blockmania {
             (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceFar"),
             (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceUltra")};
 
+    /* SETTINGS */
+    private static final int FPS_LIMIT = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.fpsLimit");
+
     private int _activeViewingDistance = 0;
 
     /* THREADING */
@@ -359,13 +362,14 @@ public final class Blockmania {
         double nextGameTick = getTime();
         int loopCounter;
 
-        BlockmaniaProfiler.begin("GAME LOOP");
 
         // MAIN GAME LOOP
         while (_runGame && !Display.isCloseRequested()) {
             updateFPS();
             processKeyboardInput();
             processMouseInput();
+
+            BlockmaniaProfiler.begin();
 
             loopCounter = 0;
             while (getTime() > nextGameTick && loopCounter < FRAME_SKIP_MAX_FRAMES) {
@@ -378,6 +382,11 @@ public final class Blockmania {
 
             // Clear dirty flag and swap buffer
             Display.update();
+
+            if (FPS_LIMIT > 0)
+                Display.sync(FPS_LIMIT);
+
+            BlockmaniaProfiler.end();
         }
 
         /*
@@ -394,8 +403,6 @@ public final class Blockmania {
         } catch (InterruptedException e) {
             getLogger().log(Level.SEVERE, e.toString(), e);
         }
-
-        BlockmaniaProfiler.end();
 
         destroy();
     }

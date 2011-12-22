@@ -17,7 +17,6 @@ package com.github.begla.blockmania.world.chunk;
 
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.BlockPosition;
-import com.github.begla.blockmania.debug.BlockmaniaProfiler;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
 
@@ -40,11 +39,13 @@ public final class ChunkUpdateManager implements BlockObserver {
     /* CHUNK UPDATES */
     private static final HashSet<Chunk> _currentlyProcessedChunks = new HashSet<Chunk>();
 
+
     /**
      * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
      * is reached, the chunk update is ignored. Chunk updates can be forced though.
      *
      * @param chunk The chunk to update
+     * @param type The chunk update type
      * @return True if a chunk update was executed
      */
     public boolean queueChunkUpdate(Chunk chunk, final UPDATE_TYPE type) {

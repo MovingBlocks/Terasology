@@ -39,16 +39,16 @@ public class GrowthSimulator extends Simulator {
     }
 
     @Override
-    public void executeSimulation() {
+    public boolean executeSimulation() {
 
         if (_activeBlocks.isEmpty())
-            return;
+            return false;
 
         BlockPosition pos = _activeBlocks.iterator().next();
         _activeBlocks.remove(pos);
 
         if (!_parent.canBlockSeeTheSky(pos.x, pos.y, pos.z))
-            return;
+            return false;
 
         ChunkGeneratorTerrain.BIOME_TYPE biome = _parent.getActiveBiome(pos.x, pos.z);
 
@@ -78,6 +78,9 @@ public class GrowthSimulator extends Simulator {
                 addActiveBlock(new BlockPosition(pos.x, pos.y, pos.z - 1));
             }
         }
+
+        // TODO: Not quite correct yet
+        return true;
     }
 
     public void lightChanged(Chunk chunk, BlockPosition pos) {

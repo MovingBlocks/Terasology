@@ -93,7 +93,7 @@ public class Skysphere implements RenderableObject {
 
         for (int i = 0; i < (int) CLOUD_RESOLUTION.x; i++) {
             for (int j = 0; j < (int) CLOUD_RESOLUTION.y; j++) {
-                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime() * 5f, 6, 2.0, 0.73218);
+                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime() * 5f);
                 byte value = (byte) ((MathHelper.clamp(noise)) * 255);
 
                 clouds.put(value);

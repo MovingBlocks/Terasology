@@ -40,11 +40,13 @@ public class LiquidSimulator extends Simulator {
     }
 
     @Override
-    public void executeSimulation() {
+    public boolean executeSimulation() {
         ArrayList<BlockPosition> currentActiveBlocks = new ArrayList<BlockPosition>(_activeBlocks);
 
+        boolean simulated = false;
         int counter = 0;
         for (int i = currentActiveBlocks.size() - 1; i >= 0 && counter < 4; i--, counter++) {
+            simulated = true;
 
             BlockPosition bp = currentActiveBlocks.get(i);
             BlockPosition bpd = new BlockPosition(bp.x, bp.y - 1, bp.z);
@@ -101,6 +103,8 @@ public class LiquidSimulator extends Simulator {
                 }
             }
         }
+
+        return simulated;
     }
 
     public void lightChanged(Chunk chunk, BlockPosition pos) {

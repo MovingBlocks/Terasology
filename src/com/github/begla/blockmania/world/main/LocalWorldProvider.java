@@ -318,7 +318,7 @@ public class LocalWorldProvider implements WorldProvider {
 
             for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 32; y--) {
 
-                double dens = tGen.calcDensity(randX + SPAWN_ORIGIN.x, y, randZ + SPAWN_ORIGIN.y);
+                double dens = tGen.calcDensity(randX + (int) SPAWN_ORIGIN.x, y, randZ + (int) SPAWN_ORIGIN.y);
 
                 if (dens >= 0 && y < 64)
                     return new Vector3f(randX + SPAWN_ORIGIN.x, y, randZ + SPAWN_ORIGIN.y);

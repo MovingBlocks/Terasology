@@ -26,43 +26,35 @@ public class BlockmaniaProfiler {
 
     private static long _prevTime;
     private static HashMap<String, Double> _checkpointDurations = new HashMap<String, Double>();
-    private static String _title;
 
-    public static void begin(String title) {
-        _title = title;
+    private static HashMap<String, Double> _results;
 
-        System.out.println("===================");
-        System.out.println("BEGIN PROFILING :: " + _title);
-        System.out.println("===================");
-
-        _checkpointDurations.clear();
-    }
-
-    public static void log(String label) {
-        if (_checkpointDurations.containsKey(label)) {
-            double value = _checkpointDurations.get(label);
-            value = (value + (System.nanoTime() - _prevTime)) / 2.0;
-            _checkpointDurations.put(label, value);
-        } else {
-            double value = (System.nanoTime() - _prevTime);
-            _checkpointDurations.put(label, value);
-        }
-
+    public static void begin() {
         _prevTime = System.nanoTime();
     }
 
+    public static void log(String label) {
+        long now = System.nanoTime();
+        double value = (now - _prevTime);
+        _checkpointDurations.put(label, value);
+        _prevTime = now;
+    }
+
     public static void end() {
+        _results = new HashMap<String, Double>();
+
         double sum = 0.0;
 
         for (Double value : _checkpointDurations.values())
             sum += value;
 
         for (String label : _checkpointDurations.keySet()) {
-            System.out.println(label + " : " + _checkpointDurations.get(label) + " ns (" + String.format("%.5f", (_checkpointDurations.get(label) / sum) * 100.0) + "%)");
+            double percentage = (_checkpointDurations.get(label) / sum);
+            _results.put(label, percentage);
         }
+    }
 
-        System.out.println("===================");
-        System.out.println("END PROFILING :: " + _title);
-        System.out.println("===================");
+    public static HashMap<String, Double> getResults() {
+        return _results;
     }
 }
