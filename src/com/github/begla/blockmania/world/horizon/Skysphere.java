@@ -270,13 +270,10 @@ public class Skysphere implements RenderableObject {
 
         for (int i = 0; i < 6; i++) {
 
-            byte[] data = TextureManager.getInstance().getTexture("stars" + (i + 1)).getTextureData();
-            ByteBuffer byteBuffer = BufferUtils.createByteBuffer(data.length);
-            byteBuffer.put(data);
-            byteBuffer.flip();
+            ByteBuffer data = TextureManager.getInstance().getTexture("stars" + (i + 1)).data;
 
             GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, 256, 256,
-                    0, format, GL11.GL_UNSIGNED_BYTE, byteBuffer);
+                    0, format, GL11.GL_UNSIGNED_BYTE, data);
         }
     }
 }

@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.rendering.cameras;
 
+import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.ViewFrustum;
 
 import javax.vecmath.Vector3f;
@@ -26,10 +27,15 @@ import javax.vecmath.Vector3f;
  */
 public abstract class Camera {
 
+    public static final float FOV = ((Double) ConfigurationManager.getInstance().getConfig().get("Player.fov")).floatValue();
+
     /* CAMERA PARAMETERS */
     protected final Vector3f _position = new Vector3f();
     protected final Vector3f _up = new Vector3f(0, 1, 0);
     protected final Vector3f _viewingDirection = new Vector3f();
+
+    protected float _targetFov = FOV;
+    protected float _activeFov = FOV - 20f;
 
     /* VIEW FRUSTUM */
     protected final ViewFrustum _viewFrustum = new ViewFrustum();
@@ -56,6 +62,7 @@ public abstract class Camera {
 
     public abstract void loadNormalizedModelViewMatrix();
 
+
     public Vector3f getPosition() {
         return _position;
     }
@@ -70,5 +77,21 @@ public abstract class Camera {
 
     public ViewFrustum getViewFrustum() {
         return _viewFrustum;
+    }
+
+    public void update() {
+        if (_activeFov < _targetFov) {
+            _activeFov += 0.5;
+        } else if (_activeFov > _targetFov) {
+            _activeFov -= 0.5;
+        }
+    }
+
+    public void extendFov(float fov) {
+        _targetFov = FOV + 10.0f;
+    }
+
+    public void resetFov() {
+        _targetFov = FOV;
     }
 }

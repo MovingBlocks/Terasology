@@ -162,22 +162,13 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
             GL11.glTranslatef(-_parent.getPlayer().getPosition().x, -_parent.getPlayer().getPosition().y, -_parent.getPlayer().getPosition().z);
             GL11.glMultMatrix(mBuffer);
 
-            float lightValue = calcLightValueForTransform(t);
+            float lightValue = _parent.getRenderingLightValueAt(t.origin);
             int lightRef = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
             GL20.glUniform1f(lightRef, lightValue);
 
             BlockManager.getInstance().getBlock(b.getType()).render();
             GL11.glPopMatrix();
         }
-    }
-
-    private float calcLightValueForTransform(Transform t) {
-        double lightValueSun = ((double) _parent.getWorldProvider().getLightAtPosition(t.origin, Chunk.LIGHT_TYPE.SUN));
-        lightValueSun = (lightValueSun / 15.0) * _parent.getDaylight();
-        double lightValueBlock = _parent.getWorldProvider().getLightAtPosition(t.origin, Chunk.LIGHT_TYPE.BLOCK);
-        lightValueBlock = lightValueBlock / 15.0;
-
-        return (float) Math.max(lightValueSun, lightValueBlock);
     }
 
     public void update() {

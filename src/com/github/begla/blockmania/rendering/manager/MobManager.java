@@ -25,6 +25,7 @@ import java.util.HashSet;
  * MobManager handles non-player entities that do stuff in the world
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class MobManager {
 

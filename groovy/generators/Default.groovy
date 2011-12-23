@@ -20,19 +20,19 @@ def t1 = new TreeGeneratorLSystem(m, "FFFFFFA", rules, probabilities, 6, 30).wit
 rules = new HashMap<String, String>();
 rules.put("A", "[&FFBFA]////[&FBFFA]////[&FFBFA]");
 
-def t4 = new TreeGeneratorLSystem(m, "FFFFFFFFFFFAFFFFFAFFFFFA", rules, probabilities, 6, 40).withLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId()).withGenerationProbability(0.01);
+def t4 = new TreeGeneratorLSystem(m, "FFFFFFFFFFFAFFFFFAFFFFFA", rules, probabilities, 6, 40).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.01);
 
 // ...and a LARGE bushy tree
 rules = new HashMap<String, String>();
 rules.put("A", "[&FFFBFFA]////[&FFFFBFA]////[&FFFBFFA]");
 
-def t2 = new TreeGeneratorLSystem(m, "FFFFAFFFFFFFAFFFFA", rules, probabilities, 6, 20).withLeafType(BlockManager.getInstance().getBlock("Dark leaf").getId()).withGenerationProbability(0.01);
+def t2 = new TreeGeneratorLSystem(m, "FFFFAFFFFFFFAFFFFA", rules, probabilities, 6, 20).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.01);
 
 // ...and some strange wobbly thingies
 rules = new HashMap<String, String>();
 rules.put("A", "[&BFA]////[&FFBA]////[&FFBFA]");
 
-def t3 = new TreeGeneratorLSystem(m, "FFAFAFFAFF", rules, probabilities, 6, 30).withLeafType(BlockManager.getInstance().getBlock("Red leaf").getId()).withGenerationProbability(0.05);
+def t3 = new TreeGeneratorLSystem(m, "FFAFAFFAFF", rules, probabilities, 6, 30).withLeafType(BlockManager.getInstance().getBlock("RedLeaf").getId()).withGenerationProbability(0.05);
 
 def c1 = new TreeGeneratorCactus(m).withGenerationProbability(0.05);
 

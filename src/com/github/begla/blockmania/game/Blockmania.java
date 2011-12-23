@@ -101,7 +101,6 @@ public final class Blockmania {
     /* LOGGING */
     private final Logger _logger;
 
-
     /* GROOVY */
     private GroovyManager _groovyManager;
 

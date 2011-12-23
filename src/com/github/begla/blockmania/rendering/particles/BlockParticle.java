@@ -18,11 +18,13 @@ package com.github.begla.blockmania.rendering.particles;
 import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
-import com.github.begla.blockmania.world.chunk.Chunk;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -32,6 +34,8 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockParticle extends Particle {
+
+    private static final float TEX_SIZE = Block.TEXTURE_OFFSET / 4f;
 
     private final float _texOffsetX;
     private final float _texOffsetY;
@@ -49,8 +53,8 @@ public class BlockParticle extends Particle {
         _size = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.05f + 0.05f;
 
         _lightOffset = (float) ((_rand.randomDouble() + 1.0) / 2.0) * 0.05f + 0.95f;
-        _texOffsetX = (float) (((_rand.randomDouble() + 1.0) / 2.0) * (0.0624 - 0.02));
-        _texOffsetY = (float) (((_rand.randomDouble() + 1.0) / 2.0) * (0.0624 - 0.02));
+        _texOffsetX = (float) (((_rand.randomDouble() + 1.0) / 2.0) * (Block.TEXTURE_OFFSET - TEX_SIZE));
+        _texOffsetY = (float) (((_rand.randomDouble() + 1.0) / 2.0) * (Block.TEXTURE_OFFSET - TEX_SIZE));
 
         _position.x += _rand.randomDouble() * 0.3;
         _position.y += _rand.randomDouble() * 0.3;
@@ -75,19 +79,24 @@ public class BlockParticle extends Particle {
         }
 
         BlockParticleEmitter pE = (BlockParticleEmitter) getParent();
-        double lightValueSun = ((double) pE.getParent().getWorldProvider().getLightAtPosition(_position, Chunk.LIGHT_TYPE.SUN));
-        lightValueSun = (lightValueSun / 15.0) * pE.getParent().getDaylight();
-        double lightValueBlock = pE.getParent().getWorldProvider().getLightAtPosition(_position, Chunk.LIGHT_TYPE.BLOCK);
-        lightValueBlock = lightValueBlock / 15.0;
+        float lightValue = _parent.getParent().getRenderingLightValueAt(_position);
 
-        float lightValue = (float) Math.max(lightValueSun, lightValueBlock) * _lightOffset;
+        // Apply biome and overall color offset
+        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
+        Vector4f color = BlockManager.getInstance().getBlock(_blockType).calcColorOffsetFor(Block.SIDE.FRONT, _parent.getParent().getActiveTemperature(), _parent.getParent().getActiveHumidity());
+        colorBuffer.put(color.x);
+        colorBuffer.put(color.y);
+        colorBuffer.put(color.z);
+        colorBuffer.flip();
 
+        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("particle"), "colorOffset");
         int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("particle"), "light");
         int texOffsetX = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("particle"), "texOffsetX");
         int texOffsetY = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("particle"), "texOffsetY");
-        GL20.glUniform1f(light, lightValue);
+        GL20.glUniform1f(light, lightValue * _lightOffset);
         GL20.glUniform1f(texOffsetX, _texOffsetX);
         GL20.glUniform1f(texOffsetY, _texOffsetY);
+        GL20.glUniform3(colorOffset, colorBuffer);
 
         glCallList(_displayLists[_blockType]);
     }
@@ -99,13 +108,13 @@ public class BlockParticle extends Particle {
         GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x, b.calcTextureOffsetFor(Block.SIDE.FRONT).y);
         GL11.glVertex3f(-0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x + 0.02f, b.calcTextureOffsetFor(Block.SIDE.FRONT).y);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x + TEX_SIZE, b.calcTextureOffsetFor(Block.SIDE.FRONT).y);
         GL11.glVertex3f(0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x + 0.02f, b.calcTextureOffsetFor(Block.SIDE.FRONT).y + 0.02f);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x + TEX_SIZE, b.calcTextureOffsetFor(Block.SIDE.FRONT).y + TEX_SIZE);
         GL11.glVertex3f(0.5f, 0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x, b.calcTextureOffsetFor(Block.SIDE.FRONT).y + 0.02f);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x, b.calcTextureOffsetFor(Block.SIDE.FRONT).y + TEX_SIZE);
         GL11.glVertex3f(-0.5f, 0.5f, 0.0f);
         glEnd();
 

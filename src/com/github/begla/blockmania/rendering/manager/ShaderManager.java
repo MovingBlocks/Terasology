@@ -15,6 +15,7 @@
  */
 package com.github.begla.blockmania.rendering.manager;
 
+import com.github.begla.blockmania.blocks.Block;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
 import org.lwjgl.BufferUtils;
@@ -41,7 +42,7 @@ public class ShaderManager {
     private final HashMap<String, Integer> _vertexShader = new HashMap<String, Integer>(32);
     private static ShaderManager _instance = null;
 
-    private String _preProcessorPreamble = "#version 120 \n";
+    private String _preProcessorPreamble = "#version 120 \n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + "; \n";
 
     /**
      * Returns (and creates – if necessary) the static instance

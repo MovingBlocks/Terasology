@@ -1,6 +1,7 @@
 uniform sampler2D textureAtlas;
 uniform sampler2D textureWater;
 uniform sampler2D textureLava;
+uniform sampler2D textureEffects;
 
 uniform float tick;
 uniform float daylight = 1.0;
@@ -9,6 +10,10 @@ uniform bool swimming;
 varying vec4 vertexWorldPos;
 
 uniform vec4 playerPosition;
+
+uniform vec2 waterCoordinate;
+uniform vec2 lavaCoordinate;
+uniform vec2 grassCoordinate;
 
 vec4 srgbToLinear(vec4 color){
     return pow(color, vec4(1.0 / GAMMA));
@@ -19,33 +24,21 @@ vec4 linearToSrgb(vec4 color){
 }
 
 void main(){
-    const vec4 grassCoordinate = vec4(0.0625 * 3.0, 0.0625 * 4.0, 0.0625 * 0.0, 0.0625 * 1.0);
-    const vec4 waterCoordinate = vec4(0.0625 * 15.0, 0.0625 * 16.0, 0.0625 * 12.0, 0.0625 * 13.0);
-    const vec4 lavaCoordinate = vec4(0.0625 * 15.0, 0.0625 * 16.0, 0.0625 * 15.0, 0.0625 * 16.0);
-
     vec4 texCoord = gl_TexCoord[0];
 
     float daylightTrans = pow(0.86, (1.0-daylight)*15.0);
     vec4 color;
 
-    if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.y && texCoord.y >= waterCoordinate.z && texCoord.y < waterCoordinate.w) {
-        texCoord.x -= waterCoordinate.x;
-        texCoord.x *= 16.0;
-        texCoord.y -= waterCoordinate.z;
-        texCoord.y *= 16.0;
-        texCoord.y /= 64.0;
-
-        texCoord.y += mod(tick,48) * 1.0/64.0;
+    if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.x + TEXTURE_OFFSET && texCoord.y >= waterCoordinate.y && texCoord.y < waterCoordinate.y + TEXTURE_OFFSET) {
+        texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
+        texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (64.0 / (1.0 / TEXTURE_OFFSET));
+        texCoord.y += mod(tick,96) * 1.0/96.0;
 
         color = texture2D(textureWater, vec2(texCoord));
-    } else if (texCoord.x >= lavaCoordinate.x && texCoord.x < lavaCoordinate.y && texCoord.y >= lavaCoordinate.z && texCoord.y < lavaCoordinate.w) {
-        texCoord.x -= lavaCoordinate.x;
-        texCoord.x *= 16;
-        texCoord.y -= lavaCoordinate.z;
-        texCoord.y *= 16;
-        texCoord.y /= 128;
-
-        texCoord.y += mod(tick,100.0) * 1.0/128.0;
+    } else if (texCoord.x >= lavaCoordinate.x && texCoord.x < lavaCoordinate.x + TEXTURE_OFFSET && texCoord.y >= lavaCoordinate.y && texCoord.y < lavaCoordinate.y + TEXTURE_OFFSET) {
+        texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
+        texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
+        texCoord.y += mod(tick,128.0) * 1.0/128.0;
 
         color = texture2D(textureLava, vec2(texCoord));
     } else {
@@ -54,21 +47,17 @@ void main(){
 
     color = srgbToLinear(color);
 
-    if (color.a < 0.5)
+    if (color.a < 0.1)
         discard;
 
     // APPLY TEXTURE OFFSET
-    if (!(texCoord.x >= grassCoordinate.x && texCoord.x < grassCoordinate.y && texCoord.y >= grassCoordinate.z && texCoord.y < grassCoordinate.w)) {
+    if (!(texCoord.x >= grassCoordinate.x && texCoord.x < grassCoordinate.x + TEXTURE_OFFSET && texCoord.y >= grassCoordinate.y && texCoord.y < grassCoordinate.y + TEXTURE_OFFSET)) {
         color.rgb *= gl_Color.rgb;
         color.a *= gl_Color.a;
     } else {
         // MASK GRASS
-        vec4 maskColor = texture2D(textureAtlas, vec2(texCoord.x + 3.0*0.0625, texCoord.y + 2.0*0.0625));
-        if (maskColor.a > 0) {
-            if (gl_Color.rgb != vec3(0.0,0.0,0.0)) {
-                color.rgb *= gl_Color.rgb;
-            }
-        }
+        if (texture2D(textureEffects, vec2(10 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET))).a != 0)
+            color.rgb *= gl_Color.rgb;
     }
 
     // CALCULATE DAYLIGHT AND BLOCKLIGHT

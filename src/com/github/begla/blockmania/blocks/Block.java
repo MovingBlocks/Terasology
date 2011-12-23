@@ -18,7 +18,6 @@ package com.github.begla.blockmania.blocks;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
-import com.github.begla.blockmania.utilities.Helper;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 
@@ -37,39 +36,47 @@ import static org.lwjgl.opengl.GL11.*;
  * Stores all information for a specific block type.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class Block implements RenderableObject {
 
+    public static final int ATLAS_SIZE_IN_PX = 256;
+    public static final int TEXTURE_SIZE_IN_PX = 16;
+    public static final int ATLAS_ELEMENTS_PER_ROW_AND_COLUMN = ATLAS_SIZE_IN_PX / TEXTURE_SIZE_IN_PX;
+    public static final float TEXTURE_OFFSET = 0.0625f;
+    public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
+
     /* PROPERTIES */
-    private byte _id = 0x0;
-    private String _title = "Untitled block";
+    protected byte _id = 0x0;
+    protected String _title = "Untitled block";
 
-    private boolean _translucent;
-    private boolean _invisible;
-    private boolean _penetrable;
-    private boolean _castsShadows;
-    private boolean _disableTessellation;
-    private boolean _renderBoundingBox;
-    private boolean _allowBlockAttachment;
-    private boolean _bypassSelectionRay;
-    private boolean _liquid;
+    protected boolean _translucent;
+    protected boolean _invisible;
+    protected boolean _penetrable;
+    protected boolean _castsShadows;
+    protected boolean _disableTessellation;
+    protected boolean _renderBoundingBox;
+    protected boolean _allowBlockAttachment;
+    protected boolean _bypassSelectionRay;
+    protected boolean _liquid;
+    protected boolean _waving;
 
-    private BLOCK_FORM _blockForm;
-    private COLOR_SOURCE _colorSource;
+    protected BLOCK_FORM _blockForm;
+    protected COLOR_SOURCE _colorSource;
 
-    private byte _luminance;
-    private byte _hardness;
-
-    private final Vector4f[] _colorOffset = new Vector4f[6];
-    private final Vector2f[] _textureAtlasPos = new Vector2f[6];
+    protected byte _luminance;
+    protected byte _hardness;
 
     /* RENDERING */
     private int _displayListBlock = -1;
     private int _displayListBillboard = -1;
 
+    protected Vector4f[] _colorOffset = new Vector4f[6];
+    protected Vector2f[] _textureAtlasPos = new Vector2f[6];
+
     /* LUTs */
-    private static BufferedImage _colorLut;
-    private static BufferedImage _foliageLut;
+    protected static BufferedImage _colorLut;
+    protected static BufferedImage _foliageLut;
 
     /**
      * The six sides of a block.
@@ -195,7 +202,7 @@ public class Block implements RenderableObject {
      * @return The texture offset
      */
     public Vector2f calcTextureOffsetFor(SIDE side) {
-        return Helper.calcOffsetForTextureAt((int) getTextureAtlasPos()[side.ordinal()].x, (int) getTextureAtlasPos()[side.ordinal()].y);
+        return new Vector2f((int) getTextureAtlasPos()[side.ordinal()].x * TEXTURE_OFFSET, (int) getTextureAtlasPos()[side.ordinal()].y * TEXTURE_OFFSET);
     }
 
     public void render() {
@@ -215,7 +222,6 @@ public class Block implements RenderableObject {
             glCallList(_displayListBillboard);
             glEnable(GL11.GL_CULL_FACE);
         }
-
     }
 
     public void update() {
@@ -234,6 +240,11 @@ public class Block implements RenderableObject {
 
     public Block withTranslucent(boolean translucent) {
         _translucent = translucent;
+        return this;
+    }
+
+    public Block withWaving(boolean waving) {
+        _waving = waving;
         return this;
     }
 
@@ -399,6 +410,10 @@ public class Block implements RenderableObject {
         return _liquid;
     }
 
+    public boolean isWaving() {
+        return _waving;
+    }
+
     public boolean isSelectionRayThrough() {
         return _bypassSelectionRay;
     }
@@ -422,19 +437,19 @@ public class Block implements RenderableObject {
         // TOP
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x, calcTextureOffsetFor(SIDE.TOP).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x + 0.0624f, calcTextureOffsetFor(SIDE.TOP).y);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.TOP).y);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x + 0.0624f, calcTextureOffsetFor(SIDE.TOP).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.TOP).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x, calcTextureOffsetFor(SIDE.TOP).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x, calcTextureOffsetFor(SIDE.TOP).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 
         // LEFT
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + 0.0624f, calcTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.LEFT).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + 0.0624f, calcTextureOffsetFor(SIDE.LEFT).y);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.LEFT).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
@@ -442,21 +457,21 @@ public class Block implements RenderableObject {
         // FRONT
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + 0.0624f, calcTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.FRONT).y);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + 0.0624f, calcTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.FRONT).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
 
         GL11.glColor3f(0.5f, 0.5f, 0.5f);
 
         // BACK
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + 0.0624f, calcTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BACK).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + 0.0624f, calcTextureOffsetFor(SIDE.BACK).y);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BACK).y);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
@@ -464,22 +479,31 @@ public class Block implements RenderableObject {
         // RIGHT
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x, calcTextureOffsetFor(SIDE.RIGHT).y);
         GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, calcTextureOffsetFor(SIDE.RIGHT).y);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.RIGHT).y);
         GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x + 0.0624f, calcTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.RIGHT).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x, calcTextureOffsetFor(SIDE.RIGHT).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x, calcTextureOffsetFor(SIDE.RIGHT).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
 
+        // FRONT
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.FRONT).y);
+        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.FRONT).y + TEXTURE_OFFSET_WIDTH);
+        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y + TEXTURE_OFFSET_WIDTH);
+        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
 
         // BOTTOM
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x, calcTextureOffsetFor(SIDE.BOTTOM).y);
         GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, calcTextureOffsetFor(SIDE.BOTTOM).y);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BOTTOM).y);
         GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x + 0.0624f, calcTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BOTTOM).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x, calcTextureOffsetFor(SIDE.BOTTOM).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x, calcTextureOffsetFor(SIDE.BOTTOM).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
 
         GL11.glEnd();
@@ -501,21 +525,21 @@ public class Block implements RenderableObject {
         GL11.glColor3f(1.0f, 1.0f, 1.0f);
 
         // LEFT
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(0f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + 0.0624f, calcTextureOffsetFor(SIDE.LEFT).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.LEFT).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(0f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + 0.0624f, calcTextureOffsetFor(SIDE.LEFT).y);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.LEFT).y);
         GL11.glVertex3f(0f, 0.5f, 0.5f);
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y);
         GL11.glVertex3f(0f, 0.5f, -0.5f);
 
         // BACK
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(-0.5f, -0.5f, 0f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + 0.0624f, calcTextureOffsetFor(SIDE.BACK).y + 0.0624f);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BACK).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(0.5f, -0.5f, 0f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + 0.0624f, calcTextureOffsetFor(SIDE.BACK).y);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH , calcTextureOffsetFor(SIDE.BACK).y);
         GL11.glVertex3f(0.5f, 0.5f, 0f);
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0f);
@@ -546,5 +570,9 @@ public class Block implements RenderableObject {
      */
     public static AABB AABBForBlockAt(int x, int y, int z) {
         return new AABB(new Vector3f(x, y, z), new Vector3f(0.5f, 0.5f, 0.5f));
+    }
+
+    public String toString() {
+        return this.getClass().getSimpleName() + ":" + _title + ";id:" + _id;
     }
 }

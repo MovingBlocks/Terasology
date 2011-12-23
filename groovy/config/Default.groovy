@@ -46,17 +46,12 @@ Graphics {
     gamma = 2.2d
     animatedWaterAndGrass = true
 
-    mipMapping = true
-    anisotropicFiltering = 1
-
     pixelFormat = new PixelFormat().withDepthBits(24)
     displayMode = new DisplayMode(1280, 720)
 
     aspectRatio = 16.0d / 9.0d
 
     fullscreen = false
-
-    fov = 80.0d
 
     viewingDistanceNear = 8
     viewingDistanceModerate = 16
@@ -107,13 +102,15 @@ Controls {
 
 Player {
 
+    fov = 80.0d
+
     cameraBobbing = true
 
     maxGravity = 1.0d
-    maxGravitySwimming = 0.01d
+    maxGravitySwimming = 0.04d
 
     gravity = 0.008d
-    gravitySwimming = gravity * 2d;
+    gravitySwimming = gravity * 4d;
 
     friction = 0.08d
 

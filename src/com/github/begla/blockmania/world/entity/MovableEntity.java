@@ -495,8 +495,14 @@ public abstract class MovableEntity extends Entity {
     }
 
     public void jump() {
-        if (_touchingGround) {
+        if (_touchingGround && !_isSwimming && !_godMode) {
             _jump = true;
+        }
+    }
+
+    public void moveUp() {
+        if (_isSwimming || _godMode) {
+            _movementDirection.y += _activeWalkingSpeed;
         }
     }
 

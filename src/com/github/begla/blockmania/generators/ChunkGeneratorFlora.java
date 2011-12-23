@@ -120,15 +120,15 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
             if (grassRand > grassProb) {
                 /*
-                 * Generate high grass.
+                 * Generate tall grass.
                  */
                 double rand = c.getRandom().standNormalDistrDouble();
                 if (rand > -0.4 && rand < 0.4) {
-                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("High grass").getId());
+                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass1").getId());
                 } else if (rand > -0.6 && rand < 0.6) {
-                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("Medium high grass").getId());
+                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass2").getId());
                 } else {
-                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("Large high grass").getId());
+                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass3").getId());
                 }
 
                 /*
@@ -136,9 +136,9 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                  */
                 if (c.getRandom().standNormalDistrDouble() < -2) {
                     if (c.getRandom().randomBoolean()) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("Red flower").getId());
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("RedFlower").getId());
                     } else {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("Yellow flower").getId());
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("YellowFlower").getId());
                     }
                 }
             }

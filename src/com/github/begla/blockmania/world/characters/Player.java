@@ -26,6 +26,7 @@ import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.intersections.RayBlockIntersection;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
+import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.tools.BlockPlacementRemovalTool;
 import com.github.begla.blockmania.tools.Tool;
@@ -34,11 +35,15 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
 import com.github.begla.blockmania.world.main.WorldRenderer;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -81,8 +86,13 @@ public final class Player extends Character {
     private byte _extractionCounter = 0;
     private RayBlockIntersection.Intersection _selectedBlock, _prevSelectedBlock;
 
+    /* GOD MODE */
+    private long _lastTimeSpacePressed = 0;
+
     /* RESPAWNING */
     private long _timeOfDeath = -1;
+
+    private float _fov;
 
     /**
      * The ToolBelt is how the player interacts with tool events from mouse or keyboard
@@ -91,10 +101,17 @@ public final class Player extends Character {
 
     public Player(WorldRenderer parent) {
         super(parent, WALKING_SPEED, RUNNING_FACTOR, JUMP_INTENSITY);
+        _godMode = GOD_MODE;
     }
 
     public void update() {
-        _godMode = GOD_MODE;
+        // Slightly adjust the FOV when flying
+        if (_godMode) {
+            _activeCamera.extendFov(10);
+        } else {
+            _activeCamera.resetFov();
+        }
+
         _walkingSpeed = WALKING_SPEED - Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.01f, 2.5f));
 
         processInteractions(-1);
@@ -171,7 +188,7 @@ public final class Player extends Character {
     }
 
     /**
-     * Renders the actively selected block in the front of the player's fir person perspective.
+     * Renders the actively selected block in the front of the player's first person perspective.
      */
     public void renderSelectedBlock() {
         Block b = BlockManager.getInstance().getBlock(Blockmania.getInstance().getActiveWorldRenderer().getPlayer().getSelectedBlockType());
@@ -181,8 +198,25 @@ public final class Player extends Character {
 
         glEnable(GL_TEXTURE_2D);
         TextureManager.getInstance().bindTexture("terrain");
+        ShaderManager.getInstance().enableShader("block");
+
+        // Adjust the brightness of the block according to the current position of the player
+        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
+        GL20.glUniform1f(light, _parent.getRenderingLightValueAt(getPosition()));
+
+        // Apply biome and overall color offset
+        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
+        Vector4f color = b.calcColorOffsetFor(Block.SIDE.FRONT, _parent.getActiveTemperature(), _parent.getActiveHumidity());
+        colorBuffer.put(color.x);
+        colorBuffer.put(color.y);
+        colorBuffer.put(color.z);
+
+        colorBuffer.flip();
+        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
+        GL20.glUniform3(colorOffset, colorBuffer);
 
         glEnable(GL11.GL_BLEND);
+
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glAlphaFunc(GL_GREATER, 0.1f);
 
@@ -199,16 +233,24 @@ public final class Player extends Character {
 
         glDisable(GL11.GL_BLEND);
         glDisable(GL_TEXTURE_2D);
+
+        ShaderManager.getInstance().
+
+                enableShader(null);
+
     }
 
     /**
      * Renders a simple hand displayed in front of the player's first person perspective.
-     *
      * TODO: Should not be rendered using immediate mode!
      */
     public void renderHand() {
         glEnable(GL11.GL_TEXTURE_2D);
         TextureManager.getInstance().bindTexture("char");
+        ShaderManager.getInstance().enableShader("block");
+
+        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
+        GL20.glUniform1f(light, _parent.getRenderingLightValueAt(getPosition()));
 
         glPushMatrix();
         glTranslatef(0.8f, -1.1f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.0f - _handMovementAnimationOffset * 0.5f);
@@ -248,6 +290,9 @@ public final class Player extends Character {
         glPopMatrix();
 
         glDisable(GL11.GL_TEXTURE_2D);
+
+        ShaderManager.getInstance().enableShader(null);
+
     }
 
     /**
@@ -285,6 +330,8 @@ public final class Player extends Character {
             Vector3f viewingTarget = new Vector3f(getPosition().x, 40, getPosition().z - 128);
             _firstPersonCamera.getViewingDirection().sub(viewingTarget, getPosition());
         }
+
+        _firstPersonCamera.update();
     }
 
     public void updatePosition() {
@@ -500,7 +547,9 @@ public final class Player extends Character {
                 }
                 break;
             case Keyboard.KEY_K:
-                damage(9999);
+                if (!repeatEvent && state) {
+                    damage(9999);
+                }
                 break;
             case Keyboard.KEY_DOWN:
                 if (!repeatEvent && state) {
@@ -510,6 +559,12 @@ public final class Player extends Character {
             case Keyboard.KEY_SPACE:
                 if (!repeatEvent && state) {
                     jump();
+
+                    if (Blockmania.getInstance().getTime() - _lastTimeSpacePressed < 400) {
+                        _godMode = !_godMode;
+                    }
+
+                    _lastTimeSpacePressed = Blockmania.getInstance().getTime();
                 }
                 break;
             // Hot keys for selecting a tool bar slot
@@ -587,6 +642,9 @@ public final class Player extends Character {
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
             strafeRight();
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+            moveUp();
         }
 
         _running = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && _touchingGround;
@@ -669,5 +727,9 @@ public final class Player extends Character {
     public void notifyObserversLightChanged(Chunk chunk, BlockPosition pos) {
         for (BlockObserver ob : _observers)
             ob.lightChanged(chunk, pos);
+    }
+
+    public float getFov() {
+        return _fov;
     }
 }

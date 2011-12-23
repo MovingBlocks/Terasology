@@ -278,7 +278,7 @@ public final class ChunkMeshGenerator {
         /*
         * Second side of the billboard
         */
-        colorBillboardOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
+        colorBillboardOffset = block.calcColorOffsetFor(Block.SIDE.BACK, temp, hum);
         texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.BACK).x, block.calcTextureOffsetFor(Block.SIDE.BACK).y, 0);
 
         p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
@@ -545,19 +545,18 @@ public final class ChunkMeshGenerator {
     }
 
     private void addBlockTextureData(ChunkMesh.VertexElements vertexElements, Vector3f texOffset, Vector3f norm) {
-
         /*
         * Rotate the texture coordinates according to the
         * orientation of the plane.
         */
         if (norm.z == 1 || norm.x == -1) {
             vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
 
-            vertexElements.tex.add(texOffset.x + 0.0624f);
-            vertexElements.tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
+            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
 
-            vertexElements.tex.add(texOffset.x + 0.0624f);
+            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
             vertexElements.tex.add(texOffset.y);
 
             vertexElements.tex.add(texOffset.x);
@@ -566,14 +565,14 @@ public final class ChunkMeshGenerator {
             vertexElements.tex.add(texOffset.x);
             vertexElements.tex.add(texOffset.y);
 
-            vertexElements.tex.add(texOffset.x + 0.0624f);
+            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
             vertexElements.tex.add(texOffset.y);
 
-            vertexElements.tex.add(texOffset.x + 0.0624f);
-            vertexElements.tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
+            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
 
             vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
         }
     }
 

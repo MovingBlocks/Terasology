@@ -31,16 +31,14 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  */
 public class FirstPersonCamera extends Camera {
 
-    public static final float FOV = ((Double) ConfigurationManager.getInstance().getConfig().get("Graphics.fov")).floatValue();
     public static final float ASPECT_RATIO = ((Double) ConfigurationManager.getInstance().getConfig().get("Graphics.aspectRatio")).floatValue();
-
     double _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0;
 
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        gluPerspective(FOV, ASPECT_RATIO, 0.1f, 1024f);
+        gluPerspective(_activeFov, ASPECT_RATIO, 0.1f, 1024f);
 
         glMatrixMode(GL11.GL_MODELVIEW);
     }
@@ -76,5 +74,4 @@ public class FirstPersonCamera extends Camera {
     public void setBobbingVerticalOffsetFactor(double f) {
         _bobbingVerticalOffsetFactor = f;
     }
-
 }

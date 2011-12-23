@@ -93,7 +93,7 @@ public class PortalManager {
 
             // Spawn some Gel. Cubes in the wilderness!
             Vector3f randomOffset = new Vector3f((float) _parent.getWorldProvider().getRandom().randomDouble(), 0, (float) _parent.getWorldProvider().getRandom().randomDouble());
-            randomOffset.scale(64);
+            randomOffset.scale(256);
 
             s.setSpawningPoint(new Vector3f(p.getBlockLocation().x + randomOffset.x, p.getBlockLocation().y + 1, p.getBlockLocation().z + randomOffset.z));
             s.respawn();

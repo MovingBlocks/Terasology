@@ -17,11 +17,12 @@ package com.github.begla.blockmania.gui.components;
 
 import com.github.begla.blockmania.gui.framework.UIDisplayElement;
 import com.github.begla.blockmania.rendering.manager.FontManager;
-import com.github.begla.blockmania.rendering.manager.TextureManager;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureImpl;
 
 import javax.vecmath.Vector2f;
 
@@ -42,6 +43,9 @@ public class UIText extends UIDisplayElement {
     private AngelCodeFont _font = FontManager.getInstance().getFont("default");
     private boolean _shadowed = true;
 
+    // TODO HACK
+    private Texture _workaroundTexture = new TextureImpl("abc", 0, 0);
+
     private final Vector2f _shadowOffset = new Vector2f(-1, 0);
 
     public UIText() {
@@ -59,16 +63,16 @@ public class UIText extends UIDisplayElement {
     }
 
     public void render() {
-        // HACK: Make sure Slick binds a new texture...
-        TextureManager.getInstance().getTexture("terrain").bind();
+        // TODO HACK: Workaround because the internal Slick texture mechanism is never used
+        _workaroundTexture.bind();
 
         if (_shadowed)
             _font.drawString(_shadowOffset.x, _shadowOffset.y, _text, _shadowColor);
 
         _font.drawString(0, 0, _text, _color);
 
+        // TODO: Also ugly..
         glDisable(GL11.GL_TEXTURE_2D);
-        /// HACK: Ends here...
     }
 
     @Override

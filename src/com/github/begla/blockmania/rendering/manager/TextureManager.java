@@ -15,24 +15,19 @@
  */
 package com.github.begla.blockmania.rendering.manager;
 
-import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import org.lwjgl.util.glu.MipMap;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
+import org.newdawn.slick.opengl.PNGDecoder;
 import org.newdawn.slick.util.ResourceLoader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import static org.lwjgl.opengl.GL11.GL_NEAREST;
-import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Provides support for loading and applying textures.
@@ -41,11 +36,15 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class TextureManager {
 
-    private static final boolean MIP_MAPPING = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.mipMapping");
-    private static final int ANISOTROPIC_FILTERING = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.anisotropicFiltering");
+    public class BlockmaniaTexture {
+        public int id;
+        public int width;
+        public int height;
+        public ByteBuffer data;
+    }
 
     private static TextureManager _instance;
-    private final HashMap<String, Texture> _textures = new HashMap<String, Texture>();
+    private final HashMap<String, BlockmaniaTexture> _textures = new HashMap<String, BlockmaniaTexture>();
 
     public static TextureManager getInstance() {
         if (_instance == null)
@@ -63,70 +62,96 @@ public class TextureManager {
     }
 
     public void loadDefaultTextures() {
-        loadTexture("terrain", true);
-        loadTexture("custom_lava_still", false);
-        loadTexture("custom_water_still", false);
-        loadTexture("custom_lava_flowing", false);
-        loadTexture("custom_water_flowing", false);
+        addTexture("custom_lava_still");
+        addTexture("custom_water_still");
+        addTexture("custom_lava_flowing");
+        addTexture("custom_water_flowing");
 
         /* UI */
-        loadTexture("gui_menu", false);
-        loadTexture("gui", false);
-        loadTexture("icons", false);
-        loadTexture("blockmania", false);
+        addTexture("gui_menu");
+        addTexture("gui");
+        addTexture("icons");
+        addTexture("items");
+        addTexture("blockmania");
 
         /* MOBS */
-        loadTexture("slime", false);
-        loadTexture("char", false);
+        addTexture("slime");
+        addTexture("char");
+
+        /* EFFECTS */
+        addTexture("effects");
 
         for (int i = 1; i <= 6; i++) {
-            loadTexture("stars" + i, false);
+            addTexture("stars" + i);
         }
     }
 
-    private void updateTextureParams(Texture tex, boolean generateMipMap) {
-        if (MIP_MAPPING && generateMipMap) {
-            glBindTexture(GL11.GL_TEXTURE_2D, tex.getTextureID());
-
-            int width = tex.getImageWidth();
-            int height = tex.getImageHeight();
-
-            byte[] texbytes = tex.getTextureData();
-            int components = texbytes.length / (width * height);
-
-            ByteBuffer texdata = BufferUtils.createByteBuffer(texbytes.length);
-            texdata.put(texbytes);
-            texdata.rewind();
-
-            MipMap.gluBuild2DMipmaps(GL11.GL_TEXTURE_2D, components, width, height, components == 3 ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, texdata);
-
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST_MIPMAP_NEAREST);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 2);
-
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, ANISOTROPIC_FILTERING);
-        }
-
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
-    }
-
-    public void loadTexture(String title, boolean generateMipMap) {
+    public void addTexture(String title) {
         try {
-            Texture tex = TextureLoader.getTexture("png", ResourceLoader.getResource("com/github/begla/blockmania/data/textures/" + title + ".png").openStream(), GL_NEAREST);
-            _textures.put(title, tex);
-
-            updateTextureParams(tex, generateMipMap);
+            addTexture(title, "com/github/begla/blockmania/data/textures/" + title + ".png");
         } catch (IOException ex) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, null, ex);
         }
     }
 
-    public void bindTexture(String s) {
-        glBindTexture(GL11.GL_TEXTURE_2D, _textures.get(s).getTextureID());
+    public void readTexture(String path, BlockmaniaTexture target) throws IOException {
+        InputStream stream = ResourceLoader.getResource(path).openStream();
+        PNGDecoder decoder = new PNGDecoder(stream);
+
+        ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
+        decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.RGBA);
+        buf.flip();
+
+        target.data = buf;
+        target.height = decoder.getHeight();
+        target.width = decoder.getWidth();
     }
 
-    public Texture getTexture(String s) {
+    public BlockmaniaTexture loadTexture(String path, String[] mipMapPaths) throws IOException {
+        BlockmaniaTexture texture = new BlockmaniaTexture();
+
+        texture.id = glGenTextures();
+        glBindTexture(GL11.GL_TEXTURE_2D, texture.id);
+
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        readTexture(path, texture);
+
+        GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, texture.width, texture.height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, texture.data);
+
+        if (mipMapPaths != null) {
+            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, mipMapPaths.length);
+            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+
+            for (int i = 0; i < mipMapPaths.length; i++) {
+                BlockmaniaTexture t = new BlockmaniaTexture();
+                readTexture(mipMapPaths[i], t);
+
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i + 1, GL11.GL_RGBA, t.width, t.height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, t.data);
+            }
+        }
+
+        return texture;
+    }
+
+    public void addTexture(String bindName, String path, String[] mipMapPaths) throws IOException {
+        _textures.put(bindName, loadTexture(path, mipMapPaths));
+    }
+
+    public void addTexture(String bindName, String path) throws IOException {
+        _textures.put(bindName, loadTexture(path, null));
+    }
+
+    public void bindTexture(String s) {
+        glBindTexture(GL11.GL_TEXTURE_2D, _textures.get(s).id);
+    }
+
+    public BlockmaniaTexture getTexture(String s) {
         return _textures.get(s);
     }
 }

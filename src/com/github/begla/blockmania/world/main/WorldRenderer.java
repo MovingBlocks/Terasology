@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.world.main;
 
 import com.github.begla.blockmania.audio.AudioManager;
+import com.github.begla.blockmania.blocks.BlockManager;
 import com.github.begla.blockmania.configuration.ConfigurationManager;
 import com.github.begla.blockmania.datastructures.AABB;
 import com.github.begla.blockmania.debug.BlockmaniaProfiler;
@@ -232,7 +233,7 @@ public final class WorldRenderer implements RenderableObject {
             if (isChunkVisible(c)) {
                 _visibleChunks.add(c);
                 c.update();
-                
+
                 if (c.isDirty())
                     _statDirty++;
 
@@ -295,17 +296,33 @@ public final class WorldRenderer implements RenderableObject {
         TextureManager.getInstance().bindTexture("custom_lava_still");
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
         TextureManager.getInstance().bindTexture("custom_water_still");
+        GL13.glActiveTexture(GL13.GL_TEXTURE3);
+        TextureManager.getInstance().bindTexture("effects");
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("terrain");
 
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
         int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
 
+        int wavingCoordinates = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "wavingCoordinates");
+        GL20.glUniform1(wavingCoordinates, BlockManager.getInstance().calcCoordinatesForWavingBlocks());
+
+        int lavaCoordinate = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "lavaCoordinate");
+        GL20.glUniform2(lavaCoordinate, BlockManager.getInstance().calcCoordinate("Lava"));
+
+        int waterCoordinate = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "waterCoordinate");
+        GL20.glUniform2(waterCoordinate, BlockManager.getInstance().calcCoordinate("Water"));
+
+        int grassCoordinate = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "grassCoordinate");
+        GL20.glUniform2(grassCoordinate, BlockManager.getInstance().calcCoordinate("Grass"));
+
         int lavaTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureLava");
         int waterTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureWater");
         int textureAtlas = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureAtlas");
+        int textureEffects = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureEffects");
         GL20.glUniform1i(lavaTexture, 1);
         GL20.glUniform1i(waterTexture, 2);
+        GL20.glUniform1i(textureEffects, 3);
         GL20.glUniform1i(textureAtlas, 0);
 
         int tick = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "tick");
@@ -459,6 +476,15 @@ public final class WorldRenderer implements RenderableObject {
         }
     }
 
+    public float getRenderingLightValueAt(Vector3f pos) {
+        double lightValueSun = ((double) _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.SUN));
+        lightValueSun = (lightValueSun / 15.0) * getDaylight();
+        double lightValueBlock = _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.BLOCK);
+        lightValueBlock = lightValueBlock / 15.0;
+
+        return (float) Math.max(lightValueSun, lightValueBlock);
+    }
+
     public void update() {
         updateTick();
 
@@ -585,7 +611,7 @@ public final class WorldRenderer implements RenderableObject {
         if (!_portalManager.hasPortal()) {
             Vector3f loc = new Vector3f(_player.getPosition().x, _player.getPosition().y + 4, _player.getPosition().z);
             Blockmania.getInstance().getLogger().log(Level.INFO, "Portal location is" + loc);
-            _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, (byte) 30, false, true);
+            _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, BlockManager.getInstance().getBlock("PortalBlock").getId(), false, true);
             _portalManager.addPortal(loc);
         }
     }
