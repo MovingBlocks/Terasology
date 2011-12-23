@@ -542,6 +542,9 @@ public final class ChunkMeshGenerator {
     }
 
     private void addBlockTextureData(ChunkMesh.VertexElements vertexElements, Vector3f texOffset, Vector3f norm) {
+        // TODO BEGLA: Should not be hardcoded!
+        float offsetX = 1.0f / 64.0f;
+        float offsetY = 1.0f / 1.0f;
 
         /*
         * Rotate the texture coordinates according to the
@@ -549,12 +552,12 @@ public final class ChunkMeshGenerator {
         */
         if (norm.z == 1 || norm.x == -1) {
             vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.y + offsetY);
 
-            vertexElements.tex.add(texOffset.x + 0.0624f);
-            vertexElements.tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.x + offsetX);
+            vertexElements.tex.add(texOffset.y + offsetY);
 
-            vertexElements.tex.add(texOffset.x + 0.0624f);
+            vertexElements.tex.add(texOffset.x + offsetX);
             vertexElements.tex.add(texOffset.y);
 
             vertexElements.tex.add(texOffset.x);
@@ -563,14 +566,14 @@ public final class ChunkMeshGenerator {
             vertexElements.tex.add(texOffset.x);
             vertexElements.tex.add(texOffset.y);
 
-            vertexElements.tex.add(texOffset.x + 0.0624f);
+            vertexElements.tex.add(texOffset.x + offsetX);
             vertexElements.tex.add(texOffset.y);
 
-            vertexElements.tex.add(texOffset.x + 0.0624f);
-            vertexElements.tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.x + offsetX);
+            vertexElements.tex.add(texOffset.y + offsetY);
 
             vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y + 0.0624f);
+            vertexElements.tex.add(texOffset.y + offsetY);
         }
     }
 

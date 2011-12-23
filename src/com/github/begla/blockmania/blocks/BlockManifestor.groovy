@@ -377,12 +377,15 @@ class BlockManifestor {
         //String s = Blockmania.getInstance().getActiveWorldProvider().getWorldSavePath() + "/BlockManifest.groovy"
 
         // Currently the image manifest is simply 16 pixels high and as wide as we have textures
-        int width = _images.size() * 16
+        // TODO BEGLA: Should not be hardcoded
+        // TODO BEGLA: Should be automatically extended to the next value power of two if there is not enough room for the textures
+        int width = 1024;
         println "We've got " + _images.size() + " images total, so the width of the final block manifest image will be " + width
         int x = 0
 
         // Do we need a different type to be able to get transparency right?
-        BufferedImage result = new BufferedImage(width, 16, BufferedImage.TYPE_INT_RGB)
+        // TODO BEGLA: This was just RGB before
+        BufferedImage result = new BufferedImage(width, 16, BufferedImage.TYPE_INT_ARGB)
         Graphics g = result.getGraphics()
 
         _images.each {

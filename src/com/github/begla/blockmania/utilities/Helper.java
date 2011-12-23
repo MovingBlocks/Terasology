@@ -24,20 +24,6 @@ import javax.vecmath.Vector2f;
  */
 public final class Helper {
 
-    private static final double DIV = 1.0 / 16.0;
-
-    /**
-     * Calculates the texture offset for a given position within
-     * the texture atlas.
-     *
-     * @param x X-coordinate
-     * @param y Y-coordinate
-     * @return The texture offset
-     */
-    public static Vector2f calcOffsetForTextureAt(int x, int y) {
-        return new Vector2f((float) (x * DIV), (float) (y * DIV));
-    }
-
     /**
      * Returns true if the flag at the given byte position
      * is set.
