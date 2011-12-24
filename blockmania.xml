@@ -213,7 +213,6 @@
             <zipfileset src="${basedir}/libs/jdom.jar"/>
             <zipfileset src="${basedir}/libs/vecmath.jar"/>
             <zipfileset src="${basedir}/libs/jbullet.jar"/>
-            <zipfileset src="${basedir}/libs/idea.jar"/>
         </jar>
         <copy file="${temp.jar.path.Blockmania.jar}" tofile="${artifact.temp.output.blockmania:jar}/Blockmania.jar"/>
     </target>
