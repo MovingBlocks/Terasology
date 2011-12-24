@@ -38,7 +38,8 @@ class BlockManifestor {
 
     private static BlockManager _bm;
 
-    private GroovyClassLoader _classLoader = new GroovyClassLoader();
+    /** Used for dynamically loading the Groovy classes **/
+    protected GroovyClassLoader _classLoader = new GroovyClassLoader();
 
     /** Holds BufferedImages during the loading process (not persisted) */
     private Map<String, BufferedImage> _images = [:]
