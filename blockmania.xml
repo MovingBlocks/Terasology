@@ -184,6 +184,10 @@
         <copy todir="${artifact.output.blockmania}/groovy">
             <fileset dir="${basedir}/groovy"/>
         </copy>
+        <mkdir dir="${artifact.output.blockmania}/blocks"/>
+        <copy todir="${artifact.output.blockmania}/blocks">
+            <fileset dir="${basedir}/blocks"/>
+        </copy>
     </target>
 
     <target name="artifact.blockmania:zip" depends="artifact.blockmania" description="None">
