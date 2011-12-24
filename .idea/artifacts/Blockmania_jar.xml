@@ -8,7 +8,6 @@
       <element id="module-output" name="Blockmania" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/annotations.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/AppleJavaExtensions.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/javolution-5.5.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/jdom.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/jinput.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/jogg-0.0.7.jar" path-in-jar="/" />

@@ -17,6 +17,7 @@ package com.github.begla.blockmania.blocks;
 
 import gnu.trove.map.hash.TByteObjectHashMap;
 import groovy.lang.Binding;
+import groovy.lang.GroovyClassLoader;
 import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Vector2f;
@@ -30,9 +31,6 @@ import java.util.Map;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BlockManager {
-
-    /* CONST */
-    private static final String DEFAULT_SCRIPT_PATH = "groovy/blocks/";
 
     /* SINGLETON */
     private static BlockManager _instance;
@@ -53,8 +51,6 @@ public class BlockManager {
     }
 
     private BlockManager() {
-        //_binding = new Binding();
-        //_binding.setVariable("blockManager", this);
         _manifestor = new BlockManifestor(this);
         loadBlocks();
     }
