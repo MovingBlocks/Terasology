@@ -38,15 +38,15 @@ public class BlueprintTool implements Tool {
     }
 
     public void executeLeftClickAction() {
-        RayBlockIntersection.Intersection is = _player.getSelectedBlock();
+        RayBlockIntersection.Intersection selectedBlock = _player.getSelectedBlock();
 
-        if (BlueprintItem.class.isInstance(_player.getActiveItem())) {
+        if (BlueprintItem.class.isInstance(_player.getActiveItem()) && selectedBlock != null) {
             BlueprintItem bpItem = (BlueprintItem) _player.getActiveItem();
 
             if (bpItem.getBlueprint() == null) {
-                addBlock(is.getBlockPosition());
+                addBlock(selectedBlock.getBlockPosition());
             } else {
-                bpItem.getBlueprint().build(_player.getParent().getWorldProvider(), is.getBlockPosition());
+                bpItem.getBlueprint().build(_player.getParent().getWorldProvider(), selectedBlock.getBlockPosition());
             }
         }
     }
