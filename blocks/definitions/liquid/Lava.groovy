@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks.liquid
-
 /**
  * Don't fall in the lava! Well, at least not after it starts hurting
  * As a liquid this block likely gets some added stats here, like viscosity
@@ -8,7 +6,7 @@ package com.github.begla.blockmania.data.blocks.liquid
  */
 block {
     version = 1
-    
+
     // Let the lava shine!
     luminance = 8
 }

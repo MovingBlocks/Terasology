@@ -114,9 +114,12 @@
     </path>
 
 
-    <target name="compile.module.blockmania" depends="compile.module.blockmania.production,compile.module.blockmania.tests" description="Compile module Blockmania"/>
+    <target name="compile.module.blockmania"
+            depends="compile.module.blockmania.production,compile.module.blockmania.tests"
+            description="Compile module Blockmania"/>
 
-    <target name="compile.module.blockmania.production" depends="register.custom.compilers" description="Compile module Blockmania; production classes">
+    <target name="compile.module.blockmania.production" depends="register.custom.compilers"
+            description="Compile module Blockmania; production classes">
         <mkdir dir="${blockmania.output.dir}"/>
         <groovyc destdir="${blockmania.output.dir}" fork="yes">
             <src refid="blockmania.module.sourcepath"/>

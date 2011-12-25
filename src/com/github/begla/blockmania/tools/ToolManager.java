@@ -15,11 +15,9 @@
  */
 package com.github.begla.blockmania.tools;
 
-import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.world.characters.Player;
 
 import java.util.HashMap;
-import java.util.logging.Level;
 
 /**
  * Handles the player interacting with various tools. Supports both "native" tools written in the core Java engine
@@ -31,7 +29,7 @@ import java.util.logging.Level;
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-public class ToolBelt {
+public class ToolManager {
 
     /**
      * Map that contains simple native tool index values for a switch here
@@ -49,11 +47,6 @@ public class ToolBelt {
     private final HashMap<Byte, Byte> _toolBinding = new HashMap<Byte, Byte>();
 
     /**
-     * Which slot in the hot bar is the active tool
-     */
-    private byte _selectedTool = 1;
-
-    /**
      * Reference back to the parent Player
      */
     private final Player _player;
@@ -61,7 +54,7 @@ public class ToolBelt {
     /**
      * Default constructor - would do some magic here to add native tools and look for plugin tools
      */
-    public ToolBelt(Player parent) {
+    public ToolManager(Player parent) {
         _player = parent;
 
         initNativeTools();
@@ -100,59 +93,7 @@ public class ToolBelt {
         // Cheating with the hard coded index for now
         _toolBinding.put((byte) 6, (byte) 51);
         _pluginStore.put((byte) 51, groovyTool);
-        Blockmania.getInstance().getLogger().log(Level.INFO, "ToolBelt.mapPluginTool called with Tool: " + groovyTool);
-    }
-
-    /**
-     * Sets _selectedTool to the supplied value, given by the keyboard listener caller
-     *
-     * @param toolBarSlotIndex A 1-10 value corresponding to the slot in the tool bar being selected
-     */
-    public void setSelectedTool(byte toolBarSlotIndex) {
-        _selectedTool = toolBarSlotIndex;
-    }
-
-    /**
-     * Sets _selectedTool to the appropriate index value (the imaginary 10-slot tool belt / hot bar) - via mouse wheel
-     *
-     * @param wheelMotion How many "notches" have the mouse wheel rolled
-     */
-    public void rollSelectedTool(byte wheelMotion) {
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Rolling the selected tool by " + wheelMotion);
-        System.out.println();
-        _selectedTool += wheelMotion;
-        // Roll back to the normal 1-10 range if we're now outside it (player may be able to roll the wheel more than a full 10 slots in one go)
-        while (_selectedTool > 10) {
-            _selectedTool -= 10;
-            Blockmania.getInstance().getLogger().log(Level.INFO, "Mouse wheel rolled the selected tool above 10, substracting 10, getting " + _selectedTool);
-        }
-
-        while (_selectedTool < 1) {
-            _selectedTool += 10;
-            Blockmania.getInstance().getLogger().log(Level.INFO, "Mouse wheel rolled the selected tool below 1, adding 10, getting " + _selectedTool);
-        }
-    }
-
-    /**
-     * Activates the selected tool - checks _selectedTool against a switch containing both native tools and plugin tools
-     *
-     * @param leftMouse if true then left mouse was used to trigger, otherwise it was right mouse
-     */
-    public void activateTool(boolean leftMouse) {
-        String mouse = leftMouse ? "Left" : "Right";
-
-        // First we dig out the Byte index that the value in _selectedTool references in the _toolBinding map
-        Byte toolIndex = _toolBinding.get(new Byte(_selectedTool));
-        Tool activeTool = getToolForIndex(toolIndex);
-
-        if (activeTool != null) {
-            Blockmania.getInstance().getLogger().log(Level.INFO, mouse + " button tool activation happened for slot " + _selectedTool + ", which is tool " + toolIndex);
-
-            if (leftMouse)
-                activeTool.executeLeftClickAction();
-            else
-                activeTool.executeRightClickAction();
-        }
+        // Blockmania.getInstance().getLogger().log(Level.INFO, "ToolManager.mapPluginTool called with Tool: " + groovyTool);
     }
 
     public Tool getToolForIndex(Byte toolIndex) {
@@ -174,14 +115,5 @@ public class ToolBelt {
         }
 
         return null;
-    }
-
-    public byte getSelectedToolId() {
-        return _selectedTool;
-    }
-
-    public Tool getSelectedTool() {
-        Byte toolIndex = _toolBinding.get(new Byte(_selectedTool));
-        return getToolForIndex(toolIndex);
     }
 }

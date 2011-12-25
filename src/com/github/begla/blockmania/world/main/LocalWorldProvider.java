@@ -135,12 +135,8 @@ public class LocalWorldProvider implements WorldProvider {
             byte oldBlock = c.getBlock(blockPosX, y, blockPosZ);
             byte newBlock;
 
-            if (BlockManager.getInstance().getBlock(c.getBlock(blockPosX, y, blockPosZ)).isDestructible()) {
-                c.setBlock(blockPosX, y, blockPosZ, type);
-                newBlock = type;
-            } else {
-                return false;
-            }
+            c.setBlock(blockPosX, y, blockPosZ, type);
+            newBlock = type;
 
             if (updateLight) {
                 /*

@@ -28,12 +28,15 @@ import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
-import com.github.begla.blockmania.tools.BlockPlacementRemovalTool;
 import com.github.begla.blockmania.tools.Tool;
-import com.github.begla.blockmania.tools.ToolBelt;
+import com.github.begla.blockmania.tools.ToolManager;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.interfaces.BlockObserver;
+import com.github.begla.blockmania.world.inventory.BlockItem;
+import com.github.begla.blockmania.world.inventory.Inventory;
+import com.github.begla.blockmania.world.inventory.Item;
+import com.github.begla.blockmania.world.inventory.Toolbar;
 import com.github.begla.blockmania.world.main.WorldRenderer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
@@ -71,9 +74,6 @@ public final class Player extends Character {
     /* OBSERVERS */
     private final ArrayList<BlockObserver> _observers = new ArrayList<BlockObserver>();
 
-    /* PROPERTIES */
-    private byte _activeBlockType = 1;
-
     /* CAMERA */
     private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
     private final Camera _activeCamera = _firstPersonCamera;
@@ -86,21 +86,22 @@ public final class Player extends Character {
     private byte _extractionCounter = 0;
     private RayBlockIntersection.Intersection _selectedBlock, _prevSelectedBlock;
 
+    /* INVENTORY */
+    private Inventory _inventory = new Inventory(this);
+    private Toolbar _toolbar = new Toolbar(this);
+
     /* GOD MODE */
     private long _lastTimeSpacePressed = 0;
 
     /* RESPAWNING */
     private long _timeOfDeath = -1;
 
-    private float _fov;
-
-    /**
-     * The ToolBelt is how the player interacts with tool events from mouse or keyboard
-     */
-    private final ToolBelt _toolBelt = new ToolBelt(this);
+    /* TOOLS */
+    private final ToolManager _toolManager = new ToolManager(this);
 
     public Player(WorldRenderer parent) {
         super(parent, WALKING_SPEED, RUNNING_FACTOR, JUMP_INTENSITY);
+
         _godMode = GOD_MODE;
     }
 
@@ -112,7 +113,13 @@ public final class Player extends Character {
             _activeCamera.resetFov();
         }
 
+        // Simulate a bit more realistic walking
         _walkingSpeed = WALKING_SPEED - Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.01f, 2.5f));
+
+        // Speedup if the player is playing god
+        if (_godMode) {
+            _walkingSpeed *= 1.5;
+        }
 
         processInteractions(-1);
 
@@ -145,16 +152,44 @@ public final class Player extends Character {
             return;
         }
 
-        // Check if one of the mouse buttons is pressed
-        if (Mouse.isButtonDown(0) || button == 0) {
-            _toolBelt.activateTool(true);
-            _lastInteraction = Blockmania.getInstance().getTime();
-            poke();
-        } else if (Mouse.isButtonDown(1) || button == 1) {
-            _toolBelt.activateTool(false);
-            _lastInteraction = Blockmania.getInstance().getTime();
-            poke();
+        Tool activeTool = getActiveTool();
+
+        if (activeTool != null) {
+            // Check if one of the mouse buttons is pressed
+            if (Mouse.isButtonDown(0) || button == 0) {
+                activeTool.executeLeftClickAction();
+                _lastInteraction = Blockmania.getInstance().getTime();
+                poke();
+            } else if (Mouse.isButtonDown(1) || button == 1) {
+                activeTool.executeRightClickAction();
+                _lastInteraction = Blockmania.getInstance().getTime();
+                poke();
+            }
         }
+    }
+
+    public Item getActiveItem() {
+        return getToolbar().getItemForSelectedSlot();
+    }
+
+    public Block getActiveBlock() {
+        Item item = getActiveItem();
+
+        if (item != null) {
+            if (item.getClass() == BlockItem.class) {
+                return BlockManager.getInstance().getBlock(((BlockItem) getActiveItem()).getBlockId());
+            }
+        }
+
+        return null;
+    }
+
+    public Tool getActiveTool() {
+        if (getActiveItem() != null) {
+            return _toolManager.getToolForIndex(getActiveItem().getToolId());
+        }
+
+        return _toolManager.getToolForIndex((byte) 0x01);
     }
 
     public void poke() {
@@ -177,23 +212,112 @@ public final class Player extends Character {
     }
 
     public void renderFirstPersonViewElements() {
-        Tool activeTool = _toolBelt.getSelectedTool();
+        if (getActiveBlock() != null) {
+            renderActiveBlock();
+            return;
+        }
 
-        if (activeTool == null)
-            renderHand();
-        else if (activeTool != null && !BlockPlacementRemovalTool.class.isInstance(activeTool))
-            renderHand();
-        else
-            renderSelectedBlock();
+        renderHand();
     }
 
     /**
      * Renders the actively selected block in the front of the player's first person perspective.
      */
-    public void renderSelectedBlock() {
-        Block b = BlockManager.getInstance().getBlock(Blockmania.getInstance().getActiveWorldRenderer().getPlayer().getSelectedBlockType());
+    public void renderExtractionOverlay() {
+        if (_extractionCounter <= 0 || _prevSelectedBlock == null)
+            return;
 
-        if (b == null)
+        Block block = BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(_prevSelectedBlock.getBlockPosition().toVector3f()));
+
+        glEnable(GL_TEXTURE_2D);
+        TextureManager.getInstance().bindTexture("effects");
+
+        glEnable(GL11.GL_BLEND);
+        glBlendFunc(GL_DST_COLOR, GL_ZERO);
+
+        glPushMatrix();
+        glTranslatef(_prevSelectedBlock.getBlockPosition().x - getPosition().x, _prevSelectedBlock.getBlockPosition().y - getPosition().y, _prevSelectedBlock.getBlockPosition().z - getPosition().z);
+
+        float offset = Math.round(((float) _extractionCounter / block.getHardness()) * 10.0f) * 0.0625f;
+
+        glBegin(GL11.GL_QUADS);
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+        // TOP
+        GL11.glTexCoord2f(offset, 0.0f);
+        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
+        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0624f);
+        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
+        GL11.glTexCoord2f(offset, 0.0624f);
+        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
+
+        // LEFT
+        GL11.glTexCoord2f(offset, 0.0f + 0.0624f);
+        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f + 0.0624f);
+        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
+        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
+        GL11.glTexCoord2f(offset, 0.0f);
+        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
+
+        // BACK
+        GL11.glTexCoord2f(offset, 0.0f + 0.0624f);
+        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f + 0.0624f);
+        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
+        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
+        GL11.glTexCoord2f(offset, 0.0f);
+        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
+
+        // RIGHT
+        GL11.glTexCoord2f(offset, 0.0f);
+        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
+        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f + 0.0624f);
+        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
+        GL11.glTexCoord2f(offset, 0.0f + 0.0624f);
+        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
+
+        // FRONT
+        GL11.glTexCoord2f(offset, 0.0f);
+        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
+        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f + 0.0624f);
+        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
+        GL11.glTexCoord2f(offset, 0.0f + 0.0624f);
+        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
+
+        // BOTTOM
+        GL11.glTexCoord2f(offset, 0.0f);
+        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
+        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
+        GL11.glTexCoord2f(offset + 0.0624f, 0.0f + 0.0624f);
+        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
+        GL11.glTexCoord2f(offset, 0.0f + 0.0624f);
+        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
+
+        glEnd();
+
+        glPopMatrix();
+
+        glDisable(GL11.GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+    }
+
+    /**
+     * Renders the actively selected block in the front of the player's first person perspective.
+     */
+    public void renderActiveBlock() {
+        Block activeBlock = getActiveBlock();
+
+        if (activeBlock == null)
             return;
 
         glEnable(GL_TEXTURE_2D);
@@ -206,7 +330,7 @@ public final class Player extends Character {
 
         // Apply biome and overall color offset
         FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
-        Vector4f color = b.calcColorOffsetFor(Block.SIDE.FRONT, _parent.getActiveTemperature(), _parent.getActiveHumidity());
+        Vector4f color = activeBlock.calcColorOffsetFor(Block.SIDE.FRONT, _parent.getActiveTemperature(), _parent.getActiveHumidity());
         colorBuffer.put(color.x);
         colorBuffer.put(color.y);
         colorBuffer.put(color.z);
@@ -227,17 +351,14 @@ public final class Player extends Character {
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
         glTranslatef(0f, 0.25f, 0f);
 
-        b.render();
+        activeBlock.render();
 
         glPopMatrix();
 
         glDisable(GL11.GL_BLEND);
         glDisable(GL_TEXTURE_2D);
 
-        ShaderManager.getInstance().
-
-                enableShader(null);
-
+        ShaderManager.getInstance().enableShader(null);
     }
 
     /**
@@ -251,6 +372,16 @@ public final class Player extends Character {
 
         int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
         GL20.glUniform1f(light, _parent.getRenderingLightValueAt(getPosition()));
+
+        // Make sure the hand is not affected by the biome color. ZOMBIES!!!!
+        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
+        colorBuffer.put(1.0f);
+        colorBuffer.put(1.0f);
+        colorBuffer.put(1.0f);
+        colorBuffer.flip();
+
+        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
+        GL20.glUniform3(colorOffset, colorBuffer);
 
         glPushMatrix();
         glTranslatef(0.8f, -1.1f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.0f - _handMovementAnimationOffset * 0.5f);
@@ -305,6 +436,9 @@ public final class Player extends Character {
      * @return
      */
     public double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
+        if (_godMode || DEMO_FLIGHT)
+            return 0;
+
         float speedFactor = 1.0f;
 
         if (_activeWalkingSpeed > 0)
@@ -316,7 +450,7 @@ public final class Player extends Character {
     public void updateCameras() {
         _firstPersonCamera.getPosition().set(calcEyeOffset());
 
-        if (!GOD_MODE && CAMERA_BOBBING) {
+        if (CAMERA_BOBBING) {
             _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.2f));
             _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f, 4.4f));
         } else {
@@ -402,7 +536,7 @@ public final class Player extends Character {
     }
 
     public void resetExtraction() {
-        _prevSelectedBlock = null;
+        _prevSelectedBlock = _selectedBlock;
         _extractionCounter = 0;
     }
 
@@ -411,30 +545,34 @@ public final class Player extends Character {
      *
      * @param type The type of the block
      */
-    public void placeBlock(byte type) {
+    public boolean placeBlock(byte type) {
         if (getParent() != null) {
             if (_selectedBlock != null) {
                 Block centerBlock = BlockManager.getInstance().getBlock(getParent().getWorldProvider().getBlock(_selectedBlock.getBlockPosition().x, _selectedBlock.getBlockPosition().y, _selectedBlock.getBlockPosition().z));
 
                 if (!centerBlock.isAllowBlockAttachment()) {
-                    return;
+                    return false;
                 }
 
                 BlockPosition blockPos = _selectedBlock.calcAdjacentBlockPos();
 
                 // Prevent players from placing blocks inside their bounding boxes
                 if (Block.AABBForBlockAt(blockPos.x, blockPos.y, blockPos.z).overlaps(getAABB())) {
-                    return;
+                    return false;
                 }
 
-                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, false);
+                getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, true);
                 AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
 
                 int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
                 int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
                 notifyObserversBlockPlaced(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
+
+                return true;
             }
         }
+
+        return false;
     }
 
     public void explode() {
@@ -477,59 +615,70 @@ public final class Player extends Character {
     /**
      * Removes a block.
      */
-    public void removeBlock(boolean createPhysBlock) {
+    public byte removeBlock(boolean createPhysBlock) {
         if (getParent() != null) {
             if (_selectedBlock != null) {
 
-                // Check if this block was "poked" before
-                if (_prevSelectedBlock != null) {
-                    if (_prevSelectedBlock.equals(_selectedBlock)) {
-                        // If so increase the extraction counter
-                        _extractionCounter++;
+                BlockPosition blockPos = _selectedBlock.getBlockPosition();
+                byte currentBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y, blockPos.z);
+                Block block = BlockManager.getInstance().getBlock(currentBlockType);
+
+                if (block.isDestructible()) {
+
+                    // Check if this block was "poked" before
+                    if (_prevSelectedBlock != null) {
+                        if (_prevSelectedBlock.equals(_selectedBlock)) {
+                            // If so increase the extraction counter
+                            _extractionCounter++;
+                        } else {
+                            // If another block was touched in between...
+                            resetExtraction();
+                            _extractionCounter++;
+                        }
                     } else {
-                        // If another block was touched in between...
-                        resetExtraction();
+                        // This block was "poked" for the first time
+                        _prevSelectedBlock = _selectedBlock;
                         _extractionCounter++;
                     }
-                } else {
-                    // This block was "poked" for the first time
-                    _prevSelectedBlock = _selectedBlock;
-                    _extractionCounter++;
-                }
 
-                // Enough pokes... Remove the block!
-                if (_extractionCounter >= 3) {
-                    BlockPosition blockPos = _selectedBlock.getBlockPosition();
-                    byte currentBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y, blockPos.z);
-                    getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, true);
+                    // Enough pokes... Remove the block!
+                    if (_extractionCounter >= block.getHardness()) {
+                        getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, true);
 
-                    // Remove the upper block if it's a billboard
-                    byte upperBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y + 1, blockPos.z);
-                    if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                        getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y + 1, blockPos.z, (byte) 0x0, true, true);
+                        // Remove the upper block if it's a billboard
+                        byte upperBlockType = getParent().getWorldProvider().getBlock(blockPos.x, blockPos.y + 1, blockPos.z);
+                        if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
+                            getParent().getWorldProvider().setBlock(blockPos.x, blockPos.y + 1, blockPos.z, (byte) 0x0, true, true);
+                        }
+
+                        _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
+                        _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
+                        AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+
+                        if (createPhysBlock && !BlockManager.getInstance().getBlock(currentBlockType).isTranslucent()) {
+                            Vector3f pos = blockPos.toVector3f();
+                            _parent.getBulletPhysicsRenderer().addBlock(pos, currentBlockType);
+                        }
+
+                        int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
+                        int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
+                        notifyObserversBlockRemoved(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
+
+                        resetExtraction();
+                        return currentBlockType;
                     }
-
-                    _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
-                    _parent.getBlockParticleEmitter().emitParticles(256, currentBlockType);
-                    AudioManager.getInstance().getAudio("RemoveBlock").playAsSoundEffect(0.6f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.5f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
-
-                    if (createPhysBlock && !BlockManager.getInstance().getBlock(currentBlockType).isTranslucent()) {
-                        Vector3f pos = blockPos.toVector3f();
-                        _parent.getBulletPhysicsRenderer().addBlock(pos, currentBlockType);
-                    }
-
-                    int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
-                    int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
-                    notifyObserversBlockRemoved(_parent.getWorldProvider().getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
-
-                    resetExtraction();
-                    return;
                 }
 
                 // Play digging sound if the block was not removed
                 AudioManager.getInstance().getAudio("Dig").playAsSoundEffect(0.8f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, 0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false);
+                // ... and spread sparkles!
+                _parent.getBlockParticleEmitter().setOrigin(blockPos.toVector3f());
+                _parent.getBlockParticleEmitter().emitParticles(64, currentBlockType);
             }
         }
+
+        // Nothing got removed
+        return 0;
     }
 
     /**
@@ -541,59 +690,48 @@ public final class Player extends Character {
      */
     public void processKeyboardInput(int key, boolean state, boolean repeatEvent) {
         switch (key) {
-            case Keyboard.KEY_UP:
-                if (!repeatEvent && state) {
-                    cycleBlockTypes(1);
-                }
-                break;
             case Keyboard.KEY_K:
                 if (!repeatEvent && state) {
                     damage(9999);
-                }
-                break;
-            case Keyboard.KEY_DOWN:
-                if (!repeatEvent && state) {
-                    cycleBlockTypes(-1);
                 }
                 break;
             case Keyboard.KEY_SPACE:
                 if (!repeatEvent && state) {
                     jump();
 
-                    if (Blockmania.getInstance().getTime() - _lastTimeSpacePressed < 400) {
+                    if (Blockmania.getInstance().getTime() - _lastTimeSpacePressed < 200) {
                         _godMode = !_godMode;
                     }
 
                     _lastTimeSpacePressed = Blockmania.getInstance().getTime();
                 }
                 break;
-            // Hot keys for selecting a tool bar slot
             case Keyboard.KEY_1:
-                _toolBelt.setSelectedTool((byte) 1);
+                _toolbar.setSelectedSlot(0);
                 break;
             case Keyboard.KEY_2:
-                _toolBelt.setSelectedTool((byte) 2);
+                _toolbar.setSelectedSlot(1);
                 break;
             case Keyboard.KEY_3:
-                _toolBelt.setSelectedTool((byte) 3);
+                _toolbar.setSelectedSlot(2);
                 break;
             case Keyboard.KEY_4:
-                _toolBelt.setSelectedTool((byte) 4);
+                _toolbar.setSelectedSlot(3);
                 break;
             case Keyboard.KEY_5:
-                _toolBelt.setSelectedTool((byte) 5);
+                _toolbar.setSelectedSlot(4);
                 break;
             case Keyboard.KEY_6:
-                _toolBelt.setSelectedTool((byte) 6);
+                _toolbar.setSelectedSlot(5);
                 break;
             case Keyboard.KEY_7:
-                _toolBelt.setSelectedTool((byte) 7);
+                _toolbar.setSelectedSlot(6);
                 break;
             case Keyboard.KEY_8:
-                _toolBelt.setSelectedTool((byte) 8);
+                _toolbar.setSelectedSlot(7);
                 break;
             case Keyboard.KEY_9:
-                _toolBelt.setSelectedTool((byte) 9);
+                _toolbar.setSelectedSlot(8);
                 break;
         }
     }
@@ -611,7 +749,7 @@ public final class Player extends Character {
 
         if (wheelMoved != 0) {
             Blockmania.getInstance().getLogger().log(Level.INFO, "Mouse wheel moved " + wheelMoved + " for button " + button + ", state " + state);
-            _toolBelt.rollSelectedTool((byte) (wheelMoved / 120));
+            _toolbar.rollSelectedSlot((byte) (wheelMoved / 120));
         } else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
         }
@@ -647,22 +785,7 @@ public final class Player extends Character {
             moveUp();
         }
 
-        _running = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && _touchingGround;
-    }
-
-    /**
-     * Cycles the selected block type.
-     *
-     * @param upDown Cycling direction
-     */
-    void cycleBlockTypes(int upDown) {
-        _activeBlockType += upDown;
-
-        if (_activeBlockType >= BlockManager.getInstance().availableBlocksSize()) {
-            _activeBlockType = 1;
-        } else if (_activeBlockType < 1) {
-            _activeBlockType = (byte) (BlockManager.getInstance().availableBlocksSize() - 1);
-        }
+        _running = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) && (_touchingGround || _godMode);
     }
 
     /**
@@ -672,7 +795,7 @@ public final class Player extends Character {
      */
     @Override
     public String toString() {
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | b: %d | gravity: %.2f | x: %.2f, y: %.2f, z: %.2f)", getPosition().x, getPosition().y, getPosition().z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _activeBlockType, _gravity, _movementDirection.x, _movementDirection.y, _movementDirection.z);
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | gravity: %.2f | x: %.2f, y: %.2f, z: %.2f)", getPosition().x, getPosition().y, getPosition().z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _gravity, _movementDirection.x, _movementDirection.y, _movementDirection.z);
     }
 
     protected AABB generateAABBForPosition(Vector3f p) {
@@ -688,17 +811,9 @@ public final class Player extends Character {
         return generateAABBForPosition(getPosition());
     }
 
-    public byte getSelectedBlockType() {
-        return _activeBlockType;
-    }
-
-    public byte getSelectedTool() {
-        return _toolBelt.getSelectedToolId();
-    }
-
     public void addTool(Tool toolToAdd) {
         Blockmania.getInstance().getLogger().log(Level.INFO, "Player.addTool called to add tool: " + toolToAdd);
-        _toolBelt.mapPluginTool(toolToAdd);
+        _toolManager.mapPluginTool(toolToAdd);
     }
 
     public Camera getActiveCamera() {
@@ -729,7 +844,11 @@ public final class Player extends Character {
             ob.lightChanged(chunk, pos);
     }
 
-    public float getFov() {
-        return _fov;
+    public Inventory getInventory() {
+        return _inventory;
+    }
+
+    public Toolbar getToolbar() {
+        return _toolbar;
     }
 }

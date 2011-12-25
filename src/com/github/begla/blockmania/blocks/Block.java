@@ -132,7 +132,7 @@ public class Block implements RenderableObject {
         withTranslucent(false);
         withInvisible(false);
         withRenderBoundingBox(true);
-        withHardness((byte) 15);
+        withHardness((byte) 3);
         withLuminance((byte) 0);
         withDisableTessellation(false);
         withLiquid(false);
@@ -454,16 +454,6 @@ public class Block implements RenderableObject {
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y);
         GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 
-        // FRONT
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y);
-        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.FRONT).y);
-        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.FRONT).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-
         GL11.glColor3f(0.5f, 0.5f, 0.5f);
 
         // BACK
@@ -539,7 +529,7 @@ public class Block implements RenderableObject {
         GL11.glVertex3f(-0.5f, -0.5f, 0f);
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BACK).y + TEXTURE_OFFSET_WIDTH);
         GL11.glVertex3f(0.5f, -0.5f, 0f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH , calcTextureOffsetFor(SIDE.BACK).y);
+        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BACK).y);
         GL11.glVertex3f(0.5f, 0.5f, 0f);
         GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y);
         GL11.glVertex3f(-0.5f, 0.5f, 0f);

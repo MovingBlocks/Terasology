@@ -26,7 +26,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public abstract class ChunkGenerator {
 
-    protected final PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen6, _pGen7,_pGen8;
+    protected final PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen6, _pGen7, _pGen8;
     protected final GeneratorManager _parent;
 
     /**

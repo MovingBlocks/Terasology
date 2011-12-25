@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks.plant.tree
-
 /**
  * This is a tree. Treat it well and it will grow tall and strong.
  * Idea is that all trees (as defined in the block/plant/tree package anyway  will have leaves
@@ -10,6 +8,8 @@ package com.github.begla.blockmania.data.blocks.plant.tree
 block {
     // Serialization
     version = 1
+
+    hardness = 6
 
     // Graphics
     faces {

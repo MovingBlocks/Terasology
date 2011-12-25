@@ -27,26 +27,18 @@ Controls
 
 * [W,A,S,D]               Walking
 * [Space]                 Jump
+* [2*Space]               God mode
 * [Shift]                 Hold for running
 * [Up, Down]              Switch active block
-* [Left click]            Activate left click tool action (default = place block)
-* [Right click]           Activate right click tool action (default = remove block)
-* [Mouse wheel up/down]   Cycle through the tool slots
-* [1,...,0]               Change active tool slot
+* [Left click]            Activate left click action (default = place block)
+* [Right click]           Activate right click action (default = remove block)
+* [Mouse wheel up/down]   Cycle through toolbar slots
+* [1,..,0]                Change the active toolbar slot
 * [F]                     Toggle viewing distance (near, moderate, far, ultra)
-* [Tab]                   Toggle developer console (pauses/unpauses the game)
+* [Tab]                   Toggle developer console
+* [K]                     Don't try this
 * [F3]                    Toggle debug information
 * [Escape]                Show/hide the pause menu screen
-
-Tools
------
-
-* [Slot1] Default block placement/removal tool
-* [Slot2] Multiple block selection tool
-* [Slot3] Rectangle block selection tool / blueprint prototype tool
-* [Slot4] Physics enabled block removal tool
-* [Slot5] Physics enabled explosion tool
-* [Slot6] Slime example plugin tool (left click to spawn a slimy slime buddy)
 
 Example console commands
 ------------------------

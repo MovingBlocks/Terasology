@@ -17,7 +17,6 @@ package com.github.begla.blockmania.blocks;
 
 import gnu.trove.map.hash.TByteObjectHashMap;
 import groovy.lang.Binding;
-import groovy.lang.GroovyClassLoader;
 import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Vector2f;

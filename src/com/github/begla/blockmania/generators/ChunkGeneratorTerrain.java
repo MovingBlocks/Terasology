@@ -20,8 +20,6 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.chunk.Chunk;
 
 import javax.vecmath.Vector2f;
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Generates the terrain of the world using a hybrid voxel-/heightmap-based approach.

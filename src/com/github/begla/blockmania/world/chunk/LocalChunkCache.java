@@ -149,7 +149,7 @@ public final class LocalChunkCache implements ChunkProvider {
      * @param c The chunk to save
      */
     private synchronized void writeChunkToDisk(Chunk c) {
-        if (c.isFresh() || !SAVE_CHUNKS) {
+        if (!SAVE_CHUNKS) {
             return;
         }
 

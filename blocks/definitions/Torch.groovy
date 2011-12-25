@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks
-
 import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
 
 /**
@@ -13,6 +11,7 @@ block {
     translucent = true
     penetrable = true
     allowBlockAttachment = false
-    
+
     luminance = 15
+    hardness = 1
 }

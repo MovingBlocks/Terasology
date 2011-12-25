@@ -22,7 +22,7 @@ System {
     saveChunks = true
 
     // Size of the chunk cache
-    chunkCacheSize = 1024+512
+    chunkCacheSize = 1024 + 512
 
     Debug {
 

@@ -51,8 +51,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     public TreeGeneratorLSystem(GeneratorManager manager, String initialAxiom, HashMap<String, String> ruleSet, HashMap<String, Double> probabilities, int iterations, int angle) {
         super(manager);
 
-        _angleInDegree = 20;
-        _iterations = 6;
+        _angleInDegree = angle;
+        _iterations = iterations;
         _leafType = BlockManager.getInstance().getBlock("GreenLeaf").getId();
 
         _initialAxiom = initialAxiom;
@@ -92,6 +92,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         rotation.setIdentity();
         rotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.PI / 2));
 
+        int angleOffset = rand.randomInt() % 16;
+
         for (int i = 0; i < axiom.length(); i++) {
             char c = axiom.charAt(i);
 
@@ -101,8 +103,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
             switch (c) {
                 case 'G':
                 case 'F':
+                    byte trunkBlockId = BlockManager.getInstance().getBlock("OakTrunk").getId();
+
                     // Tree trunk
-                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, BlockManager.getInstance().getBlock("OakTrunk").getId(), update, true);
+                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, trunkBlockId, update, true);
 
                     // Generate leaves
                     if (_stackOrientation.size() > 1) {
@@ -137,22 +141,22 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     break;
                 case '+':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.toRadians(_angleInDegree)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.toRadians(_angleInDegree + angleOffset)));
                     rotation.mul(tempRotation);
                     break;
                 case '-':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, -1), (float) Math.toRadians(_angleInDegree)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, -1), (float) Math.toRadians(_angleInDegree + angleOffset)));
                     rotation.mul(tempRotation);
                     break;
                 case '&':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 1, 0), (float) Math.toRadians(_angleInDegree)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 1, 0), (float) Math.toRadians(_angleInDegree + angleOffset)));
                     rotation.mul(tempRotation);
                     break;
                 case '^':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, -1, 0), (float) Math.toRadians(_angleInDegree)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, -1, 0), (float) Math.toRadians(_angleInDegree + angleOffset)));
                     rotation.mul(tempRotation);
                     break;
                 case '*':

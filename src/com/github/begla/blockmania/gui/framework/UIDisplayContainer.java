@@ -45,7 +45,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
         // Render all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).renderElement();
+            _displayElements.get(i).renderTransformed();
         }
     }
 

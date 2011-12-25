@@ -17,8 +17,6 @@ package com.github.begla.blockmania.utilities;
 
 import com.github.begla.blockmania.world.chunk.Chunk;
 
-import javax.vecmath.Vector2f;
-
 /**
  * Collection of math functions.
  *

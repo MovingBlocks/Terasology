@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks
-
 /**
  * Air is essentially an "empty" block and has a hard coded ID of 0 as it is used all over the place
  */
@@ -9,7 +7,7 @@ block {
     translucent = true
     invisible = true
     bypassSelectionRay = true
-    penetrable =true
+    penetrable = true
     castsShadows = false
     renderBoundingBox = false
     allowBlockAttachment = false

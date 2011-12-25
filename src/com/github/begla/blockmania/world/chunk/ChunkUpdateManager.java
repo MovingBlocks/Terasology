@@ -45,7 +45,7 @@ public final class ChunkUpdateManager implements BlockObserver {
      * is reached, the chunk update is ignored. Chunk updates can be forced though.
      *
      * @param chunk The chunk to update
-     * @param type The chunk update type
+     * @param type  The chunk update type
      * @return True if a chunk update was executed
      */
     public boolean queueChunkUpdate(Chunk chunk, final UPDATE_TYPE type) {

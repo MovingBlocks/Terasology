@@ -27,7 +27,7 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class UIDisplayRenderer extends UIDisplayContainer {
 
     @Override
-    protected void renderElement() {
+    public void renderTransformed() {
         render();
     }
 
@@ -36,7 +36,7 @@ public abstract class UIDisplayRenderer extends UIDisplayContainer {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, -5, 1);
+        glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, -32, 32);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();

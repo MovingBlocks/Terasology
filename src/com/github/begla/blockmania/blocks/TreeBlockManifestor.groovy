@@ -42,15 +42,15 @@ class TreeBlockManifestor extends BlockManifestor {
 
     /**
      * Adds TreeBlock-specific values to this Block. First calls super() to load parent properties
-     * @param b             The TreeBlock we're preparing (guaranteed to be a TreeBlock or a child there-of)
-     * @param blockConfig   The ConfigSlurper-produced props from the Groovy definition
-     * @return              The finished TreeBlock object we'll store in the BlockManager (returned via reference)
+     * @param b The TreeBlock we're preparing (guaranteed to be a TreeBlock or a child there-of)
+     * @param blockConfig The ConfigSlurper-produced props from the Groovy definition
+     * @return The finished TreeBlock object we'll store in the BlockManager (returned via reference)
      */
     protected prepareBlock(TreeBlock b, ConfigObject blockConfig) {
         // Load Block-level Groovy details first (constructors handle defaults)
         super.prepareBlock(b, blockConfig)
 
         // Now load TreeBlock Groovy details, which may overwrite parent Groovy details just loaded :-)
-        
+
     }
 }

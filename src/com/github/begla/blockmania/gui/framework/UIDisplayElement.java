@@ -47,7 +47,7 @@ public abstract class UIDisplayElement {
         _size.set(size);
     }
 
-    protected void renderElement() {
+    public void renderTransformed() {
         if (isVisible()) {
             glPushMatrix();
             glTranslatef(getPosition().x, getPosition().y, 0);
@@ -65,6 +65,7 @@ public abstract class UIDisplayElement {
     }
 
     public abstract void render();
+
     public abstract void update();
 
     public Vector2f getPosition() {

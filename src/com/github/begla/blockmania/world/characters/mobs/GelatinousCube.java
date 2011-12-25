@@ -50,7 +50,7 @@ public final class GelatinousCube extends Character {
     public float _randomSize = 1.0f;
 
     public GelatinousCube(WorldRenderer parent) {
-        super(parent, 0.01, 1.5, 0.125);
+        super(parent, 0.02, 1.5, 0.2);
 
         _randomSize = (float) MathHelper.clamp((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0 + 0.15);
         _randomColorId = Math.abs(_parent.getWorldProvider().getRandom().randomInt()) % COLORS.length;

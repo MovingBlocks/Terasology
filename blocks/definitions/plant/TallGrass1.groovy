@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks.plant
-
 import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
 import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE
 
@@ -14,6 +12,7 @@ block {
 
     translucent = true
     penetrable = true
-    
+
     waving = true
+    hardness = 1
 }

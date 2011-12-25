@@ -15,7 +15,6 @@
  */
 package com.github.begla.blockmania.gui.components;
 
-import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.gui.framework.UIDisplayContainer;
 import com.github.begla.blockmania.gui.framework.UIGraphicsElement;
 import org.lwjgl.opengl.Display;
@@ -24,8 +23,6 @@ import javax.vecmath.Vector2f;
 
 /**
  * A small toolbar placed on the bottom of the screen.
- *
- * TODO: Currently visualizes the selected tool in the tool belt. Will be used for showing item icons later on.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -47,7 +44,7 @@ public class UIToolbar extends UIDisplayContainer {
         _cells = new UIToolbarCell[9];
 
         // Create the toolbar cells
-        for (int i=0; i < 9; i++) {
+        for (int i = 0; i < 9; i++) {
             _cells[i] = new UIToolbarCell(i);
             _cells[i].setVisible(true);
             addDisplayElement(_cells[i]);
@@ -57,17 +54,6 @@ public class UIToolbar extends UIDisplayContainer {
     @Override
     public void update() {
         super.update();
-
-        // Select the cell based on the selected tool of the tool belt
-        for (int i=0; i<9; i++) {
-            if (Blockmania.getInstance().getActiveWorldRenderer().getPlayer().getSelectedTool() == i+1) {
-                _cells[i].setSelected(true);
-            }
-            else {
-                _cells[i].setSelected(false);
-            }
-        }
-
         setPosition(new Vector2f(calcCenterPosition().x, Display.getHeight() - getSize().y));
     }
 }

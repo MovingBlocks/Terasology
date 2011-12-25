@@ -16,6 +16,7 @@
 package com.github.begla.blockmania.tools;
 
 import com.github.begla.blockmania.world.characters.Player;
+import com.github.begla.blockmania.world.inventory.BlockItem;
 
 /**
  * The basic tool used for block interaction. Can be used to place and remove blocks.
@@ -29,10 +30,18 @@ public class BlockPlacementRemovalTool implements Tool {
     }
 
     public void executeLeftClickAction() {
-        _player.placeBlock(_player.getSelectedBlockType());
+        if (_player.getActiveBlock() != null) {
+            if (_player.placeBlock(_player.getActiveBlock().getId())) {
+                _player.getInventory().removeOneItemInSlot(_player.getToolbar().getSelectedSlot());
+            }
+        }
     }
 
     public void executeRightClickAction() {
-        _player.removeBlock(false);
+        byte removedBlockId = _player.removeBlock(false);
+
+        if (removedBlockId != 0) {
+            _player.getInventory().storeItemInFreeSlot(new BlockItem(removedBlockId, 1));
+        }
     }
 }

@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks.plant
-
 import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
 
 /**
@@ -7,16 +5,16 @@ import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
  * In theory fancy cacti could possibly be L-system based? Not sure where L-system stuff should go
  */
 block {
-    version=1
-    
+    version = 1
+
     faces {
         top = "CactusTop"
         bottom = "CactusBottom"
     }
-    
+
     blockform = BLOCK_FORM.CACTUS
     disableTessellation = true
-    
+
     // TODO: This is quite weird actually but necessary at the moment
     translucent = true
 }

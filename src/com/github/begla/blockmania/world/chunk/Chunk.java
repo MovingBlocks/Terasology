@@ -659,6 +659,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (isLightDirty()) {
             flags = Helper.setFlag(flags, (short) 0);
         }
+        if (isFresh()) {
+            flags = Helper.setFlag(flags, (short) 1);
+        }
 
         // The flags are stored within the first byte of the file...
         out.writeByte(flags);
@@ -684,6 +687,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         byte flags = in.readByte();
         // Parse the flags...
         setLightDirty(Helper.isFlagSet(flags, (short) 0));
+        setFresh(Helper.isFlagSet(flags, (short) 1));
 
         for (int i = 0; i < _blocks.size(); i++)
             _blocks.setRawByte(i, in.readByte());
@@ -696,9 +700,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
         for (int i = 0; i < _states.sizePacked(); i++)
             _states.setRawByte(i, in.readByte());
-
-        setFresh(false);
-        setDirty(true);
     }
 
     /**

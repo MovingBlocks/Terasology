@@ -61,7 +61,7 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnLocal(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 32)
+        if (_parent.getMobManager().getActiveMobAmount() > 64)
             return false;
 
         // 25% change something will spawn locally to the portal - will get fancier later
@@ -83,7 +83,7 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnWild(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 32)
+        if (_parent.getMobManager().getActiveMobAmount() > 64)
             return false;
 
         // 25% change something will spawn in the wild around the portal - will get fancier later

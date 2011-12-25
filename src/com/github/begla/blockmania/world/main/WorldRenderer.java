@@ -29,6 +29,7 @@ import com.github.begla.blockmania.rendering.manager.MobManager;
 import com.github.begla.blockmania.rendering.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.manager.TextureManager;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
+import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.world.characters.Player;
 import com.github.begla.blockmania.world.chunk.Chunk;
 import com.github.begla.blockmania.world.chunk.ChunkMesh;
@@ -283,6 +284,8 @@ public final class WorldRenderer implements RenderableObject {
         glEnable(GL11.GL_DEPTH_TEST);
         glPopMatrix();
         BlockmaniaProfiler.log("Render player first person view");
+
+        _player.renderExtractionOverlay();
     }
 
 
@@ -482,7 +485,7 @@ public final class WorldRenderer implements RenderableObject {
         double lightValueBlock = _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.BLOCK);
         lightValueBlock = lightValueBlock / 15.0;
 
-        return (float) Math.max(lightValueSun, lightValueBlock);
+        return (float) MathHelper.clamp(Math.max(lightValueSun, lightValueBlock) + 0.2f);
     }
 
     public void update() {

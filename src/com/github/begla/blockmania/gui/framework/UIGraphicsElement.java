@@ -42,13 +42,12 @@ public class UIGraphicsElement extends UIDisplayElement {
     public UIGraphicsElement(String textureName) {
         _textureName = textureName;
 
-        _debugColor.set((float) Math.abs(_debugRand.randomDouble()),(float) Math.abs(_debugRand.randomDouble()), (float) Math.abs(_debugRand.randomDouble()));
+        _debugColor.set((float) Math.abs(_debugRand.randomDouble()), (float) Math.abs(_debugRand.randomDouble()), (float) Math.abs(_debugRand.randomDouble()));
     }
 
     @Override
     public void render() {
         TextureManager.getInstance().bindTexture(_textureName);
-
 
         glEnable(GL11.GL_TEXTURE_2D);
         glBegin(GL11.GL_QUADS);

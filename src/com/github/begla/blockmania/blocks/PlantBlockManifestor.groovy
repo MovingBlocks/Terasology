@@ -42,15 +42,15 @@ class PlantBlockManifestor extends BlockManifestor {
 
     /**
      * Adds PlantBlock-specific values to this Block. First calls super() to load basic Block properties
-     * @param b             The PlantBlock we're preparing (guaranteed to be a PlantBlock or a child there-of)
-     * @param blockConfig   The ConfigSlurper-produced props from the Groovy definition
-     * @return              The finished PlantBlock object we'll store in the BlockManager (returned via reference)
+     * @param b The PlantBlock we're preparing (guaranteed to be a PlantBlock or a child there-of)
+     * @param blockConfig The ConfigSlurper-produced props from the Groovy definition
+     * @return The finished PlantBlock object we'll store in the BlockManager (returned via reference)
      */
     protected prepareBlock(PlantBlock b, ConfigObject blockConfig) {
         // Load Block-level Groovy details first (the Block and PlantBlock constructors handle defaults)
         super.prepareBlock(b, blockConfig)
 
         // Now load PlantBlock Groovy details, which may overwrite Block-level Groovy details just loaded :-)
-        
+
     }
 }

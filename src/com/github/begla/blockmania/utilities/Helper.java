@@ -15,8 +15,6 @@
  */
 package com.github.begla.blockmania.utilities;
 
-import javax.vecmath.Vector2f;
-
 /**
  * A simple helper class for various tasks.
  *

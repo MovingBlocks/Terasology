@@ -42,15 +42,15 @@ class LiquidBlockManifestor extends BlockManifestor {
 
     /**
      * Adds LiquidBlock-specific values to this Block. First calls super() to load basic Block properties
-     * @param b             The LiquidBlock we're preparing (guaranteed to be a LiquidBlock or a child there-of)
-     * @param blockConfig   The ConfigSlurper-produced props from the Groovy definition
-     * @return              The finished LiquidBlock object we'll store in the BlockManager (returned via reference)
+     * @param b The LiquidBlock we're preparing (guaranteed to be a LiquidBlock or a child there-of)
+     * @param blockConfig The ConfigSlurper-produced props from the Groovy definition
+     * @return The finished LiquidBlock object we'll store in the BlockManager (returned via reference)
      */
     protected prepareBlock(LiquidBlock b, ConfigObject blockConfig) {
         // Load Block-level Groovy details first (the constructors handle defaults)
         super.prepareBlock(b, blockConfig)
 
         // Now load LiquidBlock Groovy details, which may overwrite Block-level Groovy details just loaded :-)
-        
+
     }
 }
