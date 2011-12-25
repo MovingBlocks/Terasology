@@ -15,6 +15,11 @@
  */
 package com.github.begla.blockmania.model.inventory;
 
+import com.github.begla.blockmania.logic.characters.Player;
+import com.github.begla.blockmania.rendering.gui.framework.UIGraphicsElement;
+
+import javax.vecmath.Vector2f;
+
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
@@ -22,14 +27,30 @@ public abstract class Item {
 
     protected int _amount;
     protected byte _toolId;
+    protected Player _parent;
+    protected int _stackSize = 32;
 
-    public Item() {
+    protected UIGraphicsElement _icon;
+
+    public Item(Player parent) {
         _amount = 1;
+        _parent = parent;
+
+        _icon = new UIGraphicsElement("items");
+        _icon.setSize(new Vector2f(20, 20));
+        _icon.getTextureSize().set(new Vector2f(0.0624f, 0.0624f));
+        _icon.setVisible(true);
+        _icon.setPosition(new Vector2f(-8f, -10f));
     }
 
-    public abstract void renderIcon();
+    public boolean renderIcon() {
+        _icon.renderTransformed();
+        return true;
+    }
 
-    public abstract void render();
+    public boolean renderFirstPersonView() {
+        return false;
+    }
 
     public void setAmount(int amount) {
         _amount = amount;
@@ -63,5 +84,17 @@ public abstract class Item {
 
     public byte getToolId() {
         return _toolId;
+    }
+
+    public Player getParent() {
+        return _parent;
+    }
+
+    public void setIconWithAtlasPos(int x, int y) {
+        _icon.getTextureOrigin().set(new Vector2f(x * 0.0625f, y * 0.0625f));
+    }
+
+    public int getStackSize() {
+        return _stackSize;
     }
 }

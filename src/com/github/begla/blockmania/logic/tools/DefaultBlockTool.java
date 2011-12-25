@@ -52,7 +52,7 @@ public class DefaultBlockTool implements Tool {
         byte removedBlockId = removeBlock(false);
 
         if (removedBlockId != 0) {
-            _player.getInventory().storeItemInFreeSlot(new BlockItem(removedBlockId, 1));
+            _player.getInventory().storeItemInFreeSlot(new BlockItem(_player, removedBlockId, 1));
         }
     }
 

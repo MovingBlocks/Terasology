@@ -32,8 +32,11 @@ public class Inventory {
     }
 
     private void initDefaultItems() {
-        _inventory[0] = new BlockItem(BlockManager.getInstance().getBlock("Companion").getId(), 1);
-        _inventory[1] = new BlockItem(BlockManager.getInstance().getBlock("Torch").getId(), 16);
+        _inventory[0] = new BlockItem(_parent, BlockManager.getInstance().getBlock("Companion").getId(), 1);
+        _inventory[1] = new BlockItem(_parent, BlockManager.getInstance().getBlock("Torch").getId(), 16);
+
+        _inventory[7] = new BlueprintItem(_parent);
+        _inventory[8] = new BlueprintItem(_parent);
     }
 
     /**
@@ -49,8 +52,7 @@ public class Inventory {
             _inventory[slot] = item;
             return true;
         } else {
-            // TODO: The slot limit should be dynamic
-            if (_inventory[slot].equals(item) && _inventory[slot].getAmount() < 32) {
+            if (_inventory[slot].equals(item) && _inventory[slot].getAmount() < item.getStackSize()) {
                 _inventory[slot].increaseAmount();
                 return true;
             }
@@ -118,8 +120,7 @@ public class Inventory {
             if (_inventory[i] == null) {
                 return i;
             } else {
-                // TODO: The slot limit should be dynamic
-                if (_inventory[i].equals(item) && _inventory[i].getAmount() < 32) {
+                if (_inventory[i].equals(item) && _inventory[i].getAmount() < item.getStackSize()) {
                     return i;
                 }
             }

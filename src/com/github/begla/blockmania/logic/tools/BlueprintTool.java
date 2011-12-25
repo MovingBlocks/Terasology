@@ -15,63 +15,61 @@
  */
 package com.github.begla.blockmania.logic.tools;
 
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.logic.characters.Player;
 import com.github.begla.blockmania.logic.manager.BlueprintManager;
-import com.github.begla.blockmania.game.Blockmania;
-import com.github.begla.blockmania.model.blueprints.Blueprint;
+import com.github.begla.blockmania.model.inventory.BlueprintItem;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 import com.github.begla.blockmania.model.structures.RayBlockIntersection;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
 
 /**
- * Simple rectangle block selection tool. Can be used to generate and paste blueprints.
+ * Can be used to create and place blueprints.
  */
-public class RectangleSelectionTool implements Tool {
+public class BlueprintTool implements Tool {
 
     private final Player _player;
 
     private final ArrayList<BlockPosition> _selectedBlocks = new ArrayList<BlockPosition>();
 
-    private Blueprint _currentBlueprint = null;
-
-    public RectangleSelectionTool(Player player) {
+    public BlueprintTool(Player player) {
         _player = player;
     }
 
     public void executeLeftClickAction() {
-        RayBlockIntersection.Intersection is = _player.calcSelectedBlock();
+        RayBlockIntersection.Intersection is = _player.getSelectedBlock();
 
-        if (is == null)
-            return;
+        if (BlueprintItem.class.isInstance(_player.getActiveItem())) {
+            BlueprintItem bpItem = (BlueprintItem) _player.getActiveItem();
 
-        if (_currentBlueprint == null)
-            addBlock(is.getBlockPosition());
-        else
-            _currentBlueprint.build(_player.getParent().getWorldProvider(), is.getBlockPosition());
+            if (bpItem.getBlueprint() == null) {
+                addBlock(is.getBlockPosition());
+            } else {
+                bpItem.getBlueprint().build(_player.getParent().getWorldProvider(), is.getBlockPosition());
+            }
+        }
     }
 
     public void executeRightClickAction() {
-        reset();
+        if (BlueprintItem.class.isInstance(_player.getActiveItem())) {
+            BlueprintItem bpItem = (BlueprintItem) _player.getActiveItem();
+            bpItem.setBlueprint(null);
+        }
     }
 
     private void addBlock(BlockPosition blockPosition) {
-        if (_selectedBlocks.size() >= 2) {
-            _selectedBlocks.clear();
-            Blockmania.getInstance().getActiveWorldRenderer().getBlockGrid().clear();
-        }
-
         Blockmania.getInstance().getActiveWorldRenderer().getBlockGrid().addGridPosition(blockPosition);
         _selectedBlocks.add(blockPosition);
 
-        if (_selectedBlocks.size() == 2)
-            generateRectangle();
-
-        Blockmania.getInstance().getLogger().log(Level.INFO, "Added vertex block vertex at: " + blockPosition);
+        if (_selectedBlocks.size() >= 2) {
+            generateBlueprint();
+            Blockmania.getInstance().getActiveWorldRenderer().getBlockGrid().clear();
+            _selectedBlocks.clear();
+        }
     }
 
-    private void generateRectangle() {
+    private void generateBlueprint() {
         if (_selectedBlocks.size() < 2)
             return;
 
@@ -95,12 +93,9 @@ public class RectangleSelectionTool implements Tool {
             }
         }
 
-        _currentBlueprint = BlueprintManager.getInstance().generateBlueprint(_player.getParent().getWorldProvider(), _selectedBlocks);
-    }
-
-    private void reset() {
-        _currentBlueprint = null;
-        _selectedBlocks.clear();
-        Blockmania.getInstance().getActiveWorldRenderer().getBlockGrid().clear();
+        if (BlueprintItem.class.isInstance(_player.getActiveItem())) {
+            BlueprintItem bpItem = (BlueprintItem) _player.getActiveItem();
+            bpItem.setBlueprint(BlueprintManager.getInstance().generateBlueprint(_player.getParent().getWorldProvider(), _selectedBlocks));
+        }
     }
 }

@@ -16,6 +16,7 @@
  */
 package com.github.begla.blockmania.logic.characters;
 
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.logic.manager.ShaderManager;
 import com.github.begla.blockmania.logic.manager.TextureManager;
@@ -23,7 +24,6 @@ import com.github.begla.blockmania.logic.manager.ToolManager;
 import com.github.begla.blockmania.logic.tools.Tool;
 import com.github.begla.blockmania.logic.world.BlockObserver;
 import com.github.begla.blockmania.logic.world.Chunk;
-import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.model.inventory.BlockItem;
@@ -44,7 +44,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 import javax.vecmath.Vector3d;
-import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -198,9 +197,10 @@ public final class Player extends Character {
     }
 
     public void renderFirstPersonViewElements() {
-        if (getActiveBlock() != null) {
-            renderActiveBlock();
-            return;
+        if (getActiveItem() != null) {
+            if (getActiveItem().renderFirstPersonView()) {
+                return;
+            }
         }
 
         renderHand();
@@ -513,56 +513,6 @@ public final class Player extends Character {
     }
 
     /**
-     * Renders the actively selected block in the front of the player's first person perspective.
-     */
-    public void renderActiveBlock() {
-        Block activeBlock = getActiveBlock();
-
-        if (activeBlock == null)
-            return;
-
-        glEnable(GL_TEXTURE_2D);
-        TextureManager.getInstance().bindTexture("terrain");
-        ShaderManager.getInstance().enableShader("block");
-
-        // Adjust the brightness of the block according to the current position of the player
-        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
-        GL20.glUniform1f(light, _parent.getRenderingLightValueAt(getPosition()));
-
-        // Apply biome and overall color offset
-        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
-        Vector4f color = activeBlock.calcColorOffsetFor(Block.SIDE.FRONT, _parent.getActiveTemperature(), _parent.getActiveHumidity());
-        colorBuffer.put(color.x);
-        colorBuffer.put(color.y);
-        colorBuffer.put(color.z);
-
-        colorBuffer.flip();
-        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
-        GL20.glUniform3(colorOffset, colorBuffer);
-
-        glEnable(GL11.GL_BLEND);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glAlphaFunc(GL_GREATER, 0.1f);
-
-        glPushMatrix();
-
-        glTranslatef(1.0f, -1.3f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.5f - _handMovementAnimationOffset * 0.5f);
-        glRotatef(-25f - _handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
-        glRotatef(35f, 0.0f, 1.0f, 0.0f);
-        glTranslatef(0f, 0.25f, 0f);
-
-        activeBlock.render();
-
-        glPopMatrix();
-
-        glDisable(GL11.GL_BLEND);
-        glDisable(GL_TEXTURE_2D);
-
-        ShaderManager.getInstance().enableShader(null);
-    }
-
-    /**
      * Renders a simple hand displayed in front of the player's first person perspective.
      * TODO: Should not be rendered using immediate mode!
      */
@@ -716,5 +666,9 @@ public final class Player extends Character {
 
     public byte getExtractionCounter() {
         return _extractionCounter;
+    }
+
+    public float getHandMovementAnimationOffset() {
+        return _handMovementAnimationOffset;
     }
 }

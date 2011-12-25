@@ -472,6 +472,10 @@ public final class WorldRenderer implements RenderableObject {
         }
     }
 
+    public float getRenderingLightValue() {
+       return getRenderingLightValueAt(_player.getPosition());
+    }
+
     public float getRenderingLightValueAt(Vector3d pos) {
         double lightValueSun = ((double) _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.SUN));
         lightValueSun = (lightValueSun / 15.0) * getDaylight();

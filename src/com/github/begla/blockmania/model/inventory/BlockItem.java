@@ -15,10 +15,20 @@
  */
 package com.github.begla.blockmania.model.inventory;
 
+import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.logic.characters.Player;
+import com.github.begla.blockmania.logic.manager.ShaderManager;
 import com.github.begla.blockmania.logic.manager.TextureManager;
 import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.model.blocks.BlockManager;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+
+import javax.vecmath.Vector4f;
+import java.nio.FloatBuffer;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
@@ -27,21 +37,23 @@ public class BlockItem extends Item {
 
     private byte _blockId;
 
-    public BlockItem(byte blockId) {
+    public BlockItem(Player parent, byte blockId) {
+        super(parent);
         _blockId = blockId;
         _toolId = (byte) 1;
     }
 
-    public BlockItem(byte blockId, int amount) {
-        this(blockId);
+    public BlockItem(Player parent, byte blockId, int amount) {
+        this(parent, blockId);
         setAmount(amount);
     }
 
     @Override
-    public void renderIcon() {
+    public boolean renderIcon() {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
 
         GL11.glPushMatrix();
+        glTranslatef(4f, 0f, 0f);
         GL11.glScalef(20f, 20f, 20f);
         GL11.glRotatef(170f, 1f, 0f, 0f);
         GL11.glRotatef(-16f, 0f, 1f, 0f);
@@ -53,11 +65,55 @@ public class BlockItem extends Item {
         GL11.glPopMatrix();
 
         GL11.glDisable(GL11.GL_TEXTURE_2D);
+
+        return true;
     }
 
     @Override
-    public void render() {
+    public boolean renderFirstPersonView() {
+        Block activeBlock = BlockManager.getInstance().getBlock(_blockId);
 
+        glEnable(GL_TEXTURE_2D);
+        TextureManager.getInstance().bindTexture("terrain");
+        ShaderManager.getInstance().enableShader("block");
+
+        // Adjust the brightness of the block according to the current position of the player
+        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
+        GL20.glUniform1f(light, Blockmania.getInstance().getActiveWorldRenderer().getRenderingLightValue());
+
+        // Apply biome and overall color offset
+        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
+        Vector4f color = activeBlock.calcColorOffsetFor(Block.SIDE.FRONT, Blockmania.getInstance().getActiveWorldRenderer().getActiveTemperature(), Blockmania.getInstance().getActiveWorldRenderer().getActiveTemperature());
+        colorBuffer.put(color.x);
+        colorBuffer.put(color.y);
+        colorBuffer.put(color.z);
+
+        colorBuffer.flip();
+        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
+        GL20.glUniform3(colorOffset, colorBuffer);
+
+        glEnable(GL11.GL_BLEND);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glAlphaFunc(GL_GREATER, 0.1f);
+
+        glPushMatrix();
+
+        glTranslatef(1.0f, -1.3f + (float) getParent().calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - getParent().getHandMovementAnimationOffset() * 0.5f, -1.5f - getParent().getHandMovementAnimationOffset() * 0.5f);
+        glRotatef(-25f - getParent().getHandMovementAnimationOffset() * 64.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(35f, 0.0f, 1.0f, 0.0f);
+        glTranslatef(0f, 0.25f, 0f);
+
+        activeBlock.render();
+
+        glPopMatrix();
+
+        glDisable(GL11.GL_BLEND);
+        glDisable(GL_TEXTURE_2D);
+
+        ShaderManager.getInstance().enableShader(null);
+
+        return true;
     }
 
     public byte getBlockId() {

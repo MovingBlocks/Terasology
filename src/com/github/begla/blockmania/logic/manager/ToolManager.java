@@ -64,7 +64,7 @@ public class ToolManager {
     public void initNativeTools() {
         _toolStore.put((byte) 1, new DefaultBlockTool(_player));
         _toolStore.put((byte) 2, new MultipleSelectionTool(_player));
-        _toolStore.put((byte) 3, new RectangleSelectionTool(_player));
+        _toolStore.put((byte) 3, new BlueprintTool(_player));
         _toolStore.put((byte) 4, new RigidBlockTool(_player));
         _toolStore.put((byte) 5, new ExplosionTool(_player));
     }

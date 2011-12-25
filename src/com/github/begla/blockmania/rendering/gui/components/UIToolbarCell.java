@@ -90,10 +90,10 @@ public class UIToolbarCell extends UIDisplayElement {
 
         if (item != null) {
             glPushMatrix();
-            glTranslatef(24f, 20f, 0f);
+            glTranslatef(20f, 20f, 0f);
             item.renderIcon();
-            glDisable(GL11.GL_CULL_FACE);
             glPopMatrix();
+            glDisable(GL11.GL_CULL_FACE);
         }
 
         glDisable(GL11.GL_DEPTH_TEST);
