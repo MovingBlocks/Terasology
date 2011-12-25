@@ -40,8 +40,8 @@ System {
 Graphics {
 
     // Synchronizes the Display to the given amount of FPS
-    // Disabled if 0 is provided
-    fpsLimit = 60
+    // Disabled if a value <= 0 is provided
+    fpsLimit = 0
 
     gamma = 2.2d
     animatedWaterAndGrass = true

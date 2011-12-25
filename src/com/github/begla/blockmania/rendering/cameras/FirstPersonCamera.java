@@ -15,11 +15,11 @@
  */
 package com.github.begla.blockmania.rendering.cameras;
 
-import com.github.begla.blockmania.configuration.ConfigurationManager;
+import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
@@ -47,11 +47,11 @@ public class FirstPersonCamera extends Camera {
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
 
-        Vector3f right = new Vector3f();
+        Vector3d right = new Vector3d();
         right.cross(_viewingDirection, _up);
-        right.scale((float) _bobbingRotationOffsetFactor);
+        right.scale(_bobbingRotationOffsetFactor);
 
-        GLU.gluLookAt(_position.x, _position.y + (float) _bobbingVerticalOffsetFactor * 2.0f, _position.z, _position.x + _viewingDirection.x, _position.y + _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, _position.z + _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
+        GLU.gluLookAt((float) _position.x, (float) _position.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z, (float) _position.x + (float) _viewingDirection.x, (float) _position.y + (float) _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z + (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
 
         _viewFrustum.updateFrustum();
     }
@@ -60,11 +60,11 @@ public class FirstPersonCamera extends Camera {
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
 
-        Vector3f right = new Vector3f();
+        Vector3d right = new Vector3d();
         right.cross(_viewingDirection, _up);
-        right.scale((float) _bobbingRotationOffsetFactor);
+        right.scale(_bobbingRotationOffsetFactor);
 
-        GLU.gluLookAt(0, 0, 0, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
+        GLU.gluLookAt(0f, 0f, 0f, (float) _viewingDirection.x, (float) _viewingDirection.y, (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
     }
 
     public void setBobbingRotationOffsetFactor(double f) {

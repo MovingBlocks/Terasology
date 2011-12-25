@@ -1,8 +1,8 @@
-import com.github.begla.blockmania.blocks.BlockManager
-import com.github.begla.blockmania.generators.ChunkGeneratorTerrain.BIOME_TYPE
-import com.github.begla.blockmania.generators.GeneratorManager
-import com.github.begla.blockmania.generators.TreeGeneratorCactus
-import com.github.begla.blockmania.generators.TreeGeneratorLSystem
+import com.github.begla.blockmania.logic.generators.ChunkGeneratorTerrain.BIOME_TYPE
+import com.github.begla.blockmania.logic.generators.GeneratorManager
+import com.github.begla.blockmania.logic.generators.TreeGeneratorCactus
+import com.github.begla.blockmania.logic.generators.TreeGeneratorLSystem
+import com.github.begla.blockmania.model.blocks.BlockManager
 
 def GeneratorManager m = generatorManager;
 

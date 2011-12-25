@@ -1,4 +1,4 @@
-import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
+import com.github.begla.blockmania.model.blocks.Block.BLOCK_FORM
 
 /**
  * A Cactus is a Plant, but not a Tree. All plants grow but trees additionally have separate leaves

@@ -14,7 +14,7 @@
     <manifest></manifest>
     <icon></icon>
     <classPath>
-        <mainClass>com.github.begla.blockmania.game.Blockmania</mainClass>
+        <mainClass>com.github.begla.blockmania.main.Blockmania</mainClass>
         <cp>Blockmania.jar</cp>
     </classPath>
     <jre>

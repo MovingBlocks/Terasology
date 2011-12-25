@@ -1,4 +1,4 @@
-import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
+import com.github.begla.blockmania.model.blocks.Block.BLOCK_FORM
 
 /**
  * A brown mushroom. It isn't magic yet

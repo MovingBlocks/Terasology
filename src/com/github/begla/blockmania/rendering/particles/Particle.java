@@ -20,7 +20,7 @@ import com.github.begla.blockmania.utilities.FastRandom;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -33,21 +33,21 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class Particle implements RenderableObject {
     protected final ParticleEmitter _parent;
 
-    protected final Vector3f _targetVelocity = new Vector3f(0.0f, -0.03f, 0.0f);
-    protected final Vector3f _velDecSpeed = new Vector3f(0.003f, 0.003f, 0.003f);
+    protected final Vector3d _targetVelocity = new Vector3d(0.0f, -0.03f, 0.0f);
+    protected final Vector3d _velDecSpeed = new Vector3d(0.003f, 0.003f, 0.003f);
 
     protected float _size = 0.01f;
 
-    protected final Vector3f _position = new Vector3f();
-    protected final Vector3f _initialVelocity = new Vector3f(), _velocity = new Vector3f();
+    protected final Vector3d _position = new Vector3d();
+    protected final Vector3d _initialVelocity = new Vector3d(), _velocity = new Vector3d();
 
     protected static final FastRandom _rand = new FastRandom();
 
     protected int _lifetime;
 
-    public Particle(int lifeTime, Vector3f position, ParticleEmitter parent) {
+    public Particle(int lifeTime, Vector3d position, ParticleEmitter parent) {
         _position.set(position);
-        _initialVelocity.set((float) (_rand.randomInt() % 32) * 0.003f, (float) (_rand.randomInt() % 32) * 0.003f, (float) (_rand.randomInt() % 32) * 0.003f);
+        _initialVelocity.set((_rand.randomInt() % 32) * 0.003d, (_rand.randomInt() % 32) * 0.003f, (_rand.randomInt() % 32) * 0.003d);
         _velocity.set(_initialVelocity);
 
         _lifetime = lifeTime;
@@ -60,8 +60,8 @@ public abstract class Particle implements RenderableObject {
         if (isAlive()) {
             glPushMatrix();
 
-            Vector3f r = getParent().getParent().getWorldProvider().getRenderingReferencePoint();
-            glTranslatef(_position.x - r.x, _position.y - r.y, _position.z - r.z);
+            Vector3d r = getParent().getParent().getWorldProvider().getRenderingReferencePoint();
+            glTranslated(_position.x - r.x, _position.y - r.y, _position.z - r.z);
             applyOrientation();
             glScalef(_size, _size, _size);
 

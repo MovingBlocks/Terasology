@@ -1,6 +1,4 @@
-package com.github.begla.blockmania.data.blocks.plant.leaf
-
-import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE
+import com.github.begla.blockmania.model.blocks.Block.COLOR_SOURCE
 
 /**
  * This is a leaf, which can exist in the world just as a block of its own

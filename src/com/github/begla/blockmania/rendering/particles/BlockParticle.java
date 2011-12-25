@@ -15,14 +15,14 @@
  */
 package com.github.begla.blockmania.rendering.particles;
 
-import com.github.begla.blockmania.blocks.Block;
-import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.rendering.manager.ShaderManager;
+import com.github.begla.blockmania.logic.manager.ShaderManager;
+import com.github.begla.blockmania.model.blocks.Block;
+import com.github.begla.blockmania.model.blocks.BlockManager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
 
@@ -44,7 +44,7 @@ public class BlockParticle extends Particle {
 
     private static final int[] _displayLists = new int[BlockManager.getInstance().availableBlocksSize()];
 
-    public BlockParticle(int lifeTime, Vector3f position, byte blockType, BlockParticleEmitter parent) {
+    public BlockParticle(int lifeTime, Vector3d position, byte blockType, BlockParticleEmitter parent) {
         super(lifeTime, position, parent);
 
         _blockType = blockType;
@@ -67,7 +67,7 @@ public class BlockParticle extends Particle {
     public boolean canMoveVertically() {
         BlockParticleEmitter pE = (BlockParticleEmitter) getParent();
         // Very simple "collision detection" for particles.
-        return pE.getParent().getWorldProvider().getBlockAtPosition(new Vector3f(_position.x, _position.y + 2 * ((_velocity.y >= 0) ? _size : -_size), _position.z)) == 0x0;
+        return pE.getParent().getWorldProvider().getBlockAtPosition(new Vector3d(_position.x, _position.y + 2 * ((_velocity.y >= 0) ? _size : -_size), _position.z)) == 0x0;
     }
 
     protected void renderParticle() {

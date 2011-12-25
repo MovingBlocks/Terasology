@@ -15,10 +15,10 @@
  */
 package com.github.begla.blockmania.rendering.cameras;
 
-import com.github.begla.blockmania.configuration.ConfigurationManager;
-import com.github.begla.blockmania.datastructures.ViewFrustum;
+import com.github.begla.blockmania.logic.manager.ConfigurationManager;
+import com.github.begla.blockmania.model.structures.ViewFrustum;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 
 /**
  * Provides global access to fonts.
@@ -30,9 +30,9 @@ public abstract class Camera {
     public static final float FOV = ((Double) ConfigurationManager.getInstance().getConfig().get("Player.fov")).floatValue();
 
     /* CAMERA PARAMETERS */
-    protected final Vector3f _position = new Vector3f();
-    protected final Vector3f _up = new Vector3f(0, 1, 0);
-    protected final Vector3f _viewingDirection = new Vector3f();
+    protected final Vector3d _position = new Vector3d();
+    protected final Vector3d _up = new Vector3d(0, 1, 0);
+    protected final Vector3d _viewingDirection = new Vector3d();
 
     protected float _targetFov = FOV;
     protected float _activeFov = FOV - 20f;
@@ -63,15 +63,15 @@ public abstract class Camera {
     public abstract void loadNormalizedModelViewMatrix();
 
 
-    public Vector3f getPosition() {
+    public Vector3d getPosition() {
         return _position;
     }
 
-    public Vector3f getViewingDirection() {
+    public Vector3d getViewingDirection() {
         return _viewingDirection;
     }
 
-    public Vector3f getUp() {
+    public Vector3d getUp() {
         return _up;
     }
 

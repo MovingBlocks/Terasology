@@ -1,7 +1,7 @@
 package com.github.begla.blockmania.tests;
 
 
-import com.github.begla.blockmania.datastructures.BlockmaniaSmartArray;
+import com.github.begla.blockmania.model.structures.BlockmaniaSmartArray;
 import com.github.begla.blockmania.utilities.FastRandom;
 
 public class BlockmaniaSmartArrayTest extends junit.framework.TestCase {

@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.utilities;
 
-import com.github.begla.blockmania.world.chunk.Chunk;
+import com.github.begla.blockmania.logic.world.Chunk;
 
 /**
  * Collection of math functions.

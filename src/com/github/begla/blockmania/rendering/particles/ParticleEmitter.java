@@ -15,12 +15,12 @@
  */
 package com.github.begla.blockmania.rendering.particles;
 
-import com.github.begla.blockmania.configuration.ConfigurationManager;
+import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
-import com.github.begla.blockmania.world.main.WorldRenderer;
+import com.github.begla.blockmania.rendering.world.WorldRenderer;
 import org.lwjgl.opengl.GL11;
 
-import javax.vecmath.Vector3f;
+import javax.vecmath.Vector3d;
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -38,7 +38,7 @@ public abstract class ParticleEmitter implements RenderableObject {
     protected int _particlesToEmit;
 
     protected final ArrayList<Particle> _particles = new ArrayList<Particle>();
-    protected final Vector3f _origin = new Vector3f();
+    protected final Vector3d _origin = new Vector3d();
 
     protected final WorldRenderer _parent;
 
@@ -89,7 +89,7 @@ public abstract class ParticleEmitter implements RenderableObject {
         }
     }
 
-    public void setOrigin(Vector3f origin) {
+    public void setOrigin(Vector3d origin) {
         _origin.set(origin);
     }
 

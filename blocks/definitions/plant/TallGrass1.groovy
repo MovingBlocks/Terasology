@@ -1,5 +1,5 @@
-import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
-import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE
+import com.github.begla.blockmania.model.blocks.Block.BLOCK_FORM
+import com.github.begla.blockmania.model.blocks.Block.COLOR_SOURCE
 
 /**
  * Tall grass variety 1 (higher number = taller)

@@ -1,5 +1,5 @@
-import com.github.begla.blockmania.blocks.Block.BLOCK_FORM
-import com.github.begla.blockmania.blocks.Block.COLOR_SOURCE
+import com.github.begla.blockmania.model.blocks.Block.BLOCK_FORM
+import com.github.begla.blockmania.model.blocks.Block.COLOR_SOURCE
 
 /**
  * A totally beautiful yellow flower that might get some actual plant stats later

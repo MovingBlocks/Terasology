@@ -56,7 +56,7 @@ void main(){
         color.a *= gl_Color.a;
     } else {
         // MASK GRASS
-        if (texture2D(textureEffects, vec2(10 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET))).a != 0)
+        if (texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET))).a != 0.0)
             color.rgb *= gl_Color.rgb;
     }
 

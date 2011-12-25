@@ -15,10 +15,10 @@
  */
 package com.github.begla.blockmania.rendering.particles;
 
-import com.github.begla.blockmania.blocks.BlockManager;
-import com.github.begla.blockmania.rendering.manager.ShaderManager;
-import com.github.begla.blockmania.rendering.manager.TextureManager;
-import com.github.begla.blockmania.world.main.WorldRenderer;
+import com.github.begla.blockmania.logic.manager.ShaderManager;
+import com.github.begla.blockmania.logic.manager.TextureManager;
+import com.github.begla.blockmania.model.blocks.BlockManager;
+import com.github.begla.blockmania.rendering.world.WorldRenderer;
 
 /**
  * Emits block particles.
