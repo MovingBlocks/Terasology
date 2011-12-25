@@ -23,7 +23,7 @@ import com.github.begla.blockmania.logic.manager.ToolManager;
 import com.github.begla.blockmania.logic.tools.Tool;
 import com.github.begla.blockmania.logic.world.BlockObserver;
 import com.github.begla.blockmania.logic.world.Chunk;
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.model.inventory.BlockItem;

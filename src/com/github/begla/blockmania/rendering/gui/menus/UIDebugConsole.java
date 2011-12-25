@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.rendering.gui.menus;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.gui.components.UIText;
 import com.github.begla.blockmania.rendering.gui.framework.UIDisplayContainer;
 import org.lwjgl.input.Keyboard;

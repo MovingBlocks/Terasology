@@ -18,7 +18,7 @@ package com.github.begla.blockmania.logic.characters;
 
 import com.github.begla.blockmania.logic.manager.ShaderManager;
 import com.github.begla.blockmania.logic.manager.TextureManager;
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.model.structures.AABB;
 import com.github.begla.blockmania.rendering.world.WorldRenderer;
 import com.github.begla.blockmania.utilities.MathHelper;

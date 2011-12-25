@@ -17,7 +17,7 @@ package com.github.begla.blockmania.logic.tools;
 
 import com.github.begla.blockmania.logic.characters.Player;
 import com.github.begla.blockmania.logic.manager.BlueprintManager;
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.model.blueprints.Blueprint;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 import com.github.begla.blockmania.model.structures.RayBlockIntersection;

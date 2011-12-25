@@ -18,7 +18,7 @@ package com.github.begla.blockmania.rendering.world;
 import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.logic.manager.ShaderManager;
 import com.github.begla.blockmania.logic.manager.TextureManager;
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.utilities.MathHelper;
 import com.github.begla.blockmania.utilities.PerlinNoise;

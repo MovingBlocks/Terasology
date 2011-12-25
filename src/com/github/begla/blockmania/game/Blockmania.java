@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.main;
+package com.github.begla.blockmania.game;
 
 import com.github.begla.blockmania.logic.characters.Player;
 import com.github.begla.blockmania.logic.manager.*;

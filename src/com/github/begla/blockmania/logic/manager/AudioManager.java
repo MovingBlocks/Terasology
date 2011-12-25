@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.logic.manager;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;
 import org.newdawn.slick.openal.Audio;

@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.logic.manager;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.model.blocks.Block;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;

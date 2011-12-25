@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.model.blocks;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.model.structures.AABB;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import org.lwjgl.opengl.GL11;

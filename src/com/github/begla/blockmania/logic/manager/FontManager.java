@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.logic.manager;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.util.ResourceLoader;

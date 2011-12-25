@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.logic.generators;
 
 import com.github.begla.blockmania.logic.world.WorldProvider;
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;

@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.rendering.gui.components;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.gui.framework.UIDisplayContainer;
 import com.github.begla.blockmania.rendering.gui.framework.UIGraphicsElement;
 

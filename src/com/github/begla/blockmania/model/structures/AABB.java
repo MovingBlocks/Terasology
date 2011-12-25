@@ -15,7 +15,7 @@
  */
 package com.github.begla.blockmania.model.structures;
 
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector3d;

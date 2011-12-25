@@ -16,7 +16,7 @@
 package com.github.begla.blockmania.rendering.gui.menus;
 
 import com.github.begla.blockmania.logic.manager.ConfigurationManager;
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.rendering.gui.components.*;
 import com.github.begla.blockmania.rendering.gui.framework.UIDisplayRenderer;
 import com.github.begla.blockmania.rendering.world.ChunkMeshGenerator;

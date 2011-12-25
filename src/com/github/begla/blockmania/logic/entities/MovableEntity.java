@@ -17,7 +17,7 @@ package com.github.begla.blockmania.logic.entities;
 
 import com.github.begla.blockmania.logic.manager.AudioManager;
 import com.github.begla.blockmania.logic.manager.ConfigurationManager;
-import com.github.begla.blockmania.main.Blockmania;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.model.structures.AABB;
