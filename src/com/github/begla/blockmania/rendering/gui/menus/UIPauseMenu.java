@@ -15,8 +15,8 @@
  */
 package com.github.begla.blockmania.rendering.gui.menus;
 
-import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.rendering.gui.components.UIButton;
 import com.github.begla.blockmania.rendering.gui.components.UIText;
 import com.github.begla.blockmania.rendering.gui.components.UITransparentOverlay;
@@ -24,7 +24,6 @@ import com.github.begla.blockmania.rendering.gui.framework.UIClickListener;
 import com.github.begla.blockmania.rendering.gui.framework.UIDisplayElement;
 import com.github.begla.blockmania.rendering.gui.framework.UIDisplayRenderer;
 import com.github.begla.blockmania.rendering.gui.framework.UIGraphicsElement;
-import org.lwjgl.opengl.Display;
 
 import javax.vecmath.Vector2f;
 
@@ -101,13 +100,18 @@ public class UIPauseMenu extends UIDisplayRenderer {
     public void update() {
         super.update();
 
-        _version.setPosition(new Vector2f(_version.calcCenterPosition().x, 230f));
+        _version.centerHorizontally();
+        _version.getPosition().y = 230f;
 
-        _respawnButton.setPosition(new Vector2f(_respawnButton.calcCenterPosition().x, 300f));
-        _newWorldButton.setPosition(new Vector2f(_newWorldButton.calcCenterPosition().x, 300f + 32f + 8f));
+        _respawnButton.centerHorizontally();
+        _respawnButton.getPosition().y = 300f;
+        _newWorldButton.centerHorizontally();
+        _newWorldButton.getPosition().y = 300f + 32f + 8f;
 
-        _exitButton.setPosition(new Vector2f(_exitButton.calcCenterPosition().x, 300f + 2 * 32f + 32f));
+        _exitButton.centerHorizontally();
+        _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
 
-        _title.setPosition(new Vector2f(Display.getWidth() / 2 - 256f, 128f));
+        _title.centerHorizontally();
+        _title.getPosition().y = 128f;
     }
 }

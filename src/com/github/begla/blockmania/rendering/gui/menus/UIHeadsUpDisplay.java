@@ -15,8 +15,8 @@
  */
 package com.github.begla.blockmania.rendering.gui.menus;
 
-import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.rendering.gui.components.*;
 import com.github.begla.blockmania.rendering.gui.framework.UIDisplayRenderer;
 import com.github.begla.blockmania.rendering.world.ChunkMeshGenerator;
@@ -93,17 +93,12 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
 
     public void update() {
         super.update();
+        setOverlay(!_console.isVisible());
 
         _healthBar.setPosition(new Vector2f(_toolbar.getPosition().x, _toolbar.getPosition().y - _toolbar.getSize().y + 8f));
 
         _crosshair.setVisible((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.crosshair"));
-        _crosshair.setPosition(new Vector2f(Display.getDisplayMode().getWidth() / 2, Display.getDisplayMode().getHeight() / 2));
-
-        boolean enableDebug = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
-        _debugLine1.setVisible(enableDebug);
-        _debugLine2.setVisible(enableDebug);
-        _debugLine3.setVisible(enableDebug);
-        _debugLine4.setVisible(enableDebug);
+        _crosshair.setPosition(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
 
         if (Blockmania.getInstance().getTime() - _lastStatUpdate > 200) {
             HashMap<String, Double> profilerResult = BlockmaniaProfiler.getResults();
@@ -111,14 +106,22 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
             _lastStatUpdate = Blockmania.getInstance().getTime();
         }
 
+        boolean enableDebug = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
+        _debugLine1.setVisible(enableDebug);
+        _debugLine2.setVisible(enableDebug);
+        _debugLine3.setVisible(enableDebug);
+        _debugLine4.setVisible(enableDebug);
         _pieChart.setVisible(enableDebug);
-        _pieChart.setPosition(new Vector2f(Display.getWidth() - _pieChart.getSize().x - 16f, 128f));
 
-        double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-        _debugLine1.setText(String.format("%s (fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f)", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"), Blockmania.getInstance().getAverageFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
-        _debugLine2.setText(String.format("%s", Blockmania.getInstance().getActiveWorldRenderer().getPlayer()));
-        _debugLine3.setText(String.format("%s", Blockmania.getInstance().getActiveWorldRenderer()));
-        _debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkMeshGenerator.getVertexArrayUpdateCount(), Blockmania.getInstance().getThreadPool().getActiveCount()));
+        if (enableDebug) {
+            _pieChart.setPosition(new Vector2f(Display.getWidth() - _pieChart.getSize().x - 16f, 128f));
+
+            double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
+            _debugLine1.setText(String.format("%s (fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f)", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"), Blockmania.getInstance().getAverageFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
+            _debugLine2.setText(String.format("%s", Blockmania.getInstance().getActiveWorldRenderer().getPlayer()));
+            _debugLine3.setText(String.format("%s", Blockmania.getInstance().getActiveWorldRenderer()));
+            _debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkMeshGenerator.getVertexArrayUpdateCount(), Blockmania.getInstance().getThreadPool().getActiveCount()));
+        }
     }
 
     @Override

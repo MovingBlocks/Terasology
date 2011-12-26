@@ -105,6 +105,9 @@ public final class Player extends Character {
     }
 
     public void render() {
+        super.render();
+        updateCameraParameters();
+
         // Display the block the player is aiming at
         if (SHOW_PLACING_BOX) {
             if (_selectedBlock != null) {
@@ -115,29 +118,26 @@ public final class Player extends Character {
         }
 
         calcSelectedBlock();
-
-        super.render();
     }
 
     public void update() {
-        // Slightly adjust the field of view when flying
-        if (_godMode) {
-            _activeCamera.extendFov(10);
-        } else {
-            _activeCamera.resetFov();
-        }
+        _walkingSpeed = WALKING_SPEED;
 
-        // Simulate a more realistic walking animation
-        _walkingSpeed = WALKING_SPEED - Math.abs(calcBobbingOffset((float) Math.PI / 2f, 0.01f, 2.5f));
+        if (_activeCamera != null) {
+            _activeCamera.update();
+
+            // Slightly adjust the field of view when flying
+            if (_godMode) {
+                _activeCamera.extendFov(10);
+            } else {
+                _activeCamera.resetFov();
+            }
+        }
 
         // Speedup if the player is playing god
         if (_godMode) {
             _walkingSpeed *= 1.5;
         }
-
-        // Process interactions even if the mouse button is pressed down
-        // and not fired by a repeated event
-        processInteractions(-1);
 
         if (_handMovementAnimationOffset > 0) {
             _handMovementAnimationOffset -= 0.04;
@@ -146,7 +146,6 @@ public final class Player extends Character {
         }
 
         super.update();
-        updateCameras();
 
         _selectedBlock = calcSelectedBlock();
 
@@ -227,7 +226,7 @@ public final class Player extends Character {
         return Math.sin(_stepCounter * frequency + phaseOffset) * amplitude * speedFactor;
     }
 
-    public void updateCameras() {
+    public void updateCameraParameters() {
         _firstPersonCamera.getPosition().set(calcEyeOffset());
 
         if (CAMERA_BOBBING) {
@@ -244,8 +243,6 @@ public final class Player extends Character {
             Vector3d viewingTarget = new Vector3d(getPosition().x, 40, getPosition().z - 128);
             _firstPersonCamera.getViewingDirection().sub(viewingTarget, getPosition());
         }
-
-        _firstPersonCamera.update();
     }
 
     public void updatePosition() {
@@ -393,8 +390,19 @@ public final class Player extends Character {
      * command.
      */
     public void processMovement() {
+
+    }
+
+
+    public void updateInput() {
         if (isDead())
             return;
+
+        // Process interactions even if the mouse button is pressed down
+        // and not fired by a repeated event
+        processInteractions(-1);
+
+        _movementDirection.set(0, 0, 0);
 
         double dx = Mouse.getDX();
         double dy = Mouse.getDY();
@@ -671,4 +679,5 @@ public final class Player extends Character {
     public float getHandMovementAnimationOffset() {
         return _handMovementAnimationOffset;
     }
+
 }

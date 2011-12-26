@@ -33,6 +33,11 @@ public abstract class UIDisplayElement {
     private final Vector2f _position = new Vector2f(0, 0);
     private final Vector2f _size = new Vector2f(1, 1);
 
+    protected boolean _clickSoundPlayed = false;
+    protected boolean _mouseDown = false, _mouseUp = false;
+
+    private boolean _overlay;
+
     private UIDisplayElement _parent;
 
     public UIDisplayElement() {
@@ -61,7 +66,14 @@ public abstract class UIDisplayElement {
     }
 
     public void processMouseInput(int button, boolean state, int wheelMoved) {
-        // Nothing to do here
+        if (button == 0 && state && !_mouseUp) {
+            _mouseDown = true;
+            _mouseUp = false;
+            _clickSoundPlayed = false;
+        } else if (button == 0 && !state && _mouseDown) {
+            _mouseUp = true;
+            _mouseDown = false;
+        }
     }
 
     public abstract void render();
@@ -107,7 +119,7 @@ public abstract class UIDisplayElement {
      * @return True if intersecting
      */
     public boolean intersects(Vector2f point) {
-        return (point.x >= getPosition().x && point.y >= getPosition().y && point.x <= getPosition().x + getSize().x && point.y <= getPosition().y + getSize().y);
+        return (point.x >= calcAbsolutePosition().x && point.y >= calcAbsolutePosition().y && point.x <= calcAbsolutePosition().x + getSize().x && point.y <= calcAbsolutePosition().y + getSize().y);
     }
 
     /**
@@ -117,5 +129,33 @@ public abstract class UIDisplayElement {
      */
     public Vector2f calcCenterPosition() {
         return new Vector2f(Display.getWidth() / 2 - getSize().x / 2, Display.getHeight() / 2 - getSize().y / 2);
+    }
+
+    public void center() {
+        getPosition().set(calcCenterPosition());
+    }
+
+    public void centerVertically() {
+        getPosition().x = calcCenterPosition().y;
+    }
+
+    public void centerHorizontally() {
+        getPosition().x = calcCenterPosition().x;
+    }
+
+    public Vector2f calcAbsolutePosition() {
+        if (_parent == null) {
+            return getPosition();
+        } else {
+            return new Vector2f(_parent.calcAbsolutePosition().x + getPosition().x, _parent.calcAbsolutePosition().y + getPosition().y);
+        }
+    }
+
+    public boolean isOverlay() {
+        return _overlay;
+    }
+
+    public void setOverlay(boolean value) {
+        _overlay = value;
     }
 }

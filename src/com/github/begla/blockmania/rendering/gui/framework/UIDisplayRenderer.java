@@ -36,7 +36,7 @@ public abstract class UIDisplayRenderer extends UIDisplayContainer {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, -32, 32);
+        glOrtho(0, Display.getWidth(), Display.getHeight(), 0, -32, 32);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();

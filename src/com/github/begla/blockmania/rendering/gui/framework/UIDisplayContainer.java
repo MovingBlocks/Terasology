@@ -64,6 +64,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         if (!isVisible())
             return;
 
+        super.processKeyboardInput(key);
+
         // Pass the pressed key to all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
             _displayElements.get(i).processKeyboardInput(key);
@@ -74,6 +76,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void processMouseInput(int button, boolean state, int wheelMoved) {
         if (!isVisible())
             return;
+
+        super.processMouseInput(button, state, wheelMoved);
 
         // Pass the mouse event to all display elements
         for (int i = 0; i < _displayElements.size(); i++) {

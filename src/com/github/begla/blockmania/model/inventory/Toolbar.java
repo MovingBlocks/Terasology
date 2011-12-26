@@ -53,7 +53,7 @@ public class Toolbar {
             _selectedSlot = 9 + _selectedSlot;
     }
 
-    public Item getItemForSlot(int slot) {
+    public Item getItemInSlot(int slot) {
         return _player.getInventory().getItemInSlot(_slotBinding[slot]);
     }
 

@@ -54,6 +54,8 @@ public class UIToolbar extends UIDisplayContainer {
     @Override
     public void update() {
         super.update();
-        setPosition(new Vector2f(calcCenterPosition().x, Display.getHeight() - getSize().y));
+
+        centerHorizontally();
+        getPosition().y = Display.getHeight() - getSize().y;
     }
 }

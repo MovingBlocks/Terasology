@@ -28,7 +28,7 @@ public abstract class Item {
     protected int _amount;
     protected byte _toolId;
     protected Player _parent;
-    protected int _stackSize = 32;
+    protected int _stackSize = 16;
 
     protected UIGraphicsElement _icon;
 

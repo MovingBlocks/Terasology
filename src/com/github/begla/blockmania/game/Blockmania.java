@@ -19,7 +19,9 @@ import com.github.begla.blockmania.logic.characters.Player;
 import com.github.begla.blockmania.logic.manager.*;
 import com.github.begla.blockmania.logic.world.WorldProvider;
 import com.github.begla.blockmania.model.blocks.BlockManager;
+import com.github.begla.blockmania.rendering.gui.framework.UIDisplayElement;
 import com.github.begla.blockmania.rendering.gui.menus.UIHeadsUpDisplay;
+import com.github.begla.blockmania.rendering.gui.menus.UIInventoryScreen;
 import com.github.begla.blockmania.rendering.gui.menus.UIPauseMenu;
 import com.github.begla.blockmania.rendering.gui.menus.UIStatusScreen;
 import com.github.begla.blockmania.rendering.world.WorldRenderer;
@@ -37,6 +39,7 @@ import org.lwjgl.opengl.PixelFormat;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -61,24 +64,22 @@ public final class Blockmania {
             (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceFar"),
             (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceUltra")};
 
-    /* SETTINGS */
-    private static final int FPS_LIMIT = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.fpsLimit");
-
     private int _activeViewingDistance = 0;
 
     /* THREADING */
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
     /* CONST */
-    private static final int FRAME_SKIP_MAX_FRAMES = 10;
     private static final int TICKS_PER_SECOND = 60;
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 
     /* STATISTICS */
     private long _lastLoopTime, _lastFpsTime;
-    private double _averageFps;
     private int _fps;
+    private float _averageFps;
     private long _timerTicksPerSecond;
+
+    private double _timeAccumulator = 0;
 
     /* GAME LOOP */
     private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
@@ -87,9 +88,11 @@ public final class Blockmania {
     private WorldRenderer _activeWorldRenderer;
 
     /* GUI */
+    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
     private UIHeadsUpDisplay _hud;
     private UIPauseMenu _pauseMenu;
     private UIStatusScreen _statusScreen;
+    private UIInventoryScreen _inventoryScreen;
 
     /* SINGLETON */
     private static Blockmania _instance;
@@ -200,6 +203,7 @@ public final class Blockmania {
             Display.setDisplayMode((DisplayMode) ConfigurationManager.getInstance().getConfig().get("Graphics.displayMode"));
         }
 
+        Display.setResizable(true);
         Display.setTitle((String) ConfigurationManager.getInstance().getConfig().get("System.gameTitle"));
         Display.create((PixelFormat) ConfigurationManager.getInstance().getConfig().get("Graphics.pixelFormat"));
     }
@@ -281,9 +285,6 @@ public final class Blockmania {
             diff = getTime() - timeBefore;
         }
 
-        // Reset the delta value
-        _lastLoopTime = getTime();
-
         _statusScreen.setVisible(false);
         _hud.setVisible(true);
     }
@@ -314,6 +315,12 @@ public final class Blockmania {
 
         _pauseMenu = new UIPauseMenu();
         _statusScreen = new UIStatusScreen();
+        _inventoryScreen = new UIInventoryScreen();
+
+        _guiScreens.add(_hud);
+        _guiScreens.add(_pauseMenu);
+        _guiScreens.add(_statusScreen);
+        _guiScreens.add(_inventoryScreen);
 
         /*
          * Init. OpenGL
@@ -344,7 +351,7 @@ public final class Blockmania {
     }
 
     private void resizeViewport() {
-        glViewport(0, 0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight());
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     /**
@@ -352,36 +359,46 @@ public final class Blockmania {
      */
     public void startGame() {
         getInstance().getLogger().log(Level.INFO, "Starting Blockmania...");
-        _lastLoopTime = getTime();
-
-        double nextGameTick = getTime();
-        int loopCounter;
-
 
         // MAIN GAME LOOP
         while (_runGame && !Display.isCloseRequested()) {
-            updateFPS();
-            processKeyboardInput();
-            processMouseInput();
+            if (!Display.isActive()) {
+                try {
+                    Thread.sleep(500);
+
+                } catch (InterruptedException e) {
+                    getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+                }
+                continue;
+            }
 
             BlockmaniaProfiler.begin();
 
-            loopCounter = 0;
-            while (getTime() > nextGameTick && loopCounter < FRAME_SKIP_MAX_FRAMES) {
+            //long timeSimulatedThisIteration = 0;
+            long startTime = getTime();
+            while (_timeAccumulator >= SKIP_TICKS) {
                 update();
-                nextGameTick += SKIP_TICKS;
-                loopCounter++;
+                _timeAccumulator -= SKIP_TICKS;
+                //timeSimulatedThisIteration += SKIP_TICKS;
             }
 
             render();
-
-            // Clear dirty flag and swap buffer
             Display.update();
 
-            if (FPS_LIMIT > 0)
-                Display.sync(FPS_LIMIT);
+            processKeyboardInput();
+            processMouseInput();
 
+            if (!screenHasFocus())
+                getActiveWorldRenderer().getPlayer().updateInput();
+
+            Display.sync(60);
             BlockmaniaProfiler.end();
+
+            updateFps();
+            _timeAccumulator += getTime() - startTime;
+
+            if (Display.wasResized())
+                resizeViewport();
         }
 
         /*
@@ -413,14 +430,18 @@ public final class Blockmania {
     }
 
     public void update() {
-        if (!_pauseGame && !_hud.getDebugConsole().isVisible() && !_pauseMenu.isVisible()) {
-            if (_activeWorldRenderer != null)
-                _activeWorldRenderer.update();
+        if (_activeWorldRenderer != null && shouldUpdateWorld())
+            _activeWorldRenderer.update();
+
+        if (screenHasFocus() || !shouldUpdateWorld()) {
+            if (Mouse.isGrabbed()) {
+                Mouse.setGrabbed(false);
+                Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
+            }
+
+        } else {
             if (!Mouse.isGrabbed())
                 Mouse.setGrabbed(true);
-        } else {
-            if (Mouse.isGrabbed())
-                Mouse.setGrabbed(false);
         }
 
         if (_activeWorldRenderer != null) {
@@ -436,18 +457,42 @@ public final class Blockmania {
         updateUserInterface();
     }
 
+    private boolean screenHasFocus() {
+        for (UIDisplayElement screen : _guiScreens) {
+            if (screen.isVisible() && !screen.isOverlay()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean screenCanFocus(UIDisplayElement s) {
+        boolean result = true;
+
+        for (UIDisplayElement screen : _guiScreens) {
+            if (screen.isVisible() && !screen.isOverlay() && screen != s)
+                result = false;
+        }
+
+        return result;
+    }
+
+    private boolean shouldUpdateWorld() {
+        return !_pauseGame && !_pauseMenu.isVisible();
+    }
+
     private void renderUserInterface() {
-        _hud.render();
-        _pauseMenu.render();
-        _statusScreen.render();
+        for (UIDisplayElement screen : _guiScreens) {
+            screen.render();
+        }
     }
 
     private void updateUserInterface() {
-        _hud.update();
-        _pauseMenu.update();
-        _statusScreen.update();
+        for (UIDisplayElement screen : _guiScreens) {
+            screen.update();
+        }
     }
-
 
     public void pause() {
         _pauseGame = true;
@@ -465,8 +510,19 @@ public final class Blockmania {
         }
     }
 
+    private void toggleInventory() {
+        if (screenCanFocus(_inventoryScreen))
+            _inventoryScreen.setVisible(!_inventoryScreen.isVisible());
+    }
+
     public void togglePauseMenu() {
-        _pauseMenu.setVisible(!_pauseMenu.isVisible());
+        if (screenCanFocus(_pauseMenu))
+            _pauseMenu.setVisible(!_pauseMenu.isVisible());
+    }
+
+    public void toggleViewingDistance() {
+        _activeViewingDistance = (_activeViewingDistance + 1) % 4;
+        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
     }
 
     public void exit(boolean saveWorld) {
@@ -486,11 +542,14 @@ public final class Blockmania {
             int button = Mouse.getEventButton();
             int wheelMoved = Mouse.getEventDWheel();
 
-            if (!_pauseGame && !_hud.getDebugConsole().isVisible() && !_pauseMenu.isVisible())
-                _activeWorldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+            for (UIDisplayElement screen : _guiScreens) {
+                if (screenCanFocus(screen)) {
+                    screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+                }
+            }
 
-            _hud.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-            _pauseMenu.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+            if (!screenHasFocus())
+                _activeWorldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
         }
     }
 
@@ -506,6 +565,10 @@ public final class Blockmania {
                     togglePauseMenu();
                 }
 
+                if (key == Keyboard.KEY_I && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                    toggleInventory();
+                }
+
                 if (key == Keyboard.KEY_F3 && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                     ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", !(Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug"));
                 }
@@ -514,13 +577,16 @@ public final class Blockmania {
                     toggleViewingDistance();
                 }
 
-                // Pass the pressed key on to the GUI
-                _hud.processKeyboardInput(key);
-                _pauseMenu.processKeyboardInput(key);
+                // Pass input to focused GUI element
+                for (UIDisplayElement screen : _guiScreens) {
+                    if (screenCanFocus(screen)) {
+                        screen.processKeyboardInput(key);
+                    }
+                }
             }
 
             // Pass input to the current player
-            if (!_pauseGame && !_hud.getDebugConsole().isVisible() && !_pauseMenu.isVisible())
+            if (!screenHasFocus())
                 _activeWorldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
         }
     }
@@ -528,7 +594,7 @@ public final class Blockmania {
     /**
      * Updates the FPS display.
      */
-    private void updateFPS() {
+    private void updateFps() {
         // Measure the delta value and the frames per second
         long delta = getTime() - _lastLoopTime;
 
@@ -608,10 +674,5 @@ public final class Blockmania {
 
     public GroovyManager getGroovyManager() {
         return _groovyManager;
-    }
-
-    public void toggleViewingDistance() {
-        _activeViewingDistance = (_activeViewingDistance + 1) % 4;
-        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
     }
 }

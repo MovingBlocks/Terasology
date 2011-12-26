@@ -15,8 +15,8 @@
  */
 package com.github.begla.blockmania.logic.world;
 
-import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 
 import java.util.HashSet;

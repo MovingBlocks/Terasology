@@ -27,17 +27,18 @@ Controls
 
 * [W,A,S,D]               Walking
 * [Space]                 Jump
-* [2*Space]               God mode
 * [Shift]                 Hold for running
 * [Up, Down]              Switch active block
 * [Left click]            Activate left click action (default = place block)
 * [Right click]           Activate right click action (default = remove block)
 * [Mouse wheel up/down]   Cycle through toolbar slots
 * [1,..,0]                Change the active toolbar slot
+* [I]                     Toggle inventory screen
 * [F]                     Toggle viewing distance (near, moderate, far, ultra)
 * [Tab]                   Toggle developer console
-* [K]                     Don't try this
 * [F3]                    Toggle debug information
+* [2*Space]               God mode
+* [K]                     Don't try this
 * [Escape]                Show/hide the pause menu screen
 
 Example console commands

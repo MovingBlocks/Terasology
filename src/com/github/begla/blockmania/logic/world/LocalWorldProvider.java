@@ -15,12 +15,12 @@
  */
 package com.github.begla.blockmania.logic.world;
 
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.logic.generators.ChunkGeneratorTerrain;
 import com.github.begla.blockmania.logic.generators.GeneratorManager;
 import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.logic.simulators.GrowthSimulator;
 import com.github.begla.blockmania.logic.simulators.LiquidSimulator;
-import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.utilities.FastRandom;
 import com.github.begla.blockmania.utilities.MathHelper;

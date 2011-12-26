@@ -15,9 +15,9 @@
  */
 package com.github.begla.blockmania.logic.entities;
 
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.logic.manager.AudioManager;
 import com.github.begla.blockmania.logic.manager.ConfigurationManager;
-import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.model.structures.AABB;
@@ -90,6 +90,9 @@ public abstract class MovableEntity extends Entity {
     protected abstract void handleHorizontalCollision();
 
     public void render() {
+        // Update the viewing direction
+        setViewingDirection(_yaw, _pitch);
+
         if ((Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debugCollision")) {
             getAABB().render(2f);
 
@@ -109,15 +112,10 @@ public abstract class MovableEntity extends Entity {
         else
             _activeWalkingSpeed = _walkingSpeed * _runningFactor;
 
-        // Update the viewing direction
-        setViewingDirection(_yaw, _pitch);
-
         processMovement();
         updatePosition();
         checkPosition();
         updateSwimStatus();
-
-        _movementDirection.set(0, 0, 0);
 
         playMovementSound();
     }

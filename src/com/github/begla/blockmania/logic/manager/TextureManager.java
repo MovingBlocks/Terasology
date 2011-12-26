@@ -73,6 +73,7 @@ public class TextureManager {
         addTexture("icons");
         addTexture("items");
         addTexture("blockmania");
+        addTexture("inventory");
 
         /* MOBS */
         addTexture("slime");
@@ -148,7 +149,8 @@ public class TextureManager {
     }
 
     public void bindTexture(String s) {
-        glBindTexture(GL11.GL_TEXTURE_2D, _textures.get(s).id);
+        if (_textures.containsKey(s))
+            glBindTexture(GL11.GL_TEXTURE_2D, _textures.get(s).id);
     }
 
     public BlockmaniaTexture getTexture(String s) {

@@ -23,7 +23,7 @@ import com.github.begla.blockmania.model.blocks.BlockManager;
  */
 public class Inventory {
 
-    private final Item[] _inventory = new Item[64];
+    private final Item[] _inventory = new Item[27];
     private final Player _parent;
 
     public Inventory(Player parent) {
@@ -47,6 +47,9 @@ public class Inventory {
      * @return True if item could be stored
      */
     public boolean storeItemInSlot(int slot, Item item) {
+        if (slot < 0 || slot >= size())
+            return false;
+
         // The slot is empty so no problem here
         if (_inventory[slot] == null) {
             _inventory[slot] = item;
@@ -78,6 +81,9 @@ public class Inventory {
      * @return The removed object. Null if nothing could be removed.
      */
     public Item removeOneItemInSlot(int slot) {
+        if (slot < 0 || slot >= size())
+            return null;
+
         if (_inventory[slot] != null) {
             Item item = _inventory[slot];
             item.decreaseAmount();
@@ -99,6 +105,9 @@ public class Inventory {
      * @return The removed object. Null if nothing could be removed.
      */
     public Item removeAllItemsInSlot(int slot) {
+        if (slot < 0 || slot >= size())
+            return null;
+
         if (_inventory[slot] != null) {
             Item item = _inventory[slot];
             _inventory[slot] = null;
@@ -116,7 +125,7 @@ public class Inventory {
      * @return The slot if at least one is available. Returns -1 otherwise.
      */
     public int findFirstFreeSlot(Item item) {
-        for (int i = 0; i < 64; i++) {
+        for (int i = 0; i < size(); i++) {
             if (_inventory[i] == null) {
                 return i;
             } else {
@@ -130,6 +139,9 @@ public class Inventory {
     }
 
     public Item getItemInSlot(int slot) {
+        if (slot < 0 || slot >= size())
+            return null;
+
         return _inventory[slot];
     }
 

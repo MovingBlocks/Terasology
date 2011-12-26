@@ -34,9 +34,6 @@ public class UIButton extends UIDisplayContainer {
 
     private final ArrayList<UIClickListener> _clickListeners = new ArrayList<UIClickListener>();
 
-    private boolean _clickSoundPlayed = false;
-    private boolean _mouseDown = false, _mouseUp = false;
-
     private final UIGraphicsElement _defaultTexture;
     private final UIText _label;
 
@@ -87,18 +84,6 @@ public class UIButton extends UIDisplayContainer {
 
         // Position the label in the center of the button
         _label.setPosition(new Vector2f(getSize().x / 2 - getLabel().getTextWidth() / 2, getSize().y / 2 - getLabel().getTextHeight() / 2));
-    }
-
-    @Override
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
-        if (button == 0 && state && !_mouseUp) {
-            _mouseDown = true;
-            _mouseUp = false;
-            _clickSoundPlayed = false;
-        } else if (button == 0 && !state && _mouseDown) {
-            _mouseUp = true;
-            _mouseDown = false;
-        }
     }
 
     public void clicked() {
