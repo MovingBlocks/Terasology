@@ -364,10 +364,11 @@ public final class Blockmania {
         while (_runGame && !Display.isCloseRequested()) {
             if (!Display.isActive()) {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
                 }
+                Display.processMessages();
                 continue;
             }
 
