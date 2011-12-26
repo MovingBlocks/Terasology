@@ -219,8 +219,8 @@ public final class Blockmania {
         Keyboard.enableRepeatEvents(true);
 
         // Mouse
-        Mouse.setGrabbed(true);
         Mouse.create();
+        Mouse.setGrabbed(true);
     }
 
     /**
@@ -365,7 +365,6 @@ public final class Blockmania {
             if (!Display.isActive()) {
                 try {
                     Thread.sleep(500);
-
                 } catch (InterruptedException e) {
                     getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
                 }

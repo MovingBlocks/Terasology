@@ -35,6 +35,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     private int _iterations;
     private double _angleInDegree;
     private byte _leafType;
+    private byte _barkType;
 
     /* RULES */
     private final String _initialAxiom;
@@ -54,6 +55,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         _angleInDegree = angle;
         _iterations = iterations;
         _leafType = BlockManager.getInstance().getBlock("GreenLeaf").getId();
+        _barkType = BlockManager.getInstance().getBlock("OakTrunk").getId();
 
         _initialAxiom = initialAxiom;
         _ruleSet = ruleSet;
@@ -103,10 +105,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
             switch (c) {
                 case 'G':
                 case 'F':
-                    byte trunkBlockId = BlockManager.getInstance().getBlock("OakTrunk").getId();
-
                     // Tree trunk
-                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, trunkBlockId, update, true);
+                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, _barkType, update, true);
 
                     // Generate leaves
                     if (_stackOrientation.size() > 1) {
@@ -119,7 +119,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                                         continue;
 
                                     if (_generatorManager.getParent().getBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z) == 0x0)
-                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z, _leafType, update, false);
+                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z, _leafType, update, true);
 
                                 }
                             }
@@ -175,6 +175,12 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
     public TreeGenerator withLeafType(byte b) {
         _leafType = b;
+        return this;
+    }
+
+
+    public TreeGenerator withBarkType(byte b) {
+        _barkType = b;
         return this;
     }
 }

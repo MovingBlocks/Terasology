@@ -4,5 +4,5 @@
 block {
     version = 1
 
-    hardness = 6
+    hardness = 16
 }
