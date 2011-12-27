@@ -15,7 +15,6 @@
  */
 package com.github.begla.blockmania.logic.generators;
 
-import com.github.begla.blockmania.logic.simulators.LiquidSimulator;
 import com.github.begla.blockmania.logic.world.Chunk;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.model.structures.BlockPosition;
@@ -34,31 +33,24 @@ public class ChunkGeneratorLiquids extends ChunkGeneratorTerrain {
 
     @Override
     public void generate(Chunk c) {
-        LiquidSimulator liquidSimulator = new LiquidSimulator(_parent.getParent());
-
         boolean grassGenerated = false, lavaGenerated = false;
         for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 0; y -= 2) {
             String title = BlockManager.getInstance().getBlock(c.getBlock(8, y, 8)).getTitle();
+            BlockPosition blockWorldPos = new BlockPosition(c.getBlockWorldPosX(8), y, c.getBlockWorldPosZ(8));
 
             boolean set = false;
             if ((title.equals("Grass") || title.equals("Snow")) && !grassGenerated && y >= 32 && _parent.getParent().getRandom().randomDouble() > 0.8) {
-                c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Water").getId());
+                _parent.getParent().setBlock(blockWorldPos.x, blockWorldPos.y, blockWorldPos.z, BlockManager.getInstance().getBlock("Water").getId(), true, true);
                 set = true;
                 grassGenerated = true;
             } else if (title.equals("Stone") && !lavaGenerated && c.getBlock(8, y + 1, 8) == 0x0) {
-                c.setBlock(8, y, 8, BlockManager.getInstance().getBlock("Lava").getId());
+                _parent.getParent().setBlock(blockWorldPos.x, blockWorldPos.y, blockWorldPos.z, BlockManager.getInstance().getBlock("Lava").getId(), true, true);
                 set = true;
                 lavaGenerated = true;
             }
 
             if (set) {
-                liquidSimulator.addActiveBlock(new BlockPosition(c.getBlockWorldPosX(8), y, c.getBlockWorldPosZ(8)));
-
-                for (int i = 0; i < 256; i++) {
-                    if (!liquidSimulator.simulate(true)) {
-                        break;
-                    }
-                }
+                _parent.getParent().getLiquidSimulator().addActiveBlock(blockWorldPos);
             }
 
             if (lavaGenerated)

@@ -25,7 +25,6 @@ import com.github.begla.blockmania.rendering.gui.menus.UIInventoryScreen;
 import com.github.begla.blockmania.rendering.gui.menus.UIPauseMenu;
 import com.github.begla.blockmania.rendering.gui.menus.UIStatusScreen;
 import com.github.begla.blockmania.rendering.world.WorldRenderer;
-import com.github.begla.blockmania.utilities.BlockmaniaProfiler;
 import com.github.begla.blockmania.utilities.FastRandom;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -372,8 +371,6 @@ public final class Blockmania {
                 continue;
             }
 
-            BlockmaniaProfiler.begin();
-
             //long timeSimulatedThisIteration = 0;
             long startTime = getTime();
             while (_timeAccumulator >= SKIP_TICKS) {
@@ -392,7 +389,6 @@ public final class Blockmania {
                 getActiveWorldRenderer().getPlayer().updateInput();
 
             Display.sync(60);
-            BlockmaniaProfiler.end();
 
             updateFps();
             _timeAccumulator += getTime() - startTime;

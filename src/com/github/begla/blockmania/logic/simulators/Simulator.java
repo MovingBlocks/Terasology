@@ -20,7 +20,9 @@ import com.github.begla.blockmania.logic.world.BlockObserver;
 import com.github.begla.blockmania.logic.world.WorldProvider;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * TODO
@@ -29,11 +31,13 @@ import java.util.HashSet;
  */
 public abstract class Simulator implements BlockObserver {
 
+    private boolean _running = false;
+
     protected final long _updateInterval;
     protected long _lastUpdate = Blockmania.getInstance().getTime();
 
     protected final WorldProvider _parent;
-    protected final HashSet<BlockPosition> _activeBlocks = new HashSet<BlockPosition>(16);
+    protected final HashSet<BlockPosition> _activeBlocks = new HashSet<BlockPosition>(256);
 
     public Simulator(WorldProvider parent, long updateInterval) {
         _updateInterval = updateInterval;
@@ -51,15 +55,25 @@ public abstract class Simulator implements BlockObserver {
     public boolean simulate(boolean force) {
         long currentTime = Blockmania.getInstance().getTime();
 
-        boolean simulated = false;
-        if (currentTime > _lastUpdate + _updateInterval || force) {
-            if (executeSimulation()) {
-                simulated = true;
-            }
+        if ((currentTime > _lastUpdate + _updateInterval || force) && !_running) {
+
+            _running = true;
+
+            // Create a new thread and start processing
+            Runnable r = new Runnable() {
+                public void run() {
+                    executeSimulation();
+                    _running = false;
+                }
+            };
+
+            Blockmania.getInstance().getThreadPool().execute(r);
+
             _lastUpdate = currentTime;
+            return true;
         }
 
-        return simulated;
+        return false;
     }
 
     public void clear() {

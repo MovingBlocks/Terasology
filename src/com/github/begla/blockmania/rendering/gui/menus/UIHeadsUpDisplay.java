@@ -20,7 +20,6 @@ import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.rendering.gui.components.*;
 import com.github.begla.blockmania.rendering.gui.framework.UIDisplayRenderer;
 import com.github.begla.blockmania.rendering.world.ChunkMeshGenerator;
-import com.github.begla.blockmania.utilities.BlockmaniaProfiler;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
@@ -44,9 +43,6 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
 
     private final UIToolbar _toolbar;
     private final UIHealthBar _healthBar;
-    private final UIPieChart _pieChart;
-
-    private long _lastStatUpdate;
 
     /**
      * Init. the HUD.
@@ -75,9 +71,6 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _healthBar = new UIHealthBar();
         _healthBar.setVisible(true);
         addDisplayElement(_healthBar);
-
-        _pieChart = new UIPieChart();
-        addDisplayElement(_pieChart);
     }
 
 
@@ -100,22 +93,13 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _crosshair.setVisible((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.crosshair"));
         _crosshair.setPosition(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
 
-        if (Blockmania.getInstance().getTime() - _lastStatUpdate > 200) {
-            HashMap<String, Double> profilerResult = BlockmaniaProfiler.getResults();
-            _pieChart.setData(profilerResult);
-            _lastStatUpdate = Blockmania.getInstance().getTime();
-        }
-
         boolean enableDebug = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
         _debugLine1.setVisible(enableDebug);
         _debugLine2.setVisible(enableDebug);
         _debugLine3.setVisible(enableDebug);
         _debugLine4.setVisible(enableDebug);
-        _pieChart.setVisible(enableDebug);
 
         if (enableDebug) {
-            _pieChart.setPosition(new Vector2f(Display.getWidth() - _pieChart.getSize().x - 16f, 128f));
-
             double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
             _debugLine1.setText(String.format("%s (fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f)", ConfigurationManager.getInstance().getConfig().get("System.gameTitle"), Blockmania.getInstance().getAverageFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
             _debugLine2.setText(String.format("%s", Blockmania.getInstance().getActiveWorldRenderer().getPlayer()));

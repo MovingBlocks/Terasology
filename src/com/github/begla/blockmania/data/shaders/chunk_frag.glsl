@@ -32,13 +32,13 @@ void main(){
     if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.x + TEXTURE_OFFSET && texCoord.y >= waterCoordinate.y && texCoord.y < waterCoordinate.y + TEXTURE_OFFSET) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (64.0 / (1.0 / TEXTURE_OFFSET));
-        texCoord.y += mod(tick,96) * 1.0/96.0;
+        texCoord.y += mod(tick,95.0) * 1.0/96.0;
 
         color = texture2D(textureWater, vec2(texCoord));
     } else if (texCoord.x >= lavaCoordinate.x && texCoord.x < lavaCoordinate.x + TEXTURE_OFFSET && texCoord.y >= lavaCoordinate.y && texCoord.y < lavaCoordinate.y + TEXTURE_OFFSET) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
-        texCoord.y += mod(tick,128.0) * 1.0/128.0;
+        texCoord.y += mod(tick,127.0) * 1.0/128.0;
 
         color = texture2D(textureLava, vec2(texCoord));
     } else {
@@ -64,7 +64,9 @@ void main(){
     float torchDistance = abs(length(vertexWorldPos));
 
     float daylightValue = clamp(daylightTrans, 0.0, 1.0) * pow(0.92, (1.0-gl_TexCoord[1].x)*15.0);
-    float blocklightValue = gl_TexCoord[1].y;
+
+    // Slightly flickering blocklight!
+    float blocklightValue = gl_TexCoord[1].y - (sin(tick*0.02) + 1.0) / 16.0;;
     float occlusionValue = gl_TexCoord[1].z;
 
     vec3 daylightColorValue = vec3(daylightValue) * occlusionValue;

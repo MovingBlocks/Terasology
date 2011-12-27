@@ -8,5 +8,5 @@ block {
     version = 1
 
     // Let the lava shine!
-    luminance = 8
+    luminance = 15
 }

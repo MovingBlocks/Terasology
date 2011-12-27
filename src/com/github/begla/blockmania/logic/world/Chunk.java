@@ -394,10 +394,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             return result;
         }
 
-        if (type == Chunk.LIGHT_TYPE.SUN)
-            return 15;
-        else
-            return 0;
+        return 15;
     }
 
     /**
@@ -879,27 +876,27 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return _parent;
     }
 
-    public synchronized boolean isDirty() {
+    public boolean isDirty() {
         return _dirty;
     }
 
-    public synchronized boolean isFresh() {
+    public boolean isFresh() {
         return _fresh;
     }
 
-    public synchronized boolean isLightDirty() {
+    public boolean isLightDirty() {
         return _lightDirty;
     }
 
-    public synchronized void setFresh(boolean fresh) {
+    public void setFresh(boolean fresh) {
         _fresh = fresh;
     }
 
-    public synchronized void setDirty(boolean dirty) {
+    public void setDirty(boolean dirty) {
         _dirty = dirty;
     }
 
-    public synchronized void setLightDirty(boolean lightDirty) {
+    public void setLightDirty(boolean lightDirty) {
         _lightDirty = lightDirty;
     }
 

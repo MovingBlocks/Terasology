@@ -27,7 +27,6 @@ import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
 import com.github.begla.blockmania.rendering.misc.BlockGrid;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
 import com.github.begla.blockmania.rendering.physics.BulletPhysicsRenderer;
-import com.github.begla.blockmania.utilities.BlockmaniaProfiler;
 import com.github.begla.blockmania.utilities.MathHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -247,27 +246,21 @@ public final class WorldRenderer implements RenderableObject {
         /* SKYSPHERE */
         _player.getActiveCamera().lookThroughNormalized();
         _skysphere.render();
-        BlockmaniaProfiler.log("Render skysphere");
 
         /* WORLD RENDERING */
         _player.getActiveCamera().lookThrough();
 
         updateChunksInProximity(false);
         updateVisibleChunks();
-        BlockmaniaProfiler.log("Chunk list updates");
 
         _player.render();
-        BlockmaniaProfiler.log("Render player");
 
         renderChunksAndEntities();
-        BlockmaniaProfiler.log("Render chunks and entities");
 
         /* PARTICLE EFFECTS */
         _blockParticleEmitter.render();
-        BlockmaniaProfiler.log("Render particles");
 
         _blockGrid.render();
-        BlockmaniaProfiler.log("Render block grid");
 
         // The overlay has to be rendered separately so appears on top of everything else
         _player.renderExtractionOverlay();
@@ -278,7 +271,6 @@ public final class WorldRenderer implements RenderableObject {
         _player.renderFirstPersonViewElements();
         glEnable(GL11.GL_DEPTH_TEST);
         glPopMatrix();
-        BlockmaniaProfiler.log("Render player first person view");
     }
 
 
@@ -489,31 +481,23 @@ public final class WorldRenderer implements RenderableObject {
         updateTick();
 
         _skysphere.update();
-        BlockmaniaProfiler.log("Update skysphere");
         _player.update();
-        BlockmaniaProfiler.log("Update player");
         _mobManager.updateAll();
-        BlockmaniaProfiler.log("Update mobs");
 
         _bulletPhysicsRenderer.update();
-        BlockmaniaProfiler.log("Update physics");
 
         // Update the particle emitters
         _blockParticleEmitter.update();
-        BlockmaniaProfiler.log("Update particles");
 
         // Free unused space
         _worldProvider.getChunkProvider().flushCache();
-        BlockmaniaProfiler.log("Flush cache");
 
         // And finally fire any active events
         _worldTimeEventManager.fireWorldTimeEvents();
-        BlockmaniaProfiler.log("Time events");
 
         // Simulate world
         _worldProvider.getLiquidSimulator().simulate(false);
         _worldProvider.getGrowthSimulator().simulate(false);
-        BlockmaniaProfiler.log("Simulation");
     }
 
     /**

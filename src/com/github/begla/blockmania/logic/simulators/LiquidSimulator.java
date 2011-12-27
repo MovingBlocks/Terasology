@@ -36,7 +36,7 @@ public class LiquidSimulator extends Simulator {
     private static final Vector3d[] NEIGHBORS6 = {new Vector3d(0, -1, 0), new Vector3d(0, 1, 0), new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
 
     public LiquidSimulator(WorldProvider parent) {
-        super(parent, 100);
+        super(parent, 1000);
     }
 
     @Override
@@ -44,16 +44,19 @@ public class LiquidSimulator extends Simulator {
         ArrayList<BlockPosition> currentActiveBlocks = new ArrayList<BlockPosition>(_activeBlocks);
 
         boolean simulated = false;
-        int counter = 0;
-        for (int i = currentActiveBlocks.size() - 1; i >= 0 && counter < 4; i--, counter++) {
+        while (currentActiveBlocks.size() > 0) {
             simulated = true;
 
-            BlockPosition bp = currentActiveBlocks.get(i);
+            int randomBlock = Math.abs(_parent.getRandom().randomInt()) % currentActiveBlocks.size();
+
+            BlockPosition bp = currentActiveBlocks.get(randomBlock);
             BlockPosition bpd = new BlockPosition(bp.x, bp.y - 1, bp.z);
 
             _activeBlocks.remove(bp);
+            currentActiveBlocks.remove(randomBlock);
 
             byte state = _parent.getState(bp.x, bp.y, bp.z);
+
             byte type = _parent.getBlock(bp.x, bp.y, bp.z);
             byte typeBelow = _parent.getBlock(bpd.x, bpd.y, bpd.z);
 
@@ -79,6 +82,12 @@ public class LiquidSimulator extends Simulator {
 
             _parent.setState(bp.x, bp.y, bp.z, state);
 
+            if (state > 7) {
+                _parent.setBlock(bp.x, bp.y, bp.z, (byte) 0, false, true);
+                _parent.setState(bp.x, bp.y, bp.z, (byte) 0);
+                continue;
+            }
+
             if ((typeBelow == 0 || BlockManager.getInstance().getBlock(typeBelow).getBlockForm() == Block.BLOCK_FORM.BILLBOARD)) {
                 _parent.setBlock(bpd.x, bpd.y, bpd.z, type, true, true);
                 _parent.setState(bpd.x, bpd.y, bpd.z, (byte) 1);
@@ -86,10 +95,9 @@ public class LiquidSimulator extends Simulator {
                 continue;
             }
 
-            if (state > 7) {
-                _parent.setBlock(bp.x, bp.y, bp.z, (byte) 0, true, true);
-                _parent.setState(bp.x, bp.y, bp.z, (byte) 0);
-                continue;
+            // Convert grass and snow to dirt if water is above
+            if (typeBelow == BlockManager.getInstance().getBlock("Grass").getId() || typeBelow == BlockManager.getInstance().getBlock("Snow").getId()) {
+                _parent.setBlock(bpd.x, bpd.y, bpd.z, BlockManager.getInstance().getBlock("Dirt").getId(), false, true);
             }
 
             for (int k = 0; k < 4; k++) {
