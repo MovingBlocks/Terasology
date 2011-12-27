@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks.furniture
-
 /**
  * A chest is interesting for two reasons: It is asymmetrical (front texture differs) and should store stuff
  */

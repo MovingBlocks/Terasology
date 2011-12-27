@@ -63,9 +63,9 @@ public class LiquidSimulator extends Simulator {
             if (state >= 1) {
                 int minState = Integer.MAX_VALUE;
 
-                for (int j = 0; j < 6; j++) {
-                    byte nType = _parent.getBlock((int) NEIGHBORS6[j].x * j + bp.x, (int) NEIGHBORS6[j].y * j + bp.y, (int) NEIGHBORS6[j].z * j + bp.z);
-                    byte nState = _parent.getState((int) NEIGHBORS6[j].x * j + bp.x, (int) NEIGHBORS6[j].y * j + bp.y, (int) NEIGHBORS6[j].z * j + bp.z);
+                for (int j = 0; j < 4; j++) {
+                    byte nType = _parent.getBlock((int) NEIGHBORS4[j].x * j + bp.x, (int) NEIGHBORS4[j].y * j + bp.y, (int) NEIGHBORS4[j].z * j + bp.z);
+                    byte nState = _parent.getState((int) NEIGHBORS4[j].x * j + bp.x, (int) NEIGHBORS4[j].y * j + bp.y, (int) NEIGHBORS4[j].z * j + bp.z);
 
                     if (nType == type) {
                         if (nState < minState)

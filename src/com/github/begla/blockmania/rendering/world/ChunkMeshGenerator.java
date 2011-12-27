@@ -25,6 +25,7 @@ import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import org.lwjgl.BufferUtils;
 
+import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
@@ -180,30 +181,30 @@ public final class ChunkMeshGenerator {
 
         Vector3f vertexWorldPos = moveVectorFromChunkSpaceToWorldSpace(vertexPos);
 
-        blocks[0] = _chunk.getParent().getBlock((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f));
-        blocks[1] = _chunk.getParent().getBlock((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f));
-        blocks[2] = _chunk.getParent().getBlock((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f));
-        blocks[3] = _chunk.getParent().getBlock((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f));
+        blocks[0] = _chunk.getParent().getBlockAtPosition(new Vector3d((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z + 0.5f)));
+        blocks[1] = _chunk.getParent().getBlockAtPosition(new Vector3d((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z - 0.5f)));
+        blocks[2] = _chunk.getParent().getBlockAtPosition(new Vector3d((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z - 0.5f)));
+        blocks[3] = _chunk.getParent().getBlockAtPosition(new Vector3d((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z + 0.5f)));
 
-        lights[0] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[1] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[2] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[3] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
+        lights[0] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z + 0.5f)), Chunk.LIGHT_TYPE.SUN);
+        lights[1] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z - 0.5f)), Chunk.LIGHT_TYPE.SUN);
+        lights[2] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z - 0.5f)), Chunk.LIGHT_TYPE.SUN);
+        lights[3] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z + 0.5f)), Chunk.LIGHT_TYPE.SUN);
 
-        lights[4] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[5] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[6] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.SUN);
-        lights[7] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.SUN);
+        lights[4] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f)), Chunk.LIGHT_TYPE.SUN);
+        lights[5] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f)), Chunk.LIGHT_TYPE.SUN);
+        lights[6] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f)), Chunk.LIGHT_TYPE.SUN);
+        lights[7] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f)), Chunk.LIGHT_TYPE.SUN);
 
-        blockLights[0] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[1] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[2] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[3] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[0] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z + 0.5f)), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[1] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z - 0.5f)), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[2] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z - 0.5f)), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[3] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y + 0.8f), (int) (vertexWorldPos.z + 0.5f)), Chunk.LIGHT_TYPE.BLOCK);
 
-        blockLights[4] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[5] = _chunk.getParent().getLight((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[6] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[7] = _chunk.getParent().getLight((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[4] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f)), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[5] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x + 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f)), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[6] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z - 0.5f)), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[7] = _chunk.getParent().getLightAtPosition(new Vector3d((int) (vertexWorldPos.x - 0.5f), (int) (vertexWorldPos.y - 0.5f), (int) (vertexWorldPos.z + 0.5f)), Chunk.LIGHT_TYPE.BLOCK);
 
         double resultAmbientOcclusion = 1.0;
         double resultLight = 0;
@@ -485,48 +486,48 @@ public final class ChunkMeshGenerator {
         boolean lowerBottom = BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0;
 
         if (norm.x == 1.0f) {
-            p1.y -= 0.25;
-            p2.y -= 0.25;
+            p1.y -= 0.1;
+            p2.y -= 0.1;
 
             if (lowerBottom) {
-                p3.y -= 0.25;
-                p4.y -= 0.25;
+                p3.y -= 0.1;
+                p4.y -= 0.1;
             }
         } else if (norm.x == -1.0f) {
-            p3.y -= 0.25;
-            p4.y -= 0.25;
+            p3.y -= 0.1;
+            p4.y -= 0.1;
 
             if (lowerBottom) {
-                p1.y -= 0.25;
-                p2.y -= 0.25;
+                p1.y -= 0.1;
+                p2.y -= 0.1;
             }
         } else if (norm.z == 1.0f) {
-            p3.y -= 0.25;
-            p4.y -= 0.25;
+            p3.y -= 0.1;
+            p4.y -= 0.1;
 
             if (lowerBottom) {
-                p1.y -= 0.25;
-                p2.y -= 0.25;
+                p1.y -= 0.1;
+                p2.y -= 0.1;
             }
         } else if (norm.z == -1.0f) {
-            p1.y -= 0.25;
-            p2.y -= 0.25;
+            p1.y -= 0.1;
+            p2.y -= 0.1;
 
             if (lowerBottom) {
-                p3.y -= 0.25;
-                p4.y -= 0.25;
+                p3.y -= 0.1;
+                p4.y -= 0.1;
             }
         } else if (norm.y == 1.0f) {
-            p1.y -= 0.25;
-            p2.y -= 0.25;
-            p3.y -= 0.25;
-            p4.y -= 0.25;
+            p1.y -= 0.1;
+            p2.y -= 0.1;
+            p3.y -= 0.1;
+            p4.y -= 0.1;
         } else if (norm.y == -1.0f) {
             if (lowerBottom) {
-                p1.y -= 0.25;
-                p2.y -= 0.25;
-                p3.y -= 0.25;
-                p4.y -= 0.25;
+                p1.y -= 0.1;
+                p2.y -= 0.1;
+                p3.y -= 0.1;
+                p4.y -= 0.1;
             }
         }
     }

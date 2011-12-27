@@ -69,17 +69,17 @@ void main(){
     float blocklightValue = gl_TexCoord[1].y - (sin(tick*0.02) + 1.0) / 16.0;;
     float occlusionValue = gl_TexCoord[1].z;
 
-    vec3 daylightColorValue = vec3(daylightValue) * occlusionValue;
-    vec3 blocklightColorValue = vec3(blocklightValue  + clamp(1.0-(torchDistance / 10.0), 0.0, 1.0) * (1.0-daylightTrans)) * occlusionValue;
+    vec3 daylightColorValue = vec3(daylightValue);
+    vec3 blocklightColorValue = vec3(blocklightValue  + clamp(1.0-(torchDistance / 10.0), 0.0, 1.0) * (1.0-daylightTrans)) ;
 
     blocklightColorValue = clamp(blocklightColorValue,0.0,1.0);
     daylightColorValue = clamp(daylightColorValue, 0.0, 1.0);
 
-    blocklightColorValue.x *= 1.2;
-    blocklightColorValue.y *= 1.1;
+    blocklightColorValue.x *= 1.0;
+    blocklightColorValue.y *= 0.9;
     blocklightColorValue.z *= 0.7;
 
-    color.xyz *= clamp(daylightColorValue + blocklightColorValue * (1.0-daylightValue), 0.0, 1.0);
+    color.xyz *= clamp(daylightColorValue + blocklightColorValue * (1.0-daylightValue), 0.0, 1.0) * occlusionValue;
 
     float fog = 1.0 - ((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale);
     fog /= 2.0;

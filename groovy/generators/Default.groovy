@@ -3,46 +3,47 @@ import com.github.begla.blockmania.logic.generators.TreeGeneratorCactus
 import com.github.begla.blockmania.logic.generators.TreeGeneratorLSystem
 import com.github.begla.blockmania.model.blocks.BlockManager
 
-def m = generatorManager
-
-probabilities = ["A": 1.0d, "B": 0.8d]
+def mngr = generatorManager
+def probs = ["A": 1.0d, "B": 0.8d]
 
 // Default Oak
 def rules = ["A": "[&FFBFA]////[&BFFFA]////[&FBFFA]", "B": "[&FFFA]////[&FFFA]////[&FFFA]"]
-def t1 = new TreeGeneratorLSystem(m, "FFFFFFA", rules, probabilities, 4, 30).withGenerationProbability(0.08)
+def oakTree = new TreeGeneratorLSystem(mngr, "FFFFFFA", rules, probs, 4, 30).withGenerationProbability(0.08)
 
 // Pine
 rules = ["A": "[&FFFBFFA]////[&FFFFBFA]////[&FFFBFFA]"]
-def t2 = new TreeGeneratorLSystem(m, "FFFFAFFFFFFFAFFFFA", rules, probabilities, 4, 20).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.05).withBarkType(BlockManager.getInstance().getBlock("PineTrunk").getId())
+def pineTree = new TreeGeneratorLSystem(mngr, "FFFFAFFFFFFFAFFFFA", rules, probs, 4, 20).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.05).withBarkType(BlockManager.getInstance().getBlock("PineTrunk").getId())
 
 // Birk
 rules = ["A": "[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]", "B": "[&FBF]////[&FBF]////[&FBF]"]
-def t4 = new TreeGeneratorLSystem(m, "FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, probabilities, 4, 30).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.02).withBarkType(BlockManager.getInstance().getBlock("BirkTrunk").getId())
+def birkTree = new TreeGeneratorLSystem(mngr, "FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, probs, 4, 30).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.02).withBarkType(BlockManager.getInstance().getBlock("BirkTrunk").getId())
 
-// ???
+// Oak variation tree
 rules = ["A": "[&FFBFA]////[&BFFFA]////[&FBFFAFFA]", "B": "[&FFFAFFFF]////[&FFFAFFF]////[&FFFAFFAA]"]
-def t5 = new TreeGeneratorLSystem(m, "FFFFFFA", rules, probabilities, 4, 20).withGenerationProbability(0.08)
+def oakVariationTree = new TreeGeneratorLSystem(mngr, "FFFFFFA", rules, probs, 4, 20).withGenerationProbability(0.08)
 
-// ???
+// A red tree
 rules = ["A": "[&BFA]////[&FFBA]////[&FFBFA]"]
-def t3 = new TreeGeneratorLSystem(m, "FFAFAFFAFF", rules, probabilities, 4, 30).withLeafType(BlockManager.getInstance().getBlock("RedLeaf").getId()).withGenerationProbability(0.05)
+def redTree = new TreeGeneratorLSystem(mngr, "FFAFAFFAFF", rules, probs, 4, 30).withLeafType(BlockManager.getInstance().getBlock("RedLeaf").getId()).withGenerationProbability(0.05)
 
-def c1 = new TreeGeneratorCactus(m).withGenerationProbability(0.05)
+// Cactus
+def cactus = new TreeGeneratorCactus(mngr).withGenerationProbability(0.05)
+
 
 // Add the trees to the generator lists
-m.addTreeGenerator BIOME_TYPE.MOUNTAINS, t1
-m.addTreeGenerator BIOME_TYPE.MOUNTAINS, t2
-m.addTreeGenerator BIOME_TYPE.MOUNTAINS, t3
+mngr.addTreeGenerator BIOME_TYPE.MOUNTAINS, oakTree
+mngr.addTreeGenerator BIOME_TYPE.MOUNTAINS, pineTree
+mngr.addTreeGenerator BIOME_TYPE.MOUNTAINS, redTree
 
-m.addTreeGenerator BIOME_TYPE.FOREST, t1
-m.addTreeGenerator BIOME_TYPE.FOREST, t2
-m.addTreeGenerator BIOME_TYPE.FOREST, t3
-m.addTreeGenerator BIOME_TYPE.FOREST, t5
+mngr.addTreeGenerator BIOME_TYPE.FOREST, oakTree
+mngr.addTreeGenerator BIOME_TYPE.FOREST, pineTree
+mngr.addTreeGenerator BIOME_TYPE.FOREST, redTree
+mngr.addTreeGenerator BIOME_TYPE.FOREST, oakVariationTree
 
-m.addTreeGenerator BIOME_TYPE.SNOW, t4
+mngr.addTreeGenerator BIOME_TYPE.SNOW, birkTree
 
-m.addTreeGenerator BIOME_TYPE.PLAINS, t3
-m.addTreeGenerator BIOME_TYPE.PLAINS, c1
+mngr.addTreeGenerator BIOME_TYPE.PLAINS, redTree
+mngr.addTreeGenerator BIOME_TYPE.PLAINS, cactus
 
-m.addTreeGenerator BIOME_TYPE.DESERT, t3
-m.addTreeGenerator BIOME_TYPE.DESERT, c1
+mngr.addTreeGenerator BIOME_TYPE.DESERT, redTree
+mngr.addTreeGenerator BIOME_TYPE.DESERT, cactus

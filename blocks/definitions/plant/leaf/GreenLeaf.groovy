@@ -9,5 +9,7 @@ block {
 
     translucent = true
 
+    hardness = 2
+
     colorsource = COLOR_SOURCE.FOLIAGE_LUT
 }

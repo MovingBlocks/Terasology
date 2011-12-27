@@ -46,7 +46,7 @@ public class LiquidBlock extends Block {
         _bypassSelectionRay = true;
         _blockForm = BLOCK_FORM.LOWERED_BLOCK;
         _penetrable = true;
-        _castsShadows = false;
+        _castsShadows = true;
 
         // Define liquid-specific defaults
         _viscosity = 50;           // No clue how viscous "50" would be or if there's a point in having a default...

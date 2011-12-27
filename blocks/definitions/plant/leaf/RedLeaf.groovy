@@ -9,6 +9,8 @@ block {
 
     faces.all = "GreenLeaf"
 
+    hardness = 2
+
     translucent = true
 
     colorsource = COLOR_SOURCE.FOLIAGE_LUT
