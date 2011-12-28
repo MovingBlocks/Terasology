@@ -16,29 +16,21 @@
 package com.github.begla.blockmania.model.inventory;
 
 import com.github.begla.blockmania.logic.characters.Player;
-import com.github.begla.blockmania.model.blueprints.Blueprint;
+import com.github.begla.blockmania.model.blocks.BlockManager;
 
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
-public class BlueprintItem extends Item {
-
-    private Blueprint _blueprint;
-
-    public BlueprintItem(Player parent) {
+public class ItemAxe extends VoxelItem {
+    public ItemAxe(Player parent) {
         super(parent);
 
-        setIconWithAtlasPos(10, 3);
-        _toolId = (byte) 3;
-        _stackSize = 1;
-    }
+        setIconWithAtlasPos(1, 7);
+        _toolId = (byte) 1;
+        _stackSize = 8;
 
-    public Blueprint getBlueprint() {
-        return _blueprint;
+        setExtractionAmountForBlock(BlockManager.getInstance().getBlock("BirkTrunk"), (byte) 2);
+        setExtractionAmountForBlock(BlockManager.getInstance().getBlock("OakTrunk"), (byte) 2);
+        setExtractionAmountForBlock(BlockManager.getInstance().getBlock("PineTrunk"), (byte) 2);
     }
-
-    public void setBlueprint(Blueprint bp) {
-        _blueprint = bp;
-    }
-
 }

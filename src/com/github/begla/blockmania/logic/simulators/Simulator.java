@@ -20,9 +20,7 @@ import com.github.begla.blockmania.logic.world.BlockObserver;
 import com.github.begla.blockmania.logic.world.WorldProvider;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * TODO

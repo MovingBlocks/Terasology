@@ -123,7 +123,7 @@ public class BlockManager {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(2);
 
         if (_blocksByTitle.containsKey(title)) {
-            Vector2f position = _blocksByTitle.get(title).getTextureAtlasPos()[0];
+            Vector2f position = _blocksByTitle.get(title).getTextureAtlasPos()[1];
             buffer.put(position.x * Block.TEXTURE_OFFSET);
             buffer.put(position.y * Block.TEXTURE_OFFSET);
         }

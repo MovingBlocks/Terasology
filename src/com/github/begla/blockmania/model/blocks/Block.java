@@ -18,6 +18,8 @@ package com.github.begla.blockmania.model.blocks;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.model.structures.AABB;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
+import com.github.begla.blockmania.rendering.primitives.BlockTessellator;
+import com.github.begla.blockmania.rendering.primitives.BlockVertexCollection;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 
@@ -30,7 +32,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.logging.Level;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 
 /**
  * Stores all information for a specific block type.
@@ -68,8 +71,7 @@ public class Block implements RenderableObject {
     protected byte _hardness;
 
     /* RENDERING */
-    private int _displayListBlock = -1;
-    private int _displayListBillboard = -1;
+    private BlockTessellator.BlockMesh _mesh;
 
     protected Vector4f[] _colorOffset = new Vector4f[6];
     protected Vector2f[] _textureAtlasPos = new Vector2f[6];
@@ -82,7 +84,7 @@ public class Block implements RenderableObject {
      * The six sides of a block.
      */
     public static enum SIDE {
-        LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK
+        TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM
     }
 
     /**
@@ -209,17 +211,24 @@ public class Block implements RenderableObject {
         if (isInvisible())
             return;
 
-        if (_displayListBlock == -1)
-            _displayListBlock = generateDisplayList();
+        if (_mesh == null) {
+            if (getBlockForm() == BLOCK_FORM.BILLBOARD) {
+                BlockVertexCollection.addTexturedBillboard(this, 1.0f, 1.0f);
+                _mesh = BlockTessellator.getInstance().generateBlockMesh();
+            } else {
+                BlockVertexCollection.addTexturedBlock(this, 1.0f, 1.0f, 0.5f);
+                _mesh = BlockTessellator.getInstance().generateBlockMesh();
 
-        if (_displayListBillboard == -1)
-            _displayListBillboard = generateDisplayListBillboard();
+            }
+
+            BlockTessellator.getInstance().resetAll();
+        }
 
         if (getBlockForm() != BLOCK_FORM.BILLBOARD) {
-            glCallList(_displayListBlock);
+            _mesh.render();
         } else {
             glDisable(GL11.GL_CULL_FACE);
-            glCallList(_displayListBillboard);
+            _mesh.render();
             glEnable(GL11.GL_CULL_FACE);
         }
     }
@@ -420,124 +429,6 @@ public class Block implements RenderableObject {
 
     public boolean isTranslucent() {
         return _translucent;
-    }
-
-    /**
-     * Generates the display list used for rendering the block.
-     *
-     * @return The id of the display list
-     */
-    private int generateDisplayList() {
-        int id = glGenLists(1);
-
-        glNewList(id, GL11.GL_COMPILE);
-        glBegin(GL_QUADS);
-        GL11.glColor3f(1.0f, 1.0f, 1.0f);
-
-        // TOP
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x, calcTextureOffsetFor(SIDE.TOP).y);
-        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.TOP).y);
-        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.TOP).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.TOP).x, calcTextureOffsetFor(SIDE.TOP).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-
-        // LEFT
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.LEFT).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.LEFT).y);
-        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y);
-        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-
-        GL11.glColor3f(0.5f, 0.5f, 0.5f);
-
-        // BACK
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BACK).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BACK).y);
-        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y);
-        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-
-        // RIGHT
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x, calcTextureOffsetFor(SIDE.RIGHT).y);
-        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.RIGHT).y);
-        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.RIGHT).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.RIGHT).x, calcTextureOffsetFor(SIDE.RIGHT).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-
-        // FRONT
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y);
-        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.FRONT).y);
-        GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.FRONT).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.FRONT).x, calcTextureOffsetFor(SIDE.FRONT).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-
-        // BOTTOM
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x, calcTextureOffsetFor(SIDE.BOTTOM).y);
-        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BOTTOM).y);
-        GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BOTTOM).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BOTTOM).x, calcTextureOffsetFor(SIDE.BOTTOM).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-
-        GL11.glEnd();
-        glEndList();
-
-        return id;
-    }
-
-    /**
-     * Generates the display list used for rendering the block.
-     *
-     * @return The id of the display list
-     */
-    private int generateDisplayListBillboard() {
-        int id = glGenLists(1);
-
-        glNewList(id, GL11.GL_COMPILE);
-        glBegin(GL_QUADS);
-        GL11.glColor3f(1.0f, 1.0f, 1.0f);
-
-        // LEFT
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(0f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.LEFT).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(0f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.LEFT).y);
-        GL11.glVertex3f(0f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.LEFT).x, calcTextureOffsetFor(SIDE.LEFT).y);
-        GL11.glVertex3f(0f, 0.5f, -0.5f);
-
-        // BACK
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(-0.5f, -0.5f, 0f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BACK).y + TEXTURE_OFFSET_WIDTH);
-        GL11.glVertex3f(0.5f, -0.5f, 0f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x + TEXTURE_OFFSET_WIDTH, calcTextureOffsetFor(SIDE.BACK).y);
-        GL11.glVertex3f(0.5f, 0.5f, 0f);
-        GL11.glTexCoord2f(calcTextureOffsetFor(SIDE.BACK).x, calcTextureOffsetFor(SIDE.BACK).y);
-        GL11.glVertex3f(-0.5f, 0.5f, 0f);
-
-        GL11.glEnd();
-        glEndList();
-
-        return id;
     }
 
     /**

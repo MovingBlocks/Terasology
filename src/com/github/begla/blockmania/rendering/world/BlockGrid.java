@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.rendering.misc;
+package com.github.begla.blockmania.rendering.world;
 
 import com.github.begla.blockmania.model.structures.BlockPosition;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
-import com.github.begla.blockmania.rendering.world.WorldRenderer;
+import com.github.begla.blockmania.rendering.primitives.BlockTessellator;
+import com.github.begla.blockmania.rendering.primitives.BlockVertexCollection;
 import org.lwjgl.opengl.GL11;
 
 import javax.vecmath.Vector3d;
@@ -34,13 +35,17 @@ import static org.lwjgl.opengl.GL11.*;
 public class BlockGrid implements RenderableObject {
 
     /* CONST */
-    private static final int _blockDisplayList = Primitives.generateColoredBlock(new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f);
+    private final BlockTessellator.BlockMesh _blockMesh;
 
     private final HashSet<BlockPosition> _gridPositions = new HashSet<BlockPosition>();
     private final WorldRenderer _parent;
 
     public BlockGrid(WorldRenderer parent) {
         _parent = parent;
+
+        BlockVertexCollection.addBlockMesh(new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
+        _blockMesh = BlockTessellator.getInstance().generateBlockMesh();
+        BlockTessellator.getInstance().resetAll();
     }
 
     public void render() {
@@ -60,7 +65,7 @@ public class BlockGrid implements RenderableObject {
                 Vector3d r = _parent.getWorldProvider().getRenderingReferencePoint();
 
                 GL11.glTranslated(gp.x - r.x, gp.y - r.y, gp.z - r.z);
-                GL11.glCallList(_blockDisplayList);
+                _blockMesh.render();
 
                 GL11.glPopMatrix();
             }
@@ -97,5 +102,4 @@ public class BlockGrid implements RenderableObject {
     public void update() {
         // Nothing to do.
     }
-
 }

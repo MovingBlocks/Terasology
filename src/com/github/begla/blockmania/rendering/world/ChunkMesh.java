@@ -24,11 +24,13 @@ public class ChunkMesh {
     public class VertexElements {
 
         public VertexElements() {
+            normals = new TFloatArrayList();
             quads = new TFloatArrayList();
             tex = new TFloatArrayList();
             color = new TFloatArrayList();
         }
 
+        public final TFloatArrayList normals;
         public final TFloatArrayList quads;
         public final TFloatArrayList tex;
         public final TFloatArrayList color;
@@ -45,11 +47,12 @@ public class ChunkMesh {
     }
 
     /* CONST */
-    private static final int STRIDE = (3 + 3 + 2 + 4) * 4;
+    private static final int STRIDE = (3 + 3 + 3 + 2 + 4) * 4;
     private static final int OFFSET_VERTEX = 0;
     private static final int OFFSET_TEX_0 = (3 * 4);
     private static final int OFFSET_TEX_1 = ((2 + 3) * 4);
     private static final int OFFSET_COLOR = ((2 + 3 + 3) * 4);
+    private static final int OFFSET_NORMAL = ((2 + 3 + 3 + 4) * 4);
 
     /* VERTEX DATA */
     private final int[] _vertexBuffers = new int[4];
@@ -118,6 +121,7 @@ public class ChunkMesh {
             glEnableClientState(GL_VERTEX_ARRAY);
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glEnableClientState(GL_COLOR_ARRAY);
+            glEnableClientState(GL_NORMAL_ARRAY);
 
             GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, _idxBuffers[id]);
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, _vertexBuffers[id]);
@@ -132,8 +136,11 @@ public class ChunkMesh {
 
             glColorPointer(4, GL11.GL_FLOAT, STRIDE, OFFSET_COLOR);
 
+            glNormalPointer(GL11.GL_FLOAT, STRIDE, OFFSET_NORMAL);
+
             GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, _idxBufferCount[id], _idxBufferCount[id], GL_UNSIGNED_INT, 0);
 
+            glDisableClientState(GL_NORMAL_ARRAY);
             glDisableClientState(GL_COLOR_ARRAY);
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
             glDisableClientState(GL_VERTEX_ARRAY);

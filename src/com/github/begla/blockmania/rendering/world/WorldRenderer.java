@@ -24,7 +24,6 @@ import com.github.begla.blockmania.logic.world.*;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.model.structures.AABB;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
-import com.github.begla.blockmania.rendering.misc.BlockGrid;
 import com.github.begla.blockmania.rendering.particles.BlockParticleEmitter;
 import com.github.begla.blockmania.rendering.physics.BulletPhysicsRenderer;
 import com.github.begla.blockmania.utilities.MathHelper;
@@ -267,9 +266,8 @@ public final class WorldRenderer implements RenderableObject {
 
         glPushMatrix();
         glLoadIdentity();
-        glDisable(GL11.GL_DEPTH_TEST);
+        glClear(GL_DEPTH_BUFFER_BIT);
         _player.renderFirstPersonViewElements();
-        glEnable(GL11.GL_DEPTH_TEST);
         glPopMatrix();
     }
 
@@ -291,6 +289,7 @@ public final class WorldRenderer implements RenderableObject {
 
         int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
         int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
+        int carryingTorch = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "carryingTorch");
 
         int wavingCoordinates = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "wavingCoordinates");
         GL20.glUniform1(wavingCoordinates, BlockManager.getInstance().calcCoordinatesForWavingBlocks());
@@ -320,6 +319,7 @@ public final class WorldRenderer implements RenderableObject {
         GL20.glUniform1f(tick, _tick);
         GL20.glUniform1f(daylight, (float) getDaylight());
         GL20.glUniform1i(swimming, playerIsSwimming ? 1 : 0);
+        GL20.glUniform1i(carryingTorch, _player.isCarryingTorch() ? 1 : 0);
 
         int occlusionDistanceOffset = (int) (_visibleChunks.size() * OCCLUSION_CULLING_DISTANCE_OFFSET);
 

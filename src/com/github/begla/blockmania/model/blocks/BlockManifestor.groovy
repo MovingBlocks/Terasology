@@ -131,7 +131,7 @@ class BlockManifestor {
     public loadBlockDefinitions(String path) {
         // First identify what plain Block definitions we've got at the appropriate path and loop over what we get
         getClassesAt(path).each { c ->
-            println ("Got back the following class: " + c)
+            println("Got back the following class: " + c)
 
             // Prepare to load properties from the Groovy definition via ConfigSlurper
             ConfigObject blockConfig = new ConfigSlurper().parse((Class) c)
@@ -191,7 +191,7 @@ class BlockManifestor {
             // Ignore directories and compiled inner classes (closures)
             if (i.endsWith(".groovy")) {
                 println("Useful class: " + i)
-                allClasses << _classLoader.parseClass(new File(URI.create("file://"+ u.getPath().toString() + "/" + i)))
+                allClasses << _classLoader.parseClass(new File(URI.create("file://" + u.getPath().toString() + "/" + i)))
             }
         }
 

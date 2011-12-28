@@ -26,15 +26,17 @@ import com.github.begla.blockmania.logic.world.BlockObserver;
 import com.github.begla.blockmania.logic.world.Chunk;
 import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.model.blocks.BlockManager;
-import com.github.begla.blockmania.model.inventory.BlockItem;
 import com.github.begla.blockmania.model.inventory.Inventory;
 import com.github.begla.blockmania.model.inventory.Item;
+import com.github.begla.blockmania.model.inventory.ItemBlock;
 import com.github.begla.blockmania.model.inventory.Toolbar;
 import com.github.begla.blockmania.model.structures.AABB;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 import com.github.begla.blockmania.model.structures.RayBlockIntersection;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
+import com.github.begla.blockmania.rendering.primitives.BlockTessellator;
+import com.github.begla.blockmania.rendering.primitives.BlockVertexCollection;
 import com.github.begla.blockmania.rendering.world.WorldRenderer;
 import com.github.begla.blockmania.utilities.MathHelper;
 import org.lwjgl.BufferUtils;
@@ -43,7 +45,9 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,13 +80,12 @@ public final class Player extends Character {
     private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
     private final Camera _activeCamera = _firstPersonCamera;
 
-    /* HAND */
-    private float _handMovementAnimationOffset;
-
     /* INTERACTIONS */
     private long _lastInteraction;
     private byte _extractionCounter;
     private RayBlockIntersection.Intersection _selectedBlock, _extractedBlock;
+    private float _handMovementAnimationOffset;
+    private BlockTessellator.BlockMesh _handMesh, _overlayMesh;
 
     /* INVENTORY */
     private Inventory _inventory = new Inventory(this);
@@ -449,72 +452,27 @@ public final class Player extends Character {
 
         float offset = Math.round(((float) _extractionCounter / block.getHardness()) * 10.0f) * 0.0625f;
 
-        glBegin(GL11.GL_QUADS);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        if (_overlayMesh == null) {
+            Vector2f texPos = new Vector2f(0.0f, 0.0f);
+            Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
 
-        // TOP
-        GL11.glTexCoord2f(offset, 0.0f);
-        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
-        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0624f);
-        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
-        GL11.glTexCoord2f(offset, 0.0624f);
-        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
+            BlockVertexCollection.addBlockMesh(new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+            _overlayMesh = BlockTessellator.getInstance().generateBlockMesh();
+            BlockTessellator.getInstance().resetAll();
+        }
 
-        // LEFT
-        GL11.glTexCoord2f(offset, 0.0f + 0.0624f);
-        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f + 0.0624f);
-        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
-        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
-        GL11.glTexCoord2f(offset, 0.0f);
-        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
+        glMatrixMode(GL_TEXTURE);
+        glPushMatrix();
+        glTranslatef(offset, 0f, 0f);
+        glMatrixMode(GL_MODELVIEW);
 
-        // BACK
-        GL11.glTexCoord2f(offset, 0.0f + 0.0624f);
-        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f + 0.0624f);
-        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
-        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
-        GL11.glTexCoord2f(offset, 0.0f);
-        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
-
-        // RIGHT
-        GL11.glTexCoord2f(offset, 0.0f);
-        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
-        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, 0.5f + 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f + 0.0624f);
-        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
-        GL11.glTexCoord2f(offset, 0.0f + 0.0624f);
-        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
-
-        // FRONT
-        GL11.glTexCoord2f(offset, 0.0f);
-        GL11.glVertex3f(-0.5f - 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
-        GL11.glVertex3f(0.5f + 0.01f, 0.5f + 0.01f, -0.5f - 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f + 0.0624f);
-        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
-        GL11.glTexCoord2f(offset, 0.0f + 0.0624f);
-        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
-
-        // BOTTOM
-        GL11.glTexCoord2f(offset, 0.0f);
-        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f);
-        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, -0.5f - 0.01f);
-        GL11.glTexCoord2f(offset + 0.0624f, 0.0f + 0.0624f);
-        GL11.glVertex3f(0.5f + 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
-        GL11.glTexCoord2f(offset, 0.0f + 0.0624f);
-        GL11.glVertex3f(-0.5f - 0.01f, -0.5f - 0.01f, 0.5f + 0.01f);
-
-        glEnd();
+        _overlayMesh.render();
 
         glPopMatrix();
+
+        glMatrixMode(GL_TEXTURE);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
 
         glDisable(GL11.GL_BLEND);
         glDisable(GL_TEXTURE_2D);
@@ -522,7 +480,6 @@ public final class Player extends Character {
 
     /**
      * Renders a simple hand displayed in front of the player's first person perspective.
-     * TODO: Should not be rendered using immediate mode!
      */
     public void renderHand() {
         glEnable(GL11.GL_TEXTURE_2D);
@@ -549,34 +506,17 @@ public final class Player extends Character {
         glTranslatef(0f, 0.25f, 0f);
         glScalef(0.3f, 0.6f, 0.3f);
 
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GL11.glBegin(GL11.GL_QUADS);
+        if (_handMesh == null) {
+            Vector2f texPos = new Vector2f(40.0f * 0.015625f, 32.0f * 0.03125f);
+            Vector2f texWidth = new Vector2f(4.0f * 0.015625f, -12.0f * 0.03125f);
 
-        GL11.glNormal3f(-1, 0, 0);
+            BlockVertexCollection.addBlockMesh(new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
+            _handMesh = BlockTessellator.getInstance().generateBlockMesh();
+            BlockTessellator.getInstance().resetAll();
+        }
 
-        // LEFT
-        GL11.glTexCoord2f(40.0f * 0.015625f, 20.0f * 0.03125f);
-        GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-        GL11.glTexCoord2f(44.0f * 0.015625f, 20.0f * 0.03125f);
-        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(44.0f * 0.015625f, 1.0f);
-        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(40.0f * 0.015625f, 1.0f);
-        GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
+        _handMesh.render();
 
-        GL11.glNormal3f(0, 0, -1);
-
-        // BACK
-        GL11.glTexCoord2f(44.0f * 0.015625f, 20.0f * 0.03125f);
-        GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(48.0f * 0.015625f, 20.0f * 0.03125f);
-        GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-        GL11.glTexCoord2f(48.0f * 0.015625f, 1.0f);
-        GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-        GL11.glTexCoord2f(44.0f * 0.015625f, 1.0f);
-        GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-
-        GL11.glEnd();
         glPopMatrix();
 
         glDisable(GL11.GL_TEXTURE_2D);
@@ -593,8 +533,8 @@ public final class Player extends Character {
         Item item = getActiveItem();
 
         if (item != null) {
-            if (item.getClass() == BlockItem.class) {
-                return BlockManager.getInstance().getBlock(((BlockItem) getActiveItem()).getBlockId());
+            if (item.getClass() == ItemBlock.class) {
+                return BlockManager.getInstance().getBlock(((ItemBlock) getActiveItem()).getBlockId());
             }
         }
 
@@ -678,6 +618,15 @@ public final class Player extends Character {
 
     public float getHandMovementAnimationOffset() {
         return _handMovementAnimationOffset;
+    }
+
+    public boolean isCarryingTorch() {
+        if (getActiveBlock() != null) {
+            if (getActiveBlock().getLuminance() > 0)
+                return true;
+        }
+
+        return false;
     }
 
 }

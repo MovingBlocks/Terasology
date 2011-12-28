@@ -115,9 +115,6 @@ public class LiquidSimulator extends Simulator {
         return simulated;
     }
 
-    public void lightChanged(Chunk chunk, BlockPosition pos) {
-    }
-
     public void blockPlaced(Chunk chunk, BlockPosition pos) {
         if (BlockManager.getInstance().getBlock(_parent.getBlock(pos.x, pos.y, pos.z)).isLiquid()) {
             chunk.setState(pos.x, pos.y, pos.z, (byte) 1);

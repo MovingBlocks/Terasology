@@ -18,7 +18,7 @@ package com.github.begla.blockmania.logic.tools;
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.logic.characters.Player;
 import com.github.begla.blockmania.logic.manager.BlueprintManager;
-import com.github.begla.blockmania.model.inventory.BlueprintItem;
+import com.github.begla.blockmania.model.inventory.ItemBlueprint;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 import com.github.begla.blockmania.model.structures.RayBlockIntersection;
 
@@ -40,8 +40,8 @@ public class BlueprintTool implements Tool {
     public void executeLeftClickAction() {
         RayBlockIntersection.Intersection selectedBlock = _player.getSelectedBlock();
 
-        if (BlueprintItem.class.isInstance(_player.getActiveItem()) && selectedBlock != null) {
-            BlueprintItem bpItem = (BlueprintItem) _player.getActiveItem();
+        if (ItemBlueprint.class.isInstance(_player.getActiveItem()) && selectedBlock != null) {
+            ItemBlueprint bpItem = (ItemBlueprint) _player.getActiveItem();
 
             if (bpItem.getBlueprint() == null) {
                 addBlock(selectedBlock.getBlockPosition());
@@ -52,8 +52,8 @@ public class BlueprintTool implements Tool {
     }
 
     public void executeRightClickAction() {
-        if (BlueprintItem.class.isInstance(_player.getActiveItem())) {
-            BlueprintItem bpItem = (BlueprintItem) _player.getActiveItem();
+        if (ItemBlueprint.class.isInstance(_player.getActiveItem())) {
+            ItemBlueprint bpItem = (ItemBlueprint) _player.getActiveItem();
             bpItem.setBlueprint(null);
         }
     }
@@ -93,8 +93,8 @@ public class BlueprintTool implements Tool {
             }
         }
 
-        if (BlueprintItem.class.isInstance(_player.getActiveItem())) {
-            BlueprintItem bpItem = (BlueprintItem) _player.getActiveItem();
+        if (ItemBlueprint.class.isInstance(_player.getActiveItem())) {
+            ItemBlueprint bpItem = (ItemBlueprint) _player.getActiveItem();
             bpItem.setBlueprint(BlueprintManager.getInstance().generateBlueprint(_player.getParent().getWorldProvider(), _selectedBlocks));
         }
     }

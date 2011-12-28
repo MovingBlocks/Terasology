@@ -16,31 +16,40 @@
 package com.github.begla.blockmania.model.inventory;
 
 import com.github.begla.blockmania.logic.characters.Player;
+import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
+import java.util.HashMap;
 
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class Item {
 
+    protected Player _parent;
+    protected UIGraphicsElement _icon;
+
     protected int _amount;
     protected byte _toolId;
-    protected Player _parent;
+
     protected int _stackSize = 16;
 
-    protected UIGraphicsElement _icon;
+    protected int _iconX, _iconY;
+
+    protected HashMap<Block, Byte> _extractionAmountMapping = new HashMap<Block, Byte>();
 
     public Item(Player parent) {
         _amount = 1;
         _parent = parent;
 
         _icon = new UIGraphicsElement("items");
-        _icon.setSize(new Vector2f(20, 20));
+        _icon.setSize(new Vector2f(32, 32));
         _icon.getTextureSize().set(new Vector2f(0.0624f, 0.0624f));
         _icon.setVisible(true);
-        _icon.setPosition(new Vector2f(-8f, -10f));
+        _icon.setPosition(new Vector2f(-10f, -16f));
+
+        setIconWithAtlasPos(0, 0);
     }
 
     public boolean renderIcon() {
@@ -91,10 +100,23 @@ public abstract class Item {
     }
 
     public void setIconWithAtlasPos(int x, int y) {
+        _iconX = x;
+        _iconY = y;
         _icon.getTextureOrigin().set(new Vector2f(x * 0.0625f, y * 0.0625f));
     }
 
     public int getStackSize() {
         return _stackSize;
+    }
+
+    public void setExtractionAmountForBlock(Block block, byte amount) {
+        _extractionAmountMapping.put(block, amount);
+    }
+
+    public byte getExtractionAmountForBlock(Block block) {
+        if (_extractionAmountMapping.containsKey(block))
+            return _extractionAmountMapping.get(block);
+
+        return 1;
     }
 }

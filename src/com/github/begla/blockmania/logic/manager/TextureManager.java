@@ -36,7 +36,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class TextureManager {
 
-    public class BlockmaniaTexture {
+    public class Texture {
         public int id;
         public int width;
         public int height;
@@ -44,7 +44,7 @@ public class TextureManager {
     }
 
     private static TextureManager _instance;
-    private final HashMap<String, BlockmaniaTexture> _textures = new HashMap<String, BlockmaniaTexture>();
+    private final HashMap<String, Texture> _textures = new HashMap<String, Texture>();
 
     public static TextureManager getInstance() {
         if (_instance == null)
@@ -95,7 +95,7 @@ public class TextureManager {
         }
     }
 
-    public void readTexture(String path, BlockmaniaTexture target) throws IOException {
+    public void readTexture(String path, Texture target) throws IOException {
         InputStream stream = ResourceLoader.getResource(path).openStream();
         PNGDecoder decoder = new PNGDecoder(stream);
 
@@ -108,8 +108,8 @@ public class TextureManager {
         target.width = decoder.getWidth();
     }
 
-    public BlockmaniaTexture loadTexture(String path, String[] mipMapPaths) throws IOException {
-        BlockmaniaTexture texture = new BlockmaniaTexture();
+    public Texture loadTexture(String path, String[] mipMapPaths) throws IOException {
+        Texture texture = new Texture();
 
         texture.id = glGenTextures();
         glBindTexture(GL11.GL_TEXTURE_2D, texture.id);
@@ -130,7 +130,7 @@ public class TextureManager {
             GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 
             for (int i = 0; i < mipMapPaths.length; i++) {
-                BlockmaniaTexture t = new BlockmaniaTexture();
+                Texture t = new Texture();
                 readTexture(mipMapPaths[i], t);
 
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i + 1, GL11.GL_RGBA, t.width, t.height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, t.data);
@@ -153,7 +153,7 @@ public class TextureManager {
             glBindTexture(GL11.GL_TEXTURE_2D, _textures.get(s).id);
     }
 
-    public BlockmaniaTexture getTexture(String s) {
+    public Texture getTexture(String s) {
         return _textures.get(s);
     }
 }

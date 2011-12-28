@@ -33,17 +33,17 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockItem extends Item {
+public class ItemBlock extends Item {
 
     private byte _blockId;
 
-    public BlockItem(Player parent, byte blockId) {
+    public ItemBlock(Player parent, byte blockId) {
         super(parent);
         _blockId = blockId;
         _toolId = (byte) 1;
     }
 
-    public BlockItem(Player parent, byte blockId, int amount) {
+    public ItemBlock(Player parent, byte blockId, int amount) {
         this(parent, blockId);
         setAmount(amount);
     }
@@ -122,9 +122,9 @@ public class BlockItem extends Item {
 
     public boolean equals(Object o) {
         if (o != null) {
-            if (o.getClass() == BlockItem.class) {
-                BlockItem blockItem = (BlockItem) o;
-                return blockItem.getBlockId() == getBlockId();
+            if (o.getClass() == ItemBlock.class) {
+                ItemBlock itemBlock = (ItemBlock) o;
+                return itemBlock.getBlockId() == getBlockId();
             }
         }
 

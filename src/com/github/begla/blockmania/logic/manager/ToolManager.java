@@ -16,7 +16,10 @@
 package com.github.begla.blockmania.logic.manager;
 
 import com.github.begla.blockmania.logic.characters.Player;
-import com.github.begla.blockmania.logic.tools.*;
+import com.github.begla.blockmania.logic.tools.BlueprintTool;
+import com.github.begla.blockmania.logic.tools.DefaultBlockTool;
+import com.github.begla.blockmania.logic.tools.ExplosionTool;
+import com.github.begla.blockmania.logic.tools.Tool;
 
 import java.util.HashMap;
 
@@ -63,10 +66,9 @@ public class ToolManager {
      */
     public void initNativeTools() {
         _toolStore.put((byte) 1, new DefaultBlockTool(_player));
-        _toolStore.put((byte) 2, new MultipleSelectionTool(_player));
-        _toolStore.put((byte) 3, new BlueprintTool(_player));
-        _toolStore.put((byte) 4, new RigidBlockTool(_player));
-        _toolStore.put((byte) 5, new ExplosionTool(_player));
+        //_toolStore.put((byte) 2, new MultipleSelectionTool(_player));
+        _toolStore.put((byte) 2, new BlueprintTool(_player));
+        _toolStore.put((byte) 3, new ExplosionTool(_player));
     }
 
     public Tool getToolForIndex(Byte toolIndex) {

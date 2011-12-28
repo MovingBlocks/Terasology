@@ -20,7 +20,7 @@ import com.github.begla.blockmania.logic.manager.AudioManager;
 import com.github.begla.blockmania.logic.world.WorldProvider;
 import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.model.blocks.BlockManager;
-import com.github.begla.blockmania.model.inventory.BlockItem;
+import com.github.begla.blockmania.model.inventory.ItemBlock;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 import com.github.begla.blockmania.model.structures.RayBlockIntersection;
 import com.github.begla.blockmania.rendering.world.WorldRenderer;
@@ -49,10 +49,10 @@ public class DefaultBlockTool implements Tool {
     }
 
     public void executeRightClickAction() {
-        byte removedBlockId = removeBlock(false);
+        byte removedBlockId = removeBlock(true);
 
         if (removedBlockId != 0) {
-            _player.getInventory().storeItemInFreeSlot(new BlockItem(_player, removedBlockId, 1));
+            _player.getInventory().storeItemInFreeSlot(new ItemBlock(_player, removedBlockId, 1));
         }
     }
 
@@ -116,7 +116,13 @@ public class DefaultBlockTool implements Tool {
                 if (_player.getExtractedBlock() != null) {
                     if (_player.getExtractedBlock().equals(_player.getSelectedBlock())) {
                         // If so increase the extraction counter
-                        _player.setExtractionCounter((byte) (_player.getExtractionCounter() + 1));
+                        int amount = 1;
+
+                        if (_player.getActiveItem() != null) {
+                            amount = _player.getActiveItem().getExtractionAmountForBlock(block);
+                        }
+
+                        _player.setExtractionCounter((byte) (_player.getExtractionCounter() + amount));
                     } else {
                         // If another block was touched in between...
                         _player.resetExtraction();

@@ -17,14 +17,16 @@ package com.github.begla.blockmania.rendering.gui.menus;
 
 import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.logic.manager.ConfigurationManager;
-import com.github.begla.blockmania.rendering.gui.components.*;
+import com.github.begla.blockmania.rendering.gui.components.UICrosshair;
+import com.github.begla.blockmania.rendering.gui.components.UIHealthBar;
+import com.github.begla.blockmania.rendering.gui.components.UIText;
+import com.github.begla.blockmania.rendering.gui.components.UIToolbar;
 import com.github.begla.blockmania.rendering.gui.framework.UIDisplayRenderer;
 import com.github.begla.blockmania.rendering.world.ChunkMeshGenerator;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
 import javax.vecmath.Vector2f;
-import java.util.HashMap;
 
 /**
  * HUD displayed on the user's screen.

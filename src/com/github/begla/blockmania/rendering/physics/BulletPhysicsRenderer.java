@@ -29,9 +29,11 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.logic.manager.ShaderManager;
 import com.github.begla.blockmania.logic.world.BlockObserver;
 import com.github.begla.blockmania.logic.world.Chunk;
+import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
@@ -40,10 +42,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
+import javax.vecmath.*;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -148,6 +147,7 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
 
     public void render() {
         for (BlockRigidBody b : _blocks) {
+            Block block = BlockManager.getInstance().getBlock(b.getType());
             Transform t = new Transform();
             b.getMotionState().getWorldTransform(t);
 
@@ -166,6 +166,17 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
             float lightValue = _parent.getRenderingLightValueAt(new Vector3d(t.origin));
             int lightRef = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
             GL20.glUniform1f(lightRef, lightValue);
+
+            // Apply biome and overall color offset
+            FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
+            Vector4f color = block.calcColorOffsetFor(Block.SIDE.FRONT, Blockmania.getInstance().getActiveWorldRenderer().getActiveTemperature(), Blockmania.getInstance().getActiveWorldRenderer().getActiveTemperature());
+            colorBuffer.put(color.x);
+            colorBuffer.put(color.y);
+            colorBuffer.put(color.z);
+
+            colorBuffer.flip();
+            int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
+            GL20.glUniform3(colorOffset, colorBuffer);
 
             BlockManager.getInstance().getBlock(b.getType()).render();
             GL11.glPopMatrix();
@@ -190,9 +201,6 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
         }
 
         _discreteDynamicsWorld.removeRigidBody(b);
-    }
-
-    public void lightChanged(Chunk chunk, BlockPosition pos) {
     }
 
     public void removeAllBlocks() {

@@ -83,10 +83,6 @@ public class GrowthSimulator extends Simulator {
         return true;
     }
 
-    public void lightChanged(Chunk chunk, BlockPosition pos) {
-
-    }
-
     public void blockPlaced(Chunk chunk, BlockPosition pos) {
         if (_parent.getBlock(pos.x, pos.y, pos.z) == DIRT_TYPE) {
             addActiveBlock(pos);

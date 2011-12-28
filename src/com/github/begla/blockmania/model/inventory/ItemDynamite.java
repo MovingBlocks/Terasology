@@ -13,25 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.begla.blockmania.logic.tools;
+package com.github.begla.blockmania.model.inventory;
 
 import com.github.begla.blockmania.logic.characters.Player;
-import com.github.begla.blockmania.model.inventory.BlockItem;
 
 /**
- * The basic tool used for block interaction. Can be used to place and remove blocks.
+ * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
-public class RigidBlockTool extends DefaultBlockTool {
+public class ItemDynamite extends Item {
 
-    public RigidBlockTool(Player player) {
-        super(player);
-    }
+    public ItemDynamite(Player parent) {
+        super(parent);
 
-    public void executeRightClickAction() {
-        byte removedBlockId = removeBlock(true);
-
-        if (removedBlockId != 0) {
-            _player.getInventory().storeItemInFreeSlot(new BlockItem(_player, removedBlockId, 1));
-        }
+        setIconWithAtlasPos(5, 0);
+        _toolId = (byte) 3;
+        _stackSize = 1;
     }
 }

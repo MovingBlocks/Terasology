@@ -75,22 +75,13 @@ Graphics {
 }
 
 Physics {
-    // REQUIRES A LOT OF MEMORY DEPENDING
-    // ON THE ACTIVE VIEWING DISTANCE AND SIZE OF THE CHUNK CACHE
-    generatePhysicsMeshes = false
+    generatePhysicsMeshes = true
 }
 
 HUD {
 
     crosshair = true
     placingBox = true
-
-}
-
-Lighting {
-
-    occlusionIntensDefault = 1.0d / 7.0d
-    occlusionIntensBillboards = occlusionIntensDefault / 3.0d
 
 }
 

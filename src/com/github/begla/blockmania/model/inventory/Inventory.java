@@ -32,11 +32,12 @@ public class Inventory {
     }
 
     private void initDefaultItems() {
-        _inventory[0] = new BlockItem(_parent, BlockManager.getInstance().getBlock("Companion").getId(), 1);
-        _inventory[1] = new BlockItem(_parent, BlockManager.getInstance().getBlock("Torch").getId(), 16);
-
-        _inventory[7] = new BlueprintItem(_parent);
-        _inventory[8] = new BlueprintItem(_parent);
+        _inventory[0] = new ItemBlock(_parent, BlockManager.getInstance().getBlock("Companion").getId(), 1);
+        _inventory[1] = new ItemBlock(_parent, BlockManager.getInstance().getBlock("Torch").getId(), 16);
+        _inventory[2] = new ItemPickAxe(_parent);
+        _inventory[3] = new ItemAxe(_parent);
+        _inventory[4] = new ItemBlueprint(_parent);
+        _inventory[4] = new ItemDynamite(_parent);
     }
 
     /**

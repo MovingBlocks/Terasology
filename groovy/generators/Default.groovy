@@ -29,7 +29,6 @@ def redTree = new TreeGeneratorLSystem(mngr, "FFAFAFFAFF", rules, probs, 4, 30).
 // Cactus
 def cactus = new TreeGeneratorCactus(mngr).withGenerationProbability(0.05)
 
-
 // Add the trees to the generator lists
 mngr.addTreeGenerator BIOME_TYPE.MOUNTAINS, oakTree
 mngr.addTreeGenerator BIOME_TYPE.MOUNTAINS, pineTree
