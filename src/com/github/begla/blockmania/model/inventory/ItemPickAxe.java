@@ -23,7 +23,6 @@ import com.github.begla.blockmania.model.blocks.BlockManager;
  */
 public class ItemPickAxe extends VoxelItem {
 
-
     public ItemPickAxe(Player parent) {
         super(parent);
 

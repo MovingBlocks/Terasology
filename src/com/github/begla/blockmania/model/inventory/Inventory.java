@@ -37,7 +37,7 @@ public class Inventory {
         _inventory[2] = new ItemPickAxe(_parent);
         _inventory[3] = new ItemAxe(_parent);
         _inventory[4] = new ItemBlueprint(_parent);
-        _inventory[4] = new ItemDynamite(_parent);
+        _inventory[5] = new ItemDynamite(_parent);
     }
 
     /**
