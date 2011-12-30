@@ -8,7 +8,7 @@ uniform float daylight = 1.0;
 uniform bool swimming;
 uniform bool carryingTorch;
 
-varying vec3 vertexWorldPos;
+varying vec4 vertexWorldPos;
 varying vec3 normal;
 varying float distance;
 
@@ -76,7 +76,7 @@ void main(){
 
     // Calculate Lambertian lighting
     vec3 N = normalize(normal * ((gl_FrontFacing) ? 1.0 : -1.0));
-    vec3 L = normalize(-vertexWorldPos);
+    vec3 L = normalize(-vertexWorldPos.xyz);
 
     highlight = clamp(dot(N,L), 0.0, 1.0);
 
@@ -88,28 +88,22 @@ void main(){
     // Apply some lighting highlights to the daylight light value
     // Looks cool during morning and evning hours and can be seen moonlight during the night
     vec3 daylightColorValue = vec3(daylightValue + highlight * 0.05);
-    vec3 blocklightColorValue = vec3(blocklightValue + torchlight);
+
+    float blockBrightness = blocklightValue + torchlight;
+    vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.95,blockBrightness * 0.9);
 
     blocklightColorValue = clamp(blocklightColorValue,0.0,1.0);
     daylightColorValue = clamp(daylightColorValue, 0.0, 1.0);
-
-    // Color block light a reddish
-    blocklightColorValue.x *= 1.0;
-    blocklightColorValue.y *= 0.95;
-    blocklightColorValue.z *= 0.9;
 
     // Apply the final lighting mix
     color.xyz *= clamp(daylightColorValue + blocklightColorValue * (1.0-daylightValue), 0.0, 1.0) * occlusionValue;
 
     // Apply linear fog
-    float fog = 1.0 - ((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale);
-    fog /= 2.0;
-
-    fog = clamp(fog, 0.0, 1.0);
+    float fog = clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.0, 1.0);
 
     // Check if the player is below the water surface
     if (!swimming) {
-        gl_FragColor.rgb = linearToSrgb(mix(color, vec4(1.0) * daylight, fog)).rgb;
+        gl_FragColor.rgb = linearToSrgb(mix(vec4(1.0) * daylight, color, fog)).rgb;
         gl_FragColor.a = color.a;
     } else {
         color.rg *= 0.6;

@@ -134,6 +134,7 @@ public class Skysphere implements RenderableObject {
 
         glDisable(GL13.GL_TEXTURE_CUBE_MAP);
 
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         ShaderManager.getInstance().enableShader("clouds");
         // Apply daylight
         int lightClouds = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("clouds"), "light");

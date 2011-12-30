@@ -94,6 +94,8 @@ public class UIPauseMenu extends UIDisplayRenderer {
         addDisplayElement(_exitButton);
         addDisplayElement(_newWorldButton);
         addDisplayElement(_respawnButton);
+
+        update();
     }
 
     @Override

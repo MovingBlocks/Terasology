@@ -1,5 +1,5 @@
 varying vec3 normal;
-varying vec3 vertexWorldPos;
+varying vec4 vertexWorldPos;
 
 uniform float tick;
 uniform float wavingCoordinates[32];
@@ -8,9 +8,15 @@ uniform vec2 lavaCoordinate;
 
 varying float distance;
 
+float radialFog(vec4 v1)
+{
+    vec4 v2 = v1 / v1.w;
+    return length(v2);
+}
+
 void main()
 {
-	vertexWorldPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
+	vertexWorldPos = gl_ModelViewMatrix * gl_Vertex;
 	distance = length(vertexWorldPos);
 
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
@@ -48,7 +54,5 @@ if (distance < 64) {
 }
 #endif
 
-    // Linear fog
-    vec4 eyePos = gl_ModelViewMatrix * gl_Vertex;
-    gl_FogFragCoord = abs(eyePos.z/eyePos.w);
+    gl_FogFragCoord = radialFog(vertexWorldPos);
 }

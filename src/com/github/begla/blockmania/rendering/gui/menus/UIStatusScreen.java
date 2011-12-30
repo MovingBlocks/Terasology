@@ -38,6 +38,8 @@ public class UIStatusScreen extends UIDisplayRenderer {
 
         addDisplayElement(_overlay);
         addDisplayElement(_status);
+
+        update();
     }
 
     @Override

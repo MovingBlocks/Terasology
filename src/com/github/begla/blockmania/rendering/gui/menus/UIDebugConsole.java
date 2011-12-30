@@ -46,6 +46,8 @@ public final class UIDebugConsole extends UIDisplayContainer {
         _consoleText.setVisible(true);
 
         addDisplayElement(_consoleText);
+
+        update();
     }
 
     /**

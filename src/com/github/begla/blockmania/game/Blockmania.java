@@ -271,7 +271,7 @@ public final class Blockmania {
 
         float diff = 0;
 
-        for (; diff < duration; ) {
+        while (diff < duration) {
             _statusScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
 
             renderUserInterface();
@@ -345,7 +345,7 @@ public final class Blockmania {
 
         // Update the viewing distance
         double minDist = (VIEWING_DISTANCES[_activeViewingDistance] / 2) * 16.0f;
-        glFogf(GL_FOG_START, (float) (minDist * 0.01));
+        glFogf(GL_FOG_START, (float) (minDist * 0.001));
         glFogf(GL_FOG_END, (float) minDist);
     }
 

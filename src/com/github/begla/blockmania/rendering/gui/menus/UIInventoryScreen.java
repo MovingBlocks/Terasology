@@ -31,6 +31,8 @@ public class UIInventoryScreen extends UIDisplayRenderer {
         _inventory = new UIInventory();
         _inventory.setVisible(true);
         addDisplayElement(_inventory);
+
+        update();
     }
 
     @Override
