@@ -279,6 +279,6 @@ public class Skysphere implements RenderableObject {
     }
 
     public double getDaylight() {
-        return MathHelper.clamp(Math.cos(_sunPosAngle));
+        return MathHelper.clamp(Math.cos(_sunPosAngle) + 0.3);
     }
 }

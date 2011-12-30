@@ -1,6 +1,7 @@
 package com.github.begla.blockmania.rendering.world;
 
-import com.bulletphysics.collision.shapes.TriangleMeshShape;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.dynamics.RigidBody;
 import com.github.begla.blockmania.logic.manager.VertexBufferObjectManager;
 import gnu.trove.list.array.TFloatArrayList;
 import org.lwjgl.opengl.GL11;
@@ -65,7 +66,7 @@ public class ChunkMesh {
     public VertexElements[] _vertexElements = new VertexElements[4];
 
     /* BULLET PHYSICS */
-    public TriangleMeshShape _bulletMeshShape;
+    public IndexedMesh _indexedMesh;
 
 
     private boolean _disposed = false;
@@ -187,7 +188,7 @@ public class ChunkMesh {
 
             _disposed = true;
             _vertexElements = null;
-            _bulletMeshShape = null;
+            _indexedMesh = null;
         }
     }
 

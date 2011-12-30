@@ -15,10 +15,8 @@
  */
 package com.github.begla.blockmania.rendering.world;
 
-import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
 import com.bulletphysics.collision.shapes.IndexedMesh;
 import com.bulletphysics.collision.shapes.ScalarType;
-import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
 import com.github.begla.blockmania.logic.manager.ConfigurationManager;
 import com.github.begla.blockmania.logic.world.Chunk;
 import com.github.begla.blockmania.model.blocks.Block;
@@ -78,18 +76,17 @@ public final class ChunkMeshGenerator {
     }
 
     private void generateOptimizedBuffers(ChunkMesh mesh) {
-        /* BULLET PHYSICS */
-        IndexedMesh indexMesh = null;
+        mesh._indexedMesh = null;
 
-        if (mesh._vertexElements[0].quads.size() > 0 && GENERATE_PHYSICS_MESHES) {
-            indexMesh = new IndexedMesh();
-            indexMesh.vertexBase = ByteBuffer.allocate(mesh._vertexElements[0].quads.size() * 4);
-            indexMesh.triangleIndexBase = ByteBuffer.allocate(mesh._vertexElements[0].quads.size() * 4);
-            indexMesh.triangleIndexStride = 12;
-            indexMesh.vertexStride = 12;
-            indexMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
-            indexMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
-            indexMesh.indexType = ScalarType.INTEGER;
+        if (GENERATE_PHYSICS_MESHES) {
+            mesh._indexedMesh = new IndexedMesh();
+            mesh._indexedMesh.vertexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
+            mesh._indexedMesh.triangleIndexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
+            mesh._indexedMesh.triangleIndexStride = 12;
+            mesh._indexedMesh.vertexStride = 12;
+            mesh._indexedMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
+            mesh._indexedMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
+            mesh._indexedMesh.indexType = ScalarType.INTEGER;
         }
         /* ------------- */
 
@@ -112,14 +109,14 @@ public final class ChunkMeshGenerator {
                     mesh._vertexElements[j].indices.put(cIndex);
 
                     /* BULLET PHYSICS */
-                    if (j == 0 && indexMesh != null) {
-                        indexMesh.triangleIndexBase.putInt(cIndex);
-                        indexMesh.triangleIndexBase.putInt(cIndex + 1);
-                        indexMesh.triangleIndexBase.putInt(cIndex + 2);
+                    if (j == 0 && GENERATE_PHYSICS_MESHES) {
+                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex);
+                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 1);
+                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 2);
 
-                        indexMesh.triangleIndexBase.putInt(cIndex + 2);
-                        indexMesh.triangleIndexBase.putInt(cIndex + 3);
-                        indexMesh.triangleIndexBase.putInt(cIndex);
+                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 2);
+                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 3);
+                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex);
                     }
                     /* ------------- */
 
@@ -133,10 +130,10 @@ public final class ChunkMeshGenerator {
                 mesh._vertexElements[j].vertices.put(vertexPos.z);
 
                 /* BULLET PHYSICS */
-                if (j == 0 && indexMesh != null) {
-                    indexMesh.vertexBase.putFloat(vertexPos.x);
-                    indexMesh.vertexBase.putFloat(vertexPos.y);
-                    indexMesh.vertexBase.putFloat(vertexPos.z);
+                if (j == 0 && GENERATE_PHYSICS_MESHES) {
+                    mesh._indexedMesh.vertexBase.putFloat(vertexPos.x);
+                    mesh._indexedMesh.vertexBase.putFloat(vertexPos.y);
+                    mesh._indexedMesh.vertexBase.putFloat(vertexPos.z);
                 }
                 /* ------------ */
 
@@ -162,16 +159,6 @@ public final class ChunkMeshGenerator {
 
             mesh._vertexElements[j].vertices.flip();
             mesh._vertexElements[j].indices.flip();
-        }
-
-        /* BULLET PHYSICS */
-        if (indexMesh != null) {
-            TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
-            indexMesh.triangleIndexBase.flip();
-            indexMesh.vertexBase.flip();
-
-            vertexArray.addIndexedMesh(indexMesh);
-            mesh._bulletMeshShape = new BvhTriangleMeshShape(vertexArray, true);
         }
     }
 
@@ -207,7 +194,6 @@ public final class ChunkMeshGenerator {
         blockLights[6] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
         blockLights[7] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
 
-        double resultAmbientOcclusion = 1.0;
         double resultLight = 0;
         double resultBlockLight = 0;
         int counterLight = 0;
@@ -236,7 +222,7 @@ public final class ChunkMeshGenerator {
             }
         }
 
-        resultAmbientOcclusion = (Math.pow(0.70, occCounter) + Math.pow(0.92, occCounterBillboard)) / 2.0;
+        double resultAmbientOcclusion = (Math.pow(0.70, occCounter) + Math.pow(0.92, occCounterBillboard)) / 2.0;
 
         if (counterLight == 0)
             output[0] = (double) 0;

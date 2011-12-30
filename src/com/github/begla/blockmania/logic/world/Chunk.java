@@ -15,6 +15,14 @@
  */
 package com.github.begla.blockmania.logic.world;
 
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.Transform;
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.logic.entities.StaticEntity;
 import com.github.begla.blockmania.logic.generators.ChunkGenerator;
 import com.github.begla.blockmania.logic.manager.ConfigurationManager;
@@ -31,12 +39,16 @@ import com.github.begla.blockmania.utilities.MathHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -81,6 +93,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     /* ----- */
     private AABB _aabb = null;
     private AABB[] _subChunkAABB = null;
+    /* ----- */
+    private RigidBody _rigidBody = null;
 
     public enum LIGHT_TYPE {
         BLOCK,
@@ -129,13 +143,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public boolean generate() {
         if (isFresh()) {
-            setFresh(false);
-
             for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators()) {
                 gen.generate(this);
             }
 
             generateSunlight();
+            setFresh(false);
+
             return true;
         }
         return false;
@@ -709,7 +723,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (isFresh() || isLightDirty() || !isDirty())
             return;
 
-        setDirty(false);
         ChunkMesh[] newMeshes = new ChunkMesh[VERTICAL_SEGMENTS];
 
         for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
@@ -717,6 +730,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
 
         setNewMesh(newMeshes);
+        setDirty(false);
     }
 
     /**
@@ -750,6 +764,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public void update() {
         generateVBOs();
         swapActiveMesh();
+
     }
 
     public void executeOcclusionQuery() {
@@ -821,10 +836,13 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
                 ChunkMesh[] oldActiveMesh = _activeMeshes;
                 _activeMeshes = newMesh;
+                _rigidBody = null;
 
-                if (oldActiveMesh != null)
-                    for (int i = 0; i < oldActiveMesh.length; i++)
+                if (oldActiveMesh != null) {
+                    for (int i = 0; i < oldActiveMesh.length; i++) {
                         oldActiveMesh[i].dispose();
+                    }
+                }
 
                 return true;
             }
@@ -1010,5 +1028,58 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return result;
     }
 
+    public void updateRigidBody() {
+        updateRigidBody(_activeMeshes);
+    }
+
+    private void updateRigidBody(ChunkMesh[] meshes) {
+        if (_rigidBody != null)
+            return;
+
+        if (meshes == null)
+            return;
+
+        if (meshes.length < VERTICAL_SEGMENTS)
+            return;
+
+        TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+
+        int counter = 0;
+        for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
+            ChunkMesh mesh = meshes[k];
+
+            if (mesh != null) {
+                IndexedMesh indexedMesh = mesh._indexedMesh;
+
+                if (indexedMesh != null) {
+                    vertexArray.addIndexedMesh(indexedMesh);
+                    counter++;
+                }
+
+                mesh._indexedMesh = null;
+            }
+        }
+
+        if (counter == VERTICAL_SEGMENTS) {
+            try {
+                BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
+
+                Matrix3f rot = new Matrix3f();
+                rot.setIdentity();
+
+                DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
+
+                RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
+                _rigidBody = new RigidBody(blockConsInf);
+
+            } catch (Exception e) {
+                Blockmania.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+            }
+        }
+    }
+
+    public RigidBody getRigidBody() {
+        return _rigidBody;
+    }
 
 }

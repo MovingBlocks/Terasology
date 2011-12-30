@@ -1,14 +1,18 @@
-varying vec3 vertexWorldPos;
 varying vec3 normal;
+varying vec3 vertexWorldPos;
 
 uniform float tick;
 uniform float wavingCoordinates[32];
 uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
 
+varying float distance;
+
 void main()
 {
 	vertexWorldPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
+	distance = length(vertexWorldPos);
+
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 
 	gl_TexCoord[0] = gl_MultiTexCoord0;
@@ -25,6 +29,7 @@ void main()
     gl_FrontColor = gl_Color * colorOffset;
 
 #ifdef ANIMATED_WATER_AND_GRASS
+if (distance < 64) {
        // GRASS ANIMATION
         for (int i=0; i < 32; i+=2) {
            if (gl_TexCoord[0].x >= wavingCoordinates[i] && gl_TexCoord[0].x < wavingCoordinates[i] + TEXTURE_OFFSET && gl_TexCoord[0].y >= wavingCoordinates[i+1] && gl_TexCoord[0].y < wavingCoordinates[i+1] + TEXTURE_OFFSET) {
@@ -40,6 +45,7 @@ void main()
        } else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= lavaCoordinate.y && gl_TexCoord[0].y < lavaCoordinate.y + TEXTURE_OFFSET) {
             gl_Position.y += sin(tick * 0.05 + gl_Position.x) * 0.05;
        }
+}
 #endif
 
     // Linear fog

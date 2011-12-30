@@ -21,8 +21,6 @@ import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.StaticPlaneShape;
-import com.bulletphysics.collision.shapes.TriangleMeshShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
@@ -30,19 +28,22 @@ import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSo
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.github.begla.blockmania.game.Blockmania;
+import com.github.begla.blockmania.logic.characters.Player;
 import com.github.begla.blockmania.logic.manager.ShaderManager;
+import com.github.begla.blockmania.logic.manager.TextureManager;
 import com.github.begla.blockmania.logic.world.BlockObserver;
 import com.github.begla.blockmania.logic.world.Chunk;
-import com.github.begla.blockmania.model.blocks.Block;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 import com.github.begla.blockmania.rendering.interfaces.RenderableObject;
-import com.github.begla.blockmania.rendering.world.WorldRenderer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-import javax.vecmath.*;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -54,172 +55,198 @@ import java.util.HashSet;
  */
 public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
 
-    private class BlockRigidBody extends RigidBody {
+    /* SINGLETON */
+    private static BulletPhysicsRenderer _instance;
+
+    private class BlockRigidBody extends RigidBody implements Comparable<BlockRigidBody> {
         private final byte _type;
+        private final long _createdAt;
 
         public BlockRigidBody(RigidBodyConstructionInfo constructionInfo, byte type) {
             super(constructionInfo);
             _type = type;
+            _createdAt = Blockmania.getInstance().getTime();
+        }
+
+        public long calcAgeInMs() {
+            return Blockmania.getInstance().getTime() - _createdAt;
         }
 
         public byte getType() {
             return _type;
         }
+
+        public int compareTo(BlockRigidBody blockRigidBody) {
+            if (blockRigidBody.calcAgeInMs() == calcAgeInMs()) {
+                return 0;
+            }
+
+            if (blockRigidBody.calcAgeInMs() > calcAgeInMs())
+                return 1;
+            else
+                return -1;
+        }
     }
 
-    final ArrayList<BlockRigidBody> _blocks = new ArrayList<BlockRigidBody>();
-    final HashSet<RigidBody> _chunks = new HashSet<RigidBody>();
+    private final ArrayList<BlockRigidBody> _blocks = new ArrayList<BlockRigidBody>();
+    private HashSet<RigidBody> _chunks = new HashSet<RigidBody>();
 
-    final CollisionShape _blockShape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
+    private long _lastUpdate = 0;
 
-    final CollisionDispatcher _dispatcher;
-    final BroadphaseInterface _broadphase;
-    final DefaultCollisionConfiguration _defaultCollisionConfiguration;
-    final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
-    final DiscreteDynamicsWorld _discreteDynamicsWorld;
+    private final CollisionShape _blockShape = new BoxShape(new Vector3f(0.25f, 0.25f, 0.25f));
 
-    final WorldRenderer _parent;
+    private final CollisionDispatcher _dispatcher;
+    private final BroadphaseInterface _broadphase;
+    private final DefaultCollisionConfiguration _defaultCollisionConfiguration;
+    private final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
+    private final DiscreteDynamicsWorld _discreteDynamicsWorld;
 
-    public BulletPhysicsRenderer(WorldRenderer parent) {
-        _parent = parent;
+    public static BulletPhysicsRenderer getInstance() {
+        if (_instance == null)
+            _instance = new BulletPhysicsRenderer();
 
+        return _instance;
+    }
+
+    private BulletPhysicsRenderer() {
         _broadphase = new DbvtBroadphase();
         _defaultCollisionConfiguration = new DefaultCollisionConfiguration();
         _dispatcher = new CollisionDispatcher(_defaultCollisionConfiguration);
         _sequentialImpulseConstraintSolver = new SequentialImpulseConstraintSolver();
         _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -10f, 0f));
-
-        CollisionShape groundShape = new StaticPlaneShape(new Vector3f(0, 1, 0), 1);
-
-        Vector3f groundPosition = new Vector3f(0, -1, 0);
-        Matrix3f rotation = new Matrix3f();
-        rotation.setIdentity();
-
-        DefaultMotionState groundMotionState = new DefaultMotionState(new Transform(new Matrix4f(rotation, groundPosition, 1.0f)));
-        RigidBodyConstructionInfo groundCI = new RigidBodyConstructionInfo(0, groundMotionState, groundShape, new Vector3f());
-        RigidBody ground = new RigidBody(groundCI);
-
-        _discreteDynamicsWorld.addRigidBody(ground);
-    }
-
-    public void resetChunks() {
-        for (RigidBody c : _chunks) {
-            if (c != null)
-                _discreteDynamicsWorld.removeRigidBody(c);
-        }
-
-        _chunks.clear();
     }
 
     public void addBlock(Vector3f position, byte type) {
-        Matrix3f rot = new Matrix3f();
-        rot.setIdentity();
+        for (int i = 0; i < 4; i++) {
+            Matrix3f rot = new Matrix3f();
+            rot.setIdentity();
 
-        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, position, 1.0f)));
+            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, position, 1.0f)));
 
-        Vector3f fallInertia = new Vector3f();
-        _blockShape.calculateLocalInertia(1, fallInertia);
+            Vector3f fallInertia = new Vector3f();
+            _blockShape.calculateLocalInertia(10f, fallInertia);
 
-        RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(1, blockMotionState, _blockShape, fallInertia);
-        BlockRigidBody block = new BlockRigidBody(blockCI, type);
+            RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(25f, blockMotionState, _blockShape, fallInertia);
+            BlockRigidBody block = new BlockRigidBody(blockCI, type);
 
-        _discreteDynamicsWorld.addRigidBody(block);
-
-        _blocks.add(block);
+            _discreteDynamicsWorld.addRigidBody(block);
+            _blocks.add(block);
+        }
     }
 
-    public void addStaticChunk(Vector3f position, TriangleMeshShape chunkShape) {
-        if (chunkShape == null)
-            return;
+    public void updateChunks() {
+        ArrayList<Chunk> chunks = Blockmania.getInstance().getActiveWorldRenderer().getChunksInProximity();
+        HashSet<RigidBody> newBodies = new HashSet<RigidBody>();
 
-        Matrix3f rot = new Matrix3f();
-        rot.setIdentity();
+        for (int i = 0; i < 16 && i < chunks.size(); i++) {
+            final Chunk chunk = chunks.get(i);
 
-        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, position, 1.0f)));
+            if (chunk != null) {
 
-        RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(0, blockMotionState, chunkShape, new Vector3f());
-        RigidBody chunk = new RigidBody(blockCI);
+                Runnable r = new Runnable() {
+                    public void run() {
+                        chunk.updateRigidBody();
+                    }
+                };
 
-        _discreteDynamicsWorld.addRigidBody(chunk);
-        _chunks.add(chunk);
+                Blockmania.getInstance().getThreadPool().execute(r);
+
+
+                RigidBody c = chunk.getRigidBody();
+
+                if (c != null) {
+                    newBodies.add(c);
+
+                    if (!_chunks.contains(c)) {
+                        _discreteDynamicsWorld.addRigidBody(c);
+                    }
+                }
+            }
+        }
+
+        for (RigidBody body : _chunks) {
+            if (!newBodies.contains(body)) {
+                _discreteDynamicsWorld.removeRigidBody(body);
+            }
+        }
+
+        _chunks = newBodies;
     }
 
     public void render() {
+        _discreteDynamicsWorld.stepSimulation(Blockmania.getInstance().getDelta() / 1000f);
+
+        TextureManager.getInstance().bindTexture("terrain");
+        ShaderManager.getInstance().enableShader("block");
+
+        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
+        colorBuffer.put(1).put(1).put(1);
+        colorBuffer.flip();
+
+        int textured = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "textured");
+        GL20.glUniform1i(textured, 1);
+        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
+        GL20.glUniform3(colorOffset, colorBuffer);
+        int lightRef = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
+
+        Player player = Blockmania.getInstance().getActiveWorldRenderer().getPlayer();
+        FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
+        float[] mFloat = new float[16];
+
+        GL11.glPushMatrix();
+        GL11.glTranslated(-player.getPosition().x, -player.getPosition().y, -player.getPosition().z);
+
         for (BlockRigidBody b : _blocks) {
-            Block block = BlockManager.getInstance().getBlock(b.getType());
             Transform t = new Transform();
             b.getMotionState().getWorldTransform(t);
 
-            GL11.glPushMatrix();
-
-            FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
-            float[] mFloat = new float[16];
             t.getOpenGLMatrix(mFloat);
-
             mBuffer.put(mFloat);
             mBuffer.flip();
 
-            GL11.glTranslated(-_parent.getPlayer().getPosition().x, -_parent.getPlayer().getPosition().y, -_parent.getPlayer().getPosition().z);
+            GL11.glPushMatrix();
             GL11.glMultMatrix(mBuffer);
+            GL11.glScalef(0.5f, 0.5f, 0.5f);
 
-            float lightValue = _parent.getRenderingLightValueAt(new Vector3d(t.origin));
-            int lightRef = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
+            float lightValue = Blockmania.getInstance().getActiveWorldRenderer().getRenderingLightValueAt(new Vector3d(t.origin));
             GL20.glUniform1f(lightRef, lightValue);
 
-            // Apply biome and overall color offset
-            FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
-            Vector4f color = block.calcColorOffsetFor(Block.SIDE.FRONT, Blockmania.getInstance().getActiveWorldRenderer().getActiveTemperature(), Blockmania.getInstance().getActiveWorldRenderer().getActiveTemperature());
-            colorBuffer.put(color.x);
-            colorBuffer.put(color.y);
-            colorBuffer.put(color.z);
-
-            colorBuffer.flip();
-            int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
-            GL20.glUniform3(colorOffset, colorBuffer);
-
             BlockManager.getInstance().getBlock(b.getType()).render();
+
             GL11.glPopMatrix();
         }
+
+        GL11.glPopMatrix();
+
+        ShaderManager.getInstance().enableShader(null);
     }
 
     public void update() {
-        cleanUp();
-
-        _discreteDynamicsWorld.stepSimulation(1 / 60f, 5);
+        updateChunks();
+        removeBlocks();
     }
 
-    private void cleanUp() {
-        if (_blocks.isEmpty())
-            return;
+    private void removeBlocks() {
+        if (_blocks.size() > 0) {
+            for (int i = _blocks.size() - 1; i >= 0; i--) {
+                if (!_blocks.get(i).isActive()) {
+                    _discreteDynamicsWorld.removeRigidBody(_blocks.get(i));
+                    _blocks.remove(i);
+                }
+            }
 
-        BlockRigidBody b = _blocks.remove(0);
-
-        if (b.isActive() && _blocks.size() < 64) {
-            _blocks.add(b);
-            return;
+            while (_blocks.size() > 128) {
+                _discreteDynamicsWorld.removeRigidBody(_blocks.remove(0));
+            }
         }
-
-        _discreteDynamicsWorld.removeRigidBody(b);
-    }
-
-    public void removeAllBlocks() {
-        for (BlockRigidBody b : _blocks) {
-            _discreteDynamicsWorld.removeRigidBody(b);
-        }
-
-        _blocks.clear();
     }
 
     public void blockPlaced(Chunk chunk, BlockPosition pos) {
-        for (BlockRigidBody b : _blocks) {
-            b.activate();
-        }
+
     }
 
     public void blockRemoved(Chunk chunk, BlockPosition pos) {
-        for (BlockRigidBody b : _blocks) {
-            b.activate();
-        }
+
     }
 }

@@ -73,7 +73,7 @@ public final class Blockmania {
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 
     /* STATISTICS */
-    private long _lastLoopTime, _lastFpsTime;
+    private long _lastLoopTime, _lastFpsTime, _delta;
     private int _fps;
     private float _averageFps;
     private long _timerTicksPerSecond;
@@ -592,10 +592,10 @@ public final class Blockmania {
      */
     private void updateFps() {
         // Measure the delta value and the frames per second
-        long delta = getTime() - _lastLoopTime;
+        _delta = getTime() - _lastLoopTime;
 
         _lastLoopTime = getTime();
-        _lastFpsTime += delta;
+        _lastFpsTime += _delta;
         _fps++;
 
         // Update the FPS and calculate the average FPS
@@ -670,5 +670,9 @@ public final class Blockmania {
 
     public GroovyManager getGroovyManager() {
         return _groovyManager;
+    }
+
+    public long getDelta() {
+        return _delta;
     }
 }

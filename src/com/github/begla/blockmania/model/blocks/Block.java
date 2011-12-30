@@ -216,7 +216,7 @@ public class Block implements RenderableObject {
                 BlockVertexCollection.addTexturedBillboard(this, 1.0f, 1.0f);
                 _mesh = BlockTessellator.getInstance().generateBlockMesh();
             } else {
-                BlockVertexCollection.addTexturedBlock(this, 1.0f, 1.0f, 0.5f);
+                BlockVertexCollection.addTexturedBlock(this, 1.0f, 1.0f, 0.9f);
                 _mesh = BlockTessellator.getInstance().generateBlockMesh();
 
             }

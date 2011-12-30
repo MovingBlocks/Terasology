@@ -73,7 +73,6 @@ public class ItemBlock extends Item {
     public boolean renderFirstPersonView() {
         Block activeBlock = BlockManager.getInstance().getBlock(_blockId);
 
-        glEnable(GL_TEXTURE_2D);
         TextureManager.getInstance().bindTexture("terrain");
         ShaderManager.getInstance().enableShader("block");
 
@@ -109,7 +108,6 @@ public class ItemBlock extends Item {
         glPopMatrix();
 
         glDisable(GL11.GL_BLEND);
-        glDisable(GL_TEXTURE_2D);
 
         ShaderManager.getInstance().enableShader(null);
 

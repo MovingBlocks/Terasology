@@ -33,7 +33,6 @@ import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
 
 import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -90,9 +89,6 @@ public final class WorldRenderer implements RenderableObject {
     /* EVENTS */
     private final WorldTimeEventManager _worldTimeEventManager;
 
-    /* PHYSICS */
-    private final BulletPhysicsRenderer _bulletPhysicsRenderer;
-
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
 
@@ -118,7 +114,6 @@ public final class WorldRenderer implements RenderableObject {
         _portalManager = new PortalManager(this);
         _mobManager = new MobManager(this);
         _blockGrid = new BlockGrid(this);
-        _bulletPhysicsRenderer = new BulletPhysicsRenderer(this);
 
         initTimeEvents();
     }
@@ -201,25 +196,11 @@ public final class WorldRenderer implements RenderableObject {
      */
     public void updateVisibleChunks() {
         _visibleChunks.clear();
-        _bulletPhysicsRenderer.resetChunks();
         _statDirty = 0;
 
         boolean noMoreUpdates = false;
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
-
-            for (int j = 0; j < Chunk.VERTICAL_SEGMENTS; j++) {
-                if (c.isReadyForRendering()) {
-                    if (c.getActiveSubMesh(j)._bulletMeshShape != null) {
-                        Vector3d position = new Vector3d(c.getPosition());
-                        position.x *= Chunk.CHUNK_DIMENSION_X;
-                        position.y *= Chunk.CHUNK_DIMENSION_Y;
-                        position.z *= Chunk.CHUNK_DIMENSION_Z;
-
-                        _bulletPhysicsRenderer.addStaticChunk(new Vector3f(position), c.getActiveSubMesh(j)._bulletMeshShape);
-                    }
-                }
-            }
 
             if (isChunkVisible(c)) {
                 _visibleChunks.add(c);
@@ -248,10 +229,6 @@ public final class WorldRenderer implements RenderableObject {
 
         /* WORLD RENDERING */
         _player.getActiveCamera().lookThrough();
-
-        updateChunksInProximity(false);
-        updateVisibleChunks();
-
         _player.render();
 
         renderChunksAndEntities();
@@ -327,6 +304,9 @@ public final class WorldRenderer implements RenderableObject {
         _statSubMeshCulled = 0;
         _statEmpty = 0;
         _statVisibleTriangles = 0;
+
+        BulletPhysicsRenderer.getInstance().render();
+        ShaderManager.getInstance().enableShader("chunk");
 
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
@@ -406,7 +386,6 @@ public final class WorldRenderer implements RenderableObject {
 
         glDisable(GL11.GL_BLEND);
 
-
         _mobManager.renderAll();
 
         ShaderManager.getInstance().enableShader("chunk");
@@ -452,9 +431,6 @@ public final class WorldRenderer implements RenderableObject {
 
         glEnable(GL11.GL_CULL_FACE);
 
-        ShaderManager.getInstance().enableShader("block");
-        _bulletPhysicsRenderer.render();
-
         ShaderManager.getInstance().enableShader(null);
 
         long now = Blockmania.getInstance().getTime();
@@ -470,11 +446,11 @@ public final class WorldRenderer implements RenderableObject {
 
     public float getRenderingLightValueAt(Vector3d pos) {
         double lightValueSun = ((double) _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.SUN));
-        lightValueSun = (lightValueSun / 15.0) * getDaylight();
+        lightValueSun = Math.pow(0.86, 15.0 - lightValueSun) * getDaylight();
         double lightValueBlock = _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.BLOCK);
-        lightValueBlock = lightValueBlock / 15.0;
+        lightValueBlock = Math.pow(0.86, 15.0 - lightValueBlock);
 
-        return (float) MathHelper.clamp(Math.max(lightValueSun, lightValueBlock) + 0.2f);
+        return (float) MathHelper.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
     }
 
     public void update() {
@@ -483,8 +459,6 @@ public final class WorldRenderer implements RenderableObject {
         _skysphere.update();
         _player.update();
         _mobManager.updateAll();
-
-        _bulletPhysicsRenderer.update();
 
         // Update the particle emitters
         _blockParticleEmitter.update();
@@ -498,6 +472,11 @@ public final class WorldRenderer implements RenderableObject {
         // Simulate world
         _worldProvider.getLiquidSimulator().simulate(false);
         _worldProvider.getGrowthSimulator().simulate(false);
+
+        updateChunksInProximity(false);
+        updateVisibleChunks();
+
+        BulletPhysicsRenderer.getInstance().update();
     }
 
     /**
@@ -568,14 +547,12 @@ public final class WorldRenderer implements RenderableObject {
     public void setPlayer(Player p) {
         if (_player != null) {
             _player.unregisterObserver(_chunkUpdateManager);
-            _player.unregisterObserver(_bulletPhysicsRenderer);
             _player.unregisterObserver(_worldProvider.getGrowthSimulator());
             _player.unregisterObserver(_worldProvider.getLiquidSimulator());
         }
 
         _player = p;
         _player.registerObserver(_chunkUpdateManager);
-        _player.registerObserver(_bulletPhysicsRenderer);
         _player.registerObserver(_worldProvider.getGrowthSimulator());
         _player.registerObserver(_worldProvider.getLiquidSimulator());
 
@@ -661,16 +638,16 @@ public final class WorldRenderer implements RenderableObject {
         return _mobManager;
     }
 
-    public BulletPhysicsRenderer getBulletPhysicsRenderer() {
-        return _bulletPhysicsRenderer;
-    }
-
     public int getTick() {
         return _tick;
     }
 
     public int getViewingDistance() {
         return _viewingDistance;
+    }
+
+    public ArrayList<Chunk> getChunksInProximity() {
+        return _chunksInProximity;
     }
 
     public void setViewingDistance(int distance) {

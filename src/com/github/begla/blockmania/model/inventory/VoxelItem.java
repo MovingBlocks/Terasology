@@ -15,9 +15,12 @@
  */
 package com.github.begla.blockmania.model.inventory;
 
+import com.github.begla.blockmania.game.Blockmania;
 import com.github.begla.blockmania.logic.characters.Player;
+import com.github.begla.blockmania.logic.manager.ShaderManager;
 import com.github.begla.blockmania.rendering.primitives.BlockMeshFactory;
 import com.github.begla.blockmania.rendering.primitives.BlockTessellator;
+import org.lwjgl.opengl.GL20;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -37,6 +40,12 @@ public abstract class VoxelItem extends Item {
 
     @Override
     public boolean renderFirstPersonView() {
+        ShaderManager.getInstance().enableShader("block");
+        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
+        GL20.glUniform1f(light, Blockmania.getInstance().getActiveWorldRenderer().getRenderingLightValue());
+        int textured = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "textured");
+        GL20.glUniform1i(textured, 0);
+
         glPushMatrix();
 
         glTranslatef(1.0f, -1.3f + (float) getParent().calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - getParent().getHandMovementAnimationOffset() * 0.5f, -1.5f - getParent().getHandMovementAnimationOffset() * 0.5f);
@@ -51,6 +60,8 @@ public abstract class VoxelItem extends Item {
         _itemMesh.render();
 
         glPopMatrix();
+
+        ShaderManager.getInstance().enableShader(null);
 
         return true;
     }

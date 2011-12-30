@@ -23,6 +23,7 @@ import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.model.inventory.ItemBlock;
 import com.github.begla.blockmania.model.structures.BlockPosition;
 import com.github.begla.blockmania.model.structures.RayBlockIntersection;
+import com.github.begla.blockmania.rendering.physics.BulletPhysicsRenderer;
 import com.github.begla.blockmania.rendering.world.WorldRenderer;
 import com.github.begla.blockmania.utilities.MathHelper;
 
@@ -150,7 +151,7 @@ public class DefaultBlockTool implements Tool {
 
                     if (createPhysBlock && !BlockManager.getInstance().getBlock(currentBlockType).isTranslucent()) {
                         Vector3d pos = blockPos.toVector3d();
-                        worldRenderer.getBulletPhysicsRenderer().addBlock(new Vector3f(pos), currentBlockType);
+                        BulletPhysicsRenderer.getInstance().addBlock(new Vector3f(pos), currentBlockType);
                     }
 
                     int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);

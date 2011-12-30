@@ -35,6 +35,7 @@ import com.github.begla.blockmania.model.structures.BlockPosition;
 import com.github.begla.blockmania.model.structures.RayBlockIntersection;
 import com.github.begla.blockmania.rendering.cameras.Camera;
 import com.github.begla.blockmania.rendering.cameras.FirstPersonCamera;
+import com.github.begla.blockmania.rendering.physics.BulletPhysicsRenderer;
 import com.github.begla.blockmania.rendering.primitives.BlockTessellator;
 import com.github.begla.blockmania.rendering.primitives.BlockVertexCollection;
 import com.github.begla.blockmania.rendering.world.WorldRenderer;
@@ -577,11 +578,15 @@ public final class Player extends Character {
     public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos) {
         for (BlockObserver ob : _observers)
             ob.blockPlaced(chunk, pos);
+
+        BulletPhysicsRenderer.getInstance().blockPlaced(chunk, pos);
     }
 
     public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos) {
         for (BlockObserver ob : _observers)
             ob.blockRemoved(chunk, pos);
+
+        BulletPhysicsRenderer.getInstance().blockRemoved(chunk, pos);
     }
 
     public Inventory getInventory() {

@@ -10,6 +10,7 @@ uniform bool carryingTorch;
 
 varying vec3 vertexWorldPos;
 varying vec3 normal;
+varying float distance;
 
 uniform vec4 playerPosition;
 
@@ -64,29 +65,29 @@ void main(){
     }
 
     // Calculate daylight lighting value
-    float daylightTrans = pow(0.86, (1.0-daylight)*15.0);
-    float daylightValue = clamp(daylightTrans, 0.0, 1.0) * pow(0.92, (1.0-gl_TexCoord[1].x)*15.0);
+    float daylightValue = daylight * pow(0.86, (1.0-gl_TexCoord[1].x)*15.0);
 
     // Slightly flickering blocklight!
-    float blocklightValue = gl_TexCoord[1].y - (sin(tick*0.02) + 1.0) / 16.0;;
+    float blocklightValue = pow(0.86, (1.0-gl_TexCoord[1].y)*15.0) - (sin(tick*0.02) + 1.0) / 16.0;;
     float occlusionValue = gl_TexCoord[1].z;
+
+    float highlight = 0.0;
+    float torchlight = 0.0;
 
     // Calculate Lambertian lighting
     vec3 N = normalize(normal * ((gl_FrontFacing) ? 1.0 : -1.0));
     vec3 L = normalize(-vertexWorldPos);
-    float highlight = clamp(dot(N,L) + 0.3, 0.0, 1.0);
 
-    float torchlight = 0.0;
+    highlight = clamp(dot(N,L), 0.0, 1.0);
 
     // Apply torchlight
     if (carryingTorch) {
-        torchlight = highlight * clamp(1.0 - (length(vertexWorldPos) / 16.0), 0.0, 1.0) * 0.75;
+        torchlight = highlight * clamp(1.0 - (distance / 16.0), 0.0, 1.0) * 0.75;
     }
 
     // Apply some lighting highlights to the daylight light value
     // Looks cool during morning and evning hours and can be seen moonlight during the night
-    vec3 daylightColorValue = vec3(daylightValue + highlight * 0.25);
-
+    vec3 daylightColorValue = vec3(daylightValue + highlight * 0.05);
     vec3 blocklightColorValue = vec3(blocklightValue + torchlight);
 
     blocklightColorValue = clamp(blocklightColorValue,0.0,1.0);
@@ -108,7 +109,7 @@ void main(){
 
     // Check if the player is below the water surface
     if (!swimming) {
-        gl_FragColor.rgb = linearToSrgb(mix(color, vec4(1.0) * daylightTrans, fog)).rgb;
+        gl_FragColor.rgb = linearToSrgb(mix(color, vec4(1.0) * daylight, fog)).rgb;
         gl_FragColor.a = color.a;
     } else {
         color.rg *= 0.6;

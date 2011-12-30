@@ -20,6 +20,7 @@ import com.github.begla.blockmania.logic.manager.AudioManager;
 import com.github.begla.blockmania.logic.world.WorldProvider;
 import com.github.begla.blockmania.model.blocks.BlockManager;
 import com.github.begla.blockmania.model.structures.BlockPosition;
+import com.github.begla.blockmania.rendering.physics.BulletPhysicsRenderer;
 import com.github.begla.blockmania.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3d;
@@ -46,7 +47,6 @@ public class ExplosionTool implements Tool {
 
     public void explode() {
         WorldProvider worldProvider = _player.getParent().getWorldProvider();
-        WorldRenderer worldRenderer = _player.getParent();
 
         if (_player.getSelectedBlock() != null) {
             BlockPosition blockPos = _player.getSelectedBlock().getBlockPosition();
@@ -70,7 +70,7 @@ public class ExplosionTool implements Tool {
                         worldProvider.setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, true);
 
                         if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent() && counter % 4 == 0)
-                            worldRenderer.getBulletPhysicsRenderer().addBlock(new Vector3f(target), currentBlockType);
+                            BulletPhysicsRenderer.getInstance().addBlock(new Vector3f(target), currentBlockType);
 
                         counter++;
                     }
