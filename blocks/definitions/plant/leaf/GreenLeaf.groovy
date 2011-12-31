@@ -1,4 +1,4 @@
-import com.github.begla.blockmania.model.blocks.Block.COLOR_SOURCE
+import org.terasology.model.blocks.Block.COLOR_SOURCE
 
 /**
  * This is a leaf, which can exist in the world just as a block of its own

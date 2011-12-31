@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks.furniture
-
 /**
  * A bookcase only has books on the front. Well, at least this one does, for now
  */

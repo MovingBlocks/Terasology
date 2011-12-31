@@ -1,4 +1,4 @@
-import com.github.begla.blockmania.model.blocks.Block.BLOCK_FORM
+import org.terasology.model.blocks.Block.BLOCK_FORM
 
 /**
  * Torches catch on fire and stuff. On purpose!

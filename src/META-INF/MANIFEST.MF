@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.github.begla.blockmania.game.Blockmania
+Main-Class: org.terasology.game.Terasology
 

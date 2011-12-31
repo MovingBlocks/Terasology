@@ -1,5 +1,5 @@
-import com.github.begla.blockmania.model.blocks.Block.BLOCK_FORM
-import com.github.begla.blockmania.model.blocks.Block.COLOR_SOURCE
+import org.terasology.model.blocks.Block.BLOCK_FORM
+import org.terasology.model.blocks.Block.COLOR_SOURCE
 
 /**
  * Tall grass variety 3 (higher number = taller)

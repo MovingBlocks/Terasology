@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Blockmania.iml" filepath="$PROJECT_DIR$/Blockmania.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Terasology.iml" filepath="$PROJECT_DIR$/Terasology.iml" />
     </modules>
   </component>
 </project>

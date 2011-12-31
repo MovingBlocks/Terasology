@@ -1,7 +1,7 @@
-import com.github.begla.blockmania.logic.generators.ChunkGeneratorTerrain.BIOME_TYPE
-import com.github.begla.blockmania.logic.generators.TreeGeneratorCactus
-import com.github.begla.blockmania.logic.generators.TreeGeneratorLSystem
-import com.github.begla.blockmania.model.blocks.BlockManager
+import org.terasology.logic.generators.ChunkGeneratorTerrain.BIOME_TYPE
+import org.terasology.logic.generators.TreeGeneratorCactus
+import org.terasology.logic.generators.TreeGeneratorLSystem
+import org.terasology.model.blocks.BlockManager
 
 def mngr = generatorManager
 def probs = ["A": 1.0d, "B": 0.8d]

@@ -4,7 +4,7 @@ import org.lwjgl.opengl.PixelFormat
 
 System {
 
-    gameTitle = "Blockmania Pre Alpha"
+    versionTag = "Pre Alpha"
 
     // Max amount of particles
     maxParticles = 256

@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks
-
 /**
  * A Plank block is meant to be the "refined" version of wood from a tree
  */

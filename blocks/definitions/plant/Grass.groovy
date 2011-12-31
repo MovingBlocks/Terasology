@@ -1,4 +1,4 @@
-import com.github.begla.blockmania.model.blocks.Block.COLOR_SOURCE
+import org.terasology.model.blocks.Block.COLOR_SOURCE
 
 /**
  * Grass is a little more interesting as its faces differ.

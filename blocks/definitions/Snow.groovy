@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks
-
 /**
  * Snow is a Dirt block covered by Snow, just like grass.
  * Unlike Grass, it might be possible to have a SnowBlock as well

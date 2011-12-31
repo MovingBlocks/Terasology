@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks
-
 /**
  * Brick is Brick
  */

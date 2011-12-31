@@ -1,9 +1,9 @@
-Blockmania
-==========
+Terasology (previously titled Blockmania)
+=========================================
 
-![Blockmania](http://blog.movingblocks.net/wp-content/uploads/Blockmania030911-1.png "Blockmania")
+![Terasology](http://blog.movingblocks.net/wp-content/uploads/Blockmania030911-1.png "Terasology")
 
-Blockmania is an open source project started by Benjamin "begla" Glatzel to research *procedural terrain generation* and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a *block-based voxel-like approach as seen in Minecraft*.
+Terasology is an open source project started by Benjamin "begla" Glatzel to research *procedural terrain generation* and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a *block-based voxel-like approach as seen in Minecraft*.
 
 After proving itself as a solid *tech demo* begla was joined at first by Anton "small-jeeper" Kireev and Rasmus "Cervator" Praestholm and a full-fledged game concept was born.
 
@@ -13,14 +13,14 @@ For more information on the project visit our blog: [Moving Blocks!](http://blog
 
 If you're interested in joining up as a contributor register for our [forum](http://board.movingblocks.net) - the project is using the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-You can also fork the project on [GitHub](https://github.com/begla/Blockmania)
+You can also fork the project on [GitHub](https://github.com/begla/Terasology)
 
 Setup
 -----
 
-Blockmania requires the latest version of Oracle's [Java Virtual Machine (JVM)](http://www.java.com/de/download/). Also make sure that your graphics card driver is up to date.
+The game requires the latest version of Oracle's [Java Virtual Machine (JVM)](http://www.java.com/de/download/). Also make sure that your graphics card driver is up to date.
 
-You can use one of the default launch scripts to start Blockmania. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x script.sh".
+You can use one of the default launch scripts to start the game. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x script.sh".
 
 Controls
 --------
@@ -65,4 +65,4 @@ Composed by Karina Kireev.
 Additional Notes
 ================
 
-Blockmania's base graphics use the awesome <strong><a href="http://www.carrotcakestudios.co.uk/gmcraft/">Good Morning Craft!</a></strong> texture pack by Louis Durrant. Make sure to visit his <a href="http://www.carrotcakestudios.co.uk/">homepage</a> and support his work.
+Terasology's base graphics use the awesome <strong><a href="http://www.carrotcakestudios.co.uk/gmcraft/">Good Morning Craft!</a></strong> texture pack by Louis Durrant. Make sure to visit his <a href="http://www.carrotcakestudios.co.uk/">homepage</a> and support his work.

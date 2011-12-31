@@ -1,5 +1,3 @@
-package com.github.begla.blockmania.data.blocks
-
 /**
  * A PortalBlock will be tied to the central game concept of the same name. It is indestructible (for now)
  */
