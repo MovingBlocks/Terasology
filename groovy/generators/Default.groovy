@@ -11,20 +11,20 @@ def rules = ["A": "[&FFBFA]////[&BFFFA]////[&FBFFA]", "B": "[&FFFA]////[&FFFA]//
 def oakTree = new TreeGeneratorLSystem(mngr, "FFFFFFA", rules, probs, 4, 30).withGenerationProbability(0.08)
 
 // Pine
-rules = ["A": "[&FFFBFFA]////[&FFFFBFA]////[&FFFBFFA]"]
-def pineTree = new TreeGeneratorLSystem(mngr, "FFFFAFFFFFFFAFFFFA", rules, probs, 4, 20).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.05).withBarkType(BlockManager.getInstance().getBlock("PineTrunk").getId())
+rules = ["A": "[&FFFFFA]////[&FFFFFA]////[&FFFFFA]"]
+def pineTree = new TreeGeneratorLSystem(mngr, "FFFFAFFFFFFFAFFFFA", rules, probs, 4, 35).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.05).withBarkType(BlockManager.getInstance().getBlock("PineTrunk").getId())
 
 // Birk
-rules = ["A": "[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]", "B": "[&FBF]////[&FBF]////[&FBF]"]
-def birkTree = new TreeGeneratorLSystem(mngr, "FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, probs, 4, 30).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.02).withBarkType(BlockManager.getInstance().getBlock("BirkTrunk").getId())
+rules = ["A": "[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]", "B": "[&FAF]////[&FAF]////[&FAF]"]
+def birkTree = new TreeGeneratorLSystem(mngr, "FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, probs, 4, 35).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.02).withBarkType(BlockManager.getInstance().getBlock("BirkTrunk").getId())
 
 // Oak variation tree
 rules = ["A": "[&FFBFA]////[&BFFFA]////[&FBFFAFFA]", "B": "[&FFFAFFFF]////[&FFFAFFF]////[&FFFAFFAA]"]
-def oakVariationTree = new TreeGeneratorLSystem(mngr, "FFFFFFA", rules, probs, 4, 20).withGenerationProbability(0.08)
+def oakVariationTree = new TreeGeneratorLSystem(mngr, "FFFFFFA", rules, probs, 4, 35).withGenerationProbability(0.08)
 
 // A red tree
-rules = ["A": "[&BFA]////[&FFBA]////[&FFBFA]"]
-def redTree = new TreeGeneratorLSystem(mngr, "FFAFAFFAFF", rules, probs, 4, 30).withLeafType(BlockManager.getInstance().getBlock("RedLeaf").getId()).withGenerationProbability(0.05)
+rules = ["A": "[&FFAFF]////[&FFAFF]////[&FFAFF]"]
+def redTree = new TreeGeneratorLSystem(mngr, "FFFFFAFAFAF", rules, probs, 4, 40).withLeafType(BlockManager.getInstance().getBlock("RedLeaf").getId()).withGenerationProbability(0.05)
 
 // Cactus
 def cactus = new TreeGeneratorCactus(mngr).withGenerationProbability(0.05)

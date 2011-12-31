@@ -30,6 +30,8 @@ import java.util.Stack;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class TreeGeneratorLSystem extends TreeGenerator {
+    
+    public final int MAX_ANGLE_OFFSET = 5;
 
     /* SETTINGS */
     private int _iterations;
@@ -97,7 +99,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         rotation.setIdentity();
         rotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.PI / 2.0f));
 
-        int angleOffset = rand.randomInt() % 16;
+        int angleOffset = rand.randomInt() % MAX_ANGLE_OFFSET;
 
         for (int i = 0; i < axiom.length(); i++) {
             char c = axiom.charAt(i);
@@ -109,7 +111,11 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                 case 'G':
                 case 'F':
                     // Tree trunk
-                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z, _barkType, update, true);
+                    _generatorManager.getParent().setBlock(posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, _barkType, update, true);
+                    _generatorManager.getParent().setBlock(posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, _barkType, update, true);
+                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, _barkType, update, true);
+                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, _barkType, update, true);
+
 
                     // Generate leaves
                     if (_stackOrientation.size() > 1) {
@@ -121,8 +127,17 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                                     if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size)
                                         continue;
 
-                                    if (_generatorManager.getParent().getBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z) == 0x0)
-                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z, _leafType, update, true);
+                                    if (_generatorManager.getParent().getBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z) == 0x0)
+                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, _leafType, update, true);
+
+                                    if (_generatorManager.getParent().getBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z) == 0x0)
+                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, _leafType, update, true);
+
+                                    if (_generatorManager.getParent().getBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1) == 0x0)
+                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, _leafType, update, true);
+
+                                    if (_generatorManager.getParent().getBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1) == 0x0)
+                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, _leafType, update, true);
 
                                 }
                             }
