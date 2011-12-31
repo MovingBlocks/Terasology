@@ -44,8 +44,8 @@ Controls
 Example console commands
 ------------------------
 
-* "blockmania.initWorld();"                               Init. a new random world
-* "blockmania.getActiveWorldProvider().setTime(0.0);"     Set the world time
+* "tera.initWorld();"                               Init. a new random world
+* "tera.getActiveWorldProvider().setTime(0.0);"     Set the world time
 
 Credits
 =======

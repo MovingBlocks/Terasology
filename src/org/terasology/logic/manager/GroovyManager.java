@@ -99,7 +99,7 @@ public class GroovyManager {
     }
 
     private void updateBinding() {
-        _bind.setVariable("Terasology", Terasology.getInstance());
+        _bind.setVariable("tera", Terasology.getInstance());
         _bind.setVariable("configuration", ConfigurationManager.getInstance());
     }
 
