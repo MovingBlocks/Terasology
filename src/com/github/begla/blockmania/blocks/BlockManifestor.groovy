@@ -22,7 +22,9 @@ import java.awt.Graphics
 import org.newdawn.slick.util.ResourceLoader
 import javax.vecmath.Vector2f
 import javax.vecmath.Vector4f
-import com.github.begla.blockmania.rendering.manager.TextureManager;
+import com.github.begla.blockmania.rendering.manager.TextureManager
+import java.util.jar.JarEntry
+import java.util.jar.JarFile;
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -76,7 +78,17 @@ class BlockManifestor {
             // TODO: Could actually both load existing textures and added ones and update the manifest files fairly easily
         } else {
             // If we don't have a saved world we'll need to build a new ImageManifest from raw block textures
-            _images = getInternalImages("com/github/begla/blockmania/data/textures/blocks")
+            String path = "com/github/begla/blockmania/data/textures/blocks"
+            URL u = getClass().getClassLoader().getResource(path);
+            println "*** Going to get Images from classpath: " + path
+            println "The URL made from that is: " + u
+            if (u.getProtocol().equals("jar")) {
+                // If we're running from inside a jar file we have to load one way - all at once via JarFile.entries()
+                _images = getInternalImagesFromJar(path, u)
+            } else {
+                // And if not, we use a recursive file lookup method that traverses through subdirs if needed
+                _images = getInternalImages(path)
+            }
 
             //println "Loaded fresh images - here's some logging!"
             _images.eachWithIndex { key, value, index ->
@@ -340,14 +352,13 @@ class BlockManifestor {
 
     /**
      * Looks for Block image files recursively starting from a given path and adds them to a map
-     * @param path  the path to start looking from
+     * @param path  the path to start looking from (used recursively)
      * @return      a map containing loaded BufferedImages tied to their filename minus .png
      */
     private getInternalImages(String path) {
         def images = [:]
 
         URL u = getClass().getClassLoader().getResource(path);
-        println "*** Going to get Images from classpath: " + path
 
         new File(u.toURI()).list().each { i ->
             println "Checking filename/dir: " + i
@@ -364,6 +375,47 @@ class BlockManifestor {
             }
         }
         // Return the final map
+        return images
+    }
+
+    /**
+     * Looks for Block image files inside the jar file we're running from all at once and adds them to a map
+     * @param path  path within the jar file we care about
+     * @param u     URL reference to within the jar that we'll use to simply access the JarFile
+     * @return      a map containing loaded BufferedImages tied to their filename minus .png
+     */
+    private getInternalImagesFromJar(String path, URL u) {
+        def images = [:]
+
+        // Using a nifty technique adapted from http://www.uofr.net/~greg/java/get-resource-listing.html !
+        println "We're running from inside a jar file, so we're going to scan the whole thing for what we want"
+        String jarPath = u.getPath().substring(5, u.getPath().indexOf("!")); //strip out only the JAR file
+        println "jarPath: " + jarPath
+        JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+        Enumeration<JarEntry> entries = jar.entries(); // Loads up EVERYTHING inside the jar file
+        Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
+        while(entries.hasMoreElements()) {
+            String name = entries.nextElement().getName();
+            //println "Got a name: " + name
+            if (name.startsWith(path)) { // We only care about stuff under the desired path
+                String entry = name.substring(path.length());
+                println "Entry under desired path: " + entry
+                if (entry[-1] == '/') {
+                    println "This one is a dir, ignoring it"
+                } else {
+
+                    result.add(entry);
+                }
+            }
+        }
+
+        // print what we got and load as images, then return a nice mapping of the two
+        result.each {
+            println it + " is being loaded as an image and mapped to short name " + it[(it.lastIndexOf('/') + 1)..-5]
+            // Load a BufferedImage and put it in the map tied to its name short the ".png"
+            images.put(it[(it.lastIndexOf('/') + 1)..-5], ImageIO.read(ResourceLoader.getResource(path + it).openStream()))
+        }
+
         return images
     }
 

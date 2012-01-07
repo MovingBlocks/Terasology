@@ -61,9 +61,11 @@
         </fileset>
     </path>
 
-    <!-- Modules -->
-
-
+    <!-- GROOVY! -->
+    <target name="register.custom.compilers">
+        <property name="grooovyc.task.sdk" value="library.libs.classpath"/>
+        <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc" classpathref="${grooovyc.task.sdk}"/>
+    </target>
     <!-- Module Blockmania -->
 
     <dirname property="module.blockmania.basedir" file="${ant.file}"/>
@@ -118,16 +120,16 @@
             depends="compile.module.blockmania.production,compile.module.blockmania.tests"
             description="Compile module Blockmania"/>
 
-    <target name="compile.module.blockmania.production" description="Compile module Blockmania; production classes">
+    <target name="compile.module.blockmania.production" depends="register.custom.compilers" description="Compile module Blockmania; production classes">
         <mkdir dir="${blockmania.output.dir}"/>
-        <javac destdir="${blockmania.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-               memorymaximumsize="${compiler.max.memory}" fork="true">
-            <compilerarg line="${compiler.args.blockmania}"/>
-            <bootclasspath refid="blockmania.module.bootclasspath"/>
-            <classpath refid="blockmania.module.production.classpath"/>
+        <groovyc destdir="${blockmania.output.dir}" fork="yes">
             <src refid="blockmania.module.sourcepath"/>
+            <classpath refid="blockmania.module.production.classpath"/>
             <patternset refid="excluded.from.compilation.blockmania"/>
-        </javac>
+            <javac debug="${compiler.debug}">
+                <compilerarg line="${compiler.args.blockmania}"/>
+            </javac>
+        </groovyc>
 
         <copy todir="${blockmania.output.dir}">
             <fileset dir="${module.blockmania.basedir}/src">
