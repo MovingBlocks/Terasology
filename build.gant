@@ -1,0 +1,104 @@
+/**
+ * Builds stuff for Terasology. Yay Gant!
+ */
+
+def debugEnabled = true    // Not sure if this works, output is the same?
+
+// Okay, this is a little fanciful, but hey, gotta showcase Groovy / Gant some! We end up with a list with each item prefixed
+def jarIncludes = ['properties', 'xml', 'gif', 'png', 'jpeg', 'jpg', 'glsl', 'png', 'ogg', 'fnt', 'groovy'].collect {'**/?*.' + it}
+def sourceDir = 'src'
+
+def libDir = 'libs'
+def libPattern = '*.jar'
+
+def outputDir = 'out'
+def classDir = outputDir + '/classes'
+def distDir = outputDir + '/dist'
+def artifactJar = distDir + '/Blockmania.jar'
+def artifactZip = outputDir + '/Blockmania.zip'
+
+// Stuff beyond source code that we'll copy to the output dir (outside the jar file)
+def extraFiles = ['README.markdown', 'OpenAL32.dll', 'OpenAL64.dll']
+def extraDirs = ['natives', 'groovy']
+def scriptDirFiles = ['run_linux.sh', 'run_macosx.command', 'Terasology.exe']
+
+// Default target that Gant calls - kicks off everything
+target('default': 'The default target') {
+    echo ( message : 'Default target starting up, going to clean and compile')
+
+    ant.taskdef (  name : 'groovyc' , classname : 'org.codehaus.groovy.ant.Groovyc' )
+
+    clean()
+    compile ()
+    buildArtifacts ()
+    buildZip ()
+}
+
+target ('compile' : 'Compiles the code!') {
+
+    // For some reason this is needed?
+    classpathID = 'classpathID'
+    
+    path ( id : classpathID ) {
+        fileset (dir : libDir, includes : libPattern)
+    }
+
+    // Prep the output dir and put compiled class files there
+    mkdir(dir : classDir)
+    groovyc ( srcdir : sourceDir , destdir : classDir , fork : 'true') {
+        classpath { path ( refid : classpathID ) }
+        javac ( debug : debugEnabled )
+    }
+
+    echo ( message: 'Made it past compile! Going to copy some non-compiled stuff' )
+
+    // Copy non-compiled resources to the output dir
+    copy (todir : classDir) {
+        fileset ( dir : sourceDir , includes : jarIncludes.join ( ',' ) )
+    }
+}
+
+target ('clean' : 'Cleans up output dirs') {
+    delete (dir : outputDir)
+}
+
+target ('buildArtifacts' : 'Takes compiled code and everything else needed and preps packaged artifacts') {
+
+    // Prep dir and package up the primary jar
+    mkdir (dir : distDir)
+    jar ( destfile : artifactJar , manifest : sourceDir + '/META-INF/MANIFEST.MF', filesetmanifest : 'skip', duplicate : 'add') {
+        zipfileset ( dir : classDir )
+        zipfileset ( src : 'libs/annotations.jar' )
+        zipfileset ( src : 'libs/AppleJavaExtensions.jar' )
+        zipfileset ( src : 'libs/jogg-0.0.7.jar' )
+        zipfileset ( src : 'libs/jorbis-0.0.15.jar' )
+        zipfileset ( src : 'libs/jinput.jar' )
+        zipfileset ( src : 'libs/lwjgl.jar' )
+        zipfileset ( src : 'libs/lwjgl_util.jar' )
+        zipfileset ( src : 'libs/lzma.jar' )
+        zipfileset ( src : 'libs/slick.jar' )
+        zipfileset ( src : 'libs/slick-util.jar' )
+        zipfileset ( src : 'libs/trove-3.0.0.jar' )
+        zipfileset ( src : 'libs/groovy-all-1.8.2.jar' )
+        zipfileset ( src : 'libs/jdom.jar' )
+        zipfileset ( src : 'libs/vecmath.jar' )
+        zipfileset ( src : 'libs/jbullet.jar' )
+    }
+    // Whack the compiled files we don't need loose anymore
+    delete ( dir : classDir)
+
+    // Copy in additional artifacts
+    extraFiles.each { copy ( file : it, tofile : distDir + '/' + it) }
+    extraDirs.each { dirToCopy ->
+        copy ( todir : distDir + '/' + dirToCopy ) {
+            fileset ( dir : dirToCopy )
+        }
+    }
+    // Copy in executables from the scripts dir to the root of the output dir -
+    // Rename "scripts" to "bin" and adjust pathing, then these entries can move to extraFiles instead?
+    scriptDirFiles.each { copy ( file : 'scripts/' + it, tofile : distDir + '/' + it) }
+}
+
+target ('buildZip' : 'Zips up the built artifacts so we can provide a single file for download') {
+    zip ( destfile : artifactZip, basedir :  outputDir)
+}

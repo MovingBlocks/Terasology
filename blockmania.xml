@@ -179,7 +179,7 @@
         <copy file="${basedir}/OpenAL64.dll" tofile="${artifact.output.blockmania}/OpenAL64.dll"/>
         <copy file="${basedir}/scripts/run_linux.sh" tofile="${artifact.output.blockmania}/run_linux.sh"/>
         <copy file="${basedir}/scripts/run_macosx.command" tofile="${artifact.output.blockmania}/run_macosx.command"/>
-        <copy file="${basedir}/scripts/Launcher.exe" tofile="${artifact.output.blockmania}/Blockmania.exe"/>
+        <copy file="/scripts/Terasology.exe" tofile="${artifact.output.blockmania}/Blockmania.exe"/>
         <mkdir dir="${artifact.output.blockmania}/natives"/>
         <copy todir="${artifact.output.blockmania}/natives">
             <fileset dir="${basedir}/natives"/>
