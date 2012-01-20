@@ -66,7 +66,9 @@ public final class ConfigurationManager {
      */
     public void loadConfigEnvironment(String environment) {
         ConfigObject config = null;
-
+        DefaultConfig yay = new DefaultConfig();
+        config = yay.getConfig();
+/*
         try {
             if (environment != null)
                 config = new ConfigSlurper(environment).parse(new File(DEFAULT_CONFIG_PATH).toURI().toURL());
@@ -77,6 +79,7 @@ public final class ConfigurationManager {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         }
 
+        //config = new ConfigSlurper().parse(new DefaultConfig());*/
         if (config != null)
             _config = config.flatten();
     }

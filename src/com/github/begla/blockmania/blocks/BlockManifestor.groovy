@@ -138,9 +138,9 @@ class BlockManifestor {
 
     /**
      * This method figures out whether we're running from inside a jar file, in case we need to load stuff differently
-     * If we are then return JarEntries for everything inside the jar file
-     * @param path  any path to something that exists inside the jar file
-     * @return      Enumeration containing references to everything in the jar or null if we're not inside a jar file
+     * If we are then return a JarFile we can keep handy for later loading from
+     * @param path  any path to something that exists inside the jar file (better be unique!)
+     * @return      JarFile reference or null if we're not inside a jar file
      */
     private JarFile scanJar(String path) {
         URL u = getClass().getClassLoader().getResource(path);

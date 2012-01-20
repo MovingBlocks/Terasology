@@ -34,7 +34,7 @@ public class GeneratorManager {
 
     private WorldProvider _parent;
 
-    private Binding _binding;
+    //private Binding _binding;
     private static final String DEFAULT_SCRIPT_PATH = "groovy/generators/";
 
     /* WORLD GENERATION */
@@ -49,13 +49,16 @@ public class GeneratorManager {
         _chunkGenerators.add(new ChunkGeneratorFlora(this));
         _chunkGenerators.add(new ChunkGeneratorResources(this));
 
-        _binding = new Binding();
-        _binding.setVariable("generatorManager", this);
+        //_binding = new Binding();
+        //_binding.setVariable("generatorManager", this);
         loadTrees();
     }
 
     public void loadTrees() {
-        try {
+
+        new DefaultGenerators(this);
+
+/*        try {
             GroovyScriptEngine scriptEngine = new GroovyScriptEngine(DEFAULT_SCRIPT_PATH);
             scriptEngine.run("Default.groovy", _binding);
         } catch (IOException e) {
@@ -65,7 +68,8 @@ public class GeneratorManager {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         } catch (ScriptException e) {
             Blockmania.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
-        }
+        }*/
+
     }
 
     public ArrayList<TreeGenerator> getTreeGenerators(ChunkGeneratorTerrain.BIOME_TYPE type) {

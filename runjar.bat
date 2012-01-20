@@ -1,3 +1,3 @@
-cd out\artifacts\blockmania
+cd out\dist
 java -jar Blockmania.jar
-cd ../../..
+cd ../..
