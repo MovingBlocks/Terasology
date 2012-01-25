@@ -148,7 +148,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     }
 
     protected void GenerateInnerLayer(int x, int y, int z, Chunk c, BIOME_TYPE type) {
-        // TODO: GENERATE MINERALS HERE
+        // TODO: GENERATE MINERALS HERE - config waiting at org\terasology\logic\manager\DefaultConfig.groovy 2012/01/22
         c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
     }
 

@@ -15,17 +15,10 @@
  */
 package org.terasology.logic.generators;
 
-import groovy.lang.Binding;
-import groovy.util.GroovyScriptEngine;
-import groovy.util.ResourceException;
-import groovy.util.ScriptException;
-import org.terasology.game.Terasology;
 import org.terasology.logic.world.WorldProvider;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -33,9 +26,6 @@ import java.util.logging.Level;
 public class GeneratorManager {
 
     private final WorldProvider _parent;
-
-    private final Binding _binding;
-    private static final String DEFAULT_SCRIPT_PATH = "groovy/generators/";
 
     /* WORLD GENERATION */
     protected final ArrayList<ChunkGenerator> _chunkGenerators = new ArrayList<ChunkGenerator>(8);
@@ -49,22 +39,12 @@ public class GeneratorManager {
         _chunkGenerators.add(new ChunkGeneratorFlora(this));
         _chunkGenerators.add(new ChunkGeneratorLiquids(this));
 
-        _binding = new Binding();
-        _binding.setVariable("generatorManager", this);
         loadTrees();
     }
 
     public void loadTrees() {
-        try {
-            GroovyScriptEngine scriptEngine = new GroovyScriptEngine(DEFAULT_SCRIPT_PATH);
-            scriptEngine.run("Default.groovy", _binding);
-        } catch (IOException e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
-        } catch (ResourceException e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
-        } catch (ScriptException e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
-        }
+        // TODO: Turn this into a generic tree loader that goes looking for any tree definitions (MetaBlock = Tree ?)
+        new DefaultGenerators(this);
     }
 
     public ArrayList<TreeGenerator> getTreeGenerators(ChunkGeneratorTerrain.BIOME_TYPE type) {
@@ -114,7 +94,6 @@ public class GeneratorManager {
 
         return list.get(id);
     }
-
 
     public WorldProvider getParent() {
         return _parent;

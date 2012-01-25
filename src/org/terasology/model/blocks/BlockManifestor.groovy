@@ -16,16 +16,20 @@ package org.terasology.model.blocks
  * limitations under the License.
  */
 
-import java.awt.Graphics2D
+import org.terasology.logic.manager.TextureManager
+
+import org.newdawn.slick.util.ResourceLoader
+
+import java.awt.Graphics
 import java.awt.Image
-import java.awt.RenderingHints
 import java.awt.image.BufferedImage
+
+import java.util.jar.JarFile
+import java.util.jar.JarEntry;
+
 import javax.imageio.ImageIO
 import javax.vecmath.Vector2f
 import javax.vecmath.Vector4f
-import org.newdawn.slick.util.ResourceLoader
-import org.terasology.logic.manager.TextureManager
-import java.awt.Graphics
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -38,8 +42,9 @@ class BlockManifestor {
 
     private static BlockManager _bm;
 
-    /** Used for dynamically loading the Groovy classes **/
-    protected GroovyClassLoader _classLoader = new GroovyClassLoader();
+    /** Jar-execution only: Enumeration with entries for everything that we use to load stuff from. Not persisted */
+    public static JarFile _jar = null
+    // TODO: Usage of this is fairly brute force, maybe there's a more efficient way, with sorting or so?
 
     /** Holds BufferedImages during the loading process (not persisted) */
     private Map<String, BufferedImage> _images = [:]
@@ -76,6 +81,10 @@ class BlockManifestor {
      * (the "version" prop is in all the files as an example, but a complete system would take some work)
      */
     public loadConfig() throws Exception {
+        // First of all we need to know whether we're running from inside a jar or not - this will store a local ref if so
+        // The path used here can be tricky as it may catch something unexpected if too vague (like a lib jar with a matching fragment)
+        _jar = scanJar("org/terasology/data/blocks")
+
         boolean worldExists = _blockManifest.exists() && _imageManifest.exists()
 
         // Check if we've got a manifest - later this would base on / trigger when user selects world load / create (GUI)
@@ -85,7 +94,15 @@ class BlockManifestor {
             // TODO: Could actually both load existing textures and added ones and update the manifest files fairly easily
         } else {
             // If we don't have a saved world we'll need to build a new ImageManifest from raw block textures
-            _images = getInternalImages("blocks/images")
+            String path = "org/terasology/data/blocks/images"
+            println "*** Going to get Images from classpath: " + path
+            if (_jar != null) {
+                // If we're running from inside a jar file we have to load one way - all at once via JarFile.entries()
+                _images = getInternalImagesFromJar(path)
+            } else {
+                // And if not, we use a recursive file lookup method that traverses through subdirs if needed
+                _images = getInternalImages(path)
+            }
 
             println "Loaded fresh images - here's some logging!"
             _images.eachWithIndex { key, value, index ->
@@ -97,17 +114,17 @@ class BlockManifestor {
         }
 
         // We always load the block definitions, the block IDs just may already exist in the manifest if using a saved world
-        loadBlockDefinitions("")
+        loadBlockDefinitions("org/terasology/data/blocks/definitions")
 
         // Load block definitions from Block sub-classes
-        new PlantBlockManifestor().loadBlockDefinitions("plant")
-        new TreeBlockManifestor().loadBlockDefinitions("plant/tree")
-        new LiquidBlockManifestor().loadBlockDefinitions("liquid")
+        new PlantBlockManifestor().loadBlockDefinitions("org/terasology/data/blocks/definitions/plant")
+        new TreeBlockManifestor().loadBlockDefinitions("org/terasology/data/blocks/definitions/plant/tree")
+        new LiquidBlockManifestor().loadBlockDefinitions("org/terasology/data/blocks/definitions/liquid")
 
         // We can also re-use manifestors for sub dirs if we just put stuff there for a "human-friendly" grouping
-        loadBlockDefinitions("furniture")
-        loadBlockDefinitions("mineral")
-        new PlantBlockManifestor().loadBlockDefinitions("plant/leaf")
+        loadBlockDefinitions("org/terasology/data/blocks/definitions/furniture")
+        loadBlockDefinitions("org/terasology/data/blocks/definitions/mineral")
+        new PlantBlockManifestor().loadBlockDefinitions("org/terasology/data/blocks/definitions/plant/leaf")
 
         // _nextByte may not make sense if we're loading a world - until it is possible to upgrade / add stuff anyway
         println "Done loading blocks - _nextByte made it to " + _nextByte
@@ -122,6 +139,31 @@ class BlockManifestor {
         _bm.addAllBlocks(_blockIndex)
         println "_imageManifest file: " + _imageManifest.getAbsolutePath()
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
+        // Hacky hacky hack hack!
+        //System.exit(0)
+    }
+
+    /**
+     * This method figures out whether we're running from inside a jar file, in case we need to load stuff differently
+     * If we are then return a JarFile we can keep handy for later loading from
+     * @param path  any path to something that exists inside the jar file (better be unique!)
+     * @return      JarFile reference or null if we're not inside a jar file
+     */
+    private JarFile scanJar(String path) {
+        URL u = getClass().getClassLoader().getResource(path);
+        println "URL made from our dummy jar path is: " + u
+        if (u.getProtocol().equals("jar")) {
+            // Found and adapted a nifty technique from http://www.uofr.net/~greg/java/get-resource-listing.html
+            println "We're running from inside a jar file, so we're going to store references to everything inside"
+            String jarPath = u.getPath().substring(5, u.getPath().indexOf("!")); //strip out only the JAR file
+            println "jarPath is: " + jarPath
+            JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+            println "Successfully loaded a jar file reference, returning it"
+            return jar; // Store a reference to the jar file so we can loop through it later
+        }
+
+        println "We're not running inside a jar file, so we don't need any references to jar resources"
+        return null
     }
 
     /**
@@ -181,18 +223,49 @@ class BlockManifestor {
      * @param path target path to load stuff from
      * @return instanced Groovy classes
      */
-    protected getClassesAt(String type) {
+    protected getClassesAt(String path) {
         def allClasses = []
 
-        URL u = ResourceLoader.getResource("blocks/definitions/" + type);
-        println "*** Going to get Blocks from classpath: " + type
+        println "Getting Block definitions from " + path
 
-        new File(u.toURI()).list().each { i ->
-            println "Checking filename/dir: " + i
-            // Ignore directories and compiled inner classes (closures)
-            if (i.endsWith(".groovy")) {
-                println("Useful class: " + i)
-                allClasses << _classLoader.parseClass(new File(URI.create("file://" + u.getPath().toString() + "/" + i)))
+        // Check to see if we're loading from within a jar file not not
+        if (_jar != null ) {
+            Enumeration<JarEntry> entries = _jar.entries()
+            while(entries.hasMoreElements()) {
+                String name = entries.nextElement().getName();
+                //println "Got a name: " + name
+                if (name.startsWith(path)) { // We only care about stuff under the desired path
+                    String entry = name.substring(path.length());
+                    println "Class entry under desired path: " + entry
+                    if (entry[-1] == '/') {
+                        println "This one is a dir, ignoring it"
+                    } else {
+                        println "This is not a dir, going to check if it is a suitable class"
+                        // We only care about class files that are not inner classes ($) nor deeper than desired path (exactly one /)
+                        if (!entry.contains('$') && entry.endsWith(".class") && entry.count('/') == 1) {
+                            def className = entry[0..-7]
+                            println ("Useful class: " + className)
+                            allClasses << getClass().getClassLoader().loadClass((path + className).replace('/', '.'))
+                        }
+                    }
+                }
+            }
+        } else {
+            // Load from file system instead (running from source)
+            URL u = getClass().getClassLoader().getResource(path);
+            path = path.replace('/', '.')
+
+            println "*** Going to get Blocks from classpath: " + path
+
+            new File(u.toURI()).list().each { i ->
+                //println "Checking filename/dir: " + i
+                // Ignore directories and compiled inner classes (closures)
+                if (!i.contains('$') && i.endsWith(".class")) {
+                    def className = i[0..-7]
+
+                    println ("Useful class: " + className)
+                    allClasses << getClass().getClassLoader().loadClass(path + "." + className)
+                }
             }
         }
 
@@ -298,6 +371,7 @@ class BlockManifestor {
             println "Setting invisible boolean to: " + c.block.invisible
             b.withInvisible((boolean) c.block.invisible)
         }
+        // TODO: Check what's up with waving/invisible together? Not fully updated println ?
         if (c.block.waving != [:]) {
             println "Setting invisible boolean to: " + c.block.invisible
             b.withWaving((boolean) c.block.waving)
@@ -359,7 +433,9 @@ class BlockManifestor {
     private getInternalImages(String path) {
         def images = [:]
 
-        URL u = ResourceLoader.getResource(path);
+        // TODO: Check if either of these work, is resource loader better?
+        // URL u = ResourceLoader.getResource(path);
+        URL u = getClass().getClassLoader().getResource(path);
         println "*** Going to get Images from classpath: " + path
 
         new File(u.toURI()).list().each { i ->
@@ -378,6 +454,44 @@ class BlockManifestor {
         }
         // Return the final map
         return images
+    }
+
+    /**
+     * Looks for Block image files inside the jar file we're running from all at once and adds them to a map
+     * @param path  path within the jar file we care about
+     * @return      a map containing loaded BufferedImages tied to their filename minus .png
+     */
+    private getInternalImagesFromJar(String path) {
+        def images = [:]
+        Set<String> result = new HashSet<String>(); // Detect dupes
+        Enumeration<JarEntry> entries = _jar.entries()
+        while(entries.hasMoreElements()) {
+            String name = entries.nextElement().getName();
+            //println "Got a name: " + name
+            if (name.startsWith(path)) { // We only care about stuff under the desired path
+                String entry = name.substring(path.length());
+                println "Entry under desired path: " + entry
+                if (entry[-1] == '/') {
+                    println "This one is a dir, ignoring it"
+                } else {
+                    // We check to see if any item adds return false, meaning the item already existed (bad)
+                    if (!result.add(entry)) {
+                        println "Hit a dupe image - this may not be bad but killing everything anyway just in case!"
+                        throw new RuntimeException("Loaded a duplicate image from a jar file! Something might be wrong")
+                    }
+                }
+            }
+        }
+
+        // print what we got and load as images, then return a nice mapping of the two
+        result.each {
+            println it + " is being loaded as an image and mapped to short name " + it[(it.lastIndexOf('/') + 1)..-5]
+            // Load a BufferedImage and put it in the map tied to its name short the ".png"
+            images.put(it[(it.lastIndexOf('/') + 1)..-5], ImageIO.read(ResourceLoader.getResource(path + it).openStream()))
+        }
+
+        return images
+
     }
 
     public BufferedImage generateImage(int mipMapLevel) {

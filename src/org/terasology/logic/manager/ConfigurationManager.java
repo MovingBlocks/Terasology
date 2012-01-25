@@ -32,7 +32,7 @@ import java.util.logging.Level;
 public final class ConfigurationManager {
 
     /* CONST */
-    private static final String DEFAULT_CONFIG_PATH = "groovy/config/Default.groovy";
+    //private static final String DEFAULT_CONFIG_PATH = "groovy/config/Default.groovy";
 
     /* SINGLETON */
     private static ConfigurationManager _instance;
@@ -66,7 +66,10 @@ public final class ConfigurationManager {
      */
     public void loadConfigEnvironment(String environment) {
         ConfigObject config = null;
-
+        // TODO: Clean this up - temp hack to internalize the external Config defaults in Groovy
+        DefaultConfig yay = new DefaultConfig();
+        config = yay.getConfig();
+/*
         try {
             if (environment != null)
                 config = new ConfigSlurper(environment).parse(new File(DEFAULT_CONFIG_PATH).toURI().toURL());
@@ -77,6 +80,7 @@ public final class ConfigurationManager {
             Terasology.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         }
 
+        //config = new ConfigSlurper().parse(new DefaultConfig());*/
         if (config != null)
             _config = config.flatten();
     }
