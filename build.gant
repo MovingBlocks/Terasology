@@ -35,7 +35,7 @@ target('default': 'The default target - simply builds the code, but does not pac
 
 target ('buildZip' : 'Zips up the built artifacts so we can provide a single file for download') {
     depends ( buildTerasology )
-    zip ( destfile : artifactZip, basedir :  outputDir)
+    zip ( destfile : artifactZip, basedir :  distDir)
 }
 
 target ('buildApplet' : 'Prepares Terasology as an applet') {
