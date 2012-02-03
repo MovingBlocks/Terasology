@@ -184,10 +184,6 @@
         <copy todir="${artifact.output.terasology}/groovy">
             <fileset dir="${basedir}/groovy"/>
         </copy>
-        <mkdir dir="${artifact.output.terasology}/blocks"/>
-        <copy todir="${artifact.output.terasology}/blocks">
-            <fileset dir="${basedir}/blocks"/>
-        </copy>
     </target>
 
     <target name="artifact.terasology:zip" depends="artifact.terasology" description="None">

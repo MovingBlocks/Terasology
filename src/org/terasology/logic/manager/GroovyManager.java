@@ -49,7 +49,7 @@ public class GroovyManager {
      */
     public GroovyManager() {
         _bind = new Binding();
-        loadAllPlugins();
+        //loadAllPlugins();
     }
 
     private void loadAllPlugins() {

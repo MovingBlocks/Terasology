@@ -1,0 +1,145 @@
+/**
+ * Builds stuff for Terasology. Yay Gant!
+ */
+
+def debugEnabled = true    // Not sure if this works, output is the same?
+
+// Okay, this is a little fanciful, but hey, gotta showcase Groovy / Gant some! We end up with a list with each item prefixed
+def jarIncludes = ['properties', 'xml', 'gif', 'png', 'jpeg', 'jpg', 'glsl', 'png', 'ogg', 'fnt', 'groovy'].collect {'**/?*.' + it}
+def sourceDir = 'src'
+
+def libDir = 'libs'
+def libPattern = '*.jar'
+
+def outputDir = 'out'
+def classDir = outputDir + '/classes'
+def distDir = outputDir + '/dist'
+def artifactJar = distDir + '/Terasology.jar'
+def artifactZip = outputDir + '/Terasology.zip'
+
+// Stuff beyond source code that we'll copy to the output dir (outside the jar file)
+def extraFiles = ['README.markdown', 'OpenAL32.dll', 'OpenAL64.dll']
+def extraDirs = ['natives', 'groovy']   // TODO: Sort out the internal vs external Groovy setup
+def scriptDirFiles = ['run_linux.sh', 'run_macosx.command', 'Terasology.exe']
+
+// Stuff for signing the applet
+def keystore = 'applet/tera.keystore'
+def keyalias = 'Terasology'
+def keydistname = 'CN=Moving Blocks'
+def appletDir = 'applet'
+def appletOut = outputDir + '/' + appletDir
+
+target('default': 'The default target - simply builds the code, but does not package anything specific') {
+    depends ( buildTerasology )
+}
+
+target ('buildZip' : 'Zips up the built artifacts so we can provide a single file for download') {
+    depends ( buildTerasology )
+    zip ( destfile : artifactZip, basedir :  distDir)
+}
+
+target ('buildApplet' : 'Prepares Terasology as an applet') {
+    depends ( buildTerasology )
+    // TODO: We can do some stuff to shrink the size of the jar for applet usage (faster download) like gutting the Groovy jar
+    signJar ()
+    copy (todir : appletOut) {
+        fileset ( dir : appletDir , excludes : '*.keystore' )
+    }
+    copy ( file : artifactJar, todir: appletOut )
+}
+
+target ('buildAll' : 'Does everything! Does the build thing and preps all packaged formats') {
+    buildZip()
+    buildApplet()
+}
+
+target ('buildTerasology' : 'Preps, compiles, and builds the jar') {
+    init()
+    clean()
+    compile()
+    buildArtifacts()
+}
+
+target ('init' : 'Preps general stuff') {
+    ant.taskdef (  name : 'groovyc' , classname : 'org.codehaus.groovy.ant.Groovyc' )
+}
+
+target ('clean' : 'Cleans up output dirs') {
+    delete (dir : outputDir)
+}
+
+target ('compile' : 'Compiles the code!') {
+
+    // For some reason this is needed?
+    classpathID = 'classpathID'
+    
+    path ( id : classpathID ) {
+        fileset (dir : libDir, includes : libPattern)
+    }
+
+    // Prep the output dir and put compiled class files there
+    mkdir(dir : classDir)
+    groovyc ( srcdir : sourceDir , destdir : classDir , fork : 'true') {
+        classpath { path ( refid : classpathID ) }
+        javac ( debug : debugEnabled )
+    }
+
+    echo ( message: 'Made it past compile! Going to copy some non-compiled stuff' )
+
+    // Copy non-compiled resources to the output dir
+    copy (todir : classDir) {
+        fileset ( dir : sourceDir , includes : jarIncludes.join ( ',' ) )
+    }
+
+    // Copy library jar files over - could hack up a smaller Groovy jar here
+    //copy (todir : tempDir + '/' + libDir) {
+    //    fileset ( dir : libDir)
+    //}
+}
+
+target ('buildArtifacts' : 'Takes compiled code and everything else needed and preps packaged artifacts') {
+
+    // Prep dir and package up the primary jar
+    mkdir (dir : distDir)
+    jar ( destfile : artifactJar , manifest : sourceDir + '/META-INF/MANIFEST.MF', filesetmanifest : 'skip', duplicate : 'preserve') {
+        fileset ( dir : classDir )
+        zipfileset ( src : 'libs/annotations.jar' )
+        zipfileset ( src : 'libs/AppleJavaExtensions.jar' )
+        zipfileset ( src : 'libs/groovy-all-1.8.2.jar' )
+        zipfileset ( src : 'libs/jbullet.jar' )
+        zipfileset ( src : 'libs/jdom.jar' )
+        zipfileset ( src : 'libs/jinput.jar' )
+        zipfileset ( src : 'libs/jogg-0.0.7.jar' )
+        zipfileset ( src : 'libs/jorbis-0.0.15.jar' )
+        zipfileset ( src : 'libs/lwjgl.jar' )
+        zipfileset ( src : 'libs/lwjgl_util.jar' )
+        zipfileset ( src : 'libs/lzma.jar' )
+        zipfileset ( src : 'libs/slick.jar' )
+        zipfileset ( src : 'libs/slick-util.jar' )
+        zipfileset ( src : 'libs/trove-3.0.0.jar' )
+        zipfileset ( src : 'libs/vecmath.jar' )
+    }
+
+    // Whack the compiled files we don't need loose anymore
+    delete ( dir : classDir)
+
+    // Copy in additional artifacts
+    extraFiles.each { copy ( file : it, tofile : distDir + '/' + it) }
+    extraDirs.each { dirToCopy ->
+        copy ( todir : distDir + '/' + dirToCopy ) {
+            fileset ( dir : dirToCopy )
+        }
+    }
+    // Copy in executables from the scripts dir to the root of the output dir -
+    // Rename "scripts" to "bin" and adjust pathing, then these entries can move to extraFiles instead?
+    scriptDirFiles.each { copy ( file : 'scripts/' + it, tofile : distDir + '/' + it) }
+}
+
+// Note: This should only be needed once (or rarely if anything ever changes?) as the keystore is checked into source control
+target ('genKey' : 'Creates a keystore to be used for signing the applet') {
+    genkey ( keystore : keystore, alias : keyalias, storepass : keyalias, validity : 3650, dname : keydistname )
+}
+
+target ('signJar' : 'Signs our jar file with a self-signed certificate to let Groovy get fancy (for applet rights)') {
+    signjar ( jar : artifactJar, keystore : keystore, alias : keyalias, storepass : keyalias )
+}
