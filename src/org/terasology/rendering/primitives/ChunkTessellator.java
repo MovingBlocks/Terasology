@@ -96,7 +96,7 @@ public final class ChunkTessellator {
             int cTex = 0;
             int cColor = 0;
             int cIndex = 0;
-            for (int i = 0; i < mesh._vertexElements[j].quads.size(); i += 3, cTex += 2, cColor += 4) {
+            for (int i = 0; i < mesh._vertexElements[j].quads.size(); i += 3, cTex += 3, cColor += 4) {
 
                 if (i % 4 == 0) {
                     mesh._vertexElements[j].indices.put(cIndex);
@@ -138,6 +138,7 @@ public final class ChunkTessellator {
 
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex));
                 mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
+                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex + 2));
 
                 Double[] result = new Double[3];
                 calcLightingValuesForVertexPos(vertexPos, result);
@@ -546,27 +547,35 @@ public final class ChunkTessellator {
         if (norm.z == 1 || norm.x == -1) {
             vertexElements.tex.add(texOffset.x);
             vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
+            vertexElements.tex.add(1.0f);
 
             vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
             vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
+            vertexElements.tex.add(1.0f);
 
             vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
             vertexElements.tex.add(texOffset.y);
+            vertexElements.tex.add(1.0f);
 
             vertexElements.tex.add(texOffset.x);
             vertexElements.tex.add(texOffset.y);
+            vertexElements.tex.add(1.0f);
         } else {
             vertexElements.tex.add(texOffset.x);
             vertexElements.tex.add(texOffset.y);
+            vertexElements.tex.add(1.0f);
 
             vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
             vertexElements.tex.add(texOffset.y);
+            vertexElements.tex.add(1.0f);
 
             vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
             vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
+            vertexElements.tex.add(1.0f);
 
             vertexElements.tex.add(texOffset.x);
             vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
+            vertexElements.tex.add(1.0f);
         }
     }
 

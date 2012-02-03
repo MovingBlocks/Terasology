@@ -16,7 +16,6 @@
 package org.terasology.model.blocks;
 
 import gnu.trove.map.hash.TByteObjectHashMap;
-import groovy.lang.Binding;
 import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Vector2f;

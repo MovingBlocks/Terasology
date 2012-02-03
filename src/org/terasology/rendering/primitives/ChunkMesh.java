@@ -47,12 +47,12 @@ public class ChunkMesh {
     }
 
     /* CONST */
-    private static final int STRIDE = (3 + 3 + 3 + 2 + 4) * 4;
+    private static final int STRIDE = (3 + 3 + 3 + 3 + 4) * 4;
     private static final int OFFSET_VERTEX = 0;
     private static final int OFFSET_TEX_0 = (3 * 4);
-    private static final int OFFSET_TEX_1 = ((2 + 3) * 4);
-    private static final int OFFSET_COLOR = ((2 + 3 + 3) * 4);
-    private static final int OFFSET_NORMAL = ((2 + 3 + 3 + 4) * 4);
+    private static final int OFFSET_TEX_1 = ((3 + 3) * 4);
+    private static final int OFFSET_COLOR = ((3 + 3 + 3) * 4);
+    private static final int OFFSET_NORMAL = ((3 + 3 + 3 + 4) * 4);
 
     /* VERTEX DATA */
     private final int[] _vertexBuffers = new int[4];
@@ -128,7 +128,7 @@ public class ChunkMesh {
             glVertexPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_VERTEX);
 
             GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-            glTexCoordPointer(2, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
+            glTexCoordPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_0);
 
             GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
             glTexCoordPointer(3, GL11.GL_FLOAT, STRIDE, OFFSET_TEX_1);

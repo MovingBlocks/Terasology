@@ -47,9 +47,9 @@ public interface WorldProvider {
     /**
      * Sets the given state at the given position.
      *
-     * @param x The X-coordinate
-     * @param y The Y-coordinate
-     * @param z The Z-coordinate
+     * @param x     The X-coordinate
+     * @param y     The Y-coordinate
+     * @param z     The Z-coordinate
      * @param state The state value
      */
     public void setState(int x, int y, int z, byte state);

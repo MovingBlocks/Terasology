@@ -54,6 +54,7 @@ public class ToolManager {
 
     /**
      * Default constructor - would do some magic here to add native tools and look for plugin tools
+     *
      * @param parent The parent player
      */
     public ToolManager(Player parent) {

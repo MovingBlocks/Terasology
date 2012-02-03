@@ -73,10 +73,11 @@ public final class Terasology {
     private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 
     /* STATISTICS */
-    private long _lastLoopTime, _lastFpsTime, _delta;
+    private long _lastLoopTime, _lastFpsTime;
     private int _fps;
     private float _averageFps;
     private long _timerTicksPerSecond;
+    private long _delta;
 
     private double _timeAccumulator = 0;
 
@@ -345,7 +346,7 @@ public final class Terasology {
 
         // Update the viewing distance
         double minDist = (VIEWING_DISTANCES[_activeViewingDistance] / 2) * 16.0f;
-        glFogf(GL_FOG_START, (float) (minDist * 0.001));
+        glFogf(GL_FOG_START, (float) (minDist * 0.5));
         glFogf(GL_FOG_END, (float) minDist);
     }
 
@@ -380,7 +381,9 @@ public final class Terasology {
             }
 
             render();
+            updateFps();
             Display.update();
+            //Display.sync(60);
 
             processKeyboardInput();
             processMouseInput();
@@ -388,9 +391,6 @@ public final class Terasology {
             if (!screenHasFocus())
                 getActiveWorldRenderer().getPlayer().updateInput();
 
-            Display.sync(60);
-
-            updateFps();
             _timeAccumulator += getTime() - startTime;
 
             if (Display.wasResized())
@@ -592,9 +592,10 @@ public final class Terasology {
      */
     private void updateFps() {
         // Measure the delta value and the frames per second
-        _delta = getTime() - _lastLoopTime;
+        long now = getTime();
+        _delta = now - _lastLoopTime;
 
-        _lastLoopTime = getTime();
+        _lastLoopTime = now;
         _lastFpsTime += _delta;
         _fps++;
 

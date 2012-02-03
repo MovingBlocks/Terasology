@@ -16,20 +16,16 @@ package org.terasology.model.blocks
  * limitations under the License.
  */
 
-import org.terasology.logic.manager.TextureManager
-
-import org.newdawn.slick.util.ResourceLoader
-
 import java.awt.Graphics
 import java.awt.Image
 import java.awt.image.BufferedImage
-
+import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import java.util.jar.JarEntry;
-
 import javax.imageio.ImageIO
 import javax.vecmath.Vector2f
 import javax.vecmath.Vector4f
+import org.newdawn.slick.util.ResourceLoader
+import org.terasology.logic.manager.TextureManager
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -146,8 +142,8 @@ class BlockManifestor {
     /**
      * This method figures out whether we're running from inside a jar file, in case we need to load stuff differently
      * If we are then return a JarFile we can keep handy for later loading from
-     * @param path  any path to something that exists inside the jar file (better be unique!)
-     * @return      JarFile reference or null if we're not inside a jar file
+     * @param path any path to something that exists inside the jar file (better be unique!)
+     * @return JarFile reference or null if we're not inside a jar file
      */
     private JarFile scanJar(String path) {
         URL u = getClass().getClassLoader().getResource(path);
@@ -229,9 +225,9 @@ class BlockManifestor {
         println "Getting Block definitions from " + path
 
         // Check to see if we're loading from within a jar file not not
-        if (_jar != null ) {
+        if (_jar != null) {
             Enumeration<JarEntry> entries = _jar.entries()
-            while(entries.hasMoreElements()) {
+            while (entries.hasMoreElements()) {
                 String name = entries.nextElement().getName();
                 //println "Got a name: " + name
                 if (name.startsWith(path)) { // We only care about stuff under the desired path
@@ -244,7 +240,7 @@ class BlockManifestor {
                         // We only care about class files that are not inner classes ($) nor deeper than desired path (exactly one /)
                         if (!entry.contains('$') && entry.endsWith(".class") && entry.count('/') == 1) {
                             def className = entry[0..-7]
-                            println ("Useful class: " + className)
+                            println("Useful class: " + className)
                             allClasses << getClass().getClassLoader().loadClass((path + className).replace('/', '.'))
                         }
                     }
@@ -263,7 +259,7 @@ class BlockManifestor {
                 if (!i.contains('$') && i.endsWith(".class")) {
                     def className = i[0..-7]
 
-                    println ("Useful class: " + className)
+                    println("Useful class: " + className)
                     allClasses << getClass().getClassLoader().loadClass(path + "." + className)
                 }
             }
@@ -458,14 +454,14 @@ class BlockManifestor {
 
     /**
      * Looks for Block image files inside the jar file we're running from all at once and adds them to a map
-     * @param path  path within the jar file we care about
-     * @return      a map containing loaded BufferedImages tied to their filename minus .png
+     * @param path path within the jar file we care about
+     * @return a map containing loaded BufferedImages tied to their filename minus .png
      */
     private getInternalImagesFromJar(String path) {
         def images = [:]
         Set<String> result = new HashSet<String>(); // Detect dupes
         Enumeration<JarEntry> entries = _jar.entries()
-        while(entries.hasMoreElements()) {
+        while (entries.hasMoreElements()) {
             String name = entries.nextElement().getName();
             //println "Got a name: " + name
             if (name.startsWith(path)) { // We only care about stuff under the desired path

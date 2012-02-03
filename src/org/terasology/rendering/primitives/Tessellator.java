@@ -69,6 +69,7 @@ public class Tessellator {
 
         _tex.add(_activeTex.x);
         _tex.add(_activeTex.y);
+        _tex.add(0.0f);
 
         _tex.add(_lighting.x);
         _tex.add(_lighting.y);
@@ -96,9 +97,9 @@ public class Tessellator {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(size);
 
         int n = 0, t = 0, c = 0;
-        for (int v = 0; v < _vertices.size(); v += 3, t += 5, c += 4, n += 3) {
+        for (int v = 0; v < _vertices.size(); v += 3, t += 6, c += 4, n += 3) {
             buffer.put(_vertices.get(v)).put(_vertices.get(v + 1)).put(_vertices.get(v + 2));
-            buffer.put(_tex.get(t)).put(_tex.get(t + 1)).put(_tex.get(t + 2)).put(_tex.get(t + 3)).put(_tex.get(t + 4));
+            buffer.put(_tex.get(t)).put(_tex.get(t + 1)).put(_tex.get(t + 2)).put(_tex.get(t + 3)).put(_tex.get(t + 4)).put(_tex.get(t + 5));
             buffer.put(_color.get(c)).put(_color.get(c + 1)).put(_color.get(c + 2)).put(_color.get(c + 3));
             buffer.put(_normals.get(n)).put(_normals.get(n + 1)).put(_normals.get(n + 2));
         }

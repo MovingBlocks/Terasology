@@ -51,10 +51,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class WorldRenderer implements RenderableObject {
 
-    private static final boolean BOUNDING_BOXES_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.renderChunkBoundingBoxes");
-    private static final boolean OCCLUSION_CULLING_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.enabled");
-    private static final double OCCLUSION_CULLING_DISTANCE_OFFSET = (Double) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.distanceOffset");
-    private static final long OCCLUSION_CULLING_GAP = (Long) ConfigurationManager.getInstance().getConfig().get("Graphics.OcclusionCulling.timeGap");
+    public static final boolean BOUNDING_BOXES_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.renderChunkBoundingBoxes");
 
     /* VIEWING DISTANCE */
     private int _viewingDistance = 8;
@@ -94,12 +91,7 @@ public final class WorldRenderer implements RenderableObject {
     private final BlockGrid _blockGrid;
 
     /* STATISTICS */
-    private int _statVisibleTriangles = 0;
-    private int _statOcclusionCulled, _statSubMeshCulled, _statEmpty, _statDirty;
-
-    /* RENDERING */
-    private boolean _occlusionQueryToggle = false;
-    private long _occlusionLastUpdate = 0;
+    private int _statDirtyChunks = 0;
 
     /**
      * Initializes a new (local) world for the single player mode.
@@ -197,7 +189,7 @@ public final class WorldRenderer implements RenderableObject {
      */
     public void updateVisibleChunks() {
         _visibleChunks.clear();
-        _statDirty = 0;
+        _statDirtyChunks = 0;
 
         boolean noMoreUpdates = false;
         for (int i = 0; i < _chunksInProximity.size(); i++) {
@@ -208,7 +200,7 @@ public final class WorldRenderer implements RenderableObject {
                 c.update();
 
                 if (c.isDirty())
-                    _statDirty++;
+                    _statDirtyChunks++;
 
                 if ((c.isDirty() || c.isLightDirty() || c.isFresh()) && !noMoreUpdates) {
                     if (!_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT)) {
@@ -231,6 +223,8 @@ public final class WorldRenderer implements RenderableObject {
         _player.getActiveCamera().lookThrough();
         _player.render();
 
+        // Render all chunks and entities
+        Chunk.resetStats();
         renderChunksAndEntities();
 
         /* PARTICLE EFFECTS */
@@ -298,66 +292,15 @@ public final class WorldRenderer implements RenderableObject {
         GL20.glUniform1i(swimming, playerIsSwimming ? 1 : 0);
         GL20.glUniform1i(carryingTorch, _player.isCarryingTorch() ? 1 : 0);
 
-        int occlusionDistanceOffset = (int) (_visibleChunks.size() * OCCLUSION_CULLING_DISTANCE_OFFSET);
-
-        _statOcclusionCulled = 0;
-        _statSubMeshCulled = 0;
-        _statEmpty = 0;
-        _statVisibleTriangles = 0;
-
+        ShaderManager.getInstance().enableShader(null);
         BulletPhysicsRenderer.getInstance().render();
-        ShaderManager.getInstance().enableShader("chunk");
 
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
-
-            if (OCCLUSION_CULLING_ENABLED) {
-                ShaderManager.getInstance().enableShader(null);
-                if (!_occlusionQueryToggle) {
-                    c.applyOcclusionQueries();
-                } else if (i > occlusionDistanceOffset) {
-                    c.executeOcclusionQuery();
-                } else {
-                    c.resetOcclusionCulled();
-                }
-                ShaderManager.getInstance().enableShader("chunk");
-            }
-
-            GL11.glPushMatrix();
-            GL11.glTranslated(c.getPosition().x * Chunk.CHUNK_DIMENSION_X - _worldProvider.getRenderingReferencePoint().x, c.getPosition().y * Chunk.CHUNK_DIMENSION_Y - _worldProvider.getRenderingReferencePoint().y, c.getPosition().z * Chunk.CHUNK_DIMENSION_Z - _worldProvider.getRenderingReferencePoint().z);
-
-            for (int j = 0; j < Chunk.VERTICAL_SEGMENTS; j++) {
-                if (!c.isSubMeshOcclusionCulled(j)) {
-                    if (isAABBVisible(c.getSubMeshAABB(j))) {
-                        boolean rendered = c.render(ChunkMesh.RENDER_TYPE.OPAQUE, j);
-                        _statEmpty += rendered ? 0 : 1;
-
-                        if (rendered) {
-                            // Chunk was rendered
-                            c.setSubMeshCulled(j, false);
-                        } else {
-                            // Chunk was empty -> No second rendering pass needed
-                            c.setSubMeshCulled(j, true);
-                        }
-                    } else {
-                        c.setSubMeshCulled(j, true);
-                        _statSubMeshCulled++;
-                    }
-                } else {
-                    _statOcclusionCulled++;
-                }
-            }
-
-            glPopMatrix();
-
-            if (BOUNDING_BOXES_ENABLED) {
-                ShaderManager.getInstance().enableShader(null);
-                c.renderAABBs(false);
-                ShaderManager.getInstance().enableShader("chunk");
-            }
+            c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
         }
 
         /*
@@ -368,27 +311,11 @@ public final class WorldRenderer implements RenderableObject {
 
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
-
-            GL11.glPushMatrix();
-            GL11.glTranslated(c.getPosition().x * Chunk.CHUNK_DIMENSION_X - _worldProvider.getRenderingReferencePoint().x, c.getPosition().y * Chunk.CHUNK_DIMENSION_Y - _worldProvider.getRenderingReferencePoint().y, c.getPosition().z * Chunk.CHUNK_DIMENSION_Z - _worldProvider.getRenderingReferencePoint().z);
-
-            for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
-                if (!c.isSubMeshOcclusionCulled(k)) {
-                    if (!c.isSubMeshCulled(k)) {
-                        _statVisibleTriangles += c.triangleCount();
-                        c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT, k);
-                    }
-                }
-            }
-
-            glPopMatrix();
+            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
         }
-
-        glDisable(GL11.GL_BLEND);
 
         _mobManager.renderAll();
 
-        ShaderManager.getInstance().enableShader("chunk");
         TextureManager.getInstance().bindTexture("terrain");
 
         // Make sure the water surface is rendered if the player is swimming
@@ -403,41 +330,22 @@ public final class WorldRenderer implements RenderableObject {
             if (j == 0) {
                 glColorMask(false, false, false, false);
             } else {
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 glColorMask(true, true, true, true);
             }
 
-
             for (int i = 0; i < _visibleChunks.size(); i++) {
                 Chunk c = _visibleChunks.get(i);
-
-                GL11.glPushMatrix();
-                GL11.glTranslated(c.getPosition().x * Chunk.CHUNK_DIMENSION_X - _worldProvider.getRenderingReferencePoint().x, c.getPosition().y * Chunk.CHUNK_DIMENSION_Y - _worldProvider.getRenderingReferencePoint().y, c.getPosition().z * Chunk.CHUNK_DIMENSION_Z - _worldProvider.getRenderingReferencePoint().z);
-
-                for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
-                    if (!c.isSubMeshOcclusionCulled(k)) {
-                        if (!c.isSubMeshCulled(k)) {
-                            c.render(ChunkMesh.RENDER_TYPE.WATER_AND_ICE, k);
-                        }
-                    }
-                }
-
-                glPopMatrix();
+                c.render(ChunkMesh.RENDER_TYPE.WATER_AND_ICE);
             }
-
-            glDisable(GL_BLEND);
         }
 
-        glEnable(GL11.GL_CULL_FACE);
+        glDisable(GL_BLEND);
+
+        if (playerIsSwimming) {
+            glEnable(GL11.GL_CULL_FACE);
+        }
 
         ShaderManager.getInstance().enableShader(null);
-
-        long now = Terasology.getInstance().getTime();
-        if (now - _occlusionLastUpdate > OCCLUSION_CULLING_GAP) {
-            _occlusionQueryToggle = !_occlusionQueryToggle;
-            _occlusionLastUpdate = now;
-        }
     }
 
     public float getRenderingLightValue() {
@@ -587,7 +495,7 @@ public final class WorldRenderer implements RenderableObject {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %.2f, sun: %.2f, cache: %d, triangles: %d, dcs: %d, vcs: %d, seed: \"%s\", title: \"%s\", ocul: %d, smcul: %d, ec: %d)", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _statVisibleTriangles, _statDirty, _visibleChunks.size(), _worldProvider.getSeed(), _worldProvider.getTitle(), _statOcclusionCulled, _statSubMeshCulled, _statEmpty);
+        return String.format("world (biome: %s, time: %.2f, sun: %.2f, cache: %d, visible: %d, dirty: %d, tri: %d, empty: %d, not-ready: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _visibleChunks.size(), _statDirtyChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {

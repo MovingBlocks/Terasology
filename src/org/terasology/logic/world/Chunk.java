@@ -23,11 +23,11 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
 import org.terasology.game.Terasology;
 import org.terasology.logic.entities.StaticEntity;
 import org.terasology.logic.generators.ChunkGenerator;
 import org.terasology.logic.manager.ConfigurationManager;
+import org.terasology.logic.manager.ShaderManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.structures.AABB;
@@ -35,6 +35,7 @@ import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
+import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.Helper;
 import org.terasology.utilities.MathHelper;
@@ -62,6 +63,8 @@ import java.util.logging.Level;
  */
 public class Chunk extends StaticEntity implements Comparable<Chunk>, Externalizable {
 
+    public static int _statChunkMeshEmpty, _statChunkNotReady, _statRenderedTriangles;
+
     public static final long serialVersionUID = 1L;
 
     /* CONSTANT VALUES */
@@ -85,14 +88,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     /* ------ */
     private final ChunkTessellator _tessellator;
     /* ------ */
-    private boolean[] _occlusionCulled = new boolean[VERTICAL_SEGMENTS];
-    private boolean[] _subMeshCulled = new boolean[VERTICAL_SEGMENTS];
-    private final int[] _queries = new int[VERTICAL_SEGMENTS];
-    /* ------ */
     private boolean _disposed = false;
     /* ----- */
     private AABB _aabb = null;
-    private AABB[] _subChunkAABB = null;
+    private AABB[] _subMeshAABB = null;
     /* ----- */
     private RigidBody _rigidBody = null;
 
@@ -614,7 +613,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public AABB getAABB() {
         if (_aabb == null) {
-            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 2, CHUNK_DIMENSION_Y / 2, CHUNK_DIMENSION_Z / 2);
+            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 2.0, CHUNK_DIMENSION_Y / 2.0, CHUNK_DIMENSION_Z / 2.0);
             Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
             _aabb = new AABB(position, dimensions);
         }
@@ -623,19 +622,19 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public AABB getSubMeshAABB(int subMesh) {
-        if (_subChunkAABB == null) {
-            _subChunkAABB = new AABB[VERTICAL_SEGMENTS];
+        if (_subMeshAABB == null) {
+            _subMeshAABB = new AABB[VERTICAL_SEGMENTS];
 
             int heightHalf = CHUNK_DIMENSION_Y / VERTICAL_SEGMENTS / 2;
 
-            for (int i = 0; i < _subChunkAABB.length; i++) {
-                Vector3d dimensions = new Vector3d(8, CHUNK_DIMENSION_Y / VERTICAL_SEGMENTS / 2, 8);
+            for (int i = 0; i < _subMeshAABB.length; i++) {
+                Vector3d dimensions = new Vector3d(8, heightHalf, 8);
                 Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, (i * heightHalf * 2) + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
-                _subChunkAABB[i] = new AABB(position, dimensions);
+                _subMeshAABB[i] = new AABB(position, dimensions);
             }
         }
 
-        return _subChunkAABB[subMesh];
+        return _subMeshAABB[subMesh];
     }
 
     public void processChunk() {
@@ -737,18 +736,30 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Draws the opaque or translucent elements of a chunk.
      *
      * @param type The type of vertices to render
-     * @param subMesh The of the submesh to render
      * @return True if rendered
      */
-    public boolean render(ChunkMesh.RENDER_TYPE type, int subMesh) {
+    public void render(ChunkMesh.RENDER_TYPE type) {
         if (isReadyForRendering()) {
-            if (!isSubMeshEmpty(subMesh)) {
-                _activeMeshes[subMesh].render(type);
-                return true;
-            }
-        }
+            GL11.glPushMatrix();
+            GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - getParent().getRenderingReferencePoint().x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - getParent().getRenderingReferencePoint().y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - getParent().getRenderingReferencePoint().z);
 
-        return false;
+            for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
+                if (!isSubMeshEmpty(i)) {
+                    if (WorldRenderer.BOUNDING_BOXES_ENABLED) {
+                        getSubMeshAABB(i).renderLocally(2f);
+                        _statRenderedTriangles += 12;
+                    }
+
+                    ShaderManager.getInstance().enableShader("chunk");
+                    _activeMeshes[i].render(type);
+                    _statRenderedTriangles += _activeMeshes[i].triangleCount();
+                    ShaderManager.getInstance().enableShader(null);
+                }
+            }
+            GL11.glPopMatrix();
+        } else {
+            _statChunkNotReady++;
+        }
     }
 
     public boolean generateVBOs() {
@@ -766,47 +777,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public void update() {
         generateVBOs();
         swapActiveMesh();
-
-    }
-
-    public void executeOcclusionQuery() {
-        GL11.glColorMask(false, false, false, false);
-        GL11.glDepthMask(false);
-
-        if (_activeMeshes != null) {
-            for (int j = 0; j < VERTICAL_SEGMENTS; j++) {
-                if (!isSubMeshEmpty(j)) {
-                    if (_queries[j] == 0) {
-                        _queries[j] = GL15.glGenQueries();
-
-                        GL15.glBeginQuery(GL15.GL_SAMPLES_PASSED, _queries[j]);
-                        getSubMeshAABB(j).renderSolid();
-                        GL15.glEndQuery(GL15.GL_SAMPLES_PASSED);
-                    }
-                }
-            }
-        }
-
-        GL11.glColorMask(true, true, true, true);
-        GL11.glDepthMask(true);
-    }
-
-    public void applyOcclusionQueries() {
-        for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
-            if (_queries[i] != 0) {
-                int result = GL15.glGetQueryObjectui(_queries[i], GL15.GL_QUERY_RESULT_AVAILABLE);
-
-                if (result != 0) {
-
-                    result = GL15.glGetQueryObjectui(_queries[i], GL15.GL_QUERY_RESULT);
-
-                    _occlusionCulled[i] = result <= 0;
-
-                    GL15.glDeleteQueries(_queries[i]);
-                    _queries[i] = 0;
-                }
-            }
-        }
     }
 
     private void setNewMesh(ChunkMesh[] newMesh) {
@@ -954,7 +924,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return _random;
     }
 
-
     /**
      * Disposes this chunk. Can NOT be undone.
      */
@@ -979,55 +948,12 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return _activeMeshes != null;
     }
 
-    public ChunkMesh getActiveSubMesh(int subMesh) {
-        return _activeMeshes[subMesh];
-    }
-
-    public boolean isSubMeshOcclusionCulled(int subMesh) {
-        return _occlusionCulled[subMesh];
-    }
-
-    public boolean isSubMeshCulled(int subMesh) {
-        return _subMeshCulled[subMesh];
-    }
-
-    public void setSubMeshCulled(int subMesh, boolean culled) {
-        _subMeshCulled[subMesh] = culled;
-    }
-
-    public void resetOcclusionCulled() {
-        _occlusionCulled = new boolean[VERTICAL_SEGMENTS];
-    }
-
-    public void resetSubMeshCulled() {
-        _subMeshCulled = new boolean[VERTICAL_SEGMENTS];
-    }
-
     public boolean isSubMeshEmpty(int subMesh) {
-        return _activeMeshes[subMesh].isEmpty();
-    }
-
-    public void renderAABBs(boolean solid) {
         if (isReadyForRendering()) {
-            for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
-                if (!isSubMeshEmpty(i)) {
-                    if (!solid)
-                        getSubMeshAABB(i).render(2f);
-                    else
-                        getSubMeshAABB(i).renderSolid();
-                }
-            }
+            return _activeMeshes[subMesh].isEmpty();
+        } else {
+            return true;
         }
-    }
-
-    public int triangleCount() {
-        int result = 0;
-
-        for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
-            result += _activeMeshes[i].triangleCount();
-        }
-
-        return result;
     }
 
     public void updateRigidBody() {
@@ -1084,4 +1010,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return _rigidBody;
     }
 
+    public static void resetStats() {
+        _statChunkMeshEmpty = 0;
+        _statChunkNotReady = 0;
+        _statRenderedTriangles = 0;
+    }
 }

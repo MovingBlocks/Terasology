@@ -15,16 +15,16 @@
 */
 package org.terasology.game;
 
-import org.terasology.logic.manager.ConfigurationManager;
 import org.lwjgl.opengl.Display;
+import org.terasology.logic.manager.ConfigurationManager;
 
 import java.applet.Applet;
 import java.util.logging.Level;
 
 /**
-* @author Benjamin Glatzel <benjamin.glatzel@me.com>
-* @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
-*/
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
+ */
 public final class TerasologyApplet extends Applet {
     private Terasology _terasology;
     private Thread _gameThread;

@@ -99,7 +99,7 @@ void main(){
     color.xyz *= clamp(daylightColorValue + blocklightColorValue * (1.0-daylightValue), 0.0, 1.0) * occlusionValue;
 
     // Apply linear fog
-    float fog = clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.0, 1.0);
+    float fog = clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.25, 1.0);
 
     // Check if the player is below the water surface
     if (!swimming) {

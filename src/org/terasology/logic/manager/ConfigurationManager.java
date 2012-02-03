@@ -16,13 +16,8 @@
 package org.terasology.logic.manager;
 
 import groovy.util.ConfigObject;
-import groovy.util.ConfigSlurper;
-import org.terasology.game.Terasology;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
 
 /**
  * Manages and provides access to the global settings of the game.

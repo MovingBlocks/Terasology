@@ -3,9 +3,9 @@
 
 package org.terasology.logic.manager
 
+import javax.vecmath.Vector2f
 import org.lwjgl.opengl.DisplayMode
 import org.lwjgl.opengl.PixelFormat
-import javax.vecmath.Vector2f
 
 public class DefaultConfig {
 
@@ -42,16 +42,7 @@ public class DefaultConfig {
         config.put("Graphics.viewingDistanceUltra", 32)
 
         // Splits chunk meshes into multiple sub-meshes to support frustum and occlusion culling techniques
-        config.put("Graphics.verticalChunkMeshSegments", 2)
-
-        // Occlusion culling is currently disabled by default
-        config.put("Graphics.OcclusionCulling.enabled", false)
-
-        // The last 60 % of the visible chunks will be culled using occlusion queries
-        config.put("Graphics.OcclusionCulling.distanceOffset", 0.4d)
-
-        // Minimum time gap between queries and checks for available results
-        config.put("Graphics.OcclusionCulling.timeGap", 100l)
+        config.put("Graphics.verticalChunkMeshSegments", 1)
 
         config.put("Physics.generatePhysicsMeshes", true)
 
@@ -78,13 +69,13 @@ public class DefaultConfig {
         config.put("World.Biomes.Forest.grassDensity", 0.3d)
         config.put("World.Biomes.Plains.grassDensity", 0.1d)
         config.put("World.Biomes.Snow.grassDensity", 0.001d)
-        config.put("World.Biomes.Mountains.grassDensity",0.2d)
-        config.put("World.Biomes.Desert.grassDensity",0.001d)
-        config.put("World.Resources.probCoal",-2d)
-        config.put("World.Resources.probIron",-2.5d)
-        config.put("World.Resources.probCopper",-3d)
-        config.put("World.Resources.probGold",-3d)
-        config.put("World.Resources.probDiamond",-4d)
+        config.put("World.Biomes.Mountains.grassDensity", 0.2d)
+        config.put("World.Biomes.Desert.grassDensity", 0.001d)
+        config.put("World.Resources.probCoal", -2d)
+        config.put("World.Resources.probIron", -2.5d)
+        config.put("World.Resources.probCopper", -3d)
+        config.put("World.Resources.probGold", -3d)
+        config.put("World.Resources.probDiamond", -4d)
     }
 
     public ConfigObject getConfig() {
