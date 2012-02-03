@@ -23,8 +23,6 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
 
 /**
  * TODO
@@ -72,6 +70,25 @@ public class FBOManager {
         }
 
         return _instance;
+    }
+
+    public FBOManager() {
+        createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
+
+        createFBO("sceneHighPass", 1024, 1024, true, false);
+        createFBO("sceneBloom0", 1024, 1024, true, false);
+        createFBO("sceneBloom1", 1024, 1024, true, false);
+        createFBO("sceneBloom2", 1024, 1024, true, false);
+
+        createFBO("scene256", 256, 256, false, false);
+        createFBO("scene128", 128, 128, false, false);
+        createFBO("scene64", 64, 64, false, false);
+        createFBO("scene32", 32, 32, false, false);
+        createFBO("scene16", 16, 16, false, false);
+        createFBO("scene8", 8, 8, false, false);
+        createFBO("scene4", 4, 4, false, false);
+        createFBO("scene2", 2, 2, false, false);
+        createFBO("scene1", 1, 1, false, false);
     }
 
     public FBO createFBO(String title, int width, int height, boolean hdr, boolean depth) {
@@ -127,10 +144,10 @@ public class FBOManager {
         FBOManager.getInstance().getFBO("scene1").unbindTexture();
 
         float lum = 0.2126f * ((pixels.get(0) & 0xff) / 255f) + 0.7152f * ((pixels.get(1) & 0xff) / 255f) + 0.0722f * ((pixels.get(2) & 0xff) / 255f);
-        _exposure = (float) MathHelper.lerp(_exposure, 0.5f / lum, 0.008);
+        _exposure = (float) MathHelper.lerp(_exposure, 0.5f / lum, 0.01);
 
-        if (_exposure > 4.0f)
-            _exposure = 4.0f;
+        if (_exposure > 5.0f)
+            _exposure = 5.0f;
     }
 
     public void renderScene() {
@@ -138,13 +155,15 @@ public class FBOManager {
         updateExposure();
 
         generateHighPassFBO();
-        generateBloomFBO();
+        generateBloomFBO(0);
+        generateBloomFBO(1);
+        generateBloomFBO(2);
 
         ShaderManager.getInstance().enableShader("fbo");
         FBOManager.FBO scene = FBOManager.getInstance().getFBO("scene");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        FBOManager.getInstance().getFBO("sceneBloom").bindTexture();
+        FBOManager.getInstance().getFBO("sceneBloom2").bindTexture();
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         scene.bindTexture();
 
@@ -179,18 +198,22 @@ public class FBOManager {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
-    private void generateBloomFBO() {
+    private void generateBloomFBO(int id) {
         ShaderManager.getInstance().enableShader("blur");
 
-        FBOManager.getInstance().getFBO("sceneBloom").bind();
+        FBOManager.getInstance().getFBO("sceneBloom" + id).bind();
         glViewport(0, 0, 1024, 1024);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        FBOManager.getInstance().getFBO("sceneHighPass").bindTexture();
+
+        if (id == 0)
+            FBOManager.getInstance().getFBO("sceneHighPass").bindTexture();
+        else
+            FBOManager.getInstance().getFBO("sceneBloom" + (id - 1)).bindTexture();
 
         renderFullQuad();
 
-        FBOManager.getInstance().getFBO("sceneBloom").unbind();
+        FBOManager.getInstance().getFBO("sceneBloom" + id).unbind();
 
         ShaderManager.getInstance().enableShader(null);
         glViewport(0, 0, Display.getWidth(), Display.getHeight());

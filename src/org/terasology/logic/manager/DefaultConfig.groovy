@@ -15,10 +15,10 @@ public class DefaultConfig {
         config.put("System.versionTag", "Pre Alpha")
         config.put("System.maxParticles", 256)
         config.put("System.cloudResolution", new Vector2f(64, 64))
-        config.put("System.cloudUpdateInterval", (Integer) 1000)
+        config.put("System.cloudUpdateInterval", (Integer) 256)
         config.put("System.maxThreads", 2)
         config.put("System.saveChunks", true)
-        config.put("System.chunkCacheSize", 1024 + 512)
+        config.put("System.chunkCacheSize", 1024)
         config.put("System.Debug.debug", false)
         config.put("System.Debug.debugCollision", false)
         config.put("System.Debug.renderChunkBoundingBoxes", false)
@@ -58,8 +58,8 @@ public class DefaultConfig {
         config.put("Player.gravity", 0.008d)
         config.put("Player.gravitySwimming", 0.008d * 4d)
         config.put("Player.friction", 0.08d)
-        config.put("Player.walkingSpeed", 0.04d)
-        config.put("Player.runningFactor", 1.8d)
+        config.put("Player.walkingSpeed", 0.03d)
+        config.put("Player.runningFactor", 1.5d)
         config.put("Player.jumpIntensity", 0.16d)
 
         config.put("World.spawnOrigin", new Vector2f(-24429, 20547))
@@ -71,11 +71,6 @@ public class DefaultConfig {
         config.put("World.Biomes.Snow.grassDensity", 0.001d)
         config.put("World.Biomes.Mountains.grassDensity", 0.2d)
         config.put("World.Biomes.Desert.grassDensity", 0.001d)
-        config.put("World.Resources.probCoal", -2d)
-        config.put("World.Resources.probIron", -2.5d)
-        config.put("World.Resources.probCopper", -3d)
-        config.put("World.Resources.probGold", -3d)
-        config.put("World.Resources.probDiamond", -4d)
     }
 
     public ConfigObject getConfig() {

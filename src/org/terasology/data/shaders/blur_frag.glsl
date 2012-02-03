@@ -1,6 +1,6 @@
 uniform sampler2D tex;
 
-uniform float radius = 8.0;
+uniform float radius = 16.0;
 
 void main() {
     vec2 vTexelSize = vec2( 1.0/1024.0, 1.0/1024.0 );

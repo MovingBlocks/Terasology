@@ -141,15 +141,7 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
             final Chunk chunk = chunks.get(i);
 
             if (chunk != null) {
-
-                Runnable r = new Runnable() {
-                    public void run() {
-                        chunk.updateRigidBody();
-                    }
-                };
-
-                Terasology.getInstance().getThreadPool().execute(r);
-
+                chunk.updateRigidBody();
 
                 RigidBody c = chunk.getRigidBody();
 

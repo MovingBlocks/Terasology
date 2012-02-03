@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -29,6 +28,7 @@ import org.terasology.logic.manager.*;
 import org.terasology.logic.world.*;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.structures.AABB;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.interfaces.RenderableObject;
 import org.terasology.rendering.particles.BlockParticleEmitter;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
@@ -36,7 +36,6 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -112,21 +111,6 @@ public final class WorldRenderer implements RenderableObject {
         _blockGrid = new BlockGrid(this);
 
         initTimeEvents();
-
-        FBOManager.getInstance().createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
-
-        FBOManager.getInstance().createFBO("sceneHighPass", 1024, 1024, true, false);
-        FBOManager.getInstance().createFBO("sceneBloom", 1024, 1024, true, false);
-
-        FBOManager.getInstance().createFBO("scene256", 256, 256, false, false);
-        FBOManager.getInstance().createFBO("scene128", 128, 128, false, false);
-        FBOManager.getInstance().createFBO("scene64", 64, 64, false, false);
-        FBOManager.getInstance().createFBO("scene32", 32, 32, false, false);
-        FBOManager.getInstance().createFBO("scene16", 16, 16, false, false);
-        FBOManager.getInstance().createFBO("scene8", 8, 8, false, false);
-        FBOManager.getInstance().createFBO("scene4", 4, 4, false, false);
-        FBOManager.getInstance().createFBO("scene2", 2, 2, false, false);
-        FBOManager.getInstance().createFBO("scene1", 1, 1, false, false);
     }
 
     /**
@@ -239,24 +223,35 @@ public final class WorldRenderer implements RenderableObject {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* SKYSPHERE */
+        PerformanceMonitor.startActivity("Render-Sky");
         _player.getActiveCamera().lookThroughNormalized();
         _skysphere.render();
+        PerformanceMonitor.endActivity();
 
         /* WORLD RENDERING */
+        PerformanceMonitor.startActivity("Render-World");
         _player.getActiveCamera().lookThrough();
         _player.render();
 
         // Render all chunks and entities
         Chunk.resetStats();
         renderChunksAndEntities();
+        PerformanceMonitor.endActivity();
 
         /* PARTICLE EFFECTS */
+        PerformanceMonitor.startActivity("Render-Particles");
         _blockParticleEmitter.render();
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Render-Grid");
         _blockGrid.render();
+        PerformanceMonitor.endActivity();
 
         // The overlay has to be rendered separately so it appears on top of everything else
+        PerformanceMonitor.startActivity("Render-Extraction Overlay");
+
         _player.renderExtractionOverlay();
+        PerformanceMonitor.endActivity();
 
         glPushMatrix();
         glLoadIdentity();
@@ -266,6 +261,7 @@ public final class WorldRenderer implements RenderableObject {
 
         scene.unbind();
 
+        // Draw the final scene on a quad and render it...
         FBOManager.getInstance().renderScene();
     }
 
@@ -320,7 +316,11 @@ public final class WorldRenderer implements RenderableObject {
         GL20.glUniform1i(carryingTorch, _player.isCarryingTorch() ? 1 : 0);
 
         ShaderManager.getInstance().enableShader(null);
+
+        PerformanceMonitor.startActivity("BulletPhysicsRenderer");
         BulletPhysicsRenderer.getInstance().render();
+        PerformanceMonitor.endActivity();
+        ShaderManager.getInstance().enableShader("chunk");
 
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
@@ -387,29 +387,51 @@ public final class WorldRenderer implements RenderableObject {
     }
 
     public void update() {
+        PerformanceMonitor.startActivity("Update Tick");
         updateTick();
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Skysphere");
         _skysphere.update();
+        PerformanceMonitor.endActivity();
+        PerformanceMonitor.startActivity("Player");
         _player.update();
+        PerformanceMonitor.endActivity();
+        PerformanceMonitor.startActivity("Mob Manager");
         _mobManager.updateAll();
+        PerformanceMonitor.endActivity();
 
         // Update the particle emitters
+        PerformanceMonitor.startActivity("Block Particle Emitter");
         _blockParticleEmitter.update();
+        PerformanceMonitor.endActivity();
 
         // Free unused space
+        PerformanceMonitor.startActivity("Flush World Cache");
         _worldProvider.getChunkProvider().flushCache();
+        PerformanceMonitor.endActivity();
 
         // And finally fire any active events
+        PerformanceMonitor.startActivity("Fire Events");
         _worldTimeEventManager.fireWorldTimeEvents();
+        PerformanceMonitor.endActivity();
 
         // Simulate world
+        PerformanceMonitor.startActivity("Liquid");
         _worldProvider.getLiquidSimulator().simulate(false);
+        PerformanceMonitor.endActivity();
+        PerformanceMonitor.startActivity("Growth");
         _worldProvider.getGrowthSimulator().simulate(false);
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Update Chunks");
         updateChunksInProximity(false);
         updateVisibleChunks();
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Physics Renderer");
         BulletPhysicsRenderer.getInstance().update();
+        PerformanceMonitor.endActivity();
     }
 
     /**

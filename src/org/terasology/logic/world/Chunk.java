@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
 /**
@@ -94,6 +95,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     private AABB[] _subMeshAABB = null;
     /* ----- */
     private RigidBody _rigidBody = null;
+    /* ----- */
+    private ReentrantLock _lock = new ReentrantLock();
 
     public enum LIGHT_TYPE {
         BLOCK,
@@ -780,44 +783,47 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     private void setNewMesh(ChunkMesh[] newMesh) {
-        synchronized (this) {
-            if (_disposed)
-                return;
+        if (_lock.tryLock()) {
+            if (!_disposed) {
+                ChunkMesh[] oldNewMesh = _newMeshes;
+                _newMeshes = newMesh;
 
-            ChunkMesh[] oldNewMesh = _newMeshes;
-            _newMeshes = newMesh;
-
-            if (oldNewMesh != null) {
-                for (int i = 0; i < oldNewMesh.length; i++)
-                    oldNewMesh[i].dispose();
+                if (oldNewMesh != null) {
+                    for (int i = 0; i < oldNewMesh.length; i++)
+                        oldNewMesh[i].dispose();
+                }
             }
+
+            _lock.unlock();
         }
     }
 
     private boolean swapActiveMesh() {
-        synchronized (this) {
-            if (_disposed)
-                return false;
+        if (_lock.tryLock()) {
+            if (!_disposed) {
+                if (_newMeshes != null) {
+                    if (!_newMeshes[0].isDisposed() && _newMeshes[0].isGenerated()) {
 
-            if (_newMeshes != null) {
-                if (_newMeshes[0].isDisposed() || !_newMeshes[0].isGenerated())
-                    return false;
+                        ChunkMesh[] newMesh = _newMeshes;
+                        _newMeshes = null;
 
-                ChunkMesh[] newMesh = _newMeshes;
-                _newMeshes = null;
+                        ChunkMesh[] oldActiveMesh = _activeMeshes;
+                        _activeMeshes = newMesh;
+                        _rigidBody = null;
 
-                ChunkMesh[] oldActiveMesh = _activeMeshes;
-                _activeMeshes = newMesh;
-                _rigidBody = null;
+                        if (oldActiveMesh != null) {
+                            for (int i = 0; i < oldActiveMesh.length; i++) {
+                                oldActiveMesh[i].dispose();
+                            }
+                        }
 
-                if (oldActiveMesh != null) {
-                    for (int i = 0; i < oldActiveMesh.length; i++) {
-                        oldActiveMesh[i].dispose();
+                        _lock.unlock();
+                        return true;
                     }
                 }
-
-                return true;
             }
+
+            _lock.unlock();
         }
 
         return false;
@@ -928,20 +934,22 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Disposes this chunk. Can NOT be undone.
      */
     public void dispose() {
-        synchronized (this) {
-            if (_disposed)
-                return;
+        _lock.lock();
 
-            if (_activeMeshes != null)
-                for (int i = 0; i < _activeMeshes.length; i++)
-                    _activeMeshes[i].dispose();
-            if (_newMeshes != null) {
-                for (int i = 0; i < _newMeshes.length; i++)
-                    _newMeshes[i].dispose();
-            }
+        if (_disposed)
+            return;
 
-            _disposed = true;
+        if (_activeMeshes != null)
+            for (int i = 0; i < _activeMeshes.length; i++)
+                _activeMeshes[i].dispose();
+        if (_newMeshes != null) {
+            for (int i = 0; i < _newMeshes.length; i++)
+                _newMeshes[i].dispose();
         }
+
+        _disposed = true;
+
+        _lock.unlock();
     }
 
     public boolean isReadyForRendering() {
@@ -960,7 +968,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         updateRigidBody(_activeMeshes);
     }
 
-    private void updateRigidBody(ChunkMesh[] meshes) {
+    private void updateRigidBody(final ChunkMesh[] meshes) {
         if (_rigidBody != null)
             return;
 
@@ -970,40 +978,45 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (meshes.length < VERTICAL_SEGMENTS)
             return;
 
-        TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+        Terasology.getInstance().submitTask("Update Chunk Collision", new Runnable() {
+            public void run() {
+                TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
 
-        int counter = 0;
-        for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
-            ChunkMesh mesh = meshes[k];
+                int counter = 0;
+                for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
+                    ChunkMesh mesh = meshes[k];
 
-            if (mesh != null) {
-                IndexedMesh indexedMesh = mesh._indexedMesh;
+                    if (mesh != null) {
+                        IndexedMesh indexedMesh = mesh._indexedMesh;
 
-                if (indexedMesh != null) {
-                    vertexArray.addIndexedMesh(indexedMesh);
-                    counter++;
+                        if (indexedMesh != null) {
+                            vertexArray.addIndexedMesh(indexedMesh);
+                            counter++;
+                        }
+
+                        mesh._indexedMesh = null;
+                    }
                 }
 
-                mesh._indexedMesh = null;
+                if (counter == VERTICAL_SEGMENTS) {
+                    try {
+                        BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
+
+                        Matrix3f rot = new Matrix3f();
+                        rot.setIdentity();
+
+                        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
+
+                        RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
+                        _rigidBody = new RigidBody(blockConsInf);
+
+                    } catch (Exception e) {
+                        Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+                    }
+                }
+
             }
-        }
-
-        if (counter == VERTICAL_SEGMENTS) {
-            try {
-                BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
-
-                Matrix3f rot = new Matrix3f();
-                rot.setIdentity();
-
-                DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
-
-                RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
-                _rigidBody = new RigidBody(blockConsInf);
-
-            } catch (Exception e) {
-                Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
-            }
-        }
+        });
     }
 
     public RigidBody getRigidBody() {

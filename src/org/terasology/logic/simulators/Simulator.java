@@ -29,6 +29,7 @@ import java.util.HashSet;
  */
 public abstract class Simulator implements BlockObserver {
 
+    private final String _name;
     private boolean _running = false;
 
     protected final long _updateInterval;
@@ -37,13 +38,14 @@ public abstract class Simulator implements BlockObserver {
     protected final WorldProvider _parent;
     protected final HashSet<BlockPosition> _activeBlocks = new HashSet<BlockPosition>(256);
 
-    public Simulator(WorldProvider parent, long updateInterval) {
+    public Simulator(String name, WorldProvider parent, long updateInterval) {
         _updateInterval = updateInterval;
         _parent = parent;
+        _name = name;
     }
 
-    public Simulator(WorldProvider parent) {
-        this(parent, 1000);
+    public Simulator(String name, WorldProvider parent) {
+        this(name, parent, 1000);
     }
 
     public void addActiveBlock(BlockPosition bp) {
@@ -51,7 +53,7 @@ public abstract class Simulator implements BlockObserver {
     }
 
 
-    synchronized public void simulateAll() {
+    public void simulateAll() {
         if (_running)
             return;
 
@@ -70,10 +72,10 @@ public abstract class Simulator implements BlockObserver {
             }
         };
 
-        Terasology.getInstance().getThreadPool().execute(r);
+        Terasology.getInstance().submitTask(_name + "Complete", r);
     }
 
-    synchronized public boolean simulate(boolean force) {
+    public boolean simulate(boolean force) {
         if (_running)
             return false;
 
@@ -91,7 +93,7 @@ public abstract class Simulator implements BlockObserver {
                 }
             };
 
-            Terasology.getInstance().getThreadPool().execute(r);
+            Terasology.getInstance().submitTask(_name, r);
 
             _lastUpdate = currentTime;
             return true;

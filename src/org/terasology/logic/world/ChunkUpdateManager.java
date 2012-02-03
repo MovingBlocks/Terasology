@@ -68,7 +68,7 @@ public final class ChunkUpdateManager implements BlockObserver {
             }
         };
 
-        Terasology.getInstance().getThreadPool().execute(r);
+        Terasology.getInstance().submitTask("Chunk Update", r);
     }
 
     public void blockPlaced(Chunk chunk, BlockPosition pos) {

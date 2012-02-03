@@ -21,6 +21,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
@@ -128,6 +129,7 @@ public final class Player extends Character {
     public void update() {
         _walkingSpeed = WALKING_SPEED;
 
+        PerformanceMonitor.startActivity("Player Camera");
         if (_activeCamera != null) {
             _activeCamera.update();
 
@@ -138,6 +140,7 @@ public final class Player extends Character {
                 _activeCamera.resetFov();
             }
         }
+        PerformanceMonitor.endActivity();
 
         // Speedup if the player is playing god
         if (_godMode) {
@@ -152,8 +155,11 @@ public final class Player extends Character {
 
         super.update();
 
+        PerformanceMonitor.startActivity("Player Select Block");
         _selectedBlock = calcSelectedBlock();
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Player Death Check");
         // Respawn the player after a certain amount of time
         if (isDead() && _timeOfDeath == -1) {
             _timeOfDeath = Terasology.getInstance().getTime();
@@ -162,6 +168,7 @@ public final class Player extends Character {
             respawn();
             _timeOfDeath = -1;
         }
+        PerformanceMonitor.endActivity();
     }
 
     /**
@@ -289,7 +296,9 @@ public final class Player extends Character {
                     blockPosY = (int) (getPosition().y + (getPosition().y >= 0 ? 0.5f : -0.5f)) + y;
                     blockPosZ = (int) (getPosition().z + (getPosition().z >= 0 ? 0.5f : -0.5f)) + z;
 
+                    PerformanceMonitor.startActivity("Player Get Block");
                     byte blockType = _parent.getWorldProvider().getBlock(blockPosX, blockPosY, blockPosZ);
+                    PerformanceMonitor.endActivity();
 
                     // Ignore special blocks
                     if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
@@ -297,11 +306,14 @@ public final class Player extends Character {
                     }
 
                     // The ray originates from the "player's eye"
+                    PerformanceMonitor.startActivity("Player Intersect Block");
                     ArrayList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent.getWorldProvider(), blockPosX, blockPosY, blockPosZ, calcEyePosition(), _viewingDirection);
+
 
                     if (iss != null) {
                         inters.addAll(iss);
                     }
+                    PerformanceMonitor.endActivity();
                 }
             }
         }
@@ -309,10 +321,12 @@ public final class Player extends Character {
         /**
          * Calculated the closest intersection.
          */
+        PerformanceMonitor.startActivity("Player sort intersects");
         if (inters.size() > 0) {
             Collections.sort(inters);
             return inters.get(0);
         }
+        PerformanceMonitor.endActivity();
 
         return null;
     }
