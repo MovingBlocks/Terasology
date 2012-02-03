@@ -228,7 +228,7 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     private void removeBlocks() {
         if (_blocks.size() > 0) {
             for (int i = _blocks.size() - 1; i >= 0; i--) {
-                if (!_blocks.get(i).isActive()) {
+                if (!_blocks.get(i).isActive() || _blocks.get(i).calcAgeInMs() > 10000) {
                     _discreteDynamicsWorld.removeRigidBody(_blocks.get(i));
                     _blocks.remove(i);
                 }

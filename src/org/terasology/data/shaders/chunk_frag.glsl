@@ -66,9 +66,10 @@ void main(){
 
     // Calculate daylight lighting value
     float daylightValue = daylight * pow(0.86, (1.0-gl_TexCoord[1].x)*15.0);
+    float blocklightDayIntensity = 1.0 - max(daylightValue, 0.2);
 
-    // Slightly flickering blocklight!
-    float blocklightValue = pow(0.86, (1.0-gl_TexCoord[1].y)*15.0) - (sin(tick*0.02) + 1.0) / 16.0;;
+    float blocklightValue = pow(0.86, (1.0-gl_TexCoord[1].y)*15.0) * blocklightDayIntensity;
+
     float occlusionValue = gl_TexCoord[1].z;
 
     float highlight = 0.0;
@@ -78,25 +79,22 @@ void main(){
     vec3 N = normalize(normal * ((gl_FrontFacing) ? 1.0 : -1.0));
     vec3 L = normalize(-vertexWorldPos.xyz);
 
-    highlight = clamp(dot(N,L), 0.0, 1.0);
+    highlight = dot(N,L);
 
     // Apply torchlight
     if (carryingTorch) {
-        torchlight = highlight * clamp(1.0 - (distance / 16.0), 0.0, 1.0) * 0.75;
+        torchlight = highlight * clamp(1.0 - (distance / 16.0), 0.0, 1.0) * blocklightDayIntensity;
     }
 
     // Apply some lighting highlights to the daylight light value
     // Looks cool during morning and evning hours and can be seen moonlight during the night
     vec3 daylightColorValue = vec3(daylightValue + highlight * 0.05);
 
-    float blockBrightness = blocklightValue + torchlight;
-    vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.95,blockBrightness * 0.9);
-
-    blocklightColorValue = clamp(blocklightColorValue,0.0,1.0);
-    daylightColorValue = clamp(daylightColorValue, 0.0, 1.0);
+    float blockBrightness = blocklightValue + torchlight - ((sin(tick*0.02) + 1.0) / 16.0) * blocklightValue;
+    vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.99,blockBrightness * 0.98);
 
     // Apply the final lighting mix
-    color.xyz *= clamp(daylightColorValue + blocklightColorValue * (1.0-daylightValue), 0.0, 1.0) * occlusionValue;
+    color.xyz *= (daylightColorValue * occlusionValue + blocklightColorValue * occlusionValue);
 
     // Apply linear fog
     float fog = clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.25, 1.0);

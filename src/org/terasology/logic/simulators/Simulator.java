@@ -23,7 +23,7 @@ import org.terasology.model.structures.BlockPosition;
 import java.util.HashSet;
 
 /**
- * TODO
+ * Base class for all simulators.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -50,10 +50,36 @@ public abstract class Simulator implements BlockObserver {
         _activeBlocks.add(bp);
     }
 
-    public boolean simulate(boolean force) {
+
+    synchronized public void simulateAll() {
+        if (_running)
+            return;
+
+        _running = true;
+
+        // Create a new thread and start processing
+        Runnable r = new Runnable() {
+            public void run() {
+                int counter = 0;
+
+                while (executeSimulation() && counter < 1024) {
+                    counter++;
+                }
+
+                _running = false;
+            }
+        };
+
+        Terasology.getInstance().getThreadPool().execute(r);
+    }
+
+    synchronized public boolean simulate(boolean force) {
+        if (_running)
+            return false;
+
         long currentTime = Terasology.getInstance().getTime();
 
-        if ((currentTime > _lastUpdate + _updateInterval || force) && !_running) {
+        if ((currentTime > _lastUpdate + _updateInterval || force)) {
 
             _running = true;
 

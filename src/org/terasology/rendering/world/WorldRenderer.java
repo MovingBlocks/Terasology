@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.world;
 
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -34,6 +36,7 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -109,6 +112,21 @@ public final class WorldRenderer implements RenderableObject {
         _blockGrid = new BlockGrid(this);
 
         initTimeEvents();
+
+        FBOManager.getInstance().createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
+
+        FBOManager.getInstance().createFBO("sceneHighPass", 1024, 1024, true, false);
+        FBOManager.getInstance().createFBO("sceneBloom", 1024, 1024, true, false);
+
+        FBOManager.getInstance().createFBO("scene256", 256, 256, false, false);
+        FBOManager.getInstance().createFBO("scene128", 128, 128, false, false);
+        FBOManager.getInstance().createFBO("scene64", 64, 64, false, false);
+        FBOManager.getInstance().createFBO("scene32", 32, 32, false, false);
+        FBOManager.getInstance().createFBO("scene16", 16, 16, false, false);
+        FBOManager.getInstance().createFBO("scene8", 8, 8, false, false);
+        FBOManager.getInstance().createFBO("scene4", 4, 4, false, false);
+        FBOManager.getInstance().createFBO("scene2", 2, 2, false, false);
+        FBOManager.getInstance().createFBO("scene1", 1, 1, false, false);
     }
 
     /**
@@ -215,6 +233,11 @@ public final class WorldRenderer implements RenderableObject {
      * Renders the world.
      */
     public void render() {
+        FBOManager.FBO scene = FBOManager.getInstance().getFBO("scene");
+        scene.bind();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         /* SKYSPHERE */
         _player.getActiveCamera().lookThroughNormalized();
         _skysphere.render();
@@ -232,7 +255,7 @@ public final class WorldRenderer implements RenderableObject {
 
         _blockGrid.render();
 
-        // The overlay has to be rendered separately so appears on top of everything else
+        // The overlay has to be rendered separately so it appears on top of everything else
         _player.renderExtractionOverlay();
 
         glPushMatrix();
@@ -240,6 +263,10 @@ public final class WorldRenderer implements RenderableObject {
         glClear(GL_DEPTH_BUFFER_BIT);
         _player.renderFirstPersonViewElements();
         glPopMatrix();
+
+        scene.unbind();
+
+        FBOManager.getInstance().renderScene();
     }
 
 
@@ -344,8 +371,6 @@ public final class WorldRenderer implements RenderableObject {
         if (playerIsSwimming) {
             glEnable(GL11.GL_CULL_FACE);
         }
-
-        ShaderManager.getInstance().enableShader(null);
     }
 
     public float getRenderingLightValue() {

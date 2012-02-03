@@ -70,7 +70,14 @@ public class ShaderManager {
         _preProcessorPreamble += ((Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.animatedWaterAndGrass")) ? "#define ANIMATED_WATER_AND_GRASS \n" : "";
         _preProcessorPreamble += "#define GAMMA " + ConfigurationManager.getInstance().getConfig().get("Graphics.gamma").toString() + "\n";
 
-
+        createShader("highp_frag.glsl", "highp", GL20.GL_FRAGMENT_SHADER);
+        createShader("highp_vert.glsl", "highp", GL20.GL_VERTEX_SHADER);
+        createShader("blur_frag.glsl", "blur", GL20.GL_FRAGMENT_SHADER);
+        createShader("blur_vert.glsl", "blur", GL20.GL_VERTEX_SHADER);
+        createShader("down_vert.glsl", "down", GL20.GL_VERTEX_SHADER);
+        createShader("down_frag.glsl", "down", GL20.GL_FRAGMENT_SHADER);
+        createShader("fbo_vert.glsl", "fbo", GL20.GL_VERTEX_SHADER);
+        createShader("fbo_frag.glsl", "fbo", GL20.GL_FRAGMENT_SHADER);
         createShader("sky_vert.glsl", "sky", GL20.GL_VERTEX_SHADER);
         createShader("sky_frag.glsl", "sky", GL20.GL_FRAGMENT_SHADER);
         createShader("chunk_vert.glsl", "chunk", GL20.GL_VERTEX_SHADER);

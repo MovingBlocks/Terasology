@@ -72,8 +72,12 @@ public class MathHelper {
     /**
      * Linear interpolation.
      */
-    private static double lerp(double x, double x1, double x2, double q00, double q01) {
+    public static double lerp(double x, double x1, double x2, double q00, double q01) {
         return ((x2 - x) / (x2 - x1)) * q00 + ((x - x1) / (x2 - x1)) * q01;
+    }
+
+    public static double lerp(double x1, double x2, double p) {
+        return x1 * (1.0 - p) + x2 * p;
     }
 
     /**
