@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.entities.Entity;
@@ -224,22 +225,32 @@ public final class WorldRenderer implements RenderableObject {
      */
     public void render() {
         /* SKYSPHERE */
+        PerformanceMonitor.startActivity("Render-Sky");
         _player.getActiveCamera().lookThroughNormalized();
         _skysphere.render();
+        PerformanceMonitor.endActivity();
 
         /* WORLD RENDERING */
+        PerformanceMonitor.startActivity("Render-World");
         _player.getActiveCamera().lookThrough();
         _player.render();
 
         renderChunksAndEntities();
+        PerformanceMonitor.endActivity();
 
         /* PARTICLE EFFECTS */
+        PerformanceMonitor.startActivity("Render-Particles");
         _blockParticleEmitter.render();
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Render-Grid");
         _blockGrid.render();
+        PerformanceMonitor.endActivity();
 
         // The overlay has to be rendered separately so appears on top of everything else
+        PerformanceMonitor.startActivity("Render-Extraction Overlay");
         _player.renderExtractionOverlay();
+        PerformanceMonitor.endActivity();
 
         glPushMatrix();
         glLoadIdentity();
@@ -454,29 +465,51 @@ public final class WorldRenderer implements RenderableObject {
     }
 
     public void update() {
+        PerformanceMonitor.startActivity("Update Tick");
         updateTick();
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Skysphere");
         _skysphere.update();
+        PerformanceMonitor.endActivity();
+        PerformanceMonitor.startActivity("Player");
         _player.update();
+        PerformanceMonitor.endActivity();
+        PerformanceMonitor.startActivity("Mob Manager");
         _mobManager.updateAll();
+        PerformanceMonitor.endActivity();
 
         // Update the particle emitters
+        PerformanceMonitor.startActivity("Block Particle Emitter");
         _blockParticleEmitter.update();
+        PerformanceMonitor.endActivity();
 
         // Free unused space
+        PerformanceMonitor.startActivity("Flush World Cache");
         _worldProvider.getChunkProvider().flushCache();
+        PerformanceMonitor.endActivity();
 
         // And finally fire any active events
+        PerformanceMonitor.startActivity("Fire Events");
         _worldTimeEventManager.fireWorldTimeEvents();
+        PerformanceMonitor.endActivity();
 
         // Simulate world
+        PerformanceMonitor.startActivity("Liquid");
         _worldProvider.getLiquidSimulator().simulate(false);
+        PerformanceMonitor.endActivity();
+        PerformanceMonitor.startActivity("Growth");
         _worldProvider.getGrowthSimulator().simulate(false);
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Update Chunks");
         updateChunksInProximity(false);
         updateVisibleChunks();
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Physics Renderer");
         BulletPhysicsRenderer.getInstance().update();
+        PerformanceMonitor.endActivity();
     }
 
     /**
