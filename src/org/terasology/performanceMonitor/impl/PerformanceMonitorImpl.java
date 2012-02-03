@@ -1,10 +1,14 @@
 package org.terasology.performanceMonitor.impl;
 
+import gnu.trove.TCollections;
 import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
+import gnu.trove.procedure.TObjectIntProcedure;
 import gnu.trove.procedure.TObjectLongProcedure;
 import org.lwjgl.Sys;
 
@@ -26,9 +30,12 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
     private List<TObjectLongMap<String>> _metricData;
     private TObjectLongMap<String> _currentData;
     private TObjectLongMap<String> _runningTotals;
+    private TObjectIntMap<String> _runningThreads;
+    private TObjectIntMap<String> _stoppedThreads;
     private long _timerTicksPerSecond;
     private TObjectDoubleMap<String> _spikeData;
     private double timeFactor;
+    private TObjectIntMap<String> _lastRunningThreads;
 
     public PerformanceMonitorImpl()
     {
@@ -38,6 +45,9 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
         _timerTicksPerSecond = Sys.getTimerResolution();
         _currentData = new TObjectLongHashMap<String>();
         _spikeData = new TObjectDoubleHashMap<String>();
+        _runningThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
+        _stoppedThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
+        _lastRunningThreads = new TObjectIntHashMap<String>();
         timeFactor = 1000.0 / _timerTicksPerSecond;
     }
 
@@ -75,6 +85,23 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
             _metricData.remove(0);
         }
         _currentData = new TObjectLongHashMap<String>();
+
+        _runningThreads.forEachEntry(new TObjectIntProcedure<String>() {
+            public boolean execute(String s, int i) {
+                _lastRunningThreads.adjustOrPutValue(s, i, i);
+                return true;
+            }
+        });
+        TObjectIntMap<String> temp = _runningThreads;
+        temp.clear();
+        _runningThreads = _stoppedThreads;
+        _stoppedThreads = temp;
+        _lastRunningThreads.retainEntries(new TObjectIntProcedure<String>() {
+            public boolean execute(String s, int i) {
+                return i > 0;
+            }
+        });
+        
     }
 
     public void startActivity(String activity)
@@ -124,6 +151,21 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
     public TObjectDoubleMap<String> getDecayingSpikes()
     {
         return _spikeData;
+    }
+
+    public void startThread(String name)
+    {
+        _runningThreads.adjustOrPutValue(name, 1, 1);
+    }
+
+    public void endThread(String name)
+    {
+        _stoppedThreads.adjustOrPutValue(name, -1, -1);
+    }
+
+    public TObjectIntMap<String> getRunningThreads()
+    {
+         return _lastRunningThreads;
     }
 
     private static class Activity

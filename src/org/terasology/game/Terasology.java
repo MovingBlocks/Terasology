@@ -179,6 +179,7 @@ public final class Terasology {
      */
     private Terasology() {
         _logger = Logger.getLogger("Terasology");
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     }
 
     /**
@@ -684,8 +685,27 @@ public final class Terasology {
         return (Sys.getTime() * 1000) / _timerTicksPerSecond;
     }
 
-    public ThreadPoolExecutor getThreadPool() {
-        return _threadPool;
+    public void submitTask(final String name, final Runnable task)
+    {
+        _threadPool.execute(new Runnable() {
+            public void run() {
+                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                PerformanceMonitor.startThread(name);
+                try
+                {
+                    task.run();
+                }
+                finally
+                {
+                    PerformanceMonitor.endThread(name);
+                }
+            }
+        });
+    }
+    
+    public int activeTasks()
+    {
+        return _threadPool.getActiveCount();
     }
 
     public GroovyManager getGroovyManager() {

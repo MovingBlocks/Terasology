@@ -1,6 +1,7 @@
 package org.terasology.performanceMonitor;
 
 import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
@@ -49,6 +50,22 @@ public class PerformanceMonitor {
     {
         _instance.endActivity();
     }
+    
+    public static void startThread(String name)
+    {
+        _instance.startThread(name);
+    }
+    
+    public static void endThread(String name)
+    {
+        _instance.endThread(name);
+    }
+
+    public static TObjectIntMap<String> getRunningThreads()
+    {
+        return _instance.getRunningThreads();
+    }
+        
 
     /**
      * Should be called once per frame, drops old information and updates the metrics.

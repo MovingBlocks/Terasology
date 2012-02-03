@@ -1,7 +1,9 @@
 package org.terasology.rendering.gui.menus;
 
+import com.sun.corba.se.pept.transport.ListenerThread;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
+import gnu.trove.procedure.TObjectIntProcedure;
 import org.lwjgl.input.Keyboard;
 import org.terasology.game.Terasology;
 import org.terasology.logic.entities.StaticEntity;
@@ -11,8 +13,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 
 import javax.vecmath.Vector2f;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * UI element that graphs performance metrics
@@ -59,59 +60,9 @@ public class UIMetrics extends UIDisplayRenderer {
     public void update() {
         super.update();
 
-        if (!_currentMode.visible)
-        {
-            _headerLine.setVisible(false);
-            for (UIText line : _metricLines)
-            {
-                line.setVisible(false);
-            }
-        }
-        else
-        {
-            _headerLine.setVisible(true);
-            _headerLine.setText(_currentMode.displayText);
-            TObjectDoubleMap<String> metrics = _currentMode.getMetrics();
-
-            final List<String> activities = new ArrayList<String>();
-            final List<Double> values = new ArrayList<Double>();
-            sortMetrics(metrics, activities, values);
-
-            for (int i = 0; i < METRIC_LINES && i < activities.size(); ++i)
-            {
-                UIText line = _metricLines.get(i);
-                line.setVisible(true);
-                line.setText(String.format("%s: %.2fms", activities.get(i), values.get(i)));
-            }
-            for (int i = activities.size(); i < METRIC_LINES; ++i)
-            {
-                _metricLines.get(i).setVisible(false);
-            }
-        }
-    }
-
-    private void sortMetrics(TObjectDoubleMap<String> metrics, final List<String> activities, final List<Double> values) {
-        metrics.forEachEntry(new TObjectDoubleProcedure<String>() {
-            public boolean execute(String s, double v) {
-                boolean inserted = false;
-                for (int i = 0; i < values.size(); i++)
-                {
-                    if (v > values.get(i))
-                    {
-                        values.add(i, v);
-                        activities.add(i, s);
-                        inserted = true;
-                        break;
-                    }
-                }
-                if (!inserted)
-                {
-                    activities.add(s);
-                    values.add(v);
-                }
-                return true;
-            }
-        });
+        _headerLine.setVisible(_currentMode.visible);
+        _headerLine.setText(_currentMode.displayText);
+        _currentMode.updateLines(_metricLines);
     }
 
     @Override
@@ -131,23 +82,51 @@ public class UIMetrics extends UIDisplayRenderer {
         Off("", false)
                 {
                     @Override
-                    public TObjectDoubleMap<String> getMetrics() {
-                        return null;
+                    public void updateLines(List<UIText> lines) {
+                        for (UIText line : lines)
+                        {
+                            line.setVisible(false);
+                        }
                     }
                 },
 
         RunningMean("Running Means", true)
                 {
                     @Override
-                    public TObjectDoubleMap<String> getMetrics() {
-                        return PerformanceMonitor.getRunningMean();
+                    public void updateLines(List<UIText> lines) {
+                        displayMetrics(PerformanceMonitor.getRunningMean(), lines);
                     }
                 },
         DecayingSpikes("Spikes", true)
                 {
                     @Override
-                    public TObjectDoubleMap<String> getMetrics() {
-                        return PerformanceMonitor.getDecayingSpikes();
+                    public void updateLines(List<UIText> lines) {
+                        displayMetrics(PerformanceMonitor.getDecayingSpikes(), lines);
+                    }
+                },
+        RunningThreads("Running Threads", true)
+                {
+                    @Override
+                    public void updateLines(List<UIText> lines) {
+                        final SortedSet<String> threads = new TreeSet<String>();
+                        PerformanceMonitor.getRunningThreads().forEachEntry(new TObjectIntProcedure<String>() {
+                            public boolean execute(String s, int i) {
+                                threads.add(String.format("%s (%d)", s, i));
+                                return true;
+                            }
+                        });
+                        int line = 0;
+                        for (String thread : threads)
+                        {
+                            lines.get(line).setVisible(true);
+                            lines.get(line).setText(thread);
+                            line++;
+                            if (line >= lines.size()) break;
+                        }
+                        for (;line < lines.size(); line++)
+                        {
+                            lines.get(line).setVisible(false);
+                        }
                     }
                 };
 
@@ -160,7 +139,7 @@ public class UIMetrics extends UIDisplayRenderer {
             this.visible = visible;
         }
 
-        public abstract TObjectDoubleMap<String> getMetrics();
+        public abstract void updateLines(List<UIText> lines);
 
         public static Mode nextMode(Mode current)
         {
@@ -170,9 +149,53 @@ public class UIMetrics extends UIDisplayRenderer {
                     return RunningMean;
                 case RunningMean:
                     return DecayingSpikes;
+                case DecayingSpikes:
+                    return RunningThreads;
                 default:
                     return Off;
             }
+        }
+
+        private static void displayMetrics(TObjectDoubleMap<String> metrics, List<UIText> lines)
+        {
+            final List<String> activities = new ArrayList<String>();
+            final List<Double> values = new ArrayList<Double>();
+            sortMetrics(metrics, activities, values);
+
+            for (int i = 0; i < lines.size() && i < activities.size(); ++i)
+            {
+                UIText line = lines.get(i);
+                line.setVisible(true);
+                line.setText(String.format("%s: %.2fms", activities.get(i), values.get(i)));
+            }
+            for (int i = activities.size(); i < lines.size(); ++i)
+            {
+                lines.get(i).setVisible(false);
+            }
+        }
+
+        private static void sortMetrics(TObjectDoubleMap<String> metrics, final List<String> activities, final List<Double> values) {
+            metrics.forEachEntry(new TObjectDoubleProcedure<String>() {
+                public boolean execute(String s, double v) {
+                    boolean inserted = false;
+                    for (int i = 0; i < values.size(); i++)
+                    {
+                        if (v > values.get(i))
+                        {
+                            values.add(i, v);
+                            activities.add(i, s);
+                            inserted = true;
+                            break;
+                        }
+                    }
+                    if (!inserted)
+                    {
+                        activities.add(s);
+                        values.add(v);
+                    }
+                    return true;
+                }
+            });
         }
     }
 

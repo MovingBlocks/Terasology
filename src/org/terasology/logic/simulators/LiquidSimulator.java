@@ -36,7 +36,7 @@ public class LiquidSimulator extends Simulator {
     private static final Vector3d[] NEIGHBORS6 = {new Vector3d(0, -1, 0), new Vector3d(0, 1, 0), new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
 
     public LiquidSimulator(WorldProvider parent) {
-        super(parent, 1000);
+        super("Liquid", parent, 1000);
     }
 
     @Override

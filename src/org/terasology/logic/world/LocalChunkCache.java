@@ -120,7 +120,7 @@ public final class LocalChunkCache implements ChunkProvider {
             }
         };
 
-        Terasology.getInstance().getThreadPool().execute(r);
+        Terasology.getInstance().submitTask("Flush Chunk Cache", r);
     }
 
     /**
@@ -138,7 +138,7 @@ public final class LocalChunkCache implements ChunkProvider {
             }
         };
 
-        Terasology.getInstance().getThreadPool().submit(r);
+        Terasology.getInstance().submitTask("Dispose Chunk", r);
     }
 
     /**

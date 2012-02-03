@@ -35,7 +35,7 @@ public class GrowthSimulator extends Simulator {
     private static final byte GRASS_TYPE = BlockManager.getInstance().getBlock("Grass").getId();
 
     public GrowthSimulator(WorldProvider parent) {
-        super(parent, 1000);
+        super("Growth", parent, 1000);
     }
 
     @Override

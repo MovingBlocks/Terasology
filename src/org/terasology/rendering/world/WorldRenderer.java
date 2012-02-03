@@ -316,7 +316,9 @@ public final class WorldRenderer implements RenderableObject {
         _statEmpty = 0;
         _statVisibleTriangles = 0;
 
+        PerformanceMonitor.startActivity("BulletPhysicsRenderer");
         BulletPhysicsRenderer.getInstance().render();
+        PerformanceMonitor.endActivity();
         ShaderManager.getInstance().enableShader("chunk");
 
         /*

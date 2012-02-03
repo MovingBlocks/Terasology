@@ -1034,7 +1034,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         updateRigidBody(_activeMeshes);
     }
 
-    private void updateRigidBody(ChunkMesh[] meshes) {
+    private void updateRigidBody(final ChunkMesh[] meshes) {
         if (_rigidBody != null)
             return;
 
@@ -1044,40 +1044,45 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (meshes.length < VERTICAL_SEGMENTS)
             return;
 
-        TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+        Terasology.getInstance().submitTask("Update Chunk Collision", new Runnable() {
+            public void run() {
+                TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
 
-        int counter = 0;
-        for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
-            ChunkMesh mesh = meshes[k];
+                int counter = 0;
+                for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
+                    ChunkMesh mesh = meshes[k];
 
-            if (mesh != null) {
-                IndexedMesh indexedMesh = mesh._indexedMesh;
+                    if (mesh != null) {
+                        IndexedMesh indexedMesh = mesh._indexedMesh;
 
-                if (indexedMesh != null) {
-                    vertexArray.addIndexedMesh(indexedMesh);
-                    counter++;
+                        if (indexedMesh != null) {
+                            vertexArray.addIndexedMesh(indexedMesh);
+                            counter++;
+                        }
+
+                        mesh._indexedMesh = null;
+                    }
                 }
 
-                mesh._indexedMesh = null;
+                if (counter == VERTICAL_SEGMENTS) {
+                    try {
+                        BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
+
+                        Matrix3f rot = new Matrix3f();
+                        rot.setIdentity();
+
+                        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
+
+                        RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
+                        _rigidBody = new RigidBody(blockConsInf);
+
+                    } catch (Exception e) {
+                        Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+                    }
+                }
+
             }
-        }
-
-        if (counter == VERTICAL_SEGMENTS) {
-            try {
-                BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
-
-                Matrix3f rot = new Matrix3f();
-                rot.setIdentity();
-
-                DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
-
-                RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
-                _rigidBody = new RigidBody(blockConsInf);
-
-            } catch (Exception e) {
-                Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
-            }
-        }
+        });
     }
 
     public RigidBody getRigidBody() {

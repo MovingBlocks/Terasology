@@ -173,7 +173,7 @@ public class Skysphere implements RenderableObject {
         if (_cloudByteBuffer == null && Terasology.getInstance().getTime() - _lastCloudUpdate >= CLOUD_UPDATE_INTERVAL) {
             _lastCloudUpdate = Terasology.getInstance().getTime();
 
-            Terasology.getInstance().getThreadPool().execute(new Runnable() {
+            Terasology.getInstance().submitTask("Generate Clouds", new Runnable() {
                 public void run() {
                     generateNewClouds();
                 }
