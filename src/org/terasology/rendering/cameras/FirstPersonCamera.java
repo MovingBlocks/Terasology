@@ -38,7 +38,7 @@ public class FirstPersonCamera extends Camera {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        gluPerspective(_activeFov, ASPECT_RATIO, 0.1f, 1024f);
+        gluPerspective(_activeFov, ASPECT_RATIO, 0.1f, 512f);
 
         glMatrixMode(GL11.GL_MODELVIEW);
     }

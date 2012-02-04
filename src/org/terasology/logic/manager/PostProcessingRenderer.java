@@ -29,14 +29,15 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class FBOManager {
+public class PostProcessingRenderer {
 
-    private static FBOManager _instance = null;
+    private static PostProcessingRenderer _instance = null;
     private float _exposure;
 
     public class FBO {
         public int _fboId = 0;
         public int _textureId = 0;
+        public int _depthTextureId = 0;
         public int _depthRboId = 0;
 
         public void bind() {
@@ -45,6 +46,10 @@ public class FBOManager {
 
         public void unbind() {
             GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+        }
+
+        public void bindDepthTexture() {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, _depthTextureId);
         }
 
         public void bindTexture() {
@@ -64,21 +69,24 @@ public class FBOManager {
      *
      * @return The instance
      */
-    public static FBOManager getInstance() {
+    public static PostProcessingRenderer getInstance() {
         if (_instance == null) {
-            _instance = new FBOManager();
+            _instance = new PostProcessingRenderer();
         }
 
         return _instance;
     }
 
-    public FBOManager() {
+    public PostProcessingRenderer() {
         createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
 
         createFBO("sceneHighPass", 1024, 1024, true, false);
         createFBO("sceneBloom0", 1024, 1024, true, false);
         createFBO("sceneBloom1", 1024, 1024, true, false);
         createFBO("sceneBloom2", 1024, 1024, true, false);
+        createFBO("sceneBlur0", 1024, 1024, false, false);
+        createFBO("sceneBlur1", 1024, 1024, false, false);
+        createFBO("sceneBlur2", 1024, 1024, false, false);
 
         createFBO("scene256", 256, 256, false, false);
         createFBO("scene128", 128, 128, false, false);
@@ -94,7 +102,7 @@ public class FBOManager {
     public FBO createFBO(String title, int width, int height, boolean hdr, boolean depth) {
         FBO fbo = new FBO();
 
-        // Create the texture
+        // Create the color target texture
         fbo._textureId = GL11.glGenTextures();
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo._textureId);
 
@@ -108,15 +116,26 @@ public class FBOManager {
         else
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
 
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-
-        // Create depth render buffer object
         if (depth) {
+            // Generate the depth texture
+            fbo._depthTextureId = GL11.glGenTextures();
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo._depthTextureId);
+
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, (java.nio.ByteBuffer) null);
+
+            // Create depth render buffer object
             fbo._depthRboId = GL30.glGenRenderbuffers();
             GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, fbo._depthRboId);
-            GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL11.GL_DEPTH_COMPONENT, width, height);
+            GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL14.GL_DEPTH_COMPONENT24, width, height);
             GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, 0);
         }
+
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
         // Create the FBO
         fbo._fboId = GL30.glGenFramebuffers();
@@ -124,8 +143,11 @@ public class FBOManager {
 
         GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, fbo._textureId, 0);
 
-        if (depth)
+        if (depth) {
+            // Generate the depth render buffer and depth map texture
             GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_RENDERBUFFER, fbo._depthRboId);
+            GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL11.GL_TEXTURE_2D, fbo._depthTextureId, 0);
+        }
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
 
@@ -139,31 +161,36 @@ public class FBOManager {
 
     private void updateExposure() {
         ByteBuffer pixels = BufferUtils.createByteBuffer(4);
-        FBOManager.getInstance().getFBO("scene1").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("scene1").bindTexture();
         glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL_RGBA, GL11.GL_UNSIGNED_BYTE, pixels);
-        FBOManager.getInstance().getFBO("scene1").unbindTexture();
+        PostProcessingRenderer.getInstance().getFBO("scene1").unbindTexture();
 
         float lum = 0.2126f * ((pixels.get(0) & 0xff) / 255f) + 0.7152f * ((pixels.get(1) & 0xff) / 255f) + 0.0722f * ((pixels.get(2) & 0xff) / 255f);
         _exposure = (float) MathHelper.lerp(_exposure, 0.5f / lum, 0.01);
 
-        if (_exposure > 5.0f)
-            _exposure = 5.0f;
+        if (_exposure > 3.0f)
+            _exposure = 3.0f;
     }
 
     public void renderScene() {
-        generateDownsampledFBOs();
+        generateDownsampledScene();
         updateExposure();
 
-        generateHighPassFBO();
-        generateBloomFBO(0);
-        generateBloomFBO(1);
-        generateBloomFBO(2);
+        generateHighPass();
+        for (int i = 0; i < 3; i++) {
+            generateBloom(i);
+            generateBlur(i);
+        }
 
         ShaderManager.getInstance().enableShader("fbo");
-        FBOManager.FBO scene = FBOManager.getInstance().getFBO("scene");
+        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        FBOManager.getInstance().getFBO("sceneBloom2").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("sceneBloom2").bindTexture();
+        GL13.glActiveTexture(GL13.GL_TEXTURE2);
+        scene.bindDepthTexture();
+        GL13.glActiveTexture(GL13.GL_TEXTURE3);
+        PostProcessingRenderer.getInstance().getFBO("sceneBlur2").bindTexture();
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         scene.bindTexture();
 
@@ -171,6 +198,10 @@ public class FBOManager {
         GL20.glUniform1i(texScene, 0);
         int texBloom = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texBloom");
         GL20.glUniform1i(texBloom, 1);
+        int texDepth = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texDepth");
+        GL20.glUniform1i(texDepth, 2);
+        int texBlur = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texBlur");
+        GL20.glUniform1i(texBlur, 3);
 
         int expos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "exposure");
         GL20.glUniform1f(expos, _exposure);
@@ -181,45 +212,72 @@ public class FBOManager {
         ShaderManager.getInstance().enableShader(null);
     }
 
-    private void generateHighPassFBO() {
+    private void generateHighPass() {
         ShaderManager.getInstance().enableShader("highp");
 
-        FBOManager.getInstance().getFBO("sceneHighPass").bind();
+        PostProcessingRenderer.getInstance().getFBO("sceneHighPass").bind();
         glViewport(0, 0, 1024, 1024);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        FBOManager.getInstance().getFBO("scene").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
 
         renderFullQuad();
 
-        FBOManager.getInstance().getFBO("sceneHighPass").unbind();
+        PostProcessingRenderer.getInstance().getFBO("sceneHighPass").unbind();
 
         ShaderManager.getInstance().enableShader(null);
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
-    private void generateBloomFBO(int id) {
+    private void generateBlur(int id) {
         ShaderManager.getInstance().enableShader("blur");
 
-        FBOManager.getInstance().getFBO("sceneBloom" + id).bind();
+        int radius = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("blur"), "radius");
+        GL20.glUniform1f(radius, 1.5f);
+
+        PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
         glViewport(0, 0, 1024, 1024);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0)
-            FBOManager.getInstance().getFBO("sceneHighPass").bindTexture();
+            PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
         else
-            FBOManager.getInstance().getFBO("sceneBloom" + (id - 1)).bindTexture();
+            PostProcessingRenderer.getInstance().getFBO("sceneBlur" + (id - 1)).bindTexture();
 
         renderFullQuad();
 
-        FBOManager.getInstance().getFBO("sceneBloom" + id).unbind();
+        PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).unbind();
 
         ShaderManager.getInstance().enableShader(null);
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
-    private void generateDownsampledFBOs() {
+    private void generateBloom(int id) {
+        ShaderManager.getInstance().enableShader("blur");
+
+        int radius = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("blur"), "radius");
+        GL20.glUniform1f(radius, 32);
+
+        PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).bind();
+        glViewport(0, 0, 1024, 1024);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if (id == 0)
+            PostProcessingRenderer.getInstance().getFBO("sceneHighPass").bindTexture();
+        else
+            PostProcessingRenderer.getInstance().getFBO("sceneBloom" + (id - 1)).bindTexture();
+
+        renderFullQuad();
+
+        PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).unbind();
+
+        ShaderManager.getInstance().enableShader(null);
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+    }
+
+    private void generateDownsampledScene() {
         ShaderManager.getInstance().enableShader("down");
 
         for (int i = 8; i >= 0; i--) {
@@ -229,19 +287,19 @@ public class FBOManager {
             int textureSize = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("down"), "size");
             GL20.glUniform1f(textureSize, size);
 
-            FBOManager.getInstance().getFBO("scene" + size).bind();
+            PostProcessingRenderer.getInstance().getFBO("scene" + size).bind();
             glViewport(0, 0, size, size);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             if (i == 8)
-                FBOManager.getInstance().getFBO("scene").bindTexture();
+                PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
             else
-                FBOManager.getInstance().getFBO("scene" + sizePrev).bindTexture();
+                PostProcessingRenderer.getInstance().getFBO("scene" + sizePrev).bindTexture();
 
             renderFullQuad();
 
-            FBOManager.getInstance().getFBO("scene" + size).unbind();
+            PostProcessingRenderer.getInstance().getFBO("scene" + size).unbind();
 
         }
 

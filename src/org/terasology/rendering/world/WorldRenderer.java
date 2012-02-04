@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -217,7 +216,7 @@ public final class WorldRenderer implements RenderableObject {
      * Renders the world.
      */
     public void render() {
-        FBOManager.FBO scene = FBOManager.getInstance().getFBO("scene");
+        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
         scene.bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -253,16 +252,16 @@ public final class WorldRenderer implements RenderableObject {
         _player.renderExtractionOverlay();
         PerformanceMonitor.endActivity();
 
+        scene.unbind();
+
+        // Draw the final scene on a quad and render it...
+        PostProcessingRenderer.getInstance().renderScene();
+
         glPushMatrix();
         glLoadIdentity();
         glClear(GL_DEPTH_BUFFER_BIT);
         _player.renderFirstPersonViewElements();
         glPopMatrix();
-
-        scene.unbind();
-
-        // Draw the final scene on a quad and render it...
-        FBOManager.getInstance().renderScene();
     }
 
 
