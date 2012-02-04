@@ -29,7 +29,7 @@ public class DefaultConfig {
         // Disabled if a value <= 0 is provided
         config.put("Graphics.fpsLimit", 0)
 
-        config.put("Graphics.gamma", 1.8d)
+        config.put("Graphics.gamma", 2.2d)
         config.put("Graphics.animatedWaterAndGrass", true)
         config.put("Graphics.pixelFormat", new PixelFormat().withDepthBits(24))
         config.put("Graphics.displayMode", new DisplayMode(1280, 720))

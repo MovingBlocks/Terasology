@@ -168,8 +168,8 @@ public class PostProcessingRenderer {
         float lum = 0.2126f * ((pixels.get(0) & 0xff) / 255f) + 0.7152f * ((pixels.get(1) & 0xff) / 255f) + 0.0722f * ((pixels.get(2) & 0xff) / 255f);
         _exposure = (float) MathHelper.lerp(_exposure, 0.5f / lum, 0.01);
 
-        if (_exposure > 3.0f)
-            _exposure = 3.0f;
+        if (_exposure > 4.0f)
+            _exposure = 4.0f;
     }
 
     public void renderScene() {
@@ -257,7 +257,7 @@ public class PostProcessingRenderer {
         ShaderManager.getInstance().enableShader("blur");
 
         int radius = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("blur"), "radius");
-        GL20.glUniform1f(radius, 32);
+        GL20.glUniform1f(radius, 16);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).bind();
         glViewport(0, 0, 1024, 1024);

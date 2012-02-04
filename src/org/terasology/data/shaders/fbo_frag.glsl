@@ -4,7 +4,7 @@ uniform sampler2D texDepth;
 uniform sampler2D texBlur;
 
 uniform float exposure = 1.0;
-const float brightMax = 2.0;
+const float brightMax = 1.0;
 
 float linDepth() {
     float cNear = 0.1;
@@ -37,7 +37,6 @@ void main(){
 
     if (depth < 0.01)
         blur = clamp((0.01 - depth) / 0.005, 0.0, 1.0);
-
 
     // Display depth map
     //gl_FragColor = vec4(linDepth());

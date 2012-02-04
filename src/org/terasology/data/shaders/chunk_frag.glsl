@@ -66,8 +66,8 @@ void main(){
 
     // Calculate daylight lighting value
     float daylightValue = daylight * pow(0.86, (1.0-gl_TexCoord[1].x)*15.0);
-    float blocklightDayIntensity = 1.0 - max(daylightValue, 0.2);
 
+    float blocklightDayIntensity = 1.0 - daylightValue;
     float blocklightValue = pow(0.86, (1.0-gl_TexCoord[1].y)*15.0) * blocklightDayIntensity;
 
     float occlusionValue = gl_TexCoord[1].z;
@@ -87,10 +87,9 @@ void main(){
     }
 
     // Apply some lighting highlights to the daylight light value
-    // Looks cool during morning and evning hours and can be seen moonlight during the night
-    vec3 daylightColorValue = vec3(daylightValue + highlight * 0.05);
+    vec3 daylightColorValue = vec3(daylightValue * 0.95 + highlight * 0.05);
 
-    float blockBrightness = blocklightValue + torchlight - ((sin(tick*0.02) + 1.0) / 16.0) * blocklightValue;
+    float blockBrightness = blocklightValue + torchlight - ((sin(tick*0.05) + 1.0) / 16.0) * blocklightValue;
     vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.99,blockBrightness * 0.98);
 
     // Apply the final lighting mix
