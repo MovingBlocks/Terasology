@@ -31,6 +31,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class PostProcessingRenderer {
 
+    public static final boolean EFFECTS_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.enablePostProcessingEffects");
+
     private static PostProcessingRenderer _instance = null;
     private float _exposure;
 
@@ -39,6 +41,9 @@ public class PostProcessingRenderer {
         public int _textureId = 0;
         public int _depthTextureId = 0;
         public int _depthRboId = 0;
+
+        public int _width = 0;
+        public int _height = 0;
 
         public void bind() {
             GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, _fboId);
@@ -78,29 +83,49 @@ public class PostProcessingRenderer {
     }
 
     public PostProcessingRenderer() {
-        createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
+        createOrUpdateSceneFBO();
 
-        createFBO("sceneHighPass", 1024, 1024, true, false);
-        createFBO("sceneBloom0", 1024, 1024, true, false);
-        createFBO("sceneBloom1", 1024, 1024, true, false);
-        createFBO("sceneBloom2", 1024, 1024, true, false);
-        createFBO("sceneBlur0", 1024, 1024, false, false);
-        createFBO("sceneBlur1", 1024, 1024, false, false);
-        createFBO("sceneBlur2", 1024, 1024, false, false);
+        if (EFFECTS_ENABLED) {
+            createFBO("sceneBlur0", 1024, 1024, false, false);
+            createFBO("sceneBlur1", 1024, 1024, false, false);
+            createFBO("sceneBlur2", 1024, 1024, false, false);
 
-        createFBO("scene256", 256, 256, false, false);
-        createFBO("scene128", 128, 128, false, false);
-        createFBO("scene64", 64, 64, false, false);
-        createFBO("scene32", 32, 32, false, false);
-        createFBO("scene16", 16, 16, false, false);
-        createFBO("scene8", 8, 8, false, false);
-        createFBO("scene4", 4, 4, false, false);
-        createFBO("scene2", 2, 2, false, false);
-        createFBO("scene1", 1, 1, false, false);
+            createFBO("sceneHighPass", 1024, 1024, true, false);
+            createFBO("sceneBloom0", 1024, 1024, true, false);
+            createFBO("sceneBloom1", 1024, 1024, true, false);
+            createFBO("sceneBloom2", 1024, 1024, true, false);
+
+            createFBO("scene256", 256, 256, false, false);
+            createFBO("scene128", 128, 128, false, false);
+            createFBO("scene64", 64, 64, false, false);
+            createFBO("scene32", 32, 32, false, false);
+            createFBO("scene16", 16, 16, false, false);
+            createFBO("scene8", 8, 8, false, false);
+            createFBO("scene4", 4, 4, false, false);
+            createFBO("scene2", 2, 2, false, false);
+            createFBO("scene1", 1, 1, false, false);
+        }
+    }
+
+    public void deleteFBO(String title) {
+        if (_FBOs.containsKey(title)) {
+            FBO fbo = _FBOs.get(title);
+
+            GL30.glDeleteFramebuffers(fbo._fboId);
+            GL30.glDeleteRenderbuffers(fbo._depthRboId);
+            GL11.glDeleteTextures(fbo._depthTextureId);
+            GL11.glDeleteTextures(fbo._textureId);
+        }
     }
 
     public FBO createFBO(String title, int width, int height, boolean hdr, boolean depth) {
+        // Make sure to delete the existing FBO before creating a new one
+        deleteFBO(title);
+
+        // Create a new FBO object
         FBO fbo = new FBO();
+        fbo._width = width;
+        fbo._height = height;
 
         // Create the color target texture
         fbo._textureId = GL11.glGenTextures();
@@ -173,43 +198,72 @@ public class PostProcessingRenderer {
     }
 
     public void renderScene() {
-        generateDownsampledScene();
-        updateExposure();
+        if (EFFECTS_ENABLED) {
+            generateDownsampledScene();
+            updateExposure();
+            generateHighPass();
 
-        generateHighPass();
-        for (int i = 0; i < 3; i++) {
-            generateBloom(i);
-            generateBlur(i);
+            for (int i = 0; i < 3; i++) {
+                generateBloom(i);
+                generateBlur(i);
+            }
+
+            ShaderManager.getInstance().enableShader("fbo");
+            PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
+
+            GL13.glActiveTexture(GL13.GL_TEXTURE1);
+            PostProcessingRenderer.getInstance().getFBO("sceneBloom2").bindTexture();
+            GL13.glActiveTexture(GL13.GL_TEXTURE2);
+            scene.bindDepthTexture();
+            GL13.glActiveTexture(GL13.GL_TEXTURE3);
+            PostProcessingRenderer.getInstance().getFBO("sceneBlur2").bindTexture();
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            scene.bindTexture();
+
+            int texScene = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texScene");
+            GL20.glUniform1i(texScene, 0);
+            int texBloom = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texBloom");
+            GL20.glUniform1i(texBloom, 1);
+            int texDepth = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texDepth");
+            GL20.glUniform1i(texDepth, 2);
+            int texBlur = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texBlur");
+            GL20.glUniform1i(texBlur, 3);
+
+            int expos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "exposure");
+            GL20.glUniform1f(expos, _exposure);
+
+            renderFullQuad();
+
+            scene.unbindTexture();
+            ShaderManager.getInstance().enableShader(null);
+        } else {
+            PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
+
+            scene.bindTexture();
+            glEnable(GL11.GL_TEXTURE_2D);
+
+            renderFullQuad();
+
+            glDisable(GL11.GL_TEXTURE_2D);
+            scene.unbindTexture();
         }
 
-        ShaderManager.getInstance().enableShader("fbo");
-        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
+        createOrUpdateSceneFBO();
+    }
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        PostProcessingRenderer.getInstance().getFBO("sceneBloom2").bindTexture();
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        scene.bindDepthTexture();
-        GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        PostProcessingRenderer.getInstance().getFBO("sceneBlur2").bindTexture();
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        scene.bindTexture();
+    /**
+     * Initially creates the scene FBO and updates it according to the size of the viewport.
+     */
+    private void createOrUpdateSceneFBO() {
+        if (!_FBOs.containsKey("scene")) {
+            createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
+        } else {
+            FBO scene = getFBO("scene");
 
-        int texScene = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texScene");
-        GL20.glUniform1i(texScene, 0);
-        int texBloom = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texBloom");
-        GL20.glUniform1i(texBloom, 1);
-        int texDepth = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texDepth");
-        GL20.glUniform1i(texDepth, 2);
-        int texBlur = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texBlur");
-        GL20.glUniform1i(texBlur, 3);
-
-        int expos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "exposure");
-        GL20.glUniform1f(expos, _exposure);
-
-        renderFullQuad();
-
-        scene.unbindTexture();
-        ShaderManager.getInstance().enableShader(null);
+            if (scene._width != Display.getWidth() || scene._height != Display.getHeight()) {
+                createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
+            }
+        }
     }
 
     private void generateHighPass() {
@@ -308,28 +362,33 @@ public class PostProcessingRenderer {
     }
 
     private void renderFullQuad() {
-        glDisable(GL11.GL_DEPTH_TEST);
-
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
+
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
+
         glBegin(GL_QUADS);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
         glTexCoord2d(0.0, 0.0);
         glVertex3i(-1, -1, -1);
+
         glTexCoord2d(1.0, 0.0);
         glVertex3i(1, -1, -1);
+
         glTexCoord2d(1.0, 1.0);
         glVertex3i(1, 1, -1);
+
         glTexCoord2d(0.0, 1.0);
         glVertex3i(-1, 1, -1);
+
         glEnd();
         glPopMatrix();
+
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
-
-        glEnable(GL11.GL_DEPTH_TEST);
     }
 }

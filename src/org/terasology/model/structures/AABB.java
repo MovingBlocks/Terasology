@@ -191,8 +191,6 @@ public class AABB {
      * @param lineThickness The thickness of the line
      */
     public void render(float lineThickness) {
-        glLineWidth(lineThickness);
-
         glPushMatrix();
         Vector3d rp = Terasology.getInstance().getActiveWorldProvider().getRenderingReferencePoint();
         glTranslated(getPosition().x - rp.x, -rp.y, getPosition().z - rp.z);
@@ -203,28 +201,28 @@ public class AABB {
     }
 
     public void renderLocally(float lineThickness) {
-        glPushMatrix();
-        glTranslated(0f, getPosition().y, 0f);
-
-        glLineWidth(lineThickness);
-
         if (_displayListWire == -1) {
             generateDisplayListWire();
         }
 
+        glPushMatrix();
+        glTranslated(0f, getPosition().y, 0f);
+
+        glLineWidth(lineThickness);
         glCallList(_displayListWire);
 
         glPopMatrix();
     }
 
     public void renderSolidLocally() {
-        glPushMatrix();
-        glTranslated(0f, getPosition().y, 0f);
-        glScalef(1.5f, 1.5f, 1.5f);
-
         if (_displayListSolid == -1) {
             generateDisplayListSolid();
         }
+
+        glPushMatrix();
+
+        glTranslated(0f, getPosition().y, 0f);
+        glScalef(1.5f, 1.5f, 1.5f);
 
         glCallList(_displayListSolid);
 

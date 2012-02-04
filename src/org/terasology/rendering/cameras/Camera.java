@@ -39,6 +39,7 @@ public abstract class Camera {
 
     /* VIEW FRUSTUM */
     protected final ViewFrustum _viewFrustum = new ViewFrustum();
+    protected boolean _frustumNeedsUpdate = false;
 
     /**
      * Applies the projection and modelview matrix.
@@ -76,6 +77,11 @@ public abstract class Camera {
     }
 
     public ViewFrustum getViewFrustum() {
+        if (_frustumNeedsUpdate) {
+            _viewFrustum.updateFrustum();
+            _frustumNeedsUpdate = false;
+        }
+
         return _viewFrustum;
     }
 

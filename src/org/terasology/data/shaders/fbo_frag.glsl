@@ -36,7 +36,7 @@ void main(){
        blur = clamp((depth - 0.1) / 0.5, 0.0, 1.0);
 
     if (depth < 0.01)
-        blur = clamp((0.01 - depth) / 0.005, 0.0, 1.0);
+        blur = clamp((0.01 - depth) / 0.01, 0.0, 1.0);
 
     // Display depth map
     //gl_FragColor = vec4(linDepth());

@@ -38,7 +38,6 @@ public class DefaultConfig {
         config.put("System.Debug.godMode", false)
 
         config.put("Graphics.gamma", 2.2d)
-        config.put("Graphics.animatedWaterAndGrass", true)
         config.put("Graphics.pixelFormat", new PixelFormat().withDepthBits(24))
         config.put("Graphics.displayMode", new DisplayMode(1280, 720))
         config.put("Graphics.aspectRatio", 16.0d / 9.0d)
@@ -48,6 +47,10 @@ public class DefaultConfig {
         config.put("Graphics.viewingDistanceModerate", 16)
         config.put("Graphics.viewingDistanceFar", 26)
         config.put("Graphics.viewingDistanceUltra", 32)
+
+        // Advanced effects – Disable them if you are having problems running the game!
+        config.put("Graphics.enablePostProcessingEffects", true)
+        config.put("Graphics.animatedWaterAndGrass", true)
 
         // Splits chunk meshes into multiple sub-meshes to support frustum and occlusion culling techniques
         config.put("Graphics.verticalChunkMeshSegments", 1)
