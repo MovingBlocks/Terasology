@@ -1,4 +1,4 @@
-package org.terasology.tests;
+package org.terasology.model.structures;
 
 
 import org.terasology.model.structures.TeraSmartArray;
