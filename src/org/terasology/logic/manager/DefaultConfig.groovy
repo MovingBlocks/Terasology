@@ -13,16 +13,28 @@ public class DefaultConfig {
 
     public DefaultConfig() {
         config.put("System.versionTag", "Pre Alpha")
+        // Maximum amount of rendered particles
         config.put("System.maxParticles", 256)
+        // Resolution of the textures used to render the clouds
         config.put("System.cloudResolution", new Vector2f(64, 64))
+        // Time between cloud updates
         config.put("System.cloudUpdateInterval", (Integer) 1000)
+        // Maximum amount of concurrently running chunk update threads
         config.put("System.maxThreads", 2)
+        // If set to true chunks get persisted to disk when removed from the chunk cache
         config.put("System.saveChunks", true)
+        // Maximum amount of chunks stored in the chunk cache
+        // ~2048 is a good default value when using the largest viewing distance of 32 chunks
         config.put("System.chunkCacheSize", 2048)
+        // Maximum amount of chunk VBOs kept in video memory
+        // 512 chunks is a good default value for GPUs with ~1024 MB video memory using the largest viewing distance
+        config.put("System.maxChunkVBOs", 512)
+
         config.put("System.Debug.debug", false)
         config.put("System.Debug.debugCollision", false)
         config.put("System.Debug.renderChunkBoundingBoxes", false)
         config.put("System.Debug.demoFlight", false)
+        config.put("System.Debug.demoFlightSpeed", 0.08d)
         config.put("System.Debug.godMode", false)
 
         config.put("Graphics.gamma", 2.2d)

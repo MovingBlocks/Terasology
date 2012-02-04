@@ -15,7 +15,9 @@
  */
 package org.terasology.logic.manager;
 
+import gnu.trove.list.array.TIntArrayList;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
 import java.nio.FloatBuffer;
@@ -32,7 +34,7 @@ import java.util.List;
 public class VertexBufferObjectManager {
 
     private static VertexBufferObjectManager _instance = null;
-    private final List<Integer> _vertexBufferObjectPool = Collections.synchronizedList(new ArrayList());
+    private final TIntArrayList _vertexBufferObjectPool = new TIntArrayList();
 
     public static VertexBufferObjectManager getInstance() {
         if (_instance == null) {
@@ -48,16 +50,16 @@ public class VertexBufferObjectManager {
         return buffer;
     }
 
-    public Integer getVboId() {
-        if (_vertexBufferObjectPool.size() > 0) {
-            int id = _vertexBufferObjectPool.get(_vertexBufferObjectPool.size() - 1);
-            _vertexBufferObjectPool.remove(_vertexBufferObjectPool.size() - 1);
-            return id;
-        } else
-            return createVbos(1).get(0);
+    public synchronized int getVboId() {
+        while (_vertexBufferObjectPool.size() > 0) {
+            int id = _vertexBufferObjectPool.removeAt(_vertexBufferObjectPool.size() - 1);
+            GL15.glDeleteBuffers(id);
+        }
+
+        return createVbos(1).get(0);
     }
 
-    public void putVboId(int vboId) {
+    public synchronized void putVboId(int vboId) {
         if (vboId > 0) {
             _vertexBufferObjectPool.add(vboId);
         }

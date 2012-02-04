@@ -934,6 +934,30 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return _random;
     }
 
+    public void clearMeshes() {
+        _lock.lock();
+
+        try {
+            if (_disposed)
+                return;
+
+            if (_activeMeshes != null)
+                for (int i = 0; i < _activeMeshes.length; i++)
+                    _activeMeshes[i].dispose();
+            if (_newMeshes != null) {
+                for (int i = 0; i < _newMeshes.length; i++)
+                    _newMeshes[i].dispose();
+            }
+
+            _activeMeshes = null;
+            _newMeshes = null;
+            setDirty(true);
+
+        } finally {
+            _lock.unlock();
+        }
+    }
+
     /**
      * Disposes this chunk. Can NOT be undone.
      */

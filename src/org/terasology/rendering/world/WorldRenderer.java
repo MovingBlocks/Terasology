@@ -53,6 +53,7 @@ import static org.lwjgl.opengl.GL11.*;
 public final class WorldRenderer implements RenderableObject {
 
     public static final boolean BOUNDING_BOXES_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.renderChunkBoundingBoxes");
+    public static final int MAX_CHUNK_VERTEX_BUFFER_OBJECTS = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxChunkVBOs");
 
     /* VIEWING DISTANCE */
     private int _viewingDistance = 8;
@@ -208,6 +209,10 @@ public final class WorldRenderer implements RenderableObject {
                         noMoreUpdates = true;
                     }
                 }
+            } else if (i > MAX_CHUNK_VERTEX_BUFFER_OBJECTS) {
+                // Make sure not too many chunk VBOs are available in the video memory at the same time
+                // Otherwise VBOs are moved into system memory which is REALLY slow and causes lag
+                c.clearMeshes();
             }
         }
     }
