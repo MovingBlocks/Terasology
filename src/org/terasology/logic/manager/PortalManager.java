@@ -66,7 +66,7 @@ public class PortalManager {
         if (_parent.getMobManager().getActiveMobAmount() > 64)
             return false;
 
-        // 25% change something will spawn locally to the portal - will get fancier later
+        // 12.5% chance something will spawn locally to the portal - will get fancier later
         boolean spawn = _random.randomBoolean() && _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
             GelatinousCube s = new GelatinousCube(_parent);

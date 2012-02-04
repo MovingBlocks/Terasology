@@ -41,6 +41,7 @@ public abstract class MovableEntity extends Entity {
     protected long _lastFootStepSoundPlayed = 0;
     protected Audio _currentFootstepSound;
     protected Audio[] _footstepSounds;
+    protected boolean _noSound = false;
 
     /* PARENT WORLD */
     protected final WorldRenderer _parent;
@@ -61,15 +62,20 @@ public abstract class MovableEntity extends Entity {
      * @param walkingSpeed  The walking speed
      * @param runningFactor The running factor
      * @param jumpIntensity The jump intensity
+     * @param loadAudio     Whether or not to load (and play) audio resources
      */
-    public MovableEntity(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
+    public MovableEntity(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity, boolean loadAudio) {
         _parent = parent;
         _walkingSpeed = walkingSpeed;
         _runningFactor = runningFactor;
         _jumpIntensity = jumpIntensity;
 
         reset();
-        initAudio();
+        if (loadAudio) {
+            initAudio();
+        } else {
+            _noSound = true;
+        }
     }
 
     private void initAudio() {
@@ -128,6 +134,9 @@ public abstract class MovableEntity extends Entity {
 
     private void playMovementSound() {
         if (_godMode)
+            return;
+
+        if (_noSound)
             return;
 
         if ((MathHelper.fastAbs(_velocity.x) > 0.01 || MathHelper.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
@@ -358,7 +367,10 @@ public abstract class MovableEntity extends Entity {
                     // Entity reaches the ground
                     if (!_touchingGround) {
                         Vector3d playerDirection = directionOfReferencePoint();
-                        _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5].playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false, (float) playerDirection.x, (float) playerDirection.y, (float) playerDirection.z);
+                        // TODO: Whut... this could use some newlines - cheating for now :-)
+                        if (!_noSound) {
+                            _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5].playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false, (float) playerDirection.x, (float) playerDirection.y, (float) playerDirection.z);
+                        }
                         _touchingGround = true;
                     }
                 } else {

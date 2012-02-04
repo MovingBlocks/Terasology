@@ -30,7 +30,11 @@ public abstract class Character extends MovableEntity {
     private int _healthPoints = 255;
 
     public Character(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
-        super(parent, walkingSpeed, runningFactor, jumpIntensity);
+        super(parent, walkingSpeed, runningFactor, jumpIntensity, false);
+    }
+
+    public Character(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity, boolean loadAudio) {
+        super(parent, walkingSpeed, runningFactor, jumpIntensity, loadAudio);
     }
 
     /**
