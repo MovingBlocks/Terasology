@@ -180,7 +180,7 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     }
 
     public void render() {
-        _discreteDynamicsWorld.stepSimulation(1.0f/60f, 30);
+        _discreteDynamicsWorld.stepSimulation(Terasology.getInstance().getDelta() / 1000f, 30);
 
         TextureManager.getInstance().bindTexture("terrain");
         ShaderManager.getInstance().enableShader("block");

@@ -749,16 +749,17 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {
                     if (WorldRenderer.BOUNDING_BOXES_ENABLED) {
+                        ShaderManager.getInstance().enableShader(null);
                         getSubMeshAABB(i).renderLocally(2f);
                         _statRenderedTriangles += 12;
+                        ShaderManager.getInstance().enableShader("chunk");
                     }
 
-                    ShaderManager.getInstance().enableShader("chunk");
                     _activeMeshes[i].render(type);
                     _statRenderedTriangles += _activeMeshes[i].triangleCount();
-                    ShaderManager.getInstance().enableShader(null);
                 }
             }
+
             GL11.glPopMatrix();
         } else {
             _statChunkNotReady++;
@@ -952,6 +953,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             }
 
             _disposed = true;
+            _activeMeshes = null;
+            _newMeshes = null;
+
         } finally {
             _lock.unlock();
         }

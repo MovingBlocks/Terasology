@@ -15,19 +15,15 @@ public class DefaultConfig {
         config.put("System.versionTag", "Pre Alpha")
         config.put("System.maxParticles", 256)
         config.put("System.cloudResolution", new Vector2f(64, 64))
-        config.put("System.cloudUpdateInterval", (Integer) 256)
+        config.put("System.cloudUpdateInterval", (Integer) 1000)
         config.put("System.maxThreads", 2)
         config.put("System.saveChunks", true)
-        config.put("System.chunkCacheSize", 1024)
+        config.put("System.chunkCacheSize", 2048)
         config.put("System.Debug.debug", false)
         config.put("System.Debug.debugCollision", false)
         config.put("System.Debug.renderChunkBoundingBoxes", false)
         config.put("System.Debug.demoFlight", false)
         config.put("System.Debug.godMode", false)
-
-        // Synchronizes the Display to the given amount of FPS
-        // Disabled if a value <= 0 is provided
-        config.put("Graphics.fpsLimit", 0)
 
         config.put("Graphics.gamma", 2.2d)
         config.put("Graphics.animatedWaterAndGrass", true)
@@ -43,8 +39,6 @@ public class DefaultConfig {
 
         // Splits chunk meshes into multiple sub-meshes to support frustum and occlusion culling techniques
         config.put("Graphics.verticalChunkMeshSegments", 1)
-
-        config.put("Physics.generatePhysicsMeshes", true)
 
         config.put("HUD.crosshair", true)
         config.put("HUD.placingBox", true)
@@ -66,6 +60,7 @@ public class DefaultConfig {
         config.put("World.defaultSeed", "Blockmania42")
         config.put("World.dayNightLengthInMs", new Long((60 * 1000) * 20)) // 20 minutes in ms
         config.put("World.initialTimeOffsetInMs", new Long(60 * 1000)) // 120 seconds in ms
+
         config.put("World.Biomes.Forest.grassDensity", 0.3d)
         config.put("World.Biomes.Plains.grassDensity", 0.1d)
         config.put("World.Biomes.Snow.grassDensity", 0.001d)

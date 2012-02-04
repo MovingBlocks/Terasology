@@ -152,7 +152,7 @@ public class ChunkMesh {
 
                 glNormalPointer(GL11.GL_FLOAT, STRIDE, OFFSET_NORMAL);
 
-                GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, _vertexCount[id], _vertexCount[id], GL_UNSIGNED_INT, 0);
+                GL11.glDrawElements(GL11.GL_TRIANGLES, _vertexCount[id], GL_UNSIGNED_INT, 0);
 
                 glDisableClientState(GL_NORMAL_ARRAY);
                 glDisableClientState(GL_COLOR_ARRAY);

@@ -321,6 +321,8 @@ public final class WorldRenderer implements RenderableObject {
         PerformanceMonitor.endActivity();
         ShaderManager.getInstance().enableShader("chunk");
 
+        PerformanceMonitor.startActivity("Chunk-Opaque");
+
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
@@ -328,6 +330,10 @@ public final class WorldRenderer implements RenderableObject {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
         }
+
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Chunk-Billboard");
 
         /*
          * SECOND RENDER PASS: BILLBOARDS
@@ -340,9 +346,21 @@ public final class WorldRenderer implements RenderableObject {
             c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
         }
 
+        ShaderManager.getInstance().enableShader(null);
+
+        PerformanceMonitor.endActivity();
+
+        /*
+         * RENDER MOBS
+         */
+        PerformanceMonitor.startActivity("Render Mobs");
         _mobManager.renderAll();
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Chunk-WaterIce");
 
         TextureManager.getInstance().bindTexture("terrain");
+        ShaderManager.getInstance().enableShader("chunk");
 
         // Make sure the water surface is rendered if the player is swimming
         if (playerIsSwimming) {
@@ -366,10 +384,10 @@ public final class WorldRenderer implements RenderableObject {
         }
 
         glDisable(GL_BLEND);
+        glEnable(GL11.GL_CULL_FACE);
+        ShaderManager.getInstance().enableShader(null);
 
-        if (playerIsSwimming) {
-            glEnable(GL11.GL_CULL_FACE);
-        }
+        PerformanceMonitor.endActivity();
     }
 
     public float getRenderingLightValue() {
