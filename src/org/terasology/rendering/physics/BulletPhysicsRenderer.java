@@ -41,10 +41,7 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.RenderableObject;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
+import javax.vecmath.*;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -180,7 +177,7 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     }
 
     public void render() {
-        _discreteDynamicsWorld.stepSimulation(Terasology.getInstance().getDelta() / 1000f, 30);
+        _discreteDynamicsWorld.stepSimulation(Terasology.getInstance().getDelta() / 1000f, 7);
 
         TextureManager.getInstance().bindTexture("terrain");
         ShaderManager.getInstance().enableShader("block");

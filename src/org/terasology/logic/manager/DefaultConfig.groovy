@@ -16,9 +16,9 @@ public class DefaultConfig {
         // Maximum amount of rendered particles
         config.put("System.maxParticles", 256)
         // Resolution of the textures used to render the clouds
-        config.put("System.cloudResolution", new Vector2f(64, 64))
+        config.put("System.cloudResolution", new Vector2f(128, 128))
         // Time between cloud updates
-        config.put("System.cloudUpdateInterval", (Integer) 1000)
+        config.put("System.cloudUpdateInterval", (Integer) 30000)
         // Maximum amount of concurrently running chunk update threads
         config.put("System.maxThreads", 2)
         // If set to true chunks get persisted to disk when removed from the chunk cache
@@ -60,7 +60,7 @@ public class DefaultConfig {
 
         config.put("Controls.mouseSens", 0.075d)
 
-        config.put("Player.fov", 80.0d)
+        config.put("Player.fov", 86.0d)
         config.put("Player.cameraBobbing", true)
         config.put("Player.maxGravity", 1.0d)
         config.put("Player.maxGravitySwimming", 0.04d)

@@ -159,28 +159,28 @@ public final class WorldRenderer implements RenderableObject {
      */
     public void initTimeEvents() {
         // SUNRISE
-        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.01, true) {
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.1, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.2f);
+                SoundStore.get().setMusicVolume(0.1f);
                 AudioManager.getInstance().getAudio("Sunrise").playAsMusic(1.0f, 1.0f, false);
             }
         });
 
         // AFTERNOON
-        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.33, true) {
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.25, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.2f);
+                SoundStore.get().setMusicVolume(0.1f);
                 AudioManager.getInstance().getAudio("Afternoon").playAsMusic(1.0f, 1.0f, false);
             }
         });
 
         // SUNSET
-        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.44, true) {
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.4, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.2f);
+                SoundStore.get().setMusicVolume(0.1f);
                 AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 1.0f, false);
             }
         });
