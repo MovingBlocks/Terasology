@@ -579,31 +579,20 @@ public final class Terasology {
             int key = Keyboard.getEventKey();
 
             if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_ESCAPE) {
                     togglePauseMenu();
                 }
 
-                if (key == Keyboard.KEY_I && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_I) {
                     toggleInventory();
                 }
 
-                if (key == Keyboard.KEY_F3 && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_F3) {
                     ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", debugEnabled = !(debugEnabled));
                 }
 
-                if (key == Keyboard.KEY_F && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_F) {
                     toggleViewingDistance();
-                }
-
-                // Features for debug mode only
-                if (debugEnabled) {
-                    if (key == Keyboard.KEY_UP && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                        getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.005);
-                    }
-
-                    if (key == Keyboard.KEY_DOWN && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                        getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.005);
-                    }
                 }
 
                 // Pass input to focused GUI element
@@ -611,6 +600,25 @@ public final class Terasology {
                     if (screenCanFocus(screen)) {
                         screen.processKeyboardInput(key);
                     }
+                }
+            }
+
+            // Features for debug mode only
+            if (debugEnabled) {
+                if (key == Keyboard.KEY_UP && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.005);
+                }
+
+                if (key == Keyboard.KEY_DOWN && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.005);
+                }
+
+                if (key == Keyboard.KEY_RIGHT && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.02);
+                }
+
+                if (key == Keyboard.KEY_LEFT && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
                 }
             }
 
