@@ -34,8 +34,10 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
     private TObjectIntMap<String> _stoppedThreads;
     private long _timerTicksPerSecond;
     private TObjectDoubleMap<String> _spikeData;
-    private double timeFactor;
+    private double _timeFactor;
     private TObjectIntMap<String> _lastRunningThreads;
+    
+    private Thread _mainThread;
 
     public PerformanceMonitorImpl()
     {
@@ -48,7 +50,9 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
         _runningThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
         _stoppedThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
         _lastRunningThreads = new TObjectIntHashMap<String>();
-        timeFactor = 1000.0 / _timerTicksPerSecond;
+        _timeFactor = 1000.0 / _timerTicksPerSecond;
+        _mainThread = Thread.currentThread();
+
     }
 
     public void rollCycle()
@@ -64,7 +68,7 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
         _currentData.forEachEntry(new TObjectLongProcedure<String>() {
             public boolean execute(String s, long v) {
                 _runningTotals.adjustOrPutValue(s, v, v);
-                double time = v * timeFactor;
+                double time = v * _timeFactor;
                 double prev = _spikeData.get(s);
                 if (time > prev)
                 {
@@ -106,6 +110,8 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
 
     public void startActivity(String activity)
     {
+        if (Thread.currentThread() != _mainThread)
+            return;
         Activity newActivity = new Activity();
         newActivity.name = activity;
         newActivity.startTime = Sys.getTime();
@@ -120,6 +126,9 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
 
     public void endActivity()
     {
+        if (Thread.currentThread() != _mainThread || _activityStack.empty())
+            return;
+
         Activity oldActivity = _activityStack.pop();
         long time = Sys.getTime();
         long total = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + time - oldActivity.resumeTime : time - oldActivity.startTime;
@@ -135,7 +144,7 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
     public TObjectDoubleMap<String> getRunningMean()
     {
         final TObjectDoubleMap<String> result = new TObjectDoubleHashMap<String>();
-        final double factor = timeFactor / _metricData.size();
+        final double factor = _timeFactor / _metricData.size();
         _runningTotals.forEachEntry(new TObjectLongProcedure<String>() {
             public boolean execute(String s, long l) {
                 if (l > 0)

@@ -75,6 +75,8 @@ public class UIMetrics extends UIDisplayRenderer {
         if (key == Keyboard.KEY_F4) {
             _currentMode = Mode.nextMode(_currentMode);
         }
+        PerformanceMonitor.setEnabled(_currentMode != Mode.Off);
+
     }
 
     private enum Mode

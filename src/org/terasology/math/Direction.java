@@ -60,7 +60,7 @@ public enum Direction {
      */
     public Vector3i toVector3i()
     {
-        return vector;
+        return new Vector3i(vector);
     }
 
     /**
@@ -68,7 +68,7 @@ public enum Direction {
      */
     public Vector3f toVector3f()
     {
-        return vector3f;
+        return new Vector3f(vector3f);
     }
 
     /**

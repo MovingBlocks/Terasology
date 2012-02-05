@@ -365,7 +365,6 @@ public final class Terasology {
     public void startGame() {
         getInstance().getLogger().log(Level.INFO, "Starting Terasology...");
 
-        PerformanceMonitor.setEnabled(true);
         PerformanceMonitor.startActivity("Other");
 
         // MAIN GAME LOOP
