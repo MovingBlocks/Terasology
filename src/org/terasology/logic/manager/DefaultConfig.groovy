@@ -54,8 +54,8 @@ public class DefaultConfig {
         // Splits chunk meshes into multiple sub-meshes to support frustum and occlusion culling techniques
         config.put("Graphics.verticalChunkMeshSegments", 1)
 
-        config.put("HUD.placingBox", false)
-        config.put("Player.renderFirstPersonView", false)
+        config.put("HUD.placingBox", true)
+        config.put("Player.renderFirstPersonView", true)
 
         config.put("Controls.mouseSens", 0.075d)
 
