@@ -20,6 +20,7 @@ import org.lwjgl.opengl.*;
 import org.terasology.utilities.MathHelper;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.HashMap;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -35,6 +36,7 @@ public class PostProcessingRenderer {
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure;
+    private int _displayListQuad = -1;
 
     public class FBO {
         public int _fboId = 0;
@@ -88,22 +90,18 @@ public class PostProcessingRenderer {
         if (EFFECTS_ENABLED) {
             createFBO("sceneBlur0", 1024, 1024, false, false);
             createFBO("sceneBlur1", 1024, 1024, false, false);
-            createFBO("sceneBlur2", 1024, 1024, false, false);
 
             createFBO("sceneHighPass", 1024, 1024, true, false);
             createFBO("sceneBloom0", 1024, 1024, true, false);
             createFBO("sceneBloom1", 1024, 1024, true, false);
-            createFBO("sceneBloom2", 1024, 1024, true, false);
 
-            createFBO("scene256", 256, 256, false, false);
-            createFBO("scene128", 128, 128, false, false);
-            createFBO("scene64", 64, 64, false, false);
-            createFBO("scene32", 32, 32, false, false);
-            createFBO("scene16", 16, 16, false, false);
-            createFBO("scene8", 8, 8, false, false);
-            createFBO("scene4", 4, 4, false, false);
-            createFBO("scene2", 2, 2, false, false);
-            createFBO("scene1", 1, 1, false, false);
+            createFBO("scene64", 64, 64, true, false);
+            createFBO("scene32", 32, 32, true, false);
+            createFBO("scene16", 16, 16, true, false);
+            createFBO("scene8", 8, 8, true, false);
+            createFBO("scene4", 4, 4, true, false);
+            createFBO("scene2", 2, 2, true, false);
+            createFBO("scene1", 1, 1, true, false);
         }
     }
 
@@ -185,51 +183,57 @@ public class PostProcessingRenderer {
     }
 
     private void updateExposure() {
-        ByteBuffer pixels = BufferUtils.createByteBuffer(4);
-        PostProcessingRenderer.getInstance().getFBO("scene1").bindTexture();
-        glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL_RGBA, GL11.GL_UNSIGNED_BYTE, pixels);
-        PostProcessingRenderer.getInstance().getFBO("scene1").unbindTexture();
+        FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
+        FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
-        float lum = 0.2126f * ((pixels.get(0) & 0xff) / 255f) + 0.7152f * ((pixels.get(1) & 0xff) / 255f) + 0.0722f * ((pixels.get(2) & 0xff) / 255f);
+        scene.bindTexture();
+        glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_FLOAT, pixels);
+        scene.unbindTexture();
+
+        float lum = 0.2126f * pixels.get(0) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(2);
         _exposure = (float) MathHelper.lerp(_exposure, 0.5f / lum, 0.01);
 
         if (_exposure > 4.0f)
             _exposure = 4.0f;
     }
 
+    /**
+     * Renders the final scene to a quad and displays it. The FBO gets automatically rescaled if the size
+     * of the viewport changes.
+     */
     public void renderScene() {
         if (EFFECTS_ENABLED) {
             generateDownsampledScene();
             updateExposure();
             generateHighPass();
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 generateBloom(i);
                 generateBlur(i);
             }
 
-            ShaderManager.getInstance().enableShader("fbo");
+            ShaderManager.getInstance().enableShader("post");
             PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
             GL13.glActiveTexture(GL13.GL_TEXTURE1);
-            PostProcessingRenderer.getInstance().getFBO("sceneBloom2").bindTexture();
+            PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
             GL13.glActiveTexture(GL13.GL_TEXTURE2);
             scene.bindDepthTexture();
             GL13.glActiveTexture(GL13.GL_TEXTURE3);
-            PostProcessingRenderer.getInstance().getFBO("sceneBlur2").bindTexture();
+            PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            scene.bindTexture();
+            PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
 
-            int texScene = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texScene");
+            int texScene = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("post"), "texScene");
             GL20.glUniform1i(texScene, 0);
-            int texBloom = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texBloom");
+            int texBloom = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("post"), "texBloom");
             GL20.glUniform1i(texBloom, 1);
-            int texDepth = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texDepth");
+            int texDepth = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("post"), "texDepth");
             GL20.glUniform1i(texDepth, 2);
-            int texBlur = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "texBlur");
+            int texBlur = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("post"), "texBlur");
             GL20.glUniform1i(texBlur, 3);
 
-            int expos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("fbo"), "exposure");
+            int expos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("post"), "exposure");
             GL20.glUniform1f(expos, _exposure);
 
             renderFullQuad();
@@ -287,7 +291,7 @@ public class PostProcessingRenderer {
         ShaderManager.getInstance().enableShader("blur");
 
         int radius = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("blur"), "radius");
-        GL20.glUniform1f(radius, 1.5f);
+        GL20.glUniform1f(radius, 2.0f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
         glViewport(0, 0, 1024, 1024);
@@ -334,7 +338,7 @@ public class PostProcessingRenderer {
     private void generateDownsampledScene() {
         ShaderManager.getInstance().enableShader("down");
 
-        for (int i = 8; i >= 0; i--) {
+        for (int i = 6; i >= 0; i--) {
             int sizePrev = (int) Math.pow(2, i + 1);
             int size = (int) Math.pow(2, i);
 
@@ -346,7 +350,7 @@ public class PostProcessingRenderer {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            if (i == 8)
+            if (i == 6)
                 PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
             else
                 PostProcessingRenderer.getInstance().getFBO("scene" + sizePrev).bindTexture();
@@ -370,25 +374,40 @@ public class PostProcessingRenderer {
         glPushMatrix();
         glLoadIdentity();
 
-        glBegin(GL_QUADS);
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        renderQuad();
 
-        glTexCoord2d(0.0, 0.0);
-        glVertex3i(-1, -1, -1);
-
-        glTexCoord2d(1.0, 0.0);
-        glVertex3i(1, -1, -1);
-
-        glTexCoord2d(1.0, 1.0);
-        glVertex3i(1, 1, -1);
-
-        glTexCoord2d(0.0, 1.0);
-        glVertex3i(-1, 1, -1);
-
-        glEnd();
         glPopMatrix();
 
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
+    }
+
+    private void renderQuad() {
+        if (_displayListQuad == -1) {
+            _displayListQuad = glGenLists(1);
+
+            glNewList(_displayListQuad, GL11.GL_COMPILE);
+
+            glBegin(GL_QUADS);
+            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+            glTexCoord2d(0.0, 0.0);
+            glVertex3i(-1, -1, -1);
+
+            glTexCoord2d(1.0, 0.0);
+            glVertex3i(1, -1, -1);
+
+            glTexCoord2d(1.0, 1.0);
+            glVertex3i(1, 1, -1);
+
+            glTexCoord2d(0.0, 1.0);
+            glVertex3i(-1, 1, -1);
+
+            glEnd();
+
+            glEndList();
+        }
+
+        glCallList(_displayListQuad);
     }
 }

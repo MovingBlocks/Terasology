@@ -76,8 +76,8 @@ public class ShaderManager {
         createShader("blur_vert.glsl", "blur", GL20.GL_VERTEX_SHADER);
         createShader("down_vert.glsl", "down", GL20.GL_VERTEX_SHADER);
         createShader("down_frag.glsl", "down", GL20.GL_FRAGMENT_SHADER);
-        createShader("fbo_vert.glsl", "fbo", GL20.GL_VERTEX_SHADER);
-        createShader("fbo_frag.glsl", "fbo", GL20.GL_FRAGMENT_SHADER);
+        createShader("post_vert.glsl", "post", GL20.GL_VERTEX_SHADER);
+        createShader("post_frag.glsl", "post", GL20.GL_FRAGMENT_SHADER);
         createShader("sky_vert.glsl", "sky", GL20.GL_VERTEX_SHADER);
         createShader("sky_frag.glsl", "sky", GL20.GL_FRAGMENT_SHADER);
         createShader("chunk_vert.glsl", "chunk", GL20.GL_VERTEX_SHADER);

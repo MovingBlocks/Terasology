@@ -3,7 +3,6 @@ package org.terasology.rendering.primitives;
 import com.bulletphysics.collision.shapes.IndexedMesh;
 import gnu.trove.list.array.TFloatArrayList;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.logic.manager.VertexBufferObjectManager;
@@ -58,10 +57,10 @@ public class ChunkMesh {
     /* VERTEX DATA */
     private final int[] _vertexBuffers = new int[4];
     private final int[] _idxBuffers = new int[4];
-
     private final int[] _vertexCount = new int[4];
 
-    private int _triangles = -1;
+    /* STATS */
+    private int _triangleCount = -1;
 
     /* TEMPORARY DATA */
     public VertexElements[] _vertexElements = new VertexElements[4];
@@ -74,7 +73,6 @@ public class ChunkMesh {
     public ReentrantLock _lock = new ReentrantLock();
 
     public ChunkMesh() {
-        // Opaque elements assigned by sides
         _vertexElements[0] = new VertexElements();
         _vertexElements[1] = new VertexElements();
         _vertexElements[2] = new VertexElements();
@@ -98,7 +96,8 @@ public class ChunkMesh {
 
                 // Free unused space on the heap
                 _vertexElements = null;
-                _triangles = (_vertexCount[0] + _vertexCount[1] + _vertexCount[2] + _vertexCount[3]) / 3;
+                // Calculate the final amount of triangles
+                _triangleCount = (_vertexCount[0] + _vertexCount[1] + _vertexCount[2] + _vertexCount[3]) / 3;
             } finally {
                 _lock.unlock();
             }
@@ -220,10 +219,10 @@ public class ChunkMesh {
     }
 
     public int triangleCount() {
-        return _triangles;
+        return _triangleCount;
     }
 
     public boolean isEmpty() {
-        return _triangles == 0;
+        return _triangleCount == 0;
     }
 }

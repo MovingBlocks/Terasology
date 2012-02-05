@@ -18,7 +18,6 @@ package org.terasology.rendering.primitives;
 import com.bulletphysics.collision.shapes.IndexedMesh;
 import com.bulletphysics.collision.shapes.ScalarType;
 import org.lwjgl.BufferUtils;
-import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
@@ -73,16 +72,15 @@ public final class ChunkTessellator {
     }
 
     private void generateOptimizedBuffers(ChunkMesh mesh) {
-        mesh._indexedMesh = null;
-
-            mesh._indexedMesh = new IndexedMesh();
-            mesh._indexedMesh.vertexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
-            mesh._indexedMesh.triangleIndexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
-            mesh._indexedMesh.triangleIndexStride = 12;
-            mesh._indexedMesh.vertexStride = 12;
-            mesh._indexedMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
-            mesh._indexedMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
-            mesh._indexedMesh.indexType = ScalarType.INTEGER;
+        /* BULLET PHYSICS */
+        mesh._indexedMesh = new IndexedMesh();
+        mesh._indexedMesh.vertexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
+        mesh._indexedMesh.triangleIndexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
+        mesh._indexedMesh.triangleIndexStride = 12;
+        mesh._indexedMesh.vertexStride = 12;
+        mesh._indexedMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
+        mesh._indexedMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
+        mesh._indexedMesh.indexType = ScalarType.INTEGER;
         /* ------------- */
 
         for (int j = 0; j < mesh._vertexElements.length; j++) {

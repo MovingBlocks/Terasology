@@ -33,7 +33,7 @@ void main(){
     float blur = 0.0;
 
     if (depth > 0.1)
-       blur = clamp((depth - 0.1) / 0.5, 0.0, 1.0);
+       blur = clamp((depth - 0.1) / 0.2, 0.0, 1.0);
 
     if (depth < 0.01)
         blur = clamp((0.01 - depth) / 0.01, 0.0, 1.0);
