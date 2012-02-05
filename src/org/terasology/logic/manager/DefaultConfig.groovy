@@ -40,7 +40,6 @@ public class DefaultConfig {
         config.put("Graphics.gamma", 2.2d)
         config.put("Graphics.pixelFormat", new PixelFormat().withDepthBits(24))
         config.put("Graphics.displayMode", new DisplayMode(1280, 720))
-        config.put("Graphics.aspectRatio", 16.0d / 9.0d)
         config.put("Graphics.fullscreen", false)
 
         config.put("Graphics.viewingDistanceNear", 8)
