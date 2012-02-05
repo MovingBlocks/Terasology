@@ -28,7 +28,6 @@ Controls
 * [W,A,S,D]               Walking
 * [Space]                 Jump
 * [Shift]                 Hold for running
-* [Up, Down]              Switch active block
 * [Left click]            Activate left click action (default = place block)
 * [Right click]           Activate right click action (default = remove block)
 * [Mouse wheel up/down]   Cycle through toolbar slots
@@ -37,9 +36,18 @@ Controls
 * [F]                     Toggle viewing distance (near, moderate, far, ultra)
 * [Tab]                   Toggle developer console
 * [F3]                    Toggle debug information
+* [F4]                    Different debug metrics
 * [2*Space]               God mode
-* [K]                     Don't try this
-* [Escape]                Show/hide the pause menu screen
+* [K]                     Don't try this :-)
+* [Escape]                Show/hide the game menu screen
+
+Examples tools (may move slot or disappear)
+------------------------
+
+* Torch - shiny! Place with left click
+* Pickaxe / shovel - faster right-click removal of some blocks
+* Blueprint - left click one block, then another, then somewhere else to "clone" your selection (right-click resets)
+* Lighter - big bada boom!
 
 Example console commands
 ------------------------
