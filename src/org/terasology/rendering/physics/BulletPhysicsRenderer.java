@@ -39,6 +39,7 @@ import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.RenderableObject;
+import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
@@ -116,19 +117,33 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     }
 
     public void addBlock(Vector3f position, byte type) {
-        for (int i = 0; i < 4; i++) {
+        Vector3f[] positionOffsets = new Vector3f[]{new Vector3f(1, 1, -1), new Vector3f(1, -1, -1), new Vector3f(-1, 1, -1), new Vector3f(-1, -1, -1),
+                new Vector3f(1, 1, 1), new Vector3f(1, -1, 1), new Vector3f(-1, 1, 1), new Vector3f(-1, -1, 1)};
+
+        for (int i = 0; i < 8; i++) {
             Matrix3f rot = new Matrix3f();
             rot.setIdentity();
 
-            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, position, 1.0f)));
+            // Position the smaller blocks
+            Vector3f pos = new Vector3f(position);
+            positionOffsets[i].scale(0.25f);
+            pos.add(positionOffsets[i]);
+
+            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, pos, 1.0f)));
 
             Vector3f fallInertia = new Vector3f();
-            _blockShape.calculateLocalInertia(10f, fallInertia);
+            _blockShape.calculateLocalInertia(8f, fallInertia);
 
-            RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(25f, blockMotionState, _blockShape, fallInertia);
+            RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(8f, blockMotionState, _blockShape, fallInertia);
+            blockCI.restitution = 0.0f;
+
             BlockRigidBody block = new BlockRigidBody(blockCI, type);
-
             _discreteDynamicsWorld.addRigidBody(block);
+
+            // Make sure the blocks move at least
+            FastRandom rand = Terasology.getInstance().getActiveWorldProvider().getRandom();
+            block.applyCentralForce(new Vector3f(rand.randomInt() % 10000 + 1000, rand.randomInt() % 10000 + 1000, rand.randomInt() % 10000 + 256));
+
             _blocks.add(block);
         }
     }
@@ -165,7 +180,7 @@ public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
     }
 
     public void render() {
-        _discreteDynamicsWorld.stepSimulation(Terasology.getInstance().getDelta() / 1000f);
+        _discreteDynamicsWorld.stepSimulation(Terasology.getInstance().getDelta() / 1000f, 30);
 
         TextureManager.getInstance().bindTexture("terrain");
         ShaderManager.getInstance().enableShader("block");

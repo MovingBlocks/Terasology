@@ -394,7 +394,6 @@ public final class Terasology {
             updateFps();
             Display.update();
             Display.sync(60);
-
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Input");
@@ -404,7 +403,6 @@ public final class Terasology {
             if (!screenHasFocus())
                 getActiveWorldRenderer().getPlayer().updateInput();
 
-            PerformanceMonitor.endActivity();
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.rollCycle();

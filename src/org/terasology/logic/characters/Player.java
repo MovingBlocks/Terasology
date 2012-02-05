@@ -68,6 +68,7 @@ public final class Player extends Character {
     /* CONSTANT VALUES */
     private static final double MOUSE_SENS = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
     private static final boolean DEMO_FLIGHT = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight");
+    private static final double DEMO_FLIGHT_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlightSpeed");
     private static final boolean GOD_MODE = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
     private static final boolean CAMERA_BOBBING = (Boolean) ConfigurationManager.getInstance().getConfig().get("Player.cameraBobbing");
 
@@ -260,7 +261,7 @@ public final class Player extends Character {
     public void updatePosition() {
         // DEMO MODE
         if (DEMO_FLIGHT) {
-            getPosition().z -= 0.2f;
+            getPosition().z -= DEMO_FLIGHT_SPEED;
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 

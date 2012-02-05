@@ -38,7 +38,7 @@ public class FirstPersonCamera extends Camera {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        gluPerspective(_activeFov, ASPECT_RATIO, 0.1f, 1024f);
+        gluPerspective(_activeFov, ASPECT_RATIO, 0.1f, 512f);
 
         glMatrixMode(GL11.GL_MODELVIEW);
     }
@@ -52,8 +52,7 @@ public class FirstPersonCamera extends Camera {
         right.scale(_bobbingRotationOffsetFactor);
 
         GLU.gluLookAt((float) _position.x, (float) _position.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z, (float) _position.x + (float) _viewingDirection.x, (float) _position.y + (float) _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z + (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
-
-        _viewFrustum.updateFrustum();
+        _frustumNeedsUpdate = true;
     }
 
     public void loadNormalizedModelViewMatrix() {

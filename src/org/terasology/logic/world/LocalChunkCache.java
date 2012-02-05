@@ -104,7 +104,7 @@ public final class LocalChunkCache implements ChunkProvider {
                 ArrayList<Chunk> cachedChunks = new ArrayList<Chunk>(_chunkCache.values());
                 Collections.sort(cachedChunks);
 
-                while (cachedChunks.size() > CACHE_SIZE) {
+                if (cachedChunks.size() > CACHE_SIZE) {
                     Chunk chunkToDelete = cachedChunks.remove(cachedChunks.size() - 1);
                     // Write the chunk to disk (but do not remove it from the cache just jet)
                     writeChunkToDisk(chunkToDelete);

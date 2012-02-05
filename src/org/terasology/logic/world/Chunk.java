@@ -749,16 +749,17 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {
                     if (WorldRenderer.BOUNDING_BOXES_ENABLED) {
+                        ShaderManager.getInstance().enableShader(null);
                         getSubMeshAABB(i).renderLocally(2f);
                         _statRenderedTriangles += 12;
+                        ShaderManager.getInstance().enableShader("chunk");
                     }
 
-                    ShaderManager.getInstance().enableShader("chunk");
                     _activeMeshes[i].render(type);
                     _statRenderedTriangles += _activeMeshes[i].triangleCount();
-                    ShaderManager.getInstance().enableShader(null);
                 }
             }
+
             GL11.glPopMatrix();
         } else {
             _statChunkNotReady++;
@@ -784,46 +785,49 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     private void setNewMesh(ChunkMesh[] newMesh) {
         if (_lock.tryLock()) {
-            if (!_disposed) {
-                ChunkMesh[] oldNewMesh = _newMeshes;
-                _newMeshes = newMesh;
+            try {
+                if (!_disposed) {
+                    ChunkMesh[] oldNewMesh = _newMeshes;
+                    _newMeshes = newMesh;
 
-                if (oldNewMesh != null) {
-                    for (int i = 0; i < oldNewMesh.length; i++)
-                        oldNewMesh[i].dispose();
+                    if (oldNewMesh != null) {
+                        for (int i = 0; i < oldNewMesh.length; i++)
+                            oldNewMesh[i].dispose();
+                    }
                 }
+            } finally {
+                _lock.unlock();
             }
-
-            _lock.unlock();
         }
     }
 
     private boolean swapActiveMesh() {
         if (_lock.tryLock()) {
-            if (!_disposed) {
-                if (_newMeshes != null) {
-                    if (!_newMeshes[0].isDisposed() && _newMeshes[0].isGenerated()) {
+            try {
+                if (!_disposed) {
+                    if (_newMeshes != null) {
+                        if (!_newMeshes[0].isDisposed() && _newMeshes[0].isGenerated()) {
 
-                        ChunkMesh[] newMesh = _newMeshes;
-                        _newMeshes = null;
+                            ChunkMesh[] newMesh = _newMeshes;
+                            _newMeshes = null;
 
-                        ChunkMesh[] oldActiveMesh = _activeMeshes;
-                        _activeMeshes = newMesh;
-                        _rigidBody = null;
+                            ChunkMesh[] oldActiveMesh = _activeMeshes;
+                            _activeMeshes = newMesh;
+                            _rigidBody = null;
 
-                        if (oldActiveMesh != null) {
-                            for (int i = 0; i < oldActiveMesh.length; i++) {
-                                oldActiveMesh[i].dispose();
+                            if (oldActiveMesh != null) {
+                                for (int i = 0; i < oldActiveMesh.length; i++) {
+                                    oldActiveMesh[i].dispose();
+                                }
                             }
-                        }
 
-                        _lock.unlock();
-                        return true;
+                            return true;
+                        }
                     }
                 }
+            } finally {
+                _lock.unlock();
             }
-
-            _lock.unlock();
         }
 
         return false;
@@ -930,26 +934,55 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return _random;
     }
 
+    public void clearMeshes() {
+        _lock.lock();
+
+        try {
+            if (_disposed)
+                return;
+
+            if (_activeMeshes != null)
+                for (int i = 0; i < _activeMeshes.length; i++)
+                    _activeMeshes[i].dispose();
+            if (_newMeshes != null) {
+                for (int i = 0; i < _newMeshes.length; i++)
+                    _newMeshes[i].dispose();
+            }
+
+            _activeMeshes = null;
+            _newMeshes = null;
+            setDirty(true);
+
+        } finally {
+            _lock.unlock();
+        }
+    }
+
     /**
      * Disposes this chunk. Can NOT be undone.
      */
     public void dispose() {
         _lock.lock();
 
-        if (_disposed)
-            return;
+        try {
+            if (_disposed)
+                return;
 
-        if (_activeMeshes != null)
-            for (int i = 0; i < _activeMeshes.length; i++)
-                _activeMeshes[i].dispose();
-        if (_newMeshes != null) {
-            for (int i = 0; i < _newMeshes.length; i++)
-                _newMeshes[i].dispose();
+            if (_activeMeshes != null)
+                for (int i = 0; i < _activeMeshes.length; i++)
+                    _activeMeshes[i].dispose();
+            if (_newMeshes != null) {
+                for (int i = 0; i < _newMeshes.length; i++)
+                    _newMeshes[i].dispose();
+            }
+
+            _disposed = true;
+            _activeMeshes = null;
+            _newMeshes = null;
+
+        } finally {
+            _lock.unlock();
         }
-
-        _disposed = true;
-
-        _lock.unlock();
     }
 
     public boolean isReadyForRendering() {
