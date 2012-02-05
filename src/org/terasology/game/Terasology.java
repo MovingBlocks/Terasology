@@ -573,6 +573,8 @@ public final class Terasology {
      * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
     private void processKeyboardInput() {
+        boolean debugEnabled = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
+
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
 
@@ -586,11 +588,22 @@ public final class Terasology {
                 }
 
                 if (key == Keyboard.KEY_F3 && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                    ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", !(Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug"));
+                    ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", debugEnabled = !(debugEnabled));
                 }
 
                 if (key == Keyboard.KEY_F && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                     toggleViewingDistance();
+                }
+
+                // Features for debug mode only
+                if (debugEnabled) {
+                    if (key == Keyboard.KEY_UP && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                        getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.005);
+                    }
+
+                    if (key == Keyboard.KEY_DOWN && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                        getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.005);
+                    }
                 }
 
                 // Pass input to focused GUI element
@@ -685,31 +698,30 @@ public final class Terasology {
         return (Sys.getTime() * 1000) / _timerTicksPerSecond;
     }
 
-    public void submitTask(final String name, final Runnable task)
-    {
+    public void submitTask(final String name, final Runnable task) {
         _threadPool.execute(new Runnable() {
             public void run() {
                 Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
                 PerformanceMonitor.startThread(name);
-                try
-                {
+                try {
                     task.run();
-                }
-                finally
-                {
+                } finally {
                     PerformanceMonitor.endThread(name);
                 }
             }
         });
     }
-    
-    public int activeTasks()
-    {
+
+    public int activeTasks() {
         return _threadPool.getActiveCount();
     }
 
     public GroovyManager getGroovyManager() {
         return _groovyManager;
+    }
+
+    public UIHeadsUpDisplay getHUD() {
+        return _hud;
     }
 
     public long getDelta() {

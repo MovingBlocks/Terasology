@@ -21,7 +21,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
@@ -39,6 +38,7 @@ import org.terasology.model.inventory.Toolbar;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.FirstPersonCamera;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
@@ -72,6 +72,7 @@ public final class Player extends Character {
     private static final boolean GOD_MODE = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
     private static final boolean CAMERA_BOBBING = (Boolean) ConfigurationManager.getInstance().getConfig().get("Player.cameraBobbing");
 
+    private static final boolean RENDER_FIRST_PERSON_VIEW = (Boolean) ConfigurationManager.getInstance().getConfig().get("Player.renderFirstPersonView");
     private static final double WALKING_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
     private static final boolean SHOW_PLACING_BOX = (Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox");
     private static final double RUNNING_FACTOR = (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor");
@@ -209,6 +210,9 @@ public final class Player extends Character {
     }
 
     public void renderFirstPersonViewElements() {
+        if (!RENDER_FIRST_PERSON_VIEW)
+            return;
+
         if (getActiveItem() != null) {
             if (getActiveItem().renderFirstPersonView()) {
                 return;
@@ -649,5 +653,4 @@ public final class Player extends Character {
 
         return false;
     }
-
 }

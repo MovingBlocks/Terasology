@@ -54,8 +54,8 @@ public class DefaultConfig {
         // Splits chunk meshes into multiple sub-meshes to support frustum and occlusion culling techniques
         config.put("Graphics.verticalChunkMeshSegments", 1)
 
-        config.put("HUD.crosshair", true)
-        config.put("HUD.placingBox", true)
+        config.put("HUD.placingBox", false)
+        config.put("Player.renderFirstPersonView", false)
 
         config.put("Controls.mouseSens", 0.075d)
 
@@ -73,7 +73,7 @@ public class DefaultConfig {
         config.put("World.spawnOrigin", new Vector2f(-24429, 20547))
         config.put("World.defaultSeed", "Blockmania42")
         config.put("World.dayNightLengthInMs", new Long((60 * 1000) * 20)) // 20 minutes in ms
-        config.put("World.initialTimeOffsetInMs", new Long(60 * 1000)) // 120 seconds in ms
+        config.put("World.initialTimeOffsetInMs", new Long(60 * 1000)) // 60 seconds in ms
 
         config.put("World.Biomes.Forest.grassDensity", 0.3d)
         config.put("World.Biomes.Plains.grassDensity", 0.1d)

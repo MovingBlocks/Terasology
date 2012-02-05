@@ -35,11 +35,16 @@ Controls
 * [I]                     Toggle inventory screen
 * [F]                     Toggle viewing distance (near, moderate, far, ultra)
 * [Tab]                   Toggle developer console
-* [F3]                    Toggle debug information
+* [F3]                    Toggle debug mode and information
 * [F4]                    Different debug metrics
 * [2*Space]               God mode
 * [K]                     Don't try this :-)
 * [Escape]                Show/hide the game menu screen
+
+Debug features (only works when debug mode is enabled
+------------------------
+
+* [Arrow up/down]         Adjust the current time in small steps
 
 Examples tools (may move slot or disappear)
 ------------------------
