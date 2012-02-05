@@ -228,8 +228,10 @@ public final class WorldRenderer implements RenderableObject {
 
         /* SKYSPHERE */
         PerformanceMonitor.startActivity("Render-Sky");
-        _player.getActiveCamera().lookThroughNormalized();
-        _skysphere.render();
+        if (!_player.isHeadUnderWater()) {
+            _player.getActiveCamera().lookThroughNormalized();
+            _skysphere.render();
+        }
         PerformanceMonitor.endActivity();
 
         /* WORLD RENDERING */

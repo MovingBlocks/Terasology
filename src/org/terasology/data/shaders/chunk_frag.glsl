@@ -97,17 +97,19 @@ void main(){
     // Apply the final lighting mix
     color.xyz *= (daylightColorValue * occlusionValue + blocklightColorValue * occlusionValue);
 
-    // Apply linear fog
-    float fog = clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.25, 1.0);
-
     // Check if the player is below the water surface
     if (!swimming) {
+        // Apply linear fog
+        float fog = clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.25, 1.0);
+
         gl_FragColor.rgb = linearToSrgb(mix(vec4(1.0) * daylight, color, fog)).rgb;
         gl_FragColor.a = color.a;
     } else {
-        color.rg *= 0.6;
-        color.b *= 0.9;
-        gl_FragColor.rgb = linearToSrgb(color).rgb;
-        gl_FragColor.a = color.a;
+       // Very foggy below water...
+       float fog = clamp((16.0 - gl_FogFragCoord) / 16.0, 0.0, 1.0);
+
+       // And everything looks a bit blueish and darker
+       gl_FragColor.rgb = linearToSrgb(mix(vec4(0.0, 0.0, 0.1, 1.0), color * vec4(0.5, 0.5, 0.6, 1.0), fog)).rgb;
+       gl_FragColor.a = color.a;
     }
 }

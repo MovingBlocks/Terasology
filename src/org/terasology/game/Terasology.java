@@ -463,6 +463,7 @@ public final class Terasology {
         if (_activeWorldRenderer != null) {
             if (_activeWorldRenderer.getPlayer().isDead()) {
                 _statusScreen.setVisible(true);
+                _activeWorldRenderer.getPlayer().reset();
                 _statusScreen.updateStatus("Sorry. You've died. :-(");
             } else {
                 _statusScreen.setVisible(false);

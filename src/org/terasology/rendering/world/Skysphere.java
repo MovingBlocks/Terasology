@@ -235,13 +235,12 @@ public class Skysphere implements RenderableObject {
     }
 
     private void generateNewClouds() {
-
         // Generate some new clouds according to the current time
         ByteBuffer clouds = ByteBuffer.allocateDirect((int) CLOUD_RESOLUTION.x * (int) CLOUD_RESOLUTION.y * 3);
 
         for (int i = 0; i < (int) CLOUD_RESOLUTION.x; i++) {
             for (int j = 0; j < (int) CLOUD_RESOLUTION.y; j++) {
-                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime() * 5f);
+                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime());
 
                 byte value = (byte) (MathHelper.clamp(noise * 1.25 + 0.25)  * 255);
 

@@ -531,7 +531,7 @@ public final class Player extends Character {
             Vector2f texPos = new Vector2f(40.0f * 0.015625f, 32.0f * 0.03125f);
             Vector2f texWidth = new Vector2f(4.0f * 0.015625f, -12.0f * 0.03125f);
 
-            MeshCollection.addBlockMesh(new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
+            MeshCollection.addBlockMesh(new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
             _handMesh = Tessellator.getInstance().generateMesh();
             Tessellator.getInstance().resetAll();
         }

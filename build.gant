@@ -18,7 +18,7 @@ def artifactJar = distDir + '/Terasology.jar'
 def artifactZip = outputDir + '/Terasology.zip'
 
 // Stuff beyond source code that we'll copy to the output dir (outside the jar file)
-def extraFiles = ['README.markdown', 'OpenAL32.dll', 'OpenAL64.dll']
+def extraFiles = ['README.markdown', 'natives/windows/OpenAL32.dll', 'natives/windows/OpenAL64.dll']  // TODO: I am sure paths are not welcome here
 def extraDirs = ['natives', 'groovy']   // TODO: Sort out the internal vs external Groovy setup
 def scriptDirFiles = ['run_linux.sh', 'run_macosx.command', 'Terasology.exe']
 

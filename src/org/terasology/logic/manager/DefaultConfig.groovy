@@ -18,7 +18,7 @@ public class DefaultConfig {
         // Resolution of the textures used to render the clouds
         config.put("System.cloudResolution", new Vector2f(128, 128))
         // Time between cloud updates
-        config.put("System.cloudUpdateInterval", (Integer) 30000)
+        config.put("System.cloudUpdateInterval", (Integer) 8000)
         // Maximum amount of concurrently running chunk update threads
         config.put("System.maxThreads", 2)
         // If set to true chunks get persisted to disk when removed from the chunk cache
@@ -65,8 +65,8 @@ public class DefaultConfig {
         config.put("Player.maxGravitySwimming", 0.04d)
         config.put("Player.gravity", 0.008d)
         config.put("Player.gravitySwimming", 0.008d * 4d)
-        config.put("Player.friction", 0.08d)
-        config.put("Player.walkingSpeed", 0.03d)
+        config.put("Player.friction", 0.15d)
+        config.put("Player.walkingSpeed", 0.025d)
         config.put("Player.runningFactor", 1.5d)
         config.put("Player.jumpIntensity", 0.16d)
 

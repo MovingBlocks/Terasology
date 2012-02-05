@@ -19,7 +19,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 import org.terasology.utilities.MathHelper;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 
