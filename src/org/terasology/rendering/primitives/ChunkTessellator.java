@@ -20,12 +20,16 @@ import com.bulletphysics.collision.shapes.ScalarType;
 import org.lwjgl.BufferUtils;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.world.Chunk;
+import org.terasology.math.Direction;
+import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.util.EnumMap;
 
 /**
  * Generates tessellated chunk meshes from chunks.
@@ -44,6 +48,7 @@ public final class ChunkTessellator {
     }
 
     public ChunkMesh generateMesh(int meshHeight, int verticalOffset) {
+        PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh();
 
         for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
@@ -71,10 +76,12 @@ public final class ChunkTessellator {
         generateOptimizedBuffers(mesh);
         _statVertexArrayUpdateCount++;
 
+        PerformanceMonitor.endActivity();
         return mesh;
     }
 
     private void generateOptimizedBuffers(ChunkMesh mesh) {
+        PerformanceMonitor.startActivity("OptimizeBuffers");
         mesh._indexedMesh = null;
 
         if (GENERATE_PHYSICS_MESHES) {
@@ -160,39 +167,43 @@ public final class ChunkTessellator {
             mesh._vertexElements[j].vertices.flip();
             mesh._vertexElements[j].indices.flip();
         }
+        PerformanceMonitor.endActivity();
     }
 
     private void calcLightingValuesForVertexPos(Vector3f vertexPos, Double[] output) {
+        PerformanceMonitor.startActivity("calcLighting");
         double[] lights = new double[8];
         double[] blockLights = new double[8];
-        byte[] blocks = new byte[8];
+        byte[] blocks = new byte[4];
 
         Vector3f vertexWorldPos = moveVectorFromChunkSpaceToWorldSpace(vertexPos);
 
-        blocks[0] = _chunk.getParent().getBlockAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)));
-        blocks[1] = _chunk.getParent().getBlockAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)));
-        blocks[2] = _chunk.getParent().getBlockAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)));
-        blocks[3] = _chunk.getParent().getBlockAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)));
+        PerformanceMonitor.startActivity("gatherLightInfo");
+        blocks[0] = _chunk.getParent().getBlockAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f));
+        blocks[1] = _chunk.getParent().getBlockAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f));
+        blocks[2] = _chunk.getParent().getBlockAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f));
+        blocks[3] = _chunk.getParent().getBlockAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f));
 
-        lights[0] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[1] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[2] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[3] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.SUN);
+        lights[0] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[1] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[2] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[3] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.SUN);
 
-        lights[4] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[5] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[6] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[7] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.SUN);
+        lights[4] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[5] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[6] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[7] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.SUN);
 
-        blockLights[0] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[1] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[2] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[3] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[0] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[1] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[2] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[3] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.BLOCK);
 
-        blockLights[4] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[5] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[6] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[7] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[4] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[5] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[6] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[7] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        PerformanceMonitor.endActivity();
 
         double resultLight = 0;
         double resultBlockLight = 0;
@@ -235,6 +246,7 @@ public final class ChunkTessellator {
             output[1] = resultBlockLight / counterBlockLight / 15f;
 
         output[2] = resultAmbientOcclusion;
+        PerformanceMonitor.endActivity();
     }
 
     /**
@@ -289,6 +301,7 @@ public final class ChunkTessellator {
     }
 
     private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
+        PerformanceMonitor.startActivity("GenerateBlock");
         byte blockId = _chunk.getBlock(x, y, z);
         Block block = BlockManager.getInstance().getBlock(blockId);
 
@@ -423,9 +436,11 @@ public final class ChunkTessellator {
             Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.BOTTOM).x, block.calcTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
             generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
         }
+        PerformanceMonitor.endActivity();
     }
 
     private void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, ChunkMesh.RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
+        PerformanceMonitor.startActivity("GenerateBlockSide");
         int vertexElementsId = 0;
 
         switch (renderType) {
@@ -452,6 +467,7 @@ public final class ChunkTessellator {
         addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p2), norm);
         addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p3), norm);
         addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p4), norm);
+        PerformanceMonitor.endActivity();
     }
 
     private Vector3f moveVectorFromChunkSpaceToWorldSpace(Vector3f offset) {
@@ -580,6 +596,7 @@ public final class ChunkTessellator {
     }
 
     private void addBlockVertexData(ChunkMesh.VertexElements vertexElements, Vector4f colorOffset, Vector3f vertex, Vector3f normal) {
+        PerformanceMonitor.startActivity("AddBlockVertexData");
         vertexElements.color.add(colorOffset.x);
         vertexElements.color.add(colorOffset.y);
         vertexElements.color.add(colorOffset.z);
@@ -590,6 +607,7 @@ public final class ChunkTessellator {
         vertexElements.normals.add(normal.x);
         vertexElements.normals.add(normal.y);
         vertexElements.normals.add(normal.z);
+        PerformanceMonitor.endActivity();
     }
 
     /**
@@ -600,10 +618,18 @@ public final class ChunkTessellator {
      * @return True if the side is visible for the given block types
      */
     private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock) {
+        PerformanceMonitor.startActivity("CheckSideVisibility");
         Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
 
-        return bCheck.getId() == 0x0 || cBlock.isDisableTessellation() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || !cBlock.isTranslucent() && bCheck.isTranslucent() || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+        try
+        {
+            return bCheck.getId() == 0x0 || cBlock.isDisableTessellation() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || !cBlock.isTranslucent() && bCheck.isTranslucent() || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+        }
+        finally
+        {
+            PerformanceMonitor.endActivity();
+        }
     }
 
     public static int getVertexArrayUpdateCount() {
