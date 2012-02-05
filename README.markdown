@@ -1,7 +1,7 @@
 Terasology (previously titled Blockmania)
 =========================================
 
-![Terasology](http://blog.movingblocks.net/wp-content/uploads/Blockmania030911-1.png "Terasology")
+![Terasology](http://blog.movingblocks.net/?attachment_id=1039 "Terasology")
 
 Terasology is an open source project started by Benjamin "begla" Glatzel to research *procedural terrain generation* and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a *block-based voxel-like approach as seen in Minecraft*.
 
