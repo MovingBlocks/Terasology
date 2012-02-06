@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-import org.terasology.logic.manager.ConfigurationManager;
 
 import javax.vecmath.Vector3d;
 
@@ -31,14 +31,13 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  */
 public class FirstPersonCamera extends Camera {
 
-    public static final float ASPECT_RATIO = ((Double) ConfigurationManager.getInstance().getConfig().get("Graphics.aspectRatio")).floatValue();
     double _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0;
 
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        gluPerspective(_activeFov, ASPECT_RATIO, 0.1f, 1024f);
+        gluPerspective(_activeFov, (float) Display.getWidth() / Display.getHeight(), 0.1f, 512f);
 
         glMatrixMode(GL11.GL_MODELVIEW);
     }
@@ -52,8 +51,7 @@ public class FirstPersonCamera extends Camera {
         right.scale(_bobbingRotationOffsetFactor);
 
         GLU.gluLookAt((float) _position.x, (float) _position.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z, (float) _position.x + (float) _viewingDirection.x, (float) _position.y + (float) _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z + (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
-
-        _viewFrustum.updateFrustum();
+        _frustumNeedsUpdate = true;
     }
 
     public void loadNormalizedModelViewMatrix() {

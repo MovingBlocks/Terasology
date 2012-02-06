@@ -21,9 +21,7 @@ import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -104,7 +102,7 @@ public final class LocalChunkCache implements ChunkProvider {
                 ArrayList<Chunk> cachedChunks = new ArrayList<Chunk>(_chunkCache.values());
                 Collections.sort(cachedChunks);
 
-                while (cachedChunks.size() > CACHE_SIZE) {
+                if (cachedChunks.size() > CACHE_SIZE) {
                     Chunk chunkToDelete = cachedChunks.remove(cachedChunks.size() - 1);
                     // Write the chunk to disk (but do not remove it from the cache just jet)
                     writeChunkToDisk(chunkToDelete);
@@ -207,9 +205,5 @@ public final class LocalChunkCache implements ChunkProvider {
      */
     public int size() {
         return _chunkCache.size();
-    }
-
-    public Collection<Chunk> getChunks() {
-        return _chunkCache.values();
     }
 }

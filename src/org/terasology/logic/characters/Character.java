@@ -114,8 +114,8 @@ public abstract class Character extends MovableEntity {
     @Override
     protected void handleVerticalCollision() {
         // Damage by falling
-        if (_gravity < -0.2)
-            damage((int) (((Math.abs(_gravity) - 0.2) / 0.8) * getMaxHealthPoints()));
+        if (_gravity < -0.3)
+            damage((int) (((Math.abs(_gravity) - 0.3) / 0.3) * getMaxHealthPoints()));
     }
 
     @Override

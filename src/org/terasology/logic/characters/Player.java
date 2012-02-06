@@ -21,7 +21,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
@@ -39,6 +38,7 @@ import org.terasology.model.inventory.Toolbar;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.FirstPersonCamera;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
@@ -68,9 +68,11 @@ public final class Player extends Character {
     /* CONSTANT VALUES */
     private static final double MOUSE_SENS = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
     private static final boolean DEMO_FLIGHT = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight");
+    private static final double DEMO_FLIGHT_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlightSpeed");
     private static final boolean GOD_MODE = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
     private static final boolean CAMERA_BOBBING = (Boolean) ConfigurationManager.getInstance().getConfig().get("Player.cameraBobbing");
 
+    private static final boolean RENDER_FIRST_PERSON_VIEW = (Boolean) ConfigurationManager.getInstance().getConfig().get("Player.renderFirstPersonView");
     private static final double WALKING_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
     private static final boolean SHOW_PLACING_BOX = (Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox");
     private static final double RUNNING_FACTOR = (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor");
@@ -208,6 +210,9 @@ public final class Player extends Character {
     }
 
     public void renderFirstPersonViewElements() {
+        if (!RENDER_FIRST_PERSON_VIEW)
+            return;
+
         if (getActiveItem() != null) {
             if (getActiveItem().renderFirstPersonView()) {
                 return;
@@ -260,7 +265,7 @@ public final class Player extends Character {
     public void updatePosition() {
         // DEMO MODE
         if (DEMO_FLIGHT) {
-            getPosition().z -= 0.2f;
+            getPosition().z -= DEMO_FLIGHT_SPEED;
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 
@@ -526,7 +531,7 @@ public final class Player extends Character {
             Vector2f texPos = new Vector2f(40.0f * 0.015625f, 32.0f * 0.03125f);
             Vector2f texWidth = new Vector2f(4.0f * 0.015625f, -12.0f * 0.03125f);
 
-            MeshCollection.addBlockMesh(new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
+            MeshCollection.addBlockMesh(new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
             _handMesh = Tessellator.getInstance().generateMesh();
             Tessellator.getInstance().resetAll();
         }
@@ -648,5 +653,4 @@ public final class Player extends Character {
 
         return false;
     }
-
 }
