@@ -27,6 +27,7 @@ import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
@@ -310,6 +311,7 @@ public final class Terasology {
         ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();
         FontManager.getInstance();
+        BlockShapeManager.getInstance();
         BlockManager.getInstance();
 
         _hud = new UIHeadsUpDisplay();
