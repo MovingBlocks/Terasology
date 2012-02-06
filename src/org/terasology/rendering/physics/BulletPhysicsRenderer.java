@@ -34,11 +34,11 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
-import org.terasology.logic.world.BlockObserver;
+import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.structures.BlockPosition;
-import org.terasology.rendering.interfaces.RenderableObject;
+import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.*;
@@ -51,7 +51,7 @@ import java.util.HashSet;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BulletPhysicsRenderer implements RenderableObject, BlockObserver {
+public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
 
     /* SINGLETON */
     private static BulletPhysicsRenderer _instance;

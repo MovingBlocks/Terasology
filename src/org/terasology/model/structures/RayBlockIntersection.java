@@ -16,7 +16,7 @@
 */
 package org.terasology.model.structures;
 
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 
@@ -108,7 +108,7 @@ public class RayBlockIntersection {
      * @param rayDirection The direction of the ray
      * @return The list of intersections
      */
-    public static ArrayList<Intersection> executeIntersection(WorldProvider w, int x, int y, int z, Vector3d rayOrigin, Vector3d rayDirection) {
+    public static ArrayList<Intersection> executeIntersection(IWorldProvider w, int x, int y, int z, Vector3d rayOrigin, Vector3d rayDirection) {
         /*
          * Ignore invisible blocks.
          */

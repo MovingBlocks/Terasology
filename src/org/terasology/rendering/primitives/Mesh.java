@@ -4,11 +4,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.terasology.rendering.interfaces.RenderableObject;
+import org.terasology.rendering.interfaces.IGameObject;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class Mesh implements RenderableObject {
+public class Mesh implements IGameObject {
     private static final int STRIDE = (3 + 3 + 3 + 3 + 4) * 4;
     private static final int OFFSET_VERTEX = 0;
     private static final int OFFSET_TEX_0 = (3 * 4);

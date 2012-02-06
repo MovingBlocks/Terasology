@@ -17,7 +17,7 @@ package org.terasology.logic.tools;
 
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.structures.BlockPosition;
@@ -29,7 +29,7 @@ import javax.vecmath.Vector3f;
 /**
  * Creates an explosion originating from the currently selected block of the player.
  */
-public class ExplosionTool implements Tool {
+public class ExplosionTool implements ITool {
 
     private final Player _player;
 
@@ -46,7 +46,7 @@ public class ExplosionTool implements Tool {
     }
 
     public void explode() {
-        WorldProvider worldProvider = _player.getParent().getWorldProvider();
+        IWorldProvider worldProvider = _player.getParent().getWorldProvider();
 
         if (_player.getSelectedBlock() != null) {
             BlockPosition blockPos = _player.getSelectedBlock().getBlockPosition();

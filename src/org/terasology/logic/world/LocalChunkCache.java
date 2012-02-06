@@ -30,7 +30,7 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class LocalChunkCache implements ChunkProvider {
+public final class LocalChunkCache implements IChunkProvider {
 
     private static final boolean SAVE_CHUNKS = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.saveChunks");
     private static final int CACHE_SIZE = (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkCacheSize");

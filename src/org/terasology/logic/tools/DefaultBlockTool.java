@@ -17,7 +17,7 @@ package org.terasology.logic.tools;
 
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.inventory.ItemBlock;
@@ -33,7 +33,7 @@ import javax.vecmath.Vector3f;
 /**
  * The basic tool used for block interaction. Can be used to place and remove blocks.
  */
-public class DefaultBlockTool implements Tool {
+public class DefaultBlockTool implements ITool {
 
     protected final Player _player;
 
@@ -64,7 +64,7 @@ public class DefaultBlockTool implements Tool {
      * @return True if a block was placed
      */
     public boolean placeBlock(byte type) {
-        WorldProvider worldProvider = _player.getParent().getWorldProvider();
+        IWorldProvider worldProvider = _player.getParent().getWorldProvider();
         RayBlockIntersection.Intersection selectedBlock = _player.getSelectedBlock();
 
         if (selectedBlock != null) {
@@ -101,7 +101,7 @@ public class DefaultBlockTool implements Tool {
      * @return The removed block (if any)
      */
     public byte removeBlock(boolean createPhysBlock) {
-        WorldProvider worldProvider = _player.getParent().getWorldProvider();
+        IWorldProvider worldProvider = _player.getParent().getWorldProvider();
         WorldRenderer worldRenderer = _player.getParent();
         RayBlockIntersection.Intersection selectedBlock = _player.getSelectedBlock();
 

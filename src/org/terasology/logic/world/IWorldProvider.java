@@ -28,7 +28,7 @@ import javax.vecmath.Vector3d;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface WorldProvider {
+public interface IWorldProvider {
 
     /**
      * Places a block of a specific type at a given position and refreshes the
@@ -173,7 +173,7 @@ public interface WorldProvider {
      *
      * @return The chunk provider
      */
-    public ChunkProvider getChunkProvider();
+    public IChunkProvider getChunkProvider();
 
     /**
      * Returns the generator manager of this world.
@@ -209,13 +209,6 @@ public interface WorldProvider {
      * @return The RNG
      */
     public FastRandom getRandom();
-
-    /**
-     * @return The rendering origin
-     */
-    public Vector3d getRenderingReferencePoint();
-
-    public void setRenderingReferencePoint(Vector3d point);
 
     /**
      * Disposes this world provider.

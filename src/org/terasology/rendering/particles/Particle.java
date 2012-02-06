@@ -17,7 +17,8 @@ package org.terasology.rendering.particles;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.terasology.rendering.interfaces.RenderableObject;
+import org.terasology.game.Terasology;
+import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3d;
@@ -30,7 +31,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class Particle implements RenderableObject {
+public abstract class Particle implements IGameObject {
     protected final ParticleEmitter _parent;
 
     protected final Vector3d _targetVelocity = new Vector3d(0.0f, -0.03f, 0.0f);
@@ -60,8 +61,8 @@ public abstract class Particle implements RenderableObject {
         if (isAlive()) {
             glPushMatrix();
 
-            Vector3d r = getParent().getParent().getWorldProvider().getRenderingReferencePoint();
-            glTranslated(_position.x - r.x, _position.y - r.y, _position.z - r.z);
+            Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+            glTranslated(_position.x - playerPosition.x, _position.y - playerPosition.y, _position.z - playerPosition.z);
             applyOrientation();
             glScalef(_size, _size, _size);
 

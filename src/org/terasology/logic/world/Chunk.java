@@ -520,8 +520,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public double distanceToPlayer() {
         Vector3d result = new Vector3d(getPosition().x * CHUNK_DIMENSION_X, 0, getPosition().z * CHUNK_DIMENSION_Z);
-        Vector3d referencePoint = new Vector3d(_parent.getRenderingReferencePoint().x, 0, _parent.getRenderingReferencePoint().z);
-        result.sub(referencePoint);
+
+        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+        result.x -= playerPosition.x;
+        result.z -= playerPosition.z;
 
         return result.length();
     }
@@ -744,7 +746,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public void render(ChunkMesh.RENDER_TYPE type) {
         if (isReadyForRendering()) {
             GL11.glPushMatrix();
-            GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - getParent().getRenderingReferencePoint().x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - getParent().getRenderingReferencePoint().y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - getParent().getRenderingReferencePoint().z);
+            
+            Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+            GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - playerPosition.x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - playerPosition.y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - playerPosition.z);
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {

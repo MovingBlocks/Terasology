@@ -25,7 +25,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.*;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -691,8 +691,12 @@ public final class Terasology {
         return _activeWorldRenderer;
     }
 
-    public WorldProvider getActiveWorldProvider() {
+    public IWorldProvider getActiveWorldProvider() {
         return _activeWorldRenderer.getWorldProvider();
+    }
+
+    public Player getActivePlayer() {
+        return _activeWorldRenderer.getPlayer();
     }
 
     /**

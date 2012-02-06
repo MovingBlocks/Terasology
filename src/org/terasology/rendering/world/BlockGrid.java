@@ -16,8 +16,9 @@
 package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.game.Terasology;
 import org.terasology.model.structures.BlockPosition;
-import org.terasology.rendering.interfaces.RenderableObject;
+import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshCollection;
 import org.terasology.rendering.primitives.Tessellator;
@@ -33,7 +34,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockGrid implements RenderableObject {
+public class BlockGrid implements IGameObject {
 
     /* CONST */
     private final Mesh _mesh;
@@ -63,8 +64,8 @@ public class BlockGrid implements RenderableObject {
             for (BlockPosition gp : _gridPositions) {
                 GL11.glPushMatrix();
 
-                Vector3d r = _parent.getWorldProvider().getRenderingReferencePoint();
-                GL11.glTranslated(gp.x - r.x, gp.y - r.y, gp.z - r.z);
+                Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+                GL11.glTranslated(gp.x - playerPosition.x, gp.y - playerPosition.y, gp.z - playerPosition.z);
 
                 _mesh.render();
 

@@ -26,7 +26,7 @@ import java.util.HashSet;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class ChunkUpdateManager implements BlockObserver {
+public final class ChunkUpdateManager implements IBlockObserver {
 
     public enum UPDATE_TYPE {
         DEFAULT, PLAYER_TRIGGERED

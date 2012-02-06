@@ -92,7 +92,7 @@ void main(){
     float blockBrightness = blocklightValue + torchlight - ((sin(tick*0.05) + 1.0) / 16.0) * blocklightValue;
     blockBrightness *= blocklightDayIntensity;
 
-    vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.99,blockBrightness * 0.98);
+    vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.99, blockBrightness * 0.98);
 
     // Apply the final lighting mix
     color.xyz *= (daylightColorValue * occlusionValue + blocklightColorValue * occlusionValue);
@@ -109,7 +109,7 @@ void main(){
        float fog = clamp((16.0 - gl_FogFragCoord) / 16.0, 0.0, 1.0);
 
        // And everything looks a bit blueish and darker
-       gl_FragColor.rgb = linearToSrgb(mix(vec4(0.0, 0.0, 0.1, 1.0), color * vec4(0.5, 0.5, 0.6, 1.0), fog)).rgb;
+       gl_FragColor.rgb = linearToSrgb(mix(vec4(0.0, 0.0, 0.1, 1.0), color * vec4(0.8, 0.8, 0.9, 1.0), fog)).rgb;
        gl_FragColor.a = color.a;
     }
 }

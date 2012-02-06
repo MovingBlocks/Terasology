@@ -72,7 +72,8 @@ public final class GelatinousCube extends Character {
 
         glPushMatrix();
 
-        glTranslated(getPosition().x - _parent.getWorldProvider().getRenderingReferencePoint().x, getPosition().y - _parent.getWorldProvider().getRenderingReferencePoint().y, getPosition().z - _parent.getWorldProvider().getRenderingReferencePoint().z);
+        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+        glTranslated(getPosition().x - playerPosition.x, getPosition().y - playerPosition.y, getPosition().z - playerPosition.z);
         glRotatef((float) _yaw, 0f, 1f, 0f);
 
         TextureManager.getInstance().bindTexture("slime");

@@ -192,8 +192,8 @@ public class AABB {
      */
     public void render(float lineThickness) {
         glPushMatrix();
-        Vector3d rp = Terasology.getInstance().getActiveWorldProvider().getRenderingReferencePoint();
-        glTranslated(getPosition().x - rp.x, -rp.y, getPosition().z - rp.z);
+        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+        glTranslated(getPosition().x - playerPosition.x, -playerPosition.y, getPosition().z - playerPosition.z);
 
         renderLocally(lineThickness);
 

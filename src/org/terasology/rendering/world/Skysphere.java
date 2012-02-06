@@ -25,7 +25,7 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
-import org.terasology.rendering.interfaces.RenderableObject;
+import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.utilities.MathHelper;
 import org.terasology.utilities.PerlinNoise;
 
@@ -43,7 +43,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Anthony Kireev <adeon.k87@gmail.com>
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Skysphere implements RenderableObject {
+public class Skysphere implements IGameObject {
 
     private static int _displayListSphere = -1;
     private static int _displayListClouds = -1;

@@ -19,7 +19,7 @@ import org.terasology.logic.characters.Player;
 import org.terasology.logic.tools.BlueprintTool;
 import org.terasology.logic.tools.DefaultBlockTool;
 import org.terasology.logic.tools.ExplosionTool;
-import org.terasology.logic.tools.Tool;
+import org.terasology.logic.tools.ITool;
 
 import java.util.HashMap;
 
@@ -40,12 +40,12 @@ public class ToolManager {
     /**
      * Map that contains simple native tool index values for a switch here
      */
-    private final HashMap<Byte, Tool> _toolStore = new HashMap<Byte, Tool>();
+    private final HashMap<Byte, ITool> _toolStore = new HashMap<Byte, ITool>();
 
     /**
      * Map that contains advanced plugin tool index values and an associated Groovy command script to execute on use
      */
-    private final HashMap<Byte, Tool> _pluginStore = new HashMap<Byte, Tool>();
+    private final HashMap<Byte, ITool> _pluginStore = new HashMap<Byte, ITool>();
 
     /**
      * Reference back to the parent Player
@@ -73,7 +73,7 @@ public class ToolManager {
         _toolStore.put((byte) 3, new ExplosionTool(_player));
     }
 
-    public Tool getToolForIndex(Byte toolIndex) {
+    public ITool getToolForIndex(Byte toolIndex) {
         if (toolIndex == null) {
             return null;
         }

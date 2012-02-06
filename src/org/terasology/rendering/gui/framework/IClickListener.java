@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.world;
-
-import org.terasology.model.structures.BlockPosition;
+package org.terasology.rendering.gui.framework;
 
 /**
- * Block observers are notified if a block in the world changes.
+ * Notified on click events.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface BlockObserver {
-    public void blockPlaced(Chunk chunk, BlockPosition pos);
+public interface IClickListener {
 
-    public void blockRemoved(Chunk chunk, BlockPosition pos);
+    public void clicked(UIDisplayElement element);
+
 }

@@ -16,7 +16,7 @@
 package org.terasology.logic.simulators;
 
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.structures.BlockPosition;
@@ -35,7 +35,7 @@ public class LiquidSimulator extends Simulator {
     private static final Vector3d[] NEIGHBORS4 = {new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
     private static final Vector3d[] NEIGHBORS6 = {new Vector3d(0, -1, 0), new Vector3d(0, 1, 0), new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
 
-    public LiquidSimulator(WorldProvider parent) {
+    public LiquidSimulator(IWorldProvider parent) {
         super("Liquid", parent, 1000);
     }
 

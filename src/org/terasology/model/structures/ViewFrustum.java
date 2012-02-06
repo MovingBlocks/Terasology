@@ -131,24 +131,24 @@ public class ViewFrustum {
     public boolean intersects(AABB aabb) {
 
         Vector3d[] aabbVertices = aabb.getVertices();
-        Vector3d rp = Terasology.getInstance().getActiveWorldProvider().getRenderingReferencePoint();
+        Vector3d pp = Terasology.getInstance().getActivePlayer().getPosition();
 
         for (int i = 0; i < 6; i++) {
-            if (_planes[i].getA() * (aabbVertices[0].x - rp.x) + _planes[i].getB() * (aabbVertices[0].y - rp.y) + _planes[i].getC() * (aabbVertices[0].z - rp.z) + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[0].x - pp.x) + _planes[i].getB() * (aabbVertices[0].y - pp.y) + _planes[i].getC() * (aabbVertices[0].z - pp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[1].x - rp.x) + _planes[i].getB() * (aabbVertices[1].y - rp.y) + _planes[i].getC() * (aabbVertices[1].z - rp.z) + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[1].x - pp.x) + _planes[i].getB() * (aabbVertices[1].y - pp.y) + _planes[i].getC() * (aabbVertices[1].z - pp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[2].x - rp.x) + _planes[i].getB() * (aabbVertices[2].y - rp.y) + _planes[i].getC() * (aabbVertices[2].z - rp.z) + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[2].x - pp.x) + _planes[i].getB() * (aabbVertices[2].y - pp.y) + _planes[i].getC() * (aabbVertices[2].z - pp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[3].x - rp.x) + _planes[i].getB() * (aabbVertices[3].y - rp.y) + _planes[i].getC() * (aabbVertices[3].z - rp.z) + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[3].x - pp.x) + _planes[i].getB() * (aabbVertices[3].y - pp.y) + _planes[i].getC() * (aabbVertices[3].z - pp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[4].x - rp.x) + _planes[i].getB() * (aabbVertices[4].y - rp.y) + _planes[i].getC() * (aabbVertices[4].z - rp.z) + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[4].x - pp.x) + _planes[i].getB() * (aabbVertices[4].y - pp.y) + _planes[i].getC() * (aabbVertices[4].z - pp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[5].x - rp.x) + _planes[i].getB() * (aabbVertices[5].y - rp.y) + _planes[i].getC() * (aabbVertices[5].z - rp.z) + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[5].x - pp.x) + _planes[i].getB() * (aabbVertices[5].y - pp.y) + _planes[i].getC() * (aabbVertices[5].z - pp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[6].x - rp.x) + _planes[i].getB() * (aabbVertices[6].y - rp.y) + _planes[i].getC() * (aabbVertices[6].z - rp.z) + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[6].x - pp.x) + _planes[i].getB() * (aabbVertices[6].y - pp.y) + _planes[i].getC() * (aabbVertices[6].z - pp.z) + _planes[i].getD() > 0)
                 continue;
-            if (_planes[i].getA() * (aabbVertices[7].x - rp.x) + _planes[i].getB() * (aabbVertices[7].y - rp.y) + _planes[i].getC() * (aabbVertices[7].z - rp.z) + _planes[i].getD() > 0)
+            if (_planes[i].getA() * (aabbVertices[7].x - pp.x) + _planes[i].getB() * (aabbVertices[7].y - pp.y) + _planes[i].getC() * (aabbVertices[7].z - pp.z) + _planes[i].getD() > 0)
                 continue;
             return false;
         }

@@ -43,13 +43,13 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class LocalWorldProvider implements WorldProvider {
+public class LocalWorldProvider implements IWorldProvider {
 
     /* WORLD GENERATION */
     protected final GeneratorManager _generatorManager;
 
     /* CHUNK PROVIDER */
-    protected final ChunkProvider _chunkProvider;
+    protected final IChunkProvider _chunkProvider;
 
     /* CONST */
     protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) ConfigurationManager.getInstance().getConfig().get("World.dayNightLengthInMs");
@@ -58,7 +58,6 @@ public class LocalWorldProvider implements WorldProvider {
     /* PROPERTIES */
     protected String _title, _seed;
     protected long _creationTime = Terasology.getInstance().getTime() - (Long) ConfigurationManager.getInstance().getConfig().get("World.initialTimeOffsetInMs");
-    public Vector3d _renderingReferencePoint = new Vector3d();
 
     /* SIMULATORS */
     private final LiquidSimulator _liquidSimulator;
@@ -370,7 +369,7 @@ public class LocalWorldProvider implements WorldProvider {
         return (double) msSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
     }
 
-    public ChunkProvider getChunkProvider() {
+    public IChunkProvider getChunkProvider() {
         return _chunkProvider;
     }
 
@@ -396,17 +395,6 @@ public class LocalWorldProvider implements WorldProvider {
 
     public String getSeed() {
         return _seed;
-    }
-
-    /**
-     * Returns the rendering reference point of this world.
-     */
-    public Vector3d getRenderingReferencePoint() {
-        return _renderingReferencePoint;
-    }
-
-    public void setRenderingReferencePoint(Vector3d point) {
-        _renderingReferencePoint = point;
     }
 
     /**

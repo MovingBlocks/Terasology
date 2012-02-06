@@ -27,7 +27,7 @@ import java.util.ArrayList;
 /**
  * Can be used to create and place blueprints.
  */
-public class BlueprintTool implements Tool {
+public class BlueprintTool implements ITool {
 
     private final Player _player;
 

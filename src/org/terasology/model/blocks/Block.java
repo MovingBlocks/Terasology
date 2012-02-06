@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
 import org.terasology.model.structures.AABB;
-import org.terasology.rendering.interfaces.RenderableObject;
+import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshCollection;
 import org.terasology.rendering.primitives.Tessellator;
@@ -42,7 +42,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-public class Block implements RenderableObject {
+public class Block implements IGameObject {
 
     public static final int ATLAS_SIZE_IN_PX = 256;
     public static final int TEXTURE_SIZE_IN_PX = 16;

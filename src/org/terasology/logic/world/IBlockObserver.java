@@ -15,38 +15,15 @@
  */
 package org.terasology.logic.world;
 
-import java.util.Collection;
+import org.terasology.model.structures.BlockPosition;
 
 /**
- * Basic interface for anything providing chunks.
+ * Block observers are notified if a block in the world changes.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface ChunkProvider {
+public interface IBlockObserver {
+    public void blockPlaced(Chunk chunk, BlockPosition pos);
 
-    /**
-     * Returns the chunk at the given position.
-     *
-     * @param x The chunk position on the x-axis
-     * @param z The chunk position on the z-axis
-     * @return The chunk
-     */
-    public Chunk loadOrCreateChunk(int x, int z);
-
-    /**
-     * Frees obsolete chunks.
-     */
-    public void flushCache();
-
-    /**
-     * Disposes all chunks managed by this chunk provider.
-     */
-    public void dispose();
-
-    /**
-     * Returns the amount of chunks managed by this chunk provider.
-     *
-     * @return The amount of managed chunks
-     */
-    public int size();
+    public void blockRemoved(Chunk chunk, BlockPosition pos);
 }

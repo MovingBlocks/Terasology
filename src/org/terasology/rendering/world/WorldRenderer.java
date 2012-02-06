@@ -28,7 +28,7 @@ import org.terasology.logic.world.*;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.interfaces.RenderableObject;
+import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.particles.BlockParticleEmitter;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -50,7 +50,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class WorldRenderer implements RenderableObject {
+public final class WorldRenderer implements IGameObject {
 
     public static final boolean BOUNDING_BOXES_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.renderChunkBoundingBoxes");
     public static final int MAX_CHUNK_VERTEX_BUFFER_OBJECTS = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxChunkVBOs");
@@ -59,7 +59,7 @@ public final class WorldRenderer implements RenderableObject {
     private int _viewingDistance = 8;
 
     /* WORLD PROVIDER */
-    private final WorldProvider _worldProvider;
+    private final IWorldProvider _worldProvider;
 
     /* PLAYER */
     private Player _player;
@@ -535,8 +535,6 @@ public final class WorldRenderer implements RenderableObject {
         _player.registerObserver(_worldProvider.getGrowthSimulator());
         _player.registerObserver(_worldProvider.getLiquidSimulator());
 
-        _worldProvider.setRenderingReferencePoint(_player.getPosition());
-
         _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
         _player.reset();
         _player.respawn();
@@ -605,7 +603,7 @@ public final class WorldRenderer implements RenderableObject {
         return _worldProvider.getTemperatureAt((int) _player.getPosition().x, (int) _player.getPosition().z);
     }
 
-    public WorldProvider getWorldProvider() {
+    public IWorldProvider getWorldProvider() {
         return _worldProvider;
     }
 

@@ -13,23 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.interfaces;
+package org.terasology.logic.world;
+
+import java.util.Collection;
 
 /**
- * The base class of all renderable objects.
+ * Basic interface for anything providing chunks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface RenderableObject {
+public interface IChunkProvider {
 
     /**
-     * Rendering operations have to implement this method.
+     * Returns the chunk at the given position.
+     *
+     * @param x The chunk position on the x-axis
+     * @param z The chunk position on the z-axis
+     * @return The chunk
      */
-    public void render();
+    public Chunk loadOrCreateChunk(int x, int z);
 
     /**
-     * Updating operations have to implement this method.
+     * Frees obsolete chunks.
      */
-    public void update();
+    public void flushCache();
 
+    /**
+     * Disposes all chunks managed by this chunk provider.
+     */
+    public void dispose();
+
+    /**
+     * Returns the amount of chunks managed by this chunk provider.
+     *
+     * @return The amount of managed chunks
+     */
+    public int size();
 }

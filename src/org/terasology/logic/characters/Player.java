@@ -26,8 +26,8 @@ import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.manager.ToolManager;
-import org.terasology.logic.tools.Tool;
-import org.terasology.logic.world.BlockObserver;
+import org.terasology.logic.tools.ITool;
+import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
@@ -79,7 +79,7 @@ public final class Player extends Character {
     private static final double JUMP_INTENSITY = (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity");
 
     /* OBSERVERS */
-    private final ArrayList<BlockObserver> _observers = new ArrayList<BlockObserver>();
+    private final ArrayList<IBlockObserver> _observers = new ArrayList<IBlockObserver>();
 
     /* CAMERA */
     private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
@@ -184,7 +184,7 @@ public final class Player extends Character {
             return;
         }
 
-        Tool activeTool = getActiveTool();
+        ITool activeTool = getActiveTool();
 
         if (activeTool != null) {
             // Check if one of the mouse buttons is pressed
@@ -562,7 +562,7 @@ public final class Player extends Character {
         return null;
     }
 
-    public Tool getActiveTool() {
+    public ITool getActiveTool() {
         if (getActiveItem() != null) {
             return _toolManager.getToolForIndex(getActiveItem().getToolId());
         }
@@ -587,23 +587,23 @@ public final class Player extends Character {
         return _activeCamera;
     }
 
-    public void registerObserver(BlockObserver observer) {
+    public void registerObserver(IBlockObserver observer) {
         _observers.add(observer);
     }
 
-    public void unregisterObserver(BlockObserver observer) {
+    public void unregisterObserver(IBlockObserver observer) {
         _observers.remove(observer);
     }
 
     public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos) {
-        for (BlockObserver ob : _observers)
+        for (IBlockObserver ob : _observers)
             ob.blockPlaced(chunk, pos);
 
         BulletPhysicsRenderer.getInstance().blockPlaced(chunk, pos);
     }
 
     public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos) {
-        for (BlockObserver ob : _observers)
+        for (IBlockObserver ob : _observers)
             ob.blockRemoved(chunk, pos);
 
         BulletPhysicsRenderer.getInstance().blockRemoved(chunk, pos);

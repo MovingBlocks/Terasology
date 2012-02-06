@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
+package org.terasology.logic.tools;
 
 /**
- * Notified on click events.
- *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Basic interface for tools.
  */
-public interface UIClickListener {
+public interface ITool {
 
-    public void clicked(UIDisplayElement element);
+    public void executeLeftClickAction();
+
+    public void executeRightClickAction();
 
 }

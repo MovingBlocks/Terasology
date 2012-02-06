@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.tools;
+package org.terasology.rendering.interfaces;
 
 /**
- * Basic interface for tools.
+ * The base class of all game objects.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface Tool {
+public interface IGameObject {
 
-    public void executeLeftClickAction();
+    /**
+     * Rendering operations have to implement this method.
+     */
+    public void render();
 
-    public void executeRightClickAction();
+    /**
+     * Updating operations have to implement this method.
+     */
+    public void update();
 
 }

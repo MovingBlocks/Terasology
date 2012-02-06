@@ -132,7 +132,7 @@ public abstract class MovableEntity extends Entity {
 
         if ((MathHelper.fastAbs(_velocity.x) > 0.01 || MathHelper.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
-                Vector3d playerDirection = directionOfReferencePoint();
+                Vector3d playerDirection = directionOfPlayer();
                 _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
 
                 _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, false, (float) playerDirection.x, (float) playerDirection.y, (float) playerDirection.z);
@@ -357,7 +357,7 @@ public abstract class MovableEntity extends Entity {
 
                     // Entity reaches the ground
                     if (!_touchingGround) {
-                        Vector3d playerDirection = directionOfReferencePoint();
+                        Vector3d playerDirection = directionOfPlayer();
                         _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5].playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false, (float) playerDirection.x, (float) playerDirection.y, (float) playerDirection.z);
                         _touchingGround = true;
                     }
@@ -504,9 +504,9 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
-    public Vector3d directionOfReferencePoint() {
+    public Vector3d directionOfPlayer() {
         Vector3d result = new Vector3d();
-        result.sub(_parent.getWorldProvider().getRenderingReferencePoint(), getPosition());
+        result.sub(Terasology.getInstance().getActivePlayer().getPosition(), getPosition());
 
         return result;
     }
