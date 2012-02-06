@@ -50,7 +50,7 @@ public class Skysphere implements RenderableObject {
     private static final float PI = 3.1415926f;
 
     /* SKY */
-    private double _turbidity = 12.0f, _sunPosAngle = 0.1f;
+    private double _turbidity = 6.0f, _sunPosAngle = 0.1f;
 
     /* CLOUDS */
     private static final Vector2f CLOUD_RESOLUTION = (Vector2f) ConfigurationManager.getInstance().getConfig().get("System.cloudResolution");
@@ -58,7 +58,7 @@ public class Skysphere implements RenderableObject {
     private static IntBuffer _textureIds;
 
     private final PerlinNoise _noiseGenerator;
-    private long _lastCloudUpdate = Terasology.getInstance().getTime();
+    private long _lastCloudUpdate = Terasology.getInstance().getTime() - CLOUD_UPDATE_INTERVAL;
     ByteBuffer _cloudByteBuffer = null;
 
     private final WorldRenderer _parent;
@@ -179,8 +179,6 @@ public class Skysphere implements RenderableObject {
                 }
             });
         }
-
-        _turbidity = 6.0f + ((float) _parent.getActiveHumidity() * (float) _parent.getActiveTemperature()) * 6.0f;
     }
 
     private void drawSphere() {
@@ -237,14 +235,14 @@ public class Skysphere implements RenderableObject {
     }
 
     private void generateNewClouds() {
-
         // Generate some new clouds according to the current time
         ByteBuffer clouds = ByteBuffer.allocateDirect((int) CLOUD_RESOLUTION.x * (int) CLOUD_RESOLUTION.y * 3);
 
         for (int i = 0; i < (int) CLOUD_RESOLUTION.x; i++) {
             for (int j = 0; j < (int) CLOUD_RESOLUTION.y; j++) {
-                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime() * 5f);
-                byte value = (byte) ((MathHelper.clamp(noise)) * 255);
+                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime());
+
+                byte value = (byte) (MathHelper.clamp(noise * 1.25 + 0.25)  * 255);
 
                 clouds.put(value);
                 clouds.put(value);

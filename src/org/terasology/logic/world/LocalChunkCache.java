@@ -21,9 +21,7 @@ import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -207,9 +205,5 @@ public final class LocalChunkCache implements ChunkProvider {
      */
     public int size() {
         return _chunkCache.size();
-    }
-
-    public Collection<Chunk> getChunks() {
-        return _chunkCache.values();
     }
 }

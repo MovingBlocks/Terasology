@@ -18,6 +18,7 @@ package org.terasology.logic.tools;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.WorldProvider;
+import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
@@ -65,7 +66,12 @@ public class ExplosionTool implements Tool {
 
                     byte currentBlockType = worldProvider.getBlock((int) target.x, (int) target.y, (int) target.z);
 
-                    if (currentBlockType != 0x0) {
+                    if (currentBlockType == 0x0)
+                        continue;
+
+                    Block currentBlock = BlockManager.getInstance().getBlock(currentBlockType);
+
+                    if (currentBlock.isDestructible()) {
                         worldProvider.setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, true);
 
                         if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent() && counter % 4 == 0)

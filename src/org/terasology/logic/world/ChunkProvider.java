@@ -49,11 +49,4 @@ public interface ChunkProvider {
      * @return The amount of managed chunks
      */
     public int size();
-
-    /**
-     * Returns the cached chunks as an array.
-     *
-     * @return The chunks
-     */
-    public Collection<Chunk> getChunks();
 }
