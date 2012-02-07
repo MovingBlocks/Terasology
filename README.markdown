@@ -13,7 +13,7 @@ For more information on the project visit our blog: [Moving Blocks!](http://blog
 
 If you're interested in joining up as a contributor register for our [forum](http://board.movingblocks.net) - the project is using the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-You can also fork the project on [GitHub](https://github.com/begla/Terasology)
+You can also fork the project on [GitHub](https://github.com/MovingBlocks/Terasology)
 
 Setup
 -----
