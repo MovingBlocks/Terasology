@@ -27,6 +27,8 @@ import javax.vecmath.Vector4f
 import org.newdawn.slick.util.ResourceLoader
 import org.terasology.logic.manager.TextureManager
 import org.terasology.utilities.ClasspathResourceLoader
+import org.terasology.model.shapes.BlockShape
+import org.terasology.model.shapes.BlockShapeManager
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -129,8 +131,6 @@ class BlockManifestor {
         _bm.addAllBlocks(_blockIndex)
         println "_imageManifest file: " + _imageManifest.getAbsolutePath()
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
-        // Hacky hacky hack hack!
-        //System.exit(0)
     }
 
     /**
@@ -216,15 +216,22 @@ class BlockManifestor {
         println "Default image returns: " + _imageIndex.get(c.name)
 
         def textureId = _imageIndex.get(c.name)
+        
+        Vector2f centerTexturePos;
 
-        if (textureId != null)
+        if (textureId != null) {
             b.withTextureAtlasPos(calcAtlasPositionForId(textureId))
+            centerTexturePos = calcAtlasPositionForId(textureId)
+        }
 
         // Then look for each more specific assignment and overwrite defaults where needed
         if (c.block.faces.all != [:]) {
             println "Setting Block " + c.name + " to texture " + c.block.faces.all + " for all"
             b.withTextureAtlasPos(calcAtlasPositionForId(_imageIndex.get(c.block.faces.all)))
+            centerTexturePos = calcAtlasPositionForId(_imageIndex.get(c.block.faces.all))
         }
+        if (c.block.faces.center != [:])
+            centerTexturePos = calcAtlasPositionForId(_imageIndex.get(c.block.faces.center))
         if (c.block.faces.sides != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.sides + " for sides"
             b.withTextureAtlasPosMantle(calcAtlasPositionForId(_imageIndex.get(c.block.faces.sides)))
@@ -259,6 +266,22 @@ class BlockManifestor {
             b.withTextureAtlasPos(Block.SIDE.BACK, calcAtlasPositionForId(_imageIndex.get(c.block.faces.back)))
         }
         println "Faces are (L, R, T, B, F, B): " + b.getTextureAtlasPos()
+
+        BlockShape shape;
+        if (c.block.shape != [:])
+        {
+            shape = BlockShapeManager.getInstance().getBlockShape(c.block.shape);
+        }
+        if (shape != null)
+        {
+            println "Has shape: " + c.block.shape;
+            b.withCenterMesh(shape.getCenterMesh().mapTexCoords(centerTexturePos, Block.TEXTURE_OFFSET_WIDTH));
+            for (Block.SIDE side : Block.SIDE.values())
+            {
+                b.withSideMesh(side, shape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
+                 .withFullSide(side, shape.isBlockingSide(side));
+            }
+        }
 
         // *** BLOCK_FORM and COLOR_SOURCE enums (defined explicitly in block definition, not needed here)
         if (c.block.blockform != [:]) {

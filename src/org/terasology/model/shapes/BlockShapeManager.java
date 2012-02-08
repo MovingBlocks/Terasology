@@ -43,20 +43,20 @@ public class BlockShapeManager {
     }
 
     public BlockShape getBlockShape(String title) {
-        return _blockShapeByTitle.get(title);
+        return _blockShapeByTitle.get(title.toLowerCase());
     }
 
     public void addBlockShape(BlockShape shape) {
-        _blockShapeByTitle.put(shape.getTitle(), shape);
+        _blockShapeByTitle.put(shape.getTitle().toLowerCase(), shape);
     }
 
     public void removeShape(BlockShape shape) {
-        _blockShapeByTitle.remove(shape.getTitle());
+        _blockShapeByTitle.remove(shape.getTitle().toLowerCase());
     }
 
     public void addAllShapes(Iterable<BlockShape> shapes) {
         for (BlockShape b : shapes) {
-            _blockShapeByTitle.put(b.getTitle(), b);
+            _blockShapeByTitle.put(b.getTitle().toLowerCase(), b);
         }
     }
 

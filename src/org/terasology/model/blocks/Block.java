@@ -18,6 +18,7 @@ package org.terasology.model.blocks;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
+import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.model.structures.AABB;
 import org.terasology.rendering.interfaces.RenderableObject;
 import org.terasology.rendering.primitives.Mesh;
@@ -31,6 +32,7 @@ import javax.vecmath.Vector4f;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.EnumMap;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -73,6 +75,9 @@ public class Block implements RenderableObject {
 
     /* RENDERING */
     private Mesh _mesh;
+    private BlockMeshPart _centerMesh;
+    private EnumMap<Block.SIDE, BlockMeshPart> _sideMesh = new EnumMap<SIDE, BlockMeshPart>(SIDE.class);
+    private boolean[] _fullSide = new boolean[6];
 
     protected Vector4f[] _colorOffset = new Vector4f[6];
     protected Vector2f[] _textureAtlasPos = new Vector2f[6];
@@ -85,7 +90,25 @@ public class Block implements RenderableObject {
      * The six sides of a block.
      */
     public static enum SIDE {
-        TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM
+        TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM;
+        
+        private static EnumMap<SIDE, SIDE> reverseMap;
+        
+        static
+        {
+            reverseMap = new EnumMap<SIDE, SIDE>(SIDE.class);
+            reverseMap.put(TOP, BOTTOM);
+            reverseMap.put(LEFT, RIGHT);
+            reverseMap.put(RIGHT, LEFT);
+            reverseMap.put(FRONT, BACK);
+            reverseMap.put(BACK, FRONT);
+            reverseMap.put(BOTTOM, TOP);
+        }
+        
+        public SIDE reverse()
+        {
+            return reverseMap.get(this);
+        }
     }
 
     /**
@@ -355,6 +378,24 @@ public class Block implements RenderableObject {
         }
         return this;
     }
+    
+    public Block withCenterMesh(BlockMeshPart meshPart)
+    {
+        _centerMesh = meshPart;
+        return this;
+    }
+
+    public Block withSideMesh(SIDE side, BlockMeshPart meshPart)
+    {
+        _sideMesh.put(side, meshPart);
+        return this;
+    }
+    
+    public Block withFullSide(SIDE side, boolean full)
+    {
+        _fullSide[side.ordinal()] = full;
+        return this;
+    }
 
     public COLOR_SOURCE getColorSource() {
         return _colorSource;
@@ -382,6 +423,21 @@ public class Block implements RenderableObject {
 
     public byte getId() {
         return _id;
+    }
+    
+    public boolean isBlockingSide(SIDE side)
+    {
+        return _fullSide[side.ordinal()];
+    }
+    
+    public BlockMeshPart getSideMesh(SIDE side)
+    {
+        return _sideMesh.get(side);
+    }
+
+    public BlockMeshPart getCenterMesh()
+    {
+        return _centerMesh;
     }
 
     public boolean isInvisible() {

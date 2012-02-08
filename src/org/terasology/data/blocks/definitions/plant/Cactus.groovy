@@ -8,7 +8,7 @@ import org.terasology.model.blocks.Block.BLOCK_FORM
  */
 block {
     version = 1
-
+    shape = "Cube"
     faces {
         top = "CactusTop"
         bottom = "CactusBottom"
