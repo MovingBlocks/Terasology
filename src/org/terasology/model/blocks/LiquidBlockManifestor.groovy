@@ -30,6 +30,7 @@ class LiquidBlockManifestor extends BlockManifestor {
     public LiquidBlockManifestor(ClasspathResourceLoader loader)
     {
         _resourceLoader = loader;
+        fixSavePaths()
     }
 
     /**

@@ -372,8 +372,21 @@ public class LocalWorldProvider implements WorldProvider {
         return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcBiomeTypeForGlobalPosition(x, z);
     }
 
+    /**
+     * Returns the world save path, including the world's name. Will try to detect and fix quirky path issues (applet thing)
+     * @return path to save stuff at
+     */
     public String getWorldSavePath() {
-        return String.format("SAVED_WORLDS/%s", _title);
+        String path = String.format("SAVED_WORLDS/%s", _title);
+        // Try to detect if we're getting a screwy save path (usually/always the case with an applet)
+        File f = new File(path);
+        //System.out.println("Suggested absolute save path is: " + f.getAbsolutePath());
+        if (!f.getAbsolutePath().contains("Terasology")) {
+            f = new File(System.getProperty("java.io.tmpdir"), path);
+            //System.out.println("Absolute TEMP save path is: " + f.getAbsolutePath());
+            return f.getAbsolutePath();
+        }
+        return path;
     }
 
     public void setTime(double time) {

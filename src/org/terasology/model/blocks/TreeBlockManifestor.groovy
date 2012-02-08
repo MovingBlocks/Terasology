@@ -30,6 +30,7 @@ class TreeBlockManifestor extends BlockManifestor {
     public TreeBlockManifestor(ClasspathResourceLoader loader)
     {
         _resourceLoader = loader;
+        fixSavePaths()
     }
 
     /**

@@ -27,6 +27,7 @@ import javax.vecmath.Vector4f
 import org.newdawn.slick.util.ResourceLoader
 import org.terasology.logic.manager.TextureManager
 import org.terasology.utilities.ClasspathResourceLoader
+import groovy.util.logging.Log
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -35,6 +36,7 @@ import org.terasology.utilities.ClasspathResourceLoader
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
+@Log
 class BlockManifestor {
 
     private static BlockManager _bm;
@@ -69,6 +71,27 @@ class BlockManifestor {
 
     public BlockManifestor(BlockManager bm) {
         _bm = bm
+        fixSavePaths()
+    }
+    
+    // Temp helper methods until we can correctly use WorldProvider.getWorldSavePath - tries to detect and fix screwy applet paths
+    protected fixSavePaths() {
+        _blockManifest = fixSavePath(_blockManifest)
+        _imageManifest = fixSavePath(_imageManifest)
+        _imageManifestMipMap1 = fixSavePath(_imageManifestMipMap1)
+        _imageManifestMipMap2 = fixSavePath(_imageManifestMipMap2)
+        _imageManifestMipMap3 = fixSavePath(_imageManifestMipMap3)
+    }
+
+    private File fixSavePath(File f) {
+        log.info "Suggested absolute save path is: " + f.getAbsolutePath()
+        if (!f.getAbsolutePath().contains("Terasology")) {
+            f = new File(System.getProperty("java.io.tmpdir"), f.path)
+            log.info "Going to use absolute TEMP save path instead: " + f.getAbsolutePath()
+
+            return f
+        }
+        return f
     }
 
     /**
@@ -127,7 +150,7 @@ class BlockManifestor {
         }
 
         _bm.addAllBlocks(_blockIndex)
-        println "_imageManifest file: " + _imageManifest.getAbsolutePath()
+        log.info "_imageManifest file: " + _imageManifest.getAbsolutePath()
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
         // Hacky hacky hack hack!
         //System.exit(0)

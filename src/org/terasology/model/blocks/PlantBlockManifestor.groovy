@@ -30,6 +30,7 @@ class PlantBlockManifestor extends BlockManifestor {
     public PlantBlockManifestor(ClasspathResourceLoader loader)
     {
         _resourceLoader = loader;
+        fixSavePaths()
     }
 
     /**
