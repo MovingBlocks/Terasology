@@ -11,7 +11,7 @@ block {
 
     faces.all = "GreenLeaf"
 
-    hardness = 2
+    hardness = 1
 
     translucent = true
 

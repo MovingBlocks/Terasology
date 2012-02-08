@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -54,6 +53,7 @@ import static org.lwjgl.opengl.GL11.*;
 public final class WorldRenderer implements RenderableObject {
 
     public static final boolean BOUNDING_BOXES_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.renderChunkBoundingBoxes");
+    public static final int MAX_CHUNK_VERTEX_BUFFER_OBJECTS = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxChunkVBOs");
 
     /* VIEWING DISTANCE */
     private int _viewingDistance = 8;
@@ -159,28 +159,28 @@ public final class WorldRenderer implements RenderableObject {
      */
     public void initTimeEvents() {
         // SUNRISE
-        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.01, true) {
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.1, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.2f);
+                SoundStore.get().setMusicVolume(0.1f);
                 AudioManager.getInstance().getAudio("Sunrise").playAsMusic(1.0f, 1.0f, false);
             }
         });
 
         // AFTERNOON
-        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.33, true) {
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.25, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.2f);
+                SoundStore.get().setMusicVolume(0.1f);
                 AudioManager.getInstance().getAudio("Afternoon").playAsMusic(1.0f, 1.0f, false);
             }
         });
 
         // SUNSET
-        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.44, true) {
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.4, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.2f);
+                SoundStore.get().setMusicVolume(0.1f);
                 AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 1.0f, false);
             }
         });
@@ -209,6 +209,10 @@ public final class WorldRenderer implements RenderableObject {
                         noMoreUpdates = true;
                     }
                 }
+            } else if (i > MAX_CHUNK_VERTEX_BUFFER_OBJECTS) {
+                // Make sure not too many chunk VBOs are available in the video memory at the same time
+                // Otherwise VBOs are moved into system memory which is REALLY slow and causes lag
+                c.clearMeshes();
             }
         }
     }
@@ -217,15 +221,17 @@ public final class WorldRenderer implements RenderableObject {
      * Renders the world.
      */
     public void render() {
-        FBOManager.FBO scene = FBOManager.getInstance().getFBO("scene");
+        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
         scene.bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         /* SKYSPHERE */
         PerformanceMonitor.startActivity("Render-Sky");
-        _player.getActiveCamera().lookThroughNormalized();
-        _skysphere.render();
+        if (!_player.isHeadUnderWater()) {
+            _player.getActiveCamera().lookThroughNormalized();
+            _skysphere.render();
+        }
         PerformanceMonitor.endActivity();
 
         /* WORLD RENDERING */
@@ -253,16 +259,16 @@ public final class WorldRenderer implements RenderableObject {
         _player.renderExtractionOverlay();
         PerformanceMonitor.endActivity();
 
+        scene.unbind();
+
+        // Draw the final scene on a quad and render it...
+        PostProcessingRenderer.getInstance().renderScene();
+
         glPushMatrix();
         glLoadIdentity();
         glClear(GL_DEPTH_BUFFER_BIT);
         _player.renderFirstPersonViewElements();
         glPopMatrix();
-
-        scene.unbind();
-
-        // Draw the final scene on a quad and render it...
-        FBOManager.getInstance().renderScene();
     }
 
 
@@ -322,6 +328,8 @@ public final class WorldRenderer implements RenderableObject {
         PerformanceMonitor.endActivity();
         ShaderManager.getInstance().enableShader("chunk");
 
+        PerformanceMonitor.startActivity("Chunk-Opaque");
+
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
@@ -329,6 +337,10 @@ public final class WorldRenderer implements RenderableObject {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
         }
+
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Chunk-Billboard");
 
         /*
          * SECOND RENDER PASS: BILLBOARDS
@@ -341,9 +353,21 @@ public final class WorldRenderer implements RenderableObject {
             c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
         }
 
+        ShaderManager.getInstance().enableShader(null);
+
+        PerformanceMonitor.endActivity();
+
+        /*
+         * RENDER MOBS
+         */
+        PerformanceMonitor.startActivity("Render Mobs");
         _mobManager.renderAll();
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Chunk-WaterIce");
 
         TextureManager.getInstance().bindTexture("terrain");
+        ShaderManager.getInstance().enableShader("chunk");
 
         // Make sure the water surface is rendered if the player is swimming
         if (playerIsSwimming) {
@@ -367,10 +391,10 @@ public final class WorldRenderer implements RenderableObject {
         }
 
         glDisable(GL_BLEND);
+        glEnable(GL11.GL_CULL_FACE);
+        ShaderManager.getInstance().enableShader(null);
 
-        if (playerIsSwimming) {
-            glEnable(GL11.GL_CULL_FACE);
-        }
+        PerformanceMonitor.endActivity();
     }
 
     public float getRenderingLightValue() {

@@ -395,7 +395,6 @@ public final class Terasology {
             updateFps();
             Display.update();
             Display.sync(60);
-
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Input");
@@ -405,7 +404,6 @@ public final class Terasology {
             if (!screenHasFocus())
                 getActiveWorldRenderer().getPlayer().updateInput();
 
-            PerformanceMonitor.endActivity();
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.rollCycle();
@@ -465,6 +463,7 @@ public final class Terasology {
         if (_activeWorldRenderer != null) {
             if (_activeWorldRenderer.getPlayer().isDead()) {
                 _statusScreen.setVisible(true);
+                _activeWorldRenderer.getPlayer().reset();
                 _statusScreen.updateStatus("Sorry. You've died. :-(");
             } else {
                 _statusScreen.setVisible(false);
@@ -575,23 +574,25 @@ public final class Terasology {
      * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
     private void processKeyboardInput() {
+        boolean debugEnabled = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
+
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
 
             if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_ESCAPE) {
                     togglePauseMenu();
                 }
 
-                if (key == Keyboard.KEY_I && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_I) {
                     toggleInventory();
                 }
 
-                if (key == Keyboard.KEY_F3 && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                    ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", !(Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug"));
+                if (key == Keyboard.KEY_F3) {
+                    ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", debugEnabled = !(debugEnabled));
                 }
 
-                if (key == Keyboard.KEY_F && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_F) {
                     toggleViewingDistance();
                 }
 
@@ -600,6 +601,25 @@ public final class Terasology {
                     if (screenCanFocus(screen)) {
                         screen.processKeyboardInput(key);
                     }
+                }
+            }
+
+            // Features for debug mode only
+            if (debugEnabled) {
+                if (key == Keyboard.KEY_UP && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.005);
+                }
+
+                if (key == Keyboard.KEY_DOWN && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.005);
+                }
+
+                if (key == Keyboard.KEY_RIGHT && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.02);
+                }
+
+                if (key == Keyboard.KEY_LEFT && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
                 }
             }
 
@@ -687,31 +707,30 @@ public final class Terasology {
         return (Sys.getTime() * 1000) / _timerTicksPerSecond;
     }
 
-    public void submitTask(final String name, final Runnable task)
-    {
+    public void submitTask(final String name, final Runnable task) {
         _threadPool.execute(new Runnable() {
             public void run() {
                 Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
                 PerformanceMonitor.startThread(name);
-                try
-                {
+                try {
                     task.run();
-                }
-                finally
-                {
+                } finally {
                     PerformanceMonitor.endThread(name);
                 }
             }
         });
     }
-    
-    public int activeTasks()
-    {
+
+    public int activeTasks() {
         return _threadPool.getActiveCount();
     }
 
     public GroovyManager getGroovyManager() {
         return _groovyManager;
+    }
+
+    public UIHeadsUpDisplay getHUD() {
+        return _hud;
     }
 
     public long getDelta() {

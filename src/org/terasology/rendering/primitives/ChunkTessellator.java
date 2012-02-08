@@ -18,7 +18,6 @@ package org.terasology.rendering.primitives;
 import com.bulletphysics.collision.shapes.IndexedMesh;
 import com.bulletphysics.collision.shapes.ScalarType;
 import org.lwjgl.BufferUtils;
-import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
@@ -33,8 +32,6 @@ import javax.vecmath.Vector4f;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ChunkTessellator {
-
-    private static final boolean GENERATE_PHYSICS_MESHES = (Boolean) ConfigurationManager.getInstance().getConfig().get("Physics.generatePhysicsMeshes");
 
     private final Chunk _chunk;
     private static int _statVertexArrayUpdateCount = 0;
@@ -75,18 +72,15 @@ public final class ChunkTessellator {
     }
 
     private void generateOptimizedBuffers(ChunkMesh mesh) {
-        mesh._indexedMesh = null;
-
-        if (GENERATE_PHYSICS_MESHES) {
-            mesh._indexedMesh = new IndexedMesh();
-            mesh._indexedMesh.vertexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
-            mesh._indexedMesh.triangleIndexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
-            mesh._indexedMesh.triangleIndexStride = 12;
-            mesh._indexedMesh.vertexStride = 12;
-            mesh._indexedMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
-            mesh._indexedMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
-            mesh._indexedMesh.indexType = ScalarType.INTEGER;
-        }
+        /* BULLET PHYSICS */
+        mesh._indexedMesh = new IndexedMesh();
+        mesh._indexedMesh.vertexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
+        mesh._indexedMesh.triangleIndexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
+        mesh._indexedMesh.triangleIndexStride = 12;
+        mesh._indexedMesh.vertexStride = 12;
+        mesh._indexedMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
+        mesh._indexedMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
+        mesh._indexedMesh.indexType = ScalarType.INTEGER;
         /* ------------- */
 
         for (int j = 0; j < mesh._vertexElements.length; j++) {
@@ -108,7 +102,7 @@ public final class ChunkTessellator {
                     mesh._vertexElements[j].indices.put(cIndex);
 
                     /* BULLET PHYSICS */
-                    if (j == 0 && GENERATE_PHYSICS_MESHES) {
+                    if (j == 0) {
                         mesh._indexedMesh.triangleIndexBase.putInt(cIndex);
                         mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 1);
                         mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 2);
@@ -129,7 +123,7 @@ public final class ChunkTessellator {
                 mesh._vertexElements[j].vertices.put(vertexPos.z);
 
                 /* BULLET PHYSICS */
-                if (j == 0 && GENERATE_PHYSICS_MESHES) {
+                if (j == 0) {
                     mesh._indexedMesh.vertexBase.putFloat(vertexPos.x);
                     mesh._indexedMesh.vertexBase.putFloat(vertexPos.y);
                     mesh._indexedMesh.vertexBase.putFloat(vertexPos.z);

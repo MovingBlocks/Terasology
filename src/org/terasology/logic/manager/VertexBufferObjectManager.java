@@ -17,10 +17,14 @@ package org.terasology.logic.manager;
 
 import gnu.trove.list.array.TIntArrayList;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Provides support for creating and buffering Vertex Buffer Objects.
@@ -46,9 +50,11 @@ public class VertexBufferObjectManager {
         return buffer;
     }
 
-    public synchronized Integer getVboId() {
-        for (int i = _vertexBufferObjectPool.size() - 1; i >= 0; i--)
-            GL15.glDeleteBuffers(_vertexBufferObjectPool.removeAt(i));
+    public synchronized int getVboId() {
+        while (_vertexBufferObjectPool.size() > 0) {
+            int id = _vertexBufferObjectPool.removeAt(_vertexBufferObjectPool.size() - 1);
+            GL15.glDeleteBuffers(id);
+        }
 
         return createVbos(1).get(0);
     }

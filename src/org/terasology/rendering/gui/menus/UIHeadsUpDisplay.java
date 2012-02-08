@@ -51,6 +51,7 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
      */
     public UIHeadsUpDisplay() {
         _crosshair = new UICrosshair();
+        _crosshair.setVisible(true);
 
         _debugLine1 = new UIText(new Vector2f(4, 4));
         _debugLine2 = new UIText(new Vector2f(4, 22));
@@ -90,8 +91,6 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         setOverlay(!_console.isVisible());
 
         _healthBar.setPosition(new Vector2f(_toolbar.getPosition().x, _toolbar.getPosition().y - _toolbar.getSize().y + 8f));
-
-        _crosshair.setVisible((Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.crosshair"));
         _crosshair.setPosition(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
 
         boolean enableDebug = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
