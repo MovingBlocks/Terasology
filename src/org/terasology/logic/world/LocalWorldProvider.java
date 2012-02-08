@@ -30,6 +30,7 @@ import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.MathHelper;
 import org.xml.sax.InputSource;
 
+import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import java.io.File;
@@ -192,6 +193,7 @@ public class LocalWorldProvider implements WorldProvider {
         c.setState(blockPosX, y, blockPosZ, state);
     }
 
+
     /**
      * Returns the block value at the given position.
      *
@@ -200,6 +202,10 @@ public class LocalWorldProvider implements WorldProvider {
      */
     public final byte getBlockAtPosition(Vector3d pos) {
         return getBlock((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)));
+    }
+
+    public final byte getBlockAtPosition(double x, double y, double z) {
+        return getBlock((int) (x + ((x >= 0) ? 0.5f : -0.5f)), (int) (y + ((y >= 0) ? 0.5f : -0.5f)), (int) (z + ((z >= 0) ? 0.5f : -0.5f)));
     }
 
     /**
@@ -211,6 +217,10 @@ public class LocalWorldProvider implements WorldProvider {
      */
     public final byte getLightAtPosition(Vector3d pos, Chunk.LIGHT_TYPE type) {
         return getLight((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)), type);
+    }
+
+    public final byte getLightAtPosition(double x, double y, double z, Chunk.LIGHT_TYPE type) {
+        return getLight((int) (x + ((x >= 0) ? 0.5f : -0.5f)), (int) (y + ((y >= 0) ? 0.5f : -0.5f)), (int) (z + ((z >= 0) ? 0.5f : -0.5f)), type);
     }
 
     /**
@@ -230,6 +240,11 @@ public class LocalWorldProvider implements WorldProvider {
 
         Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         return c.getBlock(blockPosX, y, blockPosZ);
+    }
+    
+    public final byte getBlock(Tuple3i pos)
+    {
+        return getBlock(pos.x, pos.y, pos.z);
     }
 
     public final boolean canBlockSeeTheSky(int x, int y, int z) {

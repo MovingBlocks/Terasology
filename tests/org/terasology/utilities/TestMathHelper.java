@@ -1,4 +1,4 @@
-package org.terasology.tests;
+package org.terasology.utilities;
 
 
 import org.terasology.utilities.MathHelper;
