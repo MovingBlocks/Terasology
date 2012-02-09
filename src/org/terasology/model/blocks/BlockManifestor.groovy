@@ -113,9 +113,9 @@ class BlockManifestor {
             // TODO: Could actually both load existing textures and added ones and update the manifest files fairly easily
         } else {
             // If we don't have a saved world we'll need to build a new ImageManifest from raw block textures
-            String path = "org/terasology/data/blocks/images"
-            println "*** Going to get Images from classpath: " + path
-            _images = _resourceLoader.getImages("images")
+            String path = "images"
+            println "*** Going to scan for images from classpath: " + _resourceLoader.getPackagePath() + '/' + path
+            _images = _resourceLoader.getImages(path)
 
             println "Loaded fresh images - here's some logging!"
             _images.eachWithIndex { key, value, index ->

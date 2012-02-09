@@ -665,7 +665,7 @@ public final class Terasology {
     }
 
     private void initDefaultLogger() {
-        File dirPath = new File("LOGS");
+        File dirPath = new File("logs");
 
         if (!dirPath.exists()) {
             if (!dirPath.mkdirs()) {
@@ -673,7 +673,7 @@ public final class Terasology {
             }
         }
 
-        addLogFileHandler("LOGS/Terasology.log", Level.INFO);
+        addLogFileHandler("logs/Terasology.log", Level.INFO);
     }
 
     public Logger getLogger() {
