@@ -61,12 +61,7 @@ public final class ChunkTessellator {
                     if (block.isInvisible())
                         continue;
 
-                    Block.BLOCK_FORM blockForm = block.getBlockForm();
-
-                    if (blockForm != Block.BLOCK_FORM.BILLBOARD)
-                        generateBlockVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
-                    else
-                        generateBillboardVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
+                    generateBlockVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
                 }
             }
         }
@@ -244,57 +239,6 @@ public final class ChunkTessellator {
         PerformanceMonitor.endActivity();
     }
 
-    /**
-     * Generates the billboard vertices for a given local block position.
-     *
-     * @param mesh The active mesh
-     * @param x    Local block position on the x-axis
-     * @param y    Local block position on the y-axis
-     * @param z    Local block position on the z-axis
-     * @param temp The temperature
-     * @param hum  The humidity
-     */
-    private void generateBillboardVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
-        byte blockId = _chunk.getBlock(x, y, z);
-        Block block = BlockManager.getInstance().getBlock(blockId);
-
-        /*
-         * First side of the billboard
-         */
-        Vector4f colorBillboardOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-        Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.FRONT).x, block.calcTextureOffsetFor(Block.SIDE.FRONT).y, 0);
-
-        Vector3f p1 = new Vector3f(-0.5f, -0.5f, 0.5f);
-        Vector3f p2 = new Vector3f(0.5f, -0.5f, -0.5f);
-        Vector3f p3 = new Vector3f(0.5f, 0.5f, -0.5f);
-        Vector3f p4 = new Vector3f(-0.5f, 0.5f, 0.5f);
-        Vector3f normal = new Vector3f(0, 0, 1);
-
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4), normal);
-        addBlockTextureData(mesh._vertexElements[2], texOffset, normal);
-
-        /*
-        * Second side of the billboard
-        */
-        colorBillboardOffset = block.calcColorOffsetFor(Block.SIDE.BACK, temp, hum);
-        texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.BACK).x, block.calcTextureOffsetFor(Block.SIDE.BACK).y, 0);
-
-        p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
-        p2 = new Vector3f(0.5f, -0.5f, 0.5f);
-        p3 = new Vector3f(0.5f, 0.5f, 0.5f);
-        p4 = new Vector3f(-0.5f, 0.5f, -0.5f);
-        normal = new Vector3f(0, 0, 1);
-
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4), normal);
-        addBlockTextureData(mesh._vertexElements[2], texOffset, normal);
-    }
-
     private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
         PerformanceMonitor.startActivity("GenerateBlock");
         byte blockId = _chunk.getBlock(x, y, z);
@@ -309,6 +253,14 @@ public final class ChunkTessellator {
             renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
         if (block.getTitle().equals("Water") || block.getTitle().equals("Ice"))
             renderType = ChunkMesh.RENDER_TYPE.WATER_AND_ICE;
+
+        Block.BLOCK_FORM blockForm = block.getBlockForm();
+        
+        if (block.getCenterMesh() != null)
+        {
+            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.TOP, temp, hum);
+            generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getCenterMesh(), renderType, blockForm);
+        }
 
         boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
 
@@ -331,7 +283,7 @@ public final class ChunkTessellator {
             drawBottom = false;
         }
 
-        Block.BLOCK_FORM blockForm = block.getBlockForm();
+
 
         // If the block is lowered, some more faces have to be drawn
         if (blockForm == Block.BLOCK_FORM.LOWERED_BLOCK) {
@@ -391,6 +343,12 @@ public final class ChunkTessellator {
                 vertexElementsId = 3;
                 break;
         }
+
+        if (blockForm == Block.BLOCK_FORM.BILLBOARD)
+        {
+            vertexElementsId = 2;
+        }
+
 /*
         switch (blockForm) {
             case CACTUS:
@@ -405,37 +363,6 @@ public final class ChunkTessellator {
         {
             meshPart.appendTo(mesh, x, y, z, colorOffset, vertexElementsId);
         }
-        PerformanceMonitor.endActivity();
-    }
-
-    private void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, ChunkMesh.RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
-        PerformanceMonitor.startActivity("GenerateBlockSide");
-        int vertexElementsId = 0;
-
-        switch (renderType) {
-            case BILLBOARD_AND_TRANSLUCENT:
-                vertexElementsId = 1;
-                break;
-            case WATER_AND_ICE:
-                vertexElementsId = 3;
-                break;
-        }
-
-        switch (blockForm) {
-            case CACTUS:
-                generateCactusSide(p1, p2, p3, p4, norm);
-                break;
-            case LOWERED_BLOCK:
-                generateLoweredBlock(x, y, z, p1, p2, p3, p4, norm);
-                break;
-        }
-
-        addBlockTextureData(mesh._vertexElements[vertexElementsId], texOffset, norm);
-
-        addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p1), norm);
-        addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p2), norm);
-        addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p3), norm);
-        addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p4), norm);
         PerformanceMonitor.endActivity();
     }
 
@@ -522,61 +449,6 @@ public final class ChunkTessellator {
             p3.z -= 0.0625 * norm.z;
             p4.z -= 0.0625 * norm.z;
         }
-    }
-
-    private void addBlockTextureData(ChunkMesh.VertexElements vertexElements, Vector3f texOffset, Vector3f norm) {
-        /*
-        * Rotate the texture coordinates according to the
-        * orientation of the plane.
-        */
-        if (norm.z == 1 || norm.x == -1) {
-            vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(1.0f);
-
-            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(1.0f);
-
-            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(texOffset.y);
-            vertexElements.tex.add(1.0f);
-
-            vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y);
-            vertexElements.tex.add(1.0f);
-        } else {
-            vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y);
-            vertexElements.tex.add(1.0f);
-
-            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(texOffset.y);
-            vertexElements.tex.add(1.0f);
-
-            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(1.0f);
-
-            vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(1.0f);
-        }
-    }
-
-    private void addBlockVertexData(ChunkMesh.VertexElements vertexElements, Vector4f colorOffset, Vector3f vertex, Vector3f normal) {
-        PerformanceMonitor.startActivity("AddBlockVertexData");
-        vertexElements.color.add(colorOffset.x);
-        vertexElements.color.add(colorOffset.y);
-        vertexElements.color.add(colorOffset.z);
-        vertexElements.color.add(colorOffset.w);
-        vertexElements.quads.add(vertex.x);
-        vertexElements.quads.add(vertex.y);
-        vertexElements.quads.add(vertex.z);
-        vertexElements.normals.add(normal.x);
-        vertexElements.normals.add(normal.y);
-        vertexElements.normals.add(normal.z);
-        PerformanceMonitor.endActivity();
     }
 
     /**

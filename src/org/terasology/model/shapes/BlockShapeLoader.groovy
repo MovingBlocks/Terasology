@@ -57,7 +57,10 @@ final class BlockShapeLoader {
         // Construct the class - this loads the Block-level defaults
         BlockShape shape = new BlockShape(shapeName)
 
-        shape.setCenterMesh(loadMeshPart(shapeConfig.Center));
+        if (shapeConfig.Center != [:])
+        {
+            shape.setCenterMesh(loadMeshPart(shapeConfig.Center));
+        }
         if (shapeConfig.Top != [:]) {
             shape.setSideMesh(Block.SIDE.TOP, loadMeshPart(shapeConfig.Top));
             shape.setBlockingSide(Block.SIDE.TOP, shapeConfig.Top.fullSide);
@@ -70,15 +73,15 @@ final class BlockShapeLoader {
             shape.setSideMesh(Block.SIDE.LEFT, loadMeshPart(shapeConfig.Left));
             shape.setBlockingSide(Block.SIDE.LEFT, shapeConfig.Left.fullSide);
         }
-        if (shapeConfig.Top != [:]) {
+        if (shapeConfig.Right != [:]) {
             shape.setSideMesh(Block.SIDE.RIGHT, loadMeshPart(shapeConfig.Right));
             shape.setBlockingSide(Block.SIDE.RIGHT, shapeConfig.Right.fullSide);
         }
-        if (shapeConfig.Top != [:]) {
+        if (shapeConfig.Front != [:]) {
             shape.setSideMesh(Block.SIDE.FRONT, loadMeshPart(shapeConfig.Front));
             shape.setBlockingSide(Block.SIDE.FRONT, shapeConfig.Front.fullSide);
         }
-        if (shapeConfig.Top != [:]) {
+        if (shapeConfig.Back != [:]) {
             shape.setSideMesh(Block.SIDE.BACK, loadMeshPart(shapeConfig.Back));
             shape.setBlockingSide(Block.SIDE.BACK, shapeConfig.Back.fullSide);
         }

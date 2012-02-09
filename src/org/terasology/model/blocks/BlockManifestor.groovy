@@ -275,11 +275,18 @@ class BlockManifestor {
         if (shape != null)
         {
             println "Has shape: " + c.block.shape;
-            b.withCenterMesh(shape.getCenterMesh().mapTexCoords(centerTexturePos, Block.TEXTURE_OFFSET_WIDTH));
+            if (shape.getCenterMesh() != null)
+            {
+                b.withCenterMesh(shape.getCenterMesh().mapTexCoords(new Vector2f((float)(Block.TEXTURE_OFFSET * centerTexturePos.x), (float)(Block.TEXTURE_OFFSET * centerTexturePos.y)), Block.TEXTURE_OFFSET_WIDTH));
+            }
+
             for (Block.SIDE side : Block.SIDE.values())
             {
-                b.withSideMesh(side, shape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
-                 .withFullSide(side, shape.isBlockingSide(side));
+                if (shape.getSideMesh(side) != null)
+                {
+                    b.withSideMesh(side, shape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
+                }
+                b.withFullSide(side, shape.isBlockingSide(side));
             }
         }
 
