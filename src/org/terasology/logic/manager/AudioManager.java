@@ -63,14 +63,19 @@ public class AudioManager {
     }
 
     /**
-     * Loads the sound file with the given name.
+     * Return an audio file, loading it from disk if it isn't in the cache yet
      *
      * @param s The name of the audio file
      * @return The loaded audio file
      */
     public Audio loadSound(String s) {
         try {
-            return AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("org/terasology/data/sounds/" + s + ".ogg"));
+            Audio a = _audioFiles.get(s);
+            if (a == null) {
+                a = AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("org/terasology/data/sounds/" + s + ".ogg"));
+                _audioFiles.put(s, a);
+            }
+            return a;
         } catch (IOException e) {
             Terasology.getInstance().getLogger().log(Level.SEVERE, e.getLocalizedMessage());
         }
