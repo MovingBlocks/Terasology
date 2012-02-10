@@ -50,7 +50,28 @@ public class ChunkMesh {
      * Possible rendering types.
      */
     public enum RENDER_TYPE {
-        OPAQUE, BILLBOARD_AND_TRANSLUCENT, WATER_AND_ICE
+        OPAQUE(0),
+        TRANSLUCENT(1),
+        BILLBOARD(2),
+        WATER_AND_ICE(3);
+
+        private int _meshIndex;
+
+        private RENDER_TYPE(int index)
+        {
+            _meshIndex = index;
+        }
+
+        public int getIndex()
+        {
+            return _meshIndex;
+        }
+    }
+
+    public enum RENDER_PHASE {
+        OPAQUE,
+        BILLBOARD_AND_TRANSLUCENT,
+        WATER_AND_ICE;
     }
 
     /* CONST */
@@ -173,7 +194,7 @@ public class ChunkMesh {
         }
     }
 
-    public void render(RENDER_TYPE type) {
+    public void render(RENDER_PHASE type) {
         switch (type) {
             case OPAQUE:
                 renderVbo(0);

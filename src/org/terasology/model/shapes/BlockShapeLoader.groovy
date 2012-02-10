@@ -3,13 +3,12 @@ package org.terasology.model.shapes
 import gnu.trove.list.TIntList
 import gnu.trove.list.array.TIntArrayList
 
-import java.util.logging.Level
-import java.util.logging.Logger
 import javax.vecmath.Vector2f
 import javax.vecmath.Vector3f
-import org.terasology.model.blocks.Block
+
 import org.terasology.utilities.ClasspathResourceLoader
 import groovy.util.logging.Log
+import org.terasology.math.Side
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -62,28 +61,28 @@ final class BlockShapeLoader {
             shape.setCenterMesh(loadMeshPart(shapeConfig.Center));
         }
         if (shapeConfig.Top != [:]) {
-            shape.setSideMesh(Block.SIDE.TOP, loadMeshPart(shapeConfig.Top));
-            shape.setBlockingSide(Block.SIDE.TOP, shapeConfig.Top.fullSide);
+            shape.setSideMesh(Side.TOP, loadMeshPart(shapeConfig.Top));
+            shape.setBlockingSide(Side.TOP, shapeConfig.Top.fullSide);
         }
         if (shapeConfig.Bottom != [:]) {
-            shape.setSideMesh(Block.SIDE.BOTTOM, loadMeshPart(shapeConfig.Bottom));
-            shape.setBlockingSide(Block.SIDE.BOTTOM, shapeConfig.Bottom.fullSide);
+            shape.setSideMesh(Side.BOTTOM, loadMeshPart(shapeConfig.Bottom));
+            shape.setBlockingSide(Side.BOTTOM, shapeConfig.Bottom.fullSide);
         }
         if (shapeConfig.Left != [:]) {
-            shape.setSideMesh(Block.SIDE.LEFT, loadMeshPart(shapeConfig.Left));
-            shape.setBlockingSide(Block.SIDE.LEFT, shapeConfig.Left.fullSide);
+            shape.setSideMesh(Side.LEFT, loadMeshPart(shapeConfig.Left));
+            shape.setBlockingSide(Side.LEFT, shapeConfig.Left.fullSide);
         }
         if (shapeConfig.Right != [:]) {
-            shape.setSideMesh(Block.SIDE.RIGHT, loadMeshPart(shapeConfig.Right));
-            shape.setBlockingSide(Block.SIDE.RIGHT, shapeConfig.Right.fullSide);
+            shape.setSideMesh(Side.RIGHT, loadMeshPart(shapeConfig.Right));
+            shape.setBlockingSide(Side.RIGHT, shapeConfig.Right.fullSide);
         }
         if (shapeConfig.Front != [:]) {
-            shape.setSideMesh(Block.SIDE.FRONT, loadMeshPart(shapeConfig.Front));
-            shape.setBlockingSide(Block.SIDE.FRONT, shapeConfig.Front.fullSide);
+            shape.setSideMesh(Side.FRONT, loadMeshPart(shapeConfig.Front));
+            shape.setBlockingSide(Side.FRONT, shapeConfig.Front.fullSide);
         }
         if (shapeConfig.Back != [:]) {
-            shape.setSideMesh(Block.SIDE.BACK, loadMeshPart(shapeConfig.Back));
-            shape.setBlockingSide(Block.SIDE.BACK, shapeConfig.Back.fullSide);
+            shape.setSideMesh(Side.BACK, loadMeshPart(shapeConfig.Back));
+            shape.setBlockingSide(Side.BACK, shapeConfig.Back.fullSide);
         }
         return shape
     }

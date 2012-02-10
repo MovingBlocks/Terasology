@@ -18,7 +18,7 @@ package org.terasology.model.blocks;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Side;
 import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.model.structures.AABB;
 import org.terasology.rendering.interfaces.RenderableObject;
@@ -34,7 +34,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -77,11 +76,11 @@ public class Block implements RenderableObject {
     /* RENDERING */
     private Mesh _mesh;
     private BlockMeshPart _centerMesh;
-    private EnumMap<Block.SIDE, BlockMeshPart> _sideMesh = new EnumMap<SIDE, BlockMeshPart>(SIDE.class);
+    private EnumMap<Side, BlockMeshPart> _sideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
     private boolean[] _fullSide = new boolean[6];
 
     // For liquid handling
-    private EnumMap<Block.SIDE, BlockMeshPart> _loweredSideMesh = new EnumMap<SIDE, BlockMeshPart>(SIDE.class);
+    private EnumMap<Side, BlockMeshPart> _loweredSideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
 
     protected Vector4f[] _colorOffset = new Vector4f[6];
     protected Vector2f[] _textureAtlasPos = new Vector2f[6];
@@ -91,59 +90,10 @@ public class Block implements RenderableObject {
     protected static BufferedImage _foliageLut;
 
     /**
-     * The six sides of a block.
-     */
-    public static enum SIDE {
-        TOP(Vector3i.up()),
-        LEFT(new Vector3i(-1,0,0)),
-        RIGHT(new Vector3i(1,0,0)),
-        FRONT(new Vector3i(0,0,-1)), 
-        BACK(new Vector3i(0,0,1)), 
-        BOTTOM(Vector3i.down());
-        
-        private static EnumMap<SIDE, SIDE> reverseMap;
-        private static SIDE[] horizontalSides;
-        
-        static
-        {
-            reverseMap = new EnumMap<SIDE, SIDE>(SIDE.class);
-            reverseMap.put(TOP, BOTTOM);
-            reverseMap.put(LEFT, RIGHT);
-            reverseMap.put(RIGHT, LEFT);
-            reverseMap.put(FRONT, BACK);
-            reverseMap.put(BACK, FRONT);
-            reverseMap.put(BOTTOM, TOP);
-            horizontalSides = new SIDE[] {LEFT, RIGHT, FRONT, BACK};
-        }
-        
-        public static SIDE[] horizontalSides()
-        {
-            return horizontalSides;
-        }
-
-        private Vector3i vector3iDir;
-
-        private SIDE(Vector3i vector3i)
-        {
-            this.vector3iDir = vector3i;
-        }
-        
-        public Vector3i getVector3i()
-        {
-            return vector3iDir;
-        }
-        
-        public SIDE reverse()
-        {
-            return reverseMap.get(this);
-        }
-    }
-
-    /**
      * Possible forms of blocks.
      */
     public static enum BLOCK_FORM {
-        DEFAULT, CACTUS, LOWERED_BLOCK, BILLBOARD
+        DEFAULT, LOWERED_BLOCK, BILLBOARD
     }
 
     /**
@@ -172,8 +122,8 @@ public class Block implements RenderableObject {
         withTitle("Untitled block");
 
         for (int i = 0; i < 6; i++) {
-            withTextureAtlasPos(SIDE.values()[i], new Vector2f(0.0f, 0.0f));
-            withColorOffset(SIDE.values()[i], new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+            withTextureAtlasPos(Side.values()[i], new Vector2f(0.0f, 0.0f));
+            withColorOffset(Side.values()[i], new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         }
 
         // Load the default settings
@@ -230,7 +180,7 @@ public class Block implements RenderableObject {
      * @param humidity    The humidity
      * @return The color offset
      */
-    public Vector4f calcColorOffsetFor(SIDE side, double temperature, double humidity) {
+    public Vector4f calcColorOffsetFor(Side side, double temperature, double humidity) {
         Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         if (getColorSource() == COLOR_SOURCE.COLOR_LUT)
@@ -254,7 +204,7 @@ public class Block implements RenderableObject {
      * @param side The side of the block
      * @return The texture offset
      */
-    public Vector2f calcTextureOffsetFor(SIDE side) {
+    public Vector2f calcTextureOffsetFor(Side side) {
         return new Vector2f((int) getTextureAtlasPos()[side.ordinal()].x * TEXTURE_OFFSET, (int) getTextureAtlasPos()[side.ordinal()].y * TEXTURE_OFFSET);
     }
 
@@ -363,40 +313,40 @@ public class Block implements RenderableObject {
         return this;
     }
 
-    public Block withColorOffset(SIDE side, Vector4f colorOffset) {
+    public Block withColorOffset(Side side, Vector4f colorOffset) {
         _colorOffset[side.ordinal()] = colorOffset;
         return this;
     }
 
-    public Block withTextureAtlasPos(SIDE side, Vector2f atlasPos) {
+    public Block withTextureAtlasPos(Side side, Vector2f atlasPos) {
         _textureAtlasPos[side.ordinal()] = atlasPos;
         return this;
     }
 
     public Block withTextureAtlasPosTopBottom(Vector2f atlasPos) {
-        _textureAtlasPos[SIDE.TOP.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.BOTTOM.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.TOP.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.BOTTOM.ordinal()] = atlasPos;
         return this;
     }
 
     public Block withTextureAtlasPos(Vector2f atlasPos) {
         for (int i = 0; i < 6; i++) {
-            withTextureAtlasPos(SIDE.values()[i], atlasPos);
+            withTextureAtlasPos(Side.values()[i], atlasPos);
         }
         return this;
     }
 
     public Block withTextureAtlasPosMantle(Vector2f atlasPos) {
-        _textureAtlasPos[SIDE.LEFT.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.RIGHT.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.FRONT.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.BACK.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.LEFT.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.RIGHT.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.FRONT.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.BACK.ordinal()] = atlasPos;
         return this;
     }
 
     public Block withColorOffset(Vector4f colorOffset) {
         for (int i = 0; i < 6; i++) {
-            withColorOffset(SIDE.values()[i], colorOffset);
+            withColorOffset(Side.values()[i], colorOffset);
         }
         return this;
     }
@@ -407,19 +357,19 @@ public class Block implements RenderableObject {
         return this;
     }
 
-    public Block withSideMesh(SIDE side, BlockMeshPart meshPart)
+    public Block withSideMesh(Side side, BlockMeshPart meshPart)
     {
         _sideMesh.put(side, meshPart);
         return this;
     }
 
-    public Block withLoweredSideMesh(SIDE side, BlockMeshPart meshPart)
+    public Block withLoweredSideMesh(Side side, BlockMeshPart meshPart)
     {
         _loweredSideMesh.put(side, meshPart);
         return this;
     }
     
-    public Block withFullSide(SIDE side, boolean full)
+    public Block withFullSide(Side side, boolean full)
     {
         _fullSide[side.ordinal()] = full;
         return this;
@@ -453,12 +403,12 @@ public class Block implements RenderableObject {
         return _id;
     }
     
-    public boolean isBlockingSide(SIDE side)
+    public boolean isBlockingSide(Side side)
     {
         return _fullSide[side.ordinal()];
     }
     
-    public BlockMeshPart getSideMesh(SIDE side)
+    public BlockMeshPart getSideMesh(Side side)
     {
         return _sideMesh.get(side);
     }
@@ -468,7 +418,7 @@ public class Block implements RenderableObject {
         return _centerMesh;
     }
 
-    public BlockMeshPart getLoweredSideMesh(SIDE side)
+    public BlockMeshPart getLoweredSideMesh(Side side)
     {
         return _loweredSideMesh.get(side);
     }

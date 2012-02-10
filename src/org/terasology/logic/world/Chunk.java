@@ -741,7 +741,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @param type The type of vertices to render
      * @return True if rendered
      */
-    public void render(ChunkMesh.RENDER_TYPE type) {
+    public void render(ChunkMesh.RENDER_PHASE type) {
         if (isReadyForRendering()) {
             GL11.glPushMatrix();
             GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - getParent().getRenderingReferencePoint().x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - getParent().getRenderingReferencePoint().y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - getParent().getRenderingReferencePoint().z);

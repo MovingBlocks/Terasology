@@ -14,8 +14,6 @@ block {
         bottom = "CactusBottom"
     }
 
-    blockform = BLOCK_FORM.CACTUS
-
     // TODO: This is quite weird actually but necessary at the moment
     translucent = true
 }

@@ -19,16 +19,16 @@ package org.terasology.model.blocks
 import java.awt.Graphics
 import java.awt.Image
 import java.awt.image.BufferedImage
-import java.util.jar.JarEntry
-import java.util.jar.JarFile
+
 import javax.imageio.ImageIO
 import javax.vecmath.Vector2f
 import javax.vecmath.Vector4f
-import org.newdawn.slick.util.ResourceLoader
+
 import org.terasology.logic.manager.TextureManager
 import org.terasology.utilities.ClasspathResourceLoader
 import org.terasology.model.shapes.BlockShape
 import org.terasology.model.shapes.BlockShapeManager
+import org.terasology.math.Side
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -243,27 +243,27 @@ class BlockManifestor {
         // Top, Bottom, Left, Right, Front, Back - probably a way to do that in a loop...
         if (c.block.faces.top != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.top + " for top"
-            b.withTextureAtlasPos(Block.SIDE.TOP, calcAtlasPositionForId(_imageIndex.get(c.block.faces.top)))
+            b.withTextureAtlasPos(Side.TOP, calcAtlasPositionForId(_imageIndex.get(c.block.faces.top)))
         }
         if (c.block.faces.bottom != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.bottom + " for bottom"
-            b.withTextureAtlasPos(Block.SIDE.BOTTOM, calcAtlasPositionForId(_imageIndex.get(c.block.faces.bottom)))
+            b.withTextureAtlasPos(Side.BOTTOM, calcAtlasPositionForId(_imageIndex.get(c.block.faces.bottom)))
         }
         if (c.block.faces.left != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.left + " for left"
-            b.withTextureAtlasPos(Block.SIDE.LEFT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.left)))
+            b.withTextureAtlasPos(Side.LEFT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.left)))
         }
         if (c.block.faces.right != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.right + " for right"
-            b.withTextureAtlasPos(Block.SIDE.RIGHT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.right)))
+            b.withTextureAtlasPos(Side.RIGHT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.right)))
         }
         if (c.block.faces.front != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.front + " for front"
-            b.withTextureAtlasPos(Block.SIDE.FRONT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.front)))
+            b.withTextureAtlasPos(Side.FRONT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.front)))
         }
         if (c.block.faces.back != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.back + " for back"
-            b.withTextureAtlasPos(Block.SIDE.BACK, calcAtlasPositionForId(_imageIndex.get(c.block.faces.back)))
+            b.withTextureAtlasPos(Side.BACK, calcAtlasPositionForId(_imageIndex.get(c.block.faces.back)))
         }
         println "Faces are (L, R, T, B, F, B): " + b.getTextureAtlasPos()
 
@@ -280,7 +280,7 @@ class BlockManifestor {
                 b.withCenterMesh(shape.getCenterMesh().mapTexCoords(new Vector2f((float)(Block.TEXTURE_OFFSET * centerTexturePos.x), (float)(Block.TEXTURE_OFFSET * centerTexturePos.y)), Block.TEXTURE_OFFSET_WIDTH));
             }
 
-            for (Block.SIDE side : Block.SIDE.values())
+            for (Side side : Side.values())
             {
                 if (shape.getSideMesh(side) != null)
                 {
@@ -344,7 +344,7 @@ class BlockManifestor {
             if (loweredShape != null)
             {
                 println "Has lowered shape: " + c.block.loweredShape;
-                for (Block.SIDE side : Block.SIDE.values())
+                for (Side side : Side.values())
                 {
                     if (loweredShape.getSideMesh(side) != null)
                     {

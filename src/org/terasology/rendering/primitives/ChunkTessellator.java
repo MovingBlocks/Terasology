@@ -21,10 +21,10 @@ import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import org.lwjgl.BufferUtils;
 import org.terasology.logic.world.Chunk;
+import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
-import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.Vector3f;
@@ -236,24 +236,26 @@ public final class ChunkTessellator {
         /*
          * Determine the render process.
          */
-        ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT;
+        ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.TRANSLUCENT;
 
         if (!block.isTranslucent())
             renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
         if (block.getTitle().equals("Water") || block.getTitle().equals("Ice"))
             renderType = ChunkMesh.RENDER_TYPE.WATER_AND_ICE;
+        if (block.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
+            renderType = ChunkMesh.RENDER_TYPE.BILLBOARD;
 
         Block.BLOCK_FORM blockForm = block.getBlockForm();
         
         if (block.getCenterMesh() != null)
         {
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.TOP, temp, hum);
-            generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getCenterMesh(), renderType, blockForm);
+            Vector4f colorOffset = block.calcColorOffsetFor(Side.TOP, temp, hum);
+            block.getCenterMesh().appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
         }
 
         boolean[] drawDir = new boolean[6];
         
-        for (Block.SIDE side : Block.SIDE.values())
+        for (Side side : Side.values())
         {
             Vector3i offset = side.getVector3i();
             byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + offset.x), y + offset.y, _chunk.getBlockWorldPosZ(z + offset.z));
@@ -262,13 +264,13 @@ public final class ChunkTessellator {
         
         if (y == 0)
         {
-            drawDir[Block.SIDE.BOTTOM.ordinal()] = false;
+            drawDir[Side.BOTTOM.ordinal()] = false;
         }
 
         // If the block is lowered, some more faces may have to be drawn
         if (blockForm == Block.BLOCK_FORM.LOWERED_BLOCK) {
             // Draw horizontal sides if visible from below
-            for (Block.SIDE side : Block.SIDE.horizontalSides())
+            for (Side side : Side.horizontalSides())
             {
                 Vector3i offset = side.getVector3i();
                 byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + offset.x), y - 1, _chunk.getBlockWorldPosZ(z + offset.z));
@@ -278,51 +280,31 @@ public final class ChunkTessellator {
             // Draw the top if below a non-lowered block
             // TODO: Don't need to render the top if each side and the block above each side are either liquid or opaque solids.
             byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
-            drawDir[Block.SIDE.TOP.ordinal()] |= (BlockManager.getInstance().getBlock(blockToCheckId).getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+            drawDir[Side.TOP.ordinal()] |= (BlockManager.getInstance().getBlock(blockToCheckId).getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
 
             byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
             if (BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0)
             {
-                for (Block.SIDE dir : Block.SIDE.values())
+                for (Side dir : Side.values())
                 {
                     if (drawDir[dir.ordinal()])
                     {
                         Vector4f colorOffset = block.calcColorOffsetFor(dir, temp, hum);
-                        generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getLoweredSideMesh(dir), renderType, blockForm);
+                        block.getLoweredSideMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
                     }
                 }
                 return;
             }
         }
 
-        for (Block.SIDE dir : Block.SIDE.values())
+        for (Side dir : Side.values())
         {
             if (drawDir[dir.ordinal()])
             {
                 Vector4f colorOffset = block.calcColorOffsetFor(dir, temp, hum);
-                generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getSideMesh(dir), renderType, blockForm);
+                block.getSideMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
             }
         }
-    }
-
-    private void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector4f colorOffset, BlockMeshPart meshPart, ChunkMesh.RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
-        int vertexElementsId = 0;
-
-        switch (renderType) {
-            case BILLBOARD_AND_TRANSLUCENT:
-                vertexElementsId = 1;
-                break;
-            case WATER_AND_ICE:
-                vertexElementsId = 3;
-                break;
-        }
-
-        if (blockForm == Block.BLOCK_FORM.BILLBOARD)
-        {
-            vertexElementsId = 2;
-        }
-
-        meshPart.appendTo(mesh, x, y, z, colorOffset, vertexElementsId);
     }
 
     private Vector3f moveVectorFromChunkSpaceToWorldSpace(Vector3f offset) {
@@ -344,7 +326,7 @@ public final class ChunkTessellator {
      * @param currentBlock The current block
      * @return True if the side is visible for the given block types
      */
-    private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock, Block.SIDE side) {
+    private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock, Side side) {
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
         if (cBlock.getSideMesh(side) == null) return false;
         Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);

@@ -335,7 +335,7 @@ public final class WorldRenderer implements RenderableObject {
          */
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
-            c.render(ChunkMesh.RENDER_TYPE.OPAQUE);
+            c.render(ChunkMesh.RENDER_PHASE.OPAQUE);
         }
 
         PerformanceMonitor.endActivity();
@@ -350,7 +350,7 @@ public final class WorldRenderer implements RenderableObject {
 
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
-            c.render(ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT);
+            c.render(ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT);
         }
 
         ShaderManager.getInstance().enableShader(null);
@@ -386,7 +386,7 @@ public final class WorldRenderer implements RenderableObject {
 
             for (int i = 0; i < _visibleChunks.size(); i++) {
                 Chunk c = _visibleChunks.get(i);
-                c.render(ChunkMesh.RENDER_TYPE.WATER_AND_ICE);
+                c.render(ChunkMesh.RENDER_PHASE.WATER_AND_ICE);
             }
         }
 

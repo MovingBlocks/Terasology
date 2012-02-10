@@ -1,6 +1,6 @@
 package org.terasology.model.shapes;
 
-import org.terasology.model.blocks.Block;
+import org.terasology.math.Side;
 
 import java.util.EnumMap;
 
@@ -12,8 +12,8 @@ import java.util.EnumMap;
 public class BlockShape {
     private String _title;
     private BlockMeshPart _centerMesh;
-    private EnumMap<Block.SIDE, BlockMeshPart> _meshParts = new EnumMap<Block.SIDE, BlockMeshPart>(Block.SIDE.class);
-    private boolean[] _fullSide = new boolean[Block.SIDE.values().length];
+    private EnumMap<Side, BlockMeshPart> _meshParts = new EnumMap<Side, BlockMeshPart>(Side.class);
+    private boolean[] _fullSide = new boolean[Side.values().length];
 
     public BlockShape(String title) {
         _title = title;
@@ -26,11 +26,11 @@ public class BlockShape {
         return _centerMesh;
     }
 
-    public BlockMeshPart getSideMesh(Block.SIDE side) {
+    public BlockMeshPart getSideMesh(Side side) {
         return _meshParts.get(side);
     }
 
-    public boolean isBlockingSide(Block.SIDE side) {
+    public boolean isBlockingSide(Side side) {
         return _fullSide[side.ordinal()];
     }
 
@@ -42,11 +42,11 @@ public class BlockShape {
         _centerMesh = mesh;
     }
 
-    public void setSideMesh(Block.SIDE side, BlockMeshPart mesh) {
+    public void setSideMesh(Side side, BlockMeshPart mesh) {
         _meshParts.put(side, mesh);
     }
 
-    public void setBlockingSide(Block.SIDE side, boolean blocking) {
+    public void setBlockingSide(Side side, boolean blocking) {
         _fullSide[side.ordinal()] = blocking;
     }
 
