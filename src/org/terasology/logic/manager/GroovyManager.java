@@ -22,6 +22,9 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.terasology.game.Terasology;
+import org.terasology.logic.characters.Player;
+import org.terasology.model.inventory.ItemBlock;
+import org.terasology.utilities.Helper;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -101,6 +104,7 @@ public class GroovyManager {
     private void updateBinding() {
         _bind.setVariable("tera", Terasology.getInstance());
         _bind.setVariable("configuration", ConfigurationManager.getInstance());
+        _bind.setVariable("cmd", new CommandHelper());
     }
 
     /**
@@ -119,6 +123,15 @@ public class GroovyManager {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public static class CommandHelper
+    {
+        public void giveBlock(int blockId, int quantity)
+        {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            player.getInventory().storeItemInFreeSlot(new ItemBlock(player, (byte)blockId, quantity));
         }
     }
 }

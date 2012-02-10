@@ -21,6 +21,7 @@ import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import org.lwjgl.BufferUtils;
 import org.terasology.logic.world.Chunk;
+import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.shapes.BlockMeshPart;
@@ -251,71 +252,43 @@ public final class ChunkTessellator {
             generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getCenterMesh(), renderType, blockForm);
         }
 
-        boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
-
-        byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
-        drawTop = isSideVisibleForBlockTypes(blockToCheckId, blockId, Block.SIDE.TOP);
-        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y, _chunk.getBlockWorldPosZ(z - 1));
-        drawFront = isSideVisibleForBlockTypes(blockToCheckId, blockId, Block.SIDE.FRONT);
-        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y, _chunk.getBlockWorldPosZ(z + 1));
-        drawBack = isSideVisibleForBlockTypes(blockToCheckId, blockId, Block.SIDE.BACK);
-        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), y, _chunk.getBlockWorldPosZ(z));
-        drawLeft = isSideVisibleForBlockTypes(blockToCheckId, blockId, Block.SIDE.LEFT);
-        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y, _chunk.getBlockWorldPosZ(z));
-        drawRight = isSideVisibleForBlockTypes(blockToCheckId, blockId, Block.SIDE.RIGHT);
-
-        // Don't draw anything "below" the world
-        if (y > 0) {
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
-            drawBottom = isSideVisibleForBlockTypes(blockToCheckId, blockId, Block.SIDE.BOTTOM);
-        } else {
-            drawBottom = false;
+        boolean[] drawDir = new boolean[6];
+        
+        for (Block.SIDE side : Block.SIDE.values())
+        {
+            Vector3i offset = side.getVector3i();
+            byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + offset.x), y + offset.y, _chunk.getBlockWorldPosZ(z + offset.z));
+            drawDir[side.ordinal()] = isSideVisibleForBlockTypes(blockToCheckId, blockId, side);
+        }
+        
+        if (y == 0)
+        {
+            drawDir[Block.SIDE.BOTTOM.ordinal()] = false;
         }
 
-
-
-        // If the block is lowered, some more faces have to be drawn
+        // If the block is lowered, some more faces may have to be drawn
         if (blockForm == Block.BLOCK_FORM.LOWERED_BLOCK) {
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z - 1));
-            drawFront = isSideVisibleForBlockTypes(blockToCheckId, blockId, Block.SIDE.FRONT) || drawFront;
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z + 1));
-            drawBack = isSideVisibleForBlockTypes(blockToCheckId, blockId, Block.SIDE.BACK) || drawBack;
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), y - 1, _chunk.getBlockWorldPosZ(z));
-            drawLeft = isSideVisibleForBlockTypes(blockToCheckId, blockId, Block.SIDE.LEFT) || drawLeft;
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y - 1, _chunk.getBlockWorldPosZ(z));
-            drawRight = isSideVisibleForBlockTypes(blockToCheckId, blockId, Block.SIDE.RIGHT) || drawRight;
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
-            drawTop = (BlockManager.getInstance().getBlock(blockToCheckId).getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK) || drawTop;
+            // Draw horizontal sides if visible from below
+            for (Block.SIDE side : Block.SIDE.horizontalSides())
+            {
+                Vector3i offset = side.getVector3i();
+                byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + offset.x), y - 1, _chunk.getBlockWorldPosZ(z + offset.z));
+                drawDir[side.ordinal()] |= isSideVisibleForBlockTypes(blockToCheckId, blockId, side);
+            }
+            
+            // Draw the top if below a non-lowered block (this can be a bit weird if it is just a single solid block under water
+            // TODO: Address water top visible below a single solid block jutting down into water.
+            byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
+            drawDir[Block.SIDE.TOP.ordinal()] |= (BlockManager.getInstance().getBlock(blockToCheckId).getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
         }
 
-        if (drawTop) {
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-            generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getSideMesh(Block.SIDE.TOP), renderType, blockForm);
-        }
-
-        if (drawFront) {
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-            generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getSideMesh(Block.SIDE.FRONT), renderType, blockForm);
-        }
-
-        if (drawBack) {
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-            generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getSideMesh(Block.SIDE.BACK), renderType, blockForm);
-        }
-
-        if (drawLeft) {
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-            generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getSideMesh(Block.SIDE.LEFT), renderType, blockForm);
-        }
-
-        if (drawRight) {
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-            generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getSideMesh(Block.SIDE.RIGHT), renderType, blockForm);
-        }
-
-        if (drawBottom) {
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-            generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getSideMesh(Block.SIDE.BOTTOM), renderType, blockForm);
+        for (Block.SIDE dir : Block.SIDE.values())
+        {
+            if (drawDir[dir.ordinal()])
+            {
+                Vector4f colorOffset = block.calcColorOffsetFor(dir, temp, hum);
+                generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getSideMesh(dir), renderType, blockForm);
+            }
         }
         PerformanceMonitor.endActivity();
     }
@@ -367,63 +340,12 @@ public final class ChunkTessellator {
         return offset;
     }
 
-    private Vector3f moveVectorToChunkSpace(int cPosX, int cPosY, int cPosZ, Vector3f offset) {
-        offset.x += cPosX;
-        offset.y += cPosY;
-        offset.z += cPosZ;
-
-        return offset;
-    }
-
     private void generateLoweredBlock(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm) {
         byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
+
+        // TODO: use this as switch between mesh parts
         boolean lowerBottom = BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0;
 
-        if (norm.x == 1.0f) {
-            p1.y -= 0.1;
-            p2.y -= 0.1;
-
-            if (lowerBottom) {
-                p3.y -= 0.1;
-                p4.y -= 0.1;
-            }
-        } else if (norm.x == -1.0f) {
-            p3.y -= 0.1;
-            p4.y -= 0.1;
-
-            if (lowerBottom) {
-                p1.y -= 0.1;
-                p2.y -= 0.1;
-            }
-        } else if (norm.z == 1.0f) {
-            p3.y -= 0.1;
-            p4.y -= 0.1;
-
-            if (lowerBottom) {
-                p1.y -= 0.1;
-                p2.y -= 0.1;
-            }
-        } else if (norm.z == -1.0f) {
-            p1.y -= 0.1;
-            p2.y -= 0.1;
-
-            if (lowerBottom) {
-                p3.y -= 0.1;
-                p4.y -= 0.1;
-            }
-        } else if (norm.y == 1.0f) {
-            p1.y -= 0.1;
-            p2.y -= 0.1;
-            p3.y -= 0.1;
-            p4.y -= 0.1;
-        } else if (norm.y == -1.0f) {
-            if (lowerBottom) {
-                p1.y -= 0.1;
-                p2.y -= 0.1;
-                p3.y -= 0.1;
-                p4.y -= 0.1;
-            }
-        }
     }
 
     private void generateCactusSide(Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm) {

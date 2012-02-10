@@ -22,6 +22,9 @@ package org.terasology.utilities;
  */
 public final class Helper {
 
+    // Prevent instantiation
+    private Helper() {}
+
     /**
      * Returns true if the flag at the given byte position
      * is set.

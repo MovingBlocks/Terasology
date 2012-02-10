@@ -18,6 +18,7 @@ package org.terasology.model.blocks;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
+import org.terasology.math.Vector3i;
 import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.model.structures.AABB;
 import org.terasology.rendering.interfaces.RenderableObject;
@@ -33,6 +34,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -90,9 +92,15 @@ public class Block implements RenderableObject {
      * The six sides of a block.
      */
     public static enum SIDE {
-        TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM;
+        TOP(Vector3i.up()),
+        LEFT(new Vector3i(-1,0,0)),
+        RIGHT(new Vector3i(1,0,0)),
+        FRONT(new Vector3i(0,0,-1)), 
+        BACK(new Vector3i(0,0,1)), 
+        BOTTOM(Vector3i.down());
         
         private static EnumMap<SIDE, SIDE> reverseMap;
+        private static SIDE[] horizontalSides;
         
         static
         {
@@ -103,6 +111,24 @@ public class Block implements RenderableObject {
             reverseMap.put(FRONT, BACK);
             reverseMap.put(BACK, FRONT);
             reverseMap.put(BOTTOM, TOP);
+            horizontalSides = new SIDE[] {LEFT, RIGHT, FRONT, BACK};
+        }
+        
+        public static SIDE[] horizontalSides()
+        {
+            return horizontalSides;
+        }
+
+        private Vector3i vector3iDir;
+
+        private SIDE(Vector3i vector3i)
+        {
+            this.vector3iDir = vector3i;
+        }
+        
+        public Vector3i getVector3i()
+        {
+            return vector3iDir;
         }
         
         public SIDE reverse()
