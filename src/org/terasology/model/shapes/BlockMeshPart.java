@@ -1,6 +1,5 @@
 package org.terasology.model.shapes;
 
-import org.terasology.model.blocks.Block;
 import org.terasology.rendering.primitives.ChunkMesh;
 
 import javax.vecmath.Vector2f;
@@ -45,18 +44,25 @@ public class BlockMeshPart {
             chunk._vertexElements[meshBit].tex.add(1.0f);
         }
 
+        int nextIndex = chunk._vertexElements[meshBit].vertCount;
         for (int vIdx = 0; vIdx < _vertices.length; ++vIdx)
         {
             chunk._vertexElements[meshBit].color.add(colorOffset.x);
             chunk._vertexElements[meshBit].color.add(colorOffset.y);
             chunk._vertexElements[meshBit].color.add(colorOffset.z);
             chunk._vertexElements[meshBit].color.add(colorOffset.w);
-            chunk._vertexElements[meshBit].quads.add(_vertices[vIdx].x + offsetX);
-            chunk._vertexElements[meshBit].quads.add(_vertices[vIdx].y + offsetY);
-            chunk._vertexElements[meshBit].quads.add(_vertices[vIdx].z + offsetZ);
+            chunk._vertexElements[meshBit].vertices.add(_vertices[vIdx].x + offsetX);
+            chunk._vertexElements[meshBit].vertices.add(_vertices[vIdx].y + offsetY);
+            chunk._vertexElements[meshBit].vertices.add(_vertices[vIdx].z + offsetZ);
             chunk._vertexElements[meshBit].normals.add(_normals[vIdx].x);
             chunk._vertexElements[meshBit].normals.add(_normals[vIdx].y);
             chunk._vertexElements[meshBit].normals.add(_normals[vIdx].z);
+        }
+        chunk._vertexElements[meshBit].vertCount += _vertices.length;
+
+        for (int i = 0; i < _indices.length; ++i)
+        {
+            chunk._vertexElements[meshBit].indices.add(_indices[i] + nextIndex);
         }
     }
 }

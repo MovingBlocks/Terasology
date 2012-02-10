@@ -1,7 +1,10 @@
 package org.terasology.rendering.primitives;
 
 import com.bulletphysics.collision.shapes.IndexedMesh;
+import gnu.trove.list.TFloatList;
+import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
@@ -24,19 +27,23 @@ public class ChunkMesh {
     public class VertexElements {
 
         public VertexElements() {
+            vertCount = 0;
             normals = new TFloatArrayList();
-            quads = new TFloatArrayList();
+            vertices = new TFloatArrayList();
             tex = new TFloatArrayList();
             color = new TFloatArrayList();
+            indices = new TIntArrayList();
         }
 
-        public final TFloatArrayList normals;
-        public final TFloatArrayList quads;
-        public final TFloatArrayList tex;
-        public final TFloatArrayList color;
+        public final TFloatList normals;
+        public final TFloatList vertices;
+        public final TFloatList tex;
+        public final TFloatList color;
+        public final TIntList indices;
+        public int vertCount;
 
-        public FloatBuffer vertices;
-        public IntBuffer indices;
+        public FloatBuffer finalVertices;
+        public IntBuffer finalIndices;
     }
 
     /**
@@ -114,10 +121,10 @@ public class ChunkMesh {
                 if (!_disposed) {
                     _vertexBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
                     _idxBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
-                    _vertexCount[id] = _vertexElements[id].indices.limit();
+                    _vertexCount[id] = _vertexElements[id].finalIndices.limit();
 
-                    VertexBufferObjectManager.getInstance().bufferVboElementData(_idxBuffers[id], _vertexElements[id].indices, GL15.GL_STATIC_DRAW);
-                    VertexBufferObjectManager.getInstance().bufferVboData(_vertexBuffers[id], _vertexElements[id].vertices, GL15.GL_STATIC_DRAW);
+                    VertexBufferObjectManager.getInstance().bufferVboElementData(_idxBuffers[id], _vertexElements[id].finalIndices, GL15.GL_STATIC_DRAW);
+                    VertexBufferObjectManager.getInstance().bufferVboData(_vertexBuffers[id], _vertexElements[id].finalVertices, GL15.GL_STATIC_DRAW);
                 }
             } finally {
                 _lock.unlock();

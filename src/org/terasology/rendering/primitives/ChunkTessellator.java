@@ -17,19 +17,17 @@ package org.terasology.rendering.primitives;
 
 import com.bulletphysics.collision.shapes.IndexedMesh;
 import com.bulletphysics.collision.shapes.ScalarType;
+import gnu.trove.iterator.TFloatIterator;
+import gnu.trove.iterator.TIntIterator;
 import org.lwjgl.BufferUtils;
 import org.terasology.logic.world.Chunk;
-import org.terasology.math.Direction;
-import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.util.EnumMap;
 
 /**
  * Generates tessellated chunk meshes from chunks.
@@ -37,6 +35,9 @@ import java.util.EnumMap;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ChunkTessellator {
+    
+    private static final int FLOAT_BYTES = 4;
+    private static final int INT_BYTES = 4;
 
     private final Chunk _chunk;
     private static int _statVertexArrayUpdateCount = 0;
@@ -75,89 +76,77 @@ public final class ChunkTessellator {
 
     private void generateOptimizedBuffers(ChunkMesh mesh) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
-        /* BULLET PHYSICS */
-        mesh._indexedMesh = new IndexedMesh();
-        mesh._indexedMesh.vertexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
-        mesh._indexedMesh.triangleIndexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
-        mesh._indexedMesh.triangleIndexStride = 12;
-        mesh._indexedMesh.vertexStride = 12;
-        mesh._indexedMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
-        mesh._indexedMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
-        mesh._indexedMesh.indexType = ScalarType.INTEGER;
-        /* ------------- */
+
+        generateBulletBuffers(mesh);
 
         for (int j = 0; j < mesh._vertexElements.length; j++) {
-            mesh._vertexElements[j].vertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].quads.size() * 2 + mesh._vertexElements[j].tex.size() + mesh._vertexElements[j].color.size() + mesh._vertexElements[j].normals.size());
-            mesh._vertexElements[j].indices = BufferUtils.createIntBuffer(mesh._vertexElements[j].quads.size());
+            // Vertices double to account for light info
+            mesh._vertexElements[j].finalVertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].vertices.size() * 2 + mesh._vertexElements[j].tex.size() + mesh._vertexElements[j].color.size() + mesh._vertexElements[j].normals.size());
 
             int cTex = 0;
             int cColor = 0;
-            int cIndex = 0;
-            for (int i = 0; i < mesh._vertexElements[j].quads.size(); i += 3, cTex += 3, cColor += 4) {
+            for (int i = 0; i < mesh._vertexElements[j].vertices.size(); i += 3, cTex += 3, cColor += 4) {
 
-                if (i % 4 == 0) {
-                    mesh._vertexElements[j].indices.put(cIndex);
-                    mesh._vertexElements[j].indices.put(cIndex + 1);
-                    mesh._vertexElements[j].indices.put(cIndex + 2);
+                Vector3f vertexPos = new Vector3f(mesh._vertexElements[j].vertices.get(i), mesh._vertexElements[j].vertices.get(i + 1), mesh._vertexElements[j].vertices.get(i + 2));
 
-                    mesh._vertexElements[j].indices.put(cIndex + 2);
-                    mesh._vertexElements[j].indices.put(cIndex + 3);
-                    mesh._vertexElements[j].indices.put(cIndex);
+                mesh._vertexElements[j].finalVertices.put(vertexPos.x);
+                mesh._vertexElements[j].finalVertices.put(vertexPos.y);
+                mesh._vertexElements[j].finalVertices.put(vertexPos.z);
 
-                    /* BULLET PHYSICS */
-                    if (j == 0) {
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex);
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 1);
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 2);
-
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 2);
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 3);
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex);
-                    }
-                    /* ------------- */
-
-                    cIndex += 4;
-                }
-
-                Vector3f vertexPos = new Vector3f(mesh._vertexElements[j].quads.get(i), mesh._vertexElements[j].quads.get(i + 1), mesh._vertexElements[j].quads.get(i + 2));
-
-                mesh._vertexElements[j].vertices.put(vertexPos.x);
-                mesh._vertexElements[j].vertices.put(vertexPos.y);
-                mesh._vertexElements[j].vertices.put(vertexPos.z);
-
-                /* BULLET PHYSICS */
-                if (j == 0) {
-                    mesh._indexedMesh.vertexBase.putFloat(vertexPos.x);
-                    mesh._indexedMesh.vertexBase.putFloat(vertexPos.y);
-                    mesh._indexedMesh.vertexBase.putFloat(vertexPos.z);
-                }
-                /* ------------ */
-
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex + 2));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex + 2));
 
                 Double[] result = new Double[3];
                 calcLightingValuesForVertexPos(vertexPos, result);
 
-                mesh._vertexElements[j].vertices.put(result[0].floatValue());
-                mesh._vertexElements[j].vertices.put(result[1].floatValue());
-                mesh._vertexElements[j].vertices.put(result[2].floatValue());
+                mesh._vertexElements[j].finalVertices.put(result[0].floatValue());
+                mesh._vertexElements[j].finalVertices.put(result[1].floatValue());
+                mesh._vertexElements[j].finalVertices.put(result[2].floatValue());
 
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 1));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 2));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 3));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 1));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 2));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 3));
 
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].normals.get(i));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].normals.get(i + 1));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].normals.get(i + 2));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i + 1));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i + 2));
             }
 
-            mesh._vertexElements[j].vertices.flip();
-            mesh._vertexElements[j].indices.flip();
+            mesh._vertexElements[j].finalIndices = BufferUtils.createIntBuffer(mesh._vertexElements[j].indices.size());
+            TIntIterator indexIterator = mesh._vertexElements[j].indices.iterator();
+            while(indexIterator.hasNext())
+            {
+                mesh._vertexElements[j].finalIndices.put(indexIterator.next());
+            }
+
+            mesh._vertexElements[j].finalVertices.flip();
+            mesh._vertexElements[j].finalIndices.flip();
         }
         PerformanceMonitor.endActivity();
+    }
+
+    private void generateBulletBuffers(ChunkMesh mesh) {
+        mesh._indexedMesh = new IndexedMesh();
+        mesh._indexedMesh.vertexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].vertices.size() * FLOAT_BYTES);
+        mesh._indexedMesh.triangleIndexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].indices.size() * INT_BYTES);
+        mesh._indexedMesh.triangleIndexStride = 3 * INT_BYTES;
+        mesh._indexedMesh.vertexStride = 3 * FLOAT_BYTES;
+        mesh._indexedMesh.numVertices = mesh._vertexElements[0].vertices.size() / 3;
+        mesh._indexedMesh.numTriangles = mesh._vertexElements[0].indices.size() / 3;
+        mesh._indexedMesh.indexType = ScalarType.INTEGER;
+
+        TIntIterator indexIterator = mesh._vertexElements[0].indices.iterator();
+        while(indexIterator.hasNext())
+        {
+            mesh._indexedMesh.triangleIndexBase.putInt(indexIterator.next());
+        }
+        TFloatIterator vertIterator = mesh._vertexElements[0].vertices.iterator();
+        while(vertIterator.hasNext())
+        {
+            mesh._indexedMesh.vertexBase.putFloat(vertIterator.next());
+        }
     }
 
     private void calcLightingValuesForVertexPos(Vector3f vertexPos, Double[] output) {
