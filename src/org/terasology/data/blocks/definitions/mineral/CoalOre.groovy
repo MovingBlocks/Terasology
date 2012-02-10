@@ -5,4 +5,5 @@ package org.terasology.data.blocks.definitions.mineral
  */
 block {
     version = 1
+    shape = "cube"
 }

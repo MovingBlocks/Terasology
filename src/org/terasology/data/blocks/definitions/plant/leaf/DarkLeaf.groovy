@@ -8,7 +8,7 @@ import org.terasology.model.blocks.Block.COLOR_SOURCE
  */
 block {
     version = 1
-
+    shape = "Cube"
     faces.all = "GreenLeaf"
 
     hardness = 1

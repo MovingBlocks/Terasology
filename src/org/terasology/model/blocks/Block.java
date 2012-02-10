@@ -18,6 +18,8 @@ package org.terasology.model.blocks;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
+import org.terasology.math.Side;
+import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.model.structures.AABB;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
@@ -31,6 +33,7 @@ import javax.vecmath.Vector4f;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.EnumMap;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -58,7 +61,6 @@ public class Block implements IGameObject {
     protected boolean _invisible;
     protected boolean _penetrable;
     protected boolean _castsShadows;
-    protected boolean _disableTessellation;
     protected boolean _renderBoundingBox;
     protected boolean _allowBlockAttachment;
     protected boolean _bypassSelectionRay;
@@ -73,6 +75,12 @@ public class Block implements IGameObject {
 
     /* RENDERING */
     private Mesh _mesh;
+    private BlockMeshPart _centerMesh;
+    private EnumMap<Side, BlockMeshPart> _sideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
+    private boolean[] _fullSide = new boolean[6];
+
+    // For liquid handling
+    private EnumMap<Side, BlockMeshPart> _loweredSideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
 
     protected Vector4f[] _colorOffset = new Vector4f[6];
     protected Vector2f[] _textureAtlasPos = new Vector2f[6];
@@ -82,17 +90,10 @@ public class Block implements IGameObject {
     protected static BufferedImage _foliageLut;
 
     /**
-     * The six sides of a block.
-     */
-    public static enum SIDE {
-        TOP, LEFT, RIGHT, FRONT, BACK, BOTTOM
-    }
-
-    /**
      * Possible forms of blocks.
      */
     public static enum BLOCK_FORM {
-        DEFAULT, CACTUS, LOWERED_BLOCK, BILLBOARD
+        DEFAULT, LOWERED_BLOCK, BILLBOARD
     }
 
     /**
@@ -121,8 +122,8 @@ public class Block implements IGameObject {
         withTitle("Untitled block");
 
         for (int i = 0; i < 6; i++) {
-            withTextureAtlasPos(SIDE.values()[i], new Vector2f(0.0f, 0.0f));
-            withColorOffset(SIDE.values()[i], new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+            withTextureAtlasPos(Side.values()[i], new Vector2f(0.0f, 0.0f));
+            withColorOffset(Side.values()[i], new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         }
 
         // Load the default settings
@@ -137,7 +138,6 @@ public class Block implements IGameObject {
         withRenderBoundingBox(true);
         withHardness((byte) 3);
         withLuminance((byte) 0);
-        withDisableTessellation(false);
         withLiquid(false);
     }
 
@@ -180,7 +180,7 @@ public class Block implements IGameObject {
      * @param humidity    The humidity
      * @return The color offset
      */
-    public Vector4f calcColorOffsetFor(SIDE side, double temperature, double humidity) {
+    public Vector4f calcColorOffsetFor(Side side, double temperature, double humidity) {
         Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         if (getColorSource() == COLOR_SOURCE.COLOR_LUT)
@@ -204,7 +204,7 @@ public class Block implements IGameObject {
      * @param side The side of the block
      * @return The texture offset
      */
-    public Vector2f calcTextureOffsetFor(SIDE side) {
+    public Vector2f calcTextureOffsetFor(Side side) {
         return new Vector2f((int) getTextureAtlasPos()[side.ordinal()].x * TEXTURE_OFFSET, (int) getTextureAtlasPos()[side.ordinal()].y * TEXTURE_OFFSET);
     }
 
@@ -273,11 +273,6 @@ public class Block implements IGameObject {
         return this;
     }
 
-    public Block withDisableTessellation(boolean disableTessellation) {
-        _disableTessellation = disableTessellation;
-        return this;
-    }
-
     public Block withRenderBoundingBox(boolean renderBoundingBox) {
         _renderBoundingBox = renderBoundingBox;
         return this;
@@ -318,41 +313,65 @@ public class Block implements IGameObject {
         return this;
     }
 
-    public Block withColorOffset(SIDE side, Vector4f colorOffset) {
+    public Block withColorOffset(Side side, Vector4f colorOffset) {
         _colorOffset[side.ordinal()] = colorOffset;
         return this;
     }
 
-    public Block withTextureAtlasPos(SIDE side, Vector2f atlasPos) {
+    public Block withTextureAtlasPos(Side side, Vector2f atlasPos) {
         _textureAtlasPos[side.ordinal()] = atlasPos;
         return this;
     }
 
     public Block withTextureAtlasPosTopBottom(Vector2f atlasPos) {
-        _textureAtlasPos[SIDE.TOP.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.BOTTOM.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.TOP.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.BOTTOM.ordinal()] = atlasPos;
         return this;
     }
 
     public Block withTextureAtlasPos(Vector2f atlasPos) {
         for (int i = 0; i < 6; i++) {
-            withTextureAtlasPos(SIDE.values()[i], atlasPos);
+            withTextureAtlasPos(Side.values()[i], atlasPos);
         }
         return this;
     }
 
     public Block withTextureAtlasPosMantle(Vector2f atlasPos) {
-        _textureAtlasPos[SIDE.LEFT.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.RIGHT.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.FRONT.ordinal()] = atlasPos;
-        _textureAtlasPos[SIDE.BACK.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.LEFT.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.RIGHT.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.FRONT.ordinal()] = atlasPos;
+        _textureAtlasPos[Side.BACK.ordinal()] = atlasPos;
         return this;
     }
 
     public Block withColorOffset(Vector4f colorOffset) {
         for (int i = 0; i < 6; i++) {
-            withColorOffset(SIDE.values()[i], colorOffset);
+            withColorOffset(Side.values()[i], colorOffset);
         }
+        return this;
+    }
+    
+    public Block withCenterMesh(BlockMeshPart meshPart)
+    {
+        _centerMesh = meshPart;
+        return this;
+    }
+
+    public Block withSideMesh(Side side, BlockMeshPart meshPart)
+    {
+        _sideMesh.put(side, meshPart);
+        return this;
+    }
+
+    public Block withLoweredSideMesh(Side side, BlockMeshPart meshPart)
+    {
+        _loweredSideMesh.put(side, meshPart);
+        return this;
+    }
+    
+    public Block withFullSide(Side side, boolean full)
+    {
+        _fullSide[side.ordinal()] = full;
         return this;
     }
 
@@ -383,6 +402,26 @@ public class Block implements IGameObject {
     public byte getId() {
         return _id;
     }
+    
+    public boolean isBlockingSide(Side side)
+    {
+        return _fullSide[side.ordinal()];
+    }
+    
+    public BlockMeshPart getSideMesh(Side side)
+    {
+        return _sideMesh.get(side);
+    }
+
+    public BlockMeshPart getCenterMesh()
+    {
+        return _centerMesh;
+    }
+
+    public BlockMeshPart getLoweredSideMesh(Side side)
+    {
+        return _loweredSideMesh.get(side);
+    }
 
     public boolean isInvisible() {
         return _invisible;
@@ -394,10 +433,6 @@ public class Block implements IGameObject {
 
     public boolean isCastsShadows() {
         return _castsShadows;
-    }
-
-    public boolean isDisableTessellation() {
-        return _disableTessellation;
     }
 
     public boolean isRenderBoundingBox() {

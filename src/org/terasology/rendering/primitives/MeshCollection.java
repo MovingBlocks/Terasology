@@ -1,6 +1,7 @@
 package org.terasology.rendering.primitives;
 
 
+import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 
 import javax.vecmath.Vector2f;
@@ -119,7 +120,7 @@ public class MeshCollection {
 
         for (int i = 0; i < 6; i++) {
             sizes[i] = new Vector2f(Block.TEXTURE_OFFSET_WIDTH, Block.TEXTURE_OFFSET_WIDTH);
-            offsets[i] = new Vector2f(block.calcTextureOffsetFor(Block.SIDE.values()[i]));
+            offsets[i] = new Vector2f(block.calcTextureOffsetFor(Side.values()[i]));
         }
 
         addBlockMesh(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), offsets, sizes, size, light1, light2, 0, 0, 0);
@@ -150,22 +151,22 @@ public class MeshCollection {
         Tessellator.getInstance().resetParams();
         Tessellator.getInstance().setColor(new Vector4f(light1, light1, light1, 1.0f));
 
-        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Block.SIDE.LEFT).x, block.calcTextureOffsetFor(Block.SIDE.LEFT).y + Block.TEXTURE_OFFSET_WIDTH));
+        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Side.LEFT).x, block.calcTextureOffsetFor(Side.LEFT).y + Block.TEXTURE_OFFSET_WIDTH));
         Tessellator.getInstance().addVertex(new Vector3f(0f, -sizeHalf, -sizeHalf));
-        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Block.SIDE.LEFT).x + Block.TEXTURE_OFFSET_WIDTH, block.calcTextureOffsetFor(Block.SIDE.LEFT).y + Block.TEXTURE_OFFSET_WIDTH));
+        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Side.LEFT).x + Block.TEXTURE_OFFSET_WIDTH, block.calcTextureOffsetFor(Side.LEFT).y + Block.TEXTURE_OFFSET_WIDTH));
         Tessellator.getInstance().addVertex(new Vector3f(0f, -sizeHalf, sizeHalf));
-        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Block.SIDE.LEFT).x + Block.TEXTURE_OFFSET_WIDTH, block.calcTextureOffsetFor(Block.SIDE.LEFT).y));
+        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Side.LEFT).x + Block.TEXTURE_OFFSET_WIDTH, block.calcTextureOffsetFor(Side.LEFT).y));
         Tessellator.getInstance().addVertex(new Vector3f(0f, sizeHalf, sizeHalf));
-        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Block.SIDE.LEFT).x, block.calcTextureOffsetFor(Block.SIDE.LEFT).y));
+        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Side.LEFT).x, block.calcTextureOffsetFor(Side.LEFT).y));
         Tessellator.getInstance().addVertex(new Vector3f(0f, sizeHalf, -sizeHalf));
 
-        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Block.SIDE.BACK).x, block.calcTextureOffsetFor(Block.SIDE.BACK).y + Block.TEXTURE_OFFSET_WIDTH));
+        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Side.BACK).x, block.calcTextureOffsetFor(Side.BACK).y + Block.TEXTURE_OFFSET_WIDTH));
         Tessellator.getInstance().addVertex(new Vector3f(-sizeHalf, -sizeHalf, 0f));
-        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Block.SIDE.BACK).x + Block.TEXTURE_OFFSET_WIDTH, block.calcTextureOffsetFor(Block.SIDE.BACK).y + Block.TEXTURE_OFFSET_WIDTH));
+        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Side.BACK).x + Block.TEXTURE_OFFSET_WIDTH, block.calcTextureOffsetFor(Side.BACK).y + Block.TEXTURE_OFFSET_WIDTH));
         Tessellator.getInstance().addVertex(new Vector3f(sizeHalf, -sizeHalf, 0f));
-        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Block.SIDE.BACK).x + Block.TEXTURE_OFFSET_WIDTH, block.calcTextureOffsetFor(Block.SIDE.BACK).y));
+        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Side.BACK).x + Block.TEXTURE_OFFSET_WIDTH, block.calcTextureOffsetFor(Side.BACK).y));
         Tessellator.getInstance().addVertex(new Vector3f(sizeHalf, sizeHalf, 0f));
-        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Block.SIDE.BACK).x, block.calcTextureOffsetFor(Block.SIDE.BACK).y));
+        Tessellator.getInstance().setTex(new Vector2f(block.calcTextureOffsetFor(Side.BACK).x, block.calcTextureOffsetFor(Side.BACK).y));
         Tessellator.getInstance().addVertex(new Vector3f(-sizeHalf, sizeHalf, 0f));
     }
 }

@@ -6,4 +6,5 @@ package org.terasology.data.blocks.definitions
 block {
     // Serialization
     version = 1
+    shape = "cube"
 }

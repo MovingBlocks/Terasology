@@ -44,7 +44,7 @@ public class ChunkTessellatorPerformanceTest {
     {
         IWorldProvider worldProv = new LocalWorldProvider("Test", "ohnomelons");
         long totalTime = 0;
-        PerformanceMonitor.setEnabled(true);
+        PerformanceMonitor.setEnabled(false);
         for (int x = -1; x < 2; ++x)
         {
             for (int z = -1; z < 7; ++z)

@@ -19,6 +19,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 
@@ -82,7 +83,7 @@ public class BlockParticle extends Particle {
 
         // Apply biome and overall color offset
         FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
-        Vector4f color = BlockManager.getInstance().getBlock(_blockType).calcColorOffsetFor(Block.SIDE.FRONT, _parent.getParent().getActiveTemperature(), _parent.getParent().getActiveHumidity());
+        Vector4f color = BlockManager.getInstance().getBlock(_blockType).calcColorOffsetFor(Side.FRONT, _parent.getParent().getActiveTemperature(), _parent.getParent().getActiveHumidity());
         colorBuffer.put(color.x);
         colorBuffer.put(color.y);
         colorBuffer.put(color.z);
@@ -104,16 +105,16 @@ public class BlockParticle extends Particle {
         Block b = BlockManager.getInstance().getBlock(_blockType);
 
         glBegin(GL_QUADS);
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x, b.calcTextureOffsetFor(Block.SIDE.FRONT).y);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Side.FRONT).x, b.calcTextureOffsetFor(Side.FRONT).y);
         GL11.glVertex3f(-0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x + TEX_SIZE, b.calcTextureOffsetFor(Block.SIDE.FRONT).y);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Side.FRONT).x + TEX_SIZE, b.calcTextureOffsetFor(Side.FRONT).y);
         GL11.glVertex3f(0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x + TEX_SIZE, b.calcTextureOffsetFor(Block.SIDE.FRONT).y + TEX_SIZE);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Side.FRONT).x + TEX_SIZE, b.calcTextureOffsetFor(Side.FRONT).y + TEX_SIZE);
         GL11.glVertex3f(0.5f, 0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Block.SIDE.FRONT).x, b.calcTextureOffsetFor(Block.SIDE.FRONT).y + TEX_SIZE);
+        GL11.glTexCoord2f(b.calcTextureOffsetFor(Side.FRONT).x, b.calcTextureOffsetFor(Side.FRONT).y + TEX_SIZE);
         GL11.glVertex3f(-0.5f, 0.5f, 0.0f);
         glEnd();
 

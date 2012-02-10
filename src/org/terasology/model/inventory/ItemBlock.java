@@ -22,6 +22,7 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
+import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 
@@ -82,7 +83,7 @@ public class ItemBlock extends Item {
 
         // Apply biome and overall color offset
         FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
-        Vector4f color = activeBlock.calcColorOffsetFor(Block.SIDE.FRONT, Terasology.getInstance().getActiveWorldRenderer().getActiveTemperature(), Terasology.getInstance().getActiveWorldRenderer().getActiveTemperature());
+        Vector4f color = activeBlock.calcColorOffsetFor(Side.FRONT, Terasology.getInstance().getActiveWorldRenderer().getActiveTemperature(), Terasology.getInstance().getActiveWorldRenderer().getActiveTemperature());
         colorBuffer.put(color.x);
         colorBuffer.put(color.y);
         colorBuffer.put(color.z);

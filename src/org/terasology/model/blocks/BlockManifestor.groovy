@@ -19,14 +19,16 @@ package org.terasology.model.blocks
 import java.awt.Graphics
 import java.awt.Image
 import java.awt.image.BufferedImage
-import java.util.jar.JarEntry
-import java.util.jar.JarFile
+
 import javax.imageio.ImageIO
 import javax.vecmath.Vector2f
 import javax.vecmath.Vector4f
-import org.newdawn.slick.util.ResourceLoader
+
 import org.terasology.logic.manager.TextureManager
 import org.terasology.utilities.ClasspathResourceLoader
+import org.terasology.model.shapes.BlockShape
+import org.terasology.model.shapes.BlockShapeManager
+import org.terasology.math.Side
 import groovy.util.logging.Log
 
 /**
@@ -152,8 +154,6 @@ class BlockManifestor {
         _bm.addAllBlocks(_blockIndex)
         log.info "_imageManifest file: " + _imageManifest.getAbsolutePath()
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
-        // Hacky hacky hack hack!
-        //System.exit(0)
     }
 
     /**
@@ -239,15 +239,22 @@ class BlockManifestor {
         println "Default image returns: " + _imageIndex.get(c.name)
 
         def textureId = _imageIndex.get(c.name)
+        
+        Vector2f centerTexturePos;
 
-        if (textureId != null)
+        if (textureId != null) {
             b.withTextureAtlasPos(calcAtlasPositionForId(textureId))
+            centerTexturePos = calcAtlasPositionForId(textureId)
+        }
 
         // Then look for each more specific assignment and overwrite defaults where needed
         if (c.block.faces.all != [:]) {
             println "Setting Block " + c.name + " to texture " + c.block.faces.all + " for all"
             b.withTextureAtlasPos(calcAtlasPositionForId(_imageIndex.get(c.block.faces.all)))
+            centerTexturePos = calcAtlasPositionForId(_imageIndex.get(c.block.faces.all))
         }
+        if (c.block.faces.center != [:])
+            centerTexturePos = calcAtlasPositionForId(_imageIndex.get(c.block.faces.center))
         if (c.block.faces.sides != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.sides + " for sides"
             b.withTextureAtlasPosMantle(calcAtlasPositionForId(_imageIndex.get(c.block.faces.sides)))
@@ -259,29 +266,52 @@ class BlockManifestor {
         // Top, Bottom, Left, Right, Front, Back - probably a way to do that in a loop...
         if (c.block.faces.top != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.top + " for top"
-            b.withTextureAtlasPos(Block.SIDE.TOP, calcAtlasPositionForId(_imageIndex.get(c.block.faces.top)))
+            b.withTextureAtlasPos(Side.TOP, calcAtlasPositionForId(_imageIndex.get(c.block.faces.top)))
         }
         if (c.block.faces.bottom != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.bottom + " for bottom"
-            b.withTextureAtlasPos(Block.SIDE.BOTTOM, calcAtlasPositionForId(_imageIndex.get(c.block.faces.bottom)))
+            b.withTextureAtlasPos(Side.BOTTOM, calcAtlasPositionForId(_imageIndex.get(c.block.faces.bottom)))
         }
         if (c.block.faces.left != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.left + " for left"
-            b.withTextureAtlasPos(Block.SIDE.LEFT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.left)))
+            b.withTextureAtlasPos(Side.LEFT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.left)))
         }
         if (c.block.faces.right != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.right + " for right"
-            b.withTextureAtlasPos(Block.SIDE.RIGHT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.right)))
+            b.withTextureAtlasPos(Side.RIGHT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.right)))
         }
         if (c.block.faces.front != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.front + " for front"
-            b.withTextureAtlasPos(Block.SIDE.FRONT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.front)))
+            b.withTextureAtlasPos(Side.FRONT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.front)))
         }
         if (c.block.faces.back != [:]) {
             println "Setting Block " + c.name + " to " + c.block.faces.back + " for back"
-            b.withTextureAtlasPos(Block.SIDE.BACK, calcAtlasPositionForId(_imageIndex.get(c.block.faces.back)))
+            b.withTextureAtlasPos(Side.BACK, calcAtlasPositionForId(_imageIndex.get(c.block.faces.back)))
         }
         println "Faces are (L, R, T, B, F, B): " + b.getTextureAtlasPos()
+
+        BlockShape shape;
+        if (c.block.shape != [:])
+        {
+            shape = BlockShapeManager.getInstance().getBlockShape(c.block.shape);
+        }
+        if (shape != null)
+        {
+            println "Has shape: " + c.block.shape;
+            if (shape.getCenterMesh() != null)
+            {
+                b.withCenterMesh(shape.getCenterMesh().mapTexCoords(new Vector2f((float)(Block.TEXTURE_OFFSET * centerTexturePos.x), (float)(Block.TEXTURE_OFFSET * centerTexturePos.y)), Block.TEXTURE_OFFSET_WIDTH));
+            }
+
+            for (Side side : Side.values())
+            {
+                if (shape.getSideMesh(side) != null)
+                {
+                    b.withSideMesh(side, shape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
+                }
+                b.withFullSide(side, shape.isBlockingSide(side));
+            }
+        }
 
         // *** BLOCK_FORM and COLOR_SOURCE enums (defined explicitly in block definition, not needed here)
         if (c.block.blockform != [:]) {
@@ -304,9 +334,8 @@ class BlockManifestor {
             println "Setting invisible boolean to: " + c.block.invisible
             b.withInvisible((boolean) c.block.invisible)
         }
-        // TODO: Check what's up with waving/invisible together? Not fully updated println ?
         if (c.block.waving != [:]) {
-            println "Setting invisible boolean to: " + c.block.invisible
+            println "Setting waving boolean to: " + c.block.waving
             b.withWaving((boolean) c.block.waving)
         }
         if (c.block.penetrable != [:]) {
@@ -316,10 +345,6 @@ class BlockManifestor {
         if (c.block.castsShadows != [:]) {
             println "Setting castsShadows boolean to: " + c.block.castsShadows
             b.withCastsShadows((boolean) c.block.castsShadows)
-        }
-        if (c.block.disableTessellation != [:]) {
-            println "Setting disableTessellation boolean to: " + c.block.disableTessellation
-            b.withDisableTessellation((boolean) c.block.disableTessellation)
         }
         if (c.block.renderBoundingBox != [:]) {
             println "Setting renderBoundingBox boolean to: " + c.block.renderBoundingBox
@@ -333,10 +358,23 @@ class BlockManifestor {
             println "Setting bypassSelectionRay boolean to: " + c.block.bypassSelectionRay
             b.withBypassSelectionRay((boolean) c.block.bypassSelectionRay)
         }
-        //TODO: Move liquid to LiquidBlock rather than a Block boolean? Tho might be nice to have all basics in Block
-        if (c.block.liquid != [:]) {
-            println "Setting liquid boolean to: " + c.block.liquid
-            b.withLiquid((boolean) c.block.liquid)
+        if (c.block.loweredShape != [:]) {
+            BlockShape loweredShape;
+            if (c.block.loweredShape != [:])
+            {
+                loweredShape = BlockShapeManager.getInstance().getBlockShape(c.block.loweredShape);
+            }
+            if (loweredShape != null)
+            {
+                println "Has lowered shape: " + c.block.loweredShape;
+                for (Side side : Side.values())
+                {
+                    if (loweredShape.getSideMesh(side) != null)
+                    {
+                        b.withLoweredSideMesh(side, loweredShape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
+                    }
+                }
+            }
         }
 
         // *** MISC

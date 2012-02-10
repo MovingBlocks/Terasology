@@ -743,7 +743,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * @param type The type of vertices to render
      * @return True if rendered
      */
-    public void render(ChunkMesh.RENDER_TYPE type) {
+    public void render(ChunkMesh.RENDER_PHASE type) {
         if (isReadyForRendering()) {
             GL11.glPushMatrix();
             

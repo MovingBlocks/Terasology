@@ -1,7 +1,10 @@
 package org.terasology.model.shapes;
 
+import org.terasology.rendering.primitives.ChunkMesh;
+
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 import java.util.Arrays;
 
 /**
@@ -22,5 +25,44 @@ public class BlockMeshPart {
         _texCoords = Arrays.copyOf(texCoords, texCoords.length);
         _indices = Arrays.copyOf(indices, indices.length);
     }
-    
+
+    public BlockMeshPart mapTexCoords(Vector2f offset, float width)
+    {
+        Vector2f[] newTexCoords = new Vector2f[_texCoords.length];
+        for (int i = 0; i < newTexCoords.length; ++i) {
+            newTexCoords[i] = new Vector2f(offset.x + _texCoords[i].x * width, offset.y + _texCoords[i].y * width);
+        }
+        return new BlockMeshPart(_vertices, _normals, newTexCoords, _indices);
+    }
+
+    public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, Vector4f colorOffset, int meshBit)
+    {
+        for (Vector2f texCoord : _texCoords)
+        {
+            chunk._vertexElements[meshBit].tex.add(texCoord.x);
+            chunk._vertexElements[meshBit].tex.add(texCoord.y);
+            chunk._vertexElements[meshBit].tex.add(1.0f);
+        }
+
+        int nextIndex = chunk._vertexElements[meshBit].vertCount;
+        for (int vIdx = 0; vIdx < _vertices.length; ++vIdx)
+        {
+            chunk._vertexElements[meshBit].color.add(colorOffset.x);
+            chunk._vertexElements[meshBit].color.add(colorOffset.y);
+            chunk._vertexElements[meshBit].color.add(colorOffset.z);
+            chunk._vertexElements[meshBit].color.add(colorOffset.w);
+            chunk._vertexElements[meshBit].vertices.add(_vertices[vIdx].x + offsetX);
+            chunk._vertexElements[meshBit].vertices.add(_vertices[vIdx].y + offsetY);
+            chunk._vertexElements[meshBit].vertices.add(_vertices[vIdx].z + offsetZ);
+            chunk._vertexElements[meshBit].normals.add(_normals[vIdx].x);
+            chunk._vertexElements[meshBit].normals.add(_normals[vIdx].y);
+            chunk._vertexElements[meshBit].normals.add(_normals[vIdx].z);
+        }
+        chunk._vertexElements[meshBit].vertCount += _vertices.length;
+
+        for (int i = 0; i < _indices.length; ++i)
+        {
+            chunk._vertexElements[meshBit].indices.add(_indices[i] + nextIndex);
+        }
+    }
 }
