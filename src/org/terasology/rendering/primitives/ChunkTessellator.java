@@ -230,7 +230,6 @@ public final class ChunkTessellator {
     }
 
     private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
-        PerformanceMonitor.startActivity("GenerateBlock");
         byte blockId = _chunk.getBlock(x, y, z);
         Block block = BlockManager.getInstance().getBlock(blockId);
 
@@ -276,10 +275,24 @@ public final class ChunkTessellator {
                 drawDir[side.ordinal()] |= isSideVisibleForBlockTypes(blockToCheckId, blockId, side);
             }
             
-            // Draw the top if below a non-lowered block (this can be a bit weird if it is just a single solid block under water
-            // TODO: Address water top visible below a single solid block jutting down into water.
+            // Draw the top if below a non-lowered block
+            // TODO: Don't need to render the top if each side and the block above each side are either liquid or opaque solids.
             byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
             drawDir[Block.SIDE.TOP.ordinal()] |= (BlockManager.getInstance().getBlock(blockToCheckId).getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+
+            byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
+            if (BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0)
+            {
+                for (Block.SIDE dir : Block.SIDE.values())
+                {
+                    if (drawDir[dir.ordinal()])
+                    {
+                        Vector4f colorOffset = block.calcColorOffsetFor(dir, temp, hum);
+                        generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getLoweredSideMesh(dir), renderType, blockForm);
+                    }
+                }
+                return;
+            }
         }
 
         for (Block.SIDE dir : Block.SIDE.values())
@@ -290,11 +303,9 @@ public final class ChunkTessellator {
                 generateVerticesForBlockSide(mesh, x, y, z, colorOffset, block.getSideMesh(dir), renderType, blockForm);
             }
         }
-        PerformanceMonitor.endActivity();
     }
 
     private void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector4f colorOffset, BlockMeshPart meshPart, ChunkMesh.RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
-        PerformanceMonitor.startActivity("GenerateBlockSide");
         int vertexElementsId = 0;
 
         switch (renderType) {
@@ -311,21 +322,7 @@ public final class ChunkTessellator {
             vertexElementsId = 2;
         }
 
-/*
-        switch (blockForm) {
-            case CACTUS:
-                generateCactusSide(p1, p2, p3, p4, norm);
-                break;
-            case LOWERED_BLOCK:
-                generateLoweredBlock(x, y, z, p1, p2, p3, p4, norm);
-                break;
-        }
-*/
-        if (meshPart != null)
-        {
-            meshPart.appendTo(mesh, x, y, z, colorOffset, vertexElementsId);
-        }
-        PerformanceMonitor.endActivity();
+        meshPart.appendTo(mesh, x, y, z, colorOffset, vertexElementsId);
     }
 
     private Vector3f moveVectorFromChunkSpaceToWorldSpace(Vector3f offset) {
@@ -340,28 +337,6 @@ public final class ChunkTessellator {
         return offset;
     }
 
-    private void generateLoweredBlock(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm) {
-        byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
-
-        // TODO: use this as switch between mesh parts
-        boolean lowerBottom = BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0;
-
-    }
-
-    private void generateCactusSide(Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm) {
-        if (norm.x == 1.0f || norm.x == -1.0f) {
-            p1.x -= 0.0625 * norm.x;
-            p2.x -= 0.0625 * norm.x;
-            p3.x -= 0.0625 * norm.x;
-            p4.x -= 0.0625 * norm.x;
-        } else if (norm.z == 1.0f || norm.z == -1.0f) {
-            p1.z -= 0.0625 * norm.z;
-            p2.z -= 0.0625 * norm.z;
-            p3.z -= 0.0625 * norm.z;
-            p4.z -= 0.0625 * norm.z;
-        }
-    }
-
     /**
      * Returns true if the side should be rendered adjacent to the second side provided.
      *
@@ -370,18 +345,10 @@ public final class ChunkTessellator {
      * @return True if the side is visible for the given block types
      */
     private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock, Block.SIDE side) {
-        PerformanceMonitor.startActivity("CheckSideVisibility");
-        Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
-
-        try
-        {
-            return bCheck.getId() == 0x0 || !bCheck.isBlockingSide(side.reverse()) || cBlock.isDisableTessellation() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || !cBlock.isTranslucent() && bCheck.isTranslucent() || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
-        }
-        finally
-        {
-            PerformanceMonitor.endActivity();
-        }
+        if (cBlock.getSideMesh(side) == null) return false;
+        Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
+        return bCheck.getId() == 0x0 || !bCheck.isBlockingSide(side.reverse()) || !cBlock.isTranslucent() && bCheck.isTranslucent() || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
     }
 
     public static int getVertexArrayUpdateCount() {

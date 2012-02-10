@@ -311,9 +311,8 @@ class BlockManifestor {
             println "Setting invisible boolean to: " + c.block.invisible
             b.withInvisible((boolean) c.block.invisible)
         }
-        // TODO: Check what's up with waving/invisible together? Not fully updated println ?
         if (c.block.waving != [:]) {
-            println "Setting invisible boolean to: " + c.block.invisible
+            println "Setting waving boolean to: " + c.block.waving
             b.withWaving((boolean) c.block.waving)
         }
         if (c.block.penetrable != [:]) {
@@ -323,10 +322,6 @@ class BlockManifestor {
         if (c.block.castsShadows != [:]) {
             println "Setting castsShadows boolean to: " + c.block.castsShadows
             b.withCastsShadows((boolean) c.block.castsShadows)
-        }
-        if (c.block.disableTessellation != [:]) {
-            println "Setting disableTessellation boolean to: " + c.block.disableTessellation
-            b.withDisableTessellation((boolean) c.block.disableTessellation)
         }
         if (c.block.renderBoundingBox != [:]) {
             println "Setting renderBoundingBox boolean to: " + c.block.renderBoundingBox
@@ -340,10 +335,23 @@ class BlockManifestor {
             println "Setting bypassSelectionRay boolean to: " + c.block.bypassSelectionRay
             b.withBypassSelectionRay((boolean) c.block.bypassSelectionRay)
         }
-        //TODO: Move liquid to LiquidBlock rather than a Block boolean? Tho might be nice to have all basics in Block
-        if (c.block.liquid != [:]) {
-            println "Setting liquid boolean to: " + c.block.liquid
-            b.withLiquid((boolean) c.block.liquid)
+        if (c.block.loweredShape != [:]) {
+            BlockShape loweredShape;
+            if (c.block.loweredShape != [:])
+            {
+                loweredShape = BlockShapeManager.getInstance().getBlockShape(c.block.loweredShape);
+            }
+            if (loweredShape != null)
+            {
+                println "Has lowered shape: " + c.block.loweredShape;
+                for (Block.SIDE side : Block.SIDE.values())
+                {
+                    if (loweredShape.getSideMesh(side) != null)
+                    {
+                        b.withLoweredSideMesh(side, loweredShape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
+                    }
+                }
+            }
         }
 
         // *** MISC

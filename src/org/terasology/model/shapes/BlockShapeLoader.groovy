@@ -96,6 +96,7 @@ final class BlockShapeLoader {
         Vector3f[] normals = new Vector3f[meshConfig.vertices.size()];
         meshConfig.normals.eachWithIndex() { n, index ->
             normals[index] = new Vector3f(n[0], n[1], n[2]);
+            normals[index].normalize();
         }
         Vector2f[] texCoords = new Vector2f[meshConfig.texcoords.size()];
         meshConfig.texcoords.eachWithIndex() { uv, index -> 

@@ -62,7 +62,6 @@ public class Block implements RenderableObject {
     protected boolean _invisible;
     protected boolean _penetrable;
     protected boolean _castsShadows;
-    protected boolean _disableTessellation;
     protected boolean _renderBoundingBox;
     protected boolean _allowBlockAttachment;
     protected boolean _bypassSelectionRay;
@@ -80,6 +79,9 @@ public class Block implements RenderableObject {
     private BlockMeshPart _centerMesh;
     private EnumMap<Block.SIDE, BlockMeshPart> _sideMesh = new EnumMap<SIDE, BlockMeshPart>(SIDE.class);
     private boolean[] _fullSide = new boolean[6];
+
+    // For liquid handling
+    private EnumMap<Block.SIDE, BlockMeshPart> _loweredSideMesh = new EnumMap<SIDE, BlockMeshPart>(SIDE.class);
 
     protected Vector4f[] _colorOffset = new Vector4f[6];
     protected Vector2f[] _textureAtlasPos = new Vector2f[6];
@@ -186,7 +188,6 @@ public class Block implements RenderableObject {
         withRenderBoundingBox(true);
         withHardness((byte) 3);
         withLuminance((byte) 0);
-        withDisableTessellation(false);
         withLiquid(false);
     }
 
@@ -322,11 +323,6 @@ public class Block implements RenderableObject {
         return this;
     }
 
-    public Block withDisableTessellation(boolean disableTessellation) {
-        _disableTessellation = disableTessellation;
-        return this;
-    }
-
     public Block withRenderBoundingBox(boolean renderBoundingBox) {
         _renderBoundingBox = renderBoundingBox;
         return this;
@@ -416,6 +412,12 @@ public class Block implements RenderableObject {
         _sideMesh.put(side, meshPart);
         return this;
     }
+
+    public Block withLoweredSideMesh(SIDE side, BlockMeshPart meshPart)
+    {
+        _loweredSideMesh.put(side, meshPart);
+        return this;
+    }
     
     public Block withFullSide(SIDE side, boolean full)
     {
@@ -466,6 +468,11 @@ public class Block implements RenderableObject {
         return _centerMesh;
     }
 
+    public BlockMeshPart getLoweredSideMesh(SIDE side)
+    {
+        return _loweredSideMesh.get(side);
+    }
+
     public boolean isInvisible() {
         return _invisible;
     }
@@ -476,10 +483,6 @@ public class Block implements RenderableObject {
 
     public boolean isCastsShadows() {
         return _castsShadows;
-    }
-
-    public boolean isDisableTessellation() {
-        return _disableTessellation;
     }
 
     public boolean isRenderBoundingBox() {
