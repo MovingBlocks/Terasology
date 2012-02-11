@@ -10,6 +10,7 @@ public class MeshFactory {
 
     /* SINGLETON */
     private static MeshFactory _instance;
+    private Tessellator tessellator = new Tessellator();
 
     public static MeshFactory getInstance() {
         if (_instance == null)
@@ -22,6 +23,7 @@ public class MeshFactory {
     }
 
     public Mesh generateItemMesh(int posX, int posY) {
+
         TextureManager.Texture tex = TextureManager.getInstance().getTexture("items");
         ByteBuffer buffer = tex.data;
 
@@ -38,13 +40,13 @@ public class MeshFactory {
                 int a = buffer.get((posY + y) * stride + (posX + x) * 4 + 3) & 255;
 
                 if (a != 0) {
-                    MeshCollection.addBlockMesh(new Vector4f(r / 255f, g / 255f, b / 255f, 1.0f), 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * x - 1f / 2f, 2f * 0.0625f * (16 - y) - 1f, 0f);
+                    TessellatorHelper.addBlockMesh(tessellator, new Vector4f(r / 255f, g / 255f, b / 255f, 1.0f), 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * x - 1f / 2f, 2f * 0.0625f * (16 - y) - 1f, 0f);
                 }
             }
         }
 
-        Mesh result = Tessellator.getInstance().generateMesh();
-        Tessellator.getInstance().resetAll();
+        Mesh result = tessellator.generateMesh();
+        tessellator.resetAll();
 
         return result;
     }

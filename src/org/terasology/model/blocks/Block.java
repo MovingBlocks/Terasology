@@ -23,7 +23,6 @@ import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.model.structures.AABB;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.MeshCollection;
 import org.terasology.rendering.primitives.Tessellator;
 
 import javax.imageio.ImageIO;
@@ -52,6 +51,18 @@ public class Block implements IGameObject {
     public static final int ATLAS_ELEMENTS_PER_ROW_AND_COLUMN = ATLAS_SIZE_IN_PX / TEXTURE_SIZE_IN_PX;
     public static final float TEXTURE_OFFSET = 0.0625f;
     public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
+    
+    private static final EnumMap<Side, Float> DIRECTION_LIT_LEVEL = new EnumMap<Side, Float>(Side.class);
+    
+    static
+    {
+        DIRECTION_LIT_LEVEL.put(Side.TOP, 0.9f);
+        DIRECTION_LIT_LEVEL.put(Side.BOTTOM, 0.9f);
+        DIRECTION_LIT_LEVEL.put(Side.FRONT, 1.0f);
+        DIRECTION_LIT_LEVEL.put(Side.BACK, 1.0f);
+        DIRECTION_LIT_LEVEL.put(Side.LEFT, 0.75f);
+        DIRECTION_LIT_LEVEL.put(Side.RIGHT, 0.75f);
+    }
 
     /* PROPERTIES */
     protected byte _id = 0x0;
@@ -213,16 +224,23 @@ public class Block implements IGameObject {
             return;
 
         if (_mesh == null) {
-            if (getBlockForm() == BLOCK_FORM.BILLBOARD) {
-                MeshCollection.addBillboardMesh(this, 1.0f, 1.0f);
-                _mesh = Tessellator.getInstance().generateMesh();
-            } else {
-                MeshCollection.addBlockMesh(this, 1.0f, 1.0f, 0.9f);
-                _mesh = Tessellator.getInstance().generateMesh();
-
+            Tessellator tessellator = new Tessellator();
+            tessellator.setColor(new Vector4f(1, 1, 1, 1));
+            if (_centerMesh != null)
+            {
+                tessellator.addMeshPart(_centerMesh);
             }
-
-            Tessellator.getInstance().resetAll();
+            for (Side dir : Side.values())
+            {
+                BlockMeshPart part = _sideMesh.get(dir);
+                if (part != null)
+                {
+                    float lightLevel = DIRECTION_LIT_LEVEL.get(dir);
+                    tessellator.setColor(new Vector4f(lightLevel, lightLevel, lightLevel, lightLevel));
+                    tessellator.addMeshPart(part);
+                }
+            }
+            _mesh = tessellator.generateMesh();
         }
 
         if (getBlockForm() != BLOCK_FORM.BILLBOARD) {

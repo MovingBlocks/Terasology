@@ -25,6 +25,36 @@ public class BlockMeshPart {
         _texCoords = Arrays.copyOf(texCoords, texCoords.length);
         _indices = Arrays.copyOf(indices, indices.length);
     }
+    
+    public int size()
+    {
+        return _vertices.length;
+    }
+    
+    public int indicesSize()
+    {
+        return _indices.length;
+    }
+    
+    public Vector3f getVertex(int i)
+    {
+        return _vertices[i];
+    }
+    
+    public Vector3f getNormal(int i)
+    {
+        return _normals[i];
+    }
+    
+    public Vector2f getTexCoord(int i)
+    {
+        return _texCoords[i];
+    }
+    
+    public int getIndex(int i)
+    {
+        return _indices[i];
+    }
 
     public BlockMeshPart mapTexCoords(Vector2f offset, float width)
     {

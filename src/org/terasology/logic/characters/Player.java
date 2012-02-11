@@ -43,7 +43,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.FirstPersonCamera;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.MeshCollection;
+import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.MathHelper;
@@ -477,9 +477,9 @@ public final class Player extends Character {
             Vector2f texPos = new Vector2f(0.0f, 0.0f);
             Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
 
-            MeshCollection.addBlockMesh(new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
-            _overlayMesh = Tessellator.getInstance().generateMesh();
-            Tessellator.getInstance().resetAll();
+            Tessellator tessellator = new Tessellator();
+            TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+            _overlayMesh = tessellator.generateMesh();
         }
 
         glMatrixMode(GL_TEXTURE);
@@ -531,9 +531,9 @@ public final class Player extends Character {
             Vector2f texPos = new Vector2f(40.0f * 0.015625f, 32.0f * 0.03125f);
             Vector2f texWidth = new Vector2f(4.0f * 0.015625f, -12.0f * 0.03125f);
 
-            MeshCollection.addBlockMesh(new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
-            _handMesh = Tessellator.getInstance().generateMesh();
-            Tessellator.getInstance().resetAll();
+            Tessellator tessellator = new Tessellator();
+            TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
+            _handMesh = tessellator.generateMesh();
         }
 
         _handMesh.render();

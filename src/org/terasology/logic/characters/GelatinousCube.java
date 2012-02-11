@@ -22,7 +22,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.MeshCollection;
+import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.MathHelper;
@@ -57,10 +57,10 @@ public final class GelatinousCube extends Character {
         _randomSize = (float) MathHelper.clamp((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0 + 0.15);
         _randomColorId = Math.abs(_parent.getWorldProvider().getRandom().randomInt()) % COLORS.length;
 
-        MeshCollection.addBlockMesh(new Vector4f(COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].y, 1.0f), 0.8f * _randomSize, 0.8f, 0.6f, 0f, 0f, 0f);
-        MeshCollection.addBlockMesh(new Vector4f(COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].y, 0.6f), 1.0f * _randomSize, 1.0f, 0.8f, 0f, 0f, 0f);
-        _mesh = Tessellator.getInstance().generateMesh();
-        Tessellator.getInstance().resetAll();
+        Tessellator tessellator = new Tessellator();
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].y, 1.0f), 0.8f * _randomSize, 0.8f, 0.6f, 0f, 0f, 0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].y, 0.6f), 1.0f * _randomSize, 1.0f, 0.8f, 0f, 0f, 0f);
+        _mesh = tessellator.generateMesh();
     }
 
     public void update() {

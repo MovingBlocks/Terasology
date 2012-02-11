@@ -19,7 +19,7 @@ package org.terasology.rendering.gui.framework;
 import org.lwjgl.opengl.GL11;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.MeshCollection;
+import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
 
 import javax.vecmath.Vector2f;
@@ -44,9 +44,9 @@ public class UIGraphicsElement extends UIDisplayElement {
         _textureName = textureName;
 
         if (_mesh == null) {
-            MeshCollection.addGUIQuadMesh(new Vector4f(1f, 1f, 1f, 1f), 1.0f, 1.0f);
-            _mesh = Tessellator.getInstance().generateMesh();
-            Tessellator.getInstance().resetAll();
+            Tessellator tessellator = new Tessellator();
+            TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(1f, 1f, 1f, 1f), 1.0f, 1.0f);
+            _mesh = tessellator.generateMesh();
         }
     }
 

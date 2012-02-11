@@ -20,7 +20,7 @@ import org.terasology.game.Terasology;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.MeshCollection;
+import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
 
 import javax.vecmath.Vector3d;
@@ -45,9 +45,9 @@ public class BlockGrid implements IGameObject {
     public BlockGrid(WorldRenderer parent) {
         _parent = parent;
 
-        MeshCollection.addBlockMesh(new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
-        _mesh = Tessellator.getInstance().generateMesh();
-        Tessellator.getInstance().resetAll();
+        Tessellator tessellator = new Tessellator();
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
+        _mesh = tessellator.generateMesh();
     }
 
     public void render() {
