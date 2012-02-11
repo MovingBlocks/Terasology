@@ -13,7 +13,7 @@ void main(){
     float torchlight = 0.0;
 
     if (carryingTorch)
-        torchlight = torchlight(light(normal, vertexWorldPos), vertexWorldPos);
+        torchlight = torchlight(lambLight(normal, vertexWorldPos), vertexWorldPos);
 
     color.rgb *= clamp(gl_Color.rgb, 0.0, 1.0) * colorOffset.rgb;
     color.rgb *= expLightValue(light) + torchlight;

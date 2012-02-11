@@ -539,7 +539,7 @@ public final class WorldRenderer implements IGameObject {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %.2f, sun: %.2f, cache: %d, visible: %d, dirty: %d, tri: %d, empty: %d, not-ready: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _visibleChunks.size(), _statDirtyChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %d, visible: %d, dirty: %d, tri: %d, empty: %d, not-ready: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _visibleChunks.size(), _statDirtyChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {

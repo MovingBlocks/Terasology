@@ -32,6 +32,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class PostProcessingRenderer {
 
     public static final boolean EFFECTS_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.enablePostProcessingEffects");
+    public static final float MAX_EXPOSURE = 5.0f;
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure;
@@ -190,10 +191,12 @@ public class PostProcessingRenderer {
         scene.unbindTexture();
 
         float lum = 0.2126f * pixels.get(0) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(2);
-        _exposure = (float) MathHelper.lerp(_exposure, 0.5f / lum, 0.01);
 
-        if (_exposure > 4.0f)
-            _exposure = 4.0f;
+        if (lum > 0.0f) // No division by zero
+            _exposure = (float) MathHelper.lerp(_exposure, 0.5f / lum, 0.01);
+
+        if (_exposure > MAX_EXPOSURE)
+            _exposure = MAX_EXPOSURE;
     }
 
     /**
@@ -409,5 +412,9 @@ public class PostProcessingRenderer {
         }
 
         glCallList(_displayListQuad);
+    }
+
+    public float getExposure() {
+        return _exposure;
     }
 }

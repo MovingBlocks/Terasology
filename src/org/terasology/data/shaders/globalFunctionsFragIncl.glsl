@@ -1,5 +1,5 @@
-float light(vec3 normal, vec4 worldPos) {
-    vec3 N = normalize(normal * ((gl_FrontFacing) ? 1.0 : -1.0));
+float lambLight(vec3 normal, vec4 worldPos) {
+    vec3 N = normalize(normal);
     vec3 L = normalize(-worldPos.xyz);
 
     return dot(N,L);

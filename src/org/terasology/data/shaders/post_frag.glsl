@@ -40,11 +40,9 @@ void main(){
 
     vec4 finalColor = mix(color, colorBlur, blur);
 
-    vec2 vignette = vec2(0.25, 0.25);
-
+    // Vignette
     float d = distance(gl_TexCoord[0].xy, vec2(0.5,0.5));
 
-    // Vignette
     if (swimming)
         finalColor.rgb *= (1.0 - d) / 4.0;
     else

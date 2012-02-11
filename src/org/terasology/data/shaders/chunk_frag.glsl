@@ -61,7 +61,7 @@ void main(){
 
     float occlusionValue = gl_TexCoord[1].z;
 
-    float light = light(normal, vertexWorldPos);
+    float light = lambLight(normal, vertexWorldPos);
     float torchlight = 0.0;
 
     // Apply torchlight
@@ -69,12 +69,11 @@ void main(){
        torchlight = torchlight(light, vertexWorldPos) * blocklightDayIntensity;
     }
 
-    // Apply some lighting to the daylight light value
+    // Apply some Lambertian lighting to the daylight light value
     vec3 daylightColorValue = vec3(daylightValue * 0.85 + light * 0.15);
 
-    float blockBrightness = blocklightValue + torchlight - ((sin(tick*0.05) + 1.0) / 16.0) * blocklightValue;
+    float blockBrightness = clamp(blocklightValue + torchlight - ((sin(tick*0.05) + 1.0) / 16.0) * blocklightValue, 0.0, 1.0);
     blockBrightness *= blocklightDayIntensity;
-
     vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.99, blockBrightness * 0.98);
 
     // Apply the final lighting mix

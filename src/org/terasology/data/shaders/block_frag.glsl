@@ -21,7 +21,7 @@ void main(){
 
     // Apply torchlight
     if (carryingTorch)
-        torchlight = torchlight(light(normal, vertexWorldPos), vertexWorldPos);
+        torchlight = torchlight(lambLight(normal, vertexWorldPos), vertexWorldPos);
 
     // Apply light
     color.rgb *= clamp(expLightValue(light) + torchlight, 0.0, 1.0);
