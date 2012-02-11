@@ -3,6 +3,7 @@ uniform sampler2D texBloom;
 uniform sampler2D texDepth;
 uniform sampler2D texBlur;
 
+uniform bool swimming;
 uniform float exposure = 1.0;
 const float brightMax = 1.0;
 
@@ -32,11 +33,22 @@ void main(){
     float depth = linDepth();
     float blur = 0.0;
 
-    if (depth > 0.1)
+    if (depth > 0.1 && !swimming)
        blur = clamp((depth - 0.1) / 0.1, 0.0, 1.0);
+    else if (swimming)
+       blur = 1.0;
 
-    // Display depth map
-    //gl_FragColor = vec4(linDepth());
+    vec4 finalColor = mix(color, colorBlur, blur);
 
-    gl_FragColor = mix(color, colorBlur, blur);
+    vec2 vignette = vec2(0.25, 0.25);
+
+    float d = distance(gl_TexCoord[0].xy, vec2(0.5,0.5));
+
+    // Vignette
+    if (swimming)
+        finalColor.rgb *= (1.0 - d) / 4.0;
+    else
+        finalColor.rgb *= (1.0 - d);
+
+    gl_FragColor = finalColor;
 }

@@ -228,10 +228,8 @@ public final class WorldRenderer implements IGameObject {
 
         /* SKYSPHERE */
         PerformanceMonitor.startActivity("Render-Sky");
-        if (!_player.isHeadUnderWater()) {
-            _player.getActiveCamera().lookThroughNormalized();
-            _skysphere.render();
-        }
+        _player.getActiveCamera().lookThroughNormalized();
+        _skysphere.render();
         PerformanceMonitor.endActivity();
 
         /* WORLD RENDERING */
@@ -287,22 +285,6 @@ public final class WorldRenderer implements IGameObject {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("terrain");
 
-        int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
-        int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
-        int carryingTorch = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "carryingTorch");
-
-        int wavingCoordinates = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "wavingCoordinates");
-        GL20.glUniform1(wavingCoordinates, BlockManager.getInstance().calcCoordinatesForWavingBlocks());
-
-        int lavaCoordinate = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "lavaCoordinate");
-        GL20.glUniform2(lavaCoordinate, BlockManager.getInstance().calcCoordinate("Lava"));
-
-        int waterCoordinate = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "waterCoordinate");
-        GL20.glUniform2(waterCoordinate, BlockManager.getInstance().calcCoordinate("Water"));
-
-        int grassCoordinate = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "grassCoordinate");
-        GL20.glUniform2(grassCoordinate, BlockManager.getInstance().calcCoordinate("Grass"));
-
         int lavaTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureLava");
         int waterTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureWater");
         int textureAtlas = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureAtlas");
@@ -312,14 +294,7 @@ public final class WorldRenderer implements IGameObject {
         GL20.glUniform1i(textureEffects, 3);
         GL20.glUniform1i(textureAtlas, 0);
 
-        int tick = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "tick");
-
         boolean playerIsSwimming = _player.isHeadUnderWater();
-
-        GL20.glUniform1f(tick, _tick);
-        GL20.glUniform1f(daylight, (float) getDaylight());
-        GL20.glUniform1i(swimming, playerIsSwimming ? 1 : 0);
-        GL20.glUniform1i(carryingTorch, _player.isCarryingTorch() ? 1 : 0);
 
         ShaderManager.getInstance().enableShader(null);
 

@@ -10,21 +10,10 @@ uniform bool carryingTorch;
 
 varying vec4 vertexWorldPos;
 varying vec3 normal;
-varying float distance;
-
-uniform vec4 playerPosition;
 
 uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
 uniform vec2 grassCoordinate;
-
-vec4 srgbToLinear(vec4 color){
-    return pow(color, vec4(1.0 / GAMMA));
-}
-
-vec4 linearToSrgb(vec4 color){
-    return pow(color, vec4(GAMMA));
-}
 
 void main(){
     vec4 texCoord = gl_TexCoord[0];
@@ -72,22 +61,16 @@ void main(){
 
     float occlusionValue = gl_TexCoord[1].z;
 
-    float highlight = 0.0;
+    float light = light(normal, vertexWorldPos);
     float torchlight = 0.0;
-
-    // Calculate Lambertian lighting
-    vec3 N = normalize(normal * ((gl_FrontFacing) ? 1.0 : -1.0));
-    vec3 L = normalize(-vertexWorldPos.xyz);
-
-    highlight = dot(N,L);
 
     // Apply torchlight
     if (carryingTorch) {
-        torchlight = highlight * clamp(1.0 - (distance / 16.0), 0.0, 1.0) * blocklightDayIntensity;
+       torchlight = torchlight(light, vertexWorldPos) * blocklightDayIntensity;
     }
 
-    // Apply some lighting highlights to the daylight light value
-    vec3 daylightColorValue = vec3(daylightValue * 0.95 + highlight * 0.05);
+    // Apply some lighting to the daylight light value
+    vec3 daylightColorValue = vec3(daylightValue * 0.85 + light * 0.15);
 
     float blockBrightness = blocklightValue + torchlight - ((sin(tick*0.05) + 1.0) / 16.0) * blocklightValue;
     blockBrightness *= blocklightDayIntensity;
@@ -96,20 +79,5 @@ void main(){
 
     // Apply the final lighting mix
     color.xyz *= (daylightColorValue * occlusionValue + blocklightColorValue * occlusionValue);
-
-    // Check if the player is below the water surface
-    if (!swimming) {
-        // Apply linear fog
-        float fog = clamp((gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.25, 1.0);
-
-        gl_FragColor.rgb = linearToSrgb(mix(vec4(1.0) * daylight, color, fog)).rgb;
-        gl_FragColor.a = color.a;
-    } else {
-       // Very foggy below water...
-       float fog = clamp((16.0 - gl_FogFragCoord) / 16.0, 0.0, 1.0);
-
-       // And everything looks a bit blueish and darker
-       gl_FragColor.rgb = linearToSrgb(mix(vec4(0.0, 0.0, 0.1, 1.0), color * vec4(0.8, 0.8, 0.9, 1.0), fog)).rgb;
-       gl_FragColor.a = color.a;
-    }
+    gl_FragColor = linearToSrgb(color);
 }

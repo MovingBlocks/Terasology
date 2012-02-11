@@ -2,14 +2,6 @@ uniform sampler2D texture;
 
 uniform float light = 1.0;
 
-vec4 srgbToLinear(vec4 color){
-    return pow(color, vec4(1.0 / GAMMA));
-}
-
-vec4 linearToSrgb(vec4 color){
-    return pow(color, vec4(GAMMA));
-}
-
 void main(){
     vec4 color = srgbToLinear(texture2D(texture, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y)));
 

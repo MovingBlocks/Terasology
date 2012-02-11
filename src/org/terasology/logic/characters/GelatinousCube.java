@@ -16,14 +16,14 @@
  */
 package org.terasology.logic.characters;
 
-import org.lwjgl.opengl.GL20;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.structures.AABB;
+import org.terasology.model.structures.ShaderParameters;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.MathHelper;
 
@@ -41,8 +41,6 @@ import static org.lwjgl.opengl.GL11.*;
 public final class GelatinousCube extends Character {
 
     private final Mesh _mesh;
-
-    private static final float WIDTH_HALF = 0.5f, HEIGHT_HALF = 0.5f;
     private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 0.2f), new Vector3f(1.0f, 0.2f, 0.2f), new Vector3f(0.2f, 1.0f, 0.2f), new Vector3f(1.0f, 1.0f, 0.2f)};
 
     private long _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
@@ -54,7 +52,7 @@ public final class GelatinousCube extends Character {
     public GelatinousCube(WorldRenderer parent) {
         super(parent, 0.02, 1.5, 0.2, true);
 
-        _randomSize = (float) MathHelper.clamp((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0 + 0.15);
+        _randomSize = (float) (((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 2.0 + 0.15);
         _randomColorId = Math.abs(_parent.getWorldProvider().getRandom().randomInt()) % COLORS.length;
 
         Tessellator tessellator = new Tessellator();
@@ -78,14 +76,10 @@ public final class GelatinousCube extends Character {
 
         TextureManager.getInstance().bindTexture("slime");
 
-        // Setup the shader
         ShaderManager.getInstance().enableShader("gelatinousCube");
-        int tick = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("gelatinousCube"), "tick");
-        GL20.glUniform1f(tick, _parent.getTick());
-        int cOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("gelatinousCube"), "colorOffset");
-        GL20.glUniform4f(cOffset, COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].z, 1.0f);
-        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("gelatinousCube"), "light");
-        GL20.glUniform1f(light, _parent.getRenderingLightValueAt(getPosition()));
+        ShaderParameters params = ShaderManager.getInstance().getShaderParameters("gelatinousCube");
+        params.setFloat4("colorOffset", COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].z, 1.0f);
+        params.setFloat("light", _parent.getRenderingLightValueAt(getPosition()));
 
         _mesh.render();
 
@@ -103,20 +97,17 @@ public final class GelatinousCube extends Character {
             _movementTarget.set(_parent.getPlayer().getPosition());
         }
 
-        if (Terasology.getInstance().getTime() - _lastChangeOfDirectionAt > 5000 || distanceToPlayer <= 5) {
+        if (Terasology.getInstance().getTime() - _lastChangeOfDirectionAt > 12000 || distanceToPlayer <= 5) {
             _movementTarget.set(getPosition().x + _parent.getWorldProvider().getRandom().randomDouble() * 500, getPosition().y, getPosition().z + _parent.getWorldProvider().getRandom().randomDouble() * 500);
             _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
         }
 
         lookAt(_movementTarget);
         walkForward();
-
-        if (_parent.getWorldProvider().getRandom().randomDouble() < -0.94)
-            jump();
     }
 
     protected AABB generateAABBForPosition(Vector3d p) {
-        return new AABB(p, new Vector3d(WIDTH_HALF, HEIGHT_HALF, WIDTH_HALF));
+        return new AABB(p, new Vector3d(_randomSize / 2, _randomSize / 2, _randomSize / 2));
     }
 
     public AABB getAABB() {
@@ -130,6 +121,6 @@ public final class GelatinousCube extends Character {
 
     @Override
     protected void handleHorizontalCollision() {
-        _lastChangeOfDirectionAt = 0;
+        jump();
     }
 }

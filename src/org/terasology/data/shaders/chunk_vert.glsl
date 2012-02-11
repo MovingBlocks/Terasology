@@ -6,8 +6,6 @@ uniform float wavingCoordinates[32];
 uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
 
-varying float distance;
-
 float radialFog(vec4 v1)
 {
     vec4 v2 = v1 / v1.w;
@@ -17,7 +15,7 @@ float radialFog(vec4 v1)
 void main()
 {
 	vertexWorldPos = gl_ModelViewMatrix * gl_Vertex;
-	distance = length(vertexWorldPos);
+	float distance = length(vertexWorldPos);
 
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 

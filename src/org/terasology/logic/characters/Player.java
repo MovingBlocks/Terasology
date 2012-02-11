@@ -507,19 +507,6 @@ public final class Player extends Character {
         TextureManager.getInstance().bindTexture("char");
         ShaderManager.getInstance().enableShader("block");
 
-        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
-        GL20.glUniform1f(light, _parent.getRenderingLightValueAt(getPosition()));
-
-        // Make sure the hand is not affected by the biome color. ZOMBIES!!!!
-        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
-        colorBuffer.put(1.0f);
-        colorBuffer.put(1.0f);
-        colorBuffer.put(1.0f);
-        colorBuffer.flip();
-
-        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
-        GL20.glUniform3(colorOffset, colorBuffer);
-
         glPushMatrix();
         glTranslatef(0.8f, -1.1f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.0f - _handMovementAnimationOffset * 0.5f);
         glRotatef(-45f - _handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
