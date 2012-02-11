@@ -18,13 +18,14 @@ void main(){
     }
 
     float torchlight = 0.0;
+    float highlight = lambLight(normal, vertexWorldPos);
 
     // Apply torchlight
     if (carryingTorch)
-        torchlight = torchlight(lambLight(normal, vertexWorldPos), vertexWorldPos);
+        torchlight = torchlight(highlight, vertexWorldPos);
 
     // Apply light
-    color.rgb *= clamp(expLightValue(light) + torchlight, 0.0, 1.0);
+    color.rgb *= clamp(expLightValue(light) * 0.85 + highlight * 0.15 + torchlight, 0.0, 1.0);
 
     if (textured) {
         color.rgb *= colorOffset.rgb;

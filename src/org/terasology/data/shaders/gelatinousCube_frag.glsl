@@ -11,12 +11,13 @@ void main(){
     vec4 color = srgbToLinear(texture2D(texture, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y)));
 
     float torchlight = 0.0;
+    float highlight = lambLight(normal, vertexWorldPos);
 
     if (carryingTorch)
-        torchlight = torchlight(lambLight(normal, vertexWorldPos), vertexWorldPos);
+        torchlight = torchlight(highlight, vertexWorldPos);
 
     color.rgb *= clamp(gl_Color.rgb, 0.0, 1.0) * colorOffset.rgb;
-    color.rgb *= expLightValue(light) + torchlight;
+    color.rgb *= expLightValue(light) * 0.85 + 0.15 * highlight + torchlight;
     color.a = gl_Color.a;
 
     gl_FragColor = linearToSrgb(color);
