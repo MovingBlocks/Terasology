@@ -44,6 +44,7 @@ public final class GelatinousCube extends Character {
 
     private long _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
     private final Vector3d _movementTarget = new Vector3d();
+    private boolean _followingPlayer = false;
 
     public final int _randomColorId;
     public float _randomSize = 1.0f;
@@ -51,7 +52,7 @@ public final class GelatinousCube extends Character {
     public GelatinousCube(WorldRenderer parent) {
         super(parent, 0.02, 1.5, 0.2, true);
 
-        _randomSize = (float) (((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 2.0 + 0.15);
+        _randomSize = (float) (((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 0.8 + 0.2);
         _randomColorId = Math.abs(_parent.getWorldProvider().getRandom().randomInt()) % COLORS.length;
 
         Tessellator tessellator = new Tessellator();
@@ -94,11 +95,14 @@ public final class GelatinousCube extends Character {
 
         if (distanceToPlayer > 6 && distanceToPlayer < 16) {
             _movementTarget.set(_parent.getPlayer().getPosition());
-        }
-
-        if (Terasology.getInstance().getTime() - _lastChangeOfDirectionAt > 12000) {
-            _movementTarget.set(getPosition().x + _parent.getWorldProvider().getRandom().randomDouble() * 500, getPosition().y, getPosition().z + _parent.getWorldProvider().getRandom().randomDouble() * 500);
-            _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
+            _followingPlayer = true;
+        } else {
+            if (Terasology.getInstance().getTime() - _lastChangeOfDirectionAt > 12000 || _followingPlayer) {
+                _movementTarget.set(getPosition().x + _parent.getWorldProvider().getRandom().randomDouble() * 500, getPosition().y, getPosition().z + _parent.getWorldProvider().getRandom().randomDouble() * 500);
+                _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
+                _followingPlayer = false;
+                _walkingSpeed = ((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 0.05;
+            }
         }
 
         lookAt(_movementTarget);
@@ -106,7 +110,8 @@ public final class GelatinousCube extends Character {
     }
 
     protected AABB generateAABBForPosition(Vector3d p) {
-        return new AABB(p, new Vector3d(0.5f, 0.5f, 0.5f));
+        float sizeHalf = _randomSize / 2f;
+        return new AABB(p, new Vector3d(sizeHalf, sizeHalf, sizeHalf));
     }
 
     public AABB getAABB() {
