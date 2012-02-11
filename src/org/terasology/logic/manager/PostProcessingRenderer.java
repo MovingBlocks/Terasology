@@ -91,6 +91,9 @@ public class PostProcessingRenderer {
             createFBO("sceneBloom0", 1024, 1024, true, false);
             createFBO("sceneBloom1", 1024, 1024, true, false);
 
+            createFBO("sceneBlur0", 1024, 1024, true, false);
+            createFBO("sceneBlur1", 1024, 1024, true, false);
+
             createFBO("scene64", 64, 64, true, false);
             createFBO("scene32", 32, 32, true, false);
             createFBO("scene16", 16, 16, true, false);
@@ -257,20 +260,12 @@ public class PostProcessingRenderer {
     private void createOrUpdateFullscreenFbos() {
         if (!_FBOs.containsKey("scene")) {
             createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
-            if (EFFECTS_ENABLED) {
-                createFBO("sceneBlur0", Display.getWidth(), Display.getHeight(), false, false);
-                createFBO("sceneBlur1", Display.getWidth(), Display.getHeight(), false, false);
-            }
 
         } else {
             FBO scene = getFBO("scene");
 
             if (scene._width != Display.getWidth() || scene._height != Display.getHeight()) {
                 createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
-                if (EFFECTS_ENABLED) {
-                    createFBO("sceneBlur0", Display.getWidth(), Display.getHeight(), false, false);
-                    createFBO("sceneBlur1", Display.getWidth(), Display.getHeight(), false, false);
-                }
             }
         }
     }
@@ -299,6 +294,7 @@ public class PostProcessingRenderer {
         GL20.glUniform1f(radius, 2.0f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
+        glViewport(0, 0, 1024, 1024);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -312,6 +308,7 @@ public class PostProcessingRenderer {
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).unbind();
 
         ShaderManager.getInstance().enableShader(null);
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     private void generateBloom(int id) {

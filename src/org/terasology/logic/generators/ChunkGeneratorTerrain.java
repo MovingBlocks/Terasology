@@ -253,7 +253,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
         double x1, y1, z1;
 
         x1 = x * 0.006;
-        y1 = y * 0.002;
+        y1 = y * 0.004;
         z1 = z * 0.006;
 
         double result = _pGen4.fBm(x1, y1, z1);
