@@ -16,7 +16,7 @@ void main(){
         torchlight = torchlight(light(normal, vertexWorldPos), vertexWorldPos);
 
     color.rgb *= clamp(gl_Color.rgb, 0.0, 1.0) * colorOffset.rgb;
-    color.rgb *= pow(0.86, (1.0-light)*15.0) + torchlight;
+    color.rgb *= expLightValue(light) + torchlight;
     color.a = gl_Color.a;
 
     gl_FragColor = linearToSrgb(color);

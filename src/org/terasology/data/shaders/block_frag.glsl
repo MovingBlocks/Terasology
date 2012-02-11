@@ -24,7 +24,7 @@ void main(){
         torchlight = torchlight(light(normal, vertexWorldPos), vertexWorldPos);
 
     // Apply light
-    color.rgb *= clamp(light + torchlight, 0.0, 1.0);
+    color.rgb *= clamp(expLightValue(light) + torchlight, 0.0, 1.0);
 
     if (textured) {
         color.rgb *= colorOffset.rgb;

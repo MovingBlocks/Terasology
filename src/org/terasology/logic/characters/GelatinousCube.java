@@ -25,7 +25,6 @@ import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -93,11 +92,11 @@ public final class GelatinousCube extends Character {
 
         double distanceToPlayer = distanceSquaredTo(_parent.getPlayer().getPosition());
 
-        if (distanceToPlayer > 5 && distanceToPlayer < 32) {
+        if (distanceToPlayer > 6 && distanceToPlayer < 16) {
             _movementTarget.set(_parent.getPlayer().getPosition());
         }
 
-        if (Terasology.getInstance().getTime() - _lastChangeOfDirectionAt > 12000 || distanceToPlayer <= 5) {
+        if (Terasology.getInstance().getTime() - _lastChangeOfDirectionAt > 12000) {
             _movementTarget.set(getPosition().x + _parent.getWorldProvider().getRandom().randomDouble() * 500, getPosition().y, getPosition().z + _parent.getWorldProvider().getRandom().randomDouble() * 500);
             _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
         }
@@ -107,7 +106,7 @@ public final class GelatinousCube extends Character {
     }
 
     protected AABB generateAABBForPosition(Vector3d p) {
-        return new AABB(p, new Vector3d(_randomSize / 2, _randomSize / 2, _randomSize / 2));
+        return new AABB(p, new Vector3d(0.5f, 0.5f, 0.5f));
     }
 
     public AABB getAABB() {

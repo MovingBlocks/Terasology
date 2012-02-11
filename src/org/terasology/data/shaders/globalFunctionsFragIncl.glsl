@@ -16,3 +16,7 @@ vec4 srgbToLinear(vec4 color) {
 vec4 linearToSrgb(vec4 color) {
     return pow(color, vec4(GAMMA));
 }
+
+float expLightValue(float light) {
+    return pow(0.86, (1.0-light)*15.0);
+}

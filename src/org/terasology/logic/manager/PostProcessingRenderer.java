@@ -84,12 +84,9 @@ public class PostProcessingRenderer {
     }
 
     public PostProcessingRenderer() {
-        createOrUpdateSceneFBO();
+        createOrUpdateFullscreenFbos();
 
         if (EFFECTS_ENABLED) {
-            createFBO("sceneBlur0", 1024, 1024, false, false);
-            createFBO("sceneBlur1", 1024, 1024, false, false);
-
             createFBO("sceneHighPass", 1024, 1024, true, false);
             createFBO("sceneBloom0", 1024, 1024, true, false);
             createFBO("sceneBloom1", 1024, 1024, true, false);
@@ -251,20 +248,29 @@ public class PostProcessingRenderer {
             scene.unbindTexture();
         }
 
-        createOrUpdateSceneFBO();
+        createOrUpdateFullscreenFbos();
     }
 
     /**
      * Initially creates the scene FBO and updates it according to the size of the viewport.
      */
-    private void createOrUpdateSceneFBO() {
+    private void createOrUpdateFullscreenFbos() {
         if (!_FBOs.containsKey("scene")) {
             createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
+            if (EFFECTS_ENABLED) {
+                createFBO("sceneBlur0", Display.getWidth(), Display.getHeight(), false, false);
+                createFBO("sceneBlur1", Display.getWidth(), Display.getHeight(), false, false);
+            }
+
         } else {
             FBO scene = getFBO("scene");
 
             if (scene._width != Display.getWidth() || scene._height != Display.getHeight()) {
                 createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
+                if (EFFECTS_ENABLED) {
+                    createFBO("sceneBlur0", Display.getWidth(), Display.getHeight(), false, false);
+                    createFBO("sceneBlur1", Display.getWidth(), Display.getHeight(), false, false);
+                }
             }
         }
     }
@@ -293,7 +299,6 @@ public class PostProcessingRenderer {
         GL20.glUniform1f(radius, 2.0f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
-        glViewport(0, 0, 1024, 1024);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -307,14 +312,13 @@ public class PostProcessingRenderer {
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).unbind();
 
         ShaderManager.getInstance().enableShader(null);
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     private void generateBloom(int id) {
         ShaderManager.getInstance().enableShader("blur");
 
         int radius = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("blur"), "radius");
-        GL20.glUniform1f(radius, 16);
+        GL20.glUniform1f(radius, 16.0f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).bind();
         glViewport(0, 0, 1024, 1024);

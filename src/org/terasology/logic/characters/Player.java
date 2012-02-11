@@ -585,15 +585,11 @@ public final class Player extends Character {
     public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos) {
         for (IBlockObserver ob : _observers)
             ob.blockPlaced(chunk, pos);
-
-        BulletPhysicsRenderer.getInstance().blockPlaced(chunk, pos);
     }
 
     public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos) {
         for (IBlockObserver ob : _observers)
             ob.blockRemoved(chunk, pos);
-
-        BulletPhysicsRenderer.getInstance().blockRemoved(chunk, pos);
     }
 
     public Inventory getInventory() {

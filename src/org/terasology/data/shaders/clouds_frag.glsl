@@ -12,7 +12,7 @@ void main(){
 
     // Fade out the clouds at night
     if (light < 0.25)
-        color.a *= 1.0 - clamp(abs(0.25 - light) / 0.25, 0.0, 1.0);
+        color.a *= 1.0 - clamp(abs(0.25 - expLightValue(light)) / 0.25, 0.0, 1.0);
 
     gl_FragColor = linearToSrgb(color);
 }

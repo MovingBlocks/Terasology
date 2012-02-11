@@ -54,10 +54,10 @@ void main(){
     }
 
     // Calculate daylight lighting value
-    float daylightValue = daylight * pow(0.86, (1.0-gl_TexCoord[1].x)*15.0);
+    float daylightValue = daylight * expLightValue(gl_TexCoord[1].x);
 
     float blocklightDayIntensity = 1.0 - daylightValue * 0.95;
-    float blocklightValue = pow(0.86, (1.0-gl_TexCoord[1].y)*15.0);
+    float blocklightValue = expLightValue(gl_TexCoord[1].y);
 
     float occlusionValue = gl_TexCoord[1].z;
 

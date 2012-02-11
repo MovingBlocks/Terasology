@@ -34,9 +34,7 @@ import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.IBlockObserver;
 import org.terasology.model.blocks.BlockManager;
-import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.ShaderParameters;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.utilities.FastRandom;
@@ -54,7 +52,7 @@ import java.util.HashSet;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
+public class BulletPhysicsRenderer implements IGameObject {
 
     /* SINGLETON */
     private static BulletPhysicsRenderer _instance;
@@ -100,6 +98,9 @@ public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
     private final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     private final DiscreteDynamicsWorld _discreteDynamicsWorld;
 
+    private static final Vector3f[] _positionOffsets = new Vector3f[]{new Vector3f(1, 1, -1), new Vector3f(1, -1, -1), new Vector3f(-1, 1, -1), new Vector3f(-1, -1, -1),
+            new Vector3f(1, 1, 1), new Vector3f(1, -1, 1), new Vector3f(-1, 1, 1), new Vector3f(-1, -1, 1)};
+
     public static BulletPhysicsRenderer getInstance() {
         if (_instance == null)
             _instance = new BulletPhysicsRenderer();
@@ -117,17 +118,14 @@ public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
     }
 
     public void addBlock(Vector3f position, byte type) {
-        Vector3f[] positionOffsets = new Vector3f[]{new Vector3f(1, 1, -1), new Vector3f(1, -1, -1), new Vector3f(-1, 1, -1), new Vector3f(-1, -1, -1),
-                new Vector3f(1, 1, 1), new Vector3f(1, -1, 1), new Vector3f(-1, 1, 1), new Vector3f(-1, -1, 1)};
-
         for (int i = 0; i < 8; i++) {
             Matrix3f rot = new Matrix3f();
             rot.setIdentity();
 
             // Position the smaller blocks
             Vector3f pos = new Vector3f(position);
-            positionOffsets[i].scale(0.25f);
-            pos.add(positionOffsets[i]);
+            _positionOffsets[i].scale(0.25f);
+            pos.add(_positionOffsets[i]);
 
             DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, pos, 1.0f)));
 
@@ -236,13 +234,5 @@ public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
                 _discreteDynamicsWorld.removeRigidBody(_blocks.remove(0));
             }
         }
-    }
-
-    public void blockPlaced(Chunk chunk, BlockPosition pos) {
-
-    }
-
-    public void blockRemoved(Chunk chunk, BlockPosition pos) {
-
     }
 }
