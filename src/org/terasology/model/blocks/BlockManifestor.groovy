@@ -29,6 +29,7 @@ import org.terasology.utilities.ClasspathResourceLoader
 import org.terasology.model.shapes.BlockShape
 import org.terasology.model.shapes.BlockShapeManager
 import org.terasology.math.Side
+
 import groovy.util.logging.Log
 
 /**
@@ -43,8 +44,6 @@ class BlockManifestor {
 
     private static BlockManager _bm;
     protected ClasspathResourceLoader _resourceLoader;
-
-    // TODO: Usage of this is fairly brute force, maybe there's a more efficient way, with sorting or so?
 
     /** Holds BufferedImages during the loading process (not persisted) */
     private Map<String, BufferedImage> _images = [:]
@@ -157,9 +156,7 @@ class BlockManifestor {
     }
 
     /**
-     * Loads block definitions from available internal Groovy classes and external addon Groovy scripts
-     * Populates the stuff that groovy/blocks/Default.groovy used to load, with dynamic IDs
-     * Is also used by sub-classes where BLOCK_PATH must be separately defined along with instantiateBlock
+     * Loads block definitions from available internal Groovy classes and external add-on Groovy scripts
      */
     public loadBlockDefinitions(String path) {
         // First identify what plain Block definitions we've got at the appropriate path and loop over what we get
@@ -198,10 +195,6 @@ class BlockManifestor {
             }
 
             _blockIndex.put(b.getId(), b)
-
-            // BlockManager.addBlock(b) // This adds the instantiated class itself with all values set for game usage
-            // if (!BlockManager.hasManifested(b)) {    // Check if we already loaded a manifest ID for the Block
-            // BlockManager.addBlockManifest(b, BlockManager.nextID)    // If not then create an ID for it
         }
     }
 
@@ -290,6 +283,7 @@ class BlockManifestor {
         }
         println "Faces are (L, R, T, B, F, B): " + b.getTextureAtlasPos()
 
+        //TODO: Consider if we can use shape defaults in an OOP way too? So Block default is "cube", most PlantBlocks "Billboard", etc - might need better categorization first
         BlockShape shape;
         if (c.block.shape != [:])
         {
