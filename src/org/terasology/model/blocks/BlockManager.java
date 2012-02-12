@@ -39,6 +39,8 @@ public class BlockManager {
     /* BLOCKS */
     private final HashMap<String, Block> _blocksByTitle = new HashMap<String, Block>(128);
     private final TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
+    
+    private final HashMap<String, BlockGroup> _blockGroupsByTitle = new HashMap<String, BlockGroup>(128);
 
     public static BlockManager getInstance() {
         if (_instance == null)
@@ -63,6 +65,10 @@ public class BlockManager {
             e.printStackTrace();
             System.exit(-1);
         }
+    }
+    
+    public BlockGroup getBlockGroup(String title) {
+        return _blockGroupsByTitle.get(title);
     }
 
     public Block getBlock(String title) {
@@ -93,6 +99,13 @@ public class BlockManager {
             _blocksByTitle.put(b.getTitle(), b);
         }
     }
+    
+    public void addAllBlockGroups(Iterable<BlockGroup> groups) {
+        for (BlockGroup group : groups) {
+            _blockGroupsByTitle.put(group.getTitle(), group);
+        }
+    }
+            
 
     public FloatBuffer calcCoordinatesForWavingBlocks() {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(32);

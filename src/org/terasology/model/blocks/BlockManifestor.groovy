@@ -58,6 +58,8 @@ class BlockManifestor {
     /** Smaller version of _blockIndex only used for loading IDs */
     protected static Map<String, Byte> _blockStringIndex = [:]
 
+    protected static List<BlockGroup> _blockGroups = []
+
     /** Holds the Byte value for the next Block ID - starts at 1 since Air is always 0 */
     protected static byte _nextByte = (byte) 1
 
@@ -128,18 +130,20 @@ class BlockManifestor {
             println "The image index (ImageManifest not yet saved) now looks like this: " + _imageIndex
         }
 
+        SimpleBlockLoader blockLoader = new SimpleBlockLoader(_imageIndex);
+
         // We always load the block definitions, the block IDs just may already exist in the manifest if using a saved world
-        loadBlockDefinitions("definitions")
+        loadBlockDefinitions("definitions", blockLoader)
 
         // Load block definitions from Block sub-classes
-        new PlantBlockManifestor(_resourceLoader).loadBlockDefinitions("definitions/plant")
-        new TreeBlockManifestor(_resourceLoader).loadBlockDefinitions("definitions/plant/tree")
-        new LiquidBlockManifestor(_resourceLoader).loadBlockDefinitions("definitions/liquid")
+        loadBlockDefinitions("definitions/plant", new PlantBlockLoader(_imageIndex))
+        loadBlockDefinitions("definitions/plant/tree", new TreeBlockLoader(_imageIndex))
+        loadBlockDefinitions("definitions/liquid", new LiquidBlockLoader(_imageIndex))
 
         // We can also re-use manifestors for sub dirs if we just put stuff there for a "human-friendly" grouping
-        loadBlockDefinitions("definitions/furniture")
-        loadBlockDefinitions("definitions/mineral")
-        new PlantBlockManifestor(_resourceLoader).loadBlockDefinitions("definitions/plant/leaf")
+        loadBlockDefinitions("definitions/furniture", blockLoader)
+        loadBlockDefinitions("definitions/mineral", blockLoader)
+        loadBlockDefinitions("definitions/plant/leaf", new PlantBlockLoader(_imageIndex))
 
         // _nextByte may not make sense if we're loading a world - until it is possible to upgrade / add stuff anyway
         println "Done loading blocks - _nextByte made it to " + _nextByte
@@ -161,7 +165,7 @@ class BlockManifestor {
      * Populates the stuff that groovy/blocks/Default.groovy used to load, with dynamic IDs
      * Is also used by sub-classes where BLOCK_PATH must be separately defined along with instantiateBlock
      */
-    public loadBlockDefinitions(String path) {
+    public loadBlockDefinitions(String path, BlockLoader loader) {
         // First identify what plain Block definitions we've got at the appropriate path and loop over what we get
         _resourceLoader.getClassesAt(path).each { c ->
             println("Got back the following class: " + c)
@@ -172,7 +176,7 @@ class BlockManifestor {
             println "Loaded block config for Class " + c + ": " + blockConfig
 
             // Prepare a Block from the stuff we load from the Groovy definition
-            Block b = instantiateBlock(blockConfig)
+            Block b = loader.loadBlock(blockConfig)
 
             // Optionally use the Class object we loaded to execute any custom Groovy scripting (rare?)
             // An example would be if the Block wants to be registered as a specific type (dirt, plant, mineral..)
@@ -203,197 +207,6 @@ class BlockManifestor {
             // if (!BlockManager.hasManifested(b)) {    // Check if we already loaded a manifest ID for the Block
             // BlockManager.addBlockManifest(b, BlockManager.nextID)    // If not then create an ID for it
         }
-    }
-
-    /**
-     * The Block class this Manifestor loads & prepares (so BlockManifestor.loadBlockDefinitions can be generic)
-     * @return the instantiated and prepared class
-     */
-    private instantiateBlock(ConfigObject blockConfig) {
-        // Construct the class - this loads the Block-level defaults
-        Block b = new Block()
-
-        // Now apply Block-level details from Groovy (which may overwrite constructor defaults)
-        prepareBlock(b, blockConfig)
-
-        // Return the prepared class
-        return b
-    }
-
-    /**
-     * This method prepares an instantiated Block (or child class) with values loaded from its Groovy definition
-     * This allows sub-type Manifestors to call super() to fill values relevant to whatever is one level up
-     * @param b The Block we're preparing with values loaded at this level
-     * @param c ConfigObject holding the ConfigSlurper-produced props from the Groovy definition
-     * @return The finished Block object we'll store in the BlockManager (returned via reference)
-     */
-    protected prepareBlock(Block b, ConfigObject c) {
-        // Load Block details from Groovy, which may overwrite defaults from Block's Constructor
-        println "Preparing block with name " + c.name
-
-        // *** FACES - note how these are _not_ persisted in the Manifest, instead the texture name index values are
-        // In theory this allows Blocks to change their faces without impacting the saved state of a world
-        // First just set all 6 faces to the default for that block (its name for a png file)
-        // This can return null if there's no default texture for a block, is ok if everything is set below
-        // TODO: Might want to add some validation that all six sides have valid assignments at the end? Air gets all 0?
-        println "Default image returns: " + _imageIndex.get(c.name)
-
-        def textureId = _imageIndex.get(c.name)
-        
-        Vector2f centerTexturePos;
-
-        if (textureId != null) {
-            b.withTextureAtlasPos(calcAtlasPositionForId(textureId))
-            centerTexturePos = calcAtlasPositionForId(textureId)
-        }
-
-        // Then look for each more specific assignment and overwrite defaults where needed
-        if (c.block.faces.all != [:]) {
-            println "Setting Block " + c.name + " to texture " + c.block.faces.all + " for all"
-            b.withTextureAtlasPos(calcAtlasPositionForId(_imageIndex.get(c.block.faces.all)))
-            centerTexturePos = calcAtlasPositionForId(_imageIndex.get(c.block.faces.all))
-        }
-        if (c.block.faces.center != [:])
-            centerTexturePos = calcAtlasPositionForId(_imageIndex.get(c.block.faces.center))
-        if (c.block.faces.sides != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.sides + " for sides"
-            b.withTextureAtlasPosMantle(calcAtlasPositionForId(_imageIndex.get(c.block.faces.sides)))
-        }
-        if (c.block.faces.topbottom != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.topbottom + " for topbottom"
-            b.withTextureAtlasPosTopBottom(calcAtlasPositionForId(_imageIndex.get(c.block.faces.topbottom)))
-        }
-        // Top, Bottom, Left, Right, Front, Back - probably a way to do that in a loop...
-        if (c.block.faces.top != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.top + " for top"
-            b.withTextureAtlasPos(Side.TOP, calcAtlasPositionForId(_imageIndex.get(c.block.faces.top)))
-        }
-        if (c.block.faces.bottom != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.bottom + " for bottom"
-            b.withTextureAtlasPos(Side.BOTTOM, calcAtlasPositionForId(_imageIndex.get(c.block.faces.bottom)))
-        }
-        if (c.block.faces.left != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.left + " for left"
-            b.withTextureAtlasPos(Side.LEFT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.left)))
-        }
-        if (c.block.faces.right != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.right + " for right"
-            b.withTextureAtlasPos(Side.RIGHT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.right)))
-        }
-        if (c.block.faces.front != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.front + " for front"
-            b.withTextureAtlasPos(Side.FRONT, calcAtlasPositionForId(_imageIndex.get(c.block.faces.front)))
-        }
-        if (c.block.faces.back != [:]) {
-            println "Setting Block " + c.name + " to " + c.block.faces.back + " for back"
-            b.withTextureAtlasPos(Side.BACK, calcAtlasPositionForId(_imageIndex.get(c.block.faces.back)))
-        }
-        println "Faces are (L, R, T, B, F, B): " + b.getTextureAtlasPos()
-
-        BlockShape shape;
-        if (c.block.shape != [:])
-        {
-            shape = BlockShapeManager.getInstance().getBlockShape(c.block.shape);
-        }
-        if (shape != null)
-        {
-            println "Has shape: " + c.block.shape;
-            if (shape.getCenterMesh() != null)
-            {
-                b.withCenterMesh(shape.getCenterMesh().mapTexCoords(new Vector2f((float)(Block.TEXTURE_OFFSET * centerTexturePos.x), (float)(Block.TEXTURE_OFFSET * centerTexturePos.y)), Block.TEXTURE_OFFSET_WIDTH));
-            }
-
-            for (Side side : Side.values())
-            {
-                if (shape.getSideMesh(side) != null)
-                {
-                    b.withSideMesh(side, shape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
-                }
-                b.withFullSide(side, shape.isBlockingSide(side));
-            }
-        }
-
-        // *** BLOCK_FORM and COLOR_SOURCE enums (defined explicitly in block definition, not needed here)
-        if (c.block.blockform != [:]) {
-            println "Setting BLOCK_FORM enum to: " + c.block.blockform
-            b.withBlockForm(c.block.blockform)
-        }
-        if (c.block.colorsource != [:]) {
-            println "Setting COLOR_SOURCE enum to: " + c.block.colorsource
-            b.withColorSource(c.block.colorsource)
-        }
-        println "Block has form " + b.getBlockForm() + ", and color source " + b.getColorSource()
-
-        // *** BOOLEANS - IntelliJ may warn about "null" about here but it works alright
-        // Casting to (boolean) removes the warning but is functionally unnecessary
-        if (c.block.translucent != [:]) {
-            println "Setting translucent boolean to: " + c.block.translucent
-            b.withTranslucent((boolean) c.block.translucent)
-        }
-        if (c.block.invisible != [:]) {
-            println "Setting invisible boolean to: " + c.block.invisible
-            b.withInvisible((boolean) c.block.invisible)
-        }
-        if (c.block.waving != [:]) {
-            println "Setting waving boolean to: " + c.block.waving
-            b.withWaving((boolean) c.block.waving)
-        }
-        if (c.block.penetrable != [:]) {
-            println "Setting penetrable boolean to: " + c.block.penetrable
-            b.withPenetrable((boolean) c.block.penetrable)
-        }
-        if (c.block.castsShadows != [:]) {
-            println "Setting castsShadows boolean to: " + c.block.castsShadows
-            b.withCastsShadows((boolean) c.block.castsShadows)
-        }
-        if (c.block.renderBoundingBox != [:]) {
-            println "Setting renderBoundingBox boolean to: " + c.block.renderBoundingBox
-            b.withRenderBoundingBox((boolean) c.block.renderBoundingBox)
-        }
-        if (c.block.allowBlockAttachment != [:]) {
-            println "Setting allowBlockAttachment boolean to: " + c.block.allowBlockAttachment
-            b.withAllowBlockAttachment((boolean) c.block.allowBlockAttachment)
-        }
-        if (c.block.bypassSelectionRay != [:]) {
-            println "Setting bypassSelectionRay boolean to: " + c.block.bypassSelectionRay
-            b.withBypassSelectionRay((boolean) c.block.bypassSelectionRay)
-        }
-        if (c.block.loweredShape != [:]) {
-            BlockShape loweredShape;
-            if (c.block.loweredShape != [:])
-            {
-                loweredShape = BlockShapeManager.getInstance().getBlockShape(c.block.loweredShape);
-            }
-            if (loweredShape != null)
-            {
-                println "Has lowered shape: " + c.block.loweredShape;
-                for (Side side : Side.values())
-                {
-                    if (loweredShape.getSideMesh(side) != null)
-                    {
-                        b.withLoweredSideMesh(side, loweredShape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
-                    }
-                }
-            }
-        }
-
-        // *** MISC
-        if (c.block.luminance != [:]) {
-            println "Setting luminance to: " + c.block.luminance
-            b.withLuminance((byte) c.block.luminance)
-        }
-        if (c.block.hardness != [:]) {
-            println "Setting hardness to: " + c.block.hardness
-            b.withHardness((byte) c.block.hardness)
-        }
-
-        // *** COLOR OFFSET (4 values) - this might need error handling
-        if (c.block.colorOffset != [:]) {
-            println "Setting colorOffset to: " + c.block.colorOffset + " (after making it a Vector4f)"
-            b.withColorOffset(new Vector4f((float) c.block.colorOffset[0], (float) c.block.colorOffset[1], (float) c.block.colorOffset[2], (float) c.block.colorOffset[3]))
-            println "The Vector4f instantiated is" + b.getColorOffset()
-        }
-
     }
 
     public BufferedImage generateImage(int mipMapLevel) {
@@ -460,6 +273,7 @@ class BlockManifestor {
     }
 
 
+    // TODO: Utility method? Move to block? Is repeated in SimpleBlockLoader
     private Vector2f calcAtlasPositionForId(int id) {
         return new Vector2f(((int) id % (int) Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN), ((int) id / (int) Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN))
     }
