@@ -39,8 +39,8 @@ public class TreeBlock extends Block {
         super();
 
         // Override some defaults
-        _title = "Untitled tree block";
-        _allowBlockAttachment = true;      // Trees, unlike plain plants, _can_ in fact have stuff attached
+        withTitle("Untitled tree block");
+        withAllowBlockAttachment(true);      // Trees, unlike plain plants, _can_ in fact have stuff attached
 
         // Define plant-specific defaults
         _whut = true;           // Will probably come up with something special

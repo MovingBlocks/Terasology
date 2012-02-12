@@ -19,7 +19,7 @@ import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 

@@ -24,7 +24,7 @@ import org.terasology.logic.world.Chunk;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.Vector3f;

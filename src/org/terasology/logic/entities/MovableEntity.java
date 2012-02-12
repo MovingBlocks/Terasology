@@ -20,7 +20,7 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.world.WorldRenderer;

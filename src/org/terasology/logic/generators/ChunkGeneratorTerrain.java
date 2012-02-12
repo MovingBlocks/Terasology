@@ -16,7 +16,7 @@
 package org.terasology.logic.generators;
 
 import org.terasology.logic.world.Chunk;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector2f;

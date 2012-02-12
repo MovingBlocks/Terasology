@@ -17,6 +17,7 @@ package org.terasology.model.blocks;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
+import org.terasology.collection.EnumBooleanMap;
 import org.terasology.game.Terasology;
 import org.terasology.math.Side;
 import org.terasology.model.shapes.BlockMeshPart;
@@ -26,9 +27,7 @@ import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 
 import javax.imageio.ImageIO;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector4f;
+import javax.vecmath.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -54,47 +53,6 @@ public class Block implements IGameObject {
 
     private static final EnumMap<Side, Float> DIRECTION_LIT_LEVEL = new EnumMap<Side, Float>(Side.class);
 
-    static {
-        DIRECTION_LIT_LEVEL.put(Side.TOP, 0.9f);
-        DIRECTION_LIT_LEVEL.put(Side.BOTTOM, 0.9f);
-        DIRECTION_LIT_LEVEL.put(Side.FRONT, 1.0f);
-        DIRECTION_LIT_LEVEL.put(Side.BACK, 1.0f);
-        DIRECTION_LIT_LEVEL.put(Side.LEFT, 0.75f);
-        DIRECTION_LIT_LEVEL.put(Side.RIGHT, 0.75f);
-    }
-
-    /* PROPERTIES */
-    protected byte _id = 0x0;
-    protected String _title = "Untitled block";
-
-    protected boolean _translucent;
-    protected boolean _invisible;
-    protected boolean _penetrable;
-    protected boolean _castsShadows;
-    protected boolean _renderBoundingBox;
-    protected boolean _allowBlockAttachment;
-    protected boolean _bypassSelectionRay;
-    protected boolean _liquid;
-    protected boolean _waving;
-
-    protected BLOCK_FORM _blockForm;
-    protected COLOR_SOURCE _colorSource;
-
-    protected byte _luminance;
-    protected byte _hardness;
-
-    /* RENDERING */
-    private Mesh _mesh;
-    private BlockMeshPart _centerMesh;
-    private EnumMap<Side, BlockMeshPart> _sideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
-    private boolean[] _fullSide = new boolean[6];
-
-    // For liquid handling
-    private EnumMap<Side, BlockMeshPart> _loweredSideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
-
-    protected Vector4f[] _colorOffset = new Vector4f[6];
-    protected Vector2f[] _textureAtlasPos = new Vector2f[6];
-
     /* LUTs */
     protected static BufferedImage _colorLut;
     protected static BufferedImage _foliageLut;
@@ -117,6 +75,12 @@ public class Block implements IGameObject {
      * Init. the LUTs.
      */
     static {
+        DIRECTION_LIT_LEVEL.put(Side.TOP, 0.9f);
+        DIRECTION_LIT_LEVEL.put(Side.BOTTOM, 0.9f);
+        DIRECTION_LIT_LEVEL.put(Side.FRONT, 1.0f);
+        DIRECTION_LIT_LEVEL.put(Side.BACK, 1.0f);
+        DIRECTION_LIT_LEVEL.put(Side.LEFT, 0.75f);
+        DIRECTION_LIT_LEVEL.put(Side.RIGHT, 0.75f);
         try {
             _colorLut = ImageIO.read(ResourceLoader.getResource("org/terasology/data/textures/grasscolor.png").openStream());
             _foliageLut = ImageIO.read(ResourceLoader.getResource("org/terasology/data/textures/foliagecolor.png").openStream());
@@ -125,15 +89,53 @@ public class Block implements IGameObject {
         }
     }
 
+    /* PROPERTIES */
+    private byte _id = 0x0;
+    private String _title = "Untitled block";
+
+    private static class SharedBlockInternals {
+        private boolean translucent;
+        private boolean invisible;
+        private boolean penetrable;
+        private boolean castsShadows;
+        private boolean renderBoundingBox;
+        private boolean allowBlockAttachment;
+        private boolean bypassSelectionRay;
+        private boolean liquid;
+        private boolean waving;
+
+        private BLOCK_FORM blockForm;
+        private COLOR_SOURCE colorSource;
+
+        private byte luminance;
+        private byte hardness;
+    }
+
+    private SharedBlockInternals _internals;
+
+    /* RENDERING */
+    private Mesh _mesh;
+    private BlockMeshPart _centerMesh;
+    private EnumMap<Side, BlockMeshPart> _sideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
+    private EnumBooleanMap<Side> _fullSide = new EnumBooleanMap<Side>(Side.class);
+
+    // For liquid handling
+    private EnumMap<Side, BlockMeshPart> _loweredSideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
+
+    private EnumMap<Side, Vector4f> _colorOffset = new EnumMap<Side, Vector4f>(Side.class);
+    private EnumMap<Side, Vector2f> _textureAtlasPos = new EnumMap<Side, Vector2f>(Side.class);
+
     /**
      * Init. a new block with default properties in place.
      */
     public Block() {
         withTitle("Untitled block");
+        _internals = new SharedBlockInternals();
 
-        for (int i = 0; i < 6; i++) {
-            withTextureAtlasPos(Side.values()[i], new Vector2f(0.0f, 0.0f));
-            withColorOffset(Side.values()[i], new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+        for (Side side : Side.values()) {
+            withTextureAtlasPos(side, new Vector2f(0.0f, 0.0f));
+            withColorOffset(side, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+            withFullSide(side, false);
         }
 
         // Load the default settings
@@ -199,10 +201,11 @@ public class Block implements IGameObject {
             color.set(calcFoliageColorForTemperatureAndHumidity(temperature, humidity));
         }
 
-        color.x *= _colorOffset[side.ordinal()].x;
-        color.y *= _colorOffset[side.ordinal()].y;
-        color.z *= _colorOffset[side.ordinal()].z;
-        color.w *= _colorOffset[side.ordinal()].w;
+        Vector4f colorOffset = _colorOffset.get(side);
+        color.x *= colorOffset.x;
+        color.y *= colorOffset.y;
+        color.z *= colorOffset.z;
+        color.w *= colorOffset.w;
 
         return color;
     }
@@ -215,7 +218,8 @@ public class Block implements IGameObject {
      * @return The texture offset
      */
     public Vector2f calcTextureOffsetFor(Side side) {
-        return new Vector2f((int) getTextureAtlasPos()[side.ordinal()].x * TEXTURE_OFFSET, (int) getTextureAtlasPos()[side.ordinal()].y * TEXTURE_OFFSET);
+        Vector2f pos = getTextureAtlasPos(side);
+        return new Vector2f((int) pos.x * TEXTURE_OFFSET, (int) pos.y * TEXTURE_OFFSET);
     }
 
     public void render() {
@@ -263,104 +267,103 @@ public class Block implements IGameObject {
     }
 
     public Block withTranslucent(boolean translucent) {
-        _translucent = translucent;
+        _internals.translucent = translucent;
         return this;
     }
 
     public Block withWaving(boolean waving) {
-        _waving = waving;
+        _internals.waving = waving;
         return this;
     }
 
     public Block withInvisible(boolean invisible) {
-        _invisible = invisible;
+        _internals.invisible = invisible;
         return this;
     }
 
     public Block withPenetrable(boolean penetrable) {
-        _penetrable = penetrable;
+        _internals.penetrable = penetrable;
         return this;
     }
 
     public Block withCastsShadows(boolean castsShadows) {
-        _castsShadows = castsShadows;
+        _internals.castsShadows = castsShadows;
         return this;
     }
 
     public Block withRenderBoundingBox(boolean renderBoundingBox) {
-        _renderBoundingBox = renderBoundingBox;
+        _internals.renderBoundingBox = renderBoundingBox;
         return this;
     }
 
     public Block withAllowBlockAttachment(boolean allowBlockAttachment) {
-        _allowBlockAttachment = allowBlockAttachment;
+        _internals.allowBlockAttachment = allowBlockAttachment;
         return this;
     }
 
     public Block withBypassSelectionRay(boolean bypassSelectionRay) {
-        _bypassSelectionRay = bypassSelectionRay;
+        _internals.bypassSelectionRay = bypassSelectionRay;
         return this;
     }
 
     public Block withLiquid(boolean liquid) {
-        _liquid = liquid;
+        _internals.liquid = liquid;
         return this;
     }
 
     public Block withBlockForm(BLOCK_FORM blockForm) {
-        _blockForm = blockForm;
+        _internals.blockForm = blockForm;
         return this;
     }
 
     public Block withColorSource(COLOR_SOURCE colorSource) {
-        _colorSource = colorSource;
+        _internals.colorSource = colorSource;
         return this;
     }
 
     public Block withLuminance(byte luminance) {
-        _luminance = luminance;
+        _internals.luminance = luminance;
         return this;
     }
 
     public Block withHardness(byte hardness) {
-        _hardness = hardness;
+        _internals.hardness = hardness;
         return this;
     }
 
     public Block withColorOffset(Side side, Vector4f colorOffset) {
-        _colorOffset[side.ordinal()] = colorOffset;
+        _colorOffset.put(side, colorOffset);
         return this;
     }
 
     public Block withTextureAtlasPos(Side side, Vector2f atlasPos) {
-        _textureAtlasPos[side.ordinal()] = atlasPos;
+        _textureAtlasPos.put(side, atlasPos);
         return this;
     }
 
     public Block withTextureAtlasPosTopBottom(Vector2f atlasPos) {
-        _textureAtlasPos[Side.TOP.ordinal()] = atlasPos;
-        _textureAtlasPos[Side.BOTTOM.ordinal()] = atlasPos;
+        _textureAtlasPos.put(Side.TOP, atlasPos);
+        _textureAtlasPos.put(Side.BOTTOM, atlasPos);
         return this;
     }
 
     public Block withTextureAtlasPos(Vector2f atlasPos) {
-        for (int i = 0; i < 6; i++) {
-            withTextureAtlasPos(Side.values()[i], atlasPos);
+        for (Side side : Side.values()) {
+            withTextureAtlasPos(side, atlasPos);
         }
         return this;
     }
 
     public Block withTextureAtlasPosMantle(Vector2f atlasPos) {
-        _textureAtlasPos[Side.LEFT.ordinal()] = atlasPos;
-        _textureAtlasPos[Side.RIGHT.ordinal()] = atlasPos;
-        _textureAtlasPos[Side.FRONT.ordinal()] = atlasPos;
-        _textureAtlasPos[Side.BACK.ordinal()] = atlasPos;
+        for (Side side : Side.horizontalSides()) {
+            _textureAtlasPos.put(side, atlasPos);
+        }
         return this;
     }
 
     public Block withColorOffset(Vector4f colorOffset) {
-        for (int i = 0; i < 6; i++) {
-            withColorOffset(Side.values()[i], colorOffset);
+        for (Side side : Side.values()) {
+            withColorOffset(side, colorOffset);
         }
         return this;
     }
@@ -381,28 +384,28 @@ public class Block implements IGameObject {
     }
 
     public Block withFullSide(Side side, boolean full) {
-        _fullSide[side.ordinal()] = full;
+        _fullSide.put(side, full);
         return this;
     }
 
     public COLOR_SOURCE getColorSource() {
-        return _colorSource;
+        return _internals.colorSource;
     }
 
     public byte getHardness() {
-        return _hardness;
+        return _internals.hardness;
     }
 
-    public Vector4f[] getColorOffset() {
-        return _colorOffset;
+    public Vector4f getColorOffset(Side side) {
+        return _colorOffset.get(side);
     }
 
-    public Vector2f[] getTextureAtlasPos() {
-        return _textureAtlasPos;
+    public Vector2f getTextureAtlasPos(Side side) {
+        return _textureAtlasPos.get(side);
     }
 
     public BLOCK_FORM getBlockForm() {
-        return _blockForm;
+        return _internals.blockForm;
     }
 
     public String getTitle() {
@@ -414,7 +417,7 @@ public class Block implements IGameObject {
     }
 
     public boolean isBlockingSide(Side side) {
-        return _fullSide[side.ordinal()];
+        return _fullSide.get(side);
     }
 
     public BlockMeshPart getSideMesh(Side side) {
@@ -430,23 +433,23 @@ public class Block implements IGameObject {
     }
 
     public boolean isInvisible() {
-        return _invisible;
+        return _internals.invisible;
     }
 
     public boolean isPenetrable() {
-        return _penetrable;
+        return _internals.penetrable;
     }
 
     public boolean isCastsShadows() {
-        return _castsShadows;
+        return _internals.castsShadows;
     }
 
     public boolean isRenderBoundingBox() {
-        return _renderBoundingBox;
+        return _internals.renderBoundingBox;
     }
 
     public byte getLuminance() {
-        return _luminance;
+        return _internals.luminance;
     }
 
     public boolean isDestructible() {
@@ -454,23 +457,23 @@ public class Block implements IGameObject {
     }
 
     public boolean isAllowBlockAttachment() {
-        return _allowBlockAttachment;
+        return _internals.allowBlockAttachment;
     }
 
     public boolean isLiquid() {
-        return _liquid;
+        return _internals.liquid;
     }
 
     public boolean isWaving() {
-        return _waving;
+        return _internals.waving;
     }
 
     public boolean isSelectionRayThrough() {
-        return _bypassSelectionRay;
+        return _internals.bypassSelectionRay;
     }
 
     public boolean isTranslucent() {
-        return _translucent;
+        return _internals.translucent;
     }
 
     /**
@@ -498,4 +501,33 @@ public class Block implements IGameObject {
     public String toString() {
         return this.getClass().getSimpleName() + ":" + _title + ";id:" + _id;
     }
+
+    public Block rotateClockwise(int steps) throws IllegalAccessException, InstantiationException {
+        Block block = getClass().newInstance();
+        block._internals = _internals;
+
+        Quat4f rotation = new Quat4f();
+        rotation.set(new AxisAngle4f(new Vector3f(0, -1, 0), (float) (0.5f * Math.PI * steps)));
+
+        if (_centerMesh != null) {
+            block._centerMesh = _centerMesh.rotate(rotation);
+        }
+        for (Side side : Side.values()) {
+            Side rotatedSide = side.rotateClockwise(steps);
+            block._fullSide.put(rotatedSide, _fullSide.get(side));
+            block._colorOffset.put(rotatedSide, _colorOffset.get(side));
+            block._textureAtlasPos.put(rotatedSide, _textureAtlasPos.get(side));
+
+            BlockMeshPart sideMesh = _sideMesh.get(side);
+            if (sideMesh != null) {
+                block._sideMesh.put(rotatedSide, sideMesh.rotate(rotation));
+            }
+            BlockMeshPart loweredSideMesh = _loweredSideMesh.get(side);
+            if (loweredSideMesh != null) {
+                block._loweredSideMesh.put(rotatedSide, loweredSideMesh.rotate(rotation));
+            }
+        }
+        return block;
+    }
+
 }

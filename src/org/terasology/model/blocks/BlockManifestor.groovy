@@ -28,6 +28,7 @@ import org.terasology.math.Side
 import org.terasology.model.shapes.BlockShape
 import org.terasology.model.shapes.BlockShapeManager
 import org.terasology.utilities.ClasspathResourceLoader
+import org.terasology.model.blocks.management.BlockManager
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between

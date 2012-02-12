@@ -17,7 +17,7 @@ package org.terasology.logic.generators;
 
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.world.Chunk;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 
 /**
  * Generates some trees, flowers and high grass.

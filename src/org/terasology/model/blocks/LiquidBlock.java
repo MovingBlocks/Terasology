@@ -38,15 +38,15 @@ public class LiquidBlock extends Block {
         super();
 
         // Override some defaults
-        _title = "Untitled liquid block";
+        withTitle("Untitled liquid block");
 
-        _allowBlockAttachment = false;      // Yeah, no attaching stuff to liquids much...
-        _liquid = true;                     // Liquids are indeed liquids
-        _translucent = true;
-        _bypassSelectionRay = true;
-        _blockForm = BLOCK_FORM.LOWERED_BLOCK;
-        _penetrable = true;
-        _castsShadows = true;
+        withAllowBlockAttachment(false);      // Yeah, no attaching stuff to liquids much...
+        withLiquid(true);                     // Liquids are indeed liquids
+        withTranslucent(true);
+        withBypassSelectionRay(true);
+        withBlockForm(BLOCK_FORM.LOWERED_BLOCK);
+        withPenetrable(true);
+        withCastsShadows(true);
 
         // Define liquid-specific defaults
         _viscosity = 50;           // No clue how viscous "50" would be or if there's a point in having a default...

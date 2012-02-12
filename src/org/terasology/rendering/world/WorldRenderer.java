@@ -25,7 +25,7 @@ import org.terasology.logic.entities.Entity;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.*;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.interfaces.IGameObject;

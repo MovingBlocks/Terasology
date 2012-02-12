@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.model.blocks;
+package org.terasology.model.blocks.management;
 
 import gnu.trove.map.hash.TByteObjectHashMap;
 import org.lwjgl.BufferUtils;
+import org.terasology.math.Side;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.BlockGroup;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
@@ -39,6 +42,8 @@ public class BlockManager {
     /* BLOCKS */
     private final HashMap<String, Block> _blocksByTitle = new HashMap<String, Block>(128);
     private final TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
+    
+    private final HashMap<String, BlockGroup> _blockGroupsByTitle = new HashMap<String, BlockGroup>(128);
 
     public static BlockManager getInstance() {
         if (_instance == null)
@@ -63,6 +68,10 @@ public class BlockManager {
             e.printStackTrace();
             System.exit(-1);
         }
+    }
+    
+    public BlockGroup getBlockGroup(String title) {
+        return _blockGroupsByTitle.get(title);
     }
 
     public Block getBlock(String title) {
@@ -93,6 +102,13 @@ public class BlockManager {
             _blocksByTitle.put(b.getTitle(), b);
         }
     }
+    
+    public void addAllBlockGroups(Iterable<BlockGroup> groups) {
+        for (BlockGroup group : groups) {
+            _blockGroupsByTitle.put(group.getTitle(), group);
+        }
+    }
+            
 
     public FloatBuffer calcCoordinatesForWavingBlocks() {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(32);
@@ -100,7 +116,7 @@ public class BlockManager {
         int counter = 0;
         for (Block b : _blocksByTitle.values()) {
             if (b.isWaving()) {
-                Vector2f pos = b.getTextureAtlasPos()[0];
+                Vector2f pos = b.getTextureAtlasPos(Side.TOP);
                 buffer.put(pos.x * Block.TEXTURE_OFFSET);
                 buffer.put(pos.y * Block.TEXTURE_OFFSET);
                 counter++;
@@ -121,7 +137,7 @@ public class BlockManager {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(2);
 
         if (_blocksByTitle.containsKey(title)) {
-            Vector2f position = _blocksByTitle.get(title).getTextureAtlasPos()[1];
+            Vector2f position = _blocksByTitle.get(title).getTextureAtlasPos(Side.LEFT);
             buffer.put(position.x * Block.TEXTURE_OFFSET);
             buffer.put(position.y * Block.TEXTURE_OFFSET);
         }

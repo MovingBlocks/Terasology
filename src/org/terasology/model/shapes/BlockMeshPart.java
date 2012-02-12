@@ -1,7 +1,9 @@
 package org.terasology.model.shapes;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.rendering.primitives.ChunkMesh;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -83,5 +85,19 @@ public class BlockMeshPart {
         for (int i = 0; i < _indices.length; ++i) {
             chunk._vertexElements[meshBit].indices.add(_indices[i] + nextIndex);
         }
+    }
+    
+    public BlockMeshPart rotate(Quat4f rotation)
+    {
+        Vector3f[] newVertices = new Vector3f[_vertices.length];
+        Vector3f[] newNormals = new Vector3f[_normals.length];
+        
+        for (int i = 0; i < newVertices.length; ++i)
+        {
+            newVertices[i] = QuaternionUtil.quatRotate(rotation, _vertices[i], new Vector3f());
+            newNormals[i] = QuaternionUtil.quatRotate(rotation, _normals[i], new Vector3f());
+        }
+        
+        return new BlockMeshPart(newVertices, newNormals, _texCoords, _indices);
     }
 }

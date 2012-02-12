@@ -25,7 +25,7 @@ import org.terasology.logic.generators.GeneratorManager;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.MathHelper;
 import org.xml.sax.InputSource;

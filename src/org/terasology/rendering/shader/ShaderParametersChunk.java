@@ -16,7 +16,7 @@
 package org.terasology.rendering.shader;
 
 import org.terasology.game.Terasology;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 
 /**
  * TODO

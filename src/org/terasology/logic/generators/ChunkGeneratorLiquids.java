@@ -17,7 +17,7 @@ package org.terasology.logic.generators;
 
 import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.logic.world.Chunk;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 
 /**

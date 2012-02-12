@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.shader.ShaderParameters;
 
 import javax.vecmath.Vector3d;
