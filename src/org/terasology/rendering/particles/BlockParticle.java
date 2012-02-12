@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL20;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;

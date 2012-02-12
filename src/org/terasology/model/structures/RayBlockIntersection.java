@@ -18,7 +18,7 @@ package org.terasology.model.structures;
 
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;

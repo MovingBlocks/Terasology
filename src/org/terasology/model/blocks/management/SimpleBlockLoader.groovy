@@ -1,4 +1,4 @@
-package org.terasology.model.blocks
+package org.terasology.model.blocks.management
 
 import javax.vecmath.Vector2f
 import org.terasology.math.Side
@@ -6,6 +6,7 @@ import org.terasology.model.shapes.BlockShape
 import org.terasology.model.shapes.BlockShapeManager
 import javax.vecmath.Vector4f
 import groovy.util.logging.Log
+import org.terasology.model.blocks.Block
 
 /**
  * @author Immortius <immortius@gmail.com>

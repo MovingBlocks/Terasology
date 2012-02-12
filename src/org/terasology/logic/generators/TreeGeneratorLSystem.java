@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.generators;
 
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;

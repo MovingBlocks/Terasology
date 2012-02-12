@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.model.blocks;
+package org.terasology.model.blocks.management;
 
 import gnu.trove.map.hash.TByteObjectHashMap;
 import org.lwjgl.BufferUtils;
+import org.terasology.math.Side;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.BlockGroup;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
@@ -113,7 +116,7 @@ public class BlockManager {
         int counter = 0;
         for (Block b : _blocksByTitle.values()) {
             if (b.isWaving()) {
-                Vector2f pos = b.getTextureAtlasPos()[0];
+                Vector2f pos = b.getTextureAtlasPos(Side.TOP);
                 buffer.put(pos.x * Block.TEXTURE_OFFSET);
                 buffer.put(pos.y * Block.TEXTURE_OFFSET);
                 counter++;
@@ -134,7 +137,7 @@ public class BlockManager {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(2);
 
         if (_blocksByTitle.containsKey(title)) {
-            Vector2f position = _blocksByTitle.get(title).getTextureAtlasPos()[1];
+            Vector2f position = _blocksByTitle.get(title).getTextureAtlasPos(Side.LEFT);
             buffer.put(position.x * Block.TEXTURE_OFFSET);
             buffer.put(position.y * Block.TEXTURE_OFFSET);
         }

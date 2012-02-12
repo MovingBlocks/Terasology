@@ -1,4 +1,7 @@
-package org.terasology.model.blocks
+package org.terasology.model.blocks.management
+
+import org.terasology.model.blocks.Block
+import org.terasology.model.blocks.LiquidBlock
 
 /**
  * @author Immortius <immortius@gmail.com>

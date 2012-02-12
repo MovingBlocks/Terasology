@@ -36,7 +36,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.Chunk;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.utilities.FastRandom;

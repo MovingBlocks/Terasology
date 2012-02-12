@@ -9,4 +9,6 @@ block {
     faces {
         all = "Brick"
     }
+    // Temporary flag
+    spin = true
 }

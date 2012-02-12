@@ -18,7 +18,7 @@ package org.terasology.logic.simulators;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.IWorldProvider;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 
 import javax.vecmath.Vector3d;

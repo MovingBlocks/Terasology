@@ -26,7 +26,7 @@ import org.lwjgl.opengl.PixelFormat;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.IWorldProvider;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;

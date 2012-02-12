@@ -16,7 +16,7 @@
 package org.terasology.model.inventory;
 
 import org.terasology.logic.characters.Player;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>

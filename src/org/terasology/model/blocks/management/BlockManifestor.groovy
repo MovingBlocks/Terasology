@@ -1,4 +1,4 @@
-package org.terasology.model.blocks
+package org.terasology.model.blocks.management
 
 /*
  * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
@@ -22,14 +22,16 @@ import java.awt.image.BufferedImage
 
 import javax.imageio.ImageIO
 import javax.vecmath.Vector2f
-import javax.vecmath.Vector4f
 
 import org.terasology.logic.manager.TextureManager
 import org.terasology.utilities.ClasspathResourceLoader
-import org.terasology.model.shapes.BlockShape
-import org.terasology.model.shapes.BlockShapeManager
-import org.terasology.math.Side
+
 import groovy.util.logging.Log
+import org.terasology.model.blocks.Block
+import org.terasology.model.blocks.BlockGroup
+import org.terasology.model.blocks.SymmetricGroup
+import org.terasology.math.Side
+import org.terasology.model.blocks.HorizontalBlockGroup
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -88,10 +90,10 @@ class BlockManifestor {
     }
 
     private File fixSavePath(File f) {
-        log.info "Suggested absolute save path is: " + f.getAbsolutePath()
+        org.terasology.model.blocks.management.BlockManifestor.log.info "Suggested absolute save path is: " + f.getAbsolutePath()
         if (!f.getAbsolutePath().contains("Terasology")) {
             f = new File(System.getProperty("java.io.tmpdir"), f.path)
-            log.info "Going to use absolute TEMP save path instead: " + f.getAbsolutePath()
+            org.terasology.model.blocks.management.BlockManifestor.log.info "Going to use absolute TEMP save path instead: " + f.getAbsolutePath()
 
             return f
         }
@@ -156,7 +158,7 @@ class BlockManifestor {
         }
 
         _bm.addAllBlocks(_blockIndex)
-        log.info "_imageManifest file: " + _imageManifest.getAbsolutePath()
+        org.terasology.model.blocks.management.BlockManifestor.log.info "_imageManifest file: " + _imageManifest.getAbsolutePath()
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
     }
 
@@ -177,36 +179,54 @@ class BlockManifestor {
 
             // Prepare a Block from the stuff we load from the Groovy definition
             Block b = loader.loadBlock(blockConfig)
+            
+            if (blockConfig.block.spin != [:] && blockConfig.block.spin == true) {
+                String baseTitle = c.getSimpleName();
+                EnumMap<Side, Block> blocks = new EnumMap<Side, Block>(Side.class);
+                registerBlock(baseTitle + Side.FRONT, b);
+                blocks.put(Side.FRONT, b);
+                for (int i = 1; i < 4; ++i) {
+                    Side direction = Side.FRONT.rotateClockwise(i); 
+                    Block rotBlock = b.rotateClockwise(i);
+                    registerBlock(baseTitle + direction, rotBlock);
+                    blocks.put(direction, rotBlock);
+                }
+                _blockGroups.add(new HorizontalBlockGroup(baseTitle, blocks));
+            } else {
+                registerBlock(c.getSimpleName(), b);
+                _blockGroups.add(new SymmetricGroup(b));
+            }
 
             // Optionally use the Class object we loaded to execute any custom Groovy scripting (rare?)
             // An example would be if the Block wants to be registered as a specific type (dirt, plant, mineral..)
 
-            // Make up or load a dynamic ID and add the finished Block to our local block index (prep for BlockManager)
-            b.withTitle(c.getSimpleName())
-            // See if have an ID for this block already (we should if we loaded an existing manifest)
-            if (_blockStringIndex.containsKey(b.getTitle())) {
-                println "Found an existing block ID value, assigning it to Block " + b.getTitle()
-                b.withId((byte) _blockStringIndex.get(b.getTitle()))
-            } else {
-                // We have a single special case - the Air block (aka "empty") is ALWAYS id 0
-                if (b.getTitle() == "Air") {
-                    println "Hit the Air block - assigning this one the magic zero value a.k.a. 'empty'"
-                    b.withId((byte) 0)
-                    _blockStringIndex.put(b.getTitle(), (byte) 0)
-                } else {
-                    println "We don't have an existing ID for " + b.getTitle() + " so assigning _nextByte " + _nextByte
-                    b.withId(_nextByte)
-                    _blockStringIndex.put(b.getTitle(), _nextByte)
-                    _nextByte++
-                }
-            }
 
-            _blockIndex.put(b.getId(), b)
-
-            // BlockManager.addBlock(b) // This adds the instantiated class itself with all values set for game usage
-            // if (!BlockManager.hasManifested(b)) {    // Check if we already loaded a manifest ID for the Block
-            // BlockManager.addBlockManifest(b, BlockManager.nextID)    // If not then create an ID for it
         }
+    }
+
+    private void registerBlock(String title, Block b) {
+        b.withTitle(title);
+
+        // Make up or load a dynamic ID and add the finished Block to our local block index (prep for BlockManager)
+        // See if have an ID for this block already (we should if we loaded an existing manifest)
+        if (_blockStringIndex.containsKey(b.getTitle())) {
+            log.info "Found an existing block ID value, assigning it to Block " + b.getTitle()
+            b.withId((byte) _blockStringIndex.get(b.getTitle()))
+        } else {
+            // We have a single special case - the Air block (aka "empty") is ALWAYS id 0
+            if (b.getTitle() == "Air") {
+                log.info "Hit the Air block - assigning this one the magic zero value a.k.a. 'empty'"
+                b.withId((byte) 0)
+                _blockStringIndex.put(b.getTitle(), (byte) 0)
+            } else {
+                log.info "We don't have an existing ID for " + b.getTitle() + " so assigning _nextByte " + _nextByte
+                b.withId(_nextByte)
+                _blockStringIndex.put(b.getTitle(), _nextByte)
+                _nextByte++
+            }
+        }
+
+        _blockIndex.put(b.getId(), b)
     }
 
     public BufferedImage generateImage(int mipMapLevel) {

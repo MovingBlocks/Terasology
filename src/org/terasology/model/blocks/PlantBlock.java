@@ -38,8 +38,8 @@ public class PlantBlock extends Block {
         super();
 
         // Override some Block defaults with PlantBlock-level defaults
-        _title = "Untitled plant block";
-        _allowBlockAttachment = false;      // Generally can't attach stuff to plants!
+        withTitle("Untitled plant block");
+        withAllowBlockAttachment(false);      // Generally can't attach stuff to plants!
 
         // Define PlantBlock-unique defaults
         _requiresSunlight = true;           // Most plants like sunlight (but not necessarily all!)

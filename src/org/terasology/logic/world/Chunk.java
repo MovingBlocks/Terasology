@@ -29,7 +29,7 @@ import org.terasology.logic.generators.ChunkGenerator;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;

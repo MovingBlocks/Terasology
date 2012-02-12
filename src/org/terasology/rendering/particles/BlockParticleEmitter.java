@@ -17,7 +17,7 @@ package org.terasology.rendering.particles;
 
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**

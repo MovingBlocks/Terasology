@@ -30,7 +30,7 @@ import org.terasology.logic.tools.ITool;
 import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.Inventory;
 import org.terasology.model.inventory.Item;
 import org.terasology.model.inventory.ItemBlock;

@@ -24,7 +24,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
