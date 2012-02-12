@@ -17,6 +17,7 @@ package org.terasology.logic.manager;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL14;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
@@ -63,9 +64,9 @@ public class TextureManager {
 
     public void loadDefaultTextures() {
         addTexture("custom_lava_still");
-        addTexture("custom_water_still");
         addTexture("custom_lava_flowing");
-        addTexture("custom_water_flowing");
+        addTexture("water_normal", GL11.GL_REPEAT, GL_LINEAR);
+        addTexture("water_normal2", GL11.GL_REPEAT, GL_LINEAR);
 
         /* UI */
         addTexture("gui_menu");
@@ -96,6 +97,14 @@ public class TextureManager {
         }
     }
 
+    public void addTexture(String title, int addressingMode, int interpolationMode) {
+        try {
+            addTexture(title, "org/terasology/data/textures/" + title + ".png", null, addressingMode, interpolationMode);
+        } catch (IOException ex) {
+            Terasology.getInstance().getLogger().log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void readTexture(String path, Texture target) throws IOException {
         InputStream stream = ResourceLoader.getResource(path).openStream();
         PNGDecoder decoder = new PNGDecoder(stream);
@@ -109,16 +118,16 @@ public class TextureManager {
         target.width = decoder.getWidth();
     }
 
-    public Texture loadTexture(String path, String[] mipMapPaths) throws IOException {
+    public Texture loadTexture(String path, String[] mipMapPaths, int addressingMode, int interpolationMode) throws IOException {
         Texture texture = new Texture();
 
         texture.id = glGenTextures();
         glBindTexture(GL11.GL_TEXTURE_2D, texture.id);
 
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-        GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, addressingMode);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, addressingMode);
+        GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, interpolationMode);
+        GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, interpolationMode);
 
         readTexture(path, texture);
 
@@ -141,12 +150,16 @@ public class TextureManager {
         return texture;
     }
 
+    public void addTexture(String bindName, String path, String[] mipMapPaths, int addressingMode, int interpolationMode) throws IOException {
+        _textures.put(bindName, loadTexture(path, mipMapPaths, addressingMode, interpolationMode));
+    }
+
     public void addTexture(String bindName, String path, String[] mipMapPaths) throws IOException {
-        _textures.put(bindName, loadTexture(path, mipMapPaths));
+        _textures.put(bindName, loadTexture(path, mipMapPaths, GL_CLAMP, GL_NEAREST));
     }
 
     public void addTexture(String bindName, String path) throws IOException {
-        _textures.put(bindName, loadTexture(path, null));
+        _textures.put(bindName, loadTexture(path, null, GL_CLAMP, GL_NEAREST));
     }
 
     public void bindTexture(String s) {

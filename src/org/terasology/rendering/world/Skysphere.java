@@ -33,6 +33,7 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -108,7 +109,6 @@ public class Skysphere implements IGameObject {
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(0));
         _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
-        sunNormalise.normalize();
 
         Vector3d _zenithColor = getAllWeatherZenith(sunNormalise.y);
 
@@ -179,6 +179,13 @@ public class Skysphere implements IGameObject {
                 }
             });
         }
+
+        // Set the light direction according to the position of the sun
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(4);
+        buffer.put(0.0f).put((float) Math.cos(_sunPosAngle)).put((float)Math.sin(_sunPosAngle)).put(1.0f);
+        buffer.flip();
+
+        glLight(GL_LIGHT0, GL11.GL_POSITION, buffer);
     }
 
     private void drawSphere() {

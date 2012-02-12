@@ -365,11 +365,6 @@ public final class Terasology {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glShadeModel(GL_FLAT);
-
-        // Update the viewing distance
-        double minDist = (VIEWING_DISTANCES[_activeViewingDistance] / 2) * 16.0f;
-        glFogf(GL_FOG_START, (float) (minDist * 0.5));
-        glFogf(GL_FOG_END, (float) minDist);
     }
 
     private void resizeViewport() {

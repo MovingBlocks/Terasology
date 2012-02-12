@@ -279,18 +279,18 @@ public final class WorldRenderer implements IGameObject {
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         TextureManager.getInstance().bindTexture("custom_lava_still");
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        TextureManager.getInstance().bindTexture("custom_water_still");
+        TextureManager.getInstance().bindTexture("water_normal");
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
         TextureManager.getInstance().bindTexture("effects");
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("terrain");
 
         int lavaTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureLava");
-        int waterTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureWater");
+        int textureWaterNormal = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureWaterNormal");
         int textureAtlas = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureAtlas");
         int textureEffects = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureEffects");
         GL20.glUniform1i(lavaTexture, 1);
-        GL20.glUniform1i(waterTexture, 2);
+        GL20.glUniform1i(textureWaterNormal, 2);
         GL20.glUniform1i(textureEffects, 3);
         GL20.glUniform1i(textureAtlas, 0);
 
@@ -305,6 +305,9 @@ public final class WorldRenderer implements IGameObject {
 
         PerformanceMonitor.startActivity("Chunk-Opaque");
 
+
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
@@ -312,6 +315,8 @@ public final class WorldRenderer implements IGameObject {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_PHASE.OPAQUE);
         }
+        glDisable(GL_LIGHT0);
+        glDisable(GL_LIGHTING);
 
         PerformanceMonitor.endActivity();
 
@@ -320,6 +325,8 @@ public final class WorldRenderer implements IGameObject {
         /*
          * SECOND RENDER PASS: BILLBOARDS
          */
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -327,7 +334,8 @@ public final class WorldRenderer implements IGameObject {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT);
         }
-
+        glDisable(GL_LIGHT0);
+        glDisable(GL_LIGHTING);
         ShaderManager.getInstance().enableShader(null);
 
         PerformanceMonitor.endActivity();
@@ -352,6 +360,9 @@ public final class WorldRenderer implements IGameObject {
         /*
         * THIRD RENDER PASS: WATER AND ICE
         */
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+
         for (int j = 0; j < 2; j++) {
             if (j == 0) {
                 glColorMask(false, false, false, false);
@@ -365,6 +376,8 @@ public final class WorldRenderer implements IGameObject {
             }
         }
 
+        glDisable(GL_LIGHT0);
+        glDisable(GL_LIGHTING);
         glDisable(GL_BLEND);
         glEnable(GL11.GL_CULL_FACE);
         ShaderManager.getInstance().enableShader(null);

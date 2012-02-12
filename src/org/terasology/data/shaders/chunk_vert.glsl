@@ -1,8 +1,8 @@
 varying vec3 normal;
+varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;
 varying vec3 eyeVec;
 varying vec3 lightDir;
-uniform float sunPosAngle;
 
 uniform float tick;
 uniform float wavingCoordinates[32];
@@ -11,10 +11,10 @@ uniform vec2 lavaCoordinate;
 
 void main()
 {
-	vertexWorldPos = gl_ModelViewMatrix * gl_Vertex;
+	vertexWorldPosRaw = gl_Vertex;
+	vertexWorldPos = gl_ModelViewMatrix * vertexWorldPosRaw;
 
-	vec4 lightPos = vec4(0.0, cos(sunPosAngle) * 512.0, sin(sunPosAngle) * 512.0, 1.0);
-	lightDir = (gl_ModelViewMatrix * lightPos).xyz - vertexWorldPos.xyz;
+	lightDir = gl_LightSource[0].position.xyz;
 	eyeVec = -vertexWorldPos.xyz;
 
 	float distance = length(vertexWorldPos);

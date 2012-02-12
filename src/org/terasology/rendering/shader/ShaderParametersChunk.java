@@ -40,7 +40,6 @@ public class ShaderParametersChunk extends ShaderParameters {
         setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("Lava"));
         setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
         setFloat("tick", tera.getActiveWorldRenderer().getTick());
-        setFloat("sunPosAngle", (float) tera.getActiveWorldRenderer().getSkysphere().getSunPosAngle());
     }
 
 }
