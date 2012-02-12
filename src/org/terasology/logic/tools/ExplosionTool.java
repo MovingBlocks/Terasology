@@ -29,12 +29,10 @@ import javax.vecmath.Vector3f;
 /**
  * Creates an explosion originating from the currently selected block of the player.
  */
-public class ExplosionTool implements ITool {
-
-    private final Player _player;
+public class ExplosionTool extends SimpleTool {
 
     public ExplosionTool(Player player) {
-        _player = player;
+        super(player);
     }
 
     public void executeLeftClickAction() {
@@ -52,8 +50,7 @@ public class ExplosionTool implements ITool {
             BlockPosition blockPos = _player.getSelectedBlock().getBlockPosition();
             Vector3d origin = blockPos.toVector3d();
 
-            int counter = 0;
-            for (int i = 0; i < 512; i++) {
+            for (int i = 0; i < 256; i++) {
                 Vector3d direction = new Vector3d((float) worldProvider.getRandom().randomDouble(), (float) worldProvider.getRandom().randomDouble(), (float) worldProvider.getRandom().randomDouble());
                 direction.normalize();
 
@@ -72,12 +69,11 @@ public class ExplosionTool implements ITool {
                     Block currentBlock = BlockManager.getInstance().getBlock(currentBlockType);
 
                     if (currentBlock.isDestructible()) {
-                        worldProvider.setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, true);
+                        // Make sure no updates are triggered
+                        placeBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, false);
 
-                        if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent() && counter % 4 == 0)
+                        if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent())
                             BulletPhysicsRenderer.getInstance().addBlock(new Vector3f(target), currentBlockType);
-
-                        counter++;
                     }
                 }
             }

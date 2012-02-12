@@ -371,6 +371,7 @@ public final class Terasology {
 
         // MAIN GAME LOOP
         while (_runGame && !Display.isCloseRequested()) {
+            // Only process rendering and updating once a second
             if (!Display.isActive()) {
                 try {
                     Thread.sleep(1000);
@@ -380,7 +381,6 @@ public final class Terasology {
                 PerformanceMonitor.startActivity("Process Display");
                 Display.processMessages();
                 PerformanceMonitor.endActivity();
-                continue;
             }
 
             PerformanceMonitor.startActivity("Main Update");

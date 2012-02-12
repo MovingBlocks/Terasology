@@ -462,7 +462,7 @@ public class Block implements IGameObject {
     }
 
     public boolean isDestructible() {
-        return getHardness() >= 0;
+        return getHardness() > 0;
     }
 
     public boolean isAllowBlockAttachment() {

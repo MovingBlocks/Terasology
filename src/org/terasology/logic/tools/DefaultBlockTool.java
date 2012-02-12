@@ -33,12 +33,10 @@ import javax.vecmath.Vector3f;
 /**
  * The basic tool used for block interaction. Can be used to place and remove blocks.
  */
-public class DefaultBlockTool implements ITool {
-
-    protected final Player _player;
+public class DefaultBlockTool extends SimpleTool{
 
     public DefaultBlockTool(Player player) {
-        _player = player;
+        super(player);
     }
 
     public void executeLeftClickAction() {
@@ -81,13 +79,7 @@ public class DefaultBlockTool implements ITool {
                 return false;
             }
 
-            worldProvider.setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, true);
-            AudioManager.getInstance().playVaryingSound("PlaceBlock", 0.6f, 0.5f);
-
-            int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
-            int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
-            _player.notifyObserversBlockPlaced(worldProvider.getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
-
+            placeBlock(blockPos, type, true);
             return true;
         }
 
@@ -137,7 +129,7 @@ public class DefaultBlockTool implements ITool {
 
                 // Enough pokes... Remove the block!
                 if (_player.getExtractionCounter() >= block.getHardness()) {
-                    worldProvider.setBlock(blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, true);
+                    placeBlock(blockPos, (byte) 0x0, true);
 
                     // Remove the upper block if it's a billboard
                     byte upperBlockType = worldProvider.getBlock(blockPos.x, blockPos.y + 1, blockPos.z);
@@ -153,10 +145,6 @@ public class DefaultBlockTool implements ITool {
                         Vector3d pos = blockPos.toVector3d();
                         BulletPhysicsRenderer.getInstance().addBlock(new Vector3f(pos), currentBlockType);
                     }
-
-                    int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
-                    int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
-                    _player.notifyObserversBlockRemoved(worldProvider.getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
 
                     _player.resetExtraction();
                     return currentBlockType;

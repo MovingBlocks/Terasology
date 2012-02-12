@@ -582,14 +582,14 @@ public final class Player extends Character {
         _observers.remove(observer);
     }
 
-    public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos) {
+    public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
         for (IBlockObserver ob : _observers)
-            ob.blockPlaced(chunk, pos);
+            ob.blockPlaced(chunk, pos, update);
     }
 
-    public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos) {
+    public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
         for (IBlockObserver ob : _observers)
-            ob.blockRemoved(chunk, pos);
+            ob.blockRemoved(chunk, pos, update);
     }
 
     public Inventory getInventory() {
