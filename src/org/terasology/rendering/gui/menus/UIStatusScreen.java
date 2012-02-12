@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gui.menus;
 
+import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
@@ -26,14 +27,14 @@ import org.terasology.rendering.gui.framework.UIDisplayRenderer;
  */
 public class UIStatusScreen extends UIDisplayRenderer {
 
-    final UITransparentOverlay _overlay;
+    final UIImageOverlay _overlay;
     final UIText _status;
 
     public UIStatusScreen() {
         _status = new UIText("Loading...");
         _status.setVisible(true);
 
-        _overlay = new UITransparentOverlay();
+        _overlay = new UIImageOverlay("loadingBackground");
         _overlay.setVisible(true);
 
         addDisplayElement(_overlay);

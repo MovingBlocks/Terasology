@@ -73,6 +73,7 @@ public class TextureManager {
         addTexture("icons");
         addTexture("items");
         addTexture("terasology");
+        addTexture("loadingBackground");
         addTexture("inventory");
 
         /* MOBS */
