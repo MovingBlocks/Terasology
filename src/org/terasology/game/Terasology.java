@@ -15,6 +15,7 @@
  */
 package org.terasology.game;
 
+import com.sun.servicetag.SystemEnvironment;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -23,7 +24,6 @@ import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
-import org.newdawn.slick.openal.AudioLoader;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.IWorldProvider;
@@ -92,6 +92,7 @@ public final class Terasology {
     private UIHeadsUpDisplay _hud;
     private UIMetrics _metrics;
     private UIPauseMenu _pauseMenu;
+    private UILoadingScreen _loadingScreen;
     private UIStatusScreen _statusScreen;
     private UIInventoryScreen _inventoryScreen;
 
@@ -157,8 +158,14 @@ public final class Terasology {
             addLibraryPath("natives/macosx");
         else if (System.getProperty("os.name").equals("Linux"))
             addLibraryPath("natives/linux");
-        else
+        else {
             addLibraryPath("natives/windows");
+
+            if (SystemEnvironment.getSystemEnvironment().getOsArchitecture().equals("amd64"))
+                System.loadLibrary("OpenAL64");
+            else
+                System.loadLibrary("OpenAL32");
+        }
     }
 
     private static void addLibraryPath(String s) throws Exception {
@@ -274,14 +281,14 @@ public final class Terasology {
     private void simulateWorld(int duration) {
         long timeBefore = getTime();
 
-        _statusScreen.setVisible(true);
+        _loadingScreen.setVisible(true);
         _hud.setVisible(false);
         _metrics.setVisible(false);
 
         float diff = 0;
 
         while (diff < duration) {
-            _statusScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
+            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
 
             renderUserInterface();
             updateUserInterface();
@@ -293,7 +300,7 @@ public final class Terasology {
             diff = getTime() - timeBefore;
         }
 
-        _statusScreen.setVisible(false);
+        _loadingScreen.setVisible(false);
         _hud.setVisible(true);
         _metrics.setVisible(true);
     }
@@ -324,6 +331,7 @@ public final class Terasology {
         _hud.setVisible(true);
 
         _pauseMenu = new UIPauseMenu();
+        _loadingScreen = new UILoadingScreen();
         _statusScreen = new UIStatusScreen();
         _inventoryScreen = new UIInventoryScreen();
         _metrics = new UIMetrics();
@@ -332,8 +340,9 @@ public final class Terasology {
         _guiScreens.add(_metrics);
         _guiScreens.add(_hud);
         _guiScreens.add(_pauseMenu);
-        _guiScreens.add(_statusScreen);
+        _guiScreens.add(_loadingScreen);
         _guiScreens.add(_inventoryScreen);
+        _guiScreens.add(_statusScreen);
 
         /*
          * Init. OpenGL

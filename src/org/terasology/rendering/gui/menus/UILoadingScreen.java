@@ -15,26 +15,28 @@
  */
 package org.terasology.rendering.gui.menus;
 
+import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+
+import javax.vecmath.Vector2f;
 
 /**
  * Simple status screen with one sole text label usable for status notifications.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIStatusScreen extends UIDisplayRenderer {
+public class UILoadingScreen extends UIDisplayRenderer {
 
-    final UITransparentOverlay _overlay;
+    final UIImageOverlay _overlay;
     final UIText _status;
 
-    public UIStatusScreen() {
+    public UILoadingScreen() {
         _status = new UIText("Loading...");
         _status.setVisible(true);
 
-        _overlay = new UITransparentOverlay();
+        _overlay = new UIImageOverlay("loadingBackground");
         _overlay.setVisible(true);
 
         addDisplayElement(_overlay);
@@ -47,7 +49,7 @@ public class UIStatusScreen extends UIDisplayRenderer {
     public void update() {
         super.update();
 
-        _status.setPosition(_status.calcCenterPosition());
+        _status.setPosition(new Vector2f(_status.calcCenterPosition().x, Display.getHeight() - 64.0f));
     }
 
     public void updateStatus(String string) {
