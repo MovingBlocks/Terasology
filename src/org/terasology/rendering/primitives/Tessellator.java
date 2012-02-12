@@ -1,8 +1,6 @@
 package org.terasology.rendering.primitives;
 
 import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import org.lwjgl.BufferUtils;
@@ -52,16 +50,13 @@ public class Tessellator {
         _lighting.set(1, 1, 1);
         _activeNormal.set(0, 1, 0);
     }
-    
-    public void addPoly(Vector3f[] vertices, Vector2f[] texCoords)
-    {
-        if (vertices.length != texCoords.length || vertices.length < 3)
-        {
+
+    public void addPoly(Vector3f[] vertices, Vector2f[] texCoords) {
+        if (vertices.length != texCoords.length || vertices.length < 3) {
             throw new IllegalArgumentException("addPoly expected vertices.length == texCoords.length > 2");
         }
 
-        for (int i = 0; i < vertices.length; ++i)
-        {
+        for (int i = 0; i < vertices.length; ++i) {
             _vertices.add(vertices[i].x);
             _vertices.add(vertices[i].y);
             _vertices.add(vertices[i].z);
@@ -85,19 +80,16 @@ public class Tessellator {
         }
 
         // Standard fan
-        for (int i = 0; i < vertices.length - 2; i++)
-        {
+        for (int i = 0; i < vertices.length - 2; i++) {
             _indices.add(_indexOffset);
             _indices.add(_indexOffset + i + 1);
             _indices.add(_indexOffset + i + 2);
         }
         _indexOffset += vertices.length;
     }
-    
-    public void addMeshPart(BlockMeshPart part)
-    {
-        for (int i = 0; i < part.size(); ++i)
-        {
+
+    public void addMeshPart(BlockMeshPart part) {
+        for (int i = 0; i < part.size(); ++i) {
             Vector3f vertex = part.getVertex(i);
             _vertices.add(vertex.x);
             _vertices.add(vertex.y);
@@ -107,12 +99,12 @@ public class Tessellator {
             _color.add(_activeColor.y);
             _color.add(_activeColor.z);
             _color.add(_activeColor.w);
-            
+
             Vector3f normal = part.getNormal(i);
             _normals.add(normal.x);
             _normals.add(normal.y);
             _normals.add(normal.z);
-            
+
             Vector2f uv = part.getTexCoord(i);
             _tex.add(uv.x);
             _tex.add(uv.y);
@@ -122,9 +114,8 @@ public class Tessellator {
             _tex.add(_lighting.y);
             _tex.add(_lighting.z);
         }
-        
-        for (int i = 0; i < part.indicesSize(); ++i)
-        {
+
+        for (int i = 0; i < part.indicesSize(); ++i) {
             _indices.add(_indexOffset + part.getIndex(i));
         }
         _indexOffset += part.size();
@@ -165,8 +156,7 @@ public class Tessellator {
     private IntBuffer createIndexBuffer() {
         IntBuffer indices = BufferUtils.createIntBuffer(_indices.size());
         TIntIterator iterator = _indices.iterator();
-        while (iterator.hasNext())
-        {
+        while (iterator.hasNext()) {
             indices.put(iterator.next());
         }
         indices.flip();

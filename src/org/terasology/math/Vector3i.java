@@ -6,28 +6,76 @@ import java.util.logging.Logger;
 
 /**
  * Vector3i - integer vector class in the style of VecMath.
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public final class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
     private static final long serialVersionUID = -1965792038041767639L;
     private static final Logger logger = Logger.getLogger(Vector3i.class.getName());
 
-    public static Vector3i zero() { return new Vector3i(0, 0, 0); }
-    public static Vector3i unitX() { return new Vector3i(1, 0, 0); }
-    public static Vector3i unitY() { return new Vector3i(0, 1, 0); }
-    public static Vector3i unitZ() { return new Vector3i(0, 0, 1); }
-    public static Vector3i unitXY() { return new Vector3i(1, 1, 0); }
-    public static Vector3i unitXZ() { return new Vector3i(1, 0, 1); }
-    public static Vector3i unitYZ() { return new Vector3i(0, 1, 1); }
-    public static Vector3i one() { return new Vector3i(1, 1, 1); }
-    public static Vector3i min() { return new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE); }
-    public static Vector3i max() { return new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE); }
-    public static Vector3i north() { return unitZ(); }
-    public static Vector3i south() { return new Vector3i(0, 0, -1); }
-    public static Vector3i west() { return unitX(); }
-    public static Vector3i east() { return new Vector3i(-1, 0, 0); }
-    public static Vector3i up() { return unitY(); }
-    public static Vector3i down() { return new Vector3i(0, -1, 0); }
+    public static Vector3i zero() {
+        return new Vector3i(0, 0, 0);
+    }
+
+    public static Vector3i unitX() {
+        return new Vector3i(1, 0, 0);
+    }
+
+    public static Vector3i unitY() {
+        return new Vector3i(0, 1, 0);
+    }
+
+    public static Vector3i unitZ() {
+        return new Vector3i(0, 0, 1);
+    }
+
+    public static Vector3i unitXY() {
+        return new Vector3i(1, 1, 0);
+    }
+
+    public static Vector3i unitXZ() {
+        return new Vector3i(1, 0, 1);
+    }
+
+    public static Vector3i unitYZ() {
+        return new Vector3i(0, 1, 1);
+    }
+
+    public static Vector3i one() {
+        return new Vector3i(1, 1, 1);
+    }
+
+    public static Vector3i min() {
+        return new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+    }
+
+    public static Vector3i max() {
+        return new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+    public static Vector3i north() {
+        return unitZ();
+    }
+
+    public static Vector3i south() {
+        return new Vector3i(0, 0, -1);
+    }
+
+    public static Vector3i west() {
+        return unitX();
+    }
+
+    public static Vector3i east() {
+        return new Vector3i(-1, 0, 0);
+    }
+
+    public static Vector3i up() {
+        return unitY();
+    }
+
+    public static Vector3i down() {
+        return new Vector3i(0, -1, 0);
+    }
 
     /**
      * Constructor instantiates a new <code>Vector3i</code> with default
@@ -154,8 +202,7 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
         return (float) Math.sqrt(distanceSquared(v));
     }
 
-    public void add(int x, int y, int z)
-    {
+    public void add(int x, int y, int z) {
         this.x += x;
         this.y += y;
         this.z += z;
@@ -214,8 +261,7 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
      * @param y
      * @param z
      */
-    public void divide(int x, int y, int z)
-    {
+    public void divide(int x, int y, int z) {
         this.x /= x;
         this.y /= y;
         this.z /= z;

@@ -5,7 +5,7 @@ varying vec4 vertexWorldPos;
 
 void main()
 {
-	vec4 vertexPos = gl_ModelViewProjectionMatrix * gl_Vertex;
+	vec4 vertexPos =  ftransform();
     gl_TexCoord[0] = gl_MultiTexCoord0;
     gl_FrontColor = gl_Color;
 

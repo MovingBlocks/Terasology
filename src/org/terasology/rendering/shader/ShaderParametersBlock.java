@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.model.structures;
+package org.terasology.rendering.shader;
 
 import org.terasology.game.Terasology;
 
@@ -22,15 +22,19 @@ import org.terasology.game.Terasology;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersPostProcessing extends ShaderParameters {
+public class ShaderParametersBlock extends ShaderParameters {
 
-    public ShaderParametersPostProcessing() {
-        super("post");
+    public ShaderParametersBlock() {
+        super("block");
     }
 
     public void applyParameters() {
         Terasology tera = Terasology.getInstance();
-        setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
+
+        setFloat("light", tera.getActiveWorldRenderer().getRenderingLightValue());
+        setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
+        setInt("textured", 1);
     }
 
 }

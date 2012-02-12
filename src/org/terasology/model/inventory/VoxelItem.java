@@ -17,9 +17,9 @@ package org.terasology.model.inventory;
 
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.model.structures.ShaderParameters;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
+import org.terasology.rendering.shader.ShaderParameters;
 
 import static org.lwjgl.opengl.GL11.*;
 

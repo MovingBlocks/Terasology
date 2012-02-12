@@ -31,6 +31,7 @@ import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
+import org.terasology.rendering.world.Skysphere;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
@@ -699,7 +700,6 @@ public final class Terasology {
     public Player getActivePlayer() {
         return _activeWorldRenderer.getPlayer();
     }
-
     /**
      * Returns the system time in ms.
      *

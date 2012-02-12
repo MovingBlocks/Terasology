@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.world;
 
-import java.util.Collection;
-
 /**
  * Basic interface for anything providing chunks.
  *

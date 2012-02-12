@@ -36,7 +36,7 @@ import javax.vecmath.Vector4f;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class ChunkTessellator {
-    
+
     private static final int FLOAT_BYTES = 4;
     private static final int INT_BYTES = 4;
 
@@ -117,8 +117,7 @@ public final class ChunkTessellator {
 
             mesh._vertexElements[j].finalIndices = BufferUtils.createIntBuffer(mesh._vertexElements[j].indices.size());
             TIntIterator indexIterator = mesh._vertexElements[j].indices.iterator();
-            while(indexIterator.hasNext())
-            {
+            while (indexIterator.hasNext()) {
                 mesh._vertexElements[j].finalIndices.put(indexIterator.next());
             }
 
@@ -139,13 +138,11 @@ public final class ChunkTessellator {
         mesh._indexedMesh.indexType = ScalarType.INTEGER;
 
         TIntIterator indexIterator = mesh._vertexElements[0].indices.iterator();
-        while(indexIterator.hasNext())
-        {
+        while (indexIterator.hasNext()) {
             mesh._indexedMesh.triangleIndexBase.putInt(indexIterator.next());
         }
         TFloatIterator vertIterator = mesh._vertexElements[0].vertices.iterator();
-        while(vertIterator.hasNext())
-        {
+        while (vertIterator.hasNext()) {
             mesh._indexedMesh.vertexBase.putFloat(vertIterator.next());
         }
     }
@@ -246,49 +243,42 @@ public final class ChunkTessellator {
             renderType = ChunkMesh.RENDER_TYPE.BILLBOARD;
 
         Block.BLOCK_FORM blockForm = block.getBlockForm();
-        
-        if (block.getCenterMesh() != null)
-        {
+
+        if (block.getCenterMesh() != null) {
             Vector4f colorOffset = block.calcColorOffsetFor(Side.TOP, temp, hum);
             block.getCenterMesh().appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
         }
 
         boolean[] drawDir = new boolean[6];
-        
-        for (Side side : Side.values())
-        {
+
+        for (Side side : Side.values()) {
             Vector3i offset = side.getVector3i();
             byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + offset.x), y + offset.y, _chunk.getBlockWorldPosZ(z + offset.z));
             drawDir[side.ordinal()] = isSideVisibleForBlockTypes(blockToCheckId, blockId, side);
         }
-        
-        if (y == 0)
-        {
+
+        if (y == 0) {
             drawDir[Side.BOTTOM.ordinal()] = false;
         }
 
         // If the block is lowered, some more faces may have to be drawn
         if (blockForm == Block.BLOCK_FORM.LOWERED_BLOCK) {
             // Draw horizontal sides if visible from below
-            for (Side side : Side.horizontalSides())
-            {
+            for (Side side : Side.horizontalSides()) {
                 Vector3i offset = side.getVector3i();
                 byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + offset.x), y - 1, _chunk.getBlockWorldPosZ(z + offset.z));
                 drawDir[side.ordinal()] |= isSideVisibleForBlockTypes(blockToCheckId, blockId, side);
             }
-            
+
             // Draw the top if below a non-lowered block
             // TODO: Don't need to render the top if each side and the block above each side are either liquid or opaque solids.
             byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
             drawDir[Side.TOP.ordinal()] |= (BlockManager.getInstance().getBlock(blockToCheckId).getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
 
             byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
-            if (BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0)
-            {
-                for (Side dir : Side.values())
-                {
-                    if (drawDir[dir.ordinal()])
-                    {
+            if (BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0) {
+                for (Side dir : Side.values()) {
+                    if (drawDir[dir.ordinal()]) {
                         Vector4f colorOffset = block.calcColorOffsetFor(dir, temp, hum);
                         block.getLoweredSideMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
                     }
@@ -297,10 +287,8 @@ public final class ChunkTessellator {
             }
         }
 
-        for (Side dir : Side.values())
-        {
-            if (drawDir[dir.ordinal()])
-            {
+        for (Side dir : Side.values()) {
+            if (drawDir[dir.ordinal()]) {
                 Vector4f colorOffset = block.calcColorOffsetFor(dir, temp, hum);
                 block.getSideMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
             }

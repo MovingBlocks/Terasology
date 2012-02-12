@@ -20,10 +20,10 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.structures.AABB;
-import org.terasology.model.structures.ShaderParameters;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.rendering.shader.ShaderParameters;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3d;

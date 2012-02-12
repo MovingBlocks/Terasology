@@ -21,7 +21,8 @@ import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 

@@ -746,7 +746,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public void render(ChunkMesh.RENDER_PHASE type) {
         if (isReadyForRendering()) {
             GL11.glPushMatrix();
-            
+
             Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
             GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - playerPosition.x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - playerPosition.y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - playerPosition.z);
 

@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.structures.*;
+import org.terasology.rendering.shader.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -224,7 +224,7 @@ public class ShaderManager {
     public int getShader(String s) {
         return _shaderPrograms.get(s);
     }
-    
+
     public ShaderParameters getShaderParameters(String s) {
         return _shaderParameters.get(s);
     }

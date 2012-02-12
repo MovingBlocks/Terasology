@@ -25,7 +25,6 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -33,7 +32,7 @@ import javax.vecmath.Vector3f;
 /**
  * The basic tool used for block interaction. Can be used to place and remove blocks.
  */
-public class DefaultBlockTool extends SimpleTool{
+public class DefaultBlockTool extends SimpleTool {
 
     public DefaultBlockTool(Player player) {
         super(player);

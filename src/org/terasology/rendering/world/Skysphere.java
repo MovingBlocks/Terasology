@@ -242,7 +242,7 @@ public class Skysphere implements IGameObject {
             for (int j = 0; j < (int) CLOUD_RESOLUTION.y; j++) {
                 double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime());
 
-                byte value = (byte) (MathHelper.clamp(noise * 1.25 + 0.25)  * 255);
+                byte value = (byte) (MathHelper.clamp(noise * 1.25 + 0.25) * 255);
 
                 clouds.put(value);
                 clouds.put(value);
@@ -278,6 +278,16 @@ public class Skysphere implements IGameObject {
     }
 
     public double getDaylight() {
-        return MathHelper.clamp(Math.cos(_sunPosAngle));
+       double angle = Math.toDegrees(Math.cos(_sunPosAngle));
+
+        if (angle <= 0)
+            return 0.0;
+
+        double daylight = 1.0;
+        if (angle < 16.0) {
+            daylight = 1.0 - MathHelper.clamp((16.0-angle) / 16.0);
+        }
+
+        return daylight;
     }
 }

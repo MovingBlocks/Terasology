@@ -590,6 +590,10 @@ public final class WorldRenderer implements IGameObject {
         return _mobManager;
     }
 
+    public Skysphere getSkysphere() {
+        return _skysphere;
+    }
+
     public int getTick() {
         return _tick;
     }

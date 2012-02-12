@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.model.structures;
+package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL20;
 import org.terasology.logic.manager.ShaderManager;
 
+import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 
 /**
@@ -38,6 +39,10 @@ public abstract class ShaderParameters {
     public void setFloat(String desc, float f) {
         int id = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader(_shaderDesc), desc);
         GL20.glUniform1f(id, f);
+    }
+
+    public void setFloat3(String desc, Vector3f v) {
+        setFloat3(desc, v.x, v.y, v.z);
     }
 
     public void setFloat3(String desc, float f1, float f2, float f3) {

@@ -18,8 +18,8 @@ package org.terasology.rendering.gui.components;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;

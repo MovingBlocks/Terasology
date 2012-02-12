@@ -27,8 +27,7 @@ import org.terasology.utilities.ClasspathResourceLoader
  */
 class PlantBlockManifestor extends BlockManifestor {
 
-    public PlantBlockManifestor(ClasspathResourceLoader loader)
-    {
+    public PlantBlockManifestor(ClasspathResourceLoader loader) {
         _resourceLoader = loader;
         fixSavePaths()
     }

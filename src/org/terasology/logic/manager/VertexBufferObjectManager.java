@@ -17,14 +17,10 @@ package org.terasology.logic.manager;
 
 import gnu.trove.list.array.TIntArrayList;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Provides support for creating and buffering Vertex Buffer Objects.

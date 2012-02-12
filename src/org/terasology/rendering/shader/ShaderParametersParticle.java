@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.model.structures;
+package org.terasology.rendering.shader;
 
 import org.terasology.game.Terasology;
 
@@ -22,16 +22,16 @@ import org.terasology.game.Terasology;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersGelCube extends ShaderParameters {
+public class ShaderParametersParticle extends ShaderParameters {
 
-    public ShaderParametersGelCube() {
-        super("gelatinousCube");
+    public ShaderParametersParticle() {
+        super("particle");
     }
 
     public void applyParameters() {
         Terasology tera = Terasology.getInstance();
+
         setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
-        setInt("tick", tera.getActiveWorldRenderer().getTick());
     }
 
 }

@@ -27,8 +27,7 @@ import org.terasology.utilities.ClasspathResourceLoader
  */
 class TreeBlockManifestor extends BlockManifestor {
 
-    public TreeBlockManifestor(ClasspathResourceLoader loader)
-    {
+    public TreeBlockManifestor(ClasspathResourceLoader loader) {
         _resourceLoader = loader;
         fixSavePaths()
     }

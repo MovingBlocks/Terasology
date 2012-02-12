@@ -16,19 +16,17 @@
  */
 package org.terasology.logic.characters;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.manager.ToolManager;
 import org.terasology.logic.tools.ITool;
-import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.IBlockObserver;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockManager;
 import org.terasology.model.inventory.Inventory;
@@ -41,17 +39,15 @@ import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.FirstPersonCamera;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 

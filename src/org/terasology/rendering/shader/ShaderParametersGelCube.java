@@ -13,33 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.model.structures;
+package org.terasology.rendering.shader;
 
 import org.terasology.game.Terasology;
-import org.terasology.model.blocks.BlockManager;
 
 /**
  * TODO
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersChunk extends ShaderParameters {
+public class ShaderParametersGelCube extends ShaderParameters {
 
-    public ShaderParametersChunk() {
-        super("chunk");
+    public ShaderParametersGelCube() {
+        super("gelatinousCube");
     }
 
     public void applyParameters() {
         Terasology tera = Terasology.getInstance();
 
-        setFloat("daylight", (float) tera.getActiveWorldRenderer().getDaylight());
-        setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
         setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
-        setFloat2("grassCoordinate", BlockManager.getInstance().calcCoordinate("Grass"));
-        setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("Water"));
-        setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("Lava"));
-        setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
-        setFloat("tick", tera.getActiveWorldRenderer().getTick());
+        setInt("tick", tera.getActiveWorldRenderer().getTick());
     }
 
 }

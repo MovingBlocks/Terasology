@@ -1,23 +1,25 @@
 varying vec3 normal;
 varying vec4 vertexWorldPos;
+varying vec3 eyeVec;
+varying vec3 lightDir;
+uniform float sunPosAngle;
 
 uniform float tick;
 uniform float wavingCoordinates[32];
 uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
 
-float radialFog(vec4 v1)
-{
-    vec4 v2 = v1 / v1.w;
-    return length(v2);
-}
-
 void main()
 {
 	vertexWorldPos = gl_ModelViewMatrix * gl_Vertex;
+
+	vec4 lightPos = vec4(0.0, cos(sunPosAngle) * 512.0, sin(sunPosAngle) * 512.0, 1.0);
+	lightDir = (gl_ModelViewMatrix * lightPos).xyz - vertexWorldPos.xyz;
+	eyeVec = -vertexWorldPos.xyz;
+
 	float distance = length(vertexWorldPos);
 
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	gl_Position = ftransform();
 
 	gl_TexCoord[0] = gl_MultiTexCoord0;
     gl_TexCoord[1] = gl_MultiTexCoord1;
@@ -51,6 +53,4 @@ if (distance < 64) {
        }
 }
 #endif
-
-    gl_FogFragCoord = radialFog(vertexWorldPos);
 }

@@ -240,9 +240,8 @@ public class LocalWorldProvider implements IWorldProvider {
         Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         return c.getBlock(blockPosX, y, blockPosZ);
     }
-    
-    public final byte getBlock(Tuple3i pos)
-    {
+
+    public final byte getBlock(Tuple3i pos) {
         return getBlock(pos.x, pos.y, pos.z);
     }
 
@@ -373,6 +372,7 @@ public class LocalWorldProvider implements IWorldProvider {
 
     /**
      * Returns the world save path, including the world's name. Will try to detect and fix quirky path issues (applet thing)
+     *
      * @return path to save stuff at
      */
     public String getWorldSavePath() {

@@ -35,8 +35,8 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.BlockManager;
-import org.terasology.model.structures.ShaderParameters;
 import org.terasology.rendering.interfaces.IGameObject;
+import org.terasology.rendering.shader.ShaderParameters;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Matrix3f;

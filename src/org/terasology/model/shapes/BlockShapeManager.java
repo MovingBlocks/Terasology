@@ -6,12 +6,13 @@ import java.util.logging.Logger;
 
 /**
  * Provides acces to block shapes by their title
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public class BlockShapeManager {
 
     private final Logger _logger = Logger.getLogger(getClass().getName());
-    
+
     /* SINGLETON */
     private static BlockShapeManager _instance;
 

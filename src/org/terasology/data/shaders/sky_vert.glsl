@@ -57,6 +57,6 @@ void main(void)
     skyVec          = r * v.xyz;
     colorYxy        = allweatherSky ( turbidity, abs(v.y)+0.35, lv, l.y );
     McPosition      = gl_Vertex;
-    gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_Position     = ftransform();
     gl_TexCoord[0]  = gl_MultiTexCoord0;
 }

@@ -1,9 +1,6 @@
 package org.terasology.rendering.primitives;
 
 
-import org.terasology.math.Side;
-import org.terasology.model.blocks.Block;
-
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -144,13 +141,13 @@ public class TessellatorHelper {
         tessellator.setColor(new Vector4f(color.x, color.y, color.z, color.w));
 
         tessellator.addPoly(
-                new Vector3f[] {
+                new Vector3f[]{
                         new Vector3f(0, 0, 0),
                         new Vector3f(sizeX, 0, 0),
                         new Vector3f(sizeX, sizeY, 0),
                         new Vector3f(0, sizeY, 0)
                 },
-                new Vector2f[] {
+                new Vector2f[]{
                         new Vector2f(0, 0),
                         new Vector2f(1, 0),
                         new Vector2f(1, 1),

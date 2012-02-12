@@ -1,12 +1,10 @@
 package org.terasology.utilities
 
-import java.util.logging.Logger
-import java.util.jar.JarFile
-import java.util.logging.Level
+import groovy.util.logging.Log
 import java.util.jar.JarEntry
+import java.util.jar.JarFile
 import javax.imageio.ImageIO
 import org.newdawn.slick.util.ResourceLoader
-import groovy.util.logging.Log
 
 /**
  * Helper class for accessing resources from the classpath, whether it is
@@ -47,19 +45,16 @@ public class ClasspathResourceLoader {
             log.fine "Successfully loaded a jar file reference, returning it"
             _jar = jar
         }
-        else
-        {
+        else {
             log.info "We're not running inside a jar file, so we don't need any references to jar resources"
         }
     }
 
-    public String getPackagePath()
-    {
+    public String getPackagePath() {
         return _rootPath
     }
 
-    public boolean isJar()
-    {
+    public boolean isJar() {
         return _jar != null
     }
 
@@ -128,8 +123,7 @@ public class ClasspathResourceLoader {
      * @param subPath of where to start looking under the root path
      * @return the images we loaded
      */
-    public getImages(String subPath)
-    {
+    public getImages(String subPath) {
         def path
         if (subPath.isEmpty()) {
             path = _rootPath

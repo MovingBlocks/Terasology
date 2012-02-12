@@ -51,11 +51,10 @@ public class Block implements IGameObject {
     public static final int ATLAS_ELEMENTS_PER_ROW_AND_COLUMN = ATLAS_SIZE_IN_PX / TEXTURE_SIZE_IN_PX;
     public static final float TEXTURE_OFFSET = 0.0625f;
     public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
-    
+
     private static final EnumMap<Side, Float> DIRECTION_LIT_LEVEL = new EnumMap<Side, Float>(Side.class);
-    
-    static
-    {
+
+    static {
         DIRECTION_LIT_LEVEL.put(Side.TOP, 0.9f);
         DIRECTION_LIT_LEVEL.put(Side.BOTTOM, 0.9f);
         DIRECTION_LIT_LEVEL.put(Side.FRONT, 1.0f);
@@ -226,15 +225,12 @@ public class Block implements IGameObject {
         if (_mesh == null) {
             Tessellator tessellator = new Tessellator();
             tessellator.setColor(new Vector4f(1, 1, 1, 1));
-            if (_centerMesh != null)
-            {
+            if (_centerMesh != null) {
                 tessellator.addMeshPart(_centerMesh);
             }
-            for (Side dir : Side.values())
-            {
+            for (Side dir : Side.values()) {
                 BlockMeshPart part = _sideMesh.get(dir);
-                if (part != null)
-                {
+                if (part != null) {
                     float lightLevel = DIRECTION_LIT_LEVEL.get(dir);
                     tessellator.setColor(new Vector4f(lightLevel, lightLevel, lightLevel, lightLevel));
                     tessellator.addMeshPart(part);
@@ -368,27 +364,23 @@ public class Block implements IGameObject {
         }
         return this;
     }
-    
-    public Block withCenterMesh(BlockMeshPart meshPart)
-    {
+
+    public Block withCenterMesh(BlockMeshPart meshPart) {
         _centerMesh = meshPart;
         return this;
     }
 
-    public Block withSideMesh(Side side, BlockMeshPart meshPart)
-    {
+    public Block withSideMesh(Side side, BlockMeshPart meshPart) {
         _sideMesh.put(side, meshPart);
         return this;
     }
 
-    public Block withLoweredSideMesh(Side side, BlockMeshPart meshPart)
-    {
+    public Block withLoweredSideMesh(Side side, BlockMeshPart meshPart) {
         _loweredSideMesh.put(side, meshPart);
         return this;
     }
-    
-    public Block withFullSide(Side side, boolean full)
-    {
+
+    public Block withFullSide(Side side, boolean full) {
         _fullSide[side.ordinal()] = full;
         return this;
     }
@@ -420,24 +412,20 @@ public class Block implements IGameObject {
     public byte getId() {
         return _id;
     }
-    
-    public boolean isBlockingSide(Side side)
-    {
+
+    public boolean isBlockingSide(Side side) {
         return _fullSide[side.ordinal()];
     }
-    
-    public BlockMeshPart getSideMesh(Side side)
-    {
+
+    public BlockMeshPart getSideMesh(Side side) {
         return _sideMesh.get(side);
     }
 
-    public BlockMeshPart getCenterMesh()
-    {
+    public BlockMeshPart getCenterMesh() {
         return _centerMesh;
     }
 
-    public BlockMeshPart getLoweredSideMesh(Side side)
-    {
+    public BlockMeshPart getLoweredSideMesh(Side side) {
         return _loweredSideMesh.get(side);
     }
 

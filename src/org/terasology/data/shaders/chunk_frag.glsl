@@ -9,6 +9,8 @@ uniform bool swimming;
 uniform bool carryingTorch;
 
 varying vec4 vertexWorldPos;
+varying vec3 eyeVec;
+varying vec3 lightDir;
 varying vec3 normal;
 
 uniform vec2 waterCoordinate;
@@ -19,6 +21,8 @@ void main(){
     vec4 texCoord = gl_TexCoord[0];
     vec4 color;
 
+    float specFact = 0.05;
+
     // Switch the texture atlases based on the currently active texture
     if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.x + TEXTURE_OFFSET && texCoord.y >= waterCoordinate.y && texCoord.y < waterCoordinate.y + TEXTURE_OFFSET) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
@@ -26,6 +30,7 @@ void main(){
         texCoord.y += mod(tick,95.0) * 1.0/96.0;
 
         color = texture2D(textureWater, vec2(texCoord));
+        specFact = 1.0;
     } else if (texCoord.x >= lavaCoordinate.x && texCoord.x < lavaCoordinate.x + TEXTURE_OFFSET && texCoord.y >= lavaCoordinate.y && texCoord.y < lavaCoordinate.y + TEXTURE_OFFSET) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
@@ -61,16 +66,19 @@ void main(){
 
     float occlusionValue = gl_TexCoord[1].z;
 
-    float light = lambLight(normal, vertexWorldPos);
+    float diffuseLighting = lambLight(normal, -normalize(vertexWorldPos.xyz));
     float torchlight = 0.0;
 
     // Apply torchlight
     if (carryingTorch) {
-       torchlight = torchlight(light, vertexWorldPos) * blocklightDayIntensity;
+       torchlight = torchlight(diffuseLighting, vertexWorldPos.xyz) * blocklightDayIntensity;
     }
 
     // Apply some Lambertian lighting to the daylight light value
-    vec3 daylightColorValue = vec3(daylightValue * 0.85 + light * 0.15);
+    vec3 daylightColorValue = vec3(daylightValue * 0.85 + diffuseLighting * daylightValue * 0.15);
+
+    // Add specular highlights
+    daylightColorValue += specLight(normal, lightDir, eyeVec, 2.0) * daylightValue * specFact;
 
     float blockBrightness = clamp(blocklightValue + torchlight - ((sin(tick*0.05) + 1.0) / 16.0) * blocklightValue, 0.0, 1.0);
     blockBrightness *= blocklightDayIntensity;

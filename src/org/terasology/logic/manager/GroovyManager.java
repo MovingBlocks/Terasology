@@ -24,7 +24,6 @@ import groovy.util.ScriptException;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.model.inventory.ItemBlock;
-import org.terasology.utilities.Helper;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -126,12 +125,10 @@ public class GroovyManager {
         }
     }
 
-    public static class CommandHelper
-    {
-        public void giveBlock(int blockId, int quantity)
-        {
+    public static class CommandHelper {
+        public void giveBlock(int blockId, int quantity) {
             Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.getInventory().storeItemInFreeSlot(new ItemBlock(player, (byte)blockId, quantity));
+            player.getInventory().storeItemInFreeSlot(new ItemBlock(player, (byte) blockId, quantity));
         }
     }
 }

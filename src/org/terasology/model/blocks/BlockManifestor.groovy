@@ -16,21 +16,18 @@ package org.terasology.model.blocks
  * limitations under the License.
  */
 
+import groovy.util.logging.Log
 import java.awt.Graphics
 import java.awt.Image
 import java.awt.image.BufferedImage
-
 import javax.imageio.ImageIO
 import javax.vecmath.Vector2f
 import javax.vecmath.Vector4f
-
 import org.terasology.logic.manager.TextureManager
-import org.terasology.utilities.ClasspathResourceLoader
+import org.terasology.math.Side
 import org.terasology.model.shapes.BlockShape
 import org.terasology.model.shapes.BlockShapeManager
-import org.terasology.math.Side
-
-import groovy.util.logging.Log
+import org.terasology.utilities.ClasspathResourceLoader
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -74,7 +71,7 @@ class BlockManifestor {
         _bm = bm
         fixSavePaths()
     }
-    
+
     // Temp helper methods until we can correctly use WorldProvider.getWorldSavePath - tries to detect and fix screwy applet paths
     protected fixSavePaths() {
         _blockManifest = fixSavePath(_blockManifest)
@@ -232,7 +229,7 @@ class BlockManifestor {
         println "Default image returns: " + _imageIndex.get(c.name)
 
         def textureId = _imageIndex.get(c.name)
-        
+
         Vector2f centerTexturePos;
 
         if (textureId != null) {
@@ -285,22 +282,17 @@ class BlockManifestor {
 
         //TODO: Consider if we can use shape defaults in an OOP way too? So Block default is "cube", most PlantBlocks "Billboard", etc - might need better categorization first
         BlockShape shape;
-        if (c.block.shape != [:])
-        {
+        if (c.block.shape != [:]) {
             shape = BlockShapeManager.getInstance().getBlockShape(c.block.shape);
         }
-        if (shape != null)
-        {
+        if (shape != null) {
             println "Has shape: " + c.block.shape;
-            if (shape.getCenterMesh() != null)
-            {
-                b.withCenterMesh(shape.getCenterMesh().mapTexCoords(new Vector2f((float)(Block.TEXTURE_OFFSET * centerTexturePos.x), (float)(Block.TEXTURE_OFFSET * centerTexturePos.y)), Block.TEXTURE_OFFSET_WIDTH));
+            if (shape.getCenterMesh() != null) {
+                b.withCenterMesh(shape.getCenterMesh().mapTexCoords(new Vector2f((float) (Block.TEXTURE_OFFSET * centerTexturePos.x), (float) (Block.TEXTURE_OFFSET * centerTexturePos.y)), Block.TEXTURE_OFFSET_WIDTH));
             }
 
-            for (Side side : Side.values())
-            {
-                if (shape.getSideMesh(side) != null)
-                {
+            for (Side side: Side.values()) {
+                if (shape.getSideMesh(side) != null) {
                     b.withSideMesh(side, shape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
                 }
                 b.withFullSide(side, shape.isBlockingSide(side));
@@ -354,17 +346,13 @@ class BlockManifestor {
         }
         if (c.block.loweredShape != [:]) {
             BlockShape loweredShape;
-            if (c.block.loweredShape != [:])
-            {
+            if (c.block.loweredShape != [:]) {
                 loweredShape = BlockShapeManager.getInstance().getBlockShape(c.block.loweredShape);
             }
-            if (loweredShape != null)
-            {
+            if (loweredShape != null) {
                 println "Has lowered shape: " + c.block.loweredShape;
-                for (Side side : Side.values())
-                {
-                    if (loweredShape.getSideMesh(side) != null)
-                    {
+                for (Side side: Side.values()) {
+                    if (loweredShape.getSideMesh(side) != null) {
                         b.withLoweredSideMesh(side, loweredShape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
                     }
                 }

@@ -96,8 +96,7 @@ public class ItemBlock extends Item {
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glAlphaFunc(GL_GREATER, 0.1f);
-        if (activeBlock.isTranslucent())
-        {
+        if (activeBlock.isTranslucent()) {
             glEnable(GL11.GL_ALPHA_TEST);
         }
 
@@ -112,8 +111,7 @@ public class ItemBlock extends Item {
 
         glPopMatrix();
 
-        if (activeBlock.isTranslucent())
-        {
+        if (activeBlock.isTranslucent()) {
             glDisable(GL11.GL_ALPHA_TEST);
         }
         glDisable(GL11.GL_BLEND);

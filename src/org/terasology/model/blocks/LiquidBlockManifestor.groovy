@@ -27,8 +27,7 @@ import org.terasology.utilities.ClasspathResourceLoader
  */
 class LiquidBlockManifestor extends BlockManifestor {
 
-    public LiquidBlockManifestor(ClasspathResourceLoader loader)
-    {
+    public LiquidBlockManifestor(ClasspathResourceLoader loader) {
         _resourceLoader = loader;
         fixSavePaths()
     }

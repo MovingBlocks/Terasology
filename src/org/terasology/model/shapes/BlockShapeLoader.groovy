@@ -2,13 +2,11 @@ package org.terasology.model.shapes
 
 import gnu.trove.list.TIntList
 import gnu.trove.list.array.TIntArrayList
-
+import groovy.util.logging.Log
 import javax.vecmath.Vector2f
 import javax.vecmath.Vector3f
-
-import org.terasology.utilities.ClasspathResourceLoader
-import groovy.util.logging.Log
 import org.terasology.math.Side
+import org.terasology.utilities.ClasspathResourceLoader
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -56,8 +54,7 @@ final class BlockShapeLoader {
         // Construct the class - this loads the Block-level defaults
         BlockShape shape = new BlockShape(shapeName)
 
-        if (shapeConfig.Center != [:])
-        {
+        if (shapeConfig.Center != [:]) {
             shape.setCenterMesh(loadMeshPart(shapeConfig.Center));
         }
         if (shapeConfig.Top != [:]) {
@@ -98,18 +95,17 @@ final class BlockShapeLoader {
             normals[index].normalize();
         }
         Vector2f[] texCoords = new Vector2f[meshConfig.texcoords.size()];
-        meshConfig.texcoords.eachWithIndex() { uv, index -> 
+        meshConfig.texcoords.eachWithIndex() { uv, index ->
             texCoords[index] = new Vector2f(uv[0], uv[1]);
         }
-        
+
         if (vertices.size() != normals.size() || vertices.size() != texCoords.size()) {
             throw new IllegalFormatException("vertices, normals and texCoords must have the same length");
         }
 
         TIntList indices = new TIntArrayList();
         meshConfig.faces.each { face ->
-            for (int tri = 0; tri < face.size() - 2; tri++)
-            {
+            for (int tri = 0; tri < face.size() - 2; tri++) {
                 indices.add(face[0]);
                 indices.add(face[tri + 1]);
                 indices.add(face[tri + 2]);

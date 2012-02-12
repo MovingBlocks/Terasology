@@ -20,8 +20,8 @@ import org.terasology.game.Terasology;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
