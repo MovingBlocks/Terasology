@@ -66,19 +66,19 @@ void main(){
 
     float occlusionValue = gl_TexCoord[1].z;
 
-    float diffuseLighting = lambLight(normal, -normalize(vertexWorldPos.xyz));
+    float diffuseLighting = calcLambLight(normal, -normalize(vertexWorldPos.xyz));
     float torchlight = 0.0;
 
     // Apply torchlight
     if (carryingTorch) {
-       torchlight = torchlight(diffuseLighting, vertexWorldPos.xyz) * blocklightDayIntensity;
+       torchlight = calcTorchlight(diffuseLighting, vertexWorldPos.xyz) * blocklightDayIntensity;
     }
 
     // Apply some Lambertian lighting to the daylight light value
     vec3 daylightColorValue = vec3(daylightValue * 0.85 + diffuseLighting * daylightValue * 0.15);
 
     // Add specular highlights
-    daylightColorValue += specLight(normal, lightDir, eyeVec, 2.0) * daylightValue * specFact;
+    daylightColorValue += calcSpecLight(normal, lightDir, eyeVec, 2.0) * daylightValue * specFact;
 
     float blockBrightness = clamp(blocklightValue + torchlight - ((sin(tick*0.05) + 1.0) / 16.0) * blocklightValue, 0.0, 1.0);
     blockBrightness *= blocklightDayIntensity;

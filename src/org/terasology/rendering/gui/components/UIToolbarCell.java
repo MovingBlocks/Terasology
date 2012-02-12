@@ -53,7 +53,6 @@ public class UIToolbarCell extends UIDisplayElement {
         _label = new UIText();
         _label.setVisible(true);
         _label.setPosition(new Vector2f(30f, 20f));
-
     }
 
     @Override

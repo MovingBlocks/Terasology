@@ -23,6 +23,7 @@ import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
+import org.newdawn.slick.openal.AudioLoader;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.IWorldProvider;
@@ -31,7 +32,6 @@ import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
-import org.terasology.rendering.world.Skysphere;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
@@ -136,6 +136,7 @@ public final class Terasology {
         try {
             terasology = getInstance();
 
+            terasology.initOpenAL();
             terasology.initDisplay();
             terasology.initControls();
             terasology.initGame();
@@ -208,6 +209,10 @@ public final class Terasology {
         Display.setResizable(true);
         Display.setTitle("Terasology" + " | " + ConfigurationManager.getInstance().getConfig().get("System.versionTag"));
         Display.create((PixelFormat) ConfigurationManager.getInstance().getConfig().get("Graphics.pixelFormat"));
+    }
+
+    public void initOpenAL() {
+        AudioManager.getInstance();
     }
 
     /**
@@ -700,6 +705,7 @@ public final class Terasology {
     public Player getActivePlayer() {
         return _activeWorldRenderer.getPlayer();
     }
+
     /**
      * Returns the system time in ms.
      *
