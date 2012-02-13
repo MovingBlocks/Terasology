@@ -92,6 +92,7 @@ public class Block implements IGameObject {
     /* PROPERTIES */
     private byte _id = 0x0;
     private String _title = "Untitled block";
+    private BlockGroup _group = null;
 
     private static class SharedBlockInternals {
         private boolean translucent;
@@ -266,6 +267,11 @@ public class Block implements IGameObject {
         return this;
     }
 
+    Block withBlockGroup(BlockGroup group) {
+        _group = group;
+        return this;
+    }
+
     public Block withTranslucent(boolean translucent) {
         _internals.translucent = translucent;
         return this;
@@ -414,6 +420,10 @@ public class Block implements IGameObject {
 
     public byte getId() {
         return _id;
+    }
+
+    public BlockGroup getBlockGroup() {
+        return _group;
     }
 
     public boolean isBlockingSide(Side side) {

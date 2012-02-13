@@ -158,6 +158,7 @@ class BlockManifestor {
         }
 
         _bm.addAllBlocks(_blockIndex)
+        _bm.addAllBlockGroups(_blockGroups);
         org.terasology.model.blocks.management.BlockManifestor.log.info "_imageManifest file: " + _imageManifest.getAbsolutePath()
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
     }

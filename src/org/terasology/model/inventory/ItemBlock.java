@@ -24,6 +24,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 
 import javax.vecmath.Vector4f;
@@ -36,16 +37,16 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class ItemBlock extends Item {
 
-    private byte _blockId;
+    private BlockGroup _blockGroup;
 
-    public ItemBlock(Player parent, byte blockId) {
+    public ItemBlock(Player parent, BlockGroup blockGroup) {
         super(parent);
-        _blockId = blockId;
+        _blockGroup = blockGroup;
         _toolId = (byte) 1;
     }
 
-    public ItemBlock(Player parent, byte blockId, int amount) {
-        this(parent, blockId);
+    public ItemBlock(Player parent, BlockGroup blockGroup, int amount) {
+        this(parent, blockGroup);
         setAmount(amount);
     }
 
@@ -60,7 +61,7 @@ public class ItemBlock extends Item {
         GL11.glRotatef(-16f, 0f, 1f, 0f);
         TextureManager.getInstance().bindTexture("terrain");
 
-        Block block = BlockManager.getInstance().getBlock(_blockId);
+        Block block = _blockGroup.getArchetypeBlock();
         block.render();
 
         GL11.glPopMatrix();
@@ -72,7 +73,7 @@ public class ItemBlock extends Item {
 
     @Override
     public boolean renderFirstPersonView() {
-        Block activeBlock = BlockManager.getInstance().getBlock(_blockId);
+        Block activeBlock = _blockGroup.getArchetypeBlock();
 
         TextureManager.getInstance().bindTexture("terrain");
         ShaderManager.getInstance().enableShader("block");
@@ -121,15 +122,15 @@ public class ItemBlock extends Item {
         return true;
     }
 
-    public byte getBlockId() {
-        return _blockId;
+    public BlockGroup getBlockGroup() {
+        return _blockGroup;
     }
 
     public boolean equals(Object o) {
         if (o != null) {
             if (o.getClass() == ItemBlock.class) {
                 ItemBlock itemBlock = (ItemBlock) o;
-                return itemBlock.getBlockId() == getBlockId();
+                return itemBlock.getBlockGroup() == getBlockGroup();
             }
         }
 

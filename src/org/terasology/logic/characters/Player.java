@@ -28,6 +28,7 @@ import org.terasology.logic.tools.ITool;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.IBlockObserver;
 import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.Inventory;
 import org.terasology.model.inventory.Item;
@@ -533,12 +534,12 @@ public final class Player extends Character {
         return getToolbar().getItemForSelectedSlot();
     }
 
-    public Block getActiveBlock() {
+    public BlockGroup getActiveBlock() {
         Item item = getActiveItem();
 
         if (item != null) {
             if (item.getClass() == ItemBlock.class) {
-                return BlockManager.getInstance().getBlock(((ItemBlock) getActiveItem()).getBlockId());
+                return ((ItemBlock) getActiveItem()).getBlockGroup();
             }
         }
 
@@ -626,7 +627,7 @@ public final class Player extends Character {
 
     public boolean isCarryingTorch() {
         if (getActiveBlock() != null) {
-            if (getActiveBlock().getLuminance() > 0)
+            if (getActiveBlock().getArchetypeBlock().getLuminance() > 0)
                 return true;
         }
 

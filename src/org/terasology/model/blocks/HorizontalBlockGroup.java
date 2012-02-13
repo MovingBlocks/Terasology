@@ -28,6 +28,7 @@ public class HorizontalBlockGroup implements BlockGroup {
                 throw new IllegalArgumentException("Missing block for side: " + side.toString());
             }
             _blocks.put(side, block);
+            block.withBlockGroup(this);
         }
     }
     
@@ -40,11 +41,12 @@ public class HorizontalBlockGroup implements BlockGroup {
     }
 
     public Block getBlockFor(Side attachmentSide, Side direction) {
-        if (direction.isHorizontal())
+        if (attachmentSide.isHorizontal())
         {
-            return _blocks.get(direction.reverse());
+            return _blocks.get(attachmentSide.reverse());
         }
-        return _blocks.get(attachmentSide.reverse());
+        return _blocks.get(direction.reverse());
+
     }
 
     public Block getArchetypeBlock() {
