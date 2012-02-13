@@ -2,8 +2,13 @@ float calcLambLight(vec3 normal, vec3 lightVec) {
     return dot(normal,lightVec);
 }
 
-float calcSpecLight(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp, vec3 offset) {
+float calcSpecLightWithOffset(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp, vec3 offset) {
     vec3 halfWay = normalize(eyeVec+lightVec+vec3(offset.x, offset.y, 0.0));
+    return pow(dot(halfWay, normal), exp);
+}
+
+float calcSpecLight(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
+    vec3 halfWay = normalize(eyeVec+lightVec);
     return pow(dot(halfWay, normal), exp);
 }
 

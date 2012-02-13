@@ -109,6 +109,7 @@ public class Skysphere implements IGameObject {
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(0));
         _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
         Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
+        sunNormalise.normalize();
 
         Vector3d _zenithColor = getAllWeatherZenith(sunNormalise.y);
 
@@ -287,10 +288,11 @@ public class Skysphere implements IGameObject {
     public double getDaylight() {
        double angle = Math.toDegrees(Math.cos(_sunPosAngle));
 
-        if (angle <= 0)
+        if (angle <= 0.0)
             return 0.0;
 
         double daylight = 1.0;
+
         if (angle < 16.0) {
             daylight = 1.0 - MathHelper.clamp((16.0-angle) / 16.0);
         }

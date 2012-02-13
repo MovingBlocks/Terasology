@@ -18,6 +18,7 @@ package org.terasology.rendering.cameras;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+import org.terasology.utilities.Helper;
 
 import javax.vecmath.Vector3d;
 
@@ -31,7 +32,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  */
 public class FirstPersonCamera extends Camera {
 
-    double _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0;
+    private double _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0;
 
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
@@ -52,6 +53,8 @@ public class FirstPersonCamera extends Camera {
 
         GLU.gluLookAt((float) _position.x, (float) _position.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z, (float) _position.x + (float) _viewingDirection.x, (float) _position.y + (float) _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z + (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
         _frustumNeedsUpdate = true;
+
+        Helper.readMatrix(GL_MODELVIEW_MATRIX, _viewMatrix);
     }
 
     public void loadNormalizedModelViewMatrix() {

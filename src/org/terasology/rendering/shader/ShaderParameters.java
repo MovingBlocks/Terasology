@@ -16,8 +16,11 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL20;
+import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.utilities.Helper;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 
