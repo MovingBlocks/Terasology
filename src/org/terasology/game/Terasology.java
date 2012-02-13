@@ -15,7 +15,6 @@
  */
 package org.terasology.game;
 
-import com.sun.servicetag.SystemEnvironment;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -161,7 +160,7 @@ public final class Terasology {
         else {
             addLibraryPath("natives/windows");
 
-            if (SystemEnvironment.getSystemEnvironment().getOsArchitecture().equals("amd64"))
+            if (System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64"))
                 System.loadLibrary("OpenAL64");
             else
                 System.loadLibrary("OpenAL32");
