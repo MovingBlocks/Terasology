@@ -18,7 +18,9 @@ package org.terasology.logic.tools;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
+import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.ItemBlock;
 import org.terasology.model.structures.BlockPosition;
@@ -43,7 +45,7 @@ public class DefaultBlockTool implements ITool {
 
     public void executeLeftClickAction() {
         if (_player.getActiveBlock() != null) {
-            if (placeBlock(_player.getActiveBlock().getId())) {
+            if (placeBlock(_player.getActiveBlock())) {
                 _player.getInventory().removeOneItemInSlot(_player.getToolbar().getSelectedSlot());
             }
         }
@@ -53,7 +55,7 @@ public class DefaultBlockTool implements ITool {
         byte removedBlockId = removeBlock(true);
 
         if (removedBlockId != 0) {
-            _player.getInventory().storeItemInFreeSlot(new ItemBlock(_player, removedBlockId, 1));
+            _player.getInventory().storeItemInFreeSlot(new ItemBlock(_player, BlockManager.getInstance().getBlock(removedBlockId).getBlockGroup(), 1));
         }
     }
 
@@ -63,12 +65,13 @@ public class DefaultBlockTool implements ITool {
      * @param type The type of the block
      * @return True if a block was placed
      */
-    public boolean placeBlock(byte type) {
+    public boolean placeBlock(BlockGroup type) {
         IWorldProvider worldProvider = _player.getParent().getWorldProvider();
         RayBlockIntersection.Intersection selectedBlock = _player.getSelectedBlock();
 
         if (selectedBlock != null) {
-            Block centerBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(_player.getSelectedBlock().getBlockPosition().x, _player.getSelectedBlock().getBlockPosition().y, _player.getSelectedBlock().getBlockPosition().z));
+            BlockPosition centerPos = selectedBlock.getBlockPosition();
+            Block centerBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(centerPos.x, centerPos.y, centerPos.z));
 
             if (!centerBlock.isAllowBlockAttachment()) {
                 return false;
@@ -81,7 +84,17 @@ public class DefaultBlockTool implements ITool {
                 return false;
             }
 
-            worldProvider.setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, true);
+            // Need two things:
+            // 1. The Side of attachment
+            Side attachmentSide = Side.inDirection(centerPos.x - blockPos.x, centerPos.y - blockPos.y, centerPos.z - blockPos.z);
+            // 2. The secondary direction
+            Vector3d attachDir = new Vector3d(centerPos.x - blockPos.x, centerPos.y - blockPos.y, centerPos.z - blockPos.z); 
+            Vector3d rawDirection = new Vector3d(_player.getViewingDirection());
+            double dot = rawDirection.dot(attachDir);
+            rawDirection.sub(new Vector3d(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
+            Side direction = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z);
+
+            worldProvider.setBlock(blockPos.x, blockPos.y, blockPos.z, type.getBlockIdFor(attachmentSide, direction), true, true);
             AudioManager.getInstance().playVaryingSound("PlaceBlock", 0.6f, 0.5f);
 
             int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);

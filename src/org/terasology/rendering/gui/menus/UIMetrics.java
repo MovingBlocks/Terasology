@@ -180,7 +180,7 @@ public class UIMetrics extends UIDisplayRenderer {
             metrics.forEachEntry(new TObjectDoubleProcedure<String>() {
                 public boolean execute(String s, double v) {
                     boolean inserted = false;
-                    for (int i = 0; i < values.size(); i++)
+                    for (int i = 0; i < values.size() && i < METRIC_LINES; i++)
                     {
                         if (v > values.get(i))
                         {
@@ -190,7 +190,7 @@ public class UIMetrics extends UIDisplayRenderer {
                             break;
                         }
                     }
-                    if (!inserted)
+                    if (!inserted && values.size() < METRIC_LINES)
                     {
                         activities.add(s);
                         values.add(v);

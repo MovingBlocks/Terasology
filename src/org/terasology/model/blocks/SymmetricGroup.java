@@ -13,6 +13,7 @@ public class SymmetricGroup implements BlockGroup {
     public SymmetricGroup(Block block)
     {
         this.block = block;
+        block.withBlockGroup(this);
     }
     
     public String getTitle() {

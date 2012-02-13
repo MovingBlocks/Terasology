@@ -23,6 +23,9 @@ import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.ItemBlock;
 import org.terasology.utilities.Helper;
 
@@ -128,10 +131,34 @@ public class GroovyManager {
 
     public static class CommandHelper
     {
+        public void giveBlock(int blockId)
+        {
+            giveBlock(blockId, 16);
+        }
+
         public void giveBlock(int blockId, int quantity)
         {
             Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.getInventory().storeItemInFreeSlot(new ItemBlock(player, (byte)blockId, quantity));
+            player.getInventory().storeItemInFreeSlot(new ItemBlock(player, BlockManager.getInstance().getBlock((byte)blockId).getBlockGroup(), quantity));
+        }
+
+        public void giveBlock(String title) {
+            giveBlock(title, 16);
+        }
+        
+        public void giveBlock(String title, int quantity)
+        {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            BlockGroup group = BlockManager.getInstance().getBlockGroup(title);
+            if (group == null) {
+                Block block = BlockManager.getInstance().getBlock(title);
+                if (block != null) {
+                    group = block.getBlockGroup();
+                }
+            }
+            if (group != null) {
+                player.getInventory().storeItemInFreeSlot(new ItemBlock(player, group, quantity));
+            }
         }
     }
 }

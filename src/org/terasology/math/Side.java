@@ -1,6 +1,7 @@
 package org.terasology.math;
 
 import org.terasology.model.blocks.Block;
+import org.terasology.utilities.MathHelper;
 
 import java.util.EnumMap;
 
@@ -52,6 +53,38 @@ public enum Side {
         return horizontalSides;
     }
 
+    public static Side inDirection(int x, int y, int z)
+    {
+        if (MathHelper.fastAbs(x) > MathHelper.fastAbs(y))
+        {
+            if (MathHelper.fastAbs(x) > MathHelper.fastAbs(z))
+            {
+                return (x > 0) ? RIGHT : LEFT;
+            }
+        }
+        else if (MathHelper.fastAbs(y) > MathHelper.fastAbs(z))
+        {
+            return (y > 0) ? TOP : BOTTOM;
+        }
+        return (z > 0) ? BACK : FRONT;
+    }
+
+    public static Side inDirection(double x, double y, double z)
+    {
+        if (MathHelper.fastAbs(x) > MathHelper.fastAbs(y))
+        {
+            if (MathHelper.fastAbs(x) > MathHelper.fastAbs(z))
+            {
+                return (x > 0) ? RIGHT : LEFT;
+            }
+        }
+        else if (MathHelper.fastAbs(y) > MathHelper.fastAbs(z))
+        {
+            return (y > 0) ? TOP : BOTTOM;
+        }
+        return (z > 0) ? BACK : FRONT;
+    }
+
     private Vector3i vector3iDir;
     private boolean horizontal;
 
@@ -101,4 +134,5 @@ public enum Side {
                 return this;
         }
     }
+
 }
