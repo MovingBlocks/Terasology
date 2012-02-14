@@ -4,12 +4,12 @@ float calcLambLight(vec3 normal, vec3 lightVec) {
 
 float calcSpecLightWithOffset(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp, vec3 offset) {
     vec3 halfWay = normalize(eyeVec+lightVec+vec3(offset.x, offset.y, 0.0));
-    return pow(dot(halfWay, normal), exp);
+    return pow(clamp(dot(halfWay, normal), 0.0, 1.0), exp);
 }
 
 float calcSpecLight(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
     vec3 halfWay = normalize(eyeVec+lightVec);
-    return pow(dot(halfWay, normal), exp);
+    return pow(clamp(dot(halfWay, normal), 0.0, 1.0), exp);
 }
 
 float calcTorchlight(float light, vec3 lightPos) {

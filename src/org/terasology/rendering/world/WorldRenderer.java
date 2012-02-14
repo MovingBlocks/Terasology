@@ -274,6 +274,9 @@ public final class WorldRenderer implements IGameObject {
      * Renders all chunks that are currently in the player's field of view.
      */
     private void renderChunksAndEntities() {
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+
         ShaderManager.getInstance().enableShader("chunk");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
@@ -305,9 +308,6 @@ public final class WorldRenderer implements IGameObject {
 
         PerformanceMonitor.startActivity("Chunk-Opaque");
 
-
-        glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
@@ -325,8 +325,6 @@ public final class WorldRenderer implements IGameObject {
         /*
          * SECOND RENDER PASS: BILLBOARDS
          */
-        glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -334,8 +332,6 @@ public final class WorldRenderer implements IGameObject {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT);
         }
-        glDisable(GL_LIGHT0);
-        glDisable(GL_LIGHTING);
         ShaderManager.getInstance().enableShader(null);
 
         PerformanceMonitor.endActivity();
@@ -360,8 +356,6 @@ public final class WorldRenderer implements IGameObject {
         /*
         * THIRD RENDER PASS: WATER AND ICE
         */
-        glEnable(GL_LIGHTING);
-        glEnable(GL_LIGHT0);
 
         for (int j = 0; j < 2; j++) {
             if (j == 0) {
@@ -375,12 +369,13 @@ public final class WorldRenderer implements IGameObject {
                 c.render(ChunkMesh.RENDER_PHASE.WATER_AND_ICE);
             }
         }
-
-        glDisable(GL_LIGHT0);
-        glDisable(GL_LIGHTING);
         glDisable(GL_BLEND);
         glEnable(GL11.GL_CULL_FACE);
+
+
         ShaderManager.getInstance().enableShader(null);
+        glDisable(GL_LIGHT0);
+        glDisable(GL_LIGHTING);
 
         PerformanceMonitor.endActivity();
     }
