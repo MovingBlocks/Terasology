@@ -31,6 +31,7 @@ import org.terasology.utilities.PerlinNoise;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4d;
 import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -51,7 +52,7 @@ public class Skysphere implements IGameObject {
     private static final float PI = 3.1415926f;
 
     /* SKY */
-    private double _turbidity = 6.0f, _sunPosAngle = 0.1f;
+    private double _turbidity = 4.0f, _sunPosAngle = 0.1f;
 
     /* CLOUDS */
     private static final Vector2f CLOUD_RESOLUTION = (Vector2f) ConfigurationManager.getInstance().getConfig().get("System.cloudResolution");
@@ -108,10 +109,13 @@ public class Skysphere implements IGameObject {
         glEnable(GL13.GL_TEXTURE_CUBE_MAP);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(0));
         _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
-        Vector4f sunNormalise = new Vector4f(0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
+        Vector4d sunNormalise = new Vector4d(0.0f, Math.cos(_sunPosAngle), Math.sin(_sunPosAngle), 1.0);
         sunNormalise.normalize();
 
-        Vector3d _zenithColor = getAllWeatherZenith(sunNormalise.y);
+        Vector3d zenithColor = new Vector3d();
+
+        if (sunNormalise.y > 0.0)
+            zenithColor = getAllWeatherZenith((float) sunNormalise.y);
 
         ShaderManager.getInstance().enableShader("sky");
 
@@ -128,7 +132,7 @@ public class Skysphere implements IGameObject {
         GL20.glUniform1f(turbidity, (float) _turbidity);
 
         int zenith = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "zenith");
-        GL20.glUniform3f(zenith, (float) _zenithColor.x, (float) _zenithColor.y, (float) _zenithColor.z);
+        GL20.glUniform3f(zenith, (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
 
         // Draw the skysphere
         drawSphere();
@@ -183,7 +187,7 @@ public class Skysphere implements IGameObject {
 
         // Set the light direction according to the position of the sun
         FloatBuffer buffer = BufferUtils.createFloatBuffer(4);
-        buffer.put(0.0f).put((float) Math.cos(_sunPosAngle)).put((float)Math.sin(_sunPosAngle)).put(1.0f);
+        buffer.put(0.0f).put((float) Math.cos(_sunPosAngle)).put((float) Math.sin(_sunPosAngle)).put(1.0f);
         buffer.flip();
 
         glLight(GL_LIGHT0, GL11.GL_POSITION, buffer);
@@ -286,15 +290,11 @@ public class Skysphere implements IGameObject {
     }
 
     public double getDaylight() {
-       double angle = Math.toDegrees(Math.cos(_sunPosAngle));
-
-        if (angle <= 0.0)
-            return 0.0;
-
+        double angle = Math.toDegrees(MathHelper.clamp(Math.cos(_sunPosAngle)));
         double daylight = 1.0;
 
         if (angle < 16.0) {
-            daylight = 1.0 - MathHelper.clamp((16.0-angle) / 16.0);
+            daylight = 1.0 - (16.0 - angle) / 16.0;
         }
 
         return daylight;

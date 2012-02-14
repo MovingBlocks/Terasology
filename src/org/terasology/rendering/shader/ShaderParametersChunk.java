@@ -39,7 +39,7 @@ public class ShaderParametersChunk extends ShaderParameters {
         setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("Water"));
         setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("Lava"));
         setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
-        setFloat("tick", tera.getActiveWorldRenderer().getTick());
+        setFloat("time", (float) tera.getActiveWorldProvider().getTime());
     }
 
 }

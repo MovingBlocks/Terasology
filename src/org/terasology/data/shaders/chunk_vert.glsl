@@ -4,7 +4,7 @@ varying vec4 vertexWorldPos;
 varying vec3 eyeVec;
 varying vec3 lightDir;
 
-uniform float tick;
+uniform float time;
 uniform float wavingCoordinates[32];
 uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
@@ -35,17 +35,17 @@ void main()
         for (int i=0; i < 32; i+=2) {
            if (gl_TexCoord[0].x >= wavingCoordinates[i] && gl_TexCoord[0].x < wavingCoordinates[i] + TEXTURE_OFFSET && gl_TexCoord[0].y >= wavingCoordinates[i+1] && gl_TexCoord[0].y < wavingCoordinates[i+1] + TEXTURE_OFFSET) {
                if (gl_TexCoord[0].y < wavingCoordinates[i+1] + TEXTURE_OFFSET / 2.0) {
-                   vertexWorldPos.x += sin(tick*0.05 + vertexChunkPos.x + vertexChunkPos.z) * 0.25;
-                   vertexWorldPos.y += sin(tick*0.075 + vertexChunkPos.x + vertexChunkPos.z) * 0.25;
+                   vertexWorldPos.x += sin(timeToTick(time, 1.0) + vertexChunkPos.x) * 0.3;
+                   vertexWorldPos.y += sin(timeToTick(time, 0.5) + vertexChunkPos.x) * 0.1;
                }
            }
         }
        }
 
        if (gl_TexCoord[0].x >= waterCoordinate.x && gl_TexCoord[0].x < waterCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= waterCoordinate.y && gl_TexCoord[0].y < waterCoordinate.y + TEXTURE_OFFSET) {
-            vertexWorldPos.y += sin(tick * 0.05 + vertexChunkPos.x +  + vertexChunkPos.z) * sin(tick * 0.075 + vertexChunkPos.x  + vertexChunkPos.z + 16.0) * 0.1;
+            vertexWorldPos.y += sin(timeToTick(time, 1.0) + vertexChunkPos.x +  + vertexChunkPos.z) * sin(timeToTick(time, 0.5) + vertexChunkPos.x  + vertexChunkPos.z + 16.0) * 0.1;
        } else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= lavaCoordinate.y && gl_TexCoord[0].y < lavaCoordinate.y + TEXTURE_OFFSET) {
-            vertexWorldPos.y += sin(tick * 0.05 + vertexChunkPos.x + vertexChunkPos.z) * 0.1;
+            vertexWorldPos.y += sin(timeToTick(time, 0.5) + vertexChunkPos.x + vertexChunkPos.z) * 0.1;
        }
     #endif
 

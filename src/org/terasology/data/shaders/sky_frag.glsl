@@ -7,7 +7,7 @@ uniform	vec4  sunPos;
 uniform samplerCube texCube;
 
 vec4 	eyePos   = vec4(0.0, 0.0, 0.0, 1.0);
-float	colorExp = 4.0;
+float	colorExp = 16.0;
 
 vec3 convertColor (){
     vec3 clrYxy = vec3 ( colorYxy );
@@ -31,22 +31,26 @@ vec3 convertColor (){
 void main (){
     vec3 v = normalize ( McPosition.xyz );
 
-    vec3 l                  = normalize (sunPos.xyz);
-    float sunHighlight      = pow(max(0.0, dot(l, v)), 1024.0) * 128.0;
-    float posSunY           = 0.0;
+    if (v.y > -0.35) {
+        vec3 l                  = normalize (sunPos.xyz);
+        float sunHighlight      = pow(max(0.0, dot(l, v)), 256.0) * 128.0;
+        float posSunY           = 0.0;
 
-    if (sunPos.y > 0.0){
-        posSunY = sunPos.y;
+        if (sunPos.y > 0.0){
+            posSunY = sunPos.y;
+        }
+
+        /* ALPHA STARRY NIGHT */
+        float alpha  = (0.7 - posSunY) * (1.0 - lv);
+
+        if (alpha < 0.0){
+            alpha = 0.0;
+        }
+
+        vec4 skyColor = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight, 1.0 );
+        skyColor += alpha * textureCube (texCube, skyVec);
+        gl_FragColor = skyColor;
+    } else {
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-
-    /* ALPHA STARRY NIGHT */
-    float alpha  = (0.7 - posSunY) * (1.0 - lv);
-
-    if (alpha < 0.0){
-        alpha = 0.0;
-    }
-
-    vec4 skyColor = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight, 1.0 );
-    skyColor += alpha * textureCube (texCube, skyVec);
-    gl_FragColor = skyColor;
 }

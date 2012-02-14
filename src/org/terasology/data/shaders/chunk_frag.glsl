@@ -3,7 +3,7 @@ uniform sampler2D textureWaterNormal;
 uniform sampler2D textureLava;
 uniform sampler2D textureEffects;
 
-uniform float tick;
+uniform float time;
 uniform float daylight = 1.0;
 uniform bool swimming;
 uniform bool carryingTorch;
@@ -29,7 +29,7 @@ void main(){
 
     if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.x + TEXTURE_OFFSET && texCoord.y >= waterCoordinate.y && texCoord.y < waterCoordinate.y + TEXTURE_OFFSET) {
         /* WATER */
-        vec2 waterOffset = vec2(vertexWorldPosRaw.x + tick / 100.0, vertexWorldPosRaw.z) / 16.0;
+        vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z) / 16.0;
         normalWater = (texture2D(textureWaterNormal, waterOffset) * 2.0 - 1.0).xyz;
 
         color = vec4(83.0 / 255.0, 209.0 / 255.0, 236.0 / 255.0, 0.5);
@@ -38,7 +38,7 @@ void main(){
         /* LAVA */
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
-        texCoord.y += mod(tick,127.0) * 1.0/128.0;
+        texCoord.y += mod(timeToTick(time, 0.1),127.0) * (1.0/128.0);
 
         color = texture2D(textureLava, texCoord.xy);
     } else {
@@ -97,7 +97,7 @@ void main(){
     }
 
     float blockBrightness = clamp(blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2
-        + torchlight - ((sin(tick*0.05) + 1.0) / 16.0) * blocklightValue, 0.0, 1.0) * blocklightDayIntensity;
+        + torchlight - (sin(timeToTick(time, 0.5) + 1.0) / 16.0) * blocklightValue, 0.0, 1.0) * blocklightDayIntensity;
 
     vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.99, blockBrightness * 0.98);
 
