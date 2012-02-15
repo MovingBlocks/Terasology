@@ -7,7 +7,7 @@ uniform	vec4  sunPos;
 uniform samplerCube texCube;
 
 vec4 	eyePos   = vec4(0.0, 0.0, 0.0, 1.0);
-float	colorExp = 16.0;
+float	colorExp = 8.0;
 
 vec3 convertColor (){
     vec3 clrYxy = vec3 ( colorYxy );
@@ -33,7 +33,7 @@ void main (){
 
     if (v.y > -0.35) {
         vec3 l                  = normalize (sunPos.xyz);
-        float sunHighlight      = pow(max(0.0, dot(l, v)), 256.0) * 128.0;
+        float sunHighlight      = pow(max(0.0, dot(l, v)), 256.0) * 512.0;
         float posSunY           = 0.0;
 
         if (sunPos.y > 0.0){
