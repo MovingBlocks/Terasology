@@ -57,13 +57,11 @@ public class ChunkMesh {
 
         private int _meshIndex;
 
-        private RENDER_TYPE(int index)
-        {
+        private RENDER_TYPE(int index) {
             _meshIndex = index;
         }
 
-        public int getIndex()
-        {
+        public int getIndex() {
             return _meshIndex;
         }
     }

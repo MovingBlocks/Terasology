@@ -18,8 +18,8 @@ package org.terasology.rendering.gui.components;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -40,6 +40,8 @@ public class UITransparentOverlay extends UIDisplayElement {
             TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(0.05f, 0.05f, 0.05f, 0.8f), 1.0f, 1.0f);
             _mesh = tessellator.generateMesh();
         }
+
+        update();
     }
 
     @Override

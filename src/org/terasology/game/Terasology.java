@@ -91,6 +91,7 @@ public final class Terasology {
     private UIHeadsUpDisplay _hud;
     private UIMetrics _metrics;
     private UIPauseMenu _pauseMenu;
+    private UILoadingScreen _loadingScreen;
     private UIStatusScreen _statusScreen;
     private UIInventoryScreen _inventoryScreen;
 
@@ -135,6 +136,7 @@ public final class Terasology {
         try {
             terasology = getInstance();
 
+            terasology.initOpenAL();
             terasology.initDisplay();
             terasology.initControls();
             terasology.initGame();
@@ -155,8 +157,14 @@ public final class Terasology {
             addLibraryPath("natives/macosx");
         else if (System.getProperty("os.name").equals("Linux"))
             addLibraryPath("natives/linux");
-        else
+        else {
             addLibraryPath("natives/windows");
+
+            if (System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64"))
+                System.loadLibrary("OpenAL64");
+            else
+                System.loadLibrary("OpenAL32");
+        }
     }
 
     private static void addLibraryPath(String s) throws Exception {
@@ -207,6 +215,10 @@ public final class Terasology {
         Display.setResizable(true);
         Display.setTitle("Terasology" + " | " + ConfigurationManager.getInstance().getConfig().get("System.versionTag"));
         Display.create((PixelFormat) ConfigurationManager.getInstance().getConfig().get("Graphics.pixelFormat"));
+    }
+
+    public void initOpenAL() {
+        AudioManager.getInstance();
     }
 
     /**
@@ -268,14 +280,14 @@ public final class Terasology {
     private void simulateWorld(int duration) {
         long timeBefore = getTime();
 
-        _statusScreen.setVisible(true);
+        _loadingScreen.setVisible(true);
         _hud.setVisible(false);
         _metrics.setVisible(false);
 
         float diff = 0;
 
         while (diff < duration) {
-            _statusScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
+            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
 
             renderUserInterface();
             updateUserInterface();
@@ -287,7 +299,7 @@ public final class Terasology {
             diff = getTime() - timeBefore;
         }
 
-        _statusScreen.setVisible(false);
+        _loadingScreen.setVisible(false);
         _hud.setVisible(true);
         _metrics.setVisible(true);
     }
@@ -318,6 +330,7 @@ public final class Terasology {
         _hud.setVisible(true);
 
         _pauseMenu = new UIPauseMenu();
+        _loadingScreen = new UILoadingScreen();
         _statusScreen = new UIStatusScreen();
         _inventoryScreen = new UIInventoryScreen();
         _metrics = new UIMetrics();
@@ -326,8 +339,9 @@ public final class Terasology {
         _guiScreens.add(_metrics);
         _guiScreens.add(_hud);
         _guiScreens.add(_pauseMenu);
-        _guiScreens.add(_statusScreen);
+        _guiScreens.add(_loadingScreen);
         _guiScreens.add(_inventoryScreen);
+        _guiScreens.add(_statusScreen);
 
         /*
          * Init. OpenGL
@@ -350,11 +364,6 @@ public final class Terasology {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glShadeModel(GL_FLAT);
-
-        // Update the viewing distance
-        double minDist = (VIEWING_DISTANCES[_activeViewingDistance] / 2) * 16.0f;
-        glFogf(GL_FOG_START, (float) (minDist * 0.5));
-        glFogf(GL_FOG_END, (float) minDist);
     }
 
     private void resizeViewport() {
@@ -371,6 +380,7 @@ public final class Terasology {
 
         // MAIN GAME LOOP
         while (_runGame && !Display.isCloseRequested()) {
+            // Only process rendering and updating once a second
             if (!Display.isActive()) {
                 try {
                     Thread.sleep(1000);
@@ -380,7 +390,6 @@ public final class Terasology {
                 PerformanceMonitor.startActivity("Process Display");
                 Display.processMessages();
                 PerformanceMonitor.endActivity();
-                continue;
             }
 
             PerformanceMonitor.startActivity("Main Update");

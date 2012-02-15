@@ -32,6 +32,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class PostProcessingRenderer {
 
     public static final boolean EFFECTS_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.enablePostProcessingEffects");
+    public static final float MAX_EXPOSURE = 5.0f;
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure;
@@ -84,15 +85,15 @@ public class PostProcessingRenderer {
     }
 
     public PostProcessingRenderer() {
-        createOrUpdateSceneFBO();
+        createOrUpdateFullscreenFbos();
 
         if (EFFECTS_ENABLED) {
-            createFBO("sceneBlur0", 1024, 1024, false, false);
-            createFBO("sceneBlur1", 1024, 1024, false, false);
-
             createFBO("sceneHighPass", 1024, 1024, true, false);
             createFBO("sceneBloom0", 1024, 1024, true, false);
             createFBO("sceneBloom1", 1024, 1024, true, false);
+
+            createFBO("sceneBlur0", 1024, 1024, true, false);
+            createFBO("sceneBlur1", 1024, 1024, true, false);
 
             createFBO("scene64", 64, 64, true, false);
             createFBO("scene32", 32, 32, true, false);
@@ -190,10 +191,12 @@ public class PostProcessingRenderer {
         scene.unbindTexture();
 
         float lum = 0.2126f * pixels.get(0) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(2);
-        _exposure = (float) MathHelper.lerp(_exposure, 0.5f / lum, 0.01);
 
-        if (_exposure > 4.0f)
-            _exposure = 4.0f;
+        if (lum > 0.0f) // No division by zero
+            _exposure = (float) MathHelper.lerp(_exposure, 0.5f / lum, 0.01);
+
+        if (_exposure > MAX_EXPOSURE)
+            _exposure = MAX_EXPOSURE;
     }
 
     /**
@@ -251,15 +254,16 @@ public class PostProcessingRenderer {
             scene.unbindTexture();
         }
 
-        createOrUpdateSceneFBO();
+        createOrUpdateFullscreenFbos();
     }
 
     /**
      * Initially creates the scene FBO and updates it according to the size of the viewport.
      */
-    private void createOrUpdateSceneFBO() {
+    private void createOrUpdateFullscreenFbos() {
         if (!_FBOs.containsKey("scene")) {
             createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
+
         } else {
             FBO scene = getFBO("scene");
 
@@ -314,7 +318,7 @@ public class PostProcessingRenderer {
         ShaderManager.getInstance().enableShader("blur");
 
         int radius = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("blur"), "radius");
-        GL20.glUniform1f(radius, 16);
+        GL20.glUniform1f(radius, 16.0f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).bind();
         glViewport(0, 0, 1024, 1024);
@@ -408,5 +412,9 @@ public class PostProcessingRenderer {
         }
 
         glCallList(_displayListQuad);
+    }
+
+    public float getExposure() {
+        return _exposure;
     }
 }

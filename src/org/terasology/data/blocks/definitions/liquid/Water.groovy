@@ -7,4 +7,5 @@ block {
     version = 1
     shape = "TrimmedLoweredCube"
     loweredShape = "LoweredCube"
+    hardness = 0
 }

@@ -16,19 +16,17 @@
  */
 package org.terasology.logic.characters;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.manager.ToolManager;
 import org.terasology.logic.tools.ITool;
-import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.IBlockObserver;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
@@ -42,17 +40,15 @@ import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.FirstPersonCamera;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -508,19 +504,6 @@ public final class Player extends Character {
         TextureManager.getInstance().bindTexture("char");
         ShaderManager.getInstance().enableShader("block");
 
-        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
-        GL20.glUniform1f(light, _parent.getRenderingLightValueAt(getPosition()));
-
-        // Make sure the hand is not affected by the biome color. ZOMBIES!!!!
-        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
-        colorBuffer.put(1.0f);
-        colorBuffer.put(1.0f);
-        colorBuffer.put(1.0f);
-        colorBuffer.flip();
-
-        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
-        GL20.glUniform3(colorOffset, colorBuffer);
-
         glPushMatrix();
         glTranslatef(0.8f, -1.1f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.0f - _handMovementAnimationOffset * 0.5f);
         glRotatef(-45f - _handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
@@ -596,18 +579,14 @@ public final class Player extends Character {
         _observers.remove(observer);
     }
 
-    public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos) {
+    public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
         for (IBlockObserver ob : _observers)
-            ob.blockPlaced(chunk, pos);
-
-        BulletPhysicsRenderer.getInstance().blockPlaced(chunk, pos);
+            ob.blockPlaced(chunk, pos, update);
     }
 
-    public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos) {
+    public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
         for (IBlockObserver ob : _observers)
-            ob.blockRemoved(chunk, pos);
-
-        BulletPhysicsRenderer.getInstance().blockRemoved(chunk, pos);
+            ob.blockRemoved(chunk, pos, update);
     }
 
     public Inventory getInventory() {

@@ -27,7 +27,6 @@ import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.ItemBlock;
-import org.terasology.utilities.Helper;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -129,25 +128,21 @@ public class GroovyManager {
         }
     }
 
-    public static class CommandHelper
-    {
-        public void giveBlock(int blockId)
-        {
+    public static class CommandHelper {
+        public void giveBlock(int blockId) {
             giveBlock(blockId, 16);
         }
 
-        public void giveBlock(int blockId, int quantity)
-        {
+        public void giveBlock(int blockId, int quantity) {
             Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.getInventory().storeItemInFreeSlot(new ItemBlock(player, BlockManager.getInstance().getBlock((byte)blockId).getBlockGroup(), quantity));
+            player.getInventory().storeItemInFreeSlot(new ItemBlock(player, BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup(), quantity));
         }
 
         public void giveBlock(String title) {
             giveBlock(title, 16);
         }
-        
-        public void giveBlock(String title, int quantity)
-        {
+
+        public void giveBlock(String title, int quantity) {
             Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
             BlockGroup group = BlockManager.getInstance().getBlockGroup(title);
             if (group == null) {

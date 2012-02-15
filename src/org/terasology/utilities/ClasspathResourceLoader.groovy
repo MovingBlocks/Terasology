@@ -1,12 +1,10 @@
 package org.terasology.utilities
 
-import java.util.logging.Logger
-import java.util.jar.JarFile
-import java.util.logging.Level
+import groovy.util.logging.Log
 import java.util.jar.JarEntry
+import java.util.jar.JarFile
 import javax.imageio.ImageIO
 import org.newdawn.slick.util.ResourceLoader
-import groovy.util.logging.Log
 
 /**
  * Helper class for accessing resources from the classpath, whether it is
@@ -16,6 +14,7 @@ import groovy.util.logging.Log
  */
 @Log
 public class ClasspathResourceLoader {
+    // TODO: Usage of this is fairly brute force, maybe there's a more efficient way, with sorting or so? Probably doesn't matter much tho
     private JarFile _jar
     private String _rootPath
 
@@ -30,10 +29,9 @@ public class ClasspathResourceLoader {
 
     /**
      * This method figures out whether we're running from inside a jar file, in case we need to load stuff differently
-     * If we are then return a JarFile we can keep handy for later loading from
+     * If we are then set an instance variable JarFile we can keep handy for later loading from
      *
      * @param path any path to something that exists inside the jar file (better be unique!)
-     * @return JarFile reference or null if we're not inside a jar file
      */
     private scanForJar(String path) {
         URL u = getClass().getClassLoader().getResource(path)
@@ -47,19 +45,16 @@ public class ClasspathResourceLoader {
             log.fine "Successfully loaded a jar file reference, returning it"
             _jar = jar
         }
-        else
-        {
+        else {
             log.info "We're not running inside a jar file, so we don't need any references to jar resources"
         }
     }
 
-    public String getPackagePath()
-    {
+    public String getPackagePath() {
         return _rootPath
     }
 
-    public boolean isJar()
-    {
+    public boolean isJar() {
         return _jar != null
     }
 
@@ -67,8 +62,8 @@ public class ClasspathResourceLoader {
      * Retrieves all classes in a path within the loader
      * This relies on the directory only containing desired classes, closure stubs, and sub dirs
      * TODO: Need a separate loader for external addons - it needs override priority for user content
-     * @param subPath path under the
-     * @return instanced Groovy classes
+     * @param subPath path under the root path of the jar we care about
+     * @return instanced Groovy classes we'll later load into Java classes for performance reasons
      */
     public getClassesAt(String subPath) {
         def allClasses = []
@@ -125,11 +120,10 @@ public class ClasspathResourceLoader {
      * Assume there is nothing but images in the subpath
      * TODO: Refactor further - build around a getResources function
      * TODO: Exclude non-images
-     * @param subPath
-     * @return
+     * @param subPath of where to start looking under the root path
+     * @return the images we loaded
      */
-    public getImages(String subPath)
-    {
+    public getImages(String subPath) {
         def path
         if (subPath.isEmpty()) {
             path = _rootPath

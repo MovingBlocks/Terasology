@@ -83,7 +83,7 @@ public class GrowthSimulator extends Simulator {
         return true;
     }
 
-    public void blockPlaced(Chunk chunk, BlockPosition pos) {
+    public void blockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
         if (_parent.getBlock(pos.x, pos.y, pos.z) == DIRT_TYPE) {
             addActiveBlock(pos);
         }
@@ -97,7 +97,7 @@ public class GrowthSimulator extends Simulator {
         }
     }
 
-    public void blockRemoved(Chunk chunk, BlockPosition pos) {
+    public void blockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
         for (int i = 0; i < 6; i++) {
             BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].y, pos.z + (int) NEIGHBORS6[i].z);
 

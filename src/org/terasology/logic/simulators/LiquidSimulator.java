@@ -115,14 +115,23 @@ public class LiquidSimulator extends Simulator {
         return simulated;
     }
 
-    public void blockPlaced(Chunk chunk, BlockPosition pos) {
+    @Override
+    public void addActiveBlock(BlockPosition bp) {
+        // Make sure only liquids can be added to the generator
+        Block b = BlockManager.getInstance().getBlock(_parent.getBlock(bp.x, bp.y, bp.z));
+        if (b.isLiquid()) {
+            super.addActiveBlock(bp);
+        }
+    }
+
+    public void blockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
         if (BlockManager.getInstance().getBlock(_parent.getBlock(pos.x, pos.y, pos.z)).isLiquid()) {
             chunk.setState(pos.x, pos.y, pos.z, (byte) 1);
             addActiveBlock(pos);
         }
     }
 
-    public void blockRemoved(Chunk chunk, BlockPosition pos) {
+    public void blockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
         for (int i = 0; i < 6; i++) {
             BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].y, pos.z + (int) NEIGHBORS6[i].z);
 

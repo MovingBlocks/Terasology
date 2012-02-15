@@ -12,4 +12,5 @@ block {
     loweredShape = "LoweredCube"
     // Let the lava shine!
     luminance = 15
+    hardness = 0
 }

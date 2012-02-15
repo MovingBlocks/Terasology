@@ -228,10 +228,8 @@ public final class WorldRenderer implements IGameObject {
 
         /* SKYSPHERE */
         PerformanceMonitor.startActivity("Render-Sky");
-        if (!_player.isHeadUnderWater()) {
-            _player.getActiveCamera().lookThroughNormalized();
-            _skysphere.render();
-        }
+        _player.getActiveCamera().lookThroughNormalized();
+        _skysphere.render();
         PerformanceMonitor.endActivity();
 
         /* WORLD RENDERING */
@@ -276,50 +274,30 @@ public final class WorldRenderer implements IGameObject {
      * Renders all chunks that are currently in the player's field of view.
      */
     private void renderChunksAndEntities() {
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+
         ShaderManager.getInstance().enableShader("chunk");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         TextureManager.getInstance().bindTexture("custom_lava_still");
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        TextureManager.getInstance().bindTexture("custom_water_still");
+        TextureManager.getInstance().bindTexture("water_normal");
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
         TextureManager.getInstance().bindTexture("effects");
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("terrain");
 
-        int daylight = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "daylight");
-        int swimming = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "swimming");
-        int carryingTorch = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "carryingTorch");
-
-        int wavingCoordinates = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "wavingCoordinates");
-        GL20.glUniform1(wavingCoordinates, BlockManager.getInstance().calcCoordinatesForWavingBlocks());
-
-        int lavaCoordinate = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "lavaCoordinate");
-        GL20.glUniform2(lavaCoordinate, BlockManager.getInstance().calcCoordinate("Lava"));
-
-        int waterCoordinate = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "waterCoordinate");
-        GL20.glUniform2(waterCoordinate, BlockManager.getInstance().calcCoordinate("Water"));
-
-        int grassCoordinate = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "grassCoordinate");
-        GL20.glUniform2(grassCoordinate, BlockManager.getInstance().calcCoordinate("Grass"));
-
         int lavaTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureLava");
-        int waterTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureWater");
+        int textureWaterNormal = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureWaterNormal");
         int textureAtlas = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureAtlas");
         int textureEffects = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureEffects");
         GL20.glUniform1i(lavaTexture, 1);
-        GL20.glUniform1i(waterTexture, 2);
+        GL20.glUniform1i(textureWaterNormal, 2);
         GL20.glUniform1i(textureEffects, 3);
         GL20.glUniform1i(textureAtlas, 0);
 
-        int tick = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "tick");
-
         boolean playerIsSwimming = _player.isHeadUnderWater();
-
-        GL20.glUniform1f(tick, _tick);
-        GL20.glUniform1f(daylight, (float) getDaylight());
-        GL20.glUniform1i(swimming, playerIsSwimming ? 1 : 0);
-        GL20.glUniform1i(carryingTorch, _player.isCarryingTorch() ? 1 : 0);
 
         ShaderManager.getInstance().enableShader(null);
 
@@ -337,6 +315,8 @@ public final class WorldRenderer implements IGameObject {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_PHASE.OPAQUE);
         }
+        glDisable(GL_LIGHT0);
+        glDisable(GL_LIGHTING);
 
         PerformanceMonitor.endActivity();
 
@@ -352,7 +332,6 @@ public final class WorldRenderer implements IGameObject {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT);
         }
-
         ShaderManager.getInstance().enableShader(null);
 
         PerformanceMonitor.endActivity();
@@ -377,6 +356,7 @@ public final class WorldRenderer implements IGameObject {
         /*
         * THIRD RENDER PASS: WATER AND ICE
         */
+
         for (int j = 0; j < 2; j++) {
             if (j == 0) {
                 glColorMask(false, false, false, false);
@@ -389,10 +369,13 @@ public final class WorldRenderer implements IGameObject {
                 c.render(ChunkMesh.RENDER_PHASE.WATER_AND_ICE);
             }
         }
-
         glDisable(GL_BLEND);
         glEnable(GL11.GL_CULL_FACE);
+
+
         ShaderManager.getInstance().enableShader(null);
+        glDisable(GL_LIGHT0);
+        glDisable(GL_LIGHTING);
 
         PerformanceMonitor.endActivity();
     }
@@ -564,7 +547,7 @@ public final class WorldRenderer implements IGameObject {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %.2f, sun: %.2f, cache: %d, visible: %d, dirty: %d, tri: %d, empty: %d, not-ready: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _visibleChunks.size(), _statDirtyChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %d, visible: %d, dirty: %d, tri: %d, empty: %d, not-ready: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _visibleChunks.size(), _statDirtyChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {
@@ -613,6 +596,10 @@ public final class WorldRenderer implements IGameObject {
 
     public MobManager getMobManager() {
         return _mobManager;
+    }
+
+    public Skysphere getSkysphere() {
+        return _skysphere;
     }
 
     public int getTick() {

@@ -16,16 +16,15 @@
  */
 package org.terasology.logic.characters;
 
-import org.lwjgl.opengl.GL20;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.rendering.shader.ShaderParameters;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -41,12 +40,11 @@ import static org.lwjgl.opengl.GL11.*;
 public final class GelatinousCube extends Character {
 
     private final Mesh _mesh;
-
-    private static final float WIDTH_HALF = 0.5f, HEIGHT_HALF = 0.5f;
     private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 0.2f), new Vector3f(1.0f, 0.2f, 0.2f), new Vector3f(0.2f, 1.0f, 0.2f), new Vector3f(1.0f, 1.0f, 0.2f)};
 
     private long _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
     private final Vector3d _movementTarget = new Vector3d();
+    private boolean _followingPlayer = false;
 
     public final int _randomColorId;
     public float _randomSize = 1.0f;
@@ -54,7 +52,7 @@ public final class GelatinousCube extends Character {
     public GelatinousCube(WorldRenderer parent) {
         super(parent, 0.02, 1.5, 0.2, true);
 
-        _randomSize = (float) MathHelper.clamp((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0 + 0.15);
+        _randomSize = (float) (((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 0.8 + 0.2);
         _randomColorId = Math.abs(_parent.getWorldProvider().getRandom().randomInt()) % COLORS.length;
 
         Tessellator tessellator = new Tessellator();
@@ -78,14 +76,10 @@ public final class GelatinousCube extends Character {
 
         TextureManager.getInstance().bindTexture("slime");
 
-        // Setup the shader
         ShaderManager.getInstance().enableShader("gelatinousCube");
-        int tick = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("gelatinousCube"), "tick");
-        GL20.glUniform1f(tick, _parent.getTick());
-        int cOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("gelatinousCube"), "colorOffset");
-        GL20.glUniform4f(cOffset, COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].z, 1.0f);
-        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("gelatinousCube"), "light");
-        GL20.glUniform1f(light, _parent.getRenderingLightValueAt(getPosition()));
+        ShaderParameters params = ShaderManager.getInstance().getShaderParameters("gelatinousCube");
+        params.setFloat4("colorOffset", COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].z, 1.0f);
+        params.setFloat("light", _parent.getRenderingLightValueAt(getPosition()));
 
         _mesh.render();
 
@@ -99,24 +93,25 @@ public final class GelatinousCube extends Character {
 
         double distanceToPlayer = distanceSquaredTo(_parent.getPlayer().getPosition());
 
-        if (distanceToPlayer > 5 && distanceToPlayer < 32) {
+        if (distanceToPlayer > 6 && distanceToPlayer < 16) {
             _movementTarget.set(_parent.getPlayer().getPosition());
-        }
-
-        if (Terasology.getInstance().getTime() - _lastChangeOfDirectionAt > 5000 || distanceToPlayer <= 5) {
-            _movementTarget.set(getPosition().x + _parent.getWorldProvider().getRandom().randomDouble() * 500, getPosition().y, getPosition().z + _parent.getWorldProvider().getRandom().randomDouble() * 500);
-            _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
+            _followingPlayer = true;
+        } else {
+            if (Terasology.getInstance().getTime() - _lastChangeOfDirectionAt > 12000 || _followingPlayer) {
+                _movementTarget.set(getPosition().x + _parent.getWorldProvider().getRandom().randomDouble() * 500, getPosition().y, getPosition().z + _parent.getWorldProvider().getRandom().randomDouble() * 500);
+                _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
+                _followingPlayer = false;
+                _walkingSpeed = ((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 0.05;
+            }
         }
 
         lookAt(_movementTarget);
         walkForward();
-
-        if (_parent.getWorldProvider().getRandom().randomDouble() < -0.94)
-            jump();
     }
 
     protected AABB generateAABBForPosition(Vector3d p) {
-        return new AABB(p, new Vector3d(WIDTH_HALF, HEIGHT_HALF, WIDTH_HALF));
+        float sizeHalf = _randomSize / 2f;
+        return new AABB(p, new Vector3d(sizeHalf, sizeHalf, sizeHalf));
     }
 
     public AABB getAABB() {
@@ -130,6 +125,6 @@ public final class GelatinousCube extends Character {
 
     @Override
     protected void handleHorizontalCollision() {
-        _lastChangeOfDirectionAt = 0;
+        jump();
     }
 }

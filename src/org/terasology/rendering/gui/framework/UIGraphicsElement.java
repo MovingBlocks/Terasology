@@ -19,8 +19,8 @@ package org.terasology.rendering.gui.framework;
 import org.lwjgl.opengl.GL11;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;

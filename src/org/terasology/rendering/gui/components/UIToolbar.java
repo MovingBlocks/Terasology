@@ -49,6 +49,8 @@ public class UIToolbar extends UIDisplayContainer {
             _cells[i].setVisible(true);
             addDisplayElement(_cells[i]);
         }
+
+        update();
     }
 
     @Override

@@ -18,9 +18,10 @@ import java.util.Stack;
 
 /**
  * Active implementation of Performance Monitor
+ *
  * @author Immortius <immortius@gmail.com>
- * TODO: Check to ensure activities are being started and stopped correctly
- * TODO: Remove activities with 0 time
+ *         TODO: Check to ensure activities are being started and stopped correctly
+ *         TODO: Remove activities with 0 time
  */
 public class PerformanceMonitorImpl implements IPerformanceMonitor {
     private static final int RETAINED_CYCLES = 60;
@@ -36,11 +37,10 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
     private TObjectDoubleMap<String> _spikeData;
     private double _timeFactor;
     private TObjectIntMap<String> _lastRunningThreads;
-    
+
     private Thread _mainThread;
 
-    public PerformanceMonitorImpl()
-    {
+    public PerformanceMonitorImpl() {
         _activityStack = new Stack<Activity>();
         _metricData = new LinkedList<TObjectLongMap<String>>();
         _runningTotals = new TObjectLongHashMap<String>();
@@ -55,8 +55,7 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
 
     }
 
-    public void rollCycle()
-    {
+    public void rollCycle() {
         _metricData.add(_currentData);
         _spikeData.forEachEntry(new TObjectDoubleProcedure<String>() {
             public boolean execute(String s, double v) {
@@ -70,16 +69,14 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
                 _runningTotals.adjustOrPutValue(s, v, v);
                 double time = v * _timeFactor;
                 double prev = _spikeData.get(s);
-                if (time > prev)
-                {
+                if (time > prev) {
                     _spikeData.put(s, time);
                 }
                 return true;
             }
         });
 
-        while (_metricData.size() > RETAINED_CYCLES)
-        {
+        while (_metricData.size() > RETAINED_CYCLES) {
             _metricData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
                 public boolean execute(String s, long v) {
                     _runningTotals.adjustValue(s, -v);
@@ -105,18 +102,16 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
                 return i > 0;
             }
         });
-        
+
     }
 
-    public void startActivity(String activity)
-    {
+    public void startActivity(String activity) {
         if (Thread.currentThread() != _mainThread)
             return;
         Activity newActivity = new Activity();
         newActivity.name = activity;
         newActivity.startTime = Sys.getTime();
-        if (!_activityStack.isEmpty())
-        {
+        if (!_activityStack.isEmpty()) {
             Activity currentActivity = _activityStack.peek();
             currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0) ? currentActivity.resumeTime : currentActivity.startTime);
         }
@@ -124,8 +119,7 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
         _activityStack.push(newActivity);
     }
 
-    public void endActivity()
-    {
+    public void endActivity() {
         if (Thread.currentThread() != _mainThread || _activityStack.empty())
             return;
 
@@ -134,21 +128,18 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
         long total = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + time - oldActivity.resumeTime : time - oldActivity.startTime;
         _currentData.adjustOrPutValue(oldActivity.name, total, total);
 
-        if (!_activityStack.isEmpty())
-        {
+        if (!_activityStack.isEmpty()) {
             Activity currentActivity = _activityStack.peek();
             currentActivity.resumeTime = time;
         }
     }
 
-    public TObjectDoubleMap<String> getRunningMean()
-    {
+    public TObjectDoubleMap<String> getRunningMean() {
         final TObjectDoubleMap<String> result = new TObjectDoubleHashMap<String>();
         final double factor = _timeFactor / _metricData.size();
         _runningTotals.forEachEntry(new TObjectLongProcedure<String>() {
             public boolean execute(String s, long l) {
-                if (l > 0)
-                {
+                if (l > 0) {
                     result.put(s, l * factor);
                 }
                 return true;
@@ -157,28 +148,23 @@ public class PerformanceMonitorImpl implements IPerformanceMonitor {
         return result;
     }
 
-    public TObjectDoubleMap<String> getDecayingSpikes()
-    {
+    public TObjectDoubleMap<String> getDecayingSpikes() {
         return _spikeData;
     }
 
-    public void startThread(String name)
-    {
+    public void startThread(String name) {
         _runningThreads.adjustOrPutValue(name, 1, 1);
     }
 
-    public void endThread(String name)
-    {
+    public void endThread(String name) {
         _stoppedThreads.adjustOrPutValue(name, -1, -1);
     }
 
-    public TObjectIntMap<String> getRunningThreads()
-    {
-         return _lastRunningThreads;
+    public TObjectIntMap<String> getRunningThreads() {
+        return _lastRunningThreads;
     }
 
-    private static class Activity
-    {
+    private static class Activity {
         public String name;
         public long startTime;
         public long resumeTime;

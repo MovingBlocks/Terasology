@@ -27,14 +27,12 @@ import java.util.ArrayList;
 /**
  * Can be used to create and place blueprints.
  */
-public class BlueprintTool implements ITool {
-
-    private final Player _player;
+public class BlueprintTool extends SimpleTool {
 
     private final ArrayList<BlockPosition> _selectedBlocks = new ArrayList<BlockPosition>();
 
     public BlueprintTool(Player player) {
-        _player = player;
+        super(player);
     }
 
     public void executeLeftClickAction() {

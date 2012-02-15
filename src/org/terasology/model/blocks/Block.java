@@ -33,7 +33,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectStreamConstants;
 import java.util.EnumMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -489,7 +488,7 @@ public class Block implements IGameObject, Cloneable {
     }
 
     public boolean isDestructible() {
-        return getHardness() >= 0;
+        return getHardness() > 0;
     }
 
     public boolean isAllowBlockAttachment() {

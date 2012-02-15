@@ -29,19 +29,20 @@ import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
-import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
+import org.terasology.rendering.shader.ShaderParameters;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.*;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,7 +52,7 @@ import java.util.HashSet;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
+public class BulletPhysicsRenderer implements IGameObject {
 
     /* SINGLETON */
     private static BulletPhysicsRenderer _instance;
@@ -97,6 +98,9 @@ public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
     private final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     private final DiscreteDynamicsWorld _discreteDynamicsWorld;
 
+    private static final Vector3f[] _positionOffsets = new Vector3f[]{new Vector3f(1, 1, -1), new Vector3f(1, -1, -1), new Vector3f(-1, 1, -1), new Vector3f(-1, -1, -1),
+            new Vector3f(1, 1, 1), new Vector3f(1, -1, 1), new Vector3f(-1, 1, 1), new Vector3f(-1, -1, 1)};
+
     public static BulletPhysicsRenderer getInstance() {
         if (_instance == null)
             _instance = new BulletPhysicsRenderer();
@@ -114,24 +118,21 @@ public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
     }
 
     public void addBlock(Vector3f position, byte type) {
-        Vector3f[] positionOffsets = new Vector3f[]{new Vector3f(1, 1, -1), new Vector3f(1, -1, -1), new Vector3f(-1, 1, -1), new Vector3f(-1, -1, -1),
-                new Vector3f(1, 1, 1), new Vector3f(1, -1, 1), new Vector3f(-1, 1, 1), new Vector3f(-1, -1, 1)};
-
         for (int i = 0; i < 8; i++) {
             Matrix3f rot = new Matrix3f();
             rot.setIdentity();
 
             // Position the smaller blocks
             Vector3f pos = new Vector3f(position);
-            positionOffsets[i].scale(0.25f);
-            pos.add(positionOffsets[i]);
+            _positionOffsets[i].scale(0.25f);
+            pos.add(_positionOffsets[i]);
 
             DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, pos, 1.0f)));
 
             Vector3f fallInertia = new Vector3f();
-            _blockShape.calculateLocalInertia(8f, fallInertia);
+            _blockShape.calculateLocalInertia(100f, fallInertia);
 
-            RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(8f, blockMotionState, _blockShape, fallInertia);
+            RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(100f, blockMotionState, _blockShape, fallInertia);
             blockCI.restitution = 0.0f;
 
             BlockRigidBody block = new BlockRigidBody(blockCI, type);
@@ -139,7 +140,7 @@ public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
 
             // Make sure the blocks move at least
             FastRandom rand = Terasology.getInstance().getActiveWorldProvider().getRandom();
-            block.applyCentralForce(new Vector3f(rand.randomInt() % 10000 + 1000, rand.randomInt() % 10000 + 1000, rand.randomInt() % 10000 + 256));
+            block.applyCentralForce(new Vector3f(rand.randomInt() % 80000 + 40000, rand.randomInt() % 80000 + 40000, rand.randomInt() % 80000 + 40000));
 
             _blocks.add(block);
         }
@@ -181,16 +182,7 @@ public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
 
         TextureManager.getInstance().bindTexture("terrain");
         ShaderManager.getInstance().enableShader("block");
-
-        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
-        colorBuffer.put(1).put(1).put(1);
-        colorBuffer.flip();
-
-        int textured = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "textured");
-        GL20.glUniform1i(textured, 1);
-        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
-        GL20.glUniform3(colorOffset, colorBuffer);
-        int lightRef = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
+        ShaderParameters params = ShaderManager.getInstance().getShaderParameters("block");
 
         Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
@@ -212,7 +204,7 @@ public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
             GL11.glScalef(0.5f, 0.5f, 0.5f);
 
             float lightValue = Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValueAt(new Vector3d(t.origin));
-            GL20.glUniform1f(lightRef, lightValue);
+            params.setFloat("light", lightValue);
 
             BlockManager.getInstance().getBlock(b.getType()).render();
 
@@ -242,13 +234,5 @@ public class BulletPhysicsRenderer implements IGameObject, IBlockObserver {
                 _discreteDynamicsWorld.removeRigidBody(_blocks.remove(0));
             }
         }
-    }
-
-    public void blockPlaced(Chunk chunk, BlockPosition pos) {
-
-    }
-
-    public void blockRemoved(Chunk chunk, BlockPosition pos) {
-
     }
 }

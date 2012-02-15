@@ -15,12 +15,11 @@
  */
 package org.terasology.model.inventory;
 
-import org.lwjgl.opengl.GL20;
-import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
+import org.terasology.rendering.shader.ShaderParameters;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -41,10 +40,8 @@ public abstract class VoxelItem extends Item {
     @Override
     public boolean renderFirstPersonView() {
         ShaderManager.getInstance().enableShader("block");
-        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
-        GL20.glUniform1f(light, Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValue());
-        int textured = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "textured");
-        GL20.glUniform1i(textured, 0);
+        ShaderParameters params = ShaderManager.getInstance().getShaderParameters("block");
+        params.setInt("textured", 0);
 
         glPushMatrix();
 

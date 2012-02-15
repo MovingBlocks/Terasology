@@ -31,7 +31,8 @@ public final class BlockPosition implements Comparable<BlockPosition> {
     public int z;
     private Vector3d _origin;
 
-    public BlockPosition() {}
+    public BlockPosition() {
+    }
 
     public BlockPosition(Vector3d v) {
         this.x = (int) v.x;
