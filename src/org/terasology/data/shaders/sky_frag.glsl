@@ -31,26 +31,22 @@ vec3 convertColor (){
 void main (){
     vec3 v = normalize ( McPosition.xyz );
 
-    if (v.y > -0.35) {
-        vec3 l                  = normalize (sunPos.xyz);
-        float sunHighlight      = pow(max(0.0, dot(l, v)), 256.0) * 512.0;
-        float posSunY           = 0.0;
+    vec3 l                  = normalize (sunPos.xyz);
+    float sunHighlight      = pow(max(0.0, dot(l, v)), 256.0) * 512.0;
+    float posSunY           = 0.0;
 
-        if (sunPos.y > 0.0){
-            posSunY = sunPos.y;
-        }
-
-        /* ALPHA STARRY NIGHT */
-        float alpha  = (0.7 - posSunY) * (1.0 - lv);
-
-        if (alpha < 0.0){
-            alpha = 0.0;
-        }
-
-        vec4 skyColor = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight, 1.0 );
-        skyColor += alpha * textureCube (texCube, skyVec);
-        gl_FragColor = skyColor;
-    } else {
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    if (sunPos.y > 0.0){
+        posSunY = sunPos.y;
     }
+
+    /* ALPHA STARRY NIGHT */
+    float alpha  = (0.7 - posSunY) * (1.0 - lv);
+
+    if (alpha < 0.0){
+        alpha = 0.0;
+    }
+
+    vec4 skyColor = vec4	( clamp ( convertColor (), 0.0, 1.0 ) + sunHighlight, 1.0 );
+    skyColor += alpha * textureCube (texCube, skyVec);
+    gl_FragColor = skyColor;
 }
