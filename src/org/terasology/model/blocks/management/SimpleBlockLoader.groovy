@@ -91,29 +91,6 @@ public class SimpleBlockLoader implements BlockLoader {
         }
         println "Faces are (L, R, T, B, F, B): " + b.getTextureAtlasPos()
 
-        BlockShape shape;
-        if (c.block.shape != [:])
-        {
-            shape = BlockShapeManager.getInstance().getBlockShape(c.block.shape);
-        }
-        if (shape != null)
-        {
-            println "Has shape: " + c.block.shape;
-            if (shape.getCenterMesh() != null)
-            {
-                b.withCenterMesh(shape.getCenterMesh().mapTexCoords(new Vector2f((float)(Block.TEXTURE_OFFSET * centerTexturePos.x), (float)(Block.TEXTURE_OFFSET * centerTexturePos.y)), Block.TEXTURE_OFFSET_WIDTH));
-            }
-
-            for (Side side : Side.values())
-            {
-                if (shape.getSideMesh(side) != null)
-                {
-                    b.withSideMesh(side, shape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
-                }
-                b.withFullSide(side, shape.isBlockingSide(side));
-            }
-        }
-
         // *** BLOCK_FORM and COLOR_SOURCE enums (defined explicitly in block definition, not needed here)
         if (c.block.blockform != [:]) {
             println "Setting BLOCK_FORM enum to: " + c.block.blockform

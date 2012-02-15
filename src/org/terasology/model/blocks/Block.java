@@ -31,9 +31,11 @@ import javax.vecmath.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.ObjectStreamConstants;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
@@ -44,14 +46,15 @@ import static org.lwjgl.opengl.GL11.glEnable;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-public class Block implements IGameObject {
+public class Block implements IGameObject, Cloneable {
 
+    private static final Logger logger = Logger.getLogger(Block.class.getName());
     public static final int ATLAS_SIZE_IN_PX = 256;
     public static final int TEXTURE_SIZE_IN_PX = 16;
     public static final int ATLAS_ELEMENTS_PER_ROW_AND_COLUMN = ATLAS_SIZE_IN_PX / TEXTURE_SIZE_IN_PX;
     public static final float TEXTURE_OFFSET = 0.0625f;
     public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
-    
+
     private static final EnumMap<Side, Float> DIRECTION_LIT_LEVEL = new EnumMap<Side, Float>(Side.class);
 
     /* LUTs */
@@ -95,8 +98,7 @@ public class Block implements IGameObject {
     private String _title = "Untitled block";
     private BlockGroup _group = null;
 
-    private static class SharedBlockInternals
-    {
+    private static class SharedBlockInternals implements Cloneable {
         private boolean translucent;
         private boolean invisible;
         private boolean penetrable;
@@ -154,6 +156,28 @@ public class Block implements IGameObject {
         withHardness((byte) 3);
         withLuminance((byte) 0);
         withLiquid(false);
+    }
+
+    public Block clone() {
+        Block clone = null;
+        try {
+            clone = (Block) super.clone();
+
+            clone._group = null;
+            clone._sideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
+            clone._sideMesh.putAll(_sideMesh);
+            clone._fullSide = new EnumBooleanMap<Side>(Side.class);
+            clone._fullSide.putAll(_fullSide);
+            clone._loweredSideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
+            clone._loweredSideMesh.putAll(_loweredSideMesh);
+            clone._colorOffset = new EnumMap<Side, Vector4f>(Side.class);
+            clone._colorOffset.putAll(_colorOffset);
+            clone._textureAtlasPos = new EnumMap<Side, Vector2f>(Side.class);
+            clone._textureAtlasPos.putAll(_textureAtlasPos);
+        } catch (CloneNotSupportedException e) {
+            logger.log(Level.SEVERE, "Failed to clone block");
+        }
+        return clone;
     }
 
     /**
@@ -232,15 +256,12 @@ public class Block implements IGameObject {
         if (_mesh == null) {
             Tessellator tessellator = new Tessellator();
             tessellator.setColor(new Vector4f(1, 1, 1, 1));
-            if (_centerMesh != null)
-            {
+            if (_centerMesh != null) {
                 tessellator.addMeshPart(_centerMesh);
             }
-            for (Side dir : Side.values())
-            {
+            for (Side dir : Side.values()) {
                 BlockMeshPart part = _sideMesh.get(dir);
-                if (part != null)
-                {
+                if (part != null) {
                     float lightLevel = DIRECTION_LIT_LEVEL.get(dir);
                     tessellator.setColor(new Vector4f(lightLevel, lightLevel, lightLevel, lightLevel));
                     tessellator.addMeshPart(part);
@@ -271,7 +292,7 @@ public class Block implements IGameObject {
         _title = title;
         return this;
     }
-    
+
     Block withBlockGroup(BlockGroup group) {
         _group = group;
         return this;
@@ -378,27 +399,23 @@ public class Block implements IGameObject {
         }
         return this;
     }
-    
-    public Block withCenterMesh(BlockMeshPart meshPart)
-    {
+
+    public Block withCenterMesh(BlockMeshPart meshPart) {
         _centerMesh = meshPart;
         return this;
     }
 
-    public Block withSideMesh(Side side, BlockMeshPart meshPart)
-    {
+    public Block withSideMesh(Side side, BlockMeshPart meshPart) {
         _sideMesh.put(side, meshPart);
         return this;
     }
 
-    public Block withLoweredSideMesh(Side side, BlockMeshPart meshPart)
-    {
+    public Block withLoweredSideMesh(Side side, BlockMeshPart meshPart) {
         _loweredSideMesh.put(side, meshPart);
         return this;
     }
-    
-    public Block withFullSide(Side side, boolean full)
-    {
+
+    public Block withFullSide(Side side, boolean full) {
         _fullSide.put(side, full);
         return this;
     }
@@ -434,24 +451,20 @@ public class Block implements IGameObject {
     public BlockGroup getBlockGroup() {
         return _group;
     }
-    
-    public boolean isBlockingSide(Side side)
-    {
+
+    public boolean isBlockingSide(Side side) {
         return _fullSide.get(side);
     }
-    
-    public BlockMeshPart getSideMesh(Side side)
-    {
+
+    public BlockMeshPart getSideMesh(Side side) {
         return _sideMesh.get(side);
     }
 
-    public BlockMeshPart getCenterMesh()
-    {
+    public BlockMeshPart getCenterMesh() {
         return _centerMesh;
     }
 
-    public BlockMeshPart getLoweredSideMesh(Side side)
-    {
+    public BlockMeshPart getLoweredSideMesh(Side side) {
         return _loweredSideMesh.get(side);
     }
 
@@ -524,14 +537,12 @@ public class Block implements IGameObject {
     public String toString() {
         return this.getClass().getSimpleName() + ":" + _title + ";id:" + _id;
     }
-    
-    public Block rotateClockwise(int steps) throws IllegalAccessException, InstantiationException {
-        Block block = getClass().newInstance();
-        block._internals = _internals;
+
+    public Block rotateClockwise(int steps) {
+        Block block = clone();
 
         Quat4f rotation = new Quat4f();
-        rotation.set(new AxisAngle4f(new Vector3f(0,-1,0), (float)(0.5f * Math.PI * steps)));
-        
+        rotation.set(new AxisAngle4f(new Vector3f(0, -1, 0), (float) (0.5f * Math.PI * steps)));
         if (_centerMesh != null) {
             block._centerMesh = _centerMesh.rotate(rotation);
         }
@@ -540,14 +551,18 @@ public class Block implements IGameObject {
             block._fullSide.put(rotatedSide, _fullSide.get(side));
             block._colorOffset.put(rotatedSide, _colorOffset.get(side));
             block._textureAtlasPos.put(rotatedSide, _textureAtlasPos.get(side));
-            
+
             BlockMeshPart sideMesh = _sideMesh.get(side);
             if (sideMesh != null) {
                 block._sideMesh.put(rotatedSide, sideMesh.rotate(rotation));
+            } else {
+                block._sideMesh.put(rotatedSide, null);
             }
             BlockMeshPart loweredSideMesh = _loweredSideMesh.get(side);
             if (loweredSideMesh != null) {
                 block._loweredSideMesh.put(rotatedSide, loweredSideMesh.rotate(rotation));
+            } else {
+                block._loweredSideMesh.put(rotatedSide, null);
             }
         }
         return block;

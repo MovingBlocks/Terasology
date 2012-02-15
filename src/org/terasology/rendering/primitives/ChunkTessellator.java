@@ -50,7 +50,7 @@ public final class ChunkTessellator {
     public ChunkMesh generateMesh(int meshHeight, int verticalOffset) {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh();
-
+        
         for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
             for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z++) {
                 double biomeTemp = _chunk.getParent().getTemperatureAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
@@ -60,7 +60,7 @@ public final class ChunkTessellator {
                     byte blockType = _chunk.getBlock(x, y, z);
                     Block block = BlockManager.getInstance().getBlock(blockType);
 
-                    if (block.isInvisible())
+                    if (block == null || block.isInvisible())
                         continue;
 
                     generateBlockVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
@@ -330,7 +330,7 @@ public final class ChunkTessellator {
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
         if (cBlock.getSideMesh(side) == null) return false;
         Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
-        return bCheck.getId() == 0x0 || !bCheck.isBlockingSide(side.reverse()) || !cBlock.isTranslucent() && bCheck.isTranslucent() || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+        return bCheck == null || cBlock == null || bCheck.getId() == 0x0 || !bCheck.isBlockingSide(side.reverse()) || !cBlock.isTranslucent() && bCheck.isTranslucent() || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
     }
 
     public static int getVertexArrayUpdateCount() {

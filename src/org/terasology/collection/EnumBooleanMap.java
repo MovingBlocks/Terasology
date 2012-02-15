@@ -34,6 +34,13 @@ public class EnumBooleanMap<ENUM extends Enum> {
         store[key.ordinal()] = value;
         return old;
     }
+    
+    public void putAll(EnumBooleanMap<ENUM> other) {
+        assert other.store.length == store.length;
+        for (int i = 0; i < store.length; ++i) {
+            store[i] = other.store[i];
+        }
+    }
 
     /**
      * Sets all values to false

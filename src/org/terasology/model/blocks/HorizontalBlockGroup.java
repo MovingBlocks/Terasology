@@ -43,9 +43,9 @@ public class HorizontalBlockGroup implements BlockGroup {
     public Block getBlockFor(Side attachmentSide, Side direction) {
         if (attachmentSide.isHorizontal())
         {
-            return _blocks.get(attachmentSide.reverse());
+            return _blocks.get(attachmentSide);
         }
-        return _blocks.get(direction.reverse());
+        return _blocks.get(direction);
 
     }
 

@@ -5,10 +5,11 @@ package org.terasology.data.blocks.definitions
  */
 block {
     version = 1
-    shape = "Stair"
     faces {
         all = "Brick"
     }
-    // Temporary flag
-    spin = true
+    shape {
+        mode = "HorizontalRotation"
+        sides = "Stair"
+    }
 }

@@ -7,8 +7,7 @@ import org.terasology.model.blocks.Block.BLOCK_FORM
  */
 block {
     version = 1
-    shape = "Billboard"
-    blockform = BLOCK_FORM.BILLBOARD
+    blockform = BLOCK_FORM.DEFAULT
 
     translucent = true
     penetrable = true
@@ -16,4 +15,9 @@ block {
 
     luminance = 15
     hardness = 1
+    shape {
+        mode = "AttachToSurface"
+        sides = "TorchWall"
+        bottom = "TorchGrounded"
+    }
 }

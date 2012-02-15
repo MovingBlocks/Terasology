@@ -94,7 +94,11 @@ public class DefaultBlockTool implements ITool {
             rawDirection.sub(new Vector3d(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
             Side direction = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z);
 
-            worldProvider.setBlock(blockPos.x, blockPos.y, blockPos.z, type.getBlockIdFor(attachmentSide, direction), true, true);
+            byte blockId = type.getBlockIdFor(attachmentSide, direction);
+            if (blockId == 0)
+                return false;
+
+            worldProvider.setBlock(blockPos.x, blockPos.y, blockPos.z, blockId, true, true);
             AudioManager.getInstance().playVaryingSound("PlaceBlock", 0.6f, 0.5f);
 
             int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);

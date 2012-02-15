@@ -32,6 +32,9 @@ import org.terasology.model.blocks.BlockGroup
 import org.terasology.model.blocks.SymmetricGroup
 import org.terasology.math.Side
 import org.terasology.model.blocks.HorizontalBlockGroup
+import org.terasology.model.shapes.BlockShape
+import org.terasology.model.shapes.BlockShapeManager
+import org.terasology.model.blocks.AttachToSurfaceGroup
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -79,7 +82,7 @@ class BlockManifestor {
         _bm = bm
         fixSavePaths()
     }
-    
+
     // Temp helper methods until we can correctly use WorldProvider.getWorldSavePath - tries to detect and fix screwy applet paths
     protected fixSavePaths() {
         _blockManifest = fixSavePath(_blockManifest)
@@ -180,28 +183,90 @@ class BlockManifestor {
 
             // Prepare a Block from the stuff we load from the Groovy definition
             Block b = loader.loadBlock(blockConfig)
-            
-            if (blockConfig.block.spin != [:] && blockConfig.block.spin == true) {
-                String baseTitle = c.getSimpleName();
-                EnumMap<Side, Block> blocks = new EnumMap<Side, Block>(Side.class);
-                registerBlock(baseTitle + Side.FRONT, b);
-                blocks.put(Side.FRONT, b);
-                for (int i = 1; i < 4; ++i) {
-                    Side direction = Side.FRONT.rotateClockwise(i); 
-                    Block rotBlock = b.rotateClockwise(i);
-                    registerBlock(baseTitle + direction, rotBlock);
-                    blocks.put(direction, rotBlock);
+
+            // Single shape
+            if (blockConfig.block.shape instanceof String) {
+                applyShape(b, blockConfig.block.shape)
+                registerBlock(c.getSimpleName(), b);
+                _blockGroups.add(new SymmetricGroup(b));
+            }
+            else if (blockConfig.block.shape != [:]) {
+                String baseTitle = blockConfig.name;
+                if ("HorizontalRotation".equalsIgnoreCase(blockConfig.block.shape.mode) && blockConfig.block.shape.sides != [:]) {
+                    EnumMap<Side, Block> blocks = new EnumMap<Side, Block>(Side.class);
+                    applyShape(b, blockConfig.block.shape.sides)
+                    for (int i = 0; i < 4; ++i) {
+                        Side direction = Side.FRONT.rotateClockwise(i);
+                        Block rotBlock = b.rotateClockwise(i);
+                        registerBlock(baseTitle + direction, rotBlock);
+                        blocks.put(direction, rotBlock);
+                    }
+                    _blockGroups.add(new HorizontalBlockGroup(baseTitle, blocks));
                 }
-                _blockGroups.add(new HorizontalBlockGroup(baseTitle, blocks));
-            } else {
+                else if ("AttachToSurface".equalsIgnoreCase(blockConfig.block.shape.mode))
+                {
+                    attachToSurface(blockConfig, b, baseTitle);
+                }
+                else
+                {
+                    if (!b.isInvisible()) {
+                        // Cube
+                        applyShape(b, "cube")
+                    }
+                    registerBlock(c.getSimpleName(), b);
+                    _blockGroups.add(new SymmetricGroup(b));
+                }
+            }
+            else {
+                if (!b.isInvisible()) {
+                    // Cube
+                    applyShape(b, "cube")
+                }
                 registerBlock(c.getSimpleName(), b);
                 _blockGroups.add(new SymmetricGroup(b));
             }
 
-            // Optionally use the Class object we loaded to execute any custom Groovy scripting (rare?)
-            // An example would be if the Block wants to be registered as a specific type (dirt, plant, mineral..)
+        }
+    }
+
+    private void attachToSurface(ConfigObject blockConfig, Block b, String baseTitle) {
+        EnumMap<Side, Block> blocks = new EnumMap<Side, Block>(Side.class);
+        if (blockConfig.block.shape.sides != [:]) {
+            Block tempBlock = b.clone()
+            applyShape(tempBlock, blockConfig.block.shape.sides)
+            for (int i = 0; i < 4; ++i) {
+                Side direction = Side.FRONT.rotateClockwise(i);
+                Block rotBlock = tempBlock.rotateClockwise(i);
+                registerBlock(baseTitle + direction, rotBlock);
+                blocks.put(direction, rotBlock);
+            }
+        }
+        if (blockConfig.block.shape.bottom != [:]) {
+            Block tempBlock = b.clone()
+            applyShape(tempBlock, blockConfig.block.shape.bottom)
+            registerBlock(baseTitle + Side.BOTTOM, tempBlock)
+            blocks.put(Side.BOTTOM, tempBlock)
+        }
+        _blockGroups.add(new AttachToSurfaceGroup(baseTitle, blocks))
+    }
 
 
+    private void applyShape(Block b, String shapeTitle) {
+        BlockShape shape = BlockShapeManager.getInstance().getBlockShape(shapeTitle);
+        if (shape != null) {
+            println "Has shape: " + shapeTitle
+            if (shape.getCenterMesh() != null) {
+                // TODO: Need texPos for center
+                Vector2f centerTexturePos = b.getTextureAtlasPos(Side.FRONT)
+                b.withCenterMesh(shape.getCenterMesh().mapTexCoords(new Vector2f((float) (Block.TEXTURE_OFFSET * centerTexturePos.x), (float) (Block.TEXTURE_OFFSET * centerTexturePos.y)), Block.TEXTURE_OFFSET_WIDTH));
+            }
+
+            for (Side side: Side.values()) {
+                if (shape.getSideMesh(side) != null) {
+                    b.withSideMesh(side, shape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
+                }
+                b.withFullSide(side, shape.isBlockingSide(side));
+            }
         }
     }
 
@@ -292,7 +357,6 @@ class BlockManifestor {
         println "LOADED blockIndex: " + _blockStringIndex
         println "LOADED nextByte: " + _nextByte
     }
-
 
     // TODO: Utility method? Move to block? Is repeated in SimpleBlockLoader
     private Vector2f calcAtlasPositionForId(int id) {
