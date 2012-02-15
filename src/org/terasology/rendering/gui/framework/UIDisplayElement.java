@@ -34,7 +34,7 @@ public abstract class UIDisplayElement {
     private final Vector2f _size = new Vector2f(1, 1);
 
     protected boolean _clickSoundPlayed = false;
-    protected boolean _mouseDown = false, _mouseUp = false;
+    protected boolean _mouseDown = false, _mouseUp = false, _focused = false;
 
     private boolean _overlay;
 

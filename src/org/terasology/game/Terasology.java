@@ -23,7 +23,6 @@ import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
-import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.BlockManager;
@@ -33,20 +32,26 @@ import org.terasology.rendering.gui.menus.UIInventoryScreen;
 import org.terasology.rendering.gui.menus.UIPauseMenu;
 import org.terasology.rendering.gui.menus.UIStatusScreen;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.FastRandom;
+
+import org.terasology.game.modes.IGameMode;
+import org.terasology.game.modes.ModePlayGame;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.EnumMap;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.Map;
+    
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -57,21 +62,10 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Terasology {
 
-    /* VIEWING DISTANCE */
-    private static final int[] VIEWING_DISTANCES = {(Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceNear"),
-            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceModerate"),
-            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceFar"),
-            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceUltra")};
-
-    private int _activeViewingDistance = 0;
-
-    /* THREADING */
+  /* THREADING */
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
-    /* CONST */
-    private static final int TICKS_PER_SECOND = 60;
-    private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-
+   
     /* STATISTICS */
     private long _lastLoopTime, _lastFpsTime, _delta;
     private int _fps;
@@ -82,6 +76,14 @@ public final class Terasology {
 
     /* GAME LOOP */
     private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
+
+    /*GAME MODES*/
+    public enum GameMode {
+       undefined, mainMenu, runGame
+    };
+    
+    static GameMode _state = GameMode.undefined;
+    private static Map<GameMode,IGameMode> _gameModes = Collections.synchronizedMap(new EnumMap<GameMode,IGameMode>(GameMode.class));
 
     /* RENDERING */
     private WorldRenderer _activeWorldRenderer;
@@ -101,7 +103,7 @@ public final class Terasology {
 
     /* GROOVY */
     private GroovyManager _groovyManager;
-
+    
     /**
      * Returns the static instance of Terasology.
      *
@@ -236,56 +238,7 @@ public final class Terasology {
      * @param seed  Seed value used for the generators
      */
     public void initWorld(String title, String seed) {
-        final FastRandom random = new FastRandom();
-
-        // Get rid of the old world
-        if (_activeWorldRenderer != null) {
-            _activeWorldRenderer.dispose();
-            _activeWorldRenderer = null;
-        }
-
-        if (seed == null) {
-            seed = random.randomCharacterString(16);
-        } else if (seed.isEmpty()) {
-            seed = random.randomCharacterString(16);
-        }
-
-        getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
-
-        // Init. a new world
-        _activeWorldRenderer = new WorldRenderer(title, seed);
-        _activeWorldRenderer.setPlayer(new Player(_activeWorldRenderer));
-
-        // Create the first Portal if it doesn't exist yet
-        _activeWorldRenderer.initPortal();
-        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
-
-        simulateWorld(4000);
-    }
-
-    private void simulateWorld(int duration) {
-        long timeBefore = getTime();
-
-        _statusScreen.setVisible(true);
-        _hud.setVisible(false);
-
-        float diff = 0;
-
-        while (diff < duration) {
-            _statusScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
-
-            renderUserInterface();
-            updateUserInterface();
-
-            getActiveWorldRenderer().standaloneGenerateChunks();
-
-            Display.update();
-
-            diff = getTime() - timeBefore;
-        }
-
-        _statusScreen.setVisible(false);
-        _hud.setVisible(true);
+      //Call !!!!
     }
 
     /**
@@ -309,7 +262,8 @@ public final class Terasology {
         FontManager.getInstance();
         BlockManager.getInstance();
 
-        _hud = new UIHeadsUpDisplay();
+        /*COMPLETE*/
+        /*_hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
 
         _pauseMenu = new UIPauseMenu();
@@ -326,7 +280,8 @@ public final class Terasology {
          */
         resizeViewport();
         resetOpenGLParameters();
-
+        
+        /*
         // Generate a world with a random seed value
         String worldSeed = (String) ConfigurationManager.getInstance().getConfig().get("World.defaultSeed");
 
@@ -334,7 +289,7 @@ public final class Terasology {
             worldSeed = null;
 
         initWorld("World1", worldSeed);
-        initGroovy();
+        initGroovy();*/
     }
 
     public void resetOpenGLParameters() {
@@ -342,12 +297,7 @@ public final class Terasology {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glShadeModel(GL_FLAT);
-
-        // Update the viewing distance
-        double minDist = (VIEWING_DISTANCES[_activeViewingDistance] / 2) * 16.0f;
-        glFogf(GL_FOG_START, (float) (minDist * 0.001));
-        glFogf(GL_FOG_END, (float) minDist);
-    }
+   }
 
     private void resizeViewport() {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
@@ -359,6 +309,8 @@ public final class Terasology {
     public void startGame() {
         getInstance().getLogger().log(Level.INFO, "Starting Terasology...");
 
+        IGameMode mode = null;
+        
         // MAIN GAME LOOP
         while (_runGame && !Display.isCloseRequested()) {
             if (!Display.isActive()) {
@@ -370,15 +322,11 @@ public final class Terasology {
                 Display.processMessages();
                 continue;
             }
-
-            //long timeSimulatedThisIteration = 0;
-            long startTime = getTime();
-            while (_timeAccumulator >= SKIP_TICKS) {
-                update();
-                _timeAccumulator -= SKIP_TICKS;
-                //timeSimulatedThisIteration += SKIP_TICKS;
-            }
-
+            
+            mode = getGameMode();
+            
+            mode.update();
+            
             render();
             Display.update();
 
@@ -391,7 +339,7 @@ public final class Terasology {
             Display.sync(60);
 
             updateFps();
-            _timeAccumulator += getTime() - startTime;
+            
 
             if (Display.wasResized())
                 resizeViewport();
@@ -413,6 +361,33 @@ public final class Terasology {
         }
 
         destroy();
+    }
+    
+    public IGameMode getGameMode(){
+      
+      IGameMode mode = _gameModes.get(_state); 
+      
+      if (mode!= null){
+        return mode;
+      } 
+      
+      switch(_state){
+          case runGame:
+              mode = new ModePlayGame();
+          break;
+          /*case mainMenu:
+              _mode = new ModeMainMenu();
+          break;*/
+
+          case undefined:
+              getLogger().log(Level.SEVERE, "Undefined game state - unable to run");
+          break;
+      }
+
+      _gameModes.put(_state, mode);
+      mode.init();
+      
+      return mode;
     }
 
     public void render() {
