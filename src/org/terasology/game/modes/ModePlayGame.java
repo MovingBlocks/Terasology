@@ -91,7 +91,7 @@ public class ModePlayGame implements IGameMode{
     
     resetOpenGLParameters();
     
-    Terasology.getInstance().initWorld("World1", worldSeed);
+    initWorld("World1", worldSeed);
     Terasology.getInstance().initGroovy();
    
   }
@@ -135,6 +135,9 @@ public class ModePlayGame implements IGameMode{
       
   }
   
+  /**
+   * Init. a new random world.
+   */
   public void initWorld(String title, String seed){
     final FastRandom random = new FastRandom();
 

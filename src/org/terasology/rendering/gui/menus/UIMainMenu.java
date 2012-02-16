@@ -67,7 +67,7 @@ public class UIMainMenu extends UIDisplayRenderer {
         _startButton.addClickListener(new UIClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
-                Terasology.getInstance().initWorld();
+                Terasology.getInstance().setGameMode(Terasology.GameMode.runGame);
             }
         });
 

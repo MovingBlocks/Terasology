@@ -14,7 +14,7 @@ public interface IGameMode {
     public void processKeyboardInput();
     public void processMouseInput();
     
-    //temprorary
+    //temporary
     public WorldRenderer getActiveWorldRenderer();
     public void updatePlayerInput();
 }

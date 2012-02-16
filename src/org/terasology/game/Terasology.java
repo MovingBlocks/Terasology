@@ -83,16 +83,6 @@ public final class Terasology {
     static GameMode _state = GameMode.undefined;
     private static Map<GameMode,IGameMode> _gameModes = Collections.synchronizedMap(new EnumMap<GameMode,IGameMode>(GameMode.class));
 
-    /* RENDERING */
-    private WorldRenderer _activeWorldRenderer;
-
-    /* GUI */
-    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
-    private UIHeadsUpDisplay _hud;
-    private UIPauseMenu _pauseMenu;
-    private UIStatusScreen _statusScreen;
-    private UIInventoryScreen _inventoryScreen;
-
     /* SINGLETON */
     private static Terasology _instance;
 
@@ -223,23 +213,6 @@ public final class Terasology {
     }
 
     /**
-     * Init. a new random world.
-     */
-    public void initWorld() {
-        initWorld(null, null);
-    }
-
-    /**
-     * Prepares a new world with a given name and seed value.
-     *
-     * @param title Title of the world
-     * @param seed  Seed value used for the generators
-     */
-    public void initWorld(String title, String seed) {
-      //Call !!!!
-    }
-
-    /**
      * Clean up before exiting the application.
      */
     private void destroy() {
@@ -327,7 +300,7 @@ public final class Terasology {
          * Save the world and exit the application.
          */
         if (_saveWorldOnExit) {
-            _activeWorldRenderer.dispose();
+            getGameMode().getActiveWorldRenderer().dispose();
         }
 
         _threadPool.shutdown();
@@ -368,6 +341,10 @@ public final class Terasology {
       mode.init();
       
       return mode;
+    }
+    
+    public void setGameMode(GameMode state){
+      _state = state;
     }
 
     public void render() {
