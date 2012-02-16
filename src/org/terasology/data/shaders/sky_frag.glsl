@@ -9,16 +9,19 @@ uniform samplerCube texCube;
 vec4 	eyePos   = vec4(0.0, 0.0, 0.0, 1.0);
 float	colorExp = 8.0;
 
-vec3 convertColor (){
-    vec3 clrYxy = vec3 ( colorYxy );
-    clrYxy [0] = 1.0 - exp ( -clrYxy [0] / colorExp );
+vec3 convertColor() {
+    if (colorYxy == vec3(0.0, 0.0, 0.0))
+        return vec3(0.0, 0.0, 0.0);
 
-    float	ratio    = clrYxy [0] / clrYxy [2];	
+    vec3 clrYxy = vec3(colorYxy);
+    clrYxy.x = 1.0 - exp ( -clrYxy.x / colorExp );
+
+    float	ratio    = clrYxy.x / clrYxy.z;
 
     vec3	XYZ;
 
-    XYZ.x = clrYxy [1] * ratio;					// X = x * ratio
-    XYZ.y = clrYxy [0];							// Y = Y
+    XYZ.x = clrYxy.y * ratio;					// X = x * ratio
+    XYZ.y = clrYxy.x;							// Y = Y
     XYZ.z = ratio - XYZ.x - XYZ.y;				// Z = ratio - X - Y
 
     const vec3 rCoeffs = vec3 ( 3.240479, -1.53715, -0.49853  );
