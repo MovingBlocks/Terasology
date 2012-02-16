@@ -39,6 +39,8 @@ public class PostProcessingRenderer {
     private float _exposure;
     private int _displayListQuad = -1;
 
+    private boolean _extensionsAvailable = false;
+
     public class FBO {
         public int _fboId = 0;
         public int _textureId = 0;
@@ -49,11 +51,11 @@ public class PostProcessingRenderer {
         public int _height = 0;
 
         public void bind() {
-            GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, _fboId);
+            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _fboId);
         }
 
         public void unbind() {
-            GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
         }
 
         public void bindDepthTexture() {
@@ -86,23 +88,27 @@ public class PostProcessingRenderer {
     }
 
     public PostProcessingRenderer() {
-        createOrUpdateFullscreenFbos();
+        _extensionsAvailable = GLContext.getCapabilities().GL_ARB_framebuffer_object;
 
-        if (EFFECTS_ENABLED) {
-            createFBO("sceneHighPass", 1024, 1024, true, false);
-            createFBO("sceneBloom0", 1024, 1024, true, false);
-            createFBO("sceneBloom1", 1024, 1024, true, false);
+        if (_extensionsAvailable) {
+            createOrUpdateFullscreenFbos();
 
-            createFBO("sceneBlur0", 1024, 1024, true, false);
-            createFBO("sceneBlur1", 1024, 1024, true, false);
+            if (EFFECTS_ENABLED) {
+                createFBO("sceneHighPass", 1024, 1024, true, false);
+                createFBO("sceneBloom0", 1024, 1024, true, false);
+                createFBO("sceneBloom1", 1024, 1024, true, false);
 
-            createFBO("scene64", 64, 64, true, false);
-            createFBO("scene32", 32, 32, true, false);
-            createFBO("scene16", 16, 16, true, false);
-            createFBO("scene8", 8, 8, true, false);
-            createFBO("scene4", 4, 4, true, false);
-            createFBO("scene2", 2, 2, true, false);
-            createFBO("scene1", 1, 1, true, false);
+                createFBO("sceneBlur0", 1024, 1024, true, false);
+                createFBO("sceneBlur1", 1024, 1024, true, false);
+
+                createFBO("scene64", 64, 64, true, false);
+                createFBO("scene32", 32, 32, true, false);
+                createFBO("scene16", 16, 16, true, false);
+                createFBO("scene8", 8, 8, true, false);
+                createFBO("scene4", 4, 4, true, false);
+                createFBO("scene2", 2, 2, true, false);
+                createFBO("scene1", 1, 1, true, false);
+            }
         }
     }
 
@@ -110,8 +116,8 @@ public class PostProcessingRenderer {
         if (_FBOs.containsKey(title)) {
             FBO fbo = _FBOs.get(title);
 
-            GL30.glDeleteFramebuffers(fbo._fboId);
-            GL30.glDeleteRenderbuffers(fbo._depthRboId);
+            EXTFramebufferObject.glDeleteFramebuffersEXT(fbo._fboId);
+            EXTFramebufferObject.glDeleteRenderbuffersEXT(fbo._depthRboId);
             GL11.glDeleteTextures(fbo._depthTextureId);
             GL11.glDeleteTextures(fbo._textureId);
         }
@@ -136,7 +142,7 @@ public class PostProcessingRenderer {
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
         if (hdr)
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL30.GL_RGBA16F, width, height, 0, GL11.GL_RGBA, GL30.GL_HALF_FLOAT, (java.nio.ByteBuffer) null);
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
         else
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
 
@@ -153,34 +159,30 @@ public class PostProcessingRenderer {
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, (java.nio.ByteBuffer) null);
 
             // Create depth render buffer object
-            fbo._depthRboId = GL30.glGenRenderbuffers();
-            GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, fbo._depthRboId);
-            GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL14.GL_DEPTH_COMPONENT24, width, height);
-            GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, 0);
+            fbo._depthRboId = EXTFramebufferObject.glGenRenderbuffersEXT();
+            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo._depthRboId);
+            EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, width, height);
+            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
         }
 
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
         // Create the FBO
-        fbo._fboId = GL30.glGenFramebuffers();
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, fbo._fboId);
+        fbo._fboId = EXTFramebufferObject.glGenFramebuffersEXT();
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo._fboId);
 
-        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, fbo._textureId, 0);
+        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo._textureId, 0);
 
         if (depth) {
             // Generate the depth render buffer and depth map texture
-            GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_RENDERBUFFER, fbo._depthRboId);
-            GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL11.GL_TEXTURE_2D, fbo._depthTextureId, 0);
+            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo._depthRboId);
+            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo._depthTextureId, 0);
         }
 
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
 
         _FBOs.put(title, fbo);
         return fbo;
-    }
-
-    public FBO getFBO(String title) {
-        return _FBOs.get(title);
     }
 
     private void updateExposure() {
@@ -202,11 +204,29 @@ public class PostProcessingRenderer {
             _exposure = MIN_EXPOSURE;
     }
 
+    public void beginRenderScene() {
+        if (!_extensionsAvailable)
+            return;
+        getFBO("scene").bind();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    public void endRenderScene() {
+        if (!_extensionsAvailable)
+            return;
+
+        getFBO("scene").unbind();
+    }
+
     /**
      * Renders the final scene to a quad and displays it. The FBO gets automatically rescaled if the size
      * of the viewport changes.
      */
     public void renderScene() {
+        if (!_extensionsAvailable)
+            return;
+
         if (EFFECTS_ENABLED) {
             generateDownsampledScene();
             updateExposure();
@@ -419,5 +439,13 @@ public class PostProcessingRenderer {
 
     public float getExposure() {
         return _exposure;
+    }
+
+    public FBO getFBO(String title) {
+        return _FBOs.get(title);
+    }
+
+    public boolean areExtensionsAvailable() {
+        return _extensionsAvailable;
     }
 }

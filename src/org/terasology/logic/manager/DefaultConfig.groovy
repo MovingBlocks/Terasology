@@ -12,6 +12,8 @@ public class DefaultConfig {
     ConfigObject config = new ConfigObject()
 
     public DefaultConfig() {
+
+        // The version tag
         config.put("System.versionTag", "Pre Alpha")
         // Maximum amount of rendered particles
         config.put("System.maxParticles", 256)

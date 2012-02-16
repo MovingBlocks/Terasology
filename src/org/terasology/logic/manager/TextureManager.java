@@ -17,7 +17,6 @@ package org.terasology.logic.manager;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL14;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;

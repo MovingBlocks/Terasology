@@ -221,10 +221,7 @@ public final class WorldRenderer implements IGameObject {
      * Renders the world.
      */
     public void render() {
-        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
-        scene.bind();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        PostProcessingRenderer.getInstance().beginRenderScene();
 
         /* SKYSPHERE */
         PerformanceMonitor.startActivity("Render-Sky");
@@ -257,8 +254,7 @@ public final class WorldRenderer implements IGameObject {
         _player.renderExtractionOverlay();
         PerformanceMonitor.endActivity();
 
-        scene.unbind();
-
+        PostProcessingRenderer.getInstance().endRenderScene();
         // Draw the final scene on a quad and render it...
         PostProcessingRenderer.getInstance().renderScene();
 
@@ -315,8 +311,6 @@ public final class WorldRenderer implements IGameObject {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_PHASE.OPAQUE);
         }
-        glDisable(GL_LIGHT0);
-        glDisable(GL_LIGHTING);
 
         PerformanceMonitor.endActivity();
 

@@ -22,6 +22,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.PixelFormat;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.*;
@@ -138,10 +139,14 @@ public final class Terasology {
 
             terasology.initOpenAL();
             terasology.initDisplay();
+            terasology.checkOpenGL();
             terasology.initControls();
             terasology.initGame();
             terasology.initGroovy();
         } catch (LWJGLException e) {
+            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm so sorry: " + e.toString(), e);
+            System.exit(0);
+        } catch (Exception e) {
             getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm so sorry: " + e.toString(), e);
             System.exit(0);
         }
@@ -197,6 +202,17 @@ public final class Terasology {
      */
     public void initGroovy() {
         _groovyManager = new GroovyManager();
+    }
+
+    public void checkOpenGL() throws Exception {
+        boolean canRunGame = GLContext.getCapabilities().OpenGL20
+                & GLContext.getCapabilities().OpenGL11
+                & GLContext.getCapabilities().OpenGL12
+                & GLContext.getCapabilities().OpenGL14
+                & GLContext.getCapabilities().OpenGL15;
+
+        if (!canRunGame)
+            throw new Exception("Your GPU driver is not supporting the mandatory versions of OpenGL. Considered updating your GPU drivers?");
     }
 
     /**
