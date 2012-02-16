@@ -78,7 +78,7 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
-    private void initAudio() {
+    protected void initAudio() {
         _footstepSounds = new Audio[5];
         _footstepSounds[0] = AudioManager.getInstance().loadSound("FootGrass1");
         _footstepSounds[1] = AudioManager.getInstance().loadSound("FootGrass2");
@@ -141,14 +141,12 @@ public abstract class MovableEntity extends Entity {
 
         if ((MathHelper.fastAbs(_velocity.x) > 0.01 || MathHelper.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
-                Vector3d playerDirection = directionOfPlayer();
                 _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
-
-                _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, false, (float) playerDirection.x, (float) playerDirection.y, (float) playerDirection.z);
+                AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(), _currentFootstepSound);
             } else {
                 long timeDiff = Terasology.getInstance().getTime() - _lastFootStepSoundPlayed;
 
-                if (!_currentFootstepSound.isPlaying() && timeDiff > 400 / (_activeWalkingSpeed / _walkingSpeed)) {
+                if (timeDiff > 400 / (_activeWalkingSpeed / _walkingSpeed)) {
                     _lastFootStepSoundPlayed = Terasology.getInstance().getTime();
                     _currentFootstepSound = null;
                 }
@@ -360,17 +358,13 @@ public abstract class MovableEntity extends Entity {
                 if (oldGravity <= 0) {
                     // Jumping is only possible, if the entity is standing on ground
                     if (_jump) {
+                        AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
+                                _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
                         _jump = false;
                         _gravity = _jumpIntensity;
-                    }
-
-                    // Entity reaches the ground
-                    if (!_touchingGround) {
-                        Vector3d playerDirection = directionOfPlayer();
-                        // TODO: Whut... this could use some newlines - cheating for now :-)
-                        if (!_noSound) {
-                            _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5].playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false, (float) playerDirection.x, (float) playerDirection.y, (float) playerDirection.z);
-                        }
+                    } else if (!_touchingGround) { // Entity reaches the ground
+                        AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
+                                _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
                         _touchingGround = true;
                     }
                 } else {
@@ -516,7 +510,7 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
-    public Vector3d directionOfPlayer() {
+    public Vector3d calcEntityPositionRelativeToPlayer() {
         Vector3d result = new Vector3d();
         result.sub(Terasology.getInstance().getActivePlayer().getPosition(), getPosition());
 

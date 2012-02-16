@@ -293,8 +293,8 @@ public class Skysphere implements IGameObject {
         double angle = Math.toDegrees(MathHelper.clamp(Math.cos(_sunPosAngle)));
         double daylight = 1.0;
 
-        if (angle < 16.0) {
-            daylight = 1.0 - (16.0 - angle) / 16.0;
+        if (angle < 24.0) {
+            daylight = 1.0 - (24.0 - angle) / 24.0;
         }
 
         return daylight;

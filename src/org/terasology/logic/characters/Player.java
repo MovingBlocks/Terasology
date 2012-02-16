@@ -103,7 +103,7 @@ public final class Player extends Character {
     private final ToolManager _toolManager = new ToolManager(this);
 
     public Player(WorldRenderer parent) {
-        super(parent, WALKING_SPEED, RUNNING_FACTOR, JUMP_INTENSITY);
+        super(parent, WALKING_SPEED, RUNNING_FACTOR, JUMP_INTENSITY, true);
 
         // Set the default value for the god mode
         _godMode = GOD_MODE;

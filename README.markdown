@@ -70,10 +70,12 @@ Core Team
 * Anton "small-jeeper" Kireev
 * Rasmus "Cervator" Praestholm
 
-Soundtrack
+Soundtrack and Sound Effects
 ----------
 
-Composed by Karina Kireev.
+* Sunrise, Afternoon and Sunset composed by Karina Kireev.
+* Dimlight composed and produced by Exile.
+* Sound effects created by Exile.
 
 Additional Notes
 ================

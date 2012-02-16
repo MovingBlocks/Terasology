@@ -16,7 +16,9 @@
  */
 package org.terasology.logic.characters;
 
+import org.newdawn.slick.openal.Audio;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.structures.AABB;
@@ -59,6 +61,16 @@ public final class GelatinousCube extends Character {
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].y, 1.0f), 0.8f * _randomSize, 0.8f, 0.6f, 0f, 0f, 0f);
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].y, 0.6f), 1.0f * _randomSize, 1.0f, 0.8f, 0f, 0f, 0f);
         _mesh = tessellator.generateMesh();
+    }
+
+    @Override
+    protected void initAudio() {
+        _footstepSounds = new Audio[5];
+        _footstepSounds[0] = AudioManager.getInstance().loadSound("Slime1");
+        _footstepSounds[1] = AudioManager.getInstance().loadSound("Slime2");
+        _footstepSounds[2] = AudioManager.getInstance().loadSound("Slime3");
+        _footstepSounds[3] = AudioManager.getInstance().loadSound("Slime4");
+        _footstepSounds[4] = AudioManager.getInstance().loadSound("Slime5");
     }
 
     public void update() {

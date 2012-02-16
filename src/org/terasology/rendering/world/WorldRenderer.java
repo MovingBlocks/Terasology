@@ -184,6 +184,15 @@ public final class WorldRenderer implements IGameObject {
                 AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 1.0f, false);
             }
         });
+
+        // SUNSET
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.1f);
+                AudioManager.getInstance().getAudio("Dimlight").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
     }
 
     /**

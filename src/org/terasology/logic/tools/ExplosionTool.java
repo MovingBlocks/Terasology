@@ -78,7 +78,7 @@ public class ExplosionTool extends SimpleTool {
                 }
             }
 
-            AudioManager.getInstance().playVaryingSound("RemoveBlock", 0.3f, 1.0f);
+            AudioManager.getInstance().getAudio("Explode" + (worldProvider.getRandom().randomIntAbs(5) + 1)).playAsSoundEffect(1.0f, 0.2f, false);
             _player.poke();
         }
     }

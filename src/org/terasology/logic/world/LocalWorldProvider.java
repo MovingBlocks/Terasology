@@ -389,7 +389,8 @@ public class LocalWorldProvider implements IWorldProvider {
     }
 
     public void setTime(double time) {
-        _creationTime = Terasology.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
+        if (time >= 0.0)
+            _creationTime = Terasology.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
     }
 
     public double getTime() {
