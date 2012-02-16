@@ -33,6 +33,7 @@ public class PostProcessingRenderer {
 
     public static final boolean EFFECTS_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.enablePostProcessingEffects");
     public static final float MAX_EXPOSURE = 5.0f;
+    public static final float MIN_EXPOSURE = 1.0f;
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure;
@@ -197,6 +198,8 @@ public class PostProcessingRenderer {
 
         if (_exposure > MAX_EXPOSURE)
             _exposure = MAX_EXPOSURE;
+        if (_exposure < MIN_EXPOSURE)
+            _exposure = MIN_EXPOSURE;
     }
 
     /**

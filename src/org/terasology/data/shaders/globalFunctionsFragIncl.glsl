@@ -25,7 +25,7 @@ vec4 linearToSrgb(vec4 color) {
 }
 
 float expLightValue(float light) {
-    return pow(0.86, (1.0-light)*15.0);
+    return light;
 }
 
 float timeToTick(float time, float speed) {

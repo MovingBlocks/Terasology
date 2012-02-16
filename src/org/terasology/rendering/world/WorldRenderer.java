@@ -386,9 +386,10 @@ public final class WorldRenderer implements IGameObject {
 
     public float getRenderingLightValueAt(Vector3d pos) {
         double lightValueSun = ((double) _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.SUN));
-        lightValueSun = Math.pow(0.86, 15.0 - lightValueSun) * getDaylight();
+        lightValueSun = lightValueSun / 15.0;
+        lightValueSun *= getDaylight();
         double lightValueBlock = _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.BLOCK);
-        lightValueBlock = Math.pow(0.86, 15.0 - lightValueBlock);
+        lightValueBlock = lightValueBlock / 15.0;
 
         return (float) MathHelper.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
     }
