@@ -20,7 +20,6 @@ import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
@@ -57,6 +56,12 @@ public class BulletPhysicsRenderer implements IGameObject {
     /* SINGLETON */
     private static BulletPhysicsRenderer _instance;
 
+    public enum BLOCK_SIZE {
+        FULL_SIZE,
+        HALF_SIZE,
+        QUARTER_SIZE
+    }
+
     private class BlockRigidBody extends RigidBody implements Comparable<BlockRigidBody> {
         private final byte _type;
         private final long _createdAt;
@@ -90,16 +95,15 @@ public class BulletPhysicsRenderer implements IGameObject {
     private final ArrayList<BlockRigidBody> _blocks = new ArrayList<BlockRigidBody>();
     private HashSet<RigidBody> _chunks = new HashSet<RigidBody>();
 
-    private final CollisionShape _blockShape = new BoxShape(new Vector3f(0.25f, 0.25f, 0.25f));
+    private final BoxShape _blockShape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
+    private final BoxShape _blockShapeHalf = new BoxShape(new Vector3f(0.25f, 0.25f, 0.25f));
+    private final BoxShape _blockShapeQuarter = new BoxShape(new Vector3f(0.125f, 0.125f, 0.125f));
 
     private final CollisionDispatcher _dispatcher;
     private final BroadphaseInterface _broadphase;
     private final DefaultCollisionConfiguration _defaultCollisionConfiguration;
     private final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     private final DiscreteDynamicsWorld _discreteDynamicsWorld;
-
-    private static final Vector3f[] _positionOffsets = new Vector3f[]{new Vector3f(1, 1, -1), new Vector3f(1, -1, -1), new Vector3f(-1, 1, -1), new Vector3f(-1, -1, -1),
-            new Vector3f(1, 1, 1), new Vector3f(1, -1, 1), new Vector3f(-1, 1, 1), new Vector3f(-1, -1, 1)};
 
     public static BulletPhysicsRenderer getInstance() {
         if (_instance == null)
@@ -117,33 +121,52 @@ public class BulletPhysicsRenderer implements IGameObject {
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -10f, 0f));
     }
 
-    public void addBlock(Vector3f position, byte type) {
+    public BlockRigidBody[] addHarvestedMiniBlocks(Vector3f position, byte type) {
+        FastRandom rand = Terasology.getInstance().getActiveWorldProvider().getRandom();
+        BlockRigidBody result[] = new BlockRigidBody[8];
+
         for (int i = 0; i < 8; i++) {
-            Matrix3f rot = new Matrix3f();
-            rot.setIdentity();
-
             // Position the smaller blocks
-            Vector3f pos = new Vector3f(position);
-            _positionOffsets[i].scale(0.25f);
-            pos.add(_positionOffsets[i]);
+            Vector3f offsetPossition = new Vector3f((float) rand.randomDouble() * 0.5f, (float) rand.randomDouble() * 0.5f, (float) rand.randomDouble() * 0.5f);
+            offsetPossition.add(position);
 
-            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, pos, 1.0f)));
-
-            Vector3f fallInertia = new Vector3f();
-            _blockShape.calculateLocalInertia(100f, fallInertia);
-
-            RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(100f, blockMotionState, _blockShape, fallInertia);
-            blockCI.restitution = 0.0f;
-
-            BlockRigidBody block = new BlockRigidBody(blockCI, type);
-            _discreteDynamicsWorld.addRigidBody(block);
-
-            // Make sure the blocks move at least
-            FastRandom rand = Terasology.getInstance().getActiveWorldProvider().getRandom();
-            block.applyCentralForce(new Vector3f(rand.randomInt() % 80000 + 40000, rand.randomInt() % 80000 + 40000, rand.randomInt() % 80000 + 40000));
-
-            _blocks.add(block);
+            result[i] = addBlock(offsetPossition, type, 2000f, new Vector3f(0.0f, 4000f, 0.0f), BLOCK_SIZE.QUARTER_SIZE);
         }
+
+        return result;
+    }
+
+    public BlockRigidBody addBlock(Vector3f position, byte type, float mass, BLOCK_SIZE size) {
+        return addBlock(position, type, mass, new Vector3f(0f, 0f, 0f), size);
+    }
+
+    public BlockRigidBody addBlock(Vector3f position, byte type, float mass, Vector3f impulse, BLOCK_SIZE size) {
+        BoxShape shape = _blockShape;
+
+        if (size == BLOCK_SIZE.HALF_SIZE)
+            shape = _blockShapeHalf;
+        else if (size == BLOCK_SIZE.QUARTER_SIZE)
+            shape = _blockShapeQuarter;
+
+        Matrix3f rot = new Matrix3f();
+        rot.setIdentity();
+
+        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, position, 1.0f)));
+
+        Vector3f fallInertia = new Vector3f();
+        shape.calculateLocalInertia(mass, fallInertia);
+
+        RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(mass, blockMotionState, shape, fallInertia);
+
+        BlockRigidBody block = new BlockRigidBody(blockCI, type);
+        _discreteDynamicsWorld.addRigidBody(block);
+
+        _blocks.add(block);
+
+        // Apply impulse
+        block.applyImpulse(impulse, new Vector3f(0.0f, 0.0f, 0.0f));
+
+        return block;
     }
 
     public void updateChunks() {
@@ -178,7 +201,7 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     public void render() {
-        _discreteDynamicsWorld.stepSimulation(Terasology.getInstance().getDelta() / 1000f, 7);
+        _discreteDynamicsWorld.stepSimulation(1.0f / 60f, 7);
 
         TextureManager.getInstance().bindTexture("terrain");
         ShaderManager.getInstance().enableShader("block");
@@ -201,7 +224,11 @@ public class BulletPhysicsRenderer implements IGameObject {
 
             GL11.glPushMatrix();
             GL11.glMultMatrix(mBuffer);
-            GL11.glScalef(0.5f, 0.5f, 0.5f);
+
+            if (b.getCollisionShape() == _blockShapeHalf)
+                GL11.glScalef(0.5f, 0.5f, 0.5f);
+            else if (b.getCollisionShape() == _blockShapeQuarter)
+                GL11.glScalef(0.25f, 0.25f, 0.25f);
 
             float lightValue = Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValueAt(new Vector3d(t.origin));
             params.setFloat("light", lightValue);

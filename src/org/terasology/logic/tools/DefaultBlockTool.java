@@ -85,7 +85,7 @@ public class DefaultBlockTool extends SimpleTool {
             // 1. The Side of attachment
             Side attachmentSide = Side.inDirection(centerPos.x - blockPos.x, centerPos.y - blockPos.y, centerPos.z - blockPos.z);
             // 2. The secondary direction
-            Vector3d attachDir = new Vector3d(centerPos.x - blockPos.x, centerPos.y - blockPos.y, centerPos.z - blockPos.z); 
+            Vector3d attachDir = new Vector3d(centerPos.x - blockPos.x, centerPos.y - blockPos.y, centerPos.z - blockPos.z);
             Vector3d rawDirection = new Vector3d(_player.getViewingDirection());
             double dot = rawDirection.dot(attachDir);
             rawDirection.sub(new Vector3d(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
@@ -162,7 +162,7 @@ public class DefaultBlockTool extends SimpleTool {
 
                     if (createPhysBlock && !BlockManager.getInstance().getBlock(currentBlockType).isTranslucent()) {
                         Vector3d pos = blockPos.toVector3d();
-                        BulletPhysicsRenderer.getInstance().addBlock(new Vector3f(pos), currentBlockType);
+                        BulletPhysicsRenderer.getInstance().addHarvestedMiniBlocks(new Vector3f(pos), currentBlockType);
                     }
 
                     _player.resetExtraction();
