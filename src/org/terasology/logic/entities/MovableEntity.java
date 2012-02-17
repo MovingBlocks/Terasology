@@ -276,14 +276,11 @@ public abstract class MovableEntity extends Entity {
             byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
             AABB blockAABB = Block.AABBForBlockAt(p.x, p.y, p.z);
 
-            if (!BlockManager.getInstance().getBlock(blockType).isPenetrable() && !BlockManager.getInstance().getBlock(blockType).isComplexCollider()) {
+            if (!BlockManager.getInstance().getBlock(blockType).isPenetrable()) {
                 if (getAABB().overlaps(blockAABB)) {
                     if (BlockManager.getInstance().getBlock(blockType).isComplexCollider()) {
                         for (AABB collider : BlockManager.getInstance().getBlock(blockType).getColliders(p.x, p.y, p.z)) {
                             if (getAABB().overlaps(collider)) {
-                                result = true;
-
-                                // Calculate the direction from the origin to the current position
                                 Vector3d direction = new Vector3d(getPosition().x, 0f, getPosition().z);
                                 direction.x -= origin.x;
                                 direction.z -= origin.z;
@@ -292,7 +289,7 @@ public abstract class MovableEntity extends Entity {
                                 Vector3d blockPoi = collider.closestPointOnAABBToPoint(origin);
                                 Vector3d entityPoi = generateAABBForPosition(origin).closestPointOnAABBToPoint(blockPoi);
 
-                                Vector3d planeNormal = collider.normalForPlaneClosestToOrigin(blockPoi, origin, true, false, true);
+                                Vector3d planeNormal = collider.getFirstHitPlane(direction, origin, getAABB().getDimensions(), true, false, true);
 
                                 // Find a vector parallel to the surface normal
                                 Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
@@ -325,7 +322,7 @@ public abstract class MovableEntity extends Entity {
                         Vector3d blockPoi = blockAABB.closestPointOnAABBToPoint(origin);
                         Vector3d entityPoi = generateAABBForPosition(origin).closestPointOnAABBToPoint(blockPoi);
 
-                        Vector3d planeNormal = blockAABB.normalForPlaneClosestToOrigin(blockPoi, origin, true, false, true);
+                        Vector3d planeNormal = blockAABB.getFirstHitPlane(direction, origin, getAABB().getDimensions(), true, false, true);
 
                         // Find a vector parallel to the surface normal
                         Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
