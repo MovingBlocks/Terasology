@@ -7,6 +7,8 @@ import org.terasology.model.shapes.BlockShapeManager
 import javax.vecmath.Vector4f
 import groovy.util.logging.Log
 import org.terasology.model.blocks.Block
+import javax.vecmath.Vector3d
+import org.terasology.model.structures.AABB
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -171,6 +173,8 @@ public class SimpleBlockLoader implements BlockLoader {
             b.withColorOffset(new Vector4f((float) c.block.colorOffset[0], (float) c.block.colorOffset[1], (float) c.block.colorOffset[2], (float) c.block.colorOffset[3]))
             println "The Vector4f instantiated is" + b.getColorOffset()
         }
+
+
     }
 
     private Vector2f calcAtlasPositionForId(int id) {

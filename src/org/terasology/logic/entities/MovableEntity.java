@@ -172,26 +172,60 @@ public abstract class MovableEntity extends Entity {
     private boolean verticalHitTest(Vector3d origin) {
         ArrayList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
+        boolean moved = false;
+
         for (int i = 0; i < blockPositions.size(); i++) {
             BlockPosition p = blockPositions.get(i);
 
             byte blockType1 = _parent.getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
             AABB entityAABB = getAABB();
 
-            if (BlockManager.getInstance().getBlock(blockType1).isPenetrable() || !entityAABB.overlaps(Block.AABBForBlockAt(p.x, p.y, p.z)))
+            if (BlockManager.getInstance().getBlock(blockType1).isPenetrable())
                 continue;
+            if (!entityAABB.overlaps(Block.AABBForBlockAt(p.x, p.y, p.z))) {
+                continue;
+            }
+            if (BlockManager.getInstance().getBlock(blockType1).isComplexCollider()) {
+                AABB closestCollider = null;
+                double closestDistance = Double.POSITIVE_INFINITY;
+                for (AABB aabb : BlockManager.getInstance().getBlock(blockType1).getColliders(p.x, p.y, p.z)) {
+                    double direction = origin.y - aabb.getPosition().y;
+                    if (entityAABB.overlaps(aabb)) {
+                        double newDist = 0;
+                        if (direction >= 0)
+                            newDist = MathHelper.fastAbs(aabb.getPosition().y - p.y - aabb.getDimensions().y - entityAABB.getDimensions().y);
+                        else
+                            newDist = MathHelper.fastAbs(aabb.getPosition().y - p.y + aabb.getDimensions().y + entityAABB.getDimensions().y);
+                        if (newDist < closestDistance) {
+                            closestCollider = aabb;
+                            closestDistance = newDist;
+                        }
+                    }
+                }
+                if (closestCollider != null) {
+                    double direction = origin.y - closestCollider.getPosition().y;
+                    if (direction >= 0) {
+                        getPosition().y = closestCollider.getPosition().y + closestCollider.getDimensions().y + entityAABB.getDimensions().y;
+                        getPosition().y += Math.ulp(getPosition().y);
+                    } else {
+                        getPosition().y = closestCollider.getPosition().y - closestCollider.getDimensions().y - entityAABB.getDimensions().y;
+                        getPosition().y -= Math.ulp(getPosition().y);
+                    }
+                    moved = true;
+                }
+            } else {
+                double direction = origin.y - getPosition().y;
 
-            double direction = origin.y - getPosition().y;
+                if (direction >= 0)
+                    getPosition().y = p.y + 0.50001f + entityAABB.getDimensions().y;
+                else
+                    getPosition().y = p.y - 0.50001f - entityAABB.getDimensions().y;
 
-            if (direction >= 0)
-                getPosition().y = p.y + 0.50001f + entityAABB.getDimensions().y;
-            else
-                getPosition().y = p.y - 0.50001f - entityAABB.getDimensions().y;
-
-            return true;
+                moved = true;
+            }
         }
 
-        return false;
+        return moved;
     }
 
     /**
@@ -242,35 +276,69 @@ public abstract class MovableEntity extends Entity {
 
             if (!BlockManager.getInstance().getBlock(blockType).isPenetrable()) {
                 if (getAABB().overlaps(blockAABB)) {
-                    result = true;
+                    if (BlockManager.getInstance().getBlock(blockType).isComplexCollider()) {
+                        for (AABB collider : BlockManager.getInstance().getBlock(blockType).getColliders(p.x, p.y, p.z)) {
+                            if (getAABB().overlaps(collider)) {
+                                Vector3d direction = new Vector3d(getPosition().x, 0f, getPosition().z);
+                                direction.x -= origin.x;
+                                direction.z -= origin.z;
 
-                    // Calculate the direction from the origin to the current position
-                    Vector3d direction = new Vector3d(getPosition().x, 0f, getPosition().z);
-                    direction.x -= origin.x;
-                    direction.z -= origin.z;
+                                // Calculate the point of intersection on the block's AABB
+                                Vector3d blockPoi = collider.closestPointOnAABBToPoint(origin);
+                                Vector3d entityPoi = generateAABBForPosition(origin).closestPointOnAABBToPoint(blockPoi);
 
-                    // Calculate the point of intersection on the block's AABB
-                    Vector3d blockPoi = blockAABB.closestPointOnAABBToPoint(origin);
-                    Vector3d entityPoi = generateAABBForPosition(origin).closestPointOnAABBToPoint(blockPoi);
+                                Vector3d planeNormal = collider.getFirstHitPlane(direction, origin, getAABB().getDimensions(), true, false, true);
 
-                    Vector3d planeNormal = blockAABB.normalForPlaneClosestToOrigin(blockPoi, origin, true, false, true);
+                                // Find a vector parallel to the surface normal
+                                Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
+                                Vector3d pushBack = new Vector3d();
 
-                    // Find a vector parallel to the surface normal
-                    Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
-                    Vector3d pushBack = new Vector3d();
+                                pushBack.sub(blockPoi, entityPoi);
 
-                    pushBack.sub(blockPoi, entityPoi);
+                                // Calculate the intensity of the diversion alongside the block
+                                double length = slideVector.dot(direction);
 
-                    // Calculate the intensity of the diversion alongside the block
-                    double length = slideVector.dot(direction);
+                                Vector3d newPosition = new Vector3d();
+                                newPosition.z = origin.z + pushBack.z * 0.2 + length * slideVector.z;
+                                newPosition.x = origin.x + pushBack.x * 0.2 + length * slideVector.x;
+                                newPosition.y = origin.y;
 
-                    Vector3d newPosition = new Vector3d();
-                    newPosition.z = origin.z + pushBack.z * 0.2 + length * slideVector.z;
-                    newPosition.x = origin.x + pushBack.x * 0.2 + length * slideVector.x;
-                    newPosition.y = origin.y;
+                                // Update the position
+                                getPosition().set(newPosition);
+                            }
+                        }
+                    } else {
 
-                    // Update the position
-                    getPosition().set(newPosition);
+                        result = true;
+
+                        // Calculate the direction from the origin to the current position
+                        Vector3d direction = new Vector3d(getPosition().x, 0f, getPosition().z);
+                        direction.x -= origin.x;
+                        direction.z -= origin.z;
+
+                        // Calculate the point of intersection on the block's AABB
+                        Vector3d blockPoi = blockAABB.closestPointOnAABBToPoint(origin);
+                        Vector3d entityPoi = generateAABBForPosition(origin).closestPointOnAABBToPoint(blockPoi);
+
+                        Vector3d planeNormal = blockAABB.getFirstHitPlane(direction, origin, getAABB().getDimensions(), true, false, true);
+
+                        // Find a vector parallel to the surface normal
+                        Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
+                        Vector3d pushBack = new Vector3d();
+
+                        pushBack.sub(blockPoi, entityPoi);
+
+                        // Calculate the intensity of the diversion alongside the block
+                        double length = slideVector.dot(direction);
+
+                        Vector3d newPosition = new Vector3d();
+                        newPosition.z = origin.z + pushBack.z * 0.2 + length * slideVector.z;
+                        newPosition.x = origin.x + pushBack.x * 0.2 + length * slideVector.x;
+                        newPosition.y = origin.y;
+
+                        // Update the position
+                        getPosition().set(newPosition);
+                    }
                 }
             }
         }

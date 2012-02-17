@@ -7,6 +7,8 @@ import javax.vecmath.Vector2f
 import javax.vecmath.Vector3f
 import org.terasology.math.Side
 import org.terasology.utilities.ClasspathResourceLoader
+import org.terasology.model.structures.AABB
+import javax.vecmath.Vector3d
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -43,7 +45,7 @@ final class BlockShapeLoader {
                 }
 
             } catch (Exception e) {
-                log.severe("Failed to load shape: " + c, e)
+                log.severe(String.format("Failed to load shape: %s\n%s", c, e));
             }
         }
     }
@@ -80,6 +82,13 @@ final class BlockShapeLoader {
         if (shapeConfig.Back != [:]) {
             shape.setSideMesh(Side.BACK, loadMeshPart(shapeConfig.Back));
             shape.setBlockingSide(Side.BACK, shapeConfig.Back.fullSide);
+        }
+        if (shapeConfig.Colliders != [:]) {
+            List<AABB> colliders = new ArrayList<AABB>();
+            shapeConfig.Colliders.each() { collider -> 
+                colliders.add(new AABB(new Vector3d(collider.position[0], collider.position[1], collider.position[2]), new Vector3d(collider.extents[0], collider.extents[1], collider.extents[2])))
+            }
+            shape.setColliders(colliders);
         }
         return shape
     }

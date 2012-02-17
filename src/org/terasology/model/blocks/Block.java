@@ -31,8 +31,8 @@ import javax.vecmath.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.ObjectStreamConstants;
-import java.util.EnumMap;
+import java.util.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -128,6 +128,10 @@ public class Block implements IGameObject, Cloneable {
 
     private EnumMap<Side, Vector4f> _colorOffset = new EnumMap<Side, Vector4f>(Side.class);
     private EnumMap<Side, Vector2f> _textureAtlasPos = new EnumMap<Side, Vector2f>(Side.class);
+
+    /* COLLISION */
+
+    private List<AABB> _colliders = new ArrayList<AABB>();
 
     /**
      * Init. a new block with default properties in place.
@@ -418,6 +422,11 @@ public class Block implements IGameObject, Cloneable {
         _fullSide.put(side, full);
         return this;
     }
+    
+    public void setColliders(List<AABB> colliders) {
+        _colliders.clear();
+        _colliders.addAll(colliders);
+    }
 
     public COLOR_SOURCE getColorSource() {
         return _internals.colorSource;
@@ -475,6 +484,10 @@ public class Block implements IGameObject, Cloneable {
         return _internals.penetrable;
     }
 
+    public boolean isComplexCollider() {
+        return !_colliders.isEmpty();
+    }
+
     public boolean isCastsShadows() {
         return _internals.castsShadows;
     }
@@ -509,6 +522,48 @@ public class Block implements IGameObject, Cloneable {
 
     public boolean isTranslucent() {
         return _internals.translucent;
+    }
+
+    /**
+     * @param x x offset
+     * @param y y offset
+     * @param z z offset
+     * @return An iterator over the colliders for this block, offset by the given values
+     */
+    public Iterable<AABB> getColliders(int x, int y, int z) {
+        return new OffsetAABBIterator(_colliders, x, y, z);
+    }
+
+    private class OffsetAABBIterator implements Iterable<AABB>, Iterator<AABB> {
+        Iterator<AABB> _source;
+        int _x;
+        int _y;
+        int _z;
+
+        public OffsetAABBIterator(Iterable<AABB> source, int x, int y, int z) {
+            _source = source.iterator();
+            _x = x;
+            _y = y;
+            _z = z;
+        }
+
+        public Iterator<AABB> iterator() {
+            return this;
+        }
+
+        public boolean hasNext() {
+            return _source.hasNext();
+        }
+
+        public AABB next() {
+            AABB base = _source.next();
+            return new AABB(new Vector3d(base.getPosition().x + _x, base.getPosition().y + _y, base.getPosition().z + _z),
+                    base.getDimensions());
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**
@@ -564,7 +619,29 @@ public class Block implements IGameObject, Cloneable {
                 block._loweredSideMesh.put(rotatedSide, null);
             }
         }
+        List<AABB> newAABBs = new ArrayList<AABB>(_colliders.size());
+        for (AABB collider : _colliders) {
+            newAABBs.add(rotateClockwiseAABB(collider, steps));
+        }
+        block._colliders = newAABBs;
         return block;
+    }
+
+    private AABB rotateClockwiseAABB(AABB collider, int steps) {
+        if (steps < 0) {
+            steps = -steps + 2;
+        }
+        steps = steps % 4;
+        switch (steps) {
+            case 1:
+                return new AABB(new Vector3d(-collider.getPosition().z,collider.getPosition().y,collider.getPosition().x), new Vector3d(collider.getDimensions().z,collider.getDimensions().y, collider.getDimensions().x));
+            case 2:
+                return new AABB(new Vector3d(-collider.getPosition().x, collider.getPosition().y, -collider.getPosition().z), collider.getDimensions());
+            case 3:
+                return new AABB(new Vector3d(collider.getPosition().z,collider.getPosition().y,-collider.getPosition().x), new Vector3d(collider.getDimensions().z,collider.getDimensions().y, collider.getDimensions().x));
+            default:
+                return collider;
+        }
     }
 
 }
