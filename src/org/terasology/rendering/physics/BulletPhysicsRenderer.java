@@ -18,6 +18,7 @@ package org.terasology.rendering.physics;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
+import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
@@ -207,11 +208,11 @@ public class BulletPhysicsRenderer implements IGameObject {
         ShaderManager.getInstance().enableShader("block");
         ShaderParameters params = ShaderManager.getInstance().getShaderParameters("block");
 
-        Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
         float[] mFloat = new float[16];
 
         GL11.glPushMatrix();
+        Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
         GL11.glTranslated(-player.getPosition().x, -player.getPosition().y, -player.getPosition().z);
 
         for (BlockRigidBody b : _blocks) {
