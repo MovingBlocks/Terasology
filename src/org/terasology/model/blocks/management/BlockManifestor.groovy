@@ -267,6 +267,7 @@ class BlockManifestor {
                 }
                 b.withFullSide(side, shape.isBlockingSide(side));
             }
+            b.setColliders(shape.getColliders());
         }
     }
 

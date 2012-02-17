@@ -71,4 +71,14 @@ shape {
 		]
 		fullSide = false
 	}
+    Colliders = [
+            [
+                    position : [0, 0, -0.25],
+                    extents : [0.5, 0.5, 0.25]
+            ],
+            [
+                    position : [0, -0.25, 0.25],
+                    extents : [0.5, 0.25, 0.25]
+            ]
+    ]
 }

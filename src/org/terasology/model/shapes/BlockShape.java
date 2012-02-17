@@ -1,8 +1,12 @@
 package org.terasology.model.shapes;
 
 import org.terasology.math.Side;
+import org.terasology.model.structures.AABB;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
+import java.util.List;
 
 /**
  * Describes a shape that a block can take. The shape may also be rotated if not symmetrical.
@@ -14,6 +18,7 @@ public class BlockShape {
     private BlockMeshPart _centerMesh;
     private EnumMap<Side, BlockMeshPart> _meshParts = new EnumMap<Side, BlockMeshPart>(Side.class);
     private boolean[] _fullSide = new boolean[Side.values().length];
+    private List<AABB> _colliders = new ArrayList<AABB>();
 
     public BlockShape(String title) {
         _title = title;
@@ -37,6 +42,10 @@ public class BlockShape {
     public String getTitle() {
         return _title;
     }
+    
+    public Iterable<AABB> getColliders() {
+        return _colliders;
+    }
 
     public void setCenterMesh(BlockMeshPart mesh) {
         _centerMesh = mesh;
@@ -48,6 +57,11 @@ public class BlockShape {
 
     public void setBlockingSide(Side side, boolean blocking) {
         _fullSide[side.ordinal()] = blocking;
+    }
+    
+    public void setColliders(Collection<AABB> colliders) {
+        _colliders.clear();
+        _colliders.addAll(colliders);
     }
 
 }
