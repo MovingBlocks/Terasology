@@ -77,7 +77,7 @@ public class DefaultBlockTool extends SimpleTool {
 
             BlockPosition blockPos = selectedBlock.calcAdjacentBlockPos();
             Block adjBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z));
-            if (adjBlock != null && !adjBlock.isInvisible() && adjBlock.isRenderBoundingBox())
+            if (adjBlock != null && !adjBlock.isInvisible() && !adjBlock.isSelectionRayThrough())
             {
                 return false;
             }
