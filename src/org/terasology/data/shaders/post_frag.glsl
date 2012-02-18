@@ -8,8 +8,8 @@ uniform float exposure = 1.0;
 const float brightMax = 1.0;
 
 float linDepth() {
-    float cNear = 0.1;
-    float cZFar = 512.0;
+    const float cNear = 0.1;
+    const float cZFar = 512.0;
     float z = texture2D(texDepth, gl_TexCoord[0].xy).x;
 
     return (2.0 * cNear) / (cZFar + cNear - z * (cZFar - cNear));

@@ -263,7 +263,7 @@ public final class Terasology {
      * Init. a new world. Generates a new random seed for the title
      * if the world is not present on disk.
      *
-     * @param title
+     * @param title The title of the world
      */
     public void initWorld(String title) {
         initWorld(title, null);
