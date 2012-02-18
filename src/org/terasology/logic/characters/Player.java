@@ -63,7 +63,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Player extends Character {
+public class Player extends Character {
 
     /* CONSTANT VALUES */
     private static final double MOUSE_SENS = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
@@ -112,6 +112,8 @@ public final class Player extends Character {
         _godMode = GOD_MODE;
 
         load();
+        
+        _inventory.loadDefaultItems();
     }
 
     public void render() {

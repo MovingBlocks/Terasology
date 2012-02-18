@@ -28,10 +28,9 @@ public class Inventory {
 
     public Inventory(Player parent) {
         _parent = parent;
-        initDefaultItems();
     }
 
-    private void initDefaultItems() {
+    public void loadDefaultItems() {
         _inventory[0] = new ItemBlock(_parent, BlockManager.getInstance().getBlockGroup("Companion"), 1);
         _inventory[1] = new ItemBlock(_parent, BlockManager.getInstance().getBlockGroup("Torch"), 16);
         _inventory[2] = new ItemPickAxe(_parent);
