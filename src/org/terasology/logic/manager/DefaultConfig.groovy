@@ -50,7 +50,7 @@ public class DefaultConfig {
         config.put("Graphics.viewingDistanceUltra", 32)
 
         // Advanced effects – Disable them if you are having problems running the game!
-//        config.put("Graphics.enablePostProcessingEffects", true)
+        config.put("Graphics.enablePostProcessingEffects", true)
         config.put("Graphics.animatedWaterAndGrass", true)
 
         // Splits chunk meshes into multiple sub-meshes to support frustum and occlusion culling techniques
