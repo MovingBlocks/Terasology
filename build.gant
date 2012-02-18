@@ -97,6 +97,32 @@ target('compile': 'Compiles the code!') {
     //}
 }
 
+target('doc': 'Generate Javadoc') {
+    def packageIncludeSpec = 'org.terasology.*'
+    def packageTitle = 'Terasology'
+    def copyrightString = 'Copyright'
+    def sourceCompatibility = '5'
+  
+    def classpathID = 'classpathID'
+    
+    javadoc (
+               sourcepath : sourceDir ,
+               destdir : 'out/javadoc' ,
+               packagenames : packageIncludeSpec,
+               overview : 'overview.html' ,
+               private : 'true' ,
+               encoding : 'UTF-8' ,
+               use : 'true' ,
+               author : 'true' ,
+               version : 'true' ,
+               windowtitle : packageTitle ,
+               doctitle : packageTitle ,
+               header : packageTitle ,
+               footer : copyrightString ,
+               source : sourceCompatibility
+               )
+}
+
 target('buildArtifacts': 'Takes compiled code and everything else needed and preps packaged artifacts') {
 
     // Prep dir and package up the primary jar
