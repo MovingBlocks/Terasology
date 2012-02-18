@@ -23,6 +23,7 @@ import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.ItemBlock;
+import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
@@ -75,9 +76,9 @@ public class DefaultBlockTool extends SimpleTool {
             }
 
             BlockPosition blockPos = selectedBlock.calcAdjacentBlockPos();
-
-            // Prevent players from placing blocks inside their bounding boxes
-            if (Block.AABBForBlockAt(blockPos.x, blockPos.y, blockPos.z).overlaps(_player.getAABB())) {
+            Block adjBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z));
+            if (adjBlock != null && !adjBlock.isInvisible() && adjBlock.isRenderBoundingBox())
+            {
                 return false;
             }
 
@@ -91,11 +92,20 @@ public class DefaultBlockTool extends SimpleTool {
             rawDirection.sub(new Vector3d(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
             Side direction = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z);
 
-            byte blockId = type.getBlockIdFor(attachmentSide, direction);
-            if (blockId == 0)
+            Block block = type.getBlockFor(attachmentSide, direction);
+            if (block == null)
                 return false;
 
-            placeBlock(blockPos, blockId, true);
+            // Prevent players from placing blocks inside their bounding boxes
+            if (!block.isPenetrable()) {
+                for (AABB blockAABB : block.getColliders(blockPos.x, blockPos.y, blockPos.z)) {
+                    if (blockAABB.overlaps(_player.getAABB())) {
+                        return false;
+                    }
+                }
+            }
+
+            placeBlock(blockPos, block.getId(), true);
 
             AudioManager.getInstance().playVaryingSound("PlaceBlock", 0.6f, 0.5f);
 

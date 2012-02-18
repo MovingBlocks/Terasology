@@ -109,59 +109,62 @@ public class RayBlockIntersection {
      * @return The list of intersections
      */
     public static ArrayList<Intersection> executeIntersection(IWorldProvider w, int x, int y, int z, Vector3d rayOrigin, Vector3d rayDirection) {
+        Block block = BlockManager.getInstance().getBlock(w.getBlock(x, y, z));
         /*
          * Ignore invisible blocks.
          */
-        if (BlockManager.getInstance().getBlock(w.getBlock(x, y, z)).isInvisible()) {
+        if (block.isInvisible()) {
             return null;
         }
 
         ArrayList<Intersection> result = new ArrayList<Intersection>();
 
-        /*
-         * Fetch all vertices of the specified block.
-         */
-        Vector3d[] vertices = Block.AABBForBlockAt(x, y, z).getVertices();
-        BlockPosition blockPos = new BlockPosition(x, y, z);
+        for (AABB blockAABB : block.getColliders(x, y, z)) {
+            /*
+             * Fetch all vertices of the specified block.
+             */
+            Vector3d[] vertices = blockAABB.getVertices();
+            BlockPosition blockPos = new BlockPosition(x, y, z);
 
-        /*
-         * Generate a new intersection for each side of the block.
-         */
+            /*
+             * Generate a new intersection for each side of the block.
+             */
 
-        // Front
-        Intersection is = executeBlockFaceIntersection(blockPos, vertices[0], vertices[1], vertices[3], rayOrigin, rayDirection);
-        if (is != null) {
-            result.add(is);
-        }
+            // Front
+            Intersection is = executeBlockFaceIntersection(blockPos, vertices[0], vertices[1], vertices[3], rayOrigin, rayDirection);
+            if (is != null) {
+                result.add(is);
+            }
 
-        // Back
-        is = executeBlockFaceIntersection(blockPos, vertices[4], vertices[7], vertices[5], rayOrigin, rayDirection);
-        if (is != null) {
-            result.add(is);
-        }
+            // Back
+            is = executeBlockFaceIntersection(blockPos, vertices[4], vertices[7], vertices[5], rayOrigin, rayDirection);
+            if (is != null) {
+                result.add(is);
+            }
 
-        // Left
-        is = executeBlockFaceIntersection(blockPos, vertices[4], vertices[0], vertices[7], rayOrigin, rayDirection);
-        if (is != null) {
-            result.add(is);
-        }
+            // Left
+            is = executeBlockFaceIntersection(blockPos, vertices[4], vertices[0], vertices[7], rayOrigin, rayDirection);
+            if (is != null) {
+                result.add(is);
+            }
 
-        // Right
-        is = executeBlockFaceIntersection(blockPos, vertices[5], vertices[6], vertices[1], rayOrigin, rayDirection);
-        if (is != null) {
-            result.add(is);
-        }
+            // Right
+            is = executeBlockFaceIntersection(blockPos, vertices[5], vertices[6], vertices[1], rayOrigin, rayDirection);
+            if (is != null) {
+                result.add(is);
+            }
 
-        // Top
-        is = executeBlockFaceIntersection(blockPos, vertices[7], vertices[3], vertices[6], rayOrigin, rayDirection);
-        if (is != null) {
-            result.add(is);
-        }
+            // Top
+            is = executeBlockFaceIntersection(blockPos, vertices[7], vertices[3], vertices[6], rayOrigin, rayDirection);
+            if (is != null) {
+                result.add(is);
+            }
 
-        // Bottom
-        is = executeBlockFaceIntersection(blockPos, vertices[4], vertices[5], vertices[0], rayOrigin, rayDirection);
-        if (is != null) {
-            result.add(is);
+            // Bottom
+            is = executeBlockFaceIntersection(blockPos, vertices[4], vertices[5], vertices[0], rayOrigin, rayDirection);
+            if (is != null) {
+                result.add(is);
+            }
         }
 
         // Sort the intersections by distance to the player

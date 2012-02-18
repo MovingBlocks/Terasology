@@ -120,14 +120,13 @@ public final class Player extends Character {
 
         // Display the block the player is aiming at
         if (SHOW_PLACING_BOX) {
-            if (_selectedBlock != null) {
-                if (BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(_selectedBlock.getBlockPosition().toVector3d())).isRenderBoundingBox()) {
-                    Block.AABBForBlockAt(_selectedBlock.getBlockPosition().toVector3d()).render(8f);
+            if (_selectedBlock != null) { 
+                Block block = BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(_selectedBlock.getBlockPosition().toVector3d()));
+                if (block.isRenderBoundingBox()) {
+                    block.getBounds(_selectedBlock.getBlockPosition()).render(8f);
                 }
             }
         }
-
-        calcSelectedBlock();
     }
 
     public void update() {

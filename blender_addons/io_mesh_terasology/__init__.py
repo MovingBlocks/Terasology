@@ -10,7 +10,7 @@ bl_info = {
 	"name": "Terasology Block Shape Export",
 	"description": "Exporter for producing Terasology Block Shape files",
 	"author": "Immortius",
-	"version": (1, 0),
+	"version": (1, 1),
 	"blender": (2, 6, 0),
 	"location": "File > Import-Export",
 	"category": "Import-Export"}
@@ -31,6 +31,11 @@ class ExportBlockShape(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
 		name="Apply Modifiers",
 		description="Apply Modifiers to the exported mesh",
 		default=True)
+		
+	for_embed = BoolProperty(
+		name="For Embed in Jar",
+		description="Adds the default package to the groovy file",
+		default=False)
 
 	@classmethod
 	def	poll(cls, context):
@@ -48,6 +53,52 @@ class ExportBlockShape(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
 
 		row = layout.row()
 		row.prop(self, "apply_modifiers")
+		row = layout.row()
+		row.prop(self, "for_embed")
+		
+#UI Panel
+		
+bpy.types.Object.teraFullSide = BoolProperty(
+	name="Full Side",
+	description="Is this side of the block complete",
+	default = False)
+	
+bpy.types.Object.teraAABB = BoolProperty(
+	name="Is AABB Collider",
+	description="Is this object used to describe an AABB collider",
+	default = False)
+	
+bpy.types.Scene.teraAuthor = StringProperty(
+	name="Author",
+	description="Is this side of the block complete",
+	default = "")
+	
+bpy.types.Scene.teraAutoCollider = BoolProperty(
+	name="Auto-generate Collider",
+	description="Automatically generate an AABB collider that encapulates the block",
+	default = False)
+		
+class UIPanel(bpy.types.Panel):
+	bl_label = "Terasology Properties"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+
+	def draw(self, context):
+		layout = self.layout
+		scene = context.scene
+		if not scene:
+			return
+		layout.prop(scene, 'teraAuthor')
+		layout.prop(scene, 'teraAutoCollider')
+		
+		ob = context.object
+		if not ob:
+			return
+		if not ob.type == 'MESH':
+			return
+		
+		layout.prop(ob, 'teraFullSide')
+		layout.prop(ob, 'teraAABB')
 		
 def menu_export(self, context):
 	self.layout.operator(ExportBlockShape.bl_idname, text="Terasology Block Shape (.groovy)")

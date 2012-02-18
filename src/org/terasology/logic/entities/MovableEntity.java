@@ -106,8 +106,11 @@ public abstract class MovableEntity extends Entity {
 
             for (int i = 0; i < blocks.size(); i++) {
                 BlockPosition p = blocks.get(i);
-                AABB blockAABB = Block.AABBForBlockAt(p.x, p.y, p.z);
-                blockAABB.render(2f);
+                byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
+                Block block = BlockManager.getInstance().getBlock(blockType);
+                for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
+                    blockAABB.render(2f);
+                }
             }
         }
     }
@@ -180,46 +183,22 @@ public abstract class MovableEntity extends Entity {
             byte blockType1 = _parent.getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
             AABB entityAABB = getAABB();
 
-            if (BlockManager.getInstance().getBlock(blockType1).isPenetrable())
+            Block block = BlockManager.getInstance().getBlock(blockType1);
+            if (block.isPenetrable())
                 continue;
-            if (!entityAABB.overlaps(Block.AABBForBlockAt(p.x, p.y, p.z))) {
-                continue;
-            }
-            if (BlockManager.getInstance().getBlock(blockType1).isComplexCollider()) {
-                AABB closestCollider = null;
-                double closestDistance = Double.POSITIVE_INFINITY;
-                for (AABB aabb : BlockManager.getInstance().getBlock(blockType1).getColliders(p.x, p.y, p.z)) {
-                    double direction = origin.y - aabb.getPosition().y;
-                    if (entityAABB.overlaps(aabb)) {
-                        double newDist = 0;
-                        if (direction >= 0)
-                            newDist = MathHelper.fastAbs(aabb.getPosition().y - p.y - aabb.getDimensions().y - entityAABB.getDimensions().y);
-                        else
-                            newDist = MathHelper.fastAbs(aabb.getPosition().y - p.y + aabb.getDimensions().y + entityAABB.getDimensions().y);
-                        if (newDist < closestDistance) {
-                            closestCollider = aabb;
-                            closestDistance = newDist;
-                        }
-                    }
-                }
-                if (closestCollider != null) {
-                    double direction = origin.y - closestCollider.getPosition().y;
-                    if (direction >= 0) {
-                        getPosition().y = closestCollider.getPosition().y + closestCollider.getDimensions().y + entityAABB.getDimensions().y;
-                        getPosition().y += Math.ulp(getPosition().y);
-                    } else {
-                        getPosition().y = closestCollider.getPosition().y - closestCollider.getDimensions().y - entityAABB.getDimensions().y;
-                        getPosition().y -= Math.ulp(getPosition().y);
-                    }
-                    moved = true;
-                }
-            } else {
+            for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
+                if (!entityAABB.overlaps(blockAABB))
+                    continue;
+
                 double direction = origin.y - getPosition().y;
 
-                if (direction >= 0)
-                    getPosition().y = p.y + 0.50001f + entityAABB.getDimensions().y;
-                else
-                    getPosition().y = p.y - 0.50001f - entityAABB.getDimensions().y;
+                if (direction >= 0) {
+                    getPosition().y = blockAABB.getPosition().y + blockAABB.getDimensions().y + entityAABB.getDimensions().y;
+                    getPosition().y += Math.ulp(getPosition().y);
+                } else {
+                    getPosition().y = blockAABB.getPosition().y - blockAABB.getDimensions().y - entityAABB.getDimensions().y;
+                    getPosition().y -= Math.ulp(getPosition().y);
+                }
 
                 moved = true;
             }
@@ -272,46 +251,12 @@ public abstract class MovableEntity extends Entity {
         for (int i = 0; i < blockPositions.size(); i++) {
             BlockPosition p = blockPositions.get(i);
             byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
-            AABB blockAABB = Block.AABBForBlockAt(p.x, p.y, p.z);
+            Block block = BlockManager.getInstance().getBlock(blockType);
 
-            if (!BlockManager.getInstance().getBlock(blockType).isPenetrable()) {
-                if (getAABB().overlaps(blockAABB)) {
-                    if (BlockManager.getInstance().getBlock(blockType).isComplexCollider()) {
-                        for (AABB collider : BlockManager.getInstance().getBlock(blockType).getColliders(p.x, p.y, p.z)) {
-                            if (getAABB().overlaps(collider)) {
-                                Vector3d direction = new Vector3d(getPosition().x, 0f, getPosition().z);
-                                direction.x -= origin.x;
-                                direction.z -= origin.z;
-
-                                // Calculate the point of intersection on the block's AABB
-                                Vector3d blockPoi = collider.closestPointOnAABBToPoint(origin);
-                                Vector3d entityPoi = generateAABBForPosition(origin).closestPointOnAABBToPoint(blockPoi);
-
-                                Vector3d planeNormal = collider.getFirstHitPlane(direction, origin, getAABB().getDimensions(), true, false, true);
-
-                                // Find a vector parallel to the surface normal
-                                Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
-                                Vector3d pushBack = new Vector3d();
-
-                                pushBack.sub(blockPoi, entityPoi);
-
-                                // Calculate the intensity of the diversion alongside the block
-                                double length = slideVector.dot(direction);
-
-                                Vector3d newPosition = new Vector3d();
-                                newPosition.z = origin.z + pushBack.z * 0.2 + length * slideVector.z;
-                                newPosition.x = origin.x + pushBack.x * 0.2 + length * slideVector.x;
-                                newPosition.y = origin.y;
-
-                                // Update the position
-                                getPosition().set(newPosition);
-                            }
-                        }
-                    } else {
-
+            if (!block.isPenetrable()) {
+                for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
+                    if (getAABB().overlaps(blockAABB)) {
                         result = true;
-
-                        // Calculate the direction from the origin to the current position
                         Vector3d direction = new Vector3d(getPosition().x, 0f, getPosition().z);
                         direction.x -= origin.x;
                         direction.z -= origin.z;
@@ -475,20 +420,23 @@ public abstract class MovableEntity extends Entity {
 
         boolean swimming = false, headUnderWater = false;
 
+        Vector3d eyePos = calcEyePosition();
+        eyePos.y += 0.25;
+
         for (int i = 0; i < blockPositions.size(); i++) {
             BlockPosition p = blockPositions.get(i);
             byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
-            AABB blockAABB = Block.AABBForBlockAt(p.x, p.y, p.z);
-
-            if (BlockManager.getInstance().getBlock(blockType).isLiquid() && getAABB().overlaps(blockAABB)) {
-                swimming = true;
-            }
-
-            Vector3d eyePos = calcEyePosition();
-            eyePos.y += 0.25;
-
-            if (BlockManager.getInstance().getBlock(blockType).isLiquid() && blockAABB.contains(eyePos)) {
-                headUnderWater = true;
+            Block block = BlockManager.getInstance().getBlock(blockType);
+            if (block.isLiquid()) {
+                for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
+                    if (getAABB().overlaps(blockAABB)) {
+                        swimming = true;
+                        if (blockAABB.contains(eyePos)) {
+                            headUnderWater = true;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
