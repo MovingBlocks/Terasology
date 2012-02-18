@@ -22,6 +22,7 @@ import org.terasology.game.Terasology;
 import org.terasology.math.Side;
 import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.model.structures.AABB;
+import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -132,6 +133,7 @@ public class Block implements IGameObject, Cloneable {
     /* COLLISION */
 
     private List<AABB> _colliders = new ArrayList<AABB>();
+    public AABB _bounds = new AABB(new Vector3d(), new Vector3d());
 
     /**
      * Init. a new block with default properties in place.
@@ -424,8 +426,9 @@ public class Block implements IGameObject, Cloneable {
     }
     
     public void setColliders(List<AABB> colliders) {
-        _colliders.clear();
-        _colliders.addAll(colliders);
+        _colliders = new ArrayList<AABB>(colliders);
+
+        _bounds = new AABB(colliders);
     }
 
     public COLOR_SOURCE getColorSource() {
@@ -484,10 +487,6 @@ public class Block implements IGameObject, Cloneable {
         return _internals.penetrable;
     }
 
-    public boolean isComplexCollider() {
-        return !_colliders.isEmpty();
-    }
-
     public boolean isCastsShadows() {
         return _internals.castsShadows;
     }
@@ -533,6 +532,10 @@ public class Block implements IGameObject, Cloneable {
     public Iterable<AABB> getColliders(int x, int y, int z) {
         return new OffsetAABBIterator(_colliders, x, y, z);
     }
+    
+    public AABB getBounds(BlockPosition pos) {
+        return new AABB(new Vector3d(_bounds.getPosition().x + pos.x, _bounds.getPosition().y + pos.y, _bounds.getPosition().z + pos.z), _bounds.getDimensions());
+    }
 
     private class OffsetAABBIterator implements Iterable<AABB>, Iterator<AABB> {
         Iterator<AABB> _source;
@@ -576,18 +579,6 @@ public class Block implements IGameObject, Cloneable {
         return new AABB(pos, new Vector3d(0.5f, 0.5f, 0.5f));
     }
 
-    /**
-     * Returns the AABB for a block at the given position.
-     *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
-     * @return The AABB
-     */
-    public static AABB AABBForBlockAt(int x, int y, int z) {
-        return new AABB(new Vector3d(x, y, z), new Vector3d(0.5f, 0.5f, 0.5f));
-    }
-
     public String toString() {
         return this.getClass().getSimpleName() + ":" + _title + ";id:" + _id;
     }
@@ -623,7 +614,7 @@ public class Block implements IGameObject, Cloneable {
         for (AABB collider : _colliders) {
             newAABBs.add(rotateClockwiseAABB(collider, steps));
         }
-        block._colliders = newAABBs;
+        block.setColliders(newAABBs);
         return block;
     }
 

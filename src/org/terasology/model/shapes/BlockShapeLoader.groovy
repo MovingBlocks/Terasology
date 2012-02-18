@@ -89,6 +89,8 @@ final class BlockShapeLoader {
                 colliders.add(new AABB(new Vector3d(collider.position[0], collider.position[1], collider.position[2]), new Vector3d(collider.extents[0], collider.extents[1], collider.extents[2])))
             }
             shape.setColliders(colliders);
+        } else {
+            shape.setColliders([new AABB(new Vector3d(), new Vector3d(0.5,0.5,0.5))]);
         }
         return shape
     }

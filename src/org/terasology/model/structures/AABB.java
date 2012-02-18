@@ -20,6 +20,7 @@ import org.terasology.game.Terasology;
 
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -50,16 +51,57 @@ public class AABB {
     }
 
     /**
+     * Creates a new AABB that encapsulates a set of AABBs
+     * @param others
+     */
+    public AABB(Iterable<AABB> others) {
+        Iterator<AABB> i = others.iterator();
+        if (!i.hasNext()) {
+            _dimensions = new Vector3d();
+        } else {
+            AABB first = i.next();
+            Vector3d min = new Vector3d(first.minX(), first.minY(), first.minZ());
+            Vector3d max = new Vector3d(first.maxX(), first.maxY(), first.maxZ());
+            while (i.hasNext()) {
+                AABB next = i.next();
+                if (next.minX() < min.x) {
+                    min.x = next.minX();
+                }
+                if (next.minY() < min.y) {
+                    min.y = next.minY();
+                }
+                if (next.minZ() < min.z) {
+                    min.z = next.minZ();
+                }
+                if (next.maxX() > max.x) {
+                    max.x = next.maxX();
+                }
+                if (next.maxY() > max.y) {
+                    max.y = next.maxY();
+                }
+                if (next.maxZ() > max.z) {
+                    max.z = next.maxZ();
+                }
+            }
+            _position.set(max);
+            _position.add(min);
+            _position.scale(0.5);
+            _dimensions = new Vector3d(max);
+            _dimensions.sub(min);
+            _dimensions.scale(0.5);
+        }
+    }
+
+    /**
      * Returns true if this AABB overlaps the given AABB.
      *
      * @param aabb2 The AABB to check for overlapping
      * @return True if overlapping
      */
     public boolean overlaps(AABB aabb2) {
-        if (maxX() < aabb2.minX() || minX() > aabb2.maxX()) return false;
-        if (maxY() < aabb2.minY() || minY() > aabb2.maxY()) return false;
-        if (maxZ() < aabb2.minZ() || minZ() > aabb2.maxZ()) return false;
-        return true;
+        return !(maxX() < aabb2.minX() || minX() > aabb2.maxX()) &&
+               !(maxY() < aabb2.minY() || minY() > aabb2.maxY()) &&
+               !(maxZ() < aabb2.minZ() || minZ() > aabb2.maxZ());
     }
 
     /**
@@ -69,11 +111,9 @@ public class AABB {
      * @return True if containing
      */
     public boolean contains(Vector3d point) {
-        if (maxX() < point.x || minX() > point.x) return false;
-        if (maxY() < point.y || minY() > point.y) return false;
-        if (maxZ() < point.z || minZ() > point.z) return false;
-
-        return true;
+        return !(maxX() < point.x || minX() > point.x) &&
+               !(maxY() < point.y || minY() > point.y) &&
+               !(maxZ() < point.z || minZ() > point.z);
     }
 
     /**
