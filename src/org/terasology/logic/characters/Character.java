@@ -30,7 +30,11 @@ public abstract class Character extends MovableEntity {
     private int _healthPoints = 255;
 
     public Character(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
-        super(parent, walkingSpeed, runningFactor, jumpIntensity);
+        super(parent, walkingSpeed, runningFactor, jumpIntensity, false);
+    }
+
+    public Character(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity, boolean loadAudio) {
+        super(parent, walkingSpeed, runningFactor, jumpIntensity, loadAudio);
     }
 
     /**
@@ -114,8 +118,8 @@ public abstract class Character extends MovableEntity {
     @Override
     protected void handleVerticalCollision() {
         // Damage by falling
-        if (_gravity < -0.2)
-            damage((int) (((Math.abs(_gravity) - 0.2) / 0.8) * getMaxHealthPoints()));
+        if (_gravity < -0.3)
+            damage((int) (((Math.abs(_gravity) - 0.3) / 0.3) * getMaxHealthPoints()));
     }
 
     @Override

@@ -8,7 +8,9 @@ package org.terasology.data.blocks.definitions.liquid
  */
 block {
     version = 1
-
+    shape = "TrimmedLoweredCube"
+    loweredShape = "LoweredCube"
     // Let the lava shine!
     luminance = 15
+    hardness = 0
 }

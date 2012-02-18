@@ -22,6 +22,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
 import org.terasology.logic.manager.FontManager;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 import javax.vecmath.Vector2f;
@@ -63,6 +64,7 @@ public class UIText extends UIDisplayElement {
     }
 
     public void render() {
+        PerformanceMonitor.startActivity("Render UIText");
         // TODO HACK: Workaround because the internal Slick texture mechanism is never used
         _workaroundTexture.bind();
 
@@ -73,6 +75,7 @@ public class UIText extends UIDisplayElement {
 
         // TODO: Also ugly..
         glDisable(GL11.GL_TEXTURE_2D);
+        PerformanceMonitor.endActivity();
     }
 
     @Override

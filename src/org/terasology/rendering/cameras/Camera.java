@@ -18,6 +18,7 @@ package org.terasology.rendering.cameras;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.model.structures.ViewFrustum;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3d;
 
 /**
@@ -33,12 +34,14 @@ public abstract class Camera {
     protected final Vector3d _position = new Vector3d();
     protected final Vector3d _up = new Vector3d(0, 1, 0);
     protected final Vector3d _viewingDirection = new Vector3d();
+    protected final Matrix4f _viewMatrix = new Matrix4f();
 
     protected float _targetFov = FOV;
     protected float _activeFov = FOV - 20f;
 
     /* VIEW FRUSTUM */
     protected final ViewFrustum _viewFrustum = new ViewFrustum();
+    protected boolean _frustumNeedsUpdate = false;
 
     /**
      * Applies the projection and modelview matrix.
@@ -76,6 +79,11 @@ public abstract class Camera {
     }
 
     public ViewFrustum getViewFrustum() {
+        if (_frustumNeedsUpdate) {
+            _viewFrustum.updateFrustum();
+            _frustumNeedsUpdate = false;
+        }
+
         return _viewFrustum;
     }
 
@@ -93,5 +101,9 @@ public abstract class Camera {
 
     public void resetFov() {
         _targetFov = FOV;
+    }
+
+    public Matrix4f getViewMatrix() {
+        return _viewMatrix;
     }
 }

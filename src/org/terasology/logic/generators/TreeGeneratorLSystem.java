@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.generators;
 
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;
@@ -30,7 +30,7 @@ import java.util.Stack;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class TreeGeneratorLSystem extends TreeGenerator {
-    
+
     public final int MAX_ANGLE_OFFSET = 5;
 
     /* SETTINGS */
@@ -47,12 +47,12 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     /**
      * Init. a new L-System based tree generator.
      *
-     * @param manager      The generator manager
-     * @param initialAxiom The initial axiom to use
-     * @param ruleSet      The rule set to use
+     * @param manager       The generator manager
+     * @param initialAxiom  The initial axiom to use
+     * @param ruleSet       The rule set to use
      * @param probabilities The probability array
-     * @param iterations The amount of iterations to execute
-     * @param angle The angle
+     * @param iterations    The amount of iterations to execute
+     * @param angle         The angle
      */
     public TreeGeneratorLSystem(GeneratorManager manager, String initialAxiom, HashMap<String, String> ruleSet, HashMap<String, Double> probabilities, int iterations, int angle) {
         super(manager);

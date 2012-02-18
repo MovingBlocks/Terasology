@@ -22,7 +22,6 @@ import org.terasology.utilities.MathHelper;
 import javax.vecmath.Vector3d;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -32,7 +31,7 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class LocalChunkCache implements ChunkProvider {
+public final class LocalChunkCache implements IChunkProvider {
 
     private static final boolean SAVE_CHUNKS = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.saveChunks");
     private static final int CACHE_SIZE = (Integer) ConfigurationManager.getInstance().getConfig().get("System.chunkCacheSize");
@@ -104,23 +103,21 @@ public final class LocalChunkCache implements ChunkProvider {
                 ArrayList<Chunk> cachedChunks = new ArrayList<Chunk>(_chunkCache.values());
                 Collections.sort(cachedChunks);
 
-                synchronized (_chunkCache) {
-                    while (cachedChunks.size() > CACHE_SIZE) {
-                        Chunk chunkToDelete = cachedChunks.remove(cachedChunks.size() - 1);
-                        // Write the chunk to disk (but do not remove it from the cache just jet)
-                        writeChunkToDisk(chunkToDelete);
-                        // When the chunk is written, finally remove it from the cache
-                        _chunkCache.values().remove(chunkToDelete);
+                if (cachedChunks.size() > CACHE_SIZE) {
+                    Chunk chunkToDelete = cachedChunks.remove(cachedChunks.size() - 1);
+                    // Write the chunk to disk (but do not remove it from the cache just jet)
+                    writeChunkToDisk(chunkToDelete);
+                    // When the chunk is written, finally remove it from the cache
+                    _chunkCache.values().remove(chunkToDelete);
 
-                        chunkToDelete.dispose();
-                    }
+                    chunkToDelete.dispose();
                 }
 
                 _running = false;
             }
         };
 
-        Terasology.getInstance().getThreadPool().execute(r);
+        Terasology.getInstance().submitTask("Flush Chunk Cache", r);
     }
 
     /**
@@ -138,7 +135,7 @@ public final class LocalChunkCache implements ChunkProvider {
             }
         };
 
-        Terasology.getInstance().getThreadPool().submit(r);
+        Terasology.getInstance().submitTask("Dispose Chunk", r);
     }
 
     /**
@@ -146,7 +143,7 @@ public final class LocalChunkCache implements ChunkProvider {
      *
      * @param c The chunk to save
      */
-    private synchronized void writeChunkToDisk(Chunk c) {
+    private void writeChunkToDisk(Chunk c) {
         if (!SAVE_CHUNKS) {
             return;
         }
@@ -178,7 +175,7 @@ public final class LocalChunkCache implements ChunkProvider {
      * @param chunkPos The position of the chunk
      * @return The loaded chunk, null if none was found
      */
-    private synchronized Chunk loadChunkFromDisk(Vector3d chunkPos) {
+    private Chunk loadChunkFromDisk(Vector3d chunkPos) {
         File f = new File(_parent.getWorldSavePath() + "/" + Chunk.getChunkSavePathForPosition(chunkPos) + "/" + Chunk.getChunkFileNameForPosition(chunkPos));
 
         if (!f.exists())
@@ -209,9 +206,5 @@ public final class LocalChunkCache implements ChunkProvider {
      */
     public int size() {
         return _chunkCache.size();
-    }
-
-    public Collection<Chunk> getChunks() {
-        return _chunkCache.values();
     }
 }

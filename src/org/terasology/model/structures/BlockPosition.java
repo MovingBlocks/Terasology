@@ -32,7 +32,6 @@ public final class BlockPosition implements Comparable<BlockPosition> {
     private Vector3d _origin;
 
     public BlockPosition() {
-
     }
 
     public BlockPosition(Vector3d v) {
@@ -54,7 +53,7 @@ public final class BlockPosition implements Comparable<BlockPosition> {
         this._origin = origin;
     }
 
-    double getDistance() {
+    double calcDistanceToOrigin() {
         if (_origin == null)
             return 0;
 
@@ -78,8 +77,8 @@ public final class BlockPosition implements Comparable<BlockPosition> {
     }
 
     public int compareTo(BlockPosition o) {
-        double distance = getDistance();
-        double oDistance = o.getDistance();
+        double distance = calcDistanceToOrigin();
+        double oDistance = o.calcDistanceToOrigin();
 
         if (oDistance > distance)
             return -1;

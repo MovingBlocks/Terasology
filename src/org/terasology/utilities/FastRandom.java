@@ -62,6 +62,18 @@ public class FastRandom {
         return (int) randomLong();
     }
 
+    public int randomInt(int range) {
+        return (int) randomLong() % range;
+    }
+
+    public int randomIntAbs() {
+        return MathHelper.fastAbs(randomInt());
+    }
+
+    public int randomIntAbs(int range) {
+        return MathHelper.fastAbs(randomInt() % range);
+    }
+
     /**
      * Returns a random double value.
      *

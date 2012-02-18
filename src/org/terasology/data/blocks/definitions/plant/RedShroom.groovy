@@ -7,7 +7,7 @@ import org.terasology.model.blocks.Block.BLOCK_FORM
  */
 block {
     version = 1
-
+    shape = "Billboard"
     blockform = BLOCK_FORM.BILLBOARD
 
     translucent = true

@@ -22,21 +22,21 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.PixelFormat;
 import org.terasology.logic.manager.*;
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.shapes.BlockShapeManager;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.menus.UIHeadsUpDisplay;
-import org.terasology.rendering.gui.menus.UIInventoryScreen;
-import org.terasology.rendering.gui.menus.UIPauseMenu;
-import org.terasology.rendering.gui.menus.UIStatusScreen;
+import org.terasology.rendering.gui.menus.*;
 import org.terasology.rendering.world.WorldRenderer;
 
 import org.terasology.game.modes.IGameMode;
 import org.terasology.game.modes.ModePlayGame;
 import org.terasology.game.modes.ModeMainMenu;
-
+import org.terasology.logic.characters.Player;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -68,10 +68,11 @@ public final class Terasology {
 
    
     /* STATISTICS */
-    private long _lastLoopTime, _lastFpsTime, _delta;
+    private long _lastLoopTime, _lastFpsTime;
     private int _fps;
     private float _averageFps;
     private long _timerTicksPerSecond;
+    private long _delta;
 
     /* GAME LOOP */
     private boolean _runGame = true, _saveWorldOnExit = true;
@@ -125,11 +126,16 @@ public final class Terasology {
         try {
             terasology = getInstance();
 
+            terasology.initOpenAL();
             terasology.initDisplay();
+            terasology.checkOpenGL();
             terasology.initControls();
             terasology.initGame();
             terasology.initGroovy();
         } catch (LWJGLException e) {
+            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm so sorry: " + e.toString(), e);
+            System.exit(0);
+        } catch (Exception e) {
             getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm so sorry: " + e.toString(), e);
             System.exit(0);
         }
@@ -145,8 +151,14 @@ public final class Terasology {
             addLibraryPath("natives/macosx");
         else if (System.getProperty("os.name").equals("Linux"))
             addLibraryPath("natives/linux");
-        else
+        else {
             addLibraryPath("natives/windows");
+
+            if (System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64"))
+                System.loadLibrary("OpenAL64");
+            else
+                System.loadLibrary("OpenAL32");
+        }
     }
 
     private static void addLibraryPath(String s) throws Exception {
@@ -171,6 +183,7 @@ public final class Terasology {
      */
     private Terasology() {
         _logger = Logger.getLogger("Terasology");
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
     }
 
     /**
@@ -178,6 +191,17 @@ public final class Terasology {
      */
     public void initGroovy() {
         _groovyManager = new GroovyManager();
+    }
+
+    public void checkOpenGL() throws Exception {
+        boolean canRunGame = GLContext.getCapabilities().OpenGL20
+                & GLContext.getCapabilities().OpenGL11
+                & GLContext.getCapabilities().OpenGL12
+                & GLContext.getCapabilities().OpenGL14
+                & GLContext.getCapabilities().OpenGL15;
+
+        if (!canRunGame)
+            throw new Exception("Your GPU driver is not supporting the mandatory versions of OpenGL. Considered updating your GPU drivers?");
     }
 
     /**
@@ -198,6 +222,10 @@ public final class Terasology {
         Display.create((PixelFormat) ConfigurationManager.getInstance().getConfig().get("Graphics.pixelFormat"));
     }
 
+    public void initOpenAL() {
+        AudioManager.getInstance();
+    }
+
     /**
      * Init. keyboard and mouse input.
      *
@@ -212,6 +240,7 @@ public final class Terasology {
         Mouse.create();
         Mouse.setGrabbed(true);
     }
+
 
     /**
      * Clean up before exiting the application.
@@ -232,8 +261,8 @@ public final class Terasology {
         ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();
         FontManager.getInstance();
+        BlockShapeManager.getInstance();
         BlockManager.getInstance();
-
         /*
          * Init. OpenGL
          */
@@ -247,7 +276,7 @@ public final class Terasology {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glShadeModel(GL_FLAT);
-   }
+    }
 
     private void resizeViewport() {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
@@ -260,17 +289,20 @@ public final class Terasology {
         getInstance().getLogger().log(Level.INFO, "Starting Terasology...");
 
         IGameMode mode = null;
-        
+        PerformanceMonitor.startActivity("Other");
+
         // MAIN GAME LOOP
         while (_runGame && !Display.isCloseRequested()) {
+            // Only process rendering and updating once a second
             if (!Display.isActive()) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
                 }
+                PerformanceMonitor.startActivity("Process Display");
                 Display.processMessages();
-                continue;
+                PerformanceMonitor.endActivity();
             }
             
             mode = getGameMode();
@@ -279,20 +311,31 @@ public final class Terasology {
               _runGame = false;
               break;
             }
+
+            PerformanceMonitor.startActivity("Main Update");
             long startTime = getTime();
             mode.update();
-            
+            PerformanceMonitor.endActivity();
+            PerformanceMonitor.startActivity("Render");
             mode.render();
+            updateFps();
             Display.update();
+            Display.sync(60);
+            PerformanceMonitor.endActivity();
 
+            PerformanceMonitor.startActivity("Input");
             mode.processKeyboardInput();
             mode.processMouseInput();
             mode.updatePlayerInput();
+            PerformanceMonitor.endActivity();
 
-            Display.sync(60);
 
-            updateFps();
+
+
+            PerformanceMonitor.rollCycle();
+            PerformanceMonitor.startActivity("Other");
             mode.updateTimeAccumulator(getTime(), startTime);
+
             if (Display.wasResized())
                 resizeViewport();
         }
@@ -370,9 +413,10 @@ public final class Terasology {
      */
     private void updateFps() {
         // Measure the delta value and the frames per second
-        _delta = getTime() - _lastLoopTime;
+        long now = getTime();
+        _delta = now - _lastLoopTime;
 
-        _lastLoopTime = getTime();
+        _lastLoopTime = now;
         _lastFpsTime += _delta;
         _fps++;
 
@@ -399,7 +443,7 @@ public final class Terasology {
     }
 
     private void initDefaultLogger() {
-        File dirPath = new File("LOGS");
+        File dirPath = new File("logs");
 
         if (!dirPath.exists()) {
             if (!dirPath.mkdirs()) {
@@ -407,7 +451,7 @@ public final class Terasology {
             }
         }
 
-        addLogFileHandler("LOGS/Terasology.log", Level.INFO);
+        addLogFileHandler("logs/Terasology.log", Level.INFO);
     }
 
     public Logger getLogger() {
@@ -422,8 +466,12 @@ public final class Terasology {
         return getGameMode().getActiveWorldRenderer();
     }
 
-    public WorldProvider getActiveWorldProvider() {
+    public IWorldProvider getActiveWorldProvider() {
         return getGameMode().getActiveWorldRenderer().getWorldProvider();
+    }
+
+    public Player getActivePlayer() {
+        return getGameMode().getActiveWorldRenderer().getPlayer();
     }
 
     /**
@@ -438,8 +486,22 @@ public final class Terasology {
         return (Sys.getTime() * 1000) / _timerTicksPerSecond;
     }
 
-    public ThreadPoolExecutor getThreadPool() {
-        return _threadPool;
+    public void submitTask(final String name, final Runnable task) {
+        _threadPool.execute(new Runnable() {
+            public void run() {
+                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                PerformanceMonitor.startThread(name);
+                try {
+                    task.run();
+                } finally {
+                    PerformanceMonitor.endThread(name);
+                }
+            }
+        });
+    }
+
+    public int activeTasks() {
+        return _threadPool.getActiveCount();
     }
 
     public GroovyManager getGroovyManager() {

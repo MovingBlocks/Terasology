@@ -16,7 +16,7 @@
 package org.terasology.logic.entities;
 
 import org.terasology.model.structures.AABB;
-import org.terasology.rendering.interfaces.RenderableObject;
+import org.terasology.rendering.interfaces.IGameObject;
 
 import javax.vecmath.Vector3d;
 
@@ -25,7 +25,7 @@ import javax.vecmath.Vector3d;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class Entity implements RenderableObject {
+public abstract class Entity implements IGameObject {
 
     private final Vector3d _spawningPoint = new Vector3d();
     private final Vector3d _position = new Vector3d();

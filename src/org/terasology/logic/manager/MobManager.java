@@ -37,6 +37,7 @@ public class MobManager {
 
     /**
      * Default constructor - doesn't do anything yet
+     *
      * @param parent The parent world renderer
      */
     public MobManager(WorldRenderer parent) {

@@ -25,11 +25,12 @@ import org.terasology.logic.generators.GeneratorManager;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.MathHelper;
 import org.xml.sax.InputSource;
 
+import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import java.io.File;
@@ -43,13 +44,13 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class LocalWorldProvider implements WorldProvider {
+public class LocalWorldProvider implements IWorldProvider {
 
     /* WORLD GENERATION */
     protected final GeneratorManager _generatorManager;
 
     /* CHUNK PROVIDER */
-    protected final ChunkProvider _chunkProvider;
+    protected final IChunkProvider _chunkProvider;
 
     /* CONST */
     protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) ConfigurationManager.getInstance().getConfig().get("World.dayNightLengthInMs");
@@ -58,7 +59,6 @@ public class LocalWorldProvider implements WorldProvider {
     /* PROPERTIES */
     protected String _title, _seed;
     protected long _creationTime = Terasology.getInstance().getTime() - (Long) ConfigurationManager.getInstance().getConfig().get("World.initialTimeOffsetInMs");
-    public Vector3d _renderingReferencePoint = new Vector3d();
 
     /* SIMULATORS */
     private final LiquidSimulator _liquidSimulator;
@@ -192,6 +192,7 @@ public class LocalWorldProvider implements WorldProvider {
         c.setState(blockPosX, y, blockPosZ, state);
     }
 
+
     /**
      * Returns the block value at the given position.
      *
@@ -200,6 +201,10 @@ public class LocalWorldProvider implements WorldProvider {
      */
     public final byte getBlockAtPosition(Vector3d pos) {
         return getBlock((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)));
+    }
+
+    public final byte getBlockAtPosition(double x, double y, double z) {
+        return getBlock((int) (x + ((x >= 0) ? 0.5f : -0.5f)), (int) (y + ((y >= 0) ? 0.5f : -0.5f)), (int) (z + ((z >= 0) ? 0.5f : -0.5f)));
     }
 
     /**
@@ -211,6 +216,10 @@ public class LocalWorldProvider implements WorldProvider {
      */
     public final byte getLightAtPosition(Vector3d pos, Chunk.LIGHT_TYPE type) {
         return getLight((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)), type);
+    }
+
+    public final byte getLightAtPosition(double x, double y, double z, Chunk.LIGHT_TYPE type) {
+        return getLight((int) (x + ((x >= 0) ? 0.5f : -0.5f)), (int) (y + ((y >= 0) ? 0.5f : -0.5f)), (int) (z + ((z >= 0) ? 0.5f : -0.5f)), type);
     }
 
     /**
@@ -230,6 +239,10 @@ public class LocalWorldProvider implements WorldProvider {
 
         Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         return c.getBlock(blockPosX, y, blockPosZ);
+    }
+
+    public final byte getBlock(Tuple3i pos) {
+        return getBlock(pos.x, pos.y, pos.z);
     }
 
     public final boolean canBlockSeeTheSky(int x, int y, int z) {
@@ -357,12 +370,27 @@ public class LocalWorldProvider implements WorldProvider {
         return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcBiomeTypeForGlobalPosition(x, z);
     }
 
+    /**
+     * Returns the world save path, including the world's name. Will try to detect and fix quirky path issues (applet thing)
+     *
+     * @return path to save stuff at
+     */
     public String getWorldSavePath() {
-        return String.format("SAVED_WORLDS/%s", _title);
+        String path = String.format("SAVED_WORLDS/%s", _title);
+        // Try to detect if we're getting a screwy save path (usually/always the case with an applet)
+        File f = new File(path);
+        //System.out.println("Suggested absolute save path is: " + f.getAbsolutePath());
+        if (!f.getAbsolutePath().contains("Terasology")) {
+            f = new File(System.getProperty("java.io.tmpdir"), path);
+            //System.out.println("Absolute TEMP save path is: " + f.getAbsolutePath());
+            return f.getAbsolutePath();
+        }
+        return path;
     }
 
     public void setTime(double time) {
-        _creationTime = Terasology.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
+        if (time >= 0.0)
+            _creationTime = Terasology.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
     }
 
     public double getTime() {
@@ -370,7 +398,7 @@ public class LocalWorldProvider implements WorldProvider {
         return (double) msSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
     }
 
-    public ChunkProvider getChunkProvider() {
+    public IChunkProvider getChunkProvider() {
         return _chunkProvider;
     }
 
@@ -396,17 +424,6 @@ public class LocalWorldProvider implements WorldProvider {
 
     public String getSeed() {
         return _seed;
-    }
-
-    /**
-     * Returns the rendering reference point of this world.
-     */
-    public Vector3d getRenderingReferencePoint() {
-        return _renderingReferencePoint;
-    }
-
-    public void setRenderingReferencePoint(Vector3d point) {
-        _renderingReferencePoint = point;
     }
 
     /**

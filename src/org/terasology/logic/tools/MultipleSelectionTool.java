@@ -26,7 +26,7 @@ import java.util.logging.Level;
 /**
  * Simple selection tool. Can be used to select multiple blocks at once.
  */
-public class MultipleSelectionTool implements Tool {
+public class MultipleSelectionTool implements ITool {
 
     private final Player _player;
     private final ArrayList<BlockPosition> _vertexBlocks = new ArrayList<BlockPosition>();

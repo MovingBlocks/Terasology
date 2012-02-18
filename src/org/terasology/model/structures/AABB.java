@@ -95,6 +95,48 @@ public class AABB {
         return r;
     }
 
+    public Vector3d getFirstHitPlane(Vector3d direction, Vector3d pos, Vector3d dimensions, boolean testX, boolean testY, boolean testZ) {
+        Vector3d hitNormal = new Vector3d();
+
+        double dist = Double.POSITIVE_INFINITY;
+        
+        if (testX) {
+            double distX;
+            if (direction.x > 0) {
+                distX = (_position.x - pos.x - dimensions.x - _dimensions.x) / direction.x;
+            } else {
+                distX = (_position.x - pos.x + dimensions.x + _dimensions.x) / direction.x;
+            }
+            if (distX >= 0 && distX < dist) {
+                hitNormal.set(Math.copySign(1,direction.x),0,0);
+            }
+        }
+        if (testY) {
+            double distY;
+            if (direction.y > 0) {
+                distY = (_position.y - pos.y - dimensions.y - _dimensions.y) / direction.y;
+            } else {
+                distY = (_position.y - pos.y + dimensions.y + _dimensions.y) / direction.y;
+            }
+            if (distY >= 0 && distY < dist) {
+                hitNormal.set(0,Math.copySign(1,direction.y),0);
+            }
+        }
+        if (testZ) {
+            double distZ;
+            if (direction.z > 0) {
+                distZ = (_position.z - pos.z - dimensions.z - _dimensions.z) / direction.z;
+            } else {
+                distZ = (_position.z - pos.z + dimensions.z + _dimensions.z) / direction.z;
+            }
+            if (distZ >= 0 && distZ < dist) {
+                hitNormal.set(0,0,Math.copySign(1,direction.z));
+            }
+        }
+        return hitNormal;
+
+    }
+
     /**
      * Returns the normal of the plane closest to the given origin.
      *
@@ -187,32 +229,42 @@ public class AABB {
     /**
      * Renders this AABB.
      * <p/>
+     *
      * @param lineThickness The thickness of the line
      */
     public void render(float lineThickness) {
-        glLineWidth(lineThickness);
-
         glPushMatrix();
-        Vector3d rp = Terasology.getInstance().getActiveWorldProvider().getRenderingReferencePoint();
-        glTranslated(getPosition().x - rp.x, getPosition().y - rp.y, getPosition().z - rp.z);
+        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+        glTranslated(getPosition().x - playerPosition.x, -playerPosition.y, getPosition().z - playerPosition.z);
 
+        renderLocally(lineThickness);
+
+        glPopMatrix();
+    }
+
+    public void renderLocally(float lineThickness) {
         if (_displayListWire == -1) {
             generateDisplayListWire();
         }
 
+        glPushMatrix();
+        glTranslated(0f, getPosition().y, 0f);
+
+        glLineWidth(lineThickness);
         glCallList(_displayListWire);
 
         glPopMatrix();
     }
 
-    public void renderSolid() {
-        glPushMatrix();
-        Vector3d rp = Terasology.getInstance().getActiveWorldProvider().getRenderingReferencePoint();
-        glTranslated(getPosition().x - rp.x, getPosition().y - rp.y, getPosition().z - rp.z);
-
+    public void renderSolidLocally() {
         if (_displayListSolid == -1) {
             generateDisplayListSolid();
         }
+
+        glPushMatrix();
+
+        glTranslated(0f, getPosition().y, 0f);
+        glScalef(1.5f, 1.5f, 1.5f);
 
         glCallList(_displayListSolid);
 
@@ -353,4 +405,5 @@ public class AABB {
     public void setPosition(Vector3d position) {
         _position.set(position);
     }
+
 }

@@ -15,7 +15,7 @@
  */
 package org.terasology.model.blueprints;
 
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.structures.BlockPosition;
 
@@ -41,7 +41,7 @@ public class Blueprint {
      * @param provider The world the blueprint should be build in
      * @param position The position the blueprint should be build
      */
-    public void build(WorldProvider provider, BlockPosition position) {
+    public void build(IWorldProvider provider, BlockPosition position) {
         for (BlockPosition bp : _blockPositions) {
             provider.setBlock(bp.x + position.x, bp.y + position.y, bp.z + position.z, _blockTypes.get(bp).getId(), true, true);
         }

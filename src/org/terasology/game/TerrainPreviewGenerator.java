@@ -39,6 +39,7 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
 
     /**
      * Init. the generator with a given seed value.
+     *
      * @param generatorManager The generator manager
      */
     public TerrainPreviewGenerator(GeneratorManager generatorManager) {

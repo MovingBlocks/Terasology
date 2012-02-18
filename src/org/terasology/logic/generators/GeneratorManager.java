@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.generators;
 
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IWorldProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,13 +25,13 @@ import java.util.HashMap;
  */
 public class GeneratorManager {
 
-    private final WorldProvider _parent;
+    private final IWorldProvider _parent;
 
     /* WORLD GENERATION */
     protected final ArrayList<ChunkGenerator> _chunkGenerators = new ArrayList<ChunkGenerator>(8);
     protected final HashMap<ChunkGeneratorTerrain.BIOME_TYPE, ArrayList<TreeGenerator>> _treeGenerators = new HashMap<ChunkGeneratorTerrain.BIOME_TYPE, ArrayList<TreeGenerator>>(8);
 
-    public GeneratorManager(WorldProvider parent) {
+    public GeneratorManager(IWorldProvider parent) {
         _parent = parent;
 
         // Init. static generators
@@ -95,7 +95,7 @@ public class GeneratorManager {
         return list.get(id);
     }
 
-    public WorldProvider getParent() {
+    public IWorldProvider getParent() {
         return _parent;
     }
 

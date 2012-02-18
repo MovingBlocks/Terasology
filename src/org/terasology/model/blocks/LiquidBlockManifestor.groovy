@@ -1,5 +1,7 @@
 package org.terasology.model.blocks
 
+import org.terasology.utilities.ClasspathResourceLoader
+
 /*
  * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
  *
@@ -24,6 +26,11 @@ package org.terasology.model.blocks
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 class LiquidBlockManifestor extends BlockManifestor {
+
+    public LiquidBlockManifestor(ClasspathResourceLoader loader) {
+        _resourceLoader = loader;
+        fixSavePaths()
+    }
 
     /**
      * The Block class this Manifestor loads & prepares (so BlockManifestor.loadBlockDefinitions can be generic)

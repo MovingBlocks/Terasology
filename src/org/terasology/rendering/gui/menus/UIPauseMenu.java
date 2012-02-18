@@ -20,7 +20,7 @@ import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
-import org.terasology.rendering.gui.framework.UIClickListener;
+import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
@@ -55,28 +55,18 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
-        _exitButton.addClickListener(new UIClickListener() {
+        _exitButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 Terasology.getInstance().exit();
             }
         });
 
-       // _newWorldButton = new UIButton(new Vector2f(256f, 32f));
-      //  _newWorldButton.getLabel().setText("Create New World");
-     //   _newWorldButton.setVisible(true);
-//
-      //  _newWorldButton.addClickListener(new UIClickListener() {
-            /*public void clicked(UIDisplayElement element) {
-                setVisible(false);
-                Terasology.getInstance().initWorld();
-            }
-        });*/
 
         _respawnButton = new UIButton(new Vector2f(256f, 32f));
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.setVisible(true);
 
-        _respawnButton.addClickListener(new UIClickListener() {
+        _respawnButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
                 Terasology.getInstance().getActiveWorldRenderer().getPlayer().respawn();

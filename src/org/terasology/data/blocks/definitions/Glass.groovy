@@ -6,4 +6,5 @@ package org.terasology.data.blocks.definitions
 block {
     version = 1
     translucent = true
+    shape = "cube"
 }

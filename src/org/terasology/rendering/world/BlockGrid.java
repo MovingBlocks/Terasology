@@ -16,11 +16,12 @@
 package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.game.Terasology;
 import org.terasology.model.structures.BlockPosition;
-import org.terasology.rendering.interfaces.RenderableObject;
+import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.MeshCollection;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
@@ -33,7 +34,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockGrid implements RenderableObject {
+public class BlockGrid implements IGameObject {
 
     /* CONST */
     private final Mesh _mesh;
@@ -44,9 +45,9 @@ public class BlockGrid implements RenderableObject {
     public BlockGrid(WorldRenderer parent) {
         _parent = parent;
 
-        MeshCollection.addBlockMesh(new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
-        _mesh = Tessellator.getInstance().generateMesh();
-        Tessellator.getInstance().resetAll();
+        Tessellator tessellator = new Tessellator();
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
+        _mesh = tessellator.generateMesh();
     }
 
     public void render() {
@@ -63,8 +64,8 @@ public class BlockGrid implements RenderableObject {
             for (BlockPosition gp : _gridPositions) {
                 GL11.glPushMatrix();
 
-                Vector3d r = _parent.getWorldProvider().getRenderingReferencePoint();
-                GL11.glTranslated(gp.x - r.x, gp.y - r.y, gp.z - r.z);
+                Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+                GL11.glTranslated(gp.x - playerPosition.x, gp.y - playerPosition.y, gp.z - playerPosition.z);
 
                 _mesh.render();
 

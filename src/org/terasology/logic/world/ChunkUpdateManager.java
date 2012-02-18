@@ -26,7 +26,7 @@ import java.util.HashSet;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class ChunkUpdateManager implements BlockObserver {
+public final class ChunkUpdateManager implements IBlockObserver {
 
     public enum UPDATE_TYPE {
         DEFAULT, PLAYER_TRIGGERED
@@ -68,15 +68,17 @@ public final class ChunkUpdateManager implements BlockObserver {
             }
         };
 
-        Terasology.getInstance().getThreadPool().execute(r);
+        Terasology.getInstance().submitTask("Chunk Update", r);
     }
 
-    public void blockPlaced(Chunk chunk, BlockPosition pos) {
-        queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_TRIGGERED);
+    public void blockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
+        if (update)
+            queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_TRIGGERED);
     }
 
-    public void blockRemoved(Chunk chunk, BlockPosition pos) {
-        queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_TRIGGERED);
+    public void blockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
+        if (update)
+            queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_TRIGGERED);
     }
 
 }

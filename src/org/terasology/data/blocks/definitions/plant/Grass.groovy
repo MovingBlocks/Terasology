@@ -11,7 +11,7 @@ import org.terasology.model.blocks.Block.COLOR_SOURCE
 block {
     // Serialization (if it ever makes sense)
     version = 1
-
+    shape = "Cube"
     // Grass is actually a solid grass-covered block, so it is OK to attach stuff to it
     allowBlockAttachment = true
 

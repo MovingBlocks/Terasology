@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.manager;
 
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.blueprints.Blueprint;
 import org.terasology.model.structures.BlockPosition;
 
@@ -46,7 +46,7 @@ public class BlueprintManager {
      * @param blockPositions List of block positions
      * @return The final blueprint
      */
-    public Blueprint generateBlueprint(WorldProvider provider, Collection<BlockPosition> blockPositions) {
+    public Blueprint generateBlueprint(IWorldProvider provider, Collection<BlockPosition> blockPositions) {
         Blueprint result = new Blueprint();
 
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;

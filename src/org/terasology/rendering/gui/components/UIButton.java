@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.components;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.rendering.gui.framework.UIClickListener;
+import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -32,7 +32,7 @@ import java.util.ArrayList;
  */
 public class UIButton extends UIDisplayContainer {
 
-    private final ArrayList<UIClickListener> _clickListeners = new ArrayList<UIClickListener>();
+    private final ArrayList<IClickListener> _clickListeners = new ArrayList<IClickListener>();
 
     private final UIGraphicsElement _defaultTexture;
     private final UIText _label;
@@ -48,6 +48,8 @@ public class UIButton extends UIDisplayContainer {
         _label = new UIText("Untitled");
         _label.setVisible(true);
         addDisplayElement(_label);
+
+        update();
     }
 
     @Override
@@ -96,11 +98,11 @@ public class UIButton extends UIDisplayContainer {
         return _label;
     }
 
-    public void addClickListener(UIClickListener listener) {
+    public void addClickListener(IClickListener listener) {
         _clickListeners.add(listener);
     }
 
-    public void removeClickListener(UIClickListener listener) {
+    public void removeClickListener(IClickListener listener) {
         _clickListeners.remove(listener);
     }
 }

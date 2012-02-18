@@ -40,7 +40,7 @@ public abstract class TreeGenerator {
     /**
      * Generates a tree at the given position.
      *
-     * @param rand  The random generator
+     * @param rand   The random generator
      * @param posX   Position on the x-axis
      * @param posY   Position on the y-axis
      * @param posZ   Position on the z-axis

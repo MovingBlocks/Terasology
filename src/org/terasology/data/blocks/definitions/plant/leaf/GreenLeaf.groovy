@@ -8,10 +8,10 @@ import org.terasology.model.blocks.Block.COLOR_SOURCE
  */
 block {
     version = 1
-
+    shape = "Cube"
     translucent = true
 
-    hardness = 2
+    hardness = 1
 
     colorsource = COLOR_SOURCE.FOLIAGE_LUT
 }

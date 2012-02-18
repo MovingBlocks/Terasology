@@ -11,17 +11,17 @@ import org.lwjgl.opengl.Display;
 
 
 //GUI
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.menus.UIHeadsUpDisplay;
-import org.terasology.rendering.gui.menus.UIInventoryScreen;
-import org.terasology.rendering.gui.menus.UIPauseMenu;
-import org.terasology.rendering.gui.menus.UIStatusScreen;
+import org.terasology.rendering.gui.menus.*;
 
 import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+
+import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ConfigurationManager;
@@ -40,11 +40,13 @@ import static org.lwjgl.opengl.GL11.*;
 public class ModePlayGame implements IGameMode{
   
   //GUI
-  private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
-  private UIPauseMenu        _pauseMenu;
-  private UIStatusScreen     _statusScreen;
-  private UIInventoryScreen  _inventoryScreen;
-  private UIHeadsUpDisplay   _hud;
+    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
+    private UIHeadsUpDisplay _hud;
+    private UIMetrics _metrics;
+    private UIPauseMenu _pauseMenu;
+    private UILoadingScreen _loadingScreen;
+    private UIStatusScreen _statusScreen;
+    private UIInventoryScreen _inventoryScreen;
   
   /* CONST */
   private static final int TICKS_PER_SECOND = 60;
@@ -71,17 +73,22 @@ public class ModePlayGame implements IGameMode{
   public void init(){
     _gameInstance = Terasology.getInstance();
             
-   _hud = new UIHeadsUpDisplay();
-   _hud.setVisible(true);
+    _hud = new UIHeadsUpDisplay();
+    _hud.setVisible(true);
 
-   _pauseMenu    = new UIPauseMenu();
-   _statusScreen = new UIStatusScreen();
-   _inventoryScreen = new UIInventoryScreen();
+    _pauseMenu = new UIPauseMenu();
+    _loadingScreen = new UILoadingScreen();
+    _statusScreen = new UIStatusScreen();
+    _inventoryScreen = new UIInventoryScreen();
+    _metrics = new UIMetrics();
+    _metrics.setVisible(true);
 
-   _guiScreens.add(_hud);
-   _guiScreens.add(_pauseMenu);
-   _guiScreens.add(_statusScreen);
-   _guiScreens.add(_inventoryScreen);
+    _guiScreens.add(_metrics);
+    _guiScreens.add(_hud);
+    _guiScreens.add(_pauseMenu);
+    _guiScreens.add(_loadingScreen);
+    _guiScreens.add(_inventoryScreen);
+    _guiScreens.add(_statusScreen);
    
     String worldSeed = (String) ConfigurationManager.getInstance().getConfig().get("World.defaultSeed");
 
@@ -192,13 +199,14 @@ public class ModePlayGame implements IGameMode{
   private void simulateWorld(int duration) {
       long timeBefore = _gameInstance.getTime();
 
-      _statusScreen.setVisible(true);
+      _loadingScreen.setVisible(true);
       _hud.setVisible(false);
+      _metrics.setVisible(false);
 
       float diff = 0;
 
       while (diff < duration) {
-          _statusScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
+          _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
 
           renderUserInterface();
           updateUserInterface();
@@ -210,8 +218,9 @@ public class ModePlayGame implements IGameMode{
           diff = _gameInstance.getTime() - timeBefore;
       }
 
-      _statusScreen.setVisible(false);
-      _hud.setVisible(true);
+    _loadingScreen.setVisible(false);
+    _hud.setVisible(true);
+    _metrics.setVisible(true);
   }
   
   public void render(){
@@ -221,8 +230,9 @@ public class ModePlayGame implements IGameMode{
     if (_activeWorldRenderer != null){
       _activeWorldRenderer.render();
     }
-    
+    PerformanceMonitor.startActivity("Render UI");
     renderUserInterface();
+    PerformanceMonitor.endActivity();
   }
   
   public void renderUserInterface() {
@@ -245,39 +255,60 @@ public class ModePlayGame implements IGameMode{
    * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
    */
   public void processKeyboardInput() {
-      while (Keyboard.next()) {
-          int key = Keyboard.getEventKey();
+        boolean debugEnabled = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
 
-          if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-              if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                  togglePauseMenu();
-              }
+        while (Keyboard.next()) {
+            int key = Keyboard.getEventKey();
 
-              if (key == Keyboard.KEY_I && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                  toggleInventory();
-              }
+            if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_ESCAPE) {
+                    togglePauseMenu();
+                }
 
-              if (key == Keyboard.KEY_F3 && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                  ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", !(Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug"));
-              }
+                if (key == Keyboard.KEY_I) {
+                    toggleInventory();
+                }
 
-              if (key == Keyboard.KEY_F && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                  toggleViewingDistance();
-              }
+                if (key == Keyboard.KEY_F3) {
+                    ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", debugEnabled = !(debugEnabled));
+                }
 
-              // Pass input to focused GUI element
-              for (UIDisplayElement screen : _guiScreens) {
-                  if (screenCanFocus(screen)) {
-                      screen.processKeyboardInput(key);
-                  }
-              }
-          }
+                if (key == Keyboard.KEY_F) {
+                    toggleViewingDistance();
+                }
 
-          // Pass input to the current player
-          if (!screenHasFocus())
-              _activeWorldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
-      }
-  }
+                // Pass input to focused GUI element
+                for (UIDisplayElement screen : _guiScreens) {
+                    if (screenCanFocus(screen)) {
+                        screen.processKeyboardInput(key);
+                    }
+                }
+            }
+
+            // Features for debug mode only
+            if (debugEnabled) {
+                if (key == Keyboard.KEY_UP && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.005);
+                }
+
+                if (key == Keyboard.KEY_DOWN && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.005);
+                }
+
+                if (key == Keyboard.KEY_RIGHT && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.02);
+                }
+
+                if (key == Keyboard.KEY_LEFT && Keyboard.getEventKeyState()) {
+                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
+                }
+            }
+
+            // Pass input to the current player
+            if (!screenHasFocus())
+                _activeWorldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
+        }
+    }
   
 
   /*
@@ -350,6 +381,10 @@ public class ModePlayGame implements IGameMode{
 
   public boolean isGamePaused() {
       return _pauseGame;
+  }
+
+  public IWorldProvider getActiveWorldProvider() {
+        return _activeWorldRenderer.getWorldProvider();
   }
   
  

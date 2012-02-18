@@ -17,8 +17,8 @@ package org.terasology.logic.simulators;
 
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 
 import javax.vecmath.Vector3d;
@@ -34,8 +34,8 @@ public class GrowthSimulator extends Simulator {
     private static final byte DIRT_TYPE = BlockManager.getInstance().getBlock("Dirt").getId();
     private static final byte GRASS_TYPE = BlockManager.getInstance().getBlock("Grass").getId();
 
-    public GrowthSimulator(WorldProvider parent) {
-        super(parent, 1000);
+    public GrowthSimulator(IWorldProvider parent) {
+        super("Growth", parent, 1000);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class GrowthSimulator extends Simulator {
         return true;
     }
 
-    public void blockPlaced(Chunk chunk, BlockPosition pos) {
+    public void blockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
         if (_parent.getBlock(pos.x, pos.y, pos.z) == DIRT_TYPE) {
             addActiveBlock(pos);
         }
@@ -97,7 +97,7 @@ public class GrowthSimulator extends Simulator {
         }
     }
 
-    public void blockRemoved(Chunk chunk, BlockPosition pos) {
+    public void blockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
         for (int i = 0; i < 6; i++) {
             BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].y, pos.z + (int) NEIGHBORS6[i].z);
 

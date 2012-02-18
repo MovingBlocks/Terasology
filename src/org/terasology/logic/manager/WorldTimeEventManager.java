@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.manager;
 
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.logic.world.WorldTimeEvent;
 
 import java.util.ArrayList;
@@ -26,9 +26,9 @@ import java.util.ArrayList;
 public class WorldTimeEventManager {
 
     protected final ArrayList<WorldTimeEvent> _worldTimeEvents = new ArrayList<WorldTimeEvent>();
-    protected final WorldProvider _parent;
+    protected final IWorldProvider _parent;
 
-    public WorldTimeEventManager(WorldProvider parent) {
+    public WorldTimeEventManager(IWorldProvider parent) {
         _parent = parent;
     }
 

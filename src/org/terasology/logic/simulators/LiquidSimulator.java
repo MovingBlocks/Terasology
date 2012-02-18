@@ -16,9 +16,9 @@
 package org.terasology.logic.simulators;
 
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 
 import javax.vecmath.Vector3d;
@@ -35,8 +35,8 @@ public class LiquidSimulator extends Simulator {
     private static final Vector3d[] NEIGHBORS4 = {new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
     private static final Vector3d[] NEIGHBORS6 = {new Vector3d(0, -1, 0), new Vector3d(0, 1, 0), new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
 
-    public LiquidSimulator(WorldProvider parent) {
-        super(parent, 1000);
+    public LiquidSimulator(IWorldProvider parent) {
+        super("Liquid", parent, 1000);
     }
 
     @Override
@@ -115,14 +115,23 @@ public class LiquidSimulator extends Simulator {
         return simulated;
     }
 
-    public void blockPlaced(Chunk chunk, BlockPosition pos) {
+    @Override
+    public void addActiveBlock(BlockPosition bp) {
+        // Make sure only liquids can be added to the generator
+        Block b = BlockManager.getInstance().getBlock(_parent.getBlock(bp.x, bp.y, bp.z));
+        if (b.isLiquid()) {
+            super.addActiveBlock(bp);
+        }
+    }
+
+    public void blockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
         if (BlockManager.getInstance().getBlock(_parent.getBlock(pos.x, pos.y, pos.z)).isLiquid()) {
             chunk.setState(pos.x, pos.y, pos.z, (byte) 1);
             addActiveBlock(pos);
         }
     }
 
-    public void blockRemoved(Chunk chunk, BlockPosition pos) {
+    public void blockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
         for (int i = 0; i < 6; i++) {
             BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].y, pos.z + (int) NEIGHBORS6[i].z);
 

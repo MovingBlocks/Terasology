@@ -16,44 +16,72 @@
 package org.terasology.logic.simulators;
 
 import org.terasology.game.Terasology;
-import org.terasology.logic.world.BlockObserver;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IBlockObserver;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.structures.BlockPosition;
 
 import java.util.HashSet;
 
 /**
- * TODO
+ * Base class for all simulators.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class Simulator implements BlockObserver {
+public abstract class Simulator implements IBlockObserver {
 
+    private final String _name;
     private boolean _running = false;
 
     protected final long _updateInterval;
     protected long _lastUpdate = Terasology.getInstance().getTime();
 
-    protected final WorldProvider _parent;
+    protected final IWorldProvider _parent;
     protected final HashSet<BlockPosition> _activeBlocks = new HashSet<BlockPosition>(256);
 
-    public Simulator(WorldProvider parent, long updateInterval) {
+    public Simulator(String name, IWorldProvider parent, long updateInterval) {
         _updateInterval = updateInterval;
         _parent = parent;
+        _name = name;
     }
 
-    public Simulator(WorldProvider parent) {
-        this(parent, 1000);
+    public Simulator(String name, IWorldProvider parent) {
+        this(name, parent, 1000);
     }
 
     public void addActiveBlock(BlockPosition bp) {
         _activeBlocks.add(bp);
     }
 
+
+    public void simulateAll() {
+        if (_running)
+            return;
+
+        _running = true;
+
+        // Create a new thread and start processing
+        Runnable r = new Runnable() {
+            public void run() {
+                int counter = 0;
+
+                while (executeSimulation() && counter < 1024) {
+                    counter++;
+                }
+
+                _running = false;
+            }
+        };
+
+        Terasology.getInstance().submitTask(_name + "Complete", r);
+    }
+
     public boolean simulate(boolean force) {
+        if (_running)
+            return false;
+
         long currentTime = Terasology.getInstance().getTime();
 
-        if ((currentTime > _lastUpdate + _updateInterval || force) && !_running) {
+        if ((currentTime > _lastUpdate + _updateInterval || force)) {
 
             _running = true;
 
@@ -65,7 +93,7 @@ public abstract class Simulator implements BlockObserver {
                 }
             };
 
-            Terasology.getInstance().getThreadPool().execute(r);
+            Terasology.getInstance().submitTask(_name, r);
 
             _lastUpdate = currentTime;
             return true;

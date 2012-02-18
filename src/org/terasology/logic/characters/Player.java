@@ -16,21 +16,20 @@
  */
 package org.terasology.logic.characters;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.manager.ToolManager;
-import org.terasology.logic.tools.Tool;
-import org.terasology.logic.world.BlockObserver;
+import org.terasology.logic.tools.ITool;
 import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.IBlockObserver;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.Inventory;
 import org.terasology.model.inventory.Item;
 import org.terasology.model.inventory.ItemBlock;
@@ -38,19 +37,18 @@ import org.terasology.model.inventory.Toolbar;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.FirstPersonCamera;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.MeshCollection;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -67,16 +65,18 @@ public final class Player extends Character {
     /* CONSTANT VALUES */
     private static final double MOUSE_SENS = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
     private static final boolean DEMO_FLIGHT = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight");
+    private static final double DEMO_FLIGHT_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlightSpeed");
     private static final boolean GOD_MODE = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
     private static final boolean CAMERA_BOBBING = (Boolean) ConfigurationManager.getInstance().getConfig().get("Player.cameraBobbing");
 
+    private static final boolean RENDER_FIRST_PERSON_VIEW = (Boolean) ConfigurationManager.getInstance().getConfig().get("Player.renderFirstPersonView");
     private static final double WALKING_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
     private static final boolean SHOW_PLACING_BOX = (Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox");
     private static final double RUNNING_FACTOR = (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor");
     private static final double JUMP_INTENSITY = (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity");
 
     /* OBSERVERS */
-    private final ArrayList<BlockObserver> _observers = new ArrayList<BlockObserver>();
+    private final ArrayList<IBlockObserver> _observers = new ArrayList<IBlockObserver>();
 
     /* CAMERA */
     private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
@@ -103,7 +103,7 @@ public final class Player extends Character {
     private final ToolManager _toolManager = new ToolManager(this);
 
     public Player(WorldRenderer parent) {
-        super(parent, WALKING_SPEED, RUNNING_FACTOR, JUMP_INTENSITY);
+        super(parent, WALKING_SPEED, RUNNING_FACTOR, JUMP_INTENSITY, true);
 
         // Set the default value for the god mode
         _godMode = GOD_MODE;
@@ -128,6 +128,7 @@ public final class Player extends Character {
     public void update() {
         _walkingSpeed = WALKING_SPEED;
 
+        PerformanceMonitor.startActivity("Player Camera");
         if (_activeCamera != null) {
             _activeCamera.update();
 
@@ -138,6 +139,7 @@ public final class Player extends Character {
                 _activeCamera.resetFov();
             }
         }
+        PerformanceMonitor.endActivity();
 
         // Speedup if the player is playing god
         if (_godMode) {
@@ -152,8 +154,11 @@ public final class Player extends Character {
 
         super.update();
 
+        PerformanceMonitor.startActivity("Player Select Block");
         _selectedBlock = calcSelectedBlock();
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Player Death Check");
         // Respawn the player after a certain amount of time
         if (isDead() && _timeOfDeath == -1) {
             _timeOfDeath = Terasology.getInstance().getTime();
@@ -162,6 +167,7 @@ public final class Player extends Character {
             respawn();
             _timeOfDeath = -1;
         }
+        PerformanceMonitor.endActivity();
     }
 
     /**
@@ -175,7 +181,7 @@ public final class Player extends Character {
             return;
         }
 
-        Tool activeTool = getActiveTool();
+        ITool activeTool = getActiveTool();
 
         if (activeTool != null) {
             // Check if one of the mouse buttons is pressed
@@ -201,6 +207,9 @@ public final class Player extends Character {
     }
 
     public void renderFirstPersonViewElements() {
+        if (!RENDER_FIRST_PERSON_VIEW)
+            return;
+
         if (getActiveItem() != null) {
             if (getActiveItem().renderFirstPersonView()) {
                 return;
@@ -253,7 +262,7 @@ public final class Player extends Character {
     public void updatePosition() {
         // DEMO MODE
         if (DEMO_FLIGHT) {
-            getPosition().z -= 0.2f;
+            getPosition().z -= DEMO_FLIGHT_SPEED;
 
             int maxHeight = _parent.maxHeightAt((int) getPosition().x, (int) getPosition().z + 8) + 16;
 
@@ -289,7 +298,9 @@ public final class Player extends Character {
                     blockPosY = (int) (getPosition().y + (getPosition().y >= 0 ? 0.5f : -0.5f)) + y;
                     blockPosZ = (int) (getPosition().z + (getPosition().z >= 0 ? 0.5f : -0.5f)) + z;
 
+                    PerformanceMonitor.startActivity("Player Get Block");
                     byte blockType = _parent.getWorldProvider().getBlock(blockPosX, blockPosY, blockPosZ);
+                    PerformanceMonitor.endActivity();
 
                     // Ignore special blocks
                     if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
@@ -297,11 +308,14 @@ public final class Player extends Character {
                     }
 
                     // The ray originates from the "player's eye"
+                    PerformanceMonitor.startActivity("Player Intersect Block");
                     ArrayList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent.getWorldProvider(), blockPosX, blockPosY, blockPosZ, calcEyePosition(), _viewingDirection);
+
 
                     if (iss != null) {
                         inters.addAll(iss);
                     }
+                    PerformanceMonitor.endActivity();
                 }
             }
         }
@@ -309,10 +323,12 @@ public final class Player extends Character {
         /**
          * Calculated the closest intersection.
          */
+        PerformanceMonitor.startActivity("Player sort intersects");
         if (inters.size() > 0) {
             Collections.sort(inters);
             return inters.get(0);
         }
+        PerformanceMonitor.endActivity();
 
         return null;
     }
@@ -458,9 +474,9 @@ public final class Player extends Character {
             Vector2f texPos = new Vector2f(0.0f, 0.0f);
             Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
 
-            MeshCollection.addBlockMesh(new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
-            _overlayMesh = Tessellator.getInstance().generateMesh();
-            Tessellator.getInstance().resetAll();
+            Tessellator tessellator = new Tessellator();
+            TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+            _overlayMesh = tessellator.generateMesh();
         }
 
         glMatrixMode(GL_TEXTURE);
@@ -488,19 +504,6 @@ public final class Player extends Character {
         TextureManager.getInstance().bindTexture("char");
         ShaderManager.getInstance().enableShader("block");
 
-        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
-        GL20.glUniform1f(light, _parent.getRenderingLightValueAt(getPosition()));
-
-        // Make sure the hand is not affected by the biome color. ZOMBIES!!!!
-        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
-        colorBuffer.put(1.0f);
-        colorBuffer.put(1.0f);
-        colorBuffer.put(1.0f);
-        colorBuffer.flip();
-
-        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
-        GL20.glUniform3(colorOffset, colorBuffer);
-
         glPushMatrix();
         glTranslatef(0.8f, -1.1f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.0f - _handMovementAnimationOffset * 0.5f);
         glRotatef(-45f - _handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
@@ -512,9 +515,9 @@ public final class Player extends Character {
             Vector2f texPos = new Vector2f(40.0f * 0.015625f, 32.0f * 0.03125f);
             Vector2f texWidth = new Vector2f(4.0f * 0.015625f, -12.0f * 0.03125f);
 
-            MeshCollection.addBlockMesh(new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
-            _handMesh = Tessellator.getInstance().generateMesh();
-            Tessellator.getInstance().resetAll();
+            Tessellator tessellator = new Tessellator();
+            TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
+            _handMesh = tessellator.generateMesh();
         }
 
         _handMesh.render();
@@ -531,19 +534,19 @@ public final class Player extends Character {
         return getToolbar().getItemForSelectedSlot();
     }
 
-    public Block getActiveBlock() {
+    public BlockGroup getActiveBlock() {
         Item item = getActiveItem();
 
         if (item != null) {
             if (item.getClass() == ItemBlock.class) {
-                return BlockManager.getInstance().getBlock(((ItemBlock) getActiveItem()).getBlockId());
+                return ((ItemBlock) getActiveItem()).getBlockGroup();
             }
         }
 
         return null;
     }
 
-    public Tool getActiveTool() {
+    public ITool getActiveTool() {
         if (getActiveItem() != null) {
             return _toolManager.getToolForIndex(getActiveItem().getToolId());
         }
@@ -568,26 +571,22 @@ public final class Player extends Character {
         return _activeCamera;
     }
 
-    public void registerObserver(BlockObserver observer) {
+    public void registerObserver(IBlockObserver observer) {
         _observers.add(observer);
     }
 
-    public void unregisterObserver(BlockObserver observer) {
+    public void unregisterObserver(IBlockObserver observer) {
         _observers.remove(observer);
     }
 
-    public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos) {
-        for (BlockObserver ob : _observers)
-            ob.blockPlaced(chunk, pos);
-
-        BulletPhysicsRenderer.getInstance().blockPlaced(chunk, pos);
+    public void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
+        for (IBlockObserver ob : _observers)
+            ob.blockPlaced(chunk, pos, update);
     }
 
-    public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos) {
-        for (BlockObserver ob : _observers)
-            ob.blockRemoved(chunk, pos);
-
-        BulletPhysicsRenderer.getInstance().blockRemoved(chunk, pos);
+    public void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
+        for (IBlockObserver ob : _observers)
+            ob.blockRemoved(chunk, pos, update);
     }
 
     public Inventory getInventory() {
@@ -628,11 +627,10 @@ public final class Player extends Character {
 
     public boolean isCarryingTorch() {
         if (getActiveBlock() != null) {
-            if (getActiveBlock().getLuminance() > 0)
+            if (getActiveBlock().getArchetypeBlock().getLuminance() > 0)
                 return true;
         }
 
         return false;
     }
-
 }

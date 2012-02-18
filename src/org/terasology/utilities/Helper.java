@@ -15,12 +15,23 @@
  */
 package org.terasology.utilities;
 
+import org.lwjgl.BufferUtils;
+
+import javax.vecmath.Matrix4f;
+import java.nio.FloatBuffer;
+
+import static org.lwjgl.opengl.GL11.glGetFloat;
+
 /**
  * A simple helper class for various tasks.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class Helper {
+
+    // Prevent instantiation
+    private Helper() {
+    }
 
     /**
      * Returns true if the flag at the given byte position
@@ -43,5 +54,25 @@ public final class Helper {
      */
     public static byte setFlag(byte value, short index) {
         return (byte) (value | (1 << index));
+    }
+
+    public static void readMatrix(int type, Matrix4f target) {
+        FloatBuffer matrix = BufferUtils.createFloatBuffer(16);
+        glGetFloat(type, matrix);
+
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                target.setElement(j, i, matrix.get());
+    }
+
+    public static FloatBuffer matrixToBuffer(Matrix4f mat) {
+        FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                matrixBuffer.put(mat.getElement(j, i));
+
+        matrixBuffer.flip();
+        return matrixBuffer;
     }
 }

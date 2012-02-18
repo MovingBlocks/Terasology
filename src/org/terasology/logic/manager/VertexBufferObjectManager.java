@@ -46,9 +46,11 @@ public class VertexBufferObjectManager {
         return buffer;
     }
 
-    public synchronized Integer getVboId() {
-        for (int i = _vertexBufferObjectPool.size() - 1; i >= 0; i--)
-            GL15.glDeleteBuffers(_vertexBufferObjectPool.removeAt(i));
+    public synchronized int getVboId() {
+        while (_vertexBufferObjectPool.size() > 0) {
+            int id = _vertexBufferObjectPool.removeAt(_vertexBufferObjectPool.size() - 1);
+            GL15.glDeleteBuffers(id);
+        }
 
         return createVbos(1).get(0);
     }

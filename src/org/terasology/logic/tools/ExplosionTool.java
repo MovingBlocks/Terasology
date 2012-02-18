@@ -17,8 +17,9 @@ package org.terasology.logic.tools;
 
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 
@@ -28,12 +29,10 @@ import javax.vecmath.Vector3f;
 /**
  * Creates an explosion originating from the currently selected block of the player.
  */
-public class ExplosionTool implements Tool {
-
-    private final Player _player;
+public class ExplosionTool extends SimpleTool {
 
     public ExplosionTool(Player player) {
-        _player = player;
+        super(player);
     }
 
     public void executeLeftClickAction() {
@@ -45,19 +44,20 @@ public class ExplosionTool implements Tool {
     }
 
     public void explode() {
-        WorldProvider worldProvider = _player.getParent().getWorldProvider();
+        IWorldProvider worldProvider = _player.getParent().getWorldProvider();
 
         if (_player.getSelectedBlock() != null) {
             BlockPosition blockPos = _player.getSelectedBlock().getBlockPosition();
             Vector3d origin = blockPos.toVector3d();
 
-            int counter = 0;
-            for (int i = 0; i < 512; i++) {
+            for (int i = 0; i < 256; i++) {
                 Vector3d direction = new Vector3d((float) worldProvider.getRandom().randomDouble(), (float) worldProvider.getRandom().randomDouble(), (float) worldProvider.getRandom().randomDouble());
                 direction.normalize();
+                Vector3f impulse = new Vector3f(direction);
+                impulse.scale(1000000);
 
-                for (int j = 0; j < 5; j++) {
-                    Vector3d target = new Vector3d(origin);
+                for (int j = 0; j < 4; j++) {
+                    Vector3f target = new Vector3f(origin);
 
                     target.x += direction.x * j;
                     target.y += direction.y * j;
@@ -65,18 +65,22 @@ public class ExplosionTool implements Tool {
 
                     byte currentBlockType = worldProvider.getBlock((int) target.x, (int) target.y, (int) target.z);
 
-                    if (currentBlockType != 0x0) {
-                        worldProvider.setBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, true, true);
+                    if (currentBlockType == 0x0)
+                        continue;
 
-                        if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent() && counter % 4 == 0)
-                            BulletPhysicsRenderer.getInstance().addBlock(new Vector3f(target), currentBlockType);
+                    Block currentBlock = BlockManager.getInstance().getBlock(currentBlockType);
 
-                        counter++;
+                    if (currentBlock.isDestructible()) {
+                        // Make sure no updates are triggered
+                        placeBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, false);
+
+                        if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent())
+                            BulletPhysicsRenderer.getInstance().addBlock(target, currentBlockType, 32000f, impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
                     }
                 }
             }
 
-            AudioManager.getInstance().playVaryingSound("RemoveBlock", 0.3f, 1.0f);
+            AudioManager.getInstance().getAudio("Explode" + (worldProvider.getRandom().randomIntAbs(5) + 1)).playAsSoundEffect(1.0f, 0.2f, false);
             _player.poke();
         }
     }

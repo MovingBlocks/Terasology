@@ -17,15 +17,16 @@ package org.terasology.logic.tools;
 
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.ItemBlock;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -33,17 +34,15 @@ import javax.vecmath.Vector3f;
 /**
  * The basic tool used for block interaction. Can be used to place and remove blocks.
  */
-public class DefaultBlockTool implements Tool {
-
-    protected final Player _player;
+public class DefaultBlockTool extends SimpleTool {
 
     public DefaultBlockTool(Player player) {
-        _player = player;
+        super(player);
     }
 
     public void executeLeftClickAction() {
         if (_player.getActiveBlock() != null) {
-            if (placeBlock(_player.getActiveBlock().getId())) {
+            if (placeBlock(_player.getActiveBlock())) {
                 _player.getInventory().removeOneItemInSlot(_player.getToolbar().getSelectedSlot());
             }
         }
@@ -53,7 +52,7 @@ public class DefaultBlockTool implements Tool {
         byte removedBlockId = removeBlock(true);
 
         if (removedBlockId != 0) {
-            _player.getInventory().storeItemInFreeSlot(new ItemBlock(_player, removedBlockId, 1));
+            _player.getInventory().storeItemInFreeSlot(new ItemBlock(_player, BlockManager.getInstance().getBlock(removedBlockId).getBlockGroup(), 1));
         }
     }
 
@@ -63,12 +62,13 @@ public class DefaultBlockTool implements Tool {
      * @param type The type of the block
      * @return True if a block was placed
      */
-    public boolean placeBlock(byte type) {
-        WorldProvider worldProvider = _player.getParent().getWorldProvider();
+    public boolean placeBlock(BlockGroup type) {
+        IWorldProvider worldProvider = _player.getParent().getWorldProvider();
         RayBlockIntersection.Intersection selectedBlock = _player.getSelectedBlock();
 
         if (selectedBlock != null) {
-            Block centerBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(_player.getSelectedBlock().getBlockPosition().x, _player.getSelectedBlock().getBlockPosition().y, _player.getSelectedBlock().getBlockPosition().z));
+            BlockPosition centerPos = selectedBlock.getBlockPosition();
+            Block centerBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(centerPos.x, centerPos.y, centerPos.z));
 
             if (!centerBlock.isAllowBlockAttachment()) {
                 return false;
@@ -81,12 +81,23 @@ public class DefaultBlockTool implements Tool {
                 return false;
             }
 
-            worldProvider.setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, true);
-            AudioManager.getInstance().playVaryingSound("PlaceBlock", 0.6f, 0.5f);
+            // Need two things:
+            // 1. The Side of attachment
+            Side attachmentSide = Side.inDirection(centerPos.x - blockPos.x, centerPos.y - blockPos.y, centerPos.z - blockPos.z);
+            // 2. The secondary direction
+            Vector3d attachDir = new Vector3d(centerPos.x - blockPos.x, centerPos.y - blockPos.y, centerPos.z - blockPos.z);
+            Vector3d rawDirection = new Vector3d(_player.getViewingDirection());
+            double dot = rawDirection.dot(attachDir);
+            rawDirection.sub(new Vector3d(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
+            Side direction = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z);
 
-            int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
-            int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
-            _player.notifyObserversBlockPlaced(worldProvider.getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
+            byte blockId = type.getBlockIdFor(attachmentSide, direction);
+            if (blockId == 0)
+                return false;
+
+            placeBlock(blockPos, blockId, true);
+
+            AudioManager.getInstance().playVaryingSound("PlaceBlock", 0.6f, 0.5f);
 
             return true;
         }
@@ -101,7 +112,7 @@ public class DefaultBlockTool implements Tool {
      * @return The removed block (if any)
      */
     public byte removeBlock(boolean createPhysBlock) {
-        WorldProvider worldProvider = _player.getParent().getWorldProvider();
+        IWorldProvider worldProvider = _player.getParent().getWorldProvider();
         WorldRenderer worldRenderer = _player.getParent();
         RayBlockIntersection.Intersection selectedBlock = _player.getSelectedBlock();
 
@@ -137,7 +148,7 @@ public class DefaultBlockTool implements Tool {
 
                 // Enough pokes... Remove the block!
                 if (_player.getExtractionCounter() >= block.getHardness()) {
-                    worldProvider.setBlock(blockPos.x, blockPos.y, blockPos.z, (byte) 0x0, true, true);
+                    placeBlock(blockPos, (byte) 0x0, true);
 
                     // Remove the upper block if it's a billboard
                     byte upperBlockType = worldProvider.getBlock(blockPos.x, blockPos.y + 1, blockPos.z);
@@ -151,12 +162,8 @@ public class DefaultBlockTool implements Tool {
 
                     if (createPhysBlock && !BlockManager.getInstance().getBlock(currentBlockType).isTranslucent()) {
                         Vector3d pos = blockPos.toVector3d();
-                        BulletPhysicsRenderer.getInstance().addBlock(new Vector3f(pos), currentBlockType);
+                        BulletPhysicsRenderer.getInstance().addHarvestedMiniBlocks(new Vector3f(pos), currentBlockType);
                     }
-
-                    int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
-                    int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
-                    _player.notifyObserversBlockRemoved(worldProvider.getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos);
 
                     _player.resetExtraction();
                     return currentBlockType;

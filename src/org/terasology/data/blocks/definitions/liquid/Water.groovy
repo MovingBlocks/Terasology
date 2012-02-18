@@ -5,4 +5,7 @@ package org.terasology.data.blocks.definitions.liquid
  */
 block {
     version = 1
+    shape = "TrimmedLoweredCube"
+    loweredShape = "LoweredCube"
+    hardness = 0
 }

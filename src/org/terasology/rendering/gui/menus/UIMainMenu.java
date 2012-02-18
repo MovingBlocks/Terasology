@@ -20,7 +20,7 @@ import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
-import org.terasology.rendering.gui.framework.UIClickListener;
+import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
@@ -54,7 +54,7 @@ public class UIMainMenu extends UIDisplayRenderer {
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
-        _exitButton.addClickListener(new UIClickListener() {
+        _exitButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 Terasology.getInstance().exit();
             }
@@ -64,7 +64,7 @@ public class UIMainMenu extends UIDisplayRenderer {
         _startButton.getLabel().setText("Start the game");
         _startButton.setVisible(true);
 
-        _startButton.addClickListener(new UIClickListener() {
+        _startButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
                 Terasology.getInstance().setGameMode(Terasology.GameMode.runGame);

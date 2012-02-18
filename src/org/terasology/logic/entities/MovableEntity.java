@@ -20,7 +20,7 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.world.WorldRenderer;
@@ -41,6 +41,7 @@ public abstract class MovableEntity extends Entity {
     protected long _lastFootStepSoundPlayed = 0;
     protected Audio _currentFootstepSound;
     protected Audio[] _footstepSounds;
+    protected boolean _noSound = false;
 
     /* PARENT WORLD */
     protected final WorldRenderer _parent;
@@ -61,18 +62,23 @@ public abstract class MovableEntity extends Entity {
      * @param walkingSpeed  The walking speed
      * @param runningFactor The running factor
      * @param jumpIntensity The jump intensity
+     * @param loadAudio     Whether or not to load (and play) audio resources
      */
-    public MovableEntity(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
+    public MovableEntity(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity, boolean loadAudio) {
         _parent = parent;
         _walkingSpeed = walkingSpeed;
         _runningFactor = runningFactor;
         _jumpIntensity = jumpIntensity;
 
         reset();
-        initAudio();
+        if (loadAudio) {
+            initAudio();
+        } else {
+            _noSound = true;
+        }
     }
 
-    private void initAudio() {
+    protected void initAudio() {
         _footstepSounds = new Audio[5];
         _footstepSounds[0] = AudioManager.getInstance().loadSound("FootGrass1");
         _footstepSounds[1] = AudioManager.getInstance().loadSound("FootGrass2");
@@ -130,16 +136,17 @@ public abstract class MovableEntity extends Entity {
         if (_godMode)
             return;
 
+        if (_noSound)
+            return;
+
         if ((MathHelper.fastAbs(_velocity.x) > 0.01 || MathHelper.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
-                Vector3d playerDirection = directionOfReferencePoint();
                 _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
-
-                _currentFootstepSound.playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.2f, false, (float) playerDirection.x, (float) playerDirection.y, (float) playerDirection.z);
+                AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(), _currentFootstepSound);
             } else {
                 long timeDiff = Terasology.getInstance().getTime() - _lastFootStepSoundPlayed;
 
-                if (!_currentFootstepSound.isPlaying() && timeDiff > 400 / (_activeWalkingSpeed / _walkingSpeed)) {
+                if (timeDiff > 400 / (_activeWalkingSpeed / _walkingSpeed)) {
                     _lastFootStepSoundPlayed = Terasology.getInstance().getTime();
                     _currentFootstepSound = null;
                 }
@@ -165,26 +172,60 @@ public abstract class MovableEntity extends Entity {
     private boolean verticalHitTest(Vector3d origin) {
         ArrayList<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
+        boolean moved = false;
+
         for (int i = 0; i < blockPositions.size(); i++) {
             BlockPosition p = blockPositions.get(i);
 
             byte blockType1 = _parent.getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
             AABB entityAABB = getAABB();
 
-            if (BlockManager.getInstance().getBlock(blockType1).isPenetrable() || !entityAABB.overlaps(Block.AABBForBlockAt(p.x, p.y, p.z)))
+            if (BlockManager.getInstance().getBlock(blockType1).isPenetrable())
                 continue;
+            if (!entityAABB.overlaps(Block.AABBForBlockAt(p.x, p.y, p.z))) {
+                continue;
+            }
+            if (BlockManager.getInstance().getBlock(blockType1).isComplexCollider()) {
+                AABB closestCollider = null;
+                double closestDistance = Double.POSITIVE_INFINITY;
+                for (AABB aabb : BlockManager.getInstance().getBlock(blockType1).getColliders(p.x, p.y, p.z)) {
+                    double direction = origin.y - aabb.getPosition().y;
+                    if (entityAABB.overlaps(aabb)) {
+                        double newDist = 0;
+                        if (direction >= 0)
+                            newDist = MathHelper.fastAbs(aabb.getPosition().y - p.y - aabb.getDimensions().y - entityAABB.getDimensions().y);
+                        else
+                            newDist = MathHelper.fastAbs(aabb.getPosition().y - p.y + aabb.getDimensions().y + entityAABB.getDimensions().y);
+                        if (newDist < closestDistance) {
+                            closestCollider = aabb;
+                            closestDistance = newDist;
+                        }
+                    }
+                }
+                if (closestCollider != null) {
+                    double direction = origin.y - closestCollider.getPosition().y;
+                    if (direction >= 0) {
+                        getPosition().y = closestCollider.getPosition().y + closestCollider.getDimensions().y + entityAABB.getDimensions().y;
+                        getPosition().y += Math.ulp(getPosition().y);
+                    } else {
+                        getPosition().y = closestCollider.getPosition().y - closestCollider.getDimensions().y - entityAABB.getDimensions().y;
+                        getPosition().y -= Math.ulp(getPosition().y);
+                    }
+                    moved = true;
+                }
+            } else {
+                double direction = origin.y - getPosition().y;
 
-            double direction = origin.y - getPosition().y;
+                if (direction >= 0)
+                    getPosition().y = p.y + 0.50001f + entityAABB.getDimensions().y;
+                else
+                    getPosition().y = p.y - 0.50001f - entityAABB.getDimensions().y;
 
-            if (direction >= 0)
-                getPosition().y = p.y + 0.50001f + entityAABB.getDimensions().y;
-            else
-                getPosition().y = p.y - 0.50001f - entityAABB.getDimensions().y;
-
-            return true;
+                moved = true;
+            }
         }
 
-        return false;
+        return moved;
     }
 
     /**
@@ -235,35 +276,69 @@ public abstract class MovableEntity extends Entity {
 
             if (!BlockManager.getInstance().getBlock(blockType).isPenetrable()) {
                 if (getAABB().overlaps(blockAABB)) {
-                    result = true;
+                    if (BlockManager.getInstance().getBlock(blockType).isComplexCollider()) {
+                        for (AABB collider : BlockManager.getInstance().getBlock(blockType).getColliders(p.x, p.y, p.z)) {
+                            if (getAABB().overlaps(collider)) {
+                                Vector3d direction = new Vector3d(getPosition().x, 0f, getPosition().z);
+                                direction.x -= origin.x;
+                                direction.z -= origin.z;
 
-                    // Calculate the direction from the origin to the current position
-                    Vector3d direction = new Vector3d(getPosition().x, 0f, getPosition().z);
-                    direction.x -= origin.x;
-                    direction.z -= origin.z;
+                                // Calculate the point of intersection on the block's AABB
+                                Vector3d blockPoi = collider.closestPointOnAABBToPoint(origin);
+                                Vector3d entityPoi = generateAABBForPosition(origin).closestPointOnAABBToPoint(blockPoi);
 
-                    // Calculate the point of intersection on the block's AABB
-                    Vector3d blockPoi = blockAABB.closestPointOnAABBToPoint(origin);
-                    Vector3d entityPoi = generateAABBForPosition(origin).closestPointOnAABBToPoint(blockPoi);
+                                Vector3d planeNormal = collider.getFirstHitPlane(direction, origin, getAABB().getDimensions(), true, false, true);
 
-                    Vector3d planeNormal = blockAABB.normalForPlaneClosestToOrigin(blockPoi, origin, true, false, true);
+                                // Find a vector parallel to the surface normal
+                                Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
+                                Vector3d pushBack = new Vector3d();
 
-                    // Find a vector parallel to the surface normal
-                    Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
-                    Vector3d pushBack = new Vector3d();
+                                pushBack.sub(blockPoi, entityPoi);
 
-                    pushBack.sub(blockPoi, entityPoi);
+                                // Calculate the intensity of the diversion alongside the block
+                                double length = slideVector.dot(direction);
 
-                    // Calculate the intensity of the diversion alongside the block
-                    double length = slideVector.dot(direction);
+                                Vector3d newPosition = new Vector3d();
+                                newPosition.z = origin.z + pushBack.z * 0.2 + length * slideVector.z;
+                                newPosition.x = origin.x + pushBack.x * 0.2 + length * slideVector.x;
+                                newPosition.y = origin.y;
 
-                    Vector3d newPosition = new Vector3d();
-                    newPosition.z = origin.z + pushBack.z * 0.2 + length * slideVector.z;
-                    newPosition.x = origin.x + pushBack.x * 0.2 + length * slideVector.x;
-                    newPosition.y = origin.y;
+                                // Update the position
+                                getPosition().set(newPosition);
+                            }
+                        }
+                    } else {
 
-                    // Update the position
-                    getPosition().set(newPosition);
+                        result = true;
+
+                        // Calculate the direction from the origin to the current position
+                        Vector3d direction = new Vector3d(getPosition().x, 0f, getPosition().z);
+                        direction.x -= origin.x;
+                        direction.z -= origin.z;
+
+                        // Calculate the point of intersection on the block's AABB
+                        Vector3d blockPoi = blockAABB.closestPointOnAABBToPoint(origin);
+                        Vector3d entityPoi = generateAABBForPosition(origin).closestPointOnAABBToPoint(blockPoi);
+
+                        Vector3d planeNormal = blockAABB.getFirstHitPlane(direction, origin, getAABB().getDimensions(), true, false, true);
+
+                        // Find a vector parallel to the surface normal
+                        Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
+                        Vector3d pushBack = new Vector3d();
+
+                        pushBack.sub(blockPoi, entityPoi);
+
+                        // Calculate the intensity of the diversion alongside the block
+                        double length = slideVector.dot(direction);
+
+                        Vector3d newPosition = new Vector3d();
+                        newPosition.z = origin.z + pushBack.z * 0.2 + length * slideVector.z;
+                        newPosition.x = origin.x + pushBack.x * 0.2 + length * slideVector.x;
+                        newPosition.y = origin.y;
+
+                        // Update the position
+                        getPosition().set(newPosition);
+                    }
                 }
             }
         }
@@ -351,14 +426,13 @@ public abstract class MovableEntity extends Entity {
                 if (oldGravity <= 0) {
                     // Jumping is only possible, if the entity is standing on ground
                     if (_jump) {
+                        AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
+                                _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
                         _jump = false;
                         _gravity = _jumpIntensity;
-                    }
-
-                    // Entity reaches the ground
-                    if (!_touchingGround) {
-                        Vector3d playerDirection = directionOfReferencePoint();
-                        _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5].playAsSoundEffect(0.7f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, 0.2f + (float) MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomDouble()) * 0.3f, false, (float) playerDirection.x, (float) playerDirection.y, (float) playerDirection.z);
+                    } else if (!_touchingGround) { // Entity reaches the ground
+                        AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
+                                _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
                         _touchingGround = true;
                     }
                 } else {
@@ -504,9 +578,9 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
-    public Vector3d directionOfReferencePoint() {
+    public Vector3d calcEntityPositionRelativeToPlayer() {
         Vector3d result = new Vector3d();
-        result.sub(_parent.getWorldProvider().getRenderingReferencePoint(), getPosition());
+        result.sub(Terasology.getInstance().getActivePlayer().getPosition(), getPosition());
 
         return result;
     }
@@ -568,5 +642,9 @@ public abstract class MovableEntity extends Entity {
 
     public WorldRenderer getParent() {
         return _parent;
+    }
+
+    public Vector3d getVelocity() {
+        return _velocity;
     }
 }

@@ -15,8 +15,9 @@
  */
 package org.terasology.logic.generators;
 
+import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.logic.world.Chunk;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 
 /**
@@ -50,7 +51,9 @@ public class ChunkGeneratorLiquids extends ChunkGeneratorTerrain {
             }
 
             if (set) {
-                _parent.getParent().getLiquidSimulator().addActiveBlock(blockWorldPos);
+                LiquidSimulator sim = new LiquidSimulator(_parent.getParent());
+                sim.addActiveBlock(blockWorldPos);
+                sim.simulateAll();
             }
 
             if (lavaGenerated)

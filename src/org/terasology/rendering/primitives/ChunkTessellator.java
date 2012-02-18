@@ -17,13 +17,16 @@ package org.terasology.rendering.primitives;
 
 import com.bulletphysics.collision.shapes.IndexedMesh;
 import com.bulletphysics.collision.shapes.ScalarType;
+import gnu.trove.iterator.TFloatIterator;
+import gnu.trove.iterator.TIntIterator;
 import org.lwjgl.BufferUtils;
-import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.world.Chunk;
+import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
@@ -34,7 +37,8 @@ import javax.vecmath.Vector4f;
  */
 public final class ChunkTessellator {
 
-    private static final boolean GENERATE_PHYSICS_MESHES = (Boolean) ConfigurationManager.getInstance().getConfig().get("Physics.generatePhysicsMeshes");
+    private static final int FLOAT_BYTES = 4;
+    private static final int INT_BYTES = 4;
 
     private final Chunk _chunk;
     private static int _statVertexArrayUpdateCount = 0;
@@ -44,8 +48,9 @@ public final class ChunkTessellator {
     }
 
     public ChunkMesh generateMesh(int meshHeight, int verticalOffset) {
+        PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh();
-
+        
         for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
             for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z++) {
                 double biomeTemp = _chunk.getParent().getTemperatureAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
@@ -55,15 +60,10 @@ public final class ChunkTessellator {
                     byte blockType = _chunk.getBlock(x, y, z);
                     Block block = BlockManager.getInstance().getBlock(blockType);
 
-                    if (block.isInvisible())
+                    if (block == null || block.isInvisible())
                         continue;
 
-                    Block.BLOCK_FORM blockForm = block.getBlockForm();
-
-                    if (blockForm != Block.BLOCK_FORM.BILLBOARD)
-                        generateBlockVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
-                    else
-                        generateBillboardVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
+                    generateBlockVertices(mesh, x, y, z, biomeTemp, biomeHumidity);
                 }
             }
         }
@@ -71,127 +71,116 @@ public final class ChunkTessellator {
         generateOptimizedBuffers(mesh);
         _statVertexArrayUpdateCount++;
 
+        PerformanceMonitor.endActivity();
         return mesh;
     }
 
     private void generateOptimizedBuffers(ChunkMesh mesh) {
-        mesh._indexedMesh = null;
+        PerformanceMonitor.startActivity("OptimizeBuffers");
 
-        if (GENERATE_PHYSICS_MESHES) {
-            mesh._indexedMesh = new IndexedMesh();
-            mesh._indexedMesh.vertexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
-            mesh._indexedMesh.triangleIndexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].quads.size() * 4);
-            mesh._indexedMesh.triangleIndexStride = 12;
-            mesh._indexedMesh.vertexStride = 12;
-            mesh._indexedMesh.numVertices = mesh._vertexElements[0].quads.size() / 3;
-            mesh._indexedMesh.numTriangles = mesh._vertexElements[0].quads.size() / 6;
-            mesh._indexedMesh.indexType = ScalarType.INTEGER;
-        }
-        /* ------------- */
+        generateBulletBuffers(mesh);
 
         for (int j = 0; j < mesh._vertexElements.length; j++) {
-            mesh._vertexElements[j].vertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].quads.size() * 2 + mesh._vertexElements[j].tex.size() + mesh._vertexElements[j].color.size() + mesh._vertexElements[j].normals.size());
-            mesh._vertexElements[j].indices = BufferUtils.createIntBuffer(mesh._vertexElements[j].quads.size());
+            // Vertices double to account for light info
+            mesh._vertexElements[j].finalVertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].vertices.size() * 2 + mesh._vertexElements[j].tex.size() + mesh._vertexElements[j].color.size() + mesh._vertexElements[j].normals.size());
 
             int cTex = 0;
             int cColor = 0;
-            int cIndex = 0;
-            for (int i = 0; i < mesh._vertexElements[j].quads.size(); i += 3, cTex += 2, cColor += 4) {
+            for (int i = 0; i < mesh._vertexElements[j].vertices.size(); i += 3, cTex += 3, cColor += 4) {
 
-                if (i % 4 == 0) {
-                    mesh._vertexElements[j].indices.put(cIndex);
-                    mesh._vertexElements[j].indices.put(cIndex + 1);
-                    mesh._vertexElements[j].indices.put(cIndex + 2);
+                Vector3f vertexPos = new Vector3f(mesh._vertexElements[j].vertices.get(i), mesh._vertexElements[j].vertices.get(i + 1), mesh._vertexElements[j].vertices.get(i + 2));
 
-                    mesh._vertexElements[j].indices.put(cIndex + 2);
-                    mesh._vertexElements[j].indices.put(cIndex + 3);
-                    mesh._vertexElements[j].indices.put(cIndex);
+                mesh._vertexElements[j].finalVertices.put(vertexPos.x);
+                mesh._vertexElements[j].finalVertices.put(vertexPos.y);
+                mesh._vertexElements[j].finalVertices.put(vertexPos.z);
 
-                    /* BULLET PHYSICS */
-                    if (j == 0 && GENERATE_PHYSICS_MESHES) {
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex);
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 1);
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 2);
-
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 2);
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex + 3);
-                        mesh._indexedMesh.triangleIndexBase.putInt(cIndex);
-                    }
-                    /* ------------- */
-
-                    cIndex += 4;
-                }
-
-                Vector3f vertexPos = new Vector3f(mesh._vertexElements[j].quads.get(i), mesh._vertexElements[j].quads.get(i + 1), mesh._vertexElements[j].quads.get(i + 2));
-
-                mesh._vertexElements[j].vertices.put(vertexPos.x);
-                mesh._vertexElements[j].vertices.put(vertexPos.y);
-                mesh._vertexElements[j].vertices.put(vertexPos.z);
-
-                /* BULLET PHYSICS */
-                if (j == 0 && GENERATE_PHYSICS_MESHES) {
-                    mesh._indexedMesh.vertexBase.putFloat(vertexPos.x);
-                    mesh._indexedMesh.vertexBase.putFloat(vertexPos.y);
-                    mesh._indexedMesh.vertexBase.putFloat(vertexPos.z);
-                }
-                /* ------------ */
-
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex + 2));
 
                 Double[] result = new Double[3];
                 calcLightingValuesForVertexPos(vertexPos, result);
 
-                mesh._vertexElements[j].vertices.put(result[0].floatValue());
-                mesh._vertexElements[j].vertices.put(result[1].floatValue());
-                mesh._vertexElements[j].vertices.put(result[2].floatValue());
+                mesh._vertexElements[j].finalVertices.put(result[0].floatValue());
+                mesh._vertexElements[j].finalVertices.put(result[1].floatValue());
+                mesh._vertexElements[j].finalVertices.put(result[2].floatValue());
 
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 1));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 2));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].color.get(cColor + 3));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 1));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 2));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 3));
 
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].normals.get(i));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].normals.get(i + 1));
-                mesh._vertexElements[j].vertices.put(mesh._vertexElements[j].normals.get(i + 2));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i + 1));
+                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i + 2));
             }
 
-            mesh._vertexElements[j].vertices.flip();
-            mesh._vertexElements[j].indices.flip();
+            mesh._vertexElements[j].finalIndices = BufferUtils.createIntBuffer(mesh._vertexElements[j].indices.size());
+            TIntIterator indexIterator = mesh._vertexElements[j].indices.iterator();
+            while (indexIterator.hasNext()) {
+                mesh._vertexElements[j].finalIndices.put(indexIterator.next());
+            }
+
+            mesh._vertexElements[j].finalVertices.flip();
+            mesh._vertexElements[j].finalIndices.flip();
+        }
+        PerformanceMonitor.endActivity();
+    }
+
+    private void generateBulletBuffers(ChunkMesh mesh) {
+        mesh._indexedMesh = new IndexedMesh();
+        mesh._indexedMesh.vertexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].vertices.size() * FLOAT_BYTES);
+        mesh._indexedMesh.triangleIndexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].indices.size() * INT_BYTES);
+        mesh._indexedMesh.triangleIndexStride = 3 * INT_BYTES;
+        mesh._indexedMesh.vertexStride = 3 * FLOAT_BYTES;
+        mesh._indexedMesh.numVertices = mesh._vertexElements[0].vertices.size() / 3;
+        mesh._indexedMesh.numTriangles = mesh._vertexElements[0].indices.size() / 3;
+        mesh._indexedMesh.indexType = ScalarType.INTEGER;
+
+        TIntIterator indexIterator = mesh._vertexElements[0].indices.iterator();
+        while (indexIterator.hasNext()) {
+            mesh._indexedMesh.triangleIndexBase.putInt(indexIterator.next());
+        }
+        TFloatIterator vertIterator = mesh._vertexElements[0].vertices.iterator();
+        while (vertIterator.hasNext()) {
+            mesh._indexedMesh.vertexBase.putFloat(vertIterator.next());
         }
     }
 
     private void calcLightingValuesForVertexPos(Vector3f vertexPos, Double[] output) {
+        PerformanceMonitor.startActivity("calcLighting");
         double[] lights = new double[8];
         double[] blockLights = new double[8];
-        byte[] blocks = new byte[8];
+        byte[] blocks = new byte[4];
 
         Vector3f vertexWorldPos = moveVectorFromChunkSpaceToWorldSpace(vertexPos);
 
-        blocks[0] = _chunk.getParent().getBlockAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)));
-        blocks[1] = _chunk.getParent().getBlockAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)));
-        blocks[2] = _chunk.getParent().getBlockAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)));
-        blocks[3] = _chunk.getParent().getBlockAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)));
+        PerformanceMonitor.startActivity("gatherLightInfo");
+        blocks[0] = _chunk.getParent().getBlockAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f));
+        blocks[1] = _chunk.getParent().getBlockAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f));
+        blocks[2] = _chunk.getParent().getBlockAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f));
+        blocks[3] = _chunk.getParent().getBlockAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f));
 
-        lights[0] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[1] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[2] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[3] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.SUN);
+        lights[0] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[1] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[2] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[3] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.SUN);
 
-        lights[4] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[5] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[6] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.SUN);
-        lights[7] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.SUN);
+        lights[4] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[5] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[6] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.SUN);
+        lights[7] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.SUN);
 
-        blockLights[0] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[1] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[2] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[3] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[0] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[1] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[2] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[3] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y + 0.8f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.BLOCK);
 
-        blockLights[4] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[5] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[6] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
-        blockLights[7] = _chunk.getParent().getLightAtPosition(new Vector3d((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f)), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[4] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[5] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x + 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[6] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z - 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        blockLights[7] = _chunk.getParent().getLightAtPosition((vertexWorldPos.x - 0.1f), (vertexWorldPos.y - 0.1f), (vertexWorldPos.z + 0.1f), Chunk.LIGHT_TYPE.BLOCK);
+        PerformanceMonitor.endActivity();
 
         double resultLight = 0;
         double resultBlockLight = 0;
@@ -234,57 +223,7 @@ public final class ChunkTessellator {
             output[1] = resultBlockLight / counterBlockLight / 15f;
 
         output[2] = resultAmbientOcclusion;
-    }
-
-    /**
-     * Generates the billboard vertices for a given local block position.
-     *
-     * @param mesh The active mesh
-     * @param x    Local block position on the x-axis
-     * @param y    Local block position on the y-axis
-     * @param z    Local block position on the z-axis
-     * @param temp The temperature
-     * @param hum  The humidity
-     */
-    private void generateBillboardVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
-        byte blockId = _chunk.getBlock(x, y, z);
-        Block block = BlockManager.getInstance().getBlock(blockId);
-
-        /*
-         * First side of the billboard
-         */
-        Vector4f colorBillboardOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-        Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.FRONT).x, block.calcTextureOffsetFor(Block.SIDE.FRONT).y, 0);
-
-        Vector3f p1 = new Vector3f(-0.5f, -0.5f, 0.5f);
-        Vector3f p2 = new Vector3f(0.5f, -0.5f, -0.5f);
-        Vector3f p3 = new Vector3f(0.5f, 0.5f, -0.5f);
-        Vector3f p4 = new Vector3f(-0.5f, 0.5f, 0.5f);
-        Vector3f normal = new Vector3f(0, 0, 1);
-
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4), normal);
-        addBlockTextureData(mesh._vertexElements[2], texOffset, normal);
-
-        /*
-        * Second side of the billboard
-        */
-        colorBillboardOffset = block.calcColorOffsetFor(Block.SIDE.BACK, temp, hum);
-        texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.BACK).x, block.calcTextureOffsetFor(Block.SIDE.BACK).y, 0);
-
-        p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
-        p2 = new Vector3f(0.5f, -0.5f, 0.5f);
-        p3 = new Vector3f(0.5f, 0.5f, 0.5f);
-        p4 = new Vector3f(-0.5f, 0.5f, -0.5f);
-        normal = new Vector3f(0, 0, 1);
-
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p1), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p2), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p3), normal);
-        addBlockVertexData(mesh._vertexElements[2], colorBillboardOffset, moveVectorToChunkSpace(x, y, z, p4), normal);
-        addBlockTextureData(mesh._vertexElements[2], texOffset, normal);
+        PerformanceMonitor.endActivity();
     }
 
     private void generateBlockVertices(ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
@@ -294,163 +233,66 @@ public final class ChunkTessellator {
         /*
          * Determine the render process.
          */
-        ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.BILLBOARD_AND_TRANSLUCENT;
+        ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.TRANSLUCENT;
 
         if (!block.isTranslucent())
             renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
         if (block.getTitle().equals("Water") || block.getTitle().equals("Ice"))
             renderType = ChunkMesh.RENDER_TYPE.WATER_AND_ICE;
-
-        boolean drawFront, drawBack, drawLeft, drawRight, drawTop, drawBottom;
-
-        byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
-        drawTop = isSideVisibleForBlockTypes(blockToCheckId, blockId);
-        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y, _chunk.getBlockWorldPosZ(z - 1));
-        drawFront = isSideVisibleForBlockTypes(blockToCheckId, blockId);
-        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y, _chunk.getBlockWorldPosZ(z + 1));
-        drawBack = isSideVisibleForBlockTypes(blockToCheckId, blockId);
-        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), y, _chunk.getBlockWorldPosZ(z));
-        drawLeft = isSideVisibleForBlockTypes(blockToCheckId, blockId);
-        blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y, _chunk.getBlockWorldPosZ(z));
-        drawRight = isSideVisibleForBlockTypes(blockToCheckId, blockId);
-
-        // Don't draw anything "below" the world
-        if (y > 0) {
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
-            drawBottom = isSideVisibleForBlockTypes(blockToCheckId, blockId);
-        } else {
-            drawBottom = false;
-        }
+        if (block.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
+            renderType = ChunkMesh.RENDER_TYPE.BILLBOARD;
 
         Block.BLOCK_FORM blockForm = block.getBlockForm();
 
-        // If the block is lowered, some more faces have to be drawn
+        if (block.getCenterMesh() != null) {
+            Vector4f colorOffset = block.calcColorOffsetFor(Side.TOP, temp, hum);
+            block.getCenterMesh().appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+        }
+
+        boolean[] drawDir = new boolean[6];
+
+        for (Side side : Side.values()) {
+            Vector3i offset = side.getVector3i();
+            byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + offset.x), y + offset.y, _chunk.getBlockWorldPosZ(z + offset.z));
+            drawDir[side.ordinal()] = isSideVisibleForBlockTypes(blockToCheckId, blockId, side);
+        }
+
+        if (y == 0) {
+            drawDir[Side.BOTTOM.ordinal()] = false;
+        }
+
+        // If the block is lowered, some more faces may have to be drawn
         if (blockForm == Block.BLOCK_FORM.LOWERED_BLOCK) {
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z - 1));
-            drawFront = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawFront;
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z + 1));
-            drawBack = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawBack;
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x - 1), y - 1, _chunk.getBlockWorldPosZ(z));
-            drawLeft = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawLeft;
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + 1), y - 1, _chunk.getBlockWorldPosZ(z));
-            drawRight = isSideVisibleForBlockTypes(blockToCheckId, blockId) || drawRight;
-            blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
-            drawTop = (BlockManager.getInstance().getBlock(blockToCheckId).getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK) || drawTop;
+            // Draw horizontal sides if visible from below
+            for (Side side : Side.horizontalSides()) {
+                Vector3i offset = side.getVector3i();
+                byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x + offset.x), y - 1, _chunk.getBlockWorldPosZ(z + offset.z));
+                drawDir[side.ordinal()] |= isSideVisibleForBlockTypes(blockToCheckId, blockId, side);
+            }
+
+            // Draw the top if below a non-lowered block
+            // TODO: Don't need to render the top if each side and the block above each side are either liquid or opaque solids.
+            byte blockToCheckId = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y + 1, _chunk.getBlockWorldPosZ(z));
+            drawDir[Side.TOP.ordinal()] |= (BlockManager.getInstance().getBlock(blockToCheckId).getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+
+            byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
+            if (BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0) {
+                for (Side dir : Side.values()) {
+                    if (drawDir[dir.ordinal()]) {
+                        Vector4f colorOffset = block.calcColorOffsetFor(dir, temp, hum);
+                        block.getLoweredSideMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+                    }
+                }
+                return;
+            }
         }
 
-        if (drawTop) {
-            Vector3f p1 = new Vector3f(-0.5f, 0.5f, 0.5f);
-            Vector3f p2 = new Vector3f(0.5f, 0.5f, 0.5f);
-            Vector3f p3 = new Vector3f(0.5f, 0.5f, -0.5f);
-            Vector3f p4 = new Vector3f(-0.5f, 0.5f, -0.5f);
-
-            Vector3f norm = new Vector3f(0, 1, 0);
-
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-
-            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.TOP).x, block.calcTextureOffsetFor(Block.SIDE.TOP).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
+        for (Side dir : Side.values()) {
+            if (drawDir[dir.ordinal()]) {
+                Vector4f colorOffset = block.calcColorOffsetFor(dir, temp, hum);
+                block.getSideMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+            }
         }
-
-        if (drawFront) {
-
-            Vector3f p1 = new Vector3f(-0.5f, 0.5f, -0.5f);
-            Vector3f p2 = new Vector3f(0.5f, 0.5f, -0.5f);
-            Vector3f p3 = new Vector3f(0.5f, -0.5f, -0.5f);
-            Vector3f p4 = new Vector3f(-0.5f, -0.5f, -0.5f);
-
-            Vector3f norm = new Vector3f(0, 0, -1);
-
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-
-            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.FRONT).x, block.calcTextureOffsetFor(Block.SIDE.FRONT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-        }
-
-        if (drawBack) {
-            Vector3f p1 = new Vector3f(-0.5f, -0.5f, 0.5f);
-            Vector3f p2 = new Vector3f(0.5f, -0.5f, 0.5f);
-            Vector3f p3 = new Vector3f(0.5f, 0.5f, 0.5f);
-            Vector3f p4 = new Vector3f(-0.5f, 0.5f, 0.5f);
-
-            Vector3f norm = new Vector3f(0, 0, 1);
-
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-
-            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.BACK).x, block.calcTextureOffsetFor(Block.SIDE.BACK).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-        }
-
-        if (drawLeft) {
-            Vector3f p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
-            Vector3f p2 = new Vector3f(-0.5f, -0.5f, 0.5f);
-            Vector3f p3 = new Vector3f(-0.5f, 0.5f, 0.5f);
-            Vector3f p4 = new Vector3f(-0.5f, 0.5f, -0.5f);
-
-            Vector3f norm = new Vector3f(-1, 0, 0);
-
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-
-            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.LEFT).x, block.calcTextureOffsetFor(Block.SIDE.LEFT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-        }
-
-        if (drawRight) {
-            Vector3f p1 = new Vector3f(0.5f, 0.5f, -0.5f);
-            Vector3f p2 = new Vector3f(0.5f, 0.5f, 0.5f);
-            Vector3f p3 = new Vector3f(0.5f, -0.5f, 0.5f);
-            Vector3f p4 = new Vector3f(0.5f, -0.5f, -0.5f);
-
-            Vector3f norm = new Vector3f(1, 0, 0);
-
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-
-            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.RIGHT).x, block.calcTextureOffsetFor(Block.SIDE.RIGHT).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-        }
-
-        if (drawBottom) {
-            Vector3f p1 = new Vector3f(-0.5f, -0.5f, -0.5f);
-            Vector3f p2 = new Vector3f(0.5f, -0.5f, -0.5f);
-            Vector3f p3 = new Vector3f(0.5f, -0.5f, 0.5f);
-            Vector3f p4 = new Vector3f(-0.5f, -0.5f, 0.5f);
-
-            Vector3f norm = new Vector3f(0, -1, 0);
-
-            Vector4f colorOffset = block.calcColorOffsetFor(Block.SIDE.FRONT, temp, hum);
-
-            Vector3f texOffset = new Vector3f(block.calcTextureOffsetFor(Block.SIDE.BOTTOM).x, block.calcTextureOffsetFor(Block.SIDE.BOTTOM).y, 0f);
-            generateVerticesForBlockSide(mesh, x, y, z, p1, p2, p3, p4, norm, colorOffset, texOffset, renderType, blockForm);
-        }
-    }
-
-    private void generateVerticesForBlockSide(ChunkMesh mesh, int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm, Vector4f colorOffset, Vector3f texOffset, ChunkMesh.RENDER_TYPE renderType, Block.BLOCK_FORM blockForm) {
-        int vertexElementsId = 0;
-
-        switch (renderType) {
-            case BILLBOARD_AND_TRANSLUCENT:
-                vertexElementsId = 1;
-                break;
-            case WATER_AND_ICE:
-                vertexElementsId = 3;
-                break;
-        }
-
-        switch (blockForm) {
-            case CACTUS:
-                generateCactusSide(p1, p2, p3, p4, norm);
-                break;
-            case LOWERED_BLOCK:
-                generateLoweredBlock(x, y, z, p1, p2, p3, p4, norm);
-                break;
-        }
-
-        addBlockTextureData(mesh._vertexElements[vertexElementsId], texOffset, norm);
-
-        addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p1), norm);
-        addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p2), norm);
-        addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p3), norm);
-        addBlockVertexData(mesh._vertexElements[vertexElementsId], colorOffset, moveVectorToChunkSpace(x, y, z, p4), norm);
     }
 
     private Vector3f moveVectorFromChunkSpaceToWorldSpace(Vector3f offset) {
@@ -465,124 +307,6 @@ public final class ChunkTessellator {
         return offset;
     }
 
-    private Vector3f moveVectorToChunkSpace(int cPosX, int cPosY, int cPosZ, Vector3f offset) {
-        offset.x += cPosX;
-        offset.y += cPosY;
-        offset.z += cPosZ;
-
-        return offset;
-    }
-
-    private void generateLoweredBlock(int x, int y, int z, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm) {
-        byte bottomBlock = _chunk.getParent().getBlock(_chunk.getBlockWorldPosX(x), y - 1, _chunk.getBlockWorldPosZ(z));
-        boolean lowerBottom = BlockManager.getInstance().getBlock(bottomBlock).getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock == 0x0;
-
-        if (norm.x == 1.0f) {
-            p1.y -= 0.1;
-            p2.y -= 0.1;
-
-            if (lowerBottom) {
-                p3.y -= 0.1;
-                p4.y -= 0.1;
-            }
-        } else if (norm.x == -1.0f) {
-            p3.y -= 0.1;
-            p4.y -= 0.1;
-
-            if (lowerBottom) {
-                p1.y -= 0.1;
-                p2.y -= 0.1;
-            }
-        } else if (norm.z == 1.0f) {
-            p3.y -= 0.1;
-            p4.y -= 0.1;
-
-            if (lowerBottom) {
-                p1.y -= 0.1;
-                p2.y -= 0.1;
-            }
-        } else if (norm.z == -1.0f) {
-            p1.y -= 0.1;
-            p2.y -= 0.1;
-
-            if (lowerBottom) {
-                p3.y -= 0.1;
-                p4.y -= 0.1;
-            }
-        } else if (norm.y == 1.0f) {
-            p1.y -= 0.1;
-            p2.y -= 0.1;
-            p3.y -= 0.1;
-            p4.y -= 0.1;
-        } else if (norm.y == -1.0f) {
-            if (lowerBottom) {
-                p1.y -= 0.1;
-                p2.y -= 0.1;
-                p3.y -= 0.1;
-                p4.y -= 0.1;
-            }
-        }
-    }
-
-    private void generateCactusSide(Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4, Vector3f norm) {
-        if (norm.x == 1.0f || norm.x == -1.0f) {
-            p1.x -= 0.0625 * norm.x;
-            p2.x -= 0.0625 * norm.x;
-            p3.x -= 0.0625 * norm.x;
-            p4.x -= 0.0625 * norm.x;
-        } else if (norm.z == 1.0f || norm.z == -1.0f) {
-            p1.z -= 0.0625 * norm.z;
-            p2.z -= 0.0625 * norm.z;
-            p3.z -= 0.0625 * norm.z;
-            p4.z -= 0.0625 * norm.z;
-        }
-    }
-
-    private void addBlockTextureData(ChunkMesh.VertexElements vertexElements, Vector3f texOffset, Vector3f norm) {
-        /*
-        * Rotate the texture coordinates according to the
-        * orientation of the plane.
-        */
-        if (norm.z == 1 || norm.x == -1) {
-            vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
-
-            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
-
-            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(texOffset.y);
-
-            vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y);
-        } else {
-            vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y);
-
-            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(texOffset.y);
-
-            vertexElements.tex.add(texOffset.x + Block.TEXTURE_OFFSET_WIDTH);
-            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
-
-            vertexElements.tex.add(texOffset.x);
-            vertexElements.tex.add(texOffset.y + Block.TEXTURE_OFFSET_WIDTH);
-        }
-    }
-
-    private void addBlockVertexData(ChunkMesh.VertexElements vertexElements, Vector4f colorOffset, Vector3f vertex, Vector3f normal) {
-        vertexElements.color.add(colorOffset.x);
-        vertexElements.color.add(colorOffset.y);
-        vertexElements.color.add(colorOffset.z);
-        vertexElements.color.add(colorOffset.w);
-        vertexElements.quads.add(vertex.x);
-        vertexElements.quads.add(vertex.y);
-        vertexElements.quads.add(vertex.z);
-        vertexElements.normals.add(normal.x);
-        vertexElements.normals.add(normal.y);
-        vertexElements.normals.add(normal.z);
-    }
-
     /**
      * Returns true if the side should be rendered adjacent to the second side provided.
      *
@@ -590,11 +314,11 @@ public final class ChunkTessellator {
      * @param currentBlock The current block
      * @return True if the side is visible for the given block types
      */
-    private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock) {
-        Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
+    private boolean isSideVisibleForBlockTypes(byte blockToCheck, byte currentBlock, Side side) {
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
-
-        return bCheck.getId() == 0x0 || cBlock.isDisableTessellation() || bCheck.getBlockForm() == Block.BLOCK_FORM.BILLBOARD || !cBlock.isTranslucent() && bCheck.isTranslucent() || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+        if (cBlock.getSideMesh(side) == null) return false;
+        Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
+        return bCheck == null || cBlock == null || bCheck.getId() == 0x0 || !bCheck.isBlockingSide(side.reverse()) || !cBlock.isTranslucent() && bCheck.isTranslucent() || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
     }
 
     public static int getVertexArrayUpdateCount() {

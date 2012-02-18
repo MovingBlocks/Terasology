@@ -23,18 +23,20 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
 import org.terasology.game.Terasology;
 import org.terasology.logic.entities.StaticEntity;
 import org.terasology.logic.generators.ChunkGenerator;
 import org.terasology.logic.manager.ConfigurationManager;
+import org.terasology.logic.manager.ShaderManager;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockManager;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
+import org.terasology.rendering.shader.ShaderParameters;
+import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.Helper;
 import org.terasology.utilities.MathHelper;
@@ -48,6 +50,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
 /**
@@ -61,6 +64,8 @@ import java.util.logging.Level;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Chunk extends StaticEntity implements Comparable<Chunk>, Externalizable {
+
+    public static int _statChunkMeshEmpty, _statChunkNotReady, _statRenderedTriangles;
 
     public static final long serialVersionUID = 1L;
 
@@ -85,16 +90,14 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     /* ------ */
     private final ChunkTessellator _tessellator;
     /* ------ */
-    private boolean[] _occlusionCulled = new boolean[VERTICAL_SEGMENTS];
-    private boolean[] _subMeshCulled = new boolean[VERTICAL_SEGMENTS];
-    private final int[] _queries = new int[VERTICAL_SEGMENTS];
-    /* ------ */
     private boolean _disposed = false;
     /* ----- */
     private AABB _aabb = null;
-    private AABB[] _subChunkAABB = null;
+    private AABB[] _subMeshAABB = null;
     /* ----- */
     private RigidBody _rigidBody = null;
+    /* ----- */
+    private ReentrantLock _lock = new ReentrantLock();
 
     public enum LIGHT_TYPE {
         BLOCK,
@@ -518,8 +521,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public double distanceToPlayer() {
         Vector3d result = new Vector3d(getPosition().x * CHUNK_DIMENSION_X, 0, getPosition().z * CHUNK_DIMENSION_Z);
-        Vector3d referencePoint = new Vector3d(_parent.getRenderingReferencePoint().x, 0, _parent.getRenderingReferencePoint().z);
-        result.sub(referencePoint);
+
+        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+        result.x -= playerPosition.x;
+        result.z -= playerPosition.z;
 
         return result.length();
     }
@@ -614,7 +619,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public AABB getAABB() {
         if (_aabb == null) {
-            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 2, CHUNK_DIMENSION_Y / 2, CHUNK_DIMENSION_Z / 2);
+            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 2.0, CHUNK_DIMENSION_Y / 2.0, CHUNK_DIMENSION_Z / 2.0);
             Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
             _aabb = new AABB(position, dimensions);
         }
@@ -623,19 +628,19 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public AABB getSubMeshAABB(int subMesh) {
-        if (_subChunkAABB == null) {
-            _subChunkAABB = new AABB[VERTICAL_SEGMENTS];
+        if (_subMeshAABB == null) {
+            _subMeshAABB = new AABB[VERTICAL_SEGMENTS];
 
             int heightHalf = CHUNK_DIMENSION_Y / VERTICAL_SEGMENTS / 2;
 
-            for (int i = 0; i < _subChunkAABB.length; i++) {
-                Vector3d dimensions = new Vector3d(8, CHUNK_DIMENSION_Y / VERTICAL_SEGMENTS / 2, 8);
+            for (int i = 0; i < _subMeshAABB.length; i++) {
+                Vector3d dimensions = new Vector3d(8, heightHalf, 8);
                 Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, (i * heightHalf * 2) + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
-                _subChunkAABB[i] = new AABB(position, dimensions);
+                _subMeshAABB[i] = new AABB(position, dimensions);
             }
         }
 
-        return _subChunkAABB[subMesh];
+        return _subMeshAABB[subMesh];
     }
 
     public void processChunk() {
@@ -737,18 +742,37 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Draws the opaque or translucent elements of a chunk.
      *
      * @param type The type of vertices to render
-     * @param subMesh The of the submesh to render
      * @return True if rendered
      */
-    public boolean render(ChunkMesh.RENDER_TYPE type, int subMesh) {
+    public void render(ChunkMesh.RENDER_PHASE type) {
         if (isReadyForRendering()) {
-            if (!isSubMeshEmpty(subMesh)) {
-                _activeMeshes[subMesh].render(type);
-                return true;
-            }
-        }
+            GL11.glPushMatrix();
 
-        return false;
+            Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+            GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - playerPosition.x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - playerPosition.y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - playerPosition.z);
+
+            // Transfer the world offset of the chunk to the shader for various effects
+            ShaderParameters params = ShaderManager.getInstance().getShaderParameters("chunk");
+            params.setFloat3("chunkOffset", (float) (getPosition().x * Chunk.CHUNK_DIMENSION_X), (float) (getPosition().y * Chunk.CHUNK_DIMENSION_Y), (float) (getPosition().z * Chunk.CHUNK_DIMENSION_Z));
+
+            for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
+                if (!isSubMeshEmpty(i)) {
+                    if (WorldRenderer.BOUNDING_BOXES_ENABLED) {
+                        ShaderManager.getInstance().enableShader(null);
+                        getSubMeshAABB(i).renderLocally(2f);
+                        _statRenderedTriangles += 12;
+                        ShaderManager.getInstance().enableShader("chunk");
+                    }
+
+                    _activeMeshes[i].render(type);
+                    _statRenderedTriangles += _activeMeshes[i].triangleCount();
+                }
+            }
+
+            GL11.glPopMatrix();
+        } else {
+            _statChunkNotReady++;
+        }
     }
 
     public boolean generateVBOs() {
@@ -766,87 +790,52 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public void update() {
         generateVBOs();
         swapActiveMesh();
-
-    }
-
-    public void executeOcclusionQuery() {
-        GL11.glColorMask(false, false, false, false);
-        GL11.glDepthMask(false);
-
-        if (_activeMeshes != null) {
-            for (int j = 0; j < VERTICAL_SEGMENTS; j++) {
-                if (!isSubMeshEmpty(j)) {
-                    if (_queries[j] == 0) {
-                        _queries[j] = GL15.glGenQueries();
-
-                        GL15.glBeginQuery(GL15.GL_SAMPLES_PASSED, _queries[j]);
-                        getSubMeshAABB(j).renderSolid();
-                        GL15.glEndQuery(GL15.GL_SAMPLES_PASSED);
-                    }
-                }
-            }
-        }
-
-        GL11.glColorMask(true, true, true, true);
-        GL11.glDepthMask(true);
-    }
-
-    public void applyOcclusionQueries() {
-        for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
-            if (_queries[i] != 0) {
-                int result = GL15.glGetQueryObjectui(_queries[i], GL15.GL_QUERY_RESULT_AVAILABLE);
-
-                if (result != 0) {
-
-                    result = GL15.glGetQueryObjectui(_queries[i], GL15.GL_QUERY_RESULT);
-
-                    _occlusionCulled[i] = result <= 0;
-
-                    GL15.glDeleteQueries(_queries[i]);
-                    _queries[i] = 0;
-                }
-            }
-        }
     }
 
     private void setNewMesh(ChunkMesh[] newMesh) {
-        synchronized (this) {
-            if (_disposed)
-                return;
+        if (_lock.tryLock()) {
+            try {
+                if (!_disposed) {
+                    ChunkMesh[] oldNewMesh = _newMeshes;
+                    _newMeshes = newMesh;
 
-            ChunkMesh[] oldNewMesh = _newMeshes;
-            _newMeshes = newMesh;
-
-            if (oldNewMesh != null) {
-                for (int i = 0; i < oldNewMesh.length; i++)
-                    oldNewMesh[i].dispose();
+                    if (oldNewMesh != null) {
+                        for (int i = 0; i < oldNewMesh.length; i++)
+                            oldNewMesh[i].dispose();
+                    }
+                }
+            } finally {
+                _lock.unlock();
             }
         }
     }
 
     private boolean swapActiveMesh() {
-        synchronized (this) {
-            if (_disposed)
-                return false;
+        if (_lock.tryLock()) {
+            try {
+                if (!_disposed) {
+                    if (_newMeshes != null) {
+                        if (!_newMeshes[0].isDisposed() && _newMeshes[0].isGenerated()) {
 
-            if (_newMeshes != null) {
-                if (_newMeshes[0].isDisposed() || !_newMeshes[0].isGenerated())
-                    return false;
+                            ChunkMesh[] newMesh = _newMeshes;
+                            _newMeshes = null;
 
-                ChunkMesh[] newMesh = _newMeshes;
-                _newMeshes = null;
+                            ChunkMesh[] oldActiveMesh = _activeMeshes;
+                            _activeMeshes = newMesh;
+                            _rigidBody = null;
 
-                ChunkMesh[] oldActiveMesh = _activeMeshes;
-                _activeMeshes = newMesh;
-                _rigidBody = null;
+                            if (oldActiveMesh != null) {
+                                for (int i = 0; i < oldActiveMesh.length; i++) {
+                                    oldActiveMesh[i].dispose();
+                                }
+                            }
 
-                if (oldActiveMesh != null) {
-                    for (int i = 0; i < oldActiveMesh.length; i++) {
-                        oldActiveMesh[i].dispose();
+                            return true;
+                        }
                     }
                 }
-
-                return true;
+            } finally {
+                _lock.unlock();
             }
         }
 
@@ -954,12 +943,37 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return _random;
     }
 
+    public void clearMeshes() {
+        _lock.lock();
+
+        try {
+            if (_disposed)
+                return;
+
+            if (_activeMeshes != null)
+                for (int i = 0; i < _activeMeshes.length; i++)
+                    _activeMeshes[i].dispose();
+            if (_newMeshes != null) {
+                for (int i = 0; i < _newMeshes.length; i++)
+                    _newMeshes[i].dispose();
+            }
+
+            _activeMeshes = null;
+            _newMeshes = null;
+            setDirty(true);
+
+        } finally {
+            _lock.unlock();
+        }
+    }
 
     /**
      * Disposes this chunk. Can NOT be undone.
      */
     public void dispose() {
-        synchronized (this) {
+        _lock.lock();
+
+        try {
             if (_disposed)
                 return;
 
@@ -972,6 +986,11 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             }
 
             _disposed = true;
+            _activeMeshes = null;
+            _newMeshes = null;
+
+        } finally {
+            _lock.unlock();
         }
     }
 
@@ -979,62 +998,19 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return _activeMeshes != null;
     }
 
-    public ChunkMesh getActiveSubMesh(int subMesh) {
-        return _activeMeshes[subMesh];
-    }
-
-    public boolean isSubMeshOcclusionCulled(int subMesh) {
-        return _occlusionCulled[subMesh];
-    }
-
-    public boolean isSubMeshCulled(int subMesh) {
-        return _subMeshCulled[subMesh];
-    }
-
-    public void setSubMeshCulled(int subMesh, boolean culled) {
-        _subMeshCulled[subMesh] = culled;
-    }
-
-    public void resetOcclusionCulled() {
-        _occlusionCulled = new boolean[VERTICAL_SEGMENTS];
-    }
-
-    public void resetSubMeshCulled() {
-        _subMeshCulled = new boolean[VERTICAL_SEGMENTS];
-    }
-
     public boolean isSubMeshEmpty(int subMesh) {
-        return _activeMeshes[subMesh].isEmpty();
-    }
-
-    public void renderAABBs(boolean solid) {
         if (isReadyForRendering()) {
-            for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
-                if (!isSubMeshEmpty(i)) {
-                    if (!solid)
-                        getSubMeshAABB(i).render(2f);
-                    else
-                        getSubMeshAABB(i).renderSolid();
-                }
-            }
+            return _activeMeshes[subMesh].isEmpty();
+        } else {
+            return true;
         }
-    }
-
-    public int triangleCount() {
-        int result = 0;
-
-        for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
-            result += _activeMeshes[i].triangleCount();
-        }
-
-        return result;
     }
 
     public void updateRigidBody() {
         updateRigidBody(_activeMeshes);
     }
 
-    private void updateRigidBody(ChunkMesh[] meshes) {
+    private void updateRigidBody(final ChunkMesh[] meshes) {
         if (_rigidBody != null)
             return;
 
@@ -1044,44 +1020,54 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         if (meshes.length < VERTICAL_SEGMENTS)
             return;
 
-        TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+        Terasology.getInstance().submitTask("Update Chunk Collision", new Runnable() {
+            public void run() {
+                TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
 
-        int counter = 0;
-        for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
-            ChunkMesh mesh = meshes[k];
+                int counter = 0;
+                for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
+                    ChunkMesh mesh = meshes[k];
 
-            if (mesh != null) {
-                IndexedMesh indexedMesh = mesh._indexedMesh;
+                    if (mesh != null) {
+                        IndexedMesh indexedMesh = mesh._indexedMesh;
 
-                if (indexedMesh != null) {
-                    vertexArray.addIndexedMesh(indexedMesh);
-                    counter++;
+                        if (indexedMesh != null) {
+                            vertexArray.addIndexedMesh(indexedMesh);
+                            counter++;
+                        }
+
+                        mesh._indexedMesh = null;
+                    }
                 }
 
-                mesh._indexedMesh = null;
+                if (counter == VERTICAL_SEGMENTS) {
+                    try {
+                        BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
+
+                        Matrix3f rot = new Matrix3f();
+                        rot.setIdentity();
+
+                        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
+
+                        RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
+                        _rigidBody = new RigidBody(blockConsInf);
+
+                    } catch (Exception e) {
+                        Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+                    }
+                }
+
             }
-        }
-
-        if (counter == VERTICAL_SEGMENTS) {
-            try {
-                BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
-
-                Matrix3f rot = new Matrix3f();
-                rot.setIdentity();
-
-                DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
-
-                RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
-                _rigidBody = new RigidBody(blockConsInf);
-
-            } catch (Exception e) {
-                Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
-            }
-        }
+        });
     }
 
     public RigidBody getRigidBody() {
         return _rigidBody;
     }
 
+    public static void resetStats() {
+        _statChunkMeshEmpty = 0;
+        _statChunkNotReady = 0;
+        _statRenderedTriangles = 0;
+    }
 }

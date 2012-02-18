@@ -3,8 +3,8 @@
 
 package org.terasology.logic.generators
 
-import org.terasology.model.blocks.BlockManager
 import org.terasology.logic.generators.ChunkGeneratorTerrain.BIOME_TYPE
+import org.terasology.model.blocks.management.BlockManager
 
 public class DefaultGenerators {
 
