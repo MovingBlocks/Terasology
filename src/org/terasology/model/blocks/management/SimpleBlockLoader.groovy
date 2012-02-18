@@ -157,6 +157,12 @@ public class SimpleBlockLoader implements BlockLoader {
             }
         }
 
+        // *** PHYSICS
+        if (c.block.physics.mass != [:]) {
+            println "Setting mass to: " + c.block.physics.mass
+            b.withMass((float) c.block.physics.mass)
+        }
+
         // *** MISC
         if (c.block.luminance != [:]) {
             println "Setting luminance to: " + c.block.luminance

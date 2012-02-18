@@ -18,7 +18,6 @@ package org.terasology.rendering.physics;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
-import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
@@ -34,6 +33,7 @@ import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.world.Chunk;
+import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.shader.ShaderParameters;
@@ -131,18 +131,19 @@ public class BulletPhysicsRenderer implements IGameObject {
             Vector3f offsetPossition = new Vector3f((float) rand.randomDouble() * 0.5f, (float) rand.randomDouble() * 0.5f, (float) rand.randomDouble() * 0.5f);
             offsetPossition.add(position);
 
-            result[i] = addBlock(offsetPossition, type, 2000f, new Vector3f(0.0f, 4000f, 0.0f), BLOCK_SIZE.QUARTER_SIZE);
+            result[i] = addBlock(offsetPossition, type, new Vector3f(0.0f, 4000f, 0.0f), BLOCK_SIZE.QUARTER_SIZE);
         }
 
         return result;
     }
 
-    public BlockRigidBody addBlock(Vector3f position, byte type, float mass, BLOCK_SIZE size) {
-        return addBlock(position, type, mass, new Vector3f(0f, 0f, 0f), size);
+    public BlockRigidBody addBlock(Vector3f position, byte type, BLOCK_SIZE size) {
+        return addBlock(position, type, new Vector3f(0f, 0f, 0f), size);
     }
 
-    public BlockRigidBody addBlock(Vector3f position, byte type, float mass, Vector3f impulse, BLOCK_SIZE size) {
+    public BlockRigidBody addBlock(Vector3f position, byte type, Vector3f impulse, BLOCK_SIZE size) {
         BoxShape shape = _blockShape;
+        Block block = BlockManager.getInstance().getBlock(type);
 
         if (size == BLOCK_SIZE.HALF_SIZE)
             shape = _blockShapeHalf;
@@ -155,19 +156,23 @@ public class BulletPhysicsRenderer implements IGameObject {
         DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, position, 1.0f)));
 
         Vector3f fallInertia = new Vector3f();
-        shape.calculateLocalInertia(mass, fallInertia);
+        shape.calculateLocalInertia(block.getMass(), fallInertia);
 
-        RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(mass, blockMotionState, shape, fallInertia);
+        RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(block.getMass(), blockMotionState, shape, fallInertia);
 
-        BlockRigidBody block = new BlockRigidBody(blockCI, type);
-        _discreteDynamicsWorld.addRigidBody(block);
+        BlockRigidBody rigidBlock = new BlockRigidBody(blockCI, type);
+        rigidBlock.setRestitution(0.0f);
+        rigidBlock.setAngularFactor(0.5f);
+        rigidBlock.setFriction(0.5f);
 
-        _blocks.add(block);
+        _discreteDynamicsWorld.addRigidBody(rigidBlock);
+
+        _blocks.add(rigidBlock);
 
         // Apply impulse
-        block.applyImpulse(impulse, new Vector3f(0.0f, 0.0f, 0.0f));
+        rigidBlock.applyImpulse(impulse, new Vector3f(0.0f, 0.0f, 0.0f));
 
-        return block;
+        return rigidBlock;
     }
 
     public void updateChunks() {

@@ -7,4 +7,6 @@ block {
     version = 1
     translucent = true
     shape = "cube"
+
+    hardness = 1
 }

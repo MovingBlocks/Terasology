@@ -12,4 +12,10 @@ block {
         mode = "HorizontalRotation"
         sides = "Stair"
     }
+
+    hardness = 8
+
+    physics {
+        mass = 128000
+    }
 }

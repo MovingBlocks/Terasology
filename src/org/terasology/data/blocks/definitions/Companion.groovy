@@ -7,4 +7,6 @@ block {
     // Serialization
     version = 1
     shape = "cube"
+
+    hardness = 8
 }

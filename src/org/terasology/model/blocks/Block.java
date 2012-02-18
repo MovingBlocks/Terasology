@@ -32,7 +32,9 @@ import javax.vecmath.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -114,6 +116,8 @@ public class Block implements IGameObject, Cloneable {
 
         private byte luminance;
         private byte hardness;
+
+        private float mass;
     }
 
     private SharedBlockInternals _internals;
@@ -161,6 +165,7 @@ public class Block implements IGameObject, Cloneable {
         withHardness((byte) 3);
         withLuminance((byte) 0);
         withLiquid(false);
+        withMass(64000f);
     }
 
     public Block clone() {
@@ -313,6 +318,11 @@ public class Block implements IGameObject, Cloneable {
         return this;
     }
 
+    public Block withMass(float mass) {
+        _internals.mass = mass;
+        return this;
+    }
+
     public Block withInvisible(boolean invisible) {
         _internals.invisible = invisible;
         return this;
@@ -424,7 +434,7 @@ public class Block implements IGameObject, Cloneable {
         _fullSide.put(side, full);
         return this;
     }
-    
+
     public void setColliders(List<AABB> colliders) {
         _colliders = new ArrayList<AABB>(colliders);
 
@@ -499,6 +509,10 @@ public class Block implements IGameObject, Cloneable {
         return _internals.luminance;
     }
 
+    public float getMass() {
+        return _internals.mass;
+    }
+
     public boolean isDestructible() {
         return getHardness() > 0;
     }
@@ -532,7 +546,7 @@ public class Block implements IGameObject, Cloneable {
     public Iterable<AABB> getColliders(int x, int y, int z) {
         return new OffsetAABBIterator(_colliders, x, y, z);
     }
-    
+
     public AABB getBounds(BlockPosition pos) {
         return new AABB(new Vector3d(_bounds.getPosition().x + pos.x, _bounds.getPosition().y + pos.y, _bounds.getPosition().z + pos.z), _bounds.getDimensions());
     }
@@ -625,11 +639,11 @@ public class Block implements IGameObject, Cloneable {
         steps = steps % 4;
         switch (steps) {
             case 1:
-                return new AABB(new Vector3d(-collider.getPosition().z,collider.getPosition().y,collider.getPosition().x), new Vector3d(collider.getDimensions().z,collider.getDimensions().y, collider.getDimensions().x));
+                return new AABB(new Vector3d(-collider.getPosition().z, collider.getPosition().y, collider.getPosition().x), new Vector3d(collider.getDimensions().z, collider.getDimensions().y, collider.getDimensions().x));
             case 2:
                 return new AABB(new Vector3d(-collider.getPosition().x, collider.getPosition().y, -collider.getPosition().z), collider.getDimensions());
             case 3:
-                return new AABB(new Vector3d(collider.getPosition().z,collider.getPosition().y,-collider.getPosition().x), new Vector3d(collider.getDimensions().z,collider.getDimensions().y, collider.getDimensions().x));
+                return new AABB(new Vector3d(collider.getPosition().z, collider.getPosition().y, -collider.getPosition().x), new Vector3d(collider.getDimensions().z, collider.getDimensions().y, collider.getDimensions().x));
             default:
                 return collider;
         }

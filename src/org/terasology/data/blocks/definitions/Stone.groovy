@@ -8,4 +8,8 @@ block {
     shape = "cube"
 
     hardness = 16
+
+    physics {
+        mass = 128000
+    }
 }
