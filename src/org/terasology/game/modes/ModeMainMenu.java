@@ -52,26 +52,17 @@ public class ModeMainMenu implements IGameMode{
    _mainMenu = new UIMainMenu();
 
 
-   _guiScreens.add(_mainMenu);
-    
+    _guiScreens.add(_mainMenu);
+    _mainMenu.setVisible(true);
     Terasology.getInstance().initGroovy();
-   
+    Mouse.setGrabbed(false);
+    Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
   }
-  
+   public void updateTimeAccumulator(long currentTime, long startTime){
+      return;
+  }
   public void update(){
-      //long timeSimulatedThisIteration = 0;
-      Terasology gameInst = Terasology.getInstance();
-      long startTime = gameInst.getTime();
-      while (_timeAccumulator >= SKIP_TICKS) {
-
           updateUserInterface();
-      
-          _timeAccumulator -= SKIP_TICKS;
-          //timeSimulatedThisIteration += SKIP_TICKS;
-      }
-      
-      _timeAccumulator += gameInst.getTime() - startTime;
-      
   }
   
   

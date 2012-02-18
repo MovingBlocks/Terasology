@@ -35,6 +35,7 @@ import org.terasology.rendering.world.WorldRenderer;
 
 import org.terasology.game.modes.IGameMode;
 import org.terasology.game.modes.ModePlayGame;
+import org.terasology.game.modes.ModeMainMenu;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,7 +81,7 @@ public final class Terasology {
        undefined, mainMenu, runGame
     };
     
-    static GameMode _state = GameMode.undefined;
+    static GameMode _state = GameMode.mainMenu;
     private static Map<GameMode,IGameMode> _gameModes = Collections.synchronizedMap(new EnumMap<GameMode,IGameMode>(GameMode.class));
 
     /* SINGLETON */
@@ -278,7 +279,7 @@ public final class Terasology {
               _runGame = false;
               break;
             }
-            
+            long startTime = getTime();
             mode.update();
             
             mode.render();
@@ -291,7 +292,7 @@ public final class Terasology {
             Display.sync(60);
 
             updateFps();
-
+            mode.updateTimeAccumulator(getTime(), startTime);
             if (Display.wasResized())
                 resizeViewport();
         }
@@ -327,9 +328,9 @@ public final class Terasology {
               mode = new ModePlayGame();
           break;
             
-        //  case mainMenu:
-        //      mode = new ModeMainMenu();
-        //  break;
+          case mainMenu:
+              mode = new ModeMainMenu();
+          break;
 
           case undefined:
               getLogger().log(Level.SEVERE, "Undefined game state - unable to run");

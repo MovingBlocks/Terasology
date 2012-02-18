@@ -53,7 +53,7 @@ public class ModePlayGame implements IGameMode{
   /* RENDERING */
   private WorldRenderer _activeWorldRenderer;
   
-  private double _timeAccumulator = 0;
+  public double _timeAccumulator = 0;
   
   /* VIEWING DISTANCE */
   private static final int[] VIEWING_DISTANCES = {(Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceNear"),
@@ -99,7 +99,6 @@ public class ModePlayGame implements IGameMode{
   public void update(){
       //long timeSimulatedThisIteration = 0;
       Terasology gameInst = Terasology.getInstance();
-      long startTime = gameInst.getTime();
       while (_timeAccumulator >= SKIP_TICKS) {
           if (_activeWorldRenderer != null && shouldUpdateWorld())
               _activeWorldRenderer.update();
@@ -131,10 +130,13 @@ public class ModePlayGame implements IGameMode{
           //timeSimulatedThisIteration += SKIP_TICKS;
       }
       
-      _timeAccumulator += gameInst.getTime() - startTime;
+    //  _timeAccumulator += gameInst.getTime() - startTime;
       
   }
-  
+
+  public void updateTimeAccumulator(long currentTime, long startTime){
+      _timeAccumulator += currentTime - startTime;
+  }
   /**
    * Init. a new random world.
    */
