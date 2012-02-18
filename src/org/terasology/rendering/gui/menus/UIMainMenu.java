@@ -30,20 +30,19 @@ import javax.vecmath.Vector2f;
 /**
  * Simple pause menu providing buttons for respawning the player and creating a new world.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UIPauseMenu extends UIDisplayRenderer {
+public class UIMainMenu extends UIDisplayRenderer {
 
     final UITransparentOverlay _overlay;
     final UIGraphicsElement _title;
 
     final UIButton _exitButton;
-    //final UIButton _newWorldButton;
-    final UIButton _respawnButton;
+    final UIButton _startButton;
 
     final UIText _version;
 
-    public UIPauseMenu() {
+    public UIMainMenu() {
         _title = new UIGraphicsElement("terasology");
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
@@ -61,15 +60,14 @@ public class UIPauseMenu extends UIDisplayRenderer {
             }
         });
 
+        _startButton = new UIButton(new Vector2f(256f, 32f));
+        _startButton.getLabel().setText("Start the game");
+        _startButton.setVisible(true);
 
-        _respawnButton = new UIButton(new Vector2f(256f, 32f));
-        _respawnButton.getLabel().setText("Respawn");
-        _respawnButton.setVisible(true);
-
-        _respawnButton.addClickListener(new IClickListener() {
+        _startButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
-                Terasology.getInstance().getActiveWorldRenderer().getPlayer().respawn();
+                Terasology.getInstance().setGameMode(Terasology.GameMode.runGame);
             }
         });
 
@@ -82,9 +80,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         addDisplayElement(_version);
 
         addDisplayElement(_exitButton);
-        //addDisplayElement(_newWorldButton);
-        addDisplayElement(_respawnButton);
-
+        addDisplayElement(_startButton);
         update();
     }
 
@@ -95,10 +91,8 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _version.centerHorizontally();
         _version.getPosition().y = 230f;
 
-        _respawnButton.centerHorizontally();
-        _respawnButton.getPosition().y = 300f;
-//        _newWorldButton.centerHorizontally();
-    //    _newWorldButton.getPosition().y = 300f + 32f + 8f;
+        _startButton.centerHorizontally();
+        _startButton.getPosition().y = 300f + 32f + 8f;
 
         _exitButton.centerHorizontally();
         _exitButton.getPosition().y = 300f + 2 * 32f + 32f;

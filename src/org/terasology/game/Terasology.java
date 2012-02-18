@@ -24,7 +24,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.PixelFormat;
-import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
@@ -33,20 +32,27 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.FastRandom;
 
+import org.terasology.game.modes.IGameMode;
+import org.terasology.game.modes.ModePlayGame;
+import org.terasology.game.modes.ModeMainMenu;
+import org.terasology.logic.characters.Player;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.EnumMap;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.Map;
+    
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -57,21 +63,10 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Terasology {
 
-    /* VIEWING DISTANCE */
-    private static final int[] VIEWING_DISTANCES = {(Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceNear"),
-            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceModerate"),
-            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceFar"),
-            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceUltra")};
-
-    private int _activeViewingDistance = 0;
-
-    /* THREADING */
+  /* THREADING */
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
-    /* CONST */
-    private static final int TICKS_PER_SECOND = 60;
-    private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-
+   
     /* STATISTICS */
     private long _lastLoopTime, _lastFpsTime;
     private int _fps;
@@ -79,22 +74,16 @@ public final class Terasology {
     private long _timerTicksPerSecond;
     private long _delta;
 
-    private double _timeAccumulator = 0;
-
     /* GAME LOOP */
-    private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
+    private boolean _runGame = true, _saveWorldOnExit = true;
 
-    /* RENDERING */
-    private WorldRenderer _activeWorldRenderer;
-
-    /* GUI */
-    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
-    private UIHeadsUpDisplay _hud;
-    private UIMetrics _metrics;
-    private UIPauseMenu _pauseMenu;
-    private UILoadingScreen _loadingScreen;
-    private UIStatusScreen _statusScreen;
-    private UIInventoryScreen _inventoryScreen;
+    /*GAME MODES*/
+    public enum GameMode {
+       undefined, mainMenu, runGame
+    };
+    
+    static GameMode _state = GameMode.mainMenu;
+    private static Map<GameMode,IGameMode> _gameModes = Collections.synchronizedMap(new EnumMap<GameMode,IGameMode>(GameMode.class));
 
     /* SINGLETON */
     private static Terasology _instance;
@@ -104,7 +93,7 @@ public final class Terasology {
 
     /* GROOVY */
     private GroovyManager _groovyManager;
-
+    
     /**
      * Returns the static instance of Terasology.
      *
@@ -252,73 +241,6 @@ public final class Terasology {
         Mouse.setGrabbed(true);
     }
 
-    /**
-     * Init. a new random world.
-     */
-    public void initWorld() {
-        initWorld(null, null);
-    }
-
-    /**
-     * Prepares a new world with a given name and seed value.
-     *
-     * @param title Title of the world
-     * @param seed  Seed value used for the generators
-     */
-    public void initWorld(String title, String seed) {
-        final FastRandom random = new FastRandom();
-
-        // Get rid of the old world
-        if (_activeWorldRenderer != null) {
-            _activeWorldRenderer.dispose();
-            _activeWorldRenderer = null;
-        }
-
-        if (seed == null) {
-            seed = random.randomCharacterString(16);
-        } else if (seed.isEmpty()) {
-            seed = random.randomCharacterString(16);
-        }
-
-        getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
-
-        // Init. a new world
-        _activeWorldRenderer = new WorldRenderer(title, seed);
-        _activeWorldRenderer.setPlayer(new Player(_activeWorldRenderer));
-
-        // Create the first Portal if it doesn't exist yet
-        _activeWorldRenderer.initPortal();
-        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
-
-        simulateWorld(4000);
-    }
-
-    private void simulateWorld(int duration) {
-        long timeBefore = getTime();
-
-        _loadingScreen.setVisible(true);
-        _hud.setVisible(false);
-        _metrics.setVisible(false);
-
-        float diff = 0;
-
-        while (diff < duration) {
-            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
-
-            renderUserInterface();
-            updateUserInterface();
-
-            getActiveWorldRenderer().standaloneGenerateChunks();
-
-            Display.update();
-
-            diff = getTime() - timeBefore;
-        }
-
-        _loadingScreen.setVisible(false);
-        _hud.setVisible(true);
-        _metrics.setVisible(true);
-    }
 
     /**
      * Clean up before exiting the application.
@@ -341,38 +263,12 @@ public final class Terasology {
         FontManager.getInstance();
         BlockShapeManager.getInstance();
         BlockManager.getInstance();
-
-        _hud = new UIHeadsUpDisplay();
-        _hud.setVisible(true);
-
-        _pauseMenu = new UIPauseMenu();
-        _loadingScreen = new UILoadingScreen();
-        _statusScreen = new UIStatusScreen();
-        _inventoryScreen = new UIInventoryScreen();
-        _metrics = new UIMetrics();
-        _metrics.setVisible(true);
-
-        _guiScreens.add(_metrics);
-        _guiScreens.add(_hud);
-        _guiScreens.add(_pauseMenu);
-        _guiScreens.add(_loadingScreen);
-        _guiScreens.add(_inventoryScreen);
-        _guiScreens.add(_statusScreen);
-
         /*
          * Init. OpenGL
          */
         resizeViewport();
         resetOpenGLParameters();
-
-        // Generate a world with a random seed value
-        String worldSeed = (String) ConfigurationManager.getInstance().getConfig().get("World.defaultSeed");
-
-        if (worldSeed.isEmpty())
-            worldSeed = null;
-
-        initWorld("World1", worldSeed);
-        initGroovy();
+        
     }
 
     public void resetOpenGLParameters() {
@@ -392,6 +288,7 @@ public final class Terasology {
     public void startGame() {
         getInstance().getLogger().log(Level.INFO, "Starting Terasology...");
 
+        IGameMode mode = null;
         PerformanceMonitor.startActivity("Other");
 
         // MAIN GAME LOOP
@@ -407,35 +304,37 @@ public final class Terasology {
                 Display.processMessages();
                 PerformanceMonitor.endActivity();
             }
+            
+            mode = getGameMode();
+            
+            if(mode==null){
+              _runGame = false;
+              break;
+            }
 
             PerformanceMonitor.startActivity("Main Update");
             long startTime = getTime();
-            while (_timeAccumulator >= SKIP_TICKS) {
-                update();
-                _timeAccumulator -= SKIP_TICKS;
-            }
+            mode.update();
             PerformanceMonitor.endActivity();
-
             PerformanceMonitor.startActivity("Render");
-            render();
+            mode.render();
             updateFps();
             Display.update();
             Display.sync(60);
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Input");
-            processKeyboardInput();
-            processMouseInput();
-
-            if (!screenHasFocus())
-                getActiveWorldRenderer().getPlayer().updateInput();
-
+            mode.processKeyboardInput();
+            mode.processMouseInput();
+            mode.updatePlayerInput();
             PerformanceMonitor.endActivity();
+
+
+
 
             PerformanceMonitor.rollCycle();
             PerformanceMonitor.startActivity("Other");
-
-            _timeAccumulator += getTime() - startTime;
+            mode.updateTimeAccumulator(getTime(), startTime);
 
             if (Display.wasResized())
                 resizeViewport();
@@ -445,7 +344,7 @@ public final class Terasology {
          * Save the world and exit the application.
          */
         if (_saveWorldOnExit) {
-            _activeWorldRenderer.dispose();
+            getGameMode().getActiveWorldRenderer().dispose();
         }
 
         _threadPool.shutdown();
@@ -458,114 +357,46 @@ public final class Terasology {
 
         destroy();
     }
+    
+    public IGameMode getGameMode(){
+      
+      IGameMode mode = _gameModes.get(_state); 
+      
+      if (mode!= null){
+        return mode;
+      } 
+      
+      switch(_state){
+          case runGame:
+              mode = new ModePlayGame();
+          break;
+            
+          case mainMenu:
+              mode = new ModeMainMenu();
+          break;
+
+          case undefined:
+              getLogger().log(Level.SEVERE, "Undefined game state - unable to run");
+              return null;
+      }
+
+      _gameModes.put(_state, mode);
+      
+      mode.init();
+      
+      return mode;
+    }
+    
+    public void setGameMode(GameMode state){
+      _state = state;
+    }
 
     public void render() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glLoadIdentity();
-
-        if (_activeWorldRenderer != null)
-            _activeWorldRenderer.render();
-
-        PerformanceMonitor.startActivity("Render UI");
-        renderUserInterface();
-        PerformanceMonitor.endActivity();
+        getGameMode().render();
     }
 
     public void update() {
-        if (_activeWorldRenderer != null && shouldUpdateWorld())
-            _activeWorldRenderer.update();
-
-        if (screenHasFocus() || !shouldUpdateWorld()) {
-            if (Mouse.isGrabbed()) {
-                Mouse.setGrabbed(false);
-                Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
-            }
-
-        } else {
-            if (!Mouse.isGrabbed())
-                Mouse.setGrabbed(true);
-        }
-
-        if (_activeWorldRenderer != null) {
-            if (_activeWorldRenderer.getPlayer().isDead()) {
-                _statusScreen.setVisible(true);
-                _activeWorldRenderer.getPlayer().reset();
-                _statusScreen.updateStatus("Sorry. You've died. :-(");
-            } else {
-                _statusScreen.setVisible(false);
-            }
-
-        }
-
-        updateUserInterface();
-    }
-
-    private boolean screenHasFocus() {
-        for (UIDisplayElement screen : _guiScreens) {
-            if (screen.isVisible() && !screen.isOverlay()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean screenCanFocus(UIDisplayElement s) {
-        boolean result = true;
-
-        for (UIDisplayElement screen : _guiScreens) {
-            if (screen.isVisible() && !screen.isOverlay() && screen != s)
-                result = false;
-        }
-
-        return result;
-    }
-
-    private boolean shouldUpdateWorld() {
-        return !_pauseGame && !_pauseMenu.isVisible();
-    }
-
-    private void renderUserInterface() {
-        for (UIDisplayElement screen : _guiScreens) {
-            screen.render();
-        }
-    }
-
-    private void updateUserInterface() {
-        for (UIDisplayElement screen : _guiScreens) {
-            screen.update();
-        }
-    }
-
-    public void pause() {
-        _pauseGame = true;
-    }
-
-    public void unpause() {
-        _pauseGame = false;
-    }
-
-    public void togglePauseGame() {
-        if (_pauseGame) {
-            unpause();
-        } else {
-            pause();
-        }
-    }
-
-    private void toggleInventory() {
-        if (screenCanFocus(_inventoryScreen))
-            _inventoryScreen.setVisible(!_inventoryScreen.isVisible());
-    }
-
-    public void togglePauseMenu() {
-        if (screenCanFocus(_pauseMenu))
-            _pauseMenu.setVisible(!_pauseMenu.isVisible());
-    }
-
-    public void toggleViewingDistance() {
-        _activeViewingDistance = (_activeViewingDistance + 1) % 4;
-        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+        getGameMode().update();
     }
 
     public void exit(boolean saveWorld) {
@@ -575,84 +406,6 @@ public final class Terasology {
 
     public void exit() {
         exit(true);
-    }
-
-    /*
-     * Process mouse input - nothing system-y, so just passing it to the Player class
-     */
-    private void processMouseInput() {
-        while (Mouse.next()) {
-            int button = Mouse.getEventButton();
-            int wheelMoved = Mouse.getEventDWheel();
-
-            for (UIDisplayElement screen : _guiScreens) {
-                if (screenCanFocus(screen)) {
-                    screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-                }
-            }
-
-            if (!screenHasFocus())
-                _activeWorldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-        }
-    }
-
-    /**
-     * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
-     */
-    private void processKeyboardInput() {
-        boolean debugEnabled = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
-
-        while (Keyboard.next()) {
-            int key = Keyboard.getEventKey();
-
-            if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                if (key == Keyboard.KEY_ESCAPE) {
-                    togglePauseMenu();
-                }
-
-                if (key == Keyboard.KEY_I) {
-                    toggleInventory();
-                }
-
-                if (key == Keyboard.KEY_F3) {
-                    ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", debugEnabled = !(debugEnabled));
-                }
-
-                if (key == Keyboard.KEY_F) {
-                    toggleViewingDistance();
-                }
-
-                // Pass input to focused GUI element
-                for (UIDisplayElement screen : _guiScreens) {
-                    if (screenCanFocus(screen)) {
-                        screen.processKeyboardInput(key);
-                    }
-                }
-            }
-
-            // Features for debug mode only
-            if (debugEnabled) {
-                if (key == Keyboard.KEY_UP && Keyboard.getEventKeyState()) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.005);
-                }
-
-                if (key == Keyboard.KEY_DOWN && Keyboard.getEventKeyState()) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.005);
-                }
-
-                if (key == Keyboard.KEY_RIGHT && Keyboard.getEventKeyState()) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.02);
-                }
-
-                if (key == Keyboard.KEY_LEFT && Keyboard.getEventKeyState()) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
-                }
-            }
-
-            // Pass input to the current player
-            if (!screenHasFocus())
-                _activeWorldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
-        }
     }
 
     /**
@@ -718,24 +471,20 @@ public final class Terasology {
         return _logger;
     }
 
-    public boolean isGamePaused() {
-        return _pauseGame;
-    }
-
     public double getAverageFps() {
         return _averageFps;
     }
 
     public WorldRenderer getActiveWorldRenderer() {
-        return _activeWorldRenderer;
+        return getGameMode().getActiveWorldRenderer();
     }
 
     public IWorldProvider getActiveWorldProvider() {
-        return _activeWorldRenderer.getWorldProvider();
+        return getGameMode().getActiveWorldRenderer().getWorldProvider();
     }
 
     public Player getActivePlayer() {
-        return _activeWorldRenderer.getPlayer();
+        return getGameMode().getActiveWorldRenderer().getPlayer();
     }
 
     /**
@@ -770,10 +519,6 @@ public final class Terasology {
 
     public GroovyManager getGroovyManager() {
         return _groovyManager;
-    }
-
-    public UIHeadsUpDisplay getHUD() {
-        return _hud;
     }
 
     public long getDelta() {
