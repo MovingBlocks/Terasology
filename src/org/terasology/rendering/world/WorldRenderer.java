@@ -522,9 +522,14 @@ public final class WorldRenderer implements IGameObject {
         _player.registerObserver(_worldProvider.getGrowthSimulator());
         _player.registerObserver(_worldProvider.getLiquidSimulator());
 
+        _player.load();
         _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
         _player.reset();
-        _player.respawn();
+
+        // Only respawn the player if no position was loaded
+        if (_player.getPosition().equals(new Vector3d(0.0, 0.0, 0.0))) {
+            _player.respawn();
+        }
 
         updateChunksInProximity(true);
     }
@@ -546,6 +551,7 @@ public final class WorldRenderer implements IGameObject {
      */
     public void dispose() {
         _worldProvider.dispose();
+        _player.dispose();
         AudioManager.getInstance().stopAllSounds();
     }
 

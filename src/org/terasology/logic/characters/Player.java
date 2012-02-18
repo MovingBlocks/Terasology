@@ -16,6 +16,7 @@
  */
 package org.terasology.logic.characters;
 
+import groovy.util.ConfigObject;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -49,6 +50,8 @@ import org.terasology.utilities.MathHelper;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -107,6 +110,8 @@ public final class Player extends Character {
 
         // Set the default value for the god mode
         _godMode = GOD_MODE;
+
+        load();
     }
 
     public void render() {
@@ -528,6 +533,37 @@ public final class Player extends Character {
 
         ShaderManager.getInstance().enableShader(null);
 
+    }
+
+    @Override
+    public void writePropertiesToConfigObject(ConfigObject co) {
+        co.put("playerPositionX", getPosition().x);
+        co.put("playerPositionY", getPosition().y);
+        co.put("playerPositionZ", getPosition().z);
+        co.put("godMode", _godMode);
+    }
+
+    @Override
+    public void readPropertiesFromConfigObject(ConfigObject co) {
+        getPosition().x = ((BigDecimal) co.get("playerPositionX")).doubleValue();
+        getPosition().y = ((BigDecimal) co.get("playerPositionY")).doubleValue();
+        getPosition().z = ((BigDecimal) co.get("playerPositionZ")).doubleValue();
+        _godMode = (Boolean) co.get("godMode");
+    }
+
+    @Override
+    public String getObjectSavePath() {
+        return Terasology.getInstance().getWorldSavePath(_parent.getWorldProvider().getTitle());
+    }
+
+    @Override
+    public String getObjectFileName() {
+        return "PlayerManifest.groovy";
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
     }
 
     public Item getActiveItem() {

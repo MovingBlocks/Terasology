@@ -15,10 +15,7 @@
  */
 package org.terasology.logic.world;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
+import groovy.util.ConfigObject;
 import org.terasology.game.Terasology;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.generators.GeneratorManager;
@@ -26,16 +23,15 @@ import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.persistence.TeraObject;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.MathHelper;
-import org.xml.sax.InputSource;
 
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -44,7 +40,7 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class LocalWorldProvider implements IWorldProvider {
+public class LocalWorldProvider extends TeraObject implements IWorldProvider {
 
     /* WORLD GENERATION */
     protected final GeneratorManager _generatorManager;
@@ -74,7 +70,6 @@ public class LocalWorldProvider implements IWorldProvider {
      * @param seed  The seed string used to generate the terrain
      */
     public LocalWorldProvider(String title, String seed) {
-
         if (seed == null) {
             throw new IllegalArgumentException("No seed provided.");
         } else if (seed.isEmpty()) {
@@ -90,11 +85,10 @@ public class LocalWorldProvider implements IWorldProvider {
         _title = title;
         _seed = seed;
 
+        load();
+
         // Init. random generator
         _random = new FastRandom(seed.hashCode());
-
-        // Load the meta data of this world
-        loadMetaData();
 
         _generatorManager = new GeneratorManager(this);
         _chunkProvider = new LocalChunkCache(this);
@@ -335,8 +329,7 @@ public class LocalWorldProvider implements IWorldProvider {
 
     public void dispose() {
         Terasology.getInstance().getLogger().log(Level.INFO, "Disposing local world \"{0}\" and saving all chunks.", getTitle());
-
-        saveMetaData();
+        super.dispose();
         getChunkProvider().dispose();
     }
 
@@ -370,23 +363,6 @@ public class LocalWorldProvider implements IWorldProvider {
         return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcBiomeTypeForGlobalPosition(x, z);
     }
 
-    /**
-     * Returns the world save path, including the world's name. Will try to detect and fix quirky path issues (applet thing)
-     *
-     * @return path to save stuff at
-     */
-    public String getWorldSavePath() {
-        String path = String.format("SAVED_WORLDS/%s", _title);
-        // Try to detect if we're getting a screwy save path (usually/always the case with an applet)
-        File f = new File(path);
-        //System.out.println("Suggested absolute save path is: " + f.getAbsolutePath());
-        if (!f.getAbsolutePath().contains("Terasology")) {
-            f = new File(System.getProperty("java.io.tmpdir"), path);
-            //System.out.println("Absolute TEMP save path is: " + f.getAbsolutePath());
-            return f.getAbsolutePath();
-        }
-        return path;
-    }
 
     public void setTime(double time) {
         if (time >= 0.0)
@@ -424,70 +400,6 @@ public class LocalWorldProvider implements IWorldProvider {
 
     public String getSeed() {
         return _seed;
-    }
-
-    /**
-     * Saves the meta data of this world.
-     *
-     * @return True if saving was successful
-     */
-    public boolean saveMetaData() {
-        // Generate the save directory if needed
-        File dir = new File(getWorldSavePath());
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                Terasology.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
-                return false;
-            }
-        }
-
-        File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));
-
-        Element root = new Element("World");
-        Document doc = new Document(root);
-
-        // Save the world metadata
-        root.setAttribute("seed", _seed);
-        root.setAttribute("title", _title);
-        root.setAttribute("time", Double.toString(getTime()));
-
-        XMLOutputter outputter = new XMLOutputter();
-        FileOutputStream output;
-
-        try {
-            output = new FileOutputStream(f);
-            outputter.output(doc, output);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
-     * Loads the meta data of this world.
-     *
-     * @return True if loading was successful
-     */
-    private boolean loadMetaData() {
-        File f = new File(String.format("%s/Metadata.xml", getWorldSavePath()));
-
-        if (!f.exists())
-            return false;
-
-        try {
-            SAXBuilder builder = new SAXBuilder();
-            InputSource is = new InputSource(new FileInputStream(f));
-            Document doc = builder.build(is);
-            Element root = doc.getRootElement();
-
-            _seed = root.getAttribute("seed").getValue();
-            _title = root.getAttributeValue("title");
-            setTime(Double.parseDouble(root.getAttributeValue("time")));
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     /**
@@ -531,5 +443,38 @@ public class LocalWorldProvider implements IWorldProvider {
 
         Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
         c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
+    }
+
+    /**
+     * Returns the world save path, including the world's name. Will try to detect and fix quirky path issues (applet thing)
+     *
+     * @return path to save stuff at
+     */
+    @Override
+    public String getObjectSavePath() {
+        return Terasology.getInstance().getWorldSavePath(_title);
+    }
+
+    @Override
+    public String getObjectFileName() {
+        return "WorldManifest.groovy";
+    }
+
+    @Override
+    public void writePropertiesToConfigObject(ConfigObject co) {
+        co.put("worldTitle", getTitle());
+        co.put("worldSeed", getSeed());
+        co.put("worldTime", getTime());
+    }
+
+    @Override
+    public void readPropertiesFromConfigObject(ConfigObject co) {
+        _title = (String) co.get("worldTitle");
+        _seed = (String) co.get("worldSeed");
+
+        Double time = ((BigDecimal) co.get("worldTime")).doubleValue();
+
+        if (time != null)
+            setTime(time);
     }
 }
