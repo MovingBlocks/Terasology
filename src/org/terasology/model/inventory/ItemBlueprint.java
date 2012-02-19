@@ -15,7 +15,6 @@
  */
 package org.terasology.model.inventory;
 
-import org.terasology.logic.characters.Player;
 import org.terasology.model.blueprints.Blueprint;
 
 /**
@@ -28,7 +27,6 @@ public class ItemBlueprint extends Item {
     public ItemBlueprint() {
         super();
 
-        setIconWithAtlasPos(10, 3);
         _toolId = (byte) 2;
         _stackSize = 1;
     }

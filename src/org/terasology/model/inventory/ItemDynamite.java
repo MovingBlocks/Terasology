@@ -24,7 +24,6 @@ public class ItemDynamite extends Item {
     public ItemDynamite() {
         super();
 
-        setIconWithAtlasPos(5, 0);
         _toolId = (byte) 3;
         _stackSize = 1;
     }

@@ -15,43 +15,24 @@
  */
 package org.terasology.model.inventory;
 
+import java.util.HashMap;
+
 import org.terasology.logic.characters.Player;
 import org.terasology.model.blocks.Block;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector2f;
-import java.util.HashMap;
 
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class Item {
-
-    protected UIGraphicsElement _icon;
-
     protected int _amount;
     protected byte _toolId;
 
     protected int _stackSize = 16;
 
-    protected int _iconX, _iconY;
-
     protected HashMap<Block, Byte> _extractionAmountMapping = new HashMap<Block, Byte>();
 
     public Item() {
         _amount = 1;
-        _icon = new UIGraphicsElement("items");
-        _icon.setSize(new Vector2f(32, 32));
-        _icon.getTextureSize().set(new Vector2f(0.0624f, 0.0624f));
-        _icon.setVisible(true);
-        _icon.setPosition(new Vector2f(-10f, -16f));
-
-        setIconWithAtlasPos(0, 0);
-    }
-
-    public boolean renderIcon() {
-        _icon.renderTransformed();
-        return true;
     }
 
     public boolean renderFirstPersonView(Player player) {
@@ -90,12 +71,6 @@ public abstract class Item {
 
     public byte getToolId() {
         return _toolId;
-    }
-
-    public void setIconWithAtlasPos(int x, int y) {
-        _iconX = x;
-        _iconY = y;
-        _icon.getTextureOrigin().set(new Vector2f(x * 0.0625f, y * 0.0625f));
     }
 
     public int getStackSize() {

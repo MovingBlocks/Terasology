@@ -25,7 +25,7 @@ public class ItemAxe extends VoxelItem {
     public ItemAxe() {
         super();
 
-        setIconWithAtlasPos(1, 7);
+//        setIconWithAtlasPos(1, 7);
         _toolId = (byte) 1;
         _stackSize = 8;
 

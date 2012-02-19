@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
+import org.terasology.model.inventory.Icon;
 import org.terasology.model.inventory.Item;
 import org.terasology.model.inventory.Toolbar;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -90,7 +91,7 @@ public class UIToolbarCell extends UIDisplayElement {
         if (item != null) {
             glPushMatrix();
             glTranslatef(20f, 20f, 0f);
-            item.renderIcon();
+            Icon.get(item).render();
             glPopMatrix();
             glDisable(GL11.GL_CULL_FACE);
         }

@@ -1,12 +1,10 @@
 package org.terasology.model.inventory;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +13,6 @@ import org.junit.runner.RunWith;
 
 @RunWith(Enclosed.class)
 public class InventoryTest {
-
 	public static class StoreItemInSlot {
 		private Inventory inventory;
 		private Item item;
@@ -23,9 +20,7 @@ public class InventoryTest {
 		@Before
 		public void setUp() {
 			inventory = new Inventory();
-			item = mock(Item.class);
-
-			when(item.getStackSize()).thenReturn(64);
+			item = new ItemImpl();
 		}
 
 		@Test
@@ -63,7 +58,7 @@ public class InventoryTest {
 			inventory.storeItemInSlot(0, item);
 			inventory.storeItemInSlot(0, item);
 
-			verify(item).increaseAmount();
+			assertEquals(2, item.getAmount());
 		}
 	}
 
@@ -74,9 +69,7 @@ public class InventoryTest {
 		@Before
 		public void setUp() {
 			inventory = new Inventory();
-			item = mock(Item.class);
-
-			when(item.getStackSize()).thenReturn(64);
+			item = new ItemImpl();
 		}
 
 		@Test
@@ -94,8 +87,8 @@ public class InventoryTest {
 		public void decreasesAmountGivenItemSavedInSlot() {
 			inventory.storeItemInSlot(0, item);
 			inventory.removeOneItemInSlot(0);
-
-			verify(item).decreaseAmount();
+			
+			assertEquals(0, item.getAmount());
 		}
 
 		@Test
@@ -109,12 +102,12 @@ public class InventoryTest {
 
 	public static class StoreItemInFreeSlot {
 		private Inventory inventory;
-		private Item item;
+		private ItemImpl item;
 
 		@Before
 		public void setUp() {
 			inventory = new Inventory();
-			item = mock(Item.class);
+			item = new ItemImpl();
 		}
 
 		@Test
@@ -125,13 +118,17 @@ public class InventoryTest {
 
 		@Test
 		public void storesItemInOneGivenItemStackFull() {
-			when(item.getStackSize()).thenReturn(1);
-			when(item.getAmount()).thenReturn(1);
-
+			item.setStackSize(1);
 			inventory.storeItemInFreeSlot(item);
 			inventory.storeItemInFreeSlot(item);
 
 			assertEquals(item, inventory.getItemInSlot(1));
+		}
+	}
+	
+	public static class ItemImpl extends Item {
+		public void setStackSize(int size) {
+			this._stackSize = size;
 		}
 	}
 }

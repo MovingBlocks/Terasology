@@ -25,7 +25,6 @@ import org.terasology.logic.manager.TextureManager;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
-import org.terasology.model.blocks.management.BlockManager;
 
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
@@ -47,27 +46,6 @@ public class ItemBlock extends Item {
     public ItemBlock(BlockGroup blockGroup, int amount) {
         this(blockGroup);
         setAmount(amount);
-    }
-
-    @Override
-    public boolean renderIcon() {
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-
-        GL11.glPushMatrix();
-        glTranslatef(4f, 0f, 0f);
-        GL11.glScalef(20f, 20f, 20f);
-        GL11.glRotatef(170f, 1f, 0f, 0f);
-        GL11.glRotatef(-16f, 0f, 1f, 0f);
-        TextureManager.getInstance().bindTexture("terrain");
-
-        Block block = _blockGroup.getArchetypeBlock();
-        block.render();
-
-        GL11.glPopMatrix();
-
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-
-        return true;
     }
 
     @Override
