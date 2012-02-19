@@ -30,7 +30,6 @@ import org.terasology.utilities.MathHelper;
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.logging.Level;

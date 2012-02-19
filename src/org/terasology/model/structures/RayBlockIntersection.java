@@ -38,17 +38,12 @@ public class RayBlockIntersection {
      */
     public static class Intersection implements Comparable<Intersection> {
 
-        private final double _d;
         private final double _t;
-        private final Vector3d _rayOrigin, _intersectionPoint, _surfaceNormal, _rayDirection;
+        private final Vector3d _surfaceNormal;
         private final BlockPosition _blockPosition;
 
         public Intersection(BlockPosition blockPosition, Vector3d normal, double d, double t, Vector3d rayOrigin, Vector3d rayDirection, Vector3d intersectionPoint) {
-            this._d = d;
             this._t = t;
-            this._rayOrigin = rayOrigin;
-            this._rayDirection = rayDirection;
-            this._intersectionPoint = intersectionPoint;
             this._surfaceNormal = normal;
             this._blockPosition = blockPosition;
         }
