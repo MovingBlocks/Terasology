@@ -13,6 +13,9 @@ import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
+/**
+ * Icon for rendering items in inventory.
+ */
 @SuppressWarnings("rawtypes")
 public class Icon {
 	private static Map<Class, Icon> icons;
@@ -22,12 +25,20 @@ public class Icon {
 	private int _x;
 	private int _y;
 	
+	/**
+	 * Creates Icon for BlockGroup class.
+	 * 
+	 * @param blockGroup
+	 */
 	public Icon(BlockGroup blockGroup) {
 		_element = null;
 		_blockGroup = blockGroup;
 		setAtlasPosition(0, 0);
 	}
 	
+	/**
+	 * Creates an Icon for a non-BlockGroup class
+	 */
 	public Icon() {
 		_element = new UIGraphicsElement("items");
 		_blockGroup = null;
@@ -40,6 +51,12 @@ public class Icon {
         setAtlasPosition(0, 0);
 	}
 	
+	/**
+	 * Returns the icon for <code>item</code>.
+	 * 
+	 * @param item the Item to check
+	 * @return the Icon for item
+	 */
 	public static Icon get(Item item) {
 		if (icons == null) {
 			loadIcons();
@@ -71,6 +88,9 @@ public class Icon {
 		icons.put(ItemBlueprint.class, blueprintIcon);
 	}
 	
+	/**
+	 * Draw the icon.
+	 */
 	public void render() {
 		if (_blockGroup == null) {
 			_element.renderTransformed();			
@@ -93,10 +113,17 @@ public class Icon {
 		}
 	}
 	
+	/** 
+	 * @return x-offset in icon sheet
+	 */
 	public int getX() {
 		return _x;
 	}
 	
+	/**
+	 * 
+	 * @return y-offset in icon sheet
+	 */
 	public int getY() {
 		return _y;
 	}
