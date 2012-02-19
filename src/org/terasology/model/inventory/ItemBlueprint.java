@@ -25,8 +25,8 @@ public class ItemBlueprint extends Item {
 
     private Blueprint _blueprint;
 
-    public ItemBlueprint(Player parent) {
-        super(parent);
+    public ItemBlueprint() {
+        super();
 
         setIconWithAtlasPos(10, 3);
         _toolId = (byte) 2;

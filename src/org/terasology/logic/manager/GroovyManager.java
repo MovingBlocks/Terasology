@@ -135,7 +135,7 @@ public class GroovyManager {
 
         public void giveBlock(int blockId, int quantity) {
             Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.getInventory().storeItemInFreeSlot(new ItemBlock(player, BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup(), quantity));
+            player.getInventory().storeItemInFreeSlot(new ItemBlock(BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup(), quantity));
         }
 
         public void giveBlock(String title) {
@@ -152,7 +152,7 @@ public class GroovyManager {
                 }
             }
             if (group != null) {
-                player.getInventory().storeItemInFreeSlot(new ItemBlock(player, group, quantity));
+                player.getInventory().storeItemInFreeSlot(new ItemBlock(group, quantity));
             }
         }
     }

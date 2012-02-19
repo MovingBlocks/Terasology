@@ -120,12 +120,12 @@ public class Player extends Character {
     }
     
     private void loadDefaultItems() {
-        _inventory.storeItemInSlot(0, new ItemBlock(this, BlockManager.getInstance().getBlockGroup("Companion"), 1));
-        _inventory.storeItemInSlot(1, new ItemBlock(this, BlockManager.getInstance().getBlockGroup("Torch"), 16));
-        _inventory.storeItemInSlot(2, new ItemPickAxe(this));
-        _inventory.storeItemInSlot(3, new ItemAxe(this));
-        _inventory.storeItemInSlot(4, new ItemBlueprint(this));
-        _inventory.storeItemInSlot(5, new ItemDynamite(this));
+        _inventory.storeItemInSlot(0, new ItemBlock(BlockManager.getInstance().getBlockGroup("Companion"), 1));
+        _inventory.storeItemInSlot(1, new ItemBlock(BlockManager.getInstance().getBlockGroup("Torch"), 16));
+        _inventory.storeItemInSlot(2, new ItemPickAxe());
+        _inventory.storeItemInSlot(3, new ItemAxe());
+        _inventory.storeItemInSlot(4, new ItemBlueprint());
+        _inventory.storeItemInSlot(5, new ItemDynamite());
     }
 
     public void render() {
@@ -229,7 +229,7 @@ public class Player extends Character {
             return;
 
         if (getActiveItem() != null) {
-            if (getActiveItem().renderFirstPersonView()) {
+            if (getActiveItem().renderFirstPersonView(this)) {
                 return;
             }
         }

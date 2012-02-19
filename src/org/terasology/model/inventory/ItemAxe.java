@@ -22,8 +22,8 @@ import org.terasology.model.blocks.management.BlockManager;
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
 public class ItemAxe extends VoxelItem {
-    public ItemAxe(Player parent) {
-        super(parent);
+    public ItemAxe() {
+        super();
 
         setIconWithAtlasPos(1, 7);
         _toolId = (byte) 1;

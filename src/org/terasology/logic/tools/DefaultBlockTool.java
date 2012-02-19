@@ -53,7 +53,7 @@ public class DefaultBlockTool extends SimpleTool {
         byte removedBlockId = removeBlock(true);
 
         if (removedBlockId != 0) {
-            _player.getInventory().storeItemInFreeSlot(new ItemBlock(_player, BlockManager.getInstance().getBlock(removedBlockId).getBlockGroup(), 1));
+            _player.getInventory().storeItemInFreeSlot(new ItemBlock(BlockManager.getInstance().getBlock(removedBlockId).getBlockGroup(), 1));
         }
     }
 

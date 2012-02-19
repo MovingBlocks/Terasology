@@ -106,13 +106,24 @@ public class Inventory {
         return null;
     }
 
+    public Item getItemInSlot(int slot) {
+        if (slot < 0 || slot >= size())
+            return null;
+
+        return _inventory[slot];
+    }
+
+    public int size() {
+        return _inventory.length;
+    }
+    
     /**
      * Returns the first free slot for the given item.
      *
      * @param item The item
      * @return The slot if at least one is available. Returns -1 otherwise.
      */
-    public int findFirstFreeSlot(Item item) {
+    private int findFirstFreeSlot(Item item) {
         for (int i = 0; i < size(); i++) {
             if (_inventory[i] == null) {
                 return i;
@@ -124,16 +135,5 @@ public class Inventory {
         }
 
         return -1;
-    }
-
-    public Item getItemInSlot(int slot) {
-        if (slot < 0 || slot >= size())
-            return null;
-
-        return _inventory[slot];
-    }
-
-    public int size() {
-        return _inventory.length;
     }
 }

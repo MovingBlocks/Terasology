@@ -30,23 +30,23 @@ public abstract class VoxelItem extends Item {
 
     private Mesh _itemMesh;
 
-    public VoxelItem(Player parent) {
-        super(parent);
+    public VoxelItem() {
+        super();
 
         _toolId = (byte) 1;
         _stackSize = 8;
     }
 
     @Override
-    public boolean renderFirstPersonView() {
+    public boolean renderFirstPersonView(Player player) {
         ShaderManager.getInstance().enableShader("block");
         ShaderParameters params = ShaderManager.getInstance().getShaderParameters("block");
         params.setInt("textured", 0);
 
         glPushMatrix();
 
-        glTranslatef(1.0f, -1.3f + (float) getParent().calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - getParent().getHandMovementAnimationOffset() * 0.5f, -1.5f - getParent().getHandMovementAnimationOffset() * 0.5f);
-        glRotatef(-getParent().getHandMovementAnimationOffset() * 64.0f, 1.0f, 0.0f, 0.0f);
+        glTranslatef(1.0f, -1.3f + (float) player.calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - player.getHandMovementAnimationOffset() * 0.5f, -1.5f - player.getHandMovementAnimationOffset() * 0.5f);
+        glRotatef(-player.getHandMovementAnimationOffset() * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(-20f, 1.0f, 0.0f, 0.0f);
         glRotatef(-80f, 0.0f, 1.0f, 0.0f);
         glRotatef(45f, 0.0f, 0.0f, 1.0f);

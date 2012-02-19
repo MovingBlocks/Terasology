@@ -27,7 +27,6 @@ import java.util.HashMap;
  */
 public abstract class Item {
 
-    protected Player _parent;
     protected UIGraphicsElement _icon;
 
     protected int _amount;
@@ -39,10 +38,8 @@ public abstract class Item {
 
     protected HashMap<Block, Byte> _extractionAmountMapping = new HashMap<Block, Byte>();
 
-    public Item(Player parent) {
+    public Item() {
         _amount = 1;
-        _parent = parent;
-
         _icon = new UIGraphicsElement("items");
         _icon.setSize(new Vector2f(32, 32));
         _icon.getTextureSize().set(new Vector2f(0.0624f, 0.0624f));
@@ -57,7 +54,7 @@ public abstract class Item {
         return true;
     }
 
-    public boolean renderFirstPersonView() {
+    public boolean renderFirstPersonView(Player player) {
         return false;
     }
 
@@ -93,10 +90,6 @@ public abstract class Item {
 
     public byte getToolId() {
         return _toolId;
-    }
-
-    public Player getParent() {
-        return _parent;
     }
 
     public void setIconWithAtlasPos(int x, int y) {
