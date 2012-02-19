@@ -72,6 +72,10 @@ public class Cubbyhole {
 		return _count == 0;
 	}
 	
+	public boolean isFull() {
+		return _item != null ? _count == _item.getStackSize() : false;
+	}
+	
 	private Cubbyhole replaceInsert(Item item, int count) {
 		Cubbyhole result = new Cubbyhole();
 		result._item = _item;

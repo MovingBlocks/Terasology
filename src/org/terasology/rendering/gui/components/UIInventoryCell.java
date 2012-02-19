@@ -69,7 +69,7 @@ public class UIInventoryCell extends UIDisplayElement {
 
         if (item != null) {
             getLabel().setVisible(true);
-            getLabel().setText(Integer.toString(inventory.getItemCount(_id)));
+            getLabel().setText(Integer.toString(inventory.getItemCountAt(_id)));
         } else {
             getLabel().setVisible(false);
         }

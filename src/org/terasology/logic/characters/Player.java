@@ -120,11 +120,11 @@ public class Player extends Character {
     
     private void loadDefaultItems() {
     	_inventory.addItem(new ItemBlock(BlockManager.getInstance().getBlockGroup("Companion")), 1);
-    	_inventory.addItem(new ItemBlock(BlockManager.getInstance().getBlockGroup("Torch")), 1);
-    	_inventory.addItem(new ItemPickAxe());
-    	_inventory.addItem(new ItemAxe());
-    	_inventory.addItem(new ItemBlueprint());
-    	_inventory.addItem(new ItemDynamite());
+    	_inventory.addItem(new ItemBlock(BlockManager.getInstance().getBlockGroup("Torch")), 16);
+    	_inventory.addItem(new ItemPickAxe(), 1);
+    	_inventory.addItem(new ItemAxe(), 1);
+    	_inventory.addItem(new ItemBlueprint(), 1);
+    	_inventory.addItem(new ItemDynamite(), 1);
     }
 
     public void render() {

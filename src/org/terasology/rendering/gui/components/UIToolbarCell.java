@@ -69,15 +69,19 @@ public class UIToolbarCell extends UIDisplayElement {
         } else {
             setSelected(false);
         }
-
-        Item item = toolbar.getItemInSlot(_id);
+        
+        displayItemCount();
+    }
+    
+    private void displayItemCount() {
         Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
-
-        if (item != null) {
-            getLabel().setVisible(true);
-            getLabel().setText(Integer.toString(inventory.getItemCount(item)));
+        int count = inventory.getItemCountAt(_id);
+        
+        if (count == 0) {
+        	getLabel().setVisible(false);
         } else {
-            getLabel().setVisible(false);
+        	getLabel().setVisible(true);
+        	getLabel().setText(Integer.toString(count));
         }
     }
 

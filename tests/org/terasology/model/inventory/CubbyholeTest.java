@@ -131,6 +131,25 @@ public class CubbyholeTest {
 			assertFalse(cubby.isEmpty());
 		}
 	}
+	public static class IsFull {
+		private Cubbyhole cubby;
+		private ItemImpl item;
+		@Before
+		public void setUp() {
+			cubby = new Cubbyhole();
+			item = new ItemImpl();
+		}
+		@Test
+		public void returnsFalseWhenEmpty() {
+			assertFalse(cubby.isFull());
+		}
+		@Test
+		public void returnsTrueWhenFull() {
+			item.setStackSize(64);
+			cubby.insert(item, 64);
+			assertTrue(cubby.isFull());
+		}
+	}
 	public static class Clear {
 		private Cubbyhole cubby;
 		private ItemImpl item;

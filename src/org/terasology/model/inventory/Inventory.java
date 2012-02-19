@@ -21,150 +21,51 @@ package org.terasology.model.inventory;
 public class Inventory {
 
 	private Cubbyhole[] _cubbies;
-    private final Item[] _items = new Item[27];
-    private final int[] _counts = new int[27];
 
     public Inventory() {
     	_cubbies = new Cubbyhole[27];
-    }
-    
-    public int getItemCount(int slot) {
-    	validateSlot(slot);
     	
-    	return _counts[slot];
+    	for (int i = 0; i < _cubbies.length; i++) {
+    		_cubbies[i] = new Cubbyhole();
+    	}
     }
     
-    public int getItemCount(Item item) {
-    	for (int i = 0; i < _items.length; i++) {
-    		if (item.equals(_items[i])) {
-    			return _counts[i];
+    public void addItem(Item item, int count) {
+    	Cubbyhole free = getFreeCubby(item);
+    	Cubbyhole overflow = free.insert(item, count);
+    	
+    	if (overflow != null) {
+    		free = getFreeCubby(item);
+    		free.insert(item, overflow.getItemCount());
+    	}
+    }
+    
+    public Item removeItemAt(int index, int count) {
+    	Cubbyhole cubby = _cubbies[index];
+    	
+    	cubby.remove(count);
+    	
+    	return cubby.getItem();
+    }
+    
+    private Cubbyhole getFreeCubby(Item item) {
+    	for (Cubbyhole cubby : _cubbies) {
+    		if (cubby.getItem() == null) {
+    			return cubby;
+    		}
+    		if (cubby.getItem().equals(item) && !cubby.isFull()) {
+    			return cubby;
     		}
     	}
     	
-    	return 0;
-    }
-
-    /**
-     * Store an item at a given slot position. Returns true if the item could be stored.
-     *
-     * @param slot The slot
-     * @param item The item to store
-     * @return True if item could be stored
-     */
-    public boolean addItemAt(int slot, Item item) {
-        if (slot < 0 || slot >= size())
-            return false;
-
-        // The slot is empty so no problem here
-        if (_items[slot] == null) {
-            _items[slot] = item;
-            _counts[slot]++;
-            return true;
-        } else {
-            if (_items[slot].equals(item) && _counts[slot] < item.getStackSize()) {
-                _counts[slot]++;
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Stores the item in the first available slot position.
-     *
-     * @param item The item to store
-     * @return True if the item could be stored
-     */
-    public boolean addItem(Item item) {
-        return addItemAt(findFirstFreeSlot(item), item);
+    	return null;
     }
     
-    public boolean addItem(Item item, int count) {
-    	int slot = findFirstFreeSlot(item);
-    	boolean result = addItemAt(slot, item);
-    	
-    	_counts[slot] = _counts[slot] + count - 1;
-    	
-    	return result;
-    }
-
-    /**
-     * Removes one item at the given slot position.
-     *
-     * @param slot The slot
-     * @return The removed object. Null if nothing could be removed.
-     */
-    public Item removeOneItemAt(int slot) {
-        if (slot < 0 || slot >= size())
-            return null;
-
-        if (_items[slot] != null) {
-            Item item = _items[slot];
-            _counts[slot]--;
-
-            if (_counts[slot] == 0) {
-                _items[slot] = null;
-            }
-
-            return item;
-        }
-
-        return null;
-    }
-
-    /**
-     * Removes all items at slot.
-     *
-     * @param slot The slot
-     * @return The removed object. Null if nothing could be removed.
-     */
-    public Item clearSlot(int slot) {
-        if (slot < 0 || slot >= size())
-            return null;
-
-        if (_items[slot] != null) {
-            Item item = _items[slot];
-            _items[slot] = null;
-
-            return item;
-        }
-
-        return null;
-    }
-
-    public Item getItemAt(int slot) {
-        if (slot < 0 || slot >= size())
-            return null;
-
-        return _items[slot];
-    }
-
-    public int size() {
-        return _items.length;
+    public int getItemCountAt(int cubbyIndex) {
+    	return _cubbies[cubbyIndex].getItemCount();
     }
     
-    /**
-     * Returns the first free slot for the given item.
-     *
-     * @param item The item
-     * @return The slot if at least one is available. Returns -1 otherwise.
-     */
-    private int findFirstFreeSlot(Item item) {
-        for (int i = 0; i < size(); i++) {
-            if (_items[i] == null) {
-                return i;
-            } else {
-                if (_items[i].equals(item) && _counts[i] < item.getStackSize()) {
-                    return i;
-                }
-            }
-        }
-
-        return -1;
-    }
-    
-    private void validateSlot(int slot) {
-    	
+    public Item getItemAt(int cubbyIndex) {
+    	return _cubbies[cubbyIndex].getItem();
     }
 }
