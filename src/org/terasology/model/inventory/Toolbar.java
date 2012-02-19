@@ -54,11 +54,11 @@ public class Toolbar {
     }
 
     public Item getItemInSlot(int slot) {
-        return _player.getInventory().getItemInSlot(_slotBinding[slot]);
+        return _player.getInventory().getItemAt(_slotBinding[slot]);
     }
 
     public Item getItemForSelectedSlot() {
-        return _player.getInventory().getItemInSlot(_slotBinding[getSelectedSlot()]);
+        return _player.getInventory().getItemAt(_slotBinding[getSelectedSlot()]);
     }
 
     public int getSelectedSlot() {

@@ -15,16 +15,33 @@
  */
 package org.terasology.model.inventory;
 
-
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
 public class Inventory {
 
-    private final Item[] _inventory = new Item[27];
+	private Cubbyhole[] _cubbies;
+    private final Item[] _items = new Item[27];
+    private final int[] _counts = new int[27];
 
     public Inventory() {
+    	_cubbies = new Cubbyhole[27];
+    }
+    
+    public int getItemCount(int slot) {
+    	validateSlot(slot);
     	
+    	return _counts[slot];
+    }
+    
+    public int getItemCount(Item item) {
+    	for (int i = 0; i < _items.length; i++) {
+    		if (item.equals(_items[i])) {
+    			return _counts[i];
+    		}
+    	}
+    	
+    	return 0;
     }
 
     /**
@@ -34,17 +51,18 @@ public class Inventory {
      * @param item The item to store
      * @return True if item could be stored
      */
-    public boolean storeItemInSlot(int slot, Item item) {
+    public boolean addItemAt(int slot, Item item) {
         if (slot < 0 || slot >= size())
             return false;
 
         // The slot is empty so no problem here
-        if (_inventory[slot] == null) {
-            _inventory[slot] = item;
+        if (_items[slot] == null) {
+            _items[slot] = item;
+            _counts[slot]++;
             return true;
         } else {
-            if (_inventory[slot].equals(item) && _inventory[slot].getAmount() < item.getStackSize()) {
-                _inventory[slot].increaseAmount();
+            if (_items[slot].equals(item) && _counts[slot] < item.getStackSize()) {
+                _counts[slot]++;
                 return true;
             }
         }
@@ -58,8 +76,17 @@ public class Inventory {
      * @param item The item to store
      * @return True if the item could be stored
      */
-    public boolean storeItemInFreeSlot(Item item) {
-        return storeItemInSlot(findFirstFreeSlot(item), item);
+    public boolean addItem(Item item) {
+        return addItemAt(findFirstFreeSlot(item), item);
+    }
+    
+    public boolean addItem(Item item, int count) {
+    	int slot = findFirstFreeSlot(item);
+    	boolean result = addItemAt(slot, item);
+    	
+    	_counts[slot] = _counts[slot] + count - 1;
+    	
+    	return result;
     }
 
     /**
@@ -68,16 +95,16 @@ public class Inventory {
      * @param slot The slot
      * @return The removed object. Null if nothing could be removed.
      */
-    public Item removeOneItemInSlot(int slot) {
+    public Item removeOneItemAt(int slot) {
         if (slot < 0 || slot >= size())
             return null;
 
-        if (_inventory[slot] != null) {
-            Item item = _inventory[slot];
-            item.decreaseAmount();
+        if (_items[slot] != null) {
+            Item item = _items[slot];
+            _counts[slot]--;
 
-            if (item.getAmount() == 0) {
-                _inventory[slot] = null;
+            if (_counts[slot] == 0) {
+                _items[slot] = null;
             }
 
             return item;
@@ -87,18 +114,18 @@ public class Inventory {
     }
 
     /**
-     * Removes one item at the given slot position.
+     * Removes all items at slot.
      *
      * @param slot The slot
      * @return The removed object. Null if nothing could be removed.
      */
-    public Item removeAllItemsInSlot(int slot) {
+    public Item clearSlot(int slot) {
         if (slot < 0 || slot >= size())
             return null;
 
-        if (_inventory[slot] != null) {
-            Item item = _inventory[slot];
-            _inventory[slot] = null;
+        if (_items[slot] != null) {
+            Item item = _items[slot];
+            _items[slot] = null;
 
             return item;
         }
@@ -106,15 +133,15 @@ public class Inventory {
         return null;
     }
 
-    public Item getItemInSlot(int slot) {
+    public Item getItemAt(int slot) {
         if (slot < 0 || slot >= size())
             return null;
 
-        return _inventory[slot];
+        return _items[slot];
     }
 
     public int size() {
-        return _inventory.length;
+        return _items.length;
     }
     
     /**
@@ -125,15 +152,19 @@ public class Inventory {
      */
     private int findFirstFreeSlot(Item item) {
         for (int i = 0; i < size(); i++) {
-            if (_inventory[i] == null) {
+            if (_items[i] == null) {
                 return i;
             } else {
-                if (_inventory[i].equals(item) && _inventory[i].getAmount() < item.getStackSize()) {
+                if (_items[i].equals(item) && _counts[i] < item.getStackSize()) {
                     return i;
                 }
             }
         }
 
         return -1;
+    }
+    
+    private void validateSlot(int slot) {
+    	
     }
 }

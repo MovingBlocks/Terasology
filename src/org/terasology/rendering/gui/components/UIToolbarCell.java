@@ -18,6 +18,7 @@ package org.terasology.rendering.gui.components;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
 import org.terasology.model.inventory.Icon;
+import org.terasology.model.inventory.Inventory;
 import org.terasology.model.inventory.Item;
 import org.terasology.model.inventory.Toolbar;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -70,10 +71,11 @@ public class UIToolbarCell extends UIDisplayElement {
         }
 
         Item item = toolbar.getItemInSlot(_id);
+        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
 
         if (item != null) {
             getLabel().setVisible(true);
-            getLabel().setText(Integer.toString(item.getAmount()));
+            getLabel().setText(Integer.toString(inventory.getItemCount(item)));
         } else {
             getLabel().setVisible(false);
         }

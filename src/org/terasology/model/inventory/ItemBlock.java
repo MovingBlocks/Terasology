@@ -44,10 +44,10 @@ public class ItemBlock extends Item {
         _toolId = (byte) 1;
     }
 
-    public ItemBlock(BlockGroup blockGroup, int amount) {
-        this(blockGroup);
-        setAmount(amount);
-    }
+//    public ItemBlock(BlockGroup blockGroup, int amount) {
+//        this(blockGroup);
+//        setAmount(amount);
+//    }
 
     @Override
     public void renderFirstPersonView(Player player) {

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +12,22 @@ import org.junit.runner.RunWith;
 
 @RunWith(Enclosed.class)
 public class InventoryTest {
-	public static class StoreItemInSlot {
+	public static class GetItemCount {
+		private Inventory inventory;
+		@Before
+		public void setUp() {
+			inventory = new Inventory();
+		}
+		@Test
+		public void returnsZeroGivenNoItemInSlot() {
+			assertEquals(0, inventory.getItemCount(0));
+		}
+		@Test
+		public void returnsZeroGivenMissingItem() {
+			assertEquals(0, inventory.getItemCount(new ItemImpl()));
+		}
+	}
+	public static class StoreItemAt {
 		private Inventory inventory;
 		private Item item;
 
@@ -24,41 +38,40 @@ public class InventoryTest {
 		}
 
 		@Test
-		public void storesItemInSlot() {
-			inventory.storeItemInSlot(0, item);
-
-			assertEquals(item, inventory.getItemInSlot(0));
+		public void storesItemGivenSlot() {
+			inventory.addItemAt(0, item);
+			assertEquals(item, inventory.getItemAt(0));
 		}
 
 		@Test
 		public void returnsTrueGivenValidSlot() {
-			assertTrue(inventory.storeItemInSlot(0, item));
+			assertTrue(inventory.addItemAt(0, item));
 		}
 
 		@Test
 		public void returnsFalseGivenNegativeSlot() {
-			assertFalse(inventory.storeItemInSlot(-1, item));
+			assertFalse(inventory.addItemAt(-1, item));
 		}
 
 		@Test
 		public void returnsFalseGivenSlotTaken() {
-			Item otherItem = mock(Item.class);
+			Item otherItem = new ItemImpl();
 
-			inventory.storeItemInSlot(0, otherItem);
-			assertFalse(inventory.storeItemInSlot(0, item));
+			inventory.addItemAt(0, otherItem);
+			assertFalse(inventory.addItemAt(0, item));
 		}
 
 		@Test
 		public void returnsTrueGivenSlotTakenWithSameItem() {
-			assertTrue(inventory.storeItemInSlot(0, item));
+			assertTrue(inventory.addItemAt(0, item));
 		}
-
+		
 		@Test
-		public void increasesAmountOfItemGivenSlotTakenWithSameItem() {
-			inventory.storeItemInSlot(0, item);
-			inventory.storeItemInSlot(0, item);
-
-			assertEquals(2, item.getAmount());
+		public void incrementsAmountGivenSameItemAndStackable() {
+			inventory.addItemAt(0, item);
+			inventory.addItemAt(0, item);
+			
+			assertEquals(2, inventory.getItemCount(0));
 		}
 	}
 
@@ -74,33 +87,33 @@ public class InventoryTest {
 
 		@Test
 		public void returnsNullGivenItemNotSavedInSlot() {
-			assertNull(inventory.getItemInSlot(0));
+			assertNull(inventory.getItemAt(0));
 		}
 
 		@Test
 		public void returnsItemGivenItemSavedInSlot() {
-			inventory.storeItemInSlot(0, item);
-			assertEquals(item, inventory.removeOneItemInSlot(0));
+			inventory.addItemAt(0, item);
+			assertEquals(item, inventory.removeOneItemAt(0));
 		}
-
+		
 		@Test
-		public void decreasesAmountGivenItemSavedInSlot() {
-			inventory.storeItemInSlot(0, item);
-			inventory.removeOneItemInSlot(0);
+		public void decrementsAmountGivenItemInSlot() {
+			inventory.addItemAt(0, item);
+			inventory.removeOneItemAt(0);
 			
-			assertEquals(0, item.getAmount());
+			assertEquals(0, inventory.getItemCount(0));
 		}
 
 		@Test
 		public void removesItemGivenAmountOfOne() {
-			inventory.storeItemInSlot(0, item);
-			inventory.removeOneItemInSlot(0);
+			inventory.addItemAt(0, item);
+			inventory.removeOneItemAt(0);
 
-			assertNull(inventory.getItemInSlot(0));
+			assertNull(inventory.getItemAt(0));
 		}
 	}
 
-	public static class StoreItemInFreeSlot {
+	public static class StoreItem {
 		private Inventory inventory;
 		private ItemImpl item;
 
@@ -112,17 +125,23 @@ public class InventoryTest {
 
 		@Test
 		public void storesItemInZeroGivenEmptyInventory() {
-			inventory.storeItemInFreeSlot(item);
-			assertEquals(item, inventory.getItemInSlot(0));
+			inventory.addItem(item);
+			assertEquals(item, inventory.getItemAt(0));
 		}
 
 		@Test
-		public void storesItemInOneGivenItemStackFull() {
+		public void storesItemInFirstEmptyGivenFirstSlotFull() {
 			item.setStackSize(1);
-			inventory.storeItemInFreeSlot(item);
-			inventory.storeItemInFreeSlot(item);
+			inventory.addItem(item);
+			inventory.addItem(item);
 
-			assertEquals(item, inventory.getItemInSlot(1));
+			assertEquals(item, inventory.getItemAt(1));
+		}
+		@Test
+		public void storesItemsGivenCount() {
+			item.setStackSize(10);
+			inventory.addItem(item, 5);
+			assertEquals(5, inventory.getItemCount(0));
 		}
 	}
 	

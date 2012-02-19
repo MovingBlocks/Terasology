@@ -44,7 +44,7 @@ public class DefaultBlockTool extends SimpleTool {
     public void executeLeftClickAction() {
         if (_player.getActiveBlock() != null) {
             if (placeBlock(_player.getActiveBlock())) {
-                _player.getInventory().removeOneItemInSlot(_player.getToolbar().getSelectedSlot());
+                _player.getInventory().removeOneItemAt(_player.getToolbar().getSelectedSlot());
             }
         }
     }
@@ -53,7 +53,7 @@ public class DefaultBlockTool extends SimpleTool {
         byte removedBlockId = removeBlock(true);
 
         if (removedBlockId != 0) {
-            _player.getInventory().storeItemInFreeSlot(new ItemBlock(BlockManager.getInstance().getBlock(removedBlockId).getBlockGroup(), 1));
+            _player.getInventory().addItem(new ItemBlock(BlockManager.getInstance().getBlock(removedBlockId).getBlockGroup()));
         }
     }
 

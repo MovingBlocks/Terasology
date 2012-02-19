@@ -65,11 +65,11 @@ public class UIInventoryCell extends UIDisplayElement {
         Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         processMouseInput();
 
-        Item item = inventory.getItemInSlot(_id);
+        Item item = inventory.getItemAt(_id);
 
         if (item != null) {
             getLabel().setVisible(true);
-            getLabel().setText(Integer.toString(item.getAmount()));
+            getLabel().setText(Integer.toString(inventory.getItemCount(_id)));
         } else {
             getLabel().setVisible(false);
         }
@@ -95,7 +95,7 @@ public class UIInventoryCell extends UIDisplayElement {
         glEnable(GL11.GL_DEPTH_TEST);
 
         Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
-        Item item = inventory.getItemInSlot(_id);
+        Item item = inventory.getItemAt(_id);
 
         if (item != null) {
             glPushMatrix();

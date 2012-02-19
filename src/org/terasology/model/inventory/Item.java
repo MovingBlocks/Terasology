@@ -16,6 +16,7 @@
 package org.terasology.model.inventory;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.terasology.logic.characters.Player;
 import org.terasology.model.blocks.Block;
@@ -24,13 +25,13 @@ import org.terasology.model.blocks.Block;
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
 public abstract class Item {
-    protected int _amount;
     protected byte _toolId;
-    protected int _stackSize = 16;
-    protected HashMap<Block, Integer> _extraction = new HashMap<Block, Integer>();
+    protected int _stackSize;
+    protected Map<Block, Integer> _extraction;
 
     public Item() {
-        _amount = 1;
+        _stackSize = 16;
+        _extraction = new HashMap<Block, Integer>();
     }
 
     /**
@@ -39,36 +40,6 @@ public abstract class Item {
      */
     public void renderFirstPersonView(Player player) {
         // NO-OP
-    }
-
-    public void setAmount(int amount) {
-        _amount = amount;
-    }
-
-    public int getAmount() {
-        return _amount;
-    }
-
-    public void increaseAmount() {
-        increaseAmount(1);
-    }
-
-    public void decreaseAmount() {
-        decreaseAmount(1);
-    }
-
-    public void increaseAmount(int i) {
-        if (i <= 0)
-            return;
-
-        _amount += i;
-    }
-
-    public void decreaseAmount(int i) {
-        if (i <= 0)
-            return;
-
-        _amount -= i;
     }
 
     public byte getToolId() {

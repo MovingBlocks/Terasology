@@ -26,6 +26,7 @@ import org.terasology.logic.characters.Player;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.inventory.Item;
 import org.terasology.model.inventory.ItemBlock;
 
 import java.io.IOException;
@@ -117,7 +118,8 @@ public class GroovyManager {
 
         public void giveBlock(int blockId, int quantity) {
             Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.getInventory().storeItemInFreeSlot(new ItemBlock(BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup(), quantity));
+            Item block = new ItemBlock(BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup());
+            player.getInventory().addItem(block, quantity);
         }
 
         public void giveBlock(String title) {
@@ -134,7 +136,7 @@ public class GroovyManager {
                 }
             }
             if (group != null) {
-                player.getInventory().storeItemInFreeSlot(new ItemBlock(group, quantity));
+                player.getInventory().addItem(new ItemBlock(group), quantity);
             }
         }
     }
