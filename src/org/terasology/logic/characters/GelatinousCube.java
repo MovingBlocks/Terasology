@@ -86,8 +86,6 @@ public final class GelatinousCube extends Character {
         glTranslated(getPosition().x - playerPosition.x, getPosition().y - playerPosition.y, getPosition().z - playerPosition.z);
         glRotatef((float) _yaw, 0f, 1f, 0f);
 
-        TextureManager.getInstance().bindTexture("slime");
-
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");
 
         shader.enable();
@@ -95,8 +93,6 @@ public final class GelatinousCube extends Character {
         shader.setFloat("light", _parent.getRenderingLightValueAt(getPosition()));
 
         _mesh.render();
-
-        ShaderManager.getInstance().enableShader(null);
 
         glPopMatrix();
     }

@@ -28,6 +28,7 @@ import org.terasology.logic.manager.ToolManager;
 import org.terasology.logic.tools.ITool;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.IBlockObserver;
+import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
@@ -45,13 +46,11 @@ import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -120,7 +119,7 @@ public final class Player extends Character {
 
         // Display the block the player is aiming at
         if (SHOW_PLACING_BOX) {
-            if (_selectedBlock != null) { 
+            if (_selectedBlock != null) {
                 Block block = BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(_selectedBlock.getBlockPosition().toVector3d()));
                 if (block.isRenderBoundingBox()) {
                     block.getBounds(_selectedBlock.getBlockPosition()).render(8f);
@@ -239,9 +238,9 @@ public final class Player extends Character {
         float speedFactor = 1.0f;
 
         if (_activeWalkingSpeed > 0)
-            speedFactor = (float) MathHelper.clamp(Math.max(Math.abs(_velocity.x), Math.abs(_velocity.z)) / _activeWalkingSpeed);
+            speedFactor = (float) TeraMath.clamp(java.lang.Math.max(java.lang.Math.abs(_velocity.x), java.lang.Math.abs(_velocity.z)) / _activeWalkingSpeed);
 
-        return Math.sin(_stepCounter * frequency + phaseOffset) * amplitude * speedFactor;
+        return java.lang.Math.sin(_stepCounter * frequency + phaseOffset) * amplitude * speedFactor;
     }
 
     public void updateCameraParameters() {
@@ -249,7 +248,7 @@ public final class Player extends Character {
 
         if (CAMERA_BOBBING) {
             _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.2f));
-            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) Math.PI / 4f, 0.025f, 4.4f));
+            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 4.4f));
         } else {
             _firstPersonCamera.setBobbingRotationOffsetFactor(0.0);
             _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);
@@ -463,7 +462,7 @@ public final class Player extends Character {
 
         Block block = BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(_extractedBlock.getBlockPosition().toVector3d()));
 
-        glEnable(GL_TEXTURE_2D);
+        ShaderManager.getInstance().enableDefaultTextured();
         TextureManager.getInstance().bindTexture("effects");
 
         glEnable(GL11.GL_BLEND);
@@ -472,7 +471,7 @@ public final class Player extends Character {
         glPushMatrix();
         glTranslated(_extractedBlock.getBlockPosition().x - getPosition().x, _extractedBlock.getBlockPosition().y - getPosition().y, _extractedBlock.getBlockPosition().z - getPosition().z);
 
-        float offset = Math.round(((float) _extractionCounter / block.getHardness()) * 10.0f) * 0.0625f;
+        float offset = java.lang.Math.round(((float) _extractionCounter / block.getHardness()) * 10.0f) * 0.0625f;
 
         if (_overlayMesh == null) {
             Vector2f texPos = new Vector2f(0.0f, 0.0f);
@@ -497,19 +496,17 @@ public final class Player extends Character {
         glMatrixMode(GL_MODELVIEW);
 
         glDisable(GL11.GL_BLEND);
-        glDisable(GL_TEXTURE_2D);
     }
 
     /**
      * Renders a simple hand displayed in front of the player's first person perspective.
      */
     public void renderHand() {
-        glEnable(GL11.GL_TEXTURE_2D);
-        TextureManager.getInstance().bindTexture("char");
         ShaderManager.getInstance().enableShader("block");
+        TextureManager.getInstance().bindTexture("char");
 
         glPushMatrix();
-        glTranslatef(0.8f, -1.1f + (float) calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.0f - _handMovementAnimationOffset * 0.5f);
+        glTranslatef(0.8f, -1.1f + (float) calcBobbingOffset((float) java.lang.Math.PI / 8f, 0.05f, 2.5f) - _handMovementAnimationOffset * 0.5f, -1.0f - _handMovementAnimationOffset * 0.5f);
         glRotatef(-45f - _handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
         glTranslatef(0f, 0.25f, 0f);
@@ -527,11 +524,6 @@ public final class Player extends Character {
         _handMesh.render();
 
         glPopMatrix();
-
-        glDisable(GL11.GL_TEXTURE_2D);
-
-        ShaderManager.getInstance().enableShader(null);
-
     }
 
     @Override

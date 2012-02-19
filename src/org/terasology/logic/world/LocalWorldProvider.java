@@ -22,15 +22,14 @@ import org.terasology.logic.generators.GeneratorManager;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
+import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.persistence.TeraObject;
+import org.terasology.persistence.PersistableObject;
 import org.terasology.utilities.FastRandom;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -40,7 +39,7 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class LocalWorldProvider extends TeraObject implements IWorldProvider {
+public class LocalWorldProvider extends PersistableObject implements IWorldProvider {
 
     /* WORLD GENERATION */
     protected final GeneratorManager _generatorManager;
@@ -109,11 +108,11 @@ public class LocalWorldProvider extends TeraObject implements IWorldProvider {
      * @return True if a block was set/replaced
      */
     public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
-        int chunkPosX = MathHelper.calcChunkPosX(x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
-        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
         Chunk c = getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ);
 
@@ -176,13 +175,13 @@ public class LocalWorldProvider extends TeraObject implements IWorldProvider {
      * @param z The Z-coordinate
      */
     public void setState(int x, int y, int z, byte state) {
-        int chunkPosX = MathHelper.calcChunkPosX(x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
-        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
         c.setState(blockPosX, y, blockPosZ, state);
     }
 
@@ -225,13 +224,13 @@ public class LocalWorldProvider extends TeraObject implements IWorldProvider {
      * @return The type of the block
      */
     public final byte getBlock(int x, int y, int z) {
-        int chunkPosX = MathHelper.calcChunkPosX(x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
-        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
         return c.getBlock(blockPosX, y, blockPosZ);
     }
 
@@ -240,24 +239,24 @@ public class LocalWorldProvider extends TeraObject implements IWorldProvider {
     }
 
     public final boolean canBlockSeeTheSky(int x, int y, int z) {
-        int chunkPosX = MathHelper.calcChunkPosX(x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
-        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
         return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
     }
 
     public byte getState(int x, int y, int z) {
-        int chunkPosX = MathHelper.calcChunkPosX(x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
-        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
         return c.getState(blockPosX, y, blockPosZ);
     }
 
@@ -271,13 +270,13 @@ public class LocalWorldProvider extends TeraObject implements IWorldProvider {
      * @return The light value
      */
     public final byte getLight(int x, int y, int z, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = MathHelper.calcChunkPosX(x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
-        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
         return c.getLight(blockPosX, y, blockPosZ, type);
     }
 
@@ -291,13 +290,13 @@ public class LocalWorldProvider extends TeraObject implements IWorldProvider {
      * @param type      The type of light
      */
     public void setLight(int x, int y, int z, byte intensity, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = MathHelper.calcChunkPosX(x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
-        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
         c.setLight(blockPosX, y, blockPosZ, intensity, type);
     }
 
@@ -414,13 +413,13 @@ public class LocalWorldProvider extends TeraObject implements IWorldProvider {
      * @param brightSpots List of bright spots found while unspreading the light
      */
     public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, ArrayList<Vector3d> brightSpots) {
-        int chunkPosX = MathHelper.calcChunkPosX(x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
-        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
         c.unspreadLight(blockPosX, y, blockPosZ, lightValue, depth, type, brightSpots);
     }
 
@@ -435,13 +434,13 @@ public class LocalWorldProvider extends TeraObject implements IWorldProvider {
      * @param type       The type of light
      */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = MathHelper.calcChunkPosX(x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(z);
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
-        int blockPosX = MathHelper.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = MathHelper.calcBlockPosZ(z, chunkPosZ);
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(MathHelper.calcChunkPosX(x), MathHelper.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
         c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
     }
 

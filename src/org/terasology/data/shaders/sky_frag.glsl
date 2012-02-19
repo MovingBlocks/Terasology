@@ -35,7 +35,7 @@ void main () {
     vec3 v = normalize ( McPosition.xyz );
 
     vec3 l = normalize (sunPos.xyz);
-    float sunHighlight = pow(max(0.0, dot(l, v)), 256.0) * 512.0;
+    float sunHighlight = pow(max(0.0, dot(l, v)), 1024.0) * 2.0;
     float posSunY = 0.0;
 
     if (sunPos.y > 0.0){

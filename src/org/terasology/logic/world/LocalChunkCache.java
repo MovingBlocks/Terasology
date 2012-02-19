@@ -17,7 +17,7 @@ package org.terasology.logic.world;
 
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
-import org.terasology.utilities.MathHelper;
+import org.terasology.math.TeraMath;
 
 import javax.vecmath.Vector3d;
 import java.io.*;
@@ -61,7 +61,7 @@ public final class LocalChunkCache implements IChunkProvider {
      * @return The chunk
      */
     public Chunk loadOrCreateChunk(int x, int z) {
-        int chunkId = MathHelper.cantorize(MathHelper.mapToPositive(x), MathHelper.mapToPositive(z));
+        int chunkId = TeraMath.cantorize(TeraMath.mapToPositive(x), TeraMath.mapToPositive(z));
 
         // Try to load the chunk from the cache
         Chunk c = _chunkCache.get(chunkId);

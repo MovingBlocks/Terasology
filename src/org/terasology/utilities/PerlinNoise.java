@@ -15,6 +15,8 @@
  */
 package org.terasology.utilities;
 
+import org.terasology.math.TeraMath;
+
 /**
  * Improved Perlin noise based on the reference implementation by Ken Perlin.
  *
@@ -71,11 +73,11 @@ public class PerlinNoise {
      * @return The noise value
      */
     public double noise(double x, double y, double z) {
-        int X = (int) MathHelper.fastFloor(x) & 255, Y = (int) MathHelper.fastFloor(y) & 255, Z = (int) MathHelper.fastFloor(z) & 255;
+        int X = (int) TeraMath.fastFloor(x) & 255, Y = (int) TeraMath.fastFloor(y) & 255, Z = (int) TeraMath.fastFloor(z) & 255;
 
-        x -= MathHelper.fastFloor(x);
-        y -= MathHelper.fastFloor(y);
-        z -= MathHelper.fastFloor(z);
+        x -= TeraMath.fastFloor(x);
+        y -= TeraMath.fastFloor(y);
+        z -= TeraMath.fastFloor(z);
 
         double u = fade(x), v = fade(y), w = fade(z);
         int A = _noisePermutations[X] + Y, AA = _noisePermutations[A] + Z, AB = _noisePermutations[(A + 1)] + Z,
@@ -106,7 +108,7 @@ public class PerlinNoise {
             _spectralWeights = new double[_octaves];
 
             for (int i = 0; i < _octaves; i++)
-                _spectralWeights[i] = Math.pow(LACUNARITY, -H * i);
+                _spectralWeights[i] = java.lang.Math.pow(LACUNARITY, -H * i);
 
             _recomputeSpectralWeights = false;
         }

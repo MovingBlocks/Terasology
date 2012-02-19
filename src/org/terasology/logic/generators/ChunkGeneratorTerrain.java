@@ -16,8 +16,8 @@
 package org.terasology.logic.generators;
 
 import org.terasology.logic.world.Chunk;
+import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector2f;
 
@@ -210,7 +210,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                         int offsetX = (x / SAMPLE_RATE_3D_HOR) * SAMPLE_RATE_3D_HOR;
                         int offsetY = (y / SAMPLE_RATE_3D_VERT) * SAMPLE_RATE_3D_VERT;
                         int offsetZ = (z / SAMPLE_RATE_3D_HOR) * SAMPLE_RATE_3D_HOR;
-                        densityMap[x][y][z] = MathHelper.triLerp(x, y, z, densityMap[offsetX][offsetY][offsetZ], densityMap[offsetX][SAMPLE_RATE_3D_VERT + offsetY][offsetZ], densityMap[offsetX][offsetY][offsetZ + SAMPLE_RATE_3D_HOR], densityMap[offsetX][offsetY + SAMPLE_RATE_3D_VERT][offsetZ + SAMPLE_RATE_3D_HOR], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY][offsetZ], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY + SAMPLE_RATE_3D_VERT][offsetZ], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY][offsetZ + SAMPLE_RATE_3D_HOR], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY + SAMPLE_RATE_3D_VERT][offsetZ + SAMPLE_RATE_3D_HOR], offsetX, SAMPLE_RATE_3D_HOR + offsetX, offsetY, SAMPLE_RATE_3D_VERT + offsetY, offsetZ, offsetZ + SAMPLE_RATE_3D_HOR);
+                        densityMap[x][y][z] = TeraMath.triLerp(x, y, z, densityMap[offsetX][offsetY][offsetZ], densityMap[offsetX][SAMPLE_RATE_3D_VERT + offsetY][offsetZ], densityMap[offsetX][offsetY][offsetZ + SAMPLE_RATE_3D_HOR], densityMap[offsetX][offsetY + SAMPLE_RATE_3D_VERT][offsetZ + SAMPLE_RATE_3D_HOR], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY][offsetZ], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY + SAMPLE_RATE_3D_VERT][offsetZ], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY][offsetZ + SAMPLE_RATE_3D_HOR], densityMap[SAMPLE_RATE_3D_HOR + offsetX][offsetY + SAMPLE_RATE_3D_VERT][offsetZ + SAMPLE_RATE_3D_HOR], offsetX, SAMPLE_RATE_3D_HOR + offsetX, offsetY, SAMPLE_RATE_3D_VERT + offsetY, offsetZ, offsetZ + SAMPLE_RATE_3D_HOR);
                     }
                 }
             }
@@ -227,26 +227,26 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
         Vector2f distanceToMountainBiome = new Vector2f(temp - 0.25f, humidity - 0.35f);
 
-        double mIntens = MathHelper.clamp(1.0 - distanceToMountainBiome.length() * 3.0);
+        double mIntens = TeraMath.clamp(1.0 - distanceToMountainBiome.length() * 3.0);
         double densityMountains = calcMountainDensity(x, y, z) * mIntens;
         double densityHills = calcHillDensity(x, y, z) * (1.0 - mIntens);
 
         int plateauArea = (int) (Chunk.CHUNK_DIMENSION_Y * 0.10);
-        double flatten = MathHelper.clamp(((Chunk.CHUNK_DIMENSION_Y - 16) - y) / plateauArea);
+        double flatten = TeraMath.clamp(((Chunk.CHUNK_DIMENSION_Y - 16) - y) / plateauArea);
 
-        return -y + (((32.0 + height * 32.0) * MathHelper.clamp(river + 0.25) * MathHelper.clamp(ocean + 0.25)) + densityMountains * 1024.0 + densityHills * 128.0) * flatten;
+        return -y + (((32.0 + height * 32.0) * TeraMath.clamp(river + 0.25) * TeraMath.clamp(ocean + 0.25)) + densityMountains * 1024.0 + densityHills * 128.0) * flatten;
     }
 
     public double calcBaseTerrain(double x, double z) {
-        return MathHelper.clamp((_pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
+        return TeraMath.clamp((_pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
     }
 
     public double calcOceanTerrain(double x, double z) {
-        return MathHelper.clamp(_pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0);
+        return TeraMath.clamp(_pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0);
     }
 
     public double calcRiverTerrain(double x, double z) {
-        return MathHelper.clamp((Math.sqrt(Math.abs(_pGen3.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
+        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(_pGen3.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
     }
 
     public double calcMountainDensity(double x, double y, double z) {
@@ -275,12 +275,12 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     public double calcTemperatureAtGlobalPosition(double x, double z) {
         double result = _pGen6.fBm(x * 0.0005, 0, 0.0005 * z);
-        return MathHelper.clamp((result + 1.0) / 2.0);
+        return TeraMath.clamp((result + 1.0) / 2.0);
     }
 
     public double calcHumidityAtGlobalPosition(double x, double z) {
         double result = _pGen7.fBm(x * 0.0005, 0, 0.0005 * z);
-        return MathHelper.clamp((result + 1.0) / 2.0);
+        return TeraMath.clamp((result + 1.0) / 2.0);
     }
 
     public double calcCaveDensity(double x, double y, double z) {

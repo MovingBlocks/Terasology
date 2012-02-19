@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -30,6 +31,8 @@ public class UICrosshair extends UIDisplayElement {
     private static int _displayList = -1;
 
     public void render() {
+        ShaderManager.getInstance().enableDefault();
+
         glLineWidth(2f);
 
         if (_displayList == -1)

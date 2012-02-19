@@ -17,8 +17,9 @@ package org.terasology.logic.manager;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
+import org.terasology.game.Terasology;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.utilities.MathHelper;
 
 import java.nio.FloatBuffer;
 import java.util.HashMap;
@@ -33,8 +34,10 @@ import static org.lwjgl.opengl.GL11.*;
 public class PostProcessingRenderer {
 
     public static final boolean EFFECTS_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.enablePostProcessingEffects");
-    public static final float MAX_EXPOSURE = 5.0f;
-    public static final float MIN_EXPOSURE = 1.0f;
+    public static final float MAX_EXPOSURE = 12.0f;
+    public static final float MIN_EXPOSURE = 2.0f;
+    public static final float TARGET_LUMINANCE = 0.5f;
+    public static final float ADJUSTMENT_SPEED = 0.05f;
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure;
@@ -102,6 +105,10 @@ public class PostProcessingRenderer {
                 createFBO("sceneBlur0", 1024, 1024, true, false);
                 createFBO("sceneBlur1", 1024, 1024, true, false);
 
+                createFBO("scene1024", 1024, 1024, true, false);
+                createFBO("scene512", 512, 512, true, false);
+                createFBO("scene256", 256, 256, true, false);
+                createFBO("scene128", 128, 128, true, false);
                 createFBO("scene64", 64, 64, true, false);
                 createFBO("scene32", 32, 32, true, false);
                 createFBO("scene16", 16, 16, true, false);
@@ -197,7 +204,7 @@ public class PostProcessingRenderer {
         float lum = 0.2126f * pixels.get(0) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(2);
 
         if (lum > 0.0f) // No division by zero
-            _exposure = (float) MathHelper.lerp(_exposure, 0.5f / lum, 0.01);
+            _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / lum, ADJUSTMENT_SPEED);
 
         if (_exposure > MAX_EXPOSURE)
             _exposure = MAX_EXPOSURE;
@@ -208,6 +215,7 @@ public class PostProcessingRenderer {
     public void beginRenderScene() {
         if (!_extensionsAvailable)
             return;
+
         getFBO("scene").bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -241,37 +249,14 @@ public class PostProcessingRenderer {
             ShaderProgram shaderPost = ShaderManager.getInstance().getShaderProgram("post");
             shaderPost.enable();
 
-            PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
-
-            GL13.glActiveTexture(GL13.GL_TEXTURE1);
-            PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
-            GL13.glActiveTexture(GL13.GL_TEXTURE2);
-            scene.bindDepthTexture();
-            GL13.glActiveTexture(GL13.GL_TEXTURE3);
-            PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
-            GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
-
-            shaderPost.setInt("texScene", 0);
-            shaderPost.setInt("texBloom", 1);
-            shaderPost.setInt("texDepth", 2);
-            shaderPost.setInt("texBlur", 3);
-            shaderPost.setFloat("exposure", _exposure);
-
             renderFullQuad();
-
-            scene.unbindTexture();
-            ShaderManager.getInstance().enableShader(null);
         } else {
             PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
+            ShaderManager.getInstance().enableDefaultTextured();
             scene.bindTexture();
-            glEnable(GL11.GL_TEXTURE_2D);
 
             renderFullQuad();
-
-            glDisable(GL11.GL_TEXTURE_2D);
-            scene.unbindTexture();
         }
 
         createOrUpdateFullscreenFbos();
@@ -306,7 +291,6 @@ public class PostProcessingRenderer {
 
         PostProcessingRenderer.getInstance().getFBO("sceneHighPass").unbind();
 
-        ShaderManager.getInstance().enableShader(null);
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
@@ -330,7 +314,6 @@ public class PostProcessingRenderer {
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).unbind();
 
-        ShaderManager.getInstance().enableShader(null);
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
@@ -354,7 +337,6 @@ public class PostProcessingRenderer {
 
         PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).unbind();
 
-        ShaderManager.getInstance().enableShader(null);
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
@@ -362,10 +344,10 @@ public class PostProcessingRenderer {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("down");
         shader.enable();
 
-        for (int i = 6; i >= 0; i--) {
-            int sizePrev = (int) Math.pow(2, i + 1);
+        for (int i = 10; i >= 0; i--) {
+            int sizePrev = (int) java.lang.Math.pow(2, i + 1);
 
-            int size = (int) Math.pow(2, i);
+            int size = (int) java.lang.Math.pow(2, i);
             shader.setFloat("size", size);
 
             PostProcessingRenderer.getInstance().getFBO("scene" + size).bind();
@@ -373,7 +355,7 @@ public class PostProcessingRenderer {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            if (i == 6)
+            if (i == 10)
                 PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
             else
                 PostProcessingRenderer.getInstance().getFBO("scene" + sizePrev).bindTexture();
@@ -384,7 +366,6 @@ public class PostProcessingRenderer {
 
         }
 
-        ShaderManager.getInstance().enableShader(null);
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 

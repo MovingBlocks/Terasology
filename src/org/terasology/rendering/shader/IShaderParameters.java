@@ -16,10 +16,12 @@
 package org.terasology.rendering.shader;
 
 /**
- * TODO
+ * Interface for all shader parameters. Shader parameters can
+ * be used to automatically set shader parameters when the
+ * corresponding shader program gets activated.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class ShaderParameters {
-    public abstract void applyParameters(ShaderProgram program);
+public interface IShaderParameters {
+    public void applyParameters(ShaderProgram program);
 }

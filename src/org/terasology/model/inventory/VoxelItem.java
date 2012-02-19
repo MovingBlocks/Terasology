@@ -59,8 +59,6 @@ public abstract class VoxelItem extends Item {
 
         glPopMatrix();
 
-        ShaderManager.getInstance().enableShader(null);
-
         return true;
     }
 }

@@ -22,6 +22,7 @@ uniform vec2 grassCoordinate;
 void main(){
     vec4 texCoord = gl_TexCoord[0];
 
+    vec3 normalizedVPos = -normalize(vertexWorldPos.xyz);
     vec3 normalWater;
     bool isWater = false;
 
@@ -74,26 +75,31 @@ void main(){
     float diffuseLighting;
 
     if (isWater) {
-        diffuseLighting = calcLambLight(normalWater, -normalize(vertexWorldPos.xyz));
+        diffuseLighting = calcLambLight(normalWater, normalizedVPos);
     } else {
-        diffuseLighting = calcLambLight(normal, -normalize(vertexWorldPos.xyz));
+        diffuseLighting = calcLambLight(normal, lightDir);
     }
 
     float torchlight = 0.0;
 
     // Apply torchlight
     if (carryingTorch) {
-       torchlight = calcTorchlight(diffuseLighting, vertexWorldPos.xyz) * blocklightDayIntensity;
+        if (isWater)
+            torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * 0.1 + 0.9
+            + calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 64.0, normalWater), vertexWorldPos.xyz);
+        else
+            torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexWorldPos.xyz)) * 0.1 + 0.9
+            + calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 64.0), vertexWorldPos.xyz);
     }
 
     vec3 daylightColorValue;
 
     if (isWater) {
         daylightColorValue = vec3(diffuseLighting * daylightValue);
-        daylightColorValue += calcSpecLightWithOffset(normal, lightDir, normalize(eyeVec), 256.0, normalWater) * daylightValue;
+        daylightColorValue += calcSpecLightWithOffset(normal, lightDir, normalize(eyeVec), 64.0, normalWater) * daylightValue;
     } else {
-        daylightColorValue = vec3(daylightValue * 0.85 + diffuseLighting * 0.15 * daylightValue * 1.0);
-        daylightColorValue += calcSpecLight(normal, lightDir, normalize(eyeVec), 64.0) * daylightValue * 0.1;
+        float dP = daylightValue * 0.9;
+        daylightColorValue = vec3(dP + diffuseLighting * dP * 0.1);
     }
 
     float blockBrightness = clamp(blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2

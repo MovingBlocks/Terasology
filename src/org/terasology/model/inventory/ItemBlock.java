@@ -52,21 +52,16 @@ public class ItemBlock extends Item {
 
     @Override
     public boolean renderIcon() {
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-
         GL11.glPushMatrix();
         glTranslatef(4f, 0f, 0f);
         GL11.glScalef(20f, 20f, 20f);
         GL11.glRotatef(170f, 1f, 0f, 0f);
         GL11.glRotatef(-16f, 0f, 1f, 0f);
-        TextureManager.getInstance().bindTexture("terrain");
 
         Block block = _blockGroup.getArchetypeBlock();
         block.render();
 
         GL11.glPopMatrix();
-
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
 
         return true;
     }
@@ -80,8 +75,6 @@ public class ItemBlock extends Item {
         // Adjust the brightness of the block according to the current position of the player
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
         shader.enable();
-
-        shader.setFloat("light", Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValue());
 
         // Apply biome and overall color offset
         FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
@@ -117,8 +110,6 @@ public class ItemBlock extends Item {
             glDisable(GL11.GL_ALPHA_TEST);
         }
         glDisable(GL11.GL_BLEND);
-
-        ShaderManager.getInstance().enableShader(null);
 
         return true;
     }

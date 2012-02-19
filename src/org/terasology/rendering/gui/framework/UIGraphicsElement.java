@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.framework;
 
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -55,9 +56,8 @@ public class UIGraphicsElement extends UIDisplayElement {
         if (_mesh == null)
             return;
 
+        ShaderManager.getInstance().enableDefaultTextured();
         TextureManager.getInstance().bindTexture(_textureName);
-
-        glEnable(GL11.GL_TEXTURE_2D);
 
         glMatrixMode(GL_TEXTURE);
         glPushMatrix();
@@ -73,8 +73,6 @@ public class UIGraphicsElement extends UIDisplayElement {
         glMatrixMode(GL_TEXTURE);
         glPopMatrix();
         glMatrixMode(GL11.GL_MODELVIEW);
-
-        glDisable(GL11.GL_TEXTURE_2D);
     }
 
     public Vector2f getTextureOrigin() {

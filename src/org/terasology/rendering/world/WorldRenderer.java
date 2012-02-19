@@ -16,7 +16,6 @@
 package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.newdawn.slick.openal.SoundStore;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
@@ -24,6 +23,7 @@ import org.terasology.logic.entities.Entity;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.*;
+import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -31,8 +31,6 @@ import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.particles.BlockParticleEmitter;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
@@ -264,8 +262,12 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.endActivity();
 
         PostProcessingRenderer.getInstance().endRenderScene();
+
+
+        PerformanceMonitor.startActivity("Post-Processing");
         // Draw the final scene on a quad and render it...
         PostProcessingRenderer.getInstance().renderScene();
+        PerformanceMonitor.endActivity();
 
         glPushMatrix();
         glLoadIdentity();
@@ -279,34 +281,13 @@ public final class WorldRenderer implements IGameObject {
      * Renders all chunks that are currently in the player's field of view.
      */
     private void renderChunksAndEntities() {
-        glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
 
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
-        shader.enable();
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        TextureManager.getInstance().bindTexture("custom_lava_still");
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        TextureManager.getInstance().bindTexture("water_normal");
-        GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        TextureManager.getInstance().bindTexture("effects");
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        TextureManager.getInstance().bindTexture("terrain");
-
-        shader.setInt("textureLava", 1);
-        shader.setInt("textureWaterNormal", 2);
-        shader.setInt("textureEffects", 3);
-        shader.setInt("textureAtlas", 0);
-
-        boolean playerIsSwimming = _player.isHeadUnderWater();
-
-        ShaderManager.getInstance().enableShader(null);
+        boolean headUnderWater = _player.isHeadUnderWater();
 
         PerformanceMonitor.startActivity("BulletPhysicsRenderer");
         BulletPhysicsRenderer.getInstance().render();
         PerformanceMonitor.endActivity();
-        ShaderManager.getInstance().enableShader("chunk");
 
         PerformanceMonitor.startActivity("Chunk-Opaque");
 
@@ -332,7 +313,6 @@ public final class WorldRenderer implements IGameObject {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT);
         }
-        ShaderManager.getInstance().enableShader(null);
 
         PerformanceMonitor.endActivity();
 
@@ -345,11 +325,8 @@ public final class WorldRenderer implements IGameObject {
 
         PerformanceMonitor.startActivity("Chunk-WaterIce");
 
-        TextureManager.getInstance().bindTexture("terrain");
-        shader.enable();
-
         // Make sure the water surface is rendered if the player is swimming
-        if (playerIsSwimming) {
+        if (headUnderWater) {
             glDisable(GL11.GL_CULL_FACE);
         }
 
@@ -369,13 +346,14 @@ public final class WorldRenderer implements IGameObject {
                 c.render(ChunkMesh.RENDER_PHASE.WATER_AND_ICE);
             }
         }
+
         glDisable(GL_BLEND);
-        glEnable(GL11.GL_CULL_FACE);
 
+        if (headUnderWater) {
+            glEnable(GL11.GL_CULL_FACE);
+        }
 
-        ShaderManager.getInstance().enableShader(null);
         glDisable(GL_LIGHT0);
-        glDisable(GL_LIGHTING);
 
         PerformanceMonitor.endActivity();
     }
@@ -391,7 +369,7 @@ public final class WorldRenderer implements IGameObject {
         double lightValueBlock = _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.BLOCK);
         lightValueBlock = lightValueBlock / 15.0;
 
-        return (float) MathHelper.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
+        return (float) TeraMath.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
     }
 
     public void update() {

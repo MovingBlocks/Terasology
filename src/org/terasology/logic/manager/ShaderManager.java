@@ -30,16 +30,14 @@ import java.util.logging.Level;
  */
 public class ShaderManager {
 
-    private final HashMap<String, ShaderProgram> _shaderPrograms = new HashMap<String, ShaderProgram>(32);
-
     private static ShaderManager _instance = null;
 
-    /**
-     * Returns (and creates – if necessary) the static instance
-     * of this helper class.
-     *
-     * @return The instance
-     */
+    private final HashMap<String, ShaderProgram> _shaderPrograms = new HashMap<String, ShaderProgram>(16);
+
+    private ShaderProgram _activeShaderProgram = null;
+
+    private ShaderProgram _defaultShaderProgram, _defaultTexturedShaderProgram;
+
     public static ShaderManager getInstance() {
         if (_instance == null) {
             _instance = new ShaderManager();
@@ -58,33 +56,55 @@ public class ShaderManager {
     }
 
     private void initShaders() {
-        createShader("highp", null);
-        createShader("blur", null);
-        createShader("down", null);
-        createShader("post", new ShaderParametersPostProcessing());
-        createShader("sky", null);
-        createShader("chunk", new ShaderParametersChunk());
-        createShader("particle", new ShaderParametersParticle());
-        createShader("block", new ShaderParametersBlock());
-        createShader("gelatinousCube", new ShaderParametersGelCube());
-        createShader("clouds", null);
+        _defaultShaderProgram = createAndStoreShaderProgram("default", new ShaderParametersDefault());
+        _defaultTexturedShaderProgram = createAndStoreShaderProgram("defaultTextured", new ShaderParametersDefault());
+
+        createAndStoreShaderProgram("highp", new ShaderParametersDefault());
+        createAndStoreShaderProgram("blur", new ShaderParametersDefault());
+        createAndStoreShaderProgram("down", new ShaderParametersDefault());
+        createAndStoreShaderProgram("post", new ShaderParametersPostProcessing());
+        createAndStoreShaderProgram("sky", new ShaderParametersDefault());
+        createAndStoreShaderProgram("chunk", new ShaderParametersChunk());
+        createAndStoreShaderProgram("particle", new ShaderParametersParticle());
+        createAndStoreShaderProgram("block", new ShaderParametersBlock());
+        createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
+        createAndStoreShaderProgram("clouds", new ShaderParametersDefault());
     }
 
-    private void createShader(String title, ShaderParameters params) {
-        _shaderPrograms.put(title, new ShaderProgram(title, params));
+    private ShaderProgram createAndStoreShaderProgram(String title, IShaderParameters params) {
+        ShaderProgram program = new ShaderProgram(title, params);
+        _shaderPrograms.put(title, program);
+        return program;
+    }
+
+    /**
+     * Enables the default shader program.
+     */
+    public void enableDefault() {
+        _defaultShaderProgram.enable();
+    }
+
+    /**
+     * Enables the default shader program.
+     */
+    public void enableDefaultTextured() {
+        _defaultTexturedShaderProgram.enable();
     }
 
     /**
      * @param s Name of the shader to activate
      */
     public void enableShader(String s) {
-        if (s == null) {
-            GL20.glUseProgram(0);
-            return;
-        }
-
         ShaderProgram program = getShaderProgram(s);
         program.enable();
+    }
+
+    public ShaderProgram getActiveShaderProgram() {
+        return _activeShaderProgram;
+    }
+
+    public void setActiveShaderProgram(ShaderProgram program) {
+        _activeShaderProgram = program;
     }
 
     /**

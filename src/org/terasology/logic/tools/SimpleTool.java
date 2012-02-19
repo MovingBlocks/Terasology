@@ -17,8 +17,8 @@ package org.terasology.logic.tools;
 
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.world.IWorldProvider;
+import org.terasology.math.TeraMath;
 import org.terasology.model.structures.BlockPosition;
-import org.terasology.utilities.MathHelper;
 
 /**
  * TODO
@@ -49,8 +49,8 @@ public class SimpleTool implements ITool {
         worldProvider.setBlock(blockPos.x, blockPos.y, blockPos.z, type, true, true);
 
         // Notify the world, that a block has been removed/placed
-        int chunkPosX = MathHelper.calcChunkPosX(blockPos.x);
-        int chunkPosZ = MathHelper.calcChunkPosZ(blockPos.z);
+        int chunkPosX = TeraMath.calcChunkPosX(blockPos.x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(blockPos.z);
 
         if (type == 0) {
             _player.notifyObserversBlockRemoved(worldProvider.getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos, update);

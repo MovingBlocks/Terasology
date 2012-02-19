@@ -48,7 +48,6 @@ public abstract class ParticleEmitter implements IGameObject {
 
     public void render() {
         glDisable(GL11.GL_CULL_FACE);
-        glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -58,7 +57,6 @@ public abstract class ParticleEmitter implements IGameObject {
         }
 
         glDisable(GL_BLEND);
-        glDisable(GL11.GL_TEXTURE_2D);
         glEnable(GL11.GL_CULL_FACE);
     }
 

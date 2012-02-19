@@ -26,11 +26,11 @@ import java.net.MalformedURLException;
 import java.util.logging.Level;
 
 /**
- * Provides some basic functionality to many objects used in Terasology.
+ * Provides some basic functionality for primitively persisting objects via Config Slurper.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class TeraObject {
+public class PersistableObject {
 
     private File _file;
     private File _path;

@@ -16,13 +16,15 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.Block;
 
-import javax.vecmath.Vector3f;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
@@ -31,19 +33,20 @@ import java.nio.IntBuffer;
 import java.util.logging.Level;
 
 /**
- * TODO
+ * Wraps a OpenGL shader program. Provides convenience methods for setting
+ * uniform variables of various types.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderProgram {
 
-    private int _shaderPogram, _fragmentProgram, _vertexProgram;
+    private int _shaderProgram, _fragmentProgram, _vertexProgram;
     private String _title;
 
     private static String _preProcessorPreamble = "#version 120 \n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + "; \n";
     private static String _includedFunctionsVertex = "", _includedFunctionsFragment = "";
 
-    private ShaderParameters _parameters;
+    private IShaderParameters _parameters;
 
     static {
         _preProcessorPreamble += ((Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.animatedWaterAndGrass")) ? "#define ANIMATED_WATER_AND_GRASS \n" : "";
@@ -54,7 +57,7 @@ public class ShaderProgram {
         this(title, null);
     }
 
-    public ShaderProgram(String title, ShaderParameters params) {
+    public ShaderProgram(String title, IShaderParameters params) {
         if (_includedFunctionsVertex.length() == 0 || _includedFunctionsFragment.length() == 0) {
             _includedFunctionsFragment += readShader("globalFunctionsFragIncl.glsl");
             _includedFunctionsVertex += readShader("globalFunctionsVertIncl.glsl");
@@ -63,22 +66,22 @@ public class ShaderProgram {
         _title = title;
         _parameters = params;
 
-        createShader();
+        compileShaderProgram();
     }
 
-    private void createShader() {
-        createShader(GL20.GL_FRAGMENT_SHADER);
-        createShader(GL20.GL_VERTEX_SHADER);
+    private void compileShaderProgram() {
+        compileShader(GL20.GL_FRAGMENT_SHADER);
+        compileShader(GL20.GL_VERTEX_SHADER);
 
-        _shaderPogram = GL20.glCreateProgram();
+        _shaderProgram = GL20.glCreateProgram();
 
-        GL20.glAttachShader(_shaderPogram, _fragmentProgram);
-        GL20.glAttachShader(_shaderPogram, _vertexProgram);
-        GL20.glLinkProgram(_shaderPogram);
-        GL20.glValidateProgram(_shaderPogram);
+        GL20.glAttachShader(_shaderProgram, _fragmentProgram);
+        GL20.glAttachShader(_shaderProgram, _vertexProgram);
+        GL20.glLinkProgram(_shaderProgram);
+        GL20.glValidateProgram(_shaderProgram);
     }
 
-    private void createShader(int type) {
+    private void compileShader(int type) {
 
         int shaderId = GL20.glCreateShader(type);
 
@@ -150,53 +153,65 @@ public class ShaderProgram {
     }
 
     public void enable() {
-        GL20.glUseProgram(_shaderPogram);
+        ShaderProgram activeProgram = ShaderManager.getInstance().getActiveShaderProgram();
 
-        // Set the shader parameters if available
-        if (_parameters != null) {
-            _parameters.applyParameters(this);
+        if (activeProgram != this) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            TextureManager.getInstance().bindTexture(null);
+
+            GL20.glUseProgram(_shaderProgram);
+
+            // Make sure the shader manager knows that this program is currently active
+            ShaderManager.getInstance().setActiveShaderProgram(this);
+
+            // Set the shader parameters if available
+            if (_parameters != null) {
+                _parameters.applyParameters(this);
+            }
         }
     }
 
     public void setFloat(String desc, float f) {
-        int id = GL20.glGetUniformLocation(_shaderPogram, desc);
+        enable();
+        int id = GL20.glGetUniformLocation(_shaderProgram, desc);
         GL20.glUniform1f(id, f);
     }
 
-    public void setFloat3(String desc, Vector3f v) {
-        setFloat3(desc, v.x, v.y, v.z);
-    }
-
     public void setFloat3(String desc, float f1, float f2, float f3) {
-        int id = GL20.glGetUniformLocation(_shaderPogram, desc);
+        enable();
+        int id = GL20.glGetUniformLocation(_shaderProgram, desc);
         GL20.glUniform3f(id, f1, f2, f3);
     }
 
     public void setFloat4(String desc, float f1, float f2, float f3, float f4) {
-        int id = GL20.glGetUniformLocation(_shaderPogram, desc);
+        enable();
+        int id = GL20.glGetUniformLocation(_shaderProgram, desc);
         GL20.glUniform4f(id, f1, f2, f3, f4);
     }
 
     public void setInt(String desc, int i) {
-        int id = GL20.glGetUniformLocation(_shaderPogram, desc);
+        enable();
+        int id = GL20.glGetUniformLocation(_shaderProgram, desc);
         GL20.glUniform1i(id, i);
     }
 
     public void setFloat2(String desc, FloatBuffer buffer) {
-        int id = GL20.glGetUniformLocation(_shaderPogram, desc);
+        enable();
+        int id = GL20.glGetUniformLocation(_shaderProgram, desc);
         GL20.glUniform2(id, buffer);
     }
 
     public void setFloat1(String desc, FloatBuffer buffer) {
-        int id = GL20.glGetUniformLocation(_shaderPogram, desc);
+        enable();
+        int id = GL20.glGetUniformLocation(_shaderProgram, desc);
         GL20.glUniform1(id, buffer);
     }
 
-    public ShaderParameters getShaderParameters() {
+    public IShaderParameters getShaderParameters() {
         return _parameters;
     }
 
     public int getShaderId() {
-        return _shaderPogram;
+        return _shaderProgram;
     }
 }

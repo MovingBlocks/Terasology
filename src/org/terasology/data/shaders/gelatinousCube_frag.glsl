@@ -19,8 +19,7 @@ void main(){
     color.rgb *= clamp(gl_Color.rgb, 0.0, 1.0) * colorOffset.rgb;
 
     float lightValue = expLightValue(light);
-    color.rgb *= lightValue * 0.85 + 0.15 * highlight * lightValue;
-    color.rgb += torchlight;
+    color.rgb *= lightValue * 0.85 + 0.15 * highlight * lightValue + torchlight;
 
     color.a = gl_Color.a;
 

@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.collection.EnumBooleanMap;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Side;
 import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.model.structures.AABB;
@@ -26,6 +27,7 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.*;
@@ -259,9 +261,13 @@ public class Block implements IGameObject, Cloneable {
         return new Vector2f((int) pos.x * TEXTURE_OFFSET, (int) pos.y * TEXTURE_OFFSET);
     }
 
-    public void render() {
+    public void renderWithLightValue(float light) {
         if (isInvisible())
             return;
+
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.enable();
+        shader.setFloat("light", light);
 
         if (_mesh == null) {
             Tessellator tessellator = new Tessellator();
@@ -287,6 +293,10 @@ public class Block implements IGameObject, Cloneable {
             _mesh.render();
             glEnable(GL11.GL_CULL_FACE);
         }
+    }
+
+    public void render() {
+        renderWithLightValue(1.0f);
     }
 
     public void update() {

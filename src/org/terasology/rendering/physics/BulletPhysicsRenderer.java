@@ -30,13 +30,10 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.interfaces.IGameObject;
-import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Matrix3f;
@@ -209,11 +206,6 @@ public class BulletPhysicsRenderer implements IGameObject {
     public void render() {
         _discreteDynamicsWorld.stepSimulation(1.0f / 60f, 7);
 
-        TextureManager.getInstance().bindTexture("terrain");
-
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
-        shader.enable();
-
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
         float[] mFloat = new float[16];
 
@@ -237,17 +229,12 @@ public class BulletPhysicsRenderer implements IGameObject {
             else if (b.getCollisionShape() == _blockShapeQuarter)
                 GL11.glScalef(0.25f, 0.25f, 0.25f);
 
-            float lightValue = Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValueAt(new Vector3d(t.origin));
-            shader.setFloat("light", lightValue);
-
-            BlockManager.getInstance().getBlock(b.getType()).render();
+            BlockManager.getInstance().getBlock(b.getType()).renderWithLightValue(Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValueAt(new Vector3d(t.origin)));
 
             GL11.glPopMatrix();
         }
 
         GL11.glPopMatrix();
-
-        ShaderManager.getInstance().enableShader(null);
     }
 
     public void update() {

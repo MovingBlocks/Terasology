@@ -15,6 +15,8 @@
  */
 package org.terasology.utilities;
 
+import org.terasology.math.TeraMath;
+
 /**
  * Random number generator based on the Xorshift generator by George Marsaglia.
  *
@@ -67,11 +69,11 @@ public class FastRandom {
     }
 
     public int randomIntAbs() {
-        return MathHelper.fastAbs(randomInt());
+        return TeraMath.fastAbs(randomInt());
     }
 
     public int randomIntAbs(int range) {
-        return MathHelper.fastAbs(randomInt() % range);
+        return TeraMath.fastAbs(randomInt() % range);
     }
 
     /**
@@ -102,8 +104,8 @@ public class FastRandom {
         StringBuilder s = new StringBuilder();
 
         for (int i = 0; i < length / 2; i++) {
-            s.append((char) ('a' + MathHelper.fastAbs(randomDouble()) * 26d));
-            s.append((char) ('A' + MathHelper.fastAbs(randomDouble()) * 26d));
+            s.append((char) ('a' + TeraMath.fastAbs(randomDouble()) * 26d));
+            s.append((char) ('A' + TeraMath.fastAbs(randomDouble()) * 26d));
         }
 
         return s.toString();
@@ -124,10 +126,10 @@ public class FastRandom {
             u1 = randomDouble();
             u2 = randomDouble();
 
-            q = Math.pow(u1, 2) + Math.pow(u2, 2);
+            q = java.lang.Math.pow(u1, 2) + java.lang.Math.pow(u2, 2);
         }
 
-        double p = Math.sqrt((-2d * (Math.log(q))) / q);
+        double p = java.lang.Math.sqrt((-2d * (java.lang.Math.log(q))) / q);
         return u1 * p; // or u2 * p
     }
 }

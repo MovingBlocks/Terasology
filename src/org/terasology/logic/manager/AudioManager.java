@@ -19,8 +19,8 @@ import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.AudioLoader;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
+import org.terasology.math.TeraMath;
 import org.terasology.utilities.FastRandom;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
 import java.io.IOException;
@@ -99,7 +99,7 @@ public class AudioManager {
     }
 
     public void playVaryingSound(String s, float freq, float amp) {
-        AudioManager.getInstance().getAudio(s).playAsSoundEffect(freq + (float) MathHelper.fastAbs(_rand.randomDouble()) + (freq * 0.10f), amp + (float) MathHelper.fastAbs(_rand.randomDouble()) * (amp * 0.10f), false);
+        AudioManager.getInstance().getAudio(s).playAsSoundEffect(freq + (float) TeraMath.fastAbs(_rand.randomDouble()) + (freq * 0.10f), amp + (float) TeraMath.fastAbs(_rand.randomDouble()) * (amp * 0.10f), false);
     }
 
     public void playVaryingPositionedSound(Vector3d relativeEntityPosition, Audio sound) {
@@ -110,7 +110,7 @@ public class AudioManager {
             return;
 
 
-        float loudness = 0.05f + (float) MathHelper.fastAbs(_rand.randomDouble()) * 0.05f;
+        float loudness = 0.05f + (float) TeraMath.fastAbs(_rand.randomDouble()) * 0.05f;
 
         if (distance > 1.0) {
             loudness /= distance;
@@ -118,7 +118,7 @@ public class AudioManager {
         }
 
         sound.playAsSoundEffect(0.9f +
-                (float) MathHelper.fastAbs(_rand.randomDouble()) * 0.1f,
+                (float) TeraMath.fastAbs(_rand.randomDouble()) * 0.1f,
                 loudness,
                 false,
                 (float) relativeEntityPosition.x,

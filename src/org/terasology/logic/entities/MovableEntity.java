@@ -19,12 +19,12 @@ import org.newdawn.slick.openal.Audio;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.ConfigurationManager;
+import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
@@ -142,9 +142,9 @@ public abstract class MovableEntity extends Entity {
         if (_noSound)
             return;
 
-        if ((MathHelper.fastAbs(_velocity.x) > 0.01 || MathHelper.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
+        if ((TeraMath.fastAbs(_velocity.x) > 0.01 || TeraMath.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
-                _currentFootstepSound = _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
+                _currentFootstepSound = _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
                 AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(), _currentFootstepSound);
             } else {
                 long timeDiff = Terasology.getInstance().getTime() - _lastFootStepSoundPlayed;
@@ -194,10 +194,10 @@ public abstract class MovableEntity extends Entity {
 
                 if (direction >= 0) {
                     getPosition().y = blockAABB.getPosition().y + blockAABB.getDimensions().y + entityAABB.getDimensions().y;
-                    getPosition().y += Math.ulp(getPosition().y);
+                    getPosition().y += java.lang.Math.ulp(getPosition().y);
                 } else {
                     getPosition().y = blockAABB.getPosition().y - blockAABB.getDimensions().y - entityAABB.getDimensions().y;
-                    getPosition().y -= Math.ulp(getPosition().y);
+                    getPosition().y -= java.lang.Math.ulp(getPosition().y);
                 }
 
                 moved = true;
@@ -303,23 +303,23 @@ public abstract class MovableEntity extends Entity {
         /*
          * Slowdown the speed of the entity each time this method is called.
          */
-        if (MathHelper.fastAbs(_velocity.y) > 0f) {
+        if (TeraMath.fastAbs(_velocity.y) > 0f) {
             _velocity.y += -1f * _velocity.y * friction;
         }
 
-        if (MathHelper.fastAbs(_velocity.x) > 0f) {
+        if (TeraMath.fastAbs(_velocity.x) > 0f) {
             _velocity.x += -1f * _velocity.x * friction;
         }
 
-        if (MathHelper.fastAbs(_velocity.z) > 0f) {
+        if (TeraMath.fastAbs(_velocity.z) > 0f) {
             _velocity.z += -1f * _velocity.z * friction;
         }
 
         /*
          * Apply friction.
          */
-        if (MathHelper.fastAbs(_velocity.x) > _activeWalkingSpeed || MathHelper.fastAbs(_velocity.z) > _activeWalkingSpeed || MathHelper.fastAbs(_velocity.y) > _activeWalkingSpeed) {
-            double max = Math.max(Math.max(MathHelper.fastAbs(_velocity.x), MathHelper.fastAbs(_velocity.z)), MathHelper.fastAbs(_velocity.y));
+        if (TeraMath.fastAbs(_velocity.x) > _activeWalkingSpeed || TeraMath.fastAbs(_velocity.z) > _activeWalkingSpeed || TeraMath.fastAbs(_velocity.y) > _activeWalkingSpeed) {
+            double max = java.lang.Math.max(java.lang.Math.max(TeraMath.fastAbs(_velocity.x), TeraMath.fastAbs(_velocity.z)), TeraMath.fastAbs(_velocity.y));
             double div = max / _activeWalkingSpeed;
 
             _velocity.x /= div;
@@ -372,12 +372,12 @@ public abstract class MovableEntity extends Entity {
                     // Jumping is only possible, if the entity is standing on ground
                     if (_jump) {
                         AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
-                                _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
+                                _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
                         _jump = false;
                         _gravity = _jumpIntensity;
                     } else if (!_touchingGround) { // Entity reaches the ground
                         AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
-                                _footstepSounds[MathHelper.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
+                                _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
                         _touchingGround = true;
                     }
                 } else {
@@ -399,7 +399,7 @@ public abstract class MovableEntity extends Entity {
         getPosition().x += _velocity.x;
         getPosition().z += _velocity.z;
 
-        _stepCounter += Math.max(MathHelper.fastAbs(_velocity.x), MathHelper.fastAbs(_velocity.z));
+        _stepCounter += java.lang.Math.max(TeraMath.fastAbs(_velocity.x), TeraMath.fastAbs(_velocity.z));
 
         /*
          * Check for horizontal collisions __after__ checking for vertical
@@ -476,42 +476,42 @@ public abstract class MovableEntity extends Entity {
 
     public void walkForward() {
         if (!_godMode && !_isSwimming) {
-            _movementDirection.x += _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw));
-            _movementDirection.z -= _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw));
+            _movementDirection.x += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw));
+            _movementDirection.z -= _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw));
         } else if (!_godMode && _isSwimming) {
-            _movementDirection.x += _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movementDirection.z -= _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movementDirection.y -= _activeWalkingSpeed * Math.sin(Math.toRadians(_pitch));
+            _movementDirection.x += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.z -= _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.y -= _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
         } else {
-            _movementDirection.x += _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movementDirection.z -= _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movementDirection.y -= _activeWalkingSpeed * Math.sin(Math.toRadians(_pitch));
+            _movementDirection.x += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.z -= _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.y -= _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
         }
     }
 
     public void walkBackwards() {
         if (!_godMode && !_isSwimming) {
-            _movementDirection.x -= _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw));
-            _movementDirection.z += _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw));
+            _movementDirection.x -= _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw));
+            _movementDirection.z += _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw));
         } else if (!_godMode && _isSwimming) {
-            _movementDirection.x -= _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movementDirection.z += _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movementDirection.y += _activeWalkingSpeed * Math.sin(Math.toRadians(_pitch));
+            _movementDirection.x -= _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.z += _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.y += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
         } else {
-            _movementDirection.x -= _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movementDirection.z += _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw)) * Math.cos(Math.toRadians(_pitch));
-            _movementDirection.y += _activeWalkingSpeed * Math.sin(Math.toRadians(_pitch));
+            _movementDirection.x -= _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.z += _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.y += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
         }
     }
 
     public void strafeLeft() {
-        _movementDirection.x += _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw - 90));
-        _movementDirection.z -= _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw - 90));
+        _movementDirection.x += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw - 90));
+        _movementDirection.z -= _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw - 90));
     }
 
     public void strafeRight() {
-        _movementDirection.x += _activeWalkingSpeed * Math.sin(Math.toRadians(_yaw + 90));
-        _movementDirection.z -= _activeWalkingSpeed * Math.cos(Math.toRadians(_yaw + 90));
+        _movementDirection.x += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw + 90));
+        _movementDirection.z -= _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw + 90));
     }
 
     public void jump() {
@@ -568,13 +568,13 @@ public abstract class MovableEntity extends Entity {
     }
 
     public void setViewingDirection(double yaw, double pitch) {
-        _viewingDirection.set(Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)), -Math.sin(Math.toRadians(pitch)), -Math.cos(Math.toRadians(pitch)) * Math.cos(Math.toRadians(yaw)));
+        _viewingDirection.set(java.lang.Math.sin(java.lang.Math.toRadians(yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(pitch)), -java.lang.Math.sin(java.lang.Math.toRadians(pitch)), -java.lang.Math.cos(java.lang.Math.toRadians(pitch)) * java.lang.Math.cos(java.lang.Math.toRadians(yaw)));
         _viewingDirection.normalize(_viewingDirection);
     }
 
     public void setPitchYawFromVector(Vector3d v) {
-        _pitch = Math.toDegrees(-Math.asin(v.y));
-        _yaw = Math.toDegrees(Math.atan2(v.x, -v.z));
+        _pitch = java.lang.Math.toDegrees(-java.lang.Math.asin(v.y));
+        _yaw = java.lang.Math.toDegrees(java.lang.Math.atan2(v.x, -v.z));
 
         if (_yaw < 0)
             _yaw = 360 + _yaw;

@@ -16,7 +16,6 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.TextureManager;
 
 /**
@@ -24,18 +23,11 @@ import org.terasology.logic.manager.TextureManager;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersBlock implements IShaderParameters {
+public class ShaderParametersDefault implements IShaderParameters {
 
     public void applyParameters(ShaderProgram program) {
-        Terasology tera = Terasology.getInstance();
-
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        TextureManager.getInstance().bindTexture("terrain");
-
-        program.setFloat("light", tera.getActiveWorldRenderer().getRenderingLightValue());
-        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
-        program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
-        program.setInt("textured", 1);
+        TextureManager.getInstance().bindTexture(null);
     }
 
 }
