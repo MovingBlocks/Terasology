@@ -18,7 +18,7 @@ def artifactJar = distDir + '/Terasology.jar'
 def artifactZip = outputDir + '/Terasology.zip'
 
 // Stuff beyond source code that we'll copy to the output dir (outside the jar file)
-def extraFiles = ['README.markdown', 'natives/windows/OpenAL32.dll', 'natives/windows/OpenAL64.dll']  // TODO: I am sure paths are not welcome here
+def extraFiles = ['README.markdown']  // TODO: I am sure paths are not welcome here
 def extraDirs = ['natives', 'groovy']   // TODO: Sort out the internal vs external Groovy setup
 def scriptDirFiles = ['run_linux.sh', 'run_macosx.command', 'Terasology.exe']
 
@@ -107,7 +107,6 @@ target('buildArtifacts': 'Takes compiled code and everything else needed and pre
         zipfileset(src: 'libs/AppleJavaExtensions.jar')
         zipfileset(src: 'libs/groovy-all-1.8.2.jar')
         zipfileset(src: 'libs/jbullet.jar')
-        zipfileset(src: 'libs/jdom.jar')
         zipfileset(src: 'libs/jinput.jar')
         zipfileset(src: 'libs/jogg-0.0.7.jar')
         zipfileset(src: 'libs/jorbis-0.0.15.jar')

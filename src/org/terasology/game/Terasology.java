@@ -260,6 +260,16 @@ public final class Terasology {
     }
 
     /**
+     * Init. a new world. Generates a new random seed for the title
+     * if the world is not present on disk.
+     *
+     * @param title The title of the world
+     */
+    public void initWorld(String title) {
+        initWorld(title, null);
+    }
+
+    /**
      * Prepares a new world with a given name and seed value.
      *
      * @param title Title of the world
@@ -699,6 +709,19 @@ public final class Terasology {
         }
 
         addLogFileHandler("logs/Terasology.log", Level.INFO);
+    }
+
+    public String getWorldSavePath(String worldTitle) {
+        String path = String.format("SAVED_WORLDS/%s", worldTitle);
+        // Try to detect if we're getting a screwy save path (usually/always the case with an applet)
+        File f = new File(path);
+        //System.out.println("Suggested absolute save path is: " + f.getAbsolutePath());
+        if (!f.getAbsolutePath().contains("Terasology")) {
+            f = new File(System.getProperty("java.io.tmpdir"), path);
+            //System.out.println("Absolute TEMP save path is: " + f.getAbsolutePath());
+            return f.getAbsolutePath();
+        }
+        return path;
     }
 
     public Logger getLogger() {

@@ -53,6 +53,8 @@ public class ExplosionTool extends SimpleTool {
             for (int i = 0; i < 256; i++) {
                 Vector3d direction = new Vector3d((float) worldProvider.getRandom().randomDouble(), (float) worldProvider.getRandom().randomDouble(), (float) worldProvider.getRandom().randomDouble());
                 direction.normalize();
+                Vector3f impulse = new Vector3f(direction);
+                impulse.scale(800000);
 
                 for (int j = 0; j < 4; j++) {
                     Vector3f target = new Vector3f(origin);
@@ -73,7 +75,7 @@ public class ExplosionTool extends SimpleTool {
                         placeBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, false);
 
                         if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent())
-                            BulletPhysicsRenderer.getInstance().addBlock(target, currentBlockType, 32000f, new Vector3f(0.0f, 900000f, 0.0f), BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
+                            BulletPhysicsRenderer.getInstance().addBlock(target, currentBlockType, impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
                     }
                 }
             }

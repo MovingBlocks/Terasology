@@ -148,7 +148,7 @@ public final class LocalChunkCache implements IChunkProvider {
             return;
         }
 
-        File dirPath = new File(_parent.getWorldSavePath() + "/" + c.getChunkSavePath());
+        File dirPath = new File(_parent.getObjectSavePath() + "/" + c.getChunkSavePath());
         if (!dirPath.exists()) {
             if (!dirPath.mkdirs()) {
                 Terasology.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
@@ -156,7 +156,7 @@ public final class LocalChunkCache implements IChunkProvider {
             }
         }
 
-        File f = new File(_parent.getWorldSavePath() + "/" + c.getChunkSavePath() + "/" + c.getChunkFileName());
+        File f = new File(_parent.getObjectSavePath() + "/" + c.getChunkSavePath() + "/" + c.getChunkFileName());
 
         try {
             FileOutputStream fileOut = new FileOutputStream(f);
@@ -176,7 +176,7 @@ public final class LocalChunkCache implements IChunkProvider {
      * @return The loaded chunk, null if none was found
      */
     private Chunk loadChunkFromDisk(Vector3d chunkPos) {
-        File f = new File(_parent.getWorldSavePath() + "/" + Chunk.getChunkSavePathForPosition(chunkPos) + "/" + Chunk.getChunkFileNameForPosition(chunkPos));
+        File f = new File(_parent.getObjectSavePath() + "/" + Chunk.getChunkSavePathForPosition(chunkPos) + "/" + Chunk.getChunkFileNameForPosition(chunkPos));
 
         if (!f.exists())
             return null;

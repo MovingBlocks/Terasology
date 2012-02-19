@@ -591,4 +591,8 @@ public abstract class MovableEntity extends Entity {
     public WorldRenderer getParent() {
         return _parent;
     }
+
+    public Vector3d getVelocity() {
+        return _velocity;
+    }
 }

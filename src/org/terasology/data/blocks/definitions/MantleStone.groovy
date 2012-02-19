@@ -7,4 +7,8 @@ block {
     version = 1
     shape = "cube"
     hardness = 0
+
+    physics {
+        mass = 256000
+    }
 }
