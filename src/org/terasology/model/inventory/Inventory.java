@@ -15,8 +15,6 @@
  */
 package org.terasology.model.inventory;
 
-import org.terasology.logic.characters.Player;
-import org.terasology.model.blocks.management.BlockManager;
 
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
@@ -24,19 +22,9 @@ import org.terasology.model.blocks.management.BlockManager;
 public class Inventory {
 
     private final Item[] _inventory = new Item[27];
-    private final Player _parent;
 
-    public Inventory(Player parent) {
-        _parent = parent;
-    }
-
-    public void loadDefaultItems() {
-        _inventory[0] = new ItemBlock(_parent, BlockManager.getInstance().getBlockGroup("Companion"), 1);
-        _inventory[1] = new ItemBlock(_parent, BlockManager.getInstance().getBlockGroup("Torch"), 16);
-        _inventory[2] = new ItemPickAxe(_parent);
-        _inventory[3] = new ItemAxe(_parent);
-        _inventory[4] = new ItemBlueprint(_parent);
-        _inventory[5] = new ItemDynamite(_parent);
+    public Inventory() {
+    	
     }
 
     /**
@@ -143,10 +131,6 @@ public class Inventory {
             return null;
 
         return _inventory[slot];
-    }
-
-    public Player getParent() {
-        return _parent;
     }
 
     public int size() {

@@ -33,7 +33,11 @@ import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.Inventory;
 import org.terasology.model.inventory.Item;
+import org.terasology.model.inventory.ItemAxe;
 import org.terasology.model.inventory.ItemBlock;
+import org.terasology.model.inventory.ItemBlueprint;
+import org.terasology.model.inventory.ItemDynamite;
+import org.terasology.model.inventory.ItemPickAxe;
 import org.terasology.model.inventory.Toolbar;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
@@ -93,7 +97,7 @@ public class Player extends Character {
     private Mesh _handMesh, _overlayMesh;
 
     /* INVENTORY */
-    private Inventory _inventory = new Inventory(this);
+    private Inventory _inventory = new Inventory();
     private Toolbar _toolbar = new Toolbar(this);
 
     /* GOD MODE */
@@ -112,8 +116,16 @@ public class Player extends Character {
         _godMode = GOD_MODE;
 
         load();
-        
-        _inventory.loadDefaultItems();
+        loadDefaultItems();
+    }
+    
+    private void loadDefaultItems() {
+        _inventory.storeItemInSlot(0, new ItemBlock(this, BlockManager.getInstance().getBlockGroup("Companion"), 1));
+        _inventory.storeItemInSlot(1, new ItemBlock(this, BlockManager.getInstance().getBlockGroup("Torch"), 16));
+        _inventory.storeItemInSlot(2, new ItemPickAxe(this));
+        _inventory.storeItemInSlot(3, new ItemAxe(this));
+        _inventory.storeItemInSlot(4, new ItemBlueprint(this));
+        _inventory.storeItemInSlot(5, new ItemDynamite(this));
     }
 
     public void render() {
