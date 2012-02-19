@@ -126,7 +126,7 @@ public class InventoryTest {
 		}
 	}
 	
-	public static class ItemImpl extends Item {
+	private static class ItemImpl extends Item {
 		public void setStackSize(int size) {
 			this._stackSize = size;
 		}
