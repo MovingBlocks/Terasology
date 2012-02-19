@@ -15,7 +15,6 @@
  */
 package org.terasology.model.inventory;
 
-import org.terasology.logic.characters.Player;
 import org.terasology.model.blocks.management.BlockManager;
 
 /**
@@ -23,13 +22,12 @@ import org.terasology.model.blocks.management.BlockManager;
  */
 public class ItemPickAxe extends VoxelItem {
 
-    public ItemPickAxe(Player parent) {
-        super(parent);
+    public ItemPickAxe() {
+        super();
 
-        setIconWithAtlasPos(1, 6);
         _toolId = (byte) 1;
         _stackSize = 8;
 
-        setExtractionAmountForBlock(BlockManager.getInstance().getBlock("Stone"), (byte) 2);
+        setExtraction(BlockManager.getInstance().getBlock("Stone"), 2);
     }
 }

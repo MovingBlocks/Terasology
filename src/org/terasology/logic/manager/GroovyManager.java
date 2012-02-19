@@ -28,8 +28,6 @@ import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.ItemBlock;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -55,22 +53,6 @@ public class GroovyManager {
     public GroovyManager() {
         _bind = new Binding();
         //loadAllPlugins();
-    }
-
-    private void loadAllPlugins() {
-        File pluginDir = new File("groovy/plugins");
-
-        File[] plugins = pluginDir.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                return file.getName().contains(".groovy");
-            }
-        });
-
-        if (plugins != null) {
-            for (File p : plugins) {
-                initializePlugin(p.getName());
-            }
-        }
     }
 
     /**
@@ -135,7 +117,7 @@ public class GroovyManager {
 
         public void giveBlock(int blockId, int quantity) {
             Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.getInventory().storeItemInFreeSlot(new ItemBlock(player, BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup(), quantity));
+            player.getInventory().storeItemInFreeSlot(new ItemBlock(BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup(), quantity));
         }
 
         public void giveBlock(String title) {
@@ -152,7 +134,7 @@ public class GroovyManager {
                 }
             }
             if (group != null) {
-                player.getInventory().storeItemInFreeSlot(new ItemBlock(player, group, quantity));
+                player.getInventory().storeItemInFreeSlot(new ItemBlock(group, quantity));
             }
         }
     }

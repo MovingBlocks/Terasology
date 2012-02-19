@@ -7,8 +7,6 @@ import org.junit.Test;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.PixelFormat;
-import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.logic.world.IWorldProvider;

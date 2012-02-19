@@ -66,14 +66,4 @@ public class MultipleSelectionTool implements ITool {
 
         Terasology.getInstance().getLogger().log(Level.INFO, "Removed block at: " + blockPosition);
     }
-
-    /**
-     * Simple example to save the selected blocks somewhere... But where?
-     */
-    private void generateBlueprint() {
-        for (BlockPosition bp : _vertexBlocks) {
-            // Save me please :-)
-            _player.getParent().getWorldProvider().getBlock(bp.x, bp.y, bp.z);
-        }
-    }
 }

@@ -33,7 +33,11 @@ import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.Inventory;
 import org.terasology.model.inventory.Item;
+import org.terasology.model.inventory.ItemAxe;
 import org.terasology.model.inventory.ItemBlock;
+import org.terasology.model.inventory.ItemBlueprint;
+import org.terasology.model.inventory.ItemDynamite;
+import org.terasology.model.inventory.ItemPickAxe;
 import org.terasology.model.inventory.Toolbar;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
@@ -51,7 +55,6 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -63,7 +66,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Player extends Character {
+public class Player extends Character {
 
     /* CONSTANT VALUES */
     private static final double MOUSE_SENS = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
@@ -93,7 +96,7 @@ public final class Player extends Character {
     private Mesh _handMesh, _overlayMesh;
 
     /* INVENTORY */
-    private Inventory _inventory = new Inventory(this);
+    private Inventory _inventory = new Inventory();
     private Toolbar _toolbar = new Toolbar(this);
 
     /* GOD MODE */
@@ -112,6 +115,16 @@ public final class Player extends Character {
         _godMode = GOD_MODE;
 
         load();
+        loadDefaultItems();
+    }
+    
+    private void loadDefaultItems() {
+        _inventory.storeItemInSlot(0, new ItemBlock(BlockManager.getInstance().getBlockGroup("Companion"), 1));
+        _inventory.storeItemInSlot(1, new ItemBlock(BlockManager.getInstance().getBlockGroup("Torch"), 16));
+        _inventory.storeItemInSlot(2, new ItemPickAxe());
+        _inventory.storeItemInSlot(3, new ItemAxe());
+        _inventory.storeItemInSlot(4, new ItemBlueprint());
+        _inventory.storeItemInSlot(5, new ItemDynamite());
     }
 
     public void render() {
@@ -211,16 +224,15 @@ public final class Player extends Character {
     }
 
     public void renderFirstPersonViewElements() {
-        if (!RENDER_FIRST_PERSON_VIEW)
-            return;
-
-        if (getActiveItem() != null) {
-            if (getActiveItem().renderFirstPersonView()) {
-                return;
-            }
+        if (!RENDER_FIRST_PERSON_VIEW) {
+        	return;        	
         }
-
-        renderHand();
+        
+        if (getActiveItem() != null) {
+        	getActiveItem().renderFirstPersonView(this);
+        } else {
+        	renderHand();
+        }
     }
 
     /**
@@ -534,7 +546,8 @@ public final class Player extends Character {
 
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void writePropertiesToConfigObject(ConfigObject co) {
         co.put("playerPositionX", getPosition().x);
         co.put("playerPositionY", getPosition().y);

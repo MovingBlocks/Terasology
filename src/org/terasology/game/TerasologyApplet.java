@@ -25,6 +25,7 @@ import java.util.logging.Level;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
+@SuppressWarnings("serial")
 public final class TerasologyApplet extends Applet {
     private Terasology _terasology;
     private Thread _gameThread;

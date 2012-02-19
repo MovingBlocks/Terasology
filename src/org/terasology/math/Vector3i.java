@@ -2,7 +2,6 @@ package org.terasology.math;
 
 import javax.vecmath.Vector3f;
 import java.io.Serializable;
-import java.util.logging.Logger;
 
 /**
  * Vector3i - integer vector class in the style of VecMath.
@@ -11,7 +10,6 @@ import java.util.logging.Logger;
  */
 public final class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
     private static final long serialVersionUID = -1965792038041767639L;
-    private static final Logger logger = Logger.getLogger(Vector3i.class.getName());
 
     public static Vector3i zero() {
         return new Vector3i(0, 0, 0);

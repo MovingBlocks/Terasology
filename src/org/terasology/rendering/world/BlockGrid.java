@@ -40,11 +40,8 @@ public class BlockGrid implements IGameObject {
     private final Mesh _mesh;
 
     private final HashSet<BlockPosition> _gridPositions = new HashSet<BlockPosition>();
-    private final WorldRenderer _parent;
 
     public BlockGrid(WorldRenderer parent) {
-        _parent = parent;
-
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
         _mesh = tessellator.generateMesh();

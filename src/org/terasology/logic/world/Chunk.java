@@ -35,7 +35,6 @@ import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.rendering.shader.ShaderParameters;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;

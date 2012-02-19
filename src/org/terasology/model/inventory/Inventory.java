@@ -15,8 +15,6 @@
  */
 package org.terasology.model.inventory;
 
-import org.terasology.logic.characters.Player;
-import org.terasology.model.blocks.management.BlockManager;
 
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
@@ -24,20 +22,9 @@ import org.terasology.model.blocks.management.BlockManager;
 public class Inventory {
 
     private final Item[] _inventory = new Item[27];
-    private final Player _parent;
 
-    public Inventory(Player parent) {
-        _parent = parent;
-        initDefaultItems();
-    }
-
-    private void initDefaultItems() {
-        _inventory[0] = new ItemBlock(_parent, BlockManager.getInstance().getBlockGroup("Companion"), 1);
-        _inventory[1] = new ItemBlock(_parent, BlockManager.getInstance().getBlockGroup("Torch"), 16);
-        _inventory[2] = new ItemPickAxe(_parent);
-        _inventory[3] = new ItemAxe(_parent);
-        _inventory[4] = new ItemBlueprint(_parent);
-        _inventory[5] = new ItemDynamite(_parent);
+    public Inventory() {
+    	
     }
 
     /**
@@ -119,13 +106,24 @@ public class Inventory {
         return null;
     }
 
+    public Item getItemInSlot(int slot) {
+        if (slot < 0 || slot >= size())
+            return null;
+
+        return _inventory[slot];
+    }
+
+    public int size() {
+        return _inventory.length;
+    }
+    
     /**
      * Returns the first free slot for the given item.
      *
      * @param item The item
      * @return The slot if at least one is available. Returns -1 otherwise.
      */
-    public int findFirstFreeSlot(Item item) {
+    private int findFirstFreeSlot(Item item) {
         for (int i = 0; i < size(); i++) {
             if (_inventory[i] == null) {
                 return i;
@@ -137,20 +135,5 @@ public class Inventory {
         }
 
         return -1;
-    }
-
-    public Item getItemInSlot(int slot) {
-        if (slot < 0 || slot >= size())
-            return null;
-
-        return _inventory[slot];
-    }
-
-    public Player getParent() {
-        return _parent;
-    }
-
-    public int size() {
-        return _inventory.length;
     }
 }

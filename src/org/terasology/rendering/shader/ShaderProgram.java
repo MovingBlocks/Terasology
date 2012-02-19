@@ -122,9 +122,9 @@ public class ShaderProgram {
             }
         } catch (Exception e) {
             Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to read shader.");
-        } finally {
-            return code;
         }
+        
+        return code;
     }
 
     private void printLogInfo(int shaderId) {
