@@ -105,11 +105,6 @@ public class PostProcessingRenderer {
                 createFBO("sceneBlur0", 1024, 1024, true, false);
                 createFBO("sceneBlur1", 1024, 1024, true, false);
 
-                createFBO("scene1024", 1024, 1024, true, false);
-                createFBO("scene512", 512, 512, true, false);
-                createFBO("scene256", 256, 256, true, false);
-                createFBO("scene128", 128, 128, true, false);
-                createFBO("scene64", 64, 64, true, false);
                 createFBO("scene32", 32, 32, true, false);
                 createFBO("scene16", 16, 16, true, false);
                 createFBO("scene8", 8, 8, true, false);
@@ -344,7 +339,7 @@ public class PostProcessingRenderer {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("down");
         shader.enable();
 
-        for (int i = 10; i >= 0; i--) {
+        for (int i = 5; i >= 0; i--) {
             int sizePrev = (int) java.lang.Math.pow(2, i + 1);
 
             int size = (int) java.lang.Math.pow(2, i);
@@ -355,7 +350,7 @@ public class PostProcessingRenderer {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            if (i == 10)
+            if (i == 5)
                 PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
             else
                 PostProcessingRenderer.getInstance().getFBO("scene" + sizePrev).bindTexture();
