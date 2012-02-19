@@ -20,7 +20,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.rendering.shader.ShaderParameters;
+import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
@@ -75,13 +75,13 @@ public class BlockParticle extends Particle {
             glEndList();
         }
 
-        ShaderParameters params = ShaderManager.getInstance().getShaderParameters("particle");
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("particle");
 
         Vector4f color = BlockManager.getInstance().getBlock(_blockType).calcColorOffsetFor(Side.FRONT, _parent.getParent().getActiveTemperature(), _parent.getParent().getActiveHumidity());
-        params.setFloat3("colorOffset", color.x, color.y, color.z);
-        params.setFloat("texOffsetX", _texOffsetX);
-        params.setFloat("texOffsetY", _texOffsetY);
-        params.setFloat("light", _parent.getParent().getRenderingLightValueAt(_position));
+        shader.setFloat3("colorOffset", color.x, color.y, color.z);
+        shader.setFloat("texOffsetX", _texOffsetX);
+        shader.setFloat("texOffsetY", _texOffsetY);
+        shader.setFloat("light", _parent.getParent().getRenderingLightValueAt(_position));
 
         glCallList(_displayLists[_blockType]);
     }

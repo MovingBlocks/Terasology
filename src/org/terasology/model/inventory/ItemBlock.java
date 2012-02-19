@@ -25,7 +25,7 @@ import org.terasology.logic.manager.TextureManager;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
@@ -76,11 +76,12 @@ public class ItemBlock extends Item {
         Block activeBlock = _blockGroup.getArchetypeBlock();
 
         TextureManager.getInstance().bindTexture("terrain");
-        ShaderManager.getInstance().enableShader("block");
 
         // Adjust the brightness of the block according to the current position of the player
-        int light = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "light");
-        GL20.glUniform1f(light, Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValue());
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.enable();
+
+        shader.setFloat("light", Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValue());
 
         // Apply biome and overall color offset
         FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
@@ -90,7 +91,7 @@ public class ItemBlock extends Item {
         colorBuffer.put(color.z);
 
         colorBuffer.flip();
-        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("block"), "colorOffset");
+        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShaderProgram("block").getShaderId(), "colorOffset");
         GL20.glUniform3(colorOffset, colorBuffer);
 
         glEnable(GL11.GL_BLEND);

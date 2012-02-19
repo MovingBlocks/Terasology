@@ -26,6 +26,7 @@ import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.rendering.interfaces.IGameObject;
+import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.MathHelper;
 import org.terasology.utilities.PerlinNoise;
 
@@ -117,22 +118,14 @@ public class Skysphere implements IGameObject {
         if (sunNormalise.y >= -0.35)
             zenithColor = getAllWeatherZenith((float) sunNormalise.y);
 
-        ShaderManager.getInstance().enableShader("sky");
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("sky");
+        shader.enable();
 
-        int sunPos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunPos");
-        GL20.glUniform4f(sunPos, 0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
-
-        int time = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "time");
-        GL20.glUniform1f(time, (float) _parent.getWorldProvider().getTime());
-
-        int sunAngle = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunAngle");
-        GL20.glUniform1f(sunAngle, (float) _sunPosAngle);
-
-        int turbidity = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "turbidity");
-        GL20.glUniform1f(turbidity, (float) _turbidity);
-
-        int zenith = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "zenith");
-        GL20.glUniform3f(zenith, (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
+        shader.setFloat4("sunPos", 0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
+        shader.setFloat("time", (float) _parent.getWorldProvider().getTime());
+        shader.setFloat("sunAngle", (float) _sunPosAngle);
+        shader.setFloat("turbidity", (float) _turbidity);
+        shader.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
 
         // Draw the skysphere
         drawSphere();
@@ -142,7 +135,7 @@ public class Skysphere implements IGameObject {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         ShaderManager.getInstance().enableShader("clouds");
         // Apply daylight
-        int lightClouds = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("clouds"), "light");
+        int lightClouds = GL20.glGetUniformLocation(ShaderManager.getInstance().getShaderProgram("clouds").getShaderId(), "light");
         GL20.glUniform1f(lightClouds, (float) getDaylight());
 
         // Finally draw the clouds

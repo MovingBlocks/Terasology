@@ -24,17 +24,13 @@ import org.terasology.game.Terasology;
  */
 public class ShaderParametersBlock extends ShaderParameters {
 
-    public ShaderParametersBlock() {
-        super("block");
-    }
-
-    public void applyParameters() {
+    public void applyParameters(ShaderProgram program) {
         Terasology tera = Terasology.getInstance();
 
-        setFloat("light", tera.getActiveWorldRenderer().getRenderingLightValue());
-        setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
-        setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
-        setInt("textured", 1);
+        program.setFloat("light", tera.getActiveWorldRenderer().getRenderingLightValue());
+        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
+        program.setInt("textured", 1);
     }
 
 }

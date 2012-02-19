@@ -24,15 +24,11 @@ import org.terasology.game.Terasology;
  */
 public class ShaderParametersGelCube extends ShaderParameters {
 
-    public ShaderParametersGelCube() {
-        super("gelatinousCube");
-    }
-
-    public void applyParameters() {
+    public void applyParameters(ShaderProgram program) {
         Terasology tera = Terasology.getInstance();
 
-        setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
-        setInt("tick", tera.getActiveWorldRenderer().getTick());
+        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        program.setInt("tick", tera.getActiveWorldRenderer().getTick());
     }
 
 }

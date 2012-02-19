@@ -36,6 +36,7 @@ import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderParameters;
+import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.Helper;
@@ -752,8 +753,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - playerPosition.x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - playerPosition.y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - playerPosition.z);
 
             // Transfer the world offset of the chunk to the shader for various effects
-            ShaderParameters params = ShaderManager.getInstance().getShaderParameters("chunk");
-            params.setFloat3("chunkOffset", (float) (getPosition().x * Chunk.CHUNK_DIMENSION_X), (float) (getPosition().y * Chunk.CHUNK_DIMENSION_Y), (float) (getPosition().z * Chunk.CHUNK_DIMENSION_Z));
+            ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
+            shader.setFloat3("chunkOffset", (float) (getPosition().x * Chunk.CHUNK_DIMENSION_X), (float) (getPosition().y * Chunk.CHUNK_DIMENSION_Y), (float) (getPosition().z * Chunk.CHUNK_DIMENSION_Z));
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {
