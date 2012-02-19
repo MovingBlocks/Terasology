@@ -547,7 +547,8 @@ public class Player extends Character {
 
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void writePropertiesToConfigObject(ConfigObject co) {
         co.put("playerPositionX", getPosition().x);
         co.put("playerPositionY", getPosition().y);

@@ -609,7 +609,8 @@ public final class Terasology {
     /**
      * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
-    private void processKeyboardInput() {
+    @SuppressWarnings("unchecked")
+	private void processKeyboardInput() {
         boolean debugEnabled = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
 
         while (Keyboard.next()) {
