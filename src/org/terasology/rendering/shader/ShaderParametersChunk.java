@@ -25,21 +25,17 @@ import org.terasology.model.blocks.management.BlockManager;
  */
 public class ShaderParametersChunk extends ShaderParameters {
 
-    public ShaderParametersChunk() {
-        super("chunk");
-    }
-
-    public void applyParameters() {
+    public void applyParameters(ShaderProgram program) {
         Terasology tera = Terasology.getInstance();
 
-        setFloat("daylight", (float) tera.getActiveWorldRenderer().getDaylight());
-        setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
-        setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
-        setFloat2("grassCoordinate", BlockManager.getInstance().calcCoordinate("Grass"));
-        setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("Water"));
-        setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("Lava"));
-        setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
-        setFloat("time", (float) tera.getActiveWorldProvider().getTime());
+        program.setFloat("daylight", (float) tera.getActiveWorldRenderer().getDaylight());
+        program.setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
+        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        program.setFloat2("grassCoordinate", BlockManager.getInstance().calcCoordinate("Grass"));
+        program.setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("Water"));
+        program.setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("Lava"));
+        program.setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
+        program.setFloat("time", (float) tera.getActiveWorldProvider().getTime());
     }
 
 }

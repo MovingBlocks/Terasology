@@ -17,7 +17,6 @@ package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.openal.SoundStore;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
@@ -32,6 +31,7 @@ import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.particles.BlockParticleEmitter;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
+import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Vector3d;
@@ -282,7 +282,8 @@ public final class WorldRenderer implements IGameObject {
         glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
 
-        ShaderManager.getInstance().enableShader("chunk");
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
+        shader.enable();
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         TextureManager.getInstance().bindTexture("custom_lava_still");
@@ -293,14 +294,10 @@ public final class WorldRenderer implements IGameObject {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("terrain");
 
-        int lavaTexture = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureLava");
-        int textureWaterNormal = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureWaterNormal");
-        int textureAtlas = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureAtlas");
-        int textureEffects = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("chunk"), "textureEffects");
-        GL20.glUniform1i(lavaTexture, 1);
-        GL20.glUniform1i(textureWaterNormal, 2);
-        GL20.glUniform1i(textureEffects, 3);
-        GL20.glUniform1i(textureAtlas, 0);
+        shader.setInt("textureLava", 1);
+        shader.setInt("textureWaterNormal", 2);
+        shader.setInt("textureEffects", 3);
+        shader.setInt("textureAtlas", 0);
 
         boolean playerIsSwimming = _player.isHeadUnderWater();
 
@@ -349,7 +346,7 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.startActivity("Chunk-WaterIce");
 
         TextureManager.getInstance().bindTexture("terrain");
-        ShaderManager.getInstance().enableShader("chunk");
+        shader.enable();
 
         // Make sure the water surface is rendered if the player is swimming
         if (playerIsSwimming) {

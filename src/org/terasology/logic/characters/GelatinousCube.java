@@ -25,7 +25,7 @@ import org.terasology.model.structures.AABB;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.rendering.shader.ShaderParameters;
+import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3d;
@@ -88,10 +88,11 @@ public final class GelatinousCube extends Character {
 
         TextureManager.getInstance().bindTexture("slime");
 
-        ShaderManager.getInstance().enableShader("gelatinousCube");
-        ShaderParameters params = ShaderManager.getInstance().getShaderParameters("gelatinousCube");
-        params.setFloat4("colorOffset", COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].z, 1.0f);
-        params.setFloat("light", _parent.getRenderingLightValueAt(getPosition()));
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");
+
+        shader.enable();
+        shader.setFloat4("colorOffset", COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].z, 1.0f);
+        shader.setFloat("light", _parent.getRenderingLightValueAt(getPosition()));
 
         _mesh.render();
 

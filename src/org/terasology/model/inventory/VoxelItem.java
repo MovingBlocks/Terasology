@@ -19,7 +19,7 @@ import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
-import org.terasology.rendering.shader.ShaderParameters;
+import org.terasology.rendering.shader.ShaderProgram;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -40,8 +40,9 @@ public abstract class VoxelItem extends Item {
     @Override
     public boolean renderFirstPersonView(Player player) {
         ShaderManager.getInstance().enableShader("block");
-        ShaderParameters params = ShaderManager.getInstance().getShaderParameters("block");
-        params.setInt("textured", 0);
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.enable();
+        shader.setInt("textured", 0);
 
         glPushMatrix();
 

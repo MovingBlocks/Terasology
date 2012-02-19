@@ -24,14 +24,10 @@ import org.terasology.game.Terasology;
  */
 public class ShaderParametersParticle extends ShaderParameters {
 
-    public ShaderParametersParticle() {
-        super("particle");
-    }
-
-    public void applyParameters() {
+    public void applyParameters(ShaderProgram program) {
         Terasology tera = Terasology.getInstance();
 
-        setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
     }
 
 }

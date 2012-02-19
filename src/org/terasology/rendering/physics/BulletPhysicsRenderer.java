@@ -36,7 +36,7 @@ import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.interfaces.IGameObject;
-import org.terasology.rendering.shader.ShaderParameters;
+import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Matrix3f;
@@ -210,8 +210,9 @@ public class BulletPhysicsRenderer implements IGameObject {
         _discreteDynamicsWorld.stepSimulation(1.0f / 60f, 7);
 
         TextureManager.getInstance().bindTexture("terrain");
-        ShaderManager.getInstance().enableShader("block");
-        ShaderParameters params = ShaderManager.getInstance().getShaderParameters("block");
+
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.enable();
 
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
         float[] mFloat = new float[16];
@@ -237,7 +238,7 @@ public class BulletPhysicsRenderer implements IGameObject {
                 GL11.glScalef(0.25f, 0.25f, 0.25f);
 
             float lightValue = Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValueAt(new Vector3d(t.origin));
-            params.setFloat("light", lightValue);
+            shader.setFloat("light", lightValue);
 
             BlockManager.getInstance().getBlock(b.getType()).render();
 

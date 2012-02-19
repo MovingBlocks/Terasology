@@ -24,13 +24,10 @@ import org.terasology.game.Terasology;
  */
 public class ShaderParametersPostProcessing extends ShaderParameters {
 
-    public ShaderParametersPostProcessing() {
-        super("post");
-    }
-
-    public void applyParameters() {
+    public void applyParameters(ShaderProgram program) {
         Terasology tera = Terasology.getInstance();
-        setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
+
+        program.setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
     }
 
 }

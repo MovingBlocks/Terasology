@@ -17,6 +17,7 @@ package org.terasology.logic.manager;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
+import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.MathHelper;
 
 import java.nio.FloatBuffer;
@@ -237,7 +238,9 @@ public class PostProcessingRenderer {
                 generateBlur(i);
             }
 
-            ShaderManager.getInstance().enableShader("post");
+            ShaderProgram shaderPost = ShaderManager.getInstance().getShaderProgram("post");
+            shaderPost.enable();
+
             PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
             GL13.glActiveTexture(GL13.GL_TEXTURE1);
@@ -249,17 +252,11 @@ public class PostProcessingRenderer {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
 
-            int texScene = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("post"), "texScene");
-            GL20.glUniform1i(texScene, 0);
-            int texBloom = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("post"), "texBloom");
-            GL20.glUniform1i(texBloom, 1);
-            int texDepth = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("post"), "texDepth");
-            GL20.glUniform1i(texDepth, 2);
-            int texBlur = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("post"), "texBlur");
-            GL20.glUniform1i(texBlur, 3);
-
-            int expos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("post"), "exposure");
-            GL20.glUniform1f(expos, _exposure);
+            shaderPost.setInt("texScene", 0);
+            shaderPost.setInt("texBloom", 1);
+            shaderPost.setInt("texDepth", 2);
+            shaderPost.setInt("texBlur", 3);
+            shaderPost.setFloat("exposure", _exposure);
 
             renderFullQuad();
 
@@ -314,10 +311,10 @@ public class PostProcessingRenderer {
     }
 
     private void generateBlur(int id) {
-        ShaderManager.getInstance().enableShader("blur");
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
-        int radius = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("blur"), "radius");
-        GL20.glUniform1f(radius, 2.0f);
+        shader.enable();
+        shader.setFloat("radius", 2.0f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
         glViewport(0, 0, 1024, 1024);
@@ -338,10 +335,10 @@ public class PostProcessingRenderer {
     }
 
     private void generateBloom(int id) {
-        ShaderManager.getInstance().enableShader("blur");
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
-        int radius = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("blur"), "radius");
-        GL20.glUniform1f(radius, 16.0f);
+        shader.enable();
+        shader.setFloat("radius", 16.0f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).bind();
         glViewport(0, 0, 1024, 1024);
@@ -362,14 +359,14 @@ public class PostProcessingRenderer {
     }
 
     private void generateDownsampledScene() {
-        ShaderManager.getInstance().enableShader("down");
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("down");
+        shader.enable();
 
         for (int i = 6; i >= 0; i--) {
             int sizePrev = (int) Math.pow(2, i + 1);
-            int size = (int) Math.pow(2, i);
 
-            int textureSize = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("down"), "size");
-            GL20.glUniform1f(textureSize, size);
+            int size = (int) Math.pow(2, i);
+            shader.setFloat("size", size);
 
             PostProcessingRenderer.getInstance().getFBO("scene" + size).bind();
             glViewport(0, 0, size, size);
