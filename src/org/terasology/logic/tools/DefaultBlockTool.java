@@ -141,7 +141,7 @@ public class DefaultBlockTool extends SimpleTool {
                         int amount = 1;
 
                         if (_player.getActiveItem() != null) {
-                            amount = _player.getActiveItem().getExtractionAmountForBlock(block);
+                            amount = _player.getActiveItem().getExtraction(block);
                         }
 
                         _player.setExtractionCounter((byte) (_player.getExtractionCounter() + amount));

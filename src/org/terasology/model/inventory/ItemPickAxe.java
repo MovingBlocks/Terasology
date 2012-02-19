@@ -28,6 +28,6 @@ public class ItemPickAxe extends VoxelItem {
         _toolId = (byte) 1;
         _stackSize = 8;
 
-        setExtractionAmountForBlock(BlockManager.getInstance().getBlock("Stone"), (byte) 2);
+        setExtraction(BlockManager.getInstance().getBlock("Stone"), 2);
     }
 }

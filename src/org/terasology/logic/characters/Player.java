@@ -224,16 +224,15 @@ public class Player extends Character {
     }
 
     public void renderFirstPersonViewElements() {
-        if (!RENDER_FIRST_PERSON_VIEW)
-            return;
-
-        if (getActiveItem() != null) {
-            if (getActiveItem().renderFirstPersonView(this)) {
-                return;
-            }
+        if (!RENDER_FIRST_PERSON_VIEW) {
+        	return;        	
         }
-
-        renderHand();
+        
+        if (getActiveItem() != null) {
+        	getActiveItem().renderFirstPersonView(this);
+        } else {
+        	renderHand();
+        }
     }
 
     /**

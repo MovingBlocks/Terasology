@@ -50,7 +50,7 @@ public class ItemBlock extends Item {
     }
 
     @Override
-    public boolean renderFirstPersonView(Player player) {
+    public void renderFirstPersonView(Player player) {
         Block activeBlock = _blockGroup.getArchetypeBlock();
 
         TextureManager.getInstance().bindTexture("terrain");
@@ -97,8 +97,6 @@ public class ItemBlock extends Item {
         glDisable(GL11.GL_BLEND);
 
         ShaderManager.getInstance().enableShader(null);
-
-        return true;
     }
 
     public BlockGroup getBlockGroup() {

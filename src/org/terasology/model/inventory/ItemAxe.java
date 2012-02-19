@@ -24,12 +24,11 @@ public class ItemAxe extends VoxelItem {
     public ItemAxe() {
         super();
 
-//        setIconWithAtlasPos(1, 7);
         _toolId = (byte) 1;
         _stackSize = 8;
 
-        setExtractionAmountForBlock(BlockManager.getInstance().getBlock("BirkTrunk"), (byte) 2);
-        setExtractionAmountForBlock(BlockManager.getInstance().getBlock("OakTrunk"), (byte) 2);
-        setExtractionAmountForBlock(BlockManager.getInstance().getBlock("PineTrunk"), (byte) 2);
+        setExtraction(BlockManager.getInstance().getBlock("BirkTrunk"), 2);
+        setExtraction(BlockManager.getInstance().getBlock("OakTrunk"), 2);
+        setExtraction(BlockManager.getInstance().getBlock("PineTrunk"), 2);
     }
 }

@@ -26,17 +26,19 @@ import org.terasology.model.blocks.Block;
 public abstract class Item {
     protected int _amount;
     protected byte _toolId;
-
     protected int _stackSize = 16;
-
-    protected HashMap<Block, Byte> _extractionAmountMapping = new HashMap<Block, Byte>();
+    protected HashMap<Block, Integer> _extraction = new HashMap<Block, Integer>();
 
     public Item() {
         _amount = 1;
     }
 
-    public boolean renderFirstPersonView(Player player) {
-        return false;
+    /**
+     * 
+     * @param player the Player from whose perspective rendering will happen
+     */
+    public void renderFirstPersonView(Player player) {
+        // NO-OP
     }
 
     public void setAmount(int amount) {
@@ -77,14 +79,16 @@ public abstract class Item {
         return _stackSize;
     }
 
-    public void setExtractionAmountForBlock(Block block, byte amount) {
-        _extractionAmountMapping.put(block, amount);
+    /**
+     * 
+     * @param block the block to set extraction for
+     * @param amount the amount of extraction
+     */
+    public void setExtraction(Block block, int amount) {
+        _extraction.put(block, amount);
     }
 
-    public byte getExtractionAmountForBlock(Block block) {
-        if (_extractionAmountMapping.containsKey(block))
-            return _extractionAmountMapping.get(block);
-
-        return 1;
+    public int getExtraction(Block block) {
+    	return _extraction.containsKey(block) ? _extraction.get(block) : 1;
     }
 }

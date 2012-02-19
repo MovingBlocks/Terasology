@@ -38,7 +38,7 @@ public abstract class VoxelItem extends Item {
     }
 
     @Override
-    public boolean renderFirstPersonView(Player player) {
+    public void renderFirstPersonView(Player player) {
         ShaderManager.getInstance().enableShader("block");
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
         shader.enable();
@@ -62,7 +62,5 @@ public abstract class VoxelItem extends Item {
         glPopMatrix();
 
         ShaderManager.getInstance().enableShader(null);
-
-        return true;
     }
 }
