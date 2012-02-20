@@ -21,7 +21,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.ConfigurationManager;
+import org.terasology.logic.manager.SettingsManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.manager.ToolManager;
@@ -68,17 +68,17 @@ import static org.lwjgl.opengl.GL11.*;
 public class Player extends Character {
 
     /* CONSTANT VALUES */
-    private static final double MOUSE_SENS = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
-    private static final boolean DEMO_FLIGHT = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlight");
-    private static final double DEMO_FLIGHT_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("System.Debug.demoFlightSpeed");
-    private static final boolean GOD_MODE = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.godMode");
-    private static final boolean CAMERA_BOBBING = (Boolean) ConfigurationManager.getInstance().getConfig().get("Player.cameraBobbing");
+    private static final double MOUSE_SENS = (Double) SettingsManager.getInstance().getUserSetting("Game.Controls.mouseSens");
+    private static final boolean DEMO_FLIGHT = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.demoFlight");
+    private static final double DEMO_FLIGHT_SPEED = (Double) SettingsManager.getInstance().getWorldSetting("World.Debug.demoFlightSpeed");
+    private static final boolean GOD_MODE = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.godMode");
+    private static final boolean CAMERA_BOBBING = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Player.cameraBobbing");
 
-    private static final boolean RENDER_FIRST_PERSON_VIEW = (Boolean) ConfigurationManager.getInstance().getConfig().get("Player.renderFirstPersonView");
-    private static final double WALKING_SPEED = (Double) ConfigurationManager.getInstance().getConfig().get("Player.walkingSpeed");
-    private static final boolean SHOW_PLACING_BOX = (Boolean) ConfigurationManager.getInstance().getConfig().get("HUD.placingBox");
-    private static final double RUNNING_FACTOR = (Double) ConfigurationManager.getInstance().getConfig().get("Player.runningFactor");
-    private static final double JUMP_INTENSITY = (Double) ConfigurationManager.getInstance().getConfig().get("Player.jumpIntensity");
+    private static final boolean RENDER_FIRST_PERSON_VIEW = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Player.renderFirstPersonView");
+    private static final double WALKING_SPEED = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.walkingSpeed");
+    private static final boolean SHOW_PLACING_BOX = (Boolean) SettingsManager.getInstance().getUserSetting("Game.HUD.placingBox");
+    private static final double RUNNING_FACTOR = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.runningFactor");
+    private static final double JUMP_INTENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.jumpIntensity");
 
     /* OBSERVERS */
     private final ArrayList<IBlockObserver> _observers = new ArrayList<IBlockObserver>();
