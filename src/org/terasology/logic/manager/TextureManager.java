@@ -162,6 +162,11 @@ public class TextureManager {
     }
 
     public void bindTexture(String s) {
+        if (s == null) {
+            glBindTexture(GL11.GL_TEXTURE_2D, 0);
+            return;
+        }
+
         if (_textures.containsKey(s))
             glBindTexture(GL11.GL_TEXTURE_2D, _textures.get(s).id);
     }

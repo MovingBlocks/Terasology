@@ -40,13 +40,13 @@ void main()
                }
            }
         }
-       }
+    }
 
-       if (gl_TexCoord[0].x >= waterCoordinate.x && gl_TexCoord[0].x < waterCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= waterCoordinate.y && gl_TexCoord[0].y < waterCoordinate.y + TEXTURE_OFFSET) {
-            vertexWorldPos.y += sin(timeToTick(time, 1.0) + vertexChunkPos.x +  + vertexChunkPos.z) * sin(timeToTick(time, 0.5) + vertexChunkPos.x  + vertexChunkPos.z + 16.0) * 0.1;
-       } else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= lavaCoordinate.y && gl_TexCoord[0].y < lavaCoordinate.y + TEXTURE_OFFSET) {
-            vertexWorldPos.y += sin(timeToTick(time, 0.5) + vertexChunkPos.x + vertexChunkPos.z) * 0.1;
-       }
+    if (gl_TexCoord[0].x >= waterCoordinate.x && gl_TexCoord[0].x < waterCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= waterCoordinate.y && gl_TexCoord[0].y < waterCoordinate.y + TEXTURE_OFFSET) {
+        vertexWorldPos.y += sin(timeToTick(time, 1.0) + vertexChunkPos.x +  + vertexChunkPos.z) * sin(timeToTick(time, 0.5) + vertexChunkPos.x  + vertexChunkPos.z + 16.0) * 0.1;
+    } else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= lavaCoordinate.y && gl_TexCoord[0].y < lavaCoordinate.y + TEXTURE_OFFSET) {
+        vertexWorldPos.y += sin(timeToTick(time, 0.5) + vertexChunkPos.x + vertexChunkPos.z) * 0.1;
+    }
     #endif
 
     gl_Position = gl_ProjectionMatrix * vertexWorldPos;

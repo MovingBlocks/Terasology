@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
+package org.terasology.math;
 
-import org.lwjgl.opengl.GL13;
-import org.terasology.game.Terasology;
-import org.terasology.logic.manager.TextureManager;
+
+import javax.vecmath.Matrix4f;
+import java.nio.FloatBuffer;
 
 /**
- * Shader parameters for the Particle shader program.
+ * An extended version of the VecMath Matrix4f providing support for various
+ * OpenGL related stuff.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersParticle implements IShaderParameters {
+public class TeraMatrix4f extends Matrix4f {
 
-    public void applyParameters(ShaderProgram program) {
-        Terasology tera = Terasology.getInstance();
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        TextureManager.getInstance().bindTexture("terrain");
-
-        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+    public FloatBuffer toOpenGLMatrix() {
+          return null;
     }
 
 }

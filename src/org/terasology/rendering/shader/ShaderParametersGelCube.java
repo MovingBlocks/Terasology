@@ -15,24 +15,25 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL13;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.TextureManager;
 
 /**
- * TODO
+ * Shader parameters for the Gel. Cube shader program.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersGelCube extends ShaderParameters {
+public class ShaderParametersGelCube implements IShaderParameters {
 
-    public ShaderParametersGelCube() {
-        super("gelatinousCube");
-    }
-
-    public void applyParameters() {
+    public void applyParameters(ShaderProgram program) {
         Terasology tera = Terasology.getInstance();
 
-        setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
-        setInt("tick", tera.getActiveWorldRenderer().getTick());
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        TextureManager.getInstance().bindTexture("slime");
+
+        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        program.setInt("tick", tera.getActiveWorldRenderer().getTick());
     }
 
 }

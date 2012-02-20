@@ -17,6 +17,7 @@ package org.terasology.model.structures;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.ShaderManager;
 
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
@@ -273,6 +274,8 @@ public class AABB {
      * @param lineThickness The thickness of the line
      */
     public void render(float lineThickness) {
+        ShaderManager.getInstance().enableDefault();
+
         glPushMatrix();
         Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
         glTranslated(getPosition().x - playerPosition.x, -playerPosition.y, getPosition().z - playerPosition.z);
@@ -283,6 +286,8 @@ public class AABB {
     }
 
     public void renderLocally(float lineThickness) {
+        ShaderManager.getInstance().enableDefault();
+
         if (_displayListWire == -1) {
             generateDisplayListWire();
         }
@@ -297,6 +302,8 @@ public class AABB {
     }
 
     public void renderSolidLocally() {
+        ShaderManager.getInstance().enableDefault();
+
         if (_displayListSolid == -1) {
             generateDisplayListSolid();
         }

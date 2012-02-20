@@ -5,7 +5,6 @@ uniform sampler2D texBlur;
 
 uniform bool swimming;
 uniform float exposure = 1.0;
-const float brightMax = 1.0;
 
 float linDepth() {
     const float cNear = 0.1;
@@ -19,16 +18,14 @@ void main(){
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
 
-    // HDR Tone Mapping
-    float Y = dot(vec4(0.30, 0.59, 0.11, 0.0), color);
-    float YD = exposure * (exposure/brightMax + 1.0) / (exposure + 1.0);
+    float t = tonemapReinhard(color, 1.0, exposure);
+
+    color *= t;
+    colorBlur *= t;
 
     // Apply bloom
-    color += texture2D(texBloom, gl_TexCoord[0].xy) * 1.0;
-    colorBlur += texture2D(texBloom, gl_TexCoord[0].xy) * 1.0;
-
-    colorBlur *= YD;
-    color *= YD;
+    color += texture2D(texBloom, gl_TexCoord[0].xy);
+    colorBlur += texture2D(texBloom, gl_TexCoord[0].xy);
 
     float depth = linDepth();
     float blur = 0.0;

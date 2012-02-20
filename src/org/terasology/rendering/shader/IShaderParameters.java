@@ -15,24 +15,13 @@
  */
 package org.terasology.rendering.shader;
 
-import org.lwjgl.opengl.GL13;
-import org.terasology.game.Terasology;
-import org.terasology.logic.manager.TextureManager;
-
 /**
- * Shader parameters for the Particle shader program.
+ * Interface for all shader parameters. Shader parameters can
+ * be used to automatically set shader parameters when the
+ * corresponding shader program gets activated.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersParticle implements IShaderParameters {
-
-    public void applyParameters(ShaderProgram program) {
-        Terasology tera = Terasology.getInstance();
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        TextureManager.getInstance().bindTexture("terrain");
-
-        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
-    }
-
+public interface IShaderParameters {
+    public void applyParameters(ShaderProgram program);
 }

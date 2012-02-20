@@ -50,7 +50,7 @@ public final class ChunkTessellator {
     public ChunkMesh generateMesh(int meshHeight, int verticalOffset) {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh();
-        
+
         for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
             for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z++) {
                 double biomeTemp = _chunk.getParent().getTemperatureAt(_chunk.getBlockWorldPosX(x), _chunk.getBlockWorldPosZ(z));
@@ -210,7 +210,7 @@ public final class ChunkTessellator {
             }
         }
 
-        double resultAmbientOcclusion = (Math.pow(0.70, occCounter) + Math.pow(0.92, occCounterBillboard)) / 2.0;
+        double resultAmbientOcclusion = (Math.pow(0.60, occCounter) + Math.pow(0.86, occCounterBillboard)) / 2.0;
 
         if (counterLight == 0)
             output[0] = (double) 0;
@@ -318,7 +318,16 @@ public final class ChunkTessellator {
         Block cBlock = BlockManager.getInstance().getBlock(currentBlock);
         if (cBlock.getSideMesh(side) == null) return false;
         Block bCheck = BlockManager.getInstance().getBlock(blockToCheck);
-        return bCheck == null || cBlock == null || bCheck.getId() == 0x0 || !bCheck.isBlockingSide(side.reverse()) || !cBlock.isTranslucent() && bCheck.isTranslucent() || (bCheck.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK && cBlock.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK);
+
+        // Liquids can be transparent but there should be no visible adjacent faces
+        // !!! In comparison to leaves !!!
+        if (cBlock.isLiquid() && bCheck.isLiquid()) return false;
+
+        return bCheck == null || 
+                cBlock == null ||
+                bCheck.getId() == 0x0 || 
+                !bCheck.isBlockingSide(side.reverse()) || 
+                (!cBlock.isTranslucent() && bCheck.isTranslucent());
     }
 
     public static int getVertexArrayUpdateCount() {

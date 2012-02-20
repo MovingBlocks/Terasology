@@ -15,31 +15,43 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL13;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.management.BlockManager;
 
 /**
- * TODO
+ * Shader parameters for the Chunk shader program.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersChunk extends ShaderParameters {
+public class ShaderParametersChunk implements IShaderParameters {
 
-    public ShaderParametersChunk() {
-        super("chunk");
-    }
-
-    public void applyParameters() {
+    public void applyParameters(ShaderProgram program) {
         Terasology tera = Terasology.getInstance();
 
-        setFloat("daylight", (float) tera.getActiveWorldRenderer().getDaylight());
-        setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
-        setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
-        setFloat2("grassCoordinate", BlockManager.getInstance().calcCoordinate("Grass"));
-        setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("Water"));
-        setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("Lava"));
-        setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
-        setFloat("time", (float) tera.getActiveWorldProvider().getTime());
+        GL13.glActiveTexture(GL13.GL_TEXTURE1);
+        TextureManager.getInstance().bindTexture("custom_lava_still");
+        GL13.glActiveTexture(GL13.GL_TEXTURE2);
+        TextureManager.getInstance().bindTexture("water_normal");
+        GL13.glActiveTexture(GL13.GL_TEXTURE3);
+        TextureManager.getInstance().bindTexture("effects");
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        TextureManager.getInstance().bindTexture("terrain");
+
+        program.setInt("textureLava", 1);
+        program.setInt("textureWaterNormal", 2);
+        program.setInt("textureEffects", 3);
+        program.setInt("textureAtlas", 0);
+
+        program.setFloat("daylight", (float) tera.getActiveWorldRenderer().getDaylight());
+        program.setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
+        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        program.setFloat2("grassCoordinate", BlockManager.getInstance().calcCoordinate("Grass"));
+        program.setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("Water"));
+        program.setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("Lava"));
+        program.setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
+        program.setFloat("time", (float) tera.getActiveWorldProvider().getTime());
     }
 
 }

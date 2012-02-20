@@ -13,20 +13,20 @@ void main(){
 
     if (textured) {
         color = srgbToLinear(texture2D(textureAtlas, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y)));
+        color.rgb *= gl_Color.rgb;
     } else {
         color = gl_Color;
     }
 
     float torchlight = 0.0;
-    float highlight = calcLambLight(normal, -normalize(vertexWorldPos.xyz));
 
     // Apply torchlight
     if (carryingTorch)
-        torchlight = calcTorchlight(highlight, vertexWorldPos.xyz);
+        torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexWorldPos.xyz)), vertexWorldPos.xyz);
 
     // Apply light
     float lightValue = expLightValue(light);
-    color.rgb *= clamp(lightValue * 0.85 + highlight * 0.15 * lightValue + torchlight, 0.0, 1.0);
+    color.rgb *= clamp(lightValue + torchlight, 0.0, 1.0);
 
     if (textured) {
         color.rgb *= colorOffset.rgb;

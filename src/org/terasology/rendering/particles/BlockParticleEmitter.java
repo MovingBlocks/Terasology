@@ -39,11 +39,8 @@ public class BlockParticleEmitter extends ParticleEmitter {
     }
 
     public void render() {
-        TextureManager.getInstance().bindTexture("terrain");
-
         ShaderManager.getInstance().enableShader("particle");
         super.render();
-        ShaderManager.getInstance().enableShader(null);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package org.terasology.math;
 
-import org.terasology.utilities.MathHelper;
-
 import java.util.EnumMap;
 
 /**
@@ -55,22 +53,22 @@ public enum Side {
     }
 
     public static Side inDirection(int x, int y, int z) {
-        if (MathHelper.fastAbs(x) > MathHelper.fastAbs(y)) {
-            if (MathHelper.fastAbs(x) > MathHelper.fastAbs(z)) {
+        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(y)) {
+            if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
                 return (x > 0) ? RIGHT : LEFT;
             }
-        } else if (MathHelper.fastAbs(y) > MathHelper.fastAbs(z)) {
+        } else if (TeraMath.fastAbs(y) > TeraMath.fastAbs(z)) {
             return (y > 0) ? TOP : BOTTOM;
         }
         return (z > 0) ? BACK : FRONT;
     }
 
     public static Side inDirection(double x, double y, double z) {
-        if (MathHelper.fastAbs(x) > MathHelper.fastAbs(y)) {
-            if (MathHelper.fastAbs(x) > MathHelper.fastAbs(z)) {
+        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(y)) {
+            if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
                 return (x > 0) ? RIGHT : LEFT;
             }
-        } else if (MathHelper.fastAbs(y) > MathHelper.fastAbs(z)) {
+        } else if (TeraMath.fastAbs(y) > TeraMath.fastAbs(z)) {
             return (y > 0) ? TOP : BOTTOM;
         }
         return (z > 0) ? BACK : FRONT;

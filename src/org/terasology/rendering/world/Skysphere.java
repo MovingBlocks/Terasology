@@ -25,8 +25,9 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.interfaces.IGameObject;
-import org.terasology.utilities.MathHelper;
+import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.PerlinNoise;
 
 import javax.vecmath.Vector2f;
@@ -108,8 +109,8 @@ public class Skysphere implements IGameObject {
 
         glEnable(GL13.GL_TEXTURE_CUBE_MAP);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(0));
-        _sunPosAngle = (float) Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
-        Vector4d sunNormalise = new Vector4d(0.0f, Math.cos(_sunPosAngle), Math.sin(_sunPosAngle), 1.0);
+        _sunPosAngle = (float) java.lang.Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
+        Vector4d sunNormalise = new Vector4d(0.0f, java.lang.Math.cos(_sunPosAngle), java.lang.Math.sin(_sunPosAngle), 1.0);
         sunNormalise.normalize();
 
         Vector3d zenithColor = new Vector3d();
@@ -117,22 +118,14 @@ public class Skysphere implements IGameObject {
         if (sunNormalise.y >= -0.35)
             zenithColor = getAllWeatherZenith((float) sunNormalise.y);
 
-        ShaderManager.getInstance().enableShader("sky");
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("sky");
+        shader.enable();
 
-        int sunPos = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunPos");
-        GL20.glUniform4f(sunPos, 0.0f, (float) Math.cos(_sunPosAngle), (float) Math.sin(_sunPosAngle), 1.0f);
-
-        int time = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "time");
-        GL20.glUniform1f(time, (float) _parent.getWorldProvider().getTime());
-
-        int sunAngle = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "sunAngle");
-        GL20.glUniform1f(sunAngle, (float) _sunPosAngle);
-
-        int turbidity = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "turbidity");
-        GL20.glUniform1f(turbidity, (float) _turbidity);
-
-        int zenith = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("sky"), "zenith");
-        GL20.glUniform3f(zenith, (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
+        shader.setFloat4("sunPos", 0.0f, (float) java.lang.Math.cos(_sunPosAngle), (float) java.lang.Math.sin(_sunPosAngle), 1.0f);
+        shader.setFloat("time", (float) _parent.getWorldProvider().getTime());
+        shader.setFloat("sunAngle", (float) _sunPosAngle);
+        shader.setFloat("turbidity", (float) _turbidity);
+        shader.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
 
         // Draw the skysphere
         drawSphere();
@@ -142,19 +135,18 @@ public class Skysphere implements IGameObject {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         ShaderManager.getInstance().enableShader("clouds");
         // Apply daylight
-        int lightClouds = GL20.glGetUniformLocation(ShaderManager.getInstance().getShader("clouds"), "light");
+        int lightClouds = GL20.glGetUniformLocation(ShaderManager.getInstance().getShaderProgram("clouds").getShaderId(), "light");
         GL20.glUniform1f(lightClouds, (float) getDaylight());
 
         // Finally draw the clouds
         drawClouds();
-        ShaderManager.getInstance().enableShader(null);
 
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }
 
     private Vector3d getAllWeatherZenith(float thetaSun) {
-        thetaSun = (float) Math.acos(thetaSun);
+        thetaSun = (float) java.lang.Math.acos(thetaSun);
         Vector4f cx1 = new Vector4f(0.0f, 0.00209f, -0.00375f, 0.00165f);
         Vector4f cx2 = new Vector4f(0.00394f, -0.03202f, 0.06377f, -0.02903f);
         Vector4f cx3 = new Vector4f(0.25886f, 0.06052f, -0.21196f, 0.11693f);
@@ -162,12 +154,12 @@ public class Skysphere implements IGameObject {
         Vector4f cy2 = new Vector4f(0.00516f, -0.04153f, 0.08970f, -0.04214f);
         Vector4f cy3 = new Vector4f(0.26688f, 0.06670f, -0.26756f, 0.15346f);
 
-        double t2 = (float) Math.pow(_turbidity, 2);
+        double t2 = (float) java.lang.Math.pow(_turbidity, 2);
         double chi = (4.0f / 9.0f - _turbidity / 120.0f) * (PI - 2.0f * thetaSun);
 
-        Vector4f theta = new Vector4f(1, thetaSun, (float) Math.pow(thetaSun, 2), (float) Math.pow(thetaSun, 3));
+        Vector4f theta = new Vector4f(1, thetaSun, (float) java.lang.Math.pow(thetaSun, 2), (float) java.lang.Math.pow(thetaSun, 3));
 
-        double Y = (4.0453f * _turbidity - 4.9710f) * (float) Math.tan(chi) - 0.2155f * _turbidity + 2.4192f;
+        double Y = (4.0453f * _turbidity - 4.9710f) * (float) java.lang.Math.tan(chi) - 0.2155f * _turbidity + 2.4192f;
         double x = t2 * cx1.dot(theta) + _turbidity * cx2.dot(theta) + cx3.dot(theta);
         double y = t2 * cy1.dot(theta) + _turbidity * cy2.dot(theta) + cy3.dot(theta);
 
@@ -187,7 +179,7 @@ public class Skysphere implements IGameObject {
 
         // Set the light direction according to the position of the sun
         FloatBuffer buffer = BufferUtils.createFloatBuffer(4);
-        buffer.put(0.0f).put((float) Math.cos(_sunPosAngle)).put((float) Math.sin(_sunPosAngle)).put(1.0f);
+        buffer.put(0.0f).put((float) java.lang.Math.cos(_sunPosAngle)).put((float) java.lang.Math.sin(_sunPosAngle)).put(1.0f);
         buffer.flip();
 
         glLight(GL_LIGHT0, GL11.GL_POSITION, buffer);
@@ -210,7 +202,6 @@ public class Skysphere implements IGameObject {
 
     private void drawClouds() {
         glEnable(GL11.GL_BLEND);
-        glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, _textureIds.get(1));
 
         glPushMatrix();
@@ -242,7 +233,6 @@ public class Skysphere implements IGameObject {
         glPopMatrix();
 
         glDisable(GL_BLEND);
-        glDisable(GL11.GL_TEXTURE_2D);
 
     }
 
@@ -254,7 +244,7 @@ public class Skysphere implements IGameObject {
             for (int j = 0; j < (int) CLOUD_RESOLUTION.y; j++) {
                 double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime());
 
-                byte value = (byte) (MathHelper.clamp(noise * 1.25 + 0.25) * 255);
+                byte value = (byte) (TeraMath.clamp(noise * 1.25 + 0.25) * 255);
 
                 clouds.put(value);
                 clouds.put(value);
@@ -290,7 +280,7 @@ public class Skysphere implements IGameObject {
     }
 
     public double getDaylight() {
-        double angle = Math.toDegrees(MathHelper.clamp(Math.cos(_sunPosAngle)));
+        double angle = java.lang.Math.toDegrees(TeraMath.clamp(java.lang.Math.cos(_sunPosAngle)));
         double daylight = 1.0;
 
         if (angle < 24.0) {

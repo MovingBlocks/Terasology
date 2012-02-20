@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.logic.manager.ShaderManager;
 
 import javax.vecmath.Vector2f;
 
@@ -53,6 +54,8 @@ public abstract class UIDisplayElement {
     }
 
     public void renderTransformed() {
+        ShaderManager.getInstance().enableDefault();
+
         if (isVisible()) {
             glPushMatrix();
             glTranslatef(getPosition().x, getPosition().y, 0);

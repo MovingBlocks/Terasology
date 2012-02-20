@@ -28,6 +28,7 @@ import org.terasology.logic.entities.StaticEntity;
 import org.terasology.logic.generators.ChunkGenerator;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
@@ -35,11 +36,10 @@ import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.rendering.shader.ShaderParameters;
+import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.Helper;
-import org.terasology.utilities.MathHelper;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
@@ -105,7 +105,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public static int getChunkIdForPosition(Vector3d position) {
-        return MathHelper.cantorize(MathHelper.mapToPositive((int) position.x), MathHelper.mapToPositive((int) position.z));
+        return TeraMath.cantorize(TeraMath.mapToPositive((int) position.x), TeraMath.mapToPositive((int) position.z));
     }
 
     public Chunk() {
@@ -280,14 +280,14 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             byte val5 = getParent().getLight(blockPosX, y + 1, blockPosZ, type);
             byte val6 = getParent().getLight(blockPosX, y - 1, blockPosZ, type);
 
-            byte max = (byte) (Math.max(Math.max(Math.max(val1, val2), Math.max(val3, val4)), Math.max(val5, val6)) - 1);
+            byte max = (byte) (java.lang.Math.max(java.lang.Math.max(java.lang.Math.max(val1, val2), java.lang.Math.max(val3, val4)), java.lang.Math.max(val5, val6)) - 1);
 
             if (max < 0) {
                 max = 0;
             }
 
             // Do nothing if the current light value is brighter
-            byte res = (byte) Math.max(max, val);
+            byte res = (byte) java.lang.Math.max(max, val);
 
             // Finally set the new light value
             setLight(x, y, z, res, type);
@@ -746,24 +746,23 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
     public void render(ChunkMesh.RENDER_PHASE type) {
         if (isReadyForRendering()) {
+            ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
+            // Transfer the world offset of the chunk to the shader for various effects
+            shader.setFloat3("chunkOffset", (float) (getPosition().x * Chunk.CHUNK_DIMENSION_X), (float) (getPosition().y * Chunk.CHUNK_DIMENSION_Y), (float) (getPosition().z * Chunk.CHUNK_DIMENSION_Z));
+
             GL11.glPushMatrix();
 
             Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
             GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - playerPosition.x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - playerPosition.y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - playerPosition.z);
 
-            // Transfer the world offset of the chunk to the shader for various effects
-            ShaderParameters params = ShaderManager.getInstance().getShaderParameters("chunk");
-            params.setFloat3("chunkOffset", (float) (getPosition().x * Chunk.CHUNK_DIMENSION_X), (float) (getPosition().y * Chunk.CHUNK_DIMENSION_Y), (float) (getPosition().z * Chunk.CHUNK_DIMENSION_Z));
-
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {
                     if (WorldRenderer.BOUNDING_BOXES_ENABLED) {
-                        ShaderManager.getInstance().enableShader(null);
                         getSubMeshAABB(i).renderLocally(2f);
                         _statRenderedTriangles += 12;
-                        ShaderManager.getInstance().enableShader("chunk");
                     }
 
+                    shader.enable();
                     _activeMeshes[i].render(type);
                     _statRenderedTriangles += _activeMeshes[i].triangleCount();
                 }

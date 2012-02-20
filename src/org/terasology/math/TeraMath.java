@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.utilities;
+package org.terasology.math;
 
 import org.terasology.logic.world.Chunk;
 
@@ -22,7 +22,7 @@ import org.terasology.logic.world.Chunk;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class MathHelper {
+public class TeraMath {
 
     /**
      * Returns the absolute value.
@@ -132,7 +132,7 @@ public class MathHelper {
      * @return Value along the x-axis
      */
     public static int cantorX(int c) {
-        int j = (int) (Math.sqrt(0.25 + 2 * c) - 0.5);
+        int j = (int) (java.lang.Math.sqrt(0.25 + 2 * c) - 0.5);
         return j - cantorY(c);
     }
 
@@ -143,7 +143,7 @@ public class MathHelper {
      * @return Value along the y-axis
      */
     public static int cantorY(int c) {
-        int j = (int) (Math.sqrt(0.25 + 2 * c) - 0.5);
+        int j = (int) (java.lang.Math.sqrt(0.25 + 2 * c) - 0.5);
         return c - j * (j + 1) / 2;
     }
 
@@ -183,7 +183,7 @@ public class MathHelper {
      * @return The X-coordinate of the block within the chunk
      */
     public static int calcBlockPosX(int x1, int x2) {
-        return MathHelper.fastAbs(x1 - (x2 * Chunk.CHUNK_DIMENSION_X));
+        return TeraMath.fastAbs(x1 - (x2 * Chunk.CHUNK_DIMENSION_X));
     }
 
     /**
@@ -194,6 +194,6 @@ public class MathHelper {
      * @return The Z-coordinate of the block within the chunk
      */
     public static int calcBlockPosZ(int z1, int z2) {
-        return MathHelper.fastAbs(z1 - (z2 * Chunk.CHUNK_DIMENSION_Z));
+        return TeraMath.fastAbs(z1 - (z2 * Chunk.CHUNK_DIMENSION_Z));
     }
 }
