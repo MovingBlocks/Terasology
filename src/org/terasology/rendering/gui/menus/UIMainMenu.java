@@ -19,6 +19,7 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
+import org.terasology.rendering.gui.components.UIInput;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -39,6 +40,7 @@ public class UIMainMenu extends UIDisplayRenderer {
 
     final UIButton _exitButton;
     final UIButton _startButton;
+    final UIInput  _testInput;
 
     final UIText _version;
 
@@ -71,6 +73,9 @@ public class UIMainMenu extends UIDisplayRenderer {
             }
         });
 
+        _testInput = new UIInput(new Vector2f(256f, 32f));
+        _testInput.setVisible(true);
+
         _overlay = new UITransparentOverlay();
         _overlay.setVisible(true);
 
@@ -79,6 +84,7 @@ public class UIMainMenu extends UIDisplayRenderer {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
+        addDisplayElement(_testInput);
         addDisplayElement(_exitButton);
         addDisplayElement(_startButton);
         update();
@@ -96,6 +102,9 @@ public class UIMainMenu extends UIDisplayRenderer {
 
         _exitButton.centerHorizontally();
         _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
+
+        _testInput.centerHorizontally();
+        _testInput.getPosition().y = 300f + 3 * 32f + 32f;
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;
