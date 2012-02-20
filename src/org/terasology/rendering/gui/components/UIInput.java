@@ -10,13 +10,15 @@ import org.terasology.rendering.gui.framework.IInputListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.components.UIText;
+import org.terasology.rendering.gui.components.UITextCursor;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 
 /**
+ * A simple graphical input
  *
- * @author small-jeeper
+ * @author Anton Kireev <adeon.k87@gmail.com>
  */
 public class UIInput extends UIDisplayContainer {
   private final ArrayList<IInputListener> _inputListeners = new ArrayList<IInputListener>();
@@ -24,6 +26,7 @@ public class UIInput extends UIDisplayContainer {
   private final StringBuffer _inputValue = new StringBuffer();
   private final UIGraphicsElement _defaultTexture;
   private final UIText _inputText;
+  private final UITextCursor _textCursor;
   private final Vector2f _padding = new Vector2f(10f,10f);
   
   public UIInput(Vector2f size) {
@@ -36,11 +39,16 @@ public class UIInput extends UIDisplayContainer {
 
       _inputText = new UIText();
       _inputText.setVisible(true);
-      _inputText.setColor(Color.red);
       _inputText.setPosition(new Vector2f((getPosition().x + _padding.x), (getPosition().y + _padding.y)));
+
+      _textCursor = new UITextCursor();
+      _textCursor.setVisible(false);
+      _textCursor.setPosition(new Vector2f((getPosition().x + _padding.x + _inputText.getTextWidth()), (getPosition().y + _padding.y/2)));
+      System.out.println("OLOLOOLO" + _textCursor.getPosition());
       addDisplayElement(_defaultTexture);
       addDisplayElement(_inputText);
-     // update();
+      addDisplayElement(_textCursor);
+
   }
   
   public void update() {
@@ -75,24 +83,37 @@ public class UIInput extends UIDisplayContainer {
     }
 
     if (_focused) {
-      _defaultTexture.getTextureOrigin().set(0f, 120f / 512f);
+        if(!_textCursor.isVisible()){
+            _textCursor.setVisible(true);
+        }
+        _defaultTexture.getTextureOrigin().set(0f, 120f / 512f);
+      //_inputText.setText(_inputValue.toString() + "|");
     } else {
-      _defaultTexture.getTextureOrigin().set(0f, 90f / 512f);
+        if(_textCursor.isVisible()){
+            _textCursor.setVisible(false);
+        }
+        _defaultTexture.getTextureOrigin().set(0f, 90f / 512f);
+      //
     }
 
-      _inputText.setText(_inputValue.toString());
-     // if((_inputText.getPosition().x + getPosition().x + _inputText.getTextWidth())>(getPosition().x + getSize().x)){
-     //     _inputText.setPosition(new Vector2f((_inputText.getPosition().x + getPosition().x -8f),_inputText.getPosition().y));
-     // }
+    float textWidthWhithPos = _inputText.getTextWidth() + _inputText.getPosition().x + getPosition().x;
+
+    if(textWidthWhithPos>(getPosition().x + getSize().x)){
+         _inputText.setPosition(new Vector2f((_inputText.getPosition().x - 8f),_inputText.getPosition().y));
+    }
   }
   
   public void clicked() {
-      System.out.println("x: " + Mouse.getX()+ " y: " + (Display.getHeight() - Mouse.getY()));
-      System.out.println("Y: " + getPosition().y +  " My: " + (Display.getHeight() - Mouse.getY()));
       _focused = true;
   }
 
   public void processKeyboardInput(int key){
+    System.out.println(_inputText.getPosition().x);
+    System.out.println(getPosition().x);
+    System.out.println(_inputText.getTextWidth());
+    System.out.println(getSize().x);
+    System.out.println("==========================");
+
     if(_focused){
       //  System.out.println(_inputText.getPosition().x);
         if (key == Keyboard.KEY_BACK) {
@@ -102,12 +123,25 @@ public class UIInput extends UIDisplayContainer {
                 length = 0;
             }
             _inputValue.setLength(length);
+            
+            float textPosition  = _inputText.getPosition().x;
+            if(textPosition<0){
+                if(textPosition + 8f>0&&textPosition + 8f<_padding.x){
+                    _inputText.setPosition(new Vector2f(_padding.x,_inputText.getPosition().y));
+                }else{
+                    _inputText.setPosition(new Vector2f(textPosition + 8f,_inputText.getPosition().y));
+                }
+            }
         }else{
             char c = Keyboard.getEventCharacter();
-         //   if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'Z' + 1 || c == ' ' || c == '_' || c == '.' || c == ',' || c == '!' || c == '-' || c == '(' || c == ')' || c == '"' || c == '\'' || c == ';' || c == '+') {
+            if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'Z' + 1 || c == ' ' || c == '_' || c == '.' || c == ',' || c == '!' || c == '-' || c == '(' || c == ')' || c == '"' || c == '\'' || c == ';' || c == '+') {
                 _inputValue.append(c);
-          //  }
+           }
         }
+        _inputText.setText(_inputValue.toString());
+
+        //TO DO WTF?! What happened with getPositon? Fix it
+        _textCursor.setPosition(new Vector2f(_padding.x/2 + _inputText.getTextWidth()/2, (_textCursor.getPosition().y)));
     }
   }
   
@@ -123,6 +157,10 @@ public class UIInput extends UIDisplayContainer {
     
   public void setValue(String value){
       _inputValue.append(value);
+  }
+
+  public void setColor(Color color){
+    _inputText.setColor(color);
   }
 
 }
