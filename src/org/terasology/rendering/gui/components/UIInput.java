@@ -23,14 +23,14 @@ import java.util.ArrayList;
 public class UIInput extends UIDisplayContainer {
   private final ArrayList<IInputListener> _inputListeners = new ArrayList<IInputListener>();
   //private final ArrayList<UIClickListener> _clickListeners = new ArrayList<UIClickListener>();
-  private final StringBuffer _inputValue = new StringBuffer();
+  private final StringBuffer _inputValue     = new StringBuffer();
   private final UIGraphicsElement _defaultTexture;
   private final UIText _inputText;
   private final UITextCursor _textCursor;
   private final Vector2f _padding = new Vector2f(10f,10f);
   
-  private int _cursorPosition = 0;
-  
+  private int    _cursorPosition = 0;
+  private String _prevInputValue = new String();
   public UIInput(Vector2f size) {
       setSize(size);
       setCrop(true);
@@ -47,7 +47,7 @@ public class UIInput extends UIDisplayContainer {
       _textCursor = new UITextCursor();
       _textCursor.setVisible(false);
       _textCursor.setPosition(new Vector2f((getPosition().x + _padding.x + _inputText.getTextWidth()), (getPosition().y + _padding.y / 2)));
-      System.out.println("OLOLOOLO" + _textCursor.getPosition());
+
       addDisplayElement(_defaultTexture);
       addDisplayElement(_inputText);
       addDisplayElement(_textCursor);
@@ -100,24 +100,18 @@ public class UIInput extends UIDisplayContainer {
     float textWidthWhithPos = _inputText.getTextWidth() + _inputText.getPosition().x + getPosition().x;
 
     if(textWidthWhithPos>(getPosition().x + getSize().x)){
-         _inputText.setPosition(new Vector2f((_inputText.getPosition().x - 8f),_inputText.getPosition().y));
+         _inputText.setPosition(new Vector2f((_inputText.getPosition().x + getChangePosition(0)),_inputText.getPosition().y));
     }
   }
   
   public void clicked() {
       _focused = true;
   }
-
+//TO DO  Fix it
   public void processKeyboardInput(int key){
-    /*System.out.println(_inputText.getPosition().x);
-    System.out.println(getPosition().x);
-    System.out.println(_inputText.getTextWidth());
-    System.out.println(getSize().x);
-    System.out.println("==========================");       */
-
     if(_focused){
         Vector2f cursorPosition = new Vector2f();
-        System.out.println(_cursorPosition);
+
         if (key == Keyboard.KEY_BACK) {
 
             _cursorPosition--;
@@ -127,45 +121,52 @@ public class UIInput extends UIDisplayContainer {
             }
 
             if(_inputValue.length()>0){
+                _prevInputValue = _inputValue.toString();
                 _inputValue.deleteCharAt((_cursorPosition));
             }
 
             float textPosition  = _inputText.getPosition().x;
+            int   subPosition = getChangePosition(0);
+
             if(textPosition<0){
-                if(textPosition + 8f>0&&textPosition + 8f<_padding.x){
-                    _inputText.setPosition(new Vector2f(_padding.x,_inputText.getPosition().y));
+                if(textPosition + subPosition>0&&textPosition + subPosition<_padding.x){
+                    _inputText.setPosition(new Vector2f(_padding.x + textPosition,_inputText.getPosition().y));
                 }else{
-                    _inputText.setPosition(new Vector2f(textPosition + 8f,_inputText.getPosition().y));
+                    _inputText.setPosition(new Vector2f(textPosition + subPosition,_inputText.getPosition().y));
                 }
             }
+
             cursorPosition = new Vector2f(_padding.x/2 + _inputText.getTextWidth()/2, (_textCursor.getPosition().y));
         }else if(key == Keyboard.KEY_LEFT){
             _cursorPosition--;
             if(_cursorPosition<0){
                 _cursorPosition = 0;
             }else{
-                cursorPosition =  new Vector2f(_textCursor.getPosition().x - 8f, (_textCursor.getPosition().y));
+                cursorPosition =  new Vector2f(_padding.x + (_inputText.getTextWidth() - getChangePosition(_cursorPosition))/2, (_textCursor.getPosition().y));
             }
         }else if(key == Keyboard.KEY_RIGHT){
             _cursorPosition++;
             if(_cursorPosition>_inputValue.length()-1){
                 _cursorPosition = _inputValue.length()-1;
             }else{
-                cursorPosition =  new Vector2f(_textCursor.getPosition().x + 8f, (_textCursor.getPosition().y));
+                cursorPosition =  new Vector2f(_padding.x + (_inputText.getTextWidth() - getChangePosition(_cursorPosition))/2, (_textCursor.getPosition().y));
             }
         }else{
             char c = Keyboard.getEventCharacter();
             if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'Z' + 1 || c == ' ' || c == '_' || c == '.' || c == ',' || c == '!' || c == '-' || c == '(' || c == ')' || c == '"' || c == '\'' || c == ';' || c == '+') {
+                _prevInputValue = _inputValue.toString();
+
                 _inputValue.insert(_cursorPosition,c);
                 //_inputValue.a
                 _cursorPosition++;
            }
-           cursorPosition = new Vector2f(_padding.x/2 + _inputText.getTextWidth()/2, (_textCursor.getPosition().y));
+           cursorPosition = new Vector2f(_padding.x + _inputText.getTextWidth()/2, (_textCursor.getPosition().y));
         }
         _inputText.setText(_inputValue.toString());
 
         //TO DO WTF?! What happened with getPositon? Fix it
         _textCursor.setPosition(new Vector2f(cursorPosition));
+        //System.out.println(_textCursor.getPosition());
     }
   }
   
@@ -185,6 +186,18 @@ public class UIInput extends UIDisplayContainer {
 
   public void setColor(Color color){
     _inputText.setColor(color);
+  }
+    
+  private int getChangePosition(int cursorPos){
+      if(cursorPos==1){
+          int prevWidth    = _inputText.getFont().getWidth(_prevInputValue);
+          int currentWidth = _inputText.getFont().getWidth(_inputValue.toString());
+          return (prevWidth - currentWidth);
+      }else{
+          return  _inputText.getFont().getWidth(_inputValue.toString())
+                  -
+                  _inputText.getFont().getWidth(_inputValue.toString().substring(0,(cursorPos>0?cursorPos-1:0)));
+      }
   }
 
 }
