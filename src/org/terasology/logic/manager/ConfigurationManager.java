@@ -16,8 +16,13 @@
 package org.terasology.logic.manager;
 
 import groovy.util.ConfigObject;
+import groovy.util.ConfigSlurper;
+import org.terasology.game.Terasology;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Manages and provides access to the global settings of the game.
@@ -27,7 +32,7 @@ import java.util.Map;
 public final class ConfigurationManager {
 
     /* CONST */
-    //private static final String DEFAULT_CONFIG_PATH = "groovy/config/Default.groovy";
+    private static final String DEFAULT_CONFIG_PATH = "groovy/config/Default.groovy";
 
     /* SINGLETON */
     private static ConfigurationManager _instance;
@@ -63,20 +68,19 @@ public final class ConfigurationManager {
     public void loadConfigEnvironment(String environment) {
         ConfigObject config = null;
         // TODO: Clean this up - temp hack to internalize the external Config defaults in Groovy
-        DefaultConfig yay = new DefaultConfig();
-        config = yay.getConfig();
-/*
         try {
-            if (environment != null)
+            if (environment != null) {
                 config = new ConfigSlurper(environment).parse(new File(DEFAULT_CONFIG_PATH).toURI().toURL());
-            else
+            }
+            else {
                 config = new ConfigSlurper().parse(new File(DEFAULT_CONFIG_PATH).toURI().toURL());
+            }
 
         } catch (IOException e) {
             Terasology.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
         }
 
-        //config = new ConfigSlurper().parse(new DefaultConfig());*/
+        //config = new ConfigSlurper().parse(new DefaultConfig());
         if (config != null)
             _config = config.flatten();
     }
