@@ -10,6 +10,18 @@ import org.junit.runner.RunWith;
 
 @RunWith(Enclosed.class)
 public class InventoryTest {
+	public static class SetSelectedCubby {
+		private Inventory inventory;
+		@Before
+		public void setUp() {
+			inventory = new Inventory();
+		}
+		@Test
+		public void setsSelectedCubby() {
+			inventory.setSelctedCubbyhole(5);
+			assertEquals(5, inventory.getSelectedCubbyhole());
+		}
+	}
 	public static class GetItemCountAt {
 		private Inventory inventory;
 		@Before

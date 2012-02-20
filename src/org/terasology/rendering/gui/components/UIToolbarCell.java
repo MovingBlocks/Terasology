@@ -20,7 +20,6 @@ import org.terasology.game.Terasology;
 import org.terasology.model.inventory.Icon;
 import org.terasology.model.inventory.Inventory;
 import org.terasology.model.inventory.Item;
-import org.terasology.model.inventory.Toolbar;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -62,9 +61,9 @@ public class UIToolbarCell extends UIDisplayElement {
         _selectionRectangle.setVisible(_selected);
         setPosition(new Vector2f((getSize().x - 8f) * _id - 2f, 2f));
 
-        Toolbar toolbar = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getToolbar();
+        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
 
-        if (toolbar.getSelectedSlot() == _id) {
+        if (inventory.getSelectedCubbyhole() == _id) {
             setSelected(true);
         } else {
             setSelected(false);
@@ -91,8 +90,8 @@ public class UIToolbarCell extends UIDisplayElement {
 
         glEnable(GL11.GL_DEPTH_TEST);
 
-        Toolbar toolbar = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getToolbar();
-        Item item = toolbar.getItemInSlot(_id);
+        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
+        Item item = inventory.getItemAt(_id);
 
         if (item != null) {
             glPushMatrix();

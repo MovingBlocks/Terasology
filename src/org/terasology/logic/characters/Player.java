@@ -38,7 +38,6 @@ import org.terasology.model.inventory.ItemBlock;
 import org.terasology.model.inventory.ItemBlueprint;
 import org.terasology.model.inventory.ItemDynamite;
 import org.terasology.model.inventory.ItemPickAxe;
-import org.terasology.model.inventory.Toolbar;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
@@ -97,7 +96,7 @@ public class Player extends Character {
 
     /* INVENTORY */
     private Inventory _inventory = new Inventory();
-    private Toolbar _toolbar = new Toolbar(this);
+//    private Toolbar _toolbar = new Toolbar(this);
 
     /* GOD MODE */
     private long _lastTimeSpacePressed;
@@ -375,31 +374,40 @@ public class Player extends Character {
                 }
                 break;
             case Keyboard.KEY_1:
-                _toolbar.setSelectedSlot(0);
+            	_inventory.setSelctedCubbyhole(0);
+//                _toolbar.setSelectedSlot(0);
                 break;
             case Keyboard.KEY_2:
-                _toolbar.setSelectedSlot(1);
+            	_inventory.setSelctedCubbyhole(1);
+//                _toolbar.setSelectedSlot(1);
                 break;
             case Keyboard.KEY_3:
-                _toolbar.setSelectedSlot(2);
+            	_inventory.setSelctedCubbyhole(2);
+//                _toolbar.setSelectedSlot(2);
                 break;
             case Keyboard.KEY_4:
-                _toolbar.setSelectedSlot(3);
+            	_inventory.setSelctedCubbyhole(3);
+//                _toolbar.setSelectedSlot(3);
                 break;
             case Keyboard.KEY_5:
-                _toolbar.setSelectedSlot(4);
+            	_inventory.setSelctedCubbyhole(4);
+//                _toolbar.setSelectedSlot(4);
                 break;
             case Keyboard.KEY_6:
-                _toolbar.setSelectedSlot(5);
+            	_inventory.setSelctedCubbyhole(5);
+//                _toolbar.setSelectedSlot(5);
                 break;
             case Keyboard.KEY_7:
-                _toolbar.setSelectedSlot(6);
+            	_inventory.setSelctedCubbyhole(6);
+//                _toolbar.setSelectedSlot(6);
                 break;
             case Keyboard.KEY_8:
-                _toolbar.setSelectedSlot(7);
+            	_inventory.setSelctedCubbyhole(7);
+//                _toolbar.setSelectedSlot(7);
                 break;
             case Keyboard.KEY_9:
-                _toolbar.setSelectedSlot(8);
+            	_inventory.setSelctedCubbyhole(8);
+//                _toolbar.setSelectedSlot(8);
                 break;
         }
     }
@@ -416,10 +424,21 @@ public class Player extends Character {
             return;
 
         if (wheelMoved != 0) {
-            _toolbar.rollSelectedSlot((byte) (wheelMoved / 120));
+        	rollSelectedCubby((byte) (wheelMoved / 120));
+//            _toolbar.rollSelectedSlot((byte) (wheelMoved / 120));
         } else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
         }
+    }
+    
+    private void rollSelectedCubby(byte wheelMotion) {
+        int selectedCubby = (_inventory.getSelectedCubbyhole() + wheelMotion) % 9;
+
+        if (selectedCubby < 0) {
+        	selectedCubby = 9 + selectedCubby;
+        }
+        
+        _inventory.setSelctedCubbyhole(selectedCubby);
     }
 
     /**
@@ -579,7 +598,7 @@ public class Player extends Character {
     }
 
     public Item getActiveItem() {
-        return getToolbar().getItemForSelectedSlot();
+    	return _inventory.getSelectedItem();
     }
 
     public BlockGroup getActiveBlock() {
@@ -641,9 +660,9 @@ public class Player extends Character {
         return _inventory;
     }
 
-    public Toolbar getToolbar() {
-        return _toolbar;
-    }
+//    public Toolbar getToolbar() {
+//        return _toolbar;
+//    }
 
     public ToolManager getToolManager() {
         return _toolManager;

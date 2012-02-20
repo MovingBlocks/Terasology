@@ -21,6 +21,7 @@ package org.terasology.model.inventory;
 public class Inventory {
 
 	private Cubbyhole[] _cubbies;
+	private int _selectedCubbyIndex;
 
 	/**
 	 * Creates an empty Inventory.
@@ -31,6 +32,20 @@ public class Inventory {
     	for (int i = 0; i < _cubbies.length; i++) {
     		_cubbies[i] = new Cubbyhole();
     	}
+    	
+    	_selectedCubbyIndex = 0;
+    }
+    
+    public int getSelectedCubbyhole() {
+    	return _selectedCubbyIndex;
+    }
+    
+    public void setSelctedCubbyhole(int index) {
+    	_selectedCubbyIndex = index;
+    }
+    
+    public Item getSelectedItem() {
+    	return _cubbies[_selectedCubbyIndex].getItem();
     }
     
     /**

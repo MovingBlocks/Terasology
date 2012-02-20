@@ -44,7 +44,7 @@ public class DefaultBlockTool extends SimpleTool {
     public void executeLeftClickAction() {
         if (_player.getActiveBlock() != null) {
             if (placeBlock(_player.getActiveBlock())) {
-                _player.getInventory().removeItemAt(_player.getToolbar().getSelectedSlot(), 1);
+                _player.getInventory().removeItemAt(_player.getInventory().getSelectedCubbyhole(), 1);
             }
         }
     }
