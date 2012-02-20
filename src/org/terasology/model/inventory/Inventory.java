@@ -22,6 +22,9 @@ public class Inventory {
 
 	private Cubbyhole[] _cubbies;
 
+	/**
+	 * Creates an empty Inventory.
+	 */
     public Inventory() {
     	_cubbies = new Cubbyhole[27];
     	
@@ -30,6 +33,12 @@ public class Inventory {
     	}
     }
     
+    /**
+     * Adds an Item. Overflow is distributed among any available Cubbyholes.
+     * 
+     * @param item the Item to add
+     * @param count the number of copies to add
+     */
     public void addItem(Item item, int count) {
     	Cubbyhole free = getFreeCubby(item);
     	Cubbyhole overflow = free.insert(item, count);
@@ -40,6 +49,12 @@ public class Inventory {
     	}
     }
     
+    /**
+     * 
+     * @param index the index of the Cubbyhole
+     * @param count the number of copies to remove
+     * @return the Item that was removed
+     */
     public Item removeItemAt(int index, int count) {
     	Cubbyhole cubby = _cubbies[index];
     	

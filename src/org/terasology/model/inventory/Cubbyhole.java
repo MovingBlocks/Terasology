@@ -22,6 +22,13 @@ public class Cubbyhole {
 		return insert(item, 1);
 	}
 
+	/**
+	 * 
+	 * @param item the item to insert
+	 * @param count the number of copies to insert
+	 * @return a Cubbhole containing any overflow that results from inserting item, or null if there was no
+	 *         overflow
+	 */
 	public Cubbyhole insert(Item item, int count) {
 		if (_item == null) {
 			simpleInsert(item, count);
@@ -32,6 +39,13 @@ public class Cubbyhole {
 		return _item.equals(item) ? updateInsert(item, count) : replaceInsert(item, count);
 	}
 	
+	/**
+	 * Removes count copies of Item.
+	 * 
+	 * @param count number of copies to remove
+	 * @return the Item that was completely removed, or null if this Cubbyhole has not been emptied
+	 * @throws IllegalArgumentException if removing more items than exist
+	 */
 	public Item remove(int count) {
 		if (count > _count) {
 			throw new IllegalArgumentException("Removing too many items results in negative item count: " + count);
