@@ -42,10 +42,16 @@ public class UIInventory extends UIDisplayContainer {
 
         _cells = new UIToolbarCell[27];
 
-        for (int i = 0; i < _cells.length; i++) {
+        for (int i = 9; i < _cells.length; i++) {
             UIInventoryCell cell = new UIInventoryCell(i);
             cell.setVisible(true);
             addDisplayElement(cell);
+        }
+        
+        for (int i = 0; i < 9; i++) {
+        	UIInventoryCell cell = new UIInventoryCell(i);
+        	cell.setVisible(true);
+        	addDisplayElement(cell);
         }
 
         update();

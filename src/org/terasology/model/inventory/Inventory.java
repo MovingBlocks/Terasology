@@ -15,142 +15,87 @@
  */
 package org.terasology.model.inventory;
 
-import org.terasology.logic.characters.Player;
-import org.terasology.model.blocks.management.BlockManager;
-
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
 public class Inventory {
 
-    private final Item[] _inventory = new Item[27];
-    private final Player _parent;
+	private Cubbyhole[] _cubbies;
+	private int _selectedCubbyIndex;
 
-    public Inventory(Player parent) {
-        _parent = parent;
-        initDefaultItems();
+	/**
+	 * Creates an empty Inventory.
+	 */
+    public Inventory() {
+    	_cubbies = new Cubbyhole[27];
+    	
+    	for (int i = 0; i < _cubbies.length; i++) {
+    		_cubbies[i] = new Cubbyhole();
+    	}
+    	
+    	_selectedCubbyIndex = 0;
     }
-
-    private void initDefaultItems() {
-        _inventory[0] = new ItemBlock(_parent, BlockManager.getInstance().getBlockGroup("Companion"), 1);
-        _inventory[1] = new ItemBlock(_parent, BlockManager.getInstance().getBlockGroup("Torch"), 16);
-        _inventory[2] = new ItemPickAxe(_parent);
-        _inventory[3] = new ItemAxe(_parent);
-        _inventory[4] = new ItemBlueprint(_parent);
-        _inventory[5] = new ItemDynamite(_parent);
+    
+    public int getSelectedCubbyhole() {
+    	return _selectedCubbyIndex;
     }
-
+    
+    public void setSelctedCubbyhole(int index) {
+    	_selectedCubbyIndex = index;
+    }
+    
+    public Item getSelectedItem() {
+    	return _cubbies[_selectedCubbyIndex].getItem();
+    }
+    
     /**
-     * Store an item at a given slot position. Returns true if the item could be stored.
-     *
-     * @param slot The slot
-     * @param item The item to store
-     * @return True if item could be stored
+     * Adds an Item. Overflow is distributed among any available Cubbyholes.
+     * 
+     * @param item the Item to add
+     * @param count the number of copies to add
      */
-    public boolean storeItemInSlot(int slot, Item item) {
-        if (slot < 0 || slot >= size())
-            return false;
-
-        // The slot is empty so no problem here
-        if (_inventory[slot] == null) {
-            _inventory[slot] = item;
-            return true;
-        } else {
-            if (_inventory[slot].equals(item) && _inventory[slot].getAmount() < item.getStackSize()) {
-                _inventory[slot].increaseAmount();
-                return true;
-            }
-        }
-
-        return false;
+    public void addItem(Item item, int count) {
+    	Cubbyhole free = getFreeCubby(item);
+    	Cubbyhole overflow = free.insert(item, count);
+    	
+    	if (overflow != null) {
+    		free = getFreeCubby(item);
+    		free.insert(item, overflow.getItemCount());
+    	}
     }
-
+    
     /**
-     * Stores the item in the first available slot position.
-     *
-     * @param item The item to store
-     * @return True if the item could be stored
+     * 
+     * @param index the index of the Cubbyhole
+     * @param count the number of copies to remove
+     * @return the Item that was removed
      */
-    public boolean storeItemInFreeSlot(Item item) {
-        return storeItemInSlot(findFirstFreeSlot(item), item);
+    public Item removeItemAt(int index, int count) {
+    	Cubbyhole cubby = _cubbies[index];
+    	
+    	cubby.remove(count);
+    	
+    	return cubby.getItem();
     }
-
-    /**
-     * Removes one item at the given slot position.
-     *
-     * @param slot The slot
-     * @return The removed object. Null if nothing could be removed.
-     */
-    public Item removeOneItemInSlot(int slot) {
-        if (slot < 0 || slot >= size())
-            return null;
-
-        if (_inventory[slot] != null) {
-            Item item = _inventory[slot];
-            item.decreaseAmount();
-
-            if (item.getAmount() == 0) {
-                _inventory[slot] = null;
-            }
-
-            return item;
-        }
-
-        return null;
+    
+    private Cubbyhole getFreeCubby(Item item) {
+    	for (Cubbyhole cubby : _cubbies) {
+    		if (cubby.getItem() == null) {
+    			return cubby;
+    		}
+    		if (cubby.getItem().equals(item) && !cubby.isFull()) {
+    			return cubby;
+    		}
+    	}
+    	
+    	return null;
     }
-
-    /**
-     * Removes one item at the given slot position.
-     *
-     * @param slot The slot
-     * @return The removed object. Null if nothing could be removed.
-     */
-    public Item removeAllItemsInSlot(int slot) {
-        if (slot < 0 || slot >= size())
-            return null;
-
-        if (_inventory[slot] != null) {
-            Item item = _inventory[slot];
-            _inventory[slot] = null;
-
-            return item;
-        }
-
-        return null;
+    
+    public int getItemCountAt(int cubbyIndex) {
+    	return _cubbies[cubbyIndex].getItemCount();
     }
-
-    /**
-     * Returns the first free slot for the given item.
-     *
-     * @param item The item
-     * @return The slot if at least one is available. Returns -1 otherwise.
-     */
-    public int findFirstFreeSlot(Item item) {
-        for (int i = 0; i < size(); i++) {
-            if (_inventory[i] == null) {
-                return i;
-            } else {
-                if (_inventory[i].equals(item) && _inventory[i].getAmount() < item.getStackSize()) {
-                    return i;
-                }
-            }
-        }
-
-        return -1;
-    }
-
-    public Item getItemInSlot(int slot) {
-        if (slot < 0 || slot >= size())
-            return null;
-
-        return _inventory[slot];
-    }
-
-    public Player getParent() {
-        return _parent;
-    }
-
-    public int size() {
-        return _inventory.length;
+    
+    public Item getItemAt(int cubbyIndex) {
+    	return _cubbies[cubbyIndex].getItem();
     }
 }

@@ -19,6 +19,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
+import org.terasology.model.inventory.Icon;
 import org.terasology.model.inventory.Inventory;
 import org.terasology.model.inventory.Item;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -56,19 +57,33 @@ public class UIInventoryCell extends UIDisplayElement {
         _label.setVisible(true);
         _label.setPosition(new Vector2f(30f, 20f));
     }
+    
+    private Vector2f findPosition() {
+    	int realId = _id - 9;
+    	Vector2f result = null;
+    	
+    	if (realId >= 0) {
+    		result = new Vector2f(16f + (getSize().x - 3f) * (realId % 9), 208f + ((getSize().y - 3f) * (realId / 9)));
+    	} else {
+    		realId = _id + 27;
+    		result = new Vector2f(16f + (getSize().x - 3f) * (realId % 9), 208f + 10f + ((getSize().y - 3f) * (realId / 9)));
+    	}
+    	
+    	return result;
+    }
 
     @Override
     public void update() {
-        setPosition(new Vector2f(16f + (getSize().x - 3f) * (_id % 9), 208f + ((getSize().y - 3f) * (_id / 9))));
+        setPosition(findPosition());
 
         Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         processMouseInput();
 
-        Item item = inventory.getItemInSlot(_id);
+        Item item = inventory.getItemAt(_id);
 
         if (item != null) {
             getLabel().setVisible(true);
-            getLabel().setText(Integer.toString(item.getAmount()));
+            getLabel().setText(Integer.toString(inventory.getItemCountAt(_id)));
         } else {
             getLabel().setVisible(false);
         }
@@ -94,12 +109,13 @@ public class UIInventoryCell extends UIDisplayElement {
         glEnable(GL11.GL_DEPTH_TEST);
 
         Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
-        Item item = inventory.getItemInSlot(_id);
+        Item item = inventory.getItemAt(_id);
 
         if (item != null) {
             glPushMatrix();
             glTranslatef(20f, 20f, 0f);
-            item.renderIcon();
+            Icon.get(item).render();
+//            item.renderIcon();
             glPopMatrix();
             glDisable(GL11.GL_CULL_FACE);
         }

@@ -34,8 +34,11 @@ import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.Inventory;
 import org.terasology.model.inventory.Item;
+import org.terasology.model.inventory.ItemAxe;
 import org.terasology.model.inventory.ItemBlock;
-import org.terasology.model.inventory.Toolbar;
+import org.terasology.model.inventory.ItemBlueprint;
+import org.terasology.model.inventory.ItemDynamite;
+import org.terasology.model.inventory.ItemPickAxe;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
@@ -62,7 +65,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class Player extends Character {
+public class Player extends Character {
 
     /* CONSTANT VALUES */
     private static final double MOUSE_SENS = (Double) ConfigurationManager.getInstance().getConfig().get("Controls.mouseSens");
@@ -92,8 +95,8 @@ public final class Player extends Character {
     private Mesh _handMesh, _overlayMesh;
 
     /* INVENTORY */
-    private Inventory _inventory = new Inventory(this);
-    private Toolbar _toolbar = new Toolbar(this);
+    private Inventory _inventory = new Inventory();
+//    private Toolbar _toolbar = new Toolbar(this);
 
     /* GOD MODE */
     private long _lastTimeSpacePressed;
@@ -111,6 +114,16 @@ public final class Player extends Character {
         _godMode = GOD_MODE;
 
         load();
+        loadDefaultItems();
+    }
+    
+    private void loadDefaultItems() {
+    	_inventory.addItem(new ItemBlock(BlockManager.getInstance().getBlockGroup("Companion")), 1);
+    	_inventory.addItem(new ItemBlock(BlockManager.getInstance().getBlockGroup("Torch")), 16);
+    	_inventory.addItem(new ItemPickAxe(), 1);
+    	_inventory.addItem(new ItemAxe(), 1);
+    	_inventory.addItem(new ItemBlueprint(), 1);
+    	_inventory.addItem(new ItemDynamite(), 1);
     }
 
     public void render() {
@@ -210,16 +223,15 @@ public final class Player extends Character {
     }
 
     public void renderFirstPersonViewElements() {
-        if (!RENDER_FIRST_PERSON_VIEW)
-            return;
-
-        if (getActiveItem() != null) {
-            if (getActiveItem().renderFirstPersonView()) {
-                return;
-            }
+        if (!RENDER_FIRST_PERSON_VIEW) {
+        	return;        	
         }
-
-        renderHand();
+        
+        if (getActiveItem() != null) {
+        	getActiveItem().renderFirstPersonView(this);
+        } else {
+        	renderHand();
+        }
     }
 
     /**
@@ -362,31 +374,40 @@ public final class Player extends Character {
                 }
                 break;
             case Keyboard.KEY_1:
-                _toolbar.setSelectedSlot(0);
+            	_inventory.setSelctedCubbyhole(0);
+//                _toolbar.setSelectedSlot(0);
                 break;
             case Keyboard.KEY_2:
-                _toolbar.setSelectedSlot(1);
+            	_inventory.setSelctedCubbyhole(1);
+//                _toolbar.setSelectedSlot(1);
                 break;
             case Keyboard.KEY_3:
-                _toolbar.setSelectedSlot(2);
+            	_inventory.setSelctedCubbyhole(2);
+//                _toolbar.setSelectedSlot(2);
                 break;
             case Keyboard.KEY_4:
-                _toolbar.setSelectedSlot(3);
+            	_inventory.setSelctedCubbyhole(3);
+//                _toolbar.setSelectedSlot(3);
                 break;
             case Keyboard.KEY_5:
-                _toolbar.setSelectedSlot(4);
+            	_inventory.setSelctedCubbyhole(4);
+//                _toolbar.setSelectedSlot(4);
                 break;
             case Keyboard.KEY_6:
-                _toolbar.setSelectedSlot(5);
+            	_inventory.setSelctedCubbyhole(5);
+//                _toolbar.setSelectedSlot(5);
                 break;
             case Keyboard.KEY_7:
-                _toolbar.setSelectedSlot(6);
+            	_inventory.setSelctedCubbyhole(6);
+//                _toolbar.setSelectedSlot(6);
                 break;
             case Keyboard.KEY_8:
-                _toolbar.setSelectedSlot(7);
+            	_inventory.setSelctedCubbyhole(7);
+//                _toolbar.setSelectedSlot(7);
                 break;
             case Keyboard.KEY_9:
-                _toolbar.setSelectedSlot(8);
+            	_inventory.setSelctedCubbyhole(8);
+//                _toolbar.setSelectedSlot(8);
                 break;
         }
     }
@@ -403,10 +424,21 @@ public final class Player extends Character {
             return;
 
         if (wheelMoved != 0) {
-            _toolbar.rollSelectedSlot((byte) (wheelMoved / 120));
+        	rollSelectedCubby((byte) (wheelMoved / 120));
+//            _toolbar.rollSelectedSlot((byte) (wheelMoved / 120));
         } else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
         }
+    }
+    
+    private void rollSelectedCubby(byte wheelMotion) {
+        int selectedCubby = (_inventory.getSelectedCubbyhole() + wheelMotion) % 9;
+
+        if (selectedCubby < 0) {
+        	selectedCubby = 9 + selectedCubby;
+        }
+        
+        _inventory.setSelctedCubbyhole(selectedCubby);
     }
 
     /**
@@ -526,7 +558,8 @@ public final class Player extends Character {
         glPopMatrix();
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void writePropertiesToConfigObject(ConfigObject co) {
         co.put("playerPositionX", getPosition().x);
         co.put("playerPositionY", getPosition().y);
@@ -558,7 +591,7 @@ public final class Player extends Character {
     }
 
     public Item getActiveItem() {
-        return getToolbar().getItemForSelectedSlot();
+    	return _inventory.getSelectedItem();
     }
 
     public BlockGroup getActiveBlock() {
@@ -620,9 +653,9 @@ public final class Player extends Character {
         return _inventory;
     }
 
-    public Toolbar getToolbar() {
-        return _toolbar;
-    }
+//    public Toolbar getToolbar() {
+//        return _toolbar;
+//    }
 
     public ToolManager getToolManager() {
         return _toolManager;

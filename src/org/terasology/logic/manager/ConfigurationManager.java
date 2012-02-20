@@ -33,7 +33,8 @@ public final class ConfigurationManager {
     private static ConfigurationManager _instance;
 
     /* CONFIGURATION */
-    private Map _config;
+    @SuppressWarnings("rawtypes")
+	private Map _config;
 
     /**
      * Returns the currently active instance.
@@ -80,7 +81,8 @@ public final class ConfigurationManager {
             _config = config.flatten();
     }
 
-    public Map getConfig() {
+    @SuppressWarnings("rawtypes")
+	public Map getConfig() {
         return _config;
     }
 }
