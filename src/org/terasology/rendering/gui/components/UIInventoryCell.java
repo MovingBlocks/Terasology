@@ -57,10 +57,24 @@ public class UIInventoryCell extends UIDisplayElement {
         _label.setVisible(true);
         _label.setPosition(new Vector2f(30f, 20f));
     }
+    
+    private Vector2f findPosition() {
+    	int realId = _id - 9;
+    	Vector2f result = null;
+    	
+    	if (realId >= 0) {
+    		result = new Vector2f(16f + (getSize().x - 3f) * (realId % 9), 208f + ((getSize().y - 3f) * (realId / 9)));
+    	} else {
+    		realId = _id + 27;
+    		result = new Vector2f(16f + (getSize().x - 3f) * (realId % 9), 208f + 10f + ((getSize().y - 3f) * (realId / 9)));
+    	}
+    	
+    	return result;
+    }
 
     @Override
     public void update() {
-        setPosition(new Vector2f(16f + (getSize().x - 3f) * (_id % 9), 208f + ((getSize().y - 3f) * (_id / 9))));
+        setPosition(findPosition());
 
         Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         processMouseInput();
