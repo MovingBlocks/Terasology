@@ -70,12 +70,11 @@ public class ExplosionTool extends SimpleTool {
 
                     Block currentBlock = BlockManager.getInstance().getBlock(currentBlockType);
 
+                    /* PHYSICS */
                     if (currentBlock.isDestructible()) {
                         // Make sure no updates are triggered
                         placeBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, false);
-
-                        if (!BlockManager.getInstance().getBlock(currentBlockType).isTranslucent())
-                            BulletPhysicsRenderer.getInstance().addBlock(target, currentBlockType, impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
+                        BulletPhysicsRenderer.getInstance().addTemporaryBlock(target, currentBlockType, impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
                     }
                 }
             }

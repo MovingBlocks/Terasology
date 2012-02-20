@@ -30,7 +30,7 @@ public abstract class Item {
     protected Map<Block, Integer> _extraction;
 
     public Item() {
-        _stackSize = 16;
+        _stackSize = 64;
         _extraction = new HashMap<Block, Integer>();
     }
 
