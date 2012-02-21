@@ -12,11 +12,21 @@ World{
         jumpIntensity = 0.16d
     }
     Biomes {
-        Forest.grassDensity = 0.3d
-        Plains.grassDensity = 0.1d
-        Snow.grassDensity = 0.001d
-        Mountains.grassDensity = 0.2d
-        Desert.grassDensity = 0.001d
+        Forest{
+            grassDensity = 0.3d
+        }
+        Plains{
+            grassDensity = 0.1d
+        }
+        Snow{
+            grassDensity = 0.001d
+        }
+        Mountains{
+            grassDensity = 0.2d
+        }
+        Desert{
+            grassDensity = 0.001d
+        }
     }
     DiurnalCycle{
         dayNightLengthInMs = new Long((60 * 1000) * 30) // 30 minutes in ms
