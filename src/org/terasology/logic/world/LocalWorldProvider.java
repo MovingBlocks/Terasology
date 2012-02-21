@@ -459,7 +459,8 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         return "WorldManifest.groovy";
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void writePropertiesToConfigObject(ConfigObject co) {
         co.put("worldTitle", getTitle());
         co.put("worldSeed", getSeed());

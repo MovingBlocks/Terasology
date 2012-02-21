@@ -39,35 +39,13 @@ public class ItemBlock extends Item {
 
     private BlockGroup _blockGroup;
 
-    public ItemBlock(Player parent, BlockGroup blockGroup) {
-        super(parent);
+    public ItemBlock(BlockGroup blockGroup) {
         _blockGroup = blockGroup;
         _toolId = (byte) 1;
     }
 
-    public ItemBlock(Player parent, BlockGroup blockGroup, int amount) {
-        this(parent, blockGroup);
-        setAmount(amount);
-    }
-
     @Override
-    public boolean renderIcon() {
-        GL11.glPushMatrix();
-        glTranslatef(4f, 0f, 0f);
-        GL11.glScalef(20f, 20f, 20f);
-        GL11.glRotatef(170f, 1f, 0f, 0f);
-        GL11.glRotatef(-16f, 0f, 1f, 0f);
-
-        Block block = _blockGroup.getArchetypeBlock();
-        block.render();
-
-        GL11.glPopMatrix();
-
-        return true;
-    }
-
-    @Override
-    public boolean renderFirstPersonView() {
+    public void renderFirstPersonView(Player player) {
         Block activeBlock = _blockGroup.getArchetypeBlock();
 
         TextureManager.getInstance().bindTexture("terrain");
@@ -97,8 +75,8 @@ public class ItemBlock extends Item {
 
         glPushMatrix();
 
-        glTranslatef(1.0f, -1.3f + (float) getParent().calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - getParent().getHandMovementAnimationOffset() * 0.5f, -1.5f - getParent().getHandMovementAnimationOffset() * 0.5f);
-        glRotatef(-25f - getParent().getHandMovementAnimationOffset() * 64.0f, 1.0f, 0.0f, 0.0f);
+        glTranslatef(1.0f, -1.3f + (float) player.calcBobbingOffset((float) Math.PI / 8f, 0.05f, 2.5f) - player.getHandMovementAnimationOffset() * 0.5f, -1.5f - player.getHandMovementAnimationOffset() * 0.5f);
+        glRotatef(-25f - player.getHandMovementAnimationOffset() * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
         glTranslatef(0f, 0.25f, 0f);
 
@@ -110,8 +88,6 @@ public class ItemBlock extends Item {
             glDisable(GL11.GL_ALPHA_TEST);
         }
         glDisable(GL11.GL_BLEND);
-
-        return true;
     }
 
     public BlockGroup getBlockGroup() {

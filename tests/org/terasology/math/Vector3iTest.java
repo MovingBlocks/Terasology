@@ -20,7 +20,6 @@ public class Vector3iTest {
     private Vector3i v1;
     private Vector3i v2;
     private Vector3i v3;
-    private Vector3i v4;
     
     public Vector3iTest() {
     }
@@ -38,7 +37,6 @@ public class Vector3iTest {
         v1 = new Vector3i(1,3,7);
         v2 = new Vector3i(2,6,14);
         v3 = new Vector3i(3,9,21);
-        v4 = new Vector3i(4,12,28);
     }
     
     @After

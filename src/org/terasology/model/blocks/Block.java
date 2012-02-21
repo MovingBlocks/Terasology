@@ -113,6 +113,8 @@ public class Block implements IGameObject, Cloneable {
         private boolean liquid;
         private boolean waving;
 
+        private int lootAmount;
+
         private BLOCK_FORM blockForm;
         private COLOR_SOURCE colorSource;
 
@@ -168,6 +170,7 @@ public class Block implements IGameObject, Cloneable {
         withLuminance((byte) 0);
         withLiquid(false);
         withMass(64000f);
+        withLootAmount(2);
     }
 
     public Block clone() {
@@ -378,6 +381,11 @@ public class Block implements IGameObject, Cloneable {
         return this;
     }
 
+    public Block withLootAmount(int lootAmount) {
+        _internals.lootAmount = lootAmount;
+        return this;
+    }
+
     public Block withLuminance(byte luminance) {
         _internals.luminance = luminance;
         return this;
@@ -477,6 +485,10 @@ public class Block implements IGameObject, Cloneable {
 
     public byte getId() {
         return _id;
+    }
+
+    public int getLootAmount() {
+        return _internals.lootAmount;
     }
 
     public BlockGroup getBlockGroup() {

@@ -44,16 +44,18 @@ public class DefaultBlockTool extends SimpleTool {
     public void executeLeftClickAction() {
         if (_player.getActiveBlock() != null) {
             if (placeBlock(_player.getActiveBlock())) {
-                _player.getInventory().removeOneItemInSlot(_player.getToolbar().getSelectedSlot());
+                _player.getInventory().removeItemAt(_player.getInventory().getSelectedCubbyhole(), 1);
             }
         }
     }
 
     public void executeRightClickAction() {
-        byte removedBlockId = removeBlock(true);
+        Block removedBlock = removeBlock(true);
 
-        if (removedBlockId != 0) {
-            _player.getInventory().storeItemInFreeSlot(new ItemBlock(_player, BlockManager.getInstance().getBlock(removedBlockId).getBlockGroup(), 1));
+        if (removedBlock != null) {
+            // TODO: This should not be hardcoded!
+            if (removedBlock.getBlockGroup().getTitle().equals("Torch"))
+                _player.getInventory().addItem(new ItemBlock(removedBlock.getBlockGroup()), 1);
         }
     }
 
@@ -77,8 +79,7 @@ public class DefaultBlockTool extends SimpleTool {
 
             BlockPosition blockPos = selectedBlock.calcAdjacentBlockPos();
             Block adjBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z));
-            if (adjBlock != null && !adjBlock.isInvisible() && !adjBlock.isSelectionRayThrough())
-            {
+            if (adjBlock != null && !adjBlock.isInvisible() && !adjBlock.isSelectionRayThrough()) {
                 return false;
             }
 
@@ -121,7 +122,7 @@ public class DefaultBlockTool extends SimpleTool {
      * @param createPhysBlock Creates a rigid body block if true
      * @return The removed block (if any)
      */
-    public byte removeBlock(boolean createPhysBlock) {
+    public Block removeBlock(boolean createPhysBlock) {
         IWorldProvider worldProvider = _player.getParent().getWorldProvider();
         WorldRenderer worldRenderer = _player.getParent();
         RayBlockIntersection.Intersection selectedBlock = _player.getSelectedBlock();
@@ -141,7 +142,7 @@ public class DefaultBlockTool extends SimpleTool {
                         int amount = 1;
 
                         if (_player.getActiveItem() != null) {
-                            amount = _player.getActiveItem().getExtractionAmountForBlock(block);
+                            amount = _player.getActiveItem().getExtraction(block);
                         }
 
                         _player.setExtractionCounter((byte) (_player.getExtractionCounter() + amount));
@@ -170,13 +171,12 @@ public class DefaultBlockTool extends SimpleTool {
                     worldRenderer.getBlockParticleEmitter().emitParticles(256, currentBlockType);
                     AudioManager.getInstance().playVaryingSound("RemoveBlock", 0.6f, 0.5f);
 
-                    if (createPhysBlock && !BlockManager.getInstance().getBlock(currentBlockType).isTranslucent()) {
-                        Vector3d pos = blockPos.toVector3d();
-                        BulletPhysicsRenderer.getInstance().addHarvestedMiniBlocks(new Vector3f(pos), currentBlockType);
-                    }
+                    /* PHYSICS */
+                    Vector3d pos = blockPos.toVector3d();
+                    BulletPhysicsRenderer.getInstance().addLootableBlocks(new Vector3f(pos), block);
 
                     _player.resetExtraction();
-                    return currentBlockType;
+                    return block;
                 }
             }
 
@@ -188,6 +188,6 @@ public class DefaultBlockTool extends SimpleTool {
         }
 
         // Nothing got removed
-        return 0;
+        return null;
     }
 }

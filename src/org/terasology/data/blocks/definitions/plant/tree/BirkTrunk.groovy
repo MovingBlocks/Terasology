@@ -6,6 +6,8 @@ block {
     shape = "Cube"
     hardness = 6
 
+    lootAmount = 4
+
     faces {
         topbottom = "OakTrunk"
         sides = "BirkBark"

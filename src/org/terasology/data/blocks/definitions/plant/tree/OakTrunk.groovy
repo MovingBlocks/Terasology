@@ -13,6 +13,8 @@ block {
     shape = "Cube"
     hardness = 6
 
+    lootAmount = 4
+
     // Graphics
     faces {
         sides = "OakBark"

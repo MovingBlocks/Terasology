@@ -15,17 +15,15 @@
  */
 package org.terasology.model.inventory;
 
-import org.terasology.logic.characters.Player;
 
 /**
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
 public class ItemDynamite extends Item {
 
-    public ItemDynamite(Player parent) {
-        super(parent);
+    public ItemDynamite() {
+        super();
 
-        setIconWithAtlasPos(5, 0);
         _toolId = (byte) 3;
         _stackSize = 1;
     }

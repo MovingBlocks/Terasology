@@ -164,6 +164,11 @@ public class SimpleBlockLoader implements BlockLoader {
         }
 
         // *** MISC
+        if (c.block.lootAmount != [:]) {
+            println "Setting loot amount to: " + c.block.lootAmount
+            b.withLootAmount((byte) c.block.lootAmount)
+        }
+
         if (c.block.luminance != [:]) {
             println "Setting luminance to: " + c.block.luminance
             b.withLuminance((byte) c.block.luminance)
@@ -186,5 +191,5 @@ public class SimpleBlockLoader implements BlockLoader {
     private Vector2f calcAtlasPositionForId(int id) {
         return new Vector2f(((int) id % (int) Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN), ((int) id / (int) Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN))
     }
-    
+
 }

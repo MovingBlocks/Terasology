@@ -17,8 +17,9 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
+import org.terasology.model.inventory.Icon;
+import org.terasology.model.inventory.Inventory;
 import org.terasology.model.inventory.Item;
-import org.terasology.model.inventory.Toolbar;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -60,21 +61,26 @@ public class UIToolbarCell extends UIDisplayElement {
         _selectionRectangle.setVisible(_selected);
         setPosition(new Vector2f((getSize().x - 8f) * _id - 2f, 2f));
 
-        Toolbar toolbar = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getToolbar();
+        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
 
-        if (toolbar.getSelectedSlot() == _id) {
+        if (inventory.getSelectedCubbyhole() == _id) {
             setSelected(true);
         } else {
             setSelected(false);
         }
-
-        Item item = toolbar.getItemInSlot(_id);
-
-        if (item != null) {
-            getLabel().setVisible(true);
-            getLabel().setText(Integer.toString(item.getAmount()));
+        
+        displayItemCount();
+    }
+    
+    private void displayItemCount() {
+        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
+        int count = inventory.getItemCountAt(_id);
+        
+        if (count == 0) {
+        	getLabel().setVisible(false);
         } else {
-            getLabel().setVisible(false);
+        	getLabel().setVisible(true);
+        	getLabel().setText(Integer.toString(count));
         }
     }
 
@@ -84,13 +90,13 @@ public class UIToolbarCell extends UIDisplayElement {
 
         glEnable(GL11.GL_DEPTH_TEST);
 
-        Toolbar toolbar = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getToolbar();
-        Item item = toolbar.getItemInSlot(_id);
+        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
+        Item item = inventory.getItemAt(_id);
 
         if (item != null) {
             glPushMatrix();
             glTranslatef(20f, 20f, 0f);
-            item.renderIcon();
+            Icon.get(item).render();
             glPopMatrix();
             glDisable(GL11.GL_CULL_FACE);
         }

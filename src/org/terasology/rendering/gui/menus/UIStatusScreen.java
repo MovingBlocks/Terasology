@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
