@@ -3,6 +3,7 @@ package org.terasology.rendering.gui.components;
 
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import static org.lwjgl.opengl.GL11.*;
+import org.terasology.game.Terasology;
 /**
  * A simple graphical text cursor
  *
@@ -24,5 +25,9 @@ public class UITextCursor extends UIDisplayElement {
 
     public void update(){
 
+    }
+
+    public void setPositionBySymbol(){
+        //setPosition();
     }
 }
