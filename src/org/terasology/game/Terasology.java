@@ -58,10 +58,10 @@ import static org.lwjgl.opengl.GL11.*;
 public final class Terasology {
 
     /* VIEWING DISTANCE */
-    private static final int[] VIEWING_DISTANCES = {(Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceNear"),
-            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceModerate"),
-            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceFar"),
-            (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceUltra")};
+    private static final int[] VIEWING_DISTANCES = {(Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceNear"),
+            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceModerate"),
+            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceFar"),
+            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceUltra")};
 
     private int _activeViewingDistance = 0;
 
@@ -123,7 +123,7 @@ public final class Terasology {
      */
     public static void main(String[] args) {
         getInstance().initDefaultLogger();
-        getInstance().getLogger().log(Level.INFO, "Welcome to Terasology | {0}!", ConfigurationManager.getInstance().getConfig().get("System.versionTag"));
+        getInstance().getLogger().log(Level.INFO, "Welcome to Terasology | {0}!", "Pre Alpha");
 
         // Make sure to load the native libraries for current OS first
         try {
@@ -221,16 +221,16 @@ public final class Terasology {
      * @throws LWJGLException Thrown when the LWJGL fails
      */
     public void initDisplay() throws LWJGLException {
-        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.fullscreen")) {
+        if ((Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.fullscreen")) {
             Display.setDisplayMode(Display.getDesktopDisplayMode());
             Display.setFullscreen(true);
         } else {
-            Display.setDisplayMode((DisplayMode) ConfigurationManager.getInstance().getConfig().get("Graphics.displayMode"));
+            Display.setDisplayMode((DisplayMode) SettingsManager.getInstance().getUserSetting("Game.Graphics.displayMode"));
         }
 
         Display.setResizable(true);
-        Display.setTitle("Terasology" + " | " + ConfigurationManager.getInstance().getConfig().get("System.versionTag"));
-        Display.create((PixelFormat) ConfigurationManager.getInstance().getConfig().get("Graphics.pixelFormat"));
+        Display.setTitle("Terasology" + " | " + "Pre Alpha");
+        Display.create((PixelFormat) SettingsManager.getInstance().getUserSetting("Game.Graphics.pixelFormat"));
     }
 
     public void initOpenAL() {
@@ -376,7 +376,7 @@ public final class Terasology {
         resetOpenGLParameters();
 
         // Generate a world with a random seed value
-        String worldSeed = (String) ConfigurationManager.getInstance().getConfig().get("World.defaultSeed");
+        String worldSeed = (String) SettingsManager.getInstance().getWorldSetting("World.Creation.defaultSeed");
 
         if (worldSeed.isEmpty())
             worldSeed = null;
@@ -611,7 +611,7 @@ public final class Terasology {
      */
     @SuppressWarnings("unchecked")
 	private void processKeyboardInput() {
-        boolean debugEnabled = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
+        boolean debugEnabled = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.debug");
 
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
@@ -626,7 +626,7 @@ public final class Terasology {
                 }
 
                 if (key == Keyboard.KEY_F3) {
-                    ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", debugEnabled = !(debugEnabled));
+                    SettingsManager.getInstance().setWorldSetting("World.Debug.debug", debugEnabled = !(debugEnabled));
                 }
 
                 if (key == Keyboard.KEY_F) {

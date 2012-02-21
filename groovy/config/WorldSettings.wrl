@@ -17,6 +17,9 @@
 import javax.vecmath.Vector2f
 
 World{
+    Info{
+        title = "New World"
+    }
     Physics{
         maxGravity = 1.0d
         maxGravitySwimming = 0.04d
@@ -51,5 +54,13 @@ World{
     Creation{
         spawnOrigin = new Vector2f(-24429, 20547)
         defaultSeed = "Pinkie Pie!"
+    }
+    Debug{
+        debug = false
+        debugCollision = false
+        renderChunkBoundingBoxes = false
+        demoFlight = false
+        demoFlightSpeed = 0.08d
+        godMode = false
     }
 }
