@@ -38,7 +38,8 @@ public class UIGraphicsElement extends UIDisplayElement {
     private final Vector2f _textureOrigin = new Vector2f(0.0f, 0.0f);
     private final Vector2f _textureSize = new Vector2f(1.0f, 1.0f);
 
-    private Mesh _mesh;
+    private float _rotate = 0f;
+    private Mesh  _mesh;
 
     public UIGraphicsElement(String textureName) {
         _textureName = textureName;
@@ -66,6 +67,9 @@ public class UIGraphicsElement extends UIDisplayElement {
         glMatrixMode(GL11.GL_MODELVIEW);
 
         glPushMatrix();
+        if(_rotate>0f){
+            glRotatef(_rotate, 0f, 0f, 1f);
+        }
         glScalef(getSize().x, getSize().y, 1.0f);
         _mesh.render();
         glPopMatrix();
@@ -87,5 +91,9 @@ public class UIGraphicsElement extends UIDisplayElement {
 
     @Override
     public void update() {
+    }
+
+    public void rotate(float rotate){
+        _rotate = rotate;
     }
 }

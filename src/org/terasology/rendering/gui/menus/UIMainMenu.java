@@ -17,15 +17,11 @@ package org.terasology.rendering.gui.menus;
 
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ConfigurationManager;
-import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.components.UIInput;
-import org.terasology.rendering.gui.components.UITransparentOverlay;
+import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
 import javax.vecmath.Vector2f;
 
 /**
@@ -41,6 +37,7 @@ public class UIMainMenu extends UIDisplayRenderer {
     final UIButton _exitButton;
     final UIButton _startButton;
     final UIInput  _testInput;
+    final UIList   _testList;
 
     final UIText _version;
 
@@ -51,6 +48,9 @@ public class UIMainMenu extends UIDisplayRenderer {
 
         _version = new UIText((String) ConfigurationManager.getInstance().getConfig().get("System.versionTag"));
         _version.setVisible(true);
+
+        _testList = new UIList(new Vector2f(256f, 512f));
+        _testList.setVisible(true);
 
         _exitButton = new UIButton(new Vector2f(256f, 32f));
         _exitButton.getLabel().setText("Exit Terasology");
@@ -84,9 +84,10 @@ public class UIMainMenu extends UIDisplayRenderer {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-        addDisplayElement(_testInput);
-        addDisplayElement(_exitButton);
-        addDisplayElement(_startButton);
+   //     addDisplayElement(_testInput);
+    //    addDisplayElement(_exitButton);
+      //  addDisplayElement(_startButton);
+        addDisplayElement(_testList);
         update();
     }
 
@@ -97,14 +98,17 @@ public class UIMainMenu extends UIDisplayRenderer {
         _version.centerHorizontally();
         _version.getPosition().y = 230f;
 
-        _startButton.centerHorizontally();
-        _startButton.getPosition().y = 300f + 32f + 8f;
+    //    _startButton.centerHorizontally();
+     //   _startButton.getPosition().y = 300f + 32f + 8f;
 
-        _exitButton.centerHorizontally();
-        _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
+    //    _exitButton.centerHorizontally();
+     //   _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
 
-        _testInput.centerHorizontally();
-        _testInput.getPosition().y = 300f + 3 * 32f + 32f;
+     //   _testInput.centerHorizontally();
+       // _testInput.getPosition().y = 300f + 3 * 32f + 32f;
+
+        _testList.centerHorizontally();
+        _testList.getPosition().y = 300f + 32f;
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;

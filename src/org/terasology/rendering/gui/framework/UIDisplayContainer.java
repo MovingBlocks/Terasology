@@ -48,9 +48,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
         if(_crop){
             glEnable(GL_SCISSOR_TEST);
-            glScissor((int)getPosition().x, 0, (int)getSize().x, Display.getHeight());
+            glScissor((int)getPosition().x, Display.getHeight()-((int)getPosition().y + (int)getSize().y), (int)getSize().x, (int)getSize().y);
         }
-
         // Render all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
 

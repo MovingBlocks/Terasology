@@ -167,8 +167,7 @@ public class UIInput extends UIDisplayContainer {
       float cursorPos = 0f;
       _textWidthInContainer = _inputText.getTextWidth() + _padding.x + _inputText.getPosition().x;
       if(_textWidthInContainer > getSize().x || _inputText.getPosition().x < 0){
-          float newPosX = _inputText.getPosition().x + (getSize().x - _textWidthInContainer);
-          _inputText.setPosition(new Vector2f((newPosX),_inputText.getPosition().y));
+          _inputText.setPosition(new Vector2f((_inputText.getPosition().x + (getSize().x - _textWidthInContainer)),_inputText.getPosition().y));
       }
       if(_cursorPosition!=_inputValue.length()){
           cursorPos = (_inputText.getFont().getWidth(_inputValue.toString().substring(0, _cursorPosition)) - _textCursor.getSize().x + _inputText.getPosition().x)/2;
