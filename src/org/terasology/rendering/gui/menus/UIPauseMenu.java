@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.menus;
 
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.ConfigurationManager;
+import org.terasology.logic.manager.SettingsManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
@@ -48,7 +48,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
-        _version = new UIText((String) ConfigurationManager.getInstance().getConfig().get("System.versionTag"));
+        _version = new UIText("Pre Alpha");
         _version.setVisible(true);
 
         _exitButton = new UIButton(new Vector2f(256f, 32f));

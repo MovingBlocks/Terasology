@@ -14,5 +14,25 @@
  * limitations under the License.
  */
 
-// Placeholder for external override-priority config details (moved to org.terasology.logic.manager.DefaultConfig)
-// TODO: Figure out a nice new approach and probably leave a commented out copy of config here that users can override?
+package org.terasology.logic.manager;
+// This is a stub for user rights management. It serves mainly as a reminder 
+// that there needs to be some sort of rights management                            
+public class UserLevel {
+
+    private static UserLevel _userLevel;
+
+    public static UserLevel getInstance()
+    {
+        if(_userLevel == null) {
+            _userLevel = new UserLevel();
+        }
+        return _userLevel;
+    }
+
+    private UserLevel(){}
+
+    public boolean hasRights(){
+        //should querry server / world if user has rights
+        return true;
+    }
+}

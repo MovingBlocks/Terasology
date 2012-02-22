@@ -17,7 +17,6 @@ package org.terasology.logic.manager;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
-import org.terasology.game.Terasology;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
 
@@ -33,7 +32,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class PostProcessingRenderer {
 
-    public static final boolean EFFECTS_ENABLED = (Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.enablePostProcessingEffects");
+    public static final boolean EFFECTS_ENABLED = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.enablePostProcessingEffects");
     public static final float MAX_EXPOSURE = 12.0f;
     public static final float MIN_EXPOSURE = 2.0f;
     public static final float TARGET_LUMINANCE = 0.5f;

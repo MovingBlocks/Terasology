@@ -44,7 +44,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @todo Add screen "generation / load / delete the world."
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author Anton Kireev (adeon.k87@gmail.com)
+ * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
  */
 public class ModeMainMenu implements IGameMode{
