@@ -19,7 +19,7 @@ package org.terasology.game.modes;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
- * @author Anton Kireev
+ * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
  */
 public interface IGameMode {

@@ -15,255 +15,249 @@
  */
 package org.terasology.game.modes;
 
-import org.terasology.game.Terasology;
-
-//OpenGL
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-
-
-//GUI
+import org.terasology.game.Terasology;
+import org.terasology.logic.characters.Player;
+import org.terasology.logic.manager.SettingsManager;
 import org.terasology.logic.world.IWorldProvider;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
-
-import java.util.ArrayList;
-
-import java.util.logging.Level;
-
-import org.terasology.performanceMonitor.PerformanceMonitor;
-
-import org.terasology.logic.characters.Player;
-import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import java.util.ArrayList;
+import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
+
+//OpenGL
+//GUI
 
 /**
  * Play mode
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author  Anton Kireev (adeon.k87@gmail.com)
+ * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
  */
-public class ModePlayGame implements IGameMode{
-  
-  //GUI
-  private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
-  private UIHeadsUpDisplay _hud;
-  private UIMetrics _metrics;
-  private UIPauseMenu _pauseMenu;
-  private UILoadingScreen _loadingScreen;
-  private UIStatusScreen _statusScreen;
-  private UIInventoryScreen _inventoryScreen;
-  
-  /* CONST */
-  private static final int TICKS_PER_SECOND = 60;
-  private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+public class ModePlayGame implements IGameMode {
 
-  /* RENDERING */
-  private WorldRenderer _activeWorldRenderer;
-  
-  public double _timeAccumulator = 0;
-  
-  /* VIEWING DISTANCE */
-  private static final int[] VIEWING_DISTANCES = {(Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceNear"),
-          (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceModerate"),
-          (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceFar"),
-          (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.viewingDistanceUltra")};
-  
-  private int _activeViewingDistance = 0;
-  
-  /* GAME LOOP */
-  private boolean _pauseGame = false;
-  
-  private Terasology _gameInstance = null;
-  
-  public void init(){
-    _gameInstance = Terasology.getInstance();
-            
-    _hud = new UIHeadsUpDisplay();
-    _hud.setVisible(true);
+    /* GUI */
+    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
+    private UIHeadsUpDisplay _hud;
+    private UIMetrics _metrics;
+    private UIPauseMenu _pauseMenu;
+    private UILoadingScreen _loadingScreen;
+    private UIStatusScreen _statusScreen;
+    private UIInventoryScreen _inventoryScreen;
 
-    _pauseMenu       = new UIPauseMenu();
-    _loadingScreen   = new UILoadingScreen();
-    _statusScreen    = new UIStatusScreen();
-    _inventoryScreen = new UIInventoryScreen();
-    _metrics         = new UIMetrics();
+    /* CONST */
+    private static final int TICKS_PER_SECOND = 60;
+    private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 
-    _metrics.setVisible(true);
+    /* RENDERING */
+    private WorldRenderer _activeWorldRenderer;
 
-    _guiScreens.add(_metrics);
-    _guiScreens.add(_hud);
-    _guiScreens.add(_pauseMenu);
-    _guiScreens.add(_loadingScreen);
-    _guiScreens.add(_inventoryScreen);
-    _guiScreens.add(_statusScreen);
-   
-    String worldSeed = (String) ConfigurationManager.getInstance().getConfig().get("World.defaultSeed");
+    public double _timeAccumulator = 0;
 
-    if (worldSeed.isEmpty()){
-        worldSeed = null;
-    }
-    
-    resetOpenGLParameters();
-    
-    initWorld("World1", worldSeed);
-    Terasology.getInstance().initGroovy();
-   
-  }
-  
-  public void update(){
-      while (_timeAccumulator >= SKIP_TICKS) {
-          if (_activeWorldRenderer != null && shouldUpdateWorld())
-              _activeWorldRenderer.update();
+    /* VIEWING DISTANCE */
+    private static final int[] VIEWING_DISTANCES = {(Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceNear"),
+            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceModerate"),
+            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceFar"),
+            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceUltra")};
 
-          if (screenHasFocus() || !shouldUpdateWorld()) {
-              if (Mouse.isGrabbed()) {
-                  Mouse.setGrabbed(false);
-                  Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
-              }
+    private int _activeViewingDistance = 0;
 
-          } else {
-              if (!Mouse.isGrabbed())
-                  Mouse.setGrabbed(true);
-          }
+    /* GAME LOOP */
+    private boolean _pauseGame = false;
 
-          if (_activeWorldRenderer != null) {
-              if (_activeWorldRenderer.getPlayer().isDead()) {
-                  _statusScreen.setVisible(true);
-                  _statusScreen.updateStatus("Sorry. You've died. :-(");
-              } else {
-                  _statusScreen.setVisible(false);
-              }
+    private Terasology _gameInstance = null;
 
-          }
+    public void init() {
+        _gameInstance = Terasology.getInstance();
 
-          updateUserInterface();
-      
-          _timeAccumulator -= SKIP_TICKS;
-      }
-  }
+        _hud = new UIHeadsUpDisplay();
+        _hud.setVisible(true);
 
-  public void updateTimeAccumulator(long currentTime, long startTime){
-      _timeAccumulator += currentTime - startTime;
-  }
+        _pauseMenu = new UIPauseMenu();
+        _loadingScreen = new UILoadingScreen();
+        _statusScreen = new UIStatusScreen();
+        _inventoryScreen = new UIInventoryScreen();
+        _metrics = new UIMetrics();
 
-  /**
-   * Init. a new random world.
-   */
-  public void initWorld(String title, String seed){
-    final FastRandom random = new FastRandom();
+        _metrics.setVisible(true);
 
-    // Get rid of the old world
-    if (_activeWorldRenderer != null) {
-        _activeWorldRenderer.dispose();
-        _activeWorldRenderer = null;
+        _guiScreens.add(_metrics);
+        _guiScreens.add(_hud);
+        _guiScreens.add(_pauseMenu);
+        _guiScreens.add(_loadingScreen);
+        _guiScreens.add(_inventoryScreen);
+        _guiScreens.add(_statusScreen);
+
+        String worldSeed = (String) SettingsManager.getInstance().getWorldSetting("World.Creation.defaultSeed");
+
+        if (worldSeed.isEmpty()) {
+            worldSeed = null;
+        }
+
+        resetOpenGLParameters();
+
+        initWorld("World1", worldSeed);
+        Terasology.getInstance().initGroovy();
+
     }
 
-    if (seed == null) {
-        seed = random.randomCharacterString(16);
-    } else if (seed.isEmpty()) {
-        seed = random.randomCharacterString(16);
+    public void update() {
+        while (_timeAccumulator >= SKIP_TICKS) {
+            if (_activeWorldRenderer != null && shouldUpdateWorld())
+                _activeWorldRenderer.update();
+
+            if (screenHasFocus() || !shouldUpdateWorld()) {
+                if (Mouse.isGrabbed()) {
+                    Mouse.setGrabbed(false);
+                    Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
+                }
+
+            } else {
+                if (!Mouse.isGrabbed())
+                    Mouse.setGrabbed(true);
+            }
+
+            if (_activeWorldRenderer != null) {
+                if (_activeWorldRenderer.getPlayer().isDead()) {
+                    _statusScreen.setVisible(true);
+                    _statusScreen.updateStatus("Sorry. You've died. :-(");
+                } else {
+                    _statusScreen.setVisible(false);
+                }
+
+            }
+
+            updateUserInterface();
+
+            _timeAccumulator -= SKIP_TICKS;
+        }
     }
 
-    Terasology.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
-
-    // Init. a new world
-    _activeWorldRenderer = new WorldRenderer(title, seed);
-    _activeWorldRenderer.setPlayer(new Player(_activeWorldRenderer));
-
-    // Create the first Portal if it doesn't exist yet
-    _activeWorldRenderer.initPortal();
-    _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
-
-    simulateWorld(4000);
-  }
-  
-  private boolean screenHasFocus() {
-      for (UIDisplayElement screen : _guiScreens) {
-          if (screen.isVisible() && !screen.isOverlay()) {
-              return true;
-          }
-      }
-
-      return false;
-  }
-  
-  private boolean shouldUpdateWorld() {
-      return !_pauseGame && !_pauseMenu.isVisible();
-  }
-  
-  public void resetOpenGLParameters() {
-      // Update the viewing distance
-      double minDist = (VIEWING_DISTANCES[_activeViewingDistance] / 2) * 16.0f;
-      glFogf(GL_FOG_START, (float) (minDist * 0.001));
-      glFogf(GL_FOG_END, (float) minDist);
-  }
-  
-  private void simulateWorld(int duration) {
-      long timeBefore = _gameInstance.getTime();
-
-      _loadingScreen.setVisible(true);
-      _hud.setVisible(false);
-      _metrics.setVisible(false);
-
-      float diff = 0;
-
-      while (diff < duration) {
-          _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
-
-          renderUserInterface();
-          updateUserInterface();
-
-          getActiveWorldRenderer().standaloneGenerateChunks();
-
-          Display.update();
-
-          diff = _gameInstance.getTime() - timeBefore;
-      }
-
-    _loadingScreen.setVisible(false);
-    _hud.setVisible(true);
-    _metrics.setVisible(true);
-  }
-  
-  public void render(){
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-
-    if (_activeWorldRenderer != null){
-      _activeWorldRenderer.render();
+    public void updateTimeAccumulator(long currentTime, long startTime) {
+        _timeAccumulator += currentTime - startTime;
     }
-    PerformanceMonitor.startActivity("Render UI");
-    renderUserInterface();
-    PerformanceMonitor.endActivity();
-  }
-  
-  public void renderUserInterface() {
-      for (UIDisplayElement screen : _guiScreens) {
-          screen.render();
-      }
-  }
-  
-  private void updateUserInterface() {
-      for (UIDisplayElement screen : _guiScreens) {
-          screen.update();
-      }
-  }
-  
-  public WorldRenderer getActiveWorldRenderer() {
-      return _activeWorldRenderer;
-  }
-  
-  /**
-   * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
-   */
-  public void processKeyboardInput() {
-        boolean debugEnabled = (Boolean) ConfigurationManager.getInstance().getConfig().get("System.Debug.debug");
+
+    /**
+     * Init. a new random world.
+     */
+    public void initWorld(String title, String seed) {
+        final FastRandom random = new FastRandom();
+
+        // Get rid of the old world
+        if (_activeWorldRenderer != null) {
+            _activeWorldRenderer.dispose();
+            _activeWorldRenderer = null;
+        }
+
+        if (seed == null) {
+            seed = random.randomCharacterString(16);
+        } else if (seed.isEmpty()) {
+            seed = random.randomCharacterString(16);
+        }
+
+        Terasology.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+
+        // Init. a new world
+        _activeWorldRenderer = new WorldRenderer(title, seed);
+        _activeWorldRenderer.setPlayer(new Player(_activeWorldRenderer));
+
+        // Create the first Portal if it doesn't exist yet
+        _activeWorldRenderer.initPortal();
+        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+
+        simulateWorld(4000);
+    }
+
+    private boolean screenHasFocus() {
+        for (UIDisplayElement screen : _guiScreens) {
+            if (screen.isVisible() && !screen.isOverlay()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean shouldUpdateWorld() {
+        return !_pauseGame && !_pauseMenu.isVisible();
+    }
+
+    public void resetOpenGLParameters() {
+        // Update the viewing distance
+        double minDist = (VIEWING_DISTANCES[_activeViewingDistance] / 2) * 16.0f;
+        glFogf(GL_FOG_START, (float) (minDist * 0.001));
+        glFogf(GL_FOG_END, (float) minDist);
+    }
+
+    private void simulateWorld(int duration) {
+        long timeBefore = _gameInstance.getTime();
+
+        _loadingScreen.setVisible(true);
+        _hud.setVisible(false);
+        _metrics.setVisible(false);
+
+        float diff = 0;
+
+        while (diff < duration) {
+            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
+
+            renderUserInterface();
+            updateUserInterface();
+
+            getActiveWorldRenderer().standaloneGenerateChunks();
+
+            Display.update();
+
+            diff = _gameInstance.getTime() - timeBefore;
+        }
+
+        _loadingScreen.setVisible(false);
+        _hud.setVisible(true);
+        _metrics.setVisible(true);
+    }
+
+    public void render() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+
+        if (_activeWorldRenderer != null) {
+            _activeWorldRenderer.render();
+        }
+        PerformanceMonitor.startActivity("Render UI");
+        renderUserInterface();
+        PerformanceMonitor.endActivity();
+    }
+
+    public void renderUserInterface() {
+        for (UIDisplayElement screen : _guiScreens) {
+            screen.render();
+        }
+    }
+
+    private void updateUserInterface() {
+        for (UIDisplayElement screen : _guiScreens) {
+            screen.update();
+        }
+    }
+
+    public WorldRenderer getActiveWorldRenderer() {
+        return _activeWorldRenderer;
+    }
+
+    /**
+     * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
+     */
+    public void processKeyboardInput() {
+        boolean debugEnabled = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.debug");
 
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
@@ -278,7 +272,7 @@ public class ModePlayGame implements IGameMode{
                 }
 
                 if (key == Keyboard.KEY_F3) {
-                    ConfigurationManager.getInstance().getConfig().put("System.Debug.debug", debugEnabled = !(debugEnabled));
+                    SettingsManager.getInstance().setWorldSetting("World.Debug.debug", debugEnabled = !(debugEnabled));
                 }
 
                 if (key == Keyboard.KEY_F) {
@@ -317,83 +311,83 @@ public class ModePlayGame implements IGameMode{
                 _activeWorldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
         }
     }
-  
 
-  /*
-   * Process mouse input - nothing system-y, so just passing it to the Player class
-   */
-  public void processMouseInput() {
-      while (Mouse.next()) {
-          int button = Mouse.getEventButton();
-          int wheelMoved = Mouse.getEventDWheel();
 
-          for (UIDisplayElement screen : _guiScreens) {
-              if (screenCanFocus(screen)) {
-                  screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-              }
-          }
+    /*
+    * Process mouse input - nothing system-y, so just passing it to the Player class
+    */
+    public void processMouseInput() {
+        while (Mouse.next()) {
+            int button = Mouse.getEventButton();
+            int wheelMoved = Mouse.getEventDWheel();
 
-          if (!screenHasFocus())
-              _activeWorldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-      }
-  }
-  
+            for (UIDisplayElement screen : _guiScreens) {
+                if (screenCanFocus(screen)) {
+                    screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+                }
+            }
 
-  private boolean screenCanFocus(UIDisplayElement s) {
-      boolean result = true;
-
-      for (UIDisplayElement screen : _guiScreens) {
-          if (screen.isVisible() && !screen.isOverlay() && screen != s)
-              result = false;
-      }
-
-      return result;
-  }
-  
-  public void updatePlayerInput(){
-    if (!screenHasFocus())
-      getActiveWorldRenderer().getPlayer().updateInput();
-  }
-
-  public void pause() {
-    _pauseGame = true;
-  }
-
-  public void unpause() {
-    _pauseGame = false;
-  }
-
-  public void togglePauseGame() {
-    if (_pauseGame) {
-        unpause();
-    } else {
-        pause();
+            if (!screenHasFocus())
+                _activeWorldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+        }
     }
-  }
 
-  private void toggleInventory() {
-    if (screenCanFocus(_inventoryScreen))
-        _inventoryScreen.setVisible(!_inventoryScreen.isVisible());
-  }
 
-  public void togglePauseMenu() {
-    if (screenCanFocus(_pauseMenu))
-        _pauseMenu.setVisible(!_pauseMenu.isVisible());
-  }
+    private boolean screenCanFocus(UIDisplayElement s) {
+        boolean result = true;
 
-  public void toggleViewingDistance() {
-    _activeViewingDistance = (_activeViewingDistance + 1) % 4;
-    _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
-  }
-  
+        for (UIDisplayElement screen : _guiScreens) {
+            if (screen.isVisible() && !screen.isOverlay() && screen != s)
+                result = false;
+        }
 
-  public boolean isGamePaused() {
-      return _pauseGame;
-  }
+        return result;
+    }
 
-  public IWorldProvider getActiveWorldProvider() {
+    public void updatePlayerInput() {
+        if (!screenHasFocus())
+            getActiveWorldRenderer().getPlayer().updateInput();
+    }
+
+    public void pause() {
+        _pauseGame = true;
+    }
+
+    public void unpause() {
+        _pauseGame = false;
+    }
+
+    public void togglePauseGame() {
+        if (_pauseGame) {
+            unpause();
+        } else {
+            pause();
+        }
+    }
+
+    private void toggleInventory() {
+        if (screenCanFocus(_inventoryScreen))
+            _inventoryScreen.setVisible(!_inventoryScreen.isVisible());
+    }
+
+    public void togglePauseMenu() {
+        if (screenCanFocus(_pauseMenu))
+            _pauseMenu.setVisible(!_pauseMenu.isVisible());
+    }
+
+    public void toggleViewingDistance() {
+        _activeViewingDistance = (_activeViewingDistance + 1) % 4;
+        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+    }
+
+
+    public boolean isGamePaused() {
+        return _pauseGame;
+    }
+
+    public IWorldProvider getActiveWorldProvider() {
         return _activeWorldRenderer.getWorldProvider();
-  }
-  
- 
+    }
+
+
 }

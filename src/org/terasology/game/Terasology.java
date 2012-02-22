@@ -29,8 +29,6 @@ import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.menus.*;
 import org.terasology.rendering.world.WorldRenderer;
 
 import org.terasology.game.modes.IGameMode;
@@ -40,7 +38,6 @@ import org.terasology.logic.characters.Player;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.Executors;
@@ -65,10 +62,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Terasology {
 
-  /* THREADING */
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
-   
     /* STATISTICS */
     private long _lastLoopTime, _lastFpsTime;
     private int   _fps;
@@ -114,7 +109,7 @@ public final class Terasology {
      */
     public static void main(String[] args) {
         getInstance().initDefaultLogger();
-        getInstance().getLogger().log(Level.INFO, "Welcome to Terasology | {0}!", ConfigurationManager.getInstance().getConfig().get("System.versionTag"));
+        getInstance().getLogger().log(Level.INFO, "Welcome to Terasology | {0}!", "Pre Alpha");
 
         // Make sure to load the native libraries for current OS first
         try {
@@ -212,16 +207,16 @@ public final class Terasology {
      * @throws LWJGLException Thrown when the LWJGL fails
      */
     public void initDisplay() throws LWJGLException {
-        if ((Boolean) ConfigurationManager.getInstance().getConfig().get("Graphics.fullscreen")) {
+        if ((Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.fullscreen")) {
             Display.setDisplayMode(Display.getDesktopDisplayMode());
             Display.setFullscreen(true);
         } else {
-            Display.setDisplayMode((DisplayMode) ConfigurationManager.getInstance().getConfig().get("Graphics.displayMode"));
+            Display.setDisplayMode((DisplayMode) SettingsManager.getInstance().getUserSetting("Game.Graphics.displayMode"));
         }
 
         Display.setResizable(true);
-        Display.setTitle("Terasology" + " | " + ConfigurationManager.getInstance().getConfig().get("System.versionTag"));
-        Display.create((PixelFormat) ConfigurationManager.getInstance().getConfig().get("Graphics.pixelFormat"));
+        Display.setTitle("Terasology" + " | " + "Pre Alpha");
+        Display.create((PixelFormat) SettingsManager.getInstance().getUserSetting("Game.Graphics.pixelFormat"));
     }
 
     public void initOpenAL() {
@@ -269,7 +264,6 @@ public final class Terasology {
          */
         resizeViewport();
         resetOpenGLParameters();
-        
     }
 
     public void resetOpenGLParameters() {

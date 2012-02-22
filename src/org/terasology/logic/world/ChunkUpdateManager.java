@@ -16,7 +16,7 @@
 package org.terasology.logic.world;
 
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.ConfigurationManager;
+import org.terasology.logic.manager.SettingsManager;
 import org.terasology.model.structures.BlockPosition;
 
 import java.util.HashSet;
@@ -33,7 +33,7 @@ public final class ChunkUpdateManager implements IBlockObserver {
     }
 
     /* CONST */
-    private static final int MAX_THREADS = (Integer) ConfigurationManager.getInstance().getConfig().get("System.maxThreads");
+    private static final int MAX_THREADS = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.maxThreads");
 
     /* CHUNK UPDATES */
     private static final HashSet<Chunk> _currentlyProcessedChunks = new HashSet<Chunk>();

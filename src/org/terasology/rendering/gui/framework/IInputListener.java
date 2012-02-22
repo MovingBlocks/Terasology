@@ -16,8 +16,8 @@
 package org.terasology.rendering.gui.framework;
 
 /**
- *
- * @author kireev
+ * TODO
+ * @author Anton Kireev <adeon.k87@gmail.com>
  */
 public interface IInputListener {
     public void keyPressed(UIDisplayElement element);
