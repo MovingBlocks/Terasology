@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.data.blocks.definitions
+package org.terasology.rendering.gui.framework;
 
 /**
- * Dirt is pretty basic
- * version is for Serialization purposes (maybe?) and may not make sense for all blocks
+ *
+ * @author kireev
  */
-block {
-    version = 1
-    shape = "cube"
+public interface IInputListener {
+    public void keyPressed(UIDisplayElement element);
 }
