@@ -24,35 +24,31 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.PixelFormat;
+import org.terasology.game.modes.IGameMode;
+import org.terasology.game.modes.ModeMainMenu;
+import org.terasology.game.modes.ModePlayGame;
+import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.menus.*;
 import org.terasology.rendering.world.WorldRenderer;
 
-import org.terasology.game.modes.IGameMode;
-import org.terasology.game.modes.ModePlayGame;
-import org.terasology.game.modes.ModeMainMenu;
-import org.terasology.logic.characters.Player;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.EnumMap;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import java.util.Map;
-    
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -65,13 +61,13 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class Terasology {
 
-  /* THREADING */
+    /* THREADING */
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
-   
+
     /* STATISTICS */
     private long _lastLoopTime, _lastFpsTime;
-    private int   _fps;
+    private int _fps;
     private float _averageFps;
     private long _timerTicksPerSecond;
     private long _delta;
@@ -81,11 +77,13 @@ public final class Terasology {
 
     /*GAME MODES*/
     public enum GameMode {
-       undefined, mainMenu, runGame
-    };
-    
+        undefined, mainMenu, runGame
+    }
+
+    ;
+
     static GameMode _state = GameMode.mainMenu;
-    private static Map<GameMode,IGameMode> _gameModes = Collections.synchronizedMap(new EnumMap<GameMode,IGameMode>(GameMode.class));
+    private static Map<GameMode, IGameMode> _gameModes = Collections.synchronizedMap(new EnumMap<GameMode, IGameMode>(GameMode.class));
 
     /* SINGLETON */
     private static Terasology _instance;
@@ -95,7 +93,7 @@ public final class Terasology {
 
     /* GROOVY */
     private GroovyManager _groovyManager;
-    
+
     /**
      * Returns the static instance of Terasology.
      *
@@ -269,14 +267,13 @@ public final class Terasology {
          */
         resizeViewport();
         resetOpenGLParameters();
-        
+
     }
 
     public void resetOpenGLParameters() {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-        glShadeModel(GL_FLAT);
     }
 
     private void resizeViewport() {
@@ -289,7 +286,7 @@ public final class Terasology {
     public void startGame() {
         getInstance().getLogger().log(Level.INFO, "Starting Terasology...");
 
-        IGameMode mode = null;
+        IGameMode mode;
         PerformanceMonitor.startActivity("Other");
 
         // MAIN GAME LOOP
@@ -305,12 +302,12 @@ public final class Terasology {
                 Display.processMessages();
                 PerformanceMonitor.endActivity();
             }
-            
+
             mode = getGameMode();
-            
-            if(mode==null){
-              _runGame = false;
-              break;
+
+            if (mode == null) {
+                _runGame = false;
+                break;
             }
 
             PerformanceMonitor.startActivity("Main Update");
@@ -330,9 +327,6 @@ public final class Terasology {
             mode.updatePlayerInput();
             PerformanceMonitor.endActivity();
 
-
-
-
             PerformanceMonitor.rollCycle();
             PerformanceMonitor.startActivity("Other");
             mode.updateTimeAccumulator(getTime(), startTime);
@@ -345,7 +339,8 @@ public final class Terasology {
          * Save the world and exit the application.
          */
         if (_saveWorldOnExit) {
-            getGameMode().getActiveWorldRenderer().dispose();
+            if (getActiveWorldRenderer() != null)
+                getGameMode().getActiveWorldRenderer().dispose();
         }
 
         _threadPool.shutdown();
@@ -358,38 +353,38 @@ public final class Terasology {
 
         destroy();
     }
-    
-    public IGameMode getGameMode(){
-      
-      IGameMode mode = _gameModes.get(_state); 
-      
-      if (mode!= null){
+
+    public IGameMode getGameMode() {
+
+        IGameMode mode = _gameModes.get(_state);
+
+        if (mode != null) {
+            return mode;
+        }
+
+        switch (_state) {
+            case runGame:
+                mode = new ModePlayGame();
+                break;
+
+            case mainMenu:
+                mode = new ModeMainMenu();
+                break;
+
+            case undefined:
+                getLogger().log(Level.SEVERE, "Undefined game state - unable to run");
+                return null;
+        }
+
+        _gameModes.put(_state, mode);
+
+        mode.init();
+
         return mode;
-      } 
-      
-      switch(_state){
-          case runGame:
-              mode = new ModePlayGame();
-          break;
-            
-          case mainMenu:
-              mode = new ModeMainMenu();
-          break;
-
-          case undefined:
-              getLogger().log(Level.SEVERE, "Undefined game state - unable to run");
-              return null;
-      }
-
-      _gameModes.put(_state, mode);
-      
-      mode.init();
-      
-      return mode;
     }
-    
-    public void setGameMode(GameMode state){
-      _state = state;
+
+    public void setGameMode(GameMode state) {
+        _state = state;
     }
 
     public void render() {
@@ -520,9 +515,5 @@ public final class Terasology {
 
     public GroovyManager getGroovyManager() {
         return _groovyManager;
-    }
-
-    public long getDelta() {
-        return _delta;
     }
 }
