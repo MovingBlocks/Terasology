@@ -25,7 +25,7 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import javax.vecmath.Vector2f;
 
 /**
- * Simple pause menu providing buttons for respawning the player and creating a new world.
+ * Main menu screen.
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
@@ -36,8 +36,6 @@ public class UIMainMenu extends UIDisplayRenderer {
 
     final UIButton _exitButton;
     final UIButton _startButton;
-    final UIInput  _testInput;
-    final UIList   _testList;
 
     final UIText _version;
 
@@ -48,9 +46,6 @@ public class UIMainMenu extends UIDisplayRenderer {
 
         _version = new UIText((String) ConfigurationManager.getInstance().getConfig().get("System.versionTag"));
         _version.setVisible(true);
-
-        _testList = new UIList(new Vector2f(256f, 512f));
-        _testList.setVisible(true);
 
         _exitButton = new UIButton(new Vector2f(256f, 32f));
         _exitButton.getLabel().setText("Exit Terasology");
@@ -73,9 +68,6 @@ public class UIMainMenu extends UIDisplayRenderer {
             }
         });
 
-        _testInput = new UIInput(new Vector2f(256f, 32f));
-        _testInput.setVisible(true);
-
         _overlay = new UITransparentOverlay();
         _overlay.setVisible(true);
 
@@ -84,10 +76,9 @@ public class UIMainMenu extends UIDisplayRenderer {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-   //     addDisplayElement(_testInput);
-    //    addDisplayElement(_exitButton);
-      //  addDisplayElement(_startButton);
-        addDisplayElement(_testList);
+        addDisplayElement(_exitButton);
+        addDisplayElement(_startButton);
+
         update();
     }
 
@@ -98,17 +89,12 @@ public class UIMainMenu extends UIDisplayRenderer {
         _version.centerHorizontally();
         _version.getPosition().y = 230f;
 
-    //    _startButton.centerHorizontally();
-     //   _startButton.getPosition().y = 300f + 32f + 8f;
+        _startButton.centerHorizontally();
+        _startButton.getPosition().y = 300f + 32f + 8f;
 
-    //    _exitButton.centerHorizontally();
-     //   _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
+        _exitButton.centerHorizontally();
+        _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
 
-     //   _testInput.centerHorizontally();
-       // _testInput.getPosition().y = 300f + 3 * 32f + 32f;
-
-        _testList.centerHorizontally();
-        _testList.getPosition().y = 300f + 32f;
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;

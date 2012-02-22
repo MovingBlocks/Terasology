@@ -4,11 +4,10 @@ import org.terasology.rendering.world.WorldRenderer;
 
 
 /**
- *
  * @author Anton Kireev
+ * @version 0.1
  */
 public interface IGameMode {
-   // public double _timeAccumulator = 0;
     public void updateTimeAccumulator(long currentTime, long startTime);
     public void init();
     public void update();
@@ -16,7 +15,6 @@ public interface IGameMode {
     public void processKeyboardInput();
     public void processMouseInput();
     
-    //temporary
     public WorldRenderer getActiveWorldRenderer();
     public void updatePlayerInput();
 }

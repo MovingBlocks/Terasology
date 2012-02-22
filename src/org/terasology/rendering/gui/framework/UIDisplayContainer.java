@@ -45,14 +45,13 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         if (!isVisible())
             return;
 
-
+        //Cut the elements
         if(_crop){
             glEnable(GL_SCISSOR_TEST);
             glScissor((int)getPosition().x, Display.getHeight()-((int)getPosition().y + (int)getSize().y), (int)getSize().x, (int)getSize().y);
         }
         // Render all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
-
             _displayElements.get(i).renderTransformed();
         }
 
@@ -111,6 +110,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         return _displayElements;
     }
 
+    /*
+     * Set the option for cut elements
+     */
     public void setCrop(boolean crop){
         _crop = crop;
     }

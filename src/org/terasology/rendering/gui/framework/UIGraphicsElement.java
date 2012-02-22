@@ -93,7 +93,10 @@ public class UIGraphicsElement extends UIDisplayElement {
     public void update() {
     }
 
-    public void rotate(float rotate){
-        _rotate = rotate;
+    /*
+     * Rotate graphics element
+     */
+    public void setRotateAngle(float angle){
+        _rotate = angle;
     }
 }

@@ -5,81 +5,82 @@ import org.terasology.game.Terasology;
 //OpenGL
 import org.lwjgl.opengl.Display;
 
-
 //GUI
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.UIMainMenu;
 
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
-import org.terasology.logic.characters.Player;
-import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.FastRandom;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import static org.lwjgl.opengl.GL11.*;
+
+
 /**
+ * The class implements the main game menu. The class contains the following screens: game settings,
+ * single player, multiplayer games, generation / load / delete the world.
  *
- * @author kireev
+ * @todo Create a parent class GameMode.
+ * @todo Add screen "Single Player"
+ * @todo Add animated background
+ * @todo Add screen "Game settings"
+ * @todo Add screen "Multiplayer Player"
+ * @todo Add screen "generation / load / delete the world."
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Anton Kireev (adeon.k87@gmail.com)
+ * @version 0.1
  */
 public class ModeMainMenu implements IGameMode{
   
   //GUI
   private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
-  private UIMainMenu         _mainMenu;
-  //private UIOptionsMenu      _optionsMenu;
-  //private UIGenerateMapMenu  _generateMapMenu;
-  
-  /* CONST */
-  private static final int TICKS_PER_SECOND = 60;
-  private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 
-  
-  private double _timeAccumulator = 0;
-  
+  /*SCREENS*/
+  private UIMainMenu _mainMenu;
+
   private Terasology _gameInstance = null;
   
   public void init(){
     _gameInstance = Terasology.getInstance();
-            
-   _mainMenu = new UIMainMenu();
 
+    _mainMenu = new UIMainMenu();
+    _mainMenu.setVisible(true);
 
     _guiScreens.add(_mainMenu);
-    _mainMenu.setVisible(true);
+
     Terasology.getInstance().initGroovy();
+
     Mouse.setGrabbed(false);
     Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
   }
-   public void updateTimeAccumulator(long currentTime, long startTime){
-      return;
+
+  public void updateTimeAccumulator(long currentTime, long startTime){
+    return;
   }
   public void update(){
-          updateUserInterface();
+    updateUserInterface();
   }
   
-  
+  /*
+   * In the future, to make in the parent class GameMode
+   */
   private boolean screenHasFocus() {
-      for (UIDisplayElement screen : _guiScreens) {
-          if (screen.isVisible() && !screen.isOverlay()) {
-              return true;
-          }
+    for (UIDisplayElement screen : _guiScreens) {
+      if (screen.isVisible() && !screen.isOverlay()) {
+          return true;
       }
+    }
 
-      return false;
+    return false;
   }
   
   public void render(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    
+
     renderUserInterface();
   }
   
@@ -122,9 +123,9 @@ public class ModeMainMenu implements IGameMode{
   }
   
 
-  /*
-   * Process mouse input - nothing system-y, so just passing it to the Player class
-   */
+/*
+* Process mouse input - nothing system-y, so just passing it to the Player class
+*/
   public void processMouseInput() {
       while (Mouse.next()) {
           int button = Mouse.getEventButton();
@@ -149,7 +150,10 @@ public class ModeMainMenu implements IGameMode{
 
       return result;
   }
-  
+
+ /*
+  * This is a temporary cap. In the future, will be removed
+  */
   public void updatePlayerInput(){
     return;
   }

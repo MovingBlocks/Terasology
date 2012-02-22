@@ -60,6 +60,8 @@ import static org.lwjgl.opengl.GL11.*;
  * The heart and soul of Terasology.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Kireev   Anton   <adeon.k87@gmail.com>
+ * @todo To create the function that will return the number of generated worlds
  */
 public final class Terasology {
 
@@ -69,7 +71,7 @@ public final class Terasology {
    
     /* STATISTICS */
     private long _lastLoopTime, _lastFpsTime;
-    private int _fps;
+    private int   _fps;
     private float _averageFps;
     private long _timerTicksPerSecond;
     private long _delta;

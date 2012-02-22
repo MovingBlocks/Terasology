@@ -16,6 +16,8 @@ import java.util.ArrayList;
  * A simple graphical input
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
+ * @version 0.1
+ * @todo Add text selection and paste from clipboard
  */
 public class UIInput extends UIDisplayContainer {
   private final ArrayList<IInputListener> _inputListeners = new ArrayList<IInputListener>();
@@ -26,15 +28,16 @@ public class UIInput extends UIDisplayContainer {
   private final UITextCursor      _textCursor;
   private final Vector2f          _padding    = new Vector2f(10f,10f);
   
-  private int    _cursorPosition       = 0;
-  private int    _maxLength            = 42;
-  private float  _textWidthInContainer = 0;
+  private int    _cursorPosition       = 0;  //The current position of the carriage
+  private int    _maxLength            = 42; //The maximum number of characters that will be accepted as input
+  private float  _textWidthInContainer = 0;  //The width of the text inside the INPUT field.
 
   private String _prevInputValue = new String();
 
   public UIInput(Vector2f size) {
       setSize(size);
       setCrop(true);
+
       _defaultTexture = new UIGraphicsElement("gui_menu");
       _defaultTexture.setVisible(true);
       _defaultTexture.getTextureSize().set(new Vector2f(256f / 512f, 30f / 512f));
@@ -97,7 +100,10 @@ public class UIInput extends UIDisplayContainer {
     }
     updateTextShift();
   }
-  
+
+  /*
+   * @todo Change the current position of the carriage, when user pushed mouse button
+   */
   public void clicked(Vector2f mousePos) {
       _focused = true;
   }
@@ -148,10 +154,16 @@ public class UIInput extends UIDisplayContainer {
     }
   }
 
+  /*
+   * Get current input value
+   */
   public String getValue(){
       return _inputValue.toString();
   }
-    
+
+  /*
+   * Set current input value
+   */
   public void setValue(String value){
       _inputValue.setLength(0);
       _inputValue.append(value);
@@ -159,10 +171,17 @@ public class UIInput extends UIDisplayContainer {
       updateTextShift();
   }
 
+  /*
+   * Set color text into input field
+   */
   public void setTextColor(Color color){
     _inputText.setColor(color);
   }
 
+  /*
+   * Moves the text and the graphic text cursor accourding to the cursor's position.
+   *
+   */
   private void updateTextShift(){
       float cursorPos = 0f;
       _textWidthInContainer = _inputText.getTextWidth() + _padding.x + _inputText.getPosition().x;
@@ -181,14 +200,16 @@ public class UIInput extends UIDisplayContainer {
       return _focused;
   }
 
-  public int getTextWidth(){
-    return _inputText.getTextWidth() + (int)_padding.x;
-  }
-
+  /*
+   *Change the maximum number of characters that will be accepted as input
+   */
   public void setMaxLength(int max){
       _maxLength = max;
   }
 
+  /*
+   * Get the maximum number of characters that will be accepted as input
+   */
   public int getMaxLength(){
       return _maxLength;
   }

@@ -16,10 +16,8 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
 
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
+
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
@@ -34,19 +32,22 @@ import org.lwjgl.input.Mouse;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
+ * Play mode
  *
- * @author  Anton Kireev
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author  Anton Kireev (adeon.k87@gmail.com)
+ * @version 0.1
  */
 public class ModePlayGame implements IGameMode{
   
   //GUI
-    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
-    private UIHeadsUpDisplay _hud;
-    private UIMetrics _metrics;
-    private UIPauseMenu _pauseMenu;
-    private UILoadingScreen _loadingScreen;
-    private UIStatusScreen _statusScreen;
-    private UIInventoryScreen _inventoryScreen;
+  private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
+  private UIHeadsUpDisplay _hud;
+  private UIMetrics _metrics;
+  private UIPauseMenu _pauseMenu;
+  private UILoadingScreen _loadingScreen;
+  private UIStatusScreen _statusScreen;
+  private UIInventoryScreen _inventoryScreen;
   
   /* CONST */
   private static final int TICKS_PER_SECOND = 60;
@@ -66,7 +67,7 @@ public class ModePlayGame implements IGameMode{
   private int _activeViewingDistance = 0;
   
   /* GAME LOOP */
-  private boolean _pauseGame = false, _runGame = true, _saveWorldOnExit = true;
+  private boolean _pauseGame = false;
   
   private Terasology _gameInstance = null;
   
@@ -76,11 +77,12 @@ public class ModePlayGame implements IGameMode{
     _hud = new UIHeadsUpDisplay();
     _hud.setVisible(true);
 
-    _pauseMenu = new UIPauseMenu();
-    _loadingScreen = new UILoadingScreen();
-    _statusScreen = new UIStatusScreen();
+    _pauseMenu       = new UIPauseMenu();
+    _loadingScreen   = new UILoadingScreen();
+    _statusScreen    = new UIStatusScreen();
     _inventoryScreen = new UIInventoryScreen();
-    _metrics = new UIMetrics();
+    _metrics         = new UIMetrics();
+
     _metrics.setVisible(true);
 
     _guiScreens.add(_metrics);
@@ -104,8 +106,6 @@ public class ModePlayGame implements IGameMode{
   }
   
   public void update(){
-      //long timeSimulatedThisIteration = 0;
-      Terasology gameInst = Terasology.getInstance();
       while (_timeAccumulator >= SKIP_TICKS) {
           if (_activeWorldRenderer != null && shouldUpdateWorld())
               _activeWorldRenderer.update();
@@ -134,16 +134,13 @@ public class ModePlayGame implements IGameMode{
           updateUserInterface();
       
           _timeAccumulator -= SKIP_TICKS;
-          //timeSimulatedThisIteration += SKIP_TICKS;
       }
-      
-    //  _timeAccumulator += gameInst.getTime() - startTime;
-      
   }
 
   public void updateTimeAccumulator(long currentTime, long startTime){
       _timeAccumulator += currentTime - startTime;
   }
+
   /**
    * Init. a new random world.
    */
