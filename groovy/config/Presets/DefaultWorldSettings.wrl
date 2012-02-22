@@ -53,7 +53,7 @@ World{
     }
     Creation{
         spawnOrigin = new Vector2f(-24429, 20547)
-        defaultSeed = "Pinkie Pie!"
+        defaultSeed = "Blockmania42"
     }
     Debug{
         debug = false
