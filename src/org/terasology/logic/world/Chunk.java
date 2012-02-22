@@ -26,7 +26,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
 import org.terasology.logic.entities.StaticEntity;
 import org.terasology.logic.generators.ChunkGenerator;
-import org.terasology.logic.manager.ConfigurationManager;
+import org.terasology.logic.manager.SettingsManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
@@ -73,7 +73,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public static final int CHUNK_DIMENSION_X = 16;
     public static final int CHUNK_DIMENSION_Y = 256;
     public static final int CHUNK_DIMENSION_Z = 16;
-    public static final int VERTICAL_SEGMENTS = (Integer) ConfigurationManager.getInstance().getConfig().get("Graphics.verticalChunkMeshSegments");
+    public static final int VERTICAL_SEGMENTS = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.verticalChunkMeshSegments");
     private static final Vector3d[] LIGHT_DIRECTIONS = {new Vector3d(1, 0, 0), new Vector3d(-1, 0, 0), new Vector3d(0, 1, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
 
     protected FastRandom _random;
