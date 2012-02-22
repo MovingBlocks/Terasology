@@ -17,7 +17,8 @@ package org.terasology.rendering.gui.framework;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
-
+import static org.lwjgl.opengl.GL11.*;
+import org.lwjgl.opengl.Display;
 /**
  * Composition of multiple display elements.
  *
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 public abstract class UIDisplayContainer extends UIDisplayElement {
 
     final ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
+    private boolean _crop = false;
 
     public UIDisplayContainer() {
         super();
@@ -43,9 +45,18 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         if (!isVisible())
             return;
 
+        //Cut the elements
+        if(_crop){
+            glEnable(GL_SCISSOR_TEST);
+            glScissor((int)getPosition().x, Display.getHeight()-((int)getPosition().y + (int)getSize().y), (int)getSize().x, (int)getSize().y);
+        }
         // Render all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
             _displayElements.get(i).renderTransformed();
+        }
+
+        if(_crop){
+            glDisable(GL_SCISSOR_TEST);
         }
     }
 
@@ -97,5 +108,12 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     public ArrayList<UIDisplayElement> getDisplayElements() {
         return _displayElements;
+    }
+
+    /*
+     * Set the option for cut elements
+     */
+    public void setCrop(boolean crop){
+        _crop = crop;
     }
 }
