@@ -1,2 +1,0 @@
-// Placeholder for external override-priority config details (moved to org.terasology.logic.manager.DefaultConfig)
-// TODO: Figure out a nice new approach and probably leave a commented out copy of config here that users can override?
