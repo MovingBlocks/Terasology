@@ -379,26 +379,6 @@ public class Block implements IGameObject {
         return this;
     }
 
-    public Block withTextureAtlasPosTopBottom(Vector2f atlasPos) {
-        _textureAtlasPos.put(Side.TOP, atlasPos);
-        _textureAtlasPos.put(Side.BOTTOM, atlasPos);
-        return this;
-    }
-
-    public Block withTextureAtlasPos(Vector2f atlasPos) {
-        for (Side side : Side.values()) {
-            withTextureAtlasPos(side, atlasPos);
-        }
-        return this;
-    }
-
-    public Block withTextureAtlasPosMantle(Vector2f atlasPos) {
-        for (Side side : Side.horizontalSides()) {
-            _textureAtlasPos.put(side, atlasPos);
-        }
-        return this;
-    }
-
     public Block withColorOffset(Vector4f colorOffset) {
         for (Side side : Side.values()) {
             withColorOffset(side, colorOffset);
