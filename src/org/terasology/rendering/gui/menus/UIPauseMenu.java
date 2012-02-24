@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.menus;
 
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.ConfigurationManager;
+import org.terasology.logic.manager.SettingsManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
@@ -38,7 +38,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
     final UIGraphicsElement _title;
 
     final UIButton _exitButton;
-    final UIButton _newWorldButton;
+    //final UIButton _newWorldButton;
     final UIButton _respawnButton;
 
     final UIText _version;
@@ -48,7 +48,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
-        _version = new UIText((String) ConfigurationManager.getInstance().getConfig().get("System.versionTag"));
+        _version = new UIText("Pre Alpha");
         _version.setVisible(true);
 
         _exitButton = new UIButton(new Vector2f(256f, 32f));
@@ -61,16 +61,6 @@ public class UIPauseMenu extends UIDisplayRenderer {
             }
         });
 
-        _newWorldButton = new UIButton(new Vector2f(256f, 32f));
-        _newWorldButton.getLabel().setText("Create New World");
-        _newWorldButton.setVisible(true);
-
-        _newWorldButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                setVisible(false);
-                Terasology.getInstance().initWorld();
-            }
-        });
 
         _respawnButton = new UIButton(new Vector2f(256f, 32f));
         _respawnButton.getLabel().setText("Respawn");
@@ -92,7 +82,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         addDisplayElement(_version);
 
         addDisplayElement(_exitButton);
-        addDisplayElement(_newWorldButton);
+        //addDisplayElement(_newWorldButton);
         addDisplayElement(_respawnButton);
 
         update();
@@ -107,8 +97,8 @@ public class UIPauseMenu extends UIDisplayRenderer {
 
         _respawnButton.centerHorizontally();
         _respawnButton.getPosition().y = 300f;
-        _newWorldButton.centerHorizontally();
-        _newWorldButton.getPosition().y = 300f + 32f + 8f;
+//        _newWorldButton.centerHorizontally();
+    //    _newWorldButton.getPosition().y = 300f + 32f + 8f;
 
         _exitButton.centerHorizontally();
         _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
