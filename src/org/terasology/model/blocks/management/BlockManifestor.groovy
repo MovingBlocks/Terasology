@@ -311,9 +311,9 @@ class BlockManifestor {
             Side targetSide = rotation.rotate(side);
             if (shape.getSideMesh(side) != null) {
                 b.withSideMesh(targetSide, shape.getSideMesh(side).rotate(rotation.getQuat4f()).mapTexCoords(calcTextureOffsetFor(faces.sides.get(side)), Block.TEXTURE_OFFSET_WIDTH))
-                b.withTextureAtlasPos(targetSide, faces.sides.get(side))
             }
             b.withFullSide(targetSide, shape.isBlockingSide(side));
+            b.withTextureAtlasPos(targetSide, faces.sides.get(side))
         }
         
         List<AABB> colliders = []
@@ -501,4 +501,5 @@ class BlockManifestor {
         log.severe "Unknown texture: " + name;
         return 0;
     }
+
 }
