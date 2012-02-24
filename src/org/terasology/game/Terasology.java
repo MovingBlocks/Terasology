@@ -206,16 +206,19 @@ public final class Terasology {
      * @throws LWJGLException Thrown when the LWJGL fails
      */
     public void initDisplay() throws LWJGLException {
-        if ((Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.fullscreen")) {
+        if ((Boolean) ConfigurationManager.getInstance().getGameSetting("Game.Graphics.fullscreen")) {
             Display.setDisplayMode(Display.getDesktopDisplayMode());
             Display.setFullscreen(true);
         } else {
-            Display.setDisplayMode((DisplayMode) SettingsManager.getInstance().getUserSetting("Game.Graphics.displayMode"));
+            int width = (Integer)ConfigurationManager.getInstance().getGameSetting("Game.Graphics.displayModeWidth");
+            int height = (Integer)ConfigurationManager.getInstance().getGameSetting("Game.Graphics.displayModeHeight");
+            Display.setDisplayMode(new DisplayMode(width, height));
         }
 
         Display.setResizable(true);
         Display.setTitle("Terasology" + " | " + "Pre Alpha");
-        Display.create((PixelFormat) SettingsManager.getInstance().getUserSetting("Game.Graphics.pixelFormat"));
+        int depth = (Integer)ConfigurationManager.getInstance().getGameSetting("Game.Graphics.pixelFormat");
+        Display.create(new PixelFormat().withDepthBits(depth));
     }
 
     public void initOpenAL() {
@@ -336,6 +339,9 @@ public final class Terasology {
             if (Display.wasResized())
                 resizeViewport();
         }
+
+        //Save current settings
+        ConfigurationManager.getInstance().save();
 
         /*
          * Save the world and exit the application.

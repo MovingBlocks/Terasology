@@ -15,9 +15,11 @@
  */
 package org.terasology.logic.generators;
 
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.management.BlockManager;
+
+import java.math.BigDecimal;
 
 /**
  * Generates some trees, flowers and high grass.
@@ -26,11 +28,11 @@ import org.terasology.model.blocks.management.BlockManager;
  */
 public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
-    private static final double DESERT_GRASS_DENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Biomes.Desert.grassDensity");
-    private static final double FOREST_GRASS_DENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Biomes.Forest.grassDensity");
-    private static final double PLAINS_GRASS_DENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Biomes.Plains.grassDensity");
-    private static final double SNOW_GRASS_DENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Biomes.Snow.grassDensity");
-    private static final double MOUNTAINS_GRASS_DENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Biomes.Mountains.grassDensity");
+    private static final double DESERT_GRASS_DENSITY = (Double) ConfigurationManager.getInstance().getServerSetting("World.Biomes.Desert.grassDensity");
+    private static final double FOREST_GRASS_DENSITY = (Double) ConfigurationManager.getInstance().getServerSetting("World.Biomes.Forest.grassDensity");
+    private static final double PLAINS_GRASS_DENSITY = (Double) ConfigurationManager.getInstance().getServerSetting("World.Biomes.Plains.grassDensity");
+    private static final double SNOW_GRASS_DENSITY = (Double) ConfigurationManager.getInstance().getServerSetting("World.Biomes.Snow.grassDensity");
+    private static final double MOUNTAINS_GRASS_DENSITY = (Double) ConfigurationManager.getInstance().getServerSetting("World.Biomes.Mountains.grassDensity");
 
     public ChunkGeneratorFlora(GeneratorManager generatorManager) {
         super(generatorManager);

@@ -16,7 +16,7 @@
 package org.terasology.logic.world;
 
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.math.TeraMath;
 
 import javax.vecmath.Vector3d;
@@ -33,8 +33,8 @@ import java.util.logging.Level;
  */
 public final class LocalChunkCache implements IChunkProvider {
 
-    private static final boolean SAVE_CHUNKS = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.saveChunks");
-    private static final int CACHE_SIZE = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.chunkCacheSize");
+    private static final boolean SAVE_CHUNKS = (Boolean) ConfigurationManager.getInstance().getGameSetting("Game.Graphics.saveChunks");
+    private static final int CACHE_SIZE = (Integer) ConfigurationManager.getInstance().getGameSetting("Game.Graphics.chunkCacheSize");
 
     private static boolean _running = false;
 

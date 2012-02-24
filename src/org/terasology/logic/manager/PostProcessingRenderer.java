@@ -31,8 +31,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class PostProcessingRenderer {
-
-    public static final boolean EFFECTS_ENABLED = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.enablePostProcessingEffects");
+    public static final boolean EFFECTS_ENABLED = (Boolean) ConfigurationManager.getInstance().getGameSetting("Game.Graphics.enablePostProcessingEffects");
     public static final float MAX_EXPOSURE = 6.0f;
     public static final float MIN_EXPOSURE = 2.0f;
     public static final float TARGET_LUMINANCE = 0.5f;

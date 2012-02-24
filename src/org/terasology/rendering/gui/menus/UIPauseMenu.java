@@ -16,7 +16,6 @@
 package org.terasology.rendering.gui.menus;
 
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.SettingsManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;

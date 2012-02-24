@@ -19,7 +19,7 @@ import groovy.util.ConfigObject;
 import org.terasology.game.Terasology;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.generators.GeneratorManager;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.math.TeraMath;
@@ -48,12 +48,15 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     protected final IChunkProvider _chunkProvider;
 
     /* CONST */
-    protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) SettingsManager.getInstance().getWorldSetting("World.DiurnalCycle.dayNightLengthInMs");
-    protected final Vector2f SPAWN_ORIGIN = (Vector2f) SettingsManager.getInstance().getWorldSetting("World.Creation.spawnOrigin");
+    protected final long DAY_NIGHT_LENGTH_IN_MS = new Long((Integer) ConfigurationManager.getInstance().getServerSetting("World.DiurnalCycle.dayNightLengthInMs"));
+    protected final Vector2f SPAWN_ORIGIN = new Vector2f(
+            (Integer)ConfigurationManager.getInstance().getServerSetting("World.Creation.spawnOriginX"),
+            (Integer)ConfigurationManager.getInstance().getServerSetting("World.Creation.spawnOriginY")
+    );
 
     /* PROPERTIES */
     protected String _title, _seed;
-    protected long _creationTime = Terasology.getInstance().getTime() - (Long) SettingsManager.getInstance().getWorldSetting("World.DiurnalCycle.initialTimeOffsetInMs");
+    protected long _creationTime = Terasology.getInstance().getTime() - new Long((Integer) ConfigurationManager.getInstance().getServerSetting("World.DiurnalCycle.initialTimeOffsetInMs"));
 
     /* SIMULATORS */
     private final LiquidSimulator _liquidSimulator;
