@@ -2,6 +2,7 @@ package org.terasology.model.blocks.management
 
 import org.terasology.model.blocks.Block
 import org.terasology.model.blocks.TreeBlock
+import org.terasology.math.Rotation
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -13,15 +14,15 @@ class TreeBlockLoader extends SimpleBlockLoader {
         super(imageIndex);
     }
 
-    public Block loadBlock(ConfigObject blockConfig) {
+    public Block loadBlock(ConfigObject blockConfig, Rotation rotation) {
         TreeBlock block = new TreeBlock();
-        configureBlock(block, blockConfig);
+        configureBlock(block, blockConfig, rotation);
         return block;
     }
 
-    protected void configureBlock(TreeBlock b, ConfigObject c)
+    protected void configureBlock(TreeBlock b, ConfigObject c, Rotation rotation)
     {
-        super.configureBlock(b, c);
+        super.configureBlock(b, c, rotation);
 
         // Now load extra stuff
     }

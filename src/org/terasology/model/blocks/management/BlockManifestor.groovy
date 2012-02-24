@@ -34,7 +34,9 @@ import org.terasology.math.Side
 import org.terasology.model.blocks.HorizontalBlockGroup
 import org.terasology.model.shapes.BlockShape
 import org.terasology.model.shapes.BlockShapeManager
-import org.terasology.model.blocks.AttachToSurfaceGroup
+import org.terasology.model.blocks.AlignToSurfaceGroup
+import org.terasology.math.Rotation
+import org.terasology.model.structures.AABB
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -51,8 +53,8 @@ class BlockManifestor {
 
     // TODO: Usage of this is fairly brute force, maybe there's a more efficient way, with sorting or so?
 
-    /** Holds BufferedImages during the loading process (not persisted) */
-    private Map<String, BufferedImage> _images = [:]
+    /** Not persisted */
+    Map<String, BufferedImage> _images = [:]
 
     /** Holds image index values during the loading process. These values are persisted in the Manifest */
     protected static Map<String, Integer> _imageIndex = [:]
@@ -129,10 +131,12 @@ class BlockManifestor {
             println "Loaded fresh images - here's some logging!"
             _images.eachWithIndex { key, value, index ->
                 println "Image " + index + " is for " + key + " and looks like: " + value
-                _imageIndex.put(key, index)
+                // TODO: Using Locale.ENGLISH _seems_ sensible given that the names should be consistent between different
+                // users (is mostly used internally), but need to review
+                _imageIndex.put(key.toLowerCase(Locale.ENGLISH), index)
             }
 
-            println "The image index (ImageManifest not yet saved) now looks like this: " + _imageIndex
+            log.info "The image index (ImageManifest not yet saved) now looks like this: " + _imageIndex
         }
 
         SimpleBlockLoader blockLoader = new SimpleBlockLoader(_imageIndex);
@@ -181,95 +185,213 @@ class BlockManifestor {
             blockConfig.put("name", c.getSimpleName())
             println "Loaded block config for Class " + c + ": " + blockConfig
 
-            // Prepare a Block from the stuff we load from the Groovy definition
-            Block b = loader.loadBlock(blockConfig)
-
-            // Single shape
-            if (blockConfig.block.shape instanceof String) {
-                applyShape(b, blockConfig.block.shape)
-                registerBlock(c.getSimpleName(), b);
-                _blockGroups.add(new SymmetricGroup(b));
+            if (blockConfig.block.alignment instanceof String) {
+                String alignment = blockConfig.block.alignment;
+                if (alignment.equalsIgnoreCase("HorizontalDirection")) {
+                    loadHorizontalBlock(blockConfig, loader)
+                } else if (alignment.equalsIgnoreCase("SurfaceAligned")) {
+                    loadSurfaceAligned(blockConfig, loader)
+                } else {
+                    loadSymmetricBlock(blockConfig, loader)
+                }
+            } else {
+                loadSymmetricBlock(blockConfig, loader)
             }
-            else if (blockConfig.block.shape != [:]) {
-                String baseTitle = blockConfig.name;
-                if ("HorizontalRotation".equalsIgnoreCase(blockConfig.block.shape.mode) && blockConfig.block.shape.sides != [:]) {
-                    EnumMap<Side, Block> blocks = new EnumMap<Side, Block>(Side.class);
-                    applyShape(b, blockConfig.block.shape.sides)
-                    for (int i = 0; i < 4; ++i) {
-                        Side direction = Side.FRONT.rotateClockwise(i);
-                        Block rotBlock = b.rotateClockwise(i);
-                        registerBlock(baseTitle + direction, rotBlock);
-                        blocks.put(direction, rotBlock);
-                    }
-                    _blockGroups.add(new HorizontalBlockGroup(baseTitle, blocks));
-                }
-                else if ("AttachToSurface".equalsIgnoreCase(blockConfig.block.shape.mode))
-                {
-                    attachToSurface(blockConfig, b, baseTitle);
-                }
-                else
-                {
-                    if (!b.isInvisible()) {
-                        // Cube
-                        applyShape(b, "cube")
-                    }
-                    registerBlock(c.getSimpleName(), b);
-                    _blockGroups.add(new SymmetricGroup(b));
-                }
-            }
-            else {
-                if (!b.isInvisible()) {
-                    // Cube
-                    applyShape(b, "cube")
-                }
-                registerBlock(c.getSimpleName(), b);
-                _blockGroups.add(new SymmetricGroup(b));
-            }
-
         }
     }
 
-    private void attachToSurface(ConfigObject blockConfig, Block b, String baseTitle) {
-        EnumMap<Side, Block> blocks = new EnumMap<Side, Block>(Side.class);
-        if (blockConfig.block.shape.sides != [:]) {
-            Block tempBlock = b.clone()
-            applyShape(tempBlock, blockConfig.block.shape.sides)
-            for (int i = 0; i < 4; ++i) {
-                Side direction = Side.FRONT.rotateClockwise(i);
-                Block rotBlock = tempBlock.rotateClockwise(i);
-                registerBlock(baseTitle + direction, rotBlock);
-                blocks.put(direction, rotBlock);
+    public loadSurfaceAligned(ConfigObject blockConfig, BlockLoader loader) {
+        def loaded = false
+        EnumMap<Side, Block> blockMap = new EnumMap<Side, Block>(Side.class)
+
+        // TODO: Other sides
+        // TODO: Top-Bottom flip
+        if (blockConfig.block.bottom != [:]) {
+            ConfigObject combined = new ConfigObject();
+            combined.merge(blockConfig.block)
+            combined.merge(blockConfig.block.bottom)
+
+            Block b = loader.loadBlock(combined)
+            BlockShape shape = loadBlockShape(combined);
+            if (shape != null) {
+                FacesInfo facesInfo = loadFaces(combined.faces, blockConfig.name)
+                applyBlockShape(b, shape, facesInfo)
+            }
+            registerBlock(blockConfig.name + Side.BOTTOM, b)
+            blockMap.put(Side.BOTTOM, b)
+        }
+        if (blockConfig.block.sides != [:]) {
+            ConfigObject combined = new ConfigObject();
+            combined.merge(blockConfig.block)
+            combined.merge(blockConfig.block.sides)
+
+            BlockShape shape = loadBlockShape(combined);
+            if (shape != null) {
+                FacesInfo facesInfo = loadFaces(combined.faces, blockConfig.name)
+                for (Rotation rot : Rotation.horizontalRotations()) {
+                    Block block = loader.loadBlock(combined, rot)
+                    applyBlockShape(block, shape, facesInfo, rot)
+
+                    registerBlock(blockConfig.name + rot.rotate(Side.FRONT), block)
+                    blockMap.put(rot.rotate(Side.FRONT), block)
+                }
             }
         }
-        if (blockConfig.block.shape.bottom != [:]) {
-            Block tempBlock = b.clone()
-            applyShape(tempBlock, blockConfig.block.shape.bottom)
-            registerBlock(baseTitle + Side.BOTTOM, tempBlock)
-            blocks.put(Side.BOTTOM, tempBlock)
+
+        if (!loaded) {
+            // TODO: default, load shape and rotate to all sides
         }
-        _blockGroups.add(new AttachToSurfaceGroup(baseTitle, blocks))
+
+        _blockGroups.add(new AlignToSurfaceGroup(blockConfig.name, blockMap))
     }
 
+    public loadHorizontalBlock(ConfigObject blockConfig, BlockLoader loader) {
+        BlockShape shape = loadBlockShape(blockConfig.block);
 
-    private void applyShape(Block b, String shapeTitle) {
-        BlockShape shape = BlockShapeManager.getInstance().getBlockShape(shapeTitle);
+        EnumMap<Side, Block> blockMap = new EnumMap<Side, Block>(Side.class)
+        
+        FacesInfo facesInfo = loadFaces(blockConfig.block.faces, blockConfig.name)
+        for (Rotation rot : Rotation.horizontalRotations()) {
+            Block block = loader.loadBlock(blockConfig.block, rot)
+            applyBlockShape(block, shape, facesInfo, rot)
+
+            registerBlock(blockConfig.name + rot.rotate(Side.FRONT), block)
+            blockMap.put(rot.rotate(Side.FRONT), block)
+        }
+        _blockGroups.add(new HorizontalBlockGroup(blockConfig.name, blockMap))
+    }
+
+    public loadSymmetricBlock(ConfigObject blockConfig, BlockLoader loader) {
+        Block b = loader.loadBlock(blockConfig.block);
+        
+        BlockShape shape = loadBlockShape(blockConfig.block);
+
         if (shape != null) {
-            println "Has shape: " + shapeTitle
-            if (shape.getCenterMesh() != null) {
-                // TODO: Need texPos for center
-                Vector2f centerTexturePos = b.getTextureAtlasPos(Side.FRONT)
-                b.withCenterMesh(shape.getCenterMesh().mapTexCoords(new Vector2f((float) (Block.TEXTURE_OFFSET * centerTexturePos.x), (float) (Block.TEXTURE_OFFSET * centerTexturePos.y)), Block.TEXTURE_OFFSET_WIDTH));
+            FacesInfo facesInfo = loadFaces(blockConfig.block.faces, blockConfig.name)
+            applyBlockShape(b, shape, facesInfo)
+            if (blockConfig.block.loweredShape != [:]) {
+                applyLoweredShape(b, BlockShapeManager.getInstance().getBlockShape(blockConfig.block.loweredShape), facesInfo)
             }
+        }
 
-            for (Side side: Side.values()) {
+        registerBlock(blockConfig.name, b)
+        _blockGroups.add(new SymmetricGroup(b))
+    }
+
+    private BlockShape loadBlockShape(ConfigObject config) {
+        // TODO: No singletons!
+        if (config.shape instanceof String) {
+            return BlockShapeManager.getInstance().getBlockShape(config.shape)
+        } else if (!config.invisible) {
+            return BlockShapeManager.getInstance().getBlockShape("cube")
+        }
+        return null;
+    }
+
+    private void applyLoweredShape(Block b, BlockShape shape, FacesInfo faces) {
+        if (shape != null) {
+            for (Side side : Side.values()) {
                 if (shape.getSideMesh(side) != null) {
-                    b.withSideMesh(side, shape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
+                    b.withLoweredSideMesh(side, shape.getSideMesh(side).mapTexCoords(calcTextureOffsetFor(faces.sides.get(side)), Block.TEXTURE_OFFSET_WIDTH))
                 }
-                b.withFullSide(side, shape.isBlockingSide(side));
             }
-            b.setColliders(shape.getColliders());
         }
     }
+    
+    private void applyBlockShape(Block b, BlockShape shape, FacesInfo faces) {
+        applyBlockShape(b, shape, faces, Rotation.None)
+    }
+
+    private void applyBlockShape(Block b, BlockShape shape, FacesInfo faces, Rotation rotation) {
+        if (shape.getCenterMesh() != null) {
+            b.withCenterMesh(shape.getCenterMesh().rotate(rotation.getQuat4f()).mapTexCoords(calcTextureOffsetFor(faces.center), Block.TEXTURE_OFFSET_WIDTH))
+        }
+        
+        for (Side side : Side.values()) {
+            Side targetSide = rotation.rotate(side);
+            if (shape.getSideMesh(side) != null) {
+                b.withSideMesh(targetSide, shape.getSideMesh(side).rotate(rotation.getQuat4f()).mapTexCoords(calcTextureOffsetFor(faces.sides.get(side)), Block.TEXTURE_OFFSET_WIDTH))
+                b.withTextureAtlasPos(targetSide, faces.sides.get(side))
+            }
+            b.withFullSide(targetSide, shape.isBlockingSide(side));
+        }
+        
+        List<AABB> colliders = []
+        for (AABB col : shape.colliders) {
+            colliders.add(rotation.rotate(col));
+        }
+        b.setColliders(colliders);
+        
+    }
+
+    private Vector2f calcTextureOffsetFor(Vector2f face) {
+        return new Vector2f((float) face.x * Block.TEXTURE_OFFSET, (float) face.y * Block.TEXTURE_OFFSET);
+    }
+
+    private FacesInfo loadFaces(ConfigObject faces, String defaultTextureName) {
+        FacesInfo result = new FacesInfo();
+        
+        def textureId = getImageIdUnchecked(defaultTextureName)
+        if (faces.all != [:]) {
+            textureId = getImageId(faces.all);
+        }
+        if (textureId == null && faces.center != [:]) {
+            textureId = getImageId(faces.center);
+        }
+        if (textureId != null) {
+            Vector2f texPos = calcAtlasPositionForId(textureId);
+            result.center = texPos;
+            for (Side side : Side.values()) {
+                result.sides.put(side, texPos);
+            }
+        } else {
+            for (Side side : Side.values()) {
+                result.sides.put(side, calcAtlasPositionForId(0));
+            }
+        }
+
+        if (faces.center != [:]) {
+            result.center = calcAtlasPositionForId(getImageId(faces.center))
+        }
+        if (faces.sides != [:]) {
+            Vector2f texPos = calcAtlasPositionForId(getImageId(faces.sides))
+            for (Side side : Side.horizontalSides()) {
+                result.sides.put(side, texPos);
+            }
+        }
+        if (faces.topbottom != [:]) {
+            Vector2f texPos = calcAtlasPositionForId(getImageId(faces.topbottom))
+            result.sides.put(Side.TOP, texPos);
+            result.sides.put(Side.BOTTOM, texPos);
+        }
+        // Top, Bottom, Left, Right, Front, Back - probably a way to do that in a loop...
+        if (faces.top != [:]) {
+            result.sides.put(Side.TOP, calcAtlasPositionForId(getImageId(faces.top)))
+        }
+        if (faces.bottom != [:]) {
+            result.sides.put(Side.BOTTOM, calcAtlasPositionForId(getImageId(faces.bottom)))
+        }
+        if (faces.left != [:]) {
+            result.sides.put(Side.LEFT, calcAtlasPositionForId(getImageId(faces.left)))
+        }
+        if (faces.right != [:]) {
+            result.sides.put(Side.RIGHT, calcAtlasPositionForId(getImageId(faces.right)))
+        }
+        if (faces.front != [:]) {
+            result.sides.put(Side.FRONT, calcAtlasPositionForId(getImageId(faces.front)))
+        }
+        if (faces.back != [:]) {
+            result.sides.put(Side.BACK, calcAtlasPositionForId(getImageId(faces.back)))
+        }
+        return result;
+    }
+
+    
+    private static class FacesInfo {
+        public EnumMap<Side,Vector2f> sides = new EnumMap<Side, Vector2f>(Side.class);
+        public Vector2f center;
+    }
+
 
     private void registerBlock(String title, Block b) {
         b.withTitle(title);
@@ -350,7 +472,10 @@ class BlockManifestor {
     private loadManifest() {
         def manifest = new ConfigSlurper().parse(_blockManifest.toURL())
 
-        _imageIndex = manifest.imageIndex
+        Map<String, Integer> tempImageIndex = manifest.imageIndex
+
+        _imageIndex = new HashMap<String, Integer>();
+        tempImageIndex.each {key, value -> _imageIndex.put(key.toLowerCase(Locale.ENGLISH), value)}
         _blockStringIndex = manifest.blockIndex
         _nextByte = manifest.nextByte
 
@@ -359,8 +484,21 @@ class BlockManifestor {
         println "LOADED nextByte: " + _nextByte
     }
 
-    // TODO: Utility method? Move to block? Is repeated in SimpleBlockLoader
+    // TODO: Utility method?
     private Vector2f calcAtlasPositionForId(int id) {
         return new Vector2f(((int) id % (int) Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN), ((int) id / (int) Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN))
+    }
+    
+    private Integer getImageIdUnchecked(String name) {
+        return _imageIndex.get(name.toLowerCase(Locale.ENGLISH))
+    }
+
+    private int getImageId(String name) {
+        String lcName = name.toLowerCase(Locale.ENGLISH);
+        if (_imageIndex.containsKey(lcName)) {
+            return _imageIndex.get(lcName)
+        }
+        log.severe "Unknown texture: " + name;
+        return 0;
     }
 }

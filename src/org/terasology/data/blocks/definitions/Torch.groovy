@@ -6,6 +6,7 @@ import org.terasology.model.blocks.Block.BLOCK_FORM
  * Torches catch on fire and stuff. On purpose!
  */
 block {
+    alignment="SurfaceAligned"
     version = 1
     blockform = BLOCK_FORM.DEFAULT
 
@@ -15,9 +16,11 @@ block {
 
     luminance = 15
     hardness = 1
-    shape {
-        mode = "AttachToSurface"
-        sides = "TorchWall"
-        bottom = "TorchGrounded"
+
+    sides {
+        shape = "TorchWall"
+    }
+    bottom {
+        shape = "TorchGrounded"
     }
 }

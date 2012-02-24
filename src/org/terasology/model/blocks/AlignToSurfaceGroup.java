@@ -7,7 +7,7 @@ import java.util.EnumMap;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class AttachToSurfaceGroup implements BlockGroup {
+public class AlignToSurfaceGroup implements BlockGroup {
     String _name;
     EnumMap<Side, Block> _blocks = new EnumMap<Side, Block>(Side.class);
     Block _archetype;
@@ -16,7 +16,7 @@ public class AttachToSurfaceGroup implements BlockGroup {
      * @param name   The name for the block group.
      * @param blocks The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
      */
-    public AttachToSurfaceGroup(String name, EnumMap<Side, Block> blocks) {
+    public AlignToSurfaceGroup(String name, EnumMap<Side, Block> blocks) {
         _name = name;
         for (Side side : Side.values()) {
             Block block = blocks.get(side);
