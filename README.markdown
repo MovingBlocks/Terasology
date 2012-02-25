@@ -11,7 +11,7 @@ After proving itself as a solid *tech demo* begla was joined at first by Anton "
 
 For more information on the project visit our blog [Moving Blocks!](http://blog.movingblocks.net) or join us on the [Forum](http://board.movingblocks.net/index.php), and check out our [Facebook Page](http://www.facebook.com/pages/Blockmania/248329655219905)!
 
-If you're interested in joining up as a contributor register for our [forum](http://board.movingblocks.net) - the project is using the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html). [GitHub](https://github.com/MovingBlocks/Terasology) hosts our source code.
+The source code is available under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html). [GitHub](https://github.com/MovingBlocks/Terasology) hosts our source code.
 
 Setup
 -----
