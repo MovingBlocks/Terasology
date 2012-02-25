@@ -1,0 +1,114 @@
+/*
+ * This is a Gradle build file:
+ * - Gradle Homepage: http://gradle.org/
+ * - Gradle Installation: http://gradle.org/installation
+ * - View tasks for this project: $ gradle tasks
+ */
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.5
+version = '0.5.0'
+buildDir = 'out'
+
+sourceSets {
+	main {
+		java { srcDirs = [] }
+		groovy { srcDir 'src' }
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies{
+	groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.2'
+//	NOTE: Using Maven repos for lwgl libs will cause opengl errors due to
+//	inclusion of native libs in fat jar.
+
+	compile files(
+		"libs/annotations.jar", "libs/AppleJavaExtensions.jar", "libs/jbullet.jar",
+		"libs/jinput.jar", "libs/jogg-0.0.7.jar", "libs/jorbis-0.0.15.jar",
+		"libs/lwjgl.jar", "libs/lwjgl_util.jar", "libs/lzma.jar",
+		"libs/slick.jar", "libs/slick-utils.jar", "libs/trove-3.0.0.jar",
+		"libs/vecmath.jar"
+	)
+}
+
+task copyResources(type:Copy) {
+	description = 'Copies resources into build directory.'
+	from('src') {
+		exclude '**/*.java'
+		exclude '**/*.groovy'
+		exclude 'META-INF'
+	}
+	into 'out/classes/main'
+}
+
+jar {
+	dependsOn compileGroovy
+	dependsOn copyResources
+	from { 
+		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+	manifest {
+		attributes("Main-Class": "org.terasology.game.Terasology", "Manifest-Version": "1.0")
+	}
+	archiveName 'Terasology.jar'
+}
+
+jar.doLast {
+	// see: http://bit.ly/xVtrKW
+	ant.signjar(jar: jar.archivePath, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
+}
+
+task dist(type:Copy) {
+	description = 'Creates a fully-functional game folder.'
+	dependsOn jar
+	into('.')
+	into('out/dist') {
+		from('out/libs')
+		from('README.markdown')
+		from('License.txt')
+		from('scripts') {
+			exclude 'Launcher.xml'
+		}
+	}
+	into('out/dist/groovy') {
+		from('groovy')
+	}
+	into('out/dist/natives') {
+		from('natives')
+	}
+}
+
+task zip(type:Zip) {
+	description = 'Creates a fully-functionional game archive.'
+	dependsOn dist
+	from('out/dist')
+	into('Terasology')
+	destinationDir = buildDir
+}
+
+task applet(type:Copy) {
+	description = 'Creates a game distribution playable through a browser.'
+	dependsOn jar
+	into('.')
+	into('out/applet') {
+		from('applet') {
+			exclude '*.keystore'			
+		}
+		from jar.archivePath
+	}
+}
+
+task run(type:JavaExec) {
+	description = 'Run Terasology'
+	dependsOn compileGroovy
+	dependsOn copyResources
+	main = 'org.terasology.game.Terasology'
+	classpath = sourceSets.main.runtimeClasspath
+}
