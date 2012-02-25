@@ -84,7 +84,7 @@ void main(){
 
     // Calculate blocklight lighting value
     float blocklightDayIntensity = 1.0 - daylightValue;
-    float blocklightValue = expLightValue(gl_TexCoord[1].y);
+    float blocklightValue = expLightValue(srgbToLinear(gl_TexCoord[1].y));
 
     float occlusionValue = gl_TexCoord[1].z;
 

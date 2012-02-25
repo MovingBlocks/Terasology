@@ -30,7 +30,7 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
     /* CONST */
     protected static final int SAMPLE_RATE_3D_HOR = 4;
-    protected static final int SAMPLE_RATE_3D_VERT = 8;
+    protected static final int SAMPLE_RATE_3D_VERT = 4;
 
     /**
      * Available types of biomes.
@@ -163,10 +163,13 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
                 // Beach
                 if (y >= 28 && y <= 34) {
                     c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Sand").getId());
-                } else if (depth == 0 && y > 32) {
+                } else if (depth == 0 && y > 32 && y < 128) {
                     // Grass on top
                     c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Grass").getId());
-                } else if (depth > 8) {
+                } else if (depth == 0 && y >= 128) {
+                    // Grass on top
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Snow").getId());
+                } else if (depth > 32) {
                     // Stone
                     c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
                 } else {
@@ -176,11 +179,10 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
 
                 break;
             case SNOW:
-
                 if (depth == 0.0 && y > 32) {
                     // Snow on top
                     c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Snow").getId());
-                } else if (depth > 8) {
+                } else if (depth > 32) {
                     // Stone
                     c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
                 } else {
@@ -252,9 +254,9 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     public double calcMountainDensity(double x, double y, double z) {
         double x1, y1, z1;
 
-        x1 = x * 0.006;
-        y1 = y * 0.004;
-        z1 = z * 0.006;
+        x1 = x * 0.002;
+        y1 = y * 0.001;
+        z1 = z * 0.002;
 
         double result = _pGen4.fBm(x1, y1, z1);
 
@@ -264,11 +266,11 @@ public class ChunkGeneratorTerrain extends ChunkGenerator {
     public double calcHillDensity(double x, double y, double z) {
         double x1, y1, z1;
 
-        x1 = x * 0.01;
-        y1 = y * 0.008;
-        z1 = z * 0.01;
+        x1 = x * 0.008;
+        y1 = y * 0.006;
+        z1 = z * 0.008;
 
-        double result = _pGen5.fBm(x1, y1, z1) - 0.5;
+        double result = _pGen5.fBm(x1, y1, z1) - 0.1;
 
         return result > 0.0 ? result : 0;
     }
