@@ -36,19 +36,18 @@ import static org.lwjgl.opengl.GL11.*;
  * The class implements the main game menu. The class contains the following screens: game settings,
  * single player, multiplayer games, generation / load / delete the world.
  *
- * @todo Create a parent class GameMode.
- * @todo Add screen "Single Player"
- * @todo Add animated background
- * @todo Add screen "Game settings"
- * @todo Add screen "Multiplayer Player"
- * @todo Add screen "generation / load / delete the world."
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
  */
 public class ModeMainMenu implements IGameMode{
-  
+// TODO: Create a parent class GameMode.
+// TODO: Add screen "Single Player"
+// TODO: Add animated background
+// TODO: Add screen "Game settings"
+// TODO: Add screen "Multiplayer Player"
+// TODO: Add screen "generation / load / delete the world."
+	
   //GUI
   private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
 
