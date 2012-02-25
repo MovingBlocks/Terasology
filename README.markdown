@@ -3,13 +3,13 @@ Terasology (previously titled Blockmania)
 
 ![Terasology](http://blog.movingblocks.net/wp-content/uploads/screen3small.jpg "Terasology")
 
-Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by adopting the NPC-helper and caretaker feel from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication in the foundation systems akin to DF.
+Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by adopting the NPC-helper and caretaker feel from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
 
 Terasology is an open source project started by Benjamin "begla" Glatzel to research *procedural terrain generation* and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a *block-based voxel-like approach as seen in Minecraft*. After proving itself as a solid *tech demo* begla was joined at first by Anton "small-jeeper" Kireev and Rasmus "Cervator" Praestholm and a full-fledged game concept was born.
 
-For more information on the project visit our blog [Moving Blocks!](http://blog.movingblocks.net) or join us on the [Forum](http://board.movingblocks.net/index.php), and check out our [Facebook Page](http://www.facebook.com/pages/Blockmania/248329655219905)!
+The creators of Terasology are a diverse mix of software developers, game testers, graphic artists, and musicians. Get involved by checking out the [Forum](http://board.movingblocks.net/index.php), our blog [Moving Blocks!](http://blog.movingblocks.net), and our [Facebook Page](http://www.facebook.com/pages/Blockmania/248329655219905).
 
-Source code is available under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) and is available from [GitHub](https://github.com/MovingBlocks/Terasology).
+Terasology is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) and available in source code form at [GitHub](https://github.com/MovingBlocks/Terasology).
 
 Setup
 -----
