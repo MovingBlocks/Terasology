@@ -32,7 +32,6 @@ public class ShaderParametersBlock implements IShaderParameters {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("terrain");
 
-        program.setFloat("light", tera.getActiveWorldRenderer().getRenderingLightValue());
         program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
         program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
         program.setInt("textured", 1);
