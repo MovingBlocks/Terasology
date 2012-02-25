@@ -5,18 +5,16 @@ Terasology (previously titled Blockmania)
 
 Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by adopting the NPC-helper and caretaker feel from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication in the foundation systems akin to DF.
 
-Terasology is an open source project started by Benjamin "begla" Glatzel to research *procedural terrain generation* and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a *block-based voxel-like approach as seen in Minecraft*.
-
-After proving itself as a solid *tech demo* begla was joined at first by Anton "small-jeeper" Kireev and Rasmus "Cervator" Praestholm and a full-fledged game concept was born.
+Terasology is an open source project started by Benjamin "begla" Glatzel to research *procedural terrain generation* and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a *block-based voxel-like approach as seen in Minecraft*. After proving itself as a solid *tech demo* begla was joined at first by Anton "small-jeeper" Kireev and Rasmus "Cervator" Praestholm and a full-fledged game concept was born.
 
 For more information on the project visit our blog [Moving Blocks!](http://blog.movingblocks.net) or join us on the [Forum](http://board.movingblocks.net/index.php), and check out our [Facebook Page](http://www.facebook.com/pages/Blockmania/248329655219905)!
 
-The source code is available under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html). [GitHub](https://github.com/MovingBlocks/Terasology) hosts our source code.
+Source code is available under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) and is available from [GitHub](https://github.com/MovingBlocks/Terasology).
 
 Setup
 -----
 
-The game requires the latest version of Oracle's [Java Virtual Machine (JVM)](http://www.java.com/de/download/). Also make sure that your graphics card driver is up to date.
+Terasology requires the latest version of Oracle's [Java Virtual Machine (JVM)](http://www.java.com/de/download/). Also make sure that your graphics card driver is up to date.
 
 You can use one of the default launch scripts to start the game. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x script.sh".
 
