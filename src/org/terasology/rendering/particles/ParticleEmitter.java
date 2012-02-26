@@ -16,7 +16,7 @@
 package org.terasology.rendering.particles;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -32,7 +32,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public abstract class ParticleEmitter implements IGameObject {
 
-    protected static final int MAX_PARTICLES = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.maxParticles");
+    protected static final int MAX_PARTICLES = (Integer) ConfigurationManager.getInstance().getGameSetting("Game.Graphics.maxParticles");
     protected static final int PARTICLES_PER_UPDATE = 32;
     /* ------- */
     protected int _particlesToEmit;

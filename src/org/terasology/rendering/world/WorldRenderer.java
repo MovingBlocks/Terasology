@@ -50,8 +50,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class WorldRenderer implements IGameObject {
 
-    public static final boolean BOUNDING_BOXES_ENABLED = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.renderChunkBoundingBoxes");
-    public static final int MAX_CHUNK_VERTEX_BUFFER_OBJECTS = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.maxChunkVBOs");
+    public static final boolean BOUNDING_BOXES_ENABLED = (Boolean) ConfigurationManager.getInstance().getServerSetting("World.Debug.renderChunkBoundingBoxes");
+    public static final int MAX_CHUNK_VERTEX_BUFFER_OBJECTS = (Integer) ConfigurationManager.getInstance().getGameSetting("Game.Graphics.maxChunkVBOs");
 
     /* VIEWING DISTANCE */
     private int _viewingDistance = 8;

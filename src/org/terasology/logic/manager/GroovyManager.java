@@ -88,7 +88,7 @@ public class GroovyManager {
 
     private void updateBinding() {
         _bind.setVariable("tera", Terasology.getInstance());
-        _bind.setVariable("configuration", SettingsManager.getInstance());
+        _bind.setVariable("configuration", ConfigurationManager.getInstance());
         _bind.setVariable("cmd", new CommandHelper());
     }
 

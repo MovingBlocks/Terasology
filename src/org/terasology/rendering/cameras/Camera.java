@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.ConfigurationManager;
 import org.terasology.model.structures.ViewFrustum;
 
 import javax.vecmath.Matrix4f;
@@ -28,7 +28,7 @@ import javax.vecmath.Vector3d;
  */
 public abstract class Camera {
 
-    public static final float FOV = ((Double) SettingsManager.getInstance().getUserSetting("Game.Player.fov")).floatValue();
+    public static final float FOV = ((Double) ConfigurationManager.getInstance().getGameSetting("Game.Player.fov")).floatValue();
 
     /* CAMERA PARAMETERS */
     protected final Vector3d _position = new Vector3d();

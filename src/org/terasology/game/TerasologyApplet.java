@@ -16,7 +16,7 @@
 package org.terasology.game;
 
 import org.lwjgl.opengl.Display;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.ConfigurationManager;
 
 import java.applet.Applet;
 import java.util.logging.Level;
@@ -41,11 +41,11 @@ public final class TerasologyApplet extends Applet {
             @Override
             public void run() {
                 try {
-                    SettingsManager config = SettingsManager.getInstance();
+                    ConfigurationManager configuration = ConfigurationManager.getInstance();
 
                     Display.setParent(null);
                     Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(1280, 720));
-                    Display.setTitle((String) config.getWorldSetting("World.Info.title"));
+                    Display.setTitle((String) configuration.getServerSetting("World.Info.title"));
                     Display.create();
 
                     _terasology = Terasology.getInstance();
