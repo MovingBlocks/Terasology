@@ -304,6 +304,9 @@ public class ModePlayGame implements IGameMode {
                 if (key == Keyboard.KEY_LEFT && Keyboard.getEventKeyState()) {
                     getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
                 }
+                if (key == Keyboard.KEY_R && Keyboard.getEventKeyState()) {
+                    getActiveWorldRenderer().setWireframe(!getActiveWorldRenderer().isWireframe());
+                }
             }
 
             // Pass input to the current player
