@@ -106,6 +106,7 @@ public class ModePlayGame implements IGameMode {
         resetOpenGLParameters();
     }
 
+<<<<<<< HEAD
     public void activate() {
         initWorld("World1");
     }
@@ -113,6 +114,9 @@ public class ModePlayGame implements IGameMode {
     public void deactivate() {
         _activeWorldRenderer.dispose();
         _activeWorldRenderer = null;
+=======
+        initWorld("World1", worldSeed);
+>>>>>>> refactored Terasology class
     }
 
     public void update() {
