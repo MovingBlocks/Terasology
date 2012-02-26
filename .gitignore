@@ -8,3 +8,4 @@ out
 .settings
 .gradle
 bin
+*.png

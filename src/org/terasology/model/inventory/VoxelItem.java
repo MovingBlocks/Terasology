@@ -15,6 +15,7 @@
  */
 package org.terasology.model.inventory;
 
+import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.primitives.Mesh;
@@ -39,10 +40,11 @@ public abstract class VoxelItem extends Item {
 
     @Override
     public void renderFirstPersonView(Player player) {
-        ShaderManager.getInstance().enableShader("block");
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
         shader.enable();
+
         shader.setInt("textured", 0);
+        shader.setFloat("light", Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValue());
 
         glPushMatrix();
 
@@ -53,8 +55,8 @@ public abstract class VoxelItem extends Item {
         glRotatef(45f, 0.0f, 0.0f, 1.0f);
 
         if (_itemMesh == null) {
-        	Icon icon = Icon.get(this);
-        	_itemMesh = MeshFactory.getInstance().generateItemMesh(icon.getX(), icon.getY());
+            Icon icon = Icon.get(this);
+            _itemMesh = MeshFactory.getInstance().generateItemMesh(icon.getX(), icon.getY());
         }
 
         _itemMesh.render();

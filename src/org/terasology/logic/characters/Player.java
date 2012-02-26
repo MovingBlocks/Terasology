@@ -32,13 +32,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.inventory.Inventory;
-import org.terasology.model.inventory.Item;
-import org.terasology.model.inventory.ItemAxe;
-import org.terasology.model.inventory.ItemBlock;
-import org.terasology.model.inventory.ItemBlueprint;
-import org.terasology.model.inventory.ItemDynamite;
-import org.terasology.model.inventory.ItemPickAxe;
+import org.terasology.model.inventory.*;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
@@ -116,14 +110,14 @@ public class Player extends Character {
         load();
         loadDefaultItems();
     }
-    
+
     private void loadDefaultItems() {
-    	_inventory.addItem(new ItemBlock(BlockManager.getInstance().getBlockGroup("Companion")), 1);
-    	_inventory.addItem(new ItemBlock(BlockManager.getInstance().getBlockGroup("Torch")), 16);
-    	_inventory.addItem(new ItemPickAxe(), 1);
-    	_inventory.addItem(new ItemAxe(), 1);
-    	_inventory.addItem(new ItemBlueprint(), 1);
-    	_inventory.addItem(new ItemDynamite(), 1);
+        _inventory.addItem(new ItemBlock(BlockManager.getInstance().getBlockGroup("Companion")), 1);
+        _inventory.addItem(new ItemBlock(BlockManager.getInstance().getBlockGroup("Torch")), 16);
+        _inventory.addItem(new ItemPickAxe(), 1);
+        _inventory.addItem(new ItemAxe(), 1);
+        _inventory.addItem(new ItemBlueprint(), 1);
+        _inventory.addItem(new ItemDynamite(), 1);
     }
 
     public void render() {
@@ -224,14 +218,21 @@ public class Player extends Character {
 
     public void renderFirstPersonViewElements() {
         if (!RENDER_FIRST_PERSON_VIEW) {
-        	return;        	
+            return;
         }
-        
+
+        glPushMatrix();
+        glLoadIdentity();
+        glClear(GL_DEPTH_BUFFER_BIT);
+        getActiveCamera().loadProjectionMatrix(75f);
+
         if (getActiveItem() != null) {
-        	getActiveItem().renderFirstPersonView(this);
+            getActiveItem().renderFirstPersonView(this);
         } else {
-        	renderHand();
+            renderHand();
         }
+
+        glPopMatrix();
     }
 
     /**
@@ -374,39 +375,39 @@ public class Player extends Character {
                 }
                 break;
             case Keyboard.KEY_1:
-            	_inventory.setSelctedCubbyhole(0);
+                _inventory.setSelctedCubbyhole(0);
 //                _toolbar.setSelectedSlot(0);
                 break;
             case Keyboard.KEY_2:
-            	_inventory.setSelctedCubbyhole(1);
+                _inventory.setSelctedCubbyhole(1);
 //                _toolbar.setSelectedSlot(1);
                 break;
             case Keyboard.KEY_3:
-            	_inventory.setSelctedCubbyhole(2);
+                _inventory.setSelctedCubbyhole(2);
 //                _toolbar.setSelectedSlot(2);
                 break;
             case Keyboard.KEY_4:
-            	_inventory.setSelctedCubbyhole(3);
+                _inventory.setSelctedCubbyhole(3);
 //                _toolbar.setSelectedSlot(3);
                 break;
             case Keyboard.KEY_5:
-            	_inventory.setSelctedCubbyhole(4);
+                _inventory.setSelctedCubbyhole(4);
 //                _toolbar.setSelectedSlot(4);
                 break;
             case Keyboard.KEY_6:
-            	_inventory.setSelctedCubbyhole(5);
+                _inventory.setSelctedCubbyhole(5);
 //                _toolbar.setSelectedSlot(5);
                 break;
             case Keyboard.KEY_7:
-            	_inventory.setSelctedCubbyhole(6);
+                _inventory.setSelctedCubbyhole(6);
 //                _toolbar.setSelectedSlot(6);
                 break;
             case Keyboard.KEY_8:
-            	_inventory.setSelctedCubbyhole(7);
+                _inventory.setSelctedCubbyhole(7);
 //                _toolbar.setSelectedSlot(7);
                 break;
             case Keyboard.KEY_9:
-            	_inventory.setSelctedCubbyhole(8);
+                _inventory.setSelctedCubbyhole(8);
 //                _toolbar.setSelectedSlot(8);
                 break;
         }
@@ -424,20 +425,20 @@ public class Player extends Character {
             return;
 
         if (wheelMoved != 0) {
-        	rollSelectedCubby((byte) (wheelMoved / 120));
+            rollSelectedCubby((byte) (wheelMoved / 120));
 //            _toolbar.rollSelectedSlot((byte) (wheelMoved / 120));
         } else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
         }
     }
-    
+
     private void rollSelectedCubby(byte wheelMotion) {
         int selectedCubby = (_inventory.getSelectedCubbyhole() + wheelMotion) % 9;
 
         if (selectedCubby < 0) {
-        	selectedCubby = 9 + selectedCubby;
+            selectedCubby = 9 + selectedCubby;
         }
-        
+
         _inventory.setSelctedCubbyhole(selectedCubby);
     }
 
@@ -559,7 +560,7 @@ public class Player extends Character {
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public void writePropertiesToConfigObject(ConfigObject co) {
         co.put("playerPositionX", getPosition().x);
         co.put("playerPositionY", getPosition().y);
@@ -591,7 +592,7 @@ public class Player extends Character {
     }
 
     public Item getActiveItem() {
-    	return _inventory.getSelectedItem();
+        return _inventory.getSelectedItem();
     }
 
     public BlockGroup getActiveBlock() {

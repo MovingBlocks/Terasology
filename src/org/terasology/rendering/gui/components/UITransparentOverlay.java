@@ -37,7 +37,7 @@ public class UITransparentOverlay extends UIDisplayElement {
     public UITransparentOverlay() {
         if (_mesh == null) {
             Tessellator tessellator = new Tessellator();
-            TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(0.05f, 0.05f, 0.05f, 0.8f), 1.0f, 1.0f);
+            TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(0.0f, 0.0f, 0.0f, 0.25f), 1.0f, 1.0f);
             _mesh = tessellator.generateMesh();
         }
 

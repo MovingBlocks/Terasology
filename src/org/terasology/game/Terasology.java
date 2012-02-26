@@ -210,9 +210,9 @@ public final class Terasology {
             Display.setFullscreen(true);
         } else {
             Display.setDisplayMode((DisplayMode) SettingsManager.getInstance().getUserSetting("Game.Graphics.displayMode"));
+            Display.setResizable(true);
         }
 
-        Display.setResizable(true);
         Display.setTitle("Terasology" + " | " + "Pre Alpha");
         Display.create((PixelFormat) SettingsManager.getInstance().getUserSetting("Game.Graphics.pixelFormat"));
     }
@@ -280,7 +280,7 @@ public final class Terasology {
     public void startGame() {
         getInstance().getLogger().log(Level.INFO, "Starting Terasology...");
 
-        IGameMode mode;
+        IGameMode mode = null;
         PerformanceMonitor.startActivity("Other");
 
         // MAIN GAME LOOP
@@ -297,6 +297,7 @@ public final class Terasology {
                 PerformanceMonitor.endActivity();
             }
 
+            IGameMode prevMode = mode;
             mode = getGameMode();
 
             if (mode == null) {
@@ -304,11 +305,10 @@ public final class Terasology {
                 break;
             }
 
-            mode = getGameMode();
-
-            if (mode == null) {
-                _runGame = false;
-                break;
+            if (mode != prevMode) {
+                if (prevMode != null)
+                    prevMode.deactivate();
+                mode.activate();
             }
 
             PerformanceMonitor.startActivity("Main Update");
@@ -476,11 +476,15 @@ public final class Terasology {
     }
 
     public IWorldProvider getActiveWorldProvider() {
-        return getGameMode().getActiveWorldRenderer().getWorldProvider();
+        if (getActiveWorldRenderer() != null)
+            return getActiveWorldRenderer().getWorldProvider();
+        return null;
     }
 
     public Player getActivePlayer() {
-        return getGameMode().getActiveWorldRenderer().getPlayer();
+        if (getActiveWorldRenderer() != null)
+            return getActiveWorldRenderer().getPlayer();
+        return null;
     }
 
     /**

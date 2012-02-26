@@ -36,6 +36,7 @@ import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.ItemBlock;
 import org.terasology.rendering.interfaces.IGameObject;
+import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Matrix3f;
@@ -53,9 +54,6 @@ import java.util.List;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class BulletPhysicsRenderer implements IGameObject {
-
-    /* SINGLETON */
-    private static BulletPhysicsRenderer _instance;
 
     public enum BLOCK_SIZE {
         FULL_SIZE,
@@ -125,20 +123,16 @@ public class BulletPhysicsRenderer implements IGameObject {
     private final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     private final DiscreteDynamicsWorld _discreteDynamicsWorld;
 
-    public static BulletPhysicsRenderer getInstance() {
-        if (_instance == null)
-            _instance = new BulletPhysicsRenderer();
+    private final WorldRenderer _parent;
 
-        return _instance;
-    }
-
-    private BulletPhysicsRenderer() {
+    public BulletPhysicsRenderer(WorldRenderer parent) {
         _broadphase = new DbvtBroadphase();
         _defaultCollisionConfiguration = new DefaultCollisionConfiguration();
         _dispatcher = new CollisionDispatcher(_defaultCollisionConfiguration);
         _sequentialImpulseConstraintSolver = new SequentialImpulseConstraintSolver();
         _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -10f, 0f));
+        _parent = parent;
     }
 
     public BlockRigidBody[] addLootableBlocks(Vector3f position, Block block) {
@@ -257,13 +251,14 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     public void render() {
+        Player player = _parent.getPlayer();
+
         _discreteDynamicsWorld.stepSimulation(1.0f / 60f, 7);
 
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
         float[] mFloat = new float[16];
 
         GL11.glPushMatrix();
-        Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
         GL11.glTranslated(-player.getPosition().x, -player.getPosition().y, -player.getPosition().z);
 
         List<CollisionObject> collisionObjects = _discreteDynamicsWorld.getCollisionObjectArray();

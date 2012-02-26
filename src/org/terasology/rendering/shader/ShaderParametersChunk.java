@@ -44,14 +44,22 @@ public class ShaderParametersChunk implements IShaderParameters {
         program.setInt("textureEffects", 3);
         program.setInt("textureAtlas", 0);
 
-        program.setFloat("daylight", (float) tera.getActiveWorldRenderer().getDaylight());
-        program.setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
-        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        if (tera.getActiveWorldRenderer() != null)
+            program.setFloat("daylight", (float) tera.getActiveWorldRenderer().getDaylight());
+
+        if (tera.getActivePlayer() != null) {
+            program.setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
+            program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        }
+
+        if (tera.getActiveWorldProvider() != null) {
+            program.setFloat("time", (float) tera.getActiveWorldProvider().getTime());
+        }
+
+        program.setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
         program.setFloat2("grassCoordinate", BlockManager.getInstance().calcCoordinate("Grass"));
         program.setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("Water"));
         program.setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("Lava"));
-        program.setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
-        program.setFloat("time", (float) tera.getActiveWorldProvider().getTime());
     }
 
 }

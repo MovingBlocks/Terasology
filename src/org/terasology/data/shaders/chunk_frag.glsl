@@ -42,49 +42,56 @@ void main(){
     vec3 normalWater;
     bool isWater = false;
 
+    vec3 finalLightDir = lightDir;
+
+    if (daylight <= 0.0)
+        finalLightDir *= -1.0;
+
     vec4 color;
 
+    /* APPLY WATER TEXTURE */
     if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.x + TEXTURE_OFFSET && texCoord.y >= waterCoordinate.y && texCoord.y < waterCoordinate.y + TEXTURE_OFFSET) {
-        /* WATER */
         vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z) / 16.0;
         normalWater = (texture2D(textureWaterNormal, waterOffset) * 2.0 - 1.0).xyz;
 
         color = vec4(83.0 / 255.0, 209.0 / 255.0, 236.0 / 255.0, 0.5);
         isWater = true;
+    /* APPLY LAVA TEXTURE */
     } else if (texCoord.x >= lavaCoordinate.x && texCoord.x < lavaCoordinate.x + TEXTURE_OFFSET && texCoord.y >= lavaCoordinate.y && texCoord.y < lavaCoordinate.y + TEXTURE_OFFSET) {
-        /* LAVA */
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
         texCoord.y += mod(timeToTick(time, 0.1),127.0) * (1.0/128.0);
 
         color = texture2D(textureLava, texCoord.xy);
+    /* APPLY DEFAULT TEXTURE FROM ATLAS */
     } else {
         color = texture2D(textureAtlas, texCoord.xy);
     }
 
+    /* CONVERT SRGB TO LINEAR COLOR SPACE */
     color = srgbToLinear(color);
 
     if (color.a < 0.1)
         discard;
 
-    // APPLY TEXTURE OFFSET
+    /* APPLY OVERALL BIOME COLOR OFFSET */
     if (!(texCoord.x >= grassCoordinate.x && texCoord.x < grassCoordinate.x + TEXTURE_OFFSET && texCoord.y >= grassCoordinate.y && texCoord.y < grassCoordinate.y + TEXTURE_OFFSET)) {
         color.rgb *= gl_Color.rgb;
         color.a *= gl_Color.a;
+    /* MASK GRASS AND APPLY BIOME COLOR */
     } else {
-        // MASK GRASS
-        if (texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET))).a != 0.0)
-            color.rgb *= gl_Color.rgb;
-        else
-            color.rgb *= gl_Color.a;
+        vec4 maskColor = texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET)));
+
+        if (maskColor.a != 0.0) color.rgb *= gl_Color.rgb;
     }
 
     // Calculate daylight lighting value
-    float daylightValue = daylight * expLightValue(gl_TexCoord[1].x);
+    float daylightValue = expLightValue(gl_TexCoord[1].x);
+    float daylightScaledValue = daylight * daylightValue;
 
     // Calculate blocklight lighting value
-    float blocklightDayIntensity = 1.0 - daylightValue;
-    float blocklightValue = expLightValue(srgbToLinear(gl_TexCoord[1].y));
+    float blocklightDayIntensity = 1.0 - daylightScaledValue;
+    float blocklightValue = expLightValue(gl_TexCoord[1].y);
 
     float occlusionValue = gl_TexCoord[1].z;
 
@@ -93,37 +100,47 @@ void main(){
     if (isWater) {
         diffuseLighting = calcLambLight(normalWater, normalizedVPos);
     } else {
-        diffuseLighting = calcLambLight(normal, lightDir);
+        diffuseLighting = calcLambLight(normal, finalLightDir);
     }
 
     float torchlight = 0.0;
 
-    // Apply torchlight
+    /* CALCULATE TORCHLIGHT */
     if (carryingTorch) {
         if (isWater)
             torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * 0.1 + 0.9
             + calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 64.0, normalWater), vertexWorldPos.xyz);
         else
             torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexWorldPos.xyz)) * 0.1 + 0.9
-            + calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 64.0), vertexWorldPos.xyz);
+            + calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 128.0), vertexWorldPos.xyz);
     }
 
     vec3 daylightColorValue;
 
+    /* CREATE THE DAYLIGHT LIGHTING MIX */
     if (isWater) {
-        daylightColorValue = vec3(diffuseLighting * daylightValue);
-        daylightColorValue += calcSpecLightWithOffset(normal, lightDir, normalize(eyeVec), 64.0, normalWater) * daylightValue;
+        /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
+        daylightColorValue = vec3(diffuseLighting);
+        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalize(eyeVec), 64.0, normalWater);
     } else {
-        float dP = daylightValue * 0.9;
-        daylightColorValue = vec3(dP + diffuseLighting * dP * 0.1);
+        /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
+        daylightColorValue = vec3(1.0 + diffuseLighting * 0.25);
     }
 
-    float blockBrightness = clamp(blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2
-        + torchlight - (sin(timeToTick(time, 0.5) + 1.0) / 16.0) * blocklightValue, 0.0, 1.0) * blocklightDayIntensity;
+    /* SUNLIGHT BECOMES MOONLIGHT */
+    vec3 ambientTint = mix(vec3(0.8, 0.8, 1.0), vec3(1.0, 0.99, 0.99), daylight);
+    daylightColorValue.xyz *= ambientTint;
 
-    vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.99, blockBrightness * 0.98);
+    // Scale the lighting according to the daylight and daylight block values and add moonlight during the nights
+    daylightColorValue.xyz *= daylightScaledValue + (0.25 * (1.0 - daylight) * daylightValue);
+
+    float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2
+        + torchlight - (sin(timeToTick(time, 0.5) + 1.0) / 16.0) * blocklightValue) * blocklightDayIntensity;
+
+    // Calculate the final blocklight color value and add a slight reddish tint to it
+    vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
 
     // Apply the final lighting mix
-    color.xyz *= (daylightColorValue * occlusionValue + blocklightColorValue * occlusionValue);
+    color.xyz *= (daylightColorValue + blocklightColorValue) * occlusionValue;
     gl_FragColor = linearToSrgb(color);
 }

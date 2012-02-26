@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.tools;
 
+import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
@@ -74,7 +75,7 @@ public class ExplosionTool extends SimpleTool {
                     if (currentBlock.isDestructible()) {
                         // Make sure no updates are triggered
                         placeBlock((int) target.x, (int) target.y, (int) target.z, (byte) 0x0, false);
-                        BulletPhysicsRenderer.getInstance().addTemporaryBlock(target, currentBlockType, impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
+                        _player.getParent().getBulletRenderer().addTemporaryBlock(target, currentBlockType, impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
                     }
                 }
             }

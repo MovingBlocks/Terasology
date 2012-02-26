@@ -16,11 +16,11 @@
 
 uniform sampler2D texScene;
 uniform sampler2D texBloom;
-uniform sampler2D texDepth;
 uniform sampler2D texBlur;
+uniform sampler2D texVignette;
+uniform sampler2D texDepth;
 
 uniform bool swimming;
-uniform float exposure = 1.0;
 
 float linDepth() {
     const float cNear = 0.1;
@@ -30,18 +30,9 @@ float linDepth() {
     return (2.0 * cNear) / (cZFar + cNear - z * (cZFar - cNear));
 }
 
-void main(){
-    vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
+void main() {
+    /* BLUR */
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
-
-    float t = tonemapReinhard(color, 1.0, exposure);
-
-    color *= t;
-    colorBlur *= t;
-
-    // Apply bloom
-    color += texture2D(texBloom, gl_TexCoord[0].xy);
-    colorBlur += texture2D(texBloom, gl_TexCoord[0].xy);
 
     float depth = linDepth();
     float blur = 0.0;
@@ -51,15 +42,23 @@ void main(){
     else if (swimming)
        blur = 1.0;
 
+    /* COLOR AND BLOOM */
+    vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
+    vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
+
+    color = clamp(color + colorBloom, 0.0, 1.0);
+    colorBlur = clamp(colorBlur + colorBloom, 0.0, 1.0);
+
+    /* FINAL MIX */
     vec4 finalColor = mix(color, colorBlur, blur);
 
-    // Vignette
-    float d = distance(gl_TexCoord[0].xy, vec2(0.5,0.5));
+    /* VIGNETTE */
+    float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
 
-    if (swimming)
-        finalColor.rgb *= (1.0 - d) / 4.0;
+    if (!swimming)
+        finalColor.rgb *= vig;
     else
-        finalColor.rgb *= (1.0 - d);
+        finalColor.rgb *= vig / 2.0;
 
     gl_FragColor = finalColor;
 }

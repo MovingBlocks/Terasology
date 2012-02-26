@@ -41,7 +41,7 @@ void main(){
         torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexWorldPos.xyz)), vertexWorldPos.xyz);
 
     // Apply light
-    float lightValue = expLightValue(light);
+    float lightValue = expLightValue(light) + 0.25;
     color.rgb *= clamp(lightValue + torchlight, 0.0, 1.0);
 
     if (textured) {
