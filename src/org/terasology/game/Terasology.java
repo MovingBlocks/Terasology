@@ -211,9 +211,9 @@ public final class Terasology {
             Display.setFullscreen(true);
         } else {
             Display.setDisplayMode((DisplayMode) SettingsManager.getInstance().getUserSetting("Game.Graphics.displayMode"));
+            Display.setResizable(true);
         }
 
-        Display.setResizable(true);
         Display.setTitle("Terasology" + " | " + "Pre Alpha");
         Display.create((PixelFormat) SettingsManager.getInstance().getUserSetting("Game.Graphics.pixelFormat"));
     }
