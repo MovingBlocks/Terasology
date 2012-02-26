@@ -46,6 +46,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @todo Add screen "Multiplayer Player"
  * @todo Add screen "generation / load / delete the world."
  */
+<<<<<<< HEAD
 public class ModeMainMenu implements IGameMode {
 
     //GUI
@@ -58,9 +59,12 @@ public class ModeMainMenu implements IGameMode {
 
     public void init() {
         _gameInstance = Terasology.getInstance();
+
         _mainMenu = new UIMainMenu();
         _mainMenu.setVisible(true);
+
         _guiScreens.add(_mainMenu);
+
         Mouse.setGrabbed(false);
         Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
     }
@@ -115,6 +119,7 @@ public class ModeMainMenu implements IGameMode {
             screen.render();
         }
     }
+
     private void updateUserInterface() {
         for (UIDisplayElement screen : _guiScreens) {
             screen.update();
@@ -180,5 +185,94 @@ public class ModeMainMenu implements IGameMode {
     public void updatePlayerInput() {
         return;
     }
+=======
+public class ModeMainMenu implements IGameMode{
+  
+  //GUI
+  private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
+
+  /*SCREENS*/
+  private UIMainMenu _mainMenu;
+
+  private Terasology _gameInstance = null;
+  
+  public void init(){
+    _gameInstance = Terasology.getInstance();
+
+    _mainMenu = new UIMainMenu();
+    _mainMenu.setVisible(true);
+
+    _guiScreens.add(_mainMenu);
+
+    Mouse.setGrabbed(false);
+    Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
+  }
+
+  public void updateTimeAccumulator(long currentTime, long startTime){
+    return;
+  }
+  public void update(){
+    updateUserInterface();
+  }
+  
+  /*
+   * In the future, to make in the parent class GameMode
+   */
+  private boolean screenHasFocus() {
+    for (UIDisplayElement screen : _guiScreens) {
+      if (screen.isVisible() && !screen.isOverlay()) {
+          return true;
+      }
+    }
+
+    return false;
+  }
+  
+  public void render(){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+
+    renderUserInterface();
+  }
+  
+  public void renderUserInterface() {
+      for (UIDisplayElement screen : _guiScreens) {
+          screen.render();
+      }
+  }
+  
+  private void updateUserInterface() {
+      for (UIDisplayElement screen : _guiScreens) {
+          screen.update();
+      }
+  }
+  
+  public WorldRenderer getActiveWorldRenderer() {
+      return null;
+  }
+  
+  /**
+   * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
+   */
+  public void processKeyboardInput() {
+      while (Keyboard.next()) {
+          int key = Keyboard.getEventKey();
+
+          if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+              if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                _gameInstance.exit(false);
+                return;
+              }
+              // Pass input to focused GUI element
+              for (UIDisplayElement screen : _guiScreens) {
+                  if (screenCanFocus(screen)) {
+                      screen.processKeyboardInput(key);
+                  }
+              }
+          }
+      }
+  }
+  
+>>>>>>> refactored Terasology class
 
 }
