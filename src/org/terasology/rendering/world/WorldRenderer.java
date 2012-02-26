@@ -281,11 +281,7 @@ public final class WorldRenderer implements IGameObject {
         PostProcessingRenderer.getInstance().renderScene();
         PerformanceMonitor.endActivity();
 
-        glPushMatrix();
-        glLoadIdentity();
-        glClear(GL_DEPTH_BUFFER_BIT);
         _player.renderFirstPersonViewElements();
-        glPopMatrix();
     }
 
 

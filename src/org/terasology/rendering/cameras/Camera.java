@@ -59,7 +59,11 @@ public abstract class Camera {
         loadNormalizedModelViewMatrix();
     }
 
-    public abstract void loadProjectionMatrix();
+    public abstract void loadProjectionMatrix(float fov);
+
+    public void loadProjectionMatrix() {
+        loadProjectionMatrix(_activeFov);
+    }
 
     public abstract void loadModelViewMatrix();
 

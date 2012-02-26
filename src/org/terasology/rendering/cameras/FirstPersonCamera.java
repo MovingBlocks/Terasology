@@ -34,11 +34,11 @@ public class FirstPersonCamera extends Camera {
 
     private double _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0;
 
-    public void loadProjectionMatrix() {
+    public void loadProjectionMatrix(float fov) {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        gluPerspective(_activeFov, (float) Display.getWidth() / Display.getHeight(), 0.1f, 512f);
+        gluPerspective(fov, (float) Display.getWidth() / Display.getHeight(), 0.1f, 512f);
 
         glMatrixMode(GL11.GL_MODELVIEW);
     }
