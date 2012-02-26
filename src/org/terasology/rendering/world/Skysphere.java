@@ -61,7 +61,7 @@ public class Skysphere implements IGameObject {
     private static IntBuffer _textureIds;
 
     private final PerlinNoise _noiseGenerator;
-    private long _lastCloudUpdate = Terasology.getInstance().getTime() - CLOUD_UPDATE_INTERVAL;
+    private long _lastCloudUpdate = Terasology.getInstance().getTimeInMs() - CLOUD_UPDATE_INTERVAL;
     ByteBuffer _cloudByteBuffer = null;
 
     private final WorldRenderer _parent;
@@ -167,8 +167,8 @@ public class Skysphere implements IGameObject {
     }
 
     public void update() {
-        if (_cloudByteBuffer == null && Terasology.getInstance().getTime() - _lastCloudUpdate >= CLOUD_UPDATE_INTERVAL) {
-            _lastCloudUpdate = Terasology.getInstance().getTime();
+        if (_cloudByteBuffer == null && Terasology.getInstance().getTimeInMs() - _lastCloudUpdate >= CLOUD_UPDATE_INTERVAL) {
+            _lastCloudUpdate = Terasology.getInstance().getTimeInMs();
 
             Terasology.getInstance().submitTask("Generate Clouds", new Runnable() {
                 public void run() {

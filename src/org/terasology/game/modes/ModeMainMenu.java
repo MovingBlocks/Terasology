@@ -65,8 +65,6 @@ public class ModeMainMenu implements IGameMode{
 
     _guiScreens.add(_mainMenu);
 
-    Terasology.getInstance().initGroovy();
-
     Mouse.setGrabbed(false);
     Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
   }

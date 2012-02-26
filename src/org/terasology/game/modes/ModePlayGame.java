@@ -106,8 +106,6 @@ public class ModePlayGame implements IGameMode {
         resetOpenGLParameters();
 
         initWorld("World1", worldSeed);
-        Terasology.getInstance().initGroovy();
-
     }
 
     public void update() {
@@ -199,7 +197,7 @@ public class ModePlayGame implements IGameMode {
     }
 
     private void simulateWorld(int duration) {
-        long timeBefore = _gameInstance.getTime();
+        long timeBefore = _gameInstance.getTimeInMs();
 
         _loadingScreen.setVisible(true);
         _hud.setVisible(false);
@@ -217,7 +215,7 @@ public class ModePlayGame implements IGameMode {
 
             Display.update();
 
-            diff = _gameInstance.getTime() - timeBefore;
+            diff = _gameInstance.getTimeInMs() - timeBefore;
         }
 
         _loadingScreen.setVisible(false);

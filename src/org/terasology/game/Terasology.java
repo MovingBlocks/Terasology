@@ -60,7 +60,10 @@ import static org.lwjgl.opengl.GL11.*;
  * @todo To create the function that will return the number of generated worlds
  */
 public final class Terasology {
+    private static Terasology _instance = new Terasology();
 
+    private final Logger _logger = Logger.getLogger("Terasology");
+    private final GroovyManager _groovyManager = new GroovyManager();
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
     /* STATISTICS */
@@ -77,72 +80,31 @@ public final class Terasology {
     public enum GameMode {
         undefined, mainMenu, runGame
     }
-
     static GameMode _state = GameMode.mainMenu;
     private static Map<GameMode, IGameMode> _gameModes = Collections.synchronizedMap(new EnumMap<GameMode, IGameMode>(GameMode.class));
 
-    /* SINGLETON */
-    private static Terasology _instance;
-
-    /* LOGGING */
-    private final Logger _logger;
-
-    /* GROOVY */
-    private GroovyManager _groovyManager;
-
-    /**
-     * Returns the static instance of Terasology.
-     *
-     * @return The instance
-     */
     public static Terasology getInstance() {
-        if (_instance == null)
-            _instance = new Terasology();
         return _instance;
     }
 
-    /**
-     * Entry point of the application.
-     *
-     * @param args The arguments
-     */
-    public static void main(String[] args) {
-        getInstance().initDefaultLogger();
-        getInstance().getLogger().log(Level.INFO, "Welcome to Terasology | {0}!", "Pre Alpha");
-
-        // Make sure to load the native libraries for current OS first
-        try {
-            loadNativeLibs();
-        } catch (Exception e) {
-            getInstance().getLogger().log(Level.SEVERE, "Couldn't link static libraries. Sorry. " + e.toString(), e);
-        }
-
-        Terasology terasology = null;
-
-        try {
-            terasology = getInstance();
-
-            terasology.initOpenAL();
-            terasology.initDisplay();
-            terasology.checkOpenGL();
-            terasology.initControls();
-            terasology.initGame();
-            terasology.initGroovy();
-        } catch (LWJGLException e) {
-            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm so sorry: " + e.toString(), e);
-            System.exit(0);
-        } catch (Exception e) {
-            getInstance().getLogger().log(Level.SEVERE, "Failed to start game. I'm so sorry: " + e.toString(), e);
-            System.exit(0);
-        }
-
-        // START THE MAIN GAME LOOP
-        terasology.startGame();
-
-        System.exit(0);
+    private Terasology() {
     }
 
-    private static void loadNativeLibs() throws Exception {
+    public void init(){
+        _logger.log(Level.INFO, "Initializing Terasology...");
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+        initLogger();
+        initNativeLibs();
+        initOpenAL();
+        initDisplay();
+        initOpenGL();
+        initControls();
+        initManagers();
+        //refactor to class -> timer / stats
+        _timerTicksPerSecond = Sys.getTimerResolution();
+    }
+
+    private void initNativeLibs() {
         if (System.getProperty("os.name").equals("Mac OS X"))
             addLibraryPath("natives/macosx");
         else if (System.getProperty("os.name").equals("Linux"))
@@ -157,112 +119,73 @@ public final class Terasology {
         }
     }
 
-    private static void addLibraryPath(String s) throws Exception {
-        final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
-        usrPathsField.setAccessible(true);
+    private void addLibraryPath(String s){
+        try {
+            final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
+            usrPathsField.setAccessible(true);
 
-        final String[] paths = (String[]) usrPathsField.get(null);
+            final String[] paths = (String[]) usrPathsField.get(null);
 
-        for (String path : paths) {
-            if (path.equals(s)) {
-                return;
+            for (String path : paths) {
+                if (path.equals(s)) {
+                    return;
+                }
             }
+
+            final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
+            newPaths[newPaths.length - 1] = s;
+            usrPathsField.set(null, newPaths);
+        } catch(Exception e){
+            _logger.log(Level.SEVERE, "Couldn't link static libraries. " + e.toString(), e);
+            //brutal...
+            System.exit(1);
         }
-
-        final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
-        newPaths[newPaths.length - 1] = s;
-        usrPathsField.set(null, newPaths);
     }
 
-    /**
-     * Init. a new instance of Terasology.
-     */
-    private Terasology() {
-        _logger = Logger.getLogger("Terasology");
-        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+    private void initOpenAL() {
+        AudioManager.getInstance();
     }
 
-    /**
-     * Init. the Groovy manager.
-     */
-    public void initGroovy() {
-        _groovyManager = new GroovyManager();
+    private void initDisplay() {
+        try {
+            if ((Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.fullscreen")) {
+                Display.setDisplayMode(Display.getDesktopDisplayMode());
+                Display.setFullscreen(true);
+            } else {
+                Display.setDisplayMode((DisplayMode) SettingsManager.getInstance().getUserSetting("Game.Graphics.displayMode"));
+                Display.setResizable(true);
+            }
+
+            Display.setTitle("Terasology" + " | " + "Pre Alpha");
+            Display.create((PixelFormat) SettingsManager.getInstance().getUserSetting("Game.Graphics.pixelFormat"));
+        } catch (LWJGLException e){
+            _logger.log(Level.SEVERE, "Can not initialize graphics device.", e);
+            System.exit(1);
+        }
     }
 
-    public void checkOpenGL() throws Exception {
+    private void initOpenGL() {
+        checkOpenGL();
+        resizeViewport();
+        resetOpenGLParameters();
+    }
+
+    private void checkOpenGL(){
         boolean canRunGame = GLContext.getCapabilities().OpenGL20
                 & GLContext.getCapabilities().OpenGL11
                 & GLContext.getCapabilities().OpenGL12
                 & GLContext.getCapabilities().OpenGL14
                 & GLContext.getCapabilities().OpenGL15;
 
-        if (!canRunGame)
-            throw new Exception("Your GPU driver is not supporting the mandatory versions of OpenGL. Considered updating your GPU drivers?");
-    }
-
-    /**
-     * Init. the display.
-     *
-     * @throws LWJGLException Thrown when the LWJGL fails
-     */
-    public void initDisplay() throws LWJGLException {
-        if ((Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.fullscreen")) {
-            Display.setDisplayMode(Display.getDesktopDisplayMode());
-            Display.setFullscreen(true);
-        } else {
-            Display.setDisplayMode((DisplayMode) SettingsManager.getInstance().getUserSetting("Game.Graphics.displayMode"));
-            Display.setResizable(true);
+        if (!canRunGame) {
+            _logger.log(Level.SEVERE, "Your GPU driver is not supporting the mandatory versions of OpenGL. Considered updating your GPU drivers?");
+            System.exit(1);
         }
 
-        Display.setTitle("Terasology" + " | " + "Pre Alpha");
-        Display.create((PixelFormat) SettingsManager.getInstance().getUserSetting("Game.Graphics.pixelFormat"));
     }
 
-    public void initOpenAL() {
-        AudioManager.getInstance();
-    }
-
-    /**
-     * Init. keyboard and mouse input.
-     *
-     * @throws LWJGLException Thrown when the LWJGL fails
-     */
-    public void initControls() throws LWJGLException {
-        // Keyboard
-        Keyboard.create();
-        Keyboard.enableRepeatEvents(true);
-
-        // Mouse
-        Mouse.create();
-        Mouse.setGrabbed(true);
-    }
-
-    /**
-     * Clean up before exiting the application.
-     */
-    private void destroy() {
-        AL.destroy();
-        Mouse.destroy();
-        Keyboard.destroy();
-        Display.destroy();
-    }
-
-    public void initGame() {
-        _timerTicksPerSecond = Sys.getTimerResolution();
-
-        /*
-         * Init. management classes.
-         */
-        ShaderManager.getInstance();
-        VertexBufferObjectManager.getInstance();
-        FontManager.getInstance();
-        BlockShapeManager.getInstance();
-        BlockManager.getInstance();
-        /*
-         * Init. OpenGL
-         */
-        resizeViewport();
-        resetOpenGLParameters();
+    private void resizeViewport() {
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     public void resetOpenGLParameters() {
@@ -271,19 +194,30 @@ public final class Terasology {
         glDepthFunc(GL_LEQUAL);
     }
 
-    private void resizeViewport() {
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+    private void initControls() {
+        try {
+            Keyboard.create();
+            Keyboard.enableRepeatEvents(true);
+            Mouse.create();
+            Mouse.setGrabbed(true);
+        } catch (LWJGLException e) {
+            _logger.log(Level.SEVERE, "Could not initialize controls.", e);
+            System.exit(1);
+        }
     }
 
-    /**
-     * Starts the main game loop.
-     */
-    public void startGame() {
-        getInstance().getLogger().log(Level.INFO, "Starting Terasology...");
+    private void initManagers() {
+        ShaderManager.getInstance();
+        VertexBufferObjectManager.getInstance();
+        FontManager.getInstance();
+        BlockShapeManager.getInstance();
+        BlockManager.getInstance();
+    }
 
-        IGameMode mode;
+    public void run(){
+        _logger.log(Level.INFO, "Running Terasology...");
         PerformanceMonitor.startActivity("Other");
-
+        IGameMode mode;
         // MAIN GAME LOOP
         while (_runGame && !Display.isCloseRequested()) {
             // Only process rendering and updating once a second
@@ -305,15 +239,8 @@ public final class Terasology {
                 break;
             }
 
-            mode = getGameMode();
-
-            if (mode == null) {
-                _runGame = false;
-                break;
-            }
-
             PerformanceMonitor.startActivity("Main Update");
-            long startTime = getTime();
+            long startTime = getTimeInMs();
             mode.update();
             PerformanceMonitor.endActivity();
             PerformanceMonitor.startActivity("Render");
@@ -331,30 +258,44 @@ public final class Terasology {
 
             PerformanceMonitor.rollCycle();
             PerformanceMonitor.startActivity("Other");
-            mode.updateTimeAccumulator(getTime(), startTime);
+            mode.updateTimeAccumulator(getTimeInMs(), startTime);
 
             if (Display.wasResized())
                 resizeViewport();
         }
+    }
 
-        /*
-         * Save the world and exit the application.
-         */
+    public void shutdown(){
+        _logger.log(Level.INFO, "Shutting down Terasology...");
+        saveWorld();
+        terminateThreads();
+        destroy();
+    }
+
+    private void saveWorld() {
+        //UGLY! why does dispose save the world...
         if (_saveWorldOnExit) {
             if (getActiveWorldRenderer() != null)
                 getGameMode().getActiveWorldRenderer().dispose();
         }
+    }
 
+    private void terminateThreads() {
         _threadPool.shutdown();
-
         try {
             _threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
             getLogger().log(Level.SEVERE, e.toString(), e);
         }
-
-        destroy();
     }
+
+    private void destroy() {
+        AL.destroy();
+        Mouse.destroy();
+        Keyboard.destroy();
+        Display.destroy();
+    }
+
 
     public IGameMode getGameMode() {
         IGameMode mode = _gameModes.get(_state);
@@ -405,12 +346,9 @@ public final class Terasology {
         exit(true);
     }
 
-    /**
-     * Updates the FPS display.
-     */
     private void updateFps() {
         // Measure the delta value and the frames per second
-        long now = getTime();
+        long now = getTimeInMs();
         _delta = now - _lastLoopTime;
 
         _lastLoopTime = now;
@@ -439,7 +377,7 @@ public final class Terasology {
         }
     }
 
-    private void initDefaultLogger() {
+    private void initLogger() {
         File dirPath = new File("logs");
 
         if (!dirPath.exists()) {
@@ -484,12 +422,7 @@ public final class Terasology {
         return getGameMode().getActiveWorldRenderer().getPlayer();
     }
 
-    /**
-     * Returns the system time in ms.
-     *
-     * @return The system time in ms
-     */
-    public long getTime() {
+    public long getTimeInMs() {
         if (_timerTicksPerSecond == 0)
             return 0;
 
@@ -516,5 +449,12 @@ public final class Terasology {
 
     public GroovyManager getGroovyManager() {
         return _groovyManager;
+    }
+
+    public static void main(String[] args) {
+        _instance.init();
+        _instance.run();
+        _instance.shutdown();
+        System.exit(0);
     }
 }
