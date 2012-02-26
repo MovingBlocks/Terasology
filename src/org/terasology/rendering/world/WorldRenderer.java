@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.world;
 
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.openal.SoundStore;
 import org.terasology.game.Terasology;
@@ -32,8 +34,15 @@ import org.terasology.rendering.particles.BlockParticleEmitter;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 
+import javax.imageio.ImageIO;
 import javax.vecmath.Vector3d;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.logging.Level;
 
@@ -613,6 +622,39 @@ public final class WorldRenderer implements IGameObject {
             if (c.isDirty() || c.isLightDirty()) {
                 _chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
             }
+        }
+    }
+
+    public void printScreen() {
+        //REFACTOR TO USE BACKGROUND THREAD FOR IMAGE COPY & SAVE
+        GL11.glReadBuffer(GL11.GL_FRONT);
+        int width = Display.getDisplayMode().getWidth();
+        int height = Display.getDisplayMode().getHeight();
+        //int bpp = Display.getDisplayMode().getBitsPerPixel(); does return 0 - why?
+        int bpp = 4;
+        ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
+        GL11.glReadPixels(0, 0, width, height, (bpp==3) ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer );
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+
+        File file = new File(sdf.format(cal.getTime()) + ".png");
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        for(int x = 0; x < width; x++)
+            for(int y = 0; y < height; y++)
+            {
+                int i = (x + (width * y)) * bpp;
+                int r = buffer.get(i) & 0xFF;
+                int g = buffer.get(i + 1) & 0xFF;
+                int b = buffer.get(i + 2) & 0xFF;
+                image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
+            }
+
+        try {
+            ImageIO.write(image, "png", file);
+        } catch (IOException e) {
+            Terasology.getInstance().getLogger().log(Level.WARNING, "Could not save image!", e);
         }
     }
 }
