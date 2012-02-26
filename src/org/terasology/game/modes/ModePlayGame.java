@@ -279,6 +279,10 @@ public class ModePlayGame implements IGameMode {
                     toggleViewingDistance();
                 }
 
+                if(key == Keyboard.KEY_F12){
+                    Terasology.getInstance().getActiveWorldRenderer().printScreen();
+                }
+
                 // Pass input to focused GUI element
                 for (UIDisplayElement screen : _guiScreens) {
                     if (screenCanFocus(screen)) {
