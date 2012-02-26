@@ -93,6 +93,9 @@ public final class WorldRenderer implements IGameObject {
     /* STATISTICS */
     private int _statDirtyChunks = 0;
 
+    /* is rendering as wirefram? */
+    private boolean _wireframe;
+
     /**
      * Initializes a new (local) world for the single player mode.
      *
@@ -294,6 +297,10 @@ public final class WorldRenderer implements IGameObject {
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
+        if(_wireframe)
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_PHASE.OPAQUE);
@@ -352,7 +359,8 @@ public final class WorldRenderer implements IGameObject {
         if (headUnderWater) {
             glEnable(GL11.GL_CULL_FACE);
         }
-
+        if(_wireframe)
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         glDisable(GL_LIGHT0);
 
         PerformanceMonitor.endActivity();
@@ -614,5 +622,13 @@ public final class WorldRenderer implements IGameObject {
                 _chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
             }
         }
+    }
+
+    public boolean isWireframe() {
+        return _wireframe;
+    }
+
+    public void setWireframe(boolean _wireframe) {
+        this._wireframe = _wireframe;
     }
 }
