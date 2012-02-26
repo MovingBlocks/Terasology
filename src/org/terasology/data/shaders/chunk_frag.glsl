@@ -73,10 +73,11 @@ void main(){
         color.a *= gl_Color.a;
     } else {
         // MASK GRASS
-        if (texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET))).a != 0.0)
-            color.rgb *= gl_Color.rgb;
+        vec4 maskColor = texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET)));
+        if (maskColor.a != 0.0)
+          color.rgb *= gl_Color.rgb;
         else
-            color.rgb *= gl_Color.a;
+          color.rgb *= gl_Color.a;
     }
 
     // Calculate daylight lighting value
@@ -84,7 +85,7 @@ void main(){
 
     // Calculate blocklight lighting value
     float blocklightDayIntensity = 1.0 - daylightValue;
-    float blocklightValue = expLightValue(srgbToLinear(gl_TexCoord[1].y));
+    float blocklightValue = expLightValue(gl_TexCoord[1].y);
 
     float occlusionValue = gl_TexCoord[1].z;
 
@@ -105,7 +106,7 @@ void main(){
             + calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 64.0, normalWater), vertexWorldPos.xyz);
         else
             torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexWorldPos.xyz)) * 0.1 + 0.9
-            + calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 64.0), vertexWorldPos.xyz);
+            + calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 128.0), vertexWorldPos.xyz);
     }
 
     vec3 daylightColorValue;
@@ -114,16 +115,15 @@ void main(){
         daylightColorValue = vec3(diffuseLighting * daylightValue);
         daylightColorValue += calcSpecLightWithOffset(normal, lightDir, normalize(eyeVec), 64.0, normalWater) * daylightValue;
     } else {
-        float dP = daylightValue * 0.9;
-        daylightColorValue = vec3(dP + diffuseLighting * dP * 0.1);
+        daylightColorValue = vec3(daylightValue * (0.95 + 0.05 * (1.0 - daylightValue)) + diffuseLighting * daylightValue * 0.05);
     }
 
-    float blockBrightness = clamp(blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2
-        + torchlight - (sin(timeToTick(time, 0.5) + 1.0) / 16.0) * blocklightValue, 0.0, 1.0) * blocklightDayIntensity;
+    float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2
+        + torchlight - (sin(timeToTick(time, 0.5) + 1.0) / 16.0) * blocklightValue) * blocklightDayIntensity;
 
-    vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.99, blockBrightness * 0.98);
+    vec3 blocklightColorValue = vec3(blockBrightness * 1.0, blockBrightness * 0.95, blockBrightness * 0.94);
 
     // Apply the final lighting mix
-    color.xyz *= (daylightColorValue * occlusionValue + blocklightColorValue * occlusionValue);
+    color.xyz *= (daylightColorValue + blocklightColorValue) * occlusionValue;
     gl_FragColor = linearToSrgb(color);
 }

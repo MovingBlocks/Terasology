@@ -34,7 +34,7 @@ public class PostProcessingRenderer {
 
     public static final boolean EFFECTS_ENABLED = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.enablePostProcessingEffects");
     public static final float MAX_EXPOSURE = 6.0f;
-    public static final float MIN_EXPOSURE = 2.0f;
+    public static final float MIN_EXPOSURE = 1.0f;
     public static final float TARGET_LUMINANCE = 0.5f;
     public static final float ADJUSTMENT_SPEED = 0.025f;
 
@@ -97,19 +97,21 @@ public class PostProcessingRenderer {
             createOrUpdateFullscreenFbos();
 
             if (EFFECTS_ENABLED) {
-                createFBO("sceneHighPass", 1024, 1024, true, false);
-                createFBO("sceneBloom0", 1024, 1024, true, false);
-                createFBO("sceneBloom1", 1024, 1024, true, false);
+                createFBO("sceneHighPass", 256, 256, false, false);
+                createFBO("sceneBloom0", 256, 256, false, false);
+                createFBO("sceneBloom1", 256, 256, false, false);
+                createFBO("sceneBloom2", 256, 256, false, false);
 
                 createFBO("sceneBlur0", 1024, 1024, true, false);
                 createFBO("sceneBlur1", 1024, 1024, true, false);
+                createFBO("sceneBlur2", 1024, 1024, true, false);
 
-                createFBO("scene32", 32, 32, true, false);
-                createFBO("scene16", 16, 16, true, false);
-                createFBO("scene8", 8, 8, true, false);
-                createFBO("scene4", 4, 4, true, false);
-                createFBO("scene2", 2, 2, true, false);
-                createFBO("scene1", 1, 1, true, false);
+                createFBO("scene32", 32, 32, false, false);
+                createFBO("scene16", 16, 16, false, false);
+                createFBO("scene8", 8, 8, false, false);
+                createFBO("scene4", 4, 4, false, false);
+                createFBO("scene2", 2, 2, false, false);
+                createFBO("scene1", 1, 1, false, false);
             }
         }
     }
@@ -233,17 +235,16 @@ public class PostProcessingRenderer {
         if (EFFECTS_ENABLED) {
             generateDownsampledScene();
             updateExposure();
-            generateHighPass();
 
-            for (int i = 0; i < 2; i++) {
+            generateTonemappedScene();
+
+            for (int i = 0; i < 3; i++) {
                 generateBloom(i);
                 generateBlur(i);
             }
 
-            ShaderProgram shaderPost = ShaderManager.getInstance().getShaderProgram("post");
-            shaderPost.enable();
-
-            renderFullQuad();
+            generateHighPass();
+            renderFinalScene();
         } else {
             PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
@@ -256,18 +257,37 @@ public class PostProcessingRenderer {
         createOrUpdateFullscreenFbos();
     }
 
+    private void renderFinalScene() {
+        ShaderProgram shaderPost = ShaderManager.getInstance().getShaderProgram("post");
+        shaderPost.enable();
+
+        renderFullQuad();
+    }
+
+    private void generateTonemappedScene() {
+        ShaderManager.getInstance().enableShader("hdr");
+
+        PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        renderFullQuad();
+
+        PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").unbind();
+    }
+
     /**
      * Initially creates the scene FBO and updates it according to the size of the viewport.
      */
     private void createOrUpdateFullscreenFbos() {
         if (!_FBOs.containsKey("scene")) {
             createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
-
+            createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), false, false);
         } else {
             FBO scene = getFBO("scene");
 
             if (scene._width != Display.getWidth() || scene._height != Display.getHeight()) {
                 createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
+                createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), false, false);
             }
         }
     }
@@ -276,10 +296,10 @@ public class PostProcessingRenderer {
         ShaderManager.getInstance().enableShader("highp");
 
         PostProcessingRenderer.getInstance().getFBO("sceneHighPass").bind();
-        glViewport(0, 0, 1024, 1024);
+        glViewport(0, 0, 256, 256);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").bindTexture();
 
         renderFullQuad();
 
@@ -292,7 +312,7 @@ public class PostProcessingRenderer {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
-        shader.setFloat("radius", 2.0f);
+        shader.setFloat("radius", 3.0f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
         glViewport(0, 0, 1024, 1024);
@@ -300,7 +320,7 @@ public class PostProcessingRenderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (id == 0)
-            PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
+            PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").bindTexture();
         else
             PostProcessingRenderer.getInstance().getFBO("sceneBlur" + (id - 1)).bindTexture();
 
@@ -315,10 +335,10 @@ public class PostProcessingRenderer {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
-        shader.setFloat("radius", 16.0f);
+        shader.setFloat("radius", 8.0f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).bind();
-        glViewport(0, 0, 1024, 1024);
+        glViewport(0, 0, 256, 256);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -59,10 +59,11 @@ public class ShaderManager {
         _defaultShaderProgram = createAndStoreShaderProgram("default", new ShaderParametersDefault());
         _defaultTexturedShaderProgram = createAndStoreShaderProgram("defaultTextured", new ShaderParametersDefault());
 
+        createAndStoreShaderProgram("post", new ShaderParametersPost());
         createAndStoreShaderProgram("highp", new ShaderParametersDefault());
         createAndStoreShaderProgram("blur", new ShaderParametersDefault());
         createAndStoreShaderProgram("down", new ShaderParametersDefault());
-        createAndStoreShaderProgram("post", new ShaderParametersPostProcessing());
+        createAndStoreShaderProgram("hdr", new ShaderParametersHdr());
         createAndStoreShaderProgram("sky", new ShaderParametersDefault());
         createAndStoreShaderProgram("chunk", new ShaderParametersChunk());
         createAndStoreShaderProgram("particle", new ShaderParametersParticle());

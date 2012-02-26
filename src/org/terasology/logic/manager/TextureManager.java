@@ -82,6 +82,7 @@ public class TextureManager {
 
         /* EFFECTS */
         addTexture("effects");
+        addTexture("vignette", GL11.GL_REPEAT, GL_LINEAR);
 
         for (int i = 1; i <= 6; i++) {
             addTexture("stars" + i);
