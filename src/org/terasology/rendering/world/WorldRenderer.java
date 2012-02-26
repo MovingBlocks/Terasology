@@ -109,7 +109,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
         _portalManager = new PortalManager(this);
         _mobManager = new MobManager(this);
-        _blockGrid = new BlockGrid(this);
+        _blockGrid = new BlockGrid();
 
         initTimeEvents();
     }
