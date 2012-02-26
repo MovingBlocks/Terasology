@@ -171,8 +171,8 @@ public class Player extends Character {
         PerformanceMonitor.startActivity("Player Death Check");
         // Respawn the player after a certain amount of time
         if (isDead() && _timeOfDeath == -1) {
-            _timeOfDeath = Terasology.getInstance().getTime();
-        } else if (isDead() && Terasology.getInstance().getTime() - _timeOfDeath > 1000) {
+            _timeOfDeath = Terasology.getInstance().getTimeInMs();
+        } else if (isDead() && Terasology.getInstance().getTimeInMs() - _timeOfDeath > 1000) {
             revive();
             respawn();
             _timeOfDeath = -1;
@@ -187,7 +187,7 @@ public class Player extends Character {
      */
     private void processInteractions(int button) {
         // Throttle interactions
-        if (Terasology.getInstance().getTime() - _lastInteraction < 200) {
+        if (Terasology.getInstance().getTimeInMs() - _lastInteraction < 200) {
             return;
         }
 
@@ -197,11 +197,11 @@ public class Player extends Character {
             // Check if one of the mouse buttons is pressed
             if (Mouse.isButtonDown(0) || button == 0) {
                 activeTool.executeLeftClickAction();
-                _lastInteraction = Terasology.getInstance().getTime();
+                _lastInteraction = Terasology.getInstance().getTimeInMs();
                 poke();
             } else if (Mouse.isButtonDown(1) || button == 1) {
                 activeTool.executeRightClickAction();
-                _lastInteraction = Terasology.getInstance().getTime();
+                _lastInteraction = Terasology.getInstance().getTimeInMs();
                 poke();
             }
         }
@@ -367,11 +367,11 @@ public class Player extends Character {
                 if (!repeatEvent && state) {
                     jump();
 
-                    if (Terasology.getInstance().getTime() - _lastTimeSpacePressed < 200) {
+                    if (Terasology.getInstance().getTimeInMs() - _lastTimeSpacePressed < 200) {
                         _godMode = !_godMode;
                     }
 
-                    _lastTimeSpacePressed = Terasology.getInstance().getTime();
+                    _lastTimeSpacePressed = Terasology.getInstance().getTimeInMs();
                 }
                 break;
             case Keyboard.KEY_1:

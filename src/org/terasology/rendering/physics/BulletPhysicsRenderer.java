@@ -70,7 +70,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         public BlockRigidBody(RigidBodyConstructionInfo constructionInfo, byte type) {
             super(constructionInfo);
             _type = type;
-            _createdAt = Terasology.getInstance().getTime();
+            _createdAt = Terasology.getInstance().getTimeInMs();
         }
 
         public float distanceToPlayer() {
@@ -89,7 +89,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         }
 
         public long calcAgeInMs() {
-            return Terasology.getInstance().getTime() - _createdAt;
+            return Terasology.getInstance().getTimeInMs() - _createdAt;
         }
 
         public byte getType() {

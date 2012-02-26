@@ -214,10 +214,31 @@ public final class Terasology {
         BlockManager.getInstance();
     }
 
-    private void run(){
-        PerformanceMonitor.startActivity("Other");
-        // MAIN GAME LOOP
+<<<<<<< HEAD
+    public void resetOpenGLParameters() {
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+    }
+
+    private void resizeViewport() {
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+    }
+
+    /**
+     * Starts the main game loop.
+     */
+    public void startGame() {
+        getInstance().getLogger().log(Level.INFO, "Starting Terasology...");
+
         IGameMode mode = null;
+=======
+    public void run(){
+        _logger.log(Level.INFO, "Running Terasology...");
+>>>>>>> refactored Terasology class
+        PerformanceMonitor.startActivity("Other");
+        IGameMode mode;
+        // MAIN GAME LOOP
         while (_runGame && !Display.isCloseRequested()) {
             // Only process rendering and updating once a second
             if (!Display.isActive()) {
@@ -239,12 +260,15 @@ public final class Terasology {
                 break;
             }
 
+<<<<<<< HEAD
             if (mode != prevMode) {
                 if (prevMode != null)
                     prevMode.deactivate();
                 mode.activate();
             }
 
+=======
+>>>>>>> refactored Terasology class
             PerformanceMonitor.startActivity("Main Update");
             long startTime = getTimeInMs();
             mode.update();

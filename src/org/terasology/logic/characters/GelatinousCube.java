@@ -20,7 +20,6 @@ import org.newdawn.slick.openal.Audio;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -44,7 +43,7 @@ public final class GelatinousCube extends Character {
     private final Mesh _mesh;
     private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 0.2f), new Vector3f(1.0f, 0.2f, 0.2f), new Vector3f(0.2f, 1.0f, 0.2f), new Vector3f(1.0f, 1.0f, 0.2f)};
 
-    private long _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
+    private long _lastChangeOfDirectionAt = Terasology.getInstance().getTimeInMs();
     private final Vector3d _movementTarget = new Vector3d();
     private boolean _followingPlayer = false;
 
@@ -106,9 +105,9 @@ public final class GelatinousCube extends Character {
             _movementTarget.set(_parent.getPlayer().getPosition());
             _followingPlayer = true;
         } else {
-            if (Terasology.getInstance().getTime() - _lastChangeOfDirectionAt > 12000 || _followingPlayer) {
+            if (Terasology.getInstance().getTimeInMs() - _lastChangeOfDirectionAt > 12000 || _followingPlayer) {
                 _movementTarget.set(getPosition().x + _parent.getWorldProvider().getRandom().randomDouble() * 500, getPosition().y, getPosition().z + _parent.getWorldProvider().getRandom().randomDouble() * 500);
-                _lastChangeOfDirectionAt = Terasology.getInstance().getTime();
+                _lastChangeOfDirectionAt = Terasology.getInstance().getTimeInMs();
                 _followingPlayer = false;
                 _walkingSpeed = ((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 0.05;
             }

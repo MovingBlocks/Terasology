@@ -147,10 +147,10 @@ public abstract class MovableEntity extends Entity {
                 _currentFootstepSound = _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
                 AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(), _currentFootstepSound);
             } else {
-                long timeDiff = Terasology.getInstance().getTime() - _lastFootStepSoundPlayed;
+                long timeDiff = Terasology.getInstance().getTimeInMs() - _lastFootStepSoundPlayed;
 
                 if (timeDiff > 400 / (_activeWalkingSpeed / _walkingSpeed)) {
-                    _lastFootStepSoundPlayed = Terasology.getInstance().getTime();
+                    _lastFootStepSoundPlayed = Terasology.getInstance().getTimeInMs();
                     _currentFootstepSound = null;
                 }
             }
