@@ -48,11 +48,16 @@ void main() {
 
     color = clamp(color + colorBloom, 0.0, 1.0);
 
-    /* VIGNETTE */
-    float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
-    color.rgb *= vig;
-
     /* FINAL MIX */
     vec4 finalColor = mix(color, colorBlur, blur);
+
+    /* VIGNETTE */
+    float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
+
+    if (!swimming)
+        finalColor.rgb *= vig;
+    else
+        finalColor.rgb *= vig / 2.0;
+
     gl_FragColor = finalColor;
 }

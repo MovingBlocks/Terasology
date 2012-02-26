@@ -21,7 +21,7 @@ void main() {
     float lum = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
 
     if (lum > 0.95)
-        gl_FragColor = color;
+        gl_FragColor = vec4(1.0);
     else
         gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
