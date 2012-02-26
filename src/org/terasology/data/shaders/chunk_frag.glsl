@@ -132,7 +132,7 @@ void main(){
     daylightColorValue.xyz *= ambientTint;
 
     // Scale the lighting according to the daylight and daylight block values and add moonlight during the nights
-    daylightColorValue.xyz *= daylightScaledValue + (0.25 * (1.0 - daylight));
+    daylightColorValue.xyz *= daylightScaledValue + (0.25 * (1.0 - daylight) * daylightValue);
 
     float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2
         + torchlight - (sin(timeToTick(time, 0.5) + 1.0) / 16.0) * blocklightValue) * blocklightDayIntensity;
