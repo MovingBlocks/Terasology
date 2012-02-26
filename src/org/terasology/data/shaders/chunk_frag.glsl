@@ -115,7 +115,7 @@ void main(){
         daylightColorValue = vec3(diffuseLighting * daylightValue);
         daylightColorValue += calcSpecLightWithOffset(normal, lightDir, normalize(eyeVec), 64.0, normalWater) * daylightValue;
     } else {
-        daylightColorValue = vec3(daylightValue * (0.95 + 0.05 * (1.0 - daylightValue)) + diffuseLighting * daylightValue * 0.05);
+        daylightColorValue = vec3(daylightValue + diffuseLighting * daylightValue * 0.1);
     }
 
     float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2

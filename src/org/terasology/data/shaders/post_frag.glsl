@@ -47,6 +47,7 @@ void main() {
     vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
 
     color = clamp(color + colorBloom, 0.0, 1.0);
+    colorBlur = clamp(colorBlur + colorBloom, 0.0, 1.0);
 
     /* FINAL MIX */
     vec4 finalColor = mix(color, colorBlur, blur);

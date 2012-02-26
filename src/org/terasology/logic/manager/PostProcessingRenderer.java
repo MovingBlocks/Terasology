@@ -33,7 +33,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class PostProcessingRenderer {
 
     public static final boolean EFFECTS_ENABLED = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.enablePostProcessingEffects");
-    public static final float MAX_EXPOSURE = 6.0f;
+    public static final float MAX_EXPOSURE = 4.0f;
     public static final float MIN_EXPOSURE = 1.0f;
     public static final float TARGET_LUMINANCE = 0.5f;
     public static final float ADJUSTMENT_SPEED = 0.025f;
@@ -102,9 +102,9 @@ public class PostProcessingRenderer {
                 createFBO("sceneBloom1", 256, 256, false, false);
                 createFBO("sceneBloom2", 256, 256, false, false);
 
-                createFBO("sceneBlur0", 1024, 1024, true, false);
-                createFBO("sceneBlur1", 1024, 1024, true, false);
-                createFBO("sceneBlur2", 1024, 1024, true, false);
+                createFBO("sceneBlur0", 1024, 1024, false, false);
+                createFBO("sceneBlur1", 1024, 1024, false, false);
+                createFBO("sceneBlur2", 1024, 1024, false, false);
 
                 createFBO("scene32", 32, 32, false, false);
                 createFBO("scene16", 16, 16, false, false);
@@ -281,13 +281,13 @@ public class PostProcessingRenderer {
     private void createOrUpdateFullscreenFbos() {
         if (!_FBOs.containsKey("scene")) {
             createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
-            createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), false, false);
+            createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), true, false);
         } else {
             FBO scene = getFBO("scene");
 
             if (scene._width != Display.getWidth() || scene._height != Display.getHeight()) {
                 createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
-                createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), false, false);
+                createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), true, false);
             }
         }
     }
@@ -335,7 +335,7 @@ public class PostProcessingRenderer {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
-        shader.setFloat("radius", 8.0f);
+        shader.setFloat("radius", 16.0f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).bind();
         glViewport(0, 0, 256, 256);
