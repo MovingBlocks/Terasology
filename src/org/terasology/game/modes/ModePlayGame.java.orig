@@ -97,22 +97,26 @@ public class ModePlayGame implements IGameMode {
         _guiScreens.add(_inventoryScreen);
         _guiScreens.add(_statusScreen);
 
-        resetOpenGLParameters();
-    }
-
-    public void activate() {
         String worldSeed = (String) SettingsManager.getInstance().getWorldSetting("World.Creation.defaultSeed");
 
         if (worldSeed.isEmpty()) {
             worldSeed = null;
         }
 
-        initWorld("World1", worldSeed);
+        resetOpenGLParameters();
+    }
+
+<<<<<<< HEAD
+    public void activate() {
+        initWorld("World1");
     }
 
     public void deactivate() {
         _activeWorldRenderer.dispose();
         _activeWorldRenderer = null;
+=======
+        initWorld("World1", worldSeed);
+>>>>>>> refactored Terasology class
     }
 
     public void update() {

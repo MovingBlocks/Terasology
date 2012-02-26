@@ -6,6 +6,5 @@ out
 .classpath
 .project
 .settings
-.gradle
 bin
-*.png
+.gradle

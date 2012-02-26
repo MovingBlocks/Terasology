@@ -108,11 +108,11 @@ void main(){
     /* CALCULATE TORCHLIGHT */
     if (carryingTorch) {
         if (isWater)
-            torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * 0.1 + 0.9
-            + calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 64.0, normalWater), vertexWorldPos.xyz);
+            torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * 0.1
+            + 0.9 * calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 64.0, normalWater), vertexWorldPos.xyz);
         else
-            torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexWorldPos.xyz)) * 0.1 + 0.9
-            + calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 128.0), vertexWorldPos.xyz);
+            torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * 0.9
+            + 0.1 * calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 32.0), vertexWorldPos.xyz);
     }
 
     vec3 daylightColorValue;
@@ -134,8 +134,10 @@ void main(){
     // Scale the lighting according to the daylight and daylight block values and add moonlight during the nights
     daylightColorValue.xyz *= daylightScaledValue + (0.25 * (1.0 - daylight) * daylightValue);
 
-    float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2
-        + torchlight - (sin(timeToTick(time, 0.5) + 1.0) / 16.0) * blocklightValue) * blocklightDayIntensity;
+    // Calculate the final block light brightness
+    float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2);
+    blockBrightness += (1.0 - blockBrightness) * torchlight - (sin(timeToTick(time, 0.5) + 1.0) / 16.0) * blocklightValue;
+    blockBrightness *= blocklightDayIntensity * 0.75;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);

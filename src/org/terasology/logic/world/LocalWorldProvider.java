@@ -53,7 +53,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
     /* PROPERTIES */
     protected String _title, _seed;
-    protected long _creationTime = Terasology.getInstance().getTime() - (Long) SettingsManager.getInstance().getWorldSetting("World.DiurnalCycle.initialTimeOffsetInMs");
+    protected long _creationTime = Terasology.getInstance().getTimeInMs() - (Long) SettingsManager.getInstance().getWorldSetting("World.DiurnalCycle.initialTimeOffsetInMs");
 
     /* SIMULATORS */
     private final LiquidSimulator _liquidSimulator;
@@ -308,7 +308,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     public Vector3d nextSpawningPoint() {
         ChunkGeneratorTerrain tGen = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0));
 
-        FastRandom nRandom = new FastRandom(Terasology.getInstance().getTime());
+        FastRandom nRandom = new FastRandom(Terasology.getInstance().getTimeInMs());
 
         for (; ; ) {
             int randX = (int) (nRandom.randomDouble() * 128f);
@@ -365,11 +365,11 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
     public void setTime(double time) {
         if (time >= 0.0)
-            _creationTime = Terasology.getInstance().getTime() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
+            _creationTime = Terasology.getInstance().getTimeInMs() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
     }
 
     public double getTime() {
-        long msSinceCreation = Terasology.getInstance().getTime() - _creationTime;
+        long msSinceCreation = Terasology.getInstance().getTimeInMs() - _creationTime;
         return (double) msSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
     }
 
