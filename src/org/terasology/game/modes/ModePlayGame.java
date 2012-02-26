@@ -97,17 +97,17 @@ public class ModePlayGame implements IGameMode {
         _guiScreens.add(_inventoryScreen);
         _guiScreens.add(_statusScreen);
 
+        resetOpenGLParameters();
+    }
+
+    public void activate() {
         String worldSeed = (String) SettingsManager.getInstance().getWorldSetting("World.Creation.defaultSeed");
 
         if (worldSeed.isEmpty()) {
             worldSeed = null;
         }
 
-        resetOpenGLParameters();
-    }
-
-    public void activate() {
-        initWorld("World1");
+        initWorld("World1", worldSeed);
     }
 
     public void deactivate() {
