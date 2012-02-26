@@ -77,6 +77,7 @@ public class AudioManager {
         _audioFiles.put("Afternoon", loadMusic("Afternoon"));
         _audioFiles.put("Sunset", loadMusic("Sunset"));
         _audioFiles.put("Dimlight", loadMusic("Dimlight"));
+        _audioFiles.put("Resurface", loadMusic("Resurface"));
     }
 
     /**

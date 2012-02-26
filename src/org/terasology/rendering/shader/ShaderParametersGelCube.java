@@ -32,8 +32,12 @@ public class ShaderParametersGelCube implements IShaderParameters {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("slime");
 
-        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
-        program.setInt("tick", tera.getActiveWorldRenderer().getTick());
+        if (tera.getActivePlayer() != null) {
+            program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        }
+        if (tera.getActiveWorldRenderer() != null) {
+            program.setInt("tick", tera.getActiveWorldRenderer().getTick());
+        }
     }
 
 }

@@ -25,6 +25,8 @@ import org.terasology.rendering.world.WorldRenderer;
 public interface IGameMode {
     public void updateTimeAccumulator(long currentTime, long startTime);
     public void init();
+    public void activate();
+    public void deactivate();
     public void update();
     public void render();
     public void processKeyboardInput();

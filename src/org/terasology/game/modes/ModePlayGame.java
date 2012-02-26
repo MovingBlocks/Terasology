@@ -104,10 +104,15 @@ public class ModePlayGame implements IGameMode {
         }
 
         resetOpenGLParameters();
+    }
 
-        initWorld("World1", worldSeed);
-        Terasology.getInstance().initGroovy();
+    public void activate() {
+        initWorld("World1");
+    }
 
+    public void deactivate() {
+        _activeWorldRenderer.dispose();
+        _activeWorldRenderer = null;
     }
 
     public void update() {
@@ -136,14 +141,16 @@ public class ModePlayGame implements IGameMode {
 
             }
 
-            updateUserInterface();
-
             _timeAccumulator -= SKIP_TICKS;
         }
     }
 
     public void updateTimeAccumulator(long currentTime, long startTime) {
         _timeAccumulator += currentTime - startTime;
+    }
+
+    public void initWorld(String title) {
+        initWorld(title, null);
     }
 
     /**
@@ -232,8 +239,10 @@ public class ModePlayGame implements IGameMode {
         if (_activeWorldRenderer != null) {
             _activeWorldRenderer.render();
         }
-        PerformanceMonitor.startActivity("Render UI");
+
+        PerformanceMonitor.startActivity("RenderAndUpdate UI");
         renderUserInterface();
+        updateUserInterface();
         PerformanceMonitor.endActivity();
     }
 
@@ -279,7 +288,7 @@ public class ModePlayGame implements IGameMode {
                     toggleViewingDistance();
                 }
 
-                if(key == Keyboard.KEY_F12){
+                if (key == Keyboard.KEY_F12) {
                     Terasology.getInstance().getActiveWorldRenderer().printScreen();
                 }
 
@@ -378,8 +387,10 @@ public class ModePlayGame implements IGameMode {
     }
 
     public void togglePauseMenu() {
-        if (screenCanFocus(_pauseMenu))
+        if (screenCanFocus(_pauseMenu)) {
             _pauseMenu.setVisible(!_pauseMenu.isVisible());
+            _hud.setVisible(!_pauseMenu.isVisible());
+        }
     }
 
     public void toggleViewingDistance() {

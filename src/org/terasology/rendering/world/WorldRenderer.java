@@ -75,6 +75,7 @@ public final class WorldRenderer implements IGameObject {
     private final ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>();
     private final ArrayList<Chunk> _visibleChunks = new ArrayList<Chunk>();
     private int _chunkPosX, _chunkPosZ;
+
     /* CORE GAME OBJECTS */
     private final PortalManager _portalManager;
     private final MobManager _mobManager;
@@ -85,7 +86,7 @@ public final class WorldRenderer implements IGameObject {
     /* HORIZON */
     private final Skysphere _skysphere;
 
-    /* WATER AND LAVA ANIMATION */
+    /* TICKING */
     private int _tick = 0;
     private int _tickTock = 0;
     private long _lastTick;
@@ -96,13 +97,16 @@ public final class WorldRenderer implements IGameObject {
     /* EVENTS */
     private final WorldTimeEventManager _worldTimeEventManager;
 
+    /* PHYSICS */
+    private final BulletPhysicsRenderer _bulletRenderer;
+
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
 
     /* STATISTICS */
     private int _statDirtyChunks = 0;
 
-    /* is rendering as wirefram? */
+    /* OTHER SETTINGS */
     private boolean _wireframe;
 
     /**
@@ -119,6 +123,7 @@ public final class WorldRenderer implements IGameObject {
         _portalManager = new PortalManager(this);
         _mobManager = new MobManager(this);
         _blockGrid = new BlockGrid();
+        _bulletRenderer = new BulletPhysicsRenderer(this);
 
         initTimeEvents();
     }
@@ -195,12 +200,21 @@ public final class WorldRenderer implements IGameObject {
             }
         });
 
-        // SUNSET
+        // NIGHT
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
             @Override
             public void run() {
                 SoundStore.get().setMusicVolume(0.1f);
                 AudioManager.getInstance().getAudio("Dimlight").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
+
+        // BEFORE SUNRISE
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.1f);
+                AudioManager.getInstance().getAudio("Resurface").playAsMusic(1.0f, 1.0f, false);
             }
         });
     }
@@ -294,7 +308,7 @@ public final class WorldRenderer implements IGameObject {
         boolean headUnderWater = _player.isHeadUnderWater();
 
         PerformanceMonitor.startActivity("BulletPhysicsRenderer");
-        BulletPhysicsRenderer.getInstance().render();
+        _bulletRenderer.render();
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Chunk-Opaque");
@@ -429,7 +443,7 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Physics Renderer");
-        BulletPhysicsRenderer.getInstance().update();
+        _bulletRenderer.update();
         PerformanceMonitor.endActivity();
     }
 
@@ -667,5 +681,9 @@ public final class WorldRenderer implements IGameObject {
         } catch (IOException e) {
             Terasology.getInstance().getLogger().log(Level.WARNING, "Could not save image!", e);
         }
+    }
+
+    public BulletPhysicsRenderer getBulletRenderer() {
+        return _bulletRenderer;
     }
 }

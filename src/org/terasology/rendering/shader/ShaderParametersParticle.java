@@ -32,7 +32,8 @@ public class ShaderParametersParticle implements IShaderParameters {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("terrain");
 
-        program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        if (tera.getActivePlayer() != null)
+            program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
     }
 
 }
