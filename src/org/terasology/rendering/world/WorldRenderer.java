@@ -458,9 +458,9 @@ public final class WorldRenderer implements IGameObject {
         _tick++;
 
         // This block is based on seconds or less frequent timings
-        if (Terasology.getInstance().getTime() - _lastTick >= 1000) {
+        if (Terasology.getInstance().getTimeInMs() - _lastTick >= 1000) {
             _tickTock++;
-            _lastTick = Terasology.getInstance().getTime();
+            _lastTick = Terasology.getInstance().getTimeInMs();
 
             // PortalManager ticks for spawning once a second
             _portalManager.tickSpawn();

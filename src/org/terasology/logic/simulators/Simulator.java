@@ -33,7 +33,7 @@ public abstract class Simulator implements IBlockObserver {
     private boolean _running = false;
 
     protected final long _updateInterval;
-    protected long _lastUpdate = Terasology.getInstance().getTime();
+    protected long _lastUpdate = Terasology.getInstance().getTimeInMs();
 
     protected final IWorldProvider _parent;
     protected final HashSet<BlockPosition> _activeBlocks = new HashSet<BlockPosition>(256);
@@ -79,7 +79,7 @@ public abstract class Simulator implements IBlockObserver {
         if (_running)
             return false;
 
-        long currentTime = Terasology.getInstance().getTime();
+        long currentTime = Terasology.getInstance().getTimeInMs();
 
         if ((currentTime > _lastUpdate + _updateInterval || force)) {
 
