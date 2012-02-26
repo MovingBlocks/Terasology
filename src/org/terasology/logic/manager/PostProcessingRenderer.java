@@ -17,6 +17,7 @@ package org.terasology.logic.manager;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
+import org.terasology.game.Terasology;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
 
@@ -34,6 +35,7 @@ public class PostProcessingRenderer {
 
     public static final boolean EFFECTS_ENABLED = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.enablePostProcessingEffects");
     public static final float MAX_EXPOSURE = 4.0f;
+    public static final float MAX_EXPOSURE_NIGHT = 2.0f;
     public static final float MIN_EXPOSURE = 1.0f;
     public static final float TARGET_LUMINANCE = 0.5f;
     public static final float ADJUSTMENT_SPEED = 0.025f;
@@ -202,8 +204,13 @@ public class PostProcessingRenderer {
         if (lum > 0.0f) // No division by zero
             _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / lum, ADJUSTMENT_SPEED);
 
-        if (_exposure > MAX_EXPOSURE)
-            _exposure = MAX_EXPOSURE;
+        float maxExposure = MAX_EXPOSURE;
+
+        if (Terasology.getInstance().getActiveWorldRenderer().getSkysphere().getDaylight() == 0.0)
+            maxExposure = MAX_EXPOSURE_NIGHT;
+
+        if (_exposure > maxExposure)
+            _exposure = maxExposure;
         if (_exposure < MIN_EXPOSURE)
             _exposure = MIN_EXPOSURE;
     }

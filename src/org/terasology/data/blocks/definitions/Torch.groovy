@@ -28,6 +28,7 @@ block {
     translucent = true
     penetrable = true
     allowBlockAttachment = false
+    castsShadows = false
 
     luminance = 15
     hardness = 1
