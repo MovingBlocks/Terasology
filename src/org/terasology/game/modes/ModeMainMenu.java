@@ -18,7 +18,6 @@ package org.terasology.game.modes;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.newdawn.slick.openal.SoundStore;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -74,8 +73,7 @@ public class ModeMainMenu implements IGameMode {
     }
 
     private void playBackgroundMusic() {
-        SoundStore.get().setMusicVolume(0.1f);
-        AudioManager.getInstance().getAudio("Resurface").playAsMusic(1.0f, 1.0f, true);
+        AudioManager.playMusic("Resurface");
     }
 
     private void stopBackgroundMusic() {

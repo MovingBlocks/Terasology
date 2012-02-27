@@ -15,152 +15,280 @@
  */
 package org.terasology.logic.manager;
 
-import org.newdawn.slick.openal.Audio;
-import org.newdawn.slick.openal.AudioLoader;
-import org.newdawn.slick.util.ResourceLoader;
-import org.terasology.game.Terasology;
-import org.terasology.math.TeraMath;
-import org.terasology.utilities.FastRandom;
+import org.terasology.logic.audio.OpenALManager;
+import org.terasology.logic.audio.Sound;
+import org.terasology.logic.audio.SoundPool;
+import org.terasology.logic.audio.SoundSource;
+import org.terasology.logic.entities.Entity;
+import org.terasology.logic.entities.MovableEntity;
 
 import javax.vecmath.Vector3d;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
-import java.util.logging.Level;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Simple managing class for loading and accessing audio files.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author t3hk0d3 <contact@tehkode.ru>
  */
-public class AudioManager {
+public abstract class AudioManager {
+    public final static int PRIORITY_HIGHEST = 100;
+    public final static int PRIORITY_HIGH = 10;
+    public final static int PRIORITY_NORMAL = 5;
+    public final static int PRIORITY_LOW = 0;
 
-    private final HashMap<String, Audio> _audioFiles = new HashMap<String, Audio>();
+    protected Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
+
     private static AudioManager _instance = null;
-    private static final FastRandom _rand = new FastRandom();
 
-    public static AudioManager getInstance() {
-        if (_instance == null) {
-            _instance = new AudioManager();
-        }
+    protected Map<String, Sound> _audio = new HashMap<String, Sound>();
 
-        return _instance;
-    }
+    protected Map<String, SoundPool> _pools = new HashMap<String, SoundPool>();
 
-    private AudioManager() {
-        loadSound();
-        loadMusic();
-    }
 
-    private void loadSound() {
-        _audioFiles.put("PlaceBlock", loadSound("PlaceBlock"));
-        _audioFiles.put("RemoveBlock", loadSound("RemoveBlock"));
-        _audioFiles.put("Dig", loadSound("Dig"));
-
-        _audioFiles.put("Click", loadSound("Click"));
-
-        _audioFiles.put("Slime1", loadSound("Slime1"));
-        _audioFiles.put("Slime2", loadSound("Slime2"));
-        _audioFiles.put("Slime3", loadSound("Slime3"));
-        _audioFiles.put("Slime4", loadSound("Slime4"));
-        _audioFiles.put("Slime5", loadSound("Slime5"));
-        _audioFiles.put("Slime6", loadSound("Slime6"));
-
-        _audioFiles.put("Explode1", loadSound("Explode1"));
-        _audioFiles.put("Explode2", loadSound("Explode2"));
-        _audioFiles.put("Explode3", loadSound("Explode3"));
-        _audioFiles.put("Explode4", loadSound("Explode4"));
-        _audioFiles.put("Explode5", loadSound("Explode5"));
-    }
-
-    private void loadMusic() {
-        _audioFiles.put("Sunrise", loadMusic("Sunrise"));
-        _audioFiles.put("Afternoon", loadMusic("Afternoon"));
-        _audioFiles.put("Sunset", loadMusic("Sunset"));
-        _audioFiles.put("Dimlight", loadMusic("Dimlight"));
-        _audioFiles.put("Resurface", loadMusic("Resurface"));
+    protected AudioManager() {
     }
 
     /**
      * Return an audio file, loading it from disk if it isn't in the cache yet
      *
-     * @param s The name of the audio file
+     * @param name The name of the audio file
      * @return The loaded audio file
      */
-    public Audio loadSound(String s) {
-        try {
-            Audio a = _audioFiles.get(s);
-            if (a == null) {
-                a = AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("org/terasology/data/sounds/" + s + ".ogg"));
-                _audioFiles.put(s, a);
+    public Sound getSound(String name) {
+        Sound sound = _audio.get(name.toLowerCase());
+
+        if (sound == null) {
+            try {
+                logger.info("Loading sound 'sounds/" + name + ".ogg'");
+                sound = this.createAudio(name, getSoundAssetStream("sounds/" + name + ".ogg"));
+                _audio.put(name.toLowerCase(), sound);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load sound " + name + " - " + e.getMessage(), e);
             }
-            return a;
-        } catch (IOException e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, e.getLocalizedMessage());
         }
 
-        return null;
-    }
-
-    public void playVaryingSound(String s, float freq, float amp) {
-        AudioManager.getInstance().getAudio(s).playAsSoundEffect(freq + (float) TeraMath.fastAbs(_rand.randomDouble()) + (freq * 0.10f), amp + (float) TeraMath.fastAbs(_rand.randomDouble()) * (amp * 0.10f), false);
-    }
-
-    public void playVaryingPositionedSound(Vector3d relativeEntityPosition, Audio sound) {
-        double distance = relativeEntityPosition.length();
-
-        // No sounds so far away!
-        if (distance > 64.0)
-            return;
-
-
-        float loudness = 0.05f + (float) TeraMath.fastAbs(_rand.randomDouble()) * 0.05f;
-
-        if (distance > 1.0) {
-            loudness /= distance;
-            relativeEntityPosition.normalize();
-        }
-
-        sound.playAsSoundEffect(0.9f +
-                (float) TeraMath.fastAbs(_rand.randomDouble()) * 0.1f,
-                loudness,
-                false,
-                (float) relativeEntityPosition.x,
-                (float) relativeEntityPosition.y,
-                (float) relativeEntityPosition.z);
+        return sound;
     }
 
     /**
      * Loads the music file with the given name.
      *
-     * @param s The name of the music file
+     * @param name The name of the music file
      * @return The loaded music file
      */
-    public Audio loadMusic(String s) {
-        try {
-            return AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("org/terasology/data/music/" + s + ".ogg"));
-        } catch (IOException e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, e.getLocalizedMessage());
+    public Sound getMusic(String name) {
+        Sound sound = _audio.get(name.toLowerCase());
+
+        if (sound == null) {
+            try {
+                logger.info("Loading sound 'music/" + name + ".ogg'");
+                sound = this.createStreamingAudio(name, getSoundAssetStream("music/" + name + ".ogg"));
+                _audio.put(name.toLowerCase(), sound);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load sound " + name + " - " + e.getMessage(), e);
+            }
         }
 
-        return null;
+        return sound;
+    }
+
+    public abstract void initialize();
+
+    public abstract void update();
+
+    public abstract void destroy();
+
+    protected abstract Sound createAudio(String name, InputStream stream);
+
+    protected abstract Sound createStreamingAudio(String name, InputStream stream);
+
+    public SoundPool getSoundPool(String pool) {
+        SoundPool soundPool = this._pools.get(pool);
+
+        if (soundPool == null) {
+            throw new IllegalArgumentException("Unknown pool '" + pool + "', typo? Available pools: " + _pools.keySet());
+        }
+
+        return soundPool;
+    }
+
+    private InputStream getSoundAssetStream(String fileName) throws IOException {
+        return AssetManager.assetStream(fileName);
+    }
+
+    protected void loadAssets() {
+        this.loadSoundAssets();
+        this.loadMusicAssets();
+    }
+
+    private void loadSoundAssets() {
+        for (String sound : AssetManager.list("sounds")) {
+            logger.info("Loading sound " + sound);
+            try {
+                String name = sound.substring(sound.lastIndexOf('/') + 1);
+
+                if (!name.endsWith(".ogg")) {
+                    continue;
+                }
+
+                name = name.substring(0, name.lastIndexOf("."));
+
+                this._audio.put(name.toLowerCase(), createAudio(name, getSoundAssetStream(sound)));
+            } catch (IOException e) {
+                logger.info("Failed to load sound asset '" + sound + "'");
+            }
+        }
+    }
+
+    private void loadMusicAssets() {
+        for (String sound : AssetManager.list("music")) {
+            logger.info("Loading music " + sound);
+            try {
+                String name = sound.substring(sound.lastIndexOf('/') + 1);
+
+                if (!name.endsWith(".ogg")) {
+                    continue;
+                }
+
+
+                name = name.substring(0, name.lastIndexOf("."));
+                this._audio.put(name.toLowerCase(), createStreamingAudio(name, getSoundAssetStream(sound)));
+            } catch (IOException e) {
+                logger.info("Failed to load music asset '" + sound + "'");
+            }
+        }
+    }
+
+    public SoundSource getSoundSource(String pool, String sound) {
+        return getSoundSource(pool, getSound(sound));
+    }
+
+    public SoundSource getSoundSource(String pool, Sound sound) {
+        return getSoundPool(pool).getSource(sound);
     }
 
     /**
      * Stops all playback.
      */
     public void stopAllSounds() {
-        for (Audio a : _audioFiles.values()) {
-            a.stop();
+        for (SoundPool pool : _pools.values()) {
+            pool.stopAll();
         }
     }
 
-    /**
-     * Returns the loaded audio file with the given name.
-     *
-     * @param s The name of the audio file
-     * @return The loaded audio file
-     */
-    public Audio getAudio(String s) {
-        return _audioFiles.get(s);
+    public static AudioManager getInstance() {
+        if (_instance == null) {
+            _instance = new OpenALManager();
+        }
+
+        return _instance;
+    }
+
+    public static Sound sound(String name) {
+        return getInstance().getSound(name);
+    }
+
+    public static Sound[] sounds(String... names) {
+        Sound[] sounds = new Sound[names.length];
+
+        int i = 0;
+        for (String name : names) {
+            sounds[i++] = getInstance().getSound(name);
+        }
+
+        return sounds;
+    }
+
+    public static SoundSource source(String name) {
+        return getInstance().getSoundSource("sfx", name);
+    }
+
+    public static SoundSource source(Sound sound) {
+        return getInstance().getSoundSource("sfx", sound);
+    }
+
+    public static SoundSource source(String name, Vector3d pos, float gain) {
+        SoundSource source = source(name);
+        if (source == null) {
+            return null;
+        }
+
+        return (pos != null ? source.setPosition(pos).setAbsolute(true) : source).setGain(gain);
+    }
+
+    public static SoundSource source(Sound sound, Vector3d pos, float gain) {
+        SoundSource source = source(sound);
+
+        if (source == null) {
+            return null;
+        }
+
+        return (pos != null ? source.setPosition(pos).setAbsolute(true) : source).setGain(gain);
+    }
+
+    public static SoundSource play(String name) {
+        return play(name, null, 1.0f);
+    }
+
+    public static SoundSource play(String name, float gain) {
+        return play(name, null, gain);
+    }
+
+    public static SoundSource play(String name, Vector3d pos, float gain) {
+        SoundSource source = source(name);
+
+        if (source == null) {
+            return null;
+        }
+
+        return source.play();
+    }
+
+    public static SoundSource play(Sound sound, Vector3d pos, float gain) {
+        SoundSource source = source(sound, pos, gain);
+
+        if (source == null) {
+            return null;
+        }
+
+        return source.play();
+    }
+
+    public static SoundSource play(Sound sound, Entity entity, float gain){
+        SoundSource source = source(sound, entity.getPosition(), gain);
+
+        if (source == null) {
+            // Nof free sound sources
+            return null;
+        }
+
+        return source.play();
+    }
+
+    public static SoundSource play(Sound sound, MovableEntity entity, float gain) {
+        SoundSource source = source(sound, entity.getPosition(), gain);
+
+        if (source == null) {
+            // Nof free sound sources
+            return null;
+        }
+
+        return source.setVelocity(entity.getVelocity()).setDirection(entity.getViewingDirection()).play();
+    }
+    
+    public static SoundSource playMusic(String name) {
+        SoundPool pool = AudioManager.getInstance().getSoundPool("music");
+        SoundSource source = pool.getSource(AudioManager.sound(name));
+
+        if(source == null) { // no free music slots
+            return null;
+        }
+
+        return source.setGain(0.1f).play();
     }
 }

@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.entities;
 
-import org.newdawn.slick.openal.Audio;
 import org.terasology.game.Terasology;
+import org.terasology.logic.audio.Sound;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.SettingsManager;
 import org.terasology.math.TeraMath;
@@ -39,8 +39,8 @@ public abstract class MovableEntity extends Entity {
 
     /* AUDIO */
     protected long _lastFootStepSoundPlayed = 0;
-    protected Audio _currentFootstepSound;
-    protected Audio[] _footstepSounds;
+    protected Sound _currentFootstepSound;
+    protected Sound[] _footstepSounds;
     protected boolean _noSound = false;
 
     /* PARENT WORLD */
@@ -79,12 +79,7 @@ public abstract class MovableEntity extends Entity {
     }
 
     protected void initAudio() {
-        _footstepSounds = new Audio[5];
-        _footstepSounds[0] = AudioManager.getInstance().loadSound("FootGrass1");
-        _footstepSounds[1] = AudioManager.getInstance().loadSound("FootGrass2");
-        _footstepSounds[2] = AudioManager.getInstance().loadSound("FootGrass3");
-        _footstepSounds[3] = AudioManager.getInstance().loadSound("FootGrass4");
-        _footstepSounds[4] = AudioManager.getInstance().loadSound("FootGrass5");
+        _footstepSounds = AudioManager.sounds("FootGrass1", "FootGrass2", "FootGrass3", "FootGrass4", "FootGrass5");
     }
 
     public abstract void processMovement();
@@ -144,8 +139,7 @@ public abstract class MovableEntity extends Entity {
 
         if ((TeraMath.fastAbs(_velocity.x) > 0.01 || TeraMath.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
-                _currentFootstepSound = _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
-                AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(), _currentFootstepSound);
+                playFootstep(_currentFootstepSound = _footstepSounds[_parent.getWorldProvider().getRandom().randomIntAbs(_footstepSounds.length)]);
             } else {
                 long timeDiff = Terasology.getInstance().getTimeInMs() - _lastFootStepSoundPlayed;
 
@@ -371,13 +365,11 @@ public abstract class MovableEntity extends Entity {
                 if (oldGravity <= 0) {
                     // Jumping is only possible, if the entity is standing on ground
                     if (_jump) {
-                        AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
-                                _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
+                        playRandomFootstep();
                         _jump = false;
                         _gravity = _jumpIntensity;
                     } else if (!_touchingGround) { // Entity reaches the ground
-                        AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
-                                _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
+                        playRandomFootstep();
                         _touchingGround = true;
                     }
                 } else {
@@ -578,6 +570,14 @@ public abstract class MovableEntity extends Entity {
 
         if (_yaw < 0)
             _yaw = 360 + _yaw;
+    }
+
+    protected void playRandomFootstep() {
+        AudioManager.play(_footstepSounds[_parent.getWorldProvider().getRandom().randomIntAbs(_footstepSounds.length)], this, 0.6f);
+    }
+
+    protected void playFootstep(Sound footStep) {
+        AudioManager.play(footStep, this, 0.6f);
     }
 
     public boolean isSwimming() {
