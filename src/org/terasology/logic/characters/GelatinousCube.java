@@ -51,7 +51,7 @@ public final class GelatinousCube extends Character {
     public float _randomSize = 1.0f;
 
     public GelatinousCube(WorldRenderer parent) {
-        super(parent, 0.02, 1.5, 0.2, true);
+        super(parent);
 
         _randomSize = (float) (((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 0.8 + 0.2);
         _randomColorId = Math.abs(_parent.getWorldProvider().getRandom().randomInt()) % COLORS.length;
@@ -72,8 +72,8 @@ public final class GelatinousCube extends Character {
         _footstepSounds[4] = AudioManager.getInstance().loadSound("Slime5");
     }
 
-    public void update() {
-        super.update();
+    public void update(double delta) {
+        super.update(delta);
     }
 
     public void render() {
@@ -109,7 +109,6 @@ public final class GelatinousCube extends Character {
                 _movementTarget.set(getPosition().x + _parent.getWorldProvider().getRandom().randomDouble() * 500, getPosition().y, getPosition().z + _parent.getWorldProvider().getRandom().randomDouble() * 500);
                 _lastChangeOfDirectionAt = Terasology.getInstance().getTimeInMs();
                 _followingPlayer = false;
-                _walkingSpeed = ((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 0.05;
             }
         }
 

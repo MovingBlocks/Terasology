@@ -50,6 +50,9 @@ public class UIHealthBar extends UIDisplayContainer {
 
     @Override
     public void update() {
+        if (Terasology.getInstance().getActiveWorldRenderer() == null)
+            return;
+
         super.update();
 
         // Show/Hide hearts relatively to the available health points of the player

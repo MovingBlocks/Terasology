@@ -23,7 +23,8 @@ import org.terasology.rendering.world.WorldRenderer;
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 
 /**
  * Simple particle system.
@@ -48,25 +49,22 @@ public abstract class ParticleEmitter implements IGameObject {
 
     public void render() {
         glDisable(GL11.GL_CULL_FACE);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         for (int i = 0; i < _particles.size(); i++) {
             Particle p = _particles.get(i);
             p.render();
         }
 
-        glDisable(GL_BLEND);
         glEnable(GL11.GL_CULL_FACE);
     }
 
-    public void update() {
+    public void update(double delta) {
         removeDeadParticles();
         emitParticles();
 
         for (int i = 0; i < _particles.size(); i++) {
             Particle p = _particles.get(i);
-            p.update();
+            p.update(delta);
         }
     }
 

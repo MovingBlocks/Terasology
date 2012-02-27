@@ -302,7 +302,7 @@ public class Block implements IGameObject, Cloneable {
         renderWithLightValue(1.0f);
     }
 
-    public void update() {
+    public void update(double delta) {
         // Do nothing
     }
 

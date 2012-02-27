@@ -23,11 +23,10 @@ import org.terasology.rendering.world.WorldRenderer;
  * @version 0.1
  */
 public interface IGameMode {
-    public void updateTimeAccumulator(double delta);
     public void init();
     public void activate();
     public void deactivate();
-    public void update();
+    public void update(double delta);
     public void render();
     public void processKeyboardInput();
     public void processMouseInput();

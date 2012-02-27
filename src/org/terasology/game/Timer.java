@@ -10,20 +10,23 @@ public final class Timer {
     private long _delta = 0;
     private float _avgDelta = 0;
 
-    public Timer(){
+    public Timer() {
         //lwjgl libs need to be loaded prior to initialization!
         //do not construct timer earlier
         _timerTicksPerSecond = Sys.getTimerResolution();
     }
 
-    public void tick(){
+    public void tick() {
         long now = getTimeInMs();
         _delta = now - _last;
         _last = now;
-        _avgDelta =  _avgDelta * _decayRate + _delta * _oneMinusDecayRate;
+        _avgDelta = _avgDelta * _decayRate + _delta * _oneMinusDecayRate;
     }
 
     public double getDelta() {
+        if (_delta >= 100)
+            return 100;
+
         return _delta;
     }
 

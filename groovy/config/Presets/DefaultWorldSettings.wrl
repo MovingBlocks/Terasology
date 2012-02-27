@@ -20,16 +20,6 @@ World{
     Info{
         title = "New World"
     }
-    Physics{
-        maxGravity = 1.0d
-        maxGravitySwimming = 0.04d
-        gravity = 0.008d
-        gravitySwimming = 0.008d * 4d
-        friction = 0.15d
-        walkingSpeed = 0.025d
-        runningFactor = 1.5d
-        jumpIntensity = 0.16d
-    }
     Biomes {
         Forest{
             grassDensity = 0.3d

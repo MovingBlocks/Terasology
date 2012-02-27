@@ -33,11 +33,8 @@ import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
 
-//OpenGL
-//GUI
-
 /**
- * Play mode
+ * Play mode.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Anton Kireev <adeon.k87@gmail.com>
@@ -54,14 +51,8 @@ public class ModePlayGame implements IGameMode {
     private UIStatusScreen _statusScreen;
     private UIInventoryScreen _inventoryScreen;
 
-    /* CONST */
-    private static final int TICKS_PER_SECOND = 60;
-    private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-
     /* RENDERING */
     private WorldRenderer _activeWorldRenderer;
-
-    public double _timeAccumulator = 0;
 
     /* VIEWING DISTANCE */
     private static final int[] VIEWING_DISTANCES = {(Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceNear"),
@@ -115,10 +106,9 @@ public class ModePlayGame implements IGameMode {
         _activeWorldRenderer = null;
     }
 
-    public void update() {
-        //while (_timeAccumulator >= SKIP_TICKS) {
+    public void update(double delta) {
             if (_activeWorldRenderer != null && shouldUpdateWorld())
-                _activeWorldRenderer.update();
+                _activeWorldRenderer.update(delta);
 
             if (screenHasFocus() || !shouldUpdateWorld()) {
                 if (Mouse.isGrabbed()) {
@@ -140,17 +130,6 @@ public class ModePlayGame implements IGameMode {
                 }
 
             }
-
-            //_timeAccumulator -= SKIP_TICKS;
-        //}
-    }
-
-    public void updateTimeAccumulator(double delta) {
-        _timeAccumulator += delta;
-    }
-
-    public void initWorld(String title) {
-        initWorld(title, null);
     }
 
     /**
