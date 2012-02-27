@@ -25,15 +25,15 @@ public class PojoEntityManager implements EntityManager {
     ComponentTable store = new ComponentTable();
     private EventSystem eventSystem;
 
-    public EntityRef createEntity() {
+    public EntityRef create() {
         return new PojoEntityRef(this, nextEntityId++);
     }
 
-    public EntityRef getEntity(long entityId) {
+    public EntityRef get(long entityId) {
         return new PojoEntityRef(this, entityId);
     }
 
-    public void destroyEntity(long entityId) {
+    public void destroy(long entityId) {
         if (eventSystem != null) {
             eventSystem.send(new PojoEntityRef(this, entityId), RemovedComponentEvent.newInstance());
         }
@@ -95,6 +95,10 @@ public class PojoEntityManager implements EntityManager {
 
     public Iterable<Component> iterateComponents(long entityId) {
         return store.iterateComponents(entityId);
+    }
+
+    public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
+        return store.get(entityId, componentClass) != null;
     }
 
     private static class EntityEntry<T> implements Map.Entry<EntityRef, T>

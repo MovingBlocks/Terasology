@@ -1,14 +1,22 @@
 package org.terasology.entitySystem;
 
 /**
- * A wrapper around an entity id providing access to common functionality
+ * An entity prefab describes the recipe for creating an entity.
+ * Like an entity it groups a collection of components.
  * @author Immortius <immortius@gmail.com>
  */
-public interface EntityRef {
+public interface PrefabRef {
     /**
-     * @return The identifier for this entity
+     * @return The identifier for this prefab
      */
-    long getId();
+    String getName();
+
+    /**
+     *
+     * @param newName
+     * @throws IllegalArgumentException If the new name is already in use
+     */
+    void rename(String newName);
 
     /**
      *
@@ -33,7 +41,7 @@ public interface EntityRef {
      * @param component
      */
     void saveComponent(Component component);
-    
+
     /**
      * Iterates over all the components
      * @return
@@ -41,15 +49,8 @@ public interface EntityRef {
     Iterable<Component> iterateComponents();
 
     /**
-     * Removes all components from this entity, effectively destroying it
+     * Removes this prefab from the prefab manager
      */
     void destroy();
 
-    /**
-     * Transmits an event to this entity
-     * @param event
-     */
-    void send(Event event);
-
-    boolean hasComponent(Class<? extends Component> component);
 }

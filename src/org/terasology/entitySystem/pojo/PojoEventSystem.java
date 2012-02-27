@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,28 +44,16 @@ public class PojoEventSystem implements EventSystem {
                 Class<?>[] types = method.getParameterTypes();
                              
                 
-                if (types.length == 3 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1]) &&
-                        Component.class.isAssignableFrom(types[2]))
+                if (types.length == 2 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1]))
                 {
-                    if (receiveEventAnnotation.components().length == 0) {
-                        if (!types[2].equals(Component.class)) {
-                            Multimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get((Class<? extends Event>) types[0]);
-                            if (componentMap == null) {
-                                componentMap = HashMultimap.create();
-                                componentSpecificHandlers.put((Class<? extends Event>) types[0], componentMap);
-                            }
-                            componentMap.put((Class<? extends Component>)types[2], new EventHandlerInfo(handler, method));
+                    EventHandlerInfo handlerInfo = new EventHandlerInfo(handler, method, receiveEventAnnotation.components());
+                    for (Class<? extends Component> c : receiveEventAnnotation.components()) {
+                        Multimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get((Class<? extends Event>) types[0]);
+                        if (componentMap == null) {
+                            componentMap = HashMultimap.create();
+                            componentSpecificHandlers.put((Class<? extends Event>) types[0], componentMap);
                         }
-                    }
-                    else {
-                        for (Class<? extends Component> c : receiveEventAnnotation.components()) {
-                            Multimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get((Class<? extends Event>) types[0]);
-                            if (componentMap == null) {
-                                componentMap = HashMultimap.create();
-                                componentSpecificHandlers.put((Class<? extends Event>) types[0], componentMap);
-                            }
-                            componentMap.put(c, new EventHandlerInfo(handler, method));
-                        }
+                        componentMap.put(c, handlerInfo);
                     }
                 }
                 else
@@ -78,11 +67,16 @@ public class PojoEventSystem implements EventSystem {
     public void send(EntityRef entity, Event event) {
         Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
 
+        Set<EventHandlerInfo> processedHandlers = Sets.newHashSet();
+        
         for (Class<? extends Component> compClass : handlers.keySet()) {
-            Component comp = entity.getComponent(compClass);
-            if (comp != null) {
+            if (entity.hasComponent(compClass)) {
                 for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
-                    eventHandler.invoke(entity, comp, event);
+                    if (eventHandler.isValidFor(entity)) {
+                        if (processedHandlers.add(eventHandler)) {
+                            eventHandler.invoke(entity, event);
+                        }
+                    }
                 }
             }
         }
@@ -92,7 +86,9 @@ public class PojoEventSystem implements EventSystem {
         Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
         if (handlers != null) {
             for (EventHandlerInfo eventHandler : handlers.get(component.getClass())) {
-                eventHandler.invoke(entity, component, event);
+                if (eventHandler.isValidFor(entity)) {
+                    eventHandler.invoke(entity, event);
+                }
             }
         }
     }
@@ -101,17 +97,28 @@ public class PojoEventSystem implements EventSystem {
     {
         private EventHandler handler;
         private Method method;
+        private Class<? extends Component>[] components;
 
-        public EventHandlerInfo(EventHandler handler, Method method)
+        public EventHandlerInfo(EventHandler handler, Method method, Class<? extends Component>[] components)
         {
             this.handler = handler;
             this.method = method;
+            this.components = components;
+        }
+        
+        public boolean isValidFor(EntityRef entity) {
+            for (Class<? extends Component> component : components) {
+                if (!entity.hasComponent(component)) {
+                    return false;
+                }
+            }
+            return true;
         }
 
-        public void invoke(EntityRef entity, Component component, Event event)
+        public void invoke(EntityRef entity, Event event)
         {
             try {
-                method.invoke(handler, event, entity, component);
+                method.invoke(handler, event, entity);
             } catch (IllegalAccessException ex) {
                 logger.log(Level.SEVERE, "Failed to invoke event", ex);
             } catch (IllegalArgumentException ex) {

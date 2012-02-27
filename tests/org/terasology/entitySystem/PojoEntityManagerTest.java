@@ -29,8 +29,14 @@ public class PojoEntityManagerTest {
     }
     
     @Test
+    public void createEntity() {
+        EntityRef entity = entityManager.create();
+        assertNotNull(entity);
+    }
+    
+    @Test
     public void addAndRetrieveComponent() {
-        EntityRef entity = entityManager.createEntity();
+        EntityRef entity = entityManager.create();
         assertNotNull(entity);
 
         StringComponent comp = new StringComponent();
@@ -41,7 +47,7 @@ public class PojoEntityManagerTest {
     
     @Test
     public void removeComponent() {
-        EntityRef entity = entityManager.createEntity();
+        EntityRef entity = entityManager.create();
 
         StringComponent comp = new StringComponent();
         entity.addComponent(comp);
@@ -52,7 +58,7 @@ public class PojoEntityManagerTest {
     
     @Test
     public void replaceComponent() {
-        EntityRef entity = entityManager.createEntity();
+        EntityRef entity = entityManager.create();
         
         StringComponent comp = new StringComponent();
         comp.value = "Hello";
@@ -67,7 +73,7 @@ public class PojoEntityManagerTest {
 
     @Test
     public void destroyEntity() {
-        EntityRef entity = entityManager.createEntity();
+        EntityRef entity = entityManager.create();
         
         entity.addComponent(new StringComponent());
         entity.addComponent(new IntegerComponent());
@@ -79,7 +85,7 @@ public class PojoEntityManagerTest {
 
     @Test
     public void iterateComponents() {
-        EntityRef entity = entityManager.createEntity();
+        EntityRef entity = entityManager.create();
         StringComponent comp = new StringComponent();
         entity.addComponent(comp);
 
@@ -91,9 +97,9 @@ public class PojoEntityManagerTest {
     
     @Test
     public void changeComponentsDuringIterator() {
-        EntityRef entity1 = entityManager.createEntity();
+        EntityRef entity1 = entityManager.create();
         entity1.addComponent(new StringComponent());
-        EntityRef entity2 = entityManager.createEntity();
+        EntityRef entity2 = entityManager.create();
         entity2.addComponent(new StringComponent());
         
         Iterator<Map.Entry<EntityRef, StringComponent>> iterator = entityManager.iterateComponents(StringComponent.class).iterator();
@@ -107,7 +113,7 @@ public class PojoEntityManagerTest {
     public void addComponentEventSent() {
         EventSystem eventSystem = mock(EventSystem.class);
         entityManager.setEventSystem(eventSystem);
-        EntityRef entity1 = entityManager.createEntity();
+        EntityRef entity1 = entityManager.create();
         StringComponent comp = entity1.addComponent(new StringComponent());
 
         verify(eventSystem).send(entity1, AddComponentEvent.newInstance(), comp);
@@ -117,7 +123,7 @@ public class PojoEntityManagerTest {
     public void removeComponentEventSent() {
         EventSystem eventSystem = mock(EventSystem.class);
 
-        EntityRef entity1 = entityManager.createEntity();
+        EntityRef entity1 = entityManager.create();
         StringComponent comp = entity1.addComponent(new StringComponent());
         entityManager.setEventSystem(eventSystem);
         entity1.removeComponent(StringComponent.class);
@@ -129,7 +135,7 @@ public class PojoEntityManagerTest {
     public void changeComponentEventSentWhenSave() {
         EventSystem eventSystem = mock(EventSystem.class);
 
-        EntityRef entity1 = entityManager.createEntity();
+        EntityRef entity1 = entityManager.create();
         StringComponent comp = entity1.addComponent(new StringComponent());
         entityManager.setEventSystem(eventSystem);
         entity1.saveComponent(comp);
@@ -141,7 +147,7 @@ public class PojoEntityManagerTest {
     public void changeComponentEventSentWhenAddOverExisting() {
         EventSystem eventSystem = mock(EventSystem.class);
 
-        EntityRef entity1 = entityManager.createEntity();
+        EntityRef entity1 = entityManager.create();
         StringComponent comp1 = entity1.addComponent(new StringComponent());
         entityManager.setEventSystem(eventSystem);
         StringComponent comp2 = entity1.addComponent(new StringComponent());
@@ -153,7 +159,7 @@ public class PojoEntityManagerTest {
     public void massRemovedComponentEventSentOnDestroy() {
         EventSystem eventSystem = mock(EventSystem.class);
 
-        EntityRef entity1 = entityManager.createEntity();
+        EntityRef entity1 = entityManager.create();
         StringComponent comp1 = entity1.addComponent(new StringComponent());
         entityManager.setEventSystem(eventSystem);
         entity1.destroy();

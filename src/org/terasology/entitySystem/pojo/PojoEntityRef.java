@@ -41,11 +41,15 @@ public class PojoEntityRef implements EntityRef{
     }
 
     public void destroy() {
-        entityManager.destroyEntity(id);
+        entityManager.destroy(id);
     }
 
     public void send(Event event) {
         entityManager.getEventSystem().send(this, event);
+    }
+
+    public boolean hasComponent(Class<? extends Component> component) {
+        return entityManager.hasComponent(id, component);
     }
 
     @Override

@@ -28,7 +28,7 @@ public class PojoEventSystemTests {
         entityManager = new PojoEntityManager();
         eventSystem = new PojoEventSystem(entityManager);
         entityManager.setEventSystem(eventSystem);
-        entity = entityManager.createEntity();
+        entity = entityManager.create();
     }
 
     @Test
@@ -44,7 +44,6 @@ public class PojoEventSystemTests {
         assertEquals(1, handler.receivedList.size());
         assertEquals(event, handler.receivedList.get(0).event);
         assertEquals(entity, handler.receivedList.get(0).entity);
-        assertEquals(component, handler.receivedList.get(0).component);
         
     }
 
@@ -59,12 +58,10 @@ public class PojoEventSystemTests {
         TestEvent event = new TestEvent();
         entity.send(event);
 
-        List<Component> expectedComponents = Lists.newArrayList(stringComponent, intComponent);
         assertEquals(2, handler.receivedList.size());
         for (TestEventHandler.Received received : handler.receivedList) {
             assertEquals(event, received.event);
             assertEquals(entity, received.entity);
-            assertTrue(expectedComponents.remove(received.component));
         }
 
     }
@@ -83,7 +80,35 @@ public class PojoEventSystemTests {
         assertEquals(1, handler.receivedList.size());
         assertEquals(event, handler.receivedList.get(0).event);
         assertEquals(entity, handler.receivedList.get(0).entity);
-        assertEquals(intComponent, handler.receivedList.get(0).component);
+    }
+    
+    @Test
+    public void testNoReceiveEventWhenMissingComponents() {
+        StringComponent component = entity.addComponent(new StringComponent());
+
+        TestCompoundComponentEventHandler handler = new TestCompoundComponentEventHandler();
+        eventSystem.registerEventHandler(handler);
+
+        TestEvent event = new TestEvent();
+        eventSystem.send(entity, event);
+
+        assertEquals(0, handler.receivedList.size());
+    }
+
+    @Test
+    public void testReceiveEventRequiringMultipleComponents() {
+        StringComponent stringComponent = entity.addComponent(new StringComponent());
+        IntegerComponent intComponent = entity.addComponent(new IntegerComponent());
+
+        TestCompoundComponentEventHandler handler = new TestCompoundComponentEventHandler();
+        eventSystem.registerEventHandler(handler);
+
+        TestEvent event = new TestEvent();
+        eventSystem.send(entity, event);
+
+        assertEquals(1, handler.receivedList.size());
+        assertEquals(event, handler.receivedList.get(0).event);
+        assertEquals(entity, handler.receivedList.get(0).entity);
     }
     
     private static class TestEvent implements Event {
@@ -94,25 +119,43 @@ public class PojoEventSystemTests {
 
         List<Received> receivedList = Lists.newArrayList();        
         
-        @ReceiveEvent
-        public void handleTestEvent(TestEvent event, EntityRef entity, StringComponent component) {
-            receivedList.add(new Received(event, entity, component));
+        @ReceiveEvent(components = StringComponent.class)
+        public void handleStringEvent(TestEvent event, EntityRef entity) {
+            receivedList.add(new Received(event, entity));
         }
 
-        @ReceiveEvent
-        public void handleTestEvent(TestEvent event, EntityRef entity, IntegerComponent component) {
-            receivedList.add(new Received(event, entity, component));
+        @ReceiveEvent(components = IntegerComponent.class)
+        public void handleIntegerEvent(TestEvent event, EntityRef entity) {
+            receivedList.add(new Received(event, entity));
         }
         
         public static class Received {
             TestEvent event;
             EntityRef entity;
-            Component component;
             
-            public Received(TestEvent event, EntityRef entity, Component component) {
+            public Received(TestEvent event, EntityRef entity) {
                 this.event = event;
                 this.entity = entity;
-                this.component = component;
+            }
+        }
+    }
+
+    public static class TestCompoundComponentEventHandler implements EventHandler {
+
+        List<Received> receivedList = Lists.newArrayList();
+
+        @ReceiveEvent(components = {StringComponent.class, IntegerComponent.class})
+        public void handleStringEvent(TestEvent event, EntityRef entity) {
+            receivedList.add(new Received(event, entity));
+        }
+
+        public static class Received {
+            TestEvent event;
+            EntityRef entity;
+
+            public Received(TestEvent event, EntityRef entity) {
+                this.event = event;
+                this.entity = entity;
             }
         }
     }
