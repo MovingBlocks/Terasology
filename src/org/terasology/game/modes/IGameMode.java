@@ -23,7 +23,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * @version 0.1
  */
 public interface IGameMode {
-    public void updateTimeAccumulator(long currentTime, long startTime);
+    public void updateTimeAccumulator(double delta);
     public void init();
     public void activate();
     public void deactivate();

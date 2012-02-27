@@ -116,7 +116,7 @@ public class ModePlayGame implements IGameMode {
     }
 
     public void update() {
-        while (_timeAccumulator >= SKIP_TICKS) {
+        //while (_timeAccumulator >= SKIP_TICKS) {
             if (_activeWorldRenderer != null && shouldUpdateWorld())
                 _activeWorldRenderer.update();
 
@@ -141,12 +141,12 @@ public class ModePlayGame implements IGameMode {
 
             }
 
-            _timeAccumulator -= SKIP_TICKS;
-        }
+            //_timeAccumulator -= SKIP_TICKS;
+        //}
     }
 
-    public void updateTimeAccumulator(long currentTime, long startTime) {
-        _timeAccumulator += currentTime - startTime;
+    public void updateTimeAccumulator(double delta) {
+        _timeAccumulator += delta;
     }
 
     public void initWorld(String title) {
