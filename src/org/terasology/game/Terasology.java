@@ -407,7 +407,9 @@ public final class Terasology {
     }
 
     public long getTimeInMs() {
-
+    	if (_timer == null) {
+    		initTimer();
+    	}
         return _timer.getTimeInMs();
     }
 
