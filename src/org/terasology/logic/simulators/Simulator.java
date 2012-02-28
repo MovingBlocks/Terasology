@@ -20,7 +20,10 @@ import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.structures.BlockPosition;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Base class for all simulators.
@@ -36,7 +39,9 @@ public abstract class Simulator implements IBlockObserver {
     protected long _lastUpdate = Terasology.getInstance().getTimeInMs();
 
     protected final IWorldProvider _parent;
-    protected final HashSet<BlockPosition> _activeBlocks = new HashSet<BlockPosition>(256);
+    protected final Set<BlockPosition> _activeBlocks = new HashSet<BlockPosition>();
+
+    protected final ReentrantLock _lock = new ReentrantLock();
 
     public Simulator(String name, IWorldProvider parent, long updateInterval) {
         _updateInterval = updateInterval;
@@ -48,10 +53,51 @@ public abstract class Simulator implements IBlockObserver {
         this(name, parent, 1000);
     }
 
-    public void addActiveBlock(BlockPosition bp) {
-        _activeBlocks.add(bp);
+    public BlockPosition tryRemoveFirstBlock() {
+        try {
+            if (_lock.tryLock()) {
+                if (_activeBlocks.size() > 0) {
+                    BlockPosition bp = _activeBlocks.iterator().next();
+                    _activeBlocks.remove(bp);
+                    return bp;
+                }
+            }
+        } finally {
+            _lock.unlock();
+        }
+
+        return null;
     }
 
+    public ArrayList<BlockPosition> tryCopyActiveBlocks() {
+        try {
+            if (_lock.tryLock()) {
+                return new ArrayList<BlockPosition>(_activeBlocks);
+            }
+        } finally {
+            _lock.unlock();
+        }
+
+        return null;
+    }
+
+    public void addActiveBlock(BlockPosition bp) {
+        try {
+            _lock.lock();
+            _activeBlocks.add(bp);
+        } finally {
+            _lock.unlock();
+        }
+    }
+
+    public void clear() {
+        try {
+            _lock.lock();
+            _activeBlocks.clear();
+        } finally {
+            _lock.unlock();
+        }
+    }
 
     public void simulateAll() {
         if (_running)
@@ -62,12 +108,7 @@ public abstract class Simulator implements IBlockObserver {
         // Create a new thread and start processing
         Runnable r = new Runnable() {
             public void run() {
-                int counter = 0;
-
-                while (executeSimulation() && counter < 1024) {
-                    counter++;
-                }
-
+                while (executeSimulation()) ;
                 _running = false;
             }
         };
@@ -100,10 +141,6 @@ public abstract class Simulator implements IBlockObserver {
         }
 
         return false;
-    }
-
-    public void clear() {
-        _activeBlocks.clear();
     }
 
     protected abstract boolean executeSimulation();

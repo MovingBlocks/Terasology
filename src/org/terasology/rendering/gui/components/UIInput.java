@@ -3,12 +3,13 @@ package org.terasology.rendering.gui.components;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.logic.manager.AudioManager;
 import org.newdawn.slick.Color;
+import org.terasology.rendering.gui.framework.IInputDataElement;
+import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.IInputListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.game.Terasology;
+
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 
@@ -16,20 +17,19 @@ import java.util.ArrayList;
  * A simple graphical input
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
- * @version 0.1
- * @todo Add text selection and paste from clipboard
+ * @version 0.23
  */
-public class UIInput extends UIDisplayContainer {
+public class UIInput extends UIDisplayContainer implements IInputDataElement {
+//	TODO: Add text selection and paste from clipboard
   private final ArrayList<IInputListener> _inputListeners = new ArrayList<IInputListener>();
 
   private final StringBuffer      _inputValue = new StringBuffer();
-  private final UIGraphicsElement _defaultTexture;
   private final UIText            _inputText;
   private final UITextCursor      _textCursor;
   private final Vector2f          _padding    = new Vector2f(10f,10f);
   
   private int    _cursorPosition       = 0;  //The current position of the carriage
-  private int    _maxLength            = 42; //The maximum number of characters that will be accepted as input
+  private int    _maxLength            = 255; //The maximum number of characters that will be accepted as input
   private float  _textWidthInContainer = 0;  //The width of the text inside the INPUT field.
 
   private String _prevInputValue = new String();
@@ -37,10 +37,7 @@ public class UIInput extends UIDisplayContainer {
   public UIInput(Vector2f size) {
       setSize(size);
       setCrop(true);
-
-      _defaultTexture = new UIGraphicsElement("gui_menu");
-      _defaultTexture.setVisible(true);
-      _defaultTexture.getTextureSize().set(new Vector2f(256f / 512f, 30f / 512f));
+      setStyle("background-image","gui_menu 256/512 30/512 0 90/512");
 
       _inputText = new UIText();
       _inputText.setVisible(true);
@@ -51,21 +48,17 @@ public class UIInput extends UIDisplayContainer {
       _textCursor.setVisible(true);
       _textCursor.setPosition(new Vector2f((getPosition().x + _padding.x), (getPosition().y + _padding.y / 2)));
 
-      addDisplayElement(_defaultTexture);
       addDisplayElement(_inputText);
       addDisplayElement(_textCursor);
-
   }
   
   public void update() {
-    _defaultTexture.setSize(getSize());
-
     Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
 
     if (intersects(mousePos)) {
 
         if (!_clickSoundPlayed) {
-            AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(1.0f, 0.5f, false);
+            AudioManager.play("PlaceBlock");
             _clickSoundPlayed = true;
         }
 
@@ -84,28 +77,42 @@ public class UIInput extends UIDisplayContainer {
         _clickSoundPlayed = false;
         _mouseUp = false;
         _mouseDown = false;
-        _defaultTexture.getTextureOrigin().set(0f, 90f / 512f);
+        setStyle("background-position","0 90/512");
     }
 
     if (isFocused()) {
         if(!_textCursor.isVisible()){
             _textCursor.setVisible(true);
         }
-        _defaultTexture.getTextureOrigin().set(0f, 120f / 512f);
+        setStyle("background-position","0 120/512");
     } else {
         if(_textCursor.isVisible()){
             _textCursor.setVisible(false);
         }
-        _defaultTexture.getTextureOrigin().set(0f, 90f / 512f);
+        setStyle("background-position","0 90/512");
     }
     updateTextShift();
+    super.update();
   }
 
-  /*
-   * @todo Change the current position of the carriage, when user pushed mouse button
-   */
   public void clicked(Vector2f mousePos) {
       _focused = true;
+
+      if(_inputValue.length()>0&&_inputText.getTextWidth()>0){
+          Vector2f absolutePosition = _inputText.calcAbsolutePosition();
+          float positionRelativeElement = (absolutePosition.x + _inputText.getTextWidth()) - mousePos.x;
+          float averageSymbols =  _inputText.getTextWidth()/_inputValue.length();
+
+          int pos = Math.abs((int)(positionRelativeElement/averageSymbols)-_inputValue.length());
+
+          if(pos>(_inputValue.length())){
+              pos = _inputValue.length();
+          }else if(pos<0){
+              pos = 0;
+          }
+          _cursorPosition = pos;
+      }
+
   }
 
   public void processKeyboardInput(int key){
@@ -129,8 +136,8 @@ public class UIInput extends UIDisplayContainer {
             }
         }else if(key == Keyboard.KEY_RIGHT){
             _cursorPosition++;
-            if(_cursorPosition>_inputValue.length()-1){
-                _cursorPosition = _inputValue.length()-1;
+            if(_cursorPosition>_inputValue.length()){
+                _cursorPosition = _inputValue.length();
             }
         }else{
             if(_inputValue.length()>_maxLength){
@@ -162,6 +169,17 @@ public class UIInput extends UIDisplayContainer {
   }
 
   /*
+   * Clear _inputValue; set cursor position to "0"; set input text to "";
+   */
+  public void clearData() {
+      if(_inputValue.length() > 0){
+         _inputValue.delete(0,_inputValue.length()-1);
+      }
+      _cursorPosition = 0;
+      _inputText.setText("");
+  }
+
+  /*
    * Set current input value
    */
   public void setValue(String value){
@@ -175,7 +193,7 @@ public class UIInput extends UIDisplayContainer {
    * Set color text into input field
    */
   public void setTextColor(Color color){
-    _inputText.setColor(color);
+      _inputText.setColor(color);
   }
 
   /*
@@ -185,8 +203,8 @@ public class UIInput extends UIDisplayContainer {
   private void updateTextShift(){
       float cursorPos = 0f;
       _textWidthInContainer = _inputText.getTextWidth() + _padding.x + _inputText.getPosition().x;
-      if(_textWidthInContainer > getSize().x || _inputText.getPosition().x < 0){
-          _inputText.setPosition(new Vector2f((_inputText.getPosition().x + (getSize().x - _textWidthInContainer)),_inputText.getPosition().y));
+      if(_textWidthInContainer > getPosition().x + getSize().x || getPosition().x + _inputText.getPosition().x < 0){
+          _inputText.setPosition(new Vector2f(( _inputText.getPosition().x + (getPosition().x + getSize().x - _textWidthInContainer)),_inputText.getPosition().y));
       }
       if(_cursorPosition!=_inputValue.length()){
           cursorPos = (_inputText.getFont().getWidth(_inputValue.toString().substring(0, _cursorPosition)) - _textCursor.getSize().x + _inputText.getPosition().x)/2;

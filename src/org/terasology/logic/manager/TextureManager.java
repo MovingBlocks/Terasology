@@ -76,10 +76,12 @@ public class TextureManager {
         addTexture("loadingBackground", GL11.GL_CLAMP, GL_LINEAR);
         addTexture("menuBackground", GL11.GL_CLAMP, GL_LINEAR);
         addTexture("inventory");
+        addTexture("containerWindow");
 
         /* MOBS */
         addTexture("slime");
         addTexture("char");
+        addTexture("mhead");
 
         /* EFFECTS */
         addTexture("effects");

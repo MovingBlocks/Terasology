@@ -19,17 +19,19 @@ import groovy.util.ConfigObject;
 import org.terasology.game.Terasology;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.generators.GeneratorManager;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.structures.BlockPosition;
 import org.terasology.persistence.PersistableObject;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -41,6 +43,9 @@ import java.util.logging.Level;
  */
 public class LocalWorldProvider extends PersistableObject implements IWorldProvider {
 
+    /* OBSERVERS */
+    private final ArrayList<IBlockObserver> _observers = new ArrayList<IBlockObserver>();
+
     /* WORLD GENERATION */
     protected final GeneratorManager _generatorManager;
 
@@ -48,12 +53,12 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     protected final IChunkProvider _chunkProvider;
 
     /* CONST */
-    protected final long DAY_NIGHT_LENGTH_IN_MS = (Long) SettingsManager.getInstance().getWorldSetting("World.DiurnalCycle.dayNightLengthInMs");
-    protected final Vector2f SPAWN_ORIGIN = (Vector2f) SettingsManager.getInstance().getWorldSetting("World.Creation.spawnOrigin");
+    protected final long DAY_NIGHT_LENGTH_IN_MS = Config.getInstance().getDayNightLengthInMs();
+    protected final Vector2f SPAWN_ORIGIN = Config.getInstance().getSpawnOrigin();
 
     /* PROPERTIES */
     protected String _title, _seed;
-    protected long _creationTime = Terasology.getInstance().getTimeInMs() - (Long) SettingsManager.getInstance().getWorldSetting("World.DiurnalCycle.initialTimeOffsetInMs");
+    protected long _creationTime = Terasology.getInstance().getTimeInMs() - Config.getInstance().getInitialTimeOffsetInMs();
 
     /* SIMULATORS */
     private final LiquidSimulator _liquidSimulator;
@@ -90,10 +95,40 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         _random = new FastRandom(seed.hashCode());
 
         _generatorManager = new GeneratorManager(this);
-        _chunkProvider = new LocalChunkCache(this);
+        _chunkProvider = new ChunkProvider(this);
 
         _liquidSimulator = new LiquidSimulator(this);
         _growthSimulator = new GrowthSimulator(this);
+        registerObserver(_liquidSimulator);
+        registerObserver(_growthSimulator);
+    }
+
+    public boolean isChunkAvailableAt(Vector3f position) {
+
+        int chunkPosX = TeraMath.calcChunkPosX((int)position.x);
+        int chunkPosZ = TeraMath.calcChunkPosZ((int)position.z);
+
+        return _chunkProvider.isChunkAvailable(chunkPosX, 0, chunkPosZ);
+    }
+    
+    public boolean isChunkAvailableAt(Tuple3i position) {
+        int chunkPosX = TeraMath.calcChunkPosX(position.x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(position.z);
+
+        return _chunkProvider.isChunkAvailable(chunkPosX, 0, chunkPosZ);
+    }
+
+    public final boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite) {
+        return setBlock(pos.x, pos.y, pos.z, type, updateLight, overwrite, false);
+    }
+
+    // TODO: A better system would be to pass through the change maker, and for generators to not work through this interface
+    public final boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite, boolean suppressUpdate) {
+        return setBlock(pos.x, pos.y, pos.z, type, updateLight, overwrite, suppressUpdate);
+    }
+
+    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
+        return setBlock(x,y,z,type,updateLight,overwrite, false);
     }
 
     /**
@@ -107,14 +142,14 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @param overwrite If true currently present blocks get replaced
      * @return True if a block was set/replaced
      */
-    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
+    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite, boolean suppressUpdate) {
         int chunkPosX = TeraMath.calcChunkPosX(x);
         int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
         int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
         int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ);
+        Chunk c = getChunkProvider().getChunk(chunkPosX, 0, chunkPosZ);
 
         if (c == null) {
             return false;
@@ -126,6 +161,14 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
             c.setBlock(blockPosX, y, blockPosZ, type);
             newBlock = type;
+
+            if (!suppressUpdate) {
+                if (newBlock == 0x0) {
+                    notifyObserversBlockRemoved(c, new BlockPosition(x,y,z));
+                } else {
+                    notifyObserversBlockPlaced(c, new BlockPosition(x,y,z));
+                }
+            }
 
             if (updateLight) {
                 /*
@@ -167,6 +210,17 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         return true;
     }
 
+    // TODO: Send though source object hint
+    private void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos) {
+        for (IBlockObserver ob : _observers)
+            ob.blockPlaced(chunk, pos);
+    }
+
+    private void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos) {
+        for (IBlockObserver ob : _observers)
+            ob.blockRemoved(chunk, pos);
+    }
+
     /**
      * Sets the block state value at the given position.
      *
@@ -181,7 +235,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
         int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().getChunk(TeraMath.calcChunkPosX(x), 0, TeraMath.calcChunkPosZ(z));
         c.setState(blockPosX, y, blockPosZ, state);
     }
 
@@ -230,7 +284,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
         int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().getChunk(TeraMath.calcChunkPosX(x), 0, TeraMath.calcChunkPosZ(z));
         return c.getBlock(blockPosX, y, blockPosZ);
     }
 
@@ -245,7 +299,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
         int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().getChunk(TeraMath.calcChunkPosX(x), 0, TeraMath.calcChunkPosZ(z));
         return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
     }
 
@@ -256,7 +310,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
         int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().getChunk(TeraMath.calcChunkPosX(x), 0, TeraMath.calcChunkPosZ(z));
         return c.getState(blockPosX, y, blockPosZ);
     }
 
@@ -276,7 +330,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
         int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().getChunk(TeraMath.calcChunkPosX(x), 0, TeraMath.calcChunkPosZ(z));
         return c.getLight(blockPosX, y, blockPosZ, type);
     }
 
@@ -296,7 +350,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
         int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
 
-        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
+        Chunk c = getChunkProvider().getChunk(TeraMath.calcChunkPosX(x), 0, TeraMath.calcChunkPosZ(z));
         c.setLight(blockPosX, y, blockPosZ, intensity, type);
     }
 
@@ -330,6 +384,57 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         Terasology.getInstance().getLogger().log(Level.INFO, "Disposing local world \"{0}\" and saving all chunks.", getTitle());
         super.dispose();
         getChunkProvider().dispose();
+    }
+
+    public void registerObserver(IBlockObserver observer) {
+        _observers.add(observer);
+    }
+
+    public void unregisterObserver(IBlockObserver observer) {
+        _observers.remove(observer);
+    }
+
+    /**
+     * "Unspreads" light recursively.
+     *
+     * @param x           The X-coordinate
+     * @param y           The Y-coordinate
+     * @param z           The Z-coordinate
+     * @param lightValue  The initial light value
+     * @param depth       The current depth of the recursion
+     * @param type        The type of light
+     * @param brightSpots List of bright spots found while unspreading the light
+     */
+    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, ArrayList<Vector3d> brightSpots) {
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
+
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = getChunkProvider().getChunk(TeraMath.calcChunkPosX(x), 0, TeraMath.calcChunkPosZ(z));
+        c.unspreadLight(blockPosX, y, blockPosZ, lightValue, depth, type, brightSpots);
+    }
+
+    /**
+     * Propagates light recursively.
+     *
+     * @param x          The X-coordinate
+     * @param y          The Y-coordinate
+     * @param z          The Z-coordinate
+     * @param lightValue The initial light value
+     * @param depth      The current depth of the recursion
+     * @param type       The type of light
+     */
+    public void spreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type) {
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
+
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = getChunkProvider().getChunk(TeraMath.calcChunkPosX(x), 0, TeraMath.calcChunkPosZ(z));
+        c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
     }
 
     /**
@@ -402,49 +507,6 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     }
 
     /**
-     * "Unspreads" light recursively.
-     *
-     * @param x           The X-coordinate
-     * @param y           The Y-coordinate
-     * @param z           The Z-coordinate
-     * @param lightValue  The initial light value
-     * @param depth       The current depth of the recursion
-     * @param type        The type of light
-     * @param brightSpots List of bright spots found while unspreading the light
-     */
-    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, ArrayList<Vector3d> brightSpots) {
-        int chunkPosX = TeraMath.calcChunkPosX(x);
-        int chunkPosZ = TeraMath.calcChunkPosZ(z);
-
-        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
-
-        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
-        c.unspreadLight(blockPosX, y, blockPosZ, lightValue, depth, type, brightSpots);
-    }
-
-    /**
-     * Propagates light recursively.
-     *
-     * @param x          The X-coordinate
-     * @param y          The Y-coordinate
-     * @param z          The Z-coordinate
-     * @param lightValue The initial light value
-     * @param depth      The current depth of the recursion
-     * @param type       The type of light
-     */
-    public void spreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = TeraMath.calcChunkPosX(x);
-        int chunkPosZ = TeraMath.calcChunkPosZ(z);
-
-        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
-
-        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
-        c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
-    }
-
-    /**
      * Returns the world save path, including the world's name. Will try to detect and fix quirky path issues (applet thing)
      *
      * @return path to save stuff at
@@ -460,7 +522,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public void writePropertiesToConfigObject(ConfigObject co) {
         co.put("worldTitle", getTitle());
         co.put("worldSeed", getSeed());

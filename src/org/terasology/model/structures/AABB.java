@@ -20,6 +20,7 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -49,6 +50,11 @@ public class AABB {
     public AABB(Vector3d position, Vector3d dimensions) {
         setPosition(position);
         this._dimensions = dimensions;
+    }
+
+    public AABB(Vector3f position, Vector3f dimensions) {
+        setPosition(new Vector3d(position));
+        this._dimensions = new Vector3d(dimensions);
     }
 
     /**
@@ -115,6 +121,12 @@ public class AABB {
         return !(maxX() < point.x || minX() > point.x) &&
                !(maxY() < point.y || minY() > point.y) &&
                !(maxZ() < point.z || minZ() > point.z);
+    }
+
+    public boolean contains(Vector3f point) {
+        return !(maxX() < point.x || minX() > point.x) &&
+                !(maxY() < point.y || minY() > point.y) &&
+                !(maxZ() < point.z || minZ() > point.z);
     }
 
     /**
@@ -277,8 +289,8 @@ public class AABB {
         ShaderManager.getInstance().enableDefault();
 
         glPushMatrix();
-        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-        glTranslated(getPosition().x - playerPosition.x, -playerPosition.y, getPosition().z - playerPosition.z);
+        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+        glTranslated(getPosition().x - cameraPosition.x, -cameraPosition.y, getPosition().z - cameraPosition.z);
 
         renderLocally(lineThickness);
 

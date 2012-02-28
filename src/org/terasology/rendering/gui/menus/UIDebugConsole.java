@@ -46,8 +46,6 @@ public final class UIDebugConsole extends UIDisplayContainer {
         _consoleText.setVisible(true);
 
         addDisplayElement(_consoleText);
-
-        update();
     }
 
     /**
@@ -124,7 +122,7 @@ public final class UIDebugConsole extends UIDisplayContainer {
         }
 
         if (success) {
-            Terasology.getInstance().resetOpenGLParameters();
+            Terasology.getInstance().initOpenGLParams();
             Terasology.getInstance().getLogger().log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
 
             addToRingBuffer();

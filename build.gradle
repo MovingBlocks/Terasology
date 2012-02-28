@@ -1,0 +1,117 @@
+/*
+ * This is a Gradle build file:
+ * - Gradle Homepage: http://gradle.org/
+ * - Gradle Installation: http://gradle.org/installation
+ * - View tasks for this project: $ gradle tasks
+ */
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+idea {
+  project {
+    jdkName = '1.6'
+  }
+}
+
+sourceCompatibility = 1.5
+//version = '0.5.0' //TODO: Disabled version tagging until we actually have something solid to do with it (was breaking old artifact links)
+buildDir = 'out'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.0-milestone-8a'
+}
+
+sourceSets {
+	main {
+		java { srcDirs = [] }
+		groovy { srcDir 'src' }
+	}
+	test {
+		java { srcDir 'tests' }
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies{
+	groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.2'
+    compile group: 'com.google.guava', name: 'guava', version: '11.0.1'
+	compile group: 'com.google.code.gson', name: 'gson', version: '2.1'
+	compile fileTree(dir: 'libs', include: '*.jar', exclude: 'mockito-all-1.9.0.jar')	
+	testCompile 'junit:junit:4.10'
+	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
+}
+
+task copyResources(type:Copy) {
+	description = 'Copies resources into build directory.'
+	from('src') {
+		exclude '**/*.java'
+		exclude '**/*.groovy'
+	}
+	into('out/classes/main')
+}
+
+jar {
+	dependsOn compileGroovy
+	dependsOn copyResources
+	from { 
+		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+	manifest {
+		attributes("Main-Class": "org.terasology.game.Terasology", "Manifest-Version": "1.0")
+	}
+	archiveName('Terasology.jar')
+}
+
+jar.doLast {
+	ant.signjar(jar: jar.archivePath, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
+}
+
+task dist(type:Copy) {
+	description = 'Creates a fully-functional game folder.'
+	dependsOn jar
+	
+	from('.') {
+		include 'natives/**'
+		include 'groovy/**'
+		include 'README.markdown'
+		include 'LICENSE.txt'
+	}
+	from('scripts') {
+		exclude('Launcher.xml')
+	}
+	from(jar.archivePath)
+	into('out/dist')
+}
+
+task zip(type:Zip) {
+	description = 'Creates a fully-functionional game archive.'
+	dependsOn dist
+	from('out/dist')
+	into('Terasology')
+	destinationDir = buildDir
+}
+
+task applet(type:Copy) {
+	description = 'Creates a game distribution playable through a browser.'
+	dependsOn jar
+
+    from('applet') {
+		exclude '*.keystore'		
+	}
+    from(jar.archivePath)
+    into('out/applet')
+}
+
+task run(type:JavaExec) {
+	description = 'Run Terasology'
+	dependsOn compileGroovy
+	dependsOn copyResources
+	main = 'org.terasology.game.Terasology'
+	classpath = sourceSets.main.runtimeClasspath
+}

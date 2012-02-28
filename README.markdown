@@ -3,22 +3,18 @@ Terasology (previously titled Blockmania)
 
 ![Terasology](http://blog.movingblocks.net/wp-content/uploads/screen3small.jpg "Terasology")
 
-Terasology is an open source project started by Benjamin "begla" Glatzel to research *procedural terrain generation* and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a *block-based voxel-like approach as seen in Minecraft*.
+Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by adopting the NPC-helper and caretaker feel from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
 
-After proving itself as a solid *tech demo* begla was joined at first by Anton "small-jeeper" Kireev and Rasmus "Cervator" Praestholm and a full-fledged game concept was born.
+Terasology is an open source project started by Benjamin "begla" Glatzel to research procedural terrain generation and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a block-based voxel-like approach as seen in Minecraft. After proving itself as a solid tech demo begla was joined at first by Anton "small-jeeper" Kireev and Rasmus "Cervator" Praestholm and a full-fledged game concept was born.
 
-Our goal is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by adopting the NPC-helper and caretaker feel from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication in the foundation systems akin to DF.
+The creators of Terasology are a diverse mix of software developers, game testers, graphic artists, and musicians. Get involved by checking out the [Forum](http://board.movingblocks.net/index.php), our blog [Moving Blocks!](http://blog.movingblocks.net), and our [Facebook Page](http://www.facebook.com/pages/Blockmania/248329655219905).
 
-For more information on the project visit our blog: [Moving Blocks!](http://blog.movingblocks.net), check out our [Facebook Page](http://www.facebook.com/pages/Blockmania/248329655219905), or follow us on [Twitter](http://twitter.com/#!/Blockmania)!
-
-If you're interested in joining up as a contributor register for our [forum](http://board.movingblocks.net) - the project is using the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
-
-You can also fork the project on [GitHub](https://github.com/MovingBlocks/Terasology)
+Terasology is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) and available in source code form at [GitHub](https://github.com/MovingBlocks/Terasology).
 
 Setup
 -----
 
-The game requires the latest version of Oracle's [Java Virtual Machine (JVM)](http://www.java.com/de/download/). Also make sure that your graphics card driver is up to date.
+Terasology requires the latest version of Oracle's [Java Virtual Machine (JVM)](http://www.java.com/de/download/). Also make sure that your graphics card driver is up to date.
 
 You can use one of the default launch scripts to start the game. The scripts will setup your JVM to allocate up to 1024 MB of heap space. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x script.sh".
 
@@ -45,6 +41,8 @@ Debug features (only works when debug mode is enabled
 ------------------------
 
 * [Arrow up/down]         Adjust the current time in small steps
+* [P]                     Activate first-person player camera
+* [O]                     Activate animated spawning point camera
 
 Examples tools (may move slot or disappear)
 ------------------------
@@ -52,29 +50,52 @@ Examples tools (may move slot or disappear)
 * Torch - shiny! Place with left click
 * Pickaxe / shovel - faster right-click removal of some blocks
 * Blueprint - left click one block, then another, then somewhere else to "clone" your selection (right-click resets)
-* Lighter - big bada boom!
+* Explosion tool - big bada boom!
+* Railgun - bigger bada boom, in a straight line!
+* Debug tool - experimental
 
 Example console commands
 ------------------------
 
-* "tera.initWorld();"                               Init. a new random world
-* "tera.getActiveWorldProvider().setTime(0.0);"     Set the world time
+* cmd.giveBlock "Water"                 Gives 16 water blocks
+* cmd.giveBlock "Water", 42             Gives 42 water blocks
+* cmd.teleport 42, 42, 42               Warps the player to x = 42, y = 42, z = 42
+* cmd.fullHealth                        Fully restores the player's health
+* cmd.gotoWorld "GhostTown"             Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with a randomized seed value
+* cmd.gotoWorld "GhostTown", "Pie!"     Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with the seed value "Pie!"
+
+Building and running source
+------------------------
+
+1.  Install Gradle from http://gradle.org/
+2.  To import into Eclipse: $ gradle eclipse
+3.  To import into IntelliJ: $ gradle idea
+4.  To run from the command line: $ gradle run
+5.  For more tasks: $ gradle tasks
+
+You may also need to tweak IDE settings further for your convenience. See [Dev Setup](http://wiki.movingblocks.net/bin/view/Main/DevSetup) in our wiki for more details.
 
 Credits
 =======
 
-Core Team
+This is an incomplete list and the team is constantly growing. See [Dev Team](http://wiki.movingblocks.net/bin/view/Main/DevTeam) in the wiki for the latest updates
+
+Contributors
 ---------
 
 * Benjamin "begla" Glatzel
 * Anton "small-jeeper" Kireev
 * Rasmus "Cervator" Praestholm
+* Immortius
+* Richard "rapodaca" Apodaca
+* Kai Kratz
+* t3hk0d3
 
 Soundtrack and Sound Effects
 ----------
 
 * Sunrise, Afternoon and Sunset composed by Karina Kireev.
-* Dimlight composed and produced by Exile.
+* Dimlight, Resurface and Other Side composed and produced by Exile.
 * Sound effects created by Exile.
 
 Additional Notes

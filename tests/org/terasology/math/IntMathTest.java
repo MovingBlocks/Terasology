@@ -58,39 +58,39 @@ public class IntMathTest
     @Test
     public void testCeilPowerOfTwo()
     {
-        assertEquals(8, IntMath.ceilPowerOfTwo(8));
-        assertEquals(8, IntMath.ceilPowerOfTwo(7));
-        assertEquals(0, IntMath.ceilPowerOfTwo(-100));
+        assertEquals(8, TeraMath.ceilPowerOfTwo(8));
+        assertEquals(8, TeraMath.ceilPowerOfTwo(7));
+        assertEquals(0, TeraMath.ceilPowerOfTwo(-100));
     }
     
     @Test
     public void testSizeOfPower()
     {
-        assertEquals(0, IntMath.sizeOfPower(1));
-        assertEquals(1, IntMath.sizeOfPower(2));
-        assertEquals(2, IntMath.sizeOfPower(4));
-        assertEquals(3, IntMath.sizeOfPower(8));
-        assertEquals(4, IntMath.sizeOfPower(16));
-        assertEquals(5, IntMath.sizeOfPower(32));
+        assertEquals(0, TeraMath.sizeOfPower(1));
+        assertEquals(1, TeraMath.sizeOfPower(2));
+        assertEquals(2, TeraMath.sizeOfPower(4));
+        assertEquals(3, TeraMath.sizeOfPower(8));
+        assertEquals(4, TeraMath.sizeOfPower(16));
+        assertEquals(5, TeraMath.sizeOfPower(32));
     }
     
     @Test
     public void TestFloorToInt()
     {
-        assertEquals(0, IntMath.floorToInt(0f));
-        assertEquals(1, IntMath.floorToInt(1f));
-        assertEquals(0, IntMath.floorToInt(0.5f));
-        assertEquals(-1, IntMath.floorToInt(-0.5f));
-        assertEquals(-1, IntMath.floorToInt(-1f));
+        assertEquals(0, TeraMath.floorToInt(0f));
+        assertEquals(1, TeraMath.floorToInt(1f));
+        assertEquals(0, TeraMath.floorToInt(0.5f));
+        assertEquals(-1, TeraMath.floorToInt(-0.5f));
+        assertEquals(-1, TeraMath.floorToInt(-1f));
     }
     
     @Test
     public void TestCeilToInt()
     {
-        assertEquals(0, IntMath.ceilToInt(0f));
-        assertEquals(1, IntMath.ceilToInt(1f));
-        assertEquals(1, IntMath.ceilToInt(0.5f));
-        assertEquals(0, IntMath.ceilToInt(-0.5f));
-        assertEquals(-1, IntMath.ceilToInt(-1f));
+        assertEquals(0, TeraMath.ceilToInt(0f));
+        assertEquals(1, TeraMath.ceilToInt(1f));
+        assertEquals(1, TeraMath.ceilToInt(0.5f));
+        assertEquals(0, TeraMath.ceilToInt(-0.5f));
+        assertEquals(-1, TeraMath.ceilToInt(-1f));
     }
 }

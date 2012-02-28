@@ -15,13 +15,15 @@
  */
 package org.terasology.logic.manager;
 
+import org.terasology.components.SimpleAIComponent;
+import org.terasology.entityFactory.GelatinousCubeFactory;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.Terasology;
-import org.terasology.logic.characters.GelatinousCube;
 import org.terasology.logic.portals.Portal;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.util.HashSet;
 import java.util.logging.Level;
 
@@ -37,11 +39,16 @@ public class PortalManager {
      */
     private final HashSet<Portal> _portalStore = new HashSet<Portal>();
 
+    private final int maxMobs = 32;
     private final FastRandom _random = new FastRandom();
-    private final WorldRenderer _parent;
+    private EntityManager _entityManager;
+    private GelatinousCubeFactory factory;
 
-    public PortalManager(WorldRenderer parent) {
-        _parent = parent;
+    public PortalManager(EntityManager entityManager) {
+        this._entityManager = entityManager;
+        factory = new GelatinousCubeFactory();
+        factory.setEntityManager(entityManager);
+        factory.setRandom(_random);
     }
 
     /**
@@ -62,17 +69,15 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnLocal(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 64)
+        if (_entityManager.getComponentCount(SimpleAIComponent.class) >= maxMobs)
             return false;
 
         // 12.5% chance something will spawn locally to the portal - will get fancier later
         boolean spawn = _random.randomBoolean() && _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
-            GelatinousCube s = new GelatinousCube(_parent);
-            s.setSpawningPoint(new Vector3d(p.getBlockLocation().x, p.getBlockLocation().y - 1, p.getBlockLocation().z));
-            s.respawn();
-            Terasology.getInstance().getLogger().log(Level.INFO, "Spawning local slime at " + s.getSpawningPoint());
-            _parent.getMobManager().addMob(s);
+            Vector3f pos = new Vector3f((float)p.getBlockLocation().x, (float)p.getBlockLocation().y - 1, (float)p.getBlockLocation().z);
+            factory.generateGelatinousCube(pos);
+            Terasology.getInstance().getLogger().log(Level.INFO, "Spawning local GelatinousCube at " + pos);
         }
         return spawn;
     }
@@ -84,22 +89,16 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnWild(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 64)
+        if (_entityManager.getComponentCount(SimpleAIComponent.class) >= maxMobs)
             return false;
 
         // 25% change something will spawn in the wild around the portal - will get fancier later
         boolean spawn = _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
-            GelatinousCube s = new GelatinousCube(_parent);
-
-            // Spawn some Gel. Cubes in the wilderness!
-            Vector3d randomOffset = new Vector3d(_parent.getWorldProvider().getRandom().randomDouble(), 0, _parent.getWorldProvider().getRandom().randomDouble());
-            randomOffset.scale(256);
-
-            s.setSpawningPoint(new Vector3d(p.getBlockLocation().x + randomOffset.x, p.getBlockLocation().y + 1, p.getBlockLocation().z + randomOffset.z));
-            s.respawn();
-            Terasology.getInstance().getLogger().log(Level.INFO, "Spawning wild slime at " + s.getSpawningPoint());
-            _parent.getMobManager().addMob(s);
+            Vector3f pos = new Vector3f(_random.randomFloat(), 0, _random.randomFloat());
+            pos.scale(256);
+            factory.generateGelatinousCube(pos);
+            Terasology.getInstance().getLogger().log(Level.INFO, "Spawning wild GelatinousCube at " + pos);
         }
         return spawn;
     }

@@ -30,6 +30,6 @@ public interface IGameObject {
     /**
      * Updating operations have to implement this method.
      */
-    public void update();
+    public void update(float delta);
 
 }

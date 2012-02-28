@@ -15,25 +15,20 @@
  */
 package org.terasology.rendering.primitives;
 
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL15;
-import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.model.shapes.BlockMeshPart;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 public class Tessellator {
 
     private TFloatArrayList _color = new TFloatArrayList();
     private TFloatArrayList _vertices = new TFloatArrayList();
-    private TFloatArrayList _tex = new TFloatArrayList();
+    private TFloatArrayList _texCoord0 = new TFloatArrayList();
+    private TFloatArrayList _texCoord1 = new TFloatArrayList();
     private TFloatArrayList _normals = new TFloatArrayList();
     private TIntArrayList _indices = new TIntArrayList();
     private int _indexOffset = 0;
@@ -43,6 +38,9 @@ public class Tessellator {
     private Vector2f _activeTex = new Vector2f();
     private Vector3f _lighting = new Vector3f();
 
+    private boolean useLighting = true;
+    private boolean useNormals = true;
+
 
     public Tessellator() {
         resetParams();
@@ -51,12 +49,21 @@ public class Tessellator {
     public void resetAll() {
         _color.reset();
         _vertices.reset();
-        _tex.reset();
+        _texCoord0.reset();
+        _texCoord1.reset();
         _normals.reset();
         _indices.reset();
         _indexOffset = 0;
 
         resetParams();
+    }
+    
+    public void setUseLighting(boolean enable) {
+        this.useLighting = enable;
+    }
+
+    public void setUseNormals(boolean enable) {
+        this.useNormals = enable;
     }
 
     public void resetParams() {
@@ -81,17 +88,20 @@ public class Tessellator {
             _color.add(_activeColor.z);
             _color.add(_activeColor.w);
 
-            _normals.add(_activeNormal.x);
-            _normals.add(_activeNormal.y);
-            _normals.add(_activeNormal.z);
+            if (useNormals) {
+                _normals.add(_activeNormal.x);
+                _normals.add(_activeNormal.y);
+                _normals.add(_activeNormal.z);
+            }
 
-            _tex.add(texCoords[i].x);
-            _tex.add(texCoords[i].y);
-            _tex.add(0.0f);
+            _texCoord0.add(texCoords[i].x);
+            _texCoord0.add(texCoords[i].y);
 
-            _tex.add(_lighting.x);
-            _tex.add(_lighting.y);
-            _tex.add(_lighting.z);
+            if (useLighting) {
+                _texCoord1.add(_lighting.x);
+                _texCoord1.add(_lighting.y);
+                _texCoord1.add(_lighting.z);
+            }
         }
 
         // Standard fan
@@ -121,13 +131,12 @@ public class Tessellator {
             _normals.add(normal.z);
 
             Vector2f uv = part.getTexCoord(i);
-            _tex.add(uv.x);
-            _tex.add(uv.y);
-            _tex.add(0);
+            _texCoord0.add(uv.x);
+            _texCoord0.add(uv.y);
 
-            _tex.add(_lighting.x);
-            _tex.add(_lighting.y);
-            _tex.add(_lighting.z);
+            _texCoord1.add(_lighting.x);
+            _texCoord1.add(_lighting.y);
+            _texCoord1.add(_lighting.z);
         }
 
         for (int i = 0; i < part.indicesSize(); ++i) {
@@ -152,44 +161,8 @@ public class Tessellator {
         _lighting.set(v);
     }
 
-    private FloatBuffer createCombinedBuffer() {
-        final int size = _color.size() + _vertices.size() + _normals.size() + _tex.size();
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(size);
-
-        int n = 0, t = 0, c = 0;
-        for (int v = 0; v < _vertices.size(); v += 3, t += 6, c += 4, n += 3) {
-            buffer.put(_vertices.get(v)).put(_vertices.get(v + 1)).put(_vertices.get(v + 2));
-            buffer.put(_tex.get(t)).put(_tex.get(t + 1)).put(_tex.get(t + 2)).put(_tex.get(t + 3)).put(_tex.get(t + 4)).put(_tex.get(t + 5));
-            buffer.put(_color.get(c)).put(_color.get(c + 1)).put(_color.get(c + 2)).put(_color.get(c + 3));
-            buffer.put(_normals.get(n)).put(_normals.get(n + 1)).put(_normals.get(n + 2));
-        }
-
-        buffer.flip();
-        return buffer;
-    }
-
-    private IntBuffer createIndexBuffer() {
-        IntBuffer indices = BufferUtils.createIntBuffer(_indices.size());
-        TIntIterator iterator = _indices.iterator();
-        while (iterator.hasNext()) {
-            indices.put(iterator.next());
-        }
-        indices.flip();
-        return indices;
-    }
 
     public Mesh generateMesh() {
-        Mesh mesh = new Mesh();
-        mesh.vboVertexBuffer = VertexBufferObjectManager.getInstance().getVboId();
-        mesh.vboIndexBuffer = VertexBufferObjectManager.getInstance().getVboId();
-
-        FloatBuffer vertices = createCombinedBuffer();
-        IntBuffer indices = createIndexBuffer();
-        mesh.vertexCount = indices.capacity();
-
-        VertexBufferObjectManager.getInstance().bufferVboData(mesh.vboVertexBuffer, vertices, GL15.GL_STATIC_DRAW);
-        VertexBufferObjectManager.getInstance().bufferVboElementData(mesh.vboIndexBuffer, indices, GL15.GL_STATIC_DRAW);
-
-        return mesh;
+        return Mesh.buildMesh(_vertices, _texCoord0, _texCoord1, _normals, _color, _indices);
     }
 }

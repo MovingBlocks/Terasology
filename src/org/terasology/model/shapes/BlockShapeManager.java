@@ -1,6 +1,7 @@
 package org.terasology.model.shapes;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,20 +45,20 @@ public class BlockShapeManager {
     }
 
     public BlockShape getBlockShape(String title) {
-        return _blockShapeByTitle.get(title.toLowerCase());
+        return _blockShapeByTitle.get(title.toLowerCase(Locale.ENGLISH));
     }
 
     public void addBlockShape(BlockShape shape) {
-        _blockShapeByTitle.put(shape.getTitle().toLowerCase(), shape);
+        _blockShapeByTitle.put(shape.getTitle().toLowerCase(Locale.ENGLISH), shape);
     }
 
     public void removeShape(BlockShape shape) {
-        _blockShapeByTitle.remove(shape.getTitle().toLowerCase());
+        _blockShapeByTitle.remove(shape.getTitle().toLowerCase(Locale.ENGLISH));
     }
 
     public void addAllShapes(Iterable<BlockShape> shapes) {
         for (BlockShape b : shapes) {
-            _blockShapeByTitle.put(b.getTitle().toLowerCase(), b);
+            _blockShapeByTitle.put(b.getTitle().toLowerCase(Locale.ENGLISH), b);
         }
     }
 

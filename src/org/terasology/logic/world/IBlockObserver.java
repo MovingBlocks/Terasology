@@ -23,7 +23,9 @@ import org.terasology.model.structures.BlockPosition;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public interface IBlockObserver {
-    public void blockPlaced(Chunk chunk, BlockPosition pos, boolean update);
 
-    public void blockRemoved(Chunk chunk, BlockPosition pos, boolean update);
+    // TODO: Send through source object hint, maybe original + new block type
+    public void blockPlaced(Chunk chunk, BlockPosition pos);
+
+    public void blockRemoved(Chunk chunk, BlockPosition pos);
 }

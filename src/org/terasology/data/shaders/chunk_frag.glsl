@@ -30,6 +30,8 @@ varying vec3 eyeVec;
 varying vec3 lightDir;
 varying vec3 normal;
 
+varying float flickering;
+
 uniform vec3 chunkOffset;
 uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
@@ -44,6 +46,7 @@ void main(){
 
     vec3 finalLightDir = lightDir;
 
+    /* DAYLIGHT BECOMES... MOONLIGHT! */
     if (daylight <= 0.0)
         finalLightDir *= -1.0;
 
@@ -136,8 +139,17 @@ void main(){
 
     // Calculate the final block light brightness
     float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2);
-    blockBrightness += (1.0 - blockBrightness) * torchlight - (sin(timeToTick(time, 0.5) + 1.0) / 16.0) * blocklightValue;
+
+    torchlight -= flickering;
+    if (torchlight < 0.0)
+        torchlight = 0.0;
+
+    blockBrightness += (1.0 - blockBrightness) * torchlight;
+    blockBrightness -= flickering * blocklightValue;
     blockBrightness *= blocklightDayIntensity * 0.75;
+
+    if (blockBrightness < 0.0)
+        blockBrightness = 0.0;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);

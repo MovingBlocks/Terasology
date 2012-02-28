@@ -21,7 +21,9 @@ import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.utilities.FastRandom;
 
+import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 /**
  * Provides the basic interface for all world providers.
@@ -30,6 +32,18 @@ import javax.vecmath.Vector3d;
  */
 public interface IWorldProvider {
 
+    /**
+     * @param position
+     * @return Whether this chunk is immediately available
+     */
+    public boolean isChunkAvailableAt(Vector3f position);
+
+    /**
+     * @param position
+     * @return Whether this chunk is immediately available
+     */
+    public boolean isChunkAvailableAt(Tuple3i position);
+    
     /**
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.
@@ -44,6 +58,46 @@ public interface IWorldProvider {
      */
     public boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite);
 
+    /**
+     * Places a block of a specific type at a given position and refreshes the
+     * corresponding light values.
+     *
+     * @param pos         Block position
+     * @param type        The type of the block to set
+     * @param updateLight Update light values
+     * @param overwrite   If true currently present blocks get replaced
+     * @return True if a block was set/replaced
+     */
+    public boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite);
+
+    /**
+     * Places a block of a specific type at a given position and refreshes the
+     * corresponding light values.
+     *
+     * @param x           The X-coordinate
+     * @param y           The Y-coordinate
+     * @param z           The Z-coordinate
+     * @param type        The type of the block to set
+     * @param updateLight Update light values
+     * @param overwrite   If true currently present blocks get replaced
+     * @param suppressUpdateNotification If true, notification of the change will not be propagated to listening systems
+     * @return True if a block was set/replaced
+     */
+    public boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite, boolean suppressUpdateNotification);
+
+    /**
+     * Places a block of a specific type at a given position and refreshes the
+     * corresponding light values.
+     *
+     * @param pos         Block position
+     * @param type        The type of the block to set
+     * @param updateLight Update light values
+     * @param overwrite   If true currently present blocks get replaced
+     * @param suppressUpdateNotification If true, notification of the change will not be propagated to listening systems
+     * @return True if a block was set/replaced
+     */
+    public boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite, boolean suppressUpdateNotification);
+    
     /**
      * Sets the given state at the given position.
      *
@@ -63,6 +117,14 @@ public interface IWorldProvider {
      * @return The type of the block
      */
     public byte getBlock(int x, int y, int z);
+
+    /**
+     * Returns the block at the given position.
+     *
+     * @param pos The position
+     * @return The type of the block
+     */
+    public byte getBlock(Tuple3i pos);
 
     public boolean canBlockSeeTheSky(int x, int y, int z);
 
@@ -157,7 +219,7 @@ public interface IWorldProvider {
     /**
      * Returns the title of this world.
      *
-     * @return
+     * @return the title of this world
      */
     public String getTitle();
 
@@ -214,4 +276,8 @@ public interface IWorldProvider {
      * Disposes this world provider.
      */
     public void dispose();
+
+    public void registerObserver(IBlockObserver observer);
+
+    public void unregisterObserver(IBlockObserver observer);
 }

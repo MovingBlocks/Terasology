@@ -16,10 +16,11 @@
 package org.terasology.utilities
 
 import groovy.util.logging.Log
+import org.newdawn.slick.util.ResourceLoader
+
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import javax.imageio.ImageIO
-import org.newdawn.slick.util.ResourceLoader
 
 /**
  * Helper class for accessing resources from the classpath, whether it is
@@ -50,18 +51,18 @@ public class ClasspathResourceLoader {
      */
     private scanForJar(String path) {
         URL u = getClass().getClassLoader().getResource(path)
-        log.fine("URL made from our dummy jar path is: " + u)
+        // log.fine("URL made from our dummy jar path is: " + u)
         if (u.getProtocol().equals("jar")) {
             // Found and adapted a nifty technique from http://www.uofr.net/~greg/java/get-resource-listing.html
-            log.fine("We're running from inside a jar file, so we're going to store references to everything inside")
+            // log.fine("We're running from inside a jar file, so we're going to store references to everything inside")
             String jarPath = u.getPath().substring(5, u.getPath().indexOf("!")) //strip out only the JAR file
-            log.fine("jarPath is: " + jarPath)
+            // log.fine("jarPath is: " + jarPath)
             JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"))
-            log.fine "Successfully loaded a jar file reference, returning it"
+            // log.fine "Successfully loaded a jar file reference, returning it"
             _jar = jar
         }
         else {
-            log.info "We're not running inside a jar file, so we don't need any references to jar resources"
+            // log.info "We're not running inside a jar file, so we don't need any references to jar resources"
         }
     }
 
@@ -88,7 +89,7 @@ public class ClasspathResourceLoader {
         } else {
             path = _rootPath + "/" + subPath
         }
-        log.info "Getting classes from " + path
+        // log.info "Getting classes from " + path
 
         // Check to see if we're loading from within a jar file not not
         if (_jar != null) {
@@ -97,15 +98,15 @@ public class ClasspathResourceLoader {
                 String name = entries.nextElement().getName()
                 if (name.startsWith(path)) { // We only care about stuff under the desired path
                     String entry = name.substring(path.length())
-                    log.fine("Class entry under desired path: " + entry)
+                    // log.fine("Class entry under desired path: " + entry)
                     if (entry[-1] == '/') {
-                        log.fine("This one is a dir, ignoring it")
+                        // log.fine("This one is a dir, ignoring it")
                     } else {
-                        log.fine("This is not a dir, going to check if it is a suitable class")
+                        // log.fine("This is not a dir, going to check if it is a suitable class")
                         // We only care about class files that are not inner classes ($) nor deeper than desired path (exactly one /)
                         if (!entry.contains('$') && entry.endsWith(".class") && entry.count('/') == 1) {
                             def className = entry[0..-7]
-                            log.fine("Useful class: " + className)
+                            // log.fine("Useful class: " + className)
                             allClasses << getClass().getClassLoader().loadClass((path + className).replace('/', '.'))
                         }
                     }
@@ -121,7 +122,7 @@ public class ClasspathResourceLoader {
                 if (!i.contains('$') && i.endsWith(".class")) {
                     def className = i[0..-7]
 
-                    log.fine("Found: " + className)
+                    // log.fine("Found: " + className)
                     allClasses << getClass().getClassLoader().loadClass(path + "." + className)
                 }
             }
@@ -145,7 +146,7 @@ public class ClasspathResourceLoader {
         } else {
             path = _rootPath + "/" + subPath
         }
-        log.info "Getting images from under " + path
+        // log.info "Getting images from under " + path
 
         if (isJar()) {
             return getInternalImagesFromJar(path)
@@ -165,14 +166,14 @@ public class ClasspathResourceLoader {
         // TODO: Check if either of these work, is resource loader better?
         // URL u = ResourceLoader.getResource(path)
         URL u = getClass().getClassLoader().getResource(path)
-        log.info "*** Going to look for images under non-jar classpath: " + path
+        // log.info "*** Going to look for images under non-jar classpath: " + path
 
         new File(u.toURI()).list().each { i ->
-            log.fine "Checking filename/dir: " + i
+            // log.fine "Checking filename/dir: " + i
             // Expecting either png images or subdirs with more png images (and potentially more subdirs)
             // TODO: We might need some error handling here (hopefully solid convention is enough)
             if (i.endsWith(".png")) {
-                log.fine "Useful image: " + i
+                // log.fine "Useful image: " + i
                 // Load a BufferedImage and put it in the map tied to its name short the ".png"
                 images.put(i[0..-5], ImageIO.read(ResourceLoader.getResource(path + "/" + i).openStream()))
             }
@@ -191,7 +192,7 @@ public class ClasspathResourceLoader {
      * @return a map containing loaded BufferedImages tied to their filename minus .png
      */
     private getInternalImagesFromJar(String path) {
-        log.info "*** Going to look for images under jar classpath: " + path
+        // log.info "*** Going to look for images under jar classpath: " + path
         def images = [:]
         Set<String> result = new HashSet<String>() // Detect dupes
         Enumeration<JarEntry> entries = _jar.entries()
@@ -200,9 +201,9 @@ public class ClasspathResourceLoader {
             //println "Got a name: " + name
             if (name.startsWith(path)) { // We only care about stuff under the desired path
                 String entry = name.substring(path.length())
-                log.fine "Entry under desired path: " + entry
+                // log.fine "Entry under desired path: " + entry
                 if (entry[-1] == '/') {
-                    log.fine "This one is a dir, ignoring it"
+                    // log.fine "This one is a dir, ignoring it"
                 } else {
                     // We check to see if any item adds return false, meaning the item already existed (bad)
                     if (!result.add(entry)) {
@@ -215,7 +216,7 @@ public class ClasspathResourceLoader {
 
         // print what we got and load as images, then return a nice mapping of the two
         result.each {
-            log.info it + " is being loaded as an image and mapped to short name " + it[(it.lastIndexOf('/') + 1)..-5]
+            // log.info it + " is being loaded as an image and mapped to short name " + it[(it.lastIndexOf('/') + 1)..-5]
             // Load a BufferedImage and put it in the map tied to its name short the ".png"
             images.put(it[(it.lastIndexOf('/') + 1)..-5], ImageIO.read(ResourceLoader.getResource(path + it).openStream()))
         }

@@ -30,7 +30,9 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.imageio.ImageIO;
-import javax.vecmath.*;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4f;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -50,7 +52,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-public class Block implements IGameObject, Cloneable {
+public class Block implements IGameObject {
 
     private static final Logger logger = Logger.getLogger(Block.class.getName());
     public static final int ATLAS_SIZE_IN_PX = 256;
@@ -100,31 +102,36 @@ public class Block implements IGameObject, Cloneable {
     /* PROPERTIES */
     private byte _id = 0x0;
     private String _title = "Untitled block";
-    private BlockGroup _group = null;
+    private BlockFamily _family = null;
 
-    private static class SharedBlockInternals implements Cloneable {
-        private boolean translucent;
-        private boolean invisible;
-        private boolean penetrable;
-        private boolean castsShadows;
-        private boolean renderBoundingBox;
-        private boolean allowBlockAttachment;
-        private boolean bypassSelectionRay;
-        private boolean liquid;
-        private boolean waving;
+    private boolean _translucent;
+    private boolean _invisible;
+    private boolean _penetrable;
+    private boolean _castsShadows;
+    private boolean _renderBoundingBox;
+    private boolean _allowBlockAttachment;
+    private boolean _bypassSelectionRay;
+    private boolean _liquid;
+    private boolean _waving;
 
-        private int lootAmount;
+    private boolean _usable;
 
-        private BLOCK_FORM blockForm;
-        private COLOR_SOURCE colorSource;
+    // Inventory settings
+    private boolean _straightToInventory;
+    private boolean _stackable = true;
+    private boolean _entityRetainedWhenItem = false;
+    private String _entityPrefab = "";
 
-        private byte luminance;
-        private byte hardness;
 
-        private float mass;
-    }
+    private int _lootAmount;
 
-    private SharedBlockInternals _internals;
+    private BLOCK_FORM _blockForm;
+    private COLOR_SOURCE _colorSource;
+
+    private byte _luminance;
+    private byte _hardness;
+
+    private float _mass;
 
     /* RENDERING */
     private Mesh _mesh;
@@ -148,7 +155,6 @@ public class Block implements IGameObject, Cloneable {
      */
     public Block() {
         withTitle("Untitled block");
-        _internals = new SharedBlockInternals();
 
         for (Side side : Side.values()) {
             withTextureAtlasPos(side, new Vector2f(0.0f, 0.0f));
@@ -171,28 +177,6 @@ public class Block implements IGameObject, Cloneable {
         withLiquid(false);
         withMass(64000f);
         withLootAmount(2);
-    }
-
-    public Block clone() {
-        Block clone = null;
-        try {
-            clone = (Block) super.clone();
-
-            clone._group = null;
-            clone._sideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
-            clone._sideMesh.putAll(_sideMesh);
-            clone._fullSide = new EnumBooleanMap<Side>(Side.class);
-            clone._fullSide.putAll(_fullSide);
-            clone._loweredSideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
-            clone._loweredSideMesh.putAll(_loweredSideMesh);
-            clone._colorOffset = new EnumMap<Side, Vector4f>(Side.class);
-            clone._colorOffset.putAll(_colorOffset);
-            clone._textureAtlasPos = new EnumMap<Side, Vector2f>(Side.class);
-            clone._textureAtlasPos.putAll(_textureAtlasPos);
-        } catch (CloneNotSupportedException e) {
-            logger.log(Level.SEVERE, "Failed to clone block");
-        }
-        return clone;
     }
 
     /**
@@ -261,7 +245,7 @@ public class Block implements IGameObject, Cloneable {
      */
     public Vector2f calcTextureOffsetFor(Side side) {
         Vector2f pos = getTextureAtlasPos(side);
-        return new Vector2f((int) pos.x * TEXTURE_OFFSET, (int) pos.y * TEXTURE_OFFSET);
+        return new Vector2f((float) pos.x * TEXTURE_OFFSET, (float) pos.y * TEXTURE_OFFSET);
     }
 
     public void renderWithLightValue(float light) {
@@ -302,10 +286,12 @@ public class Block implements IGameObject, Cloneable {
         renderWithLightValue(1.0f);
     }
 
-    public void update() {
+    public void update(float delta) {
         // Do nothing
     }
 
+
+    // TODO: Change all of these to setters
     public Block withId(byte id) {
         _id = id;
         return this;
@@ -316,83 +302,83 @@ public class Block implements IGameObject, Cloneable {
         return this;
     }
 
-    Block withBlockGroup(BlockGroup group) {
-        _group = group;
+    Block withBlockFamily(BlockFamily family) {
+        _family = family;
         return this;
     }
 
     public Block withTranslucent(boolean translucent) {
-        _internals.translucent = translucent;
+        _translucent = translucent;
         return this;
     }
 
     public Block withWaving(boolean waving) {
-        _internals.waving = waving;
+        _waving = waving;
         return this;
     }
 
     public Block withMass(float mass) {
-        _internals.mass = mass;
+        _mass = mass;
         return this;
     }
 
     public Block withInvisible(boolean invisible) {
-        _internals.invisible = invisible;
+        _invisible = invisible;
         return this;
     }
 
     public Block withPenetrable(boolean penetrable) {
-        _internals.penetrable = penetrable;
+        _penetrable = penetrable;
         return this;
     }
 
     public Block withCastsShadows(boolean castsShadows) {
-        _internals.castsShadows = castsShadows;
+        _castsShadows = castsShadows;
         return this;
     }
 
     public Block withRenderBoundingBox(boolean renderBoundingBox) {
-        _internals.renderBoundingBox = renderBoundingBox;
+        _renderBoundingBox = renderBoundingBox;
         return this;
     }
 
     public Block withAllowBlockAttachment(boolean allowBlockAttachment) {
-        _internals.allowBlockAttachment = allowBlockAttachment;
+        _allowBlockAttachment = allowBlockAttachment;
         return this;
     }
 
     public Block withBypassSelectionRay(boolean bypassSelectionRay) {
-        _internals.bypassSelectionRay = bypassSelectionRay;
+        _bypassSelectionRay = bypassSelectionRay;
         return this;
     }
 
     public Block withLiquid(boolean liquid) {
-        _internals.liquid = liquid;
+        _liquid = liquid;
         return this;
     }
 
     public Block withBlockForm(BLOCK_FORM blockForm) {
-        _internals.blockForm = blockForm;
+        _blockForm = blockForm;
         return this;
     }
 
     public Block withColorSource(COLOR_SOURCE colorSource) {
-        _internals.colorSource = colorSource;
+        _colorSource = colorSource;
         return this;
     }
 
     public Block withLootAmount(int lootAmount) {
-        _internals.lootAmount = lootAmount;
+        _lootAmount = lootAmount;
         return this;
     }
 
     public Block withLuminance(byte luminance) {
-        _internals.luminance = luminance;
+        _luminance = luminance;
         return this;
     }
 
     public Block withHardness(byte hardness) {
-        _internals.hardness = hardness;
+        _hardness = hardness;
         return this;
     }
 
@@ -403,26 +389,6 @@ public class Block implements IGameObject, Cloneable {
 
     public Block withTextureAtlasPos(Side side, Vector2f atlasPos) {
         _textureAtlasPos.put(side, atlasPos);
-        return this;
-    }
-
-    public Block withTextureAtlasPosTopBottom(Vector2f atlasPos) {
-        _textureAtlasPos.put(Side.TOP, atlasPos);
-        _textureAtlasPos.put(Side.BOTTOM, atlasPos);
-        return this;
-    }
-
-    public Block withTextureAtlasPos(Vector2f atlasPos) {
-        for (Side side : Side.values()) {
-            withTextureAtlasPos(side, atlasPos);
-        }
-        return this;
-    }
-
-    public Block withTextureAtlasPosMantle(Vector2f atlasPos) {
-        for (Side side : Side.horizontalSides()) {
-            _textureAtlasPos.put(side, atlasPos);
-        }
         return this;
     }
 
@@ -452,6 +418,31 @@ public class Block implements IGameObject, Cloneable {
         _fullSide.put(side, full);
         return this;
     }
+    
+    public Block withStraightToInventory(boolean straightToInventory) {
+        _straightToInventory = straightToInventory;
+        return this;
+    }
+
+    public Block withStackable(boolean stackable) {
+        _stackable = stackable;
+        return this;
+    }
+
+    public Block withEntityRetainedWhenItem(boolean entityRetainedWhenItem) {
+        _entityRetainedWhenItem = entityRetainedWhenItem;
+        return this;
+    }
+
+    public Block withEntityPrefab(String entityPrefab) {
+        _entityPrefab = entityPrefab;
+        return this;
+    }
+
+    public Block withUsable(boolean usable) {
+        _usable = usable;
+        return this;
+    }
 
     public void setColliders(List<AABB> colliders) {
         _colliders = new ArrayList<AABB>(colliders);
@@ -460,11 +451,11 @@ public class Block implements IGameObject, Cloneable {
     }
 
     public COLOR_SOURCE getColorSource() {
-        return _internals.colorSource;
+        return _colorSource;
     }
 
     public byte getHardness() {
-        return _internals.hardness;
+        return _hardness;
     }
 
     public Vector4f getColorOffset(Side side) {
@@ -476,7 +467,7 @@ public class Block implements IGameObject, Cloneable {
     }
 
     public BLOCK_FORM getBlockForm() {
-        return _internals.blockForm;
+        return _blockForm;
     }
 
     public String getTitle() {
@@ -488,11 +479,11 @@ public class Block implements IGameObject, Cloneable {
     }
 
     public int getLootAmount() {
-        return _internals.lootAmount;
+        return _lootAmount;
     }
 
-    public BlockGroup getBlockGroup() {
-        return _group;
+    public BlockFamily getBlockFamily() {
+        return _family;
     }
 
     public boolean isBlockingSide(Side side) {
@@ -512,27 +503,27 @@ public class Block implements IGameObject, Cloneable {
     }
 
     public boolean isInvisible() {
-        return _internals.invisible;
+        return _invisible;
     }
 
     public boolean isPenetrable() {
-        return _internals.penetrable;
+        return _penetrable;
     }
 
     public boolean isCastsShadows() {
-        return _internals.castsShadows;
+        return _castsShadows;
     }
 
     public boolean isRenderBoundingBox() {
-        return _internals.renderBoundingBox;
+        return _renderBoundingBox;
     }
 
     public byte getLuminance() {
-        return _internals.luminance;
+        return _luminance;
     }
 
     public float getMass() {
-        return _internals.mass;
+        return _mass;
     }
 
     public boolean isDestructible() {
@@ -540,23 +531,43 @@ public class Block implements IGameObject, Cloneable {
     }
 
     public boolean isAllowBlockAttachment() {
-        return _internals.allowBlockAttachment;
+        return _allowBlockAttachment;
     }
 
     public boolean isLiquid() {
-        return _internals.liquid;
+        return _liquid;
     }
 
     public boolean isWaving() {
-        return _internals.waving;
+        return _waving;
     }
 
     public boolean isSelectionRayThrough() {
-        return _internals.bypassSelectionRay;
+        return _bypassSelectionRay;
     }
 
     public boolean isTranslucent() {
-        return _internals.translucent;
+        return _translucent;
+    }
+
+    public boolean isStraightToInventory() {
+        return _straightToInventory;
+    }
+
+    public boolean isStackable() {
+        return _stackable;
+    }
+
+    public boolean isEntityRetainedWhenItem() {
+        return _entityRetainedWhenItem;
+    }
+
+    public boolean isUsable() {
+        return _usable;
+    }
+
+    public String getEntityPrefab() {
+        return _entityPrefab;
     }
 
     /**
@@ -616,59 +627,8 @@ public class Block implements IGameObject, Cloneable {
     }
 
     public String toString() {
+        // This may seem excessive in logging, but you get both the class name (which may not be "Block") and block title
         return this.getClass().getSimpleName() + ":" + _title + ";id:" + _id;
-    }
-
-    public Block rotateClockwise(int steps) {
-        Block block = clone();
-
-        Quat4f rotation = new Quat4f();
-        rotation.set(new AxisAngle4f(new Vector3f(0, -1, 0), (float) (0.5f * Math.PI * steps)));
-        if (_centerMesh != null) {
-            block._centerMesh = _centerMesh.rotate(rotation);
-        }
-        for (Side side : Side.values()) {
-            Side rotatedSide = side.rotateClockwise(steps);
-            block._fullSide.put(rotatedSide, _fullSide.get(side));
-            block._colorOffset.put(rotatedSide, _colorOffset.get(side));
-            block._textureAtlasPos.put(rotatedSide, _textureAtlasPos.get(side));
-
-            BlockMeshPart sideMesh = _sideMesh.get(side);
-            if (sideMesh != null) {
-                block._sideMesh.put(rotatedSide, sideMesh.rotate(rotation));
-            } else {
-                block._sideMesh.put(rotatedSide, null);
-            }
-            BlockMeshPart loweredSideMesh = _loweredSideMesh.get(side);
-            if (loweredSideMesh != null) {
-                block._loweredSideMesh.put(rotatedSide, loweredSideMesh.rotate(rotation));
-            } else {
-                block._loweredSideMesh.put(rotatedSide, null);
-            }
-        }
-        List<AABB> newAABBs = new ArrayList<AABB>(_colliders.size());
-        for (AABB collider : _colliders) {
-            newAABBs.add(rotateClockwiseAABB(collider, steps));
-        }
-        block.setColliders(newAABBs);
-        return block;
-    }
-
-    private AABB rotateClockwiseAABB(AABB collider, int steps) {
-        if (steps < 0) {
-            steps = -steps + 2;
-        }
-        steps = steps % 4;
-        switch (steps) {
-            case 1:
-                return new AABB(new Vector3d(-collider.getPosition().z, collider.getPosition().y, collider.getPosition().x), new Vector3d(collider.getDimensions().z, collider.getDimensions().y, collider.getDimensions().x));
-            case 2:
-                return new AABB(new Vector3d(-collider.getPosition().x, collider.getPosition().y, -collider.getPosition().z), collider.getDimensions());
-            case 3:
-                return new AABB(new Vector3d(collider.getPosition().z, collider.getPosition().y, -collider.getPosition().x), new Vector3d(collider.getDimensions().z, collider.getDimensions().y, collider.getDimensions().x));
-            default:
-                return collider;
-        }
     }
 
 }

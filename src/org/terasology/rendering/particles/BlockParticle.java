@@ -77,7 +77,8 @@ public class BlockParticle extends Particle {
 
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("particle");
 
-        Vector4f color = BlockManager.getInstance().getBlock(_blockType).calcColorOffsetFor(Side.FRONT, _parent.getParent().getActiveTemperature(), _parent.getParent().getActiveHumidity());
+        // TODO: Get temperature/humitiy from world provider
+        Vector4f color = BlockManager.getInstance().getBlock(_blockType).calcColorOffsetFor(Side.FRONT, _parent.getParent().getActiveTemperature(_position), _parent.getParent().getActiveHumidity(_position));
         shader.setFloat3("colorOffset", color.x, color.y, color.z);
         shader.setFloat("texOffsetX", _texOffsetX);
         shader.setFloat("texOffsetY", _texOffsetY);

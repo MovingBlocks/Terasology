@@ -18,6 +18,7 @@ package org.terasology.utilities;
 import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Matrix4f;
+import java.io.File;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.glGetFloat;
@@ -74,5 +75,21 @@ public final class Helper {
 
         matrixBuffer.flip();
         return matrixBuffer;
+    }
+
+    /**
+     * Simple and somewhat hacky way to determine if running from source (which should be out of a "Terasology" dir)
+     * or from jar file / applet in which case we might want to use the user's temp dir instead for saving stuff
+     * @param f the file to check and fix path for
+     * @return the file with the path fixed if needed
+    */
+    public static File fixSavePath(File f) {
+        // Terasology.getInstance().getLogger().log(Level.INFO, "Suggested absolute save path is: " + f.getAbsolutePath());
+        if (!f.getAbsolutePath().contains("Terasology")) {
+            f = new File(System.getProperty("java.io.tmpdir"), f.getPath());
+            // Terasology.getInstance().getLogger().log(Level.INFO, "Going to use absolute TEMP save path instead: " + f.getAbsolutePath());
+            return f;
+        }
+        return f;
     }
 }

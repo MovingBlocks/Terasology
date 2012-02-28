@@ -28,6 +28,7 @@ import javax.vecmath.Vector2f;
 public class UIInventory extends UIDisplayContainer {
 
     private final UIGraphicsElement _background;
+    // TODO: This variable is not really used?
     private final UIToolbarCell[] _cells;
 
     public UIInventory() {
@@ -53,7 +54,5 @@ public class UIInventory extends UIDisplayContainer {
         	cell.setVisible(true);
         	addDisplayElement(cell);
         }
-
-        update();
     }
 }

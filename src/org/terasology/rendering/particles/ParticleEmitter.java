@@ -16,14 +16,15 @@
 package org.terasology.rendering.particles;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 
 /**
  * Simple particle system.
@@ -32,7 +33,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public abstract class ParticleEmitter implements IGameObject {
 
-    protected static final int MAX_PARTICLES = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.maxParticles");
+    protected static final int MAX_PARTICLES = Config.getInstance().getMaxParticles();
     protected static final int PARTICLES_PER_UPDATE = 32;
     /* ------- */
     protected int _particlesToEmit;
@@ -48,25 +49,22 @@ public abstract class ParticleEmitter implements IGameObject {
 
     public void render() {
         glDisable(GL11.GL_CULL_FACE);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         for (int i = 0; i < _particles.size(); i++) {
             Particle p = _particles.get(i);
             p.render();
         }
 
-        glDisable(GL_BLEND);
         glEnable(GL11.GL_CULL_FACE);
     }
 
-    public void update() {
+    public void update(float delta) {
         removeDeadParticles();
         emitParticles();
 
         for (int i = 0; i < _particles.size(); i++) {
             Particle p = _particles.get(i);
-            p.update();
+            p.update(delta);
         }
     }
 

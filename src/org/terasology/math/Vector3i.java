@@ -1,5 +1,6 @@
 package org.terasology.math;
 
+import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.io.Serializable;
 
@@ -8,7 +9,7 @@ import java.io.Serializable;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public final class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
+public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
     private static final long serialVersionUID = -1965792038041767639L;
 
     public static Vector3i zero() {
@@ -89,9 +90,9 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
      * @param other
      */
     public Vector3i(Vector3f other) {
-        this.x = IntMath.floorToInt(other.x);
-        this.y = IntMath.floorToInt(other.y);
-        this.z = IntMath.floorToInt(other.z);
+        this.x = TeraMath.floorToInt(other.x);
+        this.y = TeraMath.floorToInt(other.y);
+        this.z = TeraMath.floorToInt(other.z);
     }
 
     /**
@@ -138,11 +139,12 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
 
     /**
      * Calculates the total distance in axis-aligned steps between this and
-     * other vector (manhattan distance). This is the distance that is travelled
+     * other vector (manhattan distance). This is the distance that is traveled
      * if movement is restricted to adjacent vectors.
      *
-     * @param other
-     * @return
+     * @param other the other vector to test
+     * @return the total distance in axis-aligned steps between this and
+     * other vector (manhattan distance)
      */
     public int gridDistance(Vector3i other) {
         return Math.abs(other.x - x) + Math.abs(other.y - y) + Math.abs(other.z - z);
@@ -152,7 +154,8 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
      * Calculates the total magnitude of the vector as a sum of its axis aligned
      * dimensions (manhattan distance)
      *
-     * @return
+     * @return the total magnitude of the vector as a sum of its axis aligned
+     * dimensions (manhattan distance)
      */
     public int gridMagnitude() {
         return Math.abs(x) + Math.abs(y) + Math.abs(z);
@@ -211,7 +214,6 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
      * vector is returned.
      *
      * @param scalar the value to multiply this vector by.
-     * @return the new vector.
      */
     public void mult(int scalar) {
         x *= scalar;
@@ -344,5 +346,12 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
      */
     public Vector3f toVector3f() {
         return new Vector3f(x, y, z);
+    }
+
+    /**
+     * @return The equivalent Vector3d
+     */
+    public Vector3d toVector3d() {
+        return new Vector3d(x, y, z);
     }
 }

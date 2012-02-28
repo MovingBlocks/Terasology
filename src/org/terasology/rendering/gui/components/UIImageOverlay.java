@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.gui.components;
 
-import javax.vecmath.Vector2f;
-
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+
+import javax.vecmath.Vector2f;
 
 /**
  * Transparent fullscreen overlay.

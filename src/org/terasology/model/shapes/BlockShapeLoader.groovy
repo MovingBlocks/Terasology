@@ -3,12 +3,13 @@ package org.terasology.model.shapes
 import gnu.trove.list.TIntList
 import gnu.trove.list.array.TIntArrayList
 import groovy.util.logging.Log
-import javax.vecmath.Vector2f
-import javax.vecmath.Vector3f
 import org.terasology.math.Side
-import org.terasology.utilities.ClasspathResourceLoader
 import org.terasology.model.structures.AABB
+import org.terasology.utilities.ClasspathResourceLoader
+
+import javax.vecmath.Vector2f
 import javax.vecmath.Vector3d
+import javax.vecmath.Vector3f
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -33,7 +34,7 @@ final class BlockShapeLoader {
         _resourceLoader = new ClasspathResourceLoader("org/terasology/data/shapes")
         _resourceLoader.getClassesAt("").each { c ->
             try {
-                log.info("Loading shape: " + c)
+                // log.info("Loading shape: " + c)
 
                 // Prepare to load properties from the Groovy definition via ConfigSlurper
                 ConfigObject shapeConfig = new ConfigSlurper().parse((Class) c)

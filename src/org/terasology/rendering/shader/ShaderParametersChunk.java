@@ -48,7 +48,8 @@ public class ShaderParametersChunk implements IShaderParameters {
             program.setFloat("daylight", (float) tera.getActiveWorldRenderer().getDaylight());
 
         if (tera.getActivePlayer() != null) {
-            program.setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
+            // TODO: This should be whether the camera is underwater I think?
+            //program.setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
             program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
         }
 

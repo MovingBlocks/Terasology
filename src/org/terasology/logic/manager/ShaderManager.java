@@ -70,9 +70,21 @@ public class ShaderManager {
         createAndStoreShaderProgram("block", new ShaderParametersBlock());
         createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
         createAndStoreShaderProgram("clouds", new ShaderParametersDefault());
+        createAndStoreShaderProgram("genericMesh", new ShaderParametersGenericMesh());
+    }
+
+    public void recompileAllShaders() {
+        for (ShaderProgram program : _shaderPrograms.values()) {
+            program.recompile();
+        }
     }
 
     private ShaderProgram createAndStoreShaderProgram(String title, IShaderParameters params) {
+        // Make sure to remove the old shader program
+        if (_shaderPrograms.containsKey(title)) {
+            _shaderPrograms.remove(title).dispose();
+        }
+
         ShaderProgram program = new ShaderProgram(title, params);
         _shaderPrograms.put(title, program);
         return program;

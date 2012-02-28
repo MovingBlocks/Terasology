@@ -19,7 +19,7 @@ import gnu.trove.map.hash.TByteObjectHashMap;
 import org.lwjgl.BufferUtils;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.BlockFamily;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
@@ -43,7 +43,7 @@ public class BlockManager {
     private final HashMap<String, Block> _blocksByTitle = new HashMap<String, Block>(128);
     private final TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
     
-    private final HashMap<String, BlockGroup> _blockGroupsByTitle = new HashMap<String, BlockGroup>(128);
+    private final HashMap<String, BlockFamily> _blockFamiliesByTitle = new HashMap<String, BlockFamily>(128);
 
     public static BlockManager getInstance() {
         if (_instance == null)
@@ -60,18 +60,18 @@ public class BlockManager {
     private void loadBlocks() {
         try {
             _manifestor.loadConfig(); // Might have to catch plain Exception also for this step
-            System.out.println("Blocks by title: " + _blocksByTitle);
-            System.out.println("Blocks by id: " + _blocksById);
+            // System.out.println("Blocks by title: " + _blocksByTitle);
+            // System.out.println("Blocks by id: " + _blocksById);
         } catch (Exception e) {
             // TODO: Totally placeholder error handling, needs to be fancier
-            System.out.println("Exception loading blocks. Sad :-(");
-            e.printStackTrace();
+            // System.out.println("Exception loading blocks. Sad :-(");
+            // e.printStackTrace();
             System.exit(-1);
         }
     }
     
-    public BlockGroup getBlockGroup(String title) {
-        return _blockGroupsByTitle.get(title);
+    public BlockFamily getBlockFamily(String title) {
+        return _blockFamiliesByTitle.get(title);
     }
 
     public Block getBlock(String title) {
@@ -79,7 +79,10 @@ public class BlockManager {
     }
 
     public Block getBlock(byte id) {
-        return _blocksById.get(id);
+        Block result = _blocksById.get(id);
+        if (result == null)
+            return _blocksById.get((byte)0);
+        return result;
     }
 
     public int availableBlocksSize() {
@@ -103,9 +106,9 @@ public class BlockManager {
         }
     }
     
-    public void addAllBlockGroups(Iterable<BlockGroup> groups) {
-        for (BlockGroup group : groups) {
-            _blockGroupsByTitle.put(group.getTitle(), group);
+    public void addAllBlockFamilies(Iterable<BlockFamily> families) {
+        for (BlockFamily family : families) {
+            _blockFamiliesByTitle.put(family.getTitle(), family);
         }
     }
             

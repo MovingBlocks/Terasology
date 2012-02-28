@@ -51,7 +51,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _version.setVisible(true);
 
         _exitButton = new UIButton(new Vector2f(256f, 32f));
-        _exitButton.getLabel().setText("Save & Exit Terasology");
+        _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
         _exitButton.addClickListener(new IClickListener() {
@@ -68,18 +68,19 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _respawnButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
-                Terasology.getInstance().getActiveWorldRenderer().getPlayer().respawn();
+                // TODO: Respawning
+                //Terasology.getInstance().getActiveWorldRenderer().getPlayer().respawn();
             }
         });
 
         _mainMenuButton = new UIButton(new Vector2f(256f, 32f));
-        _mainMenuButton.getLabel().setText("Save & Return to Main Menu");
+        _mainMenuButton.getLabel().setText("Return to Main Menu");
         _mainMenuButton.setVisible(true);
 
         _mainMenuButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
-                Terasology.getInstance().setGameMode(Terasology.GameMode.mainMenu);
+                Terasology.getInstance().setGameState(Terasology.GAME_STATE.MAIN_MENU);
             }
         });
 

@@ -23,13 +23,20 @@ package org.terasology.logic.world;
 public interface IChunkProvider {
 
     /**
+     * @param x
+     * @param z
+     * @return Whether this chunk is immediately available
+     */
+    public boolean isChunkAvailable(int x, int y, int z);
+
+    /**
      * Returns the chunk at the given position.
      *
      * @param x The chunk position on the x-axis
      * @param z The chunk position on the z-axis
      * @return The chunk
      */
-    public Chunk loadOrCreateChunk(int x, int z);
+    public Chunk getChunk(int x, int y, int z);
 
     /**
      * Frees obsolete chunks.
@@ -46,5 +53,5 @@ public interface IChunkProvider {
      *
      * @return The amount of managed chunks
      */
-    public int size();
+    public float size();
 }

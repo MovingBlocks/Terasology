@@ -34,34 +34,27 @@ public class UIButton extends UIDisplayContainer {
 
     private final ArrayList<IClickListener> _clickListeners = new ArrayList<IClickListener>();
 
-    private final UIGraphicsElement _defaultTexture;
     private final UIText _label;
 
     public UIButton(Vector2f size) {
         setSize(size);
-
-        _defaultTexture = new UIGraphicsElement("gui_menu");
-        _defaultTexture.setVisible(true);
-        _defaultTexture.getTextureSize().set(new Vector2f(256f / 512f, 30f / 512f));
-        addDisplayElement(_defaultTexture);
-
+        setClassStyle("button","background-image: gui_menu 256/512 30/512 0 0");
+        setClassStyle("button-mouseover","background-image: gui_menu 256/512 30/512 0 30/512");
+        setClassStyle("button-mouseclick","background-image: gui_menu 256/512 30/512 0 60/512");
+        setClassStyle("button");
         _label = new UIText("Untitled");
         _label.setVisible(true);
         addDisplayElement(_label);
-
-        update();
     }
 
     @Override
     public void update() {
-        _defaultTexture.setSize(getSize());
-
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
 
         if (intersects(mousePos)) {
 
             if (!_clickSoundPlayed) {
-                AudioManager.getInstance().getAudio("Click").playAsSoundEffect(1.0f, 0.1f, false);
+                AudioManager.play("Click", 1.0f);
                 _clickSoundPlayed = true;
             }
 
@@ -71,17 +64,16 @@ public class UIButton extends UIDisplayContainer {
             }
 
             if (_mouseDown) {
-                _defaultTexture.getTextureOrigin().set(0f, 60f / 512f);
+                setClassStyle("button-mouseclick");
             } else {
-                _defaultTexture.getTextureOrigin().set(0f, 30f / 512f);
+                setClassStyle("button-mouseover");
             }
 
         } else {
             _clickSoundPlayed = false;
             _mouseUp = false;
             _mouseDown = false;
-
-            _defaultTexture.getTextureOrigin().set(0f, 0f);
+            setClassStyle("button");
         }
 
         // Position the label in the center of the button

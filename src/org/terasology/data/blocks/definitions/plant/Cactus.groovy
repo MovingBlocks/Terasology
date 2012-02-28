@@ -28,6 +28,5 @@ block {
         bottom = "CactusBottom"
     }
 
-    // TODO: This is quite weird actually but necessary at the moment
     translucent = true
 }
