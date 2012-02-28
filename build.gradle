@@ -33,7 +33,7 @@ dependencies{
 		"libs/annotations.jar", "libs/AppleJavaExtensions.jar", "libs/jbullet.jar",
 		"libs/jinput.jar", "libs/jogg-0.0.7.jar", "libs/jorbis-0.0.15.jar",
 		"libs/lwjgl.jar", "libs/lwjgl_util.jar", "libs/lzma.jar",
-		"libs/slick.jar", "libs/slick-utils.jar", "libs/trove-3.0.0.jar",
+		"libs/slick.jar", "libs/slick-util.jar", "libs/trove-3.0.0.jar",
 		"libs/vecmath.jar"
 	)
 }
