@@ -41,13 +41,6 @@ public final class TerasologyApplet extends Applet {
             @Override
             public void run() {
                 try {
-                    SettingsManager config = SettingsManager.getInstance();
-
-                    Display.setParent(null);
-                    Display.setDisplayMode(new org.lwjgl.opengl.DisplayMode(1280, 720));
-                    Display.setTitle((String) config.getWorldSetting("World.Info.title"));
-                    Display.create();
-
                     _terasology = Terasology.getInstance();
                     _terasology.init();
                     _terasology.run();
