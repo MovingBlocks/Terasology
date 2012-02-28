@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.persistence.interfaces;
 
-uniform sampler2D tex;
+import java.io.IOException;
 
-void main() {
-    vec4 color = texture2D(tex, gl_TexCoord[0].xy);
-    float lum = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
+/**
+ * Interface for persister
+ * @author Immortius <immortius@gmail.com>
+ */
+public interface LevelWriter {
 
-    if (lum > 1.25)
-        gl_FragColor = color;
-    else
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    void write(Persistable value) throws IOException;
+    boolean isInErrorState();
+    void close() throws IOException;
 }

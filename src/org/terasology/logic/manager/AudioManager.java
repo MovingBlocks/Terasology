@@ -56,6 +56,8 @@ public class AudioManager {
         _audioFiles.put("RemoveBlock", loadSound("RemoveBlock"));
         _audioFiles.put("Dig", loadSound("Dig"));
 
+        _audioFiles.put("Click", loadSound("Click"));
+
         _audioFiles.put("Slime1", loadSound("Slime1"));
         _audioFiles.put("Slime2", loadSound("Slime2"));
         _audioFiles.put("Slime3", loadSound("Slime3"));
@@ -75,6 +77,7 @@ public class AudioManager {
         _audioFiles.put("Afternoon", loadMusic("Afternoon"));
         _audioFiles.put("Sunset", loadMusic("Sunset"));
         _audioFiles.put("Dimlight", loadMusic("Dimlight"));
+        _audioFiles.put("Resurface", loadMusic("Resurface"));
     }
 
     /**

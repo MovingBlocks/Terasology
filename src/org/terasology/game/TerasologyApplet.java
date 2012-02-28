@@ -49,10 +49,9 @@ public final class TerasologyApplet extends Applet {
                     Display.create();
 
                     _terasology = Terasology.getInstance();
-                    _terasology.initControls();
-
-                    _terasology.initGame();
-                    _terasology.startGame();
+                    _terasology.init();
+                    _terasology.run();
+                    _terasology.shutdown();
                 } catch (Exception e) {
                     Terasology.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
                 }

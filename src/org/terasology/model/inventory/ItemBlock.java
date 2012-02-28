@@ -17,11 +17,9 @@ package org.terasology.model.inventory;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
@@ -48,22 +46,13 @@ public class ItemBlock extends Item {
     public void renderFirstPersonView(Player player) {
         Block activeBlock = _blockGroup.getArchetypeBlock();
 
-        TextureManager.getInstance().bindTexture("terrain");
-
         // Adjust the brightness of the block according to the current position of the player
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
         shader.enable();
 
         // Apply biome and overall color offset
-        FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(3);
         Vector4f color = activeBlock.calcColorOffsetFor(Side.FRONT, Terasology.getInstance().getActiveWorldRenderer().getActiveTemperature(), Terasology.getInstance().getActiveWorldRenderer().getActiveTemperature());
-        colorBuffer.put(color.x);
-        colorBuffer.put(color.y);
-        colorBuffer.put(color.z);
-
-        colorBuffer.flip();
-        int colorOffset = GL20.glGetUniformLocation(ShaderManager.getInstance().getShaderProgram("block").getShaderId(), "colorOffset");
-        GL20.glUniform3(colorOffset, colorBuffer);
+        shader.setFloat3("colorOffset", color.x, color.y, color.z);
 
         glEnable(GL11.GL_BLEND);
 
@@ -80,7 +69,7 @@ public class ItemBlock extends Item {
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
         glTranslatef(0f, 0.25f, 0f);
 
-        activeBlock.render();
+        activeBlock.renderWithLightValue(Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValue());
 
         glPopMatrix();
 

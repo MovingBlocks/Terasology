@@ -17,6 +17,7 @@ package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.ShaderManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
@@ -41,13 +42,15 @@ public class BlockGrid implements IGameObject {
 
     private final HashSet<BlockPosition> _gridPositions = new HashSet<BlockPosition>();
 
-    public BlockGrid(WorldRenderer parent) {
+    public BlockGrid() {
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(0.0f, 0.0f, 1.0f, 0.25f), 1.005f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f);
         _mesh = tessellator.generateMesh();
     }
 
     public void render() {
+        ShaderManager.getInstance().enableDefault();
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.world;
 
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.openal.SoundStore;
 import org.terasology.game.Terasology;
@@ -32,8 +34,15 @@ import org.terasology.rendering.particles.BlockParticleEmitter;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 
+import javax.imageio.ImageIO;
 import javax.vecmath.Vector3d;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.logging.Level;
 
@@ -66,6 +75,7 @@ public final class WorldRenderer implements IGameObject {
     private final ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>();
     private final ArrayList<Chunk> _visibleChunks = new ArrayList<Chunk>();
     private int _chunkPosX, _chunkPosZ;
+
     /* CORE GAME OBJECTS */
     private final PortalManager _portalManager;
     private final MobManager _mobManager;
@@ -76,7 +86,7 @@ public final class WorldRenderer implements IGameObject {
     /* HORIZON */
     private final Skysphere _skysphere;
 
-    /* WATER AND LAVA ANIMATION */
+    /* TICKING */
     private int _tick = 0;
     private int _tickTock = 0;
     private long _lastTick;
@@ -87,11 +97,17 @@ public final class WorldRenderer implements IGameObject {
     /* EVENTS */
     private final WorldTimeEventManager _worldTimeEventManager;
 
+    /* PHYSICS */
+    private final BulletPhysicsRenderer _bulletRenderer;
+
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
 
     /* STATISTICS */
     private int _statDirtyChunks = 0;
+
+    /* OTHER SETTINGS */
+    private boolean _wireframe;
 
     /**
      * Initializes a new (local) world for the single player mode.
@@ -106,7 +122,8 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
         _portalManager = new PortalManager(this);
         _mobManager = new MobManager(this);
-        _blockGrid = new BlockGrid(this);
+        _blockGrid = new BlockGrid();
+        _bulletRenderer = new BulletPhysicsRenderer(this);
 
         initTimeEvents();
     }
@@ -183,12 +200,21 @@ public final class WorldRenderer implements IGameObject {
             }
         });
 
-        // SUNSET
+        // NIGHT
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
             @Override
             public void run() {
                 SoundStore.get().setMusicVolume(0.1f);
                 AudioManager.getInstance().getAudio("Dimlight").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
+
+        // BEFORE SUNRISE
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.1f);
+                AudioManager.getInstance().getAudio("Resurface").playAsMusic(1.0f, 1.0f, false);
             }
         });
     }
@@ -269,11 +295,7 @@ public final class WorldRenderer implements IGameObject {
         PostProcessingRenderer.getInstance().renderScene();
         PerformanceMonitor.endActivity();
 
-        glPushMatrix();
-        glLoadIdentity();
-        glClear(GL_DEPTH_BUFFER_BIT);
         _player.renderFirstPersonViewElements();
-        glPopMatrix();
     }
 
 
@@ -286,7 +308,7 @@ public final class WorldRenderer implements IGameObject {
         boolean headUnderWater = _player.isHeadUnderWater();
 
         PerformanceMonitor.startActivity("BulletPhysicsRenderer");
-        BulletPhysicsRenderer.getInstance().render();
+        _bulletRenderer.render();
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Chunk-Opaque");
@@ -294,6 +316,10 @@ public final class WorldRenderer implements IGameObject {
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
+        if (_wireframe)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+
         for (int i = 0; i < _visibleChunks.size(); i++) {
             Chunk c = _visibleChunks.get(i);
             c.render(ChunkMesh.RENDER_PHASE.OPAQUE);
@@ -352,7 +378,8 @@ public final class WorldRenderer implements IGameObject {
         if (headUnderWater) {
             glEnable(GL11.GL_CULL_FACE);
         }
-
+        if (_wireframe)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glDisable(GL_LIGHT0);
 
         PerformanceMonitor.endActivity();
@@ -416,7 +443,7 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Physics Renderer");
-        BulletPhysicsRenderer.getInstance().update();
+        _bulletRenderer.update();
         PerformanceMonitor.endActivity();
     }
 
@@ -431,9 +458,9 @@ public final class WorldRenderer implements IGameObject {
         _tick++;
 
         // This block is based on seconds or less frequent timings
-        if (Terasology.getInstance().getTime() - _lastTick >= 1000) {
+        if (Terasology.getInstance().getTimeInMs() - _lastTick >= 1000) {
             _tickTock++;
-            _lastTick = Terasology.getInstance().getTime();
+            _lastTick = Terasology.getInstance().getTimeInMs();
 
             // PortalManager ticks for spawning once a second
             _portalManager.tickSpawn();
@@ -614,5 +641,49 @@ public final class WorldRenderer implements IGameObject {
                 _chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
             }
         }
+    }
+
+    public boolean isWireframe() {
+        return _wireframe;
+    }
+
+    public void setWireframe(boolean _wireframe) {
+        this._wireframe = _wireframe;
+    }
+
+    public void printScreen() {
+        //REFACTOR TO USE BACKGROUND THREAD FOR IMAGE COPY & SAVE
+        GL11.glReadBuffer(GL11.GL_FRONT);
+        int width = Display.getDisplayMode().getWidth();
+        int height = Display.getDisplayMode().getHeight();
+        //int bpp = Display.getDisplayMode().getBitsPerPixel(); does return 0 - why?
+        int bpp = 4;
+        ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
+        GL11.glReadPixels(0, 0, width, height, (bpp == 3) ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+
+        File file = new File(sdf.format(cal.getTime()) + ".png");
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++) {
+                int i = (x + (width * y)) * bpp;
+                int r = buffer.get(i) & 0xFF;
+                int g = buffer.get(i + 1) & 0xFF;
+                int b = buffer.get(i + 2) & 0xFF;
+                image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
+            }
+
+        try {
+            ImageIO.write(image, "png", file);
+        } catch (IOException e) {
+            Terasology.getInstance().getLogger().log(Level.WARNING, "Could not save image!", e);
+        }
+    }
+
+    public BulletPhysicsRenderer getBulletRenderer() {
+        return _bulletRenderer;
     }
 }
