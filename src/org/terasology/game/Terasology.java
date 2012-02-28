@@ -16,7 +16,6 @@
 package org.terasology.game;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.openal.AL;
@@ -64,16 +63,11 @@ public final class Terasology {
     private final Logger _logger = Logger.getLogger("Terasology");
     private final GroovyManager _groovyManager = new GroovyManager();
     private final ThreadPoolExecutor _threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-
-    /* STATISTICS */
-    private long _lastLoopTime, _lastFpsTime;
-    private int _fps;
-    private float _averageFps;
-    private long _timerTicksPerSecond;
-    private long _delta;
+    private Timer _timer;
 
     /* GAME LOOP */
     private boolean _runGame = true, _saveWorldOnExit = true;
+
 
     /* GAME MODES */
     public enum GameMode {
@@ -99,8 +93,7 @@ public final class Terasology {
         initOpenGL();
         initControls();
         initManagers();
-        //refactor to class -> timer / stats
-        _timerTicksPerSecond = Sys.getTimerResolution();
+        initTimer(); //dependant on lwjgl
     }
 
     private void initNativeLibs() {
@@ -213,11 +206,16 @@ public final class Terasology {
         BlockManager.getInstance();
     }
 
+    private void initTimer() {
+        _timer = new Timer();
+    }
+
     public void run(){
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
         IGameMode mode = null;
         while (_runGame && !Display.isCloseRequested()) {
+            _timer.tick();
             // Only process rendering and updating once a second
             if (!Display.isActive()) {
                 try {
@@ -245,12 +243,10 @@ public final class Terasology {
             }
 
             PerformanceMonitor.startActivity("Main Update");
-            long startTime = getTimeInMs();
             mode.update();
             PerformanceMonitor.endActivity();
             PerformanceMonitor.startActivity("Render");
             mode.render();
-            updateFps();
             Display.update();
             Display.sync(60);
             PerformanceMonitor.endActivity();
@@ -263,7 +259,7 @@ public final class Terasology {
 
             PerformanceMonitor.rollCycle();
             PerformanceMonitor.startActivity("Other");
-            mode.updateTimeAccumulator(getTimeInMs(), startTime);
+            mode.updateTimeAccumulator(_timer.getDelta());
 
             if (Display.wasResized())
                 resizeViewport();
@@ -300,7 +296,6 @@ public final class Terasology {
         Keyboard.destroy();
         Display.destroy();
     }
-
 
     public IGameMode getGameMode() {
         IGameMode mode = _gameModes.get(_state);
@@ -351,26 +346,6 @@ public final class Terasology {
         exit(true);
     }
 
-    private void updateFps() {
-        // Measure the delta value and the frames per second
-        long now = getTimeInMs();
-        _delta = now - _lastLoopTime;
-
-        _lastLoopTime = now;
-        _lastFpsTime += _delta;
-        _fps++;
-
-        // Update the FPS and calculate the average FPS
-        if (_lastFpsTime >= 1000) {
-            _lastFpsTime = 0;
-
-            _averageFps += _fps;
-            _averageFps /= 2;
-
-            _fps = 0;
-        }
-    }
-
     public void addLogFileHandler(String s, Level logLevel) {
         try {
             FileHandler fh = new FileHandler(s, true);
@@ -412,7 +387,7 @@ public final class Terasology {
     }
 
     public double getAverageFps() {
-        return _averageFps;
+        return _timer.getFps();
     }
 
     public WorldRenderer getActiveWorldRenderer() {
@@ -432,10 +407,8 @@ public final class Terasology {
     }
 
     public long getTimeInMs() {
-        if (_timerTicksPerSecond == 0)
-            return 0;
 
-        return (Sys.getTime() * 1000) / _timerTicksPerSecond;
+        return _timer.getTimeInMs();
     }
 
     public void submitTask(final String name, final Runnable task) {
