@@ -141,16 +141,16 @@ public final class Terasology {
 
     private void initDisplay() {
         try {
-            if ((Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.fullscreen")) {
+            if (Config.getInstance().isFullscreen()) {
                 Display.setDisplayMode(Display.getDesktopDisplayMode());
                 Display.setFullscreen(true);
             } else {
-                Display.setDisplayMode((DisplayMode) SettingsManager.getInstance().getUserSetting("Game.Graphics.displayMode"));
+                Display.setDisplayMode(Config.getInstance().getDisplayMode());
                 Display.setResizable(true);
             }
 
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
-            Display.create((PixelFormat) SettingsManager.getInstance().getUserSetting("Game.Graphics.pixelFormat"));
+            Display.create(Config.getInstance().getPixelFormat());
         } catch (LWJGLException e){
             _logger.log(Level.SEVERE, "Can not initialize graphics device.", e);
             System.exit(1);

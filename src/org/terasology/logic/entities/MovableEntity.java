@@ -18,7 +18,7 @@ package org.terasology.logic.entities;
 import org.newdawn.slick.openal.Audio;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -99,7 +99,7 @@ public abstract class MovableEntity extends Entity {
         // Update the viewing direction
         setViewingDirection(_yaw, _pitch);
 
-        if ((Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.debugCollision")) {
+        if (Config.getInstance().isDebugCollision()) {
             getAABB().render(2f);
 
             ArrayList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());
@@ -298,7 +298,7 @@ public abstract class MovableEntity extends Entity {
         // Save the previous position before changing any of the values
         Vector3d oldPosition = new Vector3d(getPosition());
 
-        double friction = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.friction");
+        double friction = Config.getInstance().getFriction();
 
         /*
          * Slowdown the speed of the entity each time this method is called.
@@ -335,10 +335,10 @@ public abstract class MovableEntity extends Entity {
         _velocity.y += _movementDirection.y;
         _velocity.z += _movementDirection.z;
 
-        double maxGravity = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.maxGravity");
-        double maxGravitySwimming = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.maxGravitySwimming");
-        double gravitySwimming = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.gravitySwimming");
-        double gravity = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.gravity");
+        double maxGravity = Config.getInstance().getMaxGravity();
+        double maxGravitySwimming = Config.getInstance().getMaxGravitySwimming();
+        double gravitySwimming = Config.getInstance().getGravitySwimming();
+        double gravity = Config.getInstance().getGravity();
 
         // Normal gravity
         if (_gravity > -maxGravity && !_godMode && !_isSwimming) {
