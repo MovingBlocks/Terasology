@@ -31,6 +31,8 @@ public interface IGameMode {
     public void render();
     public void processKeyboardInput();
     public void processMouseInput();
+    public void activateScreen(String screen);
+    public void deactivateScreen(String screen);
     
     public WorldRenderer getActiveWorldRenderer();
     public void updatePlayerInput();

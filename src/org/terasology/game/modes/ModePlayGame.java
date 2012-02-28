@@ -406,5 +406,11 @@ public class ModePlayGame implements IGameMode {
         return _activeWorldRenderer.getWorldProvider();
     }
 
+    public void activateScreen(String screen){
+        return;
+    }
 
+    public void deactivateScreen(String screen){
+        return;
+    }
 }

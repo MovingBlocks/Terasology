@@ -23,9 +23,10 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.UIMainMenu;
+import org.terasology.rendering.gui.menus.UIOptionsMenu;
 import org.terasology.rendering.world.WorldRenderer;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -49,10 +50,11 @@ import static org.lwjgl.opengl.GL11.*;
 public class ModeMainMenu implements IGameMode {
 
     //GUI
-    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
+    private HashMap<String, UIDisplayElement> _guiScreens = new HashMap<String, UIDisplayElement>();
 
     /*SCREENS*/
-    private UIMainMenu _mainMenu;
+    private UIMainMenu    _mainMenu;
+    private UIOptionsMenu _optionsMenu;
 
     private Terasology _gameInstance = null;
 
@@ -60,7 +62,13 @@ public class ModeMainMenu implements IGameMode {
         _gameInstance = Terasology.getInstance();
         _mainMenu = new UIMainMenu();
         _mainMenu.setVisible(true);
-        _guiScreens.add(_mainMenu);
+
+        _optionsMenu = new UIOptionsMenu();
+        _optionsMenu.setVisible(false);
+
+        _guiScreens.put("main_menu", _mainMenu);
+        _guiScreens.put("options", _optionsMenu);
+
         Mouse.setGrabbed(false);
         Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
     }
@@ -94,7 +102,7 @@ public class ModeMainMenu implements IGameMode {
     * In the future, to make in the parent class GameMode
     */
     private boolean screenHasFocus() {
-        for (UIDisplayElement screen : _guiScreens) {
+        for (UIDisplayElement screen : _guiScreens.values()) {
             if (screen.isVisible() && !screen.isOverlay()) {
                 return true;
             }
@@ -111,12 +119,12 @@ public class ModeMainMenu implements IGameMode {
     }
 
     public void renderUserInterface() {
-        for (UIDisplayElement screen : _guiScreens) {
+        for (UIDisplayElement screen : _guiScreens.values()) {
             screen.render();
         }
     }
     private void updateUserInterface() {
-        for (UIDisplayElement screen : _guiScreens) {
+        for (UIDisplayElement screen : _guiScreens.values()) {
             screen.update();
         }
     }
@@ -138,7 +146,7 @@ public class ModeMainMenu implements IGameMode {
                     return;
                 }
                 // Pass input to focused GUI element
-                for (UIDisplayElement screen : _guiScreens) {
+                for (UIDisplayElement screen : _guiScreens.values()) {
                     if (screenCanFocus(screen)) {
                         screen.processKeyboardInput(key);
                     }
@@ -155,7 +163,7 @@ public class ModeMainMenu implements IGameMode {
             int button = Mouse.getEventButton();
             int wheelMoved = Mouse.getEventDWheel();
 
-            for (UIDisplayElement screen : _guiScreens) {
+            for (UIDisplayElement screen : _guiScreens.values()) {
                 if (screenCanFocus(screen)) {
                     screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
                 }
@@ -166,7 +174,7 @@ public class ModeMainMenu implements IGameMode {
     private boolean screenCanFocus(UIDisplayElement s) {
         boolean result = true;
 
-        for (UIDisplayElement screen : _guiScreens) {
+        for (UIDisplayElement screen : _guiScreens.values()) {
             if (screen.isVisible() && !screen.isOverlay() && screen != s)
                 result = false;
         }
@@ -178,6 +186,16 @@ public class ModeMainMenu implements IGameMode {
     * This is a temporary cap. In the future, will be removed
     */
     public void updatePlayerInput() {
+        return;
+    }
+
+    public void activateScreen(String screen){
+        _guiScreens.get(screen).setVisible(true);
+        return;
+    }
+
+    public void deactivateScreen(String screen){
+        _guiScreens.get(screen).setVisible(false);
         return;
     }
 
