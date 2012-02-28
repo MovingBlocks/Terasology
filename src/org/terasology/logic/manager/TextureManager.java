@@ -73,7 +73,8 @@ public class TextureManager {
         addTexture("icons");
         addTexture("items");
         addTexture("terasology");
-        addTexture("loadingBackground");
+        addTexture("loadingBackground", GL11.GL_CLAMP, GL_LINEAR);
+        addTexture("menuBackground", GL11.GL_CLAMP, GL_LINEAR);
         addTexture("inventory");
 
         /* MOBS */
@@ -82,6 +83,7 @@ public class TextureManager {
 
         /* EFFECTS */
         addTexture("effects");
+        addTexture("vignette", GL11.GL_CLAMP, GL_LINEAR);
 
         for (int i = 1; i <= 6; i++) {
             addTexture("stars" + i);

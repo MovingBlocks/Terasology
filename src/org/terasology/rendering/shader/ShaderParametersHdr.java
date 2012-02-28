@@ -17,23 +17,22 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.TextureManager;
 
 /**
- * Shader parameters for the Particle shader program.
+ * Shader parameters for the Post-processing shader program.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersParticle implements IShaderParameters {
+public class ShaderParametersHdr implements IShaderParameters {
 
     public void applyParameters(ShaderProgram program) {
-        Terasology tera = Terasology.getInstance();
-
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        TextureManager.getInstance().bindTexture("terrain");
+        PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
 
-        if (tera.getActivePlayer() != null)
-            program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        program.setInt("texScene", 0);
+        program.setFloat("exposure", PostProcessingRenderer.getInstance().getExposure());
     }
 
 }

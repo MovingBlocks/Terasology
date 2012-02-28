@@ -15,22 +15,22 @@
  */
 package org.terasology.game.modes;
 
-import org.terasology.game.Terasology;
-
-//OpenGL
-import org.lwjgl.opengl.Display;
-
-//GUI
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.menus.UIMainMenu;
-
-import java.util.ArrayList;
-import org.terasology.rendering.world.WorldRenderer;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.newdawn.slick.openal.SoundStore;
+import org.terasology.game.Terasology;
+import org.terasology.logic.manager.AudioManager;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.menus.UIMainMenu;
+import org.terasology.rendering.world.WorldRenderer;
+
+import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
+
+//OpenGL
+//GUI
 
 /**
  * The class implements the main game menu. The class contains the following screens: game settings,
@@ -39,136 +39,146 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
+ * @todo Create a parent class GameMode.
+ * @todo Add screen "Single Player"
+ * @todo Add animated background
+ * @todo Add screen "Game settings"
+ * @todo Add screen "Multiplayer Player"
+ * @todo Add screen "generation / load / delete the world."
  */
-public class ModeMainMenu implements IGameMode{
-// TODO: Create a parent class GameMode.
-// TODO: Add screen "Single Player"
-// TODO: Add animated background
-// TODO: Add screen "Game settings"
-// TODO: Add screen "Multiplayer Player"
-// TODO: Add screen "generation / load / delete the world."
-	
-  //GUI
-  private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
+public class ModeMainMenu implements IGameMode {
 
-  /*SCREENS*/
-  private UIMainMenu _mainMenu;
+    //GUI
+    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
 
-  private Terasology _gameInstance = null;
-  
-  public void init(){
-    _gameInstance = Terasology.getInstance();
+    /*SCREENS*/
+    private UIMainMenu _mainMenu;
 
-    _mainMenu = new UIMainMenu();
-    _mainMenu.setVisible(true);
+    private Terasology _gameInstance = null;
 
-    _guiScreens.add(_mainMenu);
-
-    Terasology.getInstance().initGroovy();
-
-    Mouse.setGrabbed(false);
-    Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
-  }
-
-  public void updateTimeAccumulator(long currentTime, long startTime){
-    return;
-  }
-  public void update(){
-    updateUserInterface();
-  }
-  
-  /*
-   * In the future, to make in the parent class GameMode
-   */
-  private boolean screenHasFocus() {
-    for (UIDisplayElement screen : _guiScreens) {
-      if (screen.isVisible() && !screen.isOverlay()) {
-          return true;
-      }
+    public void init() {
+        _gameInstance = Terasology.getInstance();
+        _mainMenu = new UIMainMenu();
+        _mainMenu.setVisible(true);
+        _guiScreens.add(_mainMenu);
+        Mouse.setGrabbed(false);
+        Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
     }
 
-    return false;
-  }
-  
-  public void render(){
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
+    public void activate() {
+        playBackgroundMusic();
+    }
 
-    renderUserInterface();
-  }
-  
-  public void renderUserInterface() {
-      for (UIDisplayElement screen : _guiScreens) {
-          screen.render();
-      }
-  }
-  
-  private void updateUserInterface() {
-      for (UIDisplayElement screen : _guiScreens) {
-          screen.update();
-      }
-  }
-  
-  public WorldRenderer getActiveWorldRenderer() {
-      return null;
-  }
-  
-  /**
-   * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
-   */
-  public void processKeyboardInput() {
-      while (Keyboard.next()) {
-          int key = Keyboard.getEventKey();
+    public void deactivate() {
+        stopBackgroundMusic();
+    }
 
-          if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-              if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                _gameInstance.exit(false);
-                return;
-              }
-              // Pass input to focused GUI element
-              for (UIDisplayElement screen : _guiScreens) {
-                  if (screenCanFocus(screen)) {
-                      screen.processKeyboardInput(key);
-                  }
-              }
-          }
-      }
-  }
-  
+    private void playBackgroundMusic() {
+        SoundStore.get().setMusicVolume(0.1f);
+        AudioManager.getInstance().getAudio("Resurface").playAsMusic(1.0f, 1.0f, true);
+    }
 
-/*
-* Process mouse input - nothing system-y, so just passing it to the Player class
-*/
-  public void processMouseInput() {
-      while (Mouse.next()) {
-          int button = Mouse.getEventButton();
-          int wheelMoved = Mouse.getEventDWheel();
+    private void stopBackgroundMusic() {
+        AudioManager.getInstance().stopAllSounds();
+    }
 
-          for (UIDisplayElement screen : _guiScreens) {
-              if (screenCanFocus(screen)) {
-                  screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-              }
-          }
-      }
-  }
-  
+    public void updateTimeAccumulator(double delta) {
+        return;
+    }
 
-  private boolean screenCanFocus(UIDisplayElement s) {
-      boolean result = true;
+    public void update() {
+        updateUserInterface();
+    }
 
-      for (UIDisplayElement screen : _guiScreens) {
-          if (screen.isVisible() && !screen.isOverlay() && screen != s)
-              result = false;
-      }
+    /*
+    * In the future, to make in the parent class GameMode
+    */
+    private boolean screenHasFocus() {
+        for (UIDisplayElement screen : _guiScreens) {
+            if (screen.isVisible() && !screen.isOverlay()) {
+                return true;
+            }
+        }
 
-      return result;
-  }
+        return false;
+    }
 
- /*
-  * This is a temporary cap. In the future, will be removed
-  */
-  public void updatePlayerInput(){
-    return;
-  }
- 
+    public void render() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+
+        renderUserInterface();
+    }
+
+    public void renderUserInterface() {
+        for (UIDisplayElement screen : _guiScreens) {
+            screen.render();
+        }
+    }
+    private void updateUserInterface() {
+        for (UIDisplayElement screen : _guiScreens) {
+            screen.update();
+        }
+    }
+
+    public WorldRenderer getActiveWorldRenderer() {
+        return null;
+    }
+
+    /**
+     * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
+     */
+    public void processKeyboardInput() {
+        while (Keyboard.next()) {
+            int key = Keyboard.getEventKey();
+
+            if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                    _gameInstance.exit(false);
+                    return;
+                }
+                // Pass input to focused GUI element
+                for (UIDisplayElement screen : _guiScreens) {
+                    if (screenCanFocus(screen)) {
+                        screen.processKeyboardInput(key);
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+    * Process mouse input - nothing system-y, so just passing it to the Player class
+    */
+    public void processMouseInput() {
+        while (Mouse.next()) {
+            int button = Mouse.getEventButton();
+            int wheelMoved = Mouse.getEventDWheel();
+
+            for (UIDisplayElement screen : _guiScreens) {
+                if (screenCanFocus(screen)) {
+                    screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+                }
+            }
+        }
+    }
+
+    private boolean screenCanFocus(UIDisplayElement s) {
+        boolean result = true;
+
+        for (UIDisplayElement screen : _guiScreens) {
+            if (screen.isVisible() && !screen.isOverlay() && screen != s)
+                result = false;
+        }
+
+        return result;
+    }
+
+    /*
+    * This is a temporary cap. In the future, will be removed
+    */
+    public void updatePlayerInput() {
+        return;
+    }
+
 }
