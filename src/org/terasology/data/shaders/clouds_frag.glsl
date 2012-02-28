@@ -19,7 +19,7 @@ uniform sampler2D texture;
 uniform float light = 1.0;
 
 void main(){
-    vec4 color = srgbToLinear(texture2D(texture, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y)));
+    vec4 color = texture2D(texture, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y));
 
     color.a = color.r;
 
@@ -30,5 +30,5 @@ void main(){
     if (light < 0.25)
         color.a *= 1.0 - clamp(abs(0.25 - expLightValue(light)) / 0.25, 0.0, 1.0);
 
-    gl_FragColor = linearToSrgb(color);
+    gl_FragColor = color;
 }

@@ -173,7 +173,7 @@ public class DefaultBlockTool extends SimpleTool {
 
                     /* PHYSICS */
                     Vector3d pos = blockPos.toVector3d();
-                    BulletPhysicsRenderer.getInstance().addLootableBlocks(new Vector3f(pos), block);
+                    _player.getParent().getBulletRenderer().addLootableBlocks(new Vector3f(pos), block);
 
                     _player.resetExtraction();
                     return block;

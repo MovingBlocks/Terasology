@@ -97,21 +97,26 @@ public class ModePlayGame implements IGameMode {
         _guiScreens.add(_inventoryScreen);
         _guiScreens.add(_statusScreen);
 
+        resetOpenGLParameters();
+    }
+
+    public void activate() {
         String worldSeed = (String) SettingsManager.getInstance().getWorldSetting("World.Creation.defaultSeed");
 
         if (worldSeed.isEmpty()) {
             worldSeed = null;
         }
 
-        resetOpenGLParameters();
-
         initWorld("World1", worldSeed);
-        Terasology.getInstance().initGroovy();
+    }
 
+    public void deactivate() {
+        _activeWorldRenderer.dispose();
+        _activeWorldRenderer = null;
     }
 
     public void update() {
-        while (_timeAccumulator >= SKIP_TICKS) {
+        //while (_timeAccumulator >= SKIP_TICKS) {
             if (_activeWorldRenderer != null && shouldUpdateWorld())
                 _activeWorldRenderer.update();
 
@@ -136,14 +141,16 @@ public class ModePlayGame implements IGameMode {
 
             }
 
-            updateUserInterface();
-
-            _timeAccumulator -= SKIP_TICKS;
-        }
+            //_timeAccumulator -= SKIP_TICKS;
+        //}
     }
 
-    public void updateTimeAccumulator(long currentTime, long startTime) {
-        _timeAccumulator += currentTime - startTime;
+    public void updateTimeAccumulator(double delta) {
+        _timeAccumulator += delta;
+    }
+
+    public void initWorld(String title) {
+        initWorld(title, null);
     }
 
     /**
@@ -199,7 +206,7 @@ public class ModePlayGame implements IGameMode {
     }
 
     private void simulateWorld(int duration) {
-        long timeBefore = _gameInstance.getTime();
+        long timeBefore = _gameInstance.getTimeInMs();
 
         _loadingScreen.setVisible(true);
         _hud.setVisible(false);
@@ -217,7 +224,7 @@ public class ModePlayGame implements IGameMode {
 
             Display.update();
 
-            diff = _gameInstance.getTime() - timeBefore;
+            diff = _gameInstance.getTimeInMs() - timeBefore;
         }
 
         _loadingScreen.setVisible(false);
@@ -232,8 +239,10 @@ public class ModePlayGame implements IGameMode {
         if (_activeWorldRenderer != null) {
             _activeWorldRenderer.render();
         }
-        PerformanceMonitor.startActivity("Render UI");
+
+        PerformanceMonitor.startActivity("RenderAndUpdate UI");
         renderUserInterface();
+        updateUserInterface();
         PerformanceMonitor.endActivity();
     }
 
@@ -279,6 +288,10 @@ public class ModePlayGame implements IGameMode {
                     toggleViewingDistance();
                 }
 
+                if (key == Keyboard.KEY_F12) {
+                    Terasology.getInstance().getActiveWorldRenderer().printScreen();
+                }
+
                 // Pass input to focused GUI element
                 for (UIDisplayElement screen : _guiScreens) {
                     if (screenCanFocus(screen)) {
@@ -303,6 +316,9 @@ public class ModePlayGame implements IGameMode {
 
                 if (key == Keyboard.KEY_LEFT && Keyboard.getEventKeyState()) {
                     getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
+                }
+                if (key == Keyboard.KEY_R && Keyboard.getEventKeyState()) {
+                    getActiveWorldRenderer().setWireframe(!getActiveWorldRenderer().isWireframe());
                 }
             }
 
@@ -371,8 +387,9 @@ public class ModePlayGame implements IGameMode {
     }
 
     public void togglePauseMenu() {
-        if (screenCanFocus(_pauseMenu))
+        if (screenCanFocus(_pauseMenu)) {
             _pauseMenu.setVisible(!_pauseMenu.isVisible());
+        }
     }
 
     public void toggleViewingDistance() {

@@ -24,14 +24,14 @@ import org.terasology.math.TeraMath;
  */
 public class PerlinNoise {
 
-    private static final double LACUNARITY = 1.9379201;
-    private static final double H = 0.736281;
+    private static final double LACUNARITY = 2.1379201;
+    private static final double H = 0.836281;
 
     private double[] _spectralWeights;
 
     private final int[] _noisePermutations;
     private boolean _recomputeSpectralWeights = true;
-    private int _octaves = 5;
+    private int _octaves = 9;
 
     /**
      * Init. a new generator with a given seed value.

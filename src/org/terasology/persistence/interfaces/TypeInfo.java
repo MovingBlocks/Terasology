@@ -13,15 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.persistence.interfaces;
 
-uniform sampler2D tex;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
-void main() {
-    vec4 color = texture2D(tex, gl_TexCoord[0].xy);
-    float lum = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
+/**
+ * @author Immortius <immortius@gmail.com>
+ */
+public interface TypeInfo<T> {
+    public static final byte VARIABLE_LENGTH = 0;
 
-    if (lum > 1.25)
-        gl_FragColor = color;
-    else
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    void write(DataOutputStream out, T value, LevelWriter writer) throws Exception;
+    T read(DataInputStream in, LevelReader reader) throws Exception;
+    
+    short getId();
+    void setId(short id);
+    Class<T> getType();
+    String getTypeName();
+
+    /**
+     * @return The size of this type in bytes
+     */
+    byte size();
 }

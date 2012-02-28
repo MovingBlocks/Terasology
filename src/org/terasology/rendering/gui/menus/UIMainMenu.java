@@ -16,11 +16,15 @@
 package org.terasology.rendering.gui.menus;
 
 import org.terasology.game.Terasology;
-import org.terasology.rendering.gui.components.*;
+import org.terasology.logic.manager.AudioManager;
+import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.components.UIImageOverlay;
+import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+
 import javax.vecmath.Vector2f;
 
 /**
@@ -30,7 +34,7 @@ import javax.vecmath.Vector2f;
  */
 public class UIMainMenu extends UIDisplayRenderer {
 
-    final UITransparentOverlay _overlay;
+    final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
 
     final UIButton _exitButton;
@@ -57,17 +61,16 @@ public class UIMainMenu extends UIDisplayRenderer {
         });
 
         _startButton = new UIButton(new Vector2f(256f, 32f));
-        _startButton.getLabel().setText("Start the game");
+        _startButton.getLabel().setText("Play Terasology");
         _startButton.setVisible(true);
 
         _startButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                setVisible(false);
                 Terasology.getInstance().setGameMode(Terasology.GameMode.runGame);
             }
         });
 
-        _overlay = new UITransparentOverlay();
+        _overlay = new UIImageOverlay("menuBackground");
         _overlay.setVisible(true);
 
         addDisplayElement(_overlay);
