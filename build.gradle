@@ -67,22 +67,18 @@ jar.doLast {
 task dist(type:Copy) {
 	description = 'Creates a fully-functional game folder.'
 	dependsOn jar
-
-    from('.') {
-        include 'README.markdown'
-        include 'License.txt'
-    }
-    into('out/dist')
-
-    from('scripts')
-    into('out/dist')
-    exclude 'Launcher.xml'
-
-    from('groovy')
-    into('out/dist/groovy')
-
-    from('natives')
-    into('out/dist/natives')
+	
+	from('.') {
+		include 'natives/**'
+		include 'groovy/**'
+		include 'README.markdown'
+		include 'LICENSE.txt'
+	}
+	from('scripts') {
+		exclude('Launcher.xml')
+	}
+	from(jar.archivePath)
+	into('out/dist')
 }
 
 task zip(type:Zip) {
@@ -97,10 +93,9 @@ task applet(type:Copy) {
 	description = 'Creates a game distribution playable through a browser.'
 	dependsOn jar
 
-    from('applet')
-    into('out/applet')
-    exclude '*.keystore'
-
+    from('applet') {
+		exclude '*.keystore'		
+	}
     from jar.archivePath
     into('out/applet')
 }
