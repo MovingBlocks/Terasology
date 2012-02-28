@@ -6,5 +6,5 @@ out
 .classpath
 .project
 .settings
-bin
 .gradle
+bin

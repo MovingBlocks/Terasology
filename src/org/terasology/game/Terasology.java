@@ -56,6 +56,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Kireev   Anton   <adeon.k87@gmail.com>
+ * @todo To create the function that will return the number of generated worlds
  */
 public final class Terasology {
     private static Terasology _instance = new Terasology();
