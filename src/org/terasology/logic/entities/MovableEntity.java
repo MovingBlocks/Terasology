@@ -18,7 +18,7 @@ package org.terasology.logic.entities;
 import org.newdawn.slick.openal.Audio;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -99,7 +99,7 @@ public abstract class MovableEntity extends Entity {
         // Update the viewing direction
         setViewingDirection(_yaw, _pitch);
 
-        if ((Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.debugCollision")) {
+        if (Config.getInstance().isDebugCollision()) {
             getAABB().render(2f);
 
             ArrayList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());

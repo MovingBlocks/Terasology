@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.generators;
 
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.management.BlockManager;
 
@@ -26,11 +26,11 @@ import org.terasology.model.blocks.management.BlockManager;
  */
 public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
-    private static final double DESERT_GRASS_DENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Biomes.Desert.grassDensity");
-    private static final double FOREST_GRASS_DENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Biomes.Forest.grassDensity");
-    private static final double PLAINS_GRASS_DENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Biomes.Plains.grassDensity");
-    private static final double SNOW_GRASS_DENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Biomes.Snow.grassDensity");
-    private static final double MOUNTAINS_GRASS_DENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Biomes.Mountains.grassDensity");
+    private static final double DESERT_GRASS_DENSITY = Config.getInstance().getDesertGrassDensity();
+    private static final double FOREST_GRASS_DENSITY = Config.getInstance().getForrestGrassDensity();
+    private static final double PLAINS_GRASS_DENSITY = Config.getInstance().getPlainsGrassDensity();
+    private static final double SNOW_GRASS_DENSITY = Config.getInstance().getSnowGrassDensity();
+    private static final double MOUNTAINS_GRASS_DENSITY = Config.getInstance().getMountainsGrassDensity();
 
     public ChunkGeneratorFlora(GeneratorManager generatorManager) {
         super(generatorManager);

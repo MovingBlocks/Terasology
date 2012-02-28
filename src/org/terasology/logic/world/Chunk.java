@@ -25,7 +25,7 @@ import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
 import org.terasology.logic.generators.ChunkGenerator;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
@@ -72,7 +72,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     public static final int CHUNK_DIMENSION_X = 16;
     public static final int CHUNK_DIMENSION_Y = 256;
     public static final int CHUNK_DIMENSION_Z = 16;
-    public static final int VERTICAL_SEGMENTS = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.verticalChunkMeshSegments");
+    public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
     private static final Vector3d[] LIGHT_DIRECTIONS = {new Vector3d(1, 0, 0), new Vector3d(-1, 0, 0), new Vector3d(0, 1, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
 
     private final Vector3d _position = new Vector3d();
@@ -758,7 +758,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {
-                    if (WorldRenderer.BOUNDING_BOXES_ENABLED) {
+                    if (Config.getInstance().isRenderChunkBoundingBoxes()) {
                         getSubMeshAABB(i).renderLocally(2f);
                         _statRenderedTriangles += 12;
                     }

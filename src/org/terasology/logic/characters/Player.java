@@ -21,7 +21,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.manager.ToolManager;
@@ -61,13 +61,14 @@ import static org.lwjgl.opengl.GL11.*;
 public class Player extends Character {
 
     /* CONSTANT VALUES */
-    private static final double MOUSE_SENS = (Double) SettingsManager.getInstance().getUserSetting("Game.Controls.mouseSens");
-    private static final boolean DEMO_FLIGHT = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.demoFlight");
-    private static final double DEMO_FLIGHT_SPEED = (Double) SettingsManager.getInstance().getWorldSetting("World.Debug.demoFlightSpeed");
-    private static final boolean GOD_MODE = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.godMode");
-    private static final boolean CAMERA_BOBBING = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Player.cameraBobbing");
-    private static final boolean RENDER_FIRST_PERSON_VIEW = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Player.renderFirstPersonView");
-    private static final boolean SHOW_PLACING_BOX = (Boolean) SettingsManager.getInstance().getUserSetting("Game.HUD.placingBox");
+    private static final double MOUSE_SENS = Config.getInstance().getMouseSens();
+    private static final boolean DEMO_FLIGHT = Config.getInstance().isDemoFlight();
+    private static final double DEMO_FLIGHT_SPEED = Config.getInstance().getDemoFlightSpeed();
+    private static final boolean GOD_MODE = Config.getInstance().isGodMode();
+    private static final boolean CAMERA_BOBBING = Config.getInstance().isCameraBobbing();
+
+    private static final boolean RENDER_FIRST_PERSON_VIEW = Config.getInstance().isRenderFirstPersonView();
+    private static final boolean SHOW_PLACING_BOX = Config.getInstance().isPlacingBox();
 
     /* OBSERVERS */
     private final ArrayList<IBlockObserver> _observers = new ArrayList<IBlockObserver>();

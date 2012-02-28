@@ -20,7 +20,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -55,10 +55,12 @@ public class ModePlayGame implements IGameMode {
     private WorldRenderer _activeWorldRenderer;
 
     /* VIEWING DISTANCE */
-    private static final int[] VIEWING_DISTANCES = {(Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceNear"),
-            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceModerate"),
-            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceFar"),
-            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceUltra")};
+    private static final int[] VIEWING_DISTANCES = {
+            Config.getInstance().getViewingDistanceNear(),
+            Config.getInstance().getViewingDistanceModerate(),
+            Config.getInstance().getViewingDistanceFar(),
+            Config.getInstance().getViewingDistanceUltra()
+    };
 
     private int _activeViewingDistance = 0;
 
@@ -92,7 +94,7 @@ public class ModePlayGame implements IGameMode {
     }
 
     public void activate() {
-        String worldSeed = (String) SettingsManager.getInstance().getWorldSetting("World.Creation.defaultSeed");
+        String worldSeed = Config.getInstance().getDefaultSeed();
 
         if (worldSeed.isEmpty()) {
             worldSeed = null;
@@ -245,7 +247,7 @@ public class ModePlayGame implements IGameMode {
      * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
     public void processKeyboardInput() {
-        boolean debugEnabled = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.debug");
+        boolean debugEnabled = Config.getInstance().isDebug();
 
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
@@ -260,7 +262,7 @@ public class ModePlayGame implements IGameMode {
                 }
 
                 if (key == Keyboard.KEY_F3) {
-                    SettingsManager.getInstance().setWorldSetting("World.Debug.debug", debugEnabled = !(debugEnabled));
+                    Config.getInstance().setDebug(!Config.getInstance().isDebug());
                 }
 
                 if (key == Keyboard.KEY_F) {

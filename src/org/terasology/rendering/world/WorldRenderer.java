@@ -56,10 +56,6 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class WorldRenderer implements IGameObject {
-
-    public static final boolean BOUNDING_BOXES_ENABLED = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.renderChunkBoundingBoxes");
-    public static final int MAX_CHUNK_VERTEX_BUFFER_OBJECTS = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.maxChunkVBOs");
-
     /* VIEWING DISTANCE */
     private int _viewingDistance = 8;
 
@@ -261,7 +257,7 @@ public final class WorldRenderer implements IGameObject {
                         noMoreUpdates = true;
                     }
                 }
-            } else if (i > MAX_CHUNK_VERTEX_BUFFER_OBJECTS) {
+            } else if (i > Config.getInstance().getMaxChunkVBOs()) {
                 // Make sure not too many chunk VBOs are available in the video memory at the same time
                 // Otherwise VBOs are moved into system memory which is REALLY slow and causes lag
                 c.clearMeshes();
