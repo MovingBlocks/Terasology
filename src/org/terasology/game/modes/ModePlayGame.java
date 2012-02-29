@@ -20,7 +20,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -33,11 +33,8 @@ import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
 
-//OpenGL
-//GUI
-
 /**
- * Play mode
+ * Play mode.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Anton Kireev <adeon.k87@gmail.com>
@@ -54,20 +51,16 @@ public class ModePlayGame implements IGameMode {
     private UIStatusScreen _statusScreen;
     private UIInventoryScreen _inventoryScreen;
 
-    /* CONST */
-    private static final int TICKS_PER_SECOND = 60;
-    private static final int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-
     /* RENDERING */
     private WorldRenderer _activeWorldRenderer;
 
-    public double _timeAccumulator = 0;
-
     /* VIEWING DISTANCE */
-    private static final int[] VIEWING_DISTANCES = {(Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceNear"),
-            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceModerate"),
-            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceFar"),
-            (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.viewingDistanceUltra")};
+    private static final int[] VIEWING_DISTANCES = {
+            Config.getInstance().getViewingDistanceNear(),
+            Config.getInstance().getViewingDistanceModerate(),
+            Config.getInstance().getViewingDistanceFar(),
+            Config.getInstance().getViewingDistanceUltra()
+    };
 
     private int _activeViewingDistance = 0;
 
@@ -101,7 +94,7 @@ public class ModePlayGame implements IGameMode {
     }
 
     public void activate() {
-        String worldSeed = (String) SettingsManager.getInstance().getWorldSetting("World.Creation.defaultSeed");
+        String worldSeed = Config.getInstance().getDefaultSeed();
 
         if (worldSeed.isEmpty()) {
             worldSeed = null;
@@ -115,10 +108,9 @@ public class ModePlayGame implements IGameMode {
         _activeWorldRenderer = null;
     }
 
-    public void update() {
-        //while (_timeAccumulator >= SKIP_TICKS) {
+    public void update(double delta) {
             if (_activeWorldRenderer != null && shouldUpdateWorld())
-                _activeWorldRenderer.update();
+                _activeWorldRenderer.update(delta);
 
             if (screenHasFocus() || !shouldUpdateWorld()) {
                 if (Mouse.isGrabbed()) {
@@ -140,17 +132,6 @@ public class ModePlayGame implements IGameMode {
                 }
 
             }
-
-            //_timeAccumulator -= SKIP_TICKS;
-        //}
-    }
-
-    public void updateTimeAccumulator(double delta) {
-        _timeAccumulator += delta;
-    }
-
-    public void initWorld(String title) {
-        initWorld(title, null);
     }
 
     /**
@@ -266,7 +247,7 @@ public class ModePlayGame implements IGameMode {
      * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
     public void processKeyboardInput() {
-        boolean debugEnabled = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.debug");
+        boolean debugEnabled = Config.getInstance().isDebug();
 
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
@@ -281,7 +262,7 @@ public class ModePlayGame implements IGameMode {
                 }
 
                 if (key == Keyboard.KEY_F3) {
-                    SettingsManager.getInstance().setWorldSetting("World.Debug.debug", debugEnabled = !(debugEnabled));
+                    Config.getInstance().setDebug(!Config.getInstance().isDebug());
                 }
 
                 if (key == Keyboard.KEY_F) {

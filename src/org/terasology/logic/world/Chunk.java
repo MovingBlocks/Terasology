@@ -24,9 +24,8 @@ import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
-import org.terasology.logic.entities.StaticEntity;
 import org.terasology.logic.generators.ChunkGenerator;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
@@ -63,7 +62,7 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Chunk extends StaticEntity implements Comparable<Chunk>, Externalizable {
+public class Chunk implements Comparable<Chunk>, Externalizable {
 
     public static int _statChunkMeshEmpty, _statChunkNotReady, _statRenderedTriangles;
 
@@ -73,17 +72,19 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     public static final int CHUNK_DIMENSION_X = 16;
     public static final int CHUNK_DIMENSION_Y = 256;
     public static final int CHUNK_DIMENSION_Z = 16;
-    public static final int VERTICAL_SEGMENTS = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.verticalChunkMeshSegments");
+    public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
     private static final Vector3d[] LIGHT_DIRECTIONS = {new Vector3d(1, 0, 0), new Vector3d(-1, 0, 0), new Vector3d(0, 1, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
 
-    protected FastRandom _random;
+    private final Vector3d _position = new Vector3d();
     /* ------ */
-    protected boolean _dirty, _lightDirty, _fresh;
+    private FastRandom _random;
     /* ------ */
-    protected LocalWorldProvider _parent;
+    private boolean _dirty, _lightDirty, _fresh;
     /* ------ */
-    protected final TeraArray _blocks;
-    protected final TeraSmartArray _sunlight, _light, _states;
+    private LocalWorldProvider _parent;
+    /* ------ */
+    private final TeraArray _blocks;
+    private final TeraSmartArray _sunlight, _light, _states;
     /* ------ */
     private ChunkMesh _activeMeshes[];
     private ChunkMesh _newMeshes[];
@@ -756,7 +757,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {
-                    if (WorldRenderer.BOUNDING_BOXES_ENABLED) {
+                    if (Config.getInstance().isRenderChunkBoundingBoxes()) {
                         getSubMeshAABB(i).renderLocally(2f);
                         _statRenderedTriangles += 12;
                     }
@@ -908,7 +909,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     public void setPosition(Vector3d position) {
-        super.setPosition(position);
+        _position.set(position);
     }
 
     public void setParent(LocalWorldProvider parent) {
@@ -1059,6 +1060,16 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         });
     }
 
+    public int triangleCount(ChunkMesh.RENDER_PHASE type) {
+        int count = 0;
+
+        if (isReadyForRendering())
+            for (int i = 0; i < VERTICAL_SEGMENTS; i++)
+                count += _activeMeshes[i].triangleCount(type);
+
+        return count;
+    }
+
     public RigidBody getRigidBody() {
         return _rigidBody;
     }
@@ -1067,5 +1078,9 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         _statChunkMeshEmpty = 0;
         _statChunkNotReady = 0;
         _statRenderedTriangles = 0;
+    }
+
+    public Vector3d getPosition() {
+        return _position;
     }
 }

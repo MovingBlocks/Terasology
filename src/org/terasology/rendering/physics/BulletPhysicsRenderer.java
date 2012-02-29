@@ -253,8 +253,6 @@ public class BulletPhysicsRenderer implements IGameObject {
     public void render() {
         Player player = _parent.getPlayer();
 
-        _discreteDynamicsWorld.stepSimulation(1.0f / 60f, 7);
-
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
         float[] mFloat = new float[16];
 
@@ -292,7 +290,9 @@ public class BulletPhysicsRenderer implements IGameObject {
         GL11.glPopMatrix();
     }
 
-    public void update() {
+    public void update(double delta) {
+        _discreteDynamicsWorld.stepSimulation((float) (delta / 1000.0), 7);
+
         updateChunks();
         removeTemporaryBlocks();
         checkForLootedBlocks();

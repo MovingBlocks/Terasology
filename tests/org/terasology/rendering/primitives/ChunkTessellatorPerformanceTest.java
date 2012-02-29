@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.terasology.game.Terasology;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.logic.world.IWorldProvider;
@@ -26,15 +27,7 @@ public class ChunkTessellatorPerformanceTest {
     @BeforeClass
     public static void beforeClass() throws Exception
     {
-        if (System.getProperty("os.name").equals("Mac OS X"))
-            addLibraryPath("natives/macosx");
-        else if (System.getProperty("os.name").equals("Linux"))
-            addLibraryPath("natives/linux");
-        else
-            addLibraryPath("natives/windows");
-
-        Display.setDisplayMode(new DisplayMode(0,0));
-        Display.create();
+        Terasology.getInstance().init();
     }
 
     @Test
