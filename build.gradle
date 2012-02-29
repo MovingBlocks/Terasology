@@ -18,6 +18,9 @@ sourceSets {
 		java { srcDirs = [] }
 		groovy { srcDir 'src' }
 	}
+	test {
+		java { srcDir 'tests' }
+	}
 }
 
 repositories {
@@ -35,6 +38,8 @@ dependencies{
 		"libs/lwjgl.jar", "libs/lwjgl_util.jar", "libs/lzma.jar",
 		"libs/slick.jar", "libs/trove-3.0.0.jar", "libs/vecmath.jar"
 	)
+	
+	testCompile 'junit:junit:4.10'
 }
 
 task copyResources(type:Copy) {
