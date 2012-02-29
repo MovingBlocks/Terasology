@@ -2,21 +2,18 @@ package org.terasology.rendering.primitives;
 
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.lwjgl.Sys;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.terasology.game.Terasology;
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -88,22 +85,5 @@ public class ChunkTessellatorPerformanceTest {
                 return true;
             }
         });
-    }
-
-    private static void addLibraryPath(String s) throws Exception {
-        final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
-        usrPathsField.setAccessible(true);
-
-        final String[] paths = (String[]) usrPathsField.get(null);
-
-        for (String path : paths) {
-            if (path.equals(s)) {
-                return;
-            }
-        }
-
-        final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
-        newPaths[newPaths.length - 1] = s;
-        usrPathsField.set(null, newPaths);
     }
 }
