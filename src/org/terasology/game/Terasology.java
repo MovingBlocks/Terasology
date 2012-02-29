@@ -35,12 +35,10 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -381,6 +379,31 @@ public final class Terasology {
             return f.getAbsolutePath();
         }
         return path;
+    }
+    
+    public Object[] getListWolds(){
+        String path          = getWorldSavePath("");
+        //String[] worldsNames = 
+        File f = new File(path);
+        ArrayList<String> worldsNames = new ArrayList<String>();
+        if(!f.exists()){
+            return null;
+        }
+        
+        
+        for(File file : f.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                if(file.isDirectory()){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        })){
+            worldsNames.add(file.getName());
+        }
+
+        return worldsNames.toArray();
     }
 
     public Logger getLogger() {

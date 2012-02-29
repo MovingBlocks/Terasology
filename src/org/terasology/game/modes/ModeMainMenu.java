@@ -23,7 +23,7 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.UIMainMenu;
-import org.terasology.rendering.gui.menus.UIOptionsMenu;
+import org.terasology.rendering.gui.menus.UISelectWorldMenu;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class ModeMainMenu implements IGameMode {
 
     /*SCREENS*/
     private UIMainMenu    _mainMenu;
-    private UIOptionsMenu _optionsMenu;
+    private UISelectWorldMenu _selectWorldMenu;
 
     private Terasology _gameInstance = null;
 
@@ -63,11 +63,11 @@ public class ModeMainMenu implements IGameMode {
         _mainMenu = new UIMainMenu();
         _mainMenu.setVisible(true);
 
-        _optionsMenu = new UIOptionsMenu();
-        _optionsMenu.setVisible(false);
+        _selectWorldMenu = new UISelectWorldMenu();
+        _selectWorldMenu.setVisible(false);
 
         _guiScreens.put("main_menu", _mainMenu);
-        _guiScreens.put("options", _optionsMenu);
+        _guiScreens.put("select_world", _selectWorldMenu);
 
         Mouse.setGrabbed(false);
         Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);

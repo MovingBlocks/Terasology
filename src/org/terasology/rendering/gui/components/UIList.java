@@ -1,22 +1,20 @@
 package org.terasology.rendering.gui.components;
 
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: kireev
- * Date: 21.02.12
- * Time: 13:29
- * To change this template use File | Settings | File Templates.
- */
+import static org.lwjgl.opengl.GL11.*;
+
 public class UIList extends UIDisplayContainer {
-    private final UIText _text;
+  ///  private final UIText _text;
 
     //Borders
     private final UIGraphicsElement _borderTop;
@@ -24,17 +22,18 @@ public class UIList extends UIDisplayContainer {
     private final UIGraphicsElement _borderBottom;
     private final UIGraphicsElement _borderLeft;
 
+    //Background
+    private Vector4f _backgroundColor = new Vector4f(1.0f,1.0f,1.0f, 0.8f);
+    private boolean  _showBackground  = true;
+
+    private UIListItem _selectedItem        = null;
+    private int        _selectedItemIndex   = 0;
     //List items
     private List<UIListItem> _items  = new ArrayList<UIListItem>();
 
     public UIList(Vector2f size) {
         setSize(size);
-        _text = new UIText();
-        _text.setVisible(true);
-        _text.setColor(Color.red);
-        _text.setPosition(new Vector2f((getPosition().x), (getPosition().y)));
-
-        _text.setText("Future ListItem");
+        //setCrop(true);
 
         _borderTop = new UIGraphicsElement("gui_menu");
         _borderTop.setVisible(true);
@@ -57,8 +56,6 @@ public class UIList extends UIDisplayContainer {
         _borderLeft.setRotateAngle(90f);
         _borderLeft.getTextureSize().set(new Vector2f(256f/512f, 4f / 512f));
 
-
-        addDisplayElement(_text);
         addDisplayElement(_borderTop);
         addDisplayElement(_borderRight);
         addDisplayElement(_borderBottom);
@@ -67,7 +64,47 @@ public class UIList extends UIDisplayContainer {
     }
 
     public void update(){
+        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+        if (intersects(mousePos)) {
+            for (int i = (_items.size() - 1); i >= 0; i--)
+            {
+                UIListItem item = _items.get(i);
+                if(item.isVisible()){
+                    if(item.intersects(mousePos)){
+                        //@todo remake it
+                        if(_mouseDown){
+                            _items.get(_selectedItemIndex).setSelected(false);
+                            item.setSelected(true);
+                            _selectedItem = item;
+                            _selectedItemIndex = i;
+                            _mouseDown = false;
+                        }
+                    }
+                }
+            }
+        }
+
         updateBorders();
+    }
+
+    public void render(){
+        if(_showBackground){
+            glPushMatrix();
+            glLoadIdentity();
+            glColor4f(_backgroundColor.x, _backgroundColor.y,_backgroundColor.z, _backgroundColor.w);
+            glBegin(GL_QUADS);
+            glVertex2f(getPosition().x + getSize().x, getPosition().y + getSize().y);
+            glVertex2f(getPosition().x, getPosition().y + getSize().y);
+            glVertex2f(getPosition().x, getPosition().y);
+            glVertex2f(getPosition().x + getSize().x, getPosition().y);
+            glEnd();
+            glPopMatrix();
+        }
+        super.render();
+    }
+
+    private void clicked(){
+
     }
 
     private void updateBorders(){
@@ -84,11 +121,26 @@ public class UIList extends UIDisplayContainer {
         _borderLeft.getTextureOrigin().set(0f, 150f / 512f);
     }
 
-    private void addItem(){
+    public void addItem(String text, Object value){
+        UIListItem newItem = new UIListItem(new Vector2f(getSize().x, (32f)), text, value);
 
+        newItem.setVisible(true);
+        newItem.setPosition(new Vector2f(getPosition().x, getPosition().y + 32f * _items.size()));
+        _items.add(newItem);
+        addDisplayElement(_items.get(_items.size() - 1));
     }
 
-    private void deleteItem(){
-
+    public void removeItem(int index){
+        removeDisplayElement(_items.get(index));
+        _items.remove(index);
     }
+
+    public void showBackground(boolean show){
+        _showBackground = show;
+    }
+    
+    public void setBackgroundColor(Vector4f backgroundColor){
+        _backgroundColor = backgroundColor;
+    }
+
 }

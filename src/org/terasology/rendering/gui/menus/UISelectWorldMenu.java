@@ -22,6 +22,7 @@ import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.game.Terasology;
 
 import javax.vecmath.Vector2f;
 
@@ -31,20 +32,45 @@ import javax.vecmath.Vector2f;
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @todo Add scrollbar, slider
  */
-public class UIOptionsMenu extends UIDisplayRenderer {
+public class UISelectWorldMenu extends UIDisplayRenderer {
 
     final UIImageOverlay _overlay;
     final UIList _list;
+    final UIButton _goToBack;
 
-    public UIOptionsMenu() {
+    public UISelectWorldMenu() {
         _overlay = new UIImageOverlay("menuBackground");
         _overlay.setVisible(true);
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
+        
+        Object[] worlds = Terasology.getInstance().getListWolds();
+
+        for(Object worldName: worlds){
+            _list.addItem(worldName.toString(), worldName.toString());
+        }
+
+/*        _list.addItem("TestItem1", "text");
+        _list.addItem("TestItem2", "text");
+        _list.addItem("TestItem3", "text");
+        _list.addItem("TestItem4", "text");
+        _list.addItem("TestItem5", "text");*/
+
+        _goToBack = new UIButton(new Vector2f(256f, 32f));
+        _goToBack.getLabel().setText("Go to back");
+        _goToBack.setVisible(true);
+
+        _goToBack.addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                Terasology.getInstance().getGameMode().deactivateScreen("select_world");
+                Terasology.getInstance().getGameMode().activateScreen("main_menu");
+            }
+        });
 
         addDisplayElement(_overlay);
         addDisplayElement(_list);
+        addDisplayElement(_goToBack);
 
         update();
     }
@@ -54,5 +80,8 @@ public class UIOptionsMenu extends UIDisplayRenderer {
         super.update();
         _list.centerHorizontally();
         _list.getPosition().y = 230f;
+
+        _goToBack.centerHorizontally();
+        _goToBack.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
     }
 }

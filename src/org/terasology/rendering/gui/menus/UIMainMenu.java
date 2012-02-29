@@ -56,13 +56,13 @@ public class UIMainMenu extends UIDisplayRenderer {
         _exitButton.setVisible(true);
 
         _optionsButton = new UIButton(new Vector2f(256f, 32f));
-        _optionsButton.getLabel().setText("Options");
+        _optionsButton.getLabel().setText("Select World");
         _optionsButton.setVisible(true);
 
         _optionsButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 Terasology.getInstance().getGameMode().deactivateScreen("main_menu");
-                Terasology.getInstance().getGameMode().activateScreen("options");
+                Terasology.getInstance().getGameMode().activateScreen("select_world");
             }
         });
 
