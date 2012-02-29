@@ -51,9 +51,6 @@ public class BlockGrid implements IGameObject {
     public void render() {
         ShaderManager.getInstance().enableDefault();
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         for (int i = 0; i < 2; i++) {
             if (i == 0) {
                 glColorMask(false, false, false, false);
@@ -72,8 +69,6 @@ public class BlockGrid implements IGameObject {
                 GL11.glPopMatrix();
             }
         }
-
-        glDisable(GL11.GL_BLEND);
     }
 
     /**
@@ -101,7 +96,7 @@ public class BlockGrid implements IGameObject {
         _gridPositions.clear();
     }
 
-    public void update() {
+    public void update(double delta) {
         // Nothing to do.
     }
 }

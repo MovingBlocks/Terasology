@@ -21,14 +21,13 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.manager.ToolManager;
 import org.terasology.logic.tools.ITool;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.IBlockObserver;
-import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
@@ -62,17 +61,14 @@ import static org.lwjgl.opengl.GL11.*;
 public class Player extends Character {
 
     /* CONSTANT VALUES */
-    private static final double MOUSE_SENS = (Double) SettingsManager.getInstance().getUserSetting("Game.Controls.mouseSens");
-    private static final boolean DEMO_FLIGHT = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.demoFlight");
-    private static final double DEMO_FLIGHT_SPEED = (Double) SettingsManager.getInstance().getWorldSetting("World.Debug.demoFlightSpeed");
-    private static final boolean GOD_MODE = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.godMode");
-    private static final boolean CAMERA_BOBBING = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Player.cameraBobbing");
+    private static final double MOUSE_SENS = Config.getInstance().getMouseSens();
+    private static final boolean DEMO_FLIGHT = Config.getInstance().isDemoFlight();
+    private static final double DEMO_FLIGHT_SPEED = Config.getInstance().getDemoFlightSpeed();
+    private static final boolean GOD_MODE = Config.getInstance().isGodMode();
+    private static final boolean CAMERA_BOBBING = Config.getInstance().isCameraBobbing();
 
-    private static final boolean RENDER_FIRST_PERSON_VIEW = (Boolean) SettingsManager.getInstance().getUserSetting("Game.Player.renderFirstPersonView");
-    private static final double WALKING_SPEED = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.walkingSpeed");
-    private static final boolean SHOW_PLACING_BOX = (Boolean) SettingsManager.getInstance().getUserSetting("Game.HUD.placingBox");
-    private static final double RUNNING_FACTOR = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.runningFactor");
-    private static final double JUMP_INTENSITY = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.jumpIntensity");
+    private static final boolean RENDER_FIRST_PERSON_VIEW = Config.getInstance().isRenderFirstPersonView();
+    private static final boolean SHOW_PLACING_BOX = Config.getInstance().isPlacingBox();
 
     /* OBSERVERS */
     private final ArrayList<IBlockObserver> _observers = new ArrayList<IBlockObserver>();
@@ -90,7 +86,6 @@ public class Player extends Character {
 
     /* INVENTORY */
     private Inventory _inventory = new Inventory();
-//    private Toolbar _toolbar = new Toolbar(this);
 
     /* GOD MODE */
     private long _lastTimeSpacePressed;
@@ -102,7 +97,7 @@ public class Player extends Character {
     private final ToolManager _toolManager = new ToolManager(this);
 
     public Player(WorldRenderer parent) {
-        super(parent, WALKING_SPEED, RUNNING_FACTOR, JUMP_INTENSITY, true);
+        super(parent);
 
         // Set the default value for the god mode
         _godMode = GOD_MODE;
@@ -135,9 +130,7 @@ public class Player extends Character {
         }
     }
 
-    public void update() {
-        _walkingSpeed = WALKING_SPEED;
-
+    public void update(double delta) {
         PerformanceMonitor.startActivity("Player Camera");
         if (_activeCamera != null) {
             _activeCamera.update();
@@ -151,27 +144,24 @@ public class Player extends Character {
         }
         PerformanceMonitor.endActivity();
 
-        // Speedup if the player is playing god
-        if (_godMode) {
-            _walkingSpeed *= 1.5;
-        }
-
         if (_handMovementAnimationOffset > 0) {
             _handMovementAnimationOffset -= 0.04;
         } else if (_handMovementAnimationOffset < 0) {
             _handMovementAnimationOffset = 0;
         }
 
-        super.update();
+        super.update(delta);
 
         PerformanceMonitor.startActivity("Player Select Block");
         _selectedBlock = calcSelectedBlock();
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Player Death Check");
+
         // Respawn the player after a certain amount of time
         if (isDead() && _timeOfDeath == -1) {
             _timeOfDeath = Terasology.getInstance().getTimeInMs();
+            reset();
         } else if (isDead() && Terasology.getInstance().getTimeInMs() - _timeOfDeath > 1000) {
             revive();
             respawn();
@@ -248,20 +238,15 @@ public class Player extends Character {
         if (_godMode || DEMO_FLIGHT)
             return 0;
 
-        float speedFactor = 1.0f;
-
-        if (_activeWalkingSpeed > 0)
-            speedFactor = (float) TeraMath.clamp(java.lang.Math.max(java.lang.Math.abs(_velocity.x), java.lang.Math.abs(_velocity.z)) / _activeWalkingSpeed);
-
-        return java.lang.Math.sin(_stepCounter * frequency + phaseOffset) * amplitude * speedFactor;
+        return java.lang.Math.sin(_stepCounter * frequency + phaseOffset) * amplitude;
     }
 
     public void updateCameraParameters() {
         _firstPersonCamera.getPosition().set(calcEyeOffset());
 
         if (CAMERA_BOBBING) {
-            _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.2f));
-            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 4.4f));
+            _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
+            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 1.25f));
         } else {
             _firstPersonCamera.setBobbingRotationOffsetFactor(0.0);
             _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);
@@ -275,7 +260,7 @@ public class Player extends Character {
         }
     }
 
-    public void updatePosition() {
+    public void updatePosition(double delta) {
         // DEMO MODE
         if (DEMO_FLIGHT) {
             getPosition().z -= DEMO_FLIGHT_SPEED;
@@ -293,7 +278,7 @@ public class Player extends Character {
             return;
         }
 
-        super.updatePosition();
+        super.updatePosition(delta);
     }
 
     /**
@@ -376,39 +361,30 @@ public class Player extends Character {
                 break;
             case Keyboard.KEY_1:
                 _inventory.setSelctedCubbyhole(0);
-//                _toolbar.setSelectedSlot(0);
                 break;
             case Keyboard.KEY_2:
                 _inventory.setSelctedCubbyhole(1);
-//                _toolbar.setSelectedSlot(1);
                 break;
             case Keyboard.KEY_3:
                 _inventory.setSelctedCubbyhole(2);
-//                _toolbar.setSelectedSlot(2);
                 break;
             case Keyboard.KEY_4:
                 _inventory.setSelctedCubbyhole(3);
-//                _toolbar.setSelectedSlot(3);
                 break;
             case Keyboard.KEY_5:
                 _inventory.setSelctedCubbyhole(4);
-//                _toolbar.setSelectedSlot(4);
                 break;
             case Keyboard.KEY_6:
                 _inventory.setSelctedCubbyhole(5);
-//                _toolbar.setSelectedSlot(5);
                 break;
             case Keyboard.KEY_7:
                 _inventory.setSelctedCubbyhole(6);
-//                _toolbar.setSelectedSlot(6);
                 break;
             case Keyboard.KEY_8:
                 _inventory.setSelctedCubbyhole(7);
-//                _toolbar.setSelectedSlot(7);
                 break;
             case Keyboard.KEY_9:
                 _inventory.setSelctedCubbyhole(8);
-//                _toolbar.setSelectedSlot(8);
                 break;
         }
     }
@@ -426,7 +402,6 @@ public class Player extends Character {
 
         if (wheelMoved != 0) {
             rollSelectedCubby((byte) (wheelMoved / 120));
-//            _toolbar.rollSelectedSlot((byte) (wheelMoved / 120));
         } else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
         }
@@ -441,15 +416,6 @@ public class Player extends Character {
 
         _inventory.setSelctedCubbyhole(selectedCubby);
     }
-
-    /**
-     * Checks for pressed keys and mouse movement and executes the respective movement
-     * command.
-     */
-    public void processMovement() {
-
-    }
-
 
     public void updateInput() {
         if (isDead())
@@ -617,7 +583,7 @@ public class Player extends Character {
 
     @Override
     public String toString() {
-        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | gravity: %.2f | x: %.2f, y: %.2f, z: %.2f)", getPosition().x, getPosition().y, getPosition().z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _gravity, _movementDirection.x, _movementDirection.y, _movementDirection.z);
+        return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f | velEarth: %.2f | x: %.2f, y: %.2f, z: %.2f)", getPosition().x, getPosition().y, getPosition().z, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _earthVelocity, _movementDirection.x, _movementDirection.y, _movementDirection.z);
     }
 
     protected AABB generateAABBForPosition(Vector3d p) {
@@ -652,14 +618,6 @@ public class Player extends Character {
 
     public Inventory getInventory() {
         return _inventory;
-    }
-
-//    public Toolbar getToolbar() {
-//        return _toolbar;
-//    }
-
-    public ToolManager getToolManager() {
-        return _toolManager;
     }
 
     public RayBlockIntersection.Intersection getSelectedBlock() {

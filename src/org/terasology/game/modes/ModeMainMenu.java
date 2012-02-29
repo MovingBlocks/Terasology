@@ -82,11 +82,7 @@ public class ModeMainMenu implements IGameMode {
         AudioManager.getInstance().stopAllSounds();
     }
 
-    public void updateTimeAccumulator(double delta) {
-        return;
-    }
-
-    public void update() {
+    public void update(double delta) {
         updateUserInterface();
     }
 

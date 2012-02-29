@@ -74,6 +74,7 @@ public final class Terasology {
     public enum GameMode {
         undefined, mainMenu, runGame
     }
+
     static GameMode _state = GameMode.mainMenu;
     private static Map<GameMode, IGameMode> _gameModes = Collections.synchronizedMap(new EnumMap<GameMode, IGameMode>(GameMode.class));
 
@@ -84,7 +85,7 @@ public final class Terasology {
     private Terasology() {
     }
 
-    public void init(){
+    public void init() {
         _logger.log(Level.INFO, "Initializing Terasology...");
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         initLogger();
@@ -112,7 +113,7 @@ public final class Terasology {
         }
     }
 
-    private void addLibraryPath(String s){
+    private void addLibraryPath(String s) {
         try {
             final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
             usrPathsField.setAccessible(true);
@@ -128,7 +129,7 @@ public final class Terasology {
             final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
             newPaths[newPaths.length - 1] = s;
             usrPathsField.set(null, newPaths);
-        } catch(Exception e){
+        } catch (Exception e) {
             _logger.log(Level.SEVERE, "Couldn't link static libraries. " + e.toString(), e);
             //brutal...
             System.exit(1);
@@ -141,16 +142,16 @@ public final class Terasology {
 
     private void initDisplay() {
         try {
-            if ((Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.fullscreen")) {
+            if (Config.getInstance().isFullscreen()) {
                 Display.setDisplayMode(Display.getDesktopDisplayMode());
                 Display.setFullscreen(true);
             } else {
-                Display.setDisplayMode((DisplayMode) SettingsManager.getInstance().getUserSetting("Game.Graphics.displayMode"));
+                Display.setDisplayMode(Config.getInstance().getDisplayMode());
                 Display.setResizable(true);
             }
 
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
-            Display.create((PixelFormat) SettingsManager.getInstance().getUserSetting("Game.Graphics.pixelFormat"));
+            Display.create(Config.getInstance().getPixelFormat());
         } catch (LWJGLException e){
             _logger.log(Level.SEVERE, "Can not initialize graphics device.", e);
             System.exit(1);
@@ -163,7 +164,7 @@ public final class Terasology {
         resetOpenGLParameters();
     }
 
-    private void checkOpenGL(){
+    private void checkOpenGL() {
         boolean canRunGame = GLContext.getCapabilities().OpenGL20
                 & GLContext.getCapabilities().OpenGL11
                 & GLContext.getCapabilities().OpenGL12
@@ -211,12 +212,13 @@ public final class Terasology {
         _timer = new Timer();
     }
 
-    public void run(){
+    public void run() {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
         IGameMode mode = null;
         while (_runGame && !Display.isCloseRequested()) {
             _timer.tick();
+
             // Only process rendering and updating once a second
             if (!Display.isActive()) {
                 try {
@@ -244,8 +246,9 @@ public final class Terasology {
             }
 
             PerformanceMonitor.startActivity("Main Update");
-            mode.update();
+            mode.update(_timer.getDelta());
             PerformanceMonitor.endActivity();
+
             PerformanceMonitor.startActivity("Render");
             mode.render();
             Display.update();
@@ -260,14 +263,13 @@ public final class Terasology {
 
             PerformanceMonitor.rollCycle();
             PerformanceMonitor.startActivity("Other");
-            mode.updateTimeAccumulator(_timer.getDelta());
 
             if (Display.wasResized())
                 resizeViewport();
         }
     }
 
-    public void shutdown(){
+    public void shutdown() {
         _logger.log(Level.INFO, "Shutting down Terasology...");
         saveWorld();
         terminateThreads();
@@ -328,14 +330,6 @@ public final class Terasology {
 
     public void setGameMode(GameMode state) {
         _state = state;
-    }
-
-    public void render() {
-        getGameMode().render();
-    }
-
-    public void update() {
-        getGameMode().update();
     }
 
     public void exit(boolean saveWorld) {
@@ -432,6 +426,10 @@ public final class Terasology {
 
     public GroovyManager getGroovyManager() {
         return _groovyManager;
+    }
+
+    public Timer getTimer() {
+        return _timer;
     }
 
     public static void main(String[] args) {
