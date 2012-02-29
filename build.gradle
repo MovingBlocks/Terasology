@@ -33,10 +33,16 @@ dependencies{
 //	inclusion of native libs in fat jar.
 
 	compile files(
-		"libs/jbullet.jar",
-		"libs/jinput.jar", "libs/jogg-0.0.7.jar", "libs/jorbis-0.0.15.jar",
+		// MavenCentral
+		"libs/jinput.jar", "libs/jorbis-0.0.15.jar",
 		"libs/lwjgl.jar", "libs/lwjgl_util.jar", "libs/lzma.jar",
-		"libs/slick.jar", "libs/trove-3.0.0.jar", "libs/vecmath.jar"
+		"libs/trove-3.0.0.jar", "libs/vecmath.jar",
+		
+		// http://slick.cokeandcode.com/mavenrepo/
+		"libs/slick.jar",
+		
+		// No known repository
+		"libs/jbullet.jar", "libs/jogg-0.0.7.jar"
 	)
 	
 	testCompile 'junit:junit:4.10'
