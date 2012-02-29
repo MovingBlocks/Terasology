@@ -1,5 +1,6 @@
 package org.terasology.entitySystem;
 
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.event.AddComponentEvent;
@@ -10,6 +11,7 @@ import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -166,5 +168,35 @@ public class PojoEntityManagerTest {
         
         verify(eventSystem).send(entity1, RemovedComponentEvent.newInstance());
     }
+    
+    @Test
+    public void iterateEntitiesFindsEntityWithSingleComponent() {
+        EntityRef entity1 = entityManager.create();
+        StringComponent comp1 = entity1.addComponent(new StringComponent());
+        
+        List<EntityRef> results = Lists.newArrayList(entityManager.iteratorEntities(StringComponent.class));
+        assertEquals(Lists.newArrayList(entity1), results);
+    }
+
+    @Test
+    public void iterateEntitiesDoesNotFindEntityMissingAComponent() {
+        EntityRef entity1 = entityManager.create();
+        StringComponent comp1 = entity1.addComponent(new StringComponent());
+
+        List<EntityRef> results = Lists.newArrayList(entityManager.iteratorEntities(StringComponent.class, IntegerComponent.class));
+        assertEquals(Lists.newArrayList(), results);
+    }
+
+    @Test
+    public void iterateEntitiesFindsEntityWithTwoComponents() {
+        EntityRef entity1 = entityManager.create();
+        StringComponent comp1 = entity1.addComponent(new StringComponent());
+        IntegerComponent comp2 = entity1.addComponent(new IntegerComponent());
+
+        List<EntityRef> results = Lists.newArrayList(entityManager.iteratorEntities(StringComponent.class, IntegerComponent.class));
+        assertEquals(Lists.newArrayList(entity1), results);
+    }
+
+
 
 }

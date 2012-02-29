@@ -113,16 +113,22 @@ public class BinaryLevelReader implements LevelReader, StorageReader {
     }
     
     public <T> T read(String name, Class<T> clazz) {
+        return read(name, clazz, null);
+    }
+
+    public <T> T read(String name, Class<T> clazz, T defaultValue) {
         Object item = properties().get(name);
         if (clazz.isInstance(item))
         {
             return clazz.cast(item);
         }
-        return null;
+        return defaultValue;
     }
-        
+
     public String readString(String name) {
-        return read(name, String.class);
+        String result = read(name, String.class);
+        if (result == null) return "";
+        return result;
     }
 
     public Integer readInt(String name) {

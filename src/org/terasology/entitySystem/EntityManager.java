@@ -1,5 +1,8 @@
 package org.terasology.entitySystem;
 
+import org.terasology.components.LocationComponent;
+import org.terasology.components.MeshComponent;
+
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,4 +44,5 @@ public interface EntityManager {
     
     <T extends Component> Iterable<Map.Entry<EntityRef,T>> iterateComponents(Class<T> componentClass);
     Iterable<Component> iterateComponents(long entityId);
+    Iterable<EntityRef> iteratorEntities(Class<? extends Component> ...  componentClasses);
 }

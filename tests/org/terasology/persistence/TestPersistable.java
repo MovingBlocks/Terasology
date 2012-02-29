@@ -38,6 +38,6 @@ public class TestPersistable implements Persistable {
     public void retrieve(StorageReader reader) {
         stringVal = reader.readString("string");
         doubleVal = reader.readDouble("double",0);
-        vector3dVal = reader.read("vector3d", Vector3d.class);
+        vector3dVal = reader.read("vector3d", Vector3d.class, new Vector3d());
     }
 }

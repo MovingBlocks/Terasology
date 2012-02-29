@@ -1,6 +1,9 @@
 package org.terasology.entitySystem.pojo;
 
+import gnu.trove.iterator.TLongIterator;
 import gnu.trove.iterator.TLongObjectIterator;
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -11,6 +14,7 @@ import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -97,6 +101,29 @@ public class PojoEntityManager implements EntityManager {
         return store.iterateComponents(entityId);
     }
 
+    public Iterable<EntityRef> iteratorEntities(Class<? extends Component>... componentClasses) {
+        if (componentClasses.length == 0) {
+            return NullIterator.newInstance();
+        }
+        TLongList idList = new TLongArrayList();
+        TLongObjectIterator<? extends Component> primeIterator = store.componentIterator(componentClasses[0]);
+        while (primeIterator.hasNext()) {
+            primeIterator.advance();
+            long id = primeIterator.key();
+            boolean discard = false;
+            for (int i = 1; i < componentClasses.length; ++i) {
+                if (store.get(id, componentClasses[i]) == null) {
+                    discard = true;
+                    break;
+                }
+            }
+            if (!discard) {
+                idList.add(primeIterator.key());
+            }
+        }
+        return new EntityIterable(idList);
+    }
+
     public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
         return store.get(entityId, componentClass) != null;
     }
@@ -120,6 +147,40 @@ public class PojoEntityManager implements EntityManager {
         }
 
         public T setValue(T value) {
+            throw new UnsupportedOperationException();
+        }
+    }
+    
+    private class EntityIterable implements Iterable<EntityRef>
+    {
+        private TLongList list;
+
+        public EntityIterable(TLongList list) {
+            this.list = list;
+        }
+
+        public Iterator<EntityRef> iterator() {
+            return new EntityIterator(list.iterator());
+        }
+    }
+    
+    private class EntityIterator implements Iterator<EntityRef>
+    {
+        private TLongIterator idIterator;
+        
+        public EntityIterator(TLongIterator idIterator) {
+            this.idIterator = idIterator;        
+        }
+
+        public boolean hasNext() {
+            return idIterator.hasNext();
+        }
+
+        public EntityRef next() {
+            return get(idIterator.next());
+        }
+
+        public void remove() {
             throw new UnsupportedOperationException();
         }
     }

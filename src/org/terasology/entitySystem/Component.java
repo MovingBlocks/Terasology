@@ -1,6 +1,6 @@
 package org.terasology.entitySystem;
 
-import org.terasology.persistence.Persistable;
+import org.terasology.persistence.interfaces.Persistable;
 
 /**
  * A component is a collection of data that can be attached to an entity. The existence of a component and the data

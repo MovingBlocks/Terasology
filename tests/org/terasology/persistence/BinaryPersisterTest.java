@@ -25,6 +25,7 @@ import org.terasology.persistence.interfaces.LevelReader;
 import org.terasology.persistence.interfaces.LevelWriter;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 import static org.junit.Assert.*;
 
@@ -76,6 +77,25 @@ public class BinaryPersisterTest
         assertEquals(testPersist.doubleVal, result.doubleVal, 0.0001);
         assertEquals(testPersist.stringVal, result.stringVal);
         assertEquals(testPersist.vector3dVal, result.vector3dVal);
+    }
+    
+    @Test
+    public void testDefaultValueForRead() throws IOException {
+        persistenceManager.registerPersistableClasses(TestPersistable.class);
+
+        TestPersistable testPersist = new TestPersistable();
+        
+        LevelWriter writer = createLevelWriter();
+        writer.write(testPersist);
+        writer.close();
+        assertFalse(writer.isInErrorState());
+
+        LevelReader reader = createLevelReader();
+        assertTrue(reader.hasNext());
+        TestPersistable result = (TestPersistable)reader.next();
+        assertFalse(reader.hasNext());
+
+        assertEquals(new Vector3d(), result.vector3dVal);
     }
 
 }

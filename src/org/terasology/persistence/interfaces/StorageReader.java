@@ -24,6 +24,7 @@ import java.util.List;
 public interface StorageReader {
     Object read(String name);
     <T> T read(String name, Class<T> clazz);
+    <T> T read(String name, Class<T> clazz, T defaultValue);
     <T> List<T> readList(String name, Class<T> type);
 
     String readString(String name);
