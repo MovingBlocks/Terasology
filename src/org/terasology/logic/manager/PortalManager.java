@@ -62,7 +62,7 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnLocal(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 64)
+        if (_parent.getMobManager().getActiveMobAmount() > 32)
             return false;
 
         // 12.5% chance something will spawn locally to the portal - will get fancier later
@@ -84,7 +84,7 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnWild(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 64)
+        if (_parent.getMobManager().getActiveMobAmount() > 32)
             return false;
 
         // 25% change something will spawn in the wild around the portal - will get fancier later
@@ -98,9 +98,11 @@ public class PortalManager {
 
             s.setSpawningPoint(new Vector3d(p.getBlockLocation().x + randomOffset.x, p.getBlockLocation().y + 1, p.getBlockLocation().z + randomOffset.z));
             s.respawn();
+
             Terasology.getInstance().getLogger().log(Level.INFO, "Spawning wild slime at " + s.getSpawningPoint());
             _parent.getMobManager().addMob(s);
         }
+
         return spawn;
     }
 

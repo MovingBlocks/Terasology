@@ -333,6 +333,49 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     }
 
     /**
+     * "Unspreads" light recursively.
+     *
+     * @param x           The X-coordinate
+     * @param y           The Y-coordinate
+     * @param z           The Z-coordinate
+     * @param lightValue  The initial light value
+     * @param depth       The current depth of the recursion
+     * @param type        The type of light
+     * @param brightSpots List of bright spots found while unspreading the light
+     */
+    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, ArrayList<Vector3d> brightSpots) {
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
+
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
+        c.unspreadLight(blockPosX, y, blockPosZ, lightValue, depth, type, brightSpots);
+    }
+
+    /**
+     * Propagates light recursively.
+     *
+     * @param x          The X-coordinate
+     * @param y          The Y-coordinate
+     * @param z          The Z-coordinate
+     * @param lightValue The initial light value
+     * @param depth      The current depth of the recursion
+     * @param type       The type of light
+     */
+    public void spreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type) {
+        int chunkPosX = TeraMath.calcChunkPosX(x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(z);
+
+        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
+        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
+
+        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
+        c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
+    }
+
+    /**
      * Returns the humidity at the given position.
      *
      * @param x The X-coordinate
@@ -402,49 +445,6 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     }
 
     /**
-     * "Unspreads" light recursively.
-     *
-     * @param x           The X-coordinate
-     * @param y           The Y-coordinate
-     * @param z           The Z-coordinate
-     * @param lightValue  The initial light value
-     * @param depth       The current depth of the recursion
-     * @param type        The type of light
-     * @param brightSpots List of bright spots found while unspreading the light
-     */
-    public void unspreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type, ArrayList<Vector3d> brightSpots) {
-        int chunkPosX = TeraMath.calcChunkPosX(x);
-        int chunkPosZ = TeraMath.calcChunkPosZ(z);
-
-        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
-
-        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
-        c.unspreadLight(blockPosX, y, blockPosZ, lightValue, depth, type, brightSpots);
-    }
-
-    /**
-     * Propagates light recursively.
-     *
-     * @param x          The X-coordinate
-     * @param y          The Y-coordinate
-     * @param z          The Z-coordinate
-     * @param lightValue The initial light value
-     * @param depth      The current depth of the recursion
-     * @param type       The type of light
-     */
-    public void spreadLight(int x, int y, int z, byte lightValue, int depth, Chunk.LIGHT_TYPE type) {
-        int chunkPosX = TeraMath.calcChunkPosX(x);
-        int chunkPosZ = TeraMath.calcChunkPosZ(z);
-
-        int blockPosX = TeraMath.calcBlockPosX(x, chunkPosX);
-        int blockPosZ = TeraMath.calcBlockPosZ(z, chunkPosZ);
-
-        Chunk c = getChunkProvider().loadOrCreateChunk(TeraMath.calcChunkPosX(x), TeraMath.calcChunkPosZ(z));
-        c.spreadLight(blockPosX, y, blockPosZ, lightValue, depth, type);
-    }
-
-    /**
      * Returns the world save path, including the world's name. Will try to detect and fix quirky path issues (applet thing)
      *
      * @return path to save stuff at
@@ -460,7 +460,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public void writePropertiesToConfigObject(ConfigObject co) {
         co.put("worldTitle", getTitle());
         co.put("worldSeed", getSeed());
