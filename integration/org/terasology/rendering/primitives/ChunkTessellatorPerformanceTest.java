@@ -6,8 +6,6 @@ import gnu.trove.procedure.TObjectDoubleProcedure;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.lwjgl.Sys;
 import org.terasology.game.Terasology;
 import org.terasology.logic.world.Chunk;
@@ -20,16 +18,14 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
  */
 
 public class ChunkTessellatorPerformanceTest {
-
-    @BeforeClass
-    public static void beforeClass() throws Exception
-    {
-        Terasology.getInstance().init();
-    }
-
-    @Test
+	public static void main(String[] args) throws Exception {
+		ChunkTessellatorPerformanceTest test = new ChunkTessellatorPerformanceTest();
+		
+		test.performanceTestChunkTessellator();
+	}
     public void performanceTestChunkTessellator() throws Exception
     {
+    	Terasology.getInstance().init();
         IWorldProvider worldProv = new LocalWorldProvider("Test", "ohnomelons");
         long totalTime = 0;
         PerformanceMonitor.setEnabled(false);
@@ -61,6 +57,7 @@ public class ChunkTessellatorPerformanceTest {
         {
             System.out.println(String.format("%s: %.2fms", activities.get(i), values.get(i)));
         }
+        Terasology.getInstance().shutdown();
     }
 
     private static void sortMetrics(TObjectDoubleMap<String> metrics, final List<String> activities, final List<Double> values) {
