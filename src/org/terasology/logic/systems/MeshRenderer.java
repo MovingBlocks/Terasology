@@ -20,15 +20,14 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
+ * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer
  * @author Immortius <immortius@gmail.com>
  */
 public class MeshRenderer {
     private EntityManager manager;
-    private WorldRenderer worldRenderer;
     private Mesh mesh;
 
-    public MeshRenderer(WorldRenderer worldRenderer, EntityManager manager) {
-        this.worldRenderer = worldRenderer;
+    public MeshRenderer(EntityManager manager) {
         this.manager = manager;
 
         Tessellator tessellator = new Tessellator();
@@ -38,6 +37,9 @@ public class MeshRenderer {
     }
 
     public void render() {
+        WorldRenderer worldRenderer = Terasology.getInstance().getActiveWorldRenderer();
+        if (worldRenderer == null) return;
+
         Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
         for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
@@ -62,5 +64,5 @@ public class MeshRenderer {
             glPopMatrix();
         }
     }
-    
+
 }

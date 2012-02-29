@@ -19,11 +19,13 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.openal.SoundStore;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.entities.Entity;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.manager.*;
+import org.terasology.logic.systems.MeshRenderer;
 import org.terasology.logic.world.*;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.management.BlockManager;
@@ -79,6 +81,7 @@ public final class WorldRenderer implements IGameObject {
     /* CORE GAME OBJECTS */
     private final PortalManager _portalManager;
     private final MobManager _mobManager;
+    private final MeshRenderer _entityRendererSystem;;
 
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
@@ -115,7 +118,7 @@ public final class WorldRenderer implements IGameObject {
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
-    public WorldRenderer(String title, String seed) {
+    public WorldRenderer(String title, String seed, EntityManager manager) {
         _worldProvider = new LocalWorldProvider(title, seed);
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager();
@@ -124,6 +127,7 @@ public final class WorldRenderer implements IGameObject {
         _mobManager = new MobManager(this);
         _blockGrid = new BlockGrid();
         _bulletRenderer = new BulletPhysicsRenderer(this);
+        _entityRendererSystem = new MeshRenderer(manager);
 
         initTimeEvents();
     }
@@ -340,6 +344,7 @@ public final class WorldRenderer implements IGameObject {
 
         while (_renderQueueTransparent.size() > 0)
             _renderQueueTransparent.poll().render();
+        _entityRendererSystem.render();
 
         PerformanceMonitor.endActivity();
 

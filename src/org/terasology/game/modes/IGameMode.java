@@ -16,6 +16,7 @@
 
 package org.terasology.game.modes;
 
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -32,5 +33,7 @@ public interface IGameMode {
     public void processMouseInput();
     
     public WorldRenderer getActiveWorldRenderer();
+    public EntityManager getEntityManager();
     public void updatePlayerInput();
+
 }

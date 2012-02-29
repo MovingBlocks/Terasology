@@ -18,9 +18,14 @@ package org.terasology.game.modes;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.components.LocationComponent;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.systems.MeshRenderer;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -53,6 +58,8 @@ public class ModePlayGame implements IGameMode {
 
     /* RENDERING */
     private WorldRenderer _activeWorldRenderer;
+
+    private EntityManager _entityManager;
 
     /* VIEWING DISTANCE */
     private static final int[] VIEWING_DISTANCES = {
@@ -90,8 +97,11 @@ public class ModePlayGame implements IGameMode {
         _guiScreens.add(_inventoryScreen);
         _guiScreens.add(_statusScreen);
 
+        _entityManager = new PojoEntityManager();
+
         resetOpenGLParameters();
     }
+
 
     public void activate() {
         String worldSeed = Config.getInstance().getDefaultSeed();
@@ -155,7 +165,7 @@ public class ModePlayGame implements IGameMode {
         Terasology.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        _activeWorldRenderer = new WorldRenderer(title, seed);
+        _activeWorldRenderer = new WorldRenderer(title, seed, _entityManager);
         _activeWorldRenderer.setPlayer(new Player(_activeWorldRenderer));
 
         // Create the first Portal if it doesn't exist yet
@@ -221,6 +231,7 @@ public class ModePlayGame implements IGameMode {
             _activeWorldRenderer.render();
         }
 
+
         PerformanceMonitor.startActivity("RenderAndUpdate UI");
         renderUserInterface();
         updateUserInterface();
@@ -241,6 +252,10 @@ public class ModePlayGame implements IGameMode {
 
     public WorldRenderer getActiveWorldRenderer() {
         return _activeWorldRenderer;
+    }
+
+    public EntityManager getEntityManager() {
+        return _entityManager;
     }
 
     /**

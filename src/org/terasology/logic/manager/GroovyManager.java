@@ -21,6 +21,9 @@ import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
+import org.terasology.components.LocationComponent;
+import org.terasology.components.MeshComponent;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.model.blocks.Block;
@@ -29,6 +32,7 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.Item;
 import org.terasology.model.inventory.ItemBlock;
 
+import javax.vecmath.Color4f;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -148,6 +152,16 @@ public class GroovyManager {
         public void teleport(double x, double y, double z) {
             Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
             player.setPosition(x, y, z);
+        }
+
+        public void spawnTest() {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            EntityRef entity = Terasology.getInstance().getGameMode().getEntityManager().create();
+            
+            LocationComponent loc = entity.addComponent(new LocationComponent());
+            loc.position.set(player.getPosition());
+            MeshComponent mesh = entity.addComponent(new MeshComponent());
+            mesh.color = new Color4f(1.0f,0.0f,0.0f,1.0f);
         }
 
     }

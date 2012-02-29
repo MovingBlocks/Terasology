@@ -197,6 +197,10 @@ public class PojoEntityManagerTest {
         assertEquals(Lists.newArrayList(entity1), results);
     }
 
-
+    @Test
+    public void iterateWithNoComponents() {
+        List<EntityRef> results = Lists.newArrayList(entityManager.iteratorEntities(StringComponent.class));
+        assertEquals(Lists.newArrayList(), results);
+    }
 
 }

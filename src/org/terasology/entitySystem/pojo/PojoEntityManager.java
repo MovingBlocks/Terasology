@@ -107,6 +107,10 @@ public class PojoEntityManager implements EntityManager {
         }
         TLongList idList = new TLongArrayList();
         TLongObjectIterator<? extends Component> primeIterator = store.componentIterator(componentClasses[0]);
+        if (primeIterator == null) {
+            return NullIterator.newInstance();
+        }
+
         while (primeIterator.hasNext()) {
             primeIterator.advance();
             long id = primeIterator.key();

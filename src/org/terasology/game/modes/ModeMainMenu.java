@@ -19,6 +19,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.openal.SoundStore;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -118,6 +119,10 @@ public class ModeMainMenu implements IGameMode {
     }
 
     public WorldRenderer getActiveWorldRenderer() {
+        return null;
+    }
+    
+    public EntityManager getEntityManager() {
         return null;
     }
 
