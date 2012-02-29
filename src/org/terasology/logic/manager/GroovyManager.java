@@ -88,7 +88,7 @@ public class GroovyManager {
 
     private void updateBinding() {
         _bind.setVariable("tera", Terasology.getInstance());
-        _bind.setVariable("configuration", SettingsManager.getInstance());
+        _bind.setVariable("configuration", Config.getInstance());
         _bind.setVariable("cmd", new CommandHelper());
     }
 
@@ -139,5 +139,16 @@ public class GroovyManager {
                 player.getInventory().addItem(new ItemBlock(group), quantity);
             }
         }
+
+        public void fullHealth() {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            player.heal(player.getMaxHealthPoints() - player.getHealthPoints());
+        }
+
+        public void teleport(double x, double y, double z) {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            player.setPosition(x, y, z);
+        }
+
     }
 }

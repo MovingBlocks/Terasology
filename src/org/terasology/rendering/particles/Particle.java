@@ -72,7 +72,7 @@ public abstract class Particle implements IGameObject {
         }
     }
 
-    public void update() {
+    public void update(double delta) {
         updateVelocity();
         updatePosition();
         decLifetime();

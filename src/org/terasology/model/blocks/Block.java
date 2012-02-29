@@ -275,7 +275,7 @@ public class Block implements IGameObject {
         renderWithLightValue(1.0f);
     }
 
-    public void update() {
+    public void update(double delta) {
         // Do nothing
     }
 

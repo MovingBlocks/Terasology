@@ -20,7 +20,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.Block;
@@ -49,8 +49,8 @@ public class ShaderProgram {
     private IShaderParameters _parameters;
 
     static {
-        _preProcessorPreamble += ((Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.animatedWaterAndGrass")) ? "#define ANIMATED_WATER_AND_GRASS \n" : "";
-        _preProcessorPreamble += "#define GAMMA " + SettingsManager.getInstance().getUserSetting("Game.Graphics.gamma").toString() + "\n";
+        _preProcessorPreamble += (Config.getInstance().isAnimatedWaterAndGrass()) ? "#define ANIMATED_WATER_AND_GRASS \n" : "";
+        _preProcessorPreamble += "#define GAMMA " + ((Double)Config.getInstance().getGamma()).toString() + "\n";
     }
 
     public ShaderProgram(String title) {

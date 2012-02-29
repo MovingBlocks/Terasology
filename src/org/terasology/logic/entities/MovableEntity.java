@@ -18,7 +18,7 @@ package org.terasology.logic.entities;
 import org.newdawn.slick.openal.Audio;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -41,41 +41,43 @@ public abstract class MovableEntity extends Entity {
     protected long _lastFootStepSoundPlayed = 0;
     protected Audio _currentFootstepSound;
     protected Audio[] _footstepSounds;
-    protected boolean _noSound = false;
 
     /* PARENT WORLD */
     protected final WorldRenderer _parent;
 
+    /* MOVEMENT SETTINGS */
+    protected static final double MAX_ACC = 56.0d;
+    protected static final double MAX_EARTH_ACC_WATER = 10.0d;
+    protected static final double EARTH_ACC_WATER = 2.0d;
+    protected static final double EARTH_ACC = 28.0d;
+    protected static final double RUNNING_FACTOR = 1.5d;
+    protected static final double JUMP_INTENSITY = 10.0d;
+    protected static final double MOVEMENT_ACC = 1.5d;
+    protected static final double GROUND_FRICTION = 8.0d;
+
     /* MOVEMENT */
-    protected double _walkingSpeed;
-    protected final double _runningFactor;
-    protected final double _jumpIntensity;
-    protected double _stepCounter;
-    protected double _activeWalkingSpeed, _yaw = 135d, _pitch, _gravity;
-    protected final Vector3d _movementDirection = new Vector3d(), _velocity = new Vector3d(), _viewingDirection = new Vector3d();
+    protected double _earthVelocity;
+    protected double _activeMovementAcc = MOVEMENT_ACC;
+    protected final Vector3d _movementDirection = new Vector3d(), _movementVelocity = new Vector3d();
     protected boolean _isSwimming = false, _headUnderWater = false, _touchingGround = false, _running = false, _godMode, _jump = false;
+
+    /* LOOK AT ME! */
+    protected final Vector3d _viewingDirection = new Vector3d();
+    protected double _yaw = 135d, _pitch = 0;
+
+    /* BOBBING */
+    protected double _stepCounter;
 
     /**
      * Init. a new movable entity.
      *
-     * @param parent        The parent world
-     * @param walkingSpeed  The walking speed
-     * @param runningFactor The running factor
-     * @param jumpIntensity The jump intensity
-     * @param loadAudio     Whether or not to load (and play) audio resources
+     * @param parent The parent world
      */
-    public MovableEntity(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity, boolean loadAudio) {
+    public MovableEntity(WorldRenderer parent) {
         _parent = parent;
-        _walkingSpeed = walkingSpeed;
-        _runningFactor = runningFactor;
-        _jumpIntensity = jumpIntensity;
 
         reset();
-        if (loadAudio) {
-            initAudio();
-        } else {
-            _noSound = true;
-        }
+        initAudio();
     }
 
     protected void initAudio() {
@@ -87,8 +89,6 @@ public abstract class MovableEntity extends Entity {
         _footstepSounds[4] = AudioManager.getInstance().loadSound("FootGrass5");
     }
 
-    public abstract void processMovement();
-
     protected abstract AABB generateAABBForPosition(Vector3d p);
 
     protected abstract void handleVerticalCollision();
@@ -99,7 +99,7 @@ public abstract class MovableEntity extends Entity {
         // Update the viewing direction
         setViewingDirection(_yaw, _pitch);
 
-        if ((Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.debugCollision")) {
+        if (Config.getInstance().isDebugCollision()) {
             getAABB().render(2f);
 
             ArrayList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());
@@ -115,14 +115,16 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
-    public void update() {
+    public void update(double delta) {
         if (!_running)
-            _activeWalkingSpeed = _walkingSpeed;
+            _activeMovementAcc = MOVEMENT_ACC;
+        else if (_godMode)
+            _activeMovementAcc = MOVEMENT_ACC * 4.0;
         else
-            _activeWalkingSpeed = _walkingSpeed * _runningFactor;
+            _activeMovementAcc = MOVEMENT_ACC * RUNNING_FACTOR;
 
         processMovement();
-        updatePosition();
+        updatePosition(delta);
         checkPosition();
         updateSwimStatus();
 
@@ -139,17 +141,14 @@ public abstract class MovableEntity extends Entity {
         if (_godMode)
             return;
 
-        if (_noSound)
-            return;
-
-        if ((TeraMath.fastAbs(_velocity.x) > 0.01 || TeraMath.fastAbs(_velocity.z) > 0.01) && _touchingGround) {
+        if ((TeraMath.fastAbs(_movementVelocity.x) > 0.01 || TeraMath.fastAbs(_movementVelocity.z) > 0.01) && _touchingGround) {
             if (_currentFootstepSound == null) {
                 _currentFootstepSound = _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5];
                 AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(), _currentFootstepSound);
             } else {
                 long timeDiff = Terasology.getInstance().getTimeInMs() - _lastFootStepSoundPlayed;
 
-                if (timeDiff > 400 / (_activeWalkingSpeed / _walkingSpeed)) {
+                if (timeDiff > 400 / (_activeMovementAcc / MOVEMENT_ACC)) {
                     _lastFootStepSoundPlayed = Terasology.getInstance().getTimeInMs();
                     _currentFootstepSound = null;
                 }
@@ -157,13 +156,17 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
+    public void processMovement() {
+        // Do movement related stuff here
+    }
+
     /**
      * Resets the entity's attributes.
      */
     public void reset() {
-        _velocity.set(0, 0, 0);
+        _movementVelocity.set(0, 0, 0);
         _movementDirection.set(0, 0, 0);
-        _gravity = 0.0f;
+        _earthVelocity = 0.0f;
     }
 
     /**
@@ -294,87 +297,82 @@ public abstract class MovableEntity extends Entity {
     /**
      * Updates the position of the entity.
      */
-    protected void updatePosition() {
+    protected void updatePosition(double delta) {
         // Save the previous position before changing any of the values
         Vector3d oldPosition = new Vector3d(getPosition());
 
-        double friction = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.friction");
+        double timePassedInSeconds = (delta / 1000d);
 
         /*
          * Slowdown the speed of the entity each time this method is called.
          */
-        if (TeraMath.fastAbs(_velocity.y) > 0f) {
-            _velocity.y += -1f * _velocity.y * friction;
+        if (TeraMath.fastAbs(_movementVelocity.y) > 0f) {
+            _movementVelocity.y += -1f * _movementVelocity.y * GROUND_FRICTION * timePassedInSeconds;
         }
 
-        if (TeraMath.fastAbs(_velocity.x) > 0f) {
-            _velocity.x += -1f * _velocity.x * friction;
+        if (TeraMath.fastAbs(_movementVelocity.x) > 0f) {
+            _movementVelocity.x += -1f * _movementVelocity.x * GROUND_FRICTION * timePassedInSeconds;
         }
 
-        if (TeraMath.fastAbs(_velocity.z) > 0f) {
-            _velocity.z += -1f * _velocity.z * friction;
+        if (TeraMath.fastAbs(_movementVelocity.z) > 0f) {
+            _movementVelocity.z += -1f * _movementVelocity.z * GROUND_FRICTION * timePassedInSeconds;
         }
 
         /*
          * Apply friction.
          */
-        if (TeraMath.fastAbs(_velocity.x) > _activeWalkingSpeed || TeraMath.fastAbs(_velocity.z) > _activeWalkingSpeed || TeraMath.fastAbs(_velocity.y) > _activeWalkingSpeed) {
-            double max = java.lang.Math.max(java.lang.Math.max(TeraMath.fastAbs(_velocity.x), TeraMath.fastAbs(_velocity.z)), TeraMath.fastAbs(_velocity.y));
-            double div = max / _activeWalkingSpeed;
+        if (TeraMath.fastAbs(_movementVelocity.x) > _activeMovementAcc || TeraMath.fastAbs(_movementVelocity.z) > _activeMovementAcc || TeraMath.fastAbs(_movementVelocity.y) > _activeMovementAcc) {
+            double max = java.lang.Math.max(java.lang.Math.max(TeraMath.fastAbs(_movementVelocity.x), TeraMath.fastAbs(_movementVelocity.z)), TeraMath.fastAbs(_movementVelocity.y));
+            double div = max / _activeMovementAcc;
 
-            _velocity.x /= div;
-            _velocity.z /= div;
-            _velocity.y /= div;
+            _movementVelocity.x /= div;
+            _movementVelocity.z /= div;
+            _movementVelocity.y /= div;
         }
 
         /*
          * Increase the speed of the entity by adding the movement
          * vector to the acceleration vector.
          */
-        _velocity.x += _movementDirection.x;
-        _velocity.y += _movementDirection.y;
-        _velocity.z += _movementDirection.z;
+        if (_movementDirection.length() > 0.0)
+            _movementDirection.normalize();
 
-        double maxGravity = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.maxGravity");
-        double maxGravitySwimming = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.maxGravitySwimming");
-        double gravitySwimming = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.gravitySwimming");
-        double gravity = (Double) SettingsManager.getInstance().getWorldSetting("World.Physics.gravity");
+        _movementVelocity.x += _movementDirection.x * _activeMovementAcc;
+        _movementVelocity.y += _movementDirection.y * _activeMovementAcc;
+        _movementVelocity.z += _movementDirection.z * _activeMovementAcc;
 
-        // Normal gravity
-        if (_gravity > -maxGravity && !_godMode && !_isSwimming) {
-            _gravity -= gravity;
+        if (_earthVelocity > -MAX_ACC && !_godMode && !_isSwimming) {
+            _earthVelocity -= EARTH_ACC * timePassedInSeconds;
         }
 
-        if (_gravity < -maxGravity && !_godMode && !_isSwimming) {
-            _gravity = -maxGravity;
+        if (_earthVelocity < -MAX_ACC && !_godMode && !_isSwimming) {
+            _earthVelocity = -MAX_ACC;
         }
 
-        // Gravity under water
-        if (_gravity > -maxGravitySwimming && !_godMode && _isSwimming) {
-            _gravity -= gravitySwimming;
+        if (_earthVelocity > -MAX_EARTH_ACC_WATER && !_godMode && _isSwimming) {
+            _earthVelocity -= EARTH_ACC_WATER * timePassedInSeconds;
         }
 
-        if (_gravity < -maxGravitySwimming && !_godMode && _isSwimming) {
-            _gravity = -maxGravitySwimming;
+        if (_earthVelocity < -MAX_EARTH_ACC_WATER && !_godMode && _isSwimming) {
+            _earthVelocity = -MAX_EARTH_ACC_WATER;
         }
 
-        getPosition().y += _velocity.y;
-        getPosition().y += _gravity;
+        getPosition().y += (_movementVelocity.y + _earthVelocity) * timePassedInSeconds;
 
         if (!_godMode) {
             if (verticalHitTest(oldPosition)) {
                 handleVerticalCollision();
 
-                double oldGravity = _gravity;
-                _gravity = 0;
+                double oldEarthVelocity = _earthVelocity;
+                _earthVelocity = 0;
 
-                if (oldGravity <= 0) {
+                if (oldEarthVelocity <= 0) {
                     // Jumping is only possible, if the entity is standing on ground
                     if (_jump) {
                         AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
                                 _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
                         _jump = false;
-                        _gravity = _jumpIntensity;
+                        _earthVelocity = JUMP_INTENSITY;
                     } else if (!_touchingGround) { // Entity reaches the ground
                         AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
                                 _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
@@ -387,7 +385,7 @@ public abstract class MovableEntity extends Entity {
                 _touchingGround = false;
             }
         } else {
-            _gravity = 0f;
+            _earthVelocity = 0f;
         }
 
         oldPosition.set(getPosition());
@@ -396,10 +394,10 @@ public abstract class MovableEntity extends Entity {
          * Update the position of the entity
          * according to the acceleration vector.
          */
-        getPosition().x += _velocity.x;
-        getPosition().z += _velocity.z;
+        getPosition().x += _movementVelocity.x * timePassedInSeconds;
+        getPosition().z += _movementVelocity.z * timePassedInSeconds;
 
-        _stepCounter += java.lang.Math.max(TeraMath.fastAbs(_velocity.x), TeraMath.fastAbs(_velocity.z));
+        _stepCounter += java.lang.Math.max(TeraMath.fastAbs(_movementVelocity.x * timePassedInSeconds), TeraMath.fastAbs(_movementVelocity.z * timePassedInSeconds));
 
         /*
          * Check for horizontal collisions __after__ checking for vertical
@@ -476,42 +474,42 @@ public abstract class MovableEntity extends Entity {
 
     public void walkForward() {
         if (!_godMode && !_isSwimming) {
-            _movementDirection.x += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw));
-            _movementDirection.z -= _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw));
+            _movementDirection.x += java.lang.Math.sin(java.lang.Math.toRadians(_yaw));
+            _movementDirection.z -= java.lang.Math.cos(java.lang.Math.toRadians(_yaw));
         } else if (!_godMode && _isSwimming) {
-            _movementDirection.x += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
-            _movementDirection.z -= _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
-            _movementDirection.y -= _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
+            _movementDirection.x += java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.z -= java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.y -= java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
         } else {
-            _movementDirection.x += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
-            _movementDirection.z -= _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
-            _movementDirection.y -= _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
+            _movementDirection.x += java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.z -= java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.y -= java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
         }
     }
 
     public void walkBackwards() {
         if (!_godMode && !_isSwimming) {
-            _movementDirection.x -= _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw));
-            _movementDirection.z += _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw));
+            _movementDirection.x -= java.lang.Math.sin(java.lang.Math.toRadians(_yaw));
+            _movementDirection.z += java.lang.Math.cos(java.lang.Math.toRadians(_yaw));
         } else if (!_godMode && _isSwimming) {
-            _movementDirection.x -= _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
-            _movementDirection.z += _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
-            _movementDirection.y += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
+            _movementDirection.x -= java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.z += java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.y += java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
         } else {
-            _movementDirection.x -= _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
-            _movementDirection.z += _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
-            _movementDirection.y += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
+            _movementDirection.x -= java.lang.Math.sin(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.z += java.lang.Math.cos(java.lang.Math.toRadians(_yaw)) * java.lang.Math.cos(java.lang.Math.toRadians(_pitch));
+            _movementDirection.y += java.lang.Math.sin(java.lang.Math.toRadians(_pitch));
         }
     }
 
     public void strafeLeft() {
-        _movementDirection.x += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw - 90));
-        _movementDirection.z -= _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw - 90));
+        _movementDirection.x += java.lang.Math.sin(java.lang.Math.toRadians(_yaw - 90));
+        _movementDirection.z -= java.lang.Math.cos(java.lang.Math.toRadians(_yaw - 90));
     }
 
     public void strafeRight() {
-        _movementDirection.x += _activeWalkingSpeed * java.lang.Math.sin(java.lang.Math.toRadians(_yaw + 90));
-        _movementDirection.z -= _activeWalkingSpeed * java.lang.Math.cos(java.lang.Math.toRadians(_yaw + 90));
+        _movementDirection.x += java.lang.Math.sin(java.lang.Math.toRadians(_yaw + 90));
+        _movementDirection.z -= java.lang.Math.cos(java.lang.Math.toRadians(_yaw + 90));
     }
 
     public void jump() {
@@ -522,7 +520,7 @@ public abstract class MovableEntity extends Entity {
 
     public void moveUp() {
         if (_isSwimming || _godMode) {
-            _movementDirection.y += _activeWalkingSpeed;
+            _movementDirection.y += 1.0f;
         }
     }
 
@@ -593,6 +591,6 @@ public abstract class MovableEntity extends Entity {
     }
 
     public Vector3d getVelocity() {
-        return _velocity;
+        return _movementVelocity;
     }
 }
