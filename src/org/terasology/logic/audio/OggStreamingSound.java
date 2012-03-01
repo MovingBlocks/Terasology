@@ -55,9 +55,6 @@ public class OggStreamingSound extends AbstractStreamingSound {
             int read = file.read(dataBuffer, 0, dataBuffer.capacity());
             dataBuffer.rewind();
             // do something :D
-
-            System.out.println("Readed: " + read);
-
             if (read <= 0) {  // end of datastream
                 return null;
             }

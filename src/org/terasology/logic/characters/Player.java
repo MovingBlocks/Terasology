@@ -21,10 +21,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.SettingsManager;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
-import org.terasology.logic.manager.ToolManager;
+import org.terasology.logic.audio.Sound;
+import org.terasology.logic.manager.*;
 import org.terasology.logic.tools.ITool;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.IBlockObserver;
@@ -693,5 +691,10 @@ public class Player extends Character {
         }
 
         return false;
+    }
+
+    @Override
+    protected void playFootstep(Sound footStep) {
+        AudioManager.play(footStep, this, 0.6f, AudioManager.PRIORITY_HIGH);
     }
 }

@@ -58,15 +58,11 @@ public class BasicStreamingSoundSource extends BasicSoundSource {
 
     @Override
     public void update() {
-        System.out.println("Source " + this.sourceId + " state " + _playing + " / " + alGetSourcei(this.sourceId, AL_SOURCE_STATE));
-
         int buffersProcessed = alGetSourcei(this.getSourceId(), AL_BUFFERS_PROCESSED);
 
         while (buffersProcessed-- > 0) {
             int buffer = alSourceUnqueueBuffers(this.getSourceId());
             OpenALException.checkState("Buffer unqueue");
-
-            System.out.println("Updating buffer " + buffer + " for " + this.audio.getName() + " source " + this.sourceId);
 
             if (((AbstractStreamingSound) audio).updateBuffer(buffer)) {
                 alSourceQueueBuffers(this.getSourceId(), buffer);
