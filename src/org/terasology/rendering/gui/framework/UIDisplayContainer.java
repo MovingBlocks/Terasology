@@ -19,6 +19,8 @@ import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.Display;
+import org.terasology.rendering.gui.components.UIScrollBar;
+
 /**
  * Composition of multiple display elements.
  *
@@ -27,10 +29,16 @@ import org.lwjgl.opengl.Display;
 public abstract class UIDisplayContainer extends UIDisplayElement {
 
     final ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
-    private boolean _crop = false;
+    private boolean _crop          = false;
+    private boolean _scrollable    = false;
+    private UIScrollBar _scrollBar = null;
 
     public UIDisplayContainer() {
         super();
+        _scrollBar = new UIScrollBar(new Vector2f(15f, getSize().y));
+        _scrollBar.setPosition(new Vector2f(getPosition().x + getSize().x, getPosition().y));
+        _scrollBar.setVisible(false);
+        addDisplayElement(_scrollBar);
     }
 
     public UIDisplayContainer(Vector2f position) {
@@ -116,4 +124,16 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void setCrop(boolean crop){
         _crop = crop;
     }
+
+    public void setScrollable(boolean scrollable){
+        _scrollable = scrollable;
+        if(_scrollable){
+                _scrollBar.setVisible(true);
+        }/*else{
+            if(_scrollBar != null){
+                _scrollBar.setVisible(false);
+            }
+        }  */
+    }
+
 }

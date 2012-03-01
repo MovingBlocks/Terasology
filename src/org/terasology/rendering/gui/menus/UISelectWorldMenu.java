@@ -44,18 +44,21 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
-        
+
         Object[] worlds = Terasology.getInstance().getListWolds();
 
         for(Object worldName: worlds){
             _list.addItem(worldName.toString(), worldName.toString());
         }
 
-/*        _list.addItem("TestItem1", "text");
+        _list.addItem("TestItem1", "text");
         _list.addItem("TestItem2", "text");
         _list.addItem("TestItem3", "text");
         _list.addItem("TestItem4", "text");
-        _list.addItem("TestItem5", "text");*/
+        _list.addItem("TestItem5", "text");
+        _list.addItem("TestItem5", "text");
+        _list.addItem("TestItem5", "text");
+        _list.addItem("TestItem5", "text");
 
         _goToBack = new UIButton(new Vector2f(256f, 32f));
         _goToBack.getLabel().setText("Go to back");

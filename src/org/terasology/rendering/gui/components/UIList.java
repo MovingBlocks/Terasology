@@ -60,6 +60,7 @@ public class UIList extends UIDisplayContainer {
         addDisplayElement(_borderRight);
         addDisplayElement(_borderBottom);
         addDisplayElement(_borderLeft);
+        setScrollable(true);
 
     }
 
