@@ -86,11 +86,10 @@ public final class Helper {
      * @return the file with the path fixed if needed
     */
     public static File fixSavePath(File f) {
-        Terasology.getInstance().getLogger().log(Level.INFO, "Suggested absolute save path is: " + f.getAbsolutePath());
+        // Terasology.getInstance().getLogger().log(Level.INFO, "Suggested absolute save path is: " + f.getAbsolutePath());
         if (!f.getAbsolutePath().contains("Terasology")) {
             f = new File(System.getProperty("java.io.tmpdir"), f.getPath());
-            Terasology.getInstance().getLogger().log(Level.INFO, "Going to use absolute TEMP save path instead: " + f.getAbsolutePath());
-
+            // Terasology.getInstance().getLogger().log(Level.INFO, "Going to use absolute TEMP save path instead: " + f.getAbsolutePath());
             return f;
         }
         return f;

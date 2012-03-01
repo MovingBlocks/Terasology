@@ -17,6 +17,8 @@ package org.terasology.logic.manager;
 
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
+import org.terasology.game.Terasology;
+import org.terasology.game.modes.StateSinglePlayer;
 
 import javax.vecmath.Vector2f;
 
@@ -27,25 +29,32 @@ import javax.vecmath.Vector2f;
 public final class Config {
     private final static Config _instance = new Config();
     private String _worldTitle = "New world";
+
     private double _forrestGrassDensity = 0.3d;
     private double _plainsGrassDensity = 0.2d;
     private double _snowGrassDensity = 0.001d;
     private double _mountainsGrassDensity = 0.2d;
     private double _desertGrassDensity = 0.001d;
+
     private long _dayNightLengthInMs = (60l * 1000l) * 30l; // 30 minutes in ms
     private long _initialTimeOffsetInMs = (60l * 1000l); // 60 seconds in ms
+
     private Vector2f _spawnOrigin = new Vector2f(-24429, 20547);
     private String _defaultSeed = "Blockmania42";
+
     private boolean _debug = false;
     private boolean _debugCollision = false;
     private boolean _renderChunkBoundingBoxes = false;
+
     private boolean _demoFlight = false;
     private double _demoFlightSpeed = 0.08d;
     private boolean _godMode = false;
+
     private int _maxParticles = 256;
     private Vector2f _cloudResolution = new Vector2f(128, 128);
     private int _cloudUpdateInterval = 8000;
     private int _maxThreads = 2;
+
     private boolean _saveChunks = true;
     private int _chunkCacheSize = 2048;
     private int _maxChunkVBOs = 512;
@@ -53,15 +62,20 @@ public final class Config {
     private PixelFormat _pixelFormat = new PixelFormat().withDepthBits(24);
     private DisplayMode _displayMode = new DisplayMode(1280, 720);
     private boolean _fullscreen = false;
+    private float _fov = 86.0f;
+
+    private int _activeViewingDistanceId = 0;
     private int _viewingDistanceNear = 8;
     private int _viewingDistanceModerate = 16;
     private int _viewingDistanceFar = 26;
     private int _viewingDistanceUltra = 32;
-    private boolean _enablePostProcessingEffects = true;
-    private boolean _animatedWaterAndGrass = true;
+
+    private boolean _enablePostProcessingEffects = false;
+    private boolean _animatedWaterAndGrass = false;
     private int _verticalChunkMeshSegments = 1;
+
     private double _mouseSens = 0.075d;
-    private float _fov = 86.0f;
+
     private boolean _cameraBobbing = true;
     private boolean _renderFirstPersonView = true;
     private boolean _placingBox = true;
@@ -392,6 +406,44 @@ public final class Config {
     public void loadConfig(String filename) {
     }
 
+    /* SPECIAL STUFF */
+    public int getActiveViewingDistance() {
+        if (_activeViewingDistanceId == 1)
+            return getViewingDistanceModerate();
+        else if (_activeViewingDistanceId == 2)
+            return getViewingDistanceFar();
+        else if (_activeViewingDistanceId == 3)
+            return getViewingDistanceUltra();
+
+        return getViewingDistanceNear();
+    }
+
+    public int getActiveViewingDistanceId() {
+        return _activeViewingDistanceId;
+    }
+
+    public void setViewingDistanceById(int _viewingDistance) {
+        this._activeViewingDistanceId = _viewingDistance;
+
+        // Make sure to update the chunks "around" the player
+        if (Terasology.getInstance().getCurrentGameState() instanceof StateSinglePlayer)
+            Terasology.getInstance().getActiveWorldRenderer().updateChunksInProximity(true);
+    }
+
+    public void setGraphicsQuality(int qualityLevel) {
+        if (qualityLevel == 0) {
+            setEnablePostProcessingEffects(false);
+            setAnimatedWaterAndGrass(false);
+        } else if (qualityLevel == 1) {
+            setEnablePostProcessingEffects(true);
+            setAnimatedWaterAndGrass(false);
+        } else if (qualityLevel == 2) {
+            setEnablePostProcessingEffects(true);
+            setAnimatedWaterAndGrass(true);
+        }
+        
+        ShaderManager.getInstance().recompileAllShaders();
+    }
 }
 
 

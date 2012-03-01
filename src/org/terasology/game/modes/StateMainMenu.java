@@ -17,13 +17,15 @@ package org.terasology.game.modes;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
 import org.newdawn.slick.openal.SoundStore;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.Config;
+import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.menus.UIConfigMenu;
 import org.terasology.rendering.gui.menus.UIMainMenu;
-import org.terasology.rendering.world.WorldRenderer;
 
 import java.util.ArrayList;
 
@@ -33,9 +35,8 @@ import static org.lwjgl.opengl.GL11.*;
  * The class implements the main game menu.
  * <p/>
  * TODO: Add screen "Single Player"
- * TODO: Add animated background
- * TODO: Add screen "Game Settings"
  * TODO: Add screen "Multiplayer"
+ * TODO: Add animated background
  * TODO: Add screen "Generation/Load/Delete World."
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -49,21 +50,104 @@ public class StateMainMenu implements IGameState {
 
     /* SCREENS */
     private UIMainMenu _mainMenu;
+    private UIConfigMenu _configMenu;
 
     private Terasology _gameInstance = null;
 
     public void init() {
         _gameInstance = Terasology.getInstance();
+
+        setupMainMenu();
+        setupConfigMenu();
+
+        _guiScreens.add(_mainMenu);
+        _guiScreens.add(_configMenu);
+    }
+
+    private void setupMainMenu() {
         _mainMenu = new UIMainMenu();
         _mainMenu.setVisible(true);
-        _guiScreens.add(_mainMenu);
 
-        Mouse.setGrabbed(false);
-        Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
+        _mainMenu.getStartButton().addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
+            }
+        });
+
+        _mainMenu.getExitButton().addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                Terasology.getInstance().exit();
+            }
+        });
+
+        _mainMenu.getConfigButton().addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                _mainMenu.setVisible(false);
+                _configMenu.setVisible(true);
+            }
+        });
+    }
+
+    private void setupConfigMenu() {
+        _configMenu = new UIConfigMenu();
+
+        _configMenu.getBackToMainMenuButton().addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                _mainMenu.setVisible(true);
+                _configMenu.setVisible(false);
+            }
+        });
+
+        _configMenu.getGraphicsQualityButton().addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                UIButton button = (UIButton) element;
+
+                if (button.getLabel().getText().equals("Graphics Quality: Ugly")) {
+                    Config.getInstance().setGraphicsQuality(1);
+                    button.getLabel().setText("Graphics Quality: Nice");
+                } else if (button.getLabel().getText().equals("Graphics Quality: Nice")) {
+                    Config.getInstance().setGraphicsQuality(2);
+                    button.getLabel().setText("Graphics Quality: Epic");
+                } else if (button.getLabel().getText().equals("Graphics Quality: Epic")) {
+                    Config.getInstance().setGraphicsQuality(0);
+                    button.getLabel().setText("Graphics Quality: Ugly");
+                }
+            }
+        });
+
+        _configMenu.getViewingDistanceButton().addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                UIButton button = (UIButton) element;
+
+                if (button.getLabel().getText().equals("Viewing Distance: Near")) {
+                    button.getLabel().setText("Viewing Distance: Moderate");
+                    Config.getInstance().setViewingDistanceById(1);
+                } else if (button.getLabel().getText().equals("Viewing Distance: Moderate")) {
+                    button.getLabel().setText("Viewing Distance: Far");
+                    Config.getInstance().setViewingDistanceById(2);
+                } else if (button.getLabel().getText().equals("Viewing Distance: Far")) {
+                    Config.getInstance().setViewingDistanceById(3);
+                    button.getLabel().setText("Viewing Distance: Ultra");
+                } else if (button.getLabel().getText().equals("Viewing Distance: Ultra")) {
+                    Config.getInstance().setViewingDistanceById(0);
+                    button.getLabel().setText("Viewing Distance: Near");
+                }
+            }
+        });
     }
 
     public void activate() {
+        Mouse.setGrabbed(false);
         playBackgroundMusic();
+
+        if (Config.getInstance().getActiveViewingDistanceId() == 3)
+            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Ultra");
+        else if (Config.getInstance().getActiveViewingDistanceId() == 1)
+            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Moderate");
+        else if (Config.getInstance().getActiveViewingDistanceId() == 2)
+            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Far");
+        else
+            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Near");
     }
 
     public void deactivate() {
@@ -104,10 +188,6 @@ public class StateMainMenu implements IGameState {
         for (UIDisplayElement screen : _guiScreens) {
             screen.update();
         }
-    }
-
-    public WorldRenderer getActiveWorldRenderer() {
-        return null;
     }
 
     /**

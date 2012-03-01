@@ -15,12 +15,9 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import org.terasology.game.Terasology;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.IClickListener;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -31,18 +28,18 @@ import javax.vecmath.Vector2f;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UIMainMenu extends UIDisplayRenderer {
+public class UIConfigMenu extends UIDisplayRenderer {
 
-    private final UIImageOverlay _overlay;
-    private final UIGraphicsElement _title;
+    final UIImageOverlay _overlay;
+    final UIGraphicsElement _title;
 
-    private final UIButton _exitButton;
-    private final UIButton _startButton;
-    private final UIButton _configButton;
+    private final UIButton _graphicsQualityButton,
+            _backToMainMenuButton,
+            _viewingDistanceButton;
 
     final UIText _version;
 
-    public UIMainMenu() {
+    public UIConfigMenu() {
         _title = new UIGraphicsElement("terasology");
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
@@ -50,29 +47,29 @@ public class UIMainMenu extends UIDisplayRenderer {
         _version = new UIText("Pre Alpha");
         _version.setVisible(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f));
-        _exitButton.getLabel().setText("Exit Terasology");
-        _exitButton.setVisible(true);
-
-        _configButton = new UIButton(new Vector2f(256f, 32f));
-        _configButton.getLabel().setText("Settings");
-        _configButton.setVisible(true);
-
-        _startButton = new UIButton(new Vector2f(256f, 32f));
-        _startButton.getLabel().setText("Play Terasology");
-        _startButton.setVisible(true);
-
-        _overlay = new UIImageOverlay("menuBackground");
+        _overlay = new UIImageOverlay("loadingBackground");
         _overlay.setVisible(true);
+
+        _graphicsQualityButton = new UIButton(new Vector2f(256f, 32f));
+        _graphicsQualityButton.getLabel().setText("Graphics Quality: Ugly");
+        _graphicsQualityButton.setVisible(true);
+
+        _viewingDistanceButton = new UIButton(new Vector2f(256f, 32f));
+        _viewingDistanceButton.getLabel().setText("Viewing Distance: Near");
+        _viewingDistanceButton.setVisible(true);
+
+        _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _backToMainMenuButton.getLabel().setText("Return to Main Menu");
+        _backToMainMenuButton.setVisible(true);
 
         addDisplayElement(_overlay);
 
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-        addDisplayElement(_configButton);
-        addDisplayElement(_exitButton);
-        addDisplayElement(_startButton);
+        addDisplayElement(_graphicsQualityButton);
+        addDisplayElement(_backToMainMenuButton);
+        addDisplayElement(_viewingDistanceButton);
 
         update();
     }
@@ -84,28 +81,27 @@ public class UIMainMenu extends UIDisplayRenderer {
         _version.centerHorizontally();
         _version.getPosition().y = 230f;
 
-        _startButton.centerHorizontally();
-        _startButton.getPosition().y = 300f + 40f;
+        _graphicsQualityButton.centerHorizontally();
+        _graphicsQualityButton.getPosition().y = 300f + 40f;
+        _viewingDistanceButton.centerHorizontally();
+        _viewingDistanceButton.getPosition().y = 300f + 2 * 40f;
 
-        _configButton.centerHorizontally();
-        _configButton.getPosition().y = 300f + 2 * 40f;
-
-        _exitButton.centerHorizontally();
-        _exitButton.getPosition().y = 300f + 4 * 40f;
+        _backToMainMenuButton.centerHorizontally();
+        _backToMainMenuButton.getPosition().y = 300f + 4 * 40f;
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;
     }
 
-    public UIButton getExitButton() {
-        return _exitButton;
+    public UIButton getGraphicsQualityButton() {
+        return _graphicsQualityButton;
     }
 
-    public UIButton getStartButton() {
-        return _startButton;
+    public UIButton getBackToMainMenuButton() {
+        return _backToMainMenuButton;
     }
 
-    public UIButton getConfigButton() {
-        return _configButton;
+    public UIButton getViewingDistanceButton() {
+        return _viewingDistanceButton;
     }
 }

@@ -263,7 +263,7 @@ public final class Terasology {
             PerformanceMonitor.startActivity("Render");
             state.render();
             Display.update();
-            Display.sync(60);
+            //Display.sync(60);
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Input");
@@ -339,7 +339,7 @@ public final class Terasology {
             return state;
         }
 
-        switch (_state) {
+        switch (s) {
             case SINGLE_PLAYER:
                 state = new StateSinglePlayer();
                 break;

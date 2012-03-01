@@ -54,16 +54,6 @@ public class StateSinglePlayer implements IGameState {
     /* RENDERING */
     private WorldRenderer _worldRenderer;
 
-    /* VIEWING DISTANCE */
-    private static final int[] VIEWING_DISTANCES = {
-            Config.getInstance().getViewingDistanceNear(),
-            Config.getInstance().getViewingDistanceModerate(),
-            Config.getInstance().getViewingDistanceFar(),
-            Config.getInstance().getViewingDistanceUltra()
-    };
-
-    private int _activeViewingDistance = 0;
-
     /* GAME LOOP */
     private boolean _pauseGame = false;
 
@@ -163,7 +153,6 @@ public class StateSinglePlayer implements IGameState {
 
         // Create the first Portal if it doesn't exist yet
         _worldRenderer.initPortal();
-        _worldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
 
         simulateWorld(4000);
     }
@@ -367,8 +356,7 @@ public class StateSinglePlayer implements IGameState {
     }
 
     public void toggleViewingDistance() {
-        _activeViewingDistance = (_activeViewingDistance + 1) % 4;
-        _worldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+        Config.getInstance().setViewingDistanceById((Config.getInstance().getActiveViewingDistanceId() + 1) % 4);
     }
 
     public boolean isGamePaused() {
