@@ -45,7 +45,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
  */
-public class ModePlayGame implements IGameMode {
+public class StateSinglePlayer implements IGameState {
 
     /* GUI */
     private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
@@ -57,7 +57,7 @@ public class ModePlayGame implements IGameMode {
     private UIInventoryScreen _inventoryScreen;
 
     /* RENDERING */
-    private WorldRenderer _activeWorldRenderer;
+    private WorldRenderer _worldRenderer;
 
     private EntityManager _entityManager;
 
@@ -99,7 +99,6 @@ public class ModePlayGame implements IGameMode {
 
         _entityManager = new PojoEntityManager();
 
-        resetOpenGLParameters();
     }
 
 
@@ -114,33 +113,38 @@ public class ModePlayGame implements IGameMode {
     }
 
     public void deactivate() {
-        _activeWorldRenderer.dispose();
-        _activeWorldRenderer = null;
+        dispose();
+    }
+
+    public void dispose() {
+        _worldRenderer.dispose();
+        _worldRenderer = null;
     }
 
     public void update(double delta) {
-            if (_activeWorldRenderer != null && shouldUpdateWorld())
-                _activeWorldRenderer.update(delta);
+        if (_worldRenderer != null && shouldUpdateWorld())
+            _worldRenderer.update(delta);
+
+        if (!screenHasFocus())
+            getWorldRenderer().getPlayer().updateInput();
 
             if (screenHasFocus() || !shouldUpdateWorld()) {
                 if (Mouse.isGrabbed()) {
                     Mouse.setGrabbed(false);
                     Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
                 }
-
             } else {
                 if (!Mouse.isGrabbed())
                     Mouse.setGrabbed(true);
             }
 
-            if (_activeWorldRenderer != null) {
-                if (_activeWorldRenderer.getPlayer().isDead()) {
+        if (_worldRenderer != null) {
+            if (_worldRenderer.getPlayer().isDead()) {
                     _statusScreen.setVisible(true);
-                    _statusScreen.updateStatus("Sorry. You've died. :-(");
+                _statusScreen.updateStatus("Sorry! Seems like you have died. :-(");
                 } else {
                     _statusScreen.setVisible(false);
                 }
-
             }
     }
 
@@ -151,9 +155,9 @@ public class ModePlayGame implements IGameMode {
         final FastRandom random = new FastRandom();
 
         // Get rid of the old world
-        if (_activeWorldRenderer != null) {
-            _activeWorldRenderer.dispose();
-            _activeWorldRenderer = null;
+        if (_worldRenderer != null) {
+            _worldRenderer.dispose();
+            _worldRenderer = null;
         }
 
         if (seed == null) {
@@ -166,11 +170,11 @@ public class ModePlayGame implements IGameMode {
 
         // Init. a new world
         _activeWorldRenderer = new WorldRenderer(title, seed, _entityManager);
-        _activeWorldRenderer.setPlayer(new Player(_activeWorldRenderer));
+        _worldRenderer.setPlayer(new Player(_worldRenderer));
 
         // Create the first Portal if it doesn't exist yet
-        _activeWorldRenderer.initPortal();
-        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+        _worldRenderer.initPortal();
+        _worldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
 
         simulateWorld(4000);
     }
@@ -189,13 +193,6 @@ public class ModePlayGame implements IGameMode {
         return !_pauseGame && !_pauseMenu.isVisible();
     }
 
-    public void resetOpenGLParameters() {
-        // Update the viewing distance
-        double minDist = (VIEWING_DISTANCES[_activeViewingDistance] / 2) * 16.0f;
-        glFogf(GL_FOG_START, (float) (minDist * 0.001));
-        glFogf(GL_FOG_END, (float) minDist);
-    }
-
     private void simulateWorld(int duration) {
         long timeBefore = _gameInstance.getTimeInMs();
 
@@ -211,7 +208,7 @@ public class ModePlayGame implements IGameMode {
             renderUserInterface();
             updateUserInterface();
 
-            getActiveWorldRenderer().standaloneGenerateChunks();
+            getWorldRenderer().generateChunks();
 
             Display.update();
 
@@ -227,12 +224,11 @@ public class ModePlayGame implements IGameMode {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
-        if (_activeWorldRenderer != null) {
-            _activeWorldRenderer.render();
+        if (_worldRenderer != null) {
+            _worldRenderer.render();
         }
 
-
-        PerformanceMonitor.startActivity("RenderAndUpdate UI");
+        PerformanceMonitor.startActivity("Render and Update UI");
         renderUserInterface();
         updateUserInterface();
         PerformanceMonitor.endActivity();
@@ -250,8 +246,8 @@ public class ModePlayGame implements IGameMode {
         }
     }
 
-    public WorldRenderer getActiveWorldRenderer() {
-        return _activeWorldRenderer;
+    public WorldRenderer getWorldRenderer() {
+        return _worldRenderer;
     }
 
     public EntityManager getEntityManager() {
@@ -263,6 +259,8 @@ public class ModePlayGame implements IGameMode {
      */
     public void processKeyboardInput() {
         boolean debugEnabled = Config.getInstance().isDebug();
+
+        boolean screenHasFocus = screenHasFocus();
 
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
@@ -280,7 +278,7 @@ public class ModePlayGame implements IGameMode {
                     Config.getInstance().setDebug(!Config.getInstance().isDebug());
                 }
 
-                if (key == Keyboard.KEY_F) {
+                if (key == Keyboard.KEY_F && !screenHasFocus) {
                     toggleViewingDistance();
                 }
 
@@ -297,30 +295,30 @@ public class ModePlayGame implements IGameMode {
             }
 
             // Features for debug mode only
-            if (debugEnabled) {
-                if (key == Keyboard.KEY_UP && Keyboard.getEventKeyState()) {
+            if (debugEnabled && !screenHasFocus() && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_UP) {
                     getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.005);
                 }
 
-                if (key == Keyboard.KEY_DOWN && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_DOWN) {
                     getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.005);
                 }
 
-                if (key == Keyboard.KEY_RIGHT && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_RIGHT) {
                     getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.02);
                 }
 
-                if (key == Keyboard.KEY_LEFT && Keyboard.getEventKeyState()) {
+                if (key == Keyboard.KEY_LEFT) {
                     getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
                 }
-                if (key == Keyboard.KEY_R && Keyboard.getEventKeyState()) {
-                    getActiveWorldRenderer().setWireframe(!getActiveWorldRenderer().isWireframe());
+                if (key == Keyboard.KEY_R && !Keyboard.isRepeatEvent()) {
+                    getWorldRenderer().setWireframe(!getWorldRenderer().isWireframe());
                 }
             }
 
             // Pass input to the current player
             if (!screenHasFocus())
-                _activeWorldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
+                _worldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
         }
     }
 
@@ -340,7 +338,7 @@ public class ModePlayGame implements IGameMode {
             }
 
             if (!screenHasFocus())
-                _activeWorldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+                _worldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
         }
     }
 
@@ -354,11 +352,6 @@ public class ModePlayGame implements IGameMode {
         }
 
         return result;
-    }
-
-    public void updatePlayerInput() {
-        if (!screenHasFocus())
-            getActiveWorldRenderer().getPlayer().updateInput();
     }
 
     public void pause() {
@@ -390,17 +383,14 @@ public class ModePlayGame implements IGameMode {
 
     public void toggleViewingDistance() {
         _activeViewingDistance = (_activeViewingDistance + 1) % 4;
-        _activeWorldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
+        _worldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
     }
-
 
     public boolean isGamePaused() {
         return _pauseGame;
     }
 
     public IWorldProvider getActiveWorldProvider() {
-        return _activeWorldRenderer.getWorldProvider();
+        return _worldRenderer.getWorldProvider();
     }
-
-
 }

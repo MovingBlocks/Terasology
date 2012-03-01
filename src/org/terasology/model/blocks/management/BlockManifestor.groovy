@@ -37,6 +37,7 @@ import org.terasology.model.shapes.BlockShapeManager
 import org.terasology.model.blocks.AlignToSurfaceGroup
 import org.terasology.math.Rotation
 import org.terasology.model.structures.AABB
+import org.terasology.utilities.Helper
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -87,22 +88,11 @@ class BlockManifestor {
 
     // Temp helper methods until we can correctly use WorldProvider.getWorldSavePath - tries to detect and fix screwy applet paths
     protected fixSavePaths() {
-        _blockManifest = fixSavePath(_blockManifest)
-        _imageManifest = fixSavePath(_imageManifest)
-        _imageManifestMipMap1 = fixSavePath(_imageManifestMipMap1)
-        _imageManifestMipMap2 = fixSavePath(_imageManifestMipMap2)
-        _imageManifestMipMap3 = fixSavePath(_imageManifestMipMap3)
-    }
-
-    private File fixSavePath(File f) {
-        org.terasology.model.blocks.management.BlockManifestor.log.info "Suggested absolute save path is: " + f.getAbsolutePath()
-        if (!f.getAbsolutePath().contains("Terasology")) {
-            f = new File(System.getProperty("java.io.tmpdir"), f.path)
-            org.terasology.model.blocks.management.BlockManifestor.log.info "Going to use absolute TEMP save path instead: " + f.getAbsolutePath()
-
-            return f
-        }
-        return f
+        _blockManifest = Helper.fixSavePath(_blockManifest)
+        _imageManifest = Helper.fixSavePath(_imageManifest)
+        _imageManifestMipMap1 = Helper.fixSavePath(_imageManifestMipMap1)
+        _imageManifestMipMap2 = Helper.fixSavePath(_imageManifestMipMap2)
+        _imageManifestMipMap3 = Helper.fixSavePath(_imageManifestMipMap3)
     }
 
     /**

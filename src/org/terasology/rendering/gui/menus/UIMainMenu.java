@@ -16,7 +16,6 @@
 package org.terasology.rendering.gui.menus;
 
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
@@ -66,7 +65,7 @@ public class UIMainMenu extends UIDisplayRenderer {
 
         _startButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                Terasology.getInstance().setGameMode(Terasology.GameMode.runGame);
+                Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
             }
         });
 

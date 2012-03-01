@@ -15,9 +15,6 @@
 */
 package org.terasology.game;
 
-import org.lwjgl.opengl.Display;
-import org.terasology.logic.manager.Config;
-
 import java.applet.Applet;
 import java.util.logging.Level;
 
@@ -67,7 +64,7 @@ public final class TerasologyApplet extends Applet {
     @Override
     public void destroy() {
         if (_terasology != null)
-            _terasology.exit(false);
+            _terasology.exit();
 
         super.destroy();
     }
