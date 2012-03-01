@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 
@@ -16,16 +17,8 @@ public class OggSound extends AbstractSound {
 
     private int channels;
 
-    public OggSound(String name, InputStream source) {
+    public OggSound(String name, URL source) {
         super(name, source);
-    }
-
-    public OggSound(String name, String resource) {
-        super(name, resource);
-    }
-
-    public OggSound(String name) {
-        super(name);
     }
 
     public void load(InputStream stream) {
@@ -37,7 +30,6 @@ public class OggSound extends AbstractSound {
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             OggReader reader = new OggReader(stream);
-            FileOutputStream fos = new FileOutputStream("test.wav");
 
             byte buffer[] = new byte[1024];
             int read;
@@ -53,7 +45,6 @@ public class OggSound extends AbstractSound {
                 totalRead += read;
 
                 bos.write(buffer, 0, read);
-                fos.write(buffer, 0, read);
             } while (read > 0);
 
             buffer = bos.toByteArray();

@@ -24,7 +24,7 @@ import org.terasology.logic.entities.MovableEntity;
 
 import javax.vecmath.Vector3d;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -53,6 +53,57 @@ public abstract class AudioManager {
     protected AudioManager() {
     }
 
+    protected abstract Sound createAudio(String name, URL source);
+
+    protected abstract Sound createStreamingAudio(String name, URL source);
+
+    protected void loadAssets() {
+        this.loadSoundAssets();
+        this.loadMusicAssets();
+    }
+
+    private void loadSoundAssets() {
+        for (String sound : AssetManager.list("sounds")) {
+            logger.info("Loading sound " + sound);
+            try {
+                String name = sound.substring(sound.lastIndexOf('/') + 1);
+
+                if (!name.endsWith(".ogg")) {
+                    continue;
+                }
+
+                name = name.substring(0, name.lastIndexOf("."));
+
+                this._audio.put(name.toLowerCase(), createAudio(name, getSoundAsset(sound)));
+            } catch (IOException e) {
+                logger.info("Failed to load sound asset '" + sound + "'");
+            }
+        }
+    }
+
+    private void loadMusicAssets() {
+        for (String sound : AssetManager.list("music")) {
+            logger.info("Loading music " + sound);
+            try {
+                String name = sound.substring(sound.lastIndexOf('/') + 1);
+
+                if (!name.endsWith(".ogg")) {
+                    continue;
+                }
+
+
+                name = name.substring(0, name.lastIndexOf("."));
+                this._audio.put(name.toLowerCase(), createStreamingAudio(name, getSoundAsset(sound)));
+            } catch (IOException e) {
+                logger.info("Failed to load music asset '" + sound + "'");
+            }
+        }
+    }
+
+    private URL getSoundAsset(String fileName) throws IOException {
+        return AssetManager.asset(fileName);
+    }
+
     /**
      * Return an audio file, loading it from disk if it isn't in the cache yet
      *
@@ -65,7 +116,7 @@ public abstract class AudioManager {
         if (sound == null) {
             try {
                 logger.info("Loading sound 'sounds/" + name + ".ogg'");
-                sound = this.createAudio(name, getSoundAssetStream("sounds/" + name + ".ogg"));
+                sound = this.createAudio(name, getSoundAsset("sounds/" + name + ".ogg"));
                 _audio.put(name.toLowerCase(), sound);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to load sound " + name + " - " + e.getMessage(), e);
@@ -87,7 +138,7 @@ public abstract class AudioManager {
         if (sound == null) {
             try {
                 logger.info("Loading sound 'music/" + name + ".ogg'");
-                sound = this.createStreamingAudio(name, getSoundAssetStream("music/" + name + ".ogg"));
+                sound = this.createStreamingAudio(name, getSoundAsset("music/" + name + ".ogg"));
                 _audio.put(name.toLowerCase(), sound);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to load sound " + name + " - " + e.getMessage(), e);
@@ -97,16 +148,31 @@ public abstract class AudioManager {
         return sound;
     }
 
+    /**
+     * Initializes AudioManager
+     */
     public abstract void initialize();
 
+    /**
+     * Update AudioManager sound sources
+     * <p/>
+     * Should be called in main game loop
+     */
     public abstract void update();
 
+    /**
+     * Gracefully destroy audio subsystem
+     */
     public abstract void destroy();
 
-    protected abstract Sound createAudio(String name, InputStream stream);
 
-    protected abstract Sound createStreamingAudio(String name, InputStream stream);
-
+    /**
+     * Returns sound pool with specified name
+     * <b>WARNING! Method will throw IllegalArgumentException if specified sound pool is not found</b>
+     *
+     * @param pool Sound pool name
+     * @return Sound pool object
+     */
     public SoundPool getSoundPool(String pool) {
         SoundPool soundPool = this._pools.get(pool);
 
@@ -117,52 +183,6 @@ public abstract class AudioManager {
         return soundPool;
     }
 
-    private InputStream getSoundAssetStream(String fileName) throws IOException {
-        return AssetManager.assetStream(fileName);
-    }
-
-    protected void loadAssets() {
-        this.loadSoundAssets();
-        this.loadMusicAssets();
-    }
-
-    private void loadSoundAssets() {
-        for (String sound : AssetManager.list("sounds")) {
-            logger.info("Loading sound " + sound);
-            try {
-                String name = sound.substring(sound.lastIndexOf('/') + 1);
-
-                if (!name.endsWith(".ogg")) {
-                    continue;
-                }
-
-                name = name.substring(0, name.lastIndexOf("."));
-
-                this._audio.put(name.toLowerCase(), createAudio(name, getSoundAssetStream(sound)));
-            } catch (IOException e) {
-                logger.info("Failed to load sound asset '" + sound + "'");
-            }
-        }
-    }
-
-    private void loadMusicAssets() {
-        for (String sound : AssetManager.list("music")) {
-            logger.info("Loading music " + sound);
-            try {
-                String name = sound.substring(sound.lastIndexOf('/') + 1);
-
-                if (!name.endsWith(".ogg")) {
-                    continue;
-                }
-
-
-                name = name.substring(0, name.lastIndexOf("."));
-                this._audio.put(name.toLowerCase(), createStreamingAudio(name, getSoundAssetStream(sound)));
-            } catch (IOException e) {
-                logger.info("Failed to load music asset '" + sound + "'");
-            }
-        }
-    }
 
     public SoundSource getSoundSource(String pool, String sound) {
         return getSoundSource(pool, getSound(sound));
@@ -181,6 +201,11 @@ public abstract class AudioManager {
         }
     }
 
+    /**
+     * Returns AudioManager instance
+     *
+     * @return
+     */
     public static AudioManager getInstance() {
         if (_instance == null) {
             _instance = new OpenALManager();
@@ -189,10 +214,23 @@ public abstract class AudioManager {
         return _instance;
     }
 
+    /**
+     * Returns sound with specified name
+     * Method will return null if sound is not found
+     *
+     * @param name
+     * @return
+     */
     public static Sound sound(String name) {
         return getInstance().getSound(name);
     }
 
+    /**
+     * Returns sounds with specified names
+     *
+     * @param names
+     * @return
+     */
     public static Sound[] sounds(String... names) {
         Sound[] sounds = new Sound[names.length];
 
@@ -204,14 +242,34 @@ public abstract class AudioManager {
         return sounds;
     }
 
+    /**
+     * Returns sound source for specified sound from "sfx" pool
+     *
+     * @param name Sound name
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
     public static SoundSource source(String name) {
         return getInstance().getSoundSource("sfx", name);
     }
 
+    /**
+     * Returns sound source for specified sound from "sfx" pool
+     *
+     * @param sound Sound object
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
     public static SoundSource source(Sound sound) {
         return getInstance().getSoundSource("sfx", sound);
     }
 
+    /**
+     * Returns sound source from "sfx" pool configured for specified sound, position and gain
+     *
+     * @param name Sound name
+     * @param pos Sound source position
+     * @param gain Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
     public static SoundSource source(String name, Vector3d pos, float gain) {
         SoundSource source = source(name);
         if (source == null) {
@@ -221,6 +279,14 @@ public abstract class AudioManager {
         return (pos != null ? source.setPosition(pos).setAbsolute(true) : source).setGain(gain);
     }
 
+    /**
+     * Returns sound source from "sfx" pool configured for specified sound, position and gain
+     *
+     * @param sound Sound object
+     * @param pos Sound source position
+     * @param gain Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
     public static SoundSource source(Sound sound, Vector3d pos, float gain) {
         SoundSource source = source(sound);
 
@@ -231,14 +297,35 @@ public abstract class AudioManager {
         return (pos != null ? source.setPosition(pos).setAbsolute(true) : source).setGain(gain);
     }
 
+    /**
+     * Plays specified sound with gain = 1.0f
+     *
+     * @param name Sound name
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
     public static SoundSource play(String name) {
         return play(name, null, 1.0f);
     }
 
+    /**
+     * Plays specified sound with specified gain
+     *
+     * @param name Sound name
+     * @param gain Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
     public static SoundSource play(String name, float gain) {
         return play(name, null, gain);
     }
 
+    /**
+     * Plays specified sound at specified position and with specified gain
+     *
+     * @param name Sound name
+     * @param pos Sound source position
+     * @param gain Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
     public static SoundSource play(String name, Vector3d pos, float gain) {
         SoundSource source = source(name);
 
@@ -249,6 +336,14 @@ public abstract class AudioManager {
         return source.play();
     }
 
+    /**
+     * Plays specified sound at specified position and with specified gain
+     *
+     * @param sound Sound object
+     * @param pos Sound source position
+     * @param gain Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
     public static SoundSource play(Sound sound, Vector3d pos, float gain) {
         SoundSource source = source(sound, pos, gain);
 
@@ -259,7 +354,15 @@ public abstract class AudioManager {
         return source.play();
     }
 
-    public static SoundSource play(Sound sound, Entity entity, float gain){
+    /**
+     * Plays specified sound tuned for specified entity
+     *
+     * @param sound Sound object
+     * @param entity Entity sounding
+     * @param gain Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
+    public static SoundSource play(Sound sound, Entity entity, float gain) {
         SoundSource source = source(sound, entity.getPosition(), gain);
 
         if (source == null) {
@@ -270,6 +373,14 @@ public abstract class AudioManager {
         return source.play();
     }
 
+    /**
+     * Plays specified sound tuned for specified entity
+     *
+     * @param sound Sound object
+     * @param entity Entity sounding
+     * @param gain Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
     public static SoundSource play(Sound sound, MovableEntity entity, float gain) {
         SoundSource source = source(sound, entity.getPosition(), gain);
 
@@ -280,12 +391,23 @@ public abstract class AudioManager {
 
         return source.setVelocity(entity.getVelocity()).setDirection(entity.getViewingDirection()).play();
     }
-    
+
+    /**
+     * Plays specified music
+     *
+     * @param name Music name
+     * @return Sound source object, or null if there is no free sound sources in music pool
+     */
     public static SoundSource playMusic(String name) {
+        System.out.println("Start playing " + name);
+
         SoundPool pool = AudioManager.getInstance().getSoundPool("music");
+
+        pool.stopAll();
+
         SoundSource source = pool.getSource(AudioManager.sound(name));
 
-        if(source == null) { // no free music slots
+        if (source == null) { // no free music slots
             return null;
         }
 

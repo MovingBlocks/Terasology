@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import static org.lwjgl.openal.AL10.*;
 
@@ -17,14 +18,9 @@ public abstract class AbstractSound implements Sound {
 
     protected int length = 0;
 
-    public AbstractSound(String name, InputStream source) {
+    public AbstractSound(String name, URL source) {
         this(name);
         this.load(source);
-    }
-
-    public AbstractSound(String name, String resource) {
-        this(name);
-        this.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(resource));
     }
 
     public AbstractSound(String name) {
@@ -45,6 +41,14 @@ public abstract class AbstractSound implements Sound {
             this.load(new FileInputStream(file));
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load sound: " + e.getMessage(), e);
+        }
+    }
+
+    public void load(URL source) {
+        try {
+            this.load(source.openStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -83,6 +87,10 @@ public abstract class AbstractSound implements Sound {
 
     public int getBufferSize() {
         return alGetBufferi(bufferId, AL_SIZE);
+    }
+
+    public Sound reset() {
+        return this;
     }
 
     @Override

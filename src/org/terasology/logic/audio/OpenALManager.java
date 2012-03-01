@@ -12,6 +12,7 @@ import org.terasology.logic.manager.AudioManager;
 
 import javax.vecmath.Vector3d;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.FloatBuffer;
 
 public class OpenALManager extends AudioManager {
@@ -71,13 +72,13 @@ public class OpenALManager extends AudioManager {
     }
 
     @Override
-    protected Sound createAudio(String name, InputStream stream) {
-        return new OggSound(name, stream);
+    protected Sound createAudio(String name, URL source) {
+        return new OggSound(name, source);
     }
 
     @Override
-    protected Sound createStreamingAudio(String name, InputStream stream) {
-        return new OggStreamingSound(name, stream);
+    protected Sound createStreamingAudio(String name, URL source) {
+        return new OggStreamingSound(name, source);
     }
 
 }

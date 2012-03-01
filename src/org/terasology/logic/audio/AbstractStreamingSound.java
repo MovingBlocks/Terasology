@@ -2,34 +2,33 @@ package org.terasology.logic.audio;
 
 import org.lwjgl.openal.AL10;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 
 public abstract class AbstractStreamingSound extends AbstractSound {
     private final static int BUFFER_POOL_SIZE = 3;
 
-    protected InputStream audioStream = null;
+    protected URL audioSource = null;
 
     protected int[] buffers;
 
     protected int lastUpdatedBuffer;
 
-    public AbstractStreamingSound(String name, InputStream source) {
-        super(name, source);
+    public AbstractStreamingSound(String name, URL source) {
+        super(name);
 
-        this.audioStream = source;
+        this.audioSource = source;
 
         this.initializeBuffers();
+
+        this.reset();
     }
 
     protected abstract ByteBuffer fetchData();
 
-    public InputStream getAudioStream() {
-        return audioStream;
-    }
-
-    public void load(InputStream stream) {
-        this.audioStream = stream;
+    public URL getAudioSource() {
+        return audioSource;
     }
 
     public int[] getBuffers() {
@@ -45,7 +44,6 @@ public abstract class AbstractStreamingSound extends AbstractSound {
         }
 
         AL10.alBufferData(buffer, this.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, bufferData, this.getSamplingRate());
-
         OpenALException.checkState("Uploading buffer data");
 
         this.lastUpdatedBuffer = buffer;
@@ -56,7 +54,7 @@ public abstract class AbstractStreamingSound extends AbstractSound {
     private void initializeBuffers() {
         buffers = new int[BUFFER_POOL_SIZE];
 
-        for(int i = 0 ; i < buffers.length ; i ++) {
+        for (int i = 0; i < buffers.length; i++) {
             buffers[i] = AL10.alGenBuffers();
             OpenALException.checkState("Creating buffer");
         }
@@ -67,6 +65,12 @@ public abstract class AbstractStreamingSound extends AbstractSound {
     @Override
     public int getBufferId() {
         return lastUpdatedBuffer;
+    }
+
+    @Override
+    public Sound reset() {
+        this.load(this.audioSource);
+        return super.reset();
     }
 
     @Override

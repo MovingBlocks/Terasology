@@ -4,21 +4,27 @@ import org.terasology.utilities.OggReader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.ByteBuffer;
 
 
 public class OggStreamingSound extends AbstractStreamingSound {
 
     private ByteBuffer dataBuffer = ByteBuffer.allocateDirect(4096 * 8);
-    private OggReader file;
+    private OggReader file = null;
 
-    public OggStreamingSound(String name, InputStream source) {
+    public OggStreamingSound(String name, URL source) {
         super(name, source);
     }
 
-    @Override
     public void load(InputStream stream) {
-        super.load(stream);
+        if (this.file != null) {
+            try {
+                this.file.close();
+            } catch (IOException e) {
+                // @todo add logger warning
+            }
+        }
 
         this.file = new OggReader(stream);
     }
@@ -49,6 +55,8 @@ public class OggStreamingSound extends AbstractStreamingSound {
             int read = file.read(dataBuffer, 0, dataBuffer.capacity());
             dataBuffer.rewind();
             // do something :D
+
+            System.out.println("Readed: " + read);
 
             if (read <= 0) {  // end of datastream
                 return null;

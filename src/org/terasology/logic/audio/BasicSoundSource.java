@@ -1,12 +1,10 @@
 package org.terasology.logic.audio;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 import org.terasology.game.Terasology;
 
 import javax.vecmath.Vector3d;
-import java.nio.FloatBuffer;
 
 import static org.lwjgl.openal.AL10.*;
 
@@ -50,8 +48,12 @@ public class BasicSoundSource implements SoundSource {
     }
 
     public SoundSource stop() {
+        if (this.audio != null) {
+            this.audio.reset();
+        }
+
+        alSourceStop(this.getSourceId());
         alSourceRewind(this.getSourceId());
-        AL10.alSourceStop(this.getSourceId());
 
         OpenALException.checkState("Stop playback");
 
@@ -83,6 +85,10 @@ public class BasicSoundSource implements SoundSource {
             updatePosition(this.position);
         }
 
+        this.updateState();
+    }
+
+    protected void updateState() {
         if (_playing && alGetSourcei(this.sourceId, AL_SOURCE_STATE) != AL_PLAYING) {
             _playing = false; // sound stop playing
         }
@@ -249,7 +255,7 @@ public class BasicSoundSource implements SoundSource {
     }
 
     public SoundSource setLooping(boolean looping) {
-        AL10.alSourcei(this.getSourceId(), AL10.AL_LOOPING, looping ? AL10.AL_TRUE : AL10.AL_FALSE);
+        alSourcei(this.getSourceId(), AL_LOOPING, looping ? AL_TRUE : AL_FALSE);
 
         OpenALException.checkState("Setting sound looping");
 
@@ -318,11 +324,13 @@ public class BasicSoundSource implements SoundSource {
             return;
         }
 
-        float delta = (this.srcGain - this.targetGain) / 10; // 10 is fade speed
+        float delta = (this.srcGain - this.targetGain) / 100;
 
-        this.setGain(this.srcGain - delta);
+        System.out.println("Fading " + this.audio.getName());
 
-        if (this.getGain() == this.targetGain) {
+        this.setGain(this.getGain() - delta);
+
+        if (this.getGain() >= this.targetGain) {
             if (this.targetGain == 0.0f) {
                 this.stop();
             }
