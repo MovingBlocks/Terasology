@@ -166,10 +166,12 @@ public class ShaderProgram {
 
         Terasology.getInstance().getLogger().log(Level.INFO, "{0}", new String(infoBytes));
     }
-    
+
     private String getCustomPreprocessorPreamble() {
-        return _preProcessorPreamble + (Config.getInstance().isAnimatedWaterAndGrass() ? "#define ANIMATED_WATER_AND_GRASS \n" : "")
-        + "#define GAMMA " + ((Double) Config.getInstance().getGamma()).toString() + "\n";
+        return _preProcessorPreamble
+                + (Config.getInstance().isAnimatedWaterAndGrass() ? "#define ANIMATED_WATER_AND_GRASS \n" : "")
+                + (Config.getInstance().isFlickeringLight() ? "#define FLICKERING_LIGHT \n" : "")
+                + "#define GAMMA " + ((Double) Config.getInstance().getGamma()).toString() + "\n";
     }
 
     public void enable() {

@@ -70,6 +70,7 @@ public final class Config {
     private int _viewingDistanceFar = 26;
     private int _viewingDistanceUltra = 32;
 
+    private boolean _flickeringLight = false;
     private boolean _enablePostProcessingEffects = false;
     private boolean _animatedWaterAndGrass = false;
     private int _verticalChunkMeshSegments = 1;
@@ -332,6 +333,14 @@ public final class Config {
         this._viewingDistanceUltra = _viewingDistanceUltra;
     }
 
+    public boolean isFlickeringLight() {
+        return _flickeringLight;
+    }
+
+    public void setFlickeringLight(boolean _flickeringLight) {
+        this._flickeringLight = _flickeringLight;
+    }
+
     public boolean isEnablePostProcessingEffects() {
         return _enablePostProcessingEffects;
     }
@@ -434,14 +443,17 @@ public final class Config {
         if (qualityLevel == 0) {
             setEnablePostProcessingEffects(false);
             setAnimatedWaterAndGrass(false);
+            setFlickeringLight(false);
         } else if (qualityLevel == 1) {
             setEnablePostProcessingEffects(true);
             setAnimatedWaterAndGrass(false);
+            setFlickeringLight(true);
         } else if (qualityLevel == 2) {
             setEnablePostProcessingEffects(true);
             setAnimatedWaterAndGrass(true);
+            setFlickeringLight(true);
         }
-        
+
         ShaderManager.getInstance().recompileAllShaders();
     }
 }

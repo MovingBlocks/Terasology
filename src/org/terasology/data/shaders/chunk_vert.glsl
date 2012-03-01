@@ -20,6 +20,8 @@ varying vec4 vertexWorldPos;
 varying vec3 eyeVec;
 varying vec3 lightDir;
 
+varying float flickering = 0.0;
+
 uniform float time;
 uniform float wavingCoordinates[32];
 uniform vec2 waterCoordinate;
@@ -42,6 +44,10 @@ void main()
     gl_FrontColor = gl_Color;
 
 	float distance = length(vertexWorldPos);
+
+	#ifdef FLICKERING_LIGHT
+	flickering = (sin(timeToTick(time, 1.0) + 1.0) / 32.0);
+	#endif
 
     #ifdef ANIMATED_WATER_AND_GRASS
     vec3 vertexChunkPos = vertexWorldPosRaw.xyz + chunkOffset.xyz;

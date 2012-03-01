@@ -30,6 +30,8 @@ varying vec3 eyeVec;
 varying vec3 lightDir;
 varying vec3 normal;
 
+varying float flickering;
+
 uniform vec3 chunkOffset;
 uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
@@ -136,7 +138,6 @@ void main(){
 
     // Calculate the final block light brightness
     float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2);
-    float flickering = (sin(timeToTick(time, 1.0) + 1.0) / 32.0);
 
     torchlight -= flickering;
     blockBrightness += (1.0 - blockBrightness) * torchlight;
