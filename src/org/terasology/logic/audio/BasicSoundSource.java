@@ -263,14 +263,12 @@ public class BasicSoundSource implements SoundSource {
     }
 
     public SoundSource setAudio(Sound sound) {
-        if (sound == null || sound.equals(this.audio)) {
-            return this;
-        }
-
         boolean playing = isPlaying();
         if (playing) {
             this.stop();
         }
+
+        this.reset();
 
         if (sound instanceof AbstractSound) {
             this.audio = (AbstractSound) sound;
@@ -325,9 +323,6 @@ public class BasicSoundSource implements SoundSource {
         }
 
         float delta = (this.srcGain - this.targetGain) / 100;
-
-        System.out.println("Fading " + this.audio.getName());
-
         this.setGain(this.getGain() - delta);
 
         if (this.getGain() >= this.targetGain) {
