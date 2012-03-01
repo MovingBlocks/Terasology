@@ -573,11 +573,11 @@ public abstract class MovableEntity extends Entity {
     }
 
     protected void playRandomFootstep() {
-        AudioManager.play(_footstepSounds[_parent.getWorldProvider().getRandom().randomIntAbs(_footstepSounds.length)], this, 0.6f);
+        this.playFootstep(_footstepSounds[_parent.getWorldProvider().getRandom().randomIntAbs(_footstepSounds.length)]);
     }
 
     protected void playFootstep(Sound footStep) {
-        AudioManager.play(footStep, this, 0.6f);
+        AudioManager.play(footStep, this, 0.6f, AudioManager.PRIORITY_LOW);
     }
 
     public boolean isSwimming() {

@@ -19,7 +19,6 @@ import org.terasology.logic.audio.OpenALManager;
 import org.terasology.logic.audio.Sound;
 import org.terasology.logic.audio.SoundPool;
 import org.terasology.logic.audio.SoundSource;
-import org.terasology.logic.entities.Entity;
 import org.terasology.logic.entities.MovableEntity;
 
 import javax.vecmath.Vector3d;
@@ -36,10 +35,13 @@ import java.util.logging.Logger;
  * @author t3hk0d3 <contact@tehkode.ru>
  */
 public abstract class AudioManager {
+
+    public final static int PRIORITY_LOCKED = Integer.MAX_VALUE;
     public final static int PRIORITY_HIGHEST = 100;
     public final static int PRIORITY_HIGH = 10;
     public final static int PRIORITY_NORMAL = 5;
-    public final static int PRIORITY_LOW = 0;
+    public final static int PRIORITY_LOW = 3;
+    public final static int PRIORITY_LOWEST = 1;
 
     protected Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
 
@@ -184,12 +186,12 @@ public abstract class AudioManager {
     }
 
 
-    public SoundSource getSoundSource(String pool, String sound) {
-        return getSoundSource(pool, getSound(sound));
+    public SoundSource getSoundSource(String pool, String sound, int priority) {
+        return getSoundSource(pool, getSound(sound), priority);
     }
 
-    public SoundSource getSoundSource(String pool, Sound sound) {
-        return getSoundPool(pool).getSource(sound);
+    public SoundSource getSoundSource(String pool, Sound sound, int priority) {
+        return getSoundPool(pool).getSource(sound, priority);
     }
 
     /**
@@ -243,35 +245,57 @@ public abstract class AudioManager {
     }
 
     /**
-     * Returns sound source for specified sound from "sfx" pool
+     * Returns sound source for specified sound from "sfx" pool with normal priority
      *
      * @param name Sound name
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
     public static SoundSource source(String name) {
-        return getInstance().getSoundSource("sfx", name);
+        return source(name, PRIORITY_NORMAL);
     }
 
     /**
      * Returns sound source for specified sound from "sfx" pool
      *
+     * @param name
+     * @param priority Priority
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
+    public static SoundSource source(String name, int priority) {
+        return getInstance().getSoundSource("sfx", name, priority);
+    }
+
+    /**
+     * Returns sound source for specified sound from "sfx" pool with normal priority
+     *
      * @param sound Sound object
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
     public static SoundSource source(Sound sound) {
-        return getInstance().getSoundSource("sfx", sound);
+        return source(sound, PRIORITY_NORMAL);
+    }
+
+    /**
+     * Returns sound source for specified sound from "sfx" pool with normal priority
+     *
+     * @param sound    Sound object
+     * @param priority Sound priority
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
+    public static SoundSource source(Sound sound, int priority) {
+        return getInstance().getSoundSource("sfx", sound, priority);
     }
 
     /**
      * Returns sound source from "sfx" pool configured for specified sound, position and gain
      *
      * @param name Sound name
-     * @param pos Sound source position
+     * @param pos  Sound source position
      * @param gain Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
-    public static SoundSource source(String name, Vector3d pos, float gain) {
-        SoundSource source = source(name);
+    public static SoundSource source(String name, Vector3d pos, float gain, int priority) {
+        SoundSource source = source(name, priority);
         if (source == null) {
             return null;
         }
@@ -283,12 +307,12 @@ public abstract class AudioManager {
      * Returns sound source from "sfx" pool configured for specified sound, position and gain
      *
      * @param sound Sound object
-     * @param pos Sound source position
-     * @param gain Sound source gain
+     * @param pos   Sound source position
+     * @param gain  Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
-    public static SoundSource source(Sound sound, Vector3d pos, float gain) {
-        SoundSource source = source(sound);
+    public static SoundSource source(Sound sound, Vector3d pos, float gain, int priority) {
+        SoundSource source = source(sound, priority);
 
         if (source == null) {
             return null;
@@ -304,7 +328,7 @@ public abstract class AudioManager {
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
     public static SoundSource play(String name) {
-        return play(name, null, 1.0f);
+        return play(name, null, 1.0f, PRIORITY_NORMAL);
     }
 
     /**
@@ -315,74 +339,64 @@ public abstract class AudioManager {
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
     public static SoundSource play(String name, float gain) {
-        return play(name, null, gain);
+        return play(name, null, gain, PRIORITY_NORMAL);
     }
 
     /**
      * Plays specified sound at specified position and with specified gain
      *
      * @param name Sound name
-     * @param pos Sound source position
+     * @param pos  Sound source position
      * @param gain Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
-    public static SoundSource play(String name, Vector3d pos, float gain) {
-        SoundSource source = source(name);
+    public static SoundSource play(String name, Vector3d pos, float gain, int priority) {
+        SoundSource source = source(name, priority);
 
         if (source == null) {
             return null;
         }
 
-        return source.play();
+        if (pos != null) {
+            source.setAbsolute(true).setPosition(pos);
+        }
+
+        return source.setGain(gain).play();
     }
 
     /**
      * Plays specified sound at specified position and with specified gain
      *
      * @param sound Sound object
-     * @param pos Sound source position
-     * @param gain Sound source gain
+     * @param pos   Sound source position
+     * @param gain  Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
-    public static SoundSource play(Sound sound, Vector3d pos, float gain) {
-        SoundSource source = source(sound, pos, gain);
+    public static SoundSource play(Sound sound, Vector3d pos, float gain, int priority) {
+        SoundSource source = source(sound, pos, gain, priority);
 
         if (source == null) {
             return null;
         }
 
-        return source.play();
-    }
-
-    /**
-     * Plays specified sound tuned for specified entity
-     *
-     * @param sound Sound object
-     * @param entity Entity sounding
-     * @param gain Sound source gain
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource play(Sound sound, Entity entity, float gain) {
-        SoundSource source = source(sound, entity.getPosition(), gain);
-
-        if (source == null) {
-            // Nof free sound sources
-            return null;
+        if (pos != null) {
+            source.setAbsolute(true).setPosition(pos);
         }
 
-        return source.play();
+        return source.setGain(gain).play();
     }
 
     /**
      * Plays specified sound tuned for specified entity
      *
-     * @param sound Sound object
-     * @param entity Entity sounding
-     * @param gain Sound source gain
+     * @param sound    Sound object
+     * @param entity   Entity sounding
+     * @param gain     Sound source gain
+     * @param priority Sound priority
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
-    public static SoundSource play(Sound sound, MovableEntity entity, float gain) {
-        SoundSource source = source(sound, entity.getPosition(), gain);
+    public static SoundSource play(Sound sound, MovableEntity entity, float gain, int priority) {
+        SoundSource source = source(sound, entity.getPosition(), gain, priority);
 
         if (source == null) {
             // Nof free sound sources
@@ -399,8 +413,6 @@ public abstract class AudioManager {
      * @return Sound source object, or null if there is no free sound sources in music pool
      */
     public static SoundSource playMusic(String name) {
-        System.out.println("Start playing " + name);
-
         SoundPool pool = AudioManager.getInstance().getSoundPool("music");
 
         pool.stopAll();

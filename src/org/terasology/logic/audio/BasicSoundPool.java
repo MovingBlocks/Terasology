@@ -1,5 +1,7 @@
 package org.terasology.logic.audio;
 
+import org.terasology.logic.manager.AudioManager;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -8,10 +10,10 @@ import java.util.Set;
 public class BasicSoundPool implements SoundPool {
     private final static int DEFAULT_POOL_SIZE = 32;
 
-    protected Map<SoundSource, Object> _soundSources;
+    protected Map<SoundSource, Integer> _soundSources;
 
     public BasicSoundPool(int capacity) {
-        _soundSources = new HashMap<SoundSource, Object>(capacity);
+        _soundSources = new HashMap<SoundSource, Integer>(capacity);
 
         this.fillPool(capacity);
     }
@@ -32,14 +34,32 @@ public class BasicSoundPool implements SoundPool {
         return null;
     }
 
-    public SoundSource getSource(Sound sound) {
+    public SoundSource getSource(Sound sound, int priority) {
+        // @todo should be optimized (performance crucial)
+
         for (SoundSource source : _soundSources.keySet()) {
             if (!isActive(source)) {
+                _soundSources.put(source, priority);
+                return source.setAudio(sound);
+            }
+        }
+
+        // No free sound found, will look by priority
+        for (Map.Entry<SoundSource, Integer> entry : _soundSources.entrySet()) {
+            SoundSource source = entry.getKey();
+            Integer soundPriority = entry.getValue();
+
+            if (soundPriority < priority) { // sound playing wil lower priority than our query
+                _soundSources.put(source, priority);
                 return source.setAudio(sound);
             }
         }
 
         return null;
+    }
+
+    public SoundSource getSource(Sound sound) {
+        return getSource(sound, AudioManager.PRIORITY_NORMAL);
     }
 
     public Set<SoundSource> getSources() {
@@ -93,7 +113,8 @@ public class BasicSoundPool implements SoundPool {
     }
 
     public boolean isLocked(SoundSource source) {
-        return _soundSources.get(source) != null;
+        Integer lock = _soundSources.get(source);
+        return lock != null && lock == AudioManager.PRIORITY_LOCKED;
     }
 
     public boolean lock(SoundSource source) {
@@ -101,7 +122,7 @@ public class BasicSoundPool implements SoundPool {
             return false;
         }
 
-        _soundSources.put(source, 1);
+        _soundSources.put(source, AudioManager.PRIORITY_LOCKED);
 
         return true;
     }

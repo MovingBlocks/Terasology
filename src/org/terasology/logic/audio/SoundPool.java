@@ -14,7 +14,16 @@ public interface SoundPool {
     public SoundSource getLockedSource();
 
     /**
-     * Returns sound source tuned for specified sound
+     * Returns sound source tuned for specified sound with specified priority
+     *
+     * @param sound
+     * @param priority
+     * @return
+     */
+    public SoundSource getSource(Sound sound, int priority);
+
+    /**
+     * Returns sound source tuned for specified sound with normal priority
      *
      * @param sound
      * @return
@@ -30,7 +39,7 @@ public interface SoundPool {
     public Set<SoundSource> getSources();
 
     /**
-     * Returns all inactive (avaliable) sources
+     * Returns all inactive (available) sources
      *
      * @return
      */
