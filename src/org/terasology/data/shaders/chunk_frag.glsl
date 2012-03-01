@@ -136,7 +136,11 @@ void main(){
 
     // Calculate the final block light brightness
     float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2);
-    blockBrightness += (1.0 - blockBrightness) * torchlight - (sin(timeToTick(time, 0.5) + 1.0) / 16.0) * blocklightValue;
+    float flickering = (sin(timeToTick(time, 1.0) + 1.0) / 32.0);
+
+    torchlight -= flickering;
+    blockBrightness += (1.0 - blockBrightness) * torchlight;
+    blockBrightness -= flickering * blocklightValue;
     blockBrightness *= blocklightDayIntensity * 0.75;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it

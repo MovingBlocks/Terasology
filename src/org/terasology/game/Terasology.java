@@ -263,7 +263,7 @@ public final class Terasology {
             PerformanceMonitor.startActivity("Render");
             state.render();
             Display.update();
-            //Display.sync(60);
+            Display.sync(60);
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Input");

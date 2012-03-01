@@ -579,7 +579,7 @@ public final class WorldRenderer implements IGameObject {
     }
 
     public void printScreen() {
-        //REFACTOR TO USE BACKGROUND THREAD FOR IMAGE COPY & SAVE
+        // TODO: REFACTOR TO USE BACKGROUND THREAD FOR IMAGE COPY & SAVE
         GL11.glReadBuffer(GL11.GL_FRONT);
         int width = Display.getDisplayMode().getWidth();
         int height = Display.getDisplayMode().getHeight();
