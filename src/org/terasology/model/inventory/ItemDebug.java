@@ -13,28 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.manager;
+package org.terasology.model.inventory;
+
+import org.terasology.logic.characters.Player;
 
 /**
- * This is a stub for user rights management. It serves mainly as a reminder that there needs to be some sort of rights management
- * @author Kai Kratz <kaikratz@googlemail.com>
+ * Just a holder for the DebugTool in the ToolBar
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-public class UserLevel {
+public class ItemDebug extends Item {
 
-    private static UserLevel _userLevel;
+    public ItemDebug() {
+        super();
 
-    public static UserLevel getInstance()
-    {
-        if(_userLevel == null) {
-            _userLevel = new UserLevel();
-        }
-        return _userLevel;
-    }
-
-    private UserLevel(){}
-
-    public boolean hasRights(){
-        //should query server / world if user has rights
-        return true;
+        //setIconWithAtlasPos(4, 0);
+        //TODO: Hmm, what happened with the atlas and toolId. Need to get back on top of that.
+        _toolId = (byte) 4;
+        _stackSize = 1;
     }
 }

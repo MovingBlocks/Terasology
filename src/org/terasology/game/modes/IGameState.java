@@ -22,15 +22,16 @@ import org.terasology.rendering.world.WorldRenderer;
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
  */
-public interface IGameMode {
+public interface IGameState {
     public void init();
+    public void dispose();
+
     public void activate();
     public void deactivate();
+
     public void update(double delta);
     public void render();
+
     public void processKeyboardInput();
     public void processMouseInput();
-    
-    public WorldRenderer getActiveWorldRenderer();
-    public void updatePlayerInput();
 }

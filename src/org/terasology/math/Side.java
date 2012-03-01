@@ -63,6 +63,13 @@ public enum Side {
         return (z > 0) ? BACK : FRONT;
     }
 
+    /**
+     * Determines which direction the player is facing
+     * @param x right/left
+     * @param y top/bottom
+     * @param z back/front
+     * @return Side enum with the appropriate direction
+     */
     public static Side inDirection(double x, double y, double z) {
         if (TeraMath.fastAbs(x) > TeraMath.fastAbs(y)) {
             if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
@@ -70,6 +77,19 @@ public enum Side {
             }
         } else if (TeraMath.fastAbs(y) > TeraMath.fastAbs(z)) {
             return (y > 0) ? TOP : BOTTOM;
+        }
+        return (z > 0) ? BACK : FRONT;
+    }
+
+    /**
+     * Determines which horizontal direction the player is facing
+     * @param x right/left
+     * @param z back/front
+     * @return Side enum with the appropriate direction
+     */
+    public static Side inHorizontalDirection(double x, double z) {
+        if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
+                return (x > 0) ? RIGHT : LEFT;
         }
         return (z > 0) ? BACK : FRONT;
     }

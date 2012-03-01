@@ -29,28 +29,25 @@ import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
 
-//OpenGL
-//GUI
-
 /**
- * The class implements the main game menu. The class contains the following screens: game settings,
- * single player, multiplayer games, generation / load / delete the world.
+ * The class implements the main game menu.
+ * <p/>
+ * TODO: Add screen "Single Player"
+ * TODO: Add animated background
+ * TODO: Add screen "Game Settings"
+ * TODO: Add screen "Multiplayer"
+ * TODO: Add screen "Generation/Load/Delete World."
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
  */
-public class ModeMainMenu implements IGameMode {
-	// TODO Create a parent class GameMode.
-	// TODO Add screen "Single Player"
-	// TODO Add animated background
-	// TODO Add screen "Game settings"
-	// TODO Add screen "Multiplayer Player"
-	// TODO Add screen "generation / load / delete the world."
-    //GUI
+public class StateMainMenu implements IGameState {
+
+    /* GUI */
     private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
 
-    /*SCREENS*/
+    /* SCREENS */
     private UIMainMenu _mainMenu;
 
     private Terasology _gameInstance = null;
@@ -60,6 +57,7 @@ public class ModeMainMenu implements IGameMode {
         _mainMenu = new UIMainMenu();
         _mainMenu.setVisible(true);
         _guiScreens.add(_mainMenu);
+
         Mouse.setGrabbed(false);
         Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
     }
@@ -70,6 +68,10 @@ public class ModeMainMenu implements IGameMode {
 
     public void deactivate() {
         stopBackgroundMusic();
+    }
+
+    public void dispose() {
+        // Nothing to do here.
     }
 
     private void playBackgroundMusic() {
@@ -85,19 +87,6 @@ public class ModeMainMenu implements IGameMode {
         updateUserInterface();
     }
 
-    /*
-    * In the future, to make in the parent class GameMode
-    */
-    private boolean screenHasFocus() {
-        for (UIDisplayElement screen : _guiScreens) {
-            if (screen.isVisible() && !screen.isOverlay()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
@@ -110,6 +99,7 @@ public class ModeMainMenu implements IGameMode {
             screen.render();
         }
     }
+
     private void updateUserInterface() {
         for (UIDisplayElement screen : _guiScreens) {
             screen.update();
@@ -129,7 +119,7 @@ public class ModeMainMenu implements IGameMode {
 
             if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                 if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                    _gameInstance.exit(false);
+                    _gameInstance.exit();
                     return;
                 }
                 // Pass input to focused GUI element
@@ -169,12 +159,13 @@ public class ModeMainMenu implements IGameMode {
         return result;
     }
 
-    /*
-    * This is a temporary cap. In the future, will be removed
-    */
-    public void updatePlayerInput() {
-        return;
+    private boolean screenHasFocus() {
+        for (UIDisplayElement screen : _guiScreens) {
+            if (screen.isVisible() && !screen.isOverlay()) {
+                return true;
+            }
+        }
+
+        return false;
     }
-
-
 }

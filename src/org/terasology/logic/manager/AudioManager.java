@@ -55,6 +55,7 @@ public class AudioManager {
         _audioFiles.put("PlaceBlock", loadSound("PlaceBlock"));
         _audioFiles.put("RemoveBlock", loadSound("RemoveBlock"));
         _audioFiles.put("Dig", loadSound("Dig"));
+        _audioFiles.put("Loot", loadSound("Loot"));
 
         _audioFiles.put("Click", loadSound("Click"));
 
