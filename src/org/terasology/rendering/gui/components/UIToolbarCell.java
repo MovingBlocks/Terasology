@@ -97,12 +97,16 @@ public class UIToolbarCell extends UIDisplayElement {
         Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         Item item = inventory.getItemAt(_id);
 
+        glEnable(GL11.GL_DEPTH_TEST);
+
         if (item != null) {
             glPushMatrix();
             glTranslatef(20f, 20f, 0f);
             Icon.get(item).render();
             glPopMatrix();
         }
+
+        glDisable(GL11.GL_DEPTH_TEST);
 
         _label.renderTransformed();
     }

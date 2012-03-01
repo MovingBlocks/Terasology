@@ -57,19 +57,19 @@ public class UIInventoryCell extends UIDisplayElement {
         _label.setVisible(true);
         _label.setPosition(new Vector2f(30f, 20f));
     }
-    
+
     private Vector2f findPosition() {
-    	int realId = _id - 9;
-    	Vector2f result = null;
-    	
-    	if (realId >= 0) {
-    		result = new Vector2f(16f + (getSize().x - 3f) * (realId % 9), 208f + ((getSize().y - 3f) * (realId / 9)));
-    	} else {
-    		realId = _id + 27;
-    		result = new Vector2f(16f + (getSize().x - 3f) * (realId % 9), 208f + 10f + ((getSize().y - 3f) * (realId / 9)));
-    	}
-    	
-    	return result;
+        int realId = _id - 9;
+        Vector2f result;
+
+        if (realId >= 0) {
+            result = new Vector2f(16f + (getSize().x - 3f) * (realId % 9), 208f + ((getSize().y - 3f) * (realId / 9)));
+        } else {
+            realId = _id + 27;
+            result = new Vector2f(16f + (getSize().x - 3f) * (realId % 9), 208f + 10f + ((getSize().y - 3f) * (realId / 9)));
+        }
+
+        return result;
     }
 
     @Override
@@ -115,9 +115,7 @@ public class UIInventoryCell extends UIDisplayElement {
             glPushMatrix();
             glTranslatef(20f, 20f, 0f);
             Icon.get(item).render();
-//            item.renderIcon();
             glPopMatrix();
-            glDisable(GL11.GL_CULL_FACE);
         }
 
         glDisable(GL11.GL_DEPTH_TEST);
