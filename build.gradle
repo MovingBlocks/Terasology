@@ -30,22 +30,7 @@ repositories {
 
 dependencies{
 	groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.2'
-//	NOTE: Using Maven repos for lwgl libs will cause opengl errors due to
-//	inclusion of native libs in fat jar.
-
-	compile files(
-		// MavenCentral
-		"libs/jinput.jar", "libs/jorbis-0.0.15.jar",
-		"libs/lwjgl.jar", "libs/lwjgl_util.jar", "libs/lzma.jar",
-		"libs/trove-3.0.0.jar", "libs/vecmath.jar",
-		
-		// http://slick.cokeandcode.com/mavenrepo/
-		"libs/slick.jar",
-		
-		// No known repository
-		"libs/jbullet.jar", "libs/jogg-0.0.7.jar"
-	)
-	
+	compile fileTree(dir: 'libs', include: '*.jar', exclude: 'mockito-all-1.9.0.jar')	
 	testCompile 'junit:junit:4.10'
 }
 
@@ -54,7 +39,6 @@ task copyResources(type:Copy) {
 	from('src') {
 		exclude '**/*.java'
 		exclude '**/*.groovy'
-		exclude 'META-INF'
 	}
 	into('out/classes/main')
 }
@@ -72,7 +56,6 @@ jar {
 }
 
 jar.doLast {
-	// see: http://bit.ly/xVtrKW
 	ant.signjar(jar: jar.archivePath, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
 }
 
