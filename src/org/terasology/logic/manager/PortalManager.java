@@ -68,11 +68,11 @@ public class PortalManager {
         // 12.5% chance something will spawn locally to the portal - will get fancier later
         boolean spawn = _random.randomBoolean() && _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
-            GelatinousCube s = new GelatinousCube(_parent);
-            s.setSpawningPoint(new Vector3d(p.getBlockLocation().x, p.getBlockLocation().y - 1, p.getBlockLocation().z));
-            s.respawn();
-            Terasology.getInstance().getLogger().log(Level.INFO, "Spawning local slime at " + s.getSpawningPoint());
-            _parent.getMobManager().addMob(s);
+            GelatinousCube cubey = new GelatinousCube(_parent);
+            cubey.setSpawningPoint(new Vector3d(p.getBlockLocation().x, p.getBlockLocation().y - 1, p.getBlockLocation().z));
+            cubey.respawn();
+            Terasology.getInstance().getLogger().log(Level.INFO, "Spawning local GelatinousCube at " + cubey.getSpawningPoint());
+            _parent.getMobManager().addMob(cubey);
         }
         return spawn;
     }
@@ -90,19 +90,17 @@ public class PortalManager {
         // 25% change something will spawn in the wild around the portal - will get fancier later
         boolean spawn = _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
-            GelatinousCube s = new GelatinousCube(_parent);
+            GelatinousCube cubey = new GelatinousCube(_parent);
 
             // Spawn some Gel. Cubes in the wilderness!
             Vector3d randomOffset = new Vector3d(_parent.getWorldProvider().getRandom().randomDouble(), 0, _parent.getWorldProvider().getRandom().randomDouble());
             randomOffset.scale(256);
 
-            s.setSpawningPoint(new Vector3d(p.getBlockLocation().x + randomOffset.x, p.getBlockLocation().y + 1, p.getBlockLocation().z + randomOffset.z));
-            s.respawn();
-
-            Terasology.getInstance().getLogger().log(Level.INFO, "Spawning wild slime at " + s.getSpawningPoint());
-            _parent.getMobManager().addMob(s);
+            cubey.setSpawningPoint(new Vector3d(p.getBlockLocation().x + randomOffset.x, p.getBlockLocation().y + 1, p.getBlockLocation().z + randomOffset.z));
+            cubey.respawn();
+            Terasology.getInstance().getLogger().log(Level.INFO, "Spawning wild GelatinousCube at " + cubey.getSpawningPoint());
+            _parent.getMobManager().addMob(cubey);
         }
-
         return spawn;
     }
 

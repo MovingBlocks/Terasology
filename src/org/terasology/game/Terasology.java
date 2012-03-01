@@ -320,6 +320,7 @@ public final class Terasology {
 
     public String getWorldSavePath(String worldTitle) {
         String path = String.format("SAVED_WORLDS/%s", worldTitle);
+        //TODO: Maybe use Helper.fixSavePath instead? Need to fix up save paths for manifest files etc sometime better anyway
         // Try to detect if we're getting a screwy save path (usually/always the case with an applet)
         File f = new File(path);
         //System.out.println("Suggested absolute save path is: " + f.getAbsolutePath());

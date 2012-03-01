@@ -71,21 +71,25 @@ public class Icon {
 	
 	private static void loadIcons() {
 		icons = new HashMap<Class, Icon>();
-		
+
+        //TODO: Hmm, does this mean we have hard coded our tool displays? Should try to move this to ToolManager in that case?
 		Icon axeIcon = new Icon();
 		Icon pickAxeIcon = new Icon();
 		Icon dynamiteIcon = new Icon();
 		Icon blueprintIcon = new Icon();
+        Icon debugIcon = new Icon();
 		
 		axeIcon.setAtlasPosition(1, 7);
 		pickAxeIcon.setAtlasPosition(1, 6);
 		dynamiteIcon.setAtlasPosition(5, 0);
-		blueprintIcon.setAtlasPosition(10, 3);		
+		blueprintIcon.setAtlasPosition(10, 3);
+        debugIcon.setAtlasPosition(10, 3);
 		
 		icons.put(ItemAxe.class, axeIcon);
 		icons.put(ItemPickAxe.class, pickAxeIcon);
 		icons.put(ItemDynamite.class, dynamiteIcon);
 		icons.put(ItemBlueprint.class, blueprintIcon);
+        icons.put(ItemDebug.class, debugIcon);
 	}
 	
 	/**

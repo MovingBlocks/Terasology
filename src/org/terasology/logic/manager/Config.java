@@ -15,15 +15,14 @@
  */
 package org.terasology.logic.manager;
 
-
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 
 import javax.vecmath.Vector2f;
 
-
 /**
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>, Kai Kratz <kaikratz@googlemail.com>
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>,
+ * @author Kai Kratz <kaikratz@googlemail.com>
  */
 public final class Config {
     private final static Config _instance = new Config();
