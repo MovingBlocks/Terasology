@@ -157,7 +157,7 @@ public interface IWorldProvider {
     /**
      * Returns the title of this world.
      *
-     * @return
+     * @return the title of this world
      */
     public String getTitle();
 
