@@ -56,6 +56,15 @@ Example console commands
 * "tera.initWorld();"                               Init. a new random world
 * "tera.getActiveWorldProvider().setTime(0.0);"     Set the world time
 
+Building and running source
+------------------------
+
+1.  Install Gradle from http://gradle.org/
+2.  To import into Eclipse: $ gradle eclipse
+3.  To import into IntelliJ: $ gradle idea
+4.  To run from the command line: $ gradle run
+5.  For more tasks: $ gradle tasks
+
 Credits
 =======
 
