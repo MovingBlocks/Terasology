@@ -115,7 +115,7 @@ class BlockManifestor {
         } else {
             // If we don't have a saved world we'll need to build a new ImageManifest from raw block textures
             String path = "images"
-            log.info "*** Going to scan for images from classpath: " + _resourceLoader.getPackagePath() + '/' + path
+            log.fine "*** Going to scan for images from classpath: " + _resourceLoader.getPackagePath() + '/' + path
             _images = _resourceLoader.getImages(path)
 
             //println "Loaded fresh images - here's some logging!"
@@ -156,7 +156,6 @@ class BlockManifestor {
 
         _bm.addAllBlocks(_blockIndex)
         _bm.addAllBlockGroups(_blockGroups);
-        org.terasology.model.blocks.management.BlockManifestor.log.info "_imageManifest file: " + _imageManifest.getAbsolutePath()
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
     }
 
@@ -454,6 +453,7 @@ class BlockManifestor {
             writer << '// Warning: Editing this file may do crazy things to your saved world!\r\n'
             manifest.writeTo(writer)
         }
+        log.info "The block index now looks like this: " + _blockIndex
     }
 
     /**
@@ -469,8 +469,8 @@ class BlockManifestor {
         _blockStringIndex = manifest.blockIndex
         _nextByte = manifest.nextByte
 
-        log.info "LOADED imageIndex: " + _imageIndex
-        log.info "LOADED blockIndex: " + _blockStringIndex
+        log.info "LOADED imageIndex from " + _imageManifest.getAbsolutePath() + " is: " + _imageIndex
+        log.info "LOADED blockIndex from " + _blockManifest.getAbsolutePath() + " is: " + _blockStringIndex
         log.info "LOADED nextByte: " + _nextByte
     }
 

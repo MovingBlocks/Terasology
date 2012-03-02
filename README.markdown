@@ -5,7 +5,7 @@ Terasology (previously titled Blockmania)
 
 Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by adopting the NPC-helper and caretaker feel from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
 
-Terasology is an open source project started by Benjamin "begla" Glatzel to research *procedural terrain generation* and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a *block-based voxel-like approach as seen in Minecraft*. After proving itself as a solid *tech demo* begla was joined at first by Anton "small-jeeper" Kireev and Rasmus "Cervator" Praestholm and a full-fledged game concept was born.
+Terasology is an open source project started by Benjamin "begla" Glatzel to research procedural terrain generation and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a block-based voxel-like approach as seen in Minecraft. After proving itself as a solid tech demo begla was joined at first by Anton "small-jeeper" Kireev and Rasmus "Cervator" Praestholm and a full-fledged game concept was born.
 
 The creators of Terasology are a diverse mix of software developers, game testers, graphic artists, and musicians. Get involved by checking out the [Forum](http://board.movingblocks.net/index.php), our blog [Moving Blocks!](http://blog.movingblocks.net), and our [Facebook Page](http://www.facebook.com/pages/Blockmania/248329655219905).
 
@@ -65,21 +65,29 @@ Building and running source
 4.  To run from the command line: $ gradle run
 5.  For more tasks: $ gradle tasks
 
+You may also need to tweak IDE settings further for your convenience. See [Dev Setup](http://wiki.movingblocks.net/bin/view/Main/DevSetup) in our wiki for more details.
+
 Credits
 =======
 
-Core Team
+This is an incomplete list and the team is constantly growing. See [Dev Team](http://wiki.movingblocks.net/bin/view/Main/DevTeam) in the wiki for the latest updates
+
+Contributors
 ---------
 
 * Benjamin "begla" Glatzel
 * Anton "small-jeeper" Kireev
 * Rasmus "Cervator" Praestholm
+* Immortius
+* Richard Apodaca (rapodaca)
+* Kai Kratz
+* t3hk0d3
 
 Soundtrack and Sound Effects
 ----------
 
 * Sunrise, Afternoon and Sunset composed by Karina Kireev.
-* Dimlight composed and produced by Exile.
+* Dimlight, Resurface and Other Side composed and produced by Exile.
 * Sound effects created by Exile.
 
 Additional Notes
