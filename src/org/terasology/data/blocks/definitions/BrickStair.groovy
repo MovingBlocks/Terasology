@@ -21,13 +21,11 @@ package org.terasology.data.blocks.definitions
  */
 block {
     version = 1
+    alignment = "HorizontalDirection"
     faces {
         all = "Brick"
     }
-    shape {
-        mode = "HorizontalRotation"
-        sides = "Stair"
-    }
+    shape = "Stair"
 
     hardness = 8
 

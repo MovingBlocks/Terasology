@@ -139,5 +139,16 @@ public class GroovyManager {
                 player.getInventory().addItem(new ItemBlock(group), quantity);
             }
         }
+
+        public void fullHealth() {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            player.heal(player.getMaxHealthPoints() - player.getHealthPoints());
+        }
+
+        public void teleport(double x, double y, double z) {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            player.setPosition(x, y, z);
+        }
+
     }
 }
