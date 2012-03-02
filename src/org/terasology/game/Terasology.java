@@ -148,7 +148,7 @@ public final class Terasology {
     }
 
     private void initOpenAL() {
-        AudioManager.getInstance();
+        AudioManager.getInstance().initialize();
     }
 
     private void initDisplay() {
@@ -271,6 +271,10 @@ public final class Terasology {
             state.processMouseInput();
             PerformanceMonitor.endActivity();
 
+            PerformanceMonitor.startActivity("Audio");
+            AudioManager.getInstance().update();
+            PerformanceMonitor.endActivity();
+
             PerformanceMonitor.rollCycle();
             PerformanceMonitor.startActivity("Other");
 
@@ -296,7 +300,7 @@ public final class Terasology {
     }
 
     private void destroy() {
-        AL.destroy();
+        AudioManager.getInstance().destroy();
         Mouse.destroy();
         Keyboard.destroy();
         Display.destroy();

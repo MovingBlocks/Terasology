@@ -61,7 +61,7 @@ public class UIButton extends UIDisplayContainer {
         if (intersects(mousePos)) {
 
             if (!_clickSoundPlayed) {
-                AudioManager.getInstance().getAudio("Click").playAsSoundEffect(1.0f, 0.1f, false);
+                AudioManager.play("Click", 1.0f);
                 _clickSoundPlayed = true;
             }
 

@@ -653,4 +653,9 @@ public class Player extends Character {
 
         return false;
     }
+
+    @Override
+    protected void playFootstep(Sound footStep) {
+        AudioManager.play(footStep, this, 0.6f, AudioManager.PRIORITY_HIGH);
+    }
 }

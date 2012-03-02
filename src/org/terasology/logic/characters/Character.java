@@ -16,7 +16,10 @@
  */
 package org.terasology.logic.characters;
 
+import org.terasology.logic.audio.Sound;
+import org.terasology.logic.audio.SoundPool;
 import org.terasology.logic.entities.MovableEntity;
+import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**

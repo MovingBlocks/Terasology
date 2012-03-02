@@ -18,7 +18,6 @@ package org.terasology.rendering.world;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.openal.SoundStore;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.entities.Entity;
@@ -176,8 +175,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.1, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.1f);
-                AudioManager.getInstance().getAudio("Sunrise").playAsMusic(1.0f, 1.0f, false);
+                AudioManager.playMusic("Sunrise");
             }
         });
 
@@ -185,8 +183,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.25, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.1f);
-                AudioManager.getInstance().getAudio("Afternoon").playAsMusic(1.0f, 1.0f, false);
+                AudioManager.playMusic("Afternoon");
             }
         });
 
@@ -194,8 +191,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.4, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.1f);
-                AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 1.0f, false);
+                AudioManager.playMusic("Sunset");
             }
         });
 
@@ -203,8 +199,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.1f);
-                AudioManager.getInstance().getAudio("Dimlight").playAsMusic(1.0f, 1.0f, false);
+                AudioManager.playMusic("Dimlight");
             }
         });
 
@@ -212,8 +207,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.1f);
-                AudioManager.getInstance().getAudio("Resurface").playAsMusic(1.0f, 1.0f, false);
+                AudioManager.playMusic("Resurface");
             }
         });
     }
