@@ -208,6 +208,15 @@ public final class WorldRenderer implements IGameObject {
             }
         });
 
+        // NIGHT
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.75, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.1f);
+                AudioManager.getInstance().getAudio("OtherSide").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
+
         // BEFORE SUNRISE
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
             @Override
