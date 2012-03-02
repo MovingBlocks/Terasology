@@ -118,7 +118,7 @@ public final class Terasology {
         else {
             addLibraryPath("natives/windows");
 
-            if (System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64"))
+            if (System.getProperty("os.arch").contains("64"))
                 System.loadLibrary("OpenAL64");
             else
                 System.loadLibrary("OpenAL32");
@@ -393,9 +393,9 @@ public final class Terasology {
     }
 
     public long getTimeInMs() {
-    	if (_timer == null) {
-    		initTimer();
-    	}
+        if (_timer == null) {
+            initTimer();
+        }
 
         return _timer.getTimeInMs();
     }
