@@ -6,6 +6,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -50,14 +51,14 @@ public class MeshRenderer {
             glTranslated(location.position.x - playerPosition.x, location.position.y - playerPosition.y, location.position.z - playerPosition.z);
             AxisAngle4f rot = new AxisAngle4f();
             rot.set(location.rotation);
-            glRotatef(rot.angle, rot.x, rot.y, rot.z);
+            glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
             glScalef(location.scale, location.scale, location.scale);
 
             ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");
 
             shader.enable();
             shader.setFloat4("colorOffset", meshComp.color.x, meshComp.color.y, meshComp.color.z, meshComp.color.w);
-            shader.setFloat("light", worldRenderer.getRenderingLightValueAt(location.position));
+            shader.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(location.position)));
 
             mesh.render();
 

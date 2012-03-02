@@ -66,6 +66,7 @@ public class PojoEventSystem implements EventSystem {
 
     public void send(EntityRef entity, Event event) {
         Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
+        if (handlers == null) return;
 
         Set<EventHandlerInfo> processedHandlers = Sets.newHashSet();
         

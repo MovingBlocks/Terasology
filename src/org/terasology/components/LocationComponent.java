@@ -7,6 +7,7 @@ import org.terasology.persistence.interfaces.StorageWriter;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 /**
  * Component represent the location and facing of an entity in the world
@@ -14,7 +15,7 @@ import javax.vecmath.Vector3d;
  */
 public class LocationComponent implements Component {
     // Standard position/rotation
-    public Vector3d position = new Vector3d();
+    public Vector3f position = new Vector3f();
     // TODO: Represent as Euler angles instead?
     public Quat4f rotation = new Quat4f();
     // TODO: Should this be here? Probably needs to be common as it affects several other components
@@ -31,7 +32,7 @@ public class LocationComponent implements Component {
     }
 
     public void retrieve(StorageReader reader) {
-        position = reader.read("position", Vector3d.class, position);
+        position = reader.read("position", Vector3f.class, position);
         rotation = reader.read("rotation", Quat4f.class, rotation);
         scale = reader.readFloat("scale", 1.0f);
         parent = reader.read("parent", EntityRef.class, parent);

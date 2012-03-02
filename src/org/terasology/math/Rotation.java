@@ -1,5 +1,6 @@
 package org.terasology.math;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.model.structures.AABB;
 
 import javax.vecmath.*;

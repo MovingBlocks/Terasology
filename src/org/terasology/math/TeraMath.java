@@ -24,6 +24,9 @@ import org.terasology.logic.world.Chunk;
  */
 public class TeraMath {
 
+    public static final float HALF_PI = (float)(0.5f * Math.PI);
+    public static final float RAD_TO_DEG = (float) (180.0f / Math.PI);
+    
     /**
      * Returns the absolute value.
      *
@@ -32,6 +35,16 @@ public class TeraMath {
      */
     public static int fastAbs(int i) {
         return (i >= 0) ? i : -i;
+    }
+
+    /**
+     * Returns the absolute value.
+     *
+     * @param d
+     * @return
+     */
+    public static float fastAbs(float d) {
+        return (d >= 0) ? d : -d;
     }
 
     /**

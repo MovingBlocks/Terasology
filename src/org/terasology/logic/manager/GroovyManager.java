@@ -21,8 +21,7 @@ import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
-import org.terasology.components.LocationComponent;
-import org.terasology.components.MeshComponent;
+import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
@@ -31,8 +30,10 @@ import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.inventory.Item;
 import org.terasology.model.inventory.ItemBlock;
+import org.terasology.model.structures.AABB;
 
 import javax.vecmath.Color4f;
+import javax.vecmath.Vector3d;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -156,12 +157,17 @@ public class GroovyManager {
 
         public void spawnTest() {
             Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            EntityRef entity = Terasology.getInstance().getGameMode().getEntityManager().create();
+            EntityRef entity = Terasology.getInstance().getCurrentGameState().getEntityManager().create();
             
             LocationComponent loc = entity.addComponent(new LocationComponent());
             loc.position.set(player.getPosition());
             MeshComponent mesh = entity.addComponent(new MeshComponent());
             mesh.color = new Color4f(1.0f,0.0f,0.0f,1.0f);
+            CharacterMovementComponent moveComp = entity.addComponent(new CharacterMovementComponent());
+            moveComp.faceMovementDirection = true;
+            entity.addComponent(new SimpleAIComponent());
+            AABBCollisionComponent comp = entity.addComponent(new AABBCollisionComponent());
+            comp.aabb = new AABB(new Vector3d(), new Vector3d(0.5,0.5,0.5));
         }
 
     }

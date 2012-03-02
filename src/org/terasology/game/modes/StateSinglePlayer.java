@@ -18,14 +18,14 @@ package org.terasology.game.modes;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
+import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.systems.MeshRenderer;
+import org.terasology.logic.systems.CharacterMovementSystem;
+import org.terasology.logic.systems.SimpleAISystem;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -60,6 +60,8 @@ public class StateSinglePlayer implements IGameState {
     private WorldRenderer _worldRenderer;
 
     private EntityManager _entityManager;
+    private CharacterMovementSystem _charMoveSys;
+    private SimpleAISystem _ranHopSys;
 
     /* VIEWING DISTANCE */
     private static final int[] VIEWING_DISTANCES = {
@@ -98,6 +100,13 @@ public class StateSinglePlayer implements IGameState {
         _guiScreens.add(_statusScreen);
 
         _entityManager = new PojoEntityManager();
+        _entityManager.setEventSystem(new PojoEventSystem(_entityManager));
+        _charMoveSys = new CharacterMovementSystem();
+        _charMoveSys.setEntityManager(_entityManager);
+        _ranHopSys = new SimpleAISystem();
+        _ranHopSys.setEntityManager(_entityManager);
+        _entityManager.getEventSystem().registerEventHandler(_ranHopSys);
+
 
     }
 
@@ -122,6 +131,10 @@ public class StateSinglePlayer implements IGameState {
     }
 
     public void update(double delta) {
+
+        _ranHopSys.update((float)delta);
+        _charMoveSys.update((float)delta);
+
         if (_worldRenderer != null && shouldUpdateWorld())
             _worldRenderer.update(delta);
 
@@ -169,7 +182,7 @@ public class StateSinglePlayer implements IGameState {
         Terasology.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        _activeWorldRenderer = new WorldRenderer(title, seed, _entityManager);
+        _worldRenderer = new WorldRenderer(title, seed, _entityManager);
         _worldRenderer.setPlayer(new Player(_worldRenderer));
 
         // Create the first Portal if it doesn't exist yet
@@ -177,6 +190,10 @@ public class StateSinglePlayer implements IGameState {
         _worldRenderer.setViewingDistance(VIEWING_DISTANCES[_activeViewingDistance]);
 
         simulateWorld(4000);
+
+        _charMoveSys.setWorldProvider(_worldRenderer.getWorldProvider());
+        _ranHopSys.setWorldRenderer(_worldRenderer);
+        _ranHopSys.setRandom(_worldRenderer.getWorldProvider().getRandom());
     }
 
     private boolean screenHasFocus() {

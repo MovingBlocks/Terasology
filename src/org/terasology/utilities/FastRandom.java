@@ -84,6 +84,10 @@ public class FastRandom {
     public double randomDouble() {
         return randomLong() / ((double) Long.MAX_VALUE - 1d);
     }
+    
+    public float randomFloat() {
+        return randomLong() / ((float) Long.MAX_VALUE - 1f);
+    }
 
     /**
      * Returns a random bool.
