@@ -187,7 +187,7 @@ public abstract class MovableEntity extends Entity {
             AABB entityAABB = getAABB();
 
             Block block = BlockManager.getInstance().getBlock(blockType1);
-            if (block.isPenetrable())
+            if (block == null || block.isPenetrable())
                 continue;
             for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
                 if (!entityAABB.overlaps(blockAABB))
