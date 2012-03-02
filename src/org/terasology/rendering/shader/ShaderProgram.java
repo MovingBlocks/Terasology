@@ -20,7 +20,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.Block;
@@ -47,11 +47,6 @@ public class ShaderProgram {
     private static String _includedFunctionsVertex = "", _includedFunctionsFragment = "";
 
     private IShaderParameters _parameters;
-
-    static {
-        _preProcessorPreamble += ((Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.animatedWaterAndGrass")) ? "#define ANIMATED_WATER_AND_GRASS \n" : "";
-        _preProcessorPreamble += "#define GAMMA " + SettingsManager.getInstance().getUserSetting("Game.Graphics.gamma").toString() + "\n";
-    }
 
     public ShaderProgram(String title) {
         this(title, null);
@@ -81,11 +76,31 @@ public class ShaderProgram {
         GL20.glValidateProgram(_shaderProgram);
     }
 
+    public void recompile() {
+        Terasology.getInstance().getLogger().log(Level.INFO, "Recompiling shader {0}.", new String[]{_title});
+
+        dispose();
+        compileShaderProgram();
+    }
+
+    public void dispose() {
+        Terasology.getInstance().getLogger().log(Level.INFO, "Disposing shader {0}.", new String[]{_title});
+
+        GL20.glDeleteShader(_shaderProgram);
+        _shaderProgram = 0;
+
+        GL20.glDeleteProgram(_fragmentProgram);
+        _fragmentProgram = 0;
+
+        GL20.glDeleteProgram(_vertexProgram);
+        _vertexProgram = 0;
+    }
+
     private void compileShader(int type) {
 
         int shaderId = GL20.glCreateShader(type);
 
-        String code = _preProcessorPreamble + "\n";
+        String code = getCustomPreprocessorPreamble() + "\n";
         if (type == GL20.GL_FRAGMENT_SHADER)
             code += _includedFunctionsFragment + "\n";
         else
@@ -126,7 +141,7 @@ public class ShaderProgram {
         } catch (Exception e) {
             Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to read shader.");
         }
-        
+
         return code;
     }
 
@@ -150,6 +165,13 @@ public class ShaderProgram {
         infoBuffer.get(infoBytes);
 
         Terasology.getInstance().getLogger().log(Level.INFO, "{0}", new String(infoBytes));
+    }
+
+    private String getCustomPreprocessorPreamble() {
+        return _preProcessorPreamble
+                + (Config.getInstance().isAnimatedWaterAndGrass() ? "#define ANIMATED_WATER_AND_GRASS \n" : "")
+                + (Config.getInstance().isFlickeringLight() ? "#define FLICKERING_LIGHT \n" : "")
+                + "#define GAMMA " + ((Double) Config.getInstance().getGamma()).toString() + "\n";
     }
 
     public void enable() {

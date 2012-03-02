@@ -79,7 +79,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _mainMenuButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
-                Terasology.getInstance().setGameMode(Terasology.GameMode.mainMenu);
+                Terasology.getInstance().setGameState(Terasology.GAME_STATE.MAIN_MENU);
             }
         });
 

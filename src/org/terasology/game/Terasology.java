@@ -20,12 +20,10 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GLContext;
-import org.lwjgl.opengl.PixelFormat;
-import org.terasology.game.modes.IGameMode;
-import org.terasology.game.modes.ModeMainMenu;
-import org.terasology.game.modes.ModePlayGame;
+import org.terasology.game.modes.IGameState;
+import org.terasology.game.modes.StateMainMenu;
+import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.IWorldProvider;
@@ -53,10 +51,11 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * The heart and soul of Terasology.
+ * <p/>
+ * TODO: Create a function returns the number of generated worlds
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Kireev   Anton   <adeon.k87@gmail.com>
- * @todo To create the function that will return the number of generated worlds
  */
 public final class Terasology {
     private static Terasology _instance = new Terasology();
@@ -67,15 +66,15 @@ public final class Terasology {
     private Timer _timer;
 
     /* GAME LOOP */
-    private boolean _runGame = true, _saveWorldOnExit = true;
-
+    private boolean _runGame = true;
 
     /* GAME MODES */
-    public enum GameMode {
-        undefined, mainMenu, runGame
+    public enum GAME_STATE {
+        UNDEFINED, MAIN_MENU, SINGLE_PLAYER
     }
-    static GameMode _state = GameMode.mainMenu;
-    private static Map<GameMode, IGameMode> _gameModes = Collections.synchronizedMap(new EnumMap<GameMode, IGameMode>(GameMode.class));
+
+    static GAME_STATE _state = GAME_STATE.MAIN_MENU;
+    private static Map<GAME_STATE, IGameState> _gameStates = Collections.synchronizedMap(new EnumMap<GAME_STATE, IGameState>(GAME_STATE.class));
 
     public static Terasology getInstance() {
         return _instance;
@@ -84,9 +83,11 @@ public final class Terasology {
     private Terasology() {
     }
 
-    public void init(){
+    public void init() {
         _logger.log(Level.INFO, "Initializing Terasology...");
+
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+
         initLogger();
         initNativeLibs();
         initOpenAL();
@@ -94,7 +95,19 @@ public final class Terasology {
         initOpenGL();
         initControls();
         initManagers();
-        initTimer(); //dependant on lwjgl
+        initTimer(); // Dependant on LWJGL
+    }
+
+    private void initLogger() {
+        File dirPath = new File("logs");
+
+        if (!dirPath.exists()) {
+            if (!dirPath.mkdirs()) {
+                return;
+            }
+        }
+
+        addLogFileHandler("logs/Terasology.log", Level.INFO);
     }
 
     private void initNativeLibs() {
@@ -112,7 +125,7 @@ public final class Terasology {
         }
     }
 
-    private void addLibraryPath(String s){
+    private void addLibraryPath(String s) {
         try {
             final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
             usrPathsField.setAccessible(true);
@@ -128,10 +141,9 @@ public final class Terasology {
             final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
             newPaths[newPaths.length - 1] = s;
             usrPathsField.set(null, newPaths);
-        } catch(Exception e){
+        } catch (Exception e) {
             _logger.log(Level.SEVERE, "Couldn't link static libraries. " + e.toString(), e);
-            //brutal...
-            System.exit(1);
+            exit();
         }
     }
 
@@ -141,29 +153,29 @@ public final class Terasology {
 
     private void initDisplay() {
         try {
-            if ((Boolean) SettingsManager.getInstance().getUserSetting("Game.Graphics.fullscreen")) {
+            if (Config.getInstance().isFullscreen()) {
                 Display.setDisplayMode(Display.getDesktopDisplayMode());
                 Display.setFullscreen(true);
             } else {
-                Display.setDisplayMode((DisplayMode) SettingsManager.getInstance().getUserSetting("Game.Graphics.displayMode"));
+                Display.setDisplayMode(Config.getInstance().getDisplayMode());
                 Display.setResizable(true);
             }
 
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
-            Display.create((PixelFormat) SettingsManager.getInstance().getUserSetting("Game.Graphics.pixelFormat"));
-        } catch (LWJGLException e){
+            Display.create(Config.getInstance().getPixelFormat());
+        } catch (LWJGLException e) {
             _logger.log(Level.SEVERE, "Can not initialize graphics device.", e);
-            System.exit(1);
+            exit();
         }
     }
 
     private void initOpenGL() {
         checkOpenGL();
         resizeViewport();
-        resetOpenGLParameters();
+        initOpenGLParams();
     }
 
-    private void checkOpenGL(){
+    private void checkOpenGL() {
         boolean canRunGame = GLContext.getCapabilities().OpenGL20
                 & GLContext.getCapabilities().OpenGL11
                 & GLContext.getCapabilities().OpenGL12
@@ -172,7 +184,7 @@ public final class Terasology {
 
         if (!canRunGame) {
             _logger.log(Level.SEVERE, "Your GPU driver is not supporting the mandatory versions of OpenGL. Considered updating your GPU drivers?");
-            System.exit(1);
+            exit();
         }
 
     }
@@ -181,7 +193,7 @@ public final class Terasology {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
-    public void resetOpenGLParameters() {
+    public void initOpenGLParams() {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
@@ -195,7 +207,7 @@ public final class Terasology {
             Mouse.setGrabbed(true);
         } catch (LWJGLException e) {
             _logger.log(Level.SEVERE, "Could not initialize controls.", e);
-            System.exit(1);
+            exit();
         }
     }
 
@@ -211,12 +223,13 @@ public final class Terasology {
         _timer = new Timer();
     }
 
-    public void run(){
+    public void run() {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        IGameMode mode = null;
+        IGameState state = null;
         while (_runGame && !Display.isCloseRequested()) {
             _timer.tick();
+
             // Only process rendering and updating once a second
             if (!Display.isActive()) {
                 try {
@@ -229,33 +242,33 @@ public final class Terasology {
                 PerformanceMonitor.endActivity();
             }
 
-            IGameMode prevMode = mode;
-            mode = getGameMode();
+            IGameState prevState = state;
+            state = getCurrentGameState();
 
-            if (mode == null) {
-                _runGame = false;
+            if (state == null) {
+                exit();
                 break;
             }
 
-            if (mode != prevMode) {
-                if (prevMode != null)
-                    prevMode.deactivate();
-                mode.activate();
+            if (state != prevState) {
+                if (prevState != null)
+                    prevState.deactivate();
+                state.activate();
             }
 
             PerformanceMonitor.startActivity("Main Update");
-            mode.update();
+            state.update(_timer.getDelta());
             PerformanceMonitor.endActivity();
+
             PerformanceMonitor.startActivity("Render");
-            mode.render();
+            state.render();
             Display.update();
             Display.sync(60);
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Input");
-            mode.processKeyboardInput();
-            mode.processMouseInput();
-            mode.updatePlayerInput();
+            state.processKeyboardInput();
+            state.processMouseInput();
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Audio");
@@ -264,26 +277,17 @@ public final class Terasology {
 
             PerformanceMonitor.rollCycle();
             PerformanceMonitor.startActivity("Other");
-            mode.updateTimeAccumulator(_timer.getDelta());
 
             if (Display.wasResized())
                 resizeViewport();
         }
     }
 
-    public void shutdown(){
+    public void shutdown() {
         _logger.log(Level.INFO, "Shutting down Terasology...");
-        saveWorld();
+        getCurrentGameState().dispose();
         terminateThreads();
         destroy();
-    }
-
-    private void saveWorld() {
-        //UGLY! why does dispose save the world...
-        if (_saveWorldOnExit) {
-            if (getActiveWorldRenderer() != null)
-                getGameMode().getActiveWorldRenderer().dispose();
-        }
     }
 
     private void terminateThreads() {
@@ -302,53 +306,9 @@ public final class Terasology {
         Display.destroy();
     }
 
-    public IGameMode getGameMode() {
-        IGameMode mode = _gameModes.get(_state);
-
-        if (mode != null) {
-            return mode;
-        }
-
-        switch (_state) {
-            case runGame:
-                mode = new ModePlayGame();
-                break;
-
-            case mainMenu:
-                mode = new ModeMainMenu();
-                break;
-
-            case undefined:
-                getLogger().log(Level.SEVERE, "Undefined game state - unable to run");
-                return null;
-        }
-
-        _gameModes.put(_state, mode);
-
-        mode.init();
-
-        return mode;
-    }
-
-    public void setGameMode(GameMode state) {
-        _state = state;
-    }
-
-    public void render() {
-        getGameMode().render();
-    }
-
-    public void update() {
-        getGameMode().update();
-    }
-
-    public void exit(boolean saveWorld) {
-        _saveWorldOnExit = saveWorld;
-        _runGame = false;
-    }
 
     public void exit() {
-        exit(true);
+        _runGame = false;
     }
 
     public void addLogFileHandler(String s, Level logLevel) {
@@ -362,20 +322,9 @@ public final class Terasology {
         }
     }
 
-    private void initLogger() {
-        File dirPath = new File("logs");
-
-        if (!dirPath.exists()) {
-            if (!dirPath.mkdirs()) {
-                return;
-            }
-        }
-
-        addLogFileHandler("logs/Terasology.log", Level.INFO);
-    }
-
     public String getWorldSavePath(String worldTitle) {
         String path = String.format("SAVED_WORLDS/%s", worldTitle);
+        //TODO: Maybe use Helper.fixSavePath instead? Need to fix up save paths for manifest files etc sometime better anyway
         // Try to detect if we're getting a screwy save path (usually/always the case with an applet)
         File f = new File(path);
         //System.out.println("Suggested absolute save path is: " + f.getAbsolutePath());
@@ -387,6 +336,41 @@ public final class Terasology {
         return path;
     }
 
+    public IGameState getGameState(GAME_STATE s) {
+        IGameState state = _gameStates.get(s);
+
+        if (state != null) {
+            return state;
+        }
+
+        switch (s) {
+            case SINGLE_PLAYER:
+                state = new StateSinglePlayer();
+                break;
+
+            case MAIN_MENU:
+                state = new StateMainMenu();
+                break;
+
+            case UNDEFINED:
+                getLogger().log(Level.SEVERE, "Undefined game state. Can not run!");
+                return null;
+        }
+
+        state.init();
+
+        _gameStates.put(_state, state);
+        return state;
+    }
+
+    public IGameState getCurrentGameState() {
+        return getGameState(_state);
+    }
+
+    public void setGameState(GAME_STATE state) {
+        _state = state;
+    }
+
     public Logger getLogger() {
         return _logger;
     }
@@ -396,7 +380,8 @@ public final class Terasology {
     }
 
     public WorldRenderer getActiveWorldRenderer() {
-        return getGameMode().getActiveWorldRenderer();
+        StateSinglePlayer singlePlayer = (StateSinglePlayer) getGameState(GAME_STATE.SINGLE_PLAYER);
+        return singlePlayer.getWorldRenderer();
     }
 
     public IWorldProvider getActiveWorldProvider() {
@@ -412,6 +397,9 @@ public final class Terasology {
     }
 
     public long getTimeInMs() {
+    	if (_timer == null) {
+    		initTimer();
+    	}
 
         return _timer.getTimeInMs();
     }

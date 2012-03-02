@@ -29,15 +29,11 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public abstract class Character extends MovableEntity {
 
-    private int _maxHealthPoints = 255;
-    private int _healthPoints = 255;
+    private short _maxHealthPoints = 255;
+    private short _healthPoints = 255;
 
-    public Character(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity) {
-        super(parent, walkingSpeed, runningFactor, jumpIntensity, false);
-    }
-
-    public Character(WorldRenderer parent, double walkingSpeed, double runningFactor, double jumpIntensity, boolean loadAudio) {
-        super(parent, walkingSpeed, runningFactor, jumpIntensity, loadAudio);
+    public Character(WorldRenderer parent) {
+        super(parent);
     }
 
     /**
@@ -86,7 +82,7 @@ public abstract class Character extends MovableEntity {
      *
      * @param healthPoints The maximum health points
      */
-    public void setMaxHealthPoints(int healthPoints) {
+    public void setMaxHealthPoints(short healthPoints) {
         _maxHealthPoints = healthPoints;
     }
 
@@ -121,8 +117,8 @@ public abstract class Character extends MovableEntity {
     @Override
     protected void handleVerticalCollision() {
         // Damage by falling
-        if (_gravity < -0.3)
-            damage((int) (((Math.abs(_gravity) - 0.3) / 0.3) * getMaxHealthPoints()));
+        if (_earthVelocity < MAX_ACC * 0.25)
+            damage((int) (((Math.abs(_earthVelocity) - MAX_ACC * 0.25) / (MAX_ACC * 0.5)) * getMaxHealthPoints()));
     }
 
     @Override

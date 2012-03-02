@@ -138,11 +138,12 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
 
     /**
      * Calculates the total distance in axis-aligned steps between this and
-     * other vector (manhattan distance). This is the distance that is travelled
+     * other vector (manhattan distance). This is the distance that is traveled
      * if movement is restricted to adjacent vectors.
      *
-     * @param other
-     * @return
+     * @param other the other vector to test
+     * @return the total distance in axis-aligned steps between this and
+     * other vector (manhattan distance)
      */
     public int gridDistance(Vector3i other) {
         return Math.abs(other.x - x) + Math.abs(other.y - y) + Math.abs(other.z - z);
@@ -152,7 +153,8 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
      * Calculates the total magnitude of the vector as a sum of its axis aligned
      * dimensions (manhattan distance)
      *
-     * @return
+     * @return the total magnitude of the vector as a sum of its axis aligned
+     * dimensions (manhattan distance)
      */
     public int gridMagnitude() {
         return Math.abs(x) + Math.abs(y) + Math.abs(z);
@@ -211,7 +213,6 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
      * vector is returned.
      *
      * @param scalar the value to multiply this vector by.
-     * @return the new vector.
      */
     public void mult(int scalar) {
         x *= scalar;

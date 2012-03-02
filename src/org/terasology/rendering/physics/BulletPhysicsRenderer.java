@@ -31,6 +31,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
+import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -253,8 +254,6 @@ public class BulletPhysicsRenderer implements IGameObject {
     public void render() {
         Player player = _parent.getPlayer();
 
-        _discreteDynamicsWorld.stepSimulation(1.0f / 60f, 7);
-
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
         float[] mFloat = new float[16];
 
@@ -292,7 +291,9 @@ public class BulletPhysicsRenderer implements IGameObject {
         GL11.glPopMatrix();
     }
 
-    public void update() {
+    public void update(double delta) {
+        _discreteDynamicsWorld.stepSimulation((float) (delta / 1000.0), 7);
+
         updateChunks();
         removeTemporaryBlocks();
         checkForLootedBlocks();
@@ -311,8 +312,8 @@ public class BulletPhysicsRenderer implements IGameObject {
             }
 
             // Block was marked as being picked
-            if (b._picked) {
-                // Animate the movement into the direction of the player
+            if (b._picked && b.distanceToPlayer() < 32.0f) {
+                // Animate the movement in direction of the player
                 if (b.distanceToPlayer() > 1.0) {
                     Transform t = new Transform();
                     b.getMotionState().getWorldTransform(t);
@@ -331,6 +332,7 @@ public class BulletPhysicsRenderer implements IGameObject {
                     // Block was looted (and reached the player)
                     Block block = BlockManager.getInstance().getBlock(b.getType());
                     player.getInventory().addItem(new ItemBlock(block.getBlockGroup()), 1);
+                    AudioManager.getInstance().playVaryingSound("Loot", 1.0f, 0.1f);
 
                     _lootableBlocks.remove(i);
                     _discreteDynamicsWorld.removeRigidBody(b);

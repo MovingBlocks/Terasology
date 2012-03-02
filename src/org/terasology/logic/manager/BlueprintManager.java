@@ -15,10 +15,11 @@
  */
 package org.terasology.logic.manager;
 
+import org.terasology.model.structures.BlockPosition;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.blueprints.Blueprint;
-import org.terasology.model.structures.BlockPosition;
+import org.terasology.model.blueprints.SimpleBlueprint;
 
 import java.util.Collection;
 
@@ -26,6 +27,7 @@ import java.util.Collection;
  * Provides the functionality to generate blueprints from a list of block positions.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class BlueprintManager {
 
@@ -47,7 +49,8 @@ public class BlueprintManager {
      * @return The final blueprint
      */
     public Blueprint generateBlueprint(IWorldProvider provider, Collection<BlockPosition> blockPositions) {
-        Blueprint result = new Blueprint();
+        // TODO: This probably should be a factory method in Blueprint instead? Needs work, anyway,
+        Blueprint bp = new SimpleBlueprint();
 
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
 
@@ -65,11 +68,10 @@ public class BlueprintManager {
         for (BlockPosition pos : blockPositions) {
             BlockPosition newPos = new BlockPosition(pos.x - minX, pos.y - minY, pos.z - minZ);
 
-            result.getBlockPositions().add(newPos);
-            result.getBlockTypes().put(newPos, BlockManager.getInstance().getBlock(provider.getBlock(pos.x, pos.y, pos.z)));
+            bp.addBlock(newPos, BlockManager.getInstance().getBlock(provider.getBlock(pos.x, pos.y, pos.z)));
         }
 
-        return result;
+        return bp;
     }
 
 }
