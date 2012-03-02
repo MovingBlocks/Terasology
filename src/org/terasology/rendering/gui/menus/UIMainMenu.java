@@ -59,7 +59,7 @@ public class UIMainMenu extends UIDisplayRenderer {
         _configButton.setVisible(true);
 
         _startButton = new UIButton(new Vector2f(256f, 32f));
-        _startButton.getLabel().setText("Play Terasology");
+        _startButton.getLabel().setText("Play!");
         _startButton.setVisible(true);
 
         _overlay = new UIImageOverlay("menuBackground");
