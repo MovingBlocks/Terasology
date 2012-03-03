@@ -18,7 +18,6 @@ package org.terasology.game;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
 import org.terasology.game.modes.IGameState;
@@ -237,9 +236,9 @@ public final class Terasology {
                 } catch (InterruptedException e) {
                     getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
                 }
-                PerformanceMonitor.startActivity("Process Display");
+
                 Display.processMessages();
-                PerformanceMonitor.endActivity();
+                continue;
             }
 
             IGameState prevState = state;
