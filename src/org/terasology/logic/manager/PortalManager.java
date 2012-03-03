@@ -62,7 +62,7 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnLocal(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 32)
+        /*if (_parent.getMobManager().getActiveMobAmount() > 32)
             return false;
 
         // 12.5% chance something will spawn locally to the portal - will get fancier later
@@ -74,7 +74,8 @@ public class PortalManager {
             Terasology.getInstance().getLogger().log(Level.INFO, "Spawning local GelatinousCube at " + cubey.getSpawningPoint());
             _parent.getMobManager().addMob(cubey);
         }
-        return spawn;
+        return spawn;*/
+        return false;
     }
 
     /**
@@ -84,7 +85,7 @@ public class PortalManager {
      * @return boolean indicating if something spawned
      */
     private boolean spawnWild(Portal p) {
-        if (_parent.getMobManager().getActiveMobAmount() > 32)
+        /*if (_parent.getMobManager().getActiveMobAmount() > 32)
             return false;
 
         // 25% change something will spawn in the wild around the portal - will get fancier later
@@ -101,7 +102,8 @@ public class PortalManager {
             Terasology.getInstance().getLogger().log(Level.INFO, "Spawning wild GelatinousCube at " + cubey.getSpawningPoint());
             _parent.getMobManager().addMob(cubey);
         }
-        return spawn;
+        return spawn; */
+        return false;
     }
 
     /**

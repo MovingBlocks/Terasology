@@ -25,6 +25,7 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.systems.CharacterMovementSystem;
+import org.terasology.logic.systems.CharacterSoundSystem;
 import org.terasology.logic.systems.SimpleAISystem;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -62,6 +63,7 @@ public class StateSinglePlayer implements IGameState {
     private EntityManager _entityManager;
     private CharacterMovementSystem _charMoveSys;
     private SimpleAISystem _ranHopSys;
+    private CharacterSoundSystem _charSoundSys;
 
     /* GAME LOOP */
     private boolean _pauseGame = false;
@@ -96,6 +98,8 @@ public class StateSinglePlayer implements IGameState {
         _ranHopSys = new SimpleAISystem();
         _ranHopSys.setEntityManager(_entityManager);
         _entityManager.getEventSystem().registerEventHandler(_ranHopSys);
+        _charSoundSys = new CharacterSoundSystem();
+        _entityManager.getEventSystem().registerEventHandler(_charSoundSys);
 
 
     }
@@ -183,6 +187,7 @@ public class StateSinglePlayer implements IGameState {
         _charMoveSys.setWorldProvider(_worldRenderer.getWorldProvider());
         _ranHopSys.setWorldRenderer(_worldRenderer);
         _ranHopSys.setRandom(_worldRenderer.getWorldProvider().getRandom());
+        _charSoundSys.setRandom(_worldRenderer.getWorldProvider().getRandom());
     }
 
     private boolean screenHasFocus() {

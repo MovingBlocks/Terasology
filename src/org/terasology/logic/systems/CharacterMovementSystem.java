@@ -6,6 +6,7 @@ import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.events.FootstepEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.TeraMath;
@@ -89,8 +90,11 @@ public class CharacterMovementSystem {
         Vector3f worldPos = LocationHelper.localToWorldPos(location);
         Vector3f oldPos = new Vector3f(worldPos);
         worldPos.y += movementComp.velocity.y * delta;
+        
+        Vector3f extents = new Vector3f(collision.extents);
+        extents.scale(LocationHelper.totalScale(location));
 
-        if (verticalHitTest(worldPos, oldPos, collision)) {
+        if (verticalHitTest(worldPos, oldPos, extents)) {
             movementComp.velocity.y = 0;
 
             // Jumping is only possible, if the entity is standing on ground
@@ -127,11 +131,21 @@ public class CharacterMovementSystem {
          * Check for horizontal collisions __after__ checking for vertical
          * collisions.
          */
-        if (horizontalHitTest(worldPos, oldPos, collision)) {
-            entityManager.getEventSystem().send(entity, new HorizontalCollisionEvent());
+        if (horizontalHitTest(worldPos, oldPos, extents)) {
+            entity.send(new HorizontalCollisionEvent());
         }
         movementComp.velocity.x = (worldPos.x - oldPos.x) / delta;
         movementComp.velocity.z = (worldPos.z - oldPos.z) / delta;
+
+        Vector3f dist = new Vector3f(worldPos.x - oldPos.x, 0, worldPos.z - oldPos.z);
+
+        if (movementComp.isGrounded) {
+            movementComp.footstepDelta += dist.length();
+            if (movementComp.footstepDelta > movementComp.distanceBetweenFootsteps) {
+                movementComp.footstepDelta -= movementComp.distanceBetweenFootsteps;
+                entity.send(new FootstepEvent());
+            }
+        }
         location.position.set(LocationHelper.worldToLocalPos(location, worldPos));
 
         if (movementComp.faceMovementDirection) {
@@ -148,7 +162,7 @@ public class CharacterMovementSystem {
      * @param origin The origin position of the entity
      * @return True if a vertical collision was detected
      */
-    private boolean verticalHitTest(Vector3f position, Vector3f origin, AABBCollisionComponent collision) {
+    private boolean verticalHitTest(Vector3f position, Vector3f origin, Vector3f extents) {
         List<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
         boolean moved = false;
@@ -157,7 +171,7 @@ public class CharacterMovementSystem {
             BlockPosition p = blockPositions.get(i);
 
             byte blockType1 = worldProvider.getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
-            AABB entityAABB = calcAABB(position, collision.aabb);
+            AABB entityAABB = calcAABB(position, extents);
 
             Block block = BlockManager.getInstance().getBlock(blockType1);
             if (block == null || block.isPenetrable())
@@ -183,7 +197,7 @@ public class CharacterMovementSystem {
         return moved;
     }
 
-    private boolean horizontalHitTest(Vector3f position, Vector3f origin, AABBCollisionComponent collision) {
+    private boolean horizontalHitTest(Vector3f position, Vector3f origin, Vector3f extents) {
         boolean result = false;
         List<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
 
@@ -195,7 +209,7 @@ public class CharacterMovementSystem {
 
             if (!block.isPenetrable()) {
                 for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
-                    if (calcAABB(position, collision.aabb).overlaps(blockAABB)) {
+                    if (calcAABB(position, extents).overlaps(blockAABB)) {
                         result = true;
                         Vector3d direction = new Vector3d(position.x, 0f, position.z);
                         direction.x -= origin.x;
@@ -203,9 +217,9 @@ public class CharacterMovementSystem {
 
                         // Calculate the point of intersection on the block's AABB
                         Vector3d blockPoi = blockAABB.closestPointOnAABBToPoint(new Vector3d(origin));
-                        Vector3d entityPoi = calcAABB(origin, collision.aabb).closestPointOnAABBToPoint(blockPoi);
+                        Vector3d entityPoi = calcAABB(origin, extents).closestPointOnAABBToPoint(blockPoi);
 
-                        Vector3d planeNormal = blockAABB.getFirstHitPlane(direction, new Vector3d(origin), collision.aabb.getDimensions(), true, false, true);
+                        Vector3d planeNormal = blockAABB.getFirstHitPlane(direction, new Vector3d(origin), new Vector3d(extents), true, false, true);
 
                         // Find a vector parallel to the surface normal
                         Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
@@ -230,14 +244,10 @@ public class CharacterMovementSystem {
 
         return result;
     }
-    
-    private AABB calcAABB(Vector3f position, AABB baseAABB) 
+
+    private AABB calcAABB(Vector3f position, Vector3f extents)
     {
-        Vector3d newPos = new Vector3d(position);
-        newPos.x += (float)baseAABB.getPosition().x;
-        newPos.y += (float)baseAABB.getPosition().y;
-        newPos.z += (float)baseAABB.getPosition().z;
-        return new AABB(newPos, baseAABB.getDimensions());
+        return new AABB(new Vector3d(position), new Vector3d(extents));
     }
 
     private List<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {

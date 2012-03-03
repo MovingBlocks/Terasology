@@ -22,6 +22,7 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.terasology.components.*;
+import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
@@ -34,6 +35,7 @@ import org.terasology.model.structures.AABB;
 
 import javax.vecmath.Color4f;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -157,17 +159,10 @@ public class GroovyManager {
 
         public void spawnTest() {
             Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            EntityRef entity = Terasology.getInstance().getCurrentGameState().getEntityManager().create();
-            
-            LocationComponent loc = entity.addComponent(new LocationComponent());
-            loc.position.set(player.getPosition());
-            MeshComponent mesh = entity.addComponent(new MeshComponent());
-            mesh.color = new Color4f(1.0f,0.0f,0.0f,1.0f);
-            CharacterMovementComponent moveComp = entity.addComponent(new CharacterMovementComponent());
-            moveComp.faceMovementDirection = true;
-            entity.addComponent(new SimpleAIComponent());
-            AABBCollisionComponent comp = entity.addComponent(new AABBCollisionComponent());
-            comp.aabb = new AABB(new Vector3d(), new Vector3d(0.5,0.5,0.5));
+            GelatinousCubeFactory factory = new GelatinousCubeFactory();
+            factory.setEntityManager(Terasology.getInstance().getCurrentGameState().getEntityManager());
+            factory.setRandom(Terasology.getInstance().getActiveWorldRenderer().getWorldProvider().getRandom());
+            factory.generateGelatinousCube(new Vector3f((float)player.getPosition().x, (float)player.getPosition().y, (float)player.getPosition().z));
         }
 
     }

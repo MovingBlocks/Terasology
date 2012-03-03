@@ -31,6 +31,9 @@ public class CharacterMovementComponent implements Component {
     // Should have a length between 0 and 1
     public Vector3f drive = new Vector3f();
     public boolean faceMovementDirection = false;
+
+    public float distanceBetweenFootsteps = 1f;
+    public float footstepDelta = 0.0f;
     
 
     public void store(StorageWriter writer) {

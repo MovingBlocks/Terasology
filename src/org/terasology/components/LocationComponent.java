@@ -17,7 +17,7 @@ public class LocationComponent implements Component {
     // Standard position/rotation
     public Vector3f position = new Vector3f();
     // TODO: Represent as Euler angles instead?
-    public Quat4f rotation = new Quat4f();
+    public Quat4f rotation = new Quat4f(0,0,0,1);
     // TODO: Should this be here? Probably needs to be common as it affects several other components
     public float scale = 1.0f;
 
