@@ -65,7 +65,7 @@ public class UIInput extends UIDisplayContainer {
     if (intersects(mousePos)) {
 
         if (!_clickSoundPlayed) {
-            AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(1.0f, 0.5f, false);
+            AudioManager.play("PlaceBlock");
             _clickSoundPlayed = true;
         }
 

@@ -108,7 +108,7 @@ public class DefaultBlockTool extends SimpleTool {
 
             placeBlock(blockPos, block.getId(), true);
 
-            AudioManager.getInstance().playVaryingSound("PlaceBlock", 0.6f, 0.5f);
+            AudioManager.play("PlaceBlock", 0.5f);
 
             return true;
         }
@@ -169,7 +169,7 @@ public class DefaultBlockTool extends SimpleTool {
 
                     worldRenderer.getBlockParticleEmitter().setOrigin(blockPos.toVector3d());
                     worldRenderer.getBlockParticleEmitter().emitParticles(256, currentBlockType);
-                    AudioManager.getInstance().playVaryingSound("RemoveBlock", 0.6f, 0.5f);
+                    AudioManager.play("RemoveBlock", 0.6f);
 
                     /* PHYSICS */
                     Vector3d pos = blockPos.toVector3d();
@@ -181,7 +181,7 @@ public class DefaultBlockTool extends SimpleTool {
             }
 
             // Play digging sound if the block was not removed
-            AudioManager.getInstance().playVaryingSound("Dig", 0.6f, 0.5f);
+            AudioManager.play("Dig", 1.0f);
             // ... and spread sparkles!
             worldRenderer.getBlockParticleEmitter().setOrigin(blockPos.toVector3d());
             worldRenderer.getBlockParticleEmitter().emitParticles(64, currentBlockType);

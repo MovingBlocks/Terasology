@@ -159,8 +159,7 @@ public class StateMainMenu implements IGameState {
     }
 
     private void playBackgroundMusic() {
-        SoundStore.get().setMusicVolume(0.1f);
-        AudioManager.getInstance().getAudio("Resurface").playAsMusic(1.0f, 1.0f, true);
+        AudioManager.playMusic("Resurface");
     }
 
     private void stopBackgroundMusic() {
