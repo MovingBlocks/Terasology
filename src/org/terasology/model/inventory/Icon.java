@@ -90,6 +90,7 @@ public class Icon {
 		icons.put(ItemDynamite.class, dynamiteIcon);
 		icons.put(ItemBlueprint.class, blueprintIcon);
         icons.put(ItemDebug.class, debugIcon);
+        icons.put(ItemRailgun.class, dynamiteIcon);
 	}
 	
 	/**
