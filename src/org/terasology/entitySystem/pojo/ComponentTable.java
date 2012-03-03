@@ -49,6 +49,13 @@ class ComponentTable {
         }
     }
     
+    public int getComponentCount(Class<? extends Component> componentClass) {
+        TLongObjectMap<Component> map = store.get(componentClass);
+        if (map == null)
+            return 0;
+        return map.size();
+    }
+    
     public Iterable<Component> iterateComponents(long entityId) {
         List<Component> components = Lists.newArrayList();
         for (TLongObjectMap<Component> componentMap : store.values()) {

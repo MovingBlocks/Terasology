@@ -77,7 +77,6 @@ public final class WorldRenderer implements IGameObject {
 
     /* CORE GAME OBJECTS */
     private final PortalManager _portalManager;
-    private final MobManager _mobManager;
     private final MeshRenderer _entityRendererSystem;;
 
     /* PARTICLE EMITTERS */
@@ -120,8 +119,7 @@ public final class WorldRenderer implements IGameObject {
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager();
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
-        _portalManager = new PortalManager(this);
-        _mobManager = new MobManager(this);
+        _portalManager = new PortalManager(manager);
         _blockGrid = new BlockGrid();
         _bulletRenderer = new BulletPhysicsRenderer(this);
         _entityRendererSystem = new MeshRenderer(manager);
@@ -276,7 +274,6 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.endActivity();
 
         _renderQueueTransparent.add(_bulletRenderer);
-        _renderQueueTransparent.add(_mobManager);
         _renderQueueTransparent.add(_blockParticleEmitter);
         _renderQueueTransparent.add(_blockGrid);
     }
@@ -432,10 +429,6 @@ public final class WorldRenderer implements IGameObject {
         _player.update(delta);
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Mob Manager");
-        _mobManager.update(delta);
-        PerformanceMonitor.endActivity();
-
         // Update the particle emitters
         PerformanceMonitor.startActivity("Block Particle Emitter");
         _blockParticleEmitter.update(delta);
@@ -481,12 +474,6 @@ public final class WorldRenderer implements IGameObject {
 
             // PortalManager ticks for spawning once a second
             _portalManager.tickSpawn();
-
-
-            // MobManager ticks for AI every 10 seconds
-            if (_tickTock % 10 == 0) {
-                _mobManager.tickAI();
-            }
         }
     }
 
@@ -665,10 +652,6 @@ public final class WorldRenderer implements IGameObject {
 
     public BlockGrid getBlockGrid() {
         return _blockGrid;
-    }
-
-    public MobManager getMobManager() {
-        return _mobManager;
     }
 
     public Skysphere getSkysphere() {

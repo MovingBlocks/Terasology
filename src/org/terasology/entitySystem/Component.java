@@ -9,5 +9,5 @@ import org.terasology.persistence.interfaces.Persistable;
  * @author Immortius <immortius@gmail.com>
  */
 public interface Component extends Persistable {
-
+    public String getName();
 }

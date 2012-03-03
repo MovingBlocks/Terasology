@@ -76,6 +76,10 @@ public class PojoEntityManager implements EntityManager {
         }
     }
 
+    public int getComponentCount(Class<? extends Component> componentClass) {
+        return store.getComponentCount(componentClass);
+    }
+
     public EventSystem getEventSystem() {
         return eventSystem;
     }

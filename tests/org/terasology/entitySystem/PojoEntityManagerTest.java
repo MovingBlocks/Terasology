@@ -202,5 +202,17 @@ public class PojoEntityManagerTest {
         List<EntityRef> results = Lists.newArrayList(entityManager.iteratorEntities(StringComponent.class));
         assertEquals(Lists.newArrayList(), results);
     }
+    
+    @Test
+    public void getComponentCountWhenNoComponents() {
+        assertEquals(0, entityManager.getComponentCount(StringComponent.class));
+    }
+    
+    @Test
+    public void getComponentCount() {
+        entityManager.create().addComponent(new StringComponent());
+        entityManager.create().addComponent(new StringComponent());
+        assertEquals(2, entityManager.getComponentCount(StringComponent.class));
+    }
 
 }

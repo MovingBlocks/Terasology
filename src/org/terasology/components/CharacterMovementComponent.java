@@ -1,5 +1,6 @@
 package org.terasology.components;
 
+import org.terasology.entitySystem.AbstractComponent;
 import org.terasology.entitySystem.Component;
 import org.terasology.persistence.interfaces.StorageReader;
 import org.terasology.persistence.interfaces.StorageWriter;
@@ -9,7 +10,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class CharacterMovementComponent implements Component {
+public final class CharacterMovementComponent extends AbstractComponent {
 
     // Speed settings
     // TODO: consider making these floats
