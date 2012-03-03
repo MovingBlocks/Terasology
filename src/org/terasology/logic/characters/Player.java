@@ -116,6 +116,7 @@ public class Player extends Character {
         _inventory.addItem(new ItemBlueprint(), 1);
         _inventory.addItem(new ItemDynamite(), 1);
         _inventory.addItem(new ItemDebug(), 1);
+        _inventory.addItem(new ItemRailgun(), 1);
     }
 
     public void render() {

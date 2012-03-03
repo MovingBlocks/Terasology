@@ -70,6 +70,7 @@ public class ToolManager {
         _toolStore.put((byte) 2, new BlueprintTool(_player));
         _toolStore.put((byte) 3, new ExplosionTool(_player));
         _toolStore.put((byte) 4, new DebugTool(_player));
+        _toolStore.put((byte) 5, new RailgunTool(_player));
     }
 
     public ITool getToolForIndex(Byte toolIndex) {
