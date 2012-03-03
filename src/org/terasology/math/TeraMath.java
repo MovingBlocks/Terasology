@@ -31,7 +31,7 @@ public class TeraMath {
      * Returns the absolute value.
      *
      * @param i
-     * @return
+     * @return the absolute value
      */
     public static int fastAbs(int i) {
         return (i >= 0) ? i : -i;
@@ -41,7 +41,7 @@ public class TeraMath {
      * Returns the absolute value.
      *
      * @param d
-     * @return
+     * @return the absolute value
      */
     public static float fastAbs(float d) {
         return (d >= 0) ? d : -d;

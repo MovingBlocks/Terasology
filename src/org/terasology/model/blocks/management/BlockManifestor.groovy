@@ -115,12 +115,12 @@ class BlockManifestor {
         } else {
             // If we don't have a saved world we'll need to build a new ImageManifest from raw block textures
             String path = "images"
-            println "*** Going to scan for images from classpath: " + _resourceLoader.getPackagePath() + '/' + path
+            log.fine "*** Going to scan for images from classpath: " + _resourceLoader.getPackagePath() + '/' + path
             _images = _resourceLoader.getImages(path)
 
-            println "Loaded fresh images - here's some logging!"
+            //println "Loaded fresh images - here's some logging!"
             _images.eachWithIndex { key, value, index ->
-                println "Image " + index + " is for " + key + " and looks like: " + value
+                //println "Image " + index + " is for " + key + " and looks like: " + value
                 // TODO: Using Locale.ENGLISH _seems_ sensible given that the names should be consistent between different
                 // users (is mostly used internally), but need to review
                 _imageIndex.put(key.toLowerCase(Locale.ENGLISH), index)
@@ -145,8 +145,8 @@ class BlockManifestor {
         loadBlockDefinitions("definitions/plant/leaf", new PlantBlockLoader(_imageIndex))
 
         // _nextByte may not make sense if we're loading a world - until it is possible to upgrade / add stuff anyway
-        println "Done loading blocks - _nextByte made it to " + _nextByte
-        println "Final map that'll be passed to BlockManager is: " + _blockIndex
+        //println "Done loading blocks - _nextByte made it to " + _nextByte
+        //println "Final map that'll be passed to BlockManager is: " + _blockIndex
 
         // We do the same check once again - this time to see if we need to write the first-time manifest
         if (!worldExists) {
@@ -156,7 +156,6 @@ class BlockManifestor {
 
         _bm.addAllBlocks(_blockIndex)
         _bm.addAllBlockGroups(_blockGroups);
-        org.terasology.model.blocks.management.BlockManifestor.log.info "_imageManifest file: " + _imageManifest.getAbsolutePath()
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
     }
 
@@ -168,12 +167,12 @@ class BlockManifestor {
     public loadBlockDefinitions(String path, BlockLoader loader) {
         // First identify what plain Block definitions we've got at the appropriate path and loop over what we get
         _resourceLoader.getClassesAt(path).each { c ->
-            println("Got back the following class: " + c)
+            //println("Got back the following class: " + c)
 
             // Prepare to load properties from the Groovy definition via ConfigSlurper
             ConfigObject blockConfig = new ConfigSlurper().parse((Class) c)
             blockConfig.put("name", c.getSimpleName())
-            println "Loaded block config for Class " + c + ": " + blockConfig
+            //println "Loaded block config for Class " + c + ": " + blockConfig
 
             if (blockConfig.block.alignment instanceof String) {
                 String alignment = blockConfig.block.alignment;
@@ -389,16 +388,16 @@ class BlockManifestor {
         // Make up or load a dynamic ID and add the finished Block to our local block index (prep for BlockManager)
         // See if have an ID for this block already (we should if we loaded an existing manifest)
         if (_blockStringIndex.containsKey(b.getTitle())) {
-            log.info "Found an existing block ID value, assigning it to Block " + b.getTitle()
+            //log.info "Found an existing block ID value, assigning it to Block " + b.getTitle()
             b.withId((byte) _blockStringIndex.get(b.getTitle()))
         } else {
             // We have a single special case - the Air block (aka "empty") is ALWAYS id 0
             if (b.getTitle() == "Air") {
-                log.info "Hit the Air block - assigning this one the magic zero value a.k.a. 'empty'"
+                //log.info "Hit the Air block - assigning this one the magic zero value a.k.a. 'empty'"
                 b.withId((byte) 0)
                 _blockStringIndex.put(b.getTitle(), (byte) 0)
             } else {
-                log.info "We don't have an existing ID for " + b.getTitle() + " so assigning _nextByte " + _nextByte
+                //log.info "We don't have an existing ID for " + b.getTitle() + " so assigning _nextByte " + _nextByte
                 b.withId(_nextByte)
                 _blockStringIndex.put(b.getTitle(), _nextByte)
                 _nextByte++
@@ -436,7 +435,7 @@ class BlockManifestor {
         //String s = Terasology.getInstance().getActiveWorldProvider().getWorldSavePath() + "/BlockManifest.groovy"
 
         // Later need to use Terasology.getInstance().getActiveWorldProvider().getWorldSavePath() or something
-        println "Saving merged Block texture file to " + _imageManifest.absolutePath
+        log.info "Saving merged Block texture file to " + _imageManifest.absolutePath
         _imageManifest.mkdirs()
         ImageIO.write(generateImage(0), "png", _imageManifest)
         ImageIO.write(generateImage(1), "png", _imageManifestMipMap1)
@@ -449,11 +448,12 @@ class BlockManifestor {
         manifest.imageIndex = _imageIndex
         manifest.nextByte = _nextByte
 
-        println "Saving block IDs and image atlas (index) positions to " + _blockManifest.absolutePath
+        log.info "Saving block IDs and image atlas (index) positions to " + _blockManifest.absolutePath
         _blockManifest.withWriter { writer ->
             writer << '// Warning: Editing this file may do crazy things to your saved world!\r\n'
             manifest.writeTo(writer)
         }
+        log.info "The block index now looks like this: " + _blockIndex
     }
 
     /**
@@ -469,9 +469,9 @@ class BlockManifestor {
         _blockStringIndex = manifest.blockIndex
         _nextByte = manifest.nextByte
 
-        println "LOADED imageIndex: " + _imageIndex
-        println "LOADED blockIndex: " + _blockStringIndex
-        println "LOADED nextByte: " + _nextByte
+        log.info "LOADED imageIndex from " + _imageManifest.getAbsolutePath() + " is: " + _imageIndex
+        log.info "LOADED blockIndex from " + _blockManifest.getAbsolutePath() + " is: " + _blockStringIndex
+        log.info "LOADED nextByte: " + _nextByte
     }
 
     // TODO: Utility method?

@@ -45,7 +45,7 @@ public class SimpleBlockLoader implements BlockLoader {
             log.fine "Setting COLOR_SOURCE enum to: " + c.colorsource
             b.withColorSource(c.colorsource)
         }
-        println "Block has form " + b.getBlockForm() + ", and color source " + b.getColorSource()
+        log.fine "Block has form " + b.getBlockForm() + ", and color source " + b.getColorSource()
 
         // *** BOOLEANS - IntelliJ may warn about "null" about here but it works alright
         // Casting to (boolean) removes the warning but is functionally unnecessary

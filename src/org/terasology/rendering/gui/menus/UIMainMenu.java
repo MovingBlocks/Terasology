@@ -33,11 +33,12 @@ import javax.vecmath.Vector2f;
  */
 public class UIMainMenu extends UIDisplayRenderer {
 
-    final UIImageOverlay _overlay;
-    final UIGraphicsElement _title;
+    private final UIImageOverlay _overlay;
+    private final UIGraphicsElement _title;
 
-    final UIButton _exitButton;
-    final UIButton _startButton;
+    private final UIButton _exitButton;
+    private final UIButton _startButton;
+    private final UIButton _configButton;
 
     final UIText _version;
 
@@ -53,21 +54,13 @@ public class UIMainMenu extends UIDisplayRenderer {
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
-        _exitButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                Terasology.getInstance().exit();
-            }
-        });
+        _configButton = new UIButton(new Vector2f(256f, 32f));
+        _configButton.getLabel().setText("Settings");
+        _configButton.setVisible(true);
 
         _startButton = new UIButton(new Vector2f(256f, 32f));
-        _startButton.getLabel().setText("Play Terasology");
+        _startButton.getLabel().setText("Play!");
         _startButton.setVisible(true);
-
-        _startButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
-            }
-        });
 
         _overlay = new UIImageOverlay("menuBackground");
         _overlay.setVisible(true);
@@ -77,6 +70,7 @@ public class UIMainMenu extends UIDisplayRenderer {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
+        addDisplayElement(_configButton);
         addDisplayElement(_exitButton);
         addDisplayElement(_startButton);
 
@@ -91,13 +85,27 @@ public class UIMainMenu extends UIDisplayRenderer {
         _version.getPosition().y = 230f;
 
         _startButton.centerHorizontally();
-        _startButton.getPosition().y = 300f + 32f + 8f;
+        _startButton.getPosition().y = 300f + 40f;
+
+        _configButton.centerHorizontally();
+        _configButton.getPosition().y = 300f + 2 * 40f;
 
         _exitButton.centerHorizontally();
-        _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
-
+        _exitButton.getPosition().y = 300f + 4 * 40f;
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;
+    }
+
+    public UIButton getExitButton() {
+        return _exitButton;
+    }
+
+    public UIButton getStartButton() {
+        return _startButton;
+    }
+
+    public UIButton getConfigButton() {
+        return _configButton;
     }
 }

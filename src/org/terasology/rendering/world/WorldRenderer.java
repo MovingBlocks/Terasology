@@ -58,8 +58,6 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class WorldRenderer implements IGameObject {
-    /* VIEWING DISTANCE */
-    private int _viewingDistance = 8;
 
     /* WORLD PROVIDER */
     private final IWorldProvider _worldProvider;
@@ -139,16 +137,17 @@ public final class WorldRenderer implements IGameObject {
      * @return True if the list was changed
      */
     public boolean updateChunksInProximity(boolean force) {
-
         int newChunkPosX = calcPlayerChunkOffsetX();
         int newChunkPosZ = calcPlayerChunkOffsetZ();
+
+        int viewingDistance = Config.getInstance().getActiveViewingDistance();
 
         if (_chunkPosX != newChunkPosX || _chunkPosZ != newChunkPosZ || force) {
 
             _chunksInProximity.clear();
 
-            for (int x = -(_viewingDistance / 2); x < (_viewingDistance / 2); x++) {
-                for (int z = -(_viewingDistance / 2); z < (_viewingDistance / 2); z++) {
+            for (int x = -(viewingDistance / 2); x < (viewingDistance / 2); x++) {
+                for (int z = -(viewingDistance / 2); z < (viewingDistance / 2); z++) {
                     Chunk c = _worldProvider.getChunkProvider().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
                     _chunksInProximity.add(c);
                 }
@@ -170,7 +169,7 @@ public final class WorldRenderer implements IGameObject {
 
         double distLength = dist.length();
 
-        return distLength < (_viewingDistance * 8);
+        return distLength < (Config.getInstance().getActiveViewingDistance() * 8);
     }
 
     /**
@@ -210,6 +209,15 @@ public final class WorldRenderer implements IGameObject {
             public void run() {
                 SoundStore.get().setMusicVolume(0.1f);
                 AudioManager.getInstance().getAudio("Dimlight").playAsMusic(1.0f, 1.0f, false);
+            }
+        });
+
+        // NIGHT
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.75, true) {
+            @Override
+            public void run() {
+                SoundStore.get().setMusicVolume(0.1f);
+                AudioManager.getInstance().getAudio("OtherSide").playAsMusic(1.0f, 1.0f, false);
             }
         });
 
@@ -585,7 +593,7 @@ public final class WorldRenderer implements IGameObject {
     }
 
     public void printScreen() {
-        //REFACTOR TO USE BACKGROUND THREAD FOR IMAGE COPY & SAVE
+        // TODO: REFACTOR TO USE BACKGROUND THREAD FOR IMAGE COPY & SAVE
         GL11.glReadBuffer(GL11.GL_FRONT);
         int width = Display.getDisplayMode().getWidth();
         int height = Display.getDisplayMode().getHeight();
@@ -678,18 +686,8 @@ public final class WorldRenderer implements IGameObject {
         return _tick;
     }
 
-    public int getViewingDistance() {
-        return _viewingDistance;
-    }
-
     public ArrayList<Chunk> getChunksInProximity() {
         return _chunksInProximity;
-    }
-
-    public void setViewingDistance(int distance) {
-        _viewingDistance = distance;
-        updateChunksInProximity(true);
-        Terasology.getInstance().initOpenGLParams();
     }
 
     public boolean isWireframe() {
