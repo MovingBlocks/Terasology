@@ -136,11 +136,11 @@ public class Player extends Character {
     public void update(double delta) {
         PerformanceMonitor.startActivity("Player Camera");
         if (_activeCamera != null) {
-            _activeCamera.update();
+            _activeCamera.update(delta);
 
             // Slightly adjust the field of view when flying
             if (_godMode) {
-                _activeCamera.extendFov(10);
+                _activeCamera.extendFov(24);
             } else {
                 _activeCamera.resetFov();
             }

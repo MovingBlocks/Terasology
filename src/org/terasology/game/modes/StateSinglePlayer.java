@@ -154,7 +154,7 @@ public class StateSinglePlayer implements IGameState {
         // Create the first Portal if it doesn't exist yet
         _worldRenderer.initPortal();
 
-        simulateWorld(4000);
+        fastForwardWorld();
     }
 
     private boolean screenHasFocus() {
@@ -171,26 +171,23 @@ public class StateSinglePlayer implements IGameState {
         return !_pauseGame && !_pauseMenu.isVisible();
     }
 
-    private void simulateWorld(int duration) {
-        long timeBefore = _gameInstance.getTimeInMs();
-
+    private void fastForwardWorld() {
         _loadingScreen.setVisible(true);
         _hud.setVisible(false);
         _metrics.setVisible(false);
+        Display.update();
 
-        float diff = 0;
+        int chunksGenerated = 0;
 
-        while (diff < duration) {
-            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
+        while (chunksGenerated < 64) {
+            getWorldRenderer().generateChunk();
+            chunksGenerated++;
+
+            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (chunksGenerated / 64f) * 100f));
 
             renderUserInterface();
             updateUserInterface();
-
-            getWorldRenderer().generateChunks();
-
             Display.update();
-
-            diff = _gameInstance.getTimeInMs() - timeBefore;
         }
 
         _loadingScreen.setVisible(false);

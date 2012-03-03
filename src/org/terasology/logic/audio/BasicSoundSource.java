@@ -3,6 +3,7 @@ package org.terasology.logic.audio;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 import org.terasology.game.Terasology;
+import org.terasology.logic.characters.Player;
 
 import javax.vecmath.Vector3d;
 
@@ -106,7 +107,7 @@ public class BasicSoundSource implements SoundSource {
         this.setDirection(zeroVector);
 
         // some additional settings
-        alSourcef(this.getSourceId(), AL_MAX_DISTANCE, 50.0f);
+        alSourcef(this.getSourceId(), AL_MAX_DISTANCE, 15.0f);
         alSourcef(this.getSourceId(), AL_REFERENCE_DISTANCE, 1.0f);
 
         this.fade = false;
@@ -335,7 +336,12 @@ public class BasicSoundSource implements SoundSource {
     }
 
     private Vector3d getPlayerPosition() {
-        return Terasology.getInstance().getActivePlayer().getPosition();
+        Player player = Terasology.getInstance().getActivePlayer();
+
+        if (player != null)
+            return player.getPosition();
+
+        return new Vector3d();
     }
 
     @Override
