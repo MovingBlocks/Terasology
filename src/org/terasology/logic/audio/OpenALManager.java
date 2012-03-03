@@ -17,6 +17,9 @@ import java.nio.FloatBuffer;
 
 public class OpenALManager extends AudioManager {
 
+    /** For faster distance check **/
+    private final static float MAX_DISTANCE_SQUARED = (float)Math.pow(MAX_DISTANCE, 2);
+
     public static OpenALManager getInstance() {
         return (OpenALManager) AudioManager.getInstance();
     }
@@ -32,7 +35,7 @@ public class OpenALManager extends AudioManager {
 
         AL10.alGetError();
 
-        AL10.alDistanceModel(AL10.AL_INVERSE_DISTANCE);
+        AL10.alDistanceModel(AL10.AL_INVERSE_DISTANCE_CLAMPED);
 
         // Initialize sound pools
         this._pools.put("sfx", new BasicSoundPool(30)); // effects pool
@@ -81,4 +84,17 @@ public class OpenALManager extends AudioManager {
         return new OggStreamingSound(name, source);
     }
 
+    @Override
+    protected boolean checkDistance(Vector3d soundSource) {
+        Player player = Terasology.getInstance().getActivePlayer();
+
+        if (player == null) {
+            return false;
+        }
+
+        Vector3d soundPosition = new Vector3d(soundSource);
+        soundPosition.sub(player.getPosition());
+
+        return soundPosition.lengthSquared() < MAX_DISTANCE_SQUARED;
+    }
 }
