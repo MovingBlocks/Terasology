@@ -80,7 +80,7 @@ public class ExplosionTool extends SimpleTool {
                 }
             }
 
-            AudioManager.getInstance().getAudio("Explode" + (worldProvider.getRandom().randomIntAbs(5) + 1)).playAsSoundEffect(1.0f, 0.2f, false);
+            AudioManager.play("Explode" + (worldProvider.getRandom().randomIntAbs(5) + 1));
             _player.poke();
         }
     }

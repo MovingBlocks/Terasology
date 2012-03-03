@@ -332,7 +332,7 @@ public class BulletPhysicsRenderer implements IGameObject {
                     // Block was looted (and reached the player)
                     Block block = BlockManager.getInstance().getBlock(b.getType());
                     player.getInventory().addItem(new ItemBlock(block.getBlockGroup()), 1);
-                    AudioManager.getInstance().playVaryingSound("Loot", 1.0f, 0.1f);
+                    AudioManager.play("Loot");
 
                     _lootableBlocks.remove(i);
                     _discreteDynamicsWorld.removeRigidBody(b);
