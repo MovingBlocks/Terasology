@@ -36,6 +36,8 @@ import java.util.logging.Logger;
  */
 public abstract class AudioManager {
 
+    public final static float MAX_DISTANCE = 50.0f;
+
     public final static int PRIORITY_LOCKED = Integer.MAX_VALUE;
     public final static int PRIORITY_HIGHEST = 100;
     public final static int PRIORITY_HIGH = 10;
@@ -166,6 +168,8 @@ public abstract class AudioManager {
      * Gracefully destroy audio subsystem
      */
     public abstract void destroy();
+
+    protected abstract boolean checkDistance(Vector3d soundSource);
 
 
     /**
@@ -318,7 +322,15 @@ public abstract class AudioManager {
             return null;
         }
 
-        return (pos != null ? source.setPosition(pos).setAbsolute(true) : source).setGain(gain);
+        if (pos != null) {
+            if (!getInstance().checkDistance(pos)) {
+                return null;
+            }
+
+            source.setPosition(pos).setAbsolute(true);
+        }
+
+        return source.setGain(gain);
     }
 
     /**
@@ -351,17 +363,13 @@ public abstract class AudioManager {
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
     public static SoundSource play(String name, Vector3d pos, float gain, int priority) {
-        SoundSource source = source(name, priority);
+        SoundSource source = source(name, pos, gain, priority);
 
         if (source == null) {
             return null;
         }
 
-        if (pos != null) {
-            source.setAbsolute(true).setPosition(pos);
-        }
-
-        return source.setGain(gain).play();
+        return source.play();
     }
 
     /**
@@ -377,10 +385,6 @@ public abstract class AudioManager {
 
         if (source == null) {
             return null;
-        }
-
-        if (pos != null) {
-            source.setAbsolute(true).setPosition(pos);
         }
 
         return source.setGain(gain).play();
