@@ -15,6 +15,8 @@
 */
 package org.terasology.game;
 
+import org.terasology.logic.manager.Config;
+
 import java.applet.Applet;
 import java.util.logging.Level;
 
@@ -42,6 +44,7 @@ public final class TerasologyApplet extends Applet {
                     _terasology.init();
                     _terasology.run();
                     _terasology.shutdown();
+                    Config.getInstance().saveConfig("SAVED_WORLDS/last.cfg");
                 } catch (Exception e) {
                     Terasology.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
                 }
