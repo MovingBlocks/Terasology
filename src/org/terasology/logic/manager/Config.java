@@ -21,6 +21,7 @@ import org.lwjgl.opengl.PixelFormat;
 import org.terasology.game.Terasology;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.protobuf.Configuration;
+import org.terasology.utilities.Helper;
 
 import javax.vecmath.Vector2f;
 import java.io.*;
@@ -53,6 +54,8 @@ public final class Config {
     }
 
     public boolean loadConfig(String filename) {
+        filename = Helper.fixSavePath(new File(filename)).getAbsolutePath();
+        Terasology.getInstance().getLogger().log(Level.INFO, "Using config file: " + filename);
         Configuration.Setting.Builder setting = Configuration.Setting.newBuilder();
         try {
             FileInputStream fis = new FileInputStream(filename);
@@ -60,7 +63,7 @@ public final class Config {
             TextFormat.merge(isr, setting);
             isr.close();
         } catch (Exception e) {
-            Terasology.getInstance().getLogger().log(Level.WARNING, "Could not write " + filename, e);
+            Terasology.getInstance().getLogger().log(Level.WARNING, "Could not load config file, that's OK if this is the first execution. " + filename);
             return false;
         }
         _setting = setting;
@@ -69,6 +72,8 @@ public final class Config {
     
     public void saveConfig(String filename) {
         try {
+            filename = Helper.fixSavePath(new File(filename)).getAbsolutePath();
+            Terasology.getInstance().getLogger().log(Level.INFO, "Using config file: " + filename);
             FileOutputStream fos = new FileOutputStream(filename);
             OutputStreamWriter osw = new OutputStreamWriter(fos);
             TextFormat.print(_setting.build(), osw);
