@@ -1,7 +1,6 @@
 package org.terasology.entitySystem.stubs;
 
 import org.terasology.entitySystem.AbstractComponent;
-import org.terasology.entitySystem.Component;
 import org.terasology.persistence.interfaces.StorageReader;
 import org.terasology.persistence.interfaces.StorageWriter;
 

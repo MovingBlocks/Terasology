@@ -39,6 +39,8 @@ public final class CharacterMovementComponent extends AbstractComponent {
 
     public void store(StorageWriter writer) {
         //To change body of implemented methods use File | Settings | File Templates.
+
+
     }
 
     public void retrieve(StorageReader reader) {

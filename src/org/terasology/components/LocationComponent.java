@@ -38,4 +38,28 @@ public final class LocationComponent extends AbstractComponent {
         scale = reader.readFloat("scale", 1.0f);
         parent = reader.read("parent", EntityRef.class, parent);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LocationComponent component = (LocationComponent) o;
+
+        if (Float.compare(component.scale, scale) != 0) return false;
+        if (parent != null ? !parent.equals(component.parent) : component.parent != null) return false;
+        if (position != null ? !position.equals(component.position) : component.position != null) return false;
+        if (rotation != null ? !rotation.equals(component.rotation) : component.rotation != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = position != null ? position.hashCode() : 0;
+        result = 31 * result + (rotation != null ? rotation.hashCode() : 0);
+        result = 31 * result + (scale != +0.0f ? Float.floatToIntBits(scale) : 0);
+        result = 31 * result + (parent != null ? parent.hashCode() : 0);
+        return result;
+    }
 }
