@@ -259,7 +259,9 @@ public class BulletPhysicsRenderer implements IGameObject {
         float[] mFloat = new float[16];
 
         GL11.glPushMatrix();
-        GL11.glTranslated(-player.getPosition().x, -player.getPosition().y, -player.getPosition().z);
+
+        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+        GL11.glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
         List<CollisionObject> collisionObjects = _discreteDynamicsWorld.getCollisionObjectArray();
 

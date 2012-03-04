@@ -22,6 +22,8 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.terasology.game.Terasology;
+import org.terasology.game.modes.IGameState;
+import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.characters.Player;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
@@ -87,8 +89,7 @@ public class GroovyManager {
     }
 
     private void updateBinding() {
-        _bind.setVariable("tera", Terasology.getInstance());
-        _bind.setVariable("configuration", Config.getInstance());
+        _bind.setVariable("cfg", Config.getInstance());
         _bind.setVariable("cmd", new CommandHelper());
     }
 
@@ -150,5 +151,22 @@ public class GroovyManager {
             player.setPosition(x, y, z);
         }
 
+        public void gotoWorld(String title) {
+            IGameState state = Terasology.getInstance().getCurrentGameState();
+
+            if (state instanceof StateSinglePlayer) {
+                StateSinglePlayer spState = (StateSinglePlayer) state;
+                spState.initWorld(title);
+            }
+        }
+
+        public void gotoWorld(String title, String seed) {
+            IGameState state = Terasology.getInstance().getCurrentGameState();
+
+            if (state instanceof StateSinglePlayer) {
+                StateSinglePlayer spState = (StateSinglePlayer) state;
+                spState.initWorld(title, seed);
+            }
+        }
     }
 }

@@ -520,12 +520,12 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
      *
      * @return The distance of the chunk to the player
      */
-    public double distanceToPlayer() {
+    public double distanceToCamera() {
         Vector3d result = new Vector3d(getPosition().x * CHUNK_DIMENSION_X, 0, getPosition().z * CHUNK_DIMENSION_Z);
 
-        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-        result.x -= playerPosition.x;
-        result.z -= playerPosition.z;
+        Vector3d cameraPos = Terasology.getInstance().getActiveCamera().getPosition();
+        result.x -= cameraPos.x;
+        result.z -= cameraPos.z;
 
         return result.length();
     }
@@ -609,8 +609,8 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             return 0;
         }
 
-        double distance = distanceToPlayer();
-        double distance2 = o.distanceToPlayer();
+        double distance = distanceToCamera();
+        double distance2 = o.distanceToCamera();
 
         if (distance == distance2)
             return 0;
@@ -620,7 +620,8 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
     public AABB getAABB() {
         if (_aabb == null) {
-            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 2.0, CHUNK_DIMENSION_Y / 2.0, CHUNK_DIMENSION_Z / 2.0);
+            // TODO: The AABBs are currently a bit larger than the actual chunk is
+            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 1.75, CHUNK_DIMENSION_Y / 1.75, CHUNK_DIMENSION_Z / 1.75);
             Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
             _aabb = new AABB(position, dimensions);
         }
@@ -752,8 +753,8 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
             GL11.glPushMatrix();
 
-            Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-            GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - playerPosition.x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - playerPosition.y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - playerPosition.z);
+            Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+            GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - cameraPosition.x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - cameraPosition.y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - cameraPosition.z);
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {

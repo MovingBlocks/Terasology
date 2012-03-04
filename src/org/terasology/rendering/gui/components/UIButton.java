@@ -48,8 +48,6 @@ public class UIButton extends UIDisplayContainer {
         _label = new UIText("Untitled");
         _label.setVisible(true);
         addDisplayElement(_label);
-
-        update();
     }
 
     @Override

@@ -75,8 +75,8 @@ public final class GelatinousCube extends Character {
 
         glPushMatrix();
 
-        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-        glTranslated(getPosition().x - playerPosition.x, getPosition().y - playerPosition.y, getPosition().z - playerPosition.z);
+        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+        glTranslated(getPosition().x - cameraPosition.x, getPosition().y - cameraPosition.y, getPosition().z - cameraPosition.z);
         glRotatef((float) _yaw, 0f, 1f, 0f);
 
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");

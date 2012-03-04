@@ -36,7 +36,7 @@ public class ShaderParametersGelCube implements IShaderParameters {
             program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
         }
         if (tera.getActiveWorldRenderer() != null) {
-            program.setInt("tick", tera.getActiveWorldRenderer().getTick());
+            program.setFloat("tick", (float) tera.getActiveWorldRenderer().getTick());
         }
     }
 

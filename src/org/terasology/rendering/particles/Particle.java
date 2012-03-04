@@ -66,8 +66,8 @@ public abstract class Particle implements IGameObject {
         if (isAlive()) {
             glPushMatrix();
 
-            Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-            glTranslated(_position.x - playerPosition.x, _position.y - playerPosition.y, _position.z - playerPosition.z);
+            Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+            glTranslated(_position.x - cameraPosition.x, _position.y - cameraPosition.y, _position.z - cameraPosition.z);
             applyOrientation();
             glScalef(_size, _size, _size);
 

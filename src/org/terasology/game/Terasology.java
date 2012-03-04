@@ -29,6 +29,7 @@ import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.io.File;
@@ -376,6 +377,12 @@ public final class Terasology {
 
     public double getAverageFps() {
         return _timer.getFps();
+    }
+
+    public Camera getActiveCamera() {
+        if (getActiveWorldRenderer() != null)
+            return getActiveWorldRenderer().getActiveCamera();
+        return null;
     }
 
     public WorldRenderer getActiveWorldRenderer() {

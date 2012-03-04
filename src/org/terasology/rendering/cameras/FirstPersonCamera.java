@@ -50,7 +50,7 @@ public class FirstPersonCamera extends Camera {
         right.cross(_viewingDirection, _up);
         right.scale(_bobbingRotationOffsetFactor);
 
-        GLU.gluLookAt((float) _position.x, (float) _position.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z, (float) _position.x + (float) _viewingDirection.x, (float) _position.y + (float) _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z + (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
+        GLU.gluLookAt(0f, (float) _bobbingVerticalOffsetFactor * 2.0f, 0f, (float) _viewingDirection.x, (float) _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
         _viewFrustum.updateFrustum();
     }
 
@@ -63,6 +63,7 @@ public class FirstPersonCamera extends Camera {
         right.scale(_bobbingRotationOffsetFactor);
 
         GLU.gluLookAt(0f, 0f, 0f, (float) _viewingDirection.x, (float) _viewingDirection.y, (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
+        _viewFrustum.updateFrustum();
     }
 
     public void setBobbingRotationOffsetFactor(double f) {

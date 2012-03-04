@@ -30,9 +30,9 @@ public abstract class Camera {
     public static final float FOV = Config.getInstance().getFov();
 
     /* CAMERA PARAMETERS */
-    protected final Vector3d _position = new Vector3d();
+    protected final Vector3d _position = new Vector3d(0, 0, 0);
     protected final Vector3d _up = new Vector3d(0, 1, 0);
-    protected final Vector3d _viewingDirection = new Vector3d();
+    protected final Vector3d _viewingDirection = new Vector3d(1, 0, 0);
 
     protected float _targetFov = FOV;
     protected float _activeFov = FOV - 20f;

@@ -53,7 +53,5 @@ public class UIInventory extends UIDisplayContainer {
         	cell.setVisible(true);
         	addDisplayElement(cell);
         }
-
-        update();
     }
 }

@@ -57,11 +57,7 @@ public class StateSinglePlayer implements IGameState {
     /* GAME LOOP */
     private boolean _pauseGame = false;
 
-    private Terasology _gameInstance = null;
-
     public void init() {
-        _gameInstance = Terasology.getInstance();
-
         _hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
 
@@ -101,6 +97,9 @@ public class StateSinglePlayer implements IGameState {
     }
 
     public void update(double delta) {
+        /* GUI */
+        updateUserInterface();
+
         if (_worldRenderer != null && shouldUpdateWorld())
             _worldRenderer.update(delta);
 
@@ -125,6 +124,10 @@ public class StateSinglePlayer implements IGameState {
                 _statusScreen.setVisible(false);
             }
         }
+    }
+
+    public void initWorld(String title) {
+        initWorld(title, null);
     }
 
     /**
@@ -203,9 +206,9 @@ public class StateSinglePlayer implements IGameState {
             _worldRenderer.render();
         }
 
+        /* UI */
         PerformanceMonitor.startActivity("Render and Update UI");
         renderUserInterface();
-        updateUserInterface();
         PerformanceMonitor.endActivity();
     }
 
@@ -282,8 +285,17 @@ public class StateSinglePlayer implements IGameState {
                 if (key == Keyboard.KEY_LEFT) {
                     getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
                 }
+
                 if (key == Keyboard.KEY_R && !Keyboard.isRepeatEvent()) {
                     getWorldRenderer().setWireframe(!getWorldRenderer().isWireframe());
+                }
+
+                if (key == Keyboard.KEY_P && !Keyboard.isRepeatEvent()) {
+                    getWorldRenderer().setCameraMode(WorldRenderer.CAMERA_MODE.PLAYER);
+                }
+
+                if (key == Keyboard.KEY_O && !Keyboard.isRepeatEvent()) {
+                    getWorldRenderer().setCameraMode(WorldRenderer.CAMERA_MODE.SPAWN);
                 }
             }
 

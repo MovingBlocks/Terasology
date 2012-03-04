@@ -518,7 +518,7 @@ public abstract class MovableEntity extends Entity {
 
     public Vector3d calcEntityPositionRelativeToPlayer() {
         Vector3d result = new Vector3d();
-        result.sub(Terasology.getInstance().getActivePlayer().getPosition(), getPosition());
+        result.sub(Terasology.getInstance().getActiveCamera().getPosition(), getPosition());
 
         return result;
     }

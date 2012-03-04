@@ -41,6 +41,8 @@ Debug features (only works when debug mode is enabled
 ------------------------
 
 * [Arrow up/down]         Adjust the current time in small steps
+* [P]                     Activate first-person player camera
+* [O]                     Activate animated spawning point camera
 
 Examples tools (may move slot or disappear)
 ------------------------
@@ -53,8 +55,12 @@ Examples tools (may move slot or disappear)
 Example console commands
 ------------------------
 
-* "tera.initWorld();"                               Init. a new random world
-* "tera.getActiveWorldProvider().setTime(0.0);"     Set the world time
+* cmd.giveBlock "Water"                 Gives 16 water blocks
+* cmd.giveBlock "Water", 42             Gives 42 water blocks
+* cmd.teleport 42, 42, 42               Warps the player to x = 42, y = 42, z = 42
+* cmd.fullHealth                        Fully restores the player's health
+* cmd.gotoWorld "GhostTown"             Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with a randomized seed value
+* cmd.gotoWorld "GhostTown", "Pie!"     Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with the seed value "Pie!"
 
 Building and running source
 ------------------------
@@ -79,7 +85,7 @@ Contributors
 * Anton "small-jeeper" Kireev
 * Rasmus "Cervator" Praestholm
 * Immortius
-* Richard Apodaca (rapodaca)
+* Richard "rapodaca" Apodaca
 * Kai Kratz
 * t3hk0d3
 

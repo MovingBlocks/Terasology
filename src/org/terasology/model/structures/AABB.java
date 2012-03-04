@@ -277,8 +277,8 @@ public class AABB {
         ShaderManager.getInstance().enableDefault();
 
         glPushMatrix();
-        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-        glTranslated(getPosition().x - playerPosition.x, -playerPosition.y, getPosition().z - playerPosition.z);
+        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+        glTranslated(getPosition().x - cameraPosition.x, -cameraPosition.y, getPosition().z - cameraPosition.z);
 
         renderLocally(lineThickness);
 

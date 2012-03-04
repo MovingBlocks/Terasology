@@ -106,12 +106,13 @@ public class UIInventoryCell extends UIDisplayElement {
     public void render() {
         _selectionRectangle.renderTransformed();
 
-        glEnable(GL11.GL_DEPTH_TEST);
-
         Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         Item item = inventory.getItemAt(_id);
 
+        glEnable(GL11.GL_DEPTH_TEST);
+
         if (item != null) {
+            glClear(GL_DEPTH_BUFFER_BIT);
             glPushMatrix();
             glTranslatef(20f, 20f, 0f);
             Icon.get(item).render();

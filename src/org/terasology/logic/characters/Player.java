@@ -22,11 +22,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
 import org.terasology.logic.audio.Sound;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
-import org.terasology.logic.manager.ToolManager;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.*;
 import org.terasology.logic.tools.ITool;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.IBlockObserver;
@@ -78,6 +74,9 @@ public class Player extends Character {
     /* CAMERA */
     private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
     private final Camera _activeCamera = _firstPersonCamera;
+
+    /* RENDERING*/
+    private boolean _renderPlayerModel;
 
     /* INTERACTIONS */
     private long _lastInteraction;
@@ -132,6 +131,10 @@ public class Player extends Character {
                 }
             }
         }
+
+        // TODO: Replace with a real player model
+        if (isRenderPlayerModel())
+            getAABB().render(4f);
     }
 
     public void update(double delta) {
@@ -246,7 +249,11 @@ public class Player extends Character {
     }
 
     public void updateCameraParameters() {
-        _firstPersonCamera.getPosition().set(calcEyeOffset());
+        // The camera position is the player's position plus the eye offset
+        Vector3d cameraPosition = new Vector3d();
+        cameraPosition.add(getPosition(), calcEyeOffset());
+
+        _firstPersonCamera.getPosition().set(cameraPosition);
 
         if (CAMERA_BOBBING) {
             _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
@@ -471,8 +478,10 @@ public class Player extends Character {
         glEnable(GL11.GL_BLEND);
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
+        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+
         glPushMatrix();
-        glTranslated(_extractedBlock.getBlockPosition().x - getPosition().x, _extractedBlock.getBlockPosition().y - getPosition().y, _extractedBlock.getBlockPosition().z - getPosition().z);
+        glTranslated(_extractedBlock.getBlockPosition().x - cameraPosition.x, _extractedBlock.getBlockPosition().y - cameraPosition.y, _extractedBlock.getBlockPosition().z - cameraPosition.z);
 
         float offset = java.lang.Math.round(((float) _extractionCounter / block.getHardness()) * 10.0f) * 0.0625f;
 
@@ -660,5 +669,13 @@ public class Player extends Character {
     @Override
     protected void playFootstep(Sound footStep) {
         AudioManager.play(footStep, this, 0.6f, AudioManager.PRIORITY_HIGH);
+    }
+
+    public void setRenderPlayerModel(boolean render) {
+        _renderPlayerModel = render;
+    }
+
+    public boolean isRenderPlayerModel() {
+        return _renderPlayerModel;
     }
 }

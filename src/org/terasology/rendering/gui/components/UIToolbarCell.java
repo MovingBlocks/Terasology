@@ -100,6 +100,7 @@ public class UIToolbarCell extends UIDisplayElement {
         glEnable(GL11.GL_DEPTH_TEST);
 
         if (item != null) {
+            glClear(GL11.GL_DEPTH_BUFFER_BIT);
             glPushMatrix();
             glTranslatef(20f, 20f, 0f);
             Icon.get(item).render();
