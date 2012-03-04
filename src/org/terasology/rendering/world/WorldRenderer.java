@@ -29,7 +29,7 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.cameras.FirstPersonCamera;
+import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.particles.BlockParticleEmitter;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
@@ -71,7 +71,7 @@ public final class WorldRenderer implements IGameObject {
     }
 
     private CAMERA_MODE _cameraMode = CAMERA_MODE.PLAYER;
-    private Camera _spawnCamera = new FirstPersonCamera();
+    private Camera _spawnCamera = new DefaultCamera();
 
     /* CHUNKS */
     private final ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>();
@@ -480,8 +480,18 @@ public final class WorldRenderer implements IGameObject {
         cameraPosition.x += Math.sin(getTick() * 0.0005f) * 32f;
         cameraPosition.z += Math.cos(getTick() * 0.0005f) * 32f;
 
+        Vector3d playerToCamera = new Vector3d();
+        playerToCamera.sub(_player.getPosition(), cameraPosition);
+        double distanceToPlayer = playerToCamera.length();
+
         Vector3d cameraDirection = new Vector3d();
-        cameraDirection.sub(_player.getSpawningPoint(), cameraPosition);
+
+        if (distanceToPlayer > 64.0) {
+            cameraDirection.sub(_player.getSpawningPoint(), cameraPosition);
+        } else {
+            cameraDirection.set(playerToCamera);
+        }
+
         cameraDirection.normalize();
 
         _spawnCamera.getPosition().set(cameraPosition);

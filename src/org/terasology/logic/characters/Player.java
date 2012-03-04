@@ -35,7 +35,7 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.cameras.FirstPersonCamera;
+import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -72,8 +72,8 @@ public class Player extends Character {
     private final ArrayList<IBlockObserver> _observers = new ArrayList<IBlockObserver>();
 
     /* CAMERA */
-    private final FirstPersonCamera _firstPersonCamera = new FirstPersonCamera();
-    private final Camera _activeCamera = _firstPersonCamera;
+    private final DefaultCamera _defaultCamera = new DefaultCamera();
+    private final Camera _activeCamera = _defaultCamera;
 
     /* RENDERING*/
     private boolean _renderPlayerModel;
@@ -253,21 +253,21 @@ public class Player extends Character {
         Vector3d cameraPosition = new Vector3d();
         cameraPosition.add(getPosition(), calcEyeOffset());
 
-        _firstPersonCamera.getPosition().set(cameraPosition);
+        _defaultCamera.getPosition().set(cameraPosition);
 
         if (CAMERA_BOBBING) {
-            _firstPersonCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
-            _firstPersonCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 1.25f));
+            _defaultCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
+            _defaultCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 1.25f));
         } else {
-            _firstPersonCamera.setBobbingRotationOffsetFactor(0.0);
-            _firstPersonCamera.setBobbingVerticalOffsetFactor(0.0);
+            _defaultCamera.setBobbingRotationOffsetFactor(0.0);
+            _defaultCamera.setBobbingVerticalOffsetFactor(0.0);
         }
 
         if (!(DEMO_FLIGHT)) {
-            _firstPersonCamera.getViewingDirection().set(getViewingDirection());
+            _defaultCamera.getViewingDirection().set(getViewingDirection());
         } else {
             Vector3d viewingTarget = new Vector3d(getPosition().x, 40, getPosition().z - 128);
-            _firstPersonCamera.getViewingDirection().sub(viewingTarget, getPosition());
+            _defaultCamera.getViewingDirection().sub(viewingTarget, getPosition());
         }
     }
 

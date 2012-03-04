@@ -25,11 +25,11 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 /**
- * Provides global access to fonts.
+ * Simple default camera.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class FirstPersonCamera extends Camera {
+public class DefaultCamera extends Camera {
 
     private double _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0;
 
