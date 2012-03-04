@@ -15,12 +15,12 @@
  */
 package org.terasology.logic.tools;
 
+import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 
 import javax.vecmath.Vector3d;
@@ -36,12 +36,20 @@ public class RailgunTool extends SimpleTool {
     }
 
     public void executeLeftClickAction() {
-        explode();
+        Terasology.getInstance().submitTask("Railgun", new Runnable() {
+            public void run() {
+                explode();
+            }
+        });
+
+        AudioManager.play("Explode" + (_random.randomIntAbs(5) + 1));
+        _player.poke();
     }
 
     public void executeRightClickAction() {
         // Nothing to do!
     }
+
     public void explode() {
         IWorldProvider worldProvider = _player.getParent().getWorldProvider();
 
@@ -49,13 +57,13 @@ public class RailgunTool extends SimpleTool {
         //BlockPosition blockPos = _player.getSelectedBlock().getBlockPosition();
         //Vector3d origin = blockPos.toVector3d();
         Vector3d dir = _player.getViewingDirection();
-        Vector3d origin = (Vector3d)_player.getPosition().clone();
-        for(int s = 4; s <= 10000; s+=30){
+        Vector3d origin = (Vector3d) _player.getPosition().clone();
+        for (int s = 4; s <= 10000; s += 30) {
 
             origin.add(dir);
 
             for (int i = 0; i < 64; i++) {
-                Vector3d direction = new Vector3d((float) worldProvider.getRandom().randomDouble(), (float) worldProvider.getRandom().randomDouble(), (float) worldProvider.getRandom().randomDouble());
+                Vector3d direction = new Vector3d((float) _random.randomDouble(), (float) _random.randomDouble(), (float) _random.randomDouble());
                 direction.normalize();
                 Vector3f impulse = new Vector3f(direction);
                 impulse.scale(800000);
@@ -82,9 +90,6 @@ public class RailgunTool extends SimpleTool {
                     }
                 }
             }
-
-            AudioManager.play("Explode" + (worldProvider.getRandom().randomIntAbs(5) + 1));
-            _player.poke();
         }
     }
 }

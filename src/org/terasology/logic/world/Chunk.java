@@ -36,7 +36,6 @@ import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.Helper;
 
@@ -99,6 +98,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     private RigidBody _rigidBody = null;
     /* ----- */
     private ReentrantLock _lock = new ReentrantLock();
+    private ReentrantLock _lockRigidBody = new ReentrantLock();
 
     public enum LIGHT_TYPE {
         BLOCK,
@@ -1010,52 +1010,51 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     }
 
     private void updateRigidBody(final ChunkMesh[] meshes) {
-        if (_rigidBody != null)
-            return;
-
-        if (meshes == null)
-            return;
-
-        if (meshes.length < VERTICAL_SEGMENTS)
+        if (_rigidBody != null || meshes == null || meshes.length < VERTICAL_SEGMENTS)
             return;
 
         Terasology.getInstance().submitTask("Update Chunk Collision", new Runnable() {
             public void run() {
-                TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+                try {
+                    _lockRigidBody.lock();
 
-                int counter = 0;
-                for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
-                    ChunkMesh mesh = meshes[k];
+                    TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
 
-                    if (mesh != null) {
-                        IndexedMesh indexedMesh = mesh._indexedMesh;
+                    int counter = 0;
+                    for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
+                        ChunkMesh mesh = meshes[k];
 
-                        if (indexedMesh != null) {
-                            vertexArray.addIndexedMesh(indexedMesh);
-                            counter++;
+                        if (mesh != null) {
+                            IndexedMesh indexedMesh = mesh._indexedMesh;
+
+                            if (indexedMesh != null) {
+                                vertexArray.addIndexedMesh(indexedMesh);
+                                counter++;
+                            }
+
+                            mesh._indexedMesh = null;
                         }
-
-                        mesh._indexedMesh = null;
                     }
-                }
 
-                if (counter == VERTICAL_SEGMENTS) {
-                    try {
-                        BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
+                    if (counter == VERTICAL_SEGMENTS) {
+                        try {
+                            BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
 
-                        Matrix3f rot = new Matrix3f();
-                        rot.setIdentity();
+                            Matrix3f rot = new Matrix3f();
+                            rot.setIdentity();
 
-                        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
+                            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
 
-                        RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
-                        _rigidBody = new RigidBody(blockConsInf);
+                            RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
+                            _rigidBody = new RigidBody(blockConsInf);
 
-                    } catch (Exception e) {
-                        Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+                        } catch (Exception e) {
+                            Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+                        }
                     }
+                } finally {
+                    _lockRigidBody.unlock();
                 }
-
             }
         });
     }

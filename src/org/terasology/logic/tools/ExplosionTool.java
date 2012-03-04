@@ -37,7 +37,14 @@ public class ExplosionTool extends SimpleTool {
     }
 
     public void executeLeftClickAction() {
-        explode();
+        Terasology.getInstance().submitTask("Explosion", new Runnable() {
+            public void run() {
+                explode();
+            }
+        });
+
+        AudioManager.play("Explode" + (_random.randomIntAbs(5) + 1));
+        _player.poke();
     }
 
     public void executeRightClickAction() {
@@ -52,7 +59,7 @@ public class ExplosionTool extends SimpleTool {
             Vector3d origin = blockPos.toVector3d();
 
             for (int i = 0; i < 256; i++) {
-                Vector3d direction = new Vector3d((float) worldProvider.getRandom().randomDouble(), (float) worldProvider.getRandom().randomDouble(), (float) worldProvider.getRandom().randomDouble());
+                Vector3d direction = new Vector3d((float) _random.randomDouble(), (float) _random.randomDouble(), (float) _random.randomDouble());
                 direction.normalize();
                 Vector3f impulse = new Vector3f(direction);
                 impulse.scale(800000);
@@ -79,9 +86,6 @@ public class ExplosionTool extends SimpleTool {
                     }
                 }
             }
-
-            AudioManager.play("Explode" + (worldProvider.getRandom().randomIntAbs(5) + 1));
-            _player.poke();
         }
     }
 

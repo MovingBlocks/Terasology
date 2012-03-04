@@ -20,7 +20,9 @@ import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.structures.BlockPosition;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Base class for all simulators.
@@ -36,7 +38,7 @@ public abstract class Simulator implements IBlockObserver {
     protected long _lastUpdate = Terasology.getInstance().getTimeInMs();
 
     protected final IWorldProvider _parent;
-    protected final HashSet<BlockPosition> _activeBlocks = new HashSet<BlockPosition>(256);
+    protected final Set<BlockPosition> _activeBlocks = Collections.synchronizedSet(new HashSet<BlockPosition>());
 
     public Simulator(String name, IWorldProvider parent, long updateInterval) {
         _updateInterval = updateInterval;
