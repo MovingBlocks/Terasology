@@ -257,7 +257,7 @@ public class Player extends Character {
 
         if (CAMERA_BOBBING) {
             _defaultCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
-            _defaultCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 1.25f));
+            _defaultCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3.0f));
         } else {
             _defaultCamera.setBobbingRotationOffsetFactor(0.0);
             _defaultCamera.setBobbingVerticalOffsetFactor(0.0);
