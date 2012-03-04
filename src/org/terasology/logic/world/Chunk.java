@@ -759,7 +759,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {
                     if (Config.getInstance().isRenderChunkBoundingBoxes()) {
-                        getSubMeshAABB(i).renderLocally(2f);
+                        getSubMeshAABB(i).renderLocally(1f);
                         _statRenderedTriangles += 12;
                     }
 

@@ -127,14 +127,14 @@ public class Player extends Character {
             if (_selectedBlock != null) {
                 Block block = BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(_selectedBlock.getBlockPosition().toVector3d()));
                 if (block.isRenderBoundingBox()) {
-                    block.getBounds(_selectedBlock.getBlockPosition()).render(8f);
+                    block.getBounds(_selectedBlock.getBlockPosition()).render(2f);
                 }
             }
         }
 
         // TODO: Replace with a real player model
         if (isRenderPlayerModel())
-            getAABB().render(4f);
+            getAABB().render(1f);
     }
 
     public void update(double delta) {

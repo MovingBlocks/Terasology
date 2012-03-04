@@ -310,8 +310,9 @@ public final class WorldRenderer implements IGameObject {
         glEnable(GL_LIGHT0);
 
         boolean headUnderWater = false;
+
         if (_cameraMode == CAMERA_MODE.PLAYER)
-            _player.isHeadUnderWater();
+            headUnderWater = _player.isHeadUnderWater();
 
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -352,7 +353,6 @@ public final class WorldRenderer implements IGameObject {
             _renderQueueTransparent.poll().render();
 
         PerformanceMonitor.endActivity();
-
 
         PerformanceMonitor.startActivity("Render ChunkWaterIce");
 
@@ -577,6 +577,8 @@ public final class WorldRenderer implements IGameObject {
 
         _player.load();
         _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
+        updateChunksInProximity(true);
+
         _player.reset();
 
         // Only respawn the player if no position was loaded
@@ -612,8 +614,6 @@ public final class WorldRenderer implements IGameObject {
      * @return
      */
     public boolean generateChunk() {
-        updateChunksInProximity(false);
-
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
 

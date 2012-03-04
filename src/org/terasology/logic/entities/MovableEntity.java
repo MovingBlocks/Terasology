@@ -95,7 +95,7 @@ public abstract class MovableEntity extends Entity {
         setViewingDirection(_yaw, _pitch);
 
         if (Config.getInstance().isDebugCollision()) {
-            getAABB().render(2f);
+            getAABB().render(1f);
 
             ArrayList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());
 
@@ -104,7 +104,7 @@ public abstract class MovableEntity extends Entity {
                 byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
                 Block block = BlockManager.getInstance().getBlock(blockType);
                 for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
-                    blockAABB.render(2f);
+                    blockAABB.render(1f);
                 }
             }
         }
@@ -417,10 +417,14 @@ public abstract class MovableEntity extends Entity {
             BlockPosition p = blockPositions.get(i);
             byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
             Block block = BlockManager.getInstance().getBlock(blockType);
+
             if (block.isLiquid()) {
                 for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
                     if (getAABB().overlaps(blockAABB)) {
                         swimming = true;
+                    }
+
+                    if (swimming = true) {
                         if (blockAABB.contains(eyePos)) {
                             headUnderWater = true;
                             break;
