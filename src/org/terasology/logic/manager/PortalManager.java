@@ -19,9 +19,7 @@ import org.terasology.components.SimpleAIComponent;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.Terasology;
-import org.terasology.logic.characters.GelatinousCube;
 import org.terasology.logic.portals.Portal;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3d;

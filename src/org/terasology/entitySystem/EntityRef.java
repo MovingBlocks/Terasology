@@ -30,6 +30,8 @@ public interface EntityRef {
     void removeComponent(Class<? extends Component> componentClass);
 
     /**
+     * Saves changes made to a component back to the entity manager (otherwise the changes will not persist for
+     * future retrievals
      * @param component
      */
     void saveComponent(Component component);

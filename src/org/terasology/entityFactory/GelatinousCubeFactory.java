@@ -4,13 +4,9 @@ import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
-import org.terasology.logic.characters.GelatinousCube;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.model.structures.AABB;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Color4f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 /**
