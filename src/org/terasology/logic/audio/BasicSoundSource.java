@@ -4,7 +4,6 @@ import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3d;
 
@@ -344,6 +343,7 @@ public class BasicSoundSource implements SoundSource {
     }
 
     @Override
+    // TODO: This is no guaranteed to be executed at all – move to a safer place
     protected void finalize() throws Throwable {
         if (this.sourceId != 0) {
             AL10.alDeleteSources(this.sourceId);

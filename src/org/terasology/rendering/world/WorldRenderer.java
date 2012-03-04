@@ -540,8 +540,6 @@ public final class WorldRenderer implements IGameObject {
         if (_player.getPosition().equals(new Vector3d(0.0, 0.0, 0.0))) {
             _player.respawn();
         }
-
-        updateChunksInProximity(true);
     }
 
     /**
@@ -571,6 +569,8 @@ public final class WorldRenderer implements IGameObject {
      * @return
      */
     public boolean generateChunk() {
+        updateChunksInProximity(false);
+
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
 
