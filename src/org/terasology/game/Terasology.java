@@ -435,6 +435,7 @@ public final class Terasology {
         _instance.init();
         _instance.run();
         _instance.shutdown();
+        Config.getInstance().saveConfig("SAVED_WORLDS/last.cfg");
         System.exit(0);
     }
 }
