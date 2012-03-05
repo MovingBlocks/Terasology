@@ -47,8 +47,7 @@ public abstract class MovableEntity extends Entity {
 
     /* MOVEMENT SETTINGS */
     protected static final double MAX_ACC = 56.0d;
-    protected static final double MAX_EARTH_ACC_WATER = 10.0d;
-    protected static final double EARTH_ACC_WATER = 2.0d;
+    protected static final double MAX_EARTH_ACC_WATER = 2.0d;
     protected static final double EARTH_ACC = 28.0d;
     protected static final double RUNNING_FACTOR = 1.5d;
     protected static final double JUMP_INTENSITY = 10.0d;
@@ -343,11 +342,8 @@ public abstract class MovableEntity extends Entity {
             _earthVelocity = -MAX_ACC;
         }
 
-        if (_earthVelocity > -MAX_EARTH_ACC_WATER && !_godMode && _isSwimming) {
-            _earthVelocity -= EARTH_ACC_WATER * timePassedInSeconds;
-        }
-
-        if (_earthVelocity < -MAX_EARTH_ACC_WATER && !_godMode && _isSwimming) {
+        // Pull the player down when swimming
+        if (!_godMode && _isSwimming) {
             _earthVelocity = -MAX_EARTH_ACC_WATER;
         }
 
