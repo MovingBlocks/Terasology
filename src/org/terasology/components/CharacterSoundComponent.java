@@ -13,11 +13,6 @@ public final class CharacterSoundComponent extends AbstractComponent {
     public Sound[] footstepSounds = new Sound[0];
     public float footstepVolume = 1.0f;
 
-    public void store(StorageWriter writer) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 
-    public void retrieve(StorageReader reader) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+
 }
