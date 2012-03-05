@@ -2,8 +2,11 @@ package org.terasology.entitySystem;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
+
+import javax.vecmath.Vector3f;
 
 import static org.junit.Assert.*;
 
@@ -22,12 +25,12 @@ public class PojoPrefabManagerTest {
 
     @Test
     public void retrieveNonExistentPrefab() {
-        assertNull(prefabManager.get(PrefabName));
+        assertNull(prefabManager.getPrefab(PrefabName));
     }
 
     @Test
     public void createPrefab() {
-        PrefabRef ref = prefabManager.create(PrefabName);
+        Prefab ref = prefabManager.createPrefab(PrefabName);
         assertNotNull(ref);
         assertEquals(PrefabName, ref.getName());
         assertTrue(prefabManager.exists(PrefabName));
@@ -35,51 +38,50 @@ public class PojoPrefabManagerTest {
     
     @Test
     public void retrievePrefab() {
-        prefabManager.create(PrefabName);
-        PrefabRef ref = prefabManager.get(PrefabName);
+        prefabManager.createPrefab(PrefabName);
+        Prefab ref = prefabManager.getPrefab(PrefabName);
         assertNotNull(ref);
         assertEquals(PrefabName, ref.getName());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void errorIfCreatePrefabWithUsedName() {
-        prefabManager.create(PrefabName);
-        prefabManager.create(PrefabName);
+        assertEquals(prefabManager.createPrefab(PrefabName), prefabManager.createPrefab(PrefabName));
     }
 
-    @Test
-    public void renamePrefab() {
-        PrefabRef ref = prefabManager.create(PrefabName);
-        ref.rename("NewName");
-
-        assertEquals("NewName", ref.getName());
-        assertNotNull(prefabManager.get("NewName"));
-        assertNull(prefabManager.get(PrefabName));
-        assertTrue(prefabManager.exists("NewName"));
-        assertFalse(prefabManager.exists(PrefabName));
-    }
-    
-    @Test
-    public void destroyPrefab() {
-        PrefabRef ref = prefabManager.create(PrefabName);
-        ref.destroy();
-        assertFalse(prefabManager.exists(PrefabName));
-    }
-    
     @Test
     public void prefabRefEquals() {
-        prefabManager.create(PrefabName);
-        assertEquals(prefabManager.get(PrefabName), prefabManager.get(PrefabName));
+        prefabManager.createPrefab(PrefabName);
+
+        assertEquals(prefabManager.getPrefab(PrefabName), prefabManager.getPrefab(PrefabName));
     }
     
     @Test
     public void addAndRetrieveComponent() {
-        PrefabRef prefab = prefabManager.create(PrefabName);
-        StringComponent comp = prefab.addComponent(new StringComponent());
+        Prefab prefab = prefabManager.createPrefab(PrefabName);
+        StringComponent comp = prefab.setComponent(new StringComponent());
         assertNotNull(comp);
 
         assertEquals(comp, prefab.getComponent(StringComponent.class));
     }
 
+
+    @Test
+    public void testPrefabInheritance() {
+        Prefab parentPrefab = prefabManager.createPrefab("parentPrefab");
+
+        LocationComponent testComponent = new LocationComponent();
+        parentPrefab.setComponent(testComponent);
+
+
+        Prefab prefab = prefabManager.createPrefab(PrefabName);
+        prefab.addParent(parentPrefab);
+
+        assertEquals(testComponent, prefab.getComponent(testComponent.getClass()));
+
+        prefab.getComponent(testComponent.getClass()).position.set(1, 1, 1);
+
+        assertNotSame(testComponent.position,  prefab.getComponent(testComponent.getClass()).position);
+    }
 
 }
