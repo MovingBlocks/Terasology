@@ -39,6 +39,8 @@ public abstract class UIDisplayElement {
 
     private boolean _overlay;
 
+    private boolean _isMoveable = false;
+
     private UIDisplayElement _parent;
 
     public UIDisplayElement() {
@@ -161,4 +163,13 @@ public abstract class UIDisplayElement {
     public void setOverlay(boolean value) {
         _overlay = value;
     }
+
+    public void setIsMoveable(boolean moveable){
+        _isMoveable = moveable;
+    }
+
+    public boolean canMove(){
+        return _isMoveable;
+    }
+
 }

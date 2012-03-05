@@ -29,7 +29,7 @@ Game{
         maxChunkVBOs = 512
         gamma = 2.2d
         pixelFormat = new PixelFormat().withDepthBits(24)
-        displayMode = new DisplayMode(640, 480)
+        displayMode = new DisplayMode(1280, 764)
         fullscreen = false;
         viewingDistanceNear = 8
         viewingDistanceModerate = 16

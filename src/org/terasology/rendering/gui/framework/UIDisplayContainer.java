@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.framework;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 import java.util.ArrayList;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.Display;
@@ -33,12 +34,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     private boolean _scrollable    = false;
     private UIScrollBar _scrollBar = null;
 
+    private Vector4f _cropMargin = new Vector4f(/*TOP*/    0.0f,
+                                                /*RIGHT*/  0.0f,
+                                                /*BOTTOM*/ 0.0f,
+                                                /*LEFT*/   0.0f
+    );
+
     public UIDisplayContainer() {
         super();
-        _scrollBar = new UIScrollBar(new Vector2f(15f, getSize().y));
-        _scrollBar.setPosition(new Vector2f(getPosition().x + getSize().x, getPosition().y));
-        _scrollBar.setVisible(false);
-        addDisplayElement(_scrollBar);
     }
 
     public UIDisplayContainer(Vector2f position) {
@@ -56,7 +59,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         //Cut the elements
         if(_crop){
             glEnable(GL_SCISSOR_TEST);
-            glScissor((int)getPosition().x, Display.getHeight()-((int)getPosition().y + (int)getSize().y), (int)getSize().x, (int)getSize().y);
+            glScissor((int)getPosition().x + (int)_cropMargin.w, Display.getHeight()-((int)getPosition().y + (int)getSize().y + (int)_cropMargin.x), (int)getSize().x + (int)_cropMargin.y, (int)getSize().y + (int)_cropMargin.z);
         }
         // Render all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
@@ -125,15 +128,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         _crop = crop;
     }
 
-    public void setScrollable(boolean scrollable){
-        _scrollable = scrollable;
-        if(_scrollable){
-                _scrollBar.setVisible(true);
-        }/*else{
-            if(_scrollBar != null){
-                _scrollBar.setVisible(false);
-            }
-        }  */
+    public void setCropMargin(Vector4f margin){
+        _cropMargin = margin;
     }
 
 }

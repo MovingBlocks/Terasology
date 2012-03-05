@@ -2,11 +2,12 @@ package org.terasology.rendering.gui.components;
 
 import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+
 import javax.vecmath.Vector2f;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class UIListItem extends UIDisplayContainer{
+public class UIListItem extends UIDisplayContainer {
     private Object  _value;
     private String  _text;
     private boolean _isSelected;

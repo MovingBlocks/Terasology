@@ -5,6 +5,7 @@ import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -13,7 +14,7 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class UIList extends UIDisplayContainer {
+public class UIList extends UIScrollableDisplayContainer {
   ///  private final UIText _text;
 
     //Borders
@@ -28,12 +29,15 @@ public class UIList extends UIDisplayContainer {
 
     private UIListItem _selectedItem        = null;
     private int        _selectedItemIndex   = 0;
+
     //List items
     private List<UIListItem> _items  = new ArrayList<UIListItem>();
 
     public UIList(Vector2f size) {
         setSize(size);
-        //setCrop(true);
+        setCrop(true);
+        setCropMargin(new Vector4f(0.0f, 25f, 0.0f, -5f));
+        setScrollBarPosition(new Vector2f(getPosition().x + size.x, getPosition().y));
 
         _borderTop = new UIGraphicsElement("gui_menu");
         _borderTop.setVisible(true);
@@ -60,8 +64,6 @@ public class UIList extends UIDisplayContainer {
         addDisplayElement(_borderRight);
         addDisplayElement(_borderBottom);
         addDisplayElement(_borderLeft);
-        setScrollable(true);
-
     }
 
     public void update(){
@@ -83,9 +85,13 @@ public class UIList extends UIDisplayContainer {
                     }
                 }
             }
+        }else{
+           _mouseUp = false;
+           _mouseDown = false;
         }
 
         updateBorders();
+        super.update();
     }
 
     public void render(){
@@ -127,6 +133,7 @@ public class UIList extends UIDisplayContainer {
 
         newItem.setVisible(true);
         newItem.setPosition(new Vector2f(getPosition().x, getPosition().y + 32f * _items.size()));
+        newItem.setIsMoveable(true);
         _items.add(newItem);
         addDisplayElement(_items.get(_items.size() - 1));
     }
