@@ -8,6 +8,8 @@ import org.terasology.persistence.interfaces.Persistable;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public interface Component extends Persistable {
+public interface Component extends Persistable, Cloneable {
     public String getName();
+
+    public Component clone();
 }

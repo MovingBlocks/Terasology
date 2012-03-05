@@ -1,33 +1,29 @@
 package org.terasology.entitySystem;
 
 /**
+ *
+ * @todo Write javadoc
  * @author Immortius <immortius@gmail.com>
  */
 public interface PrefabManager {
 
-    /**
-     * @param name
-     * @return A new PrefabRef
-     * @throws IllegalArgumentException when name is already in use
-     */
-    PrefabRef create(String name);
+    public Prefab createPrefab(String name);
 
-    PrefabRef get(String name);
+    public Prefab getPrefab(String name);
     
-    boolean exists(String name);
+    public boolean exists(String name);
 
-    /**
-     * @param oldName
-     * @param name
-     * @return A new PrefabRef with the new name
-     * @throws IllegalArgumentException if either the oldName isn't in use or the new name is already in use
-     */
-    PrefabRef rename(String oldName, String name);
+    public Prefab registerPrefab(Prefab prefab);
 
-    void destroy(String name);
+    public Iterable<Prefab> listPrefabs();
 
-    <T extends Component> T getComponent(String name, Class<T> componentClass);
-    void addComponent(String name, Component component);
-    <T extends Component> void removeComponent(String name, Class<T> componentClass);
-    void saveComponent(String name, Component component);
+    public void removePrefab(String name);
+
+    public <T extends Component> T getComponent(String name, Class<T> componentClass);
+
+    public <T extends Component> T setComponent(String name, T component);
+
+
+    public <T extends Component> void removeComponent(String name, Class<T> componentClass);
+
 }
