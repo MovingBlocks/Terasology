@@ -2,68 +2,88 @@ package org.terasology.entitySystem.pojo;
 
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.PrefabRef;
+import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public class PojoPrefabManager implements PrefabManager {
 
-    Map<String, Map<Class<? extends Component>, Component>> prefabTable = Maps.newHashMap();
-    
-    public PrefabRef create(String name) {
-        if (prefabTable.containsKey(name)) {
-            throw new IllegalArgumentException("Prefab name already in use: " + name);
+    protected final static String OBSERVER_EVENT_DESTROYED = "destroyed";
+    protected final static String OBSERVER_EVENT_RENAMED = "rename";
+
+    Map<String, Prefab> prefabTable = Maps.newHashMap();
+
+    public Prefab createPrefab(String name) {
+        if (exists(name)) {
+            return getPrefab(name);
         }
-        Map<Class<? extends Component>, Component> map = Maps.newHashMap();
-        prefabTable.put(name, map);
-        return new PojoPrefabRef(this, name, map);
+
+        return this.registerPrefab(new PojoPrefab(name));
     }
 
-    public PrefabRef get(String name) {
-        if (prefabTable.containsKey(name)) {
-            return new PojoPrefabRef(this, name, prefabTable.get(name));
-        }
-        return null;
+    public Prefab getPrefab(String name) {
+        return exists(name) ? prefabTable.get(name) : null;
     }
 
     public boolean exists(String name) {
         return prefabTable.containsKey(name);
     }
 
-    public PrefabRef rename(String oldName, String name) {
-        if (prefabTable.containsKey(name)) {
-            throw new IllegalArgumentException("Prefab name already in use: " + name);
+    public Prefab registerPrefab(Prefab prefab) {
+        if (prefabTable.containsKey(prefab.getName())) {
+            throw new IllegalArgumentException("Prefab '" + prefab.getName() + "' already registered!");
         }
-        Map<Class<? extends Component>, Component> map = prefabTable.get(oldName);
-        if (map == null) {
-            throw new IllegalArgumentException("No prefab exists with name: " + oldName);
-        }
-        prefabTable.put(name, map);
-        prefabTable.remove(oldName);
-        return new PojoPrefabRef(this, name, map);
+
+        prefabTable.put(prefab.getName(), prefab);
+
+        return prefab;
     }
 
-    public void destroy(String name) {
+    public Iterable<Prefab> listPrefabs() {
+        return Collections.unmodifiableCollection(prefabTable.values());
+    }
+
+    public void removePrefab(String name) {
         prefabTable.remove(name);
     }
 
     public <T extends Component> T getComponent(String name, Class<T> componentClass) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        if (!exists(name)) {
+            return null;
+        }
+
+        return getPrefab(name).getComponent(componentClass);
     }
 
-    public void addComponent(String name, Component component) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public <T extends Component> T setComponent(String name, T component) {
+        if (!exists(name)) {
+            throw new IllegalArgumentException("No prefab exists with name: " + name);
+        }
+
+        return getPrefab(name).setComponent(component);
     }
 
     public <T extends Component> void removeComponent(String name, Class<T> componentClass) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        if (!exists(name)) {
+            throw new IllegalArgumentException("No prefab exists with name: " + name);
+        }
+
+        getPrefab(name).removeComponent(componentClass);
     }
 
-    public void saveComponent(String name, Component component) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    protected class PrefabObserver implements Observer {
+
+        public void update(Observable o, Object arg) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
     }
 }
