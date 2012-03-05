@@ -15,12 +15,17 @@
  */
 package org.terasology.logic.manager;
 
+import com.google.protobuf.TextFormat;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 import org.terasology.game.Terasology;
 import org.terasology.game.modes.StateSinglePlayer;
+import org.terasology.protobuf.Configuration;
+import org.terasology.utilities.Helper;
 
 import javax.vecmath.Vector2f;
+import java.io.*;
+import java.util.logging.Level;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>,
@@ -28,417 +33,415 @@ import javax.vecmath.Vector2f;
  */
 public final class Config {
     private final static Config _instance = new Config();
-    private String _worldTitle = "New world";
-
-    private double _forrestGrassDensity = 0.3d;
-    private double _plainsGrassDensity = 0.2d;
-    private double _snowGrassDensity = 0.001d;
-    private double _mountainsGrassDensity = 0.2d;
-    private double _desertGrassDensity = 0.001d;
-
-    private long _dayNightLengthInMs = (60l * 1000l) * 30l; // 30 minutes in ms
-    private long _initialTimeOffsetInMs = (60l * 1000l); // 60 seconds in ms
-
-    private Vector2f _spawnOrigin = new Vector2f(-24429, 20547);
-    private String _defaultSeed = "Blockmania42";
-
-    private boolean _debug = false;
-    private boolean _debugCollision = false;
-    private boolean _renderChunkBoundingBoxes = false;
-
-    private boolean _demoFlight = false;
-    private double _demoFlightSpeed = 0.08d;
-    private boolean _godMode = false;
-
-    private int _maxParticles = 256;
-    private Vector2f _cloudResolution = new Vector2f(128, 128);
-    private int _cloudUpdateInterval = 8000;
-    private int _maxThreads = 2;
-
-    private boolean _saveChunks = true;
-    private int _chunkCacheSize = 2048;
-    private int _maxChunkVBOs = 512;
-    private double _gamma = 2.2d;
-    private PixelFormat _pixelFormat = new PixelFormat().withDepthBits(24);
-    private DisplayMode _displayMode = new DisplayMode(1280, 720);
-    private boolean _fullscreen = false;
-    private float _fov = 86.0f;
-
-    private int _activeViewingDistanceId = 0;
-    private int _viewingDistanceNear = 8;
-    private int _viewingDistanceModerate = 16;
-    private int _viewingDistanceFar = 26;
-    private int _viewingDistanceUltra = 32;
-
-    private boolean _flickeringLight = false;
-    private boolean _enablePostProcessingEffects = false;
-    private boolean _animatedWaterAndGrass = false;
-    private int _verticalChunkMeshSegments = 1;
-
-    private double _mouseSens = 0.075d;
-
-    private boolean _cameraBobbing = true;
-    private boolean _renderFirstPersonView = true;
-    private boolean _placingBox = true;
+    private Configuration.Setting.Builder _setting;
 
     public static Config getInstance() {
         return _instance;
     }
 
+    private Config() {
+        if (!loadLastConfig()) {
+            loadDefaultConfig();
+        }
+    }
+
+    private boolean loadLastConfig() {
+        return loadConfig("SAVED_WORLDS/last.cfg");
+    }
+
+    private void loadDefaultConfig() {
+        _setting = Configuration.Setting.newBuilder();
+    }
+
+    public boolean loadConfig(String filename) {
+        filename = Helper.fixSavePath(new File(filename)).getAbsolutePath();
+        Terasology.getInstance().getLogger().log(Level.INFO, "Using config file: " + filename);
+        Configuration.Setting.Builder setting = Configuration.Setting.newBuilder();
+        try {
+            FileInputStream fis = new FileInputStream(filename);
+            InputStreamReader isr = new InputStreamReader(fis);
+            TextFormat.merge(isr, setting);
+            isr.close();
+        } catch (Exception e) {
+            Terasology.getInstance().getLogger().log(Level.WARNING, "Could not load config file, that's OK if this is the first execution. " + filename);
+            return false;
+        }
+        _setting = setting;
+        return true;
+    }
+
+    public void saveConfig(String filename) {
+        try {
+            filename = Helper.fixSavePath(new File(filename)).getAbsolutePath();
+            Terasology.getInstance().getLogger().log(Level.INFO, "Using config file: " + filename);
+            FileOutputStream fos = new FileOutputStream(filename);
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            TextFormat.print(_setting.build(), osw);
+            osw.close();
+        } catch (Exception e) {
+            Terasology.getInstance().getLogger().log(Level.WARNING, "Could not write " + filename, e);
+        }
+    }
+
+    /**
+     * Get / Set methods *
+     */
     public String getWorldTitle() {
-        return _worldTitle;
+        return _setting.getWorldBuilder().getWorldTitle();
     }
 
     public void setWorldTitle(String _worldTitle) {
-        this._worldTitle = _worldTitle;
+        _setting.getWorldBuilder().setWorldTitle(_worldTitle);
     }
 
-    public double getForrestGrassDensity() {
-        return _forrestGrassDensity;
+    public float getForrestGrassDensity() {
+        return _setting.getWorldBuilder().getForrestGrassDensity();
     }
 
-    public void setForrestGrassDensity(double _forrestGrassDensity) {
-        this._forrestGrassDensity = _forrestGrassDensity;
+    public void setForrestGrassDensity(float _forrestGrassDensity) {
+        _setting.getWorldBuilder().setForrestGrassDensity(_forrestGrassDensity);
     }
 
-    public double getPlainsGrassDensity() {
-        return _plainsGrassDensity;
+    public float getPlainsGrassDensity() {
+        return _setting.getWorldBuilder().getPlainsGrassDensity();
     }
 
-    public void setPlainsGrassDensity(double _plainsGrassDensity) {
-        this._plainsGrassDensity = _plainsGrassDensity;
+    public void setPlainsGrassDensity(float plainsGrassDensity) {
+        _setting.getWorldBuilder().setPlainsGrassDensity(plainsGrassDensity);
     }
 
-    public double getSnowGrassDensity() {
-        return _snowGrassDensity;
+    public float getSnowGrassDensity() {
+        return _setting.getWorldBuilder().getSnowGrassDensity();
     }
 
-    public void setSnowGrassDensity(double _snowGrassDensity) {
-        this._snowGrassDensity = _snowGrassDensity;
+    public void setSnowGrassDensity(float snowGrassDensity) {
+        _setting.getWorldBuilder().setSnowGrassDensity(snowGrassDensity);
     }
 
-    public double getMountainsGrassDensity() {
-        return _mountainsGrassDensity;
+    public float getMountainGrassDensity() {
+        return _setting.getWorldBuilder().getMountainGrassDensity();
     }
 
-    public void setMountainsGrassDensity(double _mountainsGrassDensity) {
-        this._mountainsGrassDensity = _mountainsGrassDensity;
+    public void setMountainGrassDensity(float mountainsGrassDensity) {
+        _setting.getWorldBuilder().setMountainGrassDensity(mountainsGrassDensity);
     }
 
-    public double getDesertGrassDensity() {
-        return _desertGrassDensity;
+    public float getDesertGrassDensity() {
+        return _setting.getWorldBuilder().getDesertGrassDensity();
     }
 
-    public void setDesertGrassDensity(double _desertGrassDensity) {
-        this._desertGrassDensity = _desertGrassDensity;
+    public void setDesertGrassDensity(float desertGrassDensity) {
+        _setting.getWorldBuilder().setDesertGrassDensity(desertGrassDensity);
     }
 
     public long getDayNightLengthInMs() {
-        return _dayNightLengthInMs;
+        return _setting.getWorldBuilder().getDayNightLengthInMs();
     }
 
-    public void setDayNightLengthInMs(long _dayNightLengthInMs) {
-        this._dayNightLengthInMs = _dayNightLengthInMs;
+    public void setDayNightLengthInMs(long dayNightLengthInMs) {
+        _setting.getWorldBuilder().setDayNightLengthInMs(dayNightLengthInMs);
     }
 
     public long getInitialTimeOffsetInMs() {
-        return _initialTimeOffsetInMs;
+        return _setting.getWorldBuilder().getInitialTimeOffsetInMs();
     }
 
-    public void setInitialTimeOffsetInMs(long _initialTimeOffsetInMs) {
-        this._initialTimeOffsetInMs = _initialTimeOffsetInMs;
+    public void setInitialTimeOffsetInMs(long initialTimeOffsetInMs) {
+        _setting.getWorldBuilder().setInitialTimeOffsetInMs(initialTimeOffsetInMs);
     }
 
     public Vector2f getSpawnOrigin() {
-        return _spawnOrigin;
+        float x = _setting.getWorldBuilder().getSpawnOriginBuilder().getX();
+        float y = _setting.getWorldBuilder().getSpawnOriginBuilder().getX();
+        return new Vector2f(x, y);
     }
 
-    public void setSpawnOrigin(Vector2f _spawnOrigin) {
-        this._spawnOrigin = _spawnOrigin;
+    public void setSpawnOrigin(Vector2f spawnOrigin) {
+        _setting.getWorldBuilder().getSpawnOriginBuilder().setX(spawnOrigin.x);
+        _setting.getWorldBuilder().getSpawnOriginBuilder().setY(spawnOrigin.y);
     }
 
     public String getDefaultSeed() {
-        return _defaultSeed;
+        return _setting.getWorldBuilder().getDefaultSeed();
     }
 
-    public void setDefaultSeed(String _defaultSeed) {
-        this._defaultSeed = _defaultSeed;
+    public void setDefaultSeed(String defaultSeed) {
+        _setting.getWorldBuilder().setDefaultSeed(defaultSeed);
     }
 
     public boolean isDebug() {
-        return _debug;
+        return _setting.getDebugInfoBuilder().getDebug();
     }
 
-    public void setDebug(boolean _debug) {
-        this._debug = _debug;
+    public void setDebug(boolean debug) {
+        _setting.getDebugInfoBuilder().setDebug(debug);
     }
 
     public boolean isDebugCollision() {
-        return _debugCollision;
+        return _setting.getDebugInfoBuilder().getDebugCollision();
     }
 
-    public void setDebugCollision(boolean _debugCollision) {
-        this._debugCollision = _debugCollision;
+    public void setDebugCollision(boolean debugCollision) {
+        _setting.getDebugInfoBuilder().setDebugCollision(debugCollision);
     }
 
     public boolean isRenderChunkBoundingBoxes() {
-        return _renderChunkBoundingBoxes;
+        return _setting.getDebugInfoBuilder().getRenderChunkBoundingBoxes();
     }
 
-    public void setRenderChunkBoundingBoxes(boolean _renderChunkBoundingBoxes) {
-        this._renderChunkBoundingBoxes = _renderChunkBoundingBoxes;
+    public void setRenderChunkBoundingBoxes(boolean renderChunkBoundingBoxes) {
+        _setting.getDebugInfoBuilder().setRenderChunkBoundingBoxes(renderChunkBoundingBoxes);
     }
 
     public boolean isDemoFlight() {
-        return _demoFlight;
+        return _setting.getDebugInfoBuilder().getDemoFlight();
     }
 
-    public void setDemoFlight(boolean _demoFlight) {
-        this._demoFlight = _demoFlight;
+    public void setDemoFlight(boolean demoFlight) {
+        _setting.getDebugInfoBuilder().setDemoFlight(demoFlight);
     }
 
     public double getDemoFlightSpeed() {
-        return _demoFlightSpeed;
+        return _setting.getDebugInfoBuilder().getDemoFlightSpeed();
     }
 
-    public void setDemoFlightSpeed(double _demoFlightSpeed) {
-        this._demoFlightSpeed = _demoFlightSpeed;
+    public void setDemoFlightSpeed(float demoFlightSpeed) {
+        _setting.getDebugInfoBuilder().setDemoFlightSpeed(demoFlightSpeed);
     }
 
     public boolean isGodMode() {
-        return _godMode;
+        return _setting.getDebugInfoBuilder().getGodMode();
     }
 
-    public void setGodMode(boolean _godMode) {
-        this._godMode = _godMode;
+    public void setGodMode(boolean godMode) {
+        _setting.getDebugInfoBuilder().setGodMode(godMode);
     }
 
     public int getMaxParticles() {
-        return _maxParticles;
+        return _setting.getSystemBuilder().getMaxParticles();
     }
 
-    public void setMaxParticles(int _maxParticles) {
-        this._maxParticles = _maxParticles;
+    public void setMaxParticles(int maxParticles) {
+        _setting.getSystemBuilder().setMaxParticles(maxParticles);
     }
 
     public Vector2f getCloudResolution() {
-        return _cloudResolution;
+        float x = _setting.getSystemBuilder().getCloudResolutionBuilder().getX();
+        float y = _setting.getSystemBuilder().getCloudResolutionBuilder().getY();
+        return new Vector2f(x, y);
     }
 
-    public void setCloudResolution(Vector2f _cloudResolution) {
-        this._cloudResolution = _cloudResolution;
+    public void setCloudResolution(Vector2f cloudResolution) {
+        _setting.getSystemBuilder().getCloudResolutionBuilder().setX(cloudResolution.x);
+        _setting.getSystemBuilder().getCloudResolutionBuilder().setX(cloudResolution.y);
     }
 
     public int getCloudUpdateInterval() {
-        return _cloudUpdateInterval;
+        return _setting.getSystemBuilder().getCloudUpdateInterval();
     }
 
-    public void setCloudUpdateInterval(int _cloudUpdateInterval) {
-        this._cloudUpdateInterval = _cloudUpdateInterval;
+    public void setCloudUpdateInterval(int cloudUpdateInterval) {
+        _setting.getSystemBuilder().setCloudUpdateInterval(cloudUpdateInterval);
     }
 
     public int getMaxThreads() {
-        return _maxThreads;
+        return _setting.getSystemBuilder().getMaxThreads();
     }
 
-    public void setMaxThreads(int _maxThreads) {
-        this._maxThreads = _maxThreads;
+    public void setMaxThreads(int maxThreads) {
+        _setting.getSystemBuilder().setMaxThreads(maxThreads);
     }
 
     public boolean isSaveChunks() {
-        return _saveChunks;
+        return _setting.getSystemBuilder().getSaveChunks();
     }
 
-    public void setSaveChunks(boolean _saveChunks) {
-        this._saveChunks = _saveChunks;
+    public void setSaveChunks(boolean saveChunks) {
+        _setting.getSystemBuilder().setSaveChunks(saveChunks);
     }
 
     public int getChunkCacheSize() {
-        return _chunkCacheSize;
+        return _setting.getSystemBuilder().getChunkCacheSize();
     }
 
-    public void setChunkCacheSize(int _chunkCacheSize) {
-        this._chunkCacheSize = _chunkCacheSize;
+    public void setChunkCacheSize(int chunkCacheSize) {
+        _setting.getSystemBuilder().setChunkCacheSize(chunkCacheSize);
     }
 
     public int getMaxChunkVBOs() {
-        return _maxChunkVBOs;
+        return _setting.getSystemBuilder().getMaxChunkVBOs();
     }
 
-    public void setMaxChunkVBOs(int _maxChunkVBOs) {
-        this._maxChunkVBOs = _maxChunkVBOs;
+    public void setMaxChunkVBOs(int maxChunkVBOs) {
+        _setting.getSystemBuilder().setMaxChunkVBOs(maxChunkVBOs);
     }
 
     public double getGamma() {
-        return _gamma;
+        return _setting.getSystemBuilder().getGamma();
     }
 
-    public void setGamma(double _gamma) {
-        this._gamma = _gamma;
+    public void setGamma(float gamma) {
+        _setting.getSystemBuilder().setGamma(gamma);
     }
 
     public PixelFormat getPixelFormat() {
-        return _pixelFormat;
+        int bits = _setting.getSystemBuilder().getPixelFormat();
+        return new PixelFormat().withDepthBits(bits);
     }
 
-    public void setPixelFormat(PixelFormat _pixelFormat) {
-        this._pixelFormat = _pixelFormat;
+    public void setPixelFormat(PixelFormat pixelFormat) {
+        _setting.getSystemBuilder().setPixelFormat(pixelFormat.getBitsPerPixel());
     }
 
     public DisplayMode getDisplayMode() {
-        return _displayMode;
+        int width = _setting.getSystemBuilder().getDisplayModeBuilder().getWidth();
+        int height = _setting.getSystemBuilder().getDisplayModeBuilder().getHeight();
+        return new DisplayMode(width, height);
     }
 
-    public void setDisplayMode(DisplayMode _displayMode) {
-        this._displayMode = _displayMode;
+    public void setDisplayMode(DisplayMode displayMode) {
+        _setting.getSystemBuilder().getDisplayModeBuilder().setWidth(displayMode.getWidth());
+        _setting.getSystemBuilder().getDisplayModeBuilder().setHeight(displayMode.getHeight());
     }
 
     public boolean isFullscreen() {
-        return _fullscreen;
+        return _setting.getSystemBuilder().getFullscreen();
     }
 
-    public void setFullscreen(boolean _fullscreen) {
-        this._fullscreen = _fullscreen;
+    public void setFullscreen(boolean fullscreen) {
+        _setting.getSystemBuilder().setFullscreen(fullscreen);
     }
 
     public int getViewingDistanceNear() {
-        return _viewingDistanceNear;
+        return _setting.getSystemBuilder().getViewingDistanceNear();
     }
 
-    public void setViewingDistanceNear(int _viewingDistanceNear) {
-        this._viewingDistanceNear = _viewingDistanceNear;
+    public void setViewingDistanceNear(int viewingDistanceNear) {
+        _setting.getSystemBuilder().setViewingDistanceNear(viewingDistanceNear);
     }
 
     public int getViewingDistanceModerate() {
-        return _viewingDistanceModerate;
+        return _setting.getSystemBuilder().getViewingDistanceModerate();
     }
 
-    public void setViewingDistanceModerate(int _viewingDistanceModerate) {
-        this._viewingDistanceModerate = _viewingDistanceModerate;
+    public void setViewingDistanceModerate(int viewingDistanceModerate) {
+        _setting.getSystemBuilder().setViewingDistanceModerate(viewingDistanceModerate);
     }
 
     public int getViewingDistanceFar() {
-        return _viewingDistanceFar;
+        return _setting.getSystemBuilder().getViewingDistanceFar();
     }
 
-    public void setViewingDistanceFar(int _viewingDistanceFar) {
-        this._viewingDistanceFar = _viewingDistanceFar;
+    public void setViewingDistanceFar(int viewingDistanceFar) {
+        _setting.getSystemBuilder().setViewingDistanceFar(viewingDistanceFar);
     }
 
     public int getViewingDistanceUltra() {
-        return _viewingDistanceUltra;
+        return _setting.getSystemBuilder().getViewingDistanceUltra();
     }
 
-    public void setViewingDistanceUltra(int _viewingDistanceUltra) {
-        this._viewingDistanceUltra = _viewingDistanceUltra;
+    public void setViewingDistanceUltra(int viewingDistanceUltra) {
+        _setting.getSystemBuilder().setViewingDistanceUltra(viewingDistanceUltra);
     }
 
     public boolean isFlickeringLight() {
-        return _flickeringLight;
+        return _setting.getSystemBuilder().getFlickeringLight();
     }
 
-    public void setFlickeringLight(boolean _flickeringLight) {
-        this._flickeringLight = _flickeringLight;
+    public void setFlickeringLight(boolean flickeringLight) {
+        _setting.getSystemBuilder().setFlickeringLight(flickeringLight);
     }
 
     public boolean isEnablePostProcessingEffects() {
-        return _enablePostProcessingEffects;
+        return _setting.getSystemBuilder().getEnablePostProcessingEffects();
     }
 
-    public void setEnablePostProcessingEffects(boolean _enablePostProcessingEffects) {
-        this._enablePostProcessingEffects = _enablePostProcessingEffects;
+    public void setEnablePostProcessingEffects(boolean enablePostProcessingEffects) {
+        _setting.getSystemBuilder().setEnablePostProcessingEffects(enablePostProcessingEffects);
     }
 
     public boolean isAnimatedWaterAndGrass() {
-        return _animatedWaterAndGrass;
+        return _setting.getSystemBuilder().getAnimatedWaterAndGrass();
     }
 
-    public void setAnimatedWaterAndGrass(boolean _animatedWaterAndGrass) {
-        this._animatedWaterAndGrass = _animatedWaterAndGrass;
+    public void setAnimatedWaterAndGrass(boolean animatedWaterAndGrass) {
+        _setting.getSystemBuilder().setAnimatedWaterAndGrass(animatedWaterAndGrass);
     }
 
     public int getVerticalChunkMeshSegments() {
-        return _verticalChunkMeshSegments;
+        return _setting.getSystemBuilder().getVerticalChunkMeshSegments();
     }
 
-    public void setVerticalChunkMeshSegments(int _verticalChunkMeshSegments) {
-        this._verticalChunkMeshSegments = _verticalChunkMeshSegments;
+    public void setVerticalChunkMeshSegments(int verticalChunkMeshSegments) {
+        _setting.getSystemBuilder().setVerticalChunkMeshSegments(verticalChunkMeshSegments);
     }
 
     public double getMouseSens() {
-        return _mouseSens;
+        return _setting.getPlayerBuilder().getMouseSens();
     }
 
-    public void setMouseSens(double _mouseSens) {
-        this._mouseSens = _mouseSens;
+    public void setMouseSens(float mouseSens) {
+        _setting.getPlayerBuilder().setMouseSens(mouseSens);
     }
 
     public float getFov() {
-        return _fov;
+        return _setting.getPlayerBuilder().getFov();
     }
 
-    public void setFov(float _fov) {
-        this._fov = _fov;
+    public void setFov(float fov) {
+        _setting.getPlayerBuilder().setFov(fov);
     }
 
     public boolean isCameraBobbing() {
-        return _cameraBobbing;
+        return _setting.getPlayerBuilder().getCameraBobbing();
     }
 
-    public void setCameraBobbing(boolean _cameraBobbing) {
-        this._cameraBobbing = _cameraBobbing;
+    public void setCameraBobbing(boolean cameraBobbing) {
+        _setting.getPlayerBuilder().setCameraBobbing(cameraBobbing);
     }
 
     public boolean isRenderFirstPersonView() {
-        return _renderFirstPersonView;
+        return _setting.getPlayerBuilder().getRenderFirstPersonView();
     }
 
-    public void setRenderFirstPersonView(boolean _renderFirstPersonView) {
-        this._renderFirstPersonView = _renderFirstPersonView;
+    public void setRenderFirstPersonView(boolean renderFirstPersonView) {
+        _setting.getPlayerBuilder().setRenderFirstPersonView(renderFirstPersonView);
     }
 
     public boolean isPlacingBox() {
-        return _placingBox;
+        return _setting.getPlayerBuilder().getPlacingBox();
     }
 
-    public void setPlacingBox(boolean _placingBox) {
-        this._placingBox = _placingBox;
-    }
-
-    private Config() {
-        loadLastConfig();
-    }
-
-    private void loadLastConfig() {
-    }
-
-    public void loadConfig(String filename) {
+    public void setPlacingBox(boolean placingBox) {
+        _setting.getPlayerBuilder().setPlacingBox(placingBox);
     }
 
     /* SPECIAL STUFF */
     public int getActiveViewingDistance() {
-        if (_activeViewingDistanceId == 1)
+        if (_setting.getSystemBuilder().getActiveViewingDistanceId() == 1)
             return getViewingDistanceModerate();
-        else if (_activeViewingDistanceId == 2)
+        else if (_setting.getSystemBuilder().getActiveViewingDistanceId() == 2)
             return getViewingDistanceFar();
-        else if (_activeViewingDistanceId == 3)
+        else if (_setting.getSystemBuilder().getActiveViewingDistanceId() == 3)
             return getViewingDistanceUltra();
 
         return getViewingDistanceNear();
     }
 
     public int getActiveViewingDistanceId() {
-        return _activeViewingDistanceId;
+        return _setting.getSystemBuilder().getActiveViewingDistanceId();
     }
 
-    public void setViewingDistanceById(int _viewingDistance) {
-        this._activeViewingDistanceId = _viewingDistance;
+    //todo remove this from the config
+    public void setViewingDistanceById(int viewingDistance) {
+        _setting.getSystemBuilder().setActiveViewingDistanceId(viewingDistance);
 
         // Make sure to update the chunks "around" the player
         if (Terasology.getInstance().getCurrentGameState() instanceof StateSinglePlayer)
             Terasology.getInstance().getActiveWorldRenderer().updateChunksInProximity(true);
     }
 
+    //todo remove this from the config
     public void setGraphicsQuality(int qualityLevel) {
         if (qualityLevel == 0) {
             setEnablePostProcessingEffects(false);
@@ -455,6 +458,17 @@ public final class Config {
         }
 
         ShaderManager.getInstance().recompileAllShaders();
+    }
+
+    //todo remove this from the config
+    public int getGraphicsQuality() {
+        if (isEnablePostProcessingEffects() & isFlickeringLight() && !isAnimatedWaterAndGrass()) {
+            return 1;
+        } else if (isEnablePostProcessingEffects() & isFlickeringLight() && isAnimatedWaterAndGrass()) {
+            return 2;
+        }
+
+        return 0;
     }
 }
 

@@ -3,6 +3,7 @@ package org.terasology.logic.audio;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.AudioManager;
 
 import javax.vecmath.Vector3d;
 
@@ -53,6 +54,9 @@ public class BasicSoundSource implements SoundSource {
         }
 
         alSourceStop(this.getSourceId());
+
+        OpenALException.checkState("Rewind");
+
         alSourceRewind(this.getSourceId());
 
         OpenALException.checkState("Stop playback");
@@ -106,8 +110,8 @@ public class BasicSoundSource implements SoundSource {
         this.setDirection(zeroVector);
 
         // some additional settings
-        alSourcef(this.getSourceId(), AL_MAX_DISTANCE, 50.0f);
-        alSourcef(this.getSourceId(), AL_REFERENCE_DISTANCE, 1.0f);
+        alSourcef(this.getSourceId(), AL_MAX_DISTANCE, AudioManager.MAX_DISTANCE);
+        alSourcef(this.getSourceId(), AL_REFERENCE_DISTANCE, 0.1f);
 
         this.fade = false;
         this.srcGain = 1.0f;
@@ -239,11 +243,11 @@ public class BasicSoundSource implements SoundSource {
     }
 
     public float getGain() {
-        return AL10.alGetSourcef(this.getSourceId(), AL10.AL_GAIN);
+        return alGetSourcef(this.getSourceId(), AL_GAIN);
     }
 
     public SoundSource setGain(float gain) {
-        AL10.alSourcef(this.getSourceId(), AL10.AL_GAIN, gain);
+        alSourcef(this.getSourceId(), AL_GAIN, gain);
 
         OpenALException.checkState("Setting sound gain");
 
@@ -306,15 +310,15 @@ public class BasicSoundSource implements SoundSource {
         float[] pos = new float[]{(float) position.x, (float) position.y, (float) position.z};
 
         if (this.isAbsolute()) {
-            Vector3d playerPos = this.getPlayerPosition();
-            pos[0] -= playerPos.x;
-            pos[1] -= playerPos.y;
-            pos[2] -= playerPos.z;
+            Vector3d cameraPos = this.getCameraPosition();
+            pos[0] -= cameraPos.x;
+            pos[1] -= cameraPos.y;
+            pos[2] -= cameraPos.z;
         }
 
         alSource3f(this.getSourceId(), AL10.AL_POSITION, pos[0], pos[1], pos[2]);
 
-        OpenALException.checkState("Chaning sound position");
+        OpenALException.checkState("Changing sound position");
     }
 
     private void updateFade() {
@@ -334,11 +338,12 @@ public class BasicSoundSource implements SoundSource {
         }
     }
 
-    private Vector3d getPlayerPosition() {
-        return Terasology.getInstance().getActivePlayer().getPosition();
+    private Vector3d getCameraPosition() {
+        return Terasology.getInstance().getActiveCamera().getPosition();
     }
 
     @Override
+    // TODO: This is no guaranteed to be executed at all – move to a safer place
     protected void finalize() throws Throwable {
         if (this.sourceId != 0) {
             AL10.alDeleteSources(this.sourceId);

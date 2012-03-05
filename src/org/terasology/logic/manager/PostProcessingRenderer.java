@@ -40,10 +40,9 @@ public class PostProcessingRenderer {
     public static final float ADJUSTMENT_SPEED = 0.025f;
 
     private static PostProcessingRenderer _instance = null;
-    private float _exposure;
+    private float _exposure = 16.0f;
     private int _displayListQuad = -1;
 
-    private boolean _initialized = false;
     private boolean _extensionsAvailable = false;
 
     public class FBO {
@@ -94,31 +93,29 @@ public class PostProcessingRenderer {
 
     public PostProcessingRenderer() {
         _extensionsAvailable = GLContext.getCapabilities().GL_ARB_framebuffer_object;
-        initialize();
+
+        if (_extensionsAvailable)
+            initialize();
     }
 
     public void initialize() {
-        if (_extensionsAvailable && !_initialized) {
-            createOrUpdateFullscreenFbos();
+        createOrUpdateFullscreenFbos();
 
-            createFBO("sceneHighPass", 256, 256, false, false);
-            createFBO("sceneBloom0", 256, 256, false, false);
-            createFBO("sceneBloom1", 256, 256, false, false);
-            createFBO("sceneBloom2", 256, 256, false, false);
+        createFBO("sceneHighPass", 256, 256, false, false);
+        createFBO("sceneBloom0", 256, 256, false, false);
+        createFBO("sceneBloom1", 256, 256, false, false);
+        createFBO("sceneBloom2", 256, 256, false, false);
 
-            createFBO("sceneBlur0", 1024, 1024, false, false);
-            createFBO("sceneBlur1", 1024, 1024, false, false);
-            createFBO("sceneBlur2", 1024, 1024, false, false);
+        createFBO("sceneBlur0", 1024, 1024, false, false);
+        createFBO("sceneBlur1", 1024, 1024, false, false);
+        createFBO("sceneBlur2", 1024, 1024, false, false);
 
-            createFBO("scene32", 32, 32, false, false);
-            createFBO("scene16", 16, 16, false, false);
-            createFBO("scene8", 8, 8, false, false);
-            createFBO("scene4", 4, 4, false, false);
-            createFBO("scene2", 2, 2, false, false);
-            createFBO("scene1", 1, 1, false, false);
-
-            _initialized = true;
-        }
+        createFBO("scene32", 32, 32, false, false);
+        createFBO("scene16", 16, 16, false, false);
+        createFBO("scene8", 8, 8, false, false);
+        createFBO("scene4", 4, 4, false, false);
+        createFBO("scene2", 2, 2, false, false);
+        createFBO("scene1", 1, 1, false, false);
     }
 
     public void deleteFBO(String title) {
@@ -242,8 +239,6 @@ public class PostProcessingRenderer {
         if (!_extensionsAvailable)
             return;
 
-        createOrUpdateFullscreenFbos();
-
         if (Config.getInstance().isEnablePostProcessingEffects()) {
             generateDownsampledScene();
             updateExposure();
@@ -265,6 +260,8 @@ public class PostProcessingRenderer {
 
             renderFullQuad();
         }
+
+        createOrUpdateFullscreenFbos();
     }
 
     private void renderFinalScene() {

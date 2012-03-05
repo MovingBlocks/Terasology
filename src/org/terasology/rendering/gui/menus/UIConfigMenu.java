@@ -70,8 +70,6 @@ public class UIConfigMenu extends UIDisplayRenderer {
         addDisplayElement(_graphicsQualityButton);
         addDisplayElement(_backToMainMenuButton);
         addDisplayElement(_viewingDistanceButton);
-
-        update();
     }
 
     @Override

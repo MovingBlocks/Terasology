@@ -19,11 +19,14 @@ import org.terasology.logic.characters.Player;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.structures.BlockPosition;
+import org.terasology.utilities.FastRandom;
 
 /**
  * TODO
  */
 public class SimpleTool implements ITool {
+
+    protected static final FastRandom _random = new FastRandom();
 
     protected final Player _player;
 

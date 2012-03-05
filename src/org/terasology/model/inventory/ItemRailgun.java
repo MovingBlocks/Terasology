@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.model.inventory;
 
-uniform float tick;
 
-varying vec3 normal;
-varying vec4 vertexWorldPos;
+/**
+ * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
+ */
+public class ItemRailgun extends Item {
 
-void main()
-{
-	vec4 vertexPos =  ftransform();
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    gl_FrontColor = gl_Color;
+    public ItemRailgun() {
+        super();
 
-    vertexWorldPos = gl_ModelViewMatrix * gl_Vertex;
-    normal = gl_NormalMatrix * gl_Normal;
-
-    vertexPos.y += cos(tick * 0.01 + vertexPos.x * 0.1) * sin(tick * 0.01 + vertexPos.x * 0.1 + 0.483921) * 0.25;
-
-    gl_Position = vertexPos;
+        _toolId = (byte) 5;
+        _stackSize = 1;
+    }
 }

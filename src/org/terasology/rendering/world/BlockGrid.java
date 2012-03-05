@@ -28,7 +28,7 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4f;
 import java.util.HashSet;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glColorMask;
 
 /**
  * Renderable block grid. Can be used for displaying a set of block selection boxes.
@@ -61,8 +61,8 @@ public class BlockGrid implements IGameObject {
             for (BlockPosition gp : _gridPositions) {
                 GL11.glPushMatrix();
 
-                Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-                GL11.glTranslated(gp.x - playerPosition.x, gp.y - playerPosition.y, gp.z - playerPosition.z);
+                Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+                GL11.glTranslated(gp.x - cameraPosition.x, gp.y - cameraPosition.y, gp.z - cameraPosition.z);
 
                 _mesh.render();
 

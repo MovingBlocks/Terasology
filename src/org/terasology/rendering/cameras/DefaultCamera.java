@@ -18,7 +18,6 @@ package org.terasology.rendering.cameras;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-import org.terasology.utilities.Helper;
 
 import javax.vecmath.Vector3d;
 
@@ -26,11 +25,11 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 /**
- * Provides global access to fonts.
+ * Simple default camera.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class FirstPersonCamera extends Camera {
+public class DefaultCamera extends Camera {
 
     private double _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0;
 
@@ -51,10 +50,8 @@ public class FirstPersonCamera extends Camera {
         right.cross(_viewingDirection, _up);
         right.scale(_bobbingRotationOffsetFactor);
 
-        GLU.gluLookAt((float) _position.x, (float) _position.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z, (float) _position.x + (float) _viewingDirection.x, (float) _position.y + (float) _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _position.z + (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
-        _frustumNeedsUpdate = true;
-
-        Helper.readMatrix(GL_MODELVIEW_MATRIX, _viewMatrix);
+        GLU.gluLookAt(0f, (float) _bobbingVerticalOffsetFactor * 2.0f, 0f, (float) _viewingDirection.x, (float) _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
+        _viewFrustum.updateFrustum();
     }
 
     public void loadNormalizedModelViewMatrix() {
@@ -66,6 +63,7 @@ public class FirstPersonCamera extends Camera {
         right.scale(_bobbingRotationOffsetFactor);
 
         GLU.gluLookAt(0f, 0f, 0f, (float) _viewingDirection.x, (float) _viewingDirection.y, (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
+        _viewFrustum.updateFrustum();
     }
 
     public void setBobbingRotationOffsetFactor(double f) {

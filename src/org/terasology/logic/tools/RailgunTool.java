@@ -21,7 +21,6 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 
 import javax.vecmath.Vector3d;
@@ -30,14 +29,14 @@ import javax.vecmath.Vector3f;
 /**
  * Creates an explosion originating from the currently selected block of the player.
  */
-public class ExplosionTool extends SimpleTool {
+public class RailgunTool extends SimpleTool {
 
-    public ExplosionTool(Player player) {
+    public RailgunTool(Player player) {
         super(player);
     }
 
     public void executeLeftClickAction() {
-        Terasology.getInstance().submitTask("Explosion", new Runnable() {
+        Terasology.getInstance().submitTask("Railgun", new Runnable() {
             public void run() {
                 explode();
             }
@@ -54,17 +53,22 @@ public class ExplosionTool extends SimpleTool {
     public void explode() {
         IWorldProvider worldProvider = _player.getParent().getWorldProvider();
 
-        if (_player.getSelectedBlock() != null) {
-            BlockPosition blockPos = _player.getSelectedBlock().getBlockPosition();
-            Vector3d origin = blockPos.toVector3d();
+        //if (_player.getSelectedBlock() != null) {
+        //BlockPosition blockPos = _player.getSelectedBlock().getBlockPosition();
+        //Vector3d origin = blockPos.toVector3d();
+        Vector3d dir = _player.getViewingDirection();
+        Vector3d origin = (Vector3d) _player.getPosition().clone();
+        for (int s = 4; s <= 10000; s += 30) {
 
-            for (int i = 0; i < 256; i++) {
+            origin.add(dir);
+
+            for (int i = 0; i < 64; i++) {
                 Vector3d direction = new Vector3d((float) _random.randomDouble(), (float) _random.randomDouble(), (float) _random.randomDouble());
                 direction.normalize();
                 Vector3f impulse = new Vector3f(direction);
                 impulse.scale(800000);
 
-                for (int j = 0; j < 4; j++) {
+                for (int j = 0; j < 3; j++) {
                     Vector3f target = new Vector3f(origin);
 
                     target.x += direction.x * j;
@@ -88,5 +92,4 @@ public class ExplosionTool extends SimpleTool {
             }
         }
     }
-
 }

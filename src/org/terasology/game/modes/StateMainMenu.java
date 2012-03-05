@@ -17,7 +17,6 @@ package org.terasology.game.modes;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.newdawn.slick.openal.SoundStore;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
@@ -149,6 +148,13 @@ public class StateMainMenu implements IGameState {
             _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Far");
         else
             _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Near");
+
+        if (Config.getInstance().getGraphicsQuality() == 1)
+            _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Nice");
+        else if (Config.getInstance().getGraphicsQuality() == 2)
+            _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Epic");
+        else
+            _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Ugly");
     }
 
     public void deactivate() {

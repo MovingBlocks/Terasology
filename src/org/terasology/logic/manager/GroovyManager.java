@@ -25,6 +25,8 @@ import org.terasology.components.*;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
+import org.terasology.game.modes.IGameState;
+import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.characters.Player;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
@@ -94,8 +96,7 @@ public class GroovyManager {
     }
 
     private void updateBinding() {
-        _bind.setVariable("tera", Terasology.getInstance());
-        _bind.setVariable("configuration", Config.getInstance());
+        _bind.setVariable("cfg", Config.getInstance());
         _bind.setVariable("cmd", new CommandHelper());
     }
 
@@ -164,6 +165,23 @@ public class GroovyManager {
             factory.setRandom(Terasology.getInstance().getActiveWorldRenderer().getWorldProvider().getRandom());
             factory.generateGelatinousCube(new Vector3f((float)player.getPosition().x, (float)player.getPosition().y, (float)player.getPosition().z));
         }
+        public void gotoWorld(String title) {
+            IGameState state = Terasology.getInstance().getCurrentGameState();
 
+            if (state instanceof StateSinglePlayer) {
+                StateSinglePlayer spState = (StateSinglePlayer) state;
+                spState.initWorld(title);
+            }
+
+        }
+
+        public void gotoWorld(String title, String seed) {
+            IGameState state = Terasology.getInstance().getCurrentGameState();
+
+            if (state instanceof StateSinglePlayer) {
+                StateSinglePlayer spState = (StateSinglePlayer) state;
+                spState.initWorld(title, seed);
+            }
+        }
     }
 }

@@ -74,8 +74,6 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _healthBar = new UIHealthBar();
         _healthBar.setVisible(true);
         addDisplayElement(_healthBar);
-
-        update();
     }
 
 

@@ -36,7 +36,6 @@ import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.Helper;
 
@@ -99,6 +98,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     private RigidBody _rigidBody = null;
     /* ----- */
     private ReentrantLock _lock = new ReentrantLock();
+    private ReentrantLock _lockRigidBody = new ReentrantLock();
 
     public enum LIGHT_TYPE {
         BLOCK,
@@ -520,12 +520,12 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
      *
      * @return The distance of the chunk to the player
      */
-    public double distanceToPlayer() {
+    public double distanceToCamera() {
         Vector3d result = new Vector3d(getPosition().x * CHUNK_DIMENSION_X, 0, getPosition().z * CHUNK_DIMENSION_Z);
 
-        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-        result.x -= playerPosition.x;
-        result.z -= playerPosition.z;
+        Vector3d cameraPos = Terasology.getInstance().getActiveCamera().getPosition();
+        result.x -= cameraPos.x;
+        result.z -= cameraPos.z;
 
         return result.length();
     }
@@ -609,8 +609,8 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             return 0;
         }
 
-        double distance = distanceToPlayer();
-        double distance2 = o.distanceToPlayer();
+        double distance = distanceToCamera();
+        double distance2 = o.distanceToCamera();
 
         if (distance == distance2)
             return 0;
@@ -620,7 +620,8 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
     public AABB getAABB() {
         if (_aabb == null) {
-            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 2.0, CHUNK_DIMENSION_Y / 2.0, CHUNK_DIMENSION_Z / 2.0);
+            // TODO: The AABBs are currently a bit larger than the actual chunk is
+            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 1.75, CHUNK_DIMENSION_Y / 1.75, CHUNK_DIMENSION_Z / 1.75);
             Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
             _aabb = new AABB(position, dimensions);
         }
@@ -752,13 +753,13 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
             GL11.glPushMatrix();
 
-            Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-            GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - playerPosition.x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - playerPosition.y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - playerPosition.z);
+            Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+            GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - cameraPosition.x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - cameraPosition.y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - cameraPosition.z);
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {
                     if (Config.getInstance().isRenderChunkBoundingBoxes()) {
-                        getSubMeshAABB(i).renderLocally(2f);
+                        getSubMeshAABB(i).renderLocally(1f);
                         _statRenderedTriangles += 12;
                     }
 
@@ -1010,52 +1011,51 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     }
 
     private void updateRigidBody(final ChunkMesh[] meshes) {
-        if (_rigidBody != null)
-            return;
-
-        if (meshes == null)
-            return;
-
-        if (meshes.length < VERTICAL_SEGMENTS)
+        if (_rigidBody != null || meshes == null || meshes.length < VERTICAL_SEGMENTS)
             return;
 
         Terasology.getInstance().submitTask("Update Chunk Collision", new Runnable() {
             public void run() {
-                TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+                try {
+                    _lockRigidBody.lock();
 
-                int counter = 0;
-                for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
-                    ChunkMesh mesh = meshes[k];
+                    TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
 
-                    if (mesh != null) {
-                        IndexedMesh indexedMesh = mesh._indexedMesh;
+                    int counter = 0;
+                    for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
+                        ChunkMesh mesh = meshes[k];
 
-                        if (indexedMesh != null) {
-                            vertexArray.addIndexedMesh(indexedMesh);
-                            counter++;
+                        if (mesh != null) {
+                            IndexedMesh indexedMesh = mesh._indexedMesh;
+
+                            if (indexedMesh != null) {
+                                vertexArray.addIndexedMesh(indexedMesh);
+                                counter++;
+                            }
+
+                            mesh._indexedMesh = null;
                         }
-
-                        mesh._indexedMesh = null;
                     }
-                }
 
-                if (counter == VERTICAL_SEGMENTS) {
-                    try {
-                        BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
+                    if (counter == VERTICAL_SEGMENTS) {
+                        try {
+                            BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
 
-                        Matrix3f rot = new Matrix3f();
-                        rot.setIdentity();
+                            Matrix3f rot = new Matrix3f();
+                            rot.setIdentity();
 
-                        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
+                            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
 
-                        RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
-                        _rigidBody = new RigidBody(blockConsInf);
+                            RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
+                            _rigidBody = new RigidBody(blockConsInf);
 
-                    } catch (Exception e) {
-                        Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+                        } catch (Exception e) {
+                            Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+                        }
                     }
+                } finally {
+                    _lockRigidBody.unlock();
                 }
-
             }
         });
     }

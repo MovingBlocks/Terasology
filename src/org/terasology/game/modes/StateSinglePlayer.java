@@ -68,11 +68,7 @@ public class StateSinglePlayer implements IGameState {
     /* GAME LOOP */
     private boolean _pauseGame = false;
 
-    private Terasology _gameInstance = null;
-
     public void init() {
-        _gameInstance = Terasology.getInstance();
-
         _hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
 
@@ -125,6 +121,9 @@ public class StateSinglePlayer implements IGameState {
     }
 
     public void update(double delta) {
+        /* GUI */
+        updateUserInterface();
+
 
         _ranHopSys.update((float)delta);
         _charMoveSys.update((float)delta);
@@ -155,6 +154,10 @@ public class StateSinglePlayer implements IGameState {
             }
     }
 
+    public void initWorld(String title) {
+        initWorld(title, null);
+    }
+
     /**
      * Init. a new random world.
      */
@@ -182,7 +185,7 @@ public class StateSinglePlayer implements IGameState {
         // Create the first Portal if it doesn't exist yet
         _worldRenderer.initPortal();
 
-        simulateWorld(4000);
+        fastForwardWorld();
 
         _charMoveSys.setWorldProvider(_worldRenderer.getWorldProvider());
         _ranHopSys.setWorldRenderer(_worldRenderer);
@@ -204,26 +207,23 @@ public class StateSinglePlayer implements IGameState {
         return !_pauseGame && !_pauseMenu.isVisible();
     }
 
-    private void simulateWorld(int duration) {
-        long timeBefore = _gameInstance.getTimeInMs();
-
+    private void fastForwardWorld() {
         _loadingScreen.setVisible(true);
         _hud.setVisible(false);
         _metrics.setVisible(false);
+        Display.update();
 
-        float diff = 0;
+        int chunksGenerated = 0;
 
-        while (diff < duration) {
-            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (diff / duration) * 100f));
+        while (chunksGenerated < 64) {
+            getWorldRenderer().generateChunk();
+            chunksGenerated++;
+
+            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (chunksGenerated / 64f) * 100f));
 
             renderUserInterface();
             updateUserInterface();
-
-            getWorldRenderer().generateChunks();
-
             Display.update();
-
-            diff = _gameInstance.getTimeInMs() - timeBefore;
         }
 
         _loadingScreen.setVisible(false);
@@ -239,9 +239,9 @@ public class StateSinglePlayer implements IGameState {
             _worldRenderer.render();
         }
 
+        /* UI */
         PerformanceMonitor.startActivity("Render and Update UI");
         renderUserInterface();
-        updateUserInterface();
         PerformanceMonitor.endActivity();
     }
 
@@ -322,8 +322,17 @@ public class StateSinglePlayer implements IGameState {
                 if (key == Keyboard.KEY_LEFT) {
                     getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
                 }
+
                 if (key == Keyboard.KEY_R && !Keyboard.isRepeatEvent()) {
                     getWorldRenderer().setWireframe(!getWorldRenderer().isWireframe());
+                }
+
+                if (key == Keyboard.KEY_P && !Keyboard.isRepeatEvent()) {
+                    getWorldRenderer().setCameraMode(WorldRenderer.CAMERA_MODE.PLAYER);
+            }
+
+                if (key == Keyboard.KEY_O && !Keyboard.isRepeatEvent()) {
+                    getWorldRenderer().setCameraMode(WorldRenderer.CAMERA_MODE.SPAWN);
                 }
             }
 

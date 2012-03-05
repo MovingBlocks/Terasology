@@ -30,7 +30,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
     private static final double FOREST_GRASS_DENSITY = Config.getInstance().getForrestGrassDensity();
     private static final double PLAINS_GRASS_DENSITY = Config.getInstance().getPlainsGrassDensity();
     private static final double SNOW_GRASS_DENSITY = Config.getInstance().getSnowGrassDensity();
-    private static final double MOUNTAINS_GRASS_DENSITY = Config.getInstance().getMountainsGrassDensity();
+    private static final double MOUNTAINS_GRASS_DENSITY = Config.getInstance().getMountainGrassDensity();
 
     public ChunkGeneratorFlora(GeneratorManager generatorManager) {
         super(generatorManager);

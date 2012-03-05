@@ -40,7 +40,6 @@ public class GrowthSimulator extends Simulator {
 
     @Override
     public boolean executeSimulation() {
-
         if (_activeBlocks.isEmpty())
             return false;
 
