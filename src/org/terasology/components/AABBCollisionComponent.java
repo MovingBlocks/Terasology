@@ -20,11 +20,5 @@ import javax.vecmath.Vector3f;
 public final class AABBCollisionComponent extends AbstractComponent {
     public Vector3f extents = new Vector3f();
 
-    public void store(StorageWriter writer) {
-        writer.write("extents", extents);
-    }
 
-    public void retrieve(StorageReader reader) {
-        extents = reader.read("extents", Vector3f.class, extents);
-    }
 }

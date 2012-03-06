@@ -37,13 +37,4 @@ public final class CharacterMovementComponent extends AbstractComponent {
     public float footstepDelta = 0.0f;
     
 
-    public void store(StorageWriter writer) {
-        //To change body of implemented methods use File | Settings | File Templates.
-
-
-    }
-
-    public void retrieve(StorageReader reader) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 }
