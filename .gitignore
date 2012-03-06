@@ -7,3 +7,5 @@ out
 .project
 .settings
 bin
+/.idea/
+/build/

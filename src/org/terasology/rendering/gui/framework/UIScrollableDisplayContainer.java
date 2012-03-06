@@ -15,6 +15,16 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
         _scrollBar.setVisible(true);
 
         addDisplayElement(_scrollBar);
+
+        _scrollBar.addScrollListener( new IScrollListener() {
+            public void scrolled(UIDisplayElement element) {
+                for(UIDisplayElement displayElement:getDisplayElements()){
+                    if(displayElement.canMove()){
+                        displayElement.getPosition().y -= _scrollBar.getScrollShift();
+                    }
+                }
+            }
+        });
     }
 
     public void setScrollBarPosition(Vector2f position){
@@ -23,7 +33,7 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
     }
 
     public void update(){
-        if(!_scrollBar.isMoveable()){
+        if(!_scrollBar.isScrolled()){
             _contentHeight = 0.0f;
             for(UIDisplayElement displayElement:getDisplayElements()){
                 if(displayElement.canMove()){
@@ -31,12 +41,6 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
                 }
             }
             _scrollBar.setStep(_contentHeight, getSize().y);
-        }else{
-            for(UIDisplayElement displayElement:getDisplayElements()){
-                if(displayElement.canMove()){
-                   displayElement.getPosition().y -= _scrollBar.getScrollShift();
-                }
-            }
         }
         super.update();
     }

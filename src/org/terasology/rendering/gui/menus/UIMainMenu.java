@@ -83,7 +83,7 @@ public class UIMainMenu extends UIDisplayRenderer {
         });
 
         _overlay = new UIImageOverlay("menuBackground");
-        _overlay.setVisible(true);
+        _overlay.setVisible(false);
 
         addDisplayElement(_overlay);
 

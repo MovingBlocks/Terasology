@@ -35,7 +35,7 @@ public class UIList extends UIScrollableDisplayContainer {
 
     public UIList(Vector2f size) {
         setSize(size);
-        setCrop(true);
+        setCrop(false);
         setCropMargin(new Vector4f(0.0f, 25f, 0.0f, -5f));
         setScrollBarPosition(new Vector2f(getPosition().x + size.x, getPosition().y));
 
@@ -110,9 +110,10 @@ public class UIList extends UIScrollableDisplayContainer {
         super.render();
     }
 
-    private void clicked(){
-
+    public int size(){
+        return _items.size();
     }
+
 
     private void updateBorders(){
         _borderTop.setSize(new Vector2f(getSize().x, 4f));
@@ -130,7 +131,6 @@ public class UIList extends UIScrollableDisplayContainer {
 
     public void addItem(String text, Object value){
         UIListItem newItem = new UIListItem(new Vector2f(getSize().x, (32f)), text, value);
-
         newItem.setVisible(true);
         newItem.setPosition(new Vector2f(getPosition().x, getPosition().y + 32f * _items.size()));
         newItem.setIsMoveable(true);

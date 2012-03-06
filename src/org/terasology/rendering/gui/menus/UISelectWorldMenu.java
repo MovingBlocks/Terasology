@@ -37,10 +37,11 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
     final UIImageOverlay _overlay;
     final UIList _list;
     final UIButton _goToBack;
+    final UIButton _addToList;
 
     public UISelectWorldMenu() {
         _overlay = new UIImageOverlay("menuBackground");
-        _overlay.setVisible(true);
+        _overlay.setVisible(false);
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
@@ -51,18 +52,14 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
             _list.addItem(worldName.toString(), worldName.toString());
         }
 
-        _list.addItem("TestItem1", "text");
-        _list.addItem("TestItem2", "text");
-        _list.addItem("TestItem3", "text");
-        _list.addItem("TestItem4", "text");
-        _list.addItem("TestItem5", "text");
-        _list.addItem("TestItem5", "text");
-        _list.addItem("TestItem5", "text");
-        _list.addItem("TestItem5", "text");
 
         _goToBack = new UIButton(new Vector2f(256f, 32f));
         _goToBack.getLabel().setText("Go to back");
         _goToBack.setVisible(true);
+
+        _addToList = new UIButton(new Vector2f(256f, 32f));
+        _addToList.getLabel().setText("Add element");
+        _addToList.setVisible(true);
 
         _goToBack.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
@@ -70,10 +67,26 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
                 Terasology.getInstance().getGameMode().activateScreen("main_menu");
             }
         });
+        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
+        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
+        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
+        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
+        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
+        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
+        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
+        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
+        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
+
+        _addToList.addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                _list.addItem("Add world " + _list.size(), "Add world " + _list.size());
+            }
+        });
 
         addDisplayElement(_overlay);
         addDisplayElement(_list);
         addDisplayElement(_goToBack);
+        addDisplayElement(_addToList);
 
         update();
     }
@@ -86,5 +99,9 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
 
         _goToBack.centerHorizontally();
         _goToBack.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
+
+        _addToList.centerHorizontally();
+        _addToList.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
+        _addToList.getPosition().x  -= 2*_goToBack.getSize().x;
     }
 }

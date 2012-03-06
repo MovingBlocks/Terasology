@@ -2,33 +2,37 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.rendering.gui.framework.IScrollListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lwjgl.opengl.GL11.*;
 
-public class UIScrollBar extends UIDisplayElement {
+public class UIScrollBar extends UIDisplayContainer {
 
     //Graphics
-    private UIGraphicsElement _scroll;
-    //private UIGraphicsElement _increaseBtn;
-    //private UIGraphicsElement _decreaseBtn;
+    private List<UIGraphicsElement> _scrollGraphicsElements = new ArrayList<UIGraphicsElement>(); // <- HEADER(0); -- BODY(1); -> FOOTER(2)
+
+
+    //Scroll Listeners
+    private final ArrayList<IScrollListener> _scrollListeners = new ArrayList<IScrollListener>();
 
     //Options
     private float   _max;
     private float   _min;
 
     private float _step;
-    private float _value;
 
     private Vector2f _prevMousePos = null;
 
     private ScrollType _scrollType = ScrollType.vertical;
 
-    private boolean _moveable = false;
+    private boolean _scrolled = false;
 
     private float _containerHeight = 0.0f;
     private float _scrollShift     = 0.0f;
@@ -39,15 +43,19 @@ public class UIScrollBar extends UIDisplayElement {
     }
 
     public UIScrollBar(Vector2f size){
-
-        _scroll = new UIGraphicsElement("gui_menu");
-        _scroll.setVisible(true);
+        for(int i=0; i<3; i++){
+            _scrollGraphicsElements.add(new UIGraphicsElement("gui_menu"));
+            _scrollGraphicsElements.get(i).setVisible(true);
+            addDisplayElement(_scrollGraphicsElements.get(i));
+        }
 
         switch(_scrollType){
             case vertical:
+                setSize(new Vector2f(15f, size.y));
                 setVerticalOptions(size);
                 break;
             case horizontal:
+                setSize(new Vector2f(size.x, 15f));
                 setHorizontalPositions();
                 break;
         }
@@ -55,62 +63,73 @@ public class UIScrollBar extends UIDisplayElement {
     }
 
     public void update(){
-        float newScrollSize = _containerHeight*_step;
-
-        if(newScrollSize!=getSize().y){
-            _scroll.getPosition().y += newScrollSize - getSize().y;
-            setSize(new Vector2f(15f, newScrollSize));
-        }
+        updateGraphicsElementsPosition();
 
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
 
         if(intersects(mousePos)){
             if(_mouseDown){
-                _moveable = true;
-            }
-
-            if(_mouseUp){
-                _moveable     = false;
-                _mouseDown    = false;
-                _prevMousePos = null;
-            }
-        }else{
-            if(!_mouseDown||!_moveable){
-                _prevMousePos = null;
-                _mouseDown    = false;
-                _mouseUp      = false;
-                _moveable     = false;
-                _scrollShift  = 0.0f;
-            }
-        }
-
-        if(_moveable){
-            if(_prevMousePos==null){
-                _prevMousePos =  mousePos;
-            }else{
-                float tempPos = getPosition().y +  mousePos.y - _prevMousePos.y;
-
-                if(_max>(tempPos  + getSize().y)&&_min<tempPos){
-                    _scrollShift = (mousePos.y - _prevMousePos.y)*_step;
-                    getPosition().y = tempPos;
-                    _prevMousePos   = mousePos;
-                }else{
-                    _scrollShift = 0.0f;
+                _scrolled = true;
+                if(_prevMousePos==null){
+                    _prevMousePos =  mousePos;
                 }
-
             }
         }
 
-        _scroll.setSize(new Vector2f(getSize().y, 15f));
-        _scroll.getTextureOrigin().set(0f, 155f / 512f);
-        _scroll.update();
+        if(_scrolled){
+            scrolled(mousePos);
+        }
+
+        if(!_mouseDown||!_scrolled || _mouseUp){
+            _scrolled     = false;
+            _mouseDown    = false;
+            _prevMousePos = null;
+            _mouseUp      = false;
+        }
     }
 
-    public void render(){
-        glPushMatrix();
-        glTranslatef(_scroll.getPosition().x, _scroll.getPosition().y, 0);
-        _scroll.render();
-        glPopMatrix();
+    private void scrolled(Vector2f mousePos){
+
+        if(_max<(getPosition().y +  mousePos.y - _prevMousePos.y  + getSize().y)){
+            mousePos.y = _max - getSize().y + _prevMousePos.y - getPosition().y;
+        }else if(_min>(getPosition().y +  mousePos.y - _prevMousePos.y)){
+            mousePos.y = _min + _prevMousePos.y - getPosition().y;
+        }
+
+        float tempPos = getPosition().y +  mousePos.y - _prevMousePos.y;
+        _scrollShift = (mousePos.y - _prevMousePos.y)*_step;
+        getPosition().y = tempPos;
+        _prevMousePos   = mousePos;
+
+        for (int i = 0; i < _scrollListeners.size(); i++) {
+            _scrollListeners.get(i).scrolled(this);
+        }
+    }
+
+    public void addScrollListener(IScrollListener listener) {
+        _scrollListeners.add(listener);
+    }
+
+    private void updateGraphicsElementsPosition(){
+        float newScrollSize     = _containerHeight*_step;
+        float newBodyScrollSize = newScrollSize - _scrollGraphicsElements.get(0).getSize().x*2;
+
+        if(newScrollSize!=getSize().y){
+            setSize(new Vector2f(15f, newScrollSize));
+            _scrollGraphicsElements.get(0).getPosition().y += newScrollSize - getSize().y;
+
+            _scrollGraphicsElements.get(1).getPosition().y += newScrollSize - getSize().y + _scrollGraphicsElements.get(0).getSize().x;
+            _scrollGraphicsElements.get(1).setSize(new Vector2f(newBodyScrollSize, 15f));
+
+            _scrollGraphicsElements.get(2).getPosition().y += newScrollSize - getSize().y
+                                                           //+  _scrollGraphicsElements.get(0).getSize().x;
+                                                           +  _scrollGraphicsElements.get(1).getSize().x - 1f;
+        }
+
+        _scrollGraphicsElements.get(0).getTextureOrigin().set(0f, 155f / 512f);
+        _scrollGraphicsElements.get(1).getTextureOrigin().set(7f/512f, 155f / 512f);
+        _scrollGraphicsElements.get(2).getTextureOrigin().set(0f, 155f / 512f);
+
     }
 
     public void setScrollType(ScrollType scrollType){
@@ -118,14 +137,31 @@ public class UIScrollBar extends UIDisplayElement {
     }
 
     private void setVerticalOptions(Vector2f size){
-        setSize(new Vector2f(15f, size.y));
-        _scroll.setRotateAngle(270f);
-        _scroll.getPosition().y += size.y;
-        _scroll.getTextureSize().set(new Vector2f(98f/512f, 15f / 512f));
+        /*SET POS FOR HEADER*/
+        _scrollGraphicsElements.get(0).setRotateAngle(90);
+        _scrollGraphicsElements.get(0).getPosition().y += size.y;
+        _scrollGraphicsElements.get(0).getPosition().x += 15f;
+        _scrollGraphicsElements.get(0).setSize(new Vector2f(7f, 15f));
+        _scrollGraphicsElements.get(0).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
+
+        /*SET POS FOR BODY*/
+        _scrollGraphicsElements.get(1).setRotateAngle(90);
+        _scrollGraphicsElements.get(1).getPosition().y += size.y + _scrollGraphicsElements.get(0).getTextureSize().y;
+        _scrollGraphicsElements.get(1).getPosition().x += 15f;
+        _scrollGraphicsElements.get(1).getTextureSize().set(new Vector2f(10f/512f, 15f / 512f));
+
+        /*SET POS FOR FOOTER*/
+        _scrollGraphicsElements.get(2).setRotateAngle(270);
+        _scrollGraphicsElements.get(2).getPosition().y += size.y
+                + _scrollGraphicsElements.get(0).getSize().y
+                + _scrollGraphicsElements.get(1).getTextureSize().y;
+        _scrollGraphicsElements.get(2).setSize(new Vector2f(7f, 15f));
+        _scrollGraphicsElements.get(2).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
+
     }
 
     private void setHorizontalPositions(){
-        _scroll.setPosition(new Vector2f());
+        //_scroll.setPosition(new Vector2f());
     }
 
     public void setMaxMin(float min, float max){
@@ -133,8 +169,8 @@ public class UIScrollBar extends UIDisplayElement {
         _max = max;
     }
 
-    public boolean isMoveable(){
-        return _moveable;
+    public boolean isScrolled(){
+        return _scrolled;
     }
 
     public void setStep(float contentHeight, float containerHeight){
