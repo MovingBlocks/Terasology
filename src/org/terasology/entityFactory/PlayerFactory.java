@@ -22,7 +22,8 @@ public class PlayerFactory {
         AABBCollisionComponent collision = player.addComponent(new AABBCollisionComponent());
         collision.extents = new Vector3f(.3f, 0.8f, .3f);
 
-        player.addComponent(new CharacterMovementComponent());
+        CharacterMovementComponent movementComp = player.addComponent(new CharacterMovementComponent());
+        movementComp.groundFriction = 16f;
         player.addComponent(new CharacterSoundComponent());
         player.addComponent(new LocalPlayerComponent());
 

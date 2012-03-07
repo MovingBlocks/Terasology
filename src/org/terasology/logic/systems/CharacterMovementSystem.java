@@ -29,8 +29,8 @@ public class CharacterMovementSystem {
 
     public static final float UnderwaterGravity = 2.0f;
     public static final float Gravity = 28.0f;
-    public static final float TerminalVelocity = 128.0f;
-    public static final float GroundFriction = 8.0f;
+    public static final float TerminalVelocity = 64.0f;
+    public static final float UnderwaterInteria = 2.0f;
 
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
@@ -75,12 +75,21 @@ public class CharacterMovementSystem {
         }
         desiredVelocity.scale(maxSpeed);
 
-        // Update the velocity to match desired velocity at a rate dependant on GroundFriction
-        movementComp.velocity.x += Math.signum(desiredVelocity.x - movementComp.velocity.x) * Math.min(GroundFriction * delta, TeraMath.fastAbs(desiredVelocity.x - movementComp.velocity.x));
-        movementComp.velocity.z += Math.signum(desiredVelocity.z - movementComp.velocity.z) * Math.min(GroundFriction * delta, TeraMath.fastAbs(desiredVelocity.z - movementComp.velocity.z));
+        // Modify velocity towards desired, up to the maximum rate determined by friction
+        Vector3f velocityDiff = new Vector3f(desiredVelocity);
+        velocityDiff.sub(movementComp.velocity);
+        velocityDiff.y = 0;
+        float changeMag = velocityDiff.length();
+        if (changeMag > movementComp.groundFriction * delta) {
+            velocityDiff.scale(movementComp.groundFriction * delta / changeMag);
+        }
+
+        movementComp.velocity.x += velocityDiff.x;
+        movementComp.velocity.z += velocityDiff.z;
+        
         // Cannot control y if not swimming (or flying I guess)
         if (movementComp.isSwimming) {
-            movementComp.velocity.y += Math.signum(desiredVelocity.y - movementComp.velocity.y) * Math.min(GroundFriction * delta, TeraMath.fastAbs(desiredVelocity.y - movementComp.velocity.y));
+            movementComp.velocity.y += Math.signum(desiredVelocity.y - movementComp.velocity.y) * Math.min(UnderwaterInteria * delta, TeraMath.fastAbs(desiredVelocity.y - movementComp.velocity.y));
             movementComp.velocity.y = Math.max(-movementComp.maxWaterSpeed, (movementComp.velocity.y - UnderwaterGravity * delta));
         }
         else {

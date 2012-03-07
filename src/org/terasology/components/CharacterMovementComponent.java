@@ -14,10 +14,14 @@ public final class CharacterMovementComponent extends AbstractComponent {
 
     // Speed settings
     // TODO: consider making these floats
-    public float maxGroundSpeed = 3.0f;
+    public float maxGroundSpeed = 5.0f;
     public float maxWaterSpeed = 2.0f;
     public float runFactor = 1.5f;
     public float jumpSpeed = 10.0f;
+
+    // Determines how easily the play can change direction
+    // TODO: Separate player agiliy from environmental friction, and ground from air control
+    public float groundFriction = 8.0f;
 
     public boolean isSwimming = false;
     public boolean isGrounded = false;
