@@ -27,15 +27,15 @@ import javax.vecmath.Vector3d;
  */
 public abstract class Camera {
 
-    public static final float FOV = Config.getInstance().getFov();
+    public static final float DEFAULT_FOV = Config.getInstance().getFov();
 
     /* CAMERA PARAMETERS */
     protected final Vector3d _position = new Vector3d(0, 0, 0);
     protected final Vector3d _up = new Vector3d(0, 1, 0);
     protected final Vector3d _viewingDirection = new Vector3d(1, 0, 0);
 
-    protected float _targetFov = FOV;
-    protected float _activeFov = FOV - 20f;
+    protected float _targetFov = DEFAULT_FOV;
+    protected float _activeFov = DEFAULT_FOV / 4f;
 
     /* VIEW FRUSTUM */
     protected final ViewFrustum _viewFrustum = new ViewFrustum();
@@ -99,10 +99,10 @@ public abstract class Camera {
     }
 
     public void extendFov(float fov) {
-        _targetFov = FOV + fov;
+        _targetFov = DEFAULT_FOV + fov;
     }
 
     public void resetFov() {
-        _targetFov = FOV;
+        _targetFov = DEFAULT_FOV;
     }
 }

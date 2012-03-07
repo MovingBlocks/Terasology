@@ -40,46 +40,45 @@ public class GrowthSimulator extends Simulator {
 
     @Override
     public boolean executeSimulation() {
-        if (_activeBlocks.isEmpty())
-            return false;
+        BlockPosition blockPos = tryRemoveFirstBlock();
 
-        BlockPosition pos = _activeBlocks.iterator().next();
-        _activeBlocks.remove(pos);
+        if (blockPos != null) {
+            if (!_parent.canBlockSeeTheSky(blockPos.x, blockPos.y, blockPos.z))
+                return false;
 
-        if (!_parent.canBlockSeeTheSky(pos.x, pos.y, pos.z))
-            return false;
+            ChunkGeneratorTerrain.BIOME_TYPE biome = _parent.getActiveBiome(blockPos.x, blockPos.z);
 
-        ChunkGeneratorTerrain.BIOME_TYPE biome = _parent.getActiveBiome(pos.x, pos.z);
+            if (biome != ChunkGeneratorTerrain.BIOME_TYPE.SNOW) {
+                byte bLeft = _parent.getBlock(blockPos.x - 1, blockPos.y, blockPos.z);
+                byte bRight = _parent.getBlock(blockPos.x + 1, blockPos.y, blockPos.z);
+                byte bUp = _parent.getBlock(blockPos.x, blockPos.y, blockPos.z + 1);
+                byte bDown = _parent.getBlock(blockPos.x, blockPos.y, blockPos.z - 1);
 
-        if (biome != ChunkGeneratorTerrain.BIOME_TYPE.SNOW) {
-            byte bLeft = _parent.getBlock(pos.x - 1, pos.y, pos.z);
-            byte bRight = _parent.getBlock(pos.x + 1, pos.y, pos.z);
-            byte bUp = _parent.getBlock(pos.x, pos.y, pos.z + 1);
-            byte bDown = _parent.getBlock(pos.x, pos.y, pos.z - 1);
+                if (bLeft == GRASS_TYPE || bRight == GRASS_TYPE || bDown == GRASS_TYPE || bUp == GRASS_TYPE) {
+                    _parent.setBlock(blockPos.x, blockPos.y, blockPos.z, GRASS_TYPE, false, true);
+                }
 
-            if (bLeft == GRASS_TYPE || bRight == GRASS_TYPE || bDown == GRASS_TYPE || bUp == GRASS_TYPE) {
-                _parent.setBlock(pos.x, pos.y, pos.z, GRASS_TYPE, false, true);
+                if (bLeft == DIRT_TYPE) {
+                    addActiveBlock(new BlockPosition(blockPos.x - 1, blockPos.y, blockPos.z));
+                }
+
+                if (bRight == DIRT_TYPE) {
+                    addActiveBlock(new BlockPosition(blockPos.x + 1, blockPos.y, blockPos.z));
+                }
+
+                if (bUp == DIRT_TYPE) {
+                    addActiveBlock(new BlockPosition(blockPos.x, blockPos.y, blockPos.z + 1));
+                }
+
+                if (bDown == DIRT_TYPE) {
+                    addActiveBlock(new BlockPosition(blockPos.x, blockPos.y, blockPos.z - 1));
+                }
             }
 
-            if (bLeft == DIRT_TYPE) {
-                addActiveBlock(new BlockPosition(pos.x - 1, pos.y, pos.z));
-            }
-
-            if (bRight == DIRT_TYPE) {
-                addActiveBlock(new BlockPosition(pos.x + 1, pos.y, pos.z));
-            }
-
-            if (bUp == DIRT_TYPE) {
-                addActiveBlock(new BlockPosition(pos.x, pos.y, pos.z + 1));
-            }
-
-            if (bDown == DIRT_TYPE) {
-                addActiveBlock(new BlockPosition(pos.x, pos.y, pos.z - 1));
-            }
+            return true;
         }
 
-        // TODO: Not quite correct yet
-        return true;
+        return false;
     }
 
     public void blockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
