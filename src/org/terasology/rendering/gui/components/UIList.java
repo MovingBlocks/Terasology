@@ -28,14 +28,14 @@ public class UIList extends UIScrollableDisplayContainer {
     private boolean  _showBackground  = true;
 
     private UIListItem _selectedItem        = null;
-    private int        _selectedItemIndex   = 0;
+    private int        _selectedItemIndex   = -1;
 
     //List items
     private List<UIListItem> _items  = new ArrayList<UIListItem>();
 
     public UIList(Vector2f size) {
         setSize(size);
-        setCrop(false);
+        setCrop(true);
         setCropMargin(new Vector4f(0.0f, 25f, 0.0f, 5f));
         setScrollBarPosition(new Vector2f(getPosition().x + size.x, getPosition().y));
 
@@ -76,7 +76,9 @@ public class UIList extends UIScrollableDisplayContainer {
                     if(item.intersects(mousePos)){
                         //@todo remake it
                         if(_mouseDown){
-                            _items.get(_selectedItemIndex).setSelected(false);
+                            if(_selectedItemIndex>0){
+                                _items.get(_selectedItemIndex).setSelected(false);
+                            }
                             item.setSelected(true);
                             _selectedItem = item;
                             _selectedItemIndex = i;
@@ -143,25 +145,39 @@ public class UIList extends UIScrollableDisplayContainer {
         newItem.getPosition().y += 32f * _items.size();
         newItem.setIsMoveable(true);
 
-       // System.out.println(getPosition());
-
         _items.add(newItem);
         addDisplayElement(newItem);
     }
 
     public void removeSelectedItem(){
+
+        if(_selectedItemIndex<0 || _selectedItem == null){
+            return;
+        }
+
         Vector2f deletedElementPosition =_items.get(_selectedItemIndex).getPosition();
 
         removeDisplayElement(_selectedItem);
         _items.remove(_selectedItemIndex);
+        _selectedItem = null;
 
-       // if(_selectedItemIndex<(_items.size()-1)){
-            for(int i=_selectedItemIndex; i<_items.size(); i++){
-                _items.get(i).getPosition().y -= 32f;
+        for(int i=_selectedItemIndex; i<_items.size(); i++){
+            _items.get(i).getPosition().y -= 32f;
+        }
+
+        if(_selectedItemIndex>_items.size()-1){
+            if(_items.size()-1>=0){
+                _selectedItemIndex = _items.size()-1;
+                _items.get(_selectedItemIndex).setSelected(true);
+            }else{
+                _selectedItemIndex = -1;
             }
-      //  }else{
-            _selectedItemIndex = _items.size()-1;
-       // }
+        }
+
+        if(_selectedItemIndex>=0){
+            _selectedItem = _items.get(_selectedItemIndex);
+            _selectedItem.setSelected(true);
+        }
 
     }
 

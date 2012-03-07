@@ -23,7 +23,7 @@ public class UIListItem extends UIDisplayContainer {
 
         _label = new UIText();
         _label.setVisible(true);
-        _label.setColor(Color.red);
+        _label.setColor(Color.black);
         _label.setPosition(new Vector2f((getPosition().x + _padding.x), (getPosition().y + _padding.y)));
         _label.setText(_text);
 
@@ -57,7 +57,7 @@ public class UIListItem extends UIDisplayContainer {
         if(_isSelected){
             _label.setColor(Color.orange);
         }else{
-            _label.setColor(Color.red);
+            _label.setColor(Color.black);
         }
     }
 

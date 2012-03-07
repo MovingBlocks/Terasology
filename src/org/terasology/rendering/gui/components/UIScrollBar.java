@@ -25,8 +25,7 @@ public class UIScrollBar extends UIDisplayContainer {
     //Options
     private float   _max;
     private float   _min;
-
-    private float _step;
+    private float   _step;
 
     private Vector2f _prevMousePos = null;
 
@@ -162,7 +161,20 @@ public class UIScrollBar extends UIDisplayContainer {
     }
 
     private void setHorizontalPositions(){
-        //_scroll.setPosition(new Vector2f());
+        /*SET POS FOR HEADER*/
+        _scrollGraphicsElements.get(0).setPosition(getPosition());
+        _scrollGraphicsElements.get(0).setSize(new Vector2f(7f, 15f));
+        _scrollGraphicsElements.get(0).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
+
+        /*SET POS FOR BODY*/
+        _scrollGraphicsElements.get(1).setPosition(new Vector2f(getPosition().x + _scrollGraphicsElements.get(0).getSize().x, getPosition().y));
+        _scrollGraphicsElements.get(1).getTextureSize().set(new Vector2f(10f/512f, 15f / 512f));
+
+        /*SET POS FOR FOOTER*/
+        _scrollGraphicsElements.get(2).setRotateAngle(180);
+        _scrollGraphicsElements.get(2).setPosition(new Vector2f((getPosition().x +  2*_scrollGraphicsElements.get(0).getTextureSize().x + _scrollGraphicsElements.get(1).getSize().x), getPosition().y));
+        _scrollGraphicsElements.get(2).setSize(new Vector2f(7f, 15f));
+        _scrollGraphicsElements.get(2).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
     }
 
     public void setMaxMin(float min, float max){
