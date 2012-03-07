@@ -97,7 +97,7 @@ public class UIScrollBar extends UIDisplayContainer {
         }
 
         float tempPos = getPosition().y +  mousePos.y - _prevMousePos.y;
-        _scrollShift = (mousePos.y - _prevMousePos.y)*_step;
+        _scrollShift = (mousePos.y - _prevMousePos.y)/_step;
         getPosition().y = tempPos;
         _prevMousePos   = mousePos;
 
@@ -116,14 +116,17 @@ public class UIScrollBar extends UIDisplayContainer {
 
         if(newScrollSize!=getSize().y){
             setSize(new Vector2f(15f, newScrollSize));
-            _scrollGraphicsElements.get(0).getPosition().y += newScrollSize - getSize().y;
 
-            _scrollGraphicsElements.get(1).getPosition().y += newScrollSize - getSize().y + _scrollGraphicsElements.get(0).getSize().x;
             _scrollGraphicsElements.get(1).setSize(new Vector2f(newBodyScrollSize, 15f));
+            _scrollGraphicsElements.get(2).getPosition().y = _scrollGraphicsElements.get(1).getPosition().y +
+                                                             _scrollGraphicsElements.get(0).getSize().x     +
+                                                             _scrollGraphicsElements.get(1).getSize().x;
 
-            _scrollGraphicsElements.get(2).getPosition().y += newScrollSize - getSize().y
-                                                           //+  _scrollGraphicsElements.get(0).getSize().x;
-                                                           +  _scrollGraphicsElements.get(1).getSize().x - 1f;
+            if(getPosition().y + getSize().y>_max){
+                _prevMousePos = getPosition();
+                scrolled(new Vector2f(getPosition().x, (getPosition().y + getSize().y) - _max));
+            }
+
         }
 
         _scrollGraphicsElements.get(0).getTextureOrigin().set(0f, 155f / 512f);
@@ -139,22 +142,20 @@ public class UIScrollBar extends UIDisplayContainer {
     private void setVerticalOptions(Vector2f size){
         /*SET POS FOR HEADER*/
         _scrollGraphicsElements.get(0).setRotateAngle(90);
-        _scrollGraphicsElements.get(0).getPosition().y += size.y;
+        _scrollGraphicsElements.get(0).setPosition(getPosition());
         _scrollGraphicsElements.get(0).getPosition().x += 15f;
         _scrollGraphicsElements.get(0).setSize(new Vector2f(7f, 15f));
         _scrollGraphicsElements.get(0).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
 
         /*SET POS FOR BODY*/
         _scrollGraphicsElements.get(1).setRotateAngle(90);
-        _scrollGraphicsElements.get(1).getPosition().y += size.y + _scrollGraphicsElements.get(0).getTextureSize().y;
+        _scrollGraphicsElements.get(1).setPosition(new Vector2f(getPosition().x, getPosition().y +  _scrollGraphicsElements.get(0).getSize().x));
         _scrollGraphicsElements.get(1).getPosition().x += 15f;
         _scrollGraphicsElements.get(1).getTextureSize().set(new Vector2f(10f/512f, 15f / 512f));
 
         /*SET POS FOR FOOTER*/
         _scrollGraphicsElements.get(2).setRotateAngle(270);
-        _scrollGraphicsElements.get(2).getPosition().y += size.y
-                + _scrollGraphicsElements.get(0).getSize().y
-                + _scrollGraphicsElements.get(1).getTextureSize().y;
+        _scrollGraphicsElements.get(2).setPosition(new Vector2f(getPosition().x, getPosition().y +  2*_scrollGraphicsElements.get(0).getTextureSize().y + _scrollGraphicsElements.get(1).getSize().y));
         _scrollGraphicsElements.get(2).setSize(new Vector2f(7f, 15f));
         _scrollGraphicsElements.get(2).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
 

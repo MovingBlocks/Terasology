@@ -38,6 +38,7 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
     final UIList _list;
     final UIButton _goToBack;
     final UIButton _addToList;
+    final UIButton _deleteFromList;
 
     public UISelectWorldMenu() {
         _overlay = new UIImageOverlay("menuBackground");
@@ -61,6 +62,10 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         _addToList.getLabel().setText("Add element");
         _addToList.setVisible(true);
 
+        _deleteFromList = new UIButton(new Vector2f(256f, 32f));
+        _deleteFromList.getLabel().setText("Delete selected element");
+        _deleteFromList.setVisible(true);
+
         _goToBack.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 Terasology.getInstance().getGameMode().deactivateScreen("select_world");
@@ -83,10 +88,17 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
             }
         });
 
+        _deleteFromList.addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                _list.removeSelectedItem();
+            }
+        });
+
         addDisplayElement(_overlay);
         addDisplayElement(_list);
         addDisplayElement(_goToBack);
         addDisplayElement(_addToList);
+        addDisplayElement(_deleteFromList);
 
         update();
     }
@@ -103,5 +115,9 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         _addToList.centerHorizontally();
         _addToList.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
         _addToList.getPosition().x  -= 2*_goToBack.getSize().x;
+
+        _deleteFromList.centerHorizontally();
+        _deleteFromList.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f + _addToList.getSize().y + 32f;
+        _deleteFromList.getPosition().x  -= 2*_goToBack.getSize().x;
     }
 }

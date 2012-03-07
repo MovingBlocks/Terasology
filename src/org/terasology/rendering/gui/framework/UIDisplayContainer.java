@@ -59,7 +59,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         //Cut the elements
         if(_crop){
             glEnable(GL_SCISSOR_TEST);
-            glScissor((int)getPosition().x + (int)_cropMargin.w, Display.getHeight()-((int)getPosition().y + (int)getSize().y + (int)_cropMargin.x), (int)getSize().x + (int)_cropMargin.y, (int)getSize().y + (int)_cropMargin.z);
+            glScissor((int)getPosition().x - (int)_cropMargin.w, Display.getHeight()-((int)getPosition().y + (int)getSize().y - (int)_cropMargin.x), (int)getSize().x + (int)_cropMargin.y, (int)getSize().y + (int)_cropMargin.z);
         }
         // Render all display elements
         for (int i = 0; i < _displayElements.size(); i++) {

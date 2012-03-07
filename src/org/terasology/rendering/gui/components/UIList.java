@@ -36,7 +36,7 @@ public class UIList extends UIScrollableDisplayContainer {
     public UIList(Vector2f size) {
         setSize(size);
         setCrop(false);
-        setCropMargin(new Vector4f(0.0f, 25f, 0.0f, -5f));
+        setCropMargin(new Vector4f(0.0f, 25f, 0.0f, 5f));
         setScrollBarPosition(new Vector2f(getPosition().x + size.x, getPosition().y));
 
         _borderTop = new UIGraphicsElement("gui_menu");
@@ -130,12 +130,39 @@ public class UIList extends UIScrollableDisplayContainer {
     }
 
     public void addItem(String text, Object value){
-        UIListItem newItem = new UIListItem(new Vector2f(getSize().x, (32f)), text, value);
+
+        Vector2f position = null;
+        UIListItem newItem  = new UIListItem(new Vector2f(getSize().x, (32f)), text, value);
+
         newItem.setVisible(true);
-        newItem.setPosition(new Vector2f(getPosition().x, getPosition().y + 32f * _items.size()));
+
+        if(_items.size()>0){
+            newItem.setPosition(_items.get(0).getPosition());
+        }
+
+        newItem.getPosition().y += 32f * _items.size();
         newItem.setIsMoveable(true);
+
+       // System.out.println(getPosition());
+
         _items.add(newItem);
-        addDisplayElement(_items.get(_items.size() - 1));
+        addDisplayElement(newItem);
+    }
+
+    public void removeSelectedItem(){
+        Vector2f deletedElementPosition =_items.get(_selectedItemIndex).getPosition();
+
+        removeDisplayElement(_selectedItem);
+        _items.remove(_selectedItemIndex);
+
+       // if(_selectedItemIndex<(_items.size()-1)){
+            for(int i=_selectedItemIndex; i<_items.size(); i++){
+                _items.get(i).getPosition().y -= 32f;
+            }
+      //  }else{
+            _selectedItemIndex = _items.size()-1;
+       // }
+
     }
 
     public void removeItem(int index){
