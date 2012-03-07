@@ -18,13 +18,7 @@ import javax.vecmath.Vector3f;
 // NOTE: May want to use a flyweight pattern - define each AABBCollisionComponent once, reuse component for each entity that needs
 // it. Will mean only need to replicate it once too.
 public final class AABBCollisionComponent extends AbstractComponent {
+
     public Vector3f extents = new Vector3f();
 
-    public void store(StorageWriter writer) {
-        writer.write("extents", extents);
-    }
-
-    public void retrieve(StorageReader reader) {
-        extents = reader.read("extents", Vector3f.class, extents);
-    }
 }

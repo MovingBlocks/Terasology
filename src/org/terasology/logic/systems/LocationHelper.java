@@ -36,6 +36,25 @@ public class LocationHelper {
         }
         return result;
     }
+    
+    public static Quat4f localToWorldRot(LocationComponent location) {
+        return localToWorldRot(location, location.rotation, new Quat4f(0,0,0,1));
+    }
+    
+    public static Quat4f localToWorldRot(LocationComponent location, Quat4f rotation) {
+        return localToWorldRot(location, rotation, new Quat4f(0,0,0,1));
+    }
+    
+    public static Quat4f localToWorldRot(LocationComponent location, Quat4f rotation, Quat4f result) {
+        result.set(rotation);
+        while (location != null && location.parent != null) {
+            location = location.parent.getComponent(LocationComponent.class);
+            if (location != null) {
+                result.mul(location.rotation);
+            }
+        }
+        return result;
+    }
 
     public static float totalScale(LocationComponent location) {
         float result = 1.0f;
@@ -53,7 +72,7 @@ public class LocationHelper {
     public static Vector3f worldToLocalPos(LocationComponent location, Vector3f position) {
         return worldToLocalPos(location, position, new Vector3f());
     }
-
+    
     public static Vector3f worldToLocalPos(LocationComponent location, Vector3f position, Vector3f result) {
         result.set(position);
         if (location.parent != null) {

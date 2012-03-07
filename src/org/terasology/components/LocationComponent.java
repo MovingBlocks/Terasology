@@ -24,20 +24,6 @@ public final class LocationComponent extends AbstractComponent {
 
     // Relative to
     public EntityRef parent = null;
-    
-    public void store(StorageWriter writer) {
-        writer.write("position", position);
-        writer.write("rotation", rotation);
-        writer.write("scale", scale);
-        writer.write("parent", parent);
-    }
-
-    public void retrieve(StorageReader reader) {
-        position = reader.read("position", Vector3f.class, position);
-        rotation = reader.read("rotation", Quat4f.class, rotation);
-        scale = reader.readFloat("scale", 1.0f);
-        parent = reader.read("parent", EntityRef.class, parent);
-    }
 
     @Override
     public boolean equals(Object o) {

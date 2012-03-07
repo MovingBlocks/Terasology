@@ -17,6 +17,7 @@
 package org.terasology.model.structures;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 /**
  * Represents the position of a block. This class is used mainly in the
@@ -51,6 +52,13 @@ public final class BlockPosition implements Comparable<BlockPosition> {
         this.y = y;
         this.z = z;
         this._origin = origin;
+    }
+
+    public BlockPosition(int x, int y, int z, Vector3f origin) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this._origin = new Vector3d(origin);
     }
 
     double calcDistanceToOrigin() {

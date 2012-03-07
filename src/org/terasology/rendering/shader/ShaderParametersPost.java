@@ -48,8 +48,10 @@ public class ShaderParametersPost implements IShaderParameters {
         program.setInt("texVignette", 3);
         program.setInt("texDepth", 4);
 
-        if (tera.getActivePlayer() != null)
-            program.setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
+        if (tera.getActivePlayer() != null) {
+            // TODO: This should use active camera
+            //program.setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
+        }
     }
 
 }

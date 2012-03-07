@@ -51,7 +51,8 @@ public class ItemBlock extends Item {
         shader.enable();
 
         // Apply biome and overall color offset
-        Vector4f color = activeBlock.calcColorOffsetFor(Side.FRONT, Terasology.getInstance().getActiveWorldRenderer().getActiveTemperature(), Terasology.getInstance().getActiveWorldRenderer().getActiveTemperature());
+        // TODO: Should get temperature, etc from world provider
+        Vector4f color = activeBlock.calcColorOffsetFor(Side.FRONT, Terasology.getInstance().getActiveWorldRenderer().getActiveTemperature(player.getPosition()), Terasology.getInstance().getActiveWorldRenderer().getActiveTemperature(player.getPosition()));
         shader.setFloat3("colorOffset", color.x, color.y, color.z);
 
         glEnable(GL11.GL_BLEND);

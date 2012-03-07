@@ -14,9 +14,8 @@ public final class CharacterMovementComponent extends AbstractComponent {
 
     // Speed settings
     // TODO: consider making these floats
-    public float maxGroundSpeed = 5.0f;
+    public float maxGroundSpeed = 3.0f;
     public float maxWaterSpeed = 2.0f;
-    public float walkSpeed = 1.5f;
     public float runFactor = 1.5f;
     public float jumpSpeed = 10.0f;
 
@@ -35,15 +34,5 @@ public final class CharacterMovementComponent extends AbstractComponent {
 
     public float distanceBetweenFootsteps = 1f;
     public float footstepDelta = 0.0f;
-    
 
-    public void store(StorageWriter writer) {
-        //To change body of implemented methods use File | Settings | File Templates.
-
-
-    }
-
-    public void retrieve(StorageReader reader) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 }

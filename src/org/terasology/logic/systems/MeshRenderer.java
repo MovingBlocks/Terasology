@@ -44,7 +44,7 @@ public class MeshRenderer {
         WorldRenderer worldRenderer = Terasology.getInstance().getActiveWorldRenderer();
         if (worldRenderer == null) return;
 
-        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
+        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
         for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
             // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
             AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
@@ -59,7 +59,7 @@ public class MeshRenderer {
             if (worldRenderer.isAABBVisible(aabb)) {
                 glPushMatrix();
 
-                glTranslated(location.position.x - playerPosition.x, location.position.y - playerPosition.y, location.position.z - playerPosition.z);
+                glTranslated(location.position.x - cameraPosition.x, location.position.y - cameraPosition.y, location.position.z - cameraPosition.z);
                 AxisAngle4f rot = new AxisAngle4f();
                 rot.set(location.rotation);
                 glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);

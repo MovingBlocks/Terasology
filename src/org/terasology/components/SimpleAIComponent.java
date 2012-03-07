@@ -18,11 +18,4 @@ public final class SimpleAIComponent extends AbstractComponent {
     public Vector3f movementTarget = new Vector3f();
     public boolean followingPlayer = false;
 
-    public void store(StorageWriter writer) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public void retrieve(StorageReader reader) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 }

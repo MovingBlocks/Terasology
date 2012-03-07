@@ -23,7 +23,7 @@ import org.lwjgl.opengl.GLContext;
 import org.terasology.game.modes.IGameState;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.logic.characters.Player;
+import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
@@ -396,7 +396,9 @@ public final class Terasology {
         return null;
     }
 
-    public Player getActivePlayer() {
+
+    // TODO: Where is a good place to put this? Registry?
+    public LocalPlayer getActivePlayer() {
         if (getActiveWorldRenderer() != null)
             return getActiveWorldRenderer().getPlayer();
         return null;

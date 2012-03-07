@@ -31,6 +31,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
+import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
@@ -77,7 +78,7 @@ public class BulletPhysicsRenderer implements IGameObject {
             Matrix4f tMatrix = new Matrix4f();
             t.getMatrix(tMatrix);
 
-            Player player = Terasology.getInstance().getActivePlayer();
+            LocalPlayer player = Terasology.getInstance().getActivePlayer();
 
             Vector3f blockPlayer = new Vector3f();
             tMatrix.get(blockPlayer);
@@ -253,7 +254,6 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     public void render() {
-        Player player = _parent.getPlayer();
 
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
         float[] mFloat = new float[16];
@@ -320,7 +320,7 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     private void checkForLootedBlocks() {
-        Player player = Terasology.getInstance().getActivePlayer();
+        LocalPlayer player = Terasology.getInstance().getActivePlayer();
 
         for (int i = _blocks.size() - 1; i >= 0; i--) {
             BlockRigidBody b = _blocks.get(i);
@@ -354,7 +354,8 @@ public class BulletPhysicsRenderer implements IGameObject {
                 } else {
                     // Block was looted (and reached the player)
                     Block block = BlockManager.getInstance().getBlock(b.getType());
-                    player.getInventory().addItem(new ItemBlock(block.getBlockGroup()), 1);
+                    // TODO: Fix pick up block
+                    //player.getInventory().addItem(new ItemBlock(block.getBlockGroup()), 1);
                     AudioManager.play("Loot");
 
                     _blocks.remove(i);

@@ -93,21 +93,6 @@ public abstract class MovableEntity extends Entity {
     public void render() {
         // Update the viewing direction
         setViewingDirection(_yaw, _pitch);
-
-        if (Config.getInstance().isDebugCollision()) {
-            getAABB().render(1f);
-
-            ArrayList<BlockPosition> blocks = gatherAdjacentBlockPositions(getPosition());
-
-            for (int i = 0; i < blocks.size(); i++) {
-                BlockPosition p = blocks.get(i);
-                byte blockType = _parent.getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
-                Block block = BlockManager.getInstance().getBlock(blockType);
-                for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
-                    blockAABB.render(1f);
-                }
-            }
-        }
     }
 
     public void update(double delta) {

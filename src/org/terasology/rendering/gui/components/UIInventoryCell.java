@@ -76,17 +76,18 @@ public class UIInventoryCell extends UIDisplayElement {
     public void update() {
         setPosition(findPosition());
 
-        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
+        // TODO: Fix inventory
+        //Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         processMouseInput();
 
-        Item item = inventory.getItemAt(_id);
+        /*Item item = inventory.getItemAt(_id);
 
         if (item != null) {
             getLabel().setVisible(true);
             getLabel().setText(Integer.toString(inventory.getItemCountAt(_id)));
         } else {
             getLabel().setVisible(false);
-        }
+        } */
     }
 
     private void processMouseInput() {
@@ -106,7 +107,8 @@ public class UIInventoryCell extends UIDisplayElement {
     public void render() {
         _selectionRectangle.renderTransformed();
 
-        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
+        // TODO: Fix inventory
+        /*Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         Item item = inventory.getItemAt(_id);
 
         glEnable(GL11.GL_DEPTH_TEST);
@@ -122,6 +124,7 @@ public class UIInventoryCell extends UIDisplayElement {
         glDisable(GL11.GL_DEPTH_TEST);
 
         _label.renderTransformed();
+        */
     }
 
     public void setSelected(boolean selected) {

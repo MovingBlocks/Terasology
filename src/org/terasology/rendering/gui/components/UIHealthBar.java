@@ -55,12 +55,13 @@ public class UIHealthBar extends UIDisplayContainer {
 
         super.update();
 
+        // TODO: Health
         // Show/Hide hearts relatively to the available health points of the player
-        for (int i = 0; i < 10; i++) {
+        /*for (int i = 0; i < 10; i++) {
             if (i < Terasology.getInstance().getActiveWorldRenderer().getPlayer().getHealthPercentage() * 10f)
                 _hearts[i].setVisible(true);
             else
                 _hearts[i].setVisible(false);
-        }
+        } */
     }
 }

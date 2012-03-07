@@ -38,7 +38,7 @@ public class SimpleAISystem implements EventHandler {
             moveComp.drive.set(0,0,0);
             if (worldRenderer.getPlayer() != null)
             {
-                Vector3d dist = new Vector3d(worldPos);
+                Vector3f dist = new Vector3f(worldPos);
                 dist.sub(worldRenderer.getPlayer().getPosition());
                 double distanceToPlayer = dist.lengthSquared();
 

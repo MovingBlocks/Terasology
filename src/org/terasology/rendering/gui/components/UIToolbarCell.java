@@ -64,19 +64,20 @@ public class UIToolbarCell extends UIDisplayElement {
         _selectionRectangle.setVisible(_selected);
         setPosition(new Vector2f((getSize().x - 8f) * _id - 2f, 2f));
 
-        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
+        // TODO: Fix Inventory UI
+        /*Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
 
         if (inventory.getSelectedCubbyhole() == _id) {
             setSelected(true);
         } else {
             setSelected(false);
-        }
+        } */
 
         displayItemCount();
     }
 
     private void displayItemCount() {
-        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
+        /*Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         int count = inventory.getItemCountAt(_id);
 
         if (count == 0) {
@@ -84,7 +85,7 @@ public class UIToolbarCell extends UIDisplayElement {
         } else {
             getLabel().setVisible(true);
             getLabel().setText(Integer.toString(count));
-        }
+        } */
     }
 
     @Override
@@ -94,7 +95,7 @@ public class UIToolbarCell extends UIDisplayElement {
 
         _selectionRectangle.renderTransformed();
 
-        Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
+        /*Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         Item item = inventory.getItemAt(_id);
 
         glEnable(GL11.GL_DEPTH_TEST);
@@ -109,7 +110,7 @@ public class UIToolbarCell extends UIDisplayElement {
 
         glDisable(GL11.GL_DEPTH_TEST);
 
-        _label.renderTransformed();
+        _label.renderTransformed();  */
     }
 
     public void setSelected(boolean selected) {

@@ -26,6 +26,7 @@ public class TeraMath {
 
     public static final float HALF_PI = (float)(0.5f * Math.PI);
     public static final float RAD_TO_DEG = (float) (180.0f / Math.PI);
+    public static final float DEG_TO_RAD = (float) (Math.PI / 180.0f);
     
     /**
      * Returns the absolute value.
@@ -70,6 +71,22 @@ public class TeraMath {
             return 1.0;
         if (value < 0.0)
             return 0.0;
+        return value;
+    }
+
+    public static double clamp(double value, double min, double max) {
+        if (value > max)
+            return max;
+        if (value < min)
+            return min;
+        return value;
+    }
+
+    public static float clamp(float value, float min, float max) {
+        if (value > max)
+            return max;
+        if (value < min)
+            return min;
         return value;
     }
 

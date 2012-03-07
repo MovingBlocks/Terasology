@@ -9,6 +9,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldUtil;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -163,7 +164,7 @@ public class CharacterMovementSystem {
      * @return True if a vertical collision was detected
      */
     private boolean verticalHitTest(Vector3f position, Vector3f origin, Vector3f extents) {
-        List<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
+        List<BlockPosition> blockPositions = WorldUtil.gatherAdjacentBlockPositions(origin);
 
         boolean moved = false;
 
@@ -199,7 +200,7 @@ public class CharacterMovementSystem {
 
     private boolean horizontalHitTest(Vector3f position, Vector3f origin, Vector3f extents) {
         boolean result = false;
-        List<BlockPosition> blockPositions = gatherAdjacentBlockPositions(origin);
+        List<BlockPosition> blockPositions = WorldUtil.gatherAdjacentBlockPositions(origin);
 
         // Check each block position for collision
         for (int i = 0; i < blockPositions.size(); i++) {
@@ -250,29 +251,4 @@ public class CharacterMovementSystem {
         return new AABB(new Vector3d(position), new Vector3d(extents));
     }
 
-    private List<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
-        /*
-         * Gather the surrounding block positions
-         * and order those by the distance to the originating point.
-         */
-        List<BlockPosition> blockPositions = Lists.newArrayList();
-        
-        Vector3d sharedOrigin = new Vector3d(origin);
-
-        for (int x = -1; x < 2; x++) {
-            for (int z = -1; z < 2; z++) {
-                for (int y = -1; y < 2; y++) {
-                    int blockPosX = (int) (origin.x + (origin.x >= 0 ? 0.5f : -0.5f)) + x;
-                    int blockPosY = (int) (origin.y + (origin.y >= 0 ? 0.5f : -0.5f)) + y;
-                    int blockPosZ = (int) (origin.z + (origin.z >= 0 ? 0.5f : -0.5f)) + z;
-
-                    blockPositions.add(new BlockPosition(blockPosX, blockPosY, blockPosZ, sharedOrigin));
-                }
-            }
-        }
-
-        // Sort the block positions
-        Collections.sort(blockPositions);
-        return blockPositions;
-    }
 }

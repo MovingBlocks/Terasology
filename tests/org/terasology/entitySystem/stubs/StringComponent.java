@@ -11,14 +11,6 @@ import org.terasology.persistence.interfaces.StorageWriter;
 public final class StringComponent extends AbstractComponent {
     public String value;
 
-    public void store(StorageWriter writer) {
-        writer.write("value", value);
-    }
-
-    public void retrieve(StorageReader reader) {
-        value = reader.read("value", String.class);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

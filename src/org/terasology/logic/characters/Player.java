@@ -71,10 +71,6 @@ public class Player extends Character {
     /* OBSERVERS */
     private final ArrayList<IBlockObserver> _observers = new ArrayList<IBlockObserver>();
 
-    /* CAMERA */
-    private final DefaultCamera _defaultCamera = new DefaultCamera();
-    private final Camera _activeCamera = _defaultCamera;
-
     /* RENDERING*/
     private boolean _renderPlayerModel;
 
@@ -139,7 +135,7 @@ public class Player extends Character {
 
     public void update(double delta) {
         PerformanceMonitor.startActivity("Player Camera");
-        if (_activeCamera != null) {
+        /*if (_activeCamera != null) {
             _activeCamera.update(delta);
 
             // Slightly adjust the field of view when flying
@@ -148,7 +144,7 @@ public class Player extends Character {
             } else {
                 _activeCamera.resetFov();
             }
-        }
+        } */
         PerformanceMonitor.endActivity();
 
         if (_handMovementAnimationOffset > 0) {
@@ -221,7 +217,7 @@ public class Player extends Character {
         glPushMatrix();
         glLoadIdentity();
         glClear(GL_DEPTH_BUFFER_BIT);
-        getActiveCamera().loadProjectionMatrix(75f);
+        //getActiveCamera().loadProjectionMatrix(75f);
 
         if (getActiveItem() != null) {
             getActiveItem().renderFirstPersonView(this);
@@ -253,7 +249,7 @@ public class Player extends Character {
         Vector3d cameraPosition = new Vector3d();
         cameraPosition.add(getPosition(), calcEyeOffset());
 
-        _defaultCamera.getPosition().set(cameraPosition);
+        /*_defaultCamera.getPosition().set(cameraPosition);
 
         if (CAMERA_BOBBING) {
             _defaultCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
@@ -268,7 +264,7 @@ public class Player extends Character {
         } else {
             Vector3d viewingTarget = new Vector3d(getPosition().x, 40, getPosition().z - 128);
             _defaultCamera.getViewingDirection().sub(viewingTarget, getPosition());
-        }
+        } */
     }
 
     public void updatePosition(double delta) {
@@ -605,10 +601,6 @@ public class Player extends Character {
 
     public AABB getAABB() {
         return generateAABBForPosition(getPosition());
-    }
-
-    public Camera getActiveCamera() {
-        return _activeCamera;
     }
 
     public void registerObserver(IBlockObserver observer) {

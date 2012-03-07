@@ -1,5 +1,6 @@
 package org.terasology.entityFactory;
 
+import com.google.common.collect.Lists;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -8,6 +9,7 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3f;
+import java.util.Arrays;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -39,7 +41,7 @@ public class GelatinousCubeFactory {
         comp.extents.set(0.5f, 0.5f, 0.5f);
         
         CharacterSoundComponent soundComp = entity.addComponent(new CharacterSoundComponent());
-        soundComp.footstepSounds = AudioManager.sounds("Slime1", "Slime2", "Slime3", "Slime4", "Slime5");
+        soundComp.footstepSounds.addAll(Arrays.asList(AudioManager.sounds("Slime1", "Slime2", "Slime3", "Slime4", "Slime5")));
         soundComp.footstepVolume = 0.7f;
 
         return entity;

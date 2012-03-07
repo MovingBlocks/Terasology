@@ -18,14 +18,18 @@ package org.terasology.game.modes;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.components.*;
+import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.game.Terasology;
-import org.terasology.logic.characters.Player;
+import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.systems.CharacterMovementSystem;
 import org.terasology.logic.systems.CharacterSoundSystem;
+import org.terasology.logic.systems.LocalPlayerSystem;
 import org.terasology.logic.systems.SimpleAISystem;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -62,8 +66,9 @@ public class StateSinglePlayer implements IGameState {
 
     private EntityManager _entityManager;
     private CharacterMovementSystem _charMoveSys;
-    private SimpleAISystem _ranHopSys;
+    private SimpleAISystem _simpleAISys;
     private CharacterSoundSystem _charSoundSys;
+    private LocalPlayerSystem _localPlayerSys;
 
     /* GAME LOOP */
     private boolean _pauseGame = false;
@@ -91,13 +96,12 @@ public class StateSinglePlayer implements IGameState {
         _entityManager.setEventSystem(new PojoEventSystem(_entityManager));
         _charMoveSys = new CharacterMovementSystem();
         _charMoveSys.setEntityManager(_entityManager);
-        _ranHopSys = new SimpleAISystem();
-        _ranHopSys.setEntityManager(_entityManager);
-        _entityManager.getEventSystem().registerEventHandler(_ranHopSys);
+        _simpleAISys = new SimpleAISystem();
+        _simpleAISys.setEntityManager(_entityManager);
+        _entityManager.getEventSystem().registerEventHandler(_simpleAISys);
         _charSoundSys = new CharacterSoundSystem();
         _entityManager.getEventSystem().registerEventHandler(_charSoundSys);
-
-
+        _localPlayerSys = new LocalPlayerSystem(_entityManager);
     }
 
 
@@ -125,14 +129,14 @@ public class StateSinglePlayer implements IGameState {
         updateUserInterface();
 
 
-        _ranHopSys.update((float)delta);
+        _simpleAISys.update((float) delta);
         _charMoveSys.update((float)delta);
 
         if (_worldRenderer != null && shouldUpdateWorld())
             _worldRenderer.update(delta);
 
         if (!screenHasFocus())
-            getWorldRenderer().getPlayer().updateInput();
+            _localPlayerSys.updateInput();
 
             if (screenHasFocus() || !shouldUpdateWorld()) {
                 if (Mouse.isGrabbed()) {
@@ -144,14 +148,19 @@ public class StateSinglePlayer implements IGameState {
                     Mouse.setGrabbed(true);
             }
 
-        if (_worldRenderer != null) {
-            if (_worldRenderer.getPlayer().isDead()) {
-                    _statusScreen.setVisible(true);
-                _statusScreen.updateStatus("Sorry! Seems like you have died. :-(");
-                } else {
-                    _statusScreen.setVisible(false);
-                }
-            }
+        // TODO: This seems a little off - plus is more of a UI than single player game state concern. Move somewhere
+        // more appropriate
+        boolean dead = true;
+        for (EntityRef entity : _entityManager.iteratorEntities(LocalPlayerComponent.class))
+        {
+            dead = entity.getComponent(LocalPlayerComponent.class).isDead;
+        }
+        if (dead) {
+            _statusScreen.setVisible(true);
+            _statusScreen.updateStatus("Sorry! Seems like you have died. :-(");
+        } else {
+            _statusScreen.setVisible(false);
+        }
     }
 
     public void initWorld(String title) {
@@ -179,8 +188,12 @@ public class StateSinglePlayer implements IGameState {
         Terasology.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        _worldRenderer = new WorldRenderer(title, seed, _entityManager);
-        _worldRenderer.setPlayer(new Player(_worldRenderer));
+        _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys);
+
+        PlayerFactory playerFactory = new PlayerFactory();
+        playerFactory.setEntityManager(_entityManager);
+
+        _worldRenderer.setPlayer(new LocalPlayer(playerFactory.newInstance()));
 
         // Create the first Portal if it doesn't exist yet
         _worldRenderer.initPortal();
@@ -188,9 +201,10 @@ public class StateSinglePlayer implements IGameState {
         fastForwardWorld();
 
         _charMoveSys.setWorldProvider(_worldRenderer.getWorldProvider());
-        _ranHopSys.setWorldRenderer(_worldRenderer);
-        _ranHopSys.setRandom(_worldRenderer.getWorldProvider().getRandom());
+        _simpleAISys.setWorldRenderer(_worldRenderer);
+        _simpleAISys.setRandom(_worldRenderer.getWorldProvider().getRandom());
         _charSoundSys.setRandom(_worldRenderer.getWorldProvider().getRandom());
+
     }
 
     private boolean screenHasFocus() {
@@ -338,7 +352,7 @@ public class StateSinglePlayer implements IGameState {
 
             // Pass input to the current player
             if (!screenHasFocus())
-                _worldRenderer.getPlayer().processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
+                _localPlayerSys.processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
         }
     }
 
@@ -358,7 +372,7 @@ public class StateSinglePlayer implements IGameState {
             }
 
             if (!screenHasFocus())
-                _worldRenderer.getPlayer().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+                _localPlayerSys.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
         }
     }
 

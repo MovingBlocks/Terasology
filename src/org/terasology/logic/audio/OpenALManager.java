@@ -8,9 +8,12 @@ import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
+import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.rendering.cameras.Camera;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -51,13 +54,14 @@ public class OpenALManager extends AudioManager {
 
     @Override
     public void update() {
-        Player player = Terasology.getInstance().getActivePlayer();
+        LocalPlayer player = Terasology.getInstance().getActivePlayer();
 
         if (player != null) {
-            Vector3d velocity = player.getVelocity();
-            Vector3d orientation = player.getViewingDirection();
+            Vector3f velocity = player.getVelocity();
+            // TODO: get this from camera
+            Vector3f orientation = player.getViewDirection();
 
-            AL10.alListener3f(AL10.AL_VELOCITY, (float) velocity.x, (float) velocity.y, (float) velocity.z);
+            AL10.alListener3f(AL10.AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
             OpenALException.checkState("Setting listener velocity");
 
@@ -86,14 +90,14 @@ public class OpenALManager extends AudioManager {
 
     @Override
     protected boolean checkDistance(Vector3d soundSource) {
-        Player player = Terasology.getInstance().getActivePlayer();
+        Camera camera = Terasology.getInstance().getActiveCamera();
 
-        if (player == null) {
+        if (camera == null) {
             return false;
         }
 
         Vector3d soundPosition = new Vector3d(soundSource);
-        soundPosition.sub(player.getPosition());
+        soundPosition.sub(camera.getPosition());
 
         return soundPosition.lengthSquared() < MAX_DISTANCE_SQUARED;
     }

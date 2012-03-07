@@ -1,0 +1,77 @@
+package org.terasology.logic.global;
+
+import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.LocationComponent;
+import org.terasology.components.PlayerComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.systems.LocationHelper;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+/**
+ * @author Immortius <immortius@gmail.com>
+ */
+public class LocalPlayer {
+    
+    private EntityRef entity;
+    
+    public LocalPlayer(EntityRef playerEntity) {
+        this.entity = playerEntity;
+    }
+
+    public boolean isValid() {
+        return entity.hasComponent(LocationComponent.class) && entity.hasComponent(LocalPlayerComponent.class) && entity.hasComponent(PlayerComponent.class);
+    }
+    
+    public Vector3f getPosition() {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        if (location == null) {
+            return new Vector3f();
+        }
+        return LocationHelper.localToWorldPos(location);
+    }
+    
+    public Quat4f getRotation() {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        if (location == null) {
+            return new Quat4f(0,0,0,1);
+        }
+        return LocationHelper.localToWorldRot(location);
+    }
+
+    public boolean isCarryingTorch() {
+        PlayerComponent player = entity.getComponent(PlayerComponent.class);
+        if (player != null) {
+            return player.isCarryingTorch;
+        }
+        return false;
+    }
+    
+    public EntityRef getEntity() {
+        return entity;
+    }
+    
+    public Vector3f getVelocity() {
+        CharacterMovementComponent movement = entity.getComponent(CharacterMovementComponent.class);
+        if (movement != null) {
+            return new Vector3f(movement.velocity);
+        }
+        return new Vector3f();
+    }
+    
+    public Vector3f getViewDirection() {
+        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
+        if (localPlayer == null) {
+            return new Vector3f(0,0,-1);
+        }
+        Quat4f rot = new Quat4f();
+        QuaternionUtil.setEuler(rot, localPlayer.yaw, localPlayer.pitch, 0);
+        // TODO: ensure this is the correct forward vector. Also, put a generator for direction vectors in a util class somewhere
+        // Annd just put quaternion -> vector somewhere too
+        Vector3f dir = new Vector3f(0,0,-1);
+        return QuaternionUtil.quatRotate(rot, dir, dir);
+    }
+}

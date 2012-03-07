@@ -28,6 +28,7 @@ import org.terasology.game.Terasology;
 import org.terasology.game.modes.IGameState;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.characters.Player;
+import org.terasology.logic.global.LocalPlayer;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
@@ -125,9 +126,10 @@ public class GroovyManager {
         }
 
         public void giveBlock(int blockId, int quantity) {
-            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            //TODO: Fix inventory
+            /*Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
             Item block = new ItemBlock(BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup());
-            player.getInventory().addItem(block, quantity);
+            player.getInventory().addItem(block, quantity);*/
         }
 
         public void giveBlock(String title) {
@@ -135,7 +137,8 @@ public class GroovyManager {
         }
 
         public void giveBlock(String title, int quantity) {
-            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            // TODO: Fix inventory
+            /*Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
             BlockGroup group = BlockManager.getInstance().getBlockGroup(title);
             if (group == null) {
                 Block block = BlockManager.getInstance().getBlock(title);
@@ -145,21 +148,26 @@ public class GroovyManager {
             }
             if (group != null) {
                 player.getInventory().addItem(new ItemBlock(group), quantity);
-            }
+            }             */
         }
 
         public void fullHealth() {
-            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.heal(player.getMaxHealthPoints() - player.getHealthPoints());
+            /*Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            player.heal(player.getMaxHealthPoints() - player.getHealthPoints());*/
         }
 
-        public void teleport(double x, double y, double z) {
-            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.setPosition(x, y, z);
+        public void teleport(float x, float y, float z) {
+            LocalPlayer player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            if (player != null) {
+                LocationComponent location = player.getEntity().getComponent(LocationComponent.class);
+                if (location != null) {
+                    location.position.set(x, y, z);
+                }
+            }
         }
 
         public void spawnTest() {
-            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            LocalPlayer player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
             GelatinousCubeFactory factory = new GelatinousCubeFactory();
             factory.setEntityManager(Terasology.getInstance().getCurrentGameState().getEntityManager());
             factory.setRandom(Terasology.getInstance().getActiveWorldRenderer().getWorldProvider().getRandom());
