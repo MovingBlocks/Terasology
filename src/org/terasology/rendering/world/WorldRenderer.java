@@ -501,7 +501,7 @@ public final class WorldRenderer implements IGameObject {
             AABBCollisionComponent collision = _player.getEntity().getComponent(AABBCollisionComponent.class);
             if (collision != null) {
                 Vector3f worldLoc = _player.getPosition();
-                AABB aabb = new AABB(new Vector3d(worldLoc), new Vector3d(collision.extents));
+                AABB aabb = new AABB(new Vector3d(worldLoc), new Vector3d(collision.getExtents()));
                 aabb.render(1f);
             }
         }

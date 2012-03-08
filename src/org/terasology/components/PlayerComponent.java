@@ -8,7 +8,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class PlayerComponent extends AbstractComponent {
+public final class PlayerComponent extends AbstractComponent {
     public Vector3f spawnPosition = new Vector3f();
 
     // TODO: This should be handled via the inventory/equipment system

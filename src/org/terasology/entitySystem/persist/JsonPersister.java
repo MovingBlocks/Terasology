@@ -162,6 +162,7 @@ public class JsonPersister implements PrefabPersister {
                     }
 
                     Field field = componentClass.getDeclaredField(element.getKey());
+                    field.setAccessible(true);
                     field.set(instance, gson.fromJson(element.getValue(), field.getType()));
                 }
 

@@ -30,6 +30,7 @@ import org.terasology.utilities.FastRandom;
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -94,6 +95,13 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
         _liquidSimulator = new LiquidSimulator(this);
         _growthSimulator = new GrowthSimulator(this);
+    }
+
+    public boolean isChunkAvailableAt(Vector3f position) {
+        int chunkPosX = TeraMath.calcChunkPosX((int)position.x);
+        int chunkPosZ = TeraMath.calcChunkPosZ((int)position.z);
+
+        return _chunkProvider.isChunkAvailable(chunkPosX, chunkPosZ);
     }
 
     /**

@@ -6,6 +6,7 @@ import org.terasology.model.structures.AABB;
 import org.terasology.persistence.interfaces.StorageReader;
 import org.terasology.persistence.interfaces.StorageWriter;
 
+import javax.vecmath.Tuple3f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
@@ -19,6 +20,14 @@ import javax.vecmath.Vector3f;
 // it. Will mean only need to replicate it once too.
 public final class AABBCollisionComponent extends AbstractComponent {
 
-    public Vector3f extents = new Vector3f();
+    private Vector3f extents = new Vector3f();
+
+    public Vector3f getExtents() {
+        return extents;
+    }
+    
+    public void setExtents(Tuple3f newExtents) {
+        extents.set(newExtents);
+    }
 
 }

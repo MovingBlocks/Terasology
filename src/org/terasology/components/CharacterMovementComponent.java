@@ -27,16 +27,32 @@ public final class CharacterMovementComponent extends AbstractComponent {
     public boolean isGrounded = false;
     public boolean isRunning = false;
 
-    public Vector3f velocity = new Vector3f();
+    private Vector3f velocity = new Vector3f();
 
     // Movement inputs - desired direction, etc
     public boolean jump = false;
     // The direction and strength of movement desired
     // Should have a length between 0 and 1
-    public Vector3f drive = new Vector3f();
+    private Vector3f drive = new Vector3f();
     public boolean faceMovementDirection = false;
 
     public float distanceBetweenFootsteps = 1f;
     public float footstepDelta = 0.0f;
+    
+    public Vector3f getVelocity() {
+        return velocity;
+    }
+    
+    public void setVelocity(Vector3f newVelocity) {
+        velocity.set(newVelocity);
+    }
+    
+    public Vector3f getDrive() {
+        return drive;
+    }
+    
+    public void setDrive(Vector3f newDrive) {
+        drive.set(newDrive);
+    }
 
 }

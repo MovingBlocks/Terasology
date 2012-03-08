@@ -10,7 +10,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class LocalPlayerComponent extends AbstractComponent {
+public final class LocalPlayerComponent extends AbstractComponent {
 
     // These aren't really needed - yaw would be applied the LocationComponent and
     // pitch would be applied to a the Camera's location component (which would parent

@@ -79,10 +79,10 @@ public class PojoPrefabManagerTest {
 
         assertEquals(testComponent, prefab.getComponent(testComponent.getClass()));
 
-        prefab.getComponent(testComponent.getClass()).position.set(1, 1, 1);
+        prefab.getComponent(testComponent.getClass()).getLocalPosition().set(1, 1, 1);
 
-        assertNotSame(testComponent.position,  prefab.getComponent(testComponent.getClass()).position);
-        assertEquals(new Vector3f(0,0,0), testComponent.position);
+        assertNotSame(testComponent.getLocalPosition(),  prefab.getComponent(testComponent.getClass()).getLocalPosition());
+        assertEquals(new Vector3f(0,0,0), testComponent.getLocalPosition());
     }
 
 }

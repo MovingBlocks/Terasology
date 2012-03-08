@@ -128,9 +128,12 @@ public class StateSinglePlayer implements IGameState {
         /* GUI */
         updateUserInterface();
 
-
+        PerformanceMonitor.startActivity("Simple AI System");
         _simpleAISys.update((float) delta);
+        PerformanceMonitor.endActivity();
+        PerformanceMonitor.startActivity("Character Movement System");
         _charMoveSys.update((float)delta);
+        PerformanceMonitor.endActivity();
 
         if (_worldRenderer != null && shouldUpdateWorld())
             _worldRenderer.update(delta);

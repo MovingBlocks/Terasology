@@ -1,6 +1,5 @@
 package org.terasology.logic.systems;
 
-import com.google.common.collect.Lists;
 import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocationComponent;
@@ -15,11 +14,11 @@ import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,6 +33,9 @@ public class CharacterMovementSystem {
 
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
+
+    // For reuse to save memory churn
+    private AABB entityAABB = new AABB(new Vector3d(), new Vector3d());
     
     public void update(float delta) {
         float deltaSeconds = (delta / 1000f);
@@ -42,6 +44,8 @@ public class CharacterMovementSystem {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
             CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
+
+            if (!worldProvider.isChunkAvailableAt(location.getWorldPosition())) continue;
 
             updatePosition(deltaSeconds, entity, location, collision, movementComp);
             //checkPosition(location, collision, movementComp);
@@ -68,7 +72,7 @@ public class CharacterMovementSystem {
     protected void updatePosition(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
 
         // TODO: Better swimming support, flying support
-        Vector3f desiredVelocity = new Vector3f(movementComp.drive);
+        Vector3f desiredVelocity = new Vector3f(movementComp.getDrive());
         float maxSpeed = movementComp.isSwimming ? movementComp.maxWaterSpeed : movementComp.maxGroundSpeed;
         if (movementComp.isRunning) {
             maxSpeed *= movementComp.runFactor;
@@ -77,35 +81,35 @@ public class CharacterMovementSystem {
 
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
-        velocityDiff.sub(movementComp.velocity);
+        velocityDiff.sub(movementComp.getVelocity());
         velocityDiff.y = 0;
         float changeMag = velocityDiff.length();
         if (changeMag > movementComp.groundFriction * delta) {
             velocityDiff.scale(movementComp.groundFriction * delta / changeMag);
         }
 
-        movementComp.velocity.x += velocityDiff.x;
-        movementComp.velocity.z += velocityDiff.z;
+        movementComp.getVelocity().x += velocityDiff.x;
+        movementComp.getVelocity().z += velocityDiff.z;
         
         // Cannot control y if not swimming (or flying I guess)
         if (movementComp.isSwimming) {
-            movementComp.velocity.y += Math.signum(desiredVelocity.y - movementComp.velocity.y) * Math.min(UnderwaterInteria * delta, TeraMath.fastAbs(desiredVelocity.y - movementComp.velocity.y));
-            movementComp.velocity.y = Math.max(-movementComp.maxWaterSpeed, (movementComp.velocity.y - UnderwaterGravity * delta));
+            movementComp.getVelocity().y += Math.signum(desiredVelocity.y - movementComp.getVelocity().y) * Math.min(UnderwaterInteria * delta, TeraMath.fastAbs(desiredVelocity.y - movementComp.getVelocity().y));
+            movementComp.getVelocity().y = Math.max(-movementComp.maxWaterSpeed, (movementComp.getVelocity().y - UnderwaterGravity * delta));
         }
         else {
-            movementComp.velocity.y = Math.max(-TerminalVelocity, (float)(movementComp.velocity.y - Gravity * delta));
+            movementComp.getVelocity().y = Math.max(-TerminalVelocity, (float)(movementComp.getVelocity().y - Gravity * delta));
         }
 
         // TODO: replace this with swept collision based on JBullet?
-        Vector3f worldPos = LocationHelper.localToWorldPos(location);
+        Vector3f worldPos = location.getWorldPosition();
         Vector3f oldPos = new Vector3f(worldPos);
-        worldPos.y += movementComp.velocity.y * delta;
+        worldPos.y += movementComp.getVelocity().y * delta;
         
-        Vector3f extents = new Vector3f(collision.extents);
-        extents.scale(LocationHelper.totalScale(location));
+        Vector3f extents = new Vector3f(collision.getExtents());
+        extents.scale(location.getWorldScale());
 
         if (verticalHitTest(worldPos, oldPos, extents)) {
-            movementComp.velocity.y = 0;
+            movementComp.getVelocity().y = 0;
 
             // Jumping is only possible, if the entity is standing on ground
             if (movementComp.jump) {
@@ -114,7 +118,7 @@ public class CharacterMovementSystem {
                 //        _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
                 movementComp.jump = false;
                 movementComp.isGrounded = false;
-                movementComp.velocity.y += movementComp.jumpSpeed;
+                movementComp.getVelocity().y += movementComp.jumpSpeed;
             } else if (!movementComp.isGrounded) { // Entity reaches the ground
                 // TODO: Event on collide (for damage)
                 //AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
@@ -126,13 +130,12 @@ public class CharacterMovementSystem {
         }
 
         oldPos.set(worldPos);
-
         /*
          * Update the position of the entity
          * according to the acceleration vector.
          */
-        worldPos.x += movementComp.velocity.x * delta;
-        worldPos.z += movementComp.velocity.z * delta;
+        worldPos.x += movementComp.getVelocity().x * delta;
+        worldPos.z += movementComp.getVelocity().z * delta;
 
         // TODO: step sound support (while not animation driven anyhow)
         //_stepCounter += java.lang.Math.max(TeraMath.fastAbs(_movementVelocity.x * timePassedInSeconds), TeraMath.fastAbs(_movementVelocity.z * timePassedInSeconds));
@@ -144,8 +147,8 @@ public class CharacterMovementSystem {
         if (horizontalHitTest(worldPos, oldPos, extents)) {
             entity.send(new HorizontalCollisionEvent());
         }
-        movementComp.velocity.x = (worldPos.x - oldPos.x) / delta;
-        movementComp.velocity.z = (worldPos.z - oldPos.z) / delta;
+        movementComp.getVelocity().x = (worldPos.x - oldPos.x) / delta;
+        movementComp.getVelocity().z = (worldPos.z - oldPos.z) / delta;
 
         Vector3f dist = new Vector3f(worldPos.x - oldPos.x, 0, worldPos.z - oldPos.z);
 
@@ -156,14 +159,13 @@ public class CharacterMovementSystem {
                 entity.send(new FootstepEvent());
             }
         }
-        location.position.set(LocationHelper.worldToLocalPos(location, worldPos));
+        location.setWorldPosition(worldPos);
 
         if (movementComp.faceMovementDirection) {
-            float yaw = (float)Math.atan2(movementComp.velocity.x, movementComp.velocity.z);
+            float yaw = (float)Math.atan2(movementComp.getVelocity().x, movementComp.getVelocity().z);
             AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-            location.rotation.set(axisAngle);
+            location.getLocalRotation().set(axisAngle);
         }
-
     }
 
     /**
@@ -173,15 +175,15 @@ public class CharacterMovementSystem {
      * @return True if a vertical collision was detected
      */
     private boolean verticalHitTest(Vector3f position, Vector3f origin, Vector3f extents) {
+
         List<BlockPosition> blockPositions = WorldUtil.gatherAdjacentBlockPositions(origin);
 
         boolean moved = false;
 
         for (int i = 0; i < blockPositions.size(); i++) {
             BlockPosition p = blockPositions.get(i);
-
             byte blockType1 = worldProvider.getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
-            AABB entityAABB = calcAABB(position, extents);
+            calcAABB(position, extents);
 
             Block block = BlockManager.getInstance().getBlock(blockType1);
             if (block == null || block.isPenetrable())
@@ -200,10 +202,12 @@ public class CharacterMovementSystem {
                     position.y -= java.lang.Math.ulp(position.y);
                 }
 
-                moved = true;
+
+               return true;
             }
         }
 
+        PerformanceMonitor.endActivity();
         return moved;
     }
 
@@ -257,7 +261,9 @@ public class CharacterMovementSystem {
 
     private AABB calcAABB(Vector3f position, Vector3f extents)
     {
-        return new AABB(new Vector3d(position), new Vector3d(extents));
+        entityAABB.getPosition().set(position);
+        entityAABB.getDimensions().set(extents);
+        return entityAABB;
     }
 
 }

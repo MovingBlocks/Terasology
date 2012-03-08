@@ -28,7 +28,7 @@ public class CharacterSoundSystem implements EventHandler {
             CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
             if (characterSounds.footstepSounds.size() > 0) {
                 Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-                AudioManager.play(sound, new Vector3d(LocationHelper.localToWorldPos(location)), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
+                AudioManager.play(sound, new Vector3d(location.getWorldPosition()), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
             }
         }
     }

@@ -19,7 +19,6 @@ import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -51,25 +50,26 @@ public class MeshRenderer {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
 
-            Vector3f worldPos = LocationHelper.localToWorldPos(location);
-            Vector3d extents = new Vector3d(collision.extents);
-            extents.scale(LocationHelper.totalScale(location));
-            AABB aabb = new AABB(new Vector3d(worldPos), new Vector3d(collision.extents));
+            Vector3f worldPos = location.getWorldPosition();
+            Vector3d extents = new Vector3d(collision.getExtents());
+            float worldScale = location.getWorldScale();
+            extents.scale(worldScale);
+            AABB aabb = new AABB(new Vector3d(worldPos), new Vector3d(collision.getExtents()));
 
             if (worldRenderer.isAABBVisible(aabb)) {
                 glPushMatrix();
 
-                glTranslated(location.position.x - cameraPosition.x, location.position.y - cameraPosition.y, location.position.z - cameraPosition.z);
+                glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
                 AxisAngle4f rot = new AxisAngle4f();
-                rot.set(location.rotation);
+                rot.set(location.getWorldRotation());
                 glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
-                glScalef(location.scale, location.scale, location.scale);
+                glScalef(worldScale, worldScale, worldScale);
 
                 ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");
 
                 shader.enable();
                 shader.setFloat4("colorOffset", meshComp.color.x, meshComp.color.y, meshComp.color.z, meshComp.color.w);
-                shader.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(location.position)));
+                shader.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos)));
 
                 mesh.render();
 

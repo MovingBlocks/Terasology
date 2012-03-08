@@ -26,8 +26,8 @@ public class GelatinousCubeFactory {
         EntityRef entity = Terasology.getInstance().getCurrentGameState().getEntityManager().create();
 
         LocationComponent loc = entity.addComponent(new LocationComponent());
-        loc.position.set(position);
-        loc.scale = (float) (((random.randomDouble() + 1.0) / 2.0) * 0.8 + 0.2);
+        loc.setLocalPosition(position);
+        loc.setLocalScale((float) (((random.randomDouble() + 1.0) / 2.0) * 0.8 + 0.2));
 
         MeshComponent mesh = entity.addComponent(new MeshComponent());
         int colorId = Math.abs(random.randomInt()) % COLORS.length;
@@ -38,7 +38,7 @@ public class GelatinousCubeFactory {
 
         entity.addComponent(new SimpleAIComponent());
         AABBCollisionComponent comp = entity.addComponent(new AABBCollisionComponent());
-        comp.extents.set(0.5f, 0.5f, 0.5f);
+        comp.getExtents().set(0.5f, 0.5f, 0.5f);
         
         CharacterSoundComponent soundComp = entity.addComponent(new CharacterSoundComponent());
         soundComp.footstepSounds.addAll(Arrays.asList(AudioManager.sounds("Slime1", "Slime2", "Slime3", "Slime4", "Slime5")));

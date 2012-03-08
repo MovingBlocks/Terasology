@@ -3,11 +3,15 @@ package org.terasology.entitySystem;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public abstract class AbstractComponent implements Component {
+    
+    private static Logger logger = Logger.getLogger(AbstractComponent.class.getName());
 
     public String getName() {
         String className = getClass().getSimpleName().toLowerCase();
@@ -19,13 +23,11 @@ public abstract class AbstractComponent implements Component {
         return className;
     }
 
-
-
     public Component clone() {
         try {
             Component component = (Component)super.clone(); // shallow copy
 
-            for (Field field : getClass().getFields()) {
+            for (Field field : getClass().getDeclaredFields()) {
                 Class fieldClass = field.getType();
 
                 if (!Cloneable.class.isAssignableFrom(fieldClass)) { // field is not cloneable
@@ -41,6 +43,7 @@ public abstract class AbstractComponent implements Component {
 
                     field.set(component, clonedField);
                 } catch (Throwable e) {
+                    logger.log(Level.SEVERE, "Failed to clone field", e);
                     // do nothing
                 }
             }

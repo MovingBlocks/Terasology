@@ -6,7 +6,6 @@ import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.logic.systems.LocationHelper;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -31,7 +30,7 @@ public class LocalPlayer {
         if (location == null) {
             return new Vector3f();
         }
-        return LocationHelper.localToWorldPos(location);
+        return location.getWorldPosition();
     }
     
     public Quat4f getRotation() {
@@ -39,7 +38,7 @@ public class LocalPlayer {
         if (location == null) {
             return new Quat4f(0,0,0,1);
         }
-        return LocationHelper.localToWorldRot(location);
+        return location.getWorldRotation();
     }
 
     public boolean isCarryingTorch() {
@@ -57,7 +56,7 @@ public class LocalPlayer {
     public Vector3f getVelocity() {
         CharacterMovementComponent movement = entity.getComponent(CharacterMovementComponent.class);
         if (movement != null) {
-            return new Vector3f(movement.velocity);
+            return new Vector3f(movement.getVelocity());
         }
         return new Vector3f();
     }

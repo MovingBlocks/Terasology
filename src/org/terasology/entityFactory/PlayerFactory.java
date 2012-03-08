@@ -20,7 +20,7 @@ public class PlayerFactory {
         player.addComponent(new PlayerComponent());
 
         AABBCollisionComponent collision = player.addComponent(new AABBCollisionComponent());
-        collision.extents = new Vector3f(.3f, 0.8f, .3f);
+        collision.setExtents(new Vector3f(.3f, 0.8f, .3f));
 
         CharacterMovementComponent movementComp = player.addComponent(new CharacterMovementComponent());
         movementComp.groundFriction = 16f;

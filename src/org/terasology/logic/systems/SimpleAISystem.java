@@ -1,6 +1,5 @@
 package org.terasology.logic.systems;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.components.SimpleAIComponent;
@@ -14,7 +13,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 /**
@@ -34,8 +32,8 @@ public class SimpleAISystem implements EventHandler {
             SimpleAIComponent ai = entity.getComponent(SimpleAIComponent.class);
             CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
 
-            Vector3f worldPos = LocationHelper.localToWorldPos(location);
-            moveComp.drive.set(0,0,0);
+            Vector3f worldPos = location.getWorldPosition();
+            moveComp.getDrive().set(0,0,0);
             if (worldRenderer.getPlayer() != null)
             {
                 Vector3f dist = new Vector3f(worldPos);
@@ -58,11 +56,11 @@ public class SimpleAISystem implements EventHandler {
                 Vector3f targetDirection = new Vector3f();
                 targetDirection.sub(ai.movementTarget, worldPos);
                 targetDirection.normalize();
-                moveComp.drive.set(targetDirection);
+                moveComp.setDrive(targetDirection);
 
                 float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
                 AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                location.rotation.set(axisAngle);
+                location.getLocalRotation().set(axisAngle);
             }
         }
     }

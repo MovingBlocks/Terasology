@@ -35,7 +35,7 @@ public class PrefabPersisterTests {
 
         LocationComponent loc = new LocationComponent();
 
-        loc.position.set(1, 1, 1);
+        loc.getLocalPosition().set(1, 1, 1);
 
 
 

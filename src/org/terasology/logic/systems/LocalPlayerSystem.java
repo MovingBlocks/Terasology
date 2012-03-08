@@ -3,27 +3,16 @@ package org.terasology.logic.systems;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
 import org.terasology.math.TeraMath;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.*;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -53,17 +42,17 @@ public class LocalPlayerSystem {
             localPlayerComponent.pitch = TeraMath.clamp(localPlayerComponent.pitch + lookInput.y, -89, 89);
             localPlayerComponent.yaw = (localPlayerComponent.yaw - lookInput.x) % 360;
 
-            QuaternionUtil.setEuler(location.rotation, TeraMath.DEG_TO_RAD * localPlayerComponent.yaw, 0, 0);
+            QuaternionUtil.setEuler(location.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayerComponent.yaw, 0, 0);
 
             // Update movement drive
-            Vector3f relMove = QuaternionUtil.quatRotate(location.rotation, movementInput, new Vector3f());
-            characterMovementComponent.drive.set(relMove);
+            Vector3f relMove = QuaternionUtil.quatRotate(location.getLocalRotation(), movementInput, new Vector3f());
+            characterMovementComponent.setDrive(relMove);
             characterMovementComponent.jump = jump;
 
             // TODO: Remove, use component camera, breaks spawn camera anyway
             Quat4f lookRotation = new Quat4f();
             QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.yaw, TeraMath.DEG_TO_RAD * localPlayerComponent.pitch, 0);
-            updateCamera(LocationHelper.localToWorldPos(location), lookRotation);
+            updateCamera(location.getWorldPosition(), lookRotation);
         }
         jump = false;
     }

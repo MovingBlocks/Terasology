@@ -22,6 +22,7 @@ import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 /**
  * Provides the basic interface for all world providers.
@@ -30,6 +31,13 @@ import javax.vecmath.Vector3d;
  */
 public interface IWorldProvider {
 
+    /**
+     *
+     * @param position
+     * @return Whether this chunk is immediately available
+     */
+    public boolean isChunkAvailableAt(Vector3f position);
+    
     /**
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.

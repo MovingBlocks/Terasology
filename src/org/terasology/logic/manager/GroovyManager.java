@@ -161,7 +161,7 @@ public class GroovyManager {
             if (player != null) {
                 LocationComponent location = player.getEntity().getComponent(LocationComponent.class);
                 if (location != null) {
-                    location.position.set(x, y, z);
+                    location.setWorldPosition(new Vector3f(x, y, z));
                 }
             }
         }

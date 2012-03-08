@@ -50,6 +50,16 @@ public final class LocalChunkCache implements IChunkProvider {
         _parent = parent;
     }
 
+    public boolean isChunkAvailable(int x, int z) {
+        int chunkId = TeraMath.cantorize(TeraMath.mapToPositive(x), TeraMath.mapToPositive(z));
+
+        // Try to load the chunk from the cache
+        Chunk c = _chunkCache.get(chunkId);
+
+        // We got a chunk! Already! Great!
+        return c != null;
+    }
+
     /**
      * Loads a specified chunk from the cache or from the disk.
      * <p/>
