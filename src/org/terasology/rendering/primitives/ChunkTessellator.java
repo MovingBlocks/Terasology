@@ -296,9 +296,9 @@ public final class ChunkTessellator {
     }
 
     private Vector3f moveVectorFromChunkSpaceToWorldSpace(Vector3f offset) {
-        double offsetX = _chunk.getPosition().x * Chunk.CHUNK_DIMENSION_X;
-        double offsetY = _chunk.getPosition().y * Chunk.CHUNK_DIMENSION_Y;
-        double offsetZ = _chunk.getPosition().z * Chunk.CHUNK_DIMENSION_Z;
+        double offsetX = _chunk.getChunkWorldPosX();
+        double offsetY = _chunk.getChunkWorldPosY();
+        double offsetZ = _chunk.getChunkWorldPosZ();
 
         offset.x += offsetX;
         offset.y += offsetY;

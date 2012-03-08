@@ -59,7 +59,7 @@ public class UIButton extends UIDisplayContainer {
         if (intersects(mousePos)) {
 
             if (!_clickSoundPlayed) {
-                AudioManager.play("Click", 1.0f);
+                //AudioManager.play("Click", 1.0f);
                 _clickSoundPlayed = true;
             }
 
