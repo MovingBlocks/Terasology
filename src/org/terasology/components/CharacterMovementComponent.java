@@ -1,9 +1,6 @@
 package org.terasology.components;
 
 import org.terasology.entitySystem.AbstractComponent;
-import org.terasology.entitySystem.Component;
-import org.terasology.persistence.interfaces.StorageReader;
-import org.terasology.persistence.interfaces.StorageWriter;
 
 import javax.vecmath.Vector3f;
 
@@ -16,6 +13,7 @@ public final class CharacterMovementComponent extends AbstractComponent {
     // TODO: consider making these floats
     public float maxGroundSpeed = 5.0f;
     public float maxWaterSpeed = 2.0f;
+    public float maxGhostSpeed = 5.0f;
     public float runFactor = 1.5f;
     public float jumpSpeed = 10.0f;
 
@@ -23,6 +21,7 @@ public final class CharacterMovementComponent extends AbstractComponent {
     // TODO: Separate player agiliy from environmental friction, and ground from air control
     public float groundFriction = 8.0f;
 
+    public boolean isGhosting = false;
     public boolean isSwimming = false;
     public boolean isGrounded = false;
     public boolean isRunning = false;

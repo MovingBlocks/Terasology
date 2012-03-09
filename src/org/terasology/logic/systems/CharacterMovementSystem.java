@@ -7,9 +7,10 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.HorizontalCollisionEvent;
+import org.terasology.events.JumpEvent;
+import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.logic.world.WorldUtil;
-import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
@@ -19,7 +20,6 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,6 +32,7 @@ public class CharacterMovementSystem {
     public static final float TerminalVelocity = 64.0f;
     public static final float UnderwaterInteria = 2.0f;
     public static final float WaterTerminalVelocity = 4.0f;
+    public static final float GhostInertia = 8.0f;
 
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
@@ -110,10 +111,45 @@ public class CharacterMovementSystem {
 
     private void updatePosition(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
 
-        if (movementComp.isSwimming) {
+        if (movementComp.isGhosting) {
+            ghost(delta, entity, location, collision, movementComp);
+        } else if (movementComp.isSwimming) {
             swim(delta, entity, location, collision, movementComp);
         } else {
             walk(delta, entity, location, collision, movementComp);
+        }
+    }
+
+    private void ghost(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
+        Vector3f desiredVelocity = new Vector3f(movementComp.getDrive());
+        float maxSpeed = movementComp.maxGhostSpeed;
+        if (movementComp.isRunning) {
+            maxSpeed *= movementComp.runFactor;
+        }
+
+        desiredVelocity.scale(maxSpeed);
+
+        // Modify velocity towards desired, up to the maximum rate determined by friction
+        Vector3f velocityDiff = new Vector3f(desiredVelocity);
+        velocityDiff.sub(movementComp.getVelocity());
+
+        float changeMag = velocityDiff.length();
+        if (changeMag > GhostInertia * delta) {
+            velocityDiff.scale(GhostInertia * delta / changeMag);
+        }
+        movementComp.getVelocity().add(velocityDiff);
+        
+        // No collision, so just do the move
+        Vector3f worldPos = location.getWorldPosition();
+        Vector3f deltaPos = new Vector3f(movementComp.getVelocity());
+        deltaPos.scale(delta);
+        worldPos.add(deltaPos);
+        location.setWorldPosition(worldPos);
+
+        if (movementComp.faceMovementDirection) {
+            float yaw = (float)Math.atan2(movementComp.getVelocity().x, movementComp.getVelocity().z);
+            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+            location.getLocalRotation().set(axisAngle);
         }
     }
 
@@ -161,16 +197,12 @@ public class CharacterMovementSystem {
 
             // Jumping is only possible, if the entity is standing on ground
             if (movementComp.jump) {
-                // TODO: Sounds
-                //AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
-                //        _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
+                entity.send(new JumpEvent());
                 movementComp.jump = false;
                 movementComp.isGrounded = false;
                 movementComp.getVelocity().y += movementComp.jumpSpeed;
             } else if (!movementComp.isGrounded) { // Entity reaches the ground
-                // TODO: Event on collide (for damage)
-                //AudioManager.getInstance().playVaryingPositionedSound(calcEntityPositionRelativeToPlayer(),
-                //        _footstepSounds[TeraMath.fastAbs(_parent.getWorldProvider().getRandom().randomInt()) % 5]);
+                entity.send(new VerticalCollisionEvent(movementComp.getVelocity(), worldPos));
                 movementComp.isGrounded = true;
             }
         } else {

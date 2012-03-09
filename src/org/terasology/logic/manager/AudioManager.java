@@ -22,6 +22,7 @@ import org.terasology.logic.audio.SoundSource;
 import org.terasology.logic.entities.MovableEntity;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -382,6 +383,24 @@ public abstract class AudioManager {
      */
     public static SoundSource play(Sound sound, Vector3d pos, float gain, int priority) {
         SoundSource source = source(sound, pos, gain, priority);
+
+        if (source == null) {
+            return null;
+        }
+
+        return source.setGain(gain).play();
+    }
+
+    /**
+     * Plays specified sound at specified position and with specified gain
+     *
+     * @param sound Sound object
+     * @param pos   Sound source position
+     * @param gain  Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
+    public static SoundSource play(Sound sound, Vector3f pos, float gain, int priority) {
+        SoundSource source = source(sound, new Vector3d(pos), gain, priority);
 
         if (source == null) {
             return null;

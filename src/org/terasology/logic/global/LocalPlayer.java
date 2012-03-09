@@ -67,7 +67,7 @@ public class LocalPlayer {
             return new Vector3f(0,0,-1);
         }
         Quat4f rot = new Quat4f();
-        QuaternionUtil.setEuler(rot, localPlayer.yaw, localPlayer.pitch, 0);
+        QuaternionUtil.setEuler(rot, localPlayer.viewYaw, localPlayer.viewPitch, 0);
         // TODO: ensure this is the correct forward vector. Also, put a generator for direction vectors in a util class somewhere
         // Annd just put quaternion -> vector somewhere too
         Vector3f dir = new Vector3f(0,0,-1);

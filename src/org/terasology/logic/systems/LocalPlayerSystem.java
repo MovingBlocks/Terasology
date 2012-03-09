@@ -8,6 +8,7 @@ import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.cameras.DefaultCamera;
@@ -27,6 +28,8 @@ public class LocalPlayerSystem {
     private boolean running = false;
 
     private double mouseSensititivy = Config.getInstance().getMouseSens();
+    private float lastTimeSpacePressed;
+    private boolean toggleGodMode;
     
     public LocalPlayerSystem(EntityManager entityManager) {
         this.entityManager = entityManager;
@@ -39,26 +42,39 @@ public class LocalPlayerSystem {
             LocationComponent location = entity.getComponent(LocationComponent.class);
 
             // Update look (pitch/yaw)
-            localPlayerComponent.pitch = TeraMath.clamp(localPlayerComponent.pitch + lookInput.y, -89, 89);
-            localPlayerComponent.yaw = (localPlayerComponent.yaw - lookInput.x) % 360;
+            localPlayerComponent.viewPitch = TeraMath.clamp(localPlayerComponent.viewPitch + lookInput.y, -89, 89);
+            localPlayerComponent.viewYaw = (localPlayerComponent.viewYaw - lookInput.x) % 360;
 
-            QuaternionUtil.setEuler(location.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayerComponent.yaw, 0, 0);
+            QuaternionUtil.setEuler(location.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, 0, 0);
 
             // Update movement drive
             Vector3f relMove = new Vector3f(movementInput);
+            relMove.y = 0;
+            if (characterMovementComponent.isGhosting || characterMovementComponent.isSwimming) {
+                Quat4f viewRot = new Quat4f();
+                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
+                QuaternionUtil.quatRotate(viewRot, relMove, relMove);
+                relMove.y += movementInput.y;
+            } else {
+                QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
+            }
             float lengthSquared = relMove.lengthSquared();
             if (lengthSquared > 1) relMove.normalize();
-            QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
             characterMovementComponent.setDrive(relMove);
+
             characterMovementComponent.jump = jump;
             characterMovementComponent.isRunning = running;
+            if (toggleGodMode) {
+                characterMovementComponent.isGhosting = !characterMovementComponent.isGhosting;
+            }
 
             // TODO: Remove, use component camera, breaks spawn camera anyway
             Quat4f lookRotation = new Quat4f();
-            QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.yaw, TeraMath.DEG_TO_RAD * localPlayerComponent.pitch, 0);
+            QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
             updateCamera(location.getWorldPosition(), lookRotation);
         }
         jump = false;
+        toggleGodMode = false;
     }
 
     private void updateCamera(Vector3f position, Quat4f rotation) {
@@ -106,13 +122,12 @@ public class LocalPlayerSystem {
                 if (!repeatEvent && state) {
                     jump = true;
 
-                    // TODO: God mode
-                    /*if (Terasology.getInstance().getTimeInMs() - _lastTimeSpacePressed < 200) {
-                        _godMode = !_godMode;
+                    // TODO: handle time better
+                    if (Terasology.getInstance().getTimeInMs() - lastTimeSpacePressed < 200) {
+                        toggleGodMode = true;
                     }
 
-                    _lastTimeSpacePressed = Terasology.getInstance().getTimeInMs();
-                    */
+                    lastTimeSpacePressed = Terasology.getInstance().getTimeInMs();
                 }
                 break;
             // TODO: Inventory selection switch

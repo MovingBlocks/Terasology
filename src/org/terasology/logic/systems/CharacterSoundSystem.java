@@ -6,6 +6,8 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandler;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.FootstepEvent;
+import org.terasology.events.JumpEvent;
+import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.logic.audio.Sound;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.utilities.FastRandom;
@@ -30,6 +32,32 @@ public class CharacterSoundSystem implements EventHandler {
                 Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
                 AudioManager.play(sound, new Vector3d(location.getWorldPosition()), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
             }
+        }
+    }
+
+    @ReceiveEvent(components = {CharacterSoundComponent.class})
+    public void jump(JumpEvent event, EntityRef entity) {
+        if (random == null) return;
+
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        if (location != null) {
+            CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+            if (characterSounds.footstepSounds.size() > -0.05f) {
+                Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
+                AudioManager.play(sound, new Vector3d(location.getWorldPosition()), 0.8f, AudioManager.PRIORITY_NORMAL);
+            }
+        }
+    }
+
+    @ReceiveEvent(components = {CharacterSoundComponent.class})
+    public void landed(VerticalCollisionEvent event, EntityRef entity) {
+        if (random == null || event.getVelocity().y > 0f) return;
+
+
+        CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
+        if (characterSounds.footstepSounds.size() > 0) {
+            Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
+            AudioManager.play(sound, event.getLocation(), 1.0f, AudioManager.PRIORITY_NORMAL);
         }
     }
 
