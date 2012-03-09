@@ -16,7 +16,10 @@
  */
 package org.terasology.model.structures;
 
+import org.terasology.math.Vector3i;
+
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 /**
  * Represents the position of a block. This class is used mainly in the
@@ -24,14 +27,18 @@ import javax.vecmath.Vector3d;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class BlockPosition implements Comparable<BlockPosition> {
+// TODO: Move origin-distance functionality out of BlockPosition, remove this class and use Vector3i instead
+public final class BlockPosition extends Vector3i implements Comparable<BlockPosition> {
 
-    public int x;
-    public int y;
-    public int z;
     private Vector3d _origin;
 
     public BlockPosition() {
+    }
+
+    public BlockPosition(Vector3f v) {
+        this.x = (int) v.x;
+        this.y = (int) v.y;
+        this.z = (int) v.z;
     }
 
     public BlockPosition(Vector3d v) {
@@ -60,22 +67,6 @@ public final class BlockPosition implements Comparable<BlockPosition> {
         return new Vector3d(x - _origin.x, y - _origin.y, z - _origin.z).length();
     }
 
-    public Vector3d toVector3d() {
-        return new Vector3d(x, y, z);
-    }
-
-    public boolean equals(Object o) {
-        if (o.getClass() != BlockPosition.class)
-            return false;
-
-        BlockPosition p = (BlockPosition) o;
-        return p.x == this.x && p.y == this.y && p.z == this.z;
-    }
-
-    public int hashCode() {
-        return (((x * 33) ^ y) * 17) ^ z;
-    }
-
     public int compareTo(BlockPosition o) {
         double distance = calcDistanceToOrigin();
         double oDistance = o.calcDistanceToOrigin();
@@ -87,10 +78,5 @@ public final class BlockPosition implements Comparable<BlockPosition> {
             return 1;
 
         return 0;
-    }
-
-    // TODO: _origin not included, don't really want it... might need to split this class so we have a pure position and separate class with the origin thing?
-    public String toString() {
-        return x + "," + y + "," + z;
     }
 }
