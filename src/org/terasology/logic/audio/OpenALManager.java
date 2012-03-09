@@ -3,9 +3,7 @@ package org.terasology.logic.audio;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.openal.AL;
-import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.AL11;
+import org.lwjgl.openal.*;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.global.LocalPlayer;
@@ -14,13 +12,15 @@ import org.terasology.rendering.cameras.Camera;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 public class OpenALManager extends AudioManager {
 
-    /** For faster distance check **/
+    /**
+     * For faster distance check *
+     */
     private final static float MAX_DISTANCE_SQUARED = (float)Math.pow(MAX_DISTANCE, 2);
 
     public static OpenALManager getInstance() {
@@ -37,6 +37,29 @@ public class OpenALManager extends AudioManager {
         }
 
         AL10.alGetError();
+
+        logger.info("OpenAL " + AL10.alGetString(AL10.AL_VERSION) + " initialized!");
+
+        ALCcontext context = ALC10.alcGetCurrentContext();
+        ALCdevice device = ALC10.alcGetContextsDevice(context);
+
+        logger.info("Using OpenAL: " + AL10.alGetString(AL10.AL_RENDERER) + " by " + AL10.alGetString(AL10.AL_VENDOR));
+        logger.info("Using device: " + ALC10.alcGetString(device, ALC10.ALC_DEVICE_SPECIFIER));
+        logger.info("Available AL extensions: " + AL10.alGetString(AL10.AL_EXTENSIONS));
+        logger.info("Available ALC extensions: " + ALC10.alcGetString(device, ALC10.ALC_EXTENSIONS));
+
+        IntBuffer buffer = BufferUtils.createIntBuffer(1);
+        ALC10.alcGetInteger(device, ALC11.ALC_MONO_SOURCES, buffer);
+        logger.info("Max mono sources: " + buffer.get(0));
+        buffer.rewind();
+
+        ALC10.alcGetInteger(device, ALC11.ALC_STEREO_SOURCES, buffer);
+        logger.info("Max stereo sources: " + buffer.get(0));
+        buffer.rewind();
+
+        ALC10.alcGetInteger(device, ALC10.ALC_FREQUENCY, buffer);
+        logger.info("Mixer frequency: " + buffer.get(0));
+        buffer.rewind();
 
         AL10.alDistanceModel(AL10.AL_INVERSE_DISTANCE_CLAMPED);
 
