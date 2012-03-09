@@ -26,6 +26,7 @@ import org.terasology.logic.entities.Entity;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.*;
+import org.terasology.logic.systems.BlockDamageRenderer;
 import org.terasology.logic.systems.LocalPlayerSystem;
 import org.terasology.logic.systems.MeshRenderer;
 import org.terasology.logic.world.*;
@@ -97,7 +98,8 @@ public final class WorldRenderer implements IGameObject {
 
     /* CORE GAME OBJECTS */
     private final PortalManager _portalManager;
-    private final MeshRenderer _entityRendererSystem;;
+    private final MeshRenderer _entityRendererSystem;
+    private final BlockDamageRenderer _blockDamageRenderer;
 
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
@@ -146,6 +148,8 @@ public final class WorldRenderer implements IGameObject {
         _entityManager = manager;
         _localPlayerSystem = localPlayerSystem;
         _localPlayerSystem.setPlayerCamera(_defaultCamera);
+        _blockDamageRenderer = new BlockDamageRenderer(manager);
+        _blockDamageRenderer.setWorldProvider(_worldProvider);
 
         initTimeEvents();
     }
@@ -402,8 +406,7 @@ public final class WorldRenderer implements IGameObject {
             }
         }
 
-        /* EXTRACTION OVERLAY */
-        _localPlayerSystem.renderExtractionOverlay();
+        _blockDamageRenderer.render();
 
         glDisable(GL_BLEND);
 

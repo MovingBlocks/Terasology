@@ -36,21 +36,21 @@ public class MultipleSelectionTool implements ITool {
     }
 
     public void executeLeftClickAction() {
-        RayBlockIntersection.Intersection is = _player.calcSelectedBlock();
+        /*RayBlockIntersection.Intersection is = _player.calcSelectedBlock();
 
         if (is == null)
             return;
 
-        addBlock(is.getBlockPosition());
+        addBlock(is.getBlockPosition());*/
     }
 
     public void executeRightClickAction() {
-        RayBlockIntersection.Intersection is = _player.calcSelectedBlock();
+       /* RayBlockIntersection.Intersection is = _player.calcSelectedBlock();
 
         if (is == null)
             return;
 
-        removeBlock(is.getBlockPosition());
+        removeBlock(is.getBlockPosition());      */
     }
 
     private void addBlock(BlockPosition blockPosition) {

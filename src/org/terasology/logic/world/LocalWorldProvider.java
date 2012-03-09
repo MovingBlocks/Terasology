@@ -23,6 +23,7 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.math.TeraMath;
+import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.persistence.PersistableObject;
 import org.terasology.utilities.FastRandom;
@@ -103,7 +104,18 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
         return _chunkProvider.isChunkAvailable(chunkPosX, chunkPosZ);
     }
+    
+    public boolean isChunkAvailableAt(Tuple3i position) {
+        int chunkPosX = TeraMath.calcChunkPosX(position.x);
+        int chunkPosZ = TeraMath.calcChunkPosZ(position.z);
 
+        return _chunkProvider.isChunkAvailable(chunkPosX, chunkPosZ);
+    }
+
+    public final boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite) {
+        return setBlock(pos.x, pos.y, pos.z, type, updateLight, overwrite);
+    }
+    
     /**
      * Places a block of a specific type at a given position and optionally refreshes the
      * corresponding light values.

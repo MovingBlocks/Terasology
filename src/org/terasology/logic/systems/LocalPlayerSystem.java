@@ -3,20 +3,25 @@ package org.terasology.logic.systems;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.common.NullEntityRef;
+import org.terasology.events.DamageEvent;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.tools.ITool;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.inventory.ItemBlock;
+import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.DefaultCamera;
+import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.*;
 import java.util.ArrayList;
@@ -30,6 +35,7 @@ public class LocalPlayerSystem {
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
     private DefaultCamera playerCamera;
+    private BlockEntityLookup blockEntityLookup;
     
     private boolean jump = false;
     private Vector3f movementInput = new Vector3f();
@@ -38,10 +44,12 @@ public class LocalPlayerSystem {
 
     private double mouseSensititivy = Config.getInstance().getMouseSens();
     private float lastTimeSpacePressed;
+    private float lastInteraction;
     private boolean toggleGodMode;
     
-    public LocalPlayerSystem(EntityManager entityManager) {
+    public LocalPlayerSystem(EntityManager entityManager, BlockEntityLookup blockEntityLookup) {
         this.entityManager = entityManager;
+        this.blockEntityLookup = blockEntityLookup;
     }
 
     public void update(float delta) {
@@ -194,13 +202,76 @@ public class LocalPlayerSystem {
      */
     public void processMouseInput(int button, boolean state, int wheelMoved) {
         /*if (isDead())
-            return;
+            return; */
 
-        if (wheelMoved != 0) {
+        /*if (wheelMoved != 0) {
             rollSelectedCubby((byte) (wheelMoved / 120));
-        } else if (state && (button == 0 || button == 1)) {
+        } else*/ if (state && (button == 0 || button == 1)) {
             processInteractions(button);
-        } */
+        }
+    }
+
+    /**
+     * Processes interactions for the given mouse button.
+     *
+     * @param button The pressed mouse button
+     */
+    private void processInteractions(int button) {
+        // Throttle interactions
+        if (Terasology.getInstance().getTimeInMs() - lastInteraction < 200) {
+            return;
+        }
+
+        // TODO: Use tool
+        //ITool activeTool = getActiveTool();
+
+        //if (activeTool != null) {
+            // Check if one of the mouse buttons is pressed
+            if (Mouse.isButtonDown(0) || button == 0) {
+                //activeTool.executeLeftClickAction();
+                lastInteraction = Terasology.getInstance().getTimeInMs();
+            } else if (Mouse.isButtonDown(1) || button == 1) {
+                removeBlock(true);
+
+                //activeTool.executeRightClickAction();
+                lastInteraction = Terasology.getInstance().getTimeInMs();
+            }
+            // TODO: Hand animation
+        //}
+    }
+
+    /**
+     * Removes a block at the given global world position.
+     *
+     * @param createPhysBlock Creates a rigid body block if true
+     * @return The removed block (if any)
+     */
+    private void removeBlock(boolean createPhysBlock) {
+        RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
+
+        if (selectedBlock != null) {
+
+            BlockPosition blockPos = selectedBlock.getBlockPosition();
+            byte currentBlockType = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
+            Block block = BlockManager.getInstance().getBlock(currentBlockType);
+
+            if (block.isDestructible()) {
+                EntityRef blockEntity = blockEntityLookup.getEntityAt(blockPos);
+                if (blockEntity == null) {
+                    blockEntity = entityManager.create();
+                    blockEntity.addComponent(new BlockComponent(blockPos, true));
+                    blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
+                }
+
+                blockEntity.send(new DamageEvent(1));
+            }
+        }
+
+            // Play digging sound if the block was not removed
+            //AudioManager.play("Dig", 1.0f);
+            // ... and spread sparkles!
+            //worldRenderer.getBlockParticleEmitter().setOrigin(blockPos.toVector3d());
+            //worldRenderer.getBlockParticleEmitter().emitParticles(64, currentBlockType);
     }
 
     public void updateInput() {
@@ -209,7 +280,7 @@ public class LocalPlayerSystem {
 
         // Process interactions even if the mouse button is pressed down
         // and not fired by a repeated event
-        //processInteractions(-1);
+        processInteractions(-1);
 
         movementInput.set(0, 0, 0);
         lookInput.set((float)(mouseSensititivy * Mouse.getDX()), (float)(mouseSensititivy * Mouse.getDY()));
@@ -234,50 +305,6 @@ public class LocalPlayerSystem {
         }
 
         running = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
-    }
-
-    public void renderExtractionOverlay() {
-        /*if (_extractionCounter <= 0 || _extractedBlock == null)
-            return;
-
-        Block block = BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(_extractedBlock.getBlockPosition().toVector3d()));
-
-        ShaderManager.getInstance().enableDefaultTextured();
-        TextureManager.getInstance().bindTexture("effects");
-
-        glEnable(GL11.GL_BLEND);
-        glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
-        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
-
-        glPushMatrix();
-        glTranslated(_extractedBlock.getBlockPosition().x - cameraPosition.x, _extractedBlock.getBlockPosition().y - cameraPosition.y, _extractedBlock.getBlockPosition().z - cameraPosition.z);
-
-        float offset = java.lang.Math.round(((float) _extractionCounter / block.getHardness()) * 10.0f) * 0.0625f;
-
-        if (_overlayMesh == null) {
-            Vector2f texPos = new Vector2f(0.0f, 0.0f);
-            Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
-
-            Tessellator tessellator = new Tessellator();
-            TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
-            _overlayMesh = tessellator.generateMesh();
-        }
-
-        glMatrixMode(GL_TEXTURE);
-        glPushMatrix();
-        glTranslatef(offset, 0f, 0f);
-        glMatrixMode(GL_MODELVIEW);
-
-        _overlayMesh.render();
-
-        glPopMatrix();
-
-        glMatrixMode(GL_TEXTURE);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-
-        glDisable(GL11.GL_BLEND);  */
     }
 
     public void renderFirstPersonViewElements() {

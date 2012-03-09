@@ -114,25 +114,6 @@ public class Player extends Character {
         _inventory.addItem(new ItemRailgun(), 1);
     }
 
-    public void render() {
-        super.render();
-        updateCameraParameters();
-
-        // Display the block the player is aiming at
-        if (SHOW_PLACING_BOX) {
-            if (_selectedBlock != null) {
-                Block block = BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(_selectedBlock.getBlockPosition().toVector3d()));
-                if (block.isRenderBoundingBox()) {
-                    block.getBounds(_selectedBlock.getBlockPosition()).render(2f);
-                }
-            }
-        }
-
-        // TODO: Replace with a real player model
-        if (isRenderPlayerModel())
-            getAABB().render(1f);
-    }
-
     public void update(double delta) {
         PerformanceMonitor.startActivity("Player Camera");
         /*if (_activeCamera != null) {
@@ -154,10 +135,6 @@ public class Player extends Character {
         }
 
         super.update(delta);
-
-        PerformanceMonitor.startActivity("Player Select Block");
-        _selectedBlock = calcSelectedBlock();
-        PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Player Death Check");
 
@@ -286,59 +263,6 @@ public class Player extends Character {
         }
 
         super.updatePosition(delta);
-    }
-
-    /**
-     * Calculates the currently targeted block in front of the player.
-     *
-     * @return Intersection point of the targeted block
-     */
-    public RayBlockIntersection.Intersection calcSelectedBlock() {
-        ArrayList<RayBlockIntersection.Intersection> inters = new ArrayList<RayBlockIntersection.Intersection>();
-
-        int blockPosX, blockPosY, blockPosZ;
-
-        for (int x = -3; x <= 3; x++) {
-            for (int y = -3; y <= 3; y++) {
-                for (int z = -3; z <= 3; z++) {
-                    // Make sure the correct block positions are calculated relatively to the position of the player
-                    blockPosX = (int) (getPosition().x + (getPosition().x >= 0 ? 0.5f : -0.5f)) + x;
-                    blockPosY = (int) (getPosition().y + (getPosition().y >= 0 ? 0.5f : -0.5f)) + y;
-                    blockPosZ = (int) (getPosition().z + (getPosition().z >= 0 ? 0.5f : -0.5f)) + z;
-
-                    PerformanceMonitor.startActivity("Player Get Block");
-                    byte blockType = _parent.getWorldProvider().getBlock(blockPosX, blockPosY, blockPosZ);
-                    PerformanceMonitor.endActivity();
-
-                    // Ignore special blocks
-                    if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
-                        continue;
-                    }
-
-                    // The ray originates from the "player's eye"
-                    PerformanceMonitor.startActivity("Player Intersect Block");
-                    ArrayList<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(_parent.getWorldProvider(), blockPosX, blockPosY, blockPosZ, calcEyePosition(), _viewingDirection);
-
-
-                    if (iss != null) {
-                        inters.addAll(iss);
-                    }
-                    PerformanceMonitor.endActivity();
-                }
-            }
-        }
-
-        /**
-         * Calculated the closest intersection.
-         */
-        PerformanceMonitor.startActivity("Player sort intersects");
-        if (inters.size() > 0) {
-            Collections.sort(inters);
-            return inters.get(0);
-        }
-        PerformanceMonitor.endActivity();
-
-        return null;
     }
 
     /**

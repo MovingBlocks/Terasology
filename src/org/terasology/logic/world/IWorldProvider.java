@@ -21,6 +21,7 @@ import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.utilities.FastRandom;
 
+import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
@@ -32,11 +33,16 @@ import javax.vecmath.Vector3f;
 public interface IWorldProvider {
 
     /**
-     *
      * @param position
      * @return Whether this chunk is immediately available
      */
     public boolean isChunkAvailableAt(Vector3f position);
+
+    /**
+     * @param position
+     * @return Whether this chunk is immediately available
+     */
+    public boolean isChunkAvailableAt(Tuple3i position);
     
     /**
      * Places a block of a specific type at a given position and refreshes the
@@ -52,6 +58,18 @@ public interface IWorldProvider {
      */
     public boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite);
 
+    /**
+     * Places a block of a specific type at a given position and refreshes the
+     * corresponding light values.
+     *
+     * @param pos         Block position
+     * @param type        The type of the block to set
+     * @param updateLight Update light values
+     * @param overwrite   If true currently present blocks get replaced
+     * @return True if a block was set/replaced
+     */
+    public boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite);
+    
     /**
      * Sets the given state at the given position.
      *
@@ -71,6 +89,14 @@ public interface IWorldProvider {
      * @return The type of the block
      */
     public byte getBlock(int x, int y, int z);
+
+    /**
+     * Returns the block at the given position.
+     *
+     * @param pos The position
+     * @return The type of the block
+     */
+    public byte getBlock(Tuple3i pos);
 
     public boolean canBlockSeeTheSky(int x, int y, int z);
 

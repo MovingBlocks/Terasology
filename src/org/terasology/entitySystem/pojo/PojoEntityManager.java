@@ -8,6 +8,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.common.NullEntityRef;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
@@ -34,7 +35,11 @@ public class PojoEntityManager implements EntityManager {
     }
 
     public EntityRef get(long entityId) {
+        if (entityId == 0) {
+            return null;
+        }
         return new PojoEntityRef(this, entityId);
+
     }
 
     public void destroy(long entityId) {

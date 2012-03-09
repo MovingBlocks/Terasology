@@ -27,10 +27,7 @@ import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.game.Terasology;
 import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.systems.CharacterMovementSystem;
-import org.terasology.logic.systems.CharacterSoundSystem;
-import org.terasology.logic.systems.LocalPlayerSystem;
-import org.terasology.logic.systems.SimpleAISystem;
+import org.terasology.logic.systems.*;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -64,11 +61,16 @@ public class StateSinglePlayer implements IGameState {
     /* RENDERING */
     private WorldRenderer _worldRenderer;
 
+
     private EntityManager _entityManager;
+    // TODO: More generic handling of systems
+    private BlockEntityLookup _blockEntityLookup;
     private CharacterMovementSystem _charMoveSys;
     private SimpleAISystem _simpleAISys;
     private CharacterSoundSystem _charSoundSys;
     private LocalPlayerSystem _localPlayerSys;
+    private HealthSystem _healthSystem;
+    private BlockEntitySystem _blockSystem;
 
     /* GAME LOOP */
     private boolean _pauseGame = false;
@@ -94,6 +96,8 @@ public class StateSinglePlayer implements IGameState {
 
         _entityManager = new PojoEntityManager();
         _entityManager.setEventSystem(new PojoEventSystem(_entityManager));
+        _blockEntityLookup = new BlockEntityLookup(_entityManager);
+        _entityManager.getEventSystem().registerEventHandler(_blockEntityLookup);
         _charMoveSys = new CharacterMovementSystem();
         _charMoveSys.setEntityManager(_entityManager);
         _simpleAISys = new SimpleAISystem();
@@ -101,7 +105,11 @@ public class StateSinglePlayer implements IGameState {
         _entityManager.getEventSystem().registerEventHandler(_simpleAISys);
         _charSoundSys = new CharacterSoundSystem();
         _entityManager.getEventSystem().registerEventHandler(_charSoundSys);
-        _localPlayerSys = new LocalPlayerSystem(_entityManager);
+        _localPlayerSys = new LocalPlayerSystem(_entityManager, _blockEntityLookup);
+        _healthSystem = new HealthSystem(_entityManager);
+        _entityManager.getEventSystem().registerEventHandler(_healthSystem);
+        _blockSystem = new BlockEntitySystem();
+        _entityManager.getEventSystem().registerEventHandler(_blockSystem);
 
     }
 
@@ -135,6 +143,8 @@ public class StateSinglePlayer implements IGameState {
         PerformanceMonitor.startActivity("Character Movement System");
         _charMoveSys.update((float)delta);
         PerformanceMonitor.endActivity();
+
+        _healthSystem.update((float)delta);
 
         if (_worldRenderer != null && shouldUpdateWorld())
             _worldRenderer.update(delta);
@@ -209,6 +219,7 @@ public class StateSinglePlayer implements IGameState {
         _simpleAISys.setRandom(_worldRenderer.getWorldProvider().getRandom());
         _charSoundSys.setRandom(_worldRenderer.getWorldProvider().getRandom());
         _localPlayerSys.setWorldProvider(_worldRenderer.getWorldProvider());
+        _blockSystem.setWorldProvider(_worldRenderer.getWorldProvider());
 
     }
 

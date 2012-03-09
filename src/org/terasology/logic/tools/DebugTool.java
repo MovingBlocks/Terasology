@@ -39,7 +39,7 @@ public class DebugTool implements ITool {
     }
 
     public void executeLeftClickAction() {
-        RayBlockIntersection.Intersection is = _player.calcSelectedBlock();
+       /* RayBlockIntersection.Intersection is = _player.calcSelectedBlock();
 
         if (is == null)
             return;
@@ -66,10 +66,11 @@ public class DebugTool implements ITool {
         //TerasologyES.createPortal(comp);
 
         Terasology.getInstance().getLogger().log(Level.INFO, "Built a portal, BP's width/height/depth: " + portalBP.getCollection().calcWidth() + "-" + portalBP.getCollection().calcHeight() + "-" + portalBP.getCollection().calcDepth());
+        */
     }
 
     public void executeRightClickAction() {
-        RayBlockIntersection.Intersection is = _player.calcSelectedBlock();
+        /*RayBlockIntersection.Intersection is = _player.calcSelectedBlock();
 
         if (is == null)
             return;
@@ -80,6 +81,7 @@ public class DebugTool implements ITool {
         Vector3d rawDirection = new Vector3d(_player.getViewingDirection());
         Side direction = Side.inHorizontalDirection(rawDirection.x,rawDirection.z);
         System.out.println("Side is" + direction);
+        */
     }
 
 
