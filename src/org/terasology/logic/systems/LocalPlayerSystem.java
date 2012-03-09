@@ -45,9 +45,13 @@ public class LocalPlayerSystem {
             QuaternionUtil.setEuler(location.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayerComponent.yaw, 0, 0);
 
             // Update movement drive
-            Vector3f relMove = QuaternionUtil.quatRotate(location.getLocalRotation(), movementInput, new Vector3f());
+            Vector3f relMove = new Vector3f(movementInput);
+            float lengthSquared = relMove.lengthSquared();
+            if (lengthSquared > 1) relMove.normalize();
+            QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
             characterMovementComponent.setDrive(relMove);
             characterMovementComponent.jump = jump;
+            characterMovementComponent.isRunning = running;
 
             // TODO: Remove, use component camera, breaks spawn camera anyway
             Quat4f lookRotation = new Quat4f();

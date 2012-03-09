@@ -109,6 +109,14 @@ public class GroovyManager {
      */
     public boolean runGroovyShell(String consoleString) {
         Terasology.getInstance().getLogger().log(Level.INFO, "Groovy console about to execute command: " + consoleString);
+        // Lets mess with the consoleString!
+        consoleString = consoleString.trim();
+        if (!(consoleString.startsWith("cmd.") || consoleString.startsWith("cfg."))) {
+            consoleString = "cmd." + consoleString;
+        }
+        if (!consoleString.endsWith(")") && !consoleString.contains(" ") && !consoleString.contains(",")) {
+            consoleString += "()";
+        }
         updateBinding();
         GroovyShell shell = new GroovyShell(_bind);
         try {
@@ -190,6 +198,14 @@ public class GroovyManager {
                 StateSinglePlayer spState = (StateSinglePlayer) state;
                 spState.initWorld(title, seed);
             }
+        }
+        
+        public void debugCollision() {
+            Config.getInstance().setDebugCollision(!Config.getInstance().isDebugCollision());
+        }
+        
+        public void exit() {
+            Terasology.getInstance().exit();
         }
     }
 }

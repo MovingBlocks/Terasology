@@ -20,6 +20,7 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -115,6 +116,12 @@ public class AABB {
         return !(maxX() < point.x || minX() > point.x) &&
                !(maxY() < point.y || minY() > point.y) &&
                !(maxZ() < point.z || minZ() > point.z);
+    }
+
+    public boolean contains(Vector3f point) {
+        return !(maxX() < point.x || minX() > point.x) &&
+                !(maxY() < point.y || minY() > point.y) &&
+                !(maxZ() < point.z || minZ() > point.z);
     }
 
     /**

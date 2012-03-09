@@ -19,6 +19,7 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,10 +27,11 @@ import java.util.List;
  */
 public class CharacterMovementSystem {
 
-    public static final float UnderwaterGravity = 2.0f;
+    public static final float UnderwaterGravity = 0.25f;
     public static final float Gravity = 28.0f;
     public static final float TerminalVelocity = 64.0f;
     public static final float UnderwaterInteria = 2.0f;
+    public static final float WaterTerminalVelocity = 4.0f;
 
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
@@ -48,8 +50,10 @@ public class CharacterMovementSystem {
             if (!worldProvider.isChunkAvailableAt(location.getWorldPosition())) continue;
 
             updatePosition(deltaSeconds, entity, location, collision, movementComp);
-            //checkPosition(location, collision, movementComp);
-            //updateSwimStatus(location, collision, movementComp);
+            updateSwimStatus(location, collision, movementComp);
+            
+            entity.saveComponent(location);
+            entity.saveComponent(movementComp);
         }
     }
 
@@ -69,13 +73,65 @@ public class CharacterMovementSystem {
         return worldProvider;
     }
 
-    protected void updatePosition(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
+    private void updateSwimStatus(LocationComponent location, AABBCollisionComponent aabb, CharacterMovementComponent movementComp) {
+        Vector3f worldPos = location.getWorldPosition();
+        List<BlockPosition> blockPositions = WorldUtil.gatherAdjacentBlockPositions(worldPos);
+        boolean topUnderwater = false;
+        boolean bottomUnderwater = false;
+        Vector3f top = new Vector3f(worldPos);
+        Vector3f bottom = new Vector3f(worldPos);
+        top.y += aabb.getExtents().y / 2;
+        bottom.y -= aabb.getExtents().y / 2;
 
-        // TODO: Better swimming support, flying support
+        for (int i = 0; i < blockPositions.size(); i++) {
+            BlockPosition p = blockPositions.get(i);
+            byte blockType = worldProvider.getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
+            Block block = BlockManager.getInstance().getBlock(blockType);
+
+            if (block.isLiquid()) {
+                for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
+                    if (blockAABB.contains(top)) {
+                        topUnderwater = true;
+                    }
+                    if (blockAABB.contains(bottom)) {
+                        bottomUnderwater = true;
+                    }
+                }
+            }
+        }
+        boolean newSwimming = topUnderwater && bottomUnderwater;
+
+        // Boost when leaving water
+        if (!newSwimming && movementComp.isSwimming && movementComp.getVelocity().y > 0) {
+            movementComp.getVelocity().y += 8.0f;
+        }
+        movementComp.isSwimming = newSwimming;
+    }
+
+    private void updatePosition(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
+
+        if (movementComp.isSwimming) {
+            swim(delta, entity, location, collision, movementComp);
+        } else {
+            walk(delta, entity, location, collision, movementComp);
+        }
+    }
+
+    private void walk(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
         Vector3f desiredVelocity = new Vector3f(movementComp.getDrive());
-        float maxSpeed = movementComp.isSwimming ? movementComp.maxWaterSpeed : movementComp.maxGroundSpeed;
+        float maxSpeed = movementComp.maxGroundSpeed;
         if (movementComp.isRunning) {
             maxSpeed *= movementComp.runFactor;
+        }
+
+        // As we can't use it, remove the y component of desired movement while maintaining speed
+        if (desiredVelocity.y != 0) {
+            float speed = desiredVelocity.length();
+            desiredVelocity.y = 0;
+            if (desiredVelocity.x != 0 || desiredVelocity.z != 0) {
+                desiredVelocity.normalize();
+                desiredVelocity.scale(speed);
+            }
         }
         desiredVelocity.scale(maxSpeed);
 
@@ -83,28 +139,20 @@ public class CharacterMovementSystem {
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(movementComp.getVelocity());
         velocityDiff.y = 0;
+
         float changeMag = velocityDiff.length();
         if (changeMag > movementComp.groundFriction * delta) {
             velocityDiff.scale(movementComp.groundFriction * delta / changeMag);
         }
-
         movementComp.getVelocity().x += velocityDiff.x;
         movementComp.getVelocity().z += velocityDiff.z;
-        
-        // Cannot control y if not swimming (or flying I guess)
-        if (movementComp.isSwimming) {
-            movementComp.getVelocity().y += Math.signum(desiredVelocity.y - movementComp.getVelocity().y) * Math.min(UnderwaterInteria * delta, TeraMath.fastAbs(desiredVelocity.y - movementComp.getVelocity().y));
-            movementComp.getVelocity().y = Math.max(-movementComp.maxWaterSpeed, (movementComp.getVelocity().y - UnderwaterGravity * delta));
-        }
-        else {
-            movementComp.getVelocity().y = Math.max(-TerminalVelocity, (float)(movementComp.getVelocity().y - Gravity * delta));
-        }
+        movementComp.getVelocity().y = Math.max(-TerminalVelocity, (float)(movementComp.getVelocity().y - Gravity * delta));
 
         // TODO: replace this with swept collision based on JBullet?
         Vector3f worldPos = location.getWorldPosition();
         Vector3f oldPos = new Vector3f(worldPos);
         worldPos.y += movementComp.getVelocity().y * delta;
-        
+
         Vector3f extents = new Vector3f(collision.getExtents());
         extents.scale(location.getWorldScale());
 
@@ -127,6 +175,7 @@ public class CharacterMovementSystem {
             }
         } else {
             movementComp.isGrounded = false;
+            movementComp.jump = false;
         }
 
         oldPos.set(worldPos);
@@ -136,9 +185,6 @@ public class CharacterMovementSystem {
          */
         worldPos.x += movementComp.getVelocity().x * delta;
         worldPos.z += movementComp.getVelocity().z * delta;
-
-        // TODO: step sound support (while not animation driven anyhow)
-        //_stepCounter += java.lang.Math.max(TeraMath.fastAbs(_movementVelocity.x * timePassedInSeconds), TeraMath.fastAbs(_movementVelocity.z * timePassedInSeconds));
 
         /*
          * Check for horizontal collisions __after__ checking for vertical
@@ -159,6 +205,73 @@ public class CharacterMovementSystem {
                 entity.send(new FootstepEvent());
             }
         }
+        location.setWorldPosition(worldPos);
+
+        if (movementComp.faceMovementDirection) {
+            float yaw = (float)Math.atan2(movementComp.getVelocity().x, movementComp.getVelocity().z);
+            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+            location.getLocalRotation().set(axisAngle);
+        }
+    }
+
+    private void swim(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
+        Vector3f desiredVelocity = new Vector3f(movementComp.getDrive());
+        float maxSpeed = movementComp.maxWaterSpeed;
+        if (movementComp.isRunning) {
+            maxSpeed *= movementComp.runFactor;
+        }
+        desiredVelocity.scale(maxSpeed);
+
+        desiredVelocity.y -= UnderwaterGravity;
+
+        // Modify velocity towards desired, up to the maximum rate determined by friction
+        Vector3f velocityDiff = new Vector3f(desiredVelocity);
+        velocityDiff.sub(movementComp.getVelocity());
+        float changeMag = velocityDiff.length();
+        if (changeMag > UnderwaterInteria * delta) {
+            velocityDiff.scale(UnderwaterInteria * delta / changeMag);
+        }
+
+        movementComp.getVelocity().x += velocityDiff.x;
+        movementComp.getVelocity().y += velocityDiff.y;
+        movementComp.getVelocity().z += velocityDiff.z;
+
+        // Slow down due to friction
+        float speed = movementComp.getVelocity().length();
+        if (speed > movementComp.maxWaterSpeed) {
+            movementComp.getVelocity().scale((speed - 4 * (speed - movementComp.maxWaterSpeed) * delta) / speed);
+        }
+
+        // TODO: replace this with swept collision based on JBullet?
+        Vector3f worldPos = location.getWorldPosition();
+        Vector3f oldPos = new Vector3f(worldPos);
+        worldPos.y += movementComp.getVelocity().y * delta;
+        
+        Vector3f extents = new Vector3f(collision.getExtents());
+        extents.scale(location.getWorldScale());
+
+        if (verticalHitTest(worldPos, oldPos, extents)) {
+            movementComp.getVelocity().y = 0;
+        }
+
+        oldPos.set(worldPos);
+        /*
+         * Update the position of the entity
+         * according to the acceleration vector.
+         */
+        worldPos.x += movementComp.getVelocity().x * delta;
+        worldPos.z += movementComp.getVelocity().z * delta;
+
+        /*
+         * Check for horizontal collisions __after__ checking for vertical
+         * collisions.
+         */
+        if (horizontalHitTest(worldPos, oldPos, extents)) {
+            entity.send(new HorizontalCollisionEvent());
+        }
+        movementComp.getVelocity().x = (worldPos.x - oldPos.x) / delta;
+        movementComp.getVelocity().z = (worldPos.z - oldPos.z) / delta;
+
         location.setWorldPosition(worldPos);
 
         if (movementComp.faceMovementDirection) {
