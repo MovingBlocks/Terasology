@@ -328,6 +328,7 @@ public final class WorldRenderer implements IGameObject {
         if (Config.getInstance().isDebugCollision()) {
             renderDebugCollision();
         }
+        _localPlayerSystem.render();
 
         glEnable(GL_LIGHT0);
 

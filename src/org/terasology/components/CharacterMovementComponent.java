@@ -10,7 +10,6 @@ import javax.vecmath.Vector3f;
 public final class CharacterMovementComponent extends AbstractComponent {
 
     // Speed settings
-    // TODO: consider making these floats
     public float maxGroundSpeed = 5.0f;
     public float maxWaterSpeed = 2.0f;
     public float maxGhostSpeed = 5.0f;
@@ -30,6 +29,7 @@ public final class CharacterMovementComponent extends AbstractComponent {
 
     // Movement inputs - desired direction, etc
     public boolean jump = false;
+
     // The direction and strength of movement desired
     // Should have a length between 0 and 1
     private Vector3f drive = new Vector3f();

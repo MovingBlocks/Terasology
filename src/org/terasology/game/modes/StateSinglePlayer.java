@@ -102,6 +102,7 @@ public class StateSinglePlayer implements IGameState {
         _charSoundSys = new CharacterSoundSystem();
         _entityManager.getEventSystem().registerEventHandler(_charSoundSys);
         _localPlayerSys = new LocalPlayerSystem(_entityManager);
+
     }
 
 
@@ -152,7 +153,7 @@ public class StateSinglePlayer implements IGameState {
             }
 
         // TODO: This seems a little off - plus is more of a UI than single player game state concern. Move somewhere
-        // more appropriate
+        // more appropriate?
         boolean dead = true;
         for (EntityRef entity : _entityManager.iteratorEntities(LocalPlayerComponent.class))
         {
@@ -207,6 +208,7 @@ public class StateSinglePlayer implements IGameState {
         _simpleAISys.setWorldRenderer(_worldRenderer);
         _simpleAISys.setRandom(_worldRenderer.getWorldProvider().getRandom());
         _charSoundSys.setRandom(_worldRenderer.getWorldProvider().getRandom());
+        _localPlayerSys.setWorldProvider(_worldRenderer.getWorldProvider());
 
     }
 

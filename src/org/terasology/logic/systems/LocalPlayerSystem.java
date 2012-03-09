@@ -10,16 +10,25 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.TeraMath;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.structures.RayBlockIntersection;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.DefaultCamera;
 
 import javax.vecmath.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public class LocalPlayerSystem {
     private EntityManager entityManager;
+    private IWorldProvider worldProvider;
     private DefaultCamera playerCamera;
     
     private boolean jump = false;
@@ -102,6 +111,20 @@ public class LocalPlayerSystem {
             Vector3d viewingTarget = new Vector3d(getPosition().x, 40, getPosition().z - 128);
             _defaultCamera.getViewingDirection().sub(viewingTarget, getPosition());
         } */
+    }
+
+    public void render() {
+        // Display the block the player is aiming at
+        if (Config.getInstance().isPlacingBox()) {
+            RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
+            if (selectedBlock != null) {
+                Block block = BlockManager.getInstance().getBlock(worldProvider.getBlockAtPosition(selectedBlock.getBlockPosition().toVector3d()));
+                if (block.isRenderBoundingBox()) {
+                    block.getBounds(selectedBlock.getBlockPosition()).render(2f);
+                }
+            }
+        }
+
     }
 
     /**
@@ -278,5 +301,58 @@ public class LocalPlayerSystem {
 
     public void setPlayerCamera(DefaultCamera camera) {
         this.playerCamera = camera;
+    }
+
+    public void setWorldProvider(IWorldProvider worldProvider) {
+        this.worldProvider = worldProvider;
+    }
+
+    /**
+     * Calculates the currently targeted block in front of the player.
+     *
+     * @return Intersection point of the targeted block
+     */
+    private RayBlockIntersection.Intersection calcSelectedBlock() {
+        // TODO: Proper and centralised ray tracing support though world
+        List<RayBlockIntersection.Intersection> inters = new ArrayList<RayBlockIntersection.Intersection>();
+
+        Vector3f pos = new Vector3f(playerCamera.getPosition());
+        
+        int blockPosX, blockPosY, blockPosZ;
+
+        for (int x = -3; x <= 3; x++) {
+            for (int y = -3; y <= 3; y++) {
+                for (int z = -3; z <= 3; z++) {
+                    // Make sure the correct block positions are calculated relatively to the position of the player
+                    blockPosX = (int) (pos.x + (pos.x >= 0 ? 0.5f : -0.5f)) + x;
+                    blockPosY = (int) (pos.y + (pos.y >= 0 ? 0.5f : -0.5f)) + y;
+                    blockPosZ = (int) (pos.z + (pos.z >= 0 ? 0.5f : -0.5f)) + z;
+
+                    byte blockType = worldProvider.getBlock(blockPosX, blockPosY, blockPosZ);
+
+                    // Ignore special blocks
+                    if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
+                        continue;
+                    }
+
+                    // The ray originates from the "player's eye"
+                    List<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(worldProvider, blockPosX, blockPosY, blockPosZ, playerCamera.getPosition(), playerCamera.getViewingDirection());
+
+                    if (iss != null) {
+                        inters.addAll(iss);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Calculated the closest intersection.
+         */
+        if (inters.size() > 0) {
+            Collections.sort(inters);
+            return inters.get(0);
+        }
+
+        return null;
     }
 }
