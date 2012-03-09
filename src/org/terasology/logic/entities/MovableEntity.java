@@ -16,7 +16,7 @@
 package org.terasology.logic.entities;
 
 import org.terasology.game.Terasology;
-import org.terasology.logic.audio.Sound;
+import org.terasology.audio.Sound;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.TeraMath;
