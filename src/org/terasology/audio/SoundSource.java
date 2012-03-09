@@ -1,4 +1,4 @@
-package org.terasology.logic.audio;
+package org.terasology.audio;
 
 import javax.vecmath.Vector3d;
 

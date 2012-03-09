@@ -1,8 +1,7 @@
-package org.terasology.logic.audio;
+package org.terasology.audio;
 
 import org.lwjgl.openal.AL10;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 
