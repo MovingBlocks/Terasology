@@ -41,6 +41,7 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages everything related to using Groovy from within Java.
@@ -57,6 +58,8 @@ public class GroovyManager {
      * Directory where we keep "plugin" files (Groovy scripts we'll run - prolly move this setting elsewhere sometime)
      */
     private static final String PLUGINS_PATH = "groovy/plugins";
+    
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     /**
      * Initialize the GroovyManager and "share" the given World variable via the Binding
@@ -78,7 +81,6 @@ public class GroovyManager {
             gse = new GroovyScriptEngine(PLUGINS_PATH);
         } catch (IOException ioe) {
             Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to initialize plugin (IOException): " + pluginName + ", reason: " + ioe.toString(), ioe);
-            ioe.printStackTrace();
         }
 
         if (gse != null) {
@@ -88,10 +90,8 @@ public class GroovyManager {
                 gse.run(pluginName, _bind);
             } catch (ResourceException re) {
                 Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to execute plugin (ResourceException): " + pluginName + ", reason: " + re.toString(), re);
-                re.printStackTrace();
             } catch (ScriptException se) {
                 Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to execute plugin (ScriptException): " + pluginName + ", reason: " + se.toString(), se);
-                se.printStackTrace();
             }
         }
     }
@@ -120,7 +120,10 @@ public class GroovyManager {
         updateBinding();
         GroovyShell shell = new GroovyShell(_bind);
         try {
-            shell.evaluate(consoleString);
+            Object result = shell.evaluate(consoleString);
+            if (result != null) {
+                logger.log(Level.INFO, "Result [" + result + "] from '" + consoleString + "'");
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();

@@ -79,14 +79,26 @@ public class FastRandom {
     /**
      * Returns a random double value.
      *
-     * @return Random value
+     * @return Random value between -1.0 and 1.0
      */
     public double randomDouble() {
         return randomLong() / ((double) Long.MAX_VALUE - 1d);
     }
-    
+
+    /**
+     *
+     * @return Random value between -1f and 1f
+     */
     public float randomFloat() {
         return randomLong() / ((float) Long.MAX_VALUE - 1f);
+    }
+
+    /**
+     *
+     * @return Random value between 0f and 1f
+     */
+    public float randomPosFloat() {
+        return 0.5f * (randomFloat() + 1.0f);
     }
 
     /**

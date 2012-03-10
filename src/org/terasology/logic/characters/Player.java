@@ -384,53 +384,6 @@ public class Player extends Character {
     }
 
     /**
-     * Renders the actively selected block in the front of the player's first person perspective.
-     */
-    public void renderExtractionOverlay() {
-        if (_extractionCounter <= 0 || _extractedBlock == null)
-            return;
-
-        Block block = BlockManager.getInstance().getBlock(_parent.getWorldProvider().getBlockAtPosition(_extractedBlock.getBlockPosition().toVector3d()));
-
-        ShaderManager.getInstance().enableDefaultTextured();
-        TextureManager.getInstance().bindTexture("effects");
-
-        glEnable(GL11.GL_BLEND);
-        glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
-        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
-
-        glPushMatrix();
-        glTranslated(_extractedBlock.getBlockPosition().x - cameraPosition.x, _extractedBlock.getBlockPosition().y - cameraPosition.y, _extractedBlock.getBlockPosition().z - cameraPosition.z);
-
-        float offset = java.lang.Math.round(((float) _extractionCounter / block.getHardness()) * 10.0f) * 0.0625f;
-
-        if (_overlayMesh == null) {
-            Vector2f texPos = new Vector2f(0.0f, 0.0f);
-            Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
-
-            Tessellator tessellator = new Tessellator();
-            TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
-            _overlayMesh = tessellator.generateMesh();
-        }
-
-        glMatrixMode(GL_TEXTURE);
-        glPushMatrix();
-        glTranslatef(offset, 0f, 0f);
-        glMatrixMode(GL_MODELVIEW);
-
-        _overlayMesh.render();
-
-        glPopMatrix();
-
-        glMatrixMode(GL_TEXTURE);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-
-        glDisable(GL11.GL_BLEND);
-    }
-
-    /**
      * Renders a simple hand displayed in front of the player's first person perspective.
      */
     public void renderHand() {

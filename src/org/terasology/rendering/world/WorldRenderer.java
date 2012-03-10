@@ -27,6 +27,7 @@ import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.systems.BlockDamageRenderer;
+import org.terasology.logic.systems.BlockParticleEmitterSystem;
 import org.terasology.logic.systems.LocalPlayerSystem;
 import org.terasology.logic.systems.MeshRenderer;
 import org.terasology.logic.world.*;
@@ -100,6 +101,7 @@ public final class WorldRenderer implements IGameObject {
     private final PortalManager _portalManager;
     private final MeshRenderer _entityRendererSystem;
     private final BlockDamageRenderer _blockDamageRenderer;
+    private final BlockParticleEmitterSystem _particleSystem;
 
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
@@ -136,7 +138,7 @@ public final class WorldRenderer implements IGameObject {
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
-    public WorldRenderer(String title, String seed, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
+    public WorldRenderer(String title, String seed, EntityManager manager, LocalPlayerSystem localPlayerSystem, BlockParticleEmitterSystem blockParticleSystem) {
         _worldProvider = new LocalWorldProvider(title, seed);
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager();
@@ -150,6 +152,9 @@ public final class WorldRenderer implements IGameObject {
         _localPlayerSystem.setPlayerCamera(_defaultCamera);
         _blockDamageRenderer = new BlockDamageRenderer(manager);
         _blockDamageRenderer.setWorldProvider(_worldProvider);
+        _particleSystem = blockParticleSystem;
+        _particleSystem.setWorldProvider(_worldProvider);
+        _particleSystem.setWorldRenderer(this);
 
         initTimeEvents();
     }
@@ -377,6 +382,7 @@ public final class WorldRenderer implements IGameObject {
 
         while (_renderQueueTransparent.size() > 0)
             _renderQueueTransparent.poll().render();
+        _particleSystem.render();
         _entityRendererSystem.render();
 
         PerformanceMonitor.endActivity();

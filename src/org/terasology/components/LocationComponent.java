@@ -22,6 +22,12 @@ public final class LocationComponent extends AbstractComponent {
     // Relative to
     public EntityRef parent = null;
 
+    public LocationComponent() {}
+
+    public LocationComponent(Vector3f position) {
+        this.position.set(position);
+    }
+
     /**
      * @return The position of this component relative to any parent. Can be directly modified to update the component
      */

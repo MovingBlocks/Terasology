@@ -27,6 +27,7 @@ public class TeraMath {
     public static final float HALF_PI = (float)(0.5f * Math.PI);
     public static final float RAD_TO_DEG = (float) (180.0f / Math.PI);
     public static final float DEG_TO_RAD = (float) (Math.PI / 180.0f);
+    public static final float METERS_TO_MM = 0.001f;
     
     /**
      * Returns the absolute value.

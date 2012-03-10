@@ -58,7 +58,7 @@ public class BlockDamageRenderer {
             glPushMatrix();
             glTranslated(blockComp.getPosition().x - cameraPosition.x, blockComp.getPosition().y - cameraPosition.y, blockComp.getPosition().z - cameraPosition.z);
 
-            float offset = java.lang.Math.round(((float) health.currentHealth / health.maxHealth) * 10.0f) * 0.0625f;
+            float offset = java.lang.Math.round((1.0f - (float) health.currentHealth / health.maxHealth) * 10.0f) * 0.0625f;
 
             glMatrixMode(GL_TEXTURE);
             glPushMatrix();

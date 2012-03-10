@@ -71,6 +71,7 @@ public class StateSinglePlayer implements IGameState {
     private LocalPlayerSystem _localPlayerSys;
     private HealthSystem _healthSystem;
     private BlockEntitySystem _blockSystem;
+    private BlockParticleEmitterSystem _particleSystem;
 
     /* GAME LOOP */
     private boolean _pauseGame = false;
@@ -110,6 +111,7 @@ public class StateSinglePlayer implements IGameState {
         _entityManager.getEventSystem().registerEventHandler(_healthSystem);
         _blockSystem = new BlockEntitySystem();
         _entityManager.getEventSystem().registerEventHandler(_blockSystem);
+        _particleSystem = new BlockParticleEmitterSystem(_entityManager);
 
     }
 
@@ -145,6 +147,7 @@ public class StateSinglePlayer implements IGameState {
         PerformanceMonitor.endActivity();
 
         _healthSystem.update((float)delta);
+        _particleSystem.update((float)delta);
 
         if (_worldRenderer != null && shouldUpdateWorld())
             _worldRenderer.update(delta);
@@ -202,7 +205,7 @@ public class StateSinglePlayer implements IGameState {
         Terasology.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys);
+        _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys, _particleSystem);
 
         PlayerFactory playerFactory = new PlayerFactory();
         playerFactory.setEntityManager(_entityManager);
