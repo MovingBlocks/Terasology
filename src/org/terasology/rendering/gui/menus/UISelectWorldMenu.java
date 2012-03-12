@@ -72,6 +72,7 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
                 Terasology.getInstance().getGameMode().activateScreen("main_menu");
             }
         });
+        _list.addItem("Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" + _list.size(), "Add world " + _list.size());
         _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
         _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
         _list.addItem("Add world" + _list.size(), "Add world " + _list.size());

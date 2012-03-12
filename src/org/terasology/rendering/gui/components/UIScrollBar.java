@@ -27,13 +27,13 @@ public class UIScrollBar extends UIDisplayContainer {
     private float   _min;
     private float   _step;
 
-    private Vector2f _prevMousePos = null;
+    private float _prevMousePos = -1;
 
     private ScrollType _scrollType = ScrollType.vertical;
 
     private boolean _scrolled = false;
 
-    private float _containerHeight = 0.0f;
+    private float _containerLength = 0.0f;
     private float _scrollShift     = 0.0f;
 
 
@@ -41,7 +41,9 @@ public class UIScrollBar extends UIDisplayContainer {
         vertical, horizontal
     }
 
-    public UIScrollBar(Vector2f size){
+    public UIScrollBar(Vector2f size, ScrollType scrollType){
+        setScrollType(scrollType);
+
         for(int i=0; i<3; i++){
             _scrollGraphicsElements.add(new UIGraphicsElement("gui_menu"));
             _scrollGraphicsElements.get(i).setVisible(true);
@@ -69,35 +71,38 @@ public class UIScrollBar extends UIDisplayContainer {
         if(intersects(mousePos)){
             if(_mouseDown){
                 _scrolled = true;
-                if(_prevMousePos==null){
-                    _prevMousePos =  mousePos;
+                if(_prevMousePos==-1){
+                    if(_scrollType==ScrollType.vertical){
+                        _prevMousePos =  mousePos.y;
+                    }else{
+                        _prevMousePos =  mousePos.x;
+                    }
                 }
             }
         }
 
         if(_scrolled){
-            scrolled(mousePos);
+            scrolled(_scrollType==ScrollType.vertical?mousePos.y:mousePos.x);
         }
 
         if(!_mouseDown||!_scrolled || _mouseUp){
             _scrolled     = false;
             _mouseDown    = false;
-            _prevMousePos = null;
+            _prevMousePos = -1;
             _mouseUp      = false;
         }
     }
 
-    private void scrolled(Vector2f mousePos){
+    private void scrolled(float mousePos){
 
-        if(_max<(getPosition().y +  mousePos.y - _prevMousePos.y  + getSize().y)){
-            mousePos.y = _max - getSize().y + _prevMousePos.y - getPosition().y;
-        }else if(_min>(getPosition().y +  mousePos.y - _prevMousePos.y)){
-            mousePos.y = _min + _prevMousePos.y - getPosition().y;
+        if(_max<(getScrollBarPosition() +  mousePos - _prevMousePos  + getScrollBarSize())){
+            mousePos = _max - getScrollBarSize() + _prevMousePos - getScrollBarPosition();
+        }else if(_min>(getScrollBarPosition() +  mousePos - _prevMousePos)){
+            mousePos = _min + _prevMousePos - getScrollBarPosition();
         }
 
-        float tempPos = getPosition().y +  mousePos.y - _prevMousePos.y;
-        _scrollShift = (mousePos.y - _prevMousePos.y)/_step;
-        getPosition().y = tempPos;
+        _scrollShift = (mousePos - _prevMousePos)/_step;
+        setScrollBarPosition((getScrollBarPosition() +  mousePos - _prevMousePos));
         _prevMousePos   = mousePos;
 
         for (int i = 0; i < _scrollListeners.size(); i++) {
@@ -110,20 +115,30 @@ public class UIScrollBar extends UIDisplayContainer {
     }
 
     private void updateGraphicsElementsPosition(){
-        float newScrollSize     = _containerHeight*_step;
+        float newScrollSize     = _containerLength*_step;
         float newBodyScrollSize = newScrollSize - _scrollGraphicsElements.get(0).getSize().x*2;
 
-        if(newScrollSize!=getSize().y){
-            setSize(new Vector2f(15f, newScrollSize));
+        if(newScrollSize!=getScrollBarSize()){
 
-            _scrollGraphicsElements.get(1).setSize(new Vector2f(newBodyScrollSize, 15f));
-            _scrollGraphicsElements.get(2).getPosition().y = _scrollGraphicsElements.get(1).getPosition().y +
-                                                             _scrollGraphicsElements.get(0).getSize().x     +
-                                                             _scrollGraphicsElements.get(1).getSize().x;
+            if(_scrollType==ScrollType.vertical){
+                setSize(new Vector2f(15f, newScrollSize));
 
-            if(getPosition().y + getSize().y>_max){
-                _prevMousePos = getPosition();
-                scrolled(new Vector2f(getPosition().x, (getPosition().y + getSize().y) - _max));
+                _scrollGraphicsElements.get(1).setSize(new Vector2f(newBodyScrollSize, 15f));
+                _scrollGraphicsElements.get(2).getPosition().y = _scrollGraphicsElements.get(1).getPosition().y +
+                                                                 _scrollGraphicsElements.get(0).getSize().x     +
+                                                                 _scrollGraphicsElements.get(1).getSize().x;
+            }else{
+                setSize(new Vector2f(newScrollSize, 15f));
+
+                _scrollGraphicsElements.get(1).setSize(new Vector2f(newBodyScrollSize, 15f));
+                _scrollGraphicsElements.get(2).getPosition().x = _scrollGraphicsElements.get(1).getPosition().x +
+                        _scrollGraphicsElements.get(0).getSize().x     +
+                        _scrollGraphicsElements.get(1).getSize().x;
+            }
+
+            if(getScrollBarPosition() + getScrollBarSize()>_max){
+                _prevMousePos = getScrollBarPosition();
+                scrolled((getScrollBarPosition() + getScrollBarSize()) - _max);
             }
 
         }
@@ -174,6 +189,7 @@ public class UIScrollBar extends UIDisplayContainer {
         _scrollGraphicsElements.get(2).setRotateAngle(180);
         _scrollGraphicsElements.get(2).setPosition(new Vector2f((getPosition().x +  2*_scrollGraphicsElements.get(0).getTextureSize().x + _scrollGraphicsElements.get(1).getSize().x), getPosition().y));
         _scrollGraphicsElements.get(2).setSize(new Vector2f(7f, 15f));
+        _scrollGraphicsElements.get(2).getPosition().y += 15f;
         _scrollGraphicsElements.get(2).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
     }
 
@@ -186,9 +202,9 @@ public class UIScrollBar extends UIDisplayContainer {
         return _scrolled;
     }
 
-    public void setStep(float contentHeight, float containerHeight){
+    public void setStep(float contentLength, float containerLength){
         try{
-            _step = 1.0f/(contentHeight/containerHeight);
+            _step = 1.0f/(contentLength/containerLength);
 
             if(_step>1.0f){
                 _step = 1.0f;
@@ -198,10 +214,32 @@ public class UIScrollBar extends UIDisplayContainer {
             _step = 1.0f;
         }
 
-        _containerHeight = containerHeight;
+        _containerLength = containerLength;
     }
 
     public float getScrollShift(){
         return _scrollShift;
+    }
+
+    private float getScrollBarPosition(){
+        if(_scrollType == ScrollType.vertical){
+            return getPosition().y;
+        }
+        return getPosition().x;
+    }
+
+    private float getScrollBarSize(){
+        if(_scrollType == ScrollType.vertical){
+            return getSize().y;
+        }
+        return getSize().x;
+    }
+
+    private void setScrollBarPosition(float newPosition){
+        if(_scrollType == ScrollType.vertical){
+           getPosition().y = newPosition;
+        }else{
+           getPosition().x = newPosition;
+        }
     }
 }

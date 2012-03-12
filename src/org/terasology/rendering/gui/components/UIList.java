@@ -35,9 +35,9 @@ public class UIList extends UIScrollableDisplayContainer {
 
     public UIList(Vector2f size) {
         setSize(size);
-        setCrop(true);
+        setCrop(false);
         setCropMargin(new Vector4f(0.0f, 25f, 0.0f, 5f));
-        setScrollBarPosition(new Vector2f(getPosition().x + size.x, getPosition().y));
+        setScrollBarsPosition(getPosition(), getSize());
 
         _borderTop = new UIGraphicsElement("gui_menu");
         _borderTop.setVisible(true);
@@ -193,5 +193,6 @@ public class UIList extends UIScrollableDisplayContainer {
     public void setBackgroundColor(Vector4f backgroundColor){
         _backgroundColor = backgroundColor;
     }
+
 
 }
