@@ -3,21 +3,23 @@ package org.terasology.logic.systems;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandler;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
+import org.terasology.game.CoreRegistry;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class HealthSystem implements EventHandler {
-    
+public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem {
+
     private EntityManager entityManager;
 
-    public HealthSystem(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public void initialise() {
+        entityManager = CoreRegistry.get(EntityManager.class);
     }
 
     public void update(float delta) {

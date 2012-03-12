@@ -2,10 +2,11 @@ package org.terasology.logic.systems;
 
 import org.terasology.components.BlockComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandler;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -13,10 +14,14 @@ import org.terasology.model.blocks.management.BlockManager;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class BlockEntitySystem implements EventHandler {
+public class BlockEntitySystem implements EventHandlerSystem {
     private static byte EmptyBlockId = 0x0;
 
     private IWorldProvider worldProvider;
+
+    public void initialise() {
+        worldProvider = CoreRegistry.get(IWorldProvider.class);
+    }
 
     @ReceiveEvent(components={BlockComponent.class})
     public void onDestroyed(NoHealthEvent event, EntityRef entity)
@@ -57,7 +62,4 @@ public class BlockEntitySystem implements EventHandler {
         }
     }
 
-    public void setWorldProvider(IWorldProvider worldProvider) {
-        this.worldProvider = worldProvider;
-    }
 }

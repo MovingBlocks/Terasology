@@ -3,7 +3,7 @@ package org.terasology.logic.systems;
 import org.terasology.components.CharacterSoundComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandler;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.JumpEvent;
@@ -17,9 +17,12 @@ import javax.vecmath.Vector3d;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class CharacterSoundSystem implements EventHandler {
+public class CharacterSoundSystem implements EventHandlerSystem {
     
-    private FastRandom random;
+    private FastRandom random = new FastRandom();
+
+    public void initialise() {
+    }
     
     @ReceiveEvent(components = {CharacterSoundComponent.class})
     public void footstep(FootstepEvent event, EntityRef entity) {
@@ -61,11 +64,4 @@ public class CharacterSoundSystem implements EventHandler {
         }
     }
 
-    public FastRandom getRandom() {
-        return random;
-    }
-
-    public void setRandom(FastRandom random) {
-        this.random = random;
-    }
 }

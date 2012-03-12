@@ -17,7 +17,6 @@
 package org.terasology.game.modes;
 
 import org.terasology.entitySystem.EntityManager;
-import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * @author Anton Kireev <adeon.k87@gmail.com>

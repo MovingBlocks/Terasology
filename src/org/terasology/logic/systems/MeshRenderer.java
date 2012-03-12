@@ -5,6 +5,8 @@ import org.terasology.components.LocationComponent;
 import org.terasology.components.MeshComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.componentSystem.RenderSystem;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
@@ -26,12 +28,12 @@ import static org.lwjgl.opengl.GL11.*;
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer
  * @author Immortius <immortius@gmail.com>
  */
-public class MeshRenderer {
+public class MeshRenderer implements RenderSystem {
     private EntityManager manager;
     private Mesh mesh;
 
-    public MeshRenderer(EntityManager manager) {
-        this.manager = manager;
+    public void initialise() {
+        manager = CoreRegistry.get(EntityManager.class);
 
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 0.8f, 0.8f, 0.6f, 0f, 0f, 0f);
@@ -39,7 +41,7 @@ public class MeshRenderer {
         mesh = tessellator.generateMesh();
     }
 
-    public void render() {
+    public void renderTransparent() {
         WorldRenderer worldRenderer = Terasology.getInstance().getActiveWorldRenderer();
         if (worldRenderer == null) return;
 
@@ -78,4 +80,11 @@ public class MeshRenderer {
         }
     }
 
+    public void renderOpaque() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void renderOverlay() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

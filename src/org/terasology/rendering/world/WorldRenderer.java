@@ -21,6 +21,9 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.componentSystem.RenderSystem;
+import org.terasology.game.ComponentSystemManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.entities.Entity;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
@@ -99,9 +102,6 @@ public final class WorldRenderer implements IGameObject {
 
     /* CORE GAME OBJECTS */
     private final PortalManager _portalManager;
-    private final MeshRenderer _entityRendererSystem;
-    private final BlockDamageRenderer _blockDamageRenderer;
-    private final BlockParticleEmitterSystem _particleSystem;
 
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
@@ -132,13 +132,15 @@ public final class WorldRenderer implements IGameObject {
     /* OTHER SETTINGS */
     private boolean _wireframe;
 
+    private ComponentSystemManager _systemManager;
+
     /**
      * Initializes a new (local) world for the single player mode.
      *
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
-    public WorldRenderer(String title, String seed, EntityManager manager, LocalPlayerSystem localPlayerSystem, BlockParticleEmitterSystem blockParticleSystem) {
+    public WorldRenderer(String title, String seed, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
         _worldProvider = new LocalWorldProvider(title, seed);
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager();
@@ -146,15 +148,10 @@ public final class WorldRenderer implements IGameObject {
         _portalManager = new PortalManager(manager);
         _blockGrid = new BlockGrid();
         _bulletRenderer = new BulletPhysicsRenderer(this);
-        _entityRendererSystem = new MeshRenderer(manager);
         _entityManager = manager;
         _localPlayerSystem = localPlayerSystem;
         _localPlayerSystem.setPlayerCamera(_defaultCamera);
-        _blockDamageRenderer = new BlockDamageRenderer(manager);
-        _blockDamageRenderer.setWorldProvider(_worldProvider);
-        _particleSystem = blockParticleSystem;
-        _particleSystem.setWorldProvider(_worldProvider);
-        _particleSystem.setWorldRenderer(this);
+        _systemManager = CoreRegistry.get(ComponentSystemManager.class);
 
         initTimeEvents();
     }
@@ -336,8 +333,7 @@ public final class WorldRenderer implements IGameObject {
         getActiveCamera().lookThrough();
         if (Config.getInstance().isDebugCollision()) {
             renderDebugCollision();
-        }
-        _localPlayerSystem.render();
+        };
 
         glEnable(GL_LIGHT0);
 
@@ -352,6 +348,10 @@ public final class WorldRenderer implements IGameObject {
 
         while (_renderQueueOpaque.size() > 0)
             _renderQueueOpaque.poll().render();
+        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+            renderer.renderOpaque();
+        }
+
 
         PerformanceMonitor.endActivity();
 
@@ -382,8 +382,9 @@ public final class WorldRenderer implements IGameObject {
 
         while (_renderQueueTransparent.size() > 0)
             _renderQueueTransparent.poll().render();
-        _particleSystem.render();
-        _entityRendererSystem.render();
+        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+            renderer.renderTransparent();
+        }
 
         PerformanceMonitor.endActivity();
 
@@ -412,7 +413,9 @@ public final class WorldRenderer implements IGameObject {
             }
         }
 
-        _blockDamageRenderer.render();
+        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+            renderer.renderOverlay();
+        }
 
         glDisable(GL_BLEND);
 
@@ -473,10 +476,6 @@ public final class WorldRenderer implements IGameObject {
         if (_activeCamera != null) {
             _activeCamera.update(delta);
         }
-
-        PerformanceMonitor.startActivity("Player");
-        _localPlayerSystem.update((float)delta);
-        PerformanceMonitor.endActivity();
 
         // Update the particle emitters
         PerformanceMonitor.startActivity("Block Particle Emitter");

@@ -8,7 +8,11 @@ import org.lwjgl.input.Mouse;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.componentSystem.RenderSystem;
+import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
 import org.terasology.events.DamageEvent;
+import org.terasology.game.ComponentSystemManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
@@ -30,7 +34,7 @@ import java.util.List;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class LocalPlayerSystem {
+public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
 
     private static TIntIntMap inventorySlotBindMap = new TIntIntHashMap();
     
@@ -50,7 +54,7 @@ public class LocalPlayerSystem {
     private IWorldProvider worldProvider;
     private DefaultCamera playerCamera;
     private BlockEntityLookup blockEntityLookup;
-    private ItemSystem inventorySystem;
+    private ItemSystem itemSystem;
     
     private boolean jump = false;
     private Vector3f movementInput = new Vector3f();
@@ -62,10 +66,17 @@ public class LocalPlayerSystem {
     private float lastInteraction;
     private boolean toggleGodMode;
 
-    public LocalPlayerSystem(EntityManager entityManager, BlockEntityLookup blockEntityLookup, ItemSystem inventorySystem) {
-        this.entityManager = entityManager;
-        this.blockEntityLookup = blockEntityLookup;
-        this.inventorySystem = inventorySystem;
+    public void initialise() {
+        entityManager = CoreRegistry.get(EntityManager.class);
+        worldProvider = CoreRegistry.get(IWorldProvider.class);
+
+        ComponentSystemManager systemManager = CoreRegistry.get(ComponentSystemManager.class);
+        blockEntityLookup = systemManager.get(BlockEntityLookup.class);
+        itemSystem = systemManager.get(ItemSystem.class);
+    }
+
+    public void setPlayerCamera(DefaultCamera camera) {
+        this.playerCamera = camera;
     }
 
     public void update(float delta) {
@@ -138,7 +149,15 @@ public class LocalPlayerSystem {
         } */
     }
 
-    public void render() {
+    public void renderOpaque() {
+
+    }
+
+    public void renderTransparent() {
+
+    }
+
+    public void renderOverlay() {
         // Display the block the player is aiming at
         if (Config.getInstance().isPlacingBox()) {
             RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
@@ -284,7 +303,7 @@ public class LocalPlayerSystem {
             rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
             Side direction = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z);
 
-            inventorySystem.useItemOnBlock(item, player, centerPos, attachmentSide, direction);
+            itemSystem.useItemOnBlock(item, player, centerPos, attachmentSide, direction);
         }
     }
 
@@ -393,14 +412,6 @@ public class LocalPlayerSystem {
         }
 
         glPopMatrix();*/
-    }
-
-    public void setPlayerCamera(DefaultCamera camera) {
-        this.playerCamera = camera;
-    }
-
-    public void setWorldProvider(IWorldProvider worldProvider) {
-        this.worldProvider = worldProvider;
     }
 
     /**

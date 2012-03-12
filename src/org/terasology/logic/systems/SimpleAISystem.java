@@ -5,10 +5,13 @@ import org.terasology.components.LocationComponent;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandler;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
 import org.terasology.events.HorizontalCollisionEvent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.global.LocalPlayer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
@@ -18,15 +21,16 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class SimpleAISystem implements EventHandler {
+public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSystem {
 
     private EntityManager entityManager;
-    // TODO: Should be able to get players without using the worldRenderer
-    private WorldRenderer worldRenderer;
-    private FastRandom random;
+    private FastRandom random = new FastRandom();
+
+    public void initialise() {
+        entityManager = CoreRegistry.get(EntityManager.class);
+    }
 
     public void update(float delta) {
-        if (worldRenderer == null) return;
         for (EntityRef entity : entityManager.iteratorEntities(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             SimpleAIComponent ai = entity.getComponent(SimpleAIComponent.class);
@@ -34,15 +38,17 @@ public class SimpleAISystem implements EventHandler {
 
             Vector3f worldPos = location.getWorldPosition();
             moveComp.getDrive().set(0,0,0);
-            if (worldRenderer.getPlayer() != null)
+            // TODO: shouldn't use local player
+            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+            if (localPlayer != null)
             {
                 Vector3f dist = new Vector3f(worldPos);
-                dist.sub(worldRenderer.getPlayer().getPosition());
+                dist.sub(localPlayer.getPosition());
                 double distanceToPlayer = dist.lengthSquared();
 
                 if (distanceToPlayer > 6 && distanceToPlayer < 16) {
                     // Head to player
-                    ai.movementTarget.set(worldRenderer.getPlayer().getPosition());
+                    ai.movementTarget.set(localPlayer.getPosition());
                     ai.followingPlayer = true;
                 } else {
                     // Random walk
@@ -71,29 +77,5 @@ public class SimpleAISystem implements EventHandler {
         if (moveComp != null && moveComp.isGrounded) {
             moveComp.jump = true;
         }
-    }
-
-    public FastRandom getRandom() {
-        return random;
-    }
-
-    public void setRandom(FastRandom random) {
-        this.random = random;
-    }
-
-    public WorldRenderer getWorldRenderer() {
-        return worldRenderer;
-    }
-
-    public void setWorldRenderer(WorldRenderer worldRenderer) {
-        this.worldRenderer = worldRenderer;
-    }
-
-    public void setEntityManager(EntityManager manager) {
-        this.entityManager = manager;
-    }
-
-    public EntityManager getEntityManager() {
-        return entityManager;
     }
 }

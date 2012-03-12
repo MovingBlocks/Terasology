@@ -25,11 +25,14 @@ import org.terasology.components.*;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entityFactory.PlaceableBlockFactory;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.ComponentSystemManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.game.modes.IGameState;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.global.LocalPlayer;
+import org.terasology.logic.systems.InventorySystem;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
@@ -161,28 +164,10 @@ public class GroovyManager {
             itemComp.stackCount = quantity;
             InventoryComponent inventory = Terasology.getInstance().getActivePlayer().getEntity().getComponent(InventoryComponent.class);
 
-            // TODO: Move this code elsewhere to be shared (inventory system?)
-            // First check for stacks
-            for (EntityRef itemStack : inventory.itemSlots) {
-                if (itemStack != null) {
-                    ItemComponent stackComp = itemStack.getComponent(ItemComponent.class);
-                    if (itemComp.stackId.equals(stackComp.stackId)) {
-                        stackComp.stackCount += quantity;
-                        item.destroy();
-                        return;
-                    }
-                }
+            InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
+            if (!inventorySystem.addItem(Terasology.getInstance().getActivePlayer().getEntity(), item)) {
+                item.destroy();
             }
-            // Then free spaces
-            int freeSlot = inventory.itemSlots.indexOf(null);
-            if (freeSlot != -1) {
-                inventory.itemSlots.set(freeSlot, item);
-                itemComp.container = Terasology.getInstance().getActivePlayer().getEntity();
-                return;
-            }
-
-            //No room! delete blocks
-            item.destroy();
         }
 
         public void fullHealth() {

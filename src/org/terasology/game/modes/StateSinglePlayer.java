@@ -15,6 +15,7 @@
  */
 package org.terasology.game.modes;
 
+import com.google.common.collect.Lists;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -22,20 +23,28 @@ import org.terasology.components.*;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.componentSystem.ComponentSystem;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
+import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
+import org.terasology.game.ComponentSystemManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.systems.*;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -63,16 +72,10 @@ public class StateSinglePlayer implements IGameState {
 
 
     private EntityManager _entityManager;
+    private ComponentSystemManager _componentSystemManager;
+
     // TODO: More generic handling of systems
-    private BlockEntityLookup _blockEntityLookup;
-    private CharacterMovementSystem _charMoveSys;
-    private SimpleAISystem _simpleAISys;
-    private CharacterSoundSystem _charSoundSys;
     private LocalPlayerSystem _localPlayerSys;
-    private HealthSystem _healthSystem;
-    private BlockEntitySystem _blockSystem;
-    private BlockParticleEmitterSystem _particleSystem;
-    private ItemSystem _itemSystem;
 
     /* GAME LOOP */
     private boolean _pauseGame = false;
@@ -98,25 +101,25 @@ public class StateSinglePlayer implements IGameState {
 
         _entityManager = new PojoEntityManager();
         _entityManager.setEventSystem(new PojoEventSystem(_entityManager));
-        _blockEntityLookup = new BlockEntityLookup(_entityManager);
-        _entityManager.getEventSystem().registerEventHandler(_blockEntityLookup);
-        _charMoveSys = new CharacterMovementSystem();
-        _charMoveSys.setEntityManager(_entityManager);
-        _simpleAISys = new SimpleAISystem();
-        _simpleAISys.setEntityManager(_entityManager);
-        _itemSystem = new ItemSystem(_entityManager);
-        _entityManager.getEventSystem().registerEventHandler(_simpleAISys);
-        _charSoundSys = new CharacterSoundSystem();
-        _entityManager.getEventSystem().registerEventHandler(_charSoundSys);
-        _localPlayerSys = new LocalPlayerSystem(_entityManager, _blockEntityLookup, _itemSystem);
-        _healthSystem = new HealthSystem(_entityManager);
-        _entityManager.getEventSystem().registerEventHandler(_healthSystem);
-        _blockSystem = new BlockEntitySystem();
-        _entityManager.getEventSystem().registerEventHandler(_blockSystem);
-        _particleSystem = new BlockParticleEmitterSystem(_entityManager);
+        CoreRegistry.put(EntityManager.class, _entityManager);
+        _componentSystemManager = new ComponentSystemManager();
+        CoreRegistry.put(ComponentSystemManager.class, _componentSystemManager);
+
+        _componentSystemManager.register(new BlockEntityLookup());
+        _componentSystemManager.register(new CharacterMovementSystem());
+        _componentSystemManager.register(new SimpleAISystem());
+        _componentSystemManager.register(new ItemSystem());
+        _componentSystemManager.register(new CharacterSoundSystem());
+        _localPlayerSys = new LocalPlayerSystem();
+        _componentSystemManager.register(_localPlayerSys);
+        _componentSystemManager.register(new HealthSystem());
+        _componentSystemManager.register(new BlockEntitySystem());
+        _componentSystemManager.register(new BlockParticleEmitterSystem());
+        _componentSystemManager.register(new BlockDamageRenderer());
+        _componentSystemManager.register(new InventorySystem());
+        _componentSystemManager.register(new MeshRenderer());
 
     }
-
 
     public void activate() {
         String worldSeed = Config.getInstance().getDefaultSeed();
@@ -140,16 +143,11 @@ public class StateSinglePlayer implements IGameState {
     public void update(double delta) {
         /* GUI */
         updateUserInterface();
-
-        PerformanceMonitor.startActivity("Simple AI System");
-        _simpleAISys.update((float) delta);
-        PerformanceMonitor.endActivity();
-        PerformanceMonitor.startActivity("Character Movement System");
-        _charMoveSys.update((float)delta);
-        PerformanceMonitor.endActivity();
-
-        _healthSystem.update((float)delta);
-        _particleSystem.update((float)delta);
+        
+        for (UpdateSubscriberSystem updater : _componentSystemManager.iterateUpdateSubscribers()) {
+            PerformanceMonitor.startActivity(updater.getClass().getSimpleName());
+            updater.update((float) delta);
+        }
 
         if (_worldRenderer != null && shouldUpdateWorld())
             _worldRenderer.update(delta);
@@ -207,7 +205,7 @@ public class StateSinglePlayer implements IGameState {
         Terasology.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys, _particleSystem);
+        _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys);
 
         PlayerFactory playerFactory = new PlayerFactory(_entityManager);
 
@@ -217,14 +215,15 @@ public class StateSinglePlayer implements IGameState {
         _worldRenderer.initPortal();
 
         fastForwardWorld();
+        CoreRegistry.put(WorldRenderer.class, _worldRenderer);
+        CoreRegistry.put(IWorldProvider.class, _worldRenderer.getWorldProvider());
+        CoreRegistry.put(LocalPlayer.class, _worldRenderer.getPlayer());
+        CoreRegistry.put(Camera.class, _worldRenderer.getActiveCamera());
+        
+        for (ComponentSystem system : _componentSystemManager.iterateAll()) {
+            system.initialise();
+        }
 
-        _charMoveSys.setWorldProvider(_worldRenderer.getWorldProvider());
-        _simpleAISys.setWorldRenderer(_worldRenderer);
-        _simpleAISys.setRandom(_worldRenderer.getWorldProvider().getRandom());
-        _charSoundSys.setRandom(_worldRenderer.getWorldProvider().getRandom());
-        _localPlayerSys.setWorldProvider(_worldRenderer.getWorldProvider());
-        _blockSystem.setWorldProvider(_worldRenderer.getWorldProvider());
-        _itemSystem.setWorldProvider(_worldRenderer.getWorldProvider());
 
     }
 

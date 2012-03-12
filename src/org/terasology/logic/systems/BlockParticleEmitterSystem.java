@@ -7,6 +7,9 @@ import org.terasology.components.BlockParticleEffectComponent.Particle;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.componentSystem.RenderSystem;
+import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.world.IWorldProvider;
@@ -33,7 +36,7 @@ import static org.lwjgl.opengl.GL11.glScalef;
  * @author Immortius <immortius@gmail.com>
  */
 // TODO: Generalise for non-block particles
-public class BlockParticleEmitterSystem {
+public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem {
     private static final int PARTICLES_PER_UPDATE = 32;
     private static final float TEX_SIZE = Block.TEXTURE_OFFSET / 4f;
 
@@ -45,8 +48,10 @@ public class BlockParticleEmitterSystem {
     private FastRandom random = new FastRandom();
     private final int[] _displayLists = new int[BlockManager.getInstance().availableBlocksSize()];
 
-    public BlockParticleEmitterSystem(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public void initialise() {
+        entityManager = CoreRegistry.get(EntityManager.class);
+        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldRenderer = CoreRegistry.get(WorldRenderer.class);
     }
     
     public void update(float deltaMS) {
@@ -109,7 +114,7 @@ public class BlockParticleEmitterSystem {
         particle.position.z += particle.velocity.z * delta;
     }
 
-    public void render() {
+    public void renderTransparent() {
         ShaderManager.getInstance().enableShader("particle");
         glDisable(GL11.GL_CULL_FACE);
 
@@ -201,11 +206,9 @@ public class BlockParticleEmitterSystem {
 
     }
 
-    public void setWorldProvider(IWorldProvider worldProvider) {
-        this.worldProvider = worldProvider;
+    public void renderOpaque() {
     }
 
-    public void setWorldRenderer(WorldRenderer worldRenderer) {
-        this.worldRenderer = worldRenderer;
+    public void renderOverlay() {
     }
 }

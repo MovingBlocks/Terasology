@@ -2,6 +2,7 @@ package org.terasology.entitySystem.pojo;
 
 import com.google.common.collect.*;
 import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,7 +26,7 @@ public class PojoEventSystem implements EventSystem {
         this.entitySystem = entitySystem;
     }
 
-    public void registerEventHandler(EventHandler handler) {
+    public void registerEventHandler(EventHandlerSystem handler) {
         Class handlerClass = handler.getClass();
         if (!Modifier.isPublic(handlerClass.getModifiers())) {
             logger.warning(String.format("Cannot register handler %s, must be public", handler.getClass().getName()));
@@ -33,6 +34,7 @@ public class PojoEventSystem implements EventSystem {
         }
 
         // TODO: Refactor
+        // TODO: Work with non-public methods
         logger.info("Registering event handler " + handlerClass.getName());
         for (Method method : handlerClass.getMethods())
         {
@@ -96,11 +98,11 @@ public class PojoEventSystem implements EventSystem {
 
     private class EventHandlerInfo
     {
-        private EventHandler handler;
+        private EventHandlerSystem handler;
         private Method method;
         private Class<? extends Component>[] components;
 
-        public EventHandlerInfo(EventHandler handler, Method method, Class<? extends Component>[] components)
+        public EventHandlerInfo(EventHandlerSystem handler, Method method, Class<? extends Component>[] components)
         {
             this.handler = handler;
             this.method = method;

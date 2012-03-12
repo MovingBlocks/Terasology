@@ -3,6 +3,10 @@ package org.terasology.logic.systems;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
@@ -13,23 +17,35 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 
 import javax.vecmath.Vector3f;
-import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class ItemSystem {
+public class ItemSystem implements EventHandlerSystem {
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
-    
-    public ItemSystem(EntityManager entityManager) {
-        this.entityManager = entityManager;
+
+    public void initialise() {
+        entityManager = CoreRegistry.get(EntityManager.class);
+        worldProvider = CoreRegistry.get(IWorldProvider.class);
     }
 
-    public void setWorldProvider(IWorldProvider worldProvider) {
-        this.worldProvider = worldProvider;
+    /**
+     * When an item is destroyed, remove it from its container.
+     * @param event
+     * @param itemEntity
+     */
+    @ReceiveEvent(components=ItemComponent.class)
+    public void onDestroy(RemovedComponentEvent event, EntityRef itemEntity) {
+        ItemComponent item = itemEntity.getComponent(ItemComponent.class);
+        if (item.container != null) {
+            InventoryComponent inventory = item.container.getComponent(InventoryComponent.class);
+            int index = inventory.itemSlots.indexOf(itemEntity);
+            if (index != -1) {
+                inventory.itemSlots.set(index, null);
+            }
+        }
     }
-    
     
     public void useItemOnBlock(EntityRef item, EntityRef user, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection) {
         if (item == null) return;
@@ -41,26 +57,12 @@ public class ItemSystem {
             if (placeBlock(placeableBlock.blockGroup, targetBlock, surfaceDirection, secondaryDirection)) {
                 itemComp.stackCount--;
                 if (itemComp.stackCount == 0) {
-                    destroyItem(item, itemComp);
+                    item.destroy();
                 }
             }
         }
         // TODO: Normal items
 
-    }
-
-    public void destroyItem(EntityRef item, ItemComponent itemComp) {
-        if (itemComp.container != null) {
-            InventoryComponent inventory = itemComp.container.getComponent(InventoryComponent.class);
-            if (inventory == null)
-                return;
-
-            int slot = inventory.itemSlots.indexOf(item);
-            if (slot != -1) {
-                inventory.itemSlots.set(slot, null);
-            }
-        }
-        item.destroy();
     }
 
     // useItem (no target)
@@ -84,7 +86,7 @@ public class ItemSystem {
         if (block == null)
             return false;
 
-        if (canPlaceBlock(block, targetBlock, placementPos, surfaceDirection, secondaryDirection)) {
+        if (canPlaceBlock(block, targetBlock, placementPos)) {
             worldProvider.setBlock(placementPos.x, placementPos.y, placementPos.z, block.getId(), true, true);
             AudioManager.play("PlaceBlock", 0.5f);
             return true;
@@ -103,15 +105,13 @@ public class ItemSystem {
         return false;
     }
     
-    private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPoar, Side surfaceDirection, Side secondaryDirection) {
+    private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
         Block centerBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z));
 
         if (!centerBlock.isAllowBlockAttachment()) {
             return false;
         }
 
-        Vector3i blockPos = new Vector3i(targetBlock);
-        blockPos.add(surfaceDirection.getVector3i());
         Block adjBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z));
         if (adjBlock != null && !adjBlock.isInvisible() && !adjBlock.isSelectionRayThrough()) {
             return false;

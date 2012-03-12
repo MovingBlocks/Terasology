@@ -3,6 +3,7 @@ package org.terasology.entitySystem;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.stubs.IntegerComponent;
@@ -115,7 +116,7 @@ public class PojoEventSystemTests {
         
     }
     
-    public static class TestEventHandler implements EventHandler {
+    public static class TestEventHandler implements EventHandlerSystem {
 
         List<Received> receivedList = Lists.newArrayList();        
         
@@ -128,7 +129,11 @@ public class PojoEventSystemTests {
         public void handleIntegerEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
         }
-        
+
+        public void initialise() {
+
+        }
+
         public static class Received {
             TestEvent event;
             EntityRef entity;
@@ -140,13 +145,17 @@ public class PojoEventSystemTests {
         }
     }
 
-    public static class TestCompoundComponentEventHandler implements EventHandler {
+    public static class TestCompoundComponentEventHandler implements EventHandlerSystem {
 
         List<Received> receivedList = Lists.newArrayList();
 
         @ReceiveEvent(components = {StringComponent.class, IntegerComponent.class})
         public void handleStringEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
+        }
+
+        public void initialise() {
+
         }
 
         public static class Received {

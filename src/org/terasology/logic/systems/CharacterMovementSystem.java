@@ -5,10 +5,12 @@ import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.logic.world.WorldUtil;
 import org.terasology.model.blocks.Block;
@@ -25,7 +27,7 @@ import java.util.List;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class CharacterMovementSystem {
+public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
     public static final float UnderwaterGravity = 0.25f;
     public static final float Gravity = 28.0f;
@@ -39,6 +41,11 @@ public class CharacterMovementSystem {
 
     // For reuse to save memory churn
     private AABB entityAABB = new AABB(new Vector3d(), new Vector3d());
+    
+    public void initialise() {
+        entityManager = CoreRegistry.get(EntityManager.class);
+        worldProvider = CoreRegistry.get(IWorldProvider.class);
+    }
     
     public void update(float delta) {
         float deltaSeconds = (delta / 1000f);
@@ -56,22 +63,6 @@ public class CharacterMovementSystem {
             entity.saveComponent(location);
             entity.saveComponent(movementComp);
         }
-    }
-
-    public void setEntityManager(EntityManager em) {
-        this.entityManager = em;
-    }
-
-    public EntityManager getEntityManager() {
-        return entityManager;
-    }
-
-    public void setWorldProvider(IWorldProvider worldProvider) {
-        this.worldProvider = worldProvider;
-    }
-
-    public IWorldProvider getWorldProvider() {
-        return worldProvider;
     }
 
     private void updateSwimStatus(LocationComponent location, AABBCollisionComponent aabb, CharacterMovementComponent movementComp) {

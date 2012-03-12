@@ -5,6 +5,8 @@ import org.terasology.components.BlockComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.componentSystem.RenderSystem;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
@@ -24,14 +26,15 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class BlockDamageRenderer {
+public class BlockDamageRenderer implements RenderSystem {
     
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
     private Mesh overlayMesh;
 
-    public BlockDamageRenderer(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public void initialise() {
+        this.entityManager = CoreRegistry.get(EntityManager.class);
+        this.worldProvider = CoreRegistry.get(IWorldProvider.class);
         Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
 
@@ -39,8 +42,8 @@ public class BlockDamageRenderer {
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh = tessellator.generateMesh();
     }
-    
-    public void render() {
+
+    public void renderOverlay() {
 
         ShaderManager.getInstance().enableDefaultTextured();
         TextureManager.getInstance().bindTexture("effects");
@@ -76,11 +79,11 @@ public class BlockDamageRenderer {
         glDisable(GL11.GL_BLEND);
     }
 
-    public IWorldProvider getWorldProvider() {
-        return worldProvider;
+    public void renderOpaque() {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void setWorldProvider(IWorldProvider worldProvider) {
-        this.worldProvider = worldProvider;
+    public void renderTransparent() {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }
