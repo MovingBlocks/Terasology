@@ -1,6 +1,7 @@
 package org.terasology.components;
 
 import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.EntityRef;
 
 import javax.vecmath.Vector3f;
 

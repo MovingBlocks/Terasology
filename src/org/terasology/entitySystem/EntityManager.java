@@ -26,7 +26,6 @@ public interface EntityManager {
      * @param entityId
      * @return A reference to an existing entity, or null if it doesn't exist
      */
-    //TODO: Not sure this should be exposed
     EntityRef get(long entityId);
 
     /**

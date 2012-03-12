@@ -3,6 +3,7 @@ package org.terasology.model.inventory;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.vecmath.Vector2f;
@@ -18,7 +19,7 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
  */
 @SuppressWarnings("rawtypes")
 public class Icon {
-	private static Map<Class, Icon> icons;
+	private static Map<String, Icon> icons;
 
 	private UIGraphicsElement _element;
 	private BlockGroup _blockGroup;
@@ -52,25 +53,21 @@ public class Icon {
 	}
 
 	/**
-	 * Returns the icon for <code>item</code>.
+	 * Returns the icon for <code>name</code>.
 	 *
-	 * @param item the Item to check
+	 * @param name the name of the icon
 	 * @return the Icon for item
 	 */
-	public static Icon get(Item item) {
+	public static Icon get(String name) {
 		if (icons == null) {
 			loadIcons();
 		}
 
-		if (item instanceof ItemBlock) {
-			return new Icon(((ItemBlock) item).getBlockGroup());
-		}
-
-		return icons.get(item.getClass());
+		return icons.get(name.toLowerCase(Locale.ENGLISH));
 	}
 
 	private static void loadIcons() {
-		icons = new HashMap<Class, Icon>();
+		icons = new HashMap<String, Icon>();
 
         //TODO: Hmm, does this mean we have hard coded our tool displays? Should try to move this to ToolManager in that case?
 		Icon axeIcon = new Icon();
@@ -87,12 +84,12 @@ public class Icon {
 		noteIcon.setAtlasPosition(10, 3);
         greenOrbIcon.setAtlasPosition(14, 1);
 
-		icons.put(ItemAxe.class, axeIcon);
-		icons.put(ItemPickAxe.class, pickAxeIcon);
-		icons.put(ItemDynamite.class, redPowderIcon);
-		icons.put(ItemBlueprint.class, noteIcon);
-        icons.put(ItemDebug.class, greenOrbIcon);
-        icons.put(ItemRailgun.class, testTubeIcon);
+		icons.put("axe", axeIcon);
+		icons.put("pickaxe", pickAxeIcon);
+		icons.put("dynamite", redPowderIcon);
+		icons.put("blueprint", noteIcon);
+        icons.put("debug", greenOrbIcon);
+        icons.put("railgun", testTubeIcon);
 	}
 
 	/**

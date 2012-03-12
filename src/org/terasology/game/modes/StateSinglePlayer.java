@@ -72,6 +72,7 @@ public class StateSinglePlayer implements IGameState {
     private HealthSystem _healthSystem;
     private BlockEntitySystem _blockSystem;
     private BlockParticleEmitterSystem _particleSystem;
+    private ItemSystem _itemSystem;
 
     /* GAME LOOP */
     private boolean _pauseGame = false;
@@ -103,10 +104,11 @@ public class StateSinglePlayer implements IGameState {
         _charMoveSys.setEntityManager(_entityManager);
         _simpleAISys = new SimpleAISystem();
         _simpleAISys.setEntityManager(_entityManager);
+        _itemSystem = new ItemSystem(_entityManager);
         _entityManager.getEventSystem().registerEventHandler(_simpleAISys);
         _charSoundSys = new CharacterSoundSystem();
         _entityManager.getEventSystem().registerEventHandler(_charSoundSys);
-        _localPlayerSys = new LocalPlayerSystem(_entityManager, _blockEntityLookup);
+        _localPlayerSys = new LocalPlayerSystem(_entityManager, _blockEntityLookup, _itemSystem);
         _healthSystem = new HealthSystem(_entityManager);
         _entityManager.getEventSystem().registerEventHandler(_healthSystem);
         _blockSystem = new BlockEntitySystem();
@@ -207,8 +209,7 @@ public class StateSinglePlayer implements IGameState {
         // Init. a new world
         _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys, _particleSystem);
 
-        PlayerFactory playerFactory = new PlayerFactory();
-        playerFactory.setEntityManager(_entityManager);
+        PlayerFactory playerFactory = new PlayerFactory(_entityManager);
 
         _worldRenderer.setPlayer(new LocalPlayer(playerFactory.newInstance()));
 
@@ -223,6 +224,7 @@ public class StateSinglePlayer implements IGameState {
         _charSoundSys.setRandom(_worldRenderer.getWorldProvider().getRandom());
         _localPlayerSys.setWorldProvider(_worldRenderer.getWorldProvider());
         _blockSystem.setWorldProvider(_worldRenderer.getWorldProvider());
+        _itemSystem.setWorldProvider(_worldRenderer.getWorldProvider());
 
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
  * @author Immortius <immortius@gmail.com>
  */
 // TODO: Generalise for non-block particles
-public class BlockParticleEffectComponent extends AbstractComponent {
+public final class BlockParticleEffectComponent extends AbstractComponent {
     public byte blockType;
     public int spawnCount = 16;
     public boolean destroyEntityOnCompletion;

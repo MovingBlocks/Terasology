@@ -39,7 +39,7 @@ public class PojoEventSystem implements EventSystem {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
                 if (!Modifier.isPublic(method.getModifiers())) {
-                    logger.warning(String.format("Cannot register %s of class %s, as it must be public", method.getName(), handlerClass.getName()));
+                    method.setAccessible(true);
                 }
                 Class<?>[] types = method.getParameterTypes();
                              

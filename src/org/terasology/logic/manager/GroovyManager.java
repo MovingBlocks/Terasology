@@ -23,6 +23,7 @@ import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.terasology.components.*;
 import org.terasology.entityFactory.GelatinousCubeFactory;
+import org.terasology.entityFactory.PlaceableBlockFactory;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
 import org.terasology.game.modes.IGameState;
@@ -40,6 +41,7 @@ import javax.vecmath.Color4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,10 +139,8 @@ public class GroovyManager {
         }
 
         public void giveBlock(int blockId, int quantity) {
-            //TODO: Fix inventory
-            /*Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            Item block = new ItemBlock(BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup());
-            player.getInventory().addItem(block, quantity);*/
+            BlockGroup blockGroup = BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup();
+            giveBlock(blockGroup, quantity);
         }
 
         public void giveBlock(String title) {
@@ -148,18 +148,41 @@ public class GroovyManager {
         }
 
         public void giveBlock(String title, int quantity) {
-            // TODO: Fix inventory
-            /*Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            BlockGroup group = BlockManager.getInstance().getBlockGroup(title);
-            if (group == null) {
-                Block block = BlockManager.getInstance().getBlock(title);
-                if (block != null) {
-                    group = block.getBlockGroup();
+            BlockGroup blockGroup = BlockManager.getInstance().getBlockGroup(title);
+            giveBlock(blockGroup, quantity);
+        }
+
+        private void giveBlock(BlockGroup blockGroup, int quantity) {
+            if (quantity < 1) return;
+
+            PlaceableBlockFactory factory = new PlaceableBlockFactory(Terasology.getInstance().getCurrentGameState().getEntityManager());
+            EntityRef item = factory.newInstance(blockGroup);
+            ItemComponent itemComp = item.getComponent(ItemComponent.class);
+            itemComp.stackCount = quantity;
+            InventoryComponent inventory = Terasology.getInstance().getActivePlayer().getEntity().getComponent(InventoryComponent.class);
+
+            // TODO: Move this code elsewhere to be shared (inventory system?)
+            // First check for stacks
+            for (EntityRef itemStack : inventory.itemSlots) {
+                if (itemStack != null) {
+                    ItemComponent stackComp = itemStack.getComponent(ItemComponent.class);
+                    if (itemComp.stackId.equals(stackComp.stackId)) {
+                        stackComp.stackCount += quantity;
+                        item.destroy();
+                        return;
+                    }
                 }
             }
-            if (group != null) {
-                player.getInventory().addItem(new ItemBlock(group), quantity);
-            }             */
+            // Then free spaces
+            int freeSlot = inventory.itemSlots.indexOf(null);
+            if (freeSlot != -1) {
+                inventory.itemSlots.set(freeSlot, item);
+                itemComp.container = Terasology.getInstance().getActivePlayer().getEntity();
+                return;
+            }
+
+            //No room! delete blocks
+            item.destroy();
         }
 
         public void fullHealth() {

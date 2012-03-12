@@ -52,6 +52,11 @@ public class AABB {
         this._dimensions = dimensions;
     }
 
+    public AABB(Vector3f position, Vector3f dimensions) {
+        setPosition(new Vector3d(position));
+        this._dimensions = new Vector3d(dimensions);
+    }
+
     /**
      * Creates a new AABB that encapsulates a set of AABBs
      * @param others

@@ -55,7 +55,7 @@ public abstract class VoxelItem extends Item {
         glRotatef(45f, 0.0f, 0.0f, 1.0f);
 
         if (_itemMesh == null) {
-            Icon icon = Icon.get(this);
+            Icon icon = Icon.get("");
             _itemMesh = MeshFactory.getInstance().generateItemMesh(icon.getX(), icon.getY());
         }
 
