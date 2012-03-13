@@ -15,11 +15,11 @@ import java.util.Arrays;
 public class PlayerFactory {
 
     private EntityManager entityManager;
-    private PlaceableBlockFactory blockFactory;
+    private BlockItemFactory blockFactory;
     
     public PlayerFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
-        blockFactory = new PlaceableBlockFactory(entityManager);
+        blockFactory = new BlockItemFactory(entityManager);
     }
     
     public EntityRef newInstance() {

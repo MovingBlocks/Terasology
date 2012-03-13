@@ -40,6 +40,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
+import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
@@ -219,7 +220,8 @@ public class StateSinglePlayer implements IGameState {
         CoreRegistry.put(IWorldProvider.class, _worldRenderer.getWorldProvider());
         CoreRegistry.put(LocalPlayer.class, _worldRenderer.getPlayer());
         CoreRegistry.put(Camera.class, _worldRenderer.getActiveCamera());
-        
+        CoreRegistry.put(BulletPhysicsRenderer.class, _worldRenderer.getBulletRenderer());
+
         for (ComponentSystem system : _componentSystemManager.iterateAll()) {
             system.initialise();
         }

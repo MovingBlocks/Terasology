@@ -100,7 +100,7 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         if (enableDebug) {
             double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
             _debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f", Terasology.getInstance().getAverageFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
-            _debugLine2.setText(String.format("%s", Terasology.getInstance().getActiveWorldRenderer().getPlayer()));
+            _debugLine2.setText(String.format("%s", Terasology.getInstance().getActivePlayer()));
             _debugLine3.setText(String.format("%s", Terasology.getInstance().getActiveWorldRenderer()));
             _debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), Terasology.getInstance().activeTasks()));
         }

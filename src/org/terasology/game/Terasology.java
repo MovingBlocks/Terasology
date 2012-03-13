@@ -231,6 +231,7 @@ public final class Terasology {
             _timer.tick();
 
             // Only process rendering and updating once a second
+            // TODO: Add debug config setting to run even if display inactive
             if (!Display.isActive()) {
                 try {
                     Thread.sleep(1000);

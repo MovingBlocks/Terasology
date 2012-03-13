@@ -23,28 +23,20 @@ import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.terasology.components.*;
 import org.terasology.entityFactory.GelatinousCubeFactory;
-import org.terasology.entityFactory.PlaceableBlockFactory;
+import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.game.modes.IGameState;
 import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.logic.characters.Player;
 import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.systems.InventorySystem;
-import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.inventory.Item;
-import org.terasology.model.inventory.ItemBlock;
-import org.terasology.model.structures.AABB;
 
-import javax.vecmath.Color4f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -158,11 +150,10 @@ public class GroovyManager {
         private void giveBlock(BlockGroup blockGroup, int quantity) {
             if (quantity < 1) return;
 
-            PlaceableBlockFactory factory = new PlaceableBlockFactory(Terasology.getInstance().getCurrentGameState().getEntityManager());
+            BlockItemFactory factory = new BlockItemFactory(Terasology.getInstance().getCurrentGameState().getEntityManager());
             EntityRef item = factory.newInstance(blockGroup);
             ItemComponent itemComp = item.getComponent(ItemComponent.class);
             itemComp.stackCount = quantity;
-            InventoryComponent inventory = Terasology.getInstance().getActivePlayer().getEntity().getComponent(InventoryComponent.class);
 
             InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
             if (!inventorySystem.addItem(Terasology.getInstance().getActivePlayer().getEntity(), item)) {

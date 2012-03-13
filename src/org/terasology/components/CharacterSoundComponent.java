@@ -1,8 +1,8 @@
 package org.terasology.components;
 
 import com.google.common.collect.Lists;
+import org.terasology.audio.Sound;
 import org.terasology.entitySystem.AbstractComponent;
-import org.terasology.logic.audio.Sound;
 
 import java.util.List;
 

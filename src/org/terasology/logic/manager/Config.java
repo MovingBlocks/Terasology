@@ -141,7 +141,7 @@ public final class Config {
     public void setDayNightLengthInMs(long dayNightLengthInMs) {
         _setting.getWorldBuilder().setDayNightLengthInMs(dayNightLengthInMs);
     }
-
+    
     public long getInitialTimeOffsetInMs() {
         return _setting.getWorldBuilder().getInitialTimeOffsetInMs();
     }

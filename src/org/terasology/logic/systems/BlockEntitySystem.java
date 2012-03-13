@@ -7,9 +7,11 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.rendering.physics.BulletPhysicsRenderer;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -28,6 +30,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
     {
         if (worldProvider == null) return;
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+        Block oldBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockComp.getPosition()));
         worldProvider.setBlock(blockComp.getPosition(), EmptyBlockId, true, true);
         // TODO: Need more central handling of these flow on effects
 
@@ -44,12 +47,11 @@ public class BlockEntitySystem implements EventHandlerSystem {
         //worldRenderer.getBlockParticleEmitter().setOrigin(blockPos.toVector3d());
         //worldRenderer.getBlockParticleEmitter().emitParticles(256, currentBlockType);
         // TODO: Sounds
-        //AudioManager.play("RemoveBlock", 0.6f);
+        AudioManager.play("RemoveBlock", 0.6f);
 
         // TODO: Pickups
         /* PHYSICS */
-        //Vector3d pos = blockPos.toVector3d();
-        //_player.getParent().getBulletRenderer().addLootableBlocks(new Vector3f(pos), block);
+        CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
 
         entity.destroy();
     }

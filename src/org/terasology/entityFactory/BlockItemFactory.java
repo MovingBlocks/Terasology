@@ -9,10 +9,10 @@ import org.terasology.model.blocks.BlockGroup;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class PlaceableBlockFactory {
+public class BlockItemFactory {
     private EntityManager entityManager;
 
-    public PlaceableBlockFactory(EntityManager entityManager) {
+    public BlockItemFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
