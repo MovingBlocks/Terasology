@@ -15,10 +15,10 @@
  */
 package org.terasology.logic.manager;
 
-import org.terasology.logic.audio.OpenALManager;
-import org.terasology.logic.audio.Sound;
-import org.terasology.logic.audio.SoundPool;
-import org.terasology.logic.audio.SoundSource;
+import org.terasology.audio.OpenALManager;
+import org.terasology.audio.Sound;
+import org.terasology.audio.SoundPool;
+import org.terasology.audio.SoundSource;
 import org.terasology.logic.entities.MovableEntity;
 
 import javax.vecmath.Vector3d;

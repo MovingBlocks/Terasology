@@ -21,7 +21,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
-import org.terasology.logic.audio.Sound;
+import org.terasology.audio.Sound;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.tools.ITool;
 import org.terasology.logic.world.Chunk;
