@@ -678,4 +678,9 @@ public class Player extends Character {
     public boolean isRenderPlayerModel() {
         return _renderPlayerModel;
     }
+
+    public void resetInventory() {
+        _inventory = new Inventory();
+        loadDefaultItems();
+    }
 }

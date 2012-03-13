@@ -168,5 +168,10 @@ public class GroovyManager {
                 spState.initWorld(title, seed);
             }
         }
+
+        public void resetInventory() {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            player.resetInventory();
+        }
     }
 }
