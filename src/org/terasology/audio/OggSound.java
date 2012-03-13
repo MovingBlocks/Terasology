@@ -1,11 +1,10 @@
-package org.terasology.logic.audio;
+package org.terasology.audio;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
 import org.terasology.utilities.OggReader;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

@@ -10,8 +10,14 @@ apply plugin: 'groovy'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
+idea {
+  project {
+    jdkName = '1.6'
+  }
+}
+
 sourceCompatibility = 1.5
-version = '0.5.0'
+//version = '0.5.0' //TODO: Disabled version tagging until we actually have something solid to do with it (was breaking old artifact links)
 buildDir = 'out'
 
 sourceSets {

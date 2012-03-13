@@ -1,9 +1,8 @@
-package org.terasology.logic.audio;
+package org.terasology.audio;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import static org.lwjgl.openal.AL10.*;
