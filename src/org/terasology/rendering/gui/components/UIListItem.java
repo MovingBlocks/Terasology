@@ -27,6 +27,10 @@ public class UIListItem extends UIDisplayContainer {
         _label.setPosition(new Vector2f((getPosition().x + _padding.x), (getPosition().y + _padding.y)));
         _label.setText(_text);
 
+        if(getSize().x<_label.getTextWidth()){
+            setSize(new Vector2f(_label.getTextWidth(), getSize().y));
+        }
+        
         addDisplayElement(_label);
 
     }

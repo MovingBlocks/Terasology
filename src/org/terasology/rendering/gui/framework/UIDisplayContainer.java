@@ -20,6 +20,8 @@ import javax.vecmath.Vector4f;
 import java.util.ArrayList;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.components.UIScrollBar;
 
 /**
@@ -30,9 +32,17 @@ import org.terasology.rendering.gui.components.UIScrollBar;
 public abstract class UIDisplayContainer extends UIDisplayElement {
 
     final ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
-    private boolean _crop          = false;
-    private boolean _scrollable    = false;
-    private UIScrollBar _scrollBar = null;
+    private boolean _crop               = false;
+    private boolean _showTexturedBorder = false;
+
+    //Textures for borders
+    private  UIGraphicsElement _borderTop;
+    private  UIGraphicsElement _borderRight;
+    private  UIGraphicsElement _borderBottom;
+    private  UIGraphicsElement _borderLeft;
+    private  Vector2f          _borderTextureSize;
+    private  Vector2f          _borderTexturePosition;
+    private  float             _borderWidth = 0f;
 
     private Vector4f _cropMargin = new Vector4f(/*TOP*/    0.0f,
                                                 /*RIGHT*/  0.0f,
@@ -53,17 +63,36 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     }
 
     public void render() {
+        boolean testCrop = false;
+        int cropX      = 0;
+        int cropY      = 0;
+        int cropWidth  = 0;
+        int cropHeight = 0;
+
         if (!isVisible())
             return;
 
         //Cut the elements
         if(_crop){
+            cropX      = (int)getPosition().x - (int)(_cropMargin.w);
+            cropY      = Display.getHeight()-((int)getPosition().y + (int)getSize().y + (int)_cropMargin.z);
+            cropWidth  = (int)getSize().x + (int)_cropMargin.y - (int)_borderWidth;
+            cropHeight = (int)getSize().y + (int)_cropMargin.x + (int)_cropMargin.z;
             glEnable(GL_SCISSOR_TEST);
-            glScissor((int)getPosition().x - (int)_cropMargin.w, Display.getHeight()-((int)getPosition().y + (int)getSize().y - (int)_cropMargin.x), (int)getSize().x + (int)_cropMargin.y, (int)getSize().y + (int)_cropMargin.z);
+            glScissor(cropX, cropY, cropWidth, cropHeight);
         }
+
         // Render all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
+            testCrop = _crop&&!_displayElements.get(i).isCroped();
+            if(testCrop){
+                glDisable(GL_SCISSOR_TEST);
+            }
             _displayElements.get(i).renderTransformed();
+            if(testCrop){
+                glEnable(GL_SCISSOR_TEST);
+                glScissor(cropX, cropY, cropWidth, cropHeight);
+            }
         }
 
         if(_crop){
@@ -78,6 +107,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         // Update all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
             _displayElements.get(i).update();
+        }
+
+        if(_showTexturedBorder){
+            updateBorders();
         }
     }
 
@@ -130,6 +163,57 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     public void setCropMargin(Vector4f margin){
         _cropMargin = margin;
+    }
+
+    public void setBorderTexture(String textureName, Vector2f textureSize, Vector2f texturePosition, float borderWidth){
+        _showTexturedBorder    = true;
+        _borderTexturePosition = texturePosition;
+        _borderTextureSize     = textureSize;
+        _borderWidth           = borderWidth;
+
+        _borderTop = new UIGraphicsElement(textureName);
+        _borderTop.setVisible(true);
+        _borderTop.setCroped(false);
+        _borderTop.getTextureSize().set(_borderTextureSize);
+
+        _borderRight = new UIGraphicsElement(textureName);
+        _borderRight.setVisible(true);
+        _borderRight.setCroped(false);
+        _borderRight.setPosition(new Vector2f(getSize().x, getPosition().y));
+        _borderRight.setRotateAngle(90f);
+        _borderRight.getTextureSize().set(_borderTextureSize);
+
+        _borderBottom = new UIGraphicsElement(textureName);
+        _borderBottom.setVisible(true);
+        _borderBottom.setCroped(false);
+        _borderBottom.setPosition(new Vector2f(getSize().x, getSize().y));
+        _borderBottom.setRotateAngle(180f);
+        _borderBottom.getTextureSize().set(_borderTextureSize);
+
+        _borderLeft = new UIGraphicsElement(textureName);
+        _borderLeft.setVisible(true);
+        _borderLeft.setCroped(false);
+        _borderLeft.setRotateAngle(90f);
+        _borderLeft.getTextureSize().set(_borderTextureSize);
+
+        addDisplayElement(_borderTop);
+        addDisplayElement(_borderRight);
+        addDisplayElement(_borderBottom);
+        addDisplayElement(_borderLeft);
+    }
+
+    private void updateBorders(){
+        _borderTop.setSize(new Vector2f(getSize().x, _borderWidth));
+        _borderTop.getTextureOrigin().set(_borderTexturePosition.x, _borderTexturePosition.y);
+
+        _borderRight.setSize(new Vector2f(getSize().y, _borderWidth));
+        _borderRight.getTextureOrigin().set(_borderTexturePosition.x, _borderTexturePosition.y);
+
+        _borderBottom.setSize(new Vector2f(getSize().x, _borderWidth));
+        _borderBottom.getTextureOrigin().set(_borderTexturePosition.x, _borderTexturePosition.y);
+
+        _borderLeft.setSize(new Vector2f(getSize().y, _borderWidth));
+        _borderLeft.getTextureOrigin().set(_borderTexturePosition.x, _borderTexturePosition.y);
     }
 
 }

@@ -4,145 +4,153 @@ import org.terasology.rendering.gui.components.UIScrollBar;
 
 import javax.vecmath.Vector2f;
 
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
 
 public class UIScrollableDisplayContainer extends UIDisplayContainer{
-    private UIScrollBar _scrollBarH   = null;
-    private UIScrollBar _scrollBarV   = null;
 
-    private float      _contentHeight = 1.0f;
-    private float      _contentWidth  = 1.0f;
+    /*
+     * ScrollBars
+     */
+    private UIScrollBar _scrollBarVertical   = null;
+    private UIScrollBar _scrollBarHorizontal = null;
 
-    private float      _verticalShift   = 0.0f;
-    private float      _horizontalShift = 0.0f;
+    private float      _contentHeight         = 1.0f;
+    private float      _contentWidth          = 1.0f;
+    private float      _scrollShiftVertical   = 0.0f;
+    private float      _scrollShiftHorizontal = 0.0f;
 
-    private Vector2f   _containerPosV  = null;
-    private Vector2f   _containerPosH  = null;
+    private Vector2f   _containerPosVertical   = null;
+    private Vector2f   _containerPosHorizontal = null;
 
     public UIScrollableDisplayContainer(){
         super();
-        _scrollBarV = new UIScrollBar(getSize(), UIScrollBar.ScrollType.vertical);
-        _scrollBarV.setVisible(true);
+        _scrollBarVertical   = new UIScrollBar(getSize(), UIScrollBar.ScrollType.vertical);
+        _scrollBarHorizontal = new UIScrollBar(getSize(), UIScrollBar.ScrollType.horizontal);
 
-        _scrollBarH = new UIScrollBar(getSize(),UIScrollBar.ScrollType.horizontal);
-        _scrollBarH.setVisible(true);
+        _scrollBarVertical.setVisible(true);
+        _scrollBarHorizontal.setVisible(true);
 
-        addDisplayElement(_scrollBarV);
-        addDisplayElement(_scrollBarH);
+        _scrollBarVertical.setCroped(false);
+        _scrollBarHorizontal.setCroped(false);
 
-        _scrollBarV.addScrollListener( new IScrollListener() {
+        addDisplayElement(_scrollBarVertical);
+        addDisplayElement(_scrollBarHorizontal);
+
+        _scrollBarVertical.addScrollListener(new IScrollListener() {
             public void scrolled(UIDisplayElement element) {
-
-                _verticalShift -= _scrollBarV.getScrollShift();
-
-                for(UIDisplayElement displayElement:getDisplayElements()){
-                    if(displayElement.canMove()){
-                        displayElement.getPosition().y -= _scrollBarV.getScrollShift();
+                _scrollShiftVertical += _scrollBarVertical.getScrollShift();
+                for (UIDisplayElement displayElement : getDisplayElements()) {
+                    if (!displayElement.isFixed()) {
+                        displayElement.getPosition().y -= _scrollBarVertical.getScrollShift();
                     }
                 }
             }
         });
 
-        _scrollBarH.addScrollListener( new IScrollListener() {
+        _scrollBarHorizontal.addScrollListener(new IScrollListener() {
             public void scrolled(UIDisplayElement element) {
-
-                _horizontalShift -= _scrollBarH.getScrollShift();
-
-                for(UIDisplayElement displayElement:getDisplayElements()){
-                    if(displayElement.canMove()){
-                        displayElement.getPosition().x -= _scrollBarH.getScrollShift();
+                _scrollShiftHorizontal += _scrollBarHorizontal.getScrollShift();
+                for (UIDisplayElement displayElement : getDisplayElements()) {
+                    if (!displayElement.isFixed()) {
+                        displayElement.getPosition().x -= _scrollBarHorizontal.getScrollShift();
                     }
                 }
             }
         });
-
     }
 
     public void setScrollBarsPosition(Vector2f position, Vector2f size){
-        _containerPosV = new Vector2f(position.x + size.x, position.y);
-        _containerPosH = new Vector2f(position.x, position.y + size.y);
+        _containerPosVertical = new Vector2f(position.x + size.x, position.y);
+        _scrollBarVertical.setPosition(_containerPosVertical);
+        _scrollBarVertical.setMaxMin(0.0f, getSize().y);
 
-        _scrollBarV.setPosition(_containerPosV);
-        _scrollBarV.setMaxMin(0.0f, getSize().y);
-
-        _scrollBarH.setPosition(_containerPosH);
-        _scrollBarH.setMaxMin(0.0f, getSize().x);
-
+        _containerPosHorizontal = new Vector2f(position.x, position.y + size.y);
+        _scrollBarHorizontal.setPosition(_containerPosHorizontal);
+        _scrollBarHorizontal.setMaxMin(0.0f, getSize().x);
     }
 
+    public void render(){
+        super.render();
+    }
+
+    //ToDo Refator this
     public void update(){
-        if(!_scrollBarV.isScrolled()){
-            updateScrollBars();
+
+        boolean verticalScrollIsScrolled   = _scrollBarVertical.isScrolled();
+        boolean horizontalScrollIsScrolled = _scrollBarHorizontal.isScrolled();
+        float checkConfusionVertical   = 0.0f;
+        float checkConfusionHorizontal = 0.0f;
+
+
+        if(!verticalScrollIsScrolled){
+            _contentHeight = 0.0f;
         }
-        super.update();
-    }
 
-    private void updateScrollBars(){
-        _contentHeight = 0.0f;
-        _contentWidth  = 0.0f;
-
-        float maxElementPosV = 0.0f;
-        float maxElementPosH = 0.0f;
-
-        float checkVerticalConfusion   = 0.0f;
-        float checkHorizontalConfusion = 0.0f;
+        if(!horizontalScrollIsScrolled){
+            _contentWidth = 0.0f;
+        }
 
         for(UIDisplayElement displayElement:getDisplayElements()){
-            if(displayElement.canMove()){
+            if(!displayElement.isFixed()){
+                if(!verticalScrollIsScrolled){
+                    if(_contentHeight<=(displayElement.getPosition().y + _scrollShiftVertical + displayElement.getSize().y)){
+                        _contentHeight = displayElement.getPosition().y + displayElement.getSize().y + _scrollShiftVertical;
+                    }
 
-                if(maxElementPosV<displayElement.getPosition().y){
-                    maxElementPosV  = displayElement.getPosition().y;
-                   _contentHeight  = displayElement.getPosition().y + displayElement.getSize().y + _verticalShift;
+                    if(!_scrollBarVertical.isVisible()&&displayElement.getPosition().y<checkConfusionVertical){
+                        checkConfusionVertical = displayElement.getPosition().y;
+                    }
                 }
 
-                if(maxElementPosH<displayElement.getPosition().x){
-                    maxElementPosH  = displayElement.getPosition().x;
-                    _contentWidth  = displayElement.getPosition().x + displayElement.getSize().x + _horizontalShift;
-                }
+                if(!horizontalScrollIsScrolled){
+                    if(_contentWidth<=(displayElement.getPosition().x+_scrollShiftHorizontal+ displayElement.getSize().x)){
+                        _contentWidth = displayElement.getPosition().x + displayElement.getSize().x + _scrollShiftHorizontal;
+                    }
 
-                //ToDo: It's not worked. Fix it.
-                if(displayElement.getPosition().y<checkVerticalConfusion){
-                    checkVerticalConfusion = displayElement.getPosition().y;
-                }
-
-                if(displayElement.getPosition().x<checkHorizontalConfusion){
-                    checkHorizontalConfusion = displayElement.getPosition().x;
+                    if(!_scrollBarHorizontal.isVisible()&&displayElement.getPosition().x<checkConfusionHorizontal){
+                        checkConfusionHorizontal = displayElement.getPosition().x;
+                    }
                 }
             }
         }
 
 
-        if(_contentHeight<=getSize().y&&_scrollBarV.isVisible()){
-            _scrollBarV.setVisible(false);
-        }else if(_contentHeight>getSize().y&&!_scrollBarV.isVisible()){
-            _scrollBarV.setPosition(_containerPosV);
-            _scrollBarV.setVisible(true);
+        if(_contentHeight<=getSize().y&&_scrollBarVertical.isVisible()){
+            _scrollBarVertical.setVisible(false);
+        }else if(_contentHeight>getSize().y&&!_scrollBarVertical.isVisible()){
+            _scrollBarVertical.setPosition(_containerPosVertical);
+            _scrollBarVertical.setVisible(true);
         }
 
-        if(_contentWidth<=getSize().x&&_scrollBarH.isVisible()){
-            _scrollBarH.setVisible(true);
-        }else if(_contentWidth>getSize().x&&!_scrollBarH.isVisible()){
-            _scrollBarH.setPosition(_containerPosH);
-            _scrollBarH.setVisible(true);
+        if(_contentWidth<=getSize().x&&_scrollBarHorizontal.isVisible()){
+            _scrollBarHorizontal.setVisible(false);
+        }else if(_contentWidth>getSize().x&&!_scrollBarHorizontal.isVisible()){
+            _scrollBarHorizontal.setPosition(_containerPosHorizontal);
+            _scrollBarHorizontal.setVisible(true);
         }
 
-        //Todo: It's very bad.
-        if(checkVerticalConfusion<0.0f){
+        if(checkConfusionVertical<0.0f){
             for(UIDisplayElement displayElement:getDisplayElements()){
-                if(displayElement.canMove()){
-                    displayElement.getPosition().y += (-1)*checkVerticalConfusion;
+                if(!displayElement.isFixed()){
+                    displayElement.getPosition().y += (-1)*checkConfusionVertical;
                 }
             }
         }
 
-        if(checkHorizontalConfusion<0.0f){
+        if(checkConfusionHorizontal<0.0f){
             for(UIDisplayElement displayElement:getDisplayElements()){
-                if(displayElement.canMove()){
-                    displayElement.getPosition().x += (-1)*checkHorizontalConfusion;
+                if(!displayElement.isFixed()){
+                    displayElement.getPosition().x += (-1)*checkConfusionHorizontal;
                 }
             }
         }
 
-        _scrollBarV.setStep(_contentHeight, getSize().y);
-        _scrollBarH.setStep(_contentWidth,  getSize().x);
+        _scrollBarVertical.setStep(_contentHeight, getSize().y);
+        _scrollBarHorizontal.setStep(_contentWidth, getSize().x);
+
+        super.update();
     }
 }
