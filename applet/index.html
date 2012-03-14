@@ -1,70 +1,35 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-    <title>Terasology Applet</title>
-</head>
-
-<body>
-
-<b>NOTE:</b> You should get a prompt to trust content from LWJGL (our graphics library) and MovingBlocks (our stuff!).
-<br><br>
-It may take a few moments to load everything - please be patient :-)<br><br>
-
-<applet code="org.lwjgl.util.applet.AppletLoader" archive="lwjgl_util_applet.jar" codebase="." width="640" height="480">
-
-    <!-- The following tags are mandatory -->
-
-    <!-- Name of Applet, will be used as name of directory it is saved in, and will uniquely identify it in cache -->
-    <param name="al_title" value="Terasology">
-
-    <!-- Main Applet Class -->
-    <param name="al_main" value="org.terasology.game.TerasologyApplet">
-
-    <!-- List of Jars to add to classpath -->
-    <param name="al_jars" value="lwjgl_applet.jar, lwjgl.jar, jinput.jar, lwjgl_util.jar, Terasology.jar">
-
-    <!-- signed windows natives jar in a jar -->
-    <param name="al_windows" value="windows_natives.jar">
-
-    <!-- signed linux natives jar in a jar -->
-    <param name="al_linux" value="linux_natives.jar">
-
-    <!-- signed mac osx natives jar in a jar -->
-    <param name="al_mac" value="macosx_natives.jar">
-
-    <!-- signed solaris natives jar in a jar -->
-    <param name="al_solaris" value="solaris_natives.jar">
-
-    <!-- Tags under here are optional -->
-
-    <!-- whether to use cache - defaults to true -->
-    <!-- <param name="al_cache" value="true"> -->
-
-    <!-- Version of Applet (case insensitive String), applet files not redownloaded if same version already in cache -->
-    <!-- <param name="al_version" value="0.1"> -->
-
-    <!-- Specify the minimum JRE version required by your applet, defaults to "1.5" -->
-    <!-- <param name="al_min_jre" value="1.6"> -->
-
-    <!-- background color to paint with, defaults to white -->
-    <!-- <param name="boxbgcolor" value="#000000"> -->
-
-    <!-- foreground color to paint with, defaults to black -->
-    <!-- <param name="boxfgcolor" value="#ffffff"> -->
-
-    <!-- logo to paint while loading, will be centered, defaults to "appletlogo.gif" -->
-    <!-- <param name="al_logo" value="appletlogo.gif"> -->
-
-    <!-- progressbar to paint while loading. Will be painted on top of logo, width clipped to percentage done, defaults to "appletprogress.gif" -->
-    <!-- <param name="al_progressbar" value="appletprogress.gif"> -->
-
-    <!-- whether to run in debug mode - this will also make resources extract with a delay allowing you to see the loader process better -->
-    <!-- <param name="al_debug" value="true"> -->
-
-    <!-- whether to prepend host to cache path - defaults to true -->
-    <!-- <param name="al_prepend_host" value="true"> -->
-
-    <param name="separate_jvm" value="true">
-</applet>
-</body>
+	<head>
+	    <title>Terasology | Pre Alpha</title>
+		<style type="text/css">
+			body {
+				background: #000000;
+				color: #FFFFFF;
+				font: 13px Arial, Helvetica, sans-serif;
+			}
+			a {
+				color: #FFFFFF;
+			}
+		</style>
+	</head>
+	<body>
+  	<div align="center">
+		<p>
+			<p><b>Welcome to Terasology | Pre Alpha!</b></p>
+			It may take a few moments to load everything - please be patient... :-)
+		</p>
+		<applet code="org.lwjgl.util.applet.AppletLoader" archive="lwjgl_util_applet.jar" codebase="." width="1280" height="720">
+		    <param name="al_title" value="Terasology">
+		    <param name="al_main" value="org.terasology.game.TerasologyApplet">
+		    <param name="al_jars" value="lwjgl_applet.jar, lwjgl.jar, jinput.jar, lwjgl_util.jar, Terasology.jar">
+		    <param name="al_windows" value="windows_natives.jar">
+		    <param name="al_linux" value="linux_natives.jar">
+		    <param name="al_mac" value="macosx_natives.jar">
+		    <param name="al_solaris" value="solaris_natives.jar">
+		    <param name="separate_jvm" value="true">
+		</applet>
+	<p><b><a href="http://blog.movingblocks.net">http://blog.movingblocks.net</a></b></p>
+	</div>
+	</body>
 </html>

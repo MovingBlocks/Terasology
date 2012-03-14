@@ -20,6 +20,10 @@ sourceCompatibility = 1.5
 //version = '0.5.0' //TODO: Disabled version tagging until we actually have something solid to do with it (was breaking old artifact links)
 buildDir = 'out'
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.0-milestone-8a'
+}
+
 sourceSets {
 	main {
 		java { srcDirs = [] }
