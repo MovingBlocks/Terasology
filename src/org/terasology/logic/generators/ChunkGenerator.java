@@ -17,7 +17,6 @@ package org.terasology.logic.generators;
 
 import org.terasology.logic.world.Chunk;
 import org.terasology.utilities.PerlinNoise;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Generators are used to generate the terrain, to generate caves and to populate the surface.
@@ -59,6 +58,6 @@ public abstract class ChunkGenerator {
      * @param c The chunk to generate/populate
      */
     public void generate(Chunk c) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }

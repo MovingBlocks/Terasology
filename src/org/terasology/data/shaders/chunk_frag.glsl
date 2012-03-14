@@ -46,6 +46,7 @@ void main(){
 
     vec3 finalLightDir = lightDir;
 
+    /* DAYLIGHT BECOMES... MOONLIGHT! */
     if (daylight <= 0.0)
         finalLightDir *= -1.0;
 
@@ -140,9 +141,15 @@ void main(){
     float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2);
 
     torchlight -= flickering;
+    if (torchlight < 0.0)
+        torchlight = 0.0;
+
     blockBrightness += (1.0 - blockBrightness) * torchlight;
     blockBrightness -= flickering * blocklightValue;
     blockBrightness *= blocklightDayIntensity * 0.75;
+
+    if (blockBrightness < 0.0)
+        blockBrightness = 0.0;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
