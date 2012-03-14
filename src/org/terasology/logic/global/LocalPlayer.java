@@ -42,10 +42,7 @@ public class LocalPlayer {
     }
 
     public boolean isCarryingTorch() {
-        PlayerComponent player = entity.getComponent(PlayerComponent.class);
-        if (player != null) {
-            return player.isCarryingTorch;
-        }
+        // TODO: Determine if carrying torch
         return false;
     }
     

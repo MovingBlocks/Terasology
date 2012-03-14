@@ -90,9 +90,9 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
      * @param other
      */
     public Vector3i(Vector3f other) {
-        this.x = IntMath.floorToInt(other.x);
-        this.y = IntMath.floorToInt(other.y);
-        this.z = IntMath.floorToInt(other.z);
+        this.x = TeraMath.floorToInt(other.x);
+        this.y = TeraMath.floorToInt(other.y);
+        this.z = TeraMath.floorToInt(other.z);
     }
 
     /**

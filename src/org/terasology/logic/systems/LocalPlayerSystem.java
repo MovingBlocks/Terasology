@@ -345,6 +345,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
             if (block.isDestructible()) {
                 EntityRef blockEntity = blockEntityLookup.getEntityAt(blockPos);
+                // TODO: Centralise block entity creation elsewhere
                 if (blockEntity == null) {
                     blockEntity = entityManager.create();
                     blockEntity.addComponent(new BlockComponent(blockPos, true));
@@ -352,27 +353,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 }
 
                 blockEntity.send(new DamageEvent(1));
-
-                // TODO: Should these be created by the block rather than the digger?
-                // TODO: Don't create particles if block is destroyed?
-                // TODO: Entity factory
-                
-                EntityRef particlesEntity = entityManager.create();
-                particlesEntity.addComponent(new LocationComponent(blockPos.toVector3f()));
-                BlockParticleEffectComponent particleEffect = new BlockParticleEffectComponent();
-                particleEffect.spawnCount = 64;
-                particleEffect.blockType = currentBlockType;
-                particleEffect.initialVelocityRange.set(4, 4, 4);
-                particleEffect.spawnRange.set(0.3f, 0.3f, 0.3f);
-                particleEffect.destroyEntityOnCompletion = true;
-                particleEffect.minSize = 0.05f;
-                particleEffect.maxSize = 0.1f;
-                particleEffect.minLifespan = 1f;
-                particleEffect.maxLifespan = 1.5f;
-                particleEffect.targetVelocity.set(0,-5, 0);
-                particleEffect.acceleration.set(2f, 2f, 2f);
-                particleEffect.collideWithBlocks = true;
-                particlesEntity.addComponent(particleEffect);
             }
 
             // Play digging sound if the block was not removed

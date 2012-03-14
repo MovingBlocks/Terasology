@@ -22,13 +22,13 @@ import org.terasology.logic.world.Chunk;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class TeraMath {
+public final class TeraMath {
 
-    public static final float HALF_PI = (float)(0.5f * Math.PI);
+    private TeraMath() {}
+
     public static final float RAD_TO_DEG = (float) (180.0f / Math.PI);
     public static final float DEG_TO_RAD = (float) (Math.PI / 180.0f);
-    public static final float METERS_TO_MM = 0.001f;
-    
+
     /**
      * Returns the absolute value.
      *
@@ -60,6 +60,11 @@ public class TeraMath {
     }
 
     public static double fastFloor(double d) {
+        int i = (int) d;
+        return (d < 0 && d != i) ? i - 1 : i;
+    }
+
+    public static float fastFloor(float d) {
         int i = (int) d;
         return (d < 0 && d != i) ? i - 1 : i;
     }
@@ -226,5 +231,47 @@ public class TeraMath {
      */
     public static int calcBlockPosZ(int z1, int z2) {
         return TeraMath.fastAbs(z1 - (z2 * Chunk.CHUNK_DIMENSION_Z));
+    }
+
+    /**
+     * Lowest power of two greater or equal to val
+     * <p/>
+     * For values &lt;= 0 returns 0
+     *
+     * @param val
+     * @return The lowest power of two greater or equal to val
+     */
+    public static int ceilPowerOfTwo(int val) {
+        val--;
+        val = (val >> 1) | val;
+        val = (val >> 2) | val;
+        val = (val >> 4) | val;
+        val = (val >> 8) | val;
+        val = (val >> 16) | val;
+        val++;
+        return val;
+    }
+
+    /**
+     * @param val
+     * @return The size of a power of two - that is, the exponent.
+     */
+    public static int sizeOfPower(int val) {
+        int power = 0;
+        while (val > 1) {
+            val = val >> 1;
+            power++;
+        }
+        return power;
+    }
+
+    public static int floorToInt(float val) {
+        int i = (int) val;
+        return (val < 0 && val != i) ? i - 1 : i;
+    }
+
+    public static int ceilToInt(float val) {
+        int i = (int) val;
+        return (val >= 0 && val != i) ? i + 1 : i;
     }
 }

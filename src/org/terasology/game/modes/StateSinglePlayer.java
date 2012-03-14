@@ -75,8 +75,6 @@ public class StateSinglePlayer implements IGameState {
 
     private EntityManager _entityManager;
     private ComponentSystemManager _componentSystemManager;
-
-    // TODO: More generic handling of systems
     private LocalPlayerSystem _localPlayerSys;
 
     /* GAME LOOP */

@@ -159,8 +159,6 @@ public class LocationComponentTest {
         TeraAssert.assertEquals(pos1, loc.getWorldPosition(), 0.000001f);
     }
 
-    // TODO: setWorldRotation
-
     @Test
     public void setWorldScaleWorksWithNoParent() {
         loc.setWorldScale(4.0f);

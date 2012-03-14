@@ -33,8 +33,6 @@ public class PojoEventSystem implements EventSystem {
             return;
         }
 
-        // TODO: Refactor
-        // TODO: Work with non-public methods
         logger.info("Registering event handler " + handlerClass.getName());
         for (Method method : handlerClass.getMethods())
         {
@@ -48,6 +46,7 @@ public class PojoEventSystem implements EventSystem {
                 
                 if (types.length == 2 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1]))
                 {
+                    logger.info("Found method: " + method.toString());
                     EventHandlerInfo handlerInfo = new EventHandlerInfo(handler, method, receiveEventAnnotation.components());
                     for (Class<? extends Component> c : receiveEventAnnotation.components()) {
                         Multimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get((Class<? extends Event>) types[0]);

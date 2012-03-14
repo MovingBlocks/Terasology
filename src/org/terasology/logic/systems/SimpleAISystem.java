@@ -38,7 +38,7 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
 
             Vector3f worldPos = location.getWorldPosition();
             moveComp.getDrive().set(0,0,0);
-            // TODO: shouldn't use local player
+            // TODO: shouldn't use local player, need some way to find nearest player
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
             if (localPlayer != null)
             {

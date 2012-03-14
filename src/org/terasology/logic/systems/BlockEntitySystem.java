@@ -1,9 +1,13 @@
 package org.terasology.logic.systems;
 
 import org.terasology.components.BlockComponent;
+import org.terasology.components.BlockParticleEffectComponent;
+import org.terasology.components.LocationComponent;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
@@ -20,8 +24,10 @@ public class BlockEntitySystem implements EventHandlerSystem {
     private static byte EmptyBlockId = 0x0;
 
     private IWorldProvider worldProvider;
+    private EntityManager entityManager;
 
     public void initialise() {
+        entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
     }
 
@@ -32,7 +38,6 @@ public class BlockEntitySystem implements EventHandlerSystem {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
         Block oldBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockComp.getPosition()));
         worldProvider.setBlock(blockComp.getPosition(), EmptyBlockId, true, true);
-        // TODO: Need more central handling of these flow on effects
 
         // TODO: A bunch of notification?
 
@@ -43,13 +48,8 @@ public class BlockEntitySystem implements EventHandlerSystem {
             // TODO: Particles here too?
         }
 
-        // TODO: Particle Entities
-        //worldRenderer.getBlockParticleEmitter().setOrigin(blockPos.toVector3d());
-        //worldRenderer.getBlockParticleEmitter().emitParticles(256, currentBlockType);
-        // TODO: Sounds
         AudioManager.play("RemoveBlock", 0.6f);
 
-        // TODO: Pickups
         /* PHYSICS */
         CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
 
@@ -62,6 +62,29 @@ public class BlockEntitySystem implements EventHandlerSystem {
         if (blockComp.temporary) {
             entity.destroy();
         }
+    }
+    
+    @ReceiveEvent(components={BlockComponent.class})
+    public void onDamaged(DamageEvent event, EntityRef entity) {
+        BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+
+        EntityRef particlesEntity = entityManager.create();
+        particlesEntity.addComponent(new LocationComponent(blockComp.getPosition().toVector3f()));
+
+        BlockParticleEffectComponent particleEffect = new BlockParticleEffectComponent();
+        particleEffect.spawnCount = 64;
+        particleEffect.blockType = worldProvider.getBlock(blockComp.getPosition());
+        particleEffect.initialVelocityRange.set(4, 4, 4);
+        particleEffect.spawnRange.set(0.3f, 0.3f, 0.3f);
+        particleEffect.destroyEntityOnCompletion = true;
+        particleEffect.minSize = 0.05f;
+        particleEffect.maxSize = 0.1f;
+        particleEffect.minLifespan = 1f;
+        particleEffect.maxLifespan = 1.5f;
+        particleEffect.targetVelocity.set(0,-5, 0);
+        particleEffect.acceleration.set(2f, 2f, 2f);
+        particleEffect.collideWithBlocks = true;
+        particlesEntity.addComponent(particleEffect);
     }
 
 }
