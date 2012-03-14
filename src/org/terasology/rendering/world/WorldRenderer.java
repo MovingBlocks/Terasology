@@ -154,7 +154,7 @@ public final class WorldRenderer implements IGameObject {
 
             for (int x = -(viewingDistance / 2); x < (viewingDistance / 2); x++) {
                 for (int z = -(viewingDistance / 2); z < (viewingDistance / 2); z++) {
-                    Chunk c = _worldProvider.getChunkProvider().loadOrCreateChunk(calcCamChunkOffsetX() + x, calcCamChunkOffsetZ() + z);
+                    Chunk c = _worldProvider.getChunkProvider().getChunk(calcCamChunkOffsetX() + x, 0, calcCamChunkOffsetZ() + z);
                     _chunksInProximity.add(c);
                 }
             }
@@ -666,7 +666,7 @@ public final class WorldRenderer implements IGameObject {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %d, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {

@@ -96,7 +96,7 @@ public class TeraMath {
     /**
      * Maps any given value to be positive only.
      */
-    public static int mapToPositive(int x) {
+    public static long mapToPositive(long x) {
         if (x >= 0)
             return x * 2;
 
@@ -106,7 +106,7 @@ public class TeraMath {
     /**
      * Recreates the original value after applying "mapToPositive".
      */
-    public static int redoMapToPositive(int x) {
+    public static long undoMapToPositive(long x) {
         if (x % 2 == 0) {
             return x / 2;
         }
@@ -121,7 +121,7 @@ public class TeraMath {
      * @param k2 Y-coordinate
      * @return Unique 1D value
      */
-    public static int cantorize(int k1, int k2) {
+    public static long cantorize(long k1, long k2) {
         return ((k1 + k2) * (k1 + k2 + 1) / 2) + k2;
     }
 
@@ -131,8 +131,8 @@ public class TeraMath {
      * @param c Cantor value
      * @return Value along the x-axis
      */
-    public static int cantorX(int c) {
-        int j = (int) (java.lang.Math.sqrt(0.25 + 2 * c) - 0.5);
+    public static long cantorX(long c) {
+        long j = (long) (java.lang.Math.sqrt(0.25 + 2 * c) - 0.5);
         return j - cantorY(c);
     }
 
@@ -142,8 +142,8 @@ public class TeraMath {
      * @param c Cantor value
      * @return Value along the y-axis
      */
-    public static int cantorY(int c) {
-        int j = (int) (java.lang.Math.sqrt(0.25 + 2 * c) - 0.5);
+    public static long cantorY(long c) {
+        long j = (long) (java.lang.Math.sqrt(0.25 + 2 * c) - 0.5);
         return c - j * (j + 1) / 2;
     }
 
