@@ -33,7 +33,7 @@ public class ChunkTessellatorPerformanceTest {
         {
             for (int z = -1; z < 7; ++z)
             {
-                Chunk chunk = worldProv.getChunkProvider().loadOrCreateChunk(x,z);
+                Chunk chunk = worldProv.getChunkProvider().getChunk(x, z);
                 chunk.generate();
                 chunk.updateLight();
             }
@@ -41,7 +41,7 @@ public class ChunkTessellatorPerformanceTest {
 
         for (int i = 0; i < 5; ++i)
         {
-            Chunk chunk = worldProv.getChunkProvider().loadOrCreateChunk(0,i);
+            Chunk chunk = worldProv.getChunkProvider().getChunk(0, i);
             long startTime = Sys.getTime();
             chunk.generateMeshes();
             long endTime = Sys.getTime();
