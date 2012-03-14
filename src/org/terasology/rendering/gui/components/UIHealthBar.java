@@ -15,7 +15,10 @@
  */
 package org.terasology.rendering.gui.components;
 
+import org.terasology.components.HealthComponent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.global.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -55,13 +58,19 @@ public class UIHealthBar extends UIDisplayContainer {
 
         super.update();
 
-        // TODO: Health
+        float healthRatio = 0;
+        HealthComponent healthComp = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(HealthComponent.class);
+        if (healthComp != null) {
+            healthRatio = (float) healthComp.currentHealth / healthComp.maxHealth;
+        }
+
         // Show/Hide hearts relatively to the available health points of the player
-        /*for (int i = 0; i < 10; i++) {
-            if (i < Terasology.getInstance().getActiveWorldRenderer().getPlayer().getHealthPercentage() * 10f)
+        for (int i = 0; i < 10; i++) {
+            
+            if (i < healthRatio * 10f)
                 _hearts[i].setVisible(true);
             else
                 _hearts[i].setVisible(false);
-        } */
+        }
     }
 }

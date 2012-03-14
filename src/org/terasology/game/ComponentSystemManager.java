@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Simple manager for component systems.
+ * This is an initial, rough implementation to be improved later.
  * @author Immortius <immortius@gmail.com>
  */
 public class ComponentSystemManager {

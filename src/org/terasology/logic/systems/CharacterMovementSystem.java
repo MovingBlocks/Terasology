@@ -184,18 +184,19 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         extents.scale(location.getWorldScale());
 
         if (verticalHitTest(worldPos, oldPos, extents)) {
+            if (!movementComp.isGrounded) {
+                entity.send(new VerticalCollisionEvent(movementComp.getVelocity(), worldPos));
+                movementComp.isGrounded = true;
+            }
             movementComp.getVelocity().y = 0;
-
             // Jumping is only possible, if the entity is standing on ground
             if (movementComp.jump) {
                 entity.send(new JumpEvent());
                 movementComp.jump = false;
                 movementComp.isGrounded = false;
                 movementComp.getVelocity().y += movementComp.jumpSpeed;
-            } else if (!movementComp.isGrounded) { // Entity reaches the ground
-                entity.send(new VerticalCollisionEvent(movementComp.getVelocity(), worldPos));
-                movementComp.isGrounded = true;
             }
+
         } else {
             movementComp.isGrounded = false;
             movementComp.jump = false;

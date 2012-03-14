@@ -22,11 +22,14 @@ public class PlayerFactory {
         blockFactory = new BlockItemFactory(entityManager);
     }
     
-    public EntityRef newInstance() {
+    public EntityRef newInstance(Vector3f spawnPosition) {
         EntityRef player = entityManager.create();
 
-        player.addComponent(new LocationComponent());
-        player.addComponent(new PlayerComponent());
+        player.addComponent(new LocationComponent(spawnPosition));
+        PlayerComponent playerComponent = new PlayerComponent();
+        playerComponent.spawnPosition.set(spawnPosition);
+        player.addComponent(playerComponent);
+        player.addComponent(new HealthComponent(255, 5, 2f));
 
         AABBCollisionComponent collision = player.addComponent(new AABBCollisionComponent());
         collision.setExtents(new Vector3f(.3f, 0.8f, .3f));

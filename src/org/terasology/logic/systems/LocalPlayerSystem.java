@@ -8,12 +8,16 @@ import org.lwjgl.input.Mouse;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.componentSystem.RenderSystem;
 import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
 import org.terasology.events.DamageEvent;
+import org.terasology.events.NoHealthEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.IWorldProvider;
@@ -34,7 +38,7 @@ import java.util.List;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
+public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, EventHandlerSystem {
 
     private static TIntIntMap inventorySlotBindMap = new TIntIntHashMap();
     
@@ -80,11 +84,30 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     }
 
     public void update(float delta) {
+        float deltaSeconds = delta / 1000;
         // TODO: Refactor
-        for (EntityRef entity : entityManager.iteratorEntities(LocalPlayerComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.iteratorEntities(LocalPlayerComponent.class, PlayerComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
             LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
             CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
             LocationComponent location = entity.getComponent(LocationComponent.class);
+            PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
+            
+            if (localPlayerComponent.isDead) {
+                localPlayerComponent.respawnWait -= deltaSeconds;
+                if (localPlayerComponent.respawnWait > 0) {
+                    characterMovementComponent.getDrive().set(0,0,0);
+                    characterMovementComponent.jump = false;
+                    continue;
+                }
+
+                // Respawn
+                localPlayerComponent.isDead = false;
+                HealthComponent health = entity.getComponent(HealthComponent.class);
+                if (health != null) {
+                    health.currentHealth = health.maxHealth;
+                }
+                location.setWorldPosition(playerComponent.spawnPosition);
+            }
 
             // Update look (pitch/yaw)
             localPlayerComponent.viewPitch = TeraMath.clamp(localPlayerComponent.viewPitch + lookInput.y, -89, 89);
@@ -149,14 +172,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         } */
     }
 
-    public void renderOpaque() {
-
-    }
-
-    public void renderTransparent() {
-
-    }
-
     public void renderOverlay() {
         // Display the block the player is aiming at
         if (Config.getInstance().isPlacingBox()) {
@@ -169,6 +184,13 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
             }
         }
 
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onDeath(NoHealthEvent event, EntityRef entity) {
+        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
+        localPlayer.isDead = true;
+        localPlayer.respawnWait = 1.0f;
     }
 
     /**
@@ -187,11 +209,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
             return;
         }
         switch (key) {
-            /*case Keyboard.KEY_K:
+            case Keyboard.KEY_K:
                 if (!repeatEvent && state) {
-                    damage(9999);
+                    CoreRegistry.get(LocalPlayer.class).getEntity().send(new DamageEvent(9999));
                 }
-                break;*/
+                break;
             case Keyboard.KEY_SPACE:
                 if (!repeatEvent && state) {
                     jump = true;
@@ -215,9 +237,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
      * @param wheelMoved Distance the mouse wheel moved since last
      */
     public void processMouseInput(int button, boolean state, int wheelMoved) {
-        /*if (isDead())
-            return; */
-
         if (wheelMoved != 0) {
             for (EntityRef entity : entityManager.iteratorEntities(LocalPlayerComponent.class)) {
                 LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
@@ -245,6 +264,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         for (EntityRef entity : entityManager.iteratorEntities(LocalPlayerComponent.class, InventoryComponent.class)) {
             LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
             InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+
+            if (localPlayer.isDead) continue;
 
             if (Mouse.isButtonDown(0) || button == 0) {
                 EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayer.selectedTool);
@@ -363,8 +384,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     }
 
     public void updateInput() {
-        //if (isDead())
-        //    return;
 
         // Process interactions even if the mouse button is pressed down
         // and not fired by a repeated event
@@ -461,5 +480,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         }
 
         return null;
+    }
+
+
+    public void renderOpaque() {
+
+    }
+
+    public void renderTransparent() {
+
     }
 }

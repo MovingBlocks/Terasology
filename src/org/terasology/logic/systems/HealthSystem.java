@@ -6,9 +6,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
-import org.terasology.events.DamageEvent;
-import org.terasology.events.FullHealthEvent;
-import org.terasology.events.NoHealthEvent;
+import org.terasology.events.*;
 import org.terasology.game.CoreRegistry;
 
 /**
@@ -27,6 +25,7 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
         
         for (EntityRef entity : entityManager.iteratorEntities(HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
+            if (health.currentHealth <= 0) continue;
 
             if (health.currentHealth < health.maxHealth && health.regenRate > 0) {
                 health.timeSinceLastDamage += deltaSeconds;
@@ -48,8 +47,26 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     @ReceiveEvent(components = {HealthComponent.class})
     public void onDamage(DamageEvent event, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
+        applyDamage(entity, health, event.getAmount());
+    }
+    
+    @ReceiveEvent(components = {HealthComponent.class})
+    public void onLand(VerticalCollisionEvent event, EntityRef entity) {
+        HealthComponent health = entity.getComponent(HealthComponent.class);
+
+        if (event.getVelocity().y < 0 && -event.getVelocity().y > health.fallingDamageSpeedThreshold) {
+            int damage = (int)((-event.getVelocity().y - health.fallingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
+            if (damage > 0) {
+                applyDamage(entity, health, damage);
+            }
+        }
+    }
+
+    private void applyDamage(EntityRef entity, HealthComponent health, int damageAmount) {
+        if (health.currentHealth <= 0) return;
+
         health.timeSinceLastDamage = 0;
-        health.currentHealth -= event.getAmount();
+        health.currentHealth -= damageAmount;
         if (health.currentHealth <= 0) {
             entity.send(new NoHealthEvent());
         }

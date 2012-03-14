@@ -44,6 +44,7 @@ import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
+import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -209,8 +210,8 @@ public class StateSinglePlayer implements IGameState {
         _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys);
 
         PlayerFactory playerFactory = new PlayerFactory(_entityManager);
-
-        _worldRenderer.setPlayer(new LocalPlayer(playerFactory.newInstance()));
+        LocalPlayer localPlayer = new LocalPlayer(playerFactory.newInstance(new Vector3f(_worldRenderer.getWorldProvider().nextSpawningPoint())));
+        _worldRenderer.setPlayer(localPlayer);
 
         // Create the first Portal if it doesn't exist yet
         _worldRenderer.initPortal();
