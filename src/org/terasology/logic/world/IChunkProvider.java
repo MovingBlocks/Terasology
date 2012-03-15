@@ -29,7 +29,7 @@ public interface IChunkProvider {
      * @param z The chunk position on the z-axis
      * @return The chunk
      */
-    public Chunk loadOrCreateChunk(int x, int z);
+    public Chunk getChunk(int x, int y, int z);
 
     /**
      * Frees obsolete chunks.
@@ -46,5 +46,5 @@ public interface IChunkProvider {
      *
      * @return The amount of managed chunks
      */
-    public int size();
+    public float size();
 }
