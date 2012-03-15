@@ -1,6 +1,7 @@
 package org.terasology.entityFactory;
 
 import org.terasology.components.ItemComponent;
+import org.terasology.components.LightComponent;
 import org.terasology.components.PlaceableBlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -22,6 +23,9 @@ public class BlockItemFactory {
 
     public EntityRef newInstance(BlockGroup blockGroup, int quantity) {
         EntityRef entity = entityManager.create();
+        if (blockGroup.getArchetypeBlock().getLuminance() > 0) {
+            entity.addComponent(new LightComponent());
+        }
         ItemComponent item = new ItemComponent();
         item.name = blockGroup.getTitle();
         item.consumedOnUse = true;

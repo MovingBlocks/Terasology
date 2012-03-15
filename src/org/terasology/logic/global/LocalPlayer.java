@@ -1,11 +1,9 @@
 package org.terasology.logic.global;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.LocationComponent;
-import org.terasology.components.PlayerComponent;
+import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.model.inventory.Inventory;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -42,7 +40,16 @@ public class LocalPlayer {
     }
 
     public boolean isCarryingTorch() {
-        // TODO: Determine if carrying torch
+        
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
+        if (inventory == null || localPlayer == null)
+            return false;
+        
+        if (inventory.itemSlots.get(localPlayer.selectedTool) != null) {
+            EntityRef item = inventory.itemSlots.get(localPlayer.selectedTool);
+            return item.getComponent(LightComponent.class) != null;
+        }
         return false;
     }
     
