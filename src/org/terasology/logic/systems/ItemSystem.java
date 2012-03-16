@@ -67,15 +67,45 @@ public class ItemSystem implements EventHandlerSystem {
         } else {
             EntityRef targetEntity = blockEntityLookup.getOrCreateEntityAt(targetBlock);
             item.send(new ActivateEvent(targetEntity, user));
+            checkConsumeItem(item, itemComp);
         }
     }
 
-    // useItem (no target)
+    public void useItem(EntityRef item, EntityRef user) {
+        if (item == null) return;
+        ItemComponent itemComp = item.getComponent(ItemComponent.class);
+        if (itemComp == null) return;
 
-    // useItemOnEntity
+        item.send(new ActivateEvent(user, user));
+        checkConsumeItem(item, itemComp);
+    }
 
-    // useItemInDirection
+    public void useItemOnEntity(EntityRef item, EntityRef target, EntityRef user) {
+        if (item == null) return;
+        ItemComponent itemComp = item.getComponent(ItemComponent.class);
+        if (itemComp == null) return;
 
+        item.send(new ActivateEvent(target, user));
+        checkConsumeItem(item, itemComp);
+    }
+
+    public void useItemInDirection(EntityRef item, Vector3f location, Vector3f direction, EntityRef user) {
+        if (item == null) return;
+        ItemComponent itemComp = item.getComponent(ItemComponent.class);
+        if (itemComp == null) return;
+
+        item.send(new ActivateEvent(location, direction, user));
+        checkConsumeItem(item, itemComp);
+    }
+
+    private void checkConsumeItem(EntityRef item, ItemComponent itemComp) {
+        if (itemComp.consumedOnUse) {
+            itemComp.stackCount--;
+            if (itemComp.stackCount == 0) {
+                item.destroy();
+            }
+        }
+    }
 
     /**
      * Places a block of a given type in front of the player.

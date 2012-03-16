@@ -17,6 +17,8 @@ package org.terasology.utilities;
 
 import org.terasology.math.TeraMath;
 
+import javax.vecmath.Vector3f;
+
 /**
  * Random number generator based on the Xorshift generator by George Marsaglia.
  *
@@ -91,6 +93,15 @@ public class FastRandom {
      */
     public float randomFloat() {
         return randomLong() / ((float) Long.MAX_VALUE - 1f);
+    }
+
+    /**
+     *
+     * @return A random vector3f with each value between -1f and 1f
+     */
+    //TODO: Produce a unit vector
+    public Vector3f randomVector3f() {
+        return new Vector3f(randomFloat(), randomFloat(), randomFloat());
     }
 
     /**

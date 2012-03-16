@@ -279,6 +279,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                         case OnBlock:
                             useItemOnBlock(entity, selectedItemEntity);
                             break;
+                        case OnUser:
+                            itemSystem.useItem(selectedItemEntity, entity);
+                            break;
+                        case InDirection:
+                            itemSystem.useItemInDirection(selectedItemEntity, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), entity);
+                            break;
                         default:
                             attack(entity, selectedItemEntity);
                             break;

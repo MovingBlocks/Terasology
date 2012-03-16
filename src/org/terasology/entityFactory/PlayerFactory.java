@@ -50,6 +50,7 @@ public class PlayerFactory {
         inventory.itemSlots.set(2, itemFactory.createAxe());
         inventory.itemSlots.set(3, itemFactory.createPickAxe());
         inventory.itemSlots.set(4, itemFactory.createDynamite());
+        inventory.itemSlots.set(5, itemFactory.createRailgun());
 
         return player;
     } 

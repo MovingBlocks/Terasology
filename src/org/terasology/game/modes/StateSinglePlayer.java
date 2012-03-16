@@ -120,6 +120,7 @@ public class StateSinglePlayer implements IGameState {
         _componentSystemManager.register(new MeshRenderer());
         _componentSystemManager.register(new ExplosionAction());
         _componentSystemManager.register(new PlaySoundAction());
+        _componentSystemManager.register(new TunnelAction());
 
     }
 
