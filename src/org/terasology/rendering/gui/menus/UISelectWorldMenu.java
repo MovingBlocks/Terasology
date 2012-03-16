@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gui.menus;
 
+import org.lwjgl.opengl.Display;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.components.*;
@@ -39,6 +40,7 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
     final UIButton _goToBack;
     final UIButton _addToList;
     final UIButton _deleteFromList;
+    final UIInput  _input;
 
     public UISelectWorldMenu() {
         _overlay = new UIImageOverlay("menuBackground");
@@ -46,6 +48,9 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
+
+        _input = new UIInput(new Vector2f(256f, 30f));
+        _input.setVisible(true);
 
         Object[] worlds = Terasology.getInstance().getListWolds();
 
@@ -85,7 +90,12 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
 
         _addToList.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                _list.addItem("Add world " + _list.size(), "Add world " + _list.size());
+                if(_input.getValue().length()>0){
+                    _list.addItem(_input.getValue(), _input.getValue());
+                }else{
+                    _list.addItem("Add world " + _list.size(), "Add world " + _list.size());
+                }
+
             }
         });
 
@@ -95,13 +105,14 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
             }
         });
 
-        addDisplayElement(_overlay);
-        addDisplayElement(_list);
-        addDisplayElement(_goToBack);
-        addDisplayElement(_addToList);
-        addDisplayElement(_deleteFromList);
+       // addDisplayElement(_overlay);
+      addDisplayElement(_list);
+      addDisplayElement(_goToBack);
+      addDisplayElement(_addToList);
+      addDisplayElement(_deleteFromList);
+      addDisplayElement(_input);
 
-        update();
+      update();
     }
 
     @Override
@@ -110,15 +121,18 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         _list.centerHorizontally();
         _list.getPosition().y = 230f;
 
+        _input.centerHorizontally();
+        _input.getPosition().x = _list.getPosition().x;
+        _input.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
+
+        _addToList.getPosition().x =_input.getPosition().x + _input.getSize().x + 15f;
+        _addToList.getPosition().y =_input.getPosition().y;
+
+        _deleteFromList.getPosition().x = _addToList.getPosition().x;
+        _deleteFromList.getPosition().y = _addToList.getPosition().y  + _addToList.getSize().y + 32f;
+
         _goToBack.centerHorizontally();
-        _goToBack.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
+        _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
 
-        _addToList.centerHorizontally();
-        _addToList.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
-        _addToList.getPosition().x  -= 2*_goToBack.getSize().x;
-
-        _deleteFromList.centerHorizontally();
-        _deleteFromList.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f + _addToList.getSize().y + 32f;
-        _deleteFromList.getPosition().x  -= 2*_goToBack.getSize().x;
     }
 }

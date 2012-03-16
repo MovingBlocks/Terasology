@@ -130,6 +130,14 @@ public class UIList extends UIScrollableDisplayContainer {
 
     }
 
+    public void removeAll(){
+        for (int i = (_items.size() - 1); i >= 0; i--)
+        {
+            removeDisplayElement(_items.get(i));
+            _items.remove(i);
+        }
+    }
+
     public void removeItem(int index){
         removeDisplayElement(_items.get(index));
         _items.remove(index);

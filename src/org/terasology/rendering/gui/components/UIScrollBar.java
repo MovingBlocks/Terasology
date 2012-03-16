@@ -15,9 +15,8 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class UIScrollBar extends UIDisplayContainer {
 
-    //Graphics
-    private List<UIGraphicsElement> _scrollGraphicsElements = new ArrayList<UIGraphicsElement>(); // <- HEADER(0); -- BODY(1); -> FOOTER(2)
-
+    //ScrollBarElements
+    private UIScrollBarThumb _scrolBarThumb;
 
     //Scroll Listeners
     private final ArrayList<IScrollListener> _scrollListeners = new ArrayList<IScrollListener>();
@@ -25,6 +24,7 @@ public class UIScrollBar extends UIDisplayContainer {
     //Options
     private float   _max;
     private float   _min;
+
     private float   _step;
 
     private float _prevMousePos = -1;
@@ -33,8 +33,10 @@ public class UIScrollBar extends UIDisplayContainer {
 
     private boolean _scrolled = false;
 
-    private float _containerLength = 0.0f;
-    private float _scrollShift     = 0.0f;
+    private float _containerLength     = 0.0f;
+    private float _contentLength       = 0.0f;
+    private float _value               = 0.0f;
+    private float _oldValue            = 0.0f;
 
 
     public static enum ScrollType {
@@ -43,28 +45,22 @@ public class UIScrollBar extends UIDisplayContainer {
 
     public UIScrollBar(Vector2f size, ScrollType scrollType){
         setScrollType(scrollType);
-
-        for(int i=0; i<3; i++){
-            _scrollGraphicsElements.add(new UIGraphicsElement("gui_menu"));
-            _scrollGraphicsElements.get(i).setVisible(true);
-            addDisplayElement(_scrollGraphicsElements.get(i));
-        }
-
         switch(_scrollType){
             case vertical:
                 setSize(new Vector2f(15f, size.y));
-                setVerticalOptions(size);
+                _scrolBarThumb = new UIScrollBarThumb(getSize(), ScrollType.vertical);
                 break;
             case horizontal:
                 setSize(new Vector2f(size.x, 15f));
-                setHorizontalPositions();
+                _scrolBarThumb = new UIScrollBarThumb(getSize(), ScrollType.horizontal);
                 break;
         }
-
+        _scrolBarThumb.setVisible(true);
+        addDisplayElement(_scrolBarThumb);
     }
 
     public void update(){
-        updateGraphicsElementsPosition();
+        updateThumb();
 
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
 
@@ -79,6 +75,7 @@ public class UIScrollBar extends UIDisplayContainer {
                     }
                 }
             }
+
         }
 
         if(_scrolled){
@@ -91,18 +88,22 @@ public class UIScrollBar extends UIDisplayContainer {
             _prevMousePos = -1;
             _mouseUp      = false;
         }
+        super.update();
     }
 
     private void scrolled(float mousePos){
 
-        if(_max<(getScrollBarPosition() +  mousePos - _prevMousePos  + getScrollBarSize())){
-            mousePos = _max - getScrollBarSize() + _prevMousePos - getScrollBarPosition();
-        }else if(_min>(getScrollBarPosition() +  mousePos - _prevMousePos)){
-            mousePos = _min + _prevMousePos - getScrollBarPosition();
+        if(_max<(_scrolBarThumb.getThumbPosition() +  mousePos - _prevMousePos  + _scrolBarThumb.getThumbSize())){
+            mousePos = _max - _scrolBarThumb.getThumbSize() + _prevMousePos - _scrolBarThumb.getThumbPosition();
+        }else if(_min>(_scrolBarThumb.getThumbPosition() +  mousePos - _prevMousePos)){
+            mousePos = _min + _prevMousePos - _scrolBarThumb.getThumbPosition();
         }
 
-        _scrollShift = (mousePos - _prevMousePos)/_step;
-        setScrollBarPosition((getScrollBarPosition() +  mousePos - _prevMousePos));
+          
+        _scrolBarThumb.setThumbPosition((_scrolBarThumb.getThumbPosition() +  mousePos - _prevMousePos));
+
+        calculateValue();
+
         _prevMousePos   = mousePos;
 
         for (int i = 0; i < _scrollListeners.size(); i++) {
@@ -114,88 +115,43 @@ public class UIScrollBar extends UIDisplayContainer {
         _scrollListeners.add(listener);
     }
 
-    private void updateGraphicsElementsPosition(){
+    private void updateThumb(){
         float newScrollSize     = _containerLength*_step;
-        float newBodyScrollSize = newScrollSize - _scrollGraphicsElements.get(0).getSize().x*2;
 
-        if(newScrollSize!=getScrollBarSize()){
 
-            if(_scrollType==ScrollType.vertical){
-                setSize(new Vector2f(15f, newScrollSize));
-
-                _scrollGraphicsElements.get(1).setSize(new Vector2f(newBodyScrollSize, 15f));
-                _scrollGraphicsElements.get(2).getPosition().y = _scrollGraphicsElements.get(1).getPosition().y +
-                                                                 _scrollGraphicsElements.get(0).getSize().x     +
-                                                                 _scrollGraphicsElements.get(1).getSize().x;
-            }else{
-                setSize(new Vector2f(newScrollSize, 15f));
-
-                _scrollGraphicsElements.get(1).setSize(new Vector2f(newBodyScrollSize, 15f));
-                _scrollGraphicsElements.get(2).getPosition().x = _scrollGraphicsElements.get(1).getPosition().x +
-                        _scrollGraphicsElements.get(0).getSize().x     +
-                        _scrollGraphicsElements.get(1).getSize().x;
-            }
-
-            if(getScrollBarPosition() + getScrollBarSize()>_max){
-                _prevMousePos = getScrollBarPosition();
-                scrolled((getScrollBarPosition() + getScrollBarSize()) - _max);
-            }
-
+        if(newScrollSize!=_scrolBarThumb.getThumbSize()){
+            _scrolBarThumb.resize(newScrollSize);
         }
 
-        _scrollGraphicsElements.get(0).getTextureOrigin().set(0f, 155f / 512f);
-        _scrollGraphicsElements.get(1).getTextureOrigin().set(7f/512f, 155f / 512f);
-        _scrollGraphicsElements.get(2).getTextureOrigin().set(0f, 155f / 512f);
-
+        if((_scrolBarThumb.getThumbPosition() + _scrolBarThumb.getThumbSize()>_max)){
+            _prevMousePos = _scrolBarThumb.getThumbPosition();
+            scrolled((_scrolBarThumb.getThumbPosition() + _scrolBarThumb.getThumbSize()) - _max);
+        }
+        calculateValue();
     }
 
     public void setScrollType(ScrollType scrollType){
         _scrollType = scrollType;
     }
 
-    private void setVerticalOptions(Vector2f size){
-        /*SET POS FOR HEADER*/
-        _scrollGraphicsElements.get(0).setRotateAngle(90);
-        _scrollGraphicsElements.get(0).setPosition(getPosition());
-        _scrollGraphicsElements.get(0).getPosition().x += 15f;
-        _scrollGraphicsElements.get(0).setSize(new Vector2f(7f, 15f));
-        _scrollGraphicsElements.get(0).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
 
-        /*SET POS FOR BODY*/
-        _scrollGraphicsElements.get(1).setRotateAngle(90);
-        _scrollGraphicsElements.get(1).setPosition(new Vector2f(getPosition().x, getPosition().y +  _scrollGraphicsElements.get(0).getSize().x));
-        _scrollGraphicsElements.get(1).getPosition().x += 15f;
-        _scrollGraphicsElements.get(1).getTextureSize().set(new Vector2f(10f/512f, 15f / 512f));
-
-        /*SET POS FOR FOOTER*/
-        _scrollGraphicsElements.get(2).setRotateAngle(270);
-        _scrollGraphicsElements.get(2).setPosition(new Vector2f(getPosition().x, getPosition().y +  2*_scrollGraphicsElements.get(0).getTextureSize().y + _scrollGraphicsElements.get(1).getSize().y));
-        _scrollGraphicsElements.get(2).setSize(new Vector2f(7f, 15f));
-        _scrollGraphicsElements.get(2).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
-
+    private void calculateValue(){
+        _value = _scrolBarThumb.getThumbPosition()/_step;
     }
 
-    private void setHorizontalPositions(){
-        /*SET POS FOR HEADER*/
-        _scrollGraphicsElements.get(0).setPosition(getPosition());
-        _scrollGraphicsElements.get(0).setSize(new Vector2f(7f, 15f));
-        _scrollGraphicsElements.get(0).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
-
-        /*SET POS FOR BODY*/
-        _scrollGraphicsElements.get(1).setPosition(new Vector2f(getPosition().x + _scrollGraphicsElements.get(0).getSize().x, getPosition().y));
-        _scrollGraphicsElements.get(1).getTextureSize().set(new Vector2f(10f/512f, 15f / 512f));
-
-        /*SET POS FOR FOOTER*/
-        _scrollGraphicsElements.get(2).setRotateAngle(180);
-        _scrollGraphicsElements.get(2).setPosition(new Vector2f((getPosition().x +  2*_scrollGraphicsElements.get(0).getTextureSize().x + _scrollGraphicsElements.get(1).getSize().x), getPosition().y));
-        _scrollGraphicsElements.get(2).setSize(new Vector2f(7f, 15f));
-        _scrollGraphicsElements.get(2).getPosition().y += 15f;
-        _scrollGraphicsElements.get(2).getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
-    }
 
     public void setMaxMin(float min, float max){
         _min = min;
         _max = max;
+
+        switch(_scrollType){
+            case vertical:
+                setSize(new Vector2f(15f, max));
+                break;
+            case horizontal:
+                setSize(new Vector2f(max, 15f));
+                break;
+        }
     }
 
     public boolean isScrolled(){
@@ -204,7 +160,7 @@ public class UIScrollBar extends UIDisplayContainer {
 
     public void setStep(float contentLength, float containerLength){
         try{
-            _step = 1.0f/(contentLength/containerLength);
+            _step = containerLength/contentLength;
 
             if(_step>1.0f){
                 _step = 1.0f;
@@ -215,31 +171,18 @@ public class UIScrollBar extends UIDisplayContainer {
         }
 
         _containerLength = containerLength;
+        _contentLength   = contentLength;
     }
 
-    public float getScrollShift(){
-        return _scrollShift;
+    public float getValue(){
+        return _value;
     }
 
-    private float getScrollBarPosition(){
-        if(_scrollType == ScrollType.vertical){
-            return getPosition().y;
-        }
-        return getPosition().x;
+    public float getOldValue(){
+        return _oldValue;
     }
 
-    private float getScrollBarSize(){
-        if(_scrollType == ScrollType.vertical){
-            return getSize().y;
-        }
-        return getSize().x;
-    }
-
-    private void setScrollBarPosition(float newPosition){
-        if(_scrollType == ScrollType.vertical){
-           getPosition().y = newPosition;
-        }else{
-           getPosition().x = newPosition;
-        }
+    public float getStep(){
+        return _step;
     }
 }

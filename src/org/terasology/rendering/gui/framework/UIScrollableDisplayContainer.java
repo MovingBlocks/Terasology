@@ -4,6 +4,8 @@ import org.terasology.rendering.gui.components.UIScrollBar;
 
 import javax.vecmath.Vector2f;
 
+import java.util.ArrayList;
+
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
@@ -21,6 +23,9 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
     private float      _contentWidth          = 1.0f;
     private float      _scrollShiftVertical   = 0.0f;
     private float      _scrollShiftHorizontal = 0.0f;
+
+    private float      _oldVertivalValue       = 0.0f;
+    private float      _oldHorizontalValue     = 0.0f;
 
     private Vector2f   _containerPosVertical   = null;
     private Vector2f   _containerPosHorizontal = null;
@@ -41,23 +46,29 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
 
         _scrollBarVertical.addScrollListener(new IScrollListener() {
             public void scrolled(UIDisplayElement element) {
-                _scrollShiftVertical += _scrollBarVertical.getScrollShift();
+                float shift = (_scrollBarVertical.getValue() - _oldVertivalValue);
+                _scrollShiftVertical += shift;
+
                 for (UIDisplayElement displayElement : getDisplayElements()) {
                     if (!displayElement.isFixed()) {
-                        displayElement.getPosition().y -= _scrollBarVertical.getScrollShift();
+                        displayElement.getPosition().y -= shift;
                     }
                 }
+                _oldVertivalValue = _scrollBarVertical.getValue();
             }
         });
 
         _scrollBarHorizontal.addScrollListener(new IScrollListener() {
             public void scrolled(UIDisplayElement element) {
-                _scrollShiftHorizontal += _scrollBarHorizontal.getScrollShift();
+                float shift = (_scrollBarHorizontal.getValue() - _oldHorizontalValue);
+                _scrollShiftHorizontal += shift;
+
                 for (UIDisplayElement displayElement : getDisplayElements()) {
                     if (!displayElement.isFixed()) {
-                        displayElement.getPosition().x -= _scrollBarHorizontal.getScrollShift();
+                        displayElement.getPosition().x -= shift;
                     }
                 }
+                _oldHorizontalValue = _scrollBarHorizontal.getValue();
             }
         });
     }
@@ -149,6 +160,7 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
         }
 
         _scrollBarVertical.setStep(_contentHeight, getSize().y);
+
         _scrollBarHorizontal.setStep(_contentWidth, getSize().x);
 
         super.update();

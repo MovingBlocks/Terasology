@@ -101,11 +101,26 @@ public class UIInput extends UIDisplayContainer {
     updateTextShift();
   }
 
-  /*
-   * @todo Change the current position of the carriage, when user pushed mouse button
-   */
   public void clicked(Vector2f mousePos) {
       _focused = true;
+
+      if(_inputValue.length()>0&&_inputText.getTextWidth()>0){
+          Vector2f absolutePosition = _inputText.calcAbsolutePosition();
+          float positionRelativeElement = (absolutePosition.x + _inputText.getTextWidth()) - mousePos.x;
+          float averageSymbols =  _inputText.getTextWidth()/_inputValue.length();
+
+          int pos = Math.abs((int)(positionRelativeElement/averageSymbols)-_inputValue.length());
+
+          if(pos>(_inputValue.length()-1)){
+              pos = _inputValue.length()-1;
+          }else if(pos<0){
+              pos = 0;
+          }
+
+          _cursorPosition = pos;
+          System.out.println(_cursorPosition);
+      }
+
   }
 
   public void processKeyboardInput(int key){
