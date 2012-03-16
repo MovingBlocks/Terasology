@@ -19,21 +19,17 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.PlaceableBlockComponent;
+import org.terasology.components.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.inventory.Icon;
-import org.terasology.model.inventory.Inventory;
-import org.terasology.model.inventory.Item;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
-
-import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -115,9 +111,9 @@ public class UIToolbarCell extends UIDisplayElement {
             return;
 
         if (item.icon.isEmpty()) {
-            PlaceableBlockComponent placeableBlock = itemEntity.getComponent(PlaceableBlockComponent.class);
-            if (placeableBlock != null) {
-                renderBlockIcon(placeableBlock.blockGroup);
+            BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
+            if (blockItem != null) {
+                renderBlockIcon(blockItem.blockGroup);
             }
         } else {
             Icon icon = Icon.get(item.icon);

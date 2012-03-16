@@ -4,12 +4,13 @@ import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.componentSystem.ComponentSystem;
-import org.terasology.game.Terasology;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public class InventorySystem implements ComponentSystem {
+
+    public static final byte MAX_STACK = (byte)99;
 
     public void initialise() {
 
@@ -32,9 +33,15 @@ public class InventorySystem implements ComponentSystem {
             if (itemStack != null) {
                 ItemComponent stackComp = itemStack.getComponent(ItemComponent.class);
                 if (item.stackId.equals(stackComp.stackId)) {
-                    stackComp.stackCount += item.stackCount;
-                    itemEntity.destroy();
-                    return true;
+                    int stackSpace = MAX_STACK - stackComp.stackCount;
+                    int amountToTransfer = Math.min(stackSpace, item.stackCount);
+                    stackComp.stackCount += amountToTransfer;
+                    item.stackCount -= amountToTransfer;
+
+                    if (item.stackCount == 0) {
+                        itemEntity.destroy();
+                        return true;
+                    }
                 }
             }
         }

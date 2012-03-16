@@ -16,11 +16,9 @@ import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.rendering.particles.BlockParticleEmitter;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
-
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -29,8 +27,6 @@ import java.nio.FloatBuffer;
 import java.util.Iterator;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glScalef;
 
 /**
  * @author Immortius <immortius@gmail.com>

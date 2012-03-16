@@ -18,7 +18,6 @@ import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.global.LocalPlayer;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
@@ -30,7 +29,10 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
 
-import javax.vecmath.*;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -267,8 +269,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
             if (localPlayer.isDead) continue;
 
+            EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayer.selectedTool);
             if (Mouse.isButtonDown(0) || button == 0) {
-                EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayer.selectedTool);
                 if (selectedItemEntity != null) {
                     ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
                     switch (item.usage) {
@@ -276,16 +278,16 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                             useItemOnBlock(entity, selectedItemEntity);
                             break;
                         default:
-                            removeBlock(entity);
+                            attack(entity, selectedItemEntity);
                             break;
                     }
                 } else {
-                    removeBlock(entity);
+                    attack(entity, selectedItemEntity);
                 }
                 lastInteraction = Terasology.getInstance().getTimeInMs();
             } else if (Mouse.isButtonDown(1) || button == 1) {
                 // TODO: Move the remove block/attack code elsewhere
-                removeBlock(entity);
+                attack(entity, selectedItemEntity);
                 lastInteraction = Terasology.getInstance().getTimeInMs();
             }
             // TODO: Hand animation
@@ -300,7 +302,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 activeTool.executeLeftClickAction();
                 lastInteraction = Terasology.getInstance().getTimeInMs();
             } else if (Mouse.isButtonDown(1) || button == 1) {
-                removeBlock(true);
+                attack(true);
 
                 activeTool.executeRightClickAction();
                 lastInteraction = Terasology.getInstance().getTimeInMs();
@@ -329,34 +331,34 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
     /**
-     * Removes a block at the given global world position.
-     *
-     * @return The removed block (if any)
+     * Attacks with currently held item
      */
-    private void removeBlock(EntityRef player) {
+    // TODO: Move this somewhere more central, for use by all creatures.
+    private void attack(EntityRef player, EntityRef withItem) {
         RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
+        ItemComponent item = null;
+        if (withItem != null) {
+            item = withItem.getComponent(ItemComponent.class);
+        }
 
         if (selectedBlock != null) {
 
             BlockPosition blockPos = selectedBlock.getBlockPosition();
             byte currentBlockType = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
             Block block = BlockManager.getInstance().getBlock(currentBlockType);
-
-            if (block.isDestructible()) {
-                EntityRef blockEntity = blockEntityLookup.getEntityAt(blockPos);
-                // TODO: Centralise block entity creation elsewhere
-                if (blockEntity == null) {
-                    blockEntity = entityManager.create();
-                    blockEntity.addComponent(new BlockComponent(blockPos, true));
-                    blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
+            
+            int damage = 1;
+            if (item != null) {
+                damage = item.baseDamage;
+                if (item.getPerBlockDamageBonus().containsKey(block.getBlockGroup().getTitle())) {
+                    damage += item.getPerBlockDamageBonus().get(block.getBlockGroup().getTitle());
                 }
-
-                blockEntity.send(new DamageEvent(1, player));
             }
 
-            // Play digging sound if the block was not removed
-            AudioManager.play("Dig", 1.0f);
-
+            if (block.isDestructible()) {
+                EntityRef blockEntity = blockEntityLookup.getOrCreateEntityAt(blockPos);
+                blockEntity.send(new DamageEvent(damage, player));
+            }
         }
 
 

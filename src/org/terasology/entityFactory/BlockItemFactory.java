@@ -2,7 +2,7 @@ package org.terasology.entityFactory;
 
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LightComponent;
-import org.terasology.components.PlaceableBlockComponent;
+import org.terasology.components.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.model.blocks.BlockGroup;
@@ -30,11 +30,11 @@ public class BlockItemFactory {
         item.name = blockGroup.getTitle();
         item.consumedOnUse = true;
         item.stackId = blockGroup.getTitle() + "Block";
-        item.stackCount = quantity;
+        item.stackCount = (byte)quantity;
         item.usage = ItemComponent.UsageType.OnBlock;
         entity.addComponent(item);
         
-        entity.addComponent(new PlaceableBlockComponent(blockGroup));
+        entity.addComponent(new BlockItemComponent(blockGroup));
         
         return entity;
     }

@@ -153,7 +153,7 @@ public class GroovyManager {
             BlockItemFactory factory = new BlockItemFactory(Terasology.getInstance().getCurrentGameState().getEntityManager());
             EntityRef item = factory.newInstance(blockGroup);
             ItemComponent itemComp = item.getComponent(ItemComponent.class);
-            itemComp.stackCount = quantity;
+            itemComp.stackCount = (byte)quantity;
 
             InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
             if (!inventorySystem.addItem(Terasology.getInstance().getActivePlayer().getEntity(), item)) {

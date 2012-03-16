@@ -6,12 +6,12 @@ import org.terasology.model.blocks.BlockGroup;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public final class PlaceableBlockComponent extends AbstractComponent {
+public final class BlockItemComponent extends AbstractComponent {
     public BlockGroup blockGroup;
 
-    public PlaceableBlockComponent() {}
+    public BlockItemComponent() {}
 
-    public PlaceableBlockComponent(BlockGroup blockGroup) {
+    public BlockItemComponent(BlockGroup blockGroup) {
         this.blockGroup = blockGroup;
     }
 }

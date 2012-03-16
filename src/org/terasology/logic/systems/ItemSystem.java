@@ -3,9 +3,11 @@ package org.terasology.logic.systems;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.events.ActivateEvent;
+import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
@@ -24,10 +26,12 @@ import javax.vecmath.Vector3f;
 public class ItemSystem implements EventHandlerSystem {
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
+    private BlockEntityLookup blockEntityLookup;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
+        blockEntityLookup = CoreRegistry.get(ComponentSystemManager.class).get(BlockEntityLookup.class);
     }
 
     /**
@@ -52,17 +56,18 @@ public class ItemSystem implements EventHandlerSystem {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp == null) return;
 
-        PlaceableBlockComponent placeableBlock = item.getComponent(PlaceableBlockComponent.class);
-        if (placeableBlock != null) {
-            if (placeBlock(placeableBlock.blockGroup, targetBlock, surfaceDirection, secondaryDirection)) {
+        BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
+        if (blockItem != null) {
+            if (placeBlock(blockItem.blockGroup, targetBlock, surfaceDirection, secondaryDirection)) {
                 itemComp.stackCount--;
                 if (itemComp.stackCount == 0) {
                     item.destroy();
                 }
             }
+        } else {
+            EntityRef targetEntity = blockEntityLookup.getOrCreateEntityAt(targetBlock);
+            item.send(new ActivateEvent(targetEntity, user));
         }
-        // TODO: Normal items
-
     }
 
     // useItem (no target)

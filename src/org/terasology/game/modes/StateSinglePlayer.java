@@ -118,6 +118,7 @@ public class StateSinglePlayer implements IGameState {
         _componentSystemManager.register(new BlockDamageRenderer());
         _componentSystemManager.register(new InventorySystem());
         _componentSystemManager.register(new MeshRenderer());
+        _componentSystemManager.register(new ExplosionAction());
 
     }
 

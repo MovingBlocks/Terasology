@@ -6,8 +6,8 @@ import org.terasology.components.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
@@ -56,7 +56,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
         AudioManager.play("RemoveBlock", 0.6f);
 
         if (oldBlock.isStraightToInventory() && event.getInstigator() != null) {
-            EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockGroup(), 1);
+            EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockGroup(), (byte)1);
             if (!inventorySystem.addItem(event.getInstigator(), item))
             {
                 item.destroy();
@@ -69,7 +69,8 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
         entity.destroy();
     }
-    
+
+    // TODO: Need a occasionally scan for and remove temporary block entities that were never damaged
     @ReceiveEvent(components={BlockComponent.class})
     public void onRepaired(FullHealthEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
@@ -99,6 +100,9 @@ public class BlockEntitySystem implements EventHandlerSystem {
         particleEffect.acceleration.set(2f, 2f, 2f);
         particleEffect.collideWithBlocks = true;
         particlesEntity.addComponent(particleEffect);
+
+        // TODO: Don't play this if destroyed
+        AudioManager.play("Dig", 1.0f);
     }
 
 }
