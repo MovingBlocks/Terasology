@@ -111,6 +111,7 @@ public class Block implements IGameObject {
     private boolean _bypassSelectionRay;
     private boolean _liquid;
     private boolean _waving;
+    private boolean _straightToInventory;
 
     private int _lootAmount;
 
@@ -405,6 +406,11 @@ public class Block implements IGameObject {
         _fullSide.put(side, full);
         return this;
     }
+    
+    public Block withStraightToInventory(boolean straightToInventory) {
+        _straightToInventory = straightToInventory;
+        return this;
+    }
 
     public void setColliders(List<AABB> colliders) {
         _colliders = new ArrayList<AABB>(colliders);
@@ -510,6 +516,10 @@ public class Block implements IGameObject {
 
     public boolean isTranslucent() {
         return _translucent;
+    }
+
+    public boolean isStraightToInventory() {
+        return _straightToInventory;
     }
 
     /**

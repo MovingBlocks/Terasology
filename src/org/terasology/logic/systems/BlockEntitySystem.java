@@ -3,6 +3,7 @@ package org.terasology.logic.systems;
 import org.terasology.components.BlockComponent;
 import org.terasology.components.BlockParticleEffectComponent;
 import org.terasology.components.LocationComponent;
+import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
@@ -10,6 +11,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
+import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
@@ -25,10 +27,14 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
     private IWorldProvider worldProvider;
     private EntityManager entityManager;
+    private InventorySystem inventorySystem;
+    private BlockItemFactory blockItemFactory;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
+        inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
+        blockItemFactory = new BlockItemFactory(entityManager);
     }
 
     @ReceiveEvent(components={BlockComponent.class})
@@ -45,13 +51,21 @@ public class BlockEntitySystem implements EventHandlerSystem {
         byte upperBlockType = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
         if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
             worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, (byte) 0x0, true, true);
-            // TODO: Particles here too?
         }
 
         AudioManager.play("RemoveBlock", 0.6f);
 
-        /* PHYSICS */
-        CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
+        if (oldBlock.isStraightToInventory() && event.getInstigator() != null) {
+            EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockGroup(), 1);
+            if (!inventorySystem.addItem(event.getInstigator(), item))
+            {
+                item.destroy();
+                CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
+            }
+        } else {
+            /* PHYSICS */
+            CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
+        }
 
         entity.destroy();
     }

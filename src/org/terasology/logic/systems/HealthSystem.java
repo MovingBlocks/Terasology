@@ -47,7 +47,7 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     @ReceiveEvent(components = {HealthComponent.class})
     public void onDamage(DamageEvent event, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
-        applyDamage(entity, health, event.getAmount());
+        applyDamage(entity, health, event.getAmount(), event.getInstigator());
     }
     
     @ReceiveEvent(components = {HealthComponent.class})
@@ -57,18 +57,18 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
         if (event.getVelocity().y < 0 && -event.getVelocity().y > health.fallingDamageSpeedThreshold) {
             int damage = (int)((-event.getVelocity().y - health.fallingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
             if (damage > 0) {
-                applyDamage(entity, health, damage);
+                applyDamage(entity, health, damage, null);
             }
         }
     }
 
-    private void applyDamage(EntityRef entity, HealthComponent health, int damageAmount) {
+    private void applyDamage(EntityRef entity, HealthComponent health, int damageAmount, EntityRef instigator) {
         if (health.currentHealth <= 0) return;
 
         health.timeSinceLastDamage = 0;
         health.currentHealth -= damageAmount;
         if (health.currentHealth <= 0) {
-            entity.send(new NoHealthEvent());
+            entity.send(new NoHealthEvent(instigator));
         }
         entity.saveComponent(health);
     }

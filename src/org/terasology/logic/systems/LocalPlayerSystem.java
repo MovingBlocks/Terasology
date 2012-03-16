@@ -211,7 +211,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         switch (key) {
             case Keyboard.KEY_K:
                 if (!repeatEvent && state) {
-                    CoreRegistry.get(LocalPlayer.class).getEntity().send(new DamageEvent(9999));
+                    CoreRegistry.get(LocalPlayer.class).getEntity().send(new DamageEvent(9999, null));
                 }
                 break;
             case Keyboard.KEY_SPACE:
@@ -276,16 +276,16 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                             useItemOnBlock(entity, selectedItemEntity);
                             break;
                         default:
-                            removeBlock(true);
+                            removeBlock(entity);
                             break;
                     }
                 } else {
-                    removeBlock(true);
+                    removeBlock(entity);
                 }
                 lastInteraction = Terasology.getInstance().getTimeInMs();
             } else if (Mouse.isButtonDown(1) || button == 1) {
                 // TODO: Move the remove block/attack code elsewhere
-                removeBlock(true);
+                removeBlock(entity);
                 lastInteraction = Terasology.getInstance().getTimeInMs();
             }
             // TODO: Hand animation
@@ -331,10 +331,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     /**
      * Removes a block at the given global world position.
      *
-     * @param createPhysBlock Creates a rigid body block if true
      * @return The removed block (if any)
      */
-    private void removeBlock(boolean createPhysBlock) {
+    private void removeBlock(EntityRef player) {
         RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
 
         if (selectedBlock != null) {
@@ -352,7 +351,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                     blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
                 }
 
-                blockEntity.send(new DamageEvent(1));
+                blockEntity.send(new DamageEvent(1, player));
             }
 
             // Play digging sound if the block was not removed

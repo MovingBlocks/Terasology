@@ -102,6 +102,10 @@ public class SimpleBlockLoader implements BlockLoader {
             log.fine "Setting hardness to: " + c.hardness
             b.withHardness((byte) c.hardness)
         }
+        if (c.straightToInventory != [:]) {
+            log.fine "Setting straightToInventory to: " + c.straightToInventory
+            b.withStraightToInventory(c.straightToInventory)
+        }
 
         // *** COLOR OFFSET (4 values) - this might need error handling
         if (c.colorOffset != [:]) {
