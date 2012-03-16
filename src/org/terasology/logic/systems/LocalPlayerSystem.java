@@ -145,6 +145,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
         jump = false;
         toggleGodMode = false;
+        movementInput.set(0,0,0);
+        lookInput.set(0,0);
     }
 
     private void updateCamera(Vector3f position, Quat4f rotation) {

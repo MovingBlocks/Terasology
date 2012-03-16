@@ -2,8 +2,12 @@ package org.terasology.entityFactory;
 
 import org.terasology.components.ItemComponent;
 import org.terasology.components.actions.ExplosionActionComponent;
+import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.manager.AudioManager;
+
+import java.util.Arrays;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -45,6 +49,7 @@ public class ItemFactory {
         itemComp.usage = ItemComponent.UsageType.OnBlock;
         item.addComponent(itemComp);
         item.addComponent(new ExplosionActionComponent());
+        item.addComponent(new PlaySoundActionComponent(AudioManager.sounds("Explode1", "Explode2", "Explode3", "Explode4", "Explode5")));
         return item;
     }
 }

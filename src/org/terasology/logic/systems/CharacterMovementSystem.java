@@ -32,7 +32,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
     public static final float UnderwaterGravity = 0.25f;
     public static final float Gravity = 28.0f;
     public static final float TerminalVelocity = 64.0f;
-    public static final float UnderwaterInteria = 2.0f;
+    public static final float UnderwaterInertia = 2.0f;
     public static final float WaterTerminalVelocity = 4.0f;
     public static final float GhostInertia = 8.0f;
 
@@ -95,7 +95,8 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
         // Boost when leaving water
         if (!newSwimming && movementComp.isSwimming && movementComp.getVelocity().y > 0) {
-            movementComp.getVelocity().y += 8.0f;
+            float len = movementComp.getVelocity().length();
+            movementComp.getVelocity().scale((len + 8)/len);
         }
         movementComp.isSwimming = newSwimming;
     }
@@ -216,9 +217,9 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
          */
         if (horizontalHitTest(worldPos, oldPos, extents)) {
             entity.send(new HorizontalCollisionEvent());
+            movementComp.getVelocity().x = (worldPos.x - oldPos.x) / delta;
+            movementComp.getVelocity().z = (worldPos.z - oldPos.z) / delta;
         }
-        movementComp.getVelocity().x = (worldPos.x - oldPos.x) / delta;
-        movementComp.getVelocity().z = (worldPos.z - oldPos.z) / delta;
 
         Vector3f dist = new Vector3f(worldPos.x - oldPos.x, 0, worldPos.z - oldPos.z);
 
@@ -252,8 +253,8 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(movementComp.getVelocity());
         float changeMag = velocityDiff.length();
-        if (changeMag > UnderwaterInteria * delta) {
-            velocityDiff.scale(UnderwaterInteria * delta / changeMag);
+        if (changeMag > UnderwaterInertia * delta) {
+            velocityDiff.scale(UnderwaterInertia * delta / changeMag);
         }
 
         movementComp.getVelocity().x += velocityDiff.x;
@@ -292,9 +293,10 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
          */
         if (horizontalHitTest(worldPos, oldPos, extents)) {
             entity.send(new HorizontalCollisionEvent());
+            movementComp.getVelocity().x = (worldPos.x - oldPos.x) / delta;
+            movementComp.getVelocity().z = (worldPos.z - oldPos.z) / delta;
         }
-        movementComp.getVelocity().x = (worldPos.x - oldPos.x) / delta;
-        movementComp.getVelocity().z = (worldPos.z - oldPos.z) / delta;
+
 
         location.setWorldPosition(worldPos);
 

@@ -1,5 +1,6 @@
 package org.terasology.events;
 
+import org.terasology.components.BlockComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
@@ -20,12 +21,18 @@ public class ActivateEvent implements Event {
     public ActivateEvent(EntityRef target, EntityRef instigator) {
         this.instigator = instigator;
         this.target = target;
-        LocationComponent loc = instigator.getComponent(LocationComponent.class);
+        LocationComponent loc = target.getComponent(LocationComponent.class);
         if (loc != null) {
             location = loc.getWorldPosition();
         }
         else {
-            location = new Vector3f();
+            BlockComponent blockComp = target.getComponent(BlockComponent.class);
+            if (blockComp != null) {
+                location = blockComp.getPosition().toVector3f();
+            }
+            else {
+                location = new Vector3f();
+            }
         }
         direction = new Vector3f();
     }
