@@ -17,17 +17,10 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.terasology.game.Terasology;
-import org.terasology.model.inventory.Icon;
-import org.terasology.model.inventory.Inventory;
-import org.terasology.model.inventory.Item;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * A single cell of the toolbar with a small text label and a selection

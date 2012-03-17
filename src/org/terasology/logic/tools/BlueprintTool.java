@@ -16,7 +16,6 @@
 package org.terasology.logic.tools;
 
 import org.terasology.game.Terasology;
-import org.terasology.logic.characters.Player;
 import org.terasology.logic.manager.BlueprintManager;
 import org.terasology.model.inventory.ItemBlueprint;
 import org.terasology.model.structures.BlockPosition;
@@ -27,7 +26,7 @@ import java.util.ArrayList;
 /**
  * Can be used to create and place blueprints.
  */
-public class BlueprintTool extends SimpleTool {
+/*public class BlueprintTool extends SimpleTool {
 
     private final ArrayList<BlockPosition> _selectedBlocks = new ArrayList<BlockPosition>();
 
@@ -96,4 +95,4 @@ public class BlueprintTool extends SimpleTool {
             bpItem.setBlueprint(BlueprintManager.getInstance().generateBlueprint(_player.getParent().getWorldProvider(), _selectedBlocks));
         }
     }
-}
+}      */

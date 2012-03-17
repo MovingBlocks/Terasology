@@ -15,7 +15,6 @@
  */
 package org.terasology.game.modes;
 
-import com.google.common.collect.Lists;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -24,20 +23,32 @@ import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.componentSystem.ComponentSystem;
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
-import org.terasology.logic.global.LocalPlayer;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.systems.*;
+import org.terasology.logic.systems.action.ExplosionAction;
+import org.terasology.logic.systems.action.PlaySoundAction;
+import org.terasology.logic.systems.action.TunnelAction;
+import org.terasology.logic.systems.characters.CharacterMovementSystem;
+import org.terasology.logic.systems.characters.CharacterSoundSystem;
+import org.terasology.logic.systems.controllers.LocalPlayerSystem;
+import org.terasology.logic.systems.controllers.SimpleAISystem;
+import org.terasology.logic.systems.rendering.BlockDamageRenderer;
+import org.terasology.logic.systems.block.BlockEntityLookup;
+import org.terasology.logic.systems.block.BlockEntitySystem;
+import org.terasology.logic.systems.items.InventorySystem;
+import org.terasology.logic.systems.items.ItemSystem;
+import org.terasology.logic.systems.rendering.FirstPersonRenderer;
+import org.terasology.logic.systems.rendering.MeshRenderer;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
@@ -46,7 +57,6 @@ import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;

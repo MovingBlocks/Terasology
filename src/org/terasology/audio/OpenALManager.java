@@ -5,8 +5,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.*;
 import org.terasology.game.Terasology;
-import org.terasology.logic.characters.Player;
-import org.terasology.logic.global.LocalPlayer;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.cameras.Camera;
 

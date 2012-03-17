@@ -1,4 +1,4 @@
-package org.terasology.logic.systems;
+package org.terasology.logic.systems.block;
 
 import org.terasology.components.BlockComponent;
 import org.terasology.components.BlockParticleEffectComponent;
@@ -14,6 +14,7 @@ import org.terasology.events.NoHealthEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.systems.items.InventorySystem;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;

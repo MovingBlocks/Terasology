@@ -25,6 +25,7 @@ import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.structures.BlockPosition;
 import org.terasology.persistence.PersistableObject;
 import org.terasology.utilities.FastRandom;
 
@@ -42,6 +43,9 @@ import java.util.logging.Level;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class LocalWorldProvider extends PersistableObject implements IWorldProvider {
+
+    /* OBSERVERS */
+    private final ArrayList<IBlockObserver> _observers = new ArrayList<IBlockObserver>();
 
     /* WORLD GENERATION */
     protected final GeneratorManager _generatorManager;
@@ -96,6 +100,8 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
         _liquidSimulator = new LiquidSimulator(this);
         _growthSimulator = new GrowthSimulator(this);
+        registerObserver(_liquidSimulator);
+        registerObserver(_growthSimulator);
     }
 
     public boolean isChunkAvailableAt(Vector3f position) {
@@ -114,9 +120,18 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     }
 
     public final boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite) {
-        return setBlock(pos.x, pos.y, pos.z, type, updateLight, overwrite);
+        return setBlock(pos.x, pos.y, pos.z, type, updateLight, overwrite, false);
     }
-    
+
+    // TODO: A better system would be to pass through the change maker, and for generators to not work through this interface
+    public final boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite, boolean suppressUpdate) {
+        return setBlock(pos.x, pos.y, pos.z, type, updateLight, overwrite, suppressUpdate);
+    }
+
+    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
+        return setBlock(x,y,z,type,updateLight,overwrite, false);
+    }
+
     /**
      * Places a block of a specific type at a given position and optionally refreshes the
      * corresponding light values.
@@ -128,7 +143,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @param overwrite If true currently present blocks get replaced
      * @return True if a block was set/replaced
      */
-    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
+    public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite, boolean suppressUpdate) {
         int chunkPosX = TeraMath.calcChunkPosX(x);
         int chunkPosZ = TeraMath.calcChunkPosZ(z);
 
@@ -147,6 +162,14 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
             c.setBlock(blockPosX, y, blockPosZ, type);
             newBlock = type;
+
+            if (!suppressUpdate) {
+                if (newBlock == 0x0) {
+                    notifyObserversBlockRemoved(c, new BlockPosition(x,y,z));
+                } else {
+                    notifyObserversBlockPlaced(c, new BlockPosition(x,y,z));
+                }
+            }
 
             if (updateLight) {
                 /*
@@ -186,6 +209,17 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         }
 
         return true;
+    }
+
+    // TODO: Send though source object hint
+    private void notifyObserversBlockPlaced(Chunk chunk, BlockPosition pos) {
+        for (IBlockObserver ob : _observers)
+            ob.blockPlaced(chunk, pos);
+    }
+
+    private void notifyObserversBlockRemoved(Chunk chunk, BlockPosition pos) {
+        for (IBlockObserver ob : _observers)
+            ob.blockRemoved(chunk, pos);
     }
 
     /**
@@ -351,6 +385,14 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         Terasology.getInstance().getLogger().log(Level.INFO, "Disposing local world \"{0}\" and saving all chunks.", getTitle());
         super.dispose();
         getChunkProvider().dispose();
+    }
+
+    public void registerObserver(IBlockObserver observer) {
+        _observers.add(observer);
+    }
+
+    public void unregisterObserver(IBlockObserver observer) {
+        _observers.remove(observer);
     }
 
     /**

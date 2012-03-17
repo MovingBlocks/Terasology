@@ -1,4 +1,4 @@
-package org.terasology.logic.systems;
+package org.terasology.logic.systems.rendering;
 
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
@@ -7,7 +7,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.componentSystem.RenderSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
-import org.terasology.logic.global.LocalPlayer;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.world.IWorldProvider;
@@ -16,7 +16,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.inventory.Icon;
-import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
 import org.terasology.rendering.primitives.Tessellator;
@@ -67,7 +66,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
     public void renderFirstPerson() {
         CharacterMovementComponent charMoveComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 2.5f) ;
+        float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f) ;
         float handMovementAnimationOffset = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).handAnimation;
 
         int invSlotIndex = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).selectedTool;
@@ -174,7 +173,7 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     private float calcBobbingOffset(float counter, float phaseOffset, float amplitude, float frequency) {
-        return (float)java.lang.Math.sin(counter * frequency + phaseOffset) * amplitude;
+        return (float)java.lang.Math.sin(2 * Math.PI * counter * frequency + phaseOffset) * amplitude;
     }
 
     

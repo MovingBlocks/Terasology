@@ -23,7 +23,7 @@ import org.lwjgl.opengl.GLContext;
 import org.terasology.game.modes.IGameState;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.logic.global.LocalPlayer;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;

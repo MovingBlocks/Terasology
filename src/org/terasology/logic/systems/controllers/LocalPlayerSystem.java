@@ -1,4 +1,4 @@
-package org.terasology.logic.systems;
+package org.terasology.logic.systems.controllers;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import gnu.trove.map.TIntIntMap;
@@ -16,8 +16,10 @@ import org.terasology.events.NoHealthEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
-import org.terasology.logic.global.LocalPlayer;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.systems.block.BlockEntityLookup;
+import org.terasology.logic.systems.items.ItemSystem;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -71,6 +73,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float lastTimeSpacePressed;
     private float lastInteraction;
     private boolean toggleGodMode;
+
+    private boolean cameraBobbing = Config.getInstance().isCameraBobbing();
+    private float bobFactor = 0;
+    private float lastStepDelta = 0;
 
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
@@ -177,13 +183,25 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         QuaternionUtil.quatRotate(rotation, viewDir, viewDir);
         playerCamera.getViewingDirection().set(viewDir);
 
-        /*if (CAMERA_BOBBING) {
-            _defaultCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
-            _defaultCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3.0f));
+        CharacterMovementComponent charMovementComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+        float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
+        if (stepDelta < 0) stepDelta += charMovementComp.distanceBetweenFootsteps;
+        bobFactor += stepDelta;
+        lastStepDelta = charMovementComp.footstepDelta;
+        
+        if (cameraBobbing) {
+            playerCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
+            playerCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
         } else {
-            _defaultCamera.setBobbingRotationOffsetFactor(0.0);
-            _defaultCamera.setBobbingVerticalOffsetFactor(0.0);
-        } */
+            playerCamera.setBobbingRotationOffsetFactor(0.0);
+            playerCamera.setBobbingVerticalOffsetFactor(0.0);
+        }
+
+        if (charMovementComp.isGhosting) {
+            playerCamera.extendFov(24);
+        } else {
+            playerCamera.resetFov();
+        }
 
         /*if (!(DEMO_FLIGHT)) {
             _defaultCamera.getViewingDirection().set(getViewingDirection());
@@ -194,6 +212,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
     public void renderOverlay() {
+        // TODO: Don't render if not in first person?
         // Display the block the player is aiming at
         if (Config.getInstance().isPlacingBox()) {
             RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
@@ -447,6 +466,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
 
         return null;
+    }
+
+    public double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
+        return java.lang.Math.sin(bobFactor * frequency + phaseOffset) * amplitude;
     }
 
 

@@ -1,4 +1,4 @@
-package org.terasology.logic.systems;
+package org.terasology.logic.systems.action;
 
 import org.terasology.audio.Sound;
 import org.terasology.components.actions.PlaySoundActionComponent;

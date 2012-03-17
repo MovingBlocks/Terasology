@@ -1,4 +1,4 @@
-package org.terasology.logic.systems;
+package org.terasology.logic.systems.characters;
 
 import org.terasology.audio.Sound;
 import org.terasology.components.CharacterSoundComponent;

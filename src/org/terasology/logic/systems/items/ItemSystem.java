@@ -1,4 +1,4 @@
-package org.terasology.logic.systems;
+package org.terasology.logic.systems.items;
 
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
@@ -10,6 +10,7 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.systems.block.BlockEntityLookup;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;

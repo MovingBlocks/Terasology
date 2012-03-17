@@ -25,11 +25,11 @@ import org.terasology.entitySystem.componentSystem.RenderSystem;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
-import org.terasology.logic.entities.Entity;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
-import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.*;
-import org.terasology.logic.systems.*;
+import org.terasology.logic.systems.controllers.LocalPlayerSystem;
+import org.terasology.logic.systems.rendering.FirstPersonRenderer;
 import org.terasology.logic.world.*;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
@@ -752,10 +752,6 @@ public final class WorldRenderer implements IGameObject {
 
     public boolean isChunkVisible(Chunk c) {
         return getActiveCamera().getViewFrustum().intersects(c.getAABB());
-    }
-
-    public boolean isEntityVisible(Entity e) {
-        return getActiveCamera().getViewFrustum().intersects(e.getAABB());
     }
 
     public double getDaylight() {

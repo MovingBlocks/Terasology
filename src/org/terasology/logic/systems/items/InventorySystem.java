@@ -1,4 +1,4 @@
-package org.terasology.logic.systems;
+package org.terasology.logic.systems.items;
 
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;

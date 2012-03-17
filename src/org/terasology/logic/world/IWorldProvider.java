@@ -69,6 +69,34 @@ public interface IWorldProvider {
      * @return True if a block was set/replaced
      */
     public boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite);
+
+    /**
+     * Places a block of a specific type at a given position and refreshes the
+     * corresponding light values.
+     *
+     * @param x           The X-coordinate
+     * @param y           The Y-coordinate
+     * @param z           The Z-coordinate
+     * @param type        The type of the block to set
+     * @param updateLight Update light values
+     * @param overwrite   If true currently present blocks get replaced
+     * @param suppressUpdateNotification If true, notification of the change will not be propagated to listening systems
+     * @return True if a block was set/replaced
+     */
+    public boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite, boolean suppressUpdateNotification);
+
+    /**
+     * Places a block of a specific type at a given position and refreshes the
+     * corresponding light values.
+     *
+     * @param pos         Block position
+     * @param type        The type of the block to set
+     * @param updateLight Update light values
+     * @param overwrite   If true currently present blocks get replaced
+     * @param suppressUpdateNotification If true, notification of the change will not be propagated to listening systems
+     * @return True if a block was set/replaced
+     */
+    public boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite, boolean suppressUpdateNotification);
     
     /**
      * Sets the given state at the given position.
@@ -248,4 +276,8 @@ public interface IWorldProvider {
      * Disposes this world provider.
      */
     public void dispose();
+
+    public void registerObserver(IBlockObserver observer);
+
+    public void unregisterObserver(IBlockObserver observer);
 }

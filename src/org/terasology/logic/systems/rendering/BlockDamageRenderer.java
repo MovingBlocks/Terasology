@@ -1,4 +1,4 @@
-package org.terasology.logic.systems;
+package org.terasology.logic.systems.rendering;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.components.BlockComponent;

@@ -1,9 +1,8 @@
-package org.terasology.logic.global;
+package org.terasology.logic;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.model.inventory.Inventory;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;

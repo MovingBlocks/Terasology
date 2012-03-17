@@ -90,13 +90,14 @@ public class LiquidSimulator extends Simulator {
                 _parent.setState(bp.x, bp.y, bp.z, state);
 
                 if (state > 7) {
-                    _parent.setBlock(bp.x, bp.y, bp.z, (byte) 0, false, true);
+                    // TODO: Don't suppress, instead suppress updates from self?
+                    _parent.setBlock(bp.x, bp.y, bp.z, (byte) 0, false, true, true);
                     _parent.setState(bp.x, bp.y, bp.z, (byte) 0);
                     continue;
                 }
 
                 if ((typeBelow == 0 || BlockManager.getInstance().getBlock(typeBelow).getBlockForm() == Block.BLOCK_FORM.BILLBOARD)) {
-                    _parent.setBlock(bpd.x, bpd.y, bpd.z, type, true, true);
+                    _parent.setBlock(bpd.x, bpd.y, bpd.z, type, true, true, true);
                     _parent.setState(bpd.x, bpd.y, bpd.z, (byte) 1);
                     addActiveBlock(bpd);
                     continue;
@@ -104,7 +105,7 @@ public class LiquidSimulator extends Simulator {
 
                 // Convert grass and snow to dirt if water is above
                 if (typeBelow == BlockManager.getInstance().getBlock("Grass").getId() || typeBelow == BlockManager.getInstance().getBlock("Snow").getId()) {
-                    _parent.setBlock(bpd.x, bpd.y, bpd.z, BlockManager.getInstance().getBlock("Dirt").getId(), false, true);
+                    _parent.setBlock(bpd.x, bpd.y, bpd.z, BlockManager.getInstance().getBlock("Dirt").getId(), false, true, true);
                 }
 
                 for (int k = 0; k < 4; k++) {
@@ -112,7 +113,7 @@ public class LiquidSimulator extends Simulator {
                     byte nBpType = _parent.getBlock(nBp.x, nBp.y, nBp.z);
 
                     if ((nBpType == 0 || BlockManager.getInstance().getBlock(nBpType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) && _parent.getBlock(nBp.x, nBp.y - 1, nBp.z) != type) {
-                        _parent.setBlock(nBp.x, nBp.y, nBp.z, type, true, true);
+                        _parent.setBlock(nBp.x, nBp.y, nBp.z, type, true, true, true);
                         _parent.setState(nBp.x, nBp.y, nBp.z, (byte) (state + 1));
                         addActiveBlock(nBp);
                     }
@@ -134,14 +135,14 @@ public class LiquidSimulator extends Simulator {
         }
     }
 
-    public void blockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
+    public void blockPlaced(Chunk chunk, BlockPosition pos) {
         if (BlockManager.getInstance().getBlock(_parent.getBlock(pos.x, pos.y, pos.z)).isLiquid()) {
             chunk.setState(pos.x, pos.y, pos.z, (byte) 1);
             addActiveBlock(pos);
         }
     }
 
-    public void blockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
+    public void blockRemoved(Chunk chunk, BlockPosition pos) {
         for (int i = 0; i < 6; i++) {
             BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].y, pos.z + (int) NEIGHBORS6[i].z);
 

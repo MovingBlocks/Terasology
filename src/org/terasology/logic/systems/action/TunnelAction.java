@@ -1,4 +1,4 @@
-package org.terasology.logic.systems;
+package org.terasology.logic.systems.action;
 
 import org.terasology.components.actions.TunnelActionComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -7,6 +7,7 @@ import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.systems.block.BlockEntityLookup;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -14,7 +15,6 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 /**

@@ -55,7 +55,8 @@ public class GrowthSimulator extends Simulator {
                 byte bDown = _parent.getBlock(blockPos.x, blockPos.y, blockPos.z - 1);
 
                 if (bLeft == GRASS_TYPE || bRight == GRASS_TYPE || bDown == GRASS_TYPE || bUp == GRASS_TYPE) {
-                    _parent.setBlock(blockPos.x, blockPos.y, blockPos.z, GRASS_TYPE, false, true);
+                    // TODO: don't suppress, but instead ignore updates from self?
+                    _parent.setBlock(blockPos.x, blockPos.y, blockPos.z, GRASS_TYPE, false, true, true);
                 }
 
                 if (bLeft == DIRT_TYPE) {
@@ -81,7 +82,7 @@ public class GrowthSimulator extends Simulator {
         return false;
     }
 
-    public void blockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
+    public void blockPlaced(Chunk chunk, BlockPosition pos) {
         if (_parent.getBlock(pos.x, pos.y, pos.z) == DIRT_TYPE) {
             addActiveBlock(pos);
         }
@@ -95,7 +96,7 @@ public class GrowthSimulator extends Simulator {
         }
     }
 
-    public void blockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
+    public void blockRemoved(Chunk chunk, BlockPosition pos) {
         for (int i = 0; i < 6; i++) {
             BlockPosition nBp = new BlockPosition(pos.x + (int) NEIGHBORS6[i].x, pos.y + (int) NEIGHBORS6[i].y, pos.z + (int) NEIGHBORS6[i].z);
 

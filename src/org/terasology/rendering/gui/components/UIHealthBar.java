@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.components;
 import org.terasology.components.HealthComponent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
-import org.terasology.logic.global.LocalPlayer;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
