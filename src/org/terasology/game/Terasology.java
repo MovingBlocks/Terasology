@@ -35,10 +35,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -125,22 +122,20 @@ public final class Terasology {
         }
     }
 
-    private void addLibraryPath(String s) {
+    private void addLibraryPath(String libPath) {
         try {
             final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
             usrPathsField.setAccessible(true);
+            
+            List<String> paths = new ArrayList<String>(Arrays.asList((String[]) usrPathsField.get(null)));
 
-            final String[] paths = (String[]) usrPathsField.get(null);
-
-            for (String path : paths) {
-                if (path.equals(s)) {
-                    return;
-                }
+            if (paths.contains(libPath)) {
+                return;
             }
 
-            final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
-            newPaths[newPaths.length - 1] = s;
-            usrPathsField.set(null, newPaths);
+            paths.add(0, libPath);  // Add to beginning, to override system libraries
+
+            usrPathsField.set(null, paths.toArray(new String[paths.size()]));
         } catch (Exception e) {
             _logger.log(Level.SEVERE, "Couldn't link static libraries. " + e.toString(), e);
             exit();
