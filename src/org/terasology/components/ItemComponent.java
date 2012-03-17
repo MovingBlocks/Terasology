@@ -14,6 +14,7 @@ public final class ItemComponent extends AbstractComponent {
     public String icon = "";
     public String stackId = "";
     public byte stackCount = 1;
+    public boolean renderWithIcon = false;
 
     public EntityRef container;
     public UsageType usage = UsageType.None;

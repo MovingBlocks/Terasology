@@ -29,10 +29,7 @@ import org.terasology.logic.entities.Entity;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.global.LocalPlayer;
 import org.terasology.logic.manager.*;
-import org.terasology.logic.systems.BlockDamageRenderer;
-import org.terasology.logic.systems.BlockParticleEmitterSystem;
-import org.terasology.logic.systems.LocalPlayerSystem;
-import org.terasology.logic.systems.MeshRenderer;
+import org.terasology.logic.systems.*;
 import org.terasology.logic.world.*;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
@@ -72,8 +69,7 @@ import static org.lwjgl.opengl.GL11.*;
 public final class WorldRenderer implements IGameObject {
     /* WORLD PROVIDER */
     private final IWorldProvider _worldProvider;
-    private EntityManager _entityManager;
-    private LocalPlayerSystem _localPlayerSystem;
+    private FirstPersonRenderer _firstPersonRenderer;
 
     /* PLAYER */
     private LocalPlayer _player;
@@ -148,10 +144,11 @@ public final class WorldRenderer implements IGameObject {
         _portalManager = new PortalManager(manager);
         _blockGrid = new BlockGrid();
         _bulletRenderer = new BulletPhysicsRenderer(this);
-        _entityManager = manager;
-        _localPlayerSystem = localPlayerSystem;
-        _localPlayerSystem.setPlayerCamera(_defaultCamera);
+
+        // TODO: won't need localPlayerSystem here once camera is in the ES proper
+        localPlayerSystem.setPlayerCamera(_defaultCamera);
         _systemManager = CoreRegistry.get(ComponentSystemManager.class);
+
 
         initTimeEvents();
     }
@@ -436,9 +433,20 @@ public final class WorldRenderer implements IGameObject {
         PostProcessingRenderer.getInstance().renderScene();
         PerformanceMonitor.endActivity();
 
-        /* FIRST PERSON VIEW ELEMENTS */
-        if (_cameraMode == CAMERA_MODE.PLAYER)
-            _localPlayerSystem.renderFirstPersonViewElements();
+        if (_cameraMode == CAMERA_MODE.PLAYER) {
+            glClear(GL_DEPTH_BUFFER_BIT);
+            glPushMatrix();
+            glLoadIdentity();
+            _activeCamera.loadProjectionMatrix(75f);
+
+            PerformanceMonitor.startActivity("Render First Person");
+            for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+                renderer.renderFirstPerson();
+            }
+            PerformanceMonitor.endActivity();
+
+            glPopMatrix();
+        }
     }
 
     public float getRenderingLightValue() {
@@ -768,6 +776,10 @@ public final class WorldRenderer implements IGameObject {
     }
 
     public double getActiveTemperature(Vector3d pos) {
+        return _worldProvider.getTemperatureAt((int) pos.x, (int) pos.z);
+    }
+
+    public double getActiveTemperature(Vector3f pos) {
         return _worldProvider.getTemperatureAt((int) pos.x, (int) pos.z);
     }
 

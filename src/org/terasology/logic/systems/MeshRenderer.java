@@ -87,4 +87,8 @@ public class MeshRenderer implements RenderSystem {
     public void renderOverlay() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    public void renderFirstPerson() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

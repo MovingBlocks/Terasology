@@ -112,6 +112,7 @@ public class StateSinglePlayer implements IGameState {
         _componentSystemManager.register(new CharacterSoundSystem());
         _localPlayerSys = new LocalPlayerSystem();
         _componentSystemManager.register(_localPlayerSys);
+        _componentSystemManager.register(new FirstPersonRenderer());
         _componentSystemManager.register(new HealthSystem());
         _componentSystemManager.register(new BlockEntitySystem());
         _componentSystemManager.register(new BlockParticleEmitterSystem());

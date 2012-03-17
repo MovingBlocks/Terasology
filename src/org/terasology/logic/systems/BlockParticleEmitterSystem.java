@@ -207,4 +207,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
     public void renderOverlay() {
     }
+
+    public void renderFirstPerson() {
+
+    }
 }

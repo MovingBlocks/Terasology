@@ -77,6 +77,10 @@ public class BlockDamageRenderer implements RenderSystem {
         glDisable(GL11.GL_BLEND);
     }
 
+    public void renderFirstPerson() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public void renderOpaque() {
         //To change body of implemented methods use File | Settings | File Templates.
     }

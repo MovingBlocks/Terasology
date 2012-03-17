@@ -28,6 +28,7 @@ public class ItemFactory {
         itemComp.getPerBlockDamageBonus().put("BirkTrunk", 1);
         itemComp.getPerBlockDamageBonus().put("OakTrunk", 1);
         itemComp.getPerBlockDamageBonus().put("PineTrunk", 1);
+        itemComp.renderWithIcon = true;
         item.addComponent(itemComp);
         return item;
     }
@@ -38,6 +39,7 @@ public class ItemFactory {
         itemComp.name = "PickAxe";
         itemComp.icon = "PickAxe";
         itemComp.getPerBlockDamageBonus().put("Stone", 1);
+        itemComp.renderWithIcon = true;
         item.addComponent(itemComp);
         return item;
     }

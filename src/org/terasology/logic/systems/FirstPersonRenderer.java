@@ -1,0 +1,181 @@
+package org.terasology.logic.systems;
+
+import com.google.common.collect.Maps;
+import org.lwjgl.opengl.GL11;
+import org.terasology.components.*;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.componentSystem.RenderSystem;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.Terasology;
+import org.terasology.logic.global.LocalPlayer;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.manager.TextureManager;
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.math.Side;
+import org.terasology.math.TeraMath;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.inventory.Icon;
+import org.terasology.rendering.cameras.DefaultCamera;
+import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.primitives.MeshFactory;
+import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.world.WorldRenderer;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
+import java.util.Map;
+
+import static org.lwjgl.opengl.GL11.*;
+
+/**
+ * @author Immortius <immortius@gmail.com>
+ */
+public class FirstPersonRenderer implements RenderSystem {
+
+    private IWorldProvider worldProvider;
+    private LocalPlayer localPlayer;
+    private WorldRenderer worldRenderer;
+    private Mesh handMesh;
+    
+    private Map<String, Mesh> iconMeshes = Maps.newHashMap();
+    
+    public void initialise() {
+        localPlayer = CoreRegistry.get(LocalPlayer.class);
+        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldRenderer = CoreRegistry.get(WorldRenderer.class);
+
+        Vector2f texPos = new Vector2f(40.0f * 0.015625f, 32.0f * 0.03125f);
+        Vector2f texWidth = new Vector2f(4.0f * 0.015625f, -12.0f * 0.03125f);
+
+        Tessellator tessellator = new Tessellator();
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
+        handMesh = tessellator.generateMesh();
+    }
+
+    public void renderOpaque() {
+
+    }
+
+    public void renderTransparent() {
+
+    }
+
+    public void renderFirstPerson() {
+        CharacterMovementComponent charMoveComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+        float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 2.5f) ;
+        float handMovementAnimationOffset = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).handAnimation;
+
+        int invSlotIndex = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).selectedTool;
+        EntityRef heldItem = localPlayer.getEntity().getComponent(InventoryComponent.class).itemSlots.get(invSlotIndex);
+        if (heldItem == null) {
+            renderHand(bobOffset, handMovementAnimationOffset);
+            return;
+        }
+        ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
+        BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);
+        if (blockItem != null) {
+            renderBlock(blockItem.blockGroup, bobOffset, handMovementAnimationOffset);
+        } else if (heldItemComp != null && heldItemComp.renderWithIcon) {
+            renderIcon(heldItemComp.icon, bobOffset, handMovementAnimationOffset);
+        } else {
+            renderHand(bobOffset, handMovementAnimationOffset);
+        }
+
+    }
+
+    public void renderOverlay() {
+
+    }
+
+    private void renderHand(float bobOffset, float handMovementAnimationOffset) {
+        ShaderManager.getInstance().enableShader("block");
+        TextureManager.getInstance().bindTexture("char");
+
+        glPushMatrix();
+        glTranslatef(0.8f, -1.1f + bobOffset - handMovementAnimationOffset * 0.5f, -1.0f - handMovementAnimationOffset * 0.5f);
+        glRotatef(-45f - handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(35f, 0.0f, 1.0f, 0.0f);
+        glTranslatef(0f, 0.25f, 0f);
+        glScalef(0.3f, 0.6f, 0.3f);
+
+        handMesh.render();
+
+        glPopMatrix();
+    }
+    
+    private void renderIcon(String iconName, float bobOffset, float handMovementAnimationOffset) {
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.enable();
+
+        shader.setInt("textured", 0);
+        shader.setFloat("light", Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValue());
+
+        glPushMatrix();
+
+        glTranslatef(1.0f, -1.3f + bobOffset - handMovementAnimationOffset * 0.5f, -1.5f - handMovementAnimationOffset * 0.5f);
+        glRotatef(-handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(-20f, 1.0f, 0.0f, 0.0f);
+        glRotatef(-80f, 0.0f, 1.0f, 0.0f);
+        glRotatef(45f, 0.0f, 0.0f, 1.0f);
+
+        Mesh itemMesh = iconMeshes.get(iconName);
+        if (itemMesh == null) {
+            Icon icon = Icon.get(iconName);
+            itemMesh = MeshFactory.getInstance().generateItemMesh(icon.getX(), icon.getY());
+            iconMeshes.put(iconName, itemMesh);
+        }
+
+        itemMesh.render();
+
+        glPopMatrix();
+    }
+    
+    private void renderBlock(BlockGroup blockGroup, float bobOffset, float handMovementAnimationOffset) {
+        Block activeBlock = blockGroup.getArchetypeBlock();
+        Vector3f playerPos = localPlayer.getPosition();
+
+        // Adjust the brightness of the block according to the current position of the player
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.enable();
+
+        // Apply biome and overall color offset
+        // TODO: Should get temperature, etc from world provider
+        Vector4f color = activeBlock.calcColorOffsetFor(Side.FRONT, worldProvider.getTemperatureAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)), worldProvider.getHumidityAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)));
+        shader.setFloat3("colorOffset", color.x, color.y, color.z);
+
+        glEnable(GL11.GL_BLEND);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glAlphaFunc(GL_GREATER, 0.1f);
+        if (activeBlock.isTranslucent()) {
+            glEnable(GL11.GL_ALPHA_TEST);
+        }
+
+        glPushMatrix();
+
+        glTranslatef(1.0f, -1.3f + bobOffset - handMovementAnimationOffset * 0.5f, -1.5f - handMovementAnimationOffset * 0.5f);
+        glRotatef(-25f - handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
+        glRotatef(35f, 0.0f, 1.0f, 0.0f);
+        glTranslatef(0f, 0.25f, 0f);
+
+        activeBlock.renderWithLightValue(worldRenderer.getRenderingLightValue());
+
+        glPopMatrix();
+
+        if (activeBlock.isTranslucent()) {
+            glDisable(GL11.GL_ALPHA_TEST);
+        }
+        glDisable(GL11.GL_BLEND);
+    }
+
+    private float calcBobbingOffset(float counter, float phaseOffset, float amplitude, float frequency) {
+        return (float)java.lang.Math.sin(counter * frequency + phaseOffset) * amplitude;
+    }
+
+    
+}
