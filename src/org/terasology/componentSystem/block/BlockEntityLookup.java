@@ -1,4 +1,4 @@
-package org.terasology.logic.systems.block;
+package org.terasology.componentSystem.block;
 
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
@@ -6,8 +6,8 @@ import org.terasology.components.BlockComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;

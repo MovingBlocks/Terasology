@@ -1,10 +1,10 @@
-package org.terasology.logic.systems.rendering;
+package org.terasology.componentSystem.rendering;
 
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.componentSystem.RenderSystem;
+import org.terasology.componentSystem.RenderSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;

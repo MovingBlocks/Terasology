@@ -31,7 +31,7 @@ import org.terasology.game.Terasology;
 import org.terasology.game.modes.IGameState;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.systems.items.InventorySystem;
+import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
 

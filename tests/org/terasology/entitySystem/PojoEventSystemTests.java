@@ -3,7 +3,6 @@ package org.terasology.entitySystem;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.stubs.IntegerComponent;

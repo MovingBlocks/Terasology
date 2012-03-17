@@ -1,9 +1,9 @@
-package org.terasology.logic.systems.items;
+package org.terasology.componentSystem.items;
 
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.componentSystem.ComponentSystem;
 
 /**
  * @author Immortius <immortius@gmail.com>

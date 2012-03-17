@@ -2,7 +2,7 @@ package org.terasology.entitySystem.pojo;
 
 import com.google.common.collect.*;
 import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventHandlerSystem;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

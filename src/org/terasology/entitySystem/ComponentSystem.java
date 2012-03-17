@@ -1,4 +1,4 @@
-package org.terasology.entitySystem.componentSystem;
+package org.terasology.entitySystem;
 
 /**
  * @author Immortius <immortius@gmail.com>

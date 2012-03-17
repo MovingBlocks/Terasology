@@ -1,4 +1,4 @@
-package org.terasology.entitySystem.componentSystem;
+package org.terasology.entitySystem;
 
 /**
  * Interface for classes that can be registered as event handlers

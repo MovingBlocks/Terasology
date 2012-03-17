@@ -1,15 +1,13 @@
-package org.terasology.logic.systems.action;
+package org.terasology.componentSystem.action;
 
 import org.terasology.audio.Sound;
 import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.Vector3d;
 
 /**
  * @author Immortius <immortius@gmail.com>

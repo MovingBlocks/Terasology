@@ -1,11 +1,11 @@
-package org.terasology.logic.systems.characters;
+package org.terasology.componentSystem.characters;
 
 import org.terasology.audio.Sound;
 import org.terasology.components.CharacterSoundComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;

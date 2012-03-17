@@ -1,4 +1,4 @@
-package org.terasology.logic.systems.block;
+package org.terasology.componentSystem.block;
 
 import org.terasology.components.BlockComponent;
 import org.terasology.components.BlockParticleEffectComponent;
@@ -6,15 +6,15 @@ import org.terasology.components.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.systems.items.InventorySystem;
+import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;

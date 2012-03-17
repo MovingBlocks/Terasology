@@ -1,16 +1,16 @@
-package org.terasology.logic.systems.items;
+package org.terasology.componentSystem.items;
 
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.systems.block.BlockEntityLookup;
+import org.terasology.componentSystem.block.BlockEntityLookup;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;

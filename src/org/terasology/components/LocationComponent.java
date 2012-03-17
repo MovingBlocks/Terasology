@@ -15,7 +15,6 @@ public final class LocationComponent extends AbstractComponent {
     // Standard position/rotation
     private Vector3f position = new Vector3f();
     private Quat4f rotation = new Quat4f(0,0,0,1);
-    // TODO: Should this be here? Probably needs to be common as it affects several other components
     private float scale = 1.0f;
 
     // Relative to

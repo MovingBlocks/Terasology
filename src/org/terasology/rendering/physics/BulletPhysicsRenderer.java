@@ -37,7 +37,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.systems.items.InventorySystem;
+import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;

@@ -1,4 +1,4 @@
-package org.terasology.logic.systems;
+package org.terasology.componentSystem;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -7,8 +7,8 @@ import org.terasology.components.BlockParticleEffectComponent.Particle;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.componentSystem.RenderSystem;
-import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
+import org.terasology.componentSystem.RenderSystem;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;

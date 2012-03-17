@@ -1,11 +1,11 @@
-package org.terasology.logic.systems.characters;
+package org.terasology.componentSystem.characters;
 
 import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.componentSystem.UpdateSubscriberSystem;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.JumpEvent;

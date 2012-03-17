@@ -1,7 +1,5 @@
 package org.terasology.entitySystem;
 
-import org.terasology.entitySystem.componentSystem.EventHandlerSystem;
-
 /**
  * Event system propagates events to registered handlers
  * @author Immortius <immortius@gmail.com>
