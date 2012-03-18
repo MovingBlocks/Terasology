@@ -30,14 +30,14 @@ public class PortalBlueprint extends Blueprint {
 
     /** Fill the blueprint with the default Portal design. This isn't the right way to do it... */
     public PortalBlueprint() {
-        // This becomes the portalBlocks Selection in PortalComponent. Yeah, the naming is wrong and this is a placeholder
-        _blockCollection.addBlock(new BlockPosition(1,1,0), BlockManager.getInstance().getBlock("Companion"));
+        // This becomes the portalBlocks Selection in PortalComponent
+        _blockCollection.addBlock(new BlockPosition(1,1,0), BlockManager.getInstance().getBlock("PortalBlock"));
 
         // And these guys make up the frame
-        _blockCollection.addBlock(new BlockPosition(1,2,0), BlockManager.getInstance().getBlock("PortalBlock"));
-        _blockCollection.addBlock(new BlockPosition(0,1,0), BlockManager.getInstance().getBlock("PortalBlock"));
-        _blockCollection.addBlock(new BlockPosition(2,1,0), BlockManager.getInstance().getBlock("PortalBlock"));
-        _blockCollection.addBlock(new BlockPosition(1,0,0), BlockManager.getInstance().getBlock("PortalBlock"));
+        _blockCollection.addBlock(new BlockPosition(1,2,0), BlockManager.getInstance().getBlock("PortalFrameBlock"));
+        _blockCollection.addBlock(new BlockPosition(0,1,0), BlockManager.getInstance().getBlock("PortalFrameBlock"));
+        _blockCollection.addBlock(new BlockPosition(2,1,0), BlockManager.getInstance().getBlock("PortalFrameBlock"));
+        _blockCollection.addBlock(new BlockPosition(1,0,0), BlockManager.getInstance().getBlock("PortalFrameBlock"));
 
         // Set the position we'll use as the attachment point
         _blockCollection.setAttachPos(new BlockPosition(1,-1,0));
@@ -54,8 +54,8 @@ public class PortalBlueprint extends Blueprint {
     //public PortalComponent createPortal(IWorldProvider provider, BlockPosition pos) {
     public void createPortal(IWorldProvider provider, BlockPosition pos) {
         // Build the Portal in pieces so we can store what's what in the returned PortalComponent
-        BlockSelection portalBlocks = _blockCollection.buildWithFilter(provider, pos, "Companion");
-        BlockSelection frameBlocks = _blockCollection.buildWithFilter(provider, pos, "PortalBlock");
+        BlockSelection portalBlocks = _blockCollection.buildWithFilter(provider, pos, "PortalBlock");
+        BlockSelection frameBlocks = _blockCollection.buildWithFilter(provider, pos, "PortalFrameBlock");
 
         //return new PortalComponent(portalBlocks, frameBlocks);
     }

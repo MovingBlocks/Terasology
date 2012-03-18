@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.mineral
 
 /**
- * Sand is fairly sandy.
- * version is for Serialization purposes (maybe?) and may not make sense for all blocks
+ * Andesite is an extrusive igneous, volcanic
+ * rock, of intermediate composition;Andesite is used
+ * in the construction field. Andesite is used mainly for
+ * making tiles, bricks, or stones that are suitable for
+ * water or landscape gardens. They use andesite to make
+ * tiles because they are naturally slip resistant.
  */
 block {
     version = 1
