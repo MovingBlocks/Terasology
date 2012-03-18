@@ -1,0 +1,17 @@
+/**
+ * @author Immortius <immortius@gmail.com>
+ */
+
+option java_package = "org.terasology.protobuf";
+option java_outer_classname = "MeshData";
+option optimize_for = SPEED;
+
+message Data {
+    optional string name = 16;
+    repeated float vertices = 1;
+    repeated float texCoords0 = 2;
+    repeated float texCoords1 = 3;
+    repeated float normals = 4;
+    repeated float colors = 5;
+    repeated int32 indices = 6;
+}

@@ -16,9 +16,12 @@
  */
 package org.terasology.logic.characters;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.asset.importer.ObjMeshImporter;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.TeraMath;
 import org.terasology.model.structures.AABB;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -26,9 +29,17 @@ import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -39,7 +50,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class GelatinousCube extends Character {
 
-    private final Mesh _mesh;
+    private static Mesh _mesh;
     private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 0.2f), new Vector3f(1.0f, 0.2f, 0.2f), new Vector3f(0.2f, 1.0f, 0.2f), new Vector3f(1.0f, 1.0f, 0.2f)};
 
     private long _lastChangeOfDirectionAt = Terasology.getInstance().getTimeInMs();
@@ -48,6 +59,8 @@ public final class GelatinousCube extends Character {
 
     public final int _randomColorId;
     public float _randomSize = 1.0f;
+    
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     public GelatinousCube(WorldRenderer parent) {
         super(parent);
@@ -55,10 +68,29 @@ public final class GelatinousCube extends Character {
         _randomSize = (float) (((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 0.8 + 0.2);
         _randomColorId = Math.abs(_parent.getWorldProvider().getRandom().randomInt()) % COLORS.length;
 
-        Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].y, 1.0f), 0.8f * _randomSize, 0.8f, 0.6f, 0f, 0f, 0f);
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].y, 0.6f), 1.0f * _randomSize, 1.0f, 0.8f, 0f, 0f, 0f);
-        _mesh = tessellator.generateMesh();
+        if (_mesh == null) {
+            InputStream stream = getClass().getClassLoader().getResourceAsStream("org/terasology/data/mesh/testmonkey.obj");
+            ObjMeshImporter importer = new ObjMeshImporter();
+            try {
+                _mesh = importer.importStream(new BufferedReader(new InputStreamReader(stream)));
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Failed to load mesh", e);
+            }
+            finally {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+
+                }
+            }
+
+            if (_mesh == null) {
+                Tessellator tessellator = new Tessellator();
+                TessellatorHelper.addBlockMesh(tessellator, new Vector4f(COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].y, 1.0f), 0.8f * _randomSize, 0.8f, 0.6f, 0f, 0f, 0f);
+                TessellatorHelper.addBlockMesh(tessellator, new Vector4f(COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].y, 0.6f), 1.0f * _randomSize, 1.0f, 0.8f, 0f, 0f, 0f);
+                _mesh = tessellator.generateMesh();
+            }
+        }
     }
 
     @Override
@@ -79,7 +111,7 @@ public final class GelatinousCube extends Character {
         glTranslated(getPosition().x - cameraPosition.x, getPosition().y - cameraPosition.y, getPosition().z - cameraPosition.z);
         glRotatef((float) _yaw, 0f, 1f, 0f);
 
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("genericMesh");
 
         shader.enable();
         shader.setFloat4("colorOffset", COLORS[_randomColorId].x, COLORS[_randomColorId].y, COLORS[_randomColorId].z, 1.0f);
