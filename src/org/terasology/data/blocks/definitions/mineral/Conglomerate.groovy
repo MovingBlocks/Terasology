@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.mineral
 
 /**
- * Bauxite is a rock that is the main source of aluminium
+ *  Conglomerates are rocks consisting of individual clasts within a finer grained
+ *  matrix that have become cemented together. Conglomerates are sedimentary rocks;
+ *  Glaciers carry a lot of coarse-grained material and many glacial deposits are
+ *  conglomeratic.
  */
 block {
     version = 1
     shape = "cube"
 
-    hardness = 16
+    hardness = 2
 
     physics {
-        mass = 128000
+        mass = 32000
     }
 }

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.soil
 
 /**
- * Peat is a partially decayed vegetable matter, found in bogs. The low levels
- * of oxygen and the acidic environment in bogs prevent the degradation of peat.
- * Peat is burned as fuel and also used as fertilizer
+ * Silty soil is a sedimentary material consisting of grains or
+ * particles of disintegrated rock, smaller than sand and larger than clay.
+ * Silty soil is often found at the bottom of bodies of water where it accumulates
+ * slowly by settling through the water.
  */
 block {
     version = 1

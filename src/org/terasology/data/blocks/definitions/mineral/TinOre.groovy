@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.mineral
 
 /**
- * Clay Soil which is composed of very fine particles, usually silicates of
- * aluminum and/or iron and magnesium. Clay soil impedes the flow of water,
- * meaning it absorbs water slowly and then retains it for a long time. Wet
- * clay soil is heavy and sticky, and tends to swell from the added moisture.
- * When dry, clay soil shrinks and settles. The top layer can bake into a hard,
- * concrete-like crust which cracks. Some plants have difficulty growing in clay
- * soil because their seedlings or roots are unable to penetrate through hard,
- * dry soil, or can be waterlogged in wet soil.
+ * Tin is used to coat other metals to prevent corrosion; die casting;
+ *
  */
 block {
     version = 1

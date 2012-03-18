@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.mineral
 
 /**
- * Kimberlite is the only stone which diamonds are found on the inside
+ * Slate is a fine-grained, foliated, homogeneous metamorphic rock; When
+ * expertly "cut" by striking with a specialized tool slate will form
+ * smooth flat sheets of stone which have long been used for roofing and
+ * floor tiles and other purposes.
  */
 block {
     version = 1

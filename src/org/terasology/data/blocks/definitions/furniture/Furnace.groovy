@@ -26,7 +26,7 @@ block {
     faces {
         sides = "FurnaceSides"
         front = "FurnaceFront"
-        topbottom = "FuranceTopBottom"
+        topbottom = "FurnaceTopBottom"
     }
 
     // MetaBlock assignment - where to look for more info on a specific instance of this block

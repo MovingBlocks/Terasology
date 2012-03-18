@@ -142,6 +142,7 @@ class BlockManifestor {
         // We can also re-use manifestors for sub dirs if we just put stuff there for a "human-friendly" grouping
         loadBlockDefinitions("definitions/furniture", blockLoader)
         loadBlockDefinitions("definitions/mineral", blockLoader)
+        loadBlockDefinitions("definitions/soil", blockLoader)
         loadBlockDefinitions("definitions/plant/leaf", new PlantBlockLoader(_imageIndex))
 
         // _nextByte may not make sense if we're loading a world - until it is possible to upgrade / add stuff anyway

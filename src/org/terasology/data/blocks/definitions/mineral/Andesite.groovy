@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.mineral
 
 /**
- * Diorite is a intermediate intrusive igneous rock that occur in entire layers;
- * Diorite is an extremely hard rock, making it difficult to carve and work with.
+ * Andesite is an extrusive igneous, volcanic
+ * rock, of intermediate composition;Andesite is used
+ * in the construction field. Andesite is used mainly for
+ * making tiles, bricks, or stones that are suitable for
+ * water or landscape gardens. They use andesite to make
+ * tiles because they are naturally slip resistant.
  */
 block {
     version = 1
     shape = "cube"
 
-    hardness = 16
+    hardness = 2
 
     physics {
-        mass = 128000
+        mass = 32000
     }
 }

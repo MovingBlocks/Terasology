@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.mineral
 
 /**
- *  Conglomerates are rocks consisting of individual clasts within a finer grained
- *  matrix that have become cemented together. Conglomerates are sedimentary rocks;
- *  Glaciers carry a lot of coarse-grained material and many glacial deposits are
- *  conglomeratic.
+ * Diorite is a intermediate intrusive igneous rock that occur in entire layers;
+ * Diorite is an extremely hard rock, making it difficult to carve and work with.
  */
 block {
     version = 1
     shape = "cube"
 
-    hardness = 2
+    hardness = 16
 
     physics {
-        mass = 32000
+        mass = 128000
     }
 }

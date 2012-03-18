@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.mineral
 
 /**
- * Tin is used to coat other metals to prevent corrosion; die casting;
- *
+ * A mineral block that would drop Coal and this coal heats hotter than Anthracite coal so it is a good use in a smelt furnace
  */
 block {
     version = 1

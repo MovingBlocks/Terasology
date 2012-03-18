@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.soil
 
 /**
  * Sandy soil is pretty basic but a soil which has a higher proportion

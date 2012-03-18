@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.soil
 
 /**
- * Chalk is a soft, white, porous sedimentary rock; It forms under reasonably
- * deep marine conditions; Chalk has greater resistance to weathering; Chalk
- * is used to make quicklime and slaked lime, mainly used as lime mortar in
- * buildings and in agriculture chalk is used for raising pH in soils with
- * high acidity
+ * Sand is fairly sandy.
+ * version is for Serialization purposes (maybe?) and may not make sense for all blocks
  */
 block {
     version = 1
     shape = "cube"
+
+    hardness = 2
+
+    physics {
+        mass = 32000
+    }
 }

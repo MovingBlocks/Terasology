@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.soil
 
 /**
- * Slate is a fine-grained, foliated, homogeneous metamorphic rock; When
- * expertly "cut" by striking with a specialized tool slate will form
- * smooth flat sheets of stone which have long been used for roofing and
- * floor tiles and other purposes.
+ * Peat is a partially decayed vegetable matter, found in bogs. The low levels
+ * of oxygen and the acidic environment in bogs prevent the degradation of peat.
+ * Peat is burned as fuel and also used as fertilizer
  */
 block {
     version = 1
     shape = "cube"
-
-    hardness = 16
-
-    physics {
-        mass = 128000
-    }
 }

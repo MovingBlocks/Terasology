@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.mineral
 
 /**
- * Andesite is an extrusive igneous, volcanic
- * rock, of intermediate composition;Andesite is used
- * in the construction field. Andesite is used mainly for
- * making tiles, bricks, or stones that are suitable for
- * water or landscape gardens. They use andesite to make
- * tiles because they are naturally slip resistant.
+ * Laterites are soil types rich in iron and aluminium, formed in hot and wet tropical areas.
+ * Tricky: It should be able to refine to metals, yet it technically is a soil - classification?
  */
 block {
     version = 1
     shape = "cube"
-
-    hardness = 2
-
-    physics {
-        mass = 32000
-    }
 }

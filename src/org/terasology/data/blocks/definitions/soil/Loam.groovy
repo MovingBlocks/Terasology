@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.soil
 
 /**
- * Dacite is an igneous, volcanic rock; can be used as aggregate, fill
- * etc. in the construction and roading industries (often not ideal for
- * concrete aggregate because of high silica content)
+ * Loam is pretty basic soil and is also a rich soil consisting of a
+ * mixture of sand, clay, and decaying organic material
  */
 block {
     version = 1
     shape = "cube"
-
-    hardness = 16
-
-    physics {
-        mass = 128000
-    }
 }

@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.mineral
 
 /**
- * Sand is fairly sandy.
- * version is for Serialization purposes (maybe?) and may not make sense for all blocks
+ * Granite is a common and widely occurring type of intrusive, felsic, igneous rock.
+ * Granite usually has a medium to coarse grained texture; Granite has been extensively
+ * used as a dimension stone and as flooring tiles;  Granite block is usually processed
+ * into slabs and after can be cut and shaped
  */
 block {
     version = 1
     shape = "cube"
 
-    hardness = 2
+    hardness = 16
 
     physics {
-        mass = 32000
+        mass = 128000
     }
 }

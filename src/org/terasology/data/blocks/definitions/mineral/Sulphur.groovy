@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.mineral
 
 /**
  * Sulphur is used in gun powder, matches; is used as fungicide and insecticide

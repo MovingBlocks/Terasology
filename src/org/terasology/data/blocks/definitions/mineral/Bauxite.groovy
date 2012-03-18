@@ -17,9 +17,15 @@
 package org.terasology.data.blocks.definitions.mineral
 
 /**
- * A mineral block that would drop Coal and this coal heats hotter than AnthraciteOre coal so it is a good use in a smelt furnace
+ * Bauxite is a rock that is the main source of aluminium
  */
 block {
     version = 1
     shape = "cube"
+
+    hardness = 16
+
+    physics {
+        mass = 128000
+    }
 }
