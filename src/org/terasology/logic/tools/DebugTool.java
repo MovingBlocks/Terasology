@@ -47,6 +47,7 @@ public class DebugTool implements ITool {
 
         // Place / replace a portal blueprint based on whether one is already there or not
         PortalBlueprint portalBP = new PortalBlueprint();
+        System.out.println("Portal's collection:" + portalBP.getCollection());
         // TODO: Test the selected block against the ES to see if there's already a portal there
         BlockPosition targetPos = is.getBlockPosition();
         // localize the BP to the location

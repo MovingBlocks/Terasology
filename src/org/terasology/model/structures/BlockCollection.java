@@ -1,5 +1,3 @@
-package org.terasology.model.structures;
-
 /*
  * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
  *
@@ -15,23 +13,24 @@ package org.terasology.model.structures;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.model.structures;
 
 import org.terasology.game.Terasology;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 
 import java.util.HashMap;
-import java.util.Set;
 import java.util.logging.Level;
 
 /**
- * A collection of actual blocks and their relative positions, _not_ absolute positions in an existing world
+ * A collection of actual blocks and their relative positions, usually _not_ absolute positions in an existing world
  * Can also store a specific position that the collection should be oriented around rather than always a specific corner
  * Useful for for blueprints and other things that apply a particular set of expectations on a spot in a world
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class BlockCollection {
+    // TODO: Can this integrate better with BlockSelection, rather than need its keyset constructed into a BlockSelection for utility?
 
     /** Map of what blocks are in which positions */
     private final HashMap<BlockPosition, Block> _blocks = new HashMap<BlockPosition, Block>();
@@ -40,11 +39,11 @@ public class BlockCollection {
     private BlockPosition _attachPos = new BlockPosition(0,0,0);
 
     /**
-     * Simple return of the BlockPositions this collection holds
-     * @return The positions contained within this collection
+     * Simple return of the BlockPositions this collection holds in the form of a BlockSelection
+     * @return A BlockSelection containing the positions within this collection
      */
-    public Set<BlockPosition> positions() {
-        return _blocks.keySet();
+    public BlockSelection positions() {
+        return new BlockSelection(_blocks.keySet());
     }
 
     /**
@@ -161,80 +160,35 @@ public class BlockCollection {
     }
 
     /**
-     * Returns the width (x) of the BlockCollection's widest points (horizontally measured, not diagonally)
+     * Returns the width (x) of the backing BlockSelection's widest point (horizontally measured, not diagonally)
      * @return int holding calculated width or -1 if there are no elements
      */
     public int calcWidth() {
-        if (_blocks.isEmpty()) {
-            return -1;
-        }
-        int xMax = Integer.MIN_VALUE;
-        int xMin = Integer.MAX_VALUE;
-        for (BlockPosition pos : _blocks.keySet()) {
-            if (pos.x > xMax) {
-                xMax = pos.x;
-            }
-            if (pos.x < xMin) {
-                xMin = pos.x;
-            }
-        }
-
-        // Calculate the width + 1 (a one-block wide construct would calculate to 0)
-        return Math.abs(xMax) - Math.abs(xMin) + 1;
+        return positions().calcWidth();
     }
 
     /**
-     * Returns the height (y) of the BlockCollection's highest points (vertically measured, not diagonally)
+     * Returns the height (y) of the backing BlockCollection's highest point (vertically measured, not diagonally)
      * @return int holding calculated height or -1 if there are no elements
      */
     public int calcHeight() {
-        if (_blocks.isEmpty()) {
-            return -1;
-        }
-        int yMax = Integer.MIN_VALUE;
-        int yMin = Integer.MAX_VALUE;
-        for (BlockPosition pos : _blocks.keySet()) {
-            if (pos.y > yMax) {
-                yMax = pos.y;
-            }
-            if (pos.y < yMin) {
-                yMin = pos.y;
-            }
-        }
-
-        // Calculate the height + 1 (a one-block wide construct would calculate to 0)
-        return Math.abs(yMax) - Math.abs(yMin) + 1;
+        return positions().calcHeight();
     }
 
     /**
-     * Returns the depth (z) of the BlockCollection's deepest points (horizontally measured, not diagonally)
+     * Returns the depth (z) of the backing BlockCollection's deepest point (horizontally measured, not diagonally)
      * @return int holding calculated depth or -1 if there are no elements
      */
     public int calcDepth() {
-        if (_blocks.isEmpty()) {
-            return -1;
-        }
-        int zMax = Integer.MIN_VALUE;
-        int zMin = Integer.MAX_VALUE;
-        for (BlockPosition pos : _blocks.keySet()) {
-            if (pos.z > zMax) {
-                zMax = pos.z;
-            }
-            if (pos.z < zMin) {
-                zMin = pos.z;
-            }
-        }
-
-        // Calculate the depth + 1 (a one-block deep construct would calculate to 0)
-        return Math.abs(zMax) - Math.abs(zMin) + 1;
+        return positions().calcDepth();
     }
 
     public String toString() {
         String result = "[[";
         for (BlockPosition pos : _blocks.keySet()) {
-            result += pos + ":" + getBlock(pos) + "],[";
+            result += pos + "-" + getBlock(pos) + "],[";
         }
-        result += "]],attachPos:" + _attachPos;
+        result = result.substring(0, result.length() - 2) + "],attachPos:" + _attachPos;
         return result;
     }
 }
