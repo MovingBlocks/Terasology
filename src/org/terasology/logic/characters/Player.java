@@ -221,7 +221,7 @@ public class Player extends Character {
         glPushMatrix();
         glLoadIdentity();
         glClear(GL_DEPTH_BUFFER_BIT);
-        getActiveCamera().loadProjectionMatrix(75f);
+        getActiveCamera().loadProjectionMatrix(80f);
 
         if (getActiveItem() != null) {
             getActiveItem().renderFirstPersonView(this);

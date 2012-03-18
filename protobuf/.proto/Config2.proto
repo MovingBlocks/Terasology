@@ -32,7 +32,7 @@ message Setting {
     }
 
     message Player {
-        optional float fov = 1 [default = 86];
+        optional float fov = 1 [default = 80];
         optional float mouse_sens = 2 [default = 0.075];
         optional bool camera_bobbing = 3 [default = true];
         optional bool render_first_person_view = 4 [default = true];

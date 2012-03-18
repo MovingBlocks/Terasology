@@ -114,6 +114,27 @@ public class StateMainMenu implements IGameState {
             }
         });
 
+        _configMenu.getFOVButton().addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                UIButton button = (UIButton) element;
+
+                // TODO: Replace with a slider later on
+                if (button.getLabel().getText().equals("Field of View: 75")) {
+                    button.getLabel().setText("Field of View: 80");
+                    Config.getInstance().setFov(80);
+                } else if (button.getLabel().getText().equals("Field of View: 80")) {
+                    button.getLabel().setText("Field of View: 85");
+                    Config.getInstance().setFov(85);
+                } else if (button.getLabel().getText().equals("Field of View: 85")) {
+                    button.getLabel().setText("Field of View: 90");
+                    Config.getInstance().setFov(90);
+                } else if (button.getLabel().getText().equals("Field of View: 90")) {
+                    button.getLabel().setText("Field of View: 75");
+                    Config.getInstance().setFov(75);
+                }
+            }
+        });
+
         _configMenu.getViewingDistanceButton().addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 UIButton button = (UIButton) element;
@@ -154,6 +175,9 @@ public class StateMainMenu implements IGameState {
             _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Epic");
         else
             _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Ugly");
+
+        // TODO: Replace with a slider later on
+        _configMenu.getFOVButton().getLabel().setText("Field of View: " + (int) Config.getInstance().getFov());
     }
 
     public void deactivate() {

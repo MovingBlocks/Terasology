@@ -35,7 +35,8 @@ public class UIConfigMenu extends UIDisplayRenderer {
 
     private final UIButton _graphicsQualityButton,
             _backToMainMenuButton,
-            _viewingDistanceButton;
+            _viewingDistanceButton,
+            _fovButton;
 
     final UIText _version;
 
@@ -58,6 +59,11 @@ public class UIConfigMenu extends UIDisplayRenderer {
         _viewingDistanceButton.getLabel().setText("Viewing Distance: Near");
         _viewingDistanceButton.setVisible(true);
 
+        // TODO: Replace with a slider later on
+        _fovButton = new UIButton(new Vector2f(256f, 32f));
+        _fovButton.getLabel().setText("Field of View: 80");
+        _fovButton.setVisible(true);
+
         _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f));
         _backToMainMenuButton.getLabel().setText("Return to Main Menu");
         _backToMainMenuButton.setVisible(true);
@@ -68,6 +74,7 @@ public class UIConfigMenu extends UIDisplayRenderer {
         addDisplayElement(_version);
 
         addDisplayElement(_graphicsQualityButton);
+        addDisplayElement(_fovButton);
         addDisplayElement(_backToMainMenuButton);
         addDisplayElement(_viewingDistanceButton);
     }
@@ -81,11 +88,15 @@ public class UIConfigMenu extends UIDisplayRenderer {
 
         _graphicsQualityButton.centerHorizontally();
         _graphicsQualityButton.getPosition().y = 300f + 40f;
+
         _viewingDistanceButton.centerHorizontally();
         _viewingDistanceButton.getPosition().y = 300f + 2 * 40f;
 
+        _fovButton.centerHorizontally();
+        _fovButton.getPosition().y = 300f + 3 * 40f;
+
         _backToMainMenuButton.centerHorizontally();
-        _backToMainMenuButton.getPosition().y = 300f + 4 * 40f;
+        _backToMainMenuButton.getPosition().y = 300f + 5 * 40f;
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;
@@ -101,5 +112,9 @@ public class UIConfigMenu extends UIDisplayRenderer {
 
     public UIButton getViewingDistanceButton() {
         return _viewingDistanceButton;
+    }
+
+    public UIButton getFOVButton() {
+        return _fovButton;
     }
 }
