@@ -13,30 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.model.inventory;
 
-import org.terasology.model.blueprints.Blueprint;
+package org.terasology.data.blocks.definitions.mineral
 
 /**
- * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
+ * Andesite is an extrusive igneous, volcanic
+ * rock, of intermediate composition;Andesite is used
+ * in the construction field. Andesite is used mainly for
+ * making tiles, bricks, or stones that are suitable for
+ * water or landscape gardens. They use andesite to make
+ * tiles because they are naturally slip resistant.
  */
-public class ItemBlueprint extends Item {
+block {
+    version = 1
+    shape = "cube"
 
-    private Blueprint _blueprint;
+    hardness = 2
 
-    public ItemBlueprint() {
-        super();
-
-        _toolId = (byte) 2;
-        _stackSize = 1;
+    physics {
+        mass = 32000
     }
-
-    public Blueprint getBlueprint() {
-        return _blueprint;
-    }
-
-    public void setBlueprint(Blueprint bp) {
-        _blueprint = bp;
-    }
-
 }

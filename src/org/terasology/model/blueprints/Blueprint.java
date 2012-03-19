@@ -51,7 +51,7 @@ public abstract class Blueprint {
      *
      * @return The list
      */
-    public Set<BlockPosition> getBlockPositions() {
+    public BlockSelection getBlockSelection() {
         return _blockCollection.positions();
     }
 

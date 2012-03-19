@@ -17,16 +17,10 @@
 package org.terasology.data.blocks.definitions
 
 /**
- * Sand is fairly sandy.
- * version is for Serialization purposes (maybe?) and may not make sense for all blocks
+ * A PortalFrameBlock is part of the frame that surrounds a PortalBlock
  */
 block {
     version = 1
     shape = "cube"
-
-    hardness = 2
-
-    physics {
-        mass = 32000
-    }
+    hardness = 0
 }

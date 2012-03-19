@@ -80,6 +80,7 @@ public class TextureManager {
         /* MOBS */
         addTexture("slime");
         addTexture("char");
+        addTexture("mhead");
 
         /* EFFECTS */
         addTexture("effects");

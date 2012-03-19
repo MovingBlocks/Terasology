@@ -15,14 +15,6 @@
  */
 package org.terasology.logic.tools;
 
-import org.terasology.game.Terasology;
-import org.terasology.logic.manager.BlueprintManager;
-import org.terasology.model.inventory.ItemBlueprint;
-import org.terasology.model.structures.BlockPosition;
-import org.terasology.model.structures.RayBlockIntersection;
-
-import java.util.ArrayList;
-
 /**
  * Can be used to create and place blueprints.
  */

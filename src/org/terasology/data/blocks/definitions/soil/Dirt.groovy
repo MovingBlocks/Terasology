@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions
+package org.terasology.data.blocks.definitions.soil
 
 /**
  * Dirt is pretty basic

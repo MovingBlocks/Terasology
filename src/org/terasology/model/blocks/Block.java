@@ -579,6 +579,7 @@ public class Block implements IGameObject {
     }
 
     public String toString() {
+        // This may seem excessive in logging, but you get both the class name (which may not be "Block") and block title
         return this.getClass().getSimpleName() + ":" + _title + ";id:" + _id;
     }
 
