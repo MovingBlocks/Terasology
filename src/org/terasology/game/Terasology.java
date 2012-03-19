@@ -116,10 +116,13 @@ public final class Terasology {
         else {
             addLibraryPath("natives/windows");
 
-            if (System.getProperty("os.arch").contains("64"))
+            if (System.getProperty("os.arch").contains("64")){
                 System.loadLibrary("OpenAL64");
-            else
+                _logger.log(Level.INFO, "Initializing openAl 64");
+            }else{
                 System.loadLibrary("OpenAL32");
+                _logger.log(Level.INFO, "Initializing openAl 32");
+            }
         }
     }
 

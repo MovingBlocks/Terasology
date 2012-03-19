@@ -71,22 +71,12 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         _deleteFromList.getLabel().setText("Delete selected element");
         _deleteFromList.setVisible(true);
 
-        _goToBack.addClickListener(new IClickListener() {
+        /*_goToBack.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 Terasology.getInstance().getGameMode().deactivateScreen("select_world");
                 Terasology.getInstance().getGameMode().activateScreen("main_menu");
             }
-        });
-        _list.addItem("Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" + _list.size(), "Add world " + _list.size());
-        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
-        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
-        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
-        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
-        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
-        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
-        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
-        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
-        _list.addItem("Add world" + _list.size(), "Add world " + _list.size());
+        });   */
 
         _addToList.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
@@ -105,7 +95,6 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
             }
         });
 
-       // addDisplayElement(_overlay);
       addDisplayElement(_list);
       addDisplayElement(_goToBack);
       addDisplayElement(_addToList);
@@ -134,5 +123,9 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         _goToBack.centerHorizontally();
         _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
 
+    }
+
+    public UIButton getGoToBackButton(){
+        return _goToBack;
     }
 }

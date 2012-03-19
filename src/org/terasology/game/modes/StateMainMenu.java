@@ -25,6 +25,7 @@ import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.UIConfigMenu;
 import org.terasology.rendering.gui.menus.UIMainMenu;
+import org.terasology.rendering.gui.menus.UISelectWorldMenu;
 
 import java.util.ArrayList;
 
@@ -48,8 +49,9 @@ public class StateMainMenu implements IGameState {
     private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
 
     /* SCREENS */
-    private UIMainMenu _mainMenu;
-    private UIConfigMenu _configMenu;
+    private UIMainMenu        _mainMenu;
+    private UIConfigMenu      _configMenu;
+    private UISelectWorldMenu _selectWorldMenu;
 
     private Terasology _gameInstance = null;
 
@@ -83,6 +85,20 @@ public class StateMainMenu implements IGameState {
             public void clicked(UIDisplayElement element) {
                 _mainMenu.setVisible(false);
                 _configMenu.setVisible(true);
+            }
+        });
+
+        _mainMenu.getOptionsButton().addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                _mainMenu.setVisible(false);
+                _selectWorldMenu.setVisible(true);
+            }
+        });
+
+        _selectWorldMenu.getGoToBackButton().addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                _selectWorldMenu.setVisible(false);
+                _mainMenu.setVisible(true);
             }
         });
     }

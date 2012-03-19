@@ -36,8 +36,9 @@ public class UIMainMenu extends UIDisplayRenderer {
     private final UIImageOverlay _overlay;
     private final UIGraphicsElement _title;
 
+
+    private final UIButton _optionsButton;
     private final UIButton _exitButton;
-    final UIButton _optionsButton;
     private final UIButton _startButton;
     private final UIButton _configButton;
 
@@ -55,22 +56,10 @@ public class UIMainMenu extends UIDisplayRenderer {
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
+
         _optionsButton = new UIButton(new Vector2f(256f, 32f));
         _optionsButton.getLabel().setText("Select World");
         _optionsButton.setVisible(true);
-
-        _optionsButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                Terasology.getInstance().getGameMode().deactivateScreen("main_menu");
-                Terasology.getInstance().getGameMode().activateScreen("select_world");
-            }
-        });
-
-        _exitButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                Terasology.getInstance().exit();
-            }
-        });
 
         _configButton = new UIButton(new Vector2f(256f, 32f));
         _configButton.getLabel().setText("Settings");
@@ -110,9 +99,9 @@ public class UIMainMenu extends UIDisplayRenderer {
 
         _exitButton.centerHorizontally();
         _exitButton.getPosition().y = 300f + 3 * 32f + 64f;
-
         _configButton.centerHorizontally();
         _configButton.getPosition().y = 300f + 2 * 40f;
+
 
         _exitButton.centerHorizontally();
         _exitButton.getPosition().y = 300f + 4 * 40f;
@@ -131,5 +120,9 @@ public class UIMainMenu extends UIDisplayRenderer {
 
     public UIButton getConfigButton() {
         return _configButton;
+    }
+
+    public UIButton getOptionsButton() {
+        return _optionsButton;
     }
 }
