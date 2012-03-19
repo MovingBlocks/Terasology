@@ -69,6 +69,9 @@ public class StateMainMenu implements IGameState {
         _mainMenu = new UIMainMenu();
         _mainMenu.setVisible(true);
 
+        _selectWorldMenu = new UISelectWorldMenu();
+        _selectWorldMenu.setVisible(false);
+
         _mainMenu.getStartButton().addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
