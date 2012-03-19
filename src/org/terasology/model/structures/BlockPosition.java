@@ -88,4 +88,9 @@ public final class BlockPosition implements Comparable<BlockPosition> {
 
         return 0;
     }
+
+    // TODO: _origin not included, don't really want it... might need to split this class so we have a pure position and separate class with the origin thing?
+    public String toString() {
+        return x + "," + y + "," + z;
+    }
 }

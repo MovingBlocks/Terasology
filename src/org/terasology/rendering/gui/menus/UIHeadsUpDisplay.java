@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.menus;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.components.UICrosshair;
 import org.terasology.rendering.gui.components.UIHealthBar;
 import org.terasology.rendering.gui.components.UIText;
@@ -74,8 +74,6 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _healthBar = new UIHealthBar();
         _healthBar.setVisible(true);
         addDisplayElement(_healthBar);
-
-        update();
     }
 
 
@@ -93,7 +91,7 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _healthBar.setPosition(new Vector2f(_toolbar.getPosition().x, _toolbar.getPosition().y - _toolbar.getSize().y + 8f));
         _crosshair.setPosition(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
 
-        boolean enableDebug = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.debug");
+        boolean enableDebug = Config.getInstance().isDebug();
         _debugLine1.setVisible(enableDebug);
         _debugLine2.setVisible(enableDebug);
         _debugLine3.setVisible(enableDebug);

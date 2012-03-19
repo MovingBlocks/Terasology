@@ -34,7 +34,10 @@ import org.terasology.math.Side
 import org.terasology.model.blocks.HorizontalBlockGroup
 import org.terasology.model.shapes.BlockShape
 import org.terasology.model.shapes.BlockShapeManager
-import org.terasology.model.blocks.AttachToSurfaceGroup
+import org.terasology.model.blocks.AlignToSurfaceGroup
+import org.terasology.math.Rotation
+import org.terasology.model.structures.AABB
+import org.terasology.utilities.Helper
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -51,8 +54,8 @@ class BlockManifestor {
 
     // TODO: Usage of this is fairly brute force, maybe there's a more efficient way, with sorting or so?
 
-    /** Holds BufferedImages during the loading process (not persisted) */
-    private Map<String, BufferedImage> _images = [:]
+    /** Not persisted */
+    Map<String, BufferedImage> _images = [:]
 
     /** Holds image index values during the loading process. These values are persisted in the Manifest */
     protected static Map<String, Integer> _imageIndex = [:]
@@ -85,22 +88,11 @@ class BlockManifestor {
 
     // Temp helper methods until we can correctly use WorldProvider.getWorldSavePath - tries to detect and fix screwy applet paths
     protected fixSavePaths() {
-        _blockManifest = fixSavePath(_blockManifest)
-        _imageManifest = fixSavePath(_imageManifest)
-        _imageManifestMipMap1 = fixSavePath(_imageManifestMipMap1)
-        _imageManifestMipMap2 = fixSavePath(_imageManifestMipMap2)
-        _imageManifestMipMap3 = fixSavePath(_imageManifestMipMap3)
-    }
-
-    private File fixSavePath(File f) {
-        org.terasology.model.blocks.management.BlockManifestor.log.info "Suggested absolute save path is: " + f.getAbsolutePath()
-        if (!f.getAbsolutePath().contains("Terasology")) {
-            f = new File(System.getProperty("java.io.tmpdir"), f.path)
-            org.terasology.model.blocks.management.BlockManifestor.log.info "Going to use absolute TEMP save path instead: " + f.getAbsolutePath()
-
-            return f
-        }
-        return f
+        _blockManifest = Helper.fixSavePath(_blockManifest)
+        _imageManifest = Helper.fixSavePath(_imageManifest)
+        _imageManifestMipMap1 = Helper.fixSavePath(_imageManifestMipMap1)
+        _imageManifestMipMap2 = Helper.fixSavePath(_imageManifestMipMap2)
+        _imageManifestMipMap3 = Helper.fixSavePath(_imageManifestMipMap3)
     }
 
     /**
@@ -123,16 +115,18 @@ class BlockManifestor {
         } else {
             // If we don't have a saved world we'll need to build a new ImageManifest from raw block textures
             String path = "images"
-            println "*** Going to scan for images from classpath: " + _resourceLoader.getPackagePath() + '/' + path
+            log.fine "*** Going to scan for images from classpath: " + _resourceLoader.getPackagePath() + '/' + path
             _images = _resourceLoader.getImages(path)
 
-            println "Loaded fresh images - here's some logging!"
+            //println "Loaded fresh images - here's some logging!"
             _images.eachWithIndex { key, value, index ->
-                println "Image " + index + " is for " + key + " and looks like: " + value
-                _imageIndex.put(key, index)
+                //println "Image " + index + " is for " + key + " and looks like: " + value
+                // TODO: Using Locale.ENGLISH _seems_ sensible given that the names should be consistent between different
+                // users (is mostly used internally), but need to review
+                _imageIndex.put(key.toLowerCase(Locale.ENGLISH), index)
             }
 
-            println "The image index (ImageManifest not yet saved) now looks like this: " + _imageIndex
+            log.info "The image index (ImageManifest not yet saved) now looks like this: " + _imageIndex
         }
 
         SimpleBlockLoader blockLoader = new SimpleBlockLoader(_imageIndex);
@@ -148,11 +142,12 @@ class BlockManifestor {
         // We can also re-use manifestors for sub dirs if we just put stuff there for a "human-friendly" grouping
         loadBlockDefinitions("definitions/furniture", blockLoader)
         loadBlockDefinitions("definitions/mineral", blockLoader)
+        loadBlockDefinitions("definitions/soil", blockLoader)
         loadBlockDefinitions("definitions/plant/leaf", new PlantBlockLoader(_imageIndex))
 
         // _nextByte may not make sense if we're loading a world - until it is possible to upgrade / add stuff anyway
-        println "Done loading blocks - _nextByte made it to " + _nextByte
-        println "Final map that'll be passed to BlockManager is: " + _blockIndex
+        //println "Done loading blocks - _nextByte made it to " + _nextByte
+        //println "Final map that'll be passed to BlockManager is: " + _blockIndex
 
         // We do the same check once again - this time to see if we need to write the first-time manifest
         if (!worldExists) {
@@ -162,7 +157,6 @@ class BlockManifestor {
 
         _bm.addAllBlocks(_blockIndex)
         _bm.addAllBlockGroups(_blockGroups);
-        org.terasology.model.blocks.management.BlockManifestor.log.info "_imageManifest file: " + _imageManifest.getAbsolutePath()
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
     }
 
@@ -174,102 +168,220 @@ class BlockManifestor {
     public loadBlockDefinitions(String path, BlockLoader loader) {
         // First identify what plain Block definitions we've got at the appropriate path and loop over what we get
         _resourceLoader.getClassesAt(path).each { c ->
-            println("Got back the following class: " + c)
+            //println("Got back the following class: " + c)
 
             // Prepare to load properties from the Groovy definition via ConfigSlurper
             ConfigObject blockConfig = new ConfigSlurper().parse((Class) c)
             blockConfig.put("name", c.getSimpleName())
-            println "Loaded block config for Class " + c + ": " + blockConfig
+            //println "Loaded block config for Class " + c + ": " + blockConfig
 
-            // Prepare a Block from the stuff we load from the Groovy definition
-            Block b = loader.loadBlock(blockConfig)
-
-            // Single shape
-            if (blockConfig.block.shape instanceof String) {
-                applyShape(b, blockConfig.block.shape)
-                registerBlock(c.getSimpleName(), b);
-                _blockGroups.add(new SymmetricGroup(b));
+            if (blockConfig.block.alignment instanceof String) {
+                String alignment = blockConfig.block.alignment;
+                if (alignment.equalsIgnoreCase("HorizontalDirection")) {
+                    loadHorizontalBlock(blockConfig, loader)
+                } else if (alignment.equalsIgnoreCase("SurfaceAligned")) {
+                    loadSurfaceAligned(blockConfig, loader)
+                } else {
+                    loadSymmetricBlock(blockConfig, loader)
+                }
+            } else {
+                loadSymmetricBlock(blockConfig, loader)
             }
-            else if (blockConfig.block.shape != [:]) {
-                String baseTitle = blockConfig.name;
-                if ("HorizontalRotation".equalsIgnoreCase(blockConfig.block.shape.mode) && blockConfig.block.shape.sides != [:]) {
-                    EnumMap<Side, Block> blocks = new EnumMap<Side, Block>(Side.class);
-                    applyShape(b, blockConfig.block.shape.sides)
-                    for (int i = 0; i < 4; ++i) {
-                        Side direction = Side.FRONT.rotateClockwise(i);
-                        Block rotBlock = b.rotateClockwise(i);
-                        registerBlock(baseTitle + direction, rotBlock);
-                        blocks.put(direction, rotBlock);
-                    }
-                    _blockGroups.add(new HorizontalBlockGroup(baseTitle, blocks));
-                }
-                else if ("AttachToSurface".equalsIgnoreCase(blockConfig.block.shape.mode))
-                {
-                    attachToSurface(blockConfig, b, baseTitle);
-                }
-                else
-                {
-                    if (!b.isInvisible()) {
-                        // Cube
-                        applyShape(b, "cube")
-                    }
-                    registerBlock(c.getSimpleName(), b);
-                    _blockGroups.add(new SymmetricGroup(b));
-                }
-            }
-            else {
-                if (!b.isInvisible()) {
-                    // Cube
-                    applyShape(b, "cube")
-                }
-                registerBlock(c.getSimpleName(), b);
-                _blockGroups.add(new SymmetricGroup(b));
-            }
-
         }
     }
 
-    private void attachToSurface(ConfigObject blockConfig, Block b, String baseTitle) {
-        EnumMap<Side, Block> blocks = new EnumMap<Side, Block>(Side.class);
-        if (blockConfig.block.shape.sides != [:]) {
-            Block tempBlock = b.clone()
-            applyShape(tempBlock, blockConfig.block.shape.sides)
-            for (int i = 0; i < 4; ++i) {
-                Side direction = Side.FRONT.rotateClockwise(i);
-                Block rotBlock = tempBlock.rotateClockwise(i);
-                registerBlock(baseTitle + direction, rotBlock);
-                blocks.put(direction, rotBlock);
+    public loadSurfaceAligned(ConfigObject blockConfig, BlockLoader loader) {
+        def loaded = false
+        EnumMap<Side, Block> blockMap = new EnumMap<Side, Block>(Side.class)
+
+        // TODO: Other sides
+        // TODO: Top-Bottom flip
+        if (blockConfig.block.bottom != [:]) {
+            ConfigObject combined = new ConfigObject();
+            combined.merge(blockConfig.block)
+            combined.merge(blockConfig.block.bottom)
+
+            Block b = loader.loadBlock(combined)
+            BlockShape shape = loadBlockShape(combined);
+            if (shape != null) {
+                FacesInfo facesInfo = loadFaces(combined.faces, blockConfig.name)
+                applyBlockShape(b, shape, facesInfo)
+            }
+            registerBlock(blockConfig.name + Side.BOTTOM, b)
+            blockMap.put(Side.BOTTOM, b)
+        }
+        if (blockConfig.block.sides != [:]) {
+            ConfigObject combined = new ConfigObject();
+            combined.merge(blockConfig.block)
+            combined.merge(blockConfig.block.sides)
+
+            BlockShape shape = loadBlockShape(combined);
+            if (shape != null) {
+                FacesInfo facesInfo = loadFaces(combined.faces, blockConfig.name)
+                for (Rotation rot : Rotation.horizontalRotations()) {
+                    Block block = loader.loadBlock(combined, rot)
+                    applyBlockShape(block, shape, facesInfo, rot)
+
+                    registerBlock(blockConfig.name + rot.rotate(Side.FRONT), block)
+                    blockMap.put(rot.rotate(Side.FRONT), block)
+                }
             }
         }
-        if (blockConfig.block.shape.bottom != [:]) {
-            Block tempBlock = b.clone()
-            applyShape(tempBlock, blockConfig.block.shape.bottom)
-            registerBlock(baseTitle + Side.BOTTOM, tempBlock)
-            blocks.put(Side.BOTTOM, tempBlock)
+
+        if (!loaded) {
+            // TODO: default, load shape and rotate to all sides
         }
-        _blockGroups.add(new AttachToSurfaceGroup(baseTitle, blocks))
+
+        _blockGroups.add(new AlignToSurfaceGroup(blockConfig.name, blockMap))
     }
 
+    public loadHorizontalBlock(ConfigObject blockConfig, BlockLoader loader) {
+        BlockShape shape = loadBlockShape(blockConfig.block);
 
-    private void applyShape(Block b, String shapeTitle) {
-        BlockShape shape = BlockShapeManager.getInstance().getBlockShape(shapeTitle);
+        EnumMap<Side, Block> blockMap = new EnumMap<Side, Block>(Side.class)
+        
+        FacesInfo facesInfo = loadFaces(blockConfig.block.faces, blockConfig.name)
+        for (Rotation rot : Rotation.horizontalRotations()) {
+            Block block = loader.loadBlock(blockConfig.block, rot)
+            applyBlockShape(block, shape, facesInfo, rot)
+
+            registerBlock(blockConfig.name + rot.rotate(Side.FRONT), block)
+            blockMap.put(rot.rotate(Side.FRONT), block)
+        }
+        _blockGroups.add(new HorizontalBlockGroup(blockConfig.name, blockMap))
+    }
+
+    public loadSymmetricBlock(ConfigObject blockConfig, BlockLoader loader) {
+        Block b = loader.loadBlock(blockConfig.block);
+        
+        BlockShape shape = loadBlockShape(blockConfig.block);
+
         if (shape != null) {
-            println "Has shape: " + shapeTitle
-            if (shape.getCenterMesh() != null) {
-                // TODO: Need texPos for center
-                Vector2f centerTexturePos = b.getTextureAtlasPos(Side.FRONT)
-                b.withCenterMesh(shape.getCenterMesh().mapTexCoords(new Vector2f((float) (Block.TEXTURE_OFFSET * centerTexturePos.x), (float) (Block.TEXTURE_OFFSET * centerTexturePos.y)), Block.TEXTURE_OFFSET_WIDTH));
+            FacesInfo facesInfo = loadFaces(blockConfig.block.faces, blockConfig.name)
+            applyBlockShape(b, shape, facesInfo)
+            if (blockConfig.block.loweredShape != [:]) {
+                applyLoweredShape(b, BlockShapeManager.getInstance().getBlockShape(blockConfig.block.loweredShape), facesInfo)
             }
+        }
 
-            for (Side side: Side.values()) {
+        registerBlock(blockConfig.name, b)
+        _blockGroups.add(new SymmetricGroup(b))
+    }
+
+    private BlockShape loadBlockShape(ConfigObject config) {
+        // TODO: No singletons!
+        if (config.shape instanceof String) {
+            return BlockShapeManager.getInstance().getBlockShape(config.shape)
+        } else if (!config.invisible) {
+            return BlockShapeManager.getInstance().getBlockShape("cube")
+        }
+        return null;
+    }
+
+    private void applyLoweredShape(Block b, BlockShape shape, FacesInfo faces) {
+        if (shape != null) {
+            for (Side side : Side.values()) {
                 if (shape.getSideMesh(side) != null) {
-                    b.withSideMesh(side, shape.getSideMesh(side).mapTexCoords(b.calcTextureOffsetFor(side), Block.TEXTURE_OFFSET_WIDTH))
+                    b.withLoweredSideMesh(side, shape.getSideMesh(side).mapTexCoords(calcTextureOffsetFor(faces.sides.get(side)), Block.TEXTURE_OFFSET_WIDTH))
                 }
-                b.withFullSide(side, shape.isBlockingSide(side));
             }
-            b.setColliders(shape.getColliders());
         }
     }
+    
+    private void applyBlockShape(Block b, BlockShape shape, FacesInfo faces) {
+        applyBlockShape(b, shape, faces, Rotation.None)
+    }
+
+    private void applyBlockShape(Block b, BlockShape shape, FacesInfo faces, Rotation rotation) {
+        if (shape.getCenterMesh() != null) {
+            b.withCenterMesh(shape.getCenterMesh().rotate(rotation.getQuat4f()).mapTexCoords(calcTextureOffsetFor(faces.center), Block.TEXTURE_OFFSET_WIDTH))
+        }
+        
+        for (Side side : Side.values()) {
+            Side targetSide = rotation.rotate(side);
+            if (shape.getSideMesh(side) != null) {
+                b.withSideMesh(targetSide, shape.getSideMesh(side).rotate(rotation.getQuat4f()).mapTexCoords(calcTextureOffsetFor(faces.sides.get(side)), Block.TEXTURE_OFFSET_WIDTH))
+            }
+            b.withFullSide(targetSide, shape.isBlockingSide(side));
+            b.withTextureAtlasPos(targetSide, faces.sides.get(side))
+        }
+        
+        List<AABB> colliders = []
+        for (AABB col : shape.colliders) {
+            colliders.add(rotation.rotate(col));
+        }
+        b.setColliders(colliders);
+        
+    }
+
+    private Vector2f calcTextureOffsetFor(Vector2f face) {
+        return new Vector2f((float) face.x * Block.TEXTURE_OFFSET, (float) face.y * Block.TEXTURE_OFFSET);
+    }
+
+    private FacesInfo loadFaces(ConfigObject faces, String defaultTextureName) {
+        FacesInfo result = new FacesInfo();
+        
+        def textureId = getImageIdUnchecked(defaultTextureName)
+        if (faces.all != [:]) {
+            textureId = getImageId(faces.all);
+        }
+        if (textureId == null && faces.center != [:]) {
+            textureId = getImageId(faces.center);
+        }
+        if (textureId != null) {
+            Vector2f texPos = calcAtlasPositionForId(textureId);
+            result.center = texPos;
+            for (Side side : Side.values()) {
+                result.sides.put(side, texPos);
+            }
+        } else {
+            for (Side side : Side.values()) {
+                result.sides.put(side, calcAtlasPositionForId(0));
+            }
+        }
+
+        if (faces.center != [:]) {
+            result.center = calcAtlasPositionForId(getImageId(faces.center))
+        }
+        if (faces.sides != [:]) {
+            Vector2f texPos = calcAtlasPositionForId(getImageId(faces.sides))
+            for (Side side : Side.horizontalSides()) {
+                result.sides.put(side, texPos);
+            }
+        }
+        if (faces.topbottom != [:]) {
+            Vector2f texPos = calcAtlasPositionForId(getImageId(faces.topbottom))
+            result.sides.put(Side.TOP, texPos);
+            result.sides.put(Side.BOTTOM, texPos);
+        }
+        // Top, Bottom, Left, Right, Front, Back - probably a way to do that in a loop...
+        if (faces.top != [:]) {
+            result.sides.put(Side.TOP, calcAtlasPositionForId(getImageId(faces.top)))
+        }
+        if (faces.bottom != [:]) {
+            result.sides.put(Side.BOTTOM, calcAtlasPositionForId(getImageId(faces.bottom)))
+        }
+        if (faces.left != [:]) {
+            result.sides.put(Side.LEFT, calcAtlasPositionForId(getImageId(faces.left)))
+        }
+        if (faces.right != [:]) {
+            result.sides.put(Side.RIGHT, calcAtlasPositionForId(getImageId(faces.right)))
+        }
+        if (faces.front != [:]) {
+            result.sides.put(Side.FRONT, calcAtlasPositionForId(getImageId(faces.front)))
+        }
+        if (faces.back != [:]) {
+            result.sides.put(Side.BACK, calcAtlasPositionForId(getImageId(faces.back)))
+        }
+        return result;
+    }
+
+    
+    private static class FacesInfo {
+        public EnumMap<Side,Vector2f> sides = new EnumMap<Side, Vector2f>(Side.class);
+        public Vector2f center;
+    }
+
 
     private void registerBlock(String title, Block b) {
         b.withTitle(title);
@@ -277,16 +389,16 @@ class BlockManifestor {
         // Make up or load a dynamic ID and add the finished Block to our local block index (prep for BlockManager)
         // See if have an ID for this block already (we should if we loaded an existing manifest)
         if (_blockStringIndex.containsKey(b.getTitle())) {
-            log.info "Found an existing block ID value, assigning it to Block " + b.getTitle()
+            //log.info "Found an existing block ID value, assigning it to Block " + b.getTitle()
             b.withId((byte) _blockStringIndex.get(b.getTitle()))
         } else {
             // We have a single special case - the Air block (aka "empty") is ALWAYS id 0
             if (b.getTitle() == "Air") {
-                log.info "Hit the Air block - assigning this one the magic zero value a.k.a. 'empty'"
+                //log.info "Hit the Air block - assigning this one the magic zero value a.k.a. 'empty'"
                 b.withId((byte) 0)
                 _blockStringIndex.put(b.getTitle(), (byte) 0)
             } else {
-                log.info "We don't have an existing ID for " + b.getTitle() + " so assigning _nextByte " + _nextByte
+                //log.info "We don't have an existing ID for " + b.getTitle() + " so assigning _nextByte " + _nextByte
                 b.withId(_nextByte)
                 _blockStringIndex.put(b.getTitle(), _nextByte)
                 _nextByte++
@@ -324,7 +436,7 @@ class BlockManifestor {
         //String s = Terasology.getInstance().getActiveWorldProvider().getWorldSavePath() + "/BlockManifest.groovy"
 
         // Later need to use Terasology.getInstance().getActiveWorldProvider().getWorldSavePath() or something
-        println "Saving merged Block texture file to " + _imageManifest.absolutePath
+        log.info "Saving merged Block texture file to " + _imageManifest.absolutePath
         _imageManifest.mkdirs()
         ImageIO.write(generateImage(0), "png", _imageManifest)
         ImageIO.write(generateImage(1), "png", _imageManifestMipMap1)
@@ -337,11 +449,12 @@ class BlockManifestor {
         manifest.imageIndex = _imageIndex
         manifest.nextByte = _nextByte
 
-        println "Saving block IDs and image atlas (index) positions to " + _blockManifest.absolutePath
+        log.info "Saving block IDs and image atlas (index) positions to " + _blockManifest.absolutePath
         _blockManifest.withWriter { writer ->
             writer << '// Warning: Editing this file may do crazy things to your saved world!\r\n'
             manifest.writeTo(writer)
         }
+        log.info "The block index now looks like this: " + _blockIndex
     }
 
     /**
@@ -350,17 +463,34 @@ class BlockManifestor {
     private loadManifest() {
         def manifest = new ConfigSlurper().parse(_blockManifest.toURL())
 
-        _imageIndex = manifest.imageIndex
+        Map<String, Integer> tempImageIndex = manifest.imageIndex
+
+        _imageIndex = new HashMap<String, Integer>();
+        tempImageIndex.each {key, value -> _imageIndex.put(key.toLowerCase(Locale.ENGLISH), value)}
         _blockStringIndex = manifest.blockIndex
         _nextByte = manifest.nextByte
 
-        println "LOADED imageIndex: " + _imageIndex
-        println "LOADED blockIndex: " + _blockStringIndex
-        println "LOADED nextByte: " + _nextByte
+        log.info "LOADED imageIndex from " + _imageManifest.getAbsolutePath() + " is: " + _imageIndex
+        log.info "LOADED blockIndex from " + _blockManifest.getAbsolutePath() + " is: " + _blockStringIndex
+        log.info "LOADED nextByte: " + _nextByte
     }
 
-    // TODO: Utility method? Move to block? Is repeated in SimpleBlockLoader
+    // TODO: Utility method?
     private Vector2f calcAtlasPositionForId(int id) {
         return new Vector2f(((int) id % (int) Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN), ((int) id / (int) Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN))
     }
+    
+    private Integer getImageIdUnchecked(String name) {
+        return _imageIndex.get(name.toLowerCase(Locale.ENGLISH))
+    }
+
+    private int getImageId(String name) {
+        String lcName = name.toLowerCase(Locale.ENGLISH);
+        if (_imageIndex.containsKey(lcName)) {
+            return _imageIndex.get(lcName)
+        }
+        log.severe "Unknown texture: " + name;
+        return 0;
+    }
+
 }

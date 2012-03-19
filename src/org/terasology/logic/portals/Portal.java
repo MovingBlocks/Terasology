@@ -33,6 +33,4 @@ public class Portal {
     public Vector3d getBlockLocation() {
         return _blockLocation;
     }
-
-
 }

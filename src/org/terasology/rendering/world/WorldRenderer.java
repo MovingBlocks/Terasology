@@ -18,7 +18,6 @@ package org.terasology.rendering.world;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.openal.SoundStore;
 import org.terasology.game.Terasology;
 import org.terasology.logic.characters.Player;
 import org.terasology.logic.entities.Entity;
@@ -29,6 +28,8 @@ import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.particles.BlockParticleEmitter;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
@@ -41,9 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
+import java.util.*;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -59,22 +58,31 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public final class WorldRenderer implements IGameObject {
 
-    public static final boolean BOUNDING_BOXES_ENABLED = (Boolean) SettingsManager.getInstance().getWorldSetting("World.Debug.renderChunkBoundingBoxes");
-    public static final int MAX_CHUNK_VERTEX_BUFFER_OBJECTS = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.maxChunkVBOs");
-
-    /* VIEWING DISTANCE */
-    private int _viewingDistance = 8;
-
     /* WORLD PROVIDER */
     private final IWorldProvider _worldProvider;
 
     /* PLAYER */
     private Player _player;
 
+    /* CAMERA */
+    public enum CAMERA_MODE {
+        PLAYER,
+        SPAWN
+    }
+
+    private CAMERA_MODE _cameraMode = CAMERA_MODE.PLAYER;
+    private Camera _spawnCamera = new DefaultCamera();
+
     /* CHUNKS */
     private final ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>();
-    private final ArrayList<Chunk> _visibleChunks = new ArrayList<Chunk>();
     private int _chunkPosX, _chunkPosZ;
+
+    /* RENDERING */
+    private final LinkedList<Chunk> _renderQueueChunksOpaque = new LinkedList<Chunk>();
+    private final PriorityQueue<Chunk> _renderQueueChunksSortedWater = new PriorityQueue<Chunk>();
+    private final PriorityQueue<Chunk> _renderQueueChunksSortedBillboards = new PriorityQueue<Chunk>();
+    private final LinkedList<IGameObject> _renderQueueOpaque = new LinkedList<IGameObject>();
+    private final LinkedList<IGameObject> _renderQueueTransparent = new LinkedList<IGameObject>();
 
     /* CORE GAME OBJECTS */
     private final PortalManager _portalManager;
@@ -87,7 +95,7 @@ public final class WorldRenderer implements IGameObject {
     private final Skysphere _skysphere;
 
     /* TICKING */
-    private int _tick = 0;
+    private double _tick = 0;
     private int _tickTock = 0;
     private long _lastTick;
 
@@ -104,7 +112,7 @@ public final class WorldRenderer implements IGameObject {
     private final BlockGrid _blockGrid;
 
     /* STATISTICS */
-    private int _statDirtyChunks = 0;
+    private int _statDirtyChunks = 0, _statVisibleChunks = 0, _statIgnoredPhases = 0;
 
     /* OTHER SETTINGS */
     private boolean _wireframe;
@@ -135,17 +143,18 @@ public final class WorldRenderer implements IGameObject {
      * @return True if the list was changed
      */
     public boolean updateChunksInProximity(boolean force) {
+        int newChunkPosX = calcCamChunkOffsetX();
+        int newChunkPosZ = calcCamChunkOffsetZ();
 
-        int newChunkPosX = calcPlayerChunkOffsetX();
-        int newChunkPosZ = calcPlayerChunkOffsetZ();
+        int viewingDistance = Config.getInstance().getActiveViewingDistance();
 
         if (_chunkPosX != newChunkPosX || _chunkPosZ != newChunkPosZ || force) {
 
             _chunksInProximity.clear();
 
-            for (int x = -(_viewingDistance / 2); x < (_viewingDistance / 2); x++) {
-                for (int z = -(_viewingDistance / 2); z < (_viewingDistance / 2); z++) {
-                    Chunk c = _worldProvider.getChunkProvider().loadOrCreateChunk(calcPlayerChunkOffsetX() + x, calcPlayerChunkOffsetZ() + z);
+            for (int x = -(viewingDistance / 2); x < (viewingDistance / 2); x++) {
+                for (int z = -(viewingDistance / 2); z < (viewingDistance / 2); z++) {
+                    Chunk c = _worldProvider.getChunkProvider().getChunk(calcCamChunkOffsetX() + x, 0, calcCamChunkOffsetZ() + z);
                     _chunksInProximity.add(c);
                 }
             }
@@ -166,7 +175,7 @@ public final class WorldRenderer implements IGameObject {
 
         double distLength = dist.length();
 
-        return distLength < (_viewingDistance * 8);
+        return distLength < (Config.getInstance().getActiveViewingDistance() * 8);
     }
 
     /**
@@ -177,8 +186,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.1, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.1f);
-                AudioManager.getInstance().getAudio("Sunrise").playAsMusic(1.0f, 1.0f, false);
+                AudioManager.playMusic("Sunrise");
             }
         });
 
@@ -186,8 +194,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.25, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.1f);
-                AudioManager.getInstance().getAudio("Afternoon").playAsMusic(1.0f, 1.0f, false);
+                AudioManager.playMusic("Afternoon");
             }
         });
 
@@ -195,8 +202,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.4, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.1f);
-                AudioManager.getInstance().getAudio("Sunset").playAsMusic(1.0f, 1.0f, false);
+                AudioManager.playMusic("Sunset");
             }
         });
 
@@ -204,8 +210,15 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.1f);
-                AudioManager.getInstance().getAudio("Dimlight").playAsMusic(1.0f, 1.0f, false);
+                AudioManager.playMusic("Dimlight");
+            }
+        });
+
+        // NIGHT
+        _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.75, true) {
+            @Override
+            public void run() {
+                AudioManager.playMusic("OtherSide");
             }
         });
 
@@ -213,8 +226,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
             @Override
             public void run() {
-                SoundStore.get().setMusicVolume(0.1f);
-                AudioManager.getInstance().getAudio("Resurface").playAsMusic(1.0f, 1.0f, false);
+                AudioManager.playMusic("Resurface");
             }
         });
     }
@@ -222,27 +234,39 @@ public final class WorldRenderer implements IGameObject {
     /**
      * Updates the currently visible chunks (in sight of the player).
      */
-    public void updateVisibleChunks() {
-        _visibleChunks.clear();
+    public void updateAndQueueVisibleChunks() {
         _statDirtyChunks = 0;
+        _statVisibleChunks = 0;
+        _statIgnoredPhases = 0;
 
-        boolean noMoreUpdates = false;
         for (int i = 0; i < _chunksInProximity.size(); i++) {
             Chunk c = _chunksInProximity.get(i);
 
             if (isChunkVisible(c)) {
-                _visibleChunks.add(c);
+                if (c.triangleCount(ChunkMesh.RENDER_PHASE.OPAQUE) > 0)
+                    _renderQueueChunksOpaque.add(c);
+                else
+                    _statIgnoredPhases++;
+
+                if (c.triangleCount(ChunkMesh.RENDER_PHASE.WATER_AND_ICE) > 0)
+                    _renderQueueChunksSortedWater.add(c);
+                else
+                    _statIgnoredPhases++;
+
+                if (c.triangleCount(ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) > 0)
+                    _renderQueueChunksSortedBillboards.add(c);
+                else
+                    _statIgnoredPhases++;
+
                 c.update();
 
-                if (c.isDirty())
+                if (c.isDirty() || c.isLightDirty() || c.isFresh()) {
                     _statDirtyChunks++;
-
-                if ((c.isDirty() || c.isLightDirty() || c.isFresh()) && !noMoreUpdates) {
-                    if (!_chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT)) {
-                        noMoreUpdates = true;
-                    }
+                    _chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
                 }
-            } else if (i > MAX_CHUNK_VERTEX_BUFFER_OBJECTS) {
+
+                _statVisibleChunks++;
+            } else if (i > Config.getInstance().getMaxChunkVBOs()) {
                 // Make sure not too many chunk VBOs are available in the video memory at the same time
                 // Otherwise VBOs are moved into system memory which is REALLY slow and causes lag
                 c.clearMeshes();
@@ -250,84 +274,67 @@ public final class WorldRenderer implements IGameObject {
         }
     }
 
+    private void queueRenderer() {
+        PerformanceMonitor.startActivity("Update and Queue Chunks");
+        updateAndQueueVisibleChunks();
+        PerformanceMonitor.endActivity();
+
+        _renderQueueTransparent.add(_bulletRenderer);
+        _renderQueueTransparent.add(_mobManager);
+        _renderQueueTransparent.add(_blockParticleEmitter);
+        _renderQueueTransparent.add(_blockGrid);
+
+        Chunk.resetStats();
+    }
+
     /**
      * Renders the world.
      */
     public void render() {
+        /* QUEUE RENDERER */
+        queueRenderer();
+
         PostProcessingRenderer.getInstance().beginRenderScene();
 
         /* SKYSPHERE */
-        PerformanceMonitor.startActivity("Render-Sky");
-        _player.getActiveCamera().lookThroughNormalized();
+        PerformanceMonitor.startActivity("Render Sky");
+        getActiveCamera().lookThroughNormalized();
         _skysphere.render();
         PerformanceMonitor.endActivity();
 
         /* WORLD RENDERING */
-        PerformanceMonitor.startActivity("Render-World");
-        _player.getActiveCamera().lookThrough();
+        PerformanceMonitor.startActivity("Render World");
+        getActiveCamera().lookThrough();
         _player.render();
 
-        // Render all chunks and entities
-        Chunk.resetStats();
-        renderChunksAndEntities();
-        PerformanceMonitor.endActivity();
-
-        /* PARTICLE EFFECTS */
-        PerformanceMonitor.startActivity("Render-Particles");
-        _blockParticleEmitter.render();
-        PerformanceMonitor.endActivity();
-
-        PerformanceMonitor.startActivity("Render-Grid");
-        _blockGrid.render();
-        PerformanceMonitor.endActivity();
-
-        // The overlay has to be rendered separately so it appears on top of everything else
-        PerformanceMonitor.startActivity("Render-Extraction Overlay");
-
-        _player.renderExtractionOverlay();
-        PerformanceMonitor.endActivity();
-
-        PostProcessingRenderer.getInstance().endRenderScene();
-
-
-        PerformanceMonitor.startActivity("Post-Processing");
-        // Draw the final scene on a quad and render it...
-        PostProcessingRenderer.getInstance().renderScene();
-        PerformanceMonitor.endActivity();
-
-        _player.renderFirstPersonViewElements();
-    }
-
-
-    /**
-     * Renders all chunks that are currently in the player's field of view.
-     */
-    private void renderChunksAndEntities() {
         glEnable(GL_LIGHT0);
 
-        boolean headUnderWater = _player.isHeadUnderWater();
+        boolean headUnderWater = false;
 
-        PerformanceMonitor.startActivity("BulletPhysicsRenderer");
-        _bulletRenderer.render();
+        if (_cameraMode == CAMERA_MODE.PLAYER)
+            headUnderWater = _player.isHeadUnderWater();
+
+        if (_wireframe)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        PerformanceMonitor.startActivity("RenderOpaque");
+
+        while (_renderQueueOpaque.size() > 0)
+            _renderQueueOpaque.poll().render();
+
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Chunk-Opaque");
+        PerformanceMonitor.startActivity("Render ChunkOpaque");
 
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
-        if (_wireframe)
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
-        for (int i = 0; i < _visibleChunks.size(); i++) {
-            Chunk c = _visibleChunks.get(i);
-            c.render(ChunkMesh.RENDER_PHASE.OPAQUE);
-        }
+        while (_renderQueueChunksOpaque.size() > 0)
+            _renderQueueChunksOpaque.poll().render(ChunkMesh.RENDER_PHASE.OPAQUE);
 
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Chunk-Billboard");
+        PerformanceMonitor.startActivity("Render ChunkTransparent");
 
         /*
          * SECOND RENDER PASS: BILLBOARDS
@@ -335,21 +342,19 @@ public final class WorldRenderer implements IGameObject {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        for (int i = 0; i < _visibleChunks.size(); i++) {
-            Chunk c = _visibleChunks.get(i);
-            c.render(ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT);
-        }
+        while (_renderQueueChunksSortedBillboards.size() > 0)
+            _renderQueueChunksSortedBillboards.poll().render(ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT);
 
         PerformanceMonitor.endActivity();
 
-        /*
-         * RENDER MOBS
-         */
-        PerformanceMonitor.startActivity("Render Mobs");
-        _mobManager.renderAll();
+        PerformanceMonitor.startActivity("Render Transparent");
+
+        while (_renderQueueTransparent.size() > 0)
+            _renderQueueTransparent.poll().render();
+
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Chunk-WaterIce");
+        PerformanceMonitor.startActivity("Render ChunkWaterIce");
 
         // Make sure the water surface is rendered if the player is swimming
         if (headUnderWater) {
@@ -357,32 +362,48 @@ public final class WorldRenderer implements IGameObject {
         }
 
         /*
-        * THIRD RENDER PASS: WATER AND ICE
+        * THIRD (AND FOURTH) RENDER PASS: WATER AND ICE
         */
+        while (_renderQueueChunksSortedWater.size() > 0) {
+            Chunk c = _renderQueueChunksSortedWater.poll();
 
-        for (int j = 0; j < 2; j++) {
-            if (j == 0) {
-                glColorMask(false, false, false, false);
-            } else {
-                glColorMask(true, true, true, true);
-            }
+            for (int j = 0; j < 2; j++) {
 
-            for (int i = 0; i < _visibleChunks.size(); i++) {
-                Chunk c = _visibleChunks.get(i);
-                c.render(ChunkMesh.RENDER_PHASE.WATER_AND_ICE);
+                if (j == 0) {
+                    glColorMask(false, false, false, false);
+                    c.render(ChunkMesh.RENDER_PHASE.WATER_AND_ICE);
+                } else {
+                    glColorMask(true, true, true, true);
+                    c.render(ChunkMesh.RENDER_PHASE.WATER_AND_ICE);
+                }
             }
         }
+
+        /* EXTRACTION OVERLAY */
+        _player.renderExtractionOverlay();
 
         glDisable(GL_BLEND);
 
-        if (headUnderWater) {
+        if (headUnderWater)
             glEnable(GL11.GL_CULL_FACE);
-        }
+
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
         glDisable(GL_LIGHT0);
 
         PerformanceMonitor.endActivity();
+
+        PostProcessingRenderer.getInstance().endRenderScene();
+
+        /* RENDER THE FINAL POST-PROCESSED SCENE */
+        PerformanceMonitor.startActivity("Render Post-Processing");
+        PostProcessingRenderer.getInstance().renderScene();
+        PerformanceMonitor.endActivity();
+
+        /* FIRST PERSON VIEW ELEMENTS */
+        if (_cameraMode == CAMERA_MODE.PLAYER)
+            _player.renderFirstPersonViewElements();
     }
 
     public float getRenderingLightValue() {
@@ -399,24 +420,35 @@ public final class WorldRenderer implements IGameObject {
         return (float) TeraMath.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
     }
 
-    public void update() {
+    public void update(double delta) {
+        PerformanceMonitor.startActivity("Cameras");
+        animateSpawnCamera(delta);
+        _spawnCamera.update(delta);
+        PerformanceMonitor.endActivity();
+
         PerformanceMonitor.startActivity("Update Tick");
-        updateTick();
+        updateTick(delta);
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Update Close Chunks");
+        updateChunksInProximity(false);
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Skysphere");
-        _skysphere.update();
+        _skysphere.update(delta);
         PerformanceMonitor.endActivity();
+
         PerformanceMonitor.startActivity("Player");
-        _player.update();
+        _player.update(delta);
         PerformanceMonitor.endActivity();
+
         PerformanceMonitor.startActivity("Mob Manager");
-        _mobManager.updateAll();
+        _mobManager.update(delta);
         PerformanceMonitor.endActivity();
 
         // Update the particle emitters
         PerformanceMonitor.startActivity("Block Particle Emitter");
-        _blockParticleEmitter.update();
+        _blockParticleEmitter.update(delta);
         PerformanceMonitor.endActivity();
 
         // Free unused space
@@ -437,14 +469,33 @@ public final class WorldRenderer implements IGameObject {
         _worldProvider.getGrowthSimulator().simulate(false);
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Update Chunks");
-        updateChunksInProximity(false);
-        updateVisibleChunks();
-        PerformanceMonitor.endActivity();
-
         PerformanceMonitor.startActivity("Physics Renderer");
-        _bulletRenderer.update();
+        _bulletRenderer.update(delta);
         PerformanceMonitor.endActivity();
+    }
+
+    private void animateSpawnCamera(double delta) {
+        Vector3d cameraPosition = new Vector3d(_player.getSpawningPoint());
+        cameraPosition.y += 32;
+        cameraPosition.x += Math.sin(getTick() * 0.0005f) * 32f;
+        cameraPosition.z += Math.cos(getTick() * 0.0005f) * 32f;
+
+        Vector3d playerToCamera = new Vector3d();
+        playerToCamera.sub(_player.getPosition(), cameraPosition);
+        double distanceToPlayer = playerToCamera.length();
+
+        Vector3d cameraDirection = new Vector3d();
+
+        if (distanceToPlayer > 64.0) {
+            cameraDirection.sub(_player.getSpawningPoint(), cameraPosition);
+        } else {
+            cameraDirection.set(playerToCamera);
+        }
+
+        cameraDirection.normalize();
+
+        _spawnCamera.getPosition().set(cameraPosition);
+        _spawnCamera.getViewingDirection().set(cameraDirection);
     }
 
     /**
@@ -453,9 +504,9 @@ public final class WorldRenderer implements IGameObject {
      * Secondary effect: Trigger spawning (via PortalManager) once every second
      * Tertiary effect: Trigger socializing (via MobManager) once every 10 seconds
      */
-    private void updateTick() {
+    private void updateTick(double delta) {
         // Update the animation tick
-        _tick++;
+        _tick += delta;
 
         // This block is based on seconds or less frequent timings
         if (Terasology.getInstance().getTimeInMs() - _lastTick >= 1000) {
@@ -494,8 +545,8 @@ public final class WorldRenderer implements IGameObject {
      *
      * @return The player offset on the x-axis
      */
-    private int calcPlayerChunkOffsetX() {
-        return (int) (_player.getPosition().x / Chunk.CHUNK_DIMENSION_X);
+    private int calcCamChunkOffsetX() {
+        return (int) (getActiveCamera().getPosition().x / Chunk.CHUNK_DIMENSION_X);
     }
 
     /**
@@ -503,8 +554,8 @@ public final class WorldRenderer implements IGameObject {
      *
      * @return The player offset on the z-axis
      */
-    private int calcPlayerChunkOffsetZ() {
-        return (int) (_player.getPosition().z / Chunk.CHUNK_DIMENSION_Z);
+    private int calcCamChunkOffsetZ() {
+        return (int) (getActiveCamera().getPosition().z / Chunk.CHUNK_DIMENSION_Z);
     }
 
     /**
@@ -526,14 +577,14 @@ public final class WorldRenderer implements IGameObject {
 
         _player.load();
         _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
+        updateChunksInProximity(true);
+
         _player.reset();
 
         // Only respawn the player if no position was loaded
         if (_player.getPosition().equals(new Vector3d(0.0, 0.0, 0.0))) {
             _player.respawn();
         }
-
-        updateChunksInProximity(true);
     }
 
     /**
@@ -557,9 +608,65 @@ public final class WorldRenderer implements IGameObject {
         AudioManager.getInstance().stopAllSounds();
     }
 
+    /**
+     * Returns true if no more chunks can be generated.
+     *
+     * @return
+     */
+    public boolean generateChunk() {
+        for (int i = 0; i < _chunksInProximity.size(); i++) {
+            Chunk c = _chunksInProximity.get(i);
+
+            if (c.isDirty() || c.isLightDirty() || c.isFresh()) {
+                c.processChunk();
+                c.generateVBOs();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void printScreen() {
+        GL11.glReadBuffer(GL11.GL_FRONT);
+        final int width = Display.getDisplayMode().getWidth();
+        final int height = Display.getDisplayMode().getHeight();
+        //int bpp = Display.getDisplayMode().getBitsPerPixel(); does return 0 - why?
+        final int bpp = 4;
+        final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
+        GL11.glReadPixels(0, 0, width, height, (bpp == 3) ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        Runnable r = new Runnable() {
+            public void run() {
+                Calendar cal = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmssSSS");
+
+                File file = new File(sdf.format(cal.getTime()) + ".png");
+                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+                for (int x = 0; x < width; x++)
+                    for (int y = 0; y < height; y++) {
+                        int i = (x + (width * y)) * bpp;
+                        int r = buffer.get(i) & 0xFF;
+                        int g = buffer.get(i + 1) & 0xFF;
+                        int b = buffer.get(i + 2) & 0xFF;
+                        image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
+                    }
+
+                try {
+                    ImageIO.write(image, "png", file);
+                } catch (IOException e) {
+                    Terasology.getInstance().getLogger().log(Level.WARNING, "Could not save image!", e);
+                }
+            }
+        };
+
+        Terasology.getInstance().submitTask("Write screenshot", r);
+    }
+
+
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %d, visible: %d, dirty: %d, tri: %d, empty: %d, not-ready: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _visibleChunks.size(), _statDirtyChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public Player getPlayer() {
@@ -567,15 +674,15 @@ public final class WorldRenderer implements IGameObject {
     }
 
     public boolean isAABBVisible(AABB aabb) {
-        return _player.getActiveCamera().getViewFrustum().intersects(aabb);
+        return getActiveCamera().getViewFrustum().intersects(aabb);
     }
 
     public boolean isChunkVisible(Chunk c) {
-        return _player.getActiveCamera().getViewFrustum().intersects(c.getAABB());
+        return getActiveCamera().getViewFrustum().intersects(c.getAABB());
     }
 
     public boolean isEntityVisible(Entity e) {
-        return _player.getActiveCamera().getViewFrustum().intersects(e.getAABB());
+        return getActiveCamera().getViewFrustum().intersects(e.getAABB());
     }
 
     public double getDaylight() {
@@ -614,33 +721,12 @@ public final class WorldRenderer implements IGameObject {
         return _skysphere;
     }
 
-    public int getTick() {
+    public double getTick() {
         return _tick;
-    }
-
-    public int getViewingDistance() {
-        return _viewingDistance;
     }
 
     public ArrayList<Chunk> getChunksInProximity() {
         return _chunksInProximity;
-    }
-
-    public void setViewingDistance(int distance) {
-        _viewingDistance = distance;
-        updateChunksInProximity(true);
-        Terasology.getInstance().resetOpenGLParameters();
-    }
-
-    public void standaloneGenerateChunks() {
-        for (int i = 0; i < _chunksInProximity.size(); i++) {
-            Chunk c = _chunksInProximity.get(i);
-            c.generateVBOs();
-
-            if (c.isDirty() || c.isLightDirty()) {
-                _chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
-            }
-        }
     }
 
     public boolean isWireframe() {
@@ -651,39 +737,27 @@ public final class WorldRenderer implements IGameObject {
         this._wireframe = _wireframe;
     }
 
-    public void printScreen() {
-        //REFACTOR TO USE BACKGROUND THREAD FOR IMAGE COPY & SAVE
-        GL11.glReadBuffer(GL11.GL_FRONT);
-        int width = Display.getDisplayMode().getWidth();
-        int height = Display.getDisplayMode().getHeight();
-        //int bpp = Display.getDisplayMode().getBitsPerPixel(); does return 0 - why?
-        int bpp = 4;
-        ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
-        GL11.glReadPixels(0, 0, width, height, (bpp == 3) ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-
-        File file = new File(sdf.format(cal.getTime()) + ".png");
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++) {
-                int i = (x + (width * y)) * bpp;
-                int r = buffer.get(i) & 0xFF;
-                int g = buffer.get(i + 1) & 0xFF;
-                int b = buffer.get(i + 2) & 0xFF;
-                image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
-            }
-
-        try {
-            ImageIO.write(image, "png", file);
-        } catch (IOException e) {
-            Terasology.getInstance().getLogger().log(Level.WARNING, "Could not save image!", e);
-        }
-    }
-
     public BulletPhysicsRenderer getBulletRenderer() {
         return _bulletRenderer;
+    }
+
+    public Camera getActiveCamera() {
+        if (_player != null && _cameraMode == CAMERA_MODE.PLAYER) {
+            return _player.getActiveCamera();
+        } else if (_cameraMode == CAMERA_MODE.SPAWN) {
+            return _spawnCamera;
+        }
+
+        return _spawnCamera;
+    }
+
+    public void setCameraMode(CAMERA_MODE mode) {
+        if (mode == CAMERA_MODE.PLAYER && _player != null) {
+            _player.setRenderPlayerModel(false);
+        } else if (mode == CAMERA_MODE.SPAWN) {
+            _player.setRenderPlayerModel(true);
+        }
+
+        _cameraMode = mode;
     }
 }

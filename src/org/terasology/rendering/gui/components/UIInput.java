@@ -17,9 +17,9 @@ import java.util.ArrayList;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
- * @todo Add text selection and paste from clipboard
  */
 public class UIInput extends UIDisplayContainer {
+//	TODO: Add text selection and paste from clipboard
   private final ArrayList<IInputListener> _inputListeners = new ArrayList<IInputListener>();
 
   private final StringBuffer      _inputValue = new StringBuffer();
@@ -65,7 +65,7 @@ public class UIInput extends UIDisplayContainer {
     if (intersects(mousePos)) {
 
         if (!_clickSoundPlayed) {
-            AudioManager.getInstance().getAudio("PlaceBlock").playAsSoundEffect(1.0f, 0.5f, false);
+            AudioManager.play("PlaceBlock");
             _clickSoundPlayed = true;
         }
 

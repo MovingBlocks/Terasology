@@ -214,7 +214,6 @@ public class ChunkMesh {
                 break;
             case BILLBOARD_AND_TRANSLUCENT:
                 renderVbo(1);
-                // BILLBOARDS
                 glDisable(GL_CULL_FACE);
                 renderVbo(2);
                 glEnable(GL_CULL_FACE);
@@ -257,6 +256,15 @@ public class ChunkMesh {
 
     public boolean isDisposed() {
         return _disposed;
+    }
+
+    public int triangleCount(RENDER_PHASE phase) {
+        if (phase == RENDER_PHASE.OPAQUE)
+            return _vertexCount[0] / 3;
+        else if (phase == RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT)
+            return (_vertexCount[1] + _vertexCount[2]) / 3;
+        else
+            return _vertexCount[3] / 3;
     }
 
     public int triangleCount() {

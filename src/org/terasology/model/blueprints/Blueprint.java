@@ -15,36 +15,35 @@
  */
 package org.terasology.model.blueprints;
 
+import org.terasology.model.structures.BlockCollection;
+import org.terasology.model.structures.BlockSelection;
+import org.terasology.model.structures.BlockPosition;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.structures.BlockPosition;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Set;
 
 /**
- * A very simple prototype of the blueprint concept.
- * <p/>
- * Blueprints are currently a set of block positions and block types
- * that can be used to create replicas in the world.
- *
+ * Blueprints are instructions for creating specific block structures in the world - relative positions of set blocks
+ * Players (and creatures) can dynamically place blueprints of assorted types in-game creating the resulting product
+ * Some blueprint types may additionally define selections of positions that are special for some reason (like Portals)
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-public class Blueprint {
+public abstract class Blueprint {
 
-    private final HashSet<BlockPosition> _blockPositions = new HashSet<BlockPosition>();
-    private final HashMap<BlockPosition, Block> _blockTypes = new HashMap<BlockPosition, Block>();
+    /** The Blocks and which BlockPositions they exist at in this blueprint. Every Blueprint has this */
+    protected BlockCollection _blockCollection = new BlockCollection();
 
     /**
-     * Builds the blueprint in the given world at the given position.
+     * Builds the blueprint in the given world at the given position, relative to the blueprint's attachment position
      *
      * @param provider The world the blueprint should be build in
-     * @param position The position the blueprint should be build
+     * @param pos The position the blueprint should be built at
+     * @return a BlockSelection containing localized positions for what was built
      */
-    public void build(IWorldProvider provider, BlockPosition position) {
-        for (BlockPosition bp : _blockPositions) {
-            provider.setBlock(bp.x + position.x, bp.y + position.y, bp.z + position.z, _blockTypes.get(bp).getId(), true, true);
-        }
+    public BlockSelection build(IWorldProvider provider, BlockPosition pos) {
+        return _blockCollection.build(provider,pos);
     }
 
     /**
@@ -52,16 +51,15 @@ public class Blueprint {
      *
      * @return The list
      */
-    public HashSet<BlockPosition> getBlockPositions() {
-        return _blockPositions;
+    public BlockSelection getBlockSelection() {
+        return _blockCollection.positions();
     }
 
-    /**
-     * Returns the map assigning block types to block positions.
-     *
-     * @return The map
-     */
-    public HashMap<BlockPosition, Block> getBlockTypes() {
-        return _blockTypes;
+    public void addBlock(BlockPosition pos, Block b) {
+        _blockCollection.addBlock(pos, b);
+    }
+
+    public BlockCollection getCollection() {
+        return _blockCollection;
     }
 }

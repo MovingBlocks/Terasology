@@ -2,10 +2,14 @@ SAVED_WORLDS
 logs
 out
 .DS_Store
-.idea/workspace.xml
+Terasology.iml
+Terasology.ipr
+Terasology.iws
+.idea
 .classpath
 .project
 .settings
 bin
 /.idea/
 /build/
+.gradle

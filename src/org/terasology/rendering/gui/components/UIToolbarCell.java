@@ -58,6 +58,9 @@ public class UIToolbarCell extends UIDisplayElement {
 
     @Override
     public void update() {
+        if (Terasology.getInstance().getActiveWorldRenderer() == null)
+            return;
+
         _selectionRectangle.setVisible(_selected);
         setPosition(new Vector2f((getSize().x - 8f) * _id - 2f, 2f));
 
@@ -68,37 +71,40 @@ public class UIToolbarCell extends UIDisplayElement {
         } else {
             setSelected(false);
         }
-        
+
         displayItemCount();
     }
-    
+
     private void displayItemCount() {
         Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         int count = inventory.getItemCountAt(_id);
-        
+
         if (count == 0) {
-        	getLabel().setVisible(false);
+            getLabel().setVisible(false);
         } else {
-        	getLabel().setVisible(true);
-        	getLabel().setText(Integer.toString(count));
+            getLabel().setVisible(true);
+            getLabel().setText(Integer.toString(count));
         }
     }
 
     @Override
     public void render() {
-        _selectionRectangle.renderTransformed();
+        if (Terasology.getInstance().getActiveWorldRenderer() == null)
+            return;
 
-        glEnable(GL11.GL_DEPTH_TEST);
+        _selectionRectangle.renderTransformed();
 
         Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         Item item = inventory.getItemAt(_id);
 
+        glEnable(GL11.GL_DEPTH_TEST);
+
         if (item != null) {
+            glClear(GL11.GL_DEPTH_BUFFER_BIT);
             glPushMatrix();
             glTranslatef(20f, 20f, 0f);
             Icon.get(item).render();
             glPopMatrix();
-            glDisable(GL11.GL_CULL_FACE);
         }
 
         glDisable(GL11.GL_DEPTH_TEST);

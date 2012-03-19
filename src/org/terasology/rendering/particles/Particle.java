@@ -34,8 +34,10 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class Particle implements IGameObject {
     protected final ParticleEmitter _parent;
 
-    protected final Vector3d _targetVelocity = new Vector3d(0.0f, -0.03f, 0.0f);
-    protected final Vector3d _velDecSpeed = new Vector3d(0.003f, 0.003f, 0.003f);
+    protected static final double METERS_TO_MM = 0.001;
+
+    protected final Vector3d _targetVelocity = new Vector3d(0.0f, -1.0f * METERS_TO_MM, 0.0f);
+    protected final Vector3d _velDecFactor = new Vector3d(0.01 * METERS_TO_MM, 0.01 * METERS_TO_MM, 0.01 * METERS_TO_MM);
 
     protected float _size = 0.01f;
 
@@ -48,7 +50,10 @@ public abstract class Particle implements IGameObject {
 
     public Particle(int lifeTime, Vector3d position, ParticleEmitter parent) {
         _position.set(position);
-        _initialVelocity.set((_rand.randomInt() % 32) * 0.003d, (_rand.randomInt() % 32) * 0.003f, (_rand.randomInt() % 32) * 0.003d);
+
+        _initialVelocity.set(_rand.randomDouble() * 4.0, _rand.randomDouble() * 4.0, _rand.randomDouble() * 4.0);
+        _initialVelocity.scale(METERS_TO_MM);
+
         _velocity.set(_initialVelocity);
 
         _lifetime = lifeTime;
@@ -61,8 +66,8 @@ public abstract class Particle implements IGameObject {
         if (isAlive()) {
             glPushMatrix();
 
-            Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-            glTranslated(_position.x - playerPosition.x, _position.y - playerPosition.y, _position.z - playerPosition.z);
+            Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+            glTranslated(_position.x - cameraPosition.x, _position.y - cameraPosition.y, _position.z - cameraPosition.z);
             applyOrientation();
             glScalef(_size, _size, _size);
 
@@ -72,9 +77,9 @@ public abstract class Particle implements IGameObject {
         }
     }
 
-    public void update() {
-        updateVelocity();
-        updatePosition();
+    public void update(double delta) {
+        updateVelocity(delta);
+        updatePosition(delta);
         decLifetime();
     }
 
@@ -96,23 +101,23 @@ public abstract class Particle implements IGameObject {
         GL11.glLoadMatrix(model);
     }
 
-    protected void updateVelocity() {
+    protected void updateVelocity(double delta) {
         int dirX = (_velocity.x - _targetVelocity.x) >= 0 ? -1 : 1;
         int dirY = (_velocity.y - _targetVelocity.y) >= 0 ? -1 : 1;
         int dirZ = (_velocity.z - _targetVelocity.z) >= 0 ? -1 : 1;
 
-        if (Math.abs(_velocity.x - _targetVelocity.x) > 0.01)
-            _velocity.x += dirX * _velDecSpeed.x;
+        if (Math.abs(_velocity.x - _targetVelocity.x) > 0.000001)
+            _velocity.x += dirX * _velDecFactor.x * delta;
         else
             _velocity.x = _targetVelocity.x;
 
-        if (Math.abs(_velocity.y - _targetVelocity.y) > 0.01)
-            _velocity.y += dirY * _velDecSpeed.y;
+        if (Math.abs(_velocity.y - _targetVelocity.y) > 0.000001)
+            _velocity.y += dirY * _velDecFactor.y * delta;
         else
             _velocity.y = _targetVelocity.y;
 
-        if (Math.abs(_velocity.z - _targetVelocity.z) > 0.01)
-            _velocity.z += dirZ * _velDecSpeed.z;
+        if (Math.abs(_velocity.z - _targetVelocity.z) > 0.000001)
+            _velocity.z += dirZ * _velDecFactor.z * delta;
         else
             _velocity.z = _targetVelocity.z;
     }
@@ -121,14 +126,16 @@ public abstract class Particle implements IGameObject {
         return true;
     }
 
-    protected void updatePosition() {
+    protected void updatePosition(double delta) {
         if (!canMoveVertically()) {
-            _velocity.x += (_velocity.y / 2) * _initialVelocity.x;
-            _velocity.z += (_velocity.y / 2) * _initialVelocity.z;
+            _velocity.x += (_velocity.y / 2) * _initialVelocity.x * delta;
+            _velocity.z += (_velocity.y / 2) * _initialVelocity.z * delta;
             _velocity.y = 0;
         }
 
-        _position.add(_velocity);
+        _position.x += _velocity.x * delta;
+        _position.y += _velocity.y * delta;
+        _position.z += _velocity.z * delta;
     }
 
     protected void decLifetime() {

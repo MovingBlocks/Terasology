@@ -33,7 +33,7 @@ final class BlockShapeLoader {
         _resourceLoader = new ClasspathResourceLoader("org/terasology/data/shapes")
         _resourceLoader.getClassesAt("").each { c ->
             try {
-                log.info("Loading shape: " + c)
+                // log.info("Loading shape: " + c)
 
                 // Prepare to load properties from the Groovy definition via ConfigSlurper
                 ConfigObject shapeConfig = new ConfigSlurper().parse((Class) c)

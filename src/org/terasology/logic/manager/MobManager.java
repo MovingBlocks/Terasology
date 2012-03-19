@@ -17,6 +17,7 @@
 package org.terasology.logic.manager;
 
 import org.terasology.logic.entities.MovableEntity;
+import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.util.HashSet;
@@ -27,7 +28,7 @@ import java.util.HashSet;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class MobManager {
+public class MobManager implements IGameObject {
 
     /**
      * Set that contains mobs
@@ -53,26 +54,6 @@ public class MobManager {
     }
 
     /**
-     * Loops through all mobs in the Set and calls their update() method
-     */
-    public void updateAll() {
-        for (MovableEntity mob : _mobStore) {
-            if (_parent.isInRange(mob.getPosition()))
-                mob.update();
-        }
-    }
-
-    /**
-     * Loops through all mobs in the Set and calls their render() method
-     */
-    public void renderAll() {
-        for (MovableEntity mob : _mobStore) {
-            if (_parent.isEntityVisible(mob) && _parent.isInRange(mob.getPosition()))
-                mob.render();
-        }
-    }
-
-    /**
      * Adds a mob to the manager
      *
      * @param mob The provided mob
@@ -88,5 +69,19 @@ public class MobManager {
      */
     public int getActiveMobAmount() {
         return _mobStore.size();
+    }
+
+    public void render() {
+        for (MovableEntity mob : _mobStore) {
+            if (_parent.isEntityVisible(mob) && _parent.isInRange(mob.getPosition()))
+                mob.render();
+        }
+    }
+
+    public void update(double delta) {
+        for (MovableEntity mob : _mobStore) {
+            if (_parent.isInRange(mob.getPosition()))
+                mob.update(delta);
+        }
     }
 }

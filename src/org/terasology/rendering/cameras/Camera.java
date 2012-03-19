@@ -15,10 +15,9 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.model.structures.ViewFrustum;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3d;
 
 /**
@@ -28,20 +27,16 @@ import javax.vecmath.Vector3d;
  */
 public abstract class Camera {
 
-    public static final float FOV = ((Double) SettingsManager.getInstance().getUserSetting("Game.Player.fov")).floatValue();
-
     /* CAMERA PARAMETERS */
-    protected final Vector3d _position = new Vector3d();
+    protected final Vector3d _position = new Vector3d(0, 0, 0);
     protected final Vector3d _up = new Vector3d(0, 1, 0);
-    protected final Vector3d _viewingDirection = new Vector3d();
-    protected final Matrix4f _viewMatrix = new Matrix4f();
+    protected final Vector3d _viewingDirection = new Vector3d(1, 0, 0);
 
-    protected float _targetFov = FOV;
-    protected float _activeFov = FOV - 20f;
+    protected float _targetFov = Config.getInstance().getFov();
+    protected float _activeFov = Config.getInstance().getFov() / 4f;
 
     /* VIEW FRUSTUM */
     protected final ViewFrustum _viewFrustum = new ViewFrustum();
-    protected boolean _frustumNeedsUpdate = false;
 
     /**
      * Applies the projection and modelview matrix.
@@ -83,31 +78,29 @@ public abstract class Camera {
     }
 
     public ViewFrustum getViewFrustum() {
-        if (_frustumNeedsUpdate) {
-            _viewFrustum.updateFrustum();
-            _frustumNeedsUpdate = false;
-        }
-
         return _viewFrustum;
     }
 
-    public void update() {
+    public void update(double delta) {
+        double diff = Math.abs(_activeFov - _targetFov);
+
+        if (diff < 1.0) {
+            _activeFov = _targetFov;
+            return;
+        }
+
         if (_activeFov < _targetFov) {
-            _activeFov += 0.5;
+            _activeFov += 0.05 * delta;
         } else if (_activeFov > _targetFov) {
-            _activeFov -= 0.5;
+            _activeFov -= 0.05 * delta;
         }
     }
 
     public void extendFov(float fov) {
-        _targetFov = FOV + fov;
+        _targetFov = Config.getInstance().getFov() + fov;
     }
 
     public void resetFov() {
-        _targetFov = FOV;
-    }
-
-    public Matrix4f getViewMatrix() {
-        return _viewMatrix;
+        _targetFov = Config.getInstance().getFov();
     }
 }

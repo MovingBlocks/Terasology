@@ -19,11 +19,14 @@ import org.terasology.logic.characters.Player;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.structures.BlockPosition;
+import org.terasology.utilities.FastRandom;
 
 /**
  * TODO
  */
 public class SimpleTool implements ITool {
+
+    protected static final FastRandom _random = new FastRandom();
 
     protected final Player _player;
 
@@ -53,9 +56,9 @@ public class SimpleTool implements ITool {
         int chunkPosZ = TeraMath.calcChunkPosZ(blockPos.z);
 
         if (type == 0) {
-            _player.notifyObserversBlockRemoved(worldProvider.getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos, update);
+            _player.notifyObserversBlockRemoved(worldProvider.getChunkProvider().getChunk(chunkPosX, 0, chunkPosZ), blockPos, update);
         } else {
-            _player.notifyObserversBlockPlaced(worldProvider.getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos, update);
+            _player.notifyObserversBlockPlaced(worldProvider.getChunkProvider().getChunk(chunkPosX, 0, chunkPosZ), blockPos, update);
         }
     }
 }

@@ -24,11 +24,11 @@ import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
-import org.terasology.logic.entities.StaticEntity;
 import org.terasology.logic.generators.ChunkGenerator;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
+import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
@@ -37,7 +37,6 @@ import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.Helper;
 
@@ -63,54 +62,56 @@ import java.util.logging.Level;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Chunk extends StaticEntity implements Comparable<Chunk>, Externalizable {
-
-    public static int _statChunkMeshEmpty, _statChunkNotReady, _statRenderedTriangles;
-
-    public static final long serialVersionUID = 1L;
-
-    /* CONSTANT VALUES */
+public class Chunk implements Comparable<Chunk>, Externalizable {
+    /* PUBLIC CONSTANT VALUES */
     public static final int CHUNK_DIMENSION_X = 16;
     public static final int CHUNK_DIMENSION_Y = 256;
     public static final int CHUNK_DIMENSION_Z = 16;
-    public static final int VERTICAL_SEGMENTS = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.verticalChunkMeshSegments");
-    private static final Vector3d[] LIGHT_DIRECTIONS = {new Vector3d(1, 0, 0), new Vector3d(-1, 0, 0), new Vector3d(0, 1, 0), new Vector3d(0, -1, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
+    public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
 
-    protected FastRandom _random;
-    /* ------ */
-    protected boolean _dirty, _lightDirty, _fresh;
-    /* ------ */
-    protected LocalWorldProvider _parent;
-    /* ------ */
-    protected final TeraArray _blocks;
-    protected final TeraSmartArray _sunlight, _light, _states;
-    /* ------ */
+    private static final Vector3d[] LIGHT_DIRECTIONS = {
+            new Vector3d(1, 0, 0), new Vector3d(-1, 0, 0),
+            new Vector3d(0, 1, 0), new Vector3d(0, -1, 0),
+            new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)
+    };
+
+    public static int _statChunkMeshEmpty, _statChunkNotReady, _statRenderedTriangles;
+    private int _id = 0;
+    private final Vector3i _pos = new Vector3i();
+
+    private final TeraArray _blocks;
+    private final TeraSmartArray _sunlight, _light, _states;
+    private final ChunkTessellator _tessellator;
+
+    private boolean _dirty, _lightDirty, _fresh;
+    private boolean _disposed = false;
+
+    private FastRandom _random;
+    private LocalWorldProvider _parent;
     private ChunkMesh _activeMeshes[];
     private ChunkMesh _newMeshes[];
-    /* ------ */
-    private final ChunkTessellator _tessellator;
-    /* ------ */
-    private boolean _disposed = false;
-    /* ----- */
+
     private AABB _aabb = null;
     private AABB[] _subMeshAABB = null;
-    /* ----- */
     private RigidBody _rigidBody = null;
-    /* ----- */
     private ReentrantLock _lock = new ReentrantLock();
+    private ReentrantLock _lockRigidBody = new ReentrantLock();
 
     public enum LIGHT_TYPE {
         BLOCK,
         SUN
     }
 
-    public static int getChunkIdForPosition(Vector3d position) {
-        return TeraMath.cantorize(TeraMath.mapToPositive((int) position.x), TeraMath.mapToPositive((int) position.z));
+    public static String getChunkFileName(Vector3i v) {
+        return Integer.toString(v.hashCode(),36);
+    }
+
+    public static String getChunkFileNameFromId(int id) {
+        return Integer.toString(id,36);
     }
 
     public Chunk() {
         _tessellator = new ChunkTessellator(this);
-
         _blocks = new TeraArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
         _sunlight = new TeraSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
         _light = new TeraSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
@@ -123,27 +124,16 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         _random = new FastRandom();
     }
 
-    /**
-     * Init. the chunk with a parent world and an absolute position.
-     *
-     * @param p        The parent world
-     * @param position The absolute position of the chunk within the world
-     */
-    public Chunk(LocalWorldProvider p, Vector3d position) {
+    public Chunk(LocalWorldProvider p, int x, int y, int z) {
         this();
-
-        setPosition(position);
+        _pos.x = x;
+        _pos.y = y;
+        _pos.z = z;
+        _id = _pos.hashCode();
         _parent = p;
-
-        _random = new FastRandom((_parent.getSeed()).hashCode() + getChunkIdForPosition(position));
+        _random = new FastRandom((_parent.getSeed()).hashCode() + _pos.hashCode());
     }
 
-    /**
-     * Tries to load a chunk from disk. If the chunk is not present,
-     * it is created from scratch.
-     *
-     * @return True if a generation has been executed
-     */
     public boolean generate() {
         if (isFresh()) {
             for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators()) {
@@ -158,9 +148,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return false;
     }
 
-    /**
-     * Updates the light of this chunk.
-     */
     public void updateLight() {
         if (isFresh() || !isLightDirty())
             return;
@@ -174,7 +161,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
                     if (!BlockManager.getInstance().getBlock(blockValue).isTranslucent()) {
                         continue;
                     }
-
                     // Spread the sunlight in translucent blocks with a light value greater than zero.
                     if (lightValue > 0) {
                         spreadLight(x, y, z, lightValue, LIGHT_TYPE.SUN);
@@ -186,9 +172,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         setLightDirty(false);
     }
 
-    /**
-     * Generates the initial sunlight.
-     */
     private void generateSunlight() {
         for (int x = 0; x < CHUNK_DIMENSION_X; x++) {
             for (int z = 0; z < CHUNK_DIMENSION_Z; z++) {
@@ -197,14 +180,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
     }
 
-    /**
-     * Calculates the sunlight at a given column within the chunk.
-     *
-     * @param x               Local block position on the x-axis
-     * @param z               Local block position on the z-axis
-     * @param spreadLight     Spread light if a light value is greater than the old one
-     * @param refreshSunlight Refreshes the sunlight using the surrounding chunks when the light value is lower than before
-     */
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
         boolean covered = false;
 
@@ -254,12 +229,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
     }
 
-    /**
-     * @param x    Local block position on the x-axis
-     * @param y    Local block position on the y-axis
-     * @param z    Local block position on the z-axis
-     * @param type The type of the light
-     */
     public void refreshLightAtLocalPos(int x, int y, int z, LIGHT_TYPE type) {
         int blockPosX = getBlockWorldPosX(x);
         int blockPosZ = getBlockWorldPosZ(z);
@@ -294,15 +263,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
     }
 
-    /**
-     * Recursive light calculation.
-     *
-     * @param x          Local block position on the x-axis
-     * @param y          Local block position on the y-axis
-     * @param z          Local block position on the z-axis
-     * @param lightValue The light value used to spread the light
-     * @param type       The type of the light
-     */
     public void unspreadLight(int x, int y, int z, byte lightValue, LIGHT_TYPE type) {
         ArrayList<Vector3d> brightSpots = new ArrayList<Vector3d>();
         unspreadLight(x, y, z, lightValue, 0, type, brightSpots);
@@ -312,17 +272,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
     }
 
-    /**
-     * Recursive light calculation.
-     *
-     * @param x           Local block position on the x-axis
-     * @param y           Local block position on the y-axis
-     * @param z           Local block position on the z-axis
-     * @param lightValue  The light value used to spread the light
-     * @param depth       Depth of the recursion
-     * @param type        The type of the light
-     * @param brightSpots Log of light spots, which where brighter than the current light node
-     */
     public void unspreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type, ArrayList<Vector3d> brightSpots) {
         int blockPosX = getBlockWorldPosX(x);
         int blockPosZ = getBlockWorldPosZ(z);
@@ -343,29 +292,10 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
     }
 
-    /**
-     * Recursive light calculation.
-     *
-     * @param x          Local block position on the x-axis
-     * @param y          Local block position on the y-axis
-     * @param z          Local block position on the z-axis
-     * @param lightValue The light value used to spread the light
-     * @param type       The type of the light
-     */
     public void spreadLight(int x, int y, int z, byte lightValue, LIGHT_TYPE type) {
         spreadLight(x, y, z, lightValue, 0, type);
     }
 
-    /**
-     * Recursive light calculation.
-     *
-     * @param x          Local block position on the x-axis
-     * @param y          Local block position on the y-axis
-     * @param z          Local block position on the z-axis
-     * @param lightValue The light value used to spread the light
-     * @param depth      Depth of the recursion
-     * @param type       The type of the light
-     */
     public void spreadLight(int x, int y, int z, byte lightValue, int depth, LIGHT_TYPE type) {
         if (depth > lightValue || lightValue - depth < 1) {
             return;
@@ -389,15 +319,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
     }
 
-    /**
-     * Returns the light intensity at a given local block position.
-     *
-     * @param x    Local block position on the x-axis
-     * @param y    Local block position on the y-axis
-     * @param z    Local block position on the z-axis
-     * @param type The type of the light
-     * @return The light intensity
-     */
     public byte getLight(int x, int y, int z, LIGHT_TYPE type) {
         byte result;
 
@@ -414,15 +335,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return 15;
     }
 
-    /**
-     * Sets the light value at the given position.
-     *
-     * @param x         Local block position on the x-axis
-     * @param y         Local block position on the y-axis
-     * @param z         Local block position on the z-axis
-     * @param intensity The light intensity
-     * @param type      The type of the light
-     */
     public void setLight(int x, int y, int z, byte intensity, LIGHT_TYPE type) {
         TeraSmartArray lSource;
         if (type == LIGHT_TYPE.SUN) {
@@ -443,14 +355,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
     }
 
-    /**
-     * Returns the block type at a given local block position.
-     *
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
-     * @return The block type
-     */
     public byte getBlock(int x, int y, int z) {
         byte result = _blocks.get(x, y, z);
 
@@ -461,14 +365,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return 0;
     }
 
-    /**
-     * Returns the state at a given local block position.
-     *
-     * @param x Local block position on the x-axis
-     * @param y Local block position on the y-axis
-     * @param z Local block position on the z-axis
-     * @return The block type
-     */
     public byte getState(int x, int y, int z) {
         return _states.get(x, y, z);
     }
@@ -482,14 +378,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         return true;
     }
 
-    /**
-     * Sets the block value at the given position.
-     *
-     * @param x    Local block position on the x-axis
-     * @param y    Local block position on the y-axis
-     * @param z    Local block position on the z-axis
-     * @param type The block type
-     */
     public void setBlock(int x, int y, int z, byte type) {
         byte oldValue = _blocks.get(x, y, z);
         _blocks.set(x, y, z, type);
@@ -502,60 +390,35 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         }
     }
 
-    /**
-     * Sets the state value at the given position.
-     *
-     * @param x    Local block position on the x-axis
-     * @param y    Local block position on the y-axis
-     * @param z    Local block position on the z-axis
-     * @param type The block type
-     */
     public void setState(int x, int y, int z, byte type) {
         _states.set(x, y, z, type);
     }
 
-    /**
-     * Calculates the distance of the chunk to the player.
-     *
-     * @return The distance of the chunk to the player
-     */
-    public double distanceToPlayer() {
-        Vector3d result = new Vector3d(getPosition().x * CHUNK_DIMENSION_X, 0, getPosition().z * CHUNK_DIMENSION_Z);
+    public double distanceToCamera() {
+        Vector3d result = new Vector3d(_pos.x * CHUNK_DIMENSION_X, _pos.y * CHUNK_DIMENSION_Y, _pos.z * CHUNK_DIMENSION_Z);
 
-        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-        result.x -= playerPosition.x;
-        result.z -= playerPosition.z;
+        Vector3d cameraPos = Terasology.getInstance().getActiveCamera().getPosition();
+        result.x -= cameraPos.x;
+        result.z -= cameraPos.z;
 
         return result.length();
     }
 
-    /**
-     * Returns the neighbor chunks of this chunk.
-     *
-     * @return The adjacent chunks
-     */
     public Chunk[] loadOrCreateNeighbors() {
         Chunk[] chunks = new Chunk[8];
 
-        chunks[0] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x + 1, (int) getPosition().z);
-        chunks[1] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x - 1, (int) getPosition().z);
-        chunks[2] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x, (int) getPosition().z + 1);
-        chunks[3] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x, (int) getPosition().z - 1);
-        chunks[4] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x + 1, (int) getPosition().z + 1);
-        chunks[5] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x - 1, (int) getPosition().z - 1);
-        chunks[6] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x - 1, (int) getPosition().z + 1);
-        chunks[7] = getParent().getChunkProvider().loadOrCreateChunk((int) getPosition().x + 1, (int) getPosition().z - 1);
+        chunks[0] = getParent().getChunkProvider().getChunk(_pos.x + 1, 0, _pos.z);
+        chunks[1] = getParent().getChunkProvider().getChunk(_pos.x - 1, 0, _pos.z);
+        chunks[2] = getParent().getChunkProvider().getChunk(_pos.x, 0, _pos.z + 1);
+        chunks[3] = getParent().getChunkProvider().getChunk(_pos.x, 0, _pos.z - 1);
+        chunks[4] = getParent().getChunkProvider().getChunk(_pos.x + 1, 0, _pos.z + 1);
+        chunks[5] = getParent().getChunkProvider().getChunk(_pos.x - 1, 0, _pos.z - 1);
+        chunks[6] = getParent().getChunkProvider().getChunk(_pos.x - 1, 0, _pos.z + 1);
+        chunks[7] = getParent().getChunkProvider().getChunk(_pos.x + 1, 0, _pos.z - 1);
 
         return chunks;
     }
 
-    /**
-     * Marks those neighbors of a chunk dirty, that are adjacent to
-     * the given block coordinate.
-     *
-     * @param x Local block position on the x-axis
-     * @param z Local block position on the z-axis
-     */
     private void markNeighborsDirty(int x, int z) {
         Chunk[] neighbors = loadOrCreateNeighbors();
 
@@ -594,7 +457,7 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     @Override
     public String toString() {
-        return String.format("Chunk at %s.", getPosition());
+        return String.format("Chunk at %s.", _pos.toString());
     }
 
     /**
@@ -608,8 +471,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
             return 0;
         }
 
-        double distance = distanceToPlayer();
-        double distance2 = o.distanceToPlayer();
+        double distance = distanceToCamera();
+        double distance2 = o.distanceToCamera();
 
         if (distance == distance2)
             return 0;
@@ -619,7 +482,8 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
 
     public AABB getAABB() {
         if (_aabb == null) {
-            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 2.0, CHUNK_DIMENSION_Y / 2.0, CHUNK_DIMENSION_Z / 2.0);
+            // TODO: The AABBs are currently a bit larger than the actual chunk is
+            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 1.75, CHUNK_DIMENSION_Y / 1.75, CHUNK_DIMENSION_Z / 1.75);
             Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
             _aabb = new AABB(position, dimensions);
         }
@@ -669,58 +533,6 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         generateMeshes();
     }
 
-    public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeInt((int) getPosition().x);
-        out.writeInt((int) getPosition().z);
-
-        // Save flags...
-        byte flags = 0x0;
-        if (isLightDirty()) {
-            flags = Helper.setFlag(flags, (short) 0);
-        }
-        if (isFresh()) {
-            flags = Helper.setFlag(flags, (short) 1);
-        }
-
-        // The flags are stored in the first byte of the file...
-        out.writeByte(flags);
-
-        for (int i = 0; i < _blocks.size(); i++)
-            out.writeByte(_blocks.getRawByte(i));
-
-        for (int i = 0; i < _sunlight.sizePacked(); i++)
-            out.writeByte(_sunlight.getRawByte(i));
-
-        for (int i = 0; i < _light.sizePacked(); i++)
-            out.writeByte(_light.getRawByte(i));
-
-        for (int i = 0; i < _states.sizePacked(); i++)
-            out.writeByte(_states.getRawByte(i));
-    }
-
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        getPosition().x = in.readInt();
-        getPosition().z = in.readInt();
-
-        // The first byte contains the flags...
-        byte flags = in.readByte();
-        // Parse the flags...
-        setLightDirty(Helper.isFlagSet(flags, (short) 0));
-        setFresh(Helper.isFlagSet(flags, (short) 1));
-
-        for (int i = 0; i < _blocks.size(); i++)
-            _blocks.setRawByte(i, in.readByte());
-
-        for (int i = 0; i < _sunlight.sizePacked(); i++)
-            _sunlight.setRawByte(i, in.readByte());
-
-        for (int i = 0; i < _light.sizePacked(); i++)
-            _light.setRawByte(i, in.readByte());
-
-        for (int i = 0; i < _states.sizePacked(); i++)
-            _states.setRawByte(i, in.readByte());
-    }
-
     /**
      * Generates the terrain mesh (creates the internal vertex arrays).
      */
@@ -742,23 +554,22 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      * Draws the opaque or translucent elements of a chunk.
      *
      * @param type The type of vertices to render
-     * @return True if rendered
      */
     public void render(ChunkMesh.RENDER_PHASE type) {
         if (isReadyForRendering()) {
             ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
             // Transfer the world offset of the chunk to the shader for various effects
-            shader.setFloat3("chunkOffset", (float) (getPosition().x * Chunk.CHUNK_DIMENSION_X), (float) (getPosition().y * Chunk.CHUNK_DIMENSION_Y), (float) (getPosition().z * Chunk.CHUNK_DIMENSION_Z));
+            shader.setFloat3("chunkOffset", (float) (_pos.x * Chunk.CHUNK_DIMENSION_X), (float) (_pos.y * Chunk.CHUNK_DIMENSION_Y), (float) (_pos.z * Chunk.CHUNK_DIMENSION_Z));
 
             GL11.glPushMatrix();
 
-            Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-            GL11.glTranslated(getPosition().x * Chunk.CHUNK_DIMENSION_X - playerPosition.x, getPosition().y * Chunk.CHUNK_DIMENSION_Y - playerPosition.y, getPosition().z * Chunk.CHUNK_DIMENSION_Z - playerPosition.z);
+            Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+            GL11.glTranslated(_pos.x * Chunk.CHUNK_DIMENSION_X - cameraPosition.x, _pos.y * Chunk.CHUNK_DIMENSION_Y - cameraPosition.y, _pos.z * Chunk.CHUNK_DIMENSION_Z - cameraPosition.z);
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!isSubMeshEmpty(i)) {
-                    if (WorldRenderer.BOUNDING_BOXES_ENABLED) {
-                        getSubMeshAABB(i).renderLocally(2f);
+                    if (Config.getInstance().isRenderChunkBoundingBoxes()) {
+                        getSubMeshAABB(i).renderLocally(1f);
                         _statRenderedTriangles += 12;
                     }
 
@@ -848,34 +659,25 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
      */
 
     public int getChunkWorldPosX() {
-        return (int) getPosition().x * CHUNK_DIMENSION_X;
+        return _pos.x * CHUNK_DIMENSION_X;
     }
 
-    /**
-     * Returns the position of the chunk within the world.
-     *
-     * @return Thew world position
-     */
+    public int getChunkWorldPosY() {
+        return _pos.y * CHUNK_DIMENSION_Y;
+    }
+
     public int getChunkWorldPosZ() {
-        return (int) getPosition().z * CHUNK_DIMENSION_Z;
+        return _pos.z * CHUNK_DIMENSION_Z;
     }
 
-    /**
-     * Returns the position of block within the world.
-     *
-     * @param x The local position
-     * @return The world position
-     */
     public int getBlockWorldPosX(int x) {
         return x + getChunkWorldPosX();
     }
 
-    /**
-     * Returns the position of block within the world.
-     *
-     * @param z The local position
-     * @return The world position
-     */
+    public int getBlockWorldPosY(int y) {
+        return y + getChunkWorldPosY();
+    }
+
     public int getBlockWorldPosZ(int z) {
         return z + getChunkWorldPosZ();
     }
@@ -908,34 +710,12 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
         _lightDirty = lightDirty;
     }
 
-    public void setPosition(Vector3d position) {
-        super.setPosition(position);
-    }
-
     public void setParent(LocalWorldProvider parent) {
         _parent = parent;
     }
 
-    public static String getChunkSavePathForPosition(Vector3d position) {
-        String x36 = Integer.toString((int) position.x, 36);
-        String z36 = Integer.toString((int) position.z, 36);
-
-        return x36 + "/" + z36;
-    }
-
-    public static String getChunkFileNameForPosition(Vector3d position) {
-        String x36 = Integer.toString((int) position.x, 36);
-        String z36 = Integer.toString((int) position.z, 36);
-
-        return "bc_" + x36 + "." + z36;
-    }
-
-    public String getChunkSavePath() {
-        return Chunk.getChunkSavePathForPosition(getPosition());
-    }
-
     public String getChunkFileName() {
-        return Chunk.getChunkFileNameForPosition(getPosition());
+        return getChunkFileName(_pos);
     }
 
     public FastRandom getRandom() {
@@ -1010,63 +790,137 @@ public class Chunk extends StaticEntity implements Comparable<Chunk>, Externaliz
     }
 
     private void updateRigidBody(final ChunkMesh[] meshes) {
-        if (_rigidBody != null)
-            return;
-
-        if (meshes == null)
-            return;
-
-        if (meshes.length < VERTICAL_SEGMENTS)
+        if (_rigidBody != null || meshes == null || meshes.length < VERTICAL_SEGMENTS)
             return;
 
         Terasology.getInstance().submitTask("Update Chunk Collision", new Runnable() {
             public void run() {
-                TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+                try {
+                    _lockRigidBody.lock();
 
-                int counter = 0;
-                for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
-                    ChunkMesh mesh = meshes[k];
+                    TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
 
-                    if (mesh != null) {
-                        IndexedMesh indexedMesh = mesh._indexedMesh;
+                    int counter = 0;
+                    for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
+                        ChunkMesh mesh = meshes[k];
 
-                        if (indexedMesh != null) {
-                            vertexArray.addIndexedMesh(indexedMesh);
-                            counter++;
+                        if (mesh != null) {
+                            IndexedMesh indexedMesh = mesh._indexedMesh;
+
+                            if (indexedMesh != null) {
+                                vertexArray.addIndexedMesh(indexedMesh);
+                                counter++;
+                            }
+
+                            mesh._indexedMesh = null;
                         }
-
-                        mesh._indexedMesh = null;
                     }
-                }
 
-                if (counter == VERTICAL_SEGMENTS) {
-                    try {
-                        BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
+                    if (counter == VERTICAL_SEGMENTS) {
+                        try {
+                            BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
 
-                        Matrix3f rot = new Matrix3f();
-                        rot.setIdentity();
+                            Matrix3f rot = new Matrix3f();
+                            rot.setIdentity();
 
-                        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) getPosition().x * Chunk.CHUNK_DIMENSION_X, (float) getPosition().y * Chunk.CHUNK_DIMENSION_Y, (float) getPosition().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
+                            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) _pos.x * Chunk.CHUNK_DIMENSION_X, (float) _pos.y * Chunk.CHUNK_DIMENSION_Y, (float) _pos.z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
 
-                        RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
-                        _rigidBody = new RigidBody(blockConsInf);
+                            RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
+                            _rigidBody = new RigidBody(blockConsInf);
 
-                    } catch (Exception e) {
-                        Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+                        } catch (Exception e) {
+                            Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+                        }
                     }
+                } finally {
+                    _lockRigidBody.unlock();
                 }
-
             }
         });
+    }
+
+    public int triangleCount(ChunkMesh.RENDER_PHASE type) {
+        int count = 0;
+
+        if (isReadyForRendering())
+            for (int i = 0; i < VERTICAL_SEGMENTS; i++)
+                count += _activeMeshes[i].triangleCount(type);
+
+        return count;
     }
 
     public RigidBody getRigidBody() {
         return _rigidBody;
     }
 
+    public int getId() {
+        return _id;
+    }
+
+    public Vector3i getPos() {
+        return _pos;
+    }
+
     public static void resetStats() {
         _statChunkMeshEmpty = 0;
         _statChunkNotReady = 0;
         _statRenderedTriangles = 0;
+    }
+
+    //Externalizable Interface
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(_id);
+        out.writeInt(_pos.x);
+        out.writeInt(_pos.y);
+        out.writeInt(_pos.z);
+
+        // Save flags...
+        byte flags = 0x0;
+        if (isLightDirty()) {
+            flags = Helper.setFlag(flags, (short) 0);
+        }
+        if (isFresh()) {
+            flags = Helper.setFlag(flags, (short) 1);
+        }
+
+        // The flags are stored in the first byte of the file...
+        out.writeByte(flags);
+
+        for (int i = 0; i < _blocks.size(); i++)
+            out.writeByte(_blocks.getRawByte(i));
+
+        for (int i = 0; i < _sunlight.sizePacked(); i++)
+            out.writeByte(_sunlight.getRawByte(i));
+
+        for (int i = 0; i < _light.sizePacked(); i++)
+            out.writeByte(_light.getRawByte(i));
+
+        for (int i = 0; i < _states.sizePacked(); i++)
+            out.writeByte(_states.getRawByte(i));
+    }
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        _id = in.readInt();
+        _pos.x = in.readInt();
+        _pos.y = in.readInt();
+        _pos.z = in.readInt();
+
+        // The first byte contains the flags...
+        byte flags = in.readByte();
+        // Parse the flags...
+        setLightDirty(Helper.isFlagSet(flags, (short) 0));
+        setFresh(Helper.isFlagSet(flags, (short) 1));
+
+        for (int i = 0; i < _blocks.size(); i++)
+            _blocks.setRawByte(i, in.readByte());
+
+        for (int i = 0; i < _sunlight.sizePacked(); i++)
+            _sunlight.setRawByte(i, in.readByte());
+
+        for (int i = 0; i < _light.sizePacked(); i++)
+            _light.setRawByte(i, in.readByte());
+
+        for (int i = 0; i < _states.sizePacked(); i++)
+            _states.setRawByte(i, in.readByte());
     }
 }

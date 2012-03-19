@@ -22,7 +22,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.SettingsManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.math.TeraMath;
@@ -56,8 +56,8 @@ public class Skysphere implements IGameObject {
     private double _turbidity = 6.0f, _sunPosAngle = 0.1f;
 
     /* CLOUDS */
-    private static final Vector2f CLOUD_RESOLUTION = (Vector2f) SettingsManager.getInstance().getUserSetting("Game.Graphics.cloudResolution");
-    private static final long CLOUD_UPDATE_INTERVAL = (Integer) SettingsManager.getInstance().getUserSetting("Game.Graphics.cloudUpdateInterval");
+    private static final Vector2f CLOUD_RESOLUTION = Config.getInstance().getCloudResolution();
+    private static final long CLOUD_UPDATE_INTERVAL = Config.getInstance().getCloudUpdateInterval();
     private static IntBuffer _textureIds;
 
     private final PerlinNoise _noiseGenerator;
@@ -166,7 +166,7 @@ public class Skysphere implements IGameObject {
         return new Vector3d(Y, x, y);
     }
 
-    public void update() {
+    public void update(double delta) {
         if (_cloudByteBuffer == null && Terasology.getInstance().getTimeInMs() - _lastCloudUpdate >= CLOUD_UPDATE_INTERVAL) {
             _lastCloudUpdate = Terasology.getInstance().getTimeInMs();
 

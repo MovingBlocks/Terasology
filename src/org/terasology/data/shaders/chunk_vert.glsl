@@ -20,6 +20,8 @@ varying vec4 vertexWorldPos;
 varying vec3 eyeVec;
 varying vec3 lightDir;
 
+varying float flickering;
+
 uniform float time;
 uniform float wavingCoordinates[32];
 uniform vec2 waterCoordinate;
@@ -43,7 +45,13 @@ void main()
 
 	float distance = length(vertexWorldPos);
 
-    #ifdef ANIMATED_WATER_AND_GRASS
+#ifdef FLICKERING_LIGHT
+	flickering = (sin(timeToTick(time, 1.0) + 1.0) / 32.0);
+#else
+	flickering = 0.0;
+#endif
+
+#ifdef ANIMATED_WATER_AND_GRASS
     vec3 vertexChunkPos = vertexWorldPosRaw.xyz + chunkOffset.xyz;
 
     if (distance < 64.0) {
@@ -63,7 +71,7 @@ void main()
     } else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= lavaCoordinate.y && gl_TexCoord[0].y < lavaCoordinate.y + TEXTURE_OFFSET) {
         vertexWorldPos.y += sin(timeToTick(time, 0.5) + vertexChunkPos.x + vertexChunkPos.z) * 0.1;
     }
-    #endif
+#endif
 
     gl_Position = gl_ProjectionMatrix * vertexWorldPos;
 }

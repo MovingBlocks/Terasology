@@ -16,7 +16,6 @@
  */
 package org.terasology.logic.characters;
 
-import org.newdawn.slick.openal.Audio;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.ShaderManager;
@@ -51,7 +50,7 @@ public final class GelatinousCube extends Character {
     public float _randomSize = 1.0f;
 
     public GelatinousCube(WorldRenderer parent) {
-        super(parent, 0.02, 1.5, 0.2, true);
+        super(parent);
 
         _randomSize = (float) (((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 0.8 + 0.2);
         _randomColorId = Math.abs(_parent.getWorldProvider().getRandom().randomInt()) % COLORS.length;
@@ -64,16 +63,11 @@ public final class GelatinousCube extends Character {
 
     @Override
     protected void initAudio() {
-        _footstepSounds = new Audio[5];
-        _footstepSounds[0] = AudioManager.getInstance().loadSound("Slime1");
-        _footstepSounds[1] = AudioManager.getInstance().loadSound("Slime2");
-        _footstepSounds[2] = AudioManager.getInstance().loadSound("Slime3");
-        _footstepSounds[3] = AudioManager.getInstance().loadSound("Slime4");
-        _footstepSounds[4] = AudioManager.getInstance().loadSound("Slime5");
+        _footstepSounds = AudioManager.sounds("Slime1", "Slime2", "Slime3", "Slime4", "Slime5");
     }
 
-    public void update() {
-        super.update();
+    public void update(double delta) {
+        super.update(delta);
     }
 
     public void render() {
@@ -81,8 +75,8 @@ public final class GelatinousCube extends Character {
 
         glPushMatrix();
 
-        Vector3d playerPosition = Terasology.getInstance().getActivePlayer().getPosition();
-        glTranslated(getPosition().x - playerPosition.x, getPosition().y - playerPosition.y, getPosition().z - playerPosition.z);
+        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+        glTranslated(getPosition().x - cameraPosition.x, getPosition().y - cameraPosition.y, getPosition().z - cameraPosition.z);
         glRotatef((float) _yaw, 0f, 1f, 0f);
 
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");
@@ -109,7 +103,6 @@ public final class GelatinousCube extends Character {
                 _movementTarget.set(getPosition().x + _parent.getWorldProvider().getRandom().randomDouble() * 500, getPosition().y, getPosition().z + _parent.getWorldProvider().getRandom().randomDouble() * 500);
                 _lastChangeOfDirectionAt = Terasology.getInstance().getTimeInMs();
                 _followingPlayer = false;
-                _walkingSpeed = ((_parent.getWorldProvider().getRandom().randomDouble() + 1.0) / 2.0) * 0.05;
             }
         }
 

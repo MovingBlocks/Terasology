@@ -16,10 +16,7 @@
 package org.terasology.logic.manager;
 
 import org.terasology.logic.characters.Player;
-import org.terasology.logic.tools.BlueprintTool;
-import org.terasology.logic.tools.DefaultBlockTool;
-import org.terasology.logic.tools.ExplosionTool;
-import org.terasology.logic.tools.ITool;
+import org.terasology.logic.tools.*;
 
 import java.util.HashMap;
 
@@ -67,10 +64,13 @@ public class ToolManager {
      * Initializes the native tools.
      */
     public void initNativeTools() {
+        //TODO: Did this get more or less replaced via new inventory stuff? This was meant to help make tools more extensible
         _toolStore.put((byte) 1, new DefaultBlockTool(_player));
         //_toolStore.put((byte) 2, new MultipleSelectionTool(_player));
         _toolStore.put((byte) 2, new BlueprintTool(_player));
         _toolStore.put((byte) 3, new ExplosionTool(_player));
+        _toolStore.put((byte) 4, new DebugTool(_player));
+        _toolStore.put((byte) 5, new RailgunTool(_player));
     }
 
     public ITool getToolForIndex(Byte toolIndex) {

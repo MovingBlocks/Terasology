@@ -22,6 +22,8 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.terasology.game.Terasology;
+import org.terasology.game.modes.IGameState;
+import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.characters.Player;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
@@ -87,8 +89,7 @@ public class GroovyManager {
     }
 
     private void updateBinding() {
-        _bind.setVariable("tera", Terasology.getInstance());
-        _bind.setVariable("configuration", SettingsManager.getInstance());
+        _bind.setVariable("cfg", Config.getInstance());
         _bind.setVariable("cmd", new CommandHelper());
     }
 
@@ -138,6 +139,39 @@ public class GroovyManager {
             if (group != null) {
                 player.getInventory().addItem(new ItemBlock(group), quantity);
             }
+        }
+
+        public void fullHealth() {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            player.heal(player.getMaxHealthPoints() - player.getHealthPoints());
+        }
+
+        public void teleport(double x, double y, double z) {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            player.setPosition(x, y, z);
+        }
+
+        public void gotoWorld(String title) {
+            IGameState state = Terasology.getInstance().getCurrentGameState();
+
+            if (state instanceof StateSinglePlayer) {
+                StateSinglePlayer spState = (StateSinglePlayer) state;
+                spState.initWorld(title);
+            }
+        }
+
+        public void gotoWorld(String title, String seed) {
+            IGameState state = Terasology.getInstance().getCurrentGameState();
+
+            if (state instanceof StateSinglePlayer) {
+                StateSinglePlayer spState = (StateSinglePlayer) state;
+                spState.initWorld(title, seed);
+            }
+        }
+
+        public void resetInventory() {
+            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            player.resetInventory();
         }
     }
 }
