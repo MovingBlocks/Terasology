@@ -116,13 +116,10 @@ public final class Terasology {
         else {
             addLibraryPath("natives/windows");
 
-            if (System.getProperty("os.arch").contains("64")){
+            if (System.getProperty("os.arch").contains("64"))
                 System.loadLibrary("OpenAL64");
-                _logger.log(Level.INFO, "Initializing openAl 64");
-            }else{
+            else
                 System.loadLibrary("OpenAL32");
-                _logger.log(Level.INFO, "Initializing openAl 32");
-            }
         }
     }
 
@@ -130,7 +127,7 @@ public final class Terasology {
         try {
             final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
             usrPathsField.setAccessible(true);
-            
+
             List<String> paths = new ArrayList<String>(Arrays.asList((String[]) usrPathsField.get(null)));
 
             if (paths.contains(libPath)) {
@@ -334,31 +331,6 @@ public final class Terasology {
         }
         return path;
     }
-    
-    public Object[] getListWolds(){
-        String path          = getWorldSavePath("");
-        //String[] worldsNames = 
-        File f = new File(path);
-        ArrayList<String> worldsNames = new ArrayList<String>();
-        if(!f.exists()){
-            return null;
-        }
-        
-        
-        for(File file : f.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                if(file.isDirectory()){
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-        })){
-            worldsNames.add(file.getName());
-        }
-
-        return worldsNames.toArray();
-    }
 
     public IGameState getGameState(GAME_STATE s) {
         IGameState state = _gameStates.get(s);
@@ -462,5 +434,30 @@ public final class Terasology {
         _instance.shutdown();
         Config.getInstance().saveConfig("SAVED_WORLDS/last.cfg");
         System.exit(0);
+    }
+
+    public Object[] getListWolds(){
+        String path          = getWorldSavePath("");
+        //String[] worldsNames =
+        File f = new File(path);
+        ArrayList<String> worldsNames = new ArrayList<String>();
+        if(!f.exists()){
+            return null;
+        }
+
+
+        for(File file : f.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                if(file.isDirectory()){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        })){
+            worldsNames.add(file.getName());
+        }
+
+        return worldsNames.toArray();
     }
 }

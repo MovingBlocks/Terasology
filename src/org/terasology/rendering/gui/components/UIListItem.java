@@ -23,7 +23,7 @@ public class UIListItem extends UIDisplayContainer {
 
         _label = new UIText();
         _label.setVisible(true);
-        _label.setColor(Color.black);
+        _label.setColor(Color.white);
         _label.setPosition(new Vector2f((getPosition().x + _padding.x), (getPosition().y + _padding.y)));
         _label.setText(_text);
 

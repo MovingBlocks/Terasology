@@ -30,7 +30,9 @@ public class OpenALManager extends AudioManager {
         try {
             AL.create();
         } catch (LWJGLException e) {
-            throw new RuntimeException(e);
+            //throw new RuntimeException(e);
+            logger.info("OpenAl crashed: " + e.getMessage());
+            return;
         }
 
         AL10.alGetError();

@@ -23,7 +23,6 @@ public class UIInput extends UIDisplayContainer {
   private final ArrayList<IInputListener> _inputListeners = new ArrayList<IInputListener>();
 
   private final StringBuffer      _inputValue = new StringBuffer();
-  private final UIGraphicsElement _defaultTexture;
   private final UIText            _inputText;
   private final UITextCursor      _textCursor;
   private final Vector2f          _padding    = new Vector2f(10f,10f);
@@ -37,10 +36,7 @@ public class UIInput extends UIDisplayContainer {
   public UIInput(Vector2f size) {
       setSize(size);
       setCrop(true);
-
-      _defaultTexture = new UIGraphicsElement("gui_menu");
-      _defaultTexture.setVisible(true);
-      _defaultTexture.getTextureSize().set(new Vector2f(256f / 512f, 30f / 512f));
+      setStyle("background-image","gui_menu 256/512 30/512 0 90/512");
 
       _inputText = new UIText();
       _inputText.setVisible(true);
@@ -51,15 +47,12 @@ public class UIInput extends UIDisplayContainer {
       _textCursor.setVisible(true);
       _textCursor.setPosition(new Vector2f((getPosition().x + _padding.x), (getPosition().y + _padding.y / 2)));
 
-      addDisplayElement(_defaultTexture);
-      addDisplayElement(_inputText);
+       addDisplayElement(_inputText);
       addDisplayElement(_textCursor);
 
   }
   
   public void update() {
-    _defaultTexture.setSize(getSize());
-
     Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
 
     if (intersects(mousePos)) {
@@ -84,19 +77,19 @@ public class UIInput extends UIDisplayContainer {
         _clickSoundPlayed = false;
         _mouseUp = false;
         _mouseDown = false;
-        _defaultTexture.getTextureOrigin().set(0f, 90f / 512f);
+        setStyle("background-position","0 90/512");
     }
 
     if (isFocused()) {
         if(!_textCursor.isVisible()){
             _textCursor.setVisible(true);
         }
-        _defaultTexture.getTextureOrigin().set(0f, 120f / 512f);
+        setStyle("background-position","0 120/512");
     } else {
         if(_textCursor.isVisible()){
             _textCursor.setVisible(false);
         }
-        _defaultTexture.getTextureOrigin().set(0f, 90f / 512f);
+        setStyle("background-position","0 90/512");
     }
     updateTextShift();
   }

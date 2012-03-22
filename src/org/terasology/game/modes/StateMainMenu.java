@@ -63,6 +63,7 @@ public class StateMainMenu implements IGameState {
 
         _guiScreens.add(_mainMenu);
         _guiScreens.add(_configMenu);
+        _guiScreens.add(_selectWorldMenu);
     }
 
     private void setupMainMenu() {

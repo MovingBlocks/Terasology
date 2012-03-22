@@ -340,7 +340,8 @@ public abstract class AudioManager {
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
     public static SoundSource play(String name) {
-        return play(name, null, 1.0f, PRIORITY_NORMAL);
+        return null;
+        //return play(name, null, 1.0f, PRIORITY_NORMAL);
     }
 
     /**
@@ -351,7 +352,8 @@ public abstract class AudioManager {
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
     public static SoundSource play(String name, float gain) {
-        return play(name, null, gain, PRIORITY_NORMAL);
+        return null;
+        //return play(name, null, gain, PRIORITY_NORMAL);
     }
 
     /**
@@ -417,7 +419,8 @@ public abstract class AudioManager {
      * @return Sound source object, or null if there is no free sound sources in music pool
      */
     public static SoundSource playMusic(String name) {
-        SoundPool pool = AudioManager.getInstance().getSoundPool("music");
+        return null;
+        /*SoundPool pool = AudioManager.getInstance().getSoundPool("music");
 
         pool.stopAll();
 
@@ -427,6 +430,6 @@ public abstract class AudioManager {
             return null;
         }
 
-        return source.setGain(0.1f).play();
+        return source.setGain(0.1f).play();*/
     }
 }

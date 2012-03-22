@@ -71,13 +71,6 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         _deleteFromList.getLabel().setText("Delete selected element");
         _deleteFromList.setVisible(true);
 
-        /*_goToBack.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                Terasology.getInstance().getGameMode().deactivateScreen("select_world");
-                Terasology.getInstance().getGameMode().activateScreen("main_menu");
-            }
-        });   */
-
         _addToList.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 if(_input.getValue().length()>0){

@@ -6,16 +6,12 @@ import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
 
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class UIList extends UIScrollableDisplayContainer {
-    //Background
-    private Vector4f _backgroundColor = new Vector4f(1.0f,1.0f,1.0f, 0.8f);
-    private boolean  _showBackground  = true;
 
     private UIListItem _selectedItem        = null;
     private int        _selectedItemIndex   = -1;
@@ -27,7 +23,13 @@ public class UIList extends UIScrollableDisplayContainer {
         setSize(size);
         setCrop(true);
         setScrollBarsPosition(getPosition(), getSize());
-        setBorderTexture("gui_menu", new Vector2f(256f/512f, 4f / 512f), new Vector2f(0f, 150f / 512f), 4f);
+        //setStyle("border-image-top",   "gui_menu 256/512 4/512 0 150/512 4");
+        //setStyle("border-image-right", "gui_menu 256/512 4/512 0 150/512 4 90");
+        //setStyle("border-image-bottom","gui_menu 256/512 4/512 0 150/512 4 180");
+        //setStyle("border-image-left",  "gui_menu 256/512 4/512 0 150/512 4 90");
+        //or you can do that:
+        setStyle("border-image",  "gui_menu 256/512 4/512 0 150/512 4");
+        setStyle("background-color",   "#ffffff 0.8");
     }
 
     public void update(){
@@ -60,27 +62,12 @@ public class UIList extends UIScrollableDisplayContainer {
     }
 
     public void render(){
-        if(_showBackground){
-            glPushMatrix();
-            glLoadIdentity();
-            glColor4f(_backgroundColor.x, _backgroundColor.y,_backgroundColor.z, _backgroundColor.w);
-            glBegin(GL_QUADS);
-            glVertex2f(getPosition().x + getSize().x, getPosition().y + getSize().y);
-            glVertex2f(getPosition().x, getPosition().y + getSize().y);
-            glVertex2f(getPosition().x, getPosition().y);
-            glVertex2f(getPosition().x + getSize().x, getPosition().y);
-            glEnd();
-            glPopMatrix();
-        }
         super.render();
     }
 
     public int size(){
         return _items.size();
     }
-
-
-
     public void addItem(String text, Object value){
 
         UIListItem newItem  = new UIListItem(new Vector2f(getSize().x, (32f)), text, value);
@@ -103,8 +90,6 @@ public class UIList extends UIScrollableDisplayContainer {
         if(_selectedItemIndex<0 || _selectedItem == null){
             return;
         }
-
-        Vector2f deletedElementPosition =_items.get(_selectedItemIndex).getPosition();
 
         removeDisplayElement(_selectedItem);
         _items.remove(_selectedItemIndex);
@@ -142,14 +127,4 @@ public class UIList extends UIScrollableDisplayContainer {
         removeDisplayElement(_items.get(index));
         _items.remove(index);
     }
-
-    public void showBackground(boolean show){
-        _showBackground = show;
-    }
-    
-    public void setBackgroundColor(Vector4f backgroundColor){
-        _backgroundColor = backgroundColor;
-    }
-
-
 }
