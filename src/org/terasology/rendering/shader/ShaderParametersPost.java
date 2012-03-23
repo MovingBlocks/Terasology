@@ -17,6 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.TextureManager;
 
@@ -47,6 +48,8 @@ public class ShaderParametersPost implements IShaderParameters {
         program.setInt("texBlur", 2);
         program.setInt("texVignette", 3);
         program.setInt("texDepth", 4);
+        
+        program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
         if (tera.getActivePlayer() != null)
             program.setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
