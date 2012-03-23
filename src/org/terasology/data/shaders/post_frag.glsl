@@ -22,12 +22,15 @@ uniform sampler2D texDepth;
 
 uniform bool swimming;
 
-float linDepth() {
-    const float cNear = 0.1;
-    const float cZFar = 512.0;
-    float z = texture2D(texDepth, gl_TexCoord[0].xy).x;
+uniform float viewingDistance;
 
-    return (2.0 * cNear) / (cZFar + cNear - z * (cZFar - cNear));
+#define Z_NEAR 0.1
+#define BLUR_START 0.25
+#define BLUR_LENGTH 0.25
+
+float linDepth() {
+    float z = texture2D(texDepth, gl_TexCoord[0].xy).x;
+    return (2.0 * Z_NEAR) / (viewingDistance + Z_NEAR - z * (viewingDistance - Z_NEAR));
 }
 
 void main() {
@@ -38,7 +41,7 @@ void main() {
     float blur = 0.0;
 
     if (depth > 0.1 && !swimming)
-       blur = clamp((depth - 0.1) / 0.1, 0.0, 1.0);
+       blur = clamp((depth - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
     else if (swimming)
        blur = 1.0;
 

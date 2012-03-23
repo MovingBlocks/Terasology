@@ -437,7 +437,7 @@ public final class WorldRenderer implements IGameObject {
             glClear(GL_DEPTH_BUFFER_BIT);
             glPushMatrix();
             glLoadIdentity();
-            _activeCamera.loadProjectionMatrix(75f);
+            _activeCamera.loadProjectionMatrix(80f);
 
             PerformanceMonitor.startActivity("Render First Person");
             for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
