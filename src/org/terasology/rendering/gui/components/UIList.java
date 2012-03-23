@@ -23,41 +23,44 @@ public class UIList extends UIScrollableDisplayContainer {
         setSize(size);
         setCrop(true);
         setScrollBarsPosition(getPosition(), getSize());
-        //setStyle("border-image-top",   "gui_menu 256/512 4/512 0 150/512 4");
-        //setStyle("border-image-right", "gui_menu 256/512 4/512 0 150/512 4 90");
-        //setStyle("border-image-bottom","gui_menu 256/512 4/512 0 150/512 4 180");
-        //setStyle("border-image-left",  "gui_menu 256/512 4/512 0 150/512 4 90");
-        //or you can do that:
-        setStyle("border-image",  "gui_menu 256/512 4/512 0 150/512 4");
-        setStyle("background-color",   "#ffffff 0.8");
+        setStyle("border-image",     "gui_menu 256/512 4/512 0 150/512 4");
+        //setStyle("border", "5 #FF3333");
+        setStyle("background-color", "#ffffff 0.8");
     }
 
     public void update(){
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
         if (intersects(mousePos)) {
+            boolean itemClicked = false;
             for (int i = (_items.size() - 1); i >= 0; i--)
             {
                 UIListItem item = _items.get(i);
                 if(item.isVisible()){
                     if(item.intersects(mousePos)){
-                        //todo refactor it
                         if(_mouseDown){
+                            if(item.isSelected()){
+                                break;
+                            }
                             if(_selectedItemIndex>=0){
                                 _items.get(_selectedItemIndex).setSelected(false);
                             }
                             item.setSelected(true);
-                            _selectedItem = item;
+                            _selectedItem      = item;
                             _selectedItemIndex = i;
-                            _mouseDown = false;
+                            _mouseDown         = false;
+                            itemClicked = true;
                         }
                     }
                 }
+            }
+            if(!itemClicked){
+                _mouseUp   = false;
+                _mouseDown = false;
             }
         }else{
            _mouseUp = false;
            _mouseDown = false;
         }
-
         super.update();
     }
 

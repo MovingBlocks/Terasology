@@ -23,7 +23,7 @@ public class UIListItem extends UIDisplayContainer {
 
         _label = new UIText();
         _label.setVisible(true);
-        _label.setColor(Color.white);
+        _label.setColor(Color.black);
         _label.setPosition(new Vector2f((getPosition().x + _padding.x), (getPosition().y + _padding.y)));
         _label.setText(_text);
 
@@ -58,28 +58,13 @@ public class UIListItem extends UIDisplayContainer {
 
     public void setSelected(boolean selected){
         _isSelected = selected;
+
         if(_isSelected){
+            setStyle("background-color","#FFFFFF 1");
             _label.setColor(Color.orange);
         }else{
+            setStyle("background","none");
             _label.setColor(Color.black);
         }
     }
-
-    public void render(){
-        super.render();
-        /*Vector2f currentPosition = getPosition();
-        glPushMatrix();
-        //glLoadIdentity();
-        glLineWidth(2f);
-        glBegin(GL_LINE);
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glVertex2f(currentPosition.x,  currentPosition.y);
-        glVertex2f(currentPosition.x + getSize().x-5f, currentPosition.y);
-        glEnd();
-        glPopMatrix();*/
-    }
-
-    /*public void update(){
-        return;
-    } */
 }

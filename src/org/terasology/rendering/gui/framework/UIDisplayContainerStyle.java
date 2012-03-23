@@ -1,5 +1,6 @@
 package org.terasology.rendering.gui.framework;
 
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.terasology.game.Terasology;
 
@@ -37,29 +38,78 @@ public class UIDisplayContainerStyle extends UIDisplayElement{
     }
 
     public void render() {
-        if(_showTexturedBorders){
-            for(String borderType: _bordersTexture.keySet()){
-                _bordersTexture.get(borderType).renderTransformed();
-            }
+        if(_backgroundImage!=null&&_backgroundImage.isVisible()){
+            renderBackgroundImage();
+        }
+        if(_showBackground&&!_showBackgroundImage){
+            renderBackgroundSolid();
         }
 
-        if(_backgroundImage!=null&&_backgroundImage.isVisible()){
-            _backgroundImage.renderTransformed();
+        if(_showTexturedBorders){
+            renderTexturedBolders();
+        }else if(_showBorders){
+            renderBorderSolid();
         }
-        
-        if(_showBackground&&!_showBackgroundImage){
-            glPushMatrix();
-                glLoadIdentity();
-                glTranslatef(calcAbsolutePosition().x, calcAbsolutePosition().y, 0);
-                glColor4f(_backgroundColor.x, _backgroundColor.y,_backgroundColor.z, _backgroundColor.w);
-                glBegin(GL_QUADS);
-                    glVertex2f(getPosition().x + getSize().x, getPosition().y + getSize().y);
-                    glVertex2f(getPosition().x, getPosition().y + getSize().y);
-                    glVertex2f(getPosition().x, getPosition().y);
-                    glVertex2f(getPosition().x + getSize().x, getPosition().y);
-                glEnd();
-            glPopMatrix();
+
+    }
+
+    private void renderTexturedBolders(){
+        for(String borderType: _bordersTexture.keySet()){
+            _bordersTexture.get(borderType).renderTransformed();
         }
+    }
+
+    private void renderBackgroundImage(){
+        _backgroundImage.renderTransformed();
+    }
+
+    private void renderBackgroundSolid(){
+        glPushMatrix();
+            glLoadIdentity();
+            glTranslatef(calcAbsolutePosition().x, calcAbsolutePosition().y, 0);
+            glColor4f(_backgroundColor.x, _backgroundColor.y,_backgroundColor.z, _backgroundColor.w);
+            glBegin(GL_QUADS);
+                glVertex2f(0f, 0f);
+                glVertex2f(getSize().x, 0f);
+                glVertex2f(getSize().x, getSize().y);
+                glVertex2f(0f, getSize().y);
+            glEnd();
+        glPopMatrix();
+    }
+
+    private void renderBorderSolid(){
+        glPushMatrix();
+        glLoadIdentity();
+        glTranslatef(calcAbsolutePosition().x, calcAbsolutePosition().y, 0);
+
+        glLineWidth(_bordersWidth.get("top"));
+        glBegin(GL11.GL_LINE);
+            glColor4f(_bordersColors.get("top").x, _bordersColors.get("top").y,_bordersColors.get("top").z, _bordersColors.get("top").w);
+            glVertex2f(getPosition().x, getPosition().y);
+            glVertex2f(getPosition().x + getSize().x, getPosition().y);
+        glEnd();
+
+        glLineWidth(_bordersWidth.get("right"));
+        glBegin(GL11.GL_LINE);
+            glColor4f(_bordersColors.get("right").x, _bordersColors.get("right").y,_bordersColors.get("right").z, _bordersColors.get("right").w);
+            glVertex2f(getPosition().x + getSize().x, getPosition().y);
+            glVertex2f(getPosition().x + getSize().x, getPosition().y + getSize().y);
+        glEnd();
+
+        glLineWidth(_bordersWidth.get("bottom"));
+        glBegin(GL11.GL_LINE);
+            glColor4f(_bordersColors.get("bottom").x, _bordersColors.get("bottom").y,_bordersColors.get("bottom").z, _bordersColors.get("bottom").w);
+            glVertex2f(getPosition().x + getSize().x, getPosition().y + getSize().y);
+            glVertex2f(getPosition().x, getPosition().y + getSize().y);
+        glEnd();
+
+        glLineWidth(_bordersWidth.get("left"));
+        glBegin(GL11.GL_LINE);
+            glColor4f(_bordersColors.get("left").x, _bordersColors.get("left").y,_bordersColors.get("left").z, _bordersColors.get("left").w);
+            glVertex2f(getPosition().x, getPosition().y + getSize().y);
+            glVertex2f(getPosition().x, getPosition().y);
+            glEnd();
+        glPopMatrix();
     }
 
     public void update() {
@@ -92,6 +142,7 @@ public class UIDisplayContainerStyle extends UIDisplayElement{
                     _showTexturedBorders = true;
                 }
             }else{
+                System.out.println("border -one ");
                 //border none
                 if(value.equals("none")){
                     _showBorders = false;
@@ -99,19 +150,24 @@ public class UIDisplayContainerStyle extends UIDisplayElement{
                 }else{
                     //border <border_width> <color hex>
                     String[] values = value.split(" ");
-                    if(subProperty.length==2){
-                        float borderWidth = parseFloat(values[0]);
-                        _bordersWidth.put("top",    borderWidth);
-                        _bordersWidth.put("right",  borderWidth);
-                        _bordersWidth.put("bottom", borderWidth);
-                        _bordersWidth.put("left",   borderWidth);
+                    //System.out.println("border -one  get ");
+                    if(values.length==2){
+                        try{
+                            float borderWidth = parseFloat(values[0]);
+                            _bordersWidth.put("top",    borderWidth);
+                            _bordersWidth.put("right",  borderWidth);
+                            _bordersWidth.put("bottom", borderWidth);
+                            _bordersWidth.put("left",   borderWidth);
 
-                        _bordersColors.put("top",    hexToRGB(values[1]));
-                        _bordersColors.put("right",  hexToRGB(values[1]));
-                        _bordersColors.put("bottom", hexToRGB(values[1]));
-                        _bordersColors.put("left",   hexToRGB(values[1]));
+                            _bordersColors.put("top",    hexToRGB(values[1]));
+                            _bordersColors.put("right",  hexToRGB(values[1]));
+                            _bordersColors.put("bottom", hexToRGB(values[1]));
+                            _bordersColors.put("left",   hexToRGB(values[1]));
 
-                        _showBorders = true;
+                            _showBorders = true;
+                        }catch(NumberFormatException e){
+                            Terasology.getInstance().getLogger().log(Level.WARNING, "Bad value for border width: " + values[0]);
+                        }
                     }
                 }
             }
@@ -121,7 +177,9 @@ public class UIDisplayContainerStyle extends UIDisplayElement{
             }else{
                 if(value.equals("none")){
                     _showBackground      = false;
-                    _backgroundImage.setVisible(false);
+                    if(_backgroundImage != null){
+                        _backgroundImage.setVisible(false);
+                    }
                 }
             }
         }
@@ -222,31 +280,37 @@ public class UIDisplayContainerStyle extends UIDisplayElement{
     //Temporary. Value can have 2 arguments. For example 2/150
     private float parseFloat(String value){
         if(value.indexOf("/")<0){
-            return  Float.parseFloat(value);
+            try{
+                return  Float.parseFloat(value);
+            }catch(NumberFormatException e){
+                Terasology.getInstance().getLogger().log(Level.WARNING, "Bad float value - " + value);
+                return 0f;
+            }
         }else{
-            float arg1 = Float.parseFloat(value.split("/")[0]);
-            float arg2 = Float.parseFloat(value.split("/")[1]);
-
-            return arg1/arg2;
+            try{
+                float arg1 = Float.parseFloat(value.split("/")[0]);
+                float arg2 = Float.parseFloat(value.split("/")[1]);
+                return arg1/arg2;
+            }catch(Exception e){
+                Terasology.getInstance().getLogger().log(Level.WARNING, e.getMessage());
+                return 0f;
+            }
         }
     }
 
     private Vector4f hexToRGB(String hexColor){
-        return new Vector4f((float)Integer.parseInt(checkHex(hexColor).substring(0,2),16),
-                            (float)Integer.parseInt(checkHex(hexColor).substring(2,4),16),
-                            (float)Integer.parseInt(checkHex(hexColor).substring(4,6),16),
+        try{
+            return new Vector4f((float)Integer.parseInt(checkHex(hexColor).substring(0,2),16)/255f,
+                            (float)Integer.parseInt(checkHex(hexColor).substring(2,4),16)/255f,
+                            (float)Integer.parseInt(checkHex(hexColor).substring(4,6),16)/255f,
                             1.0f);
+        }catch (NumberFormatException e){
+            Terasology.getInstance().getLogger().log(Level.WARNING, "Bad Hex color value - " + hexColor);
+            return new Vector4f();
+        }
     }
 
     private String checkHex(String h){
         return (h.charAt(0)=='#')?h.substring(1,7):h;
-    }
-
-    private void showBackground(boolean show){
-        _showBackground = show;
-    }
-
-    private void showBackgroundImage(boolean show){
-        _showBackgroundImage = show;
     }
 }

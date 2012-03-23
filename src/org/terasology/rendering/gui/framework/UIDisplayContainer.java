@@ -42,17 +42,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     public UIDisplayContainer() {
         super();
-        //_style = new UIDisplayContainerStyle();
     }
 
     public UIDisplayContainer(Vector2f position) {
         super(position);
-       // _style = new UIDisplayContainerStyle();
     }
 
     public UIDisplayContainer(Vector2f position, Vector2f size) {
         super(position, size);
-        //_style = new UIDisplayContainerStyle();
     }
 
     public void render() {
@@ -134,6 +131,11 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         element.setParent(this);
     }
 
+    public void addFirstDisplayElement(UIDisplayElement element) {
+        _displayElements.add(0,element);
+        element.setParent(this);
+    }
+
     public void removeDisplayElement(UIDisplayElement element) {
         _displayElements.remove(element);
         element.setParent(null);
@@ -157,10 +159,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void setStyle(String property, String value){
         if(_style==null){
             _style = new UIDisplayContainerStyle(getSize());
-            _style.setPosition(getPosition());
+            _style.setPosition(new Vector2f(0f,0f));
             _style.setVisible(true);
             _style.setCroped(false);
-            addDisplayElement(_style);
+            addFirstDisplayElement(_style);
         }
         _style.parseStyle(property,value);
     }

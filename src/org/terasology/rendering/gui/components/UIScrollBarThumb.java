@@ -38,6 +38,10 @@ public class UIScrollBarThumb extends UIDisplayContainer {
                 setHorizontalPositions();
                 break;
         }
+
+        _header.getTextureOrigin().set(0f, 155f / 512f);
+        _body.getTextureOrigin().set(7f/512f, 155f / 512f);
+        _footer.getTextureOrigin().set(0f, 155f / 512f);
     }
 
     private void setVerticalOptions(){
@@ -77,12 +81,6 @@ public class UIScrollBarThumb extends UIDisplayContainer {
         _footer.setSize(new Vector2f(7f, 15f));
         _footer.getPosition().y += 15f;
         _footer.getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
-    }
-
-    public void update(){
-        _header.getTextureOrigin().set(0f, 155f / 512f);
-        _body.getTextureOrigin().set(7f/512f, 155f / 512f);
-        _footer.getTextureOrigin().set(0f, 155f / 512f);
     }
 
     public void resize(float newScrollSize){

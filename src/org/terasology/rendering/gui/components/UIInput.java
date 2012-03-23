@@ -47,7 +47,7 @@ public class UIInput extends UIDisplayContainer {
       _textCursor.setVisible(true);
       _textCursor.setPosition(new Vector2f((getPosition().x + _padding.x), (getPosition().y + _padding.y / 2)));
 
-       addDisplayElement(_inputText);
+      addDisplayElement(_inputText);
       addDisplayElement(_textCursor);
 
   }
@@ -109,9 +109,7 @@ public class UIInput extends UIDisplayContainer {
           }else if(pos<0){
               pos = 0;
           }
-
           _cursorPosition = pos;
-          System.out.println(_cursorPosition);
       }
 
   }
