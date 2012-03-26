@@ -23,9 +23,22 @@ public class UIList extends UIScrollableDisplayContainer {
         setSize(size);
         setCrop(true);
         setScrollBarsPosition(getPosition(), getSize());
-        setStyle("border-image",     "gui_menu 256/512 4/512 0 150/512 4");
+
+        setStyle("border-image-top",    "gui_menu 159/512 18/512 264/512 0 18");
+        setStyle("border-image-right",  "gui_menu 9/512 63/512 423/512 18/512 9");
+        setStyle("border-image-bottom", "gui_menu 159/512 9/512 264/512 81/512 9");
+        setStyle("border-image-left",   "gui_menu 8/512 64/512 256/512 17/512 8");
+
+        setStyle("border-corner-topleft",     "gui_menu 256/512 0");
+        setStyle("border-corner-topright",    "gui_menu 423/512 0");
+        setStyle("border-corner-bottomright", "gui_menu 423/512 81/512");
+        setStyle("border-corner-bottomleft",  "gui_menu 256/512 81/512");
+
+        setStyle("background-image","gui_menu 159/512 63/512 264/512 18/512");
+        //setStyle("border-image",     "gui_menu 256/512 4/512 0 150/512 4");
+       //
         //setStyle("border", "5 #FF3333");
-        setStyle("background-color", "#ffffff 0.8");
+        //setStyle("background-color", "#ffffff 0.8");
     }
 
     public void update(){
