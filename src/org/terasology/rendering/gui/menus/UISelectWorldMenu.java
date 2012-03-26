@@ -44,7 +44,7 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
 
     public UISelectWorldMenu() {
         _overlay = new UIImageOverlay("menuBackground");
-        _overlay.setVisible(false);
+        _overlay.setVisible(true);
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
@@ -88,11 +88,13 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
             }
         });
 
+      addDisplayElement(_overlay);
       addDisplayElement(_list);
       addDisplayElement(_goToBack);
       addDisplayElement(_addToList);
       addDisplayElement(_deleteFromList);
       addDisplayElement(_input);
+
 
       update();
     }
