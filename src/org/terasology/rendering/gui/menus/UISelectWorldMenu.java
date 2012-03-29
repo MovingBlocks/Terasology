@@ -19,10 +19,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.components.*;
-import org.terasology.rendering.gui.framework.IClickListener;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.*;
 import org.terasology.game.Terasology;
 
 import javax.vecmath.Vector2f;
@@ -41,10 +38,14 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
     final UIButton _addToList;
     final UIButton _deleteFromList;
     final UIInput  _input;
+    final UIDisplayWindow _window;
 
     public UISelectWorldMenu() {
         _overlay = new UIImageOverlay("menuBackground");
         _overlay.setVisible(true);
+
+        _window = new UIDisplayWindow("test", new Vector2f(512f, 256f));
+        _window.setVisible(true);
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
@@ -88,13 +89,14 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
             }
         });
 
-      addDisplayElement(_overlay);
+     /* addDisplayElement(_overlay);
       addDisplayElement(_list);
       addDisplayElement(_goToBack);
       addDisplayElement(_addToList);
       addDisplayElement(_deleteFromList);
-      addDisplayElement(_input);
-
+      addDisplayElement(_input);    */
+      addDisplayElement(_window);
+        _window.center();
 
       update();
     }
@@ -116,6 +118,7 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         _deleteFromList.getPosition().y = _addToList.getPosition().y  + _addToList.getSize().y + 32f;
 
         _goToBack.centerHorizontally();
+
         _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
 
     }

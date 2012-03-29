@@ -21,8 +21,6 @@ public class UIStyle extends UIDisplayContainer {
     //borders
     UIPropertyBorder _border                 = new UIPropertyBorder();
 
-    //Corners
-    //private final HashMap<String, UIGraphicsElement> _cornersTexture = new HashMap<String, UIGraphicsElement>();
     public UIStyle(Vector2f size){
         setSize(size);
         _background.setSize(getSize());
@@ -38,6 +36,18 @@ public class UIStyle extends UIDisplayContainer {
         }else if(property.indexOf("background")>=0){
             _background.parse(property, value);
         }
+    }
+
+    public void parse(String value){
+        String[] parseData = value.split(":");
+        parseData[1] = validateString(parseData[1].trim());
+        parse(parseData[0], parseData[1]);
+    }
+    
+    private String validateString(String value){
+        value = value.trim();
+        value = value.replaceAll("[ ]+", " ");
+        return value;
     }
 
 }

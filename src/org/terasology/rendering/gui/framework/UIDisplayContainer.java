@@ -18,6 +18,8 @@ package org.terasology.rendering.gui.framework;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.framework.style.UIStyle;
@@ -33,6 +35,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     private boolean _crop               = false;
 
     private UIStyle _style       = null;
+    private final HashMap<String, UIStyle> _styleClasses = new HashMap<String, UIStyle>();
 
     private Vector4f _cropMargin = new Vector4f(/*TOP*/    0.0f,
                                                 /*RIGHT*/  0.0f,
@@ -164,7 +167,29 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             _style.setCroped(false);
             addFirstDisplayElement(_style);
         }
-        _style.parse(property,value);
+        _style.parse(property, value);
     }
+
+    public void setClassStyle(String className, String value){
+       UIStyle style = new UIStyle(getSize());
+       style.setPosition(new Vector2f(0f,0f));
+       style.setVisible(true);
+       style.setCroped(false);
+       style.parse(value);
+       _styleClasses.put(className,style);
+    }
+
+    public void setClassStyle(String className){
+        if(_styleClasses.containsKey(className)){
+            if(_style!=null){
+                removeDisplayElement(_style);
+            }
+            _style = _styleClasses.get(className);
+            addFirstDisplayElement(_style);
+        }
+    }
+
+    
+
 
 }

@@ -38,8 +38,11 @@ public class UIButton extends UIDisplayContainer {
 
     public UIButton(Vector2f size) {
         setSize(size);
-        setStyle("background-image","gui_menu 256/512 30/512 0 90/512");
-
+       // setStyle("background-image","gui_menu 256/512 30/512 0 90/512");
+         setClassStyle("button","background-image: gui_menu 256/512 30/512 0 0");
+         setClassStyle("button-mouseover","background-image: gui_menu 256/512 30/512 0 30/512");
+         setClassStyle("button-mouseclick","background-image: gui_menu 256/512 30/512 0 60/512");
+         setClassStyle("button");
         _label = new UIText("Untitled");
         _label.setVisible(true);
         addDisplayElement(_label);
@@ -62,16 +65,16 @@ public class UIButton extends UIDisplayContainer {
             }
 
             if (_mouseDown) {
-                setStyle("background-position","0 60/512");
+                setClassStyle("button-mouseover");
             } else {
-                setStyle("background-position","0 30/512");
+                setClassStyle("button-mouseclick");
             }
 
         } else {
             _clickSoundPlayed = false;
             _mouseUp = false;
             _mouseDown = false;
-            setStyle("background-position","0 0");
+            setClassStyle("button");
         }
 
         // Position the label in the center of the button
