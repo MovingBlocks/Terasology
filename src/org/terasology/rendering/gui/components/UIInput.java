@@ -28,7 +28,7 @@ public class UIInput extends UIDisplayContainer {
   private final Vector2f          _padding    = new Vector2f(10f,10f);
   
   private int    _cursorPosition       = 0;  //The current position of the carriage
-  private int    _maxLength            = 42; //The maximum number of characters that will be accepted as input
+  private int    _maxLength            = 255; //The maximum number of characters that will be accepted as input
   private float  _textWidthInContainer = 0;  //The width of the text inside the INPUT field.
 
   private String _prevInputValue = new String();
@@ -49,7 +49,6 @@ public class UIInput extends UIDisplayContainer {
 
       addDisplayElement(_inputText);
       addDisplayElement(_textCursor);
-
   }
   
   public void update() {
@@ -92,6 +91,7 @@ public class UIInput extends UIDisplayContainer {
         setStyle("background-position","0 90/512");
     }
     updateTextShift();
+    super.update();
   }
 
   public void clicked(Vector2f mousePos) {
@@ -104,8 +104,8 @@ public class UIInput extends UIDisplayContainer {
 
           int pos = Math.abs((int)(positionRelativeElement/averageSymbols)-_inputValue.length());
 
-          if(pos>(_inputValue.length()-1)){
-              pos = _inputValue.length()-1;
+          if(pos>(_inputValue.length())){
+              pos = _inputValue.length();
           }else if(pos<0){
               pos = 0;
           }
@@ -135,8 +135,8 @@ public class UIInput extends UIDisplayContainer {
             }
         }else if(key == Keyboard.KEY_RIGHT){
             _cursorPosition++;
-            if(_cursorPosition>_inputValue.length()-1){
-                _cursorPosition = _inputValue.length()-1;
+            if(_cursorPosition>_inputValue.length()){
+                _cursorPosition = _inputValue.length();
             }
         }else{
             if(_inputValue.length()>_maxLength){
@@ -191,8 +191,8 @@ public class UIInput extends UIDisplayContainer {
   private void updateTextShift(){
       float cursorPos = 0f;
       _textWidthInContainer = _inputText.getTextWidth() + _padding.x + _inputText.getPosition().x;
-      if(_textWidthInContainer > getSize().x || _inputText.getPosition().x < 0){
-          _inputText.setPosition(new Vector2f((_inputText.getPosition().x + (getSize().x - _textWidthInContainer)),_inputText.getPosition().y));
+      if(_textWidthInContainer > getPosition().x + getSize().x || getPosition().x + _inputText.getPosition().x < 0){
+          _inputText.setPosition(new Vector2f(( _inputText.getPosition().x + (getPosition().x + getSize().x - _textWidthInContainer)),_inputText.getPosition().y));
       }
       if(_cursorPosition!=_inputValue.length()){
           cursorPos = (_inputText.getFont().getWidth(_inputValue.toString().substring(0, _cursorPosition)) - _textCursor.getSize().x + _inputText.getPosition().x)/2;

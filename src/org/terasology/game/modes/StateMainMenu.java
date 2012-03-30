@@ -73,9 +73,10 @@ public class StateMainMenu implements IGameState {
         _selectWorldMenu = new UISelectWorldMenu();
         _selectWorldMenu.setVisible(false);
 
-        _mainMenu.getStartButton().addClickListener(new IClickListener() {
+        _mainMenu.getSinglePlayerButton().addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
+                _mainMenu.setVisible(false);
+                _selectWorldMenu.setVisible(true);
             }
         });
 
@@ -89,13 +90,6 @@ public class StateMainMenu implements IGameState {
             public void clicked(UIDisplayElement element) {
                 _mainMenu.setVisible(false);
                 _configMenu.setVisible(true);
-            }
-        });
-
-        _mainMenu.getOptionsButton().addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                _mainMenu.setVisible(false);
-                _selectWorldMenu.setVisible(true);
             }
         });
 

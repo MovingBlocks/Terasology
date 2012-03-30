@@ -15,71 +15,94 @@
  */
 package org.terasology.rendering.gui.menus;
 
+import groovy.util.ConfigObject;
+import groovy.util.ConfigSlurper;
 import org.lwjgl.opengl.Display;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.components.*;
+import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.*;
 import org.terasology.game.Terasology;
 
 import javax.vecmath.Vector2f;
+import java.io.File;
+import java.io.FileFilter;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.logging.Level;
 
 /**
- * Main menu screen.
+ * Select world menu screen.
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
- * @todo Add scrollbar, slider
+ *
  */
 public class UISelectWorldMenu extends UIDisplayRenderer {
 
     final UIImageOverlay _overlay;
     final UIList _list;
     final UIButton _goToBack;
-    final UIButton _addToList;
+    final UIButton _createNewWorld;
+    final UIButton _loadFromList;
     final UIButton _deleteFromList;
-    final UIInput  _input;
-    final UIDisplayWindow _window;
+    final UIDialogCreateNewWorld _window;
 
     public UISelectWorldMenu() {
         _overlay = new UIImageOverlay("menuBackground");
         _overlay.setVisible(true);
 
-        _window = new UIDisplayWindow("test", new Vector2f(512f, 256f));
-        _window.setVisible(true);
+        _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 256f));
+        _window.setVisible(false);
+        _window.center();
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
 
-        _input = new UIInput(new Vector2f(256f, 30f));
-        _input.setVisible(true);
+        ConfigObject config = null;
 
-        Object[] worlds = Terasology.getInstance().getListWolds();
+        String path          = Terasology.getInstance().getWorldSavePath("");
 
-        for(Object worldName: worlds){
-            _list.addItem(worldName.toString(), worldName.toString());
+        File f = new File(path);
+
+        for(File file : f.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                if(file.isDirectory()){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        })){
+            try {
+                config = new ConfigSlurper().parse(file.toURI().toURL());
+                if(config.get("worldTitle")!=null&&config.get("worldSeed")!=null){
+                    _list.addItem((String) config.get("worldTitle"), (String)config.get("worldSeed"));
+                }
+            } catch (MalformedURLException e) {
+                Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
+            }
         }
-
 
         _goToBack = new UIButton(new Vector2f(256f, 32f));
         _goToBack.getLabel().setText("Go to back");
         _goToBack.setVisible(true);
 
-        _addToList = new UIButton(new Vector2f(256f, 32f));
-        _addToList.getLabel().setText("Add element");
-        _addToList.setVisible(true);
+        _loadFromList = new UIButton(new Vector2f(128f, 32f));
+        _loadFromList.getLabel().setText("Load");
+        _loadFromList.setVisible(true);
 
-        _deleteFromList = new UIButton(new Vector2f(256f, 32f));
-        _deleteFromList.getLabel().setText("Delete selected element");
+        _createNewWorld = new UIButton(new Vector2f(192f, 32f));
+        _createNewWorld.getLabel().setText("Create new world");
+        _createNewWorld.setVisible(true);
+
+        _deleteFromList = new UIButton(new Vector2f(128f, 32f));
+        _deleteFromList.getLabel().setText("Delete");
         _deleteFromList.setVisible(true);
 
-        _addToList.addClickListener(new IClickListener() {
+        _createNewWorld.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                if(_input.getValue().length()>0){
-                    _list.addItem(_input.getValue(), _input.getValue());
-                }else{
-                    _list.addItem("Add world " + _list.size(), "Add world " + _list.size());
-                }
-
+                _window.setVisible(true);
             }
         });
 
@@ -89,16 +112,14 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
             }
         });
 
-     /* addDisplayElement(_overlay);
-      addDisplayElement(_list);
-      addDisplayElement(_goToBack);
-      addDisplayElement(_addToList);
-      addDisplayElement(_deleteFromList);
-      addDisplayElement(_input);    */
-      addDisplayElement(_window);
-        _window.center();
-
-      update();
+        addDisplayElement(_overlay);
+        addDisplayElement(_list);
+        addDisplayElement(_loadFromList);
+        addDisplayElement(_goToBack);
+        addDisplayElement(_createNewWorld);
+        addDisplayElement(_deleteFromList);
+        addDisplayElement(_window);
+        update();
     }
 
     @Override
@@ -107,15 +128,15 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         _list.centerHorizontally();
         _list.getPosition().y = 230f;
 
-        _input.centerHorizontally();
-        _input.getPosition().x = _list.getPosition().x;
-        _input.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
+        _createNewWorld.getPosition().x = _list.getPosition().x;
+        _createNewWorld.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
 
-        _addToList.getPosition().x =_input.getPosition().x + _input.getSize().x + 15f;
-        _addToList.getPosition().y =_input.getPosition().y;
+        _loadFromList.getPosition().x =_createNewWorld.getPosition().x + _createNewWorld.getSize().x + 15f;
+        _loadFromList.getPosition().y =_createNewWorld.getPosition().y;
 
-        _deleteFromList.getPosition().x = _addToList.getPosition().x;
-        _deleteFromList.getPosition().y = _addToList.getPosition().y  + _addToList.getSize().y + 32f;
+        _deleteFromList.getPosition().x =_loadFromList.getPosition().x + _loadFromList.getSize().x + 15f;
+        _deleteFromList.getPosition().y =_loadFromList.getPosition().y;
+
 
         _goToBack.centerHorizontally();
 

@@ -89,6 +89,11 @@ public abstract class UIDisplayElement {
         }
     }
 
+    public boolean isFocused(){
+        return _focused;
+    }
+
+
     public abstract void render();
 
     public abstract void update();
@@ -111,6 +116,10 @@ public abstract class UIDisplayElement {
 
     public void setVisible(boolean visible) {
         _visible = visible;
+    }
+    
+    public void setFocus(boolean focus){
+        _focused = focus;
     }
 
     public boolean isVisible() {

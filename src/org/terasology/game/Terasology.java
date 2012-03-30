@@ -435,29 +435,4 @@ public final class Terasology {
         Config.getInstance().saveConfig("SAVED_WORLDS/last.cfg");
         System.exit(0);
     }
-
-    public Object[] getListWolds(){
-        String path          = getWorldSavePath("");
-        //String[] worldsNames =
-        File f = new File(path);
-        ArrayList<String> worldsNames = new ArrayList<String>();
-        if(!f.exists()){
-            return null;
-        }
-
-
-        for(File file : f.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                if(file.isDirectory()){
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-        })){
-            worldsNames.add(file.getName());
-        }
-
-        return worldsNames.toArray();
-    }
 }

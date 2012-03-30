@@ -1,5 +1,6 @@
 package org.terasology.rendering.gui.framework;
 
+import org.lwjgl.input.Cursor;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.components.UIButton;
@@ -7,13 +8,6 @@ import org.terasology.rendering.gui.components.UIWindowTitle;
 
 import javax.vecmath.Vector2f;
 
-/**
- * Created by IntelliJ IDEA.
- * User: kireev
- * Date: 29.03.12
- * Time: 13:08
- * To change this template use File | Settings | File Templates.
- */
 public class UIDisplayWindow extends UIScrollableDisplayContainer{
     private UIButton _close;
     private Vector2f _prevMousePos = null;
@@ -23,7 +17,6 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer{
     public UIDisplayWindow(String title, Vector2f size){
         super();
         setSize(size);
-        //this.getClass().getName();
         setStyle("border-image-top", "gui_menu 168/512 5/512 260/512 89/512 5");
         setStyle("border-image-right",  "gui_menu 4/512 81/512 428/512 94/512 4");
         setStyle("border-image-bottom", "gui_menu 168/512 4/512 260/512 175/512 4");
@@ -36,56 +29,69 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer{
 
         setStyle("background-image","gui_menu 168/512 76/512 260/512 94/512");
 
-        _title = new UIWindowTitle(new Vector2f(getSize().x*0.6f, 19f), title);
+        _title = new UIWindowTitle(new Vector2f(getSize().x*0.85f, 19f), title);
         _title.setVisible(true);
-        addDisplayElement(_title);
+        _title.getPosition().x = (getPosition().x + size.x/2f) - _title.getSize().x/2;
+        _title.setTitle(title);
+
 
         _close = new UIButton(new Vector2f(19f, 19f));
 
         _close.setClassStyle("button","background-image: gui_menu 19/512 19/512 73/512 155/512");
-        _close.setClassStyle("button-mouseover","background-image: gui_menu 19/512 19/512 92/512 155/512");
+        _close.setClassStyle("button-mouseover","background-image: gui_menu 19/512 19/512 54/512 155/512");
         _close.setClassStyle("button-mouseclick","background-image: gui_menu 19/512 19/512 92/512 155/512");
 
-        _close.setPosition(new Vector2f(getSize().x-25f,getPosition().y+10f));
+        _close.getPosition().x = getSize().x-25f;
         _close.setVisible(true);
         _close.getLabel().setText("");
 
-        addDisplayElement(_close);
+        _close.addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                close();
+            }
+        });
+
+       addDisplayElement(_close);
+       addDisplayElement(_title);
     }
 
     public void update(){
-     //   _title.getPosition().x = getPosition().x + getSize().x/2;
-   //     _title.getSize().x = getSize().x*0.6f;
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-        if(intersects(mousePos)){
-            if(_mouseDown){
-                _dragged = true;
-                if(_prevMousePos==null){
-                   _prevMousePos =  new Vector2f(mousePos);
+            if(intersects(mousePos)){
+                if(_mouseDown){
+                    _focused = true;
+                    if(_title.intersects(mousePos)){
+                        _dragged = true;
+                        if(_prevMousePos==null){
+                           _prevMousePos =  new Vector2f(mousePos);
+                        }
+                    }
                 }
             }
 
-        }
+            if(_dragged){
+                drag(new Vector2f(_prevMousePos.x - mousePos.x, _prevMousePos.y-mousePos.y));
+                _prevMousePos =  new Vector2f(mousePos);
+            }
 
-        if(_dragged){
-            //setPosition(mousePos);
-            drag(new Vector2f(_prevMousePos.x - mousePos.x, _prevMousePos.y-mousePos.y));
-            _prevMousePos =  new Vector2f(mousePos);
-        }
-
-        if(!_mouseDown||!_dragged || _mouseUp){
-            _dragged     = false;
-            _mouseDown    = false;
-            _prevMousePos = null;
-            _mouseUp      = false;
-        }
+            if(!_mouseDown||!_dragged || _mouseUp){
+                _dragged     = false;
+                _mouseDown    = false;
+                _prevMousePos = null;
+                _mouseUp      = false;
+                _focused = false;
+            }
 
         super.update();
     }
 
     private void drag(Vector2f value){
-        System.out.println(value);
         getPosition().x -=value.x;
         getPosition().y -=value.y;
+    }
+
+    public void close(){
+        setVisible(false);
+        setFocus(false);
     }
 }

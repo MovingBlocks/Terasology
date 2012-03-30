@@ -37,13 +37,12 @@ public class UIMainMenu extends UIDisplayRenderer {
     private final UIGraphicsElement _title;
 
 
-    private final UIButton _optionsButton;
     private final UIButton _exitButton;
-    private final UIButton _startButton;
+    private final UIButton _singlePlayer;
     private final UIButton _configButton;
 
     final UIText _version;
-
+                                                                  
     public UIMainMenu() {
         _title = new UIGraphicsElement("terasology");
         _title.setVisible(true);
@@ -57,29 +56,23 @@ public class UIMainMenu extends UIDisplayRenderer {
         _exitButton.setVisible(true);
 
 
-        _optionsButton = new UIButton(new Vector2f(256f, 32f));
-        _optionsButton.getLabel().setText("Select World");
-        _optionsButton.setVisible(true);
-
         _configButton = new UIButton(new Vector2f(256f, 32f));
         _configButton.getLabel().setText("Settings");
         _configButton.setVisible(true);
 
-        _startButton = new UIButton(new Vector2f(256f, 32f));
-        _startButton.getLabel().setText("Play!");
-        _startButton.setVisible(true);
+        _singlePlayer = new UIButton(new Vector2f(256f, 32f));
+        _singlePlayer.getLabel().setText("Single player");
+        _singlePlayer.setVisible(true);
 
         _overlay = new UIImageOverlay("menuBackground");
-        _overlay.setVisible(false);
+        _overlay.setVisible(true);
 
         addDisplayElement(_overlay);
-
         addDisplayElement(_title);
         addDisplayElement(_version);
-        addDisplayElement(_optionsButton);
         addDisplayElement(_configButton);
         addDisplayElement(_exitButton);
-        addDisplayElement(_startButton);
+        addDisplayElement(_singlePlayer);
 
         update();
     }
@@ -91,17 +84,13 @@ public class UIMainMenu extends UIDisplayRenderer {
         _version.centerHorizontally();
         _version.getPosition().y = 230f;
 
-        _startButton.centerHorizontally();
-        _startButton.getPosition().y = 300f + 40f;
-
-        _optionsButton.centerHorizontally();
-        _optionsButton.getPosition().y = 300f + 5 * 32f + 32f;
+        _singlePlayer.centerHorizontally();
+        _singlePlayer.getPosition().y = 300f + 40f;
 
         _exitButton.centerHorizontally();
         _exitButton.getPosition().y = 300f + 3 * 32f + 64f;
         _configButton.centerHorizontally();
         _configButton.getPosition().y = 300f + 2 * 40f;
-
 
         _exitButton.centerHorizontally();
         _exitButton.getPosition().y = 300f + 4 * 40f;
@@ -114,15 +103,11 @@ public class UIMainMenu extends UIDisplayRenderer {
         return _exitButton;
     }
 
-    public UIButton getStartButton() {
-        return _startButton;
+    public UIButton getSinglePlayerButton() {
+        return _singlePlayer;
     }
 
     public UIButton getConfigButton() {
         return _configButton;
-    }
-
-    public UIButton getOptionsButton() {
-        return _optionsButton;
     }
 }

@@ -79,12 +79,12 @@ public class StateSinglePlayer implements IGameState {
 
     public void activate() {
         String worldSeed = Config.getInstance().getDefaultSeed();
-
+        String worldTitle = Config.getInstance().getWorldTitle();
         if (worldSeed.isEmpty()) {
             worldSeed = null;
         }
 
-        initWorld("World1", worldSeed);
+        initWorld(worldTitle, worldSeed);
     }
 
     public void deactivate() {
