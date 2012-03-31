@@ -5,10 +5,21 @@ package org.terasology.entitySystem;
  * @author Immortius <immortius@gmail.com>
  */
 public interface EntityRef {
+
     /**
-     * @return The identifier for this entity
+     * Whether this is a null entity. Null entities do not have components
+     * and cannot have components.
+     *
+     * @return Whether this entity exists.
      */
-    long getId();
+    boolean isNull();
+
+    /**
+     *
+     * @param component
+     * @return If this entity has the given component
+     */
+    boolean hasComponent(Class<? extends Component> component);
 
     /**
      *
@@ -34,10 +45,11 @@ public interface EntityRef {
      * future retrievals
      * @param component
      */
+    // TODO: Actually need this? Or just save entity?
     void saveComponent(Component component);
     
     /**
-     * Iterates over all the components
+     * Iterates over all the components this entity has
      * @return
      */
     Iterable<Component> iterateComponents();
@@ -53,5 +65,5 @@ public interface EntityRef {
      */
     void send(Event event);
 
-    boolean hasComponent(Class<? extends Component> component);
+
 }

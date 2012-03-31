@@ -3,6 +3,8 @@ package org.terasology.entitySystem;
 import org.terasology.components.LocationComponent;
 import org.terasology.components.MeshComponent;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Map;
@@ -12,9 +14,18 @@ import java.util.Map;
  */
 public interface EntityManager {
 
-    EventSystem getEventSystem();
-    void setEventSystem(EventSystem systen);
-    
+    void registerComponentClass(Class<? extends Component> componentClass);
+
+    public enum SaveFormat {
+        Binary,
+        Text,
+        JSON
+    }
+
+    void save(File file, SaveFormat format) throws IOException;
+    void load(File file, SaveFormat format) throws IOException;
+    void clear();
+
     // Entity Management
 
     /**
@@ -23,38 +34,16 @@ public interface EntityManager {
     EntityRef create();
 
     /**
-     * @param entityId
-     * @return A reference to an existing entity, or null if it doesn't exist
-     */
-    EntityRef get(long entityId);
-
-    /**
-     * Strips an entity of all its components and destroys it
-     * @param entityId
-     */
-    void destroy(long entityId);
-    
-    // Component Management
-
-    /**
-     *
-     * @param entityId
-     * @param componentClass
-     * @return Whether the given entity has a component of the given class
-     */
-    boolean hasComponent(long entityId, Class<? extends Component> componentClass);
-    <T extends Component> T getComponent(long entityId, Class<T> componentClass);
-    <T extends Component> T addComponent(long entityId, T component);
-    void removeComponent(long entityId, Class<? extends Component> componentClass);
-    void saveComponent(long entityId, Component component);
-
-    /**
      * @param componentClass
      * @return The number of entities with this component class
      */
     int getComponentCount(Class<? extends Component> componentClass);
-    
-    <T extends Component> Iterable<Map.Entry<EntityRef,T>> iterateComponents(Class<T> componentClass);
-    Iterable<Component> iterateComponents(long entityId);
+
     Iterable<EntityRef> iteratorEntities(Class<? extends Component> ...  componentClasses);
+
+    <T extends Component> Iterable<Map.Entry<EntityRef,T>> iterateComponents(Class<T> componentClass);
+
+    EventSystem getEventSystem();
+    void setEventSystem(EventSystem system);
+
 }

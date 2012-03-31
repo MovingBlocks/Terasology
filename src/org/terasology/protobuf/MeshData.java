@@ -15,32 +15,32 @@ public final class MeshData {
     boolean hasName();
     String getName();
     
-    // repeated float vertices = 1;
+    // repeated float vertices = 1 [packed = true];
     java.util.List<java.lang.Float> getVerticesList();
     int getVerticesCount();
     float getVertices(int index);
     
-    // repeated float texCoords0 = 2;
+    // repeated float tex_coords_0 = 2 [packed = true];
     java.util.List<java.lang.Float> getTexCoords0List();
     int getTexCoords0Count();
     float getTexCoords0(int index);
     
-    // repeated float texCoords1 = 3;
+    // repeated float tex_coords_1 = 3 [packed = true];
     java.util.List<java.lang.Float> getTexCoords1List();
     int getTexCoords1Count();
     float getTexCoords1(int index);
     
-    // repeated float normals = 4;
+    // repeated float normals = 4 [packed = true];
     java.util.List<java.lang.Float> getNormalsList();
     int getNormalsCount();
     float getNormals(int index);
     
-    // repeated float colors = 5;
+    // repeated float colors = 5 [packed = true];
     java.util.List<java.lang.Float> getColorsList();
     int getColorsCount();
     float getColors(int index);
     
-    // repeated int32 indices = 6;
+    // repeated int32 indices = 6 [packed = true];
     java.util.List<java.lang.Integer> getIndicesList();
     int getIndicesCount();
     int getIndices(int index);
@@ -106,7 +106,7 @@ public final class MeshData {
       }
     }
     
-    // repeated float vertices = 1;
+    // repeated float vertices = 1 [packed = true];
     public static final int VERTICES_FIELD_NUMBER = 1;
     private java.util.List<java.lang.Float> vertices_;
     public java.util.List<java.lang.Float>
@@ -119,9 +119,10 @@ public final class MeshData {
     public float getVertices(int index) {
       return vertices_.get(index);
     }
+    private int verticesMemoizedSerializedSize = -1;
     
-    // repeated float texCoords0 = 2;
-    public static final int TEXCOORDS0_FIELD_NUMBER = 2;
+    // repeated float tex_coords_0 = 2 [packed = true];
+    public static final int TEX_COORDS_0_FIELD_NUMBER = 2;
     private java.util.List<java.lang.Float> texCoords0_;
     public java.util.List<java.lang.Float>
         getTexCoords0List() {
@@ -133,9 +134,10 @@ public final class MeshData {
     public float getTexCoords0(int index) {
       return texCoords0_.get(index);
     }
+    private int texCoords0MemoizedSerializedSize = -1;
     
-    // repeated float texCoords1 = 3;
-    public static final int TEXCOORDS1_FIELD_NUMBER = 3;
+    // repeated float tex_coords_1 = 3 [packed = true];
+    public static final int TEX_COORDS_1_FIELD_NUMBER = 3;
     private java.util.List<java.lang.Float> texCoords1_;
     public java.util.List<java.lang.Float>
         getTexCoords1List() {
@@ -147,8 +149,9 @@ public final class MeshData {
     public float getTexCoords1(int index) {
       return texCoords1_.get(index);
     }
+    private int texCoords1MemoizedSerializedSize = -1;
     
-    // repeated float normals = 4;
+    // repeated float normals = 4 [packed = true];
     public static final int NORMALS_FIELD_NUMBER = 4;
     private java.util.List<java.lang.Float> normals_;
     public java.util.List<java.lang.Float>
@@ -161,8 +164,9 @@ public final class MeshData {
     public float getNormals(int index) {
       return normals_.get(index);
     }
+    private int normalsMemoizedSerializedSize = -1;
     
-    // repeated float colors = 5;
+    // repeated float colors = 5 [packed = true];
     public static final int COLORS_FIELD_NUMBER = 5;
     private java.util.List<java.lang.Float> colors_;
     public java.util.List<java.lang.Float>
@@ -175,8 +179,9 @@ public final class MeshData {
     public float getColors(int index) {
       return colors_.get(index);
     }
+    private int colorsMemoizedSerializedSize = -1;
     
-    // repeated int32 indices = 6;
+    // repeated int32 indices = 6 [packed = true];
     public static final int INDICES_FIELD_NUMBER = 6;
     private java.util.List<java.lang.Integer> indices_;
     public java.util.List<java.lang.Integer>
@@ -189,6 +194,7 @@ public final class MeshData {
     public int getIndices(int index) {
       return indices_.get(index);
     }
+    private int indicesMemoizedSerializedSize = -1;
     
     private void initFields() {
       name_ = "";
@@ -211,23 +217,47 @@ public final class MeshData {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
+      if (getVerticesList().size() > 0) {
+        output.writeRawVarint32(10);
+        output.writeRawVarint32(verticesMemoizedSerializedSize);
+      }
       for (int i = 0; i < vertices_.size(); i++) {
-        output.writeFloat(1, vertices_.get(i));
+        output.writeFloatNoTag(vertices_.get(i));
+      }
+      if (getTexCoords0List().size() > 0) {
+        output.writeRawVarint32(18);
+        output.writeRawVarint32(texCoords0MemoizedSerializedSize);
       }
       for (int i = 0; i < texCoords0_.size(); i++) {
-        output.writeFloat(2, texCoords0_.get(i));
+        output.writeFloatNoTag(texCoords0_.get(i));
+      }
+      if (getTexCoords1List().size() > 0) {
+        output.writeRawVarint32(26);
+        output.writeRawVarint32(texCoords1MemoizedSerializedSize);
       }
       for (int i = 0; i < texCoords1_.size(); i++) {
-        output.writeFloat(3, texCoords1_.get(i));
+        output.writeFloatNoTag(texCoords1_.get(i));
+      }
+      if (getNormalsList().size() > 0) {
+        output.writeRawVarint32(34);
+        output.writeRawVarint32(normalsMemoizedSerializedSize);
       }
       for (int i = 0; i < normals_.size(); i++) {
-        output.writeFloat(4, normals_.get(i));
+        output.writeFloatNoTag(normals_.get(i));
+      }
+      if (getColorsList().size() > 0) {
+        output.writeRawVarint32(42);
+        output.writeRawVarint32(colorsMemoizedSerializedSize);
       }
       for (int i = 0; i < colors_.size(); i++) {
-        output.writeFloat(5, colors_.get(i));
+        output.writeFloatNoTag(colors_.get(i));
+      }
+      if (getIndicesList().size() > 0) {
+        output.writeRawVarint32(50);
+        output.writeRawVarint32(indicesMemoizedSerializedSize);
       }
       for (int i = 0; i < indices_.size(); i++) {
-        output.writeInt32(6, indices_.get(i));
+        output.writeInt32NoTag(indices_.get(i));
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(16, getNameBytes());
@@ -245,31 +275,56 @@ public final class MeshData {
         int dataSize = 0;
         dataSize = 4 * getVerticesList().size();
         size += dataSize;
-        size += 1 * getVerticesList().size();
+        if (!getVerticesList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        verticesMemoizedSerializedSize = dataSize;
       }
       {
         int dataSize = 0;
         dataSize = 4 * getTexCoords0List().size();
         size += dataSize;
-        size += 1 * getTexCoords0List().size();
+        if (!getTexCoords0List().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        texCoords0MemoizedSerializedSize = dataSize;
       }
       {
         int dataSize = 0;
         dataSize = 4 * getTexCoords1List().size();
         size += dataSize;
-        size += 1 * getTexCoords1List().size();
+        if (!getTexCoords1List().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        texCoords1MemoizedSerializedSize = dataSize;
       }
       {
         int dataSize = 0;
         dataSize = 4 * getNormalsList().size();
         size += dataSize;
-        size += 1 * getNormalsList().size();
+        if (!getNormalsList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        normalsMemoizedSerializedSize = dataSize;
       }
       {
         int dataSize = 0;
         dataSize = 4 * getColorsList().size();
         size += dataSize;
-        size += 1 * getColorsList().size();
+        if (!getColorsList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        colorsMemoizedSerializedSize = dataSize;
       }
       {
         int dataSize = 0;
@@ -278,7 +333,12 @@ public final class MeshData {
             .computeInt32SizeNoTag(indices_.get(i));
         }
         size += dataSize;
-        size += 1 * getIndicesList().size();
+        if (!getIndicesList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        indicesMemoizedSerializedSize = dataSize;
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
@@ -735,7 +795,7 @@ public final class MeshData {
         onChanged();
       }
       
-      // repeated float vertices = 1;
+      // repeated float vertices = 1 [packed = true];
       private java.util.List<java.lang.Float> vertices_ = java.util.Collections.emptyList();;
       private void ensureVerticesIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
@@ -780,7 +840,7 @@ public final class MeshData {
         return this;
       }
       
-      // repeated float texCoords0 = 2;
+      // repeated float tex_coords_0 = 2 [packed = true];
       private java.util.List<java.lang.Float> texCoords0_ = java.util.Collections.emptyList();;
       private void ensureTexCoords0IsMutable() {
         if (!((bitField0_ & 0x00000004) == 0x00000004)) {
@@ -825,7 +885,7 @@ public final class MeshData {
         return this;
       }
       
-      // repeated float texCoords1 = 3;
+      // repeated float tex_coords_1 = 3 [packed = true];
       private java.util.List<java.lang.Float> texCoords1_ = java.util.Collections.emptyList();;
       private void ensureTexCoords1IsMutable() {
         if (!((bitField0_ & 0x00000008) == 0x00000008)) {
@@ -870,7 +930,7 @@ public final class MeshData {
         return this;
       }
       
-      // repeated float normals = 4;
+      // repeated float normals = 4 [packed = true];
       private java.util.List<java.lang.Float> normals_ = java.util.Collections.emptyList();;
       private void ensureNormalsIsMutable() {
         if (!((bitField0_ & 0x00000010) == 0x00000010)) {
@@ -915,7 +975,7 @@ public final class MeshData {
         return this;
       }
       
-      // repeated float colors = 5;
+      // repeated float colors = 5 [packed = true];
       private java.util.List<java.lang.Float> colors_ = java.util.Collections.emptyList();;
       private void ensureColorsIsMutable() {
         if (!((bitField0_ & 0x00000020) == 0x00000020)) {
@@ -960,7 +1020,7 @@ public final class MeshData {
         return this;
       }
       
-      // repeated int32 indices = 6;
+      // repeated int32 indices = 6 [packed = true];
       private java.util.List<java.lang.Integer> indices_ = java.util.Collections.emptyList();;
       private void ensureIndicesIsMutable() {
         if (!((bitField0_ & 0x00000040) == 0x00000040)) {
@@ -1030,11 +1090,12 @@ public final class MeshData {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\016MeshData.proto\"\200\001\n\004Data\022\014\n\004name\030\020 \001(\t\022" +
-      "\020\n\010vertices\030\001 \003(\002\022\022\n\ntexCoords0\030\002 \003(\002\022\022\n" +
-      "\ntexCoords1\030\003 \003(\002\022\017\n\007normals\030\004 \003(\002\022\016\n\006co" +
-      "lors\030\005 \003(\002\022\017\n\007indices\030\006 \003(\005B%\n\027org.teras" +
-      "ology.protobufB\010MeshDataH\001"
+      "\n\016MeshData.proto\"\234\001\n\004Data\022\014\n\004name\030\020 \001(\t\022" +
+      "\024\n\010vertices\030\001 \003(\002B\002\020\001\022\030\n\014tex_coords_0\030\002 " +
+      "\003(\002B\002\020\001\022\030\n\014tex_coords_1\030\003 \003(\002B\002\020\001\022\023\n\007nor" +
+      "mals\030\004 \003(\002B\002\020\001\022\022\n\006colors\030\005 \003(\002B\002\020\001\022\023\n\007in" +
+      "dices\030\006 \003(\005B\002\020\001B%\n\027org.terasology.protob" +
+      "ufB\010MeshDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

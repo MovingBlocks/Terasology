@@ -1,6 +1,6 @@
 package org.terasology.audio;
 
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.SoundManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -59,7 +59,7 @@ public class BasicSoundPool implements SoundPool {
     }
 
     public SoundSource getSource(Sound sound) {
-        return getSource(sound, AudioManager.PRIORITY_NORMAL);
+        return getSource(sound, SoundManager.PRIORITY_NORMAL);
     }
 
     public Set<SoundSource> getSources() {
@@ -114,7 +114,7 @@ public class BasicSoundPool implements SoundPool {
 
     public boolean isLocked(SoundSource source) {
         Integer lock = _soundSources.get(source);
-        return lock != null && lock == AudioManager.PRIORITY_LOCKED;
+        return lock != null && lock == SoundManager.PRIORITY_LOCKED;
     }
 
     public boolean lock(SoundSource source) {
@@ -122,7 +122,7 @@ public class BasicSoundPool implements SoundPool {
             return false;
         }
 
-        _soundSources.put(source, AudioManager.PRIORITY_LOCKED);
+        _soundSources.put(source, SoundManager.PRIORITY_LOCKED);
 
         return true;
     }

@@ -24,6 +24,7 @@ import groovy.util.ScriptException;
 import org.terasology.components.*;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entityFactory.BlockItemFactory;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
@@ -34,8 +35,10 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.model.blocks.BlockGroup;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.utilities.Helper;
 
 import javax.vecmath.Vector3f;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -190,7 +193,6 @@ public class GroovyManager {
                 StateSinglePlayer spState = (StateSinglePlayer) state;
                 spState.initWorld(title);
             }
-
         }
 
         public void gotoWorld(String title, String seed) {
@@ -200,6 +202,10 @@ public class GroovyManager {
                 StateSinglePlayer spState = (StateSinglePlayer) state;
                 spState.initWorld(title, seed);
             }
+        }
+
+        public void dumpEntities() throws IOException {
+            CoreRegistry.get(EntityManager.class).save(Helper.fixSavePath(new File("entityDump.txt")), EntityManager.SaveFormat.JSON);
         }
         
         public void debugCollision() {

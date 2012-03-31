@@ -1,5 +1,6 @@
 package org.terasology.componentSystem.block;
 
+import com.google.common.collect.Maps;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
 import org.terasology.components.BlockComponent;
@@ -16,6 +17,8 @@ import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 
+import java.util.Map;
+
 /**
  * @author Immortius <immortius@gmail.com>
  */
@@ -25,31 +28,29 @@ public class BlockEntityLookup implements EventHandlerSystem {
     private IWorldProvider worldProvider;
 
     // TODO: Perhaps a better datastructure for spatial lookups
-    private TObjectLongMap<Vector3i> blockComponentLookup = new TObjectLongHashMap<Vector3i>();
+    // TODO: Or perhaps a build in indexing system for entities
+    private Map<Vector3i, EntityRef> blockComponentLookup = Maps.newHashMap();
 
     public void initialise() {
         this.entityManager = CoreRegistry.get(EntityManager.class);
         this.worldProvider = CoreRegistry.get(IWorldProvider.class);
         for (EntityRef blockComp : entityManager.iteratorEntities(BlockComponent.class)) {
             BlockComponent comp = blockComp.getComponent(BlockComponent.class);
-            blockComponentLookup.put(new Vector3i(comp.getPosition()), blockComp.getId());
+            blockComponentLookup.put(new Vector3i(comp.getPosition()), blockComp);
         }
     }
     
     public EntityRef getEntityAt(Vector3i blockPosition) {
-        return entityManager.get(blockComponentLookup.get(blockPosition));
+        return blockComponentLookup.get(blockPosition);
     }
     
     public EntityRef getOrCreateEntityAt(Vector3i blockPosition) {
-        long id = blockComponentLookup.get(blockPosition);
-        EntityRef blockEntity;
-        if (id == 0) {
+        EntityRef blockEntity = blockComponentLookup.get(blockPosition);
+        if (blockEntity.isNull()) {
             Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPosition));
             blockEntity = entityManager.create();
             blockEntity.addComponent(new BlockComponent(blockPosition, true));
             blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
-        } else {
-            blockEntity = entityManager.get(id);
         }
         return blockEntity;
     }
@@ -57,7 +58,7 @@ public class BlockEntityLookup implements EventHandlerSystem {
     @ReceiveEvent(components = {BlockComponent.class})
     public void onCreate(AddComponentEvent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
-        blockComponentLookup.put(new Vector3i(block.getPosition()), entity.getId());
+        blockComponentLookup.put(new Vector3i(block.getPosition()), entity);
     }
 
     @ReceiveEvent(components = {BlockComponent.class})

@@ -7,6 +7,7 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.SoundManager;
 import org.terasology.utilities.FastRandom;
 
 /**
@@ -25,7 +26,7 @@ public class PlaySoundAction implements EventHandlerSystem {
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
         if (playSound.sounds.size() > 0) {
             Sound sound = playSound.sounds.get(random.randomIntAbs(playSound.sounds.size()));
-            AudioManager.play(sound, event.getLocation(), playSound.volume, AudioManager.PRIORITY_NORMAL);
+            AudioManager.play(sound, event.getLocation(), playSound.volume, SoundManager.PRIORITY_NORMAL);
         }
     }
 }

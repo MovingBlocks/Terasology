@@ -3,7 +3,7 @@ package org.terasology.audio;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.SoundManager;
 
 import javax.vecmath.Vector3d;
 
@@ -110,7 +110,7 @@ public class BasicSoundSource implements SoundSource {
         this.setDirection(zeroVector);
 
         // some additional settings
-        alSourcef(this.getSourceId(), AL_MAX_DISTANCE, AudioManager.MAX_DISTANCE);
+        alSourcef(this.getSourceId(), AL_MAX_DISTANCE, SoundManager.MAX_DISTANCE);
         alSourcef(this.getSourceId(), AL_REFERENCE_DISTANCE, 0.1f);
 
         this.fade = false;

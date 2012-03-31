@@ -41,16 +41,7 @@ import java.util.logging.Logger;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author t3hk0d3 <contact@tehkode.ru>
  */
-public abstract class AudioManager {
-
-    public final static float MAX_DISTANCE = 50.0f;
-
-    public final static int PRIORITY_LOCKED = Integer.MAX_VALUE;
-    public final static int PRIORITY_HIGHEST = 100;
-    public final static int PRIORITY_HIGH = 10;
-    public final static int PRIORITY_NORMAL = 5;
-    public final static int PRIORITY_LOW = 3;
-    public final static int PRIORITY_LOWEST = 1;
+public abstract class AudioManager implements SoundManager {
 
     protected Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
 
@@ -158,23 +149,6 @@ public abstract class AudioManager {
 
         return sound;
     }
-
-    /**
-     * Initializes AudioManager
-     */
-    public abstract void initialize();
-
-    /**
-     * Update AudioManager sound sources
-     * <p/>
-     * Should be called in main game loop
-     */
-    public abstract void update();
-
-    /**
-     * Gracefully destroy audio subsystem
-     */
-    public abstract void destroy();
 
     protected abstract boolean checkDistance(Vector3d soundSource);
 

@@ -10,6 +10,7 @@ import org.terasology.events.FootstepEvent;
 import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.SoundManager;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3d;
@@ -33,7 +34,7 @@ public class CharacterSoundSystem implements EventHandlerSystem {
             CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
             if (characterSounds.footstepSounds.size() > 0) {
                 Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-                AudioManager.play(sound, new Vector3d(location.getWorldPosition()), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
+                AudioManager.play(sound, new Vector3d(location.getWorldPosition()), characterSounds.footstepVolume, SoundManager.PRIORITY_NORMAL);
             }
         }
     }
@@ -47,7 +48,7 @@ public class CharacterSoundSystem implements EventHandlerSystem {
             CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
             if (characterSounds.footstepSounds.size() > -0.05f) {
                 Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-                AudioManager.play(sound, new Vector3d(location.getWorldPosition()), 0.8f, AudioManager.PRIORITY_NORMAL);
+                AudioManager.play(sound, new Vector3d(location.getWorldPosition()), 0.8f, SoundManager.PRIORITY_NORMAL);
             }
         }
     }
@@ -60,7 +61,7 @@ public class CharacterSoundSystem implements EventHandlerSystem {
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
         if (characterSounds.footstepSounds.size() > 0) {
             Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-            AudioManager.play(sound, event.getLocation(), 1.0f, AudioManager.PRIORITY_NORMAL);
+            AudioManager.play(sound, event.getLocation(), 1.0f, SoundManager.PRIORITY_NORMAL);
         }
     }
 

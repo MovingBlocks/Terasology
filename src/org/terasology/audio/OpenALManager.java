@@ -26,7 +26,6 @@ public class OpenALManager extends AudioManager {
         return (OpenALManager) AudioManager.getInstance();
     }
 
-    @Override
     public void initialize() {
         logger.info("Initializing OpenAL audio manager");
         try {
@@ -69,12 +68,10 @@ public class OpenALManager extends AudioManager {
         this.loadAssets();
     }
 
-    @Override
     public void destroy() {
         AL.destroy();
     }
 
-    @Override
     public void update() {
         LocalPlayer player = Terasology.getInstance().getActivePlayer();
 

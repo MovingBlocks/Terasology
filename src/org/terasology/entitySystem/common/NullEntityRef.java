@@ -18,8 +18,12 @@ public class NullEntityRef implements EntityRef {
     private NullEntityRef() {
     }
 
-    public long getId() {
-        return 0;
+    public boolean isNull() {
+        return true;
+    }
+
+    public boolean hasComponent(Class<? extends Component> component) {
+        return false;
     }
 
     public <T extends Component> T getComponent(Class<T> componentClass) {
@@ -46,7 +50,23 @@ public class NullEntityRef implements EntityRef {
     public void send(Event event) {
     }
 
-    public boolean hasComponent(Class<? extends Component> component) {
+    @Override
+    public String toString() {
+        return "Entity(Null)";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof EntityRef) {
+            return ((EntityRef) o).isNull();
+        }
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+
 }

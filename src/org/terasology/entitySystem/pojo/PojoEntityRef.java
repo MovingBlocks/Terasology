@@ -8,16 +8,20 @@ import org.terasology.entitySystem.Event;
  * @author Immortius <immortius@gmail.com>
  */
 public class PojoEntityRef implements EntityRef{
-    long id;
+    int id;
     PojoEntityManager entityManager;
 
-    PojoEntityRef(PojoEntityManager manager, long id) {
+    PojoEntityRef(PojoEntityManager manager, int id) {
         this.id = id;
         this.entityManager = manager;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
+    }
+
+    public boolean isNull() {
+        return id == PojoEntityManager.NULL_ID;
     }
 
     public <T extends Component> T getComponent(Class<T> componentClass) {
@@ -55,17 +59,17 @@ public class PojoEntityRef implements EntityRef{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        PojoEntityRef that = (PojoEntityRef) o;
-
-        if (id != that.id) return false;
-
-        return true;
+        if (o instanceof EntityRef) {
+            if (isNull() && ((EntityRef) o).isNull()) return true;
+        }
+        if (o instanceof PojoEntityRef) {
+            return id == ((PojoEntityRef) o).id;
+        }
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return (int) (id ^ (id >>> 32));
+        return isNull() ? 0 : (int) (id ^ (id >>> 32));
     }
 }

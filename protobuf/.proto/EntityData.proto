@@ -1,0 +1,54 @@
+/**
+ * @author Immortius <immortius@gmail.com>
+ */
+
+option java_package = "org.terasology.protobuf";
+option java_outer_classname = "EntityData";
+option optimize_for = SPEED;
+
+message Value {
+    repeated double double = 1 [packed=true];
+    repeated float float = 2 [packed=true];
+    repeated sint32 integer = 3 [packed=true];
+    repeated sint64 long = 4 [packed=true];
+    repeated bool boolean = 5 [packed=true];
+    repeated string string = 6;
+    repeated bytes byte = 7;
+    repeated Value value = 8;
+    repeated NameValue name_value = 9; // For string maps
+    // repeated ValuePair value_value = 10; // For other maps
+}
+
+/*
+message ValuePair {
+    optional Value key = 1;
+    optional Value value = 2;
+}
+*/
+
+message NameValue {
+    optional string name = 1;
+    optional Value value = 2;
+}
+
+message Component {
+    optional int32 type_index = 1; // Index of the type, if contained in a world with component_classes table
+    optional string type = 15; // The name of the type. Not needed if index provided
+    repeated NameValue field = 2;
+
+    extensions 1000 to 1999;
+}
+
+message Entity {
+    optional sint32 id = 1;
+    repeated Component component = 2;
+    extensions 1000 to 1999;
+}
+
+message World {
+    repeated Entity entity = 1;
+    repeated string component_class = 15; // Table of component classes, the index of which corresponds to ComponentTypeIndex.
+    optional sint32 next_entity_id = 16;
+    repeated sint32 dead_entity_ids = 17 [packed=true];
+    extensions 1000 to 1999;
+}
