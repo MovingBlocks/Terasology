@@ -43,17 +43,18 @@ public class ItemSystem implements EventHandlerSystem {
     @ReceiveEvent(components=ItemComponent.class)
     public void onDestroy(RemovedComponentEvent event, EntityRef itemEntity) {
         ItemComponent item = itemEntity.getComponent(ItemComponent.class);
-        if (item.container != null) {
-            InventoryComponent inventory = item.container.getComponent(InventoryComponent.class);
+
+        InventoryComponent inventory = item.container.getComponent(InventoryComponent.class);
+        if (inventory != null) {
             int index = inventory.itemSlots.indexOf(itemEntity);
             if (index != -1) {
-                inventory.itemSlots.set(index, null);
+                inventory.itemSlots.set(index, EntityRef.NULL);
             }
         }
     }
     
     public void useItemOnBlock(EntityRef item, EntityRef user, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection) {
-        if (item == null) return;
+
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp == null) return;
 
@@ -73,7 +74,6 @@ public class ItemSystem implements EventHandlerSystem {
     }
 
     public void useItem(EntityRef item, EntityRef user) {
-        if (item == null) return;
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp == null) return;
 
@@ -82,7 +82,6 @@ public class ItemSystem implements EventHandlerSystem {
     }
 
     public void useItemOnEntity(EntityRef item, EntityRef target, EntityRef user) {
-        if (item == null) return;
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp == null) return;
 
@@ -91,7 +90,6 @@ public class ItemSystem implements EventHandlerSystem {
     }
 
     public void useItemInDirection(EntityRef item, Vector3f location, Vector3f direction, EntityRef user) {
-        if (item == null) return;
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp == null) return;
 
@@ -126,17 +124,6 @@ public class ItemSystem implements EventHandlerSystem {
             worldProvider.setBlock(placementPos.x, placementPos.y, placementPos.z, block.getId(), true, true);
             AudioManager.play("PlaceBlock", 0.5f);
             return true;
-
-            // TODO: Block change notification - should be handled by world?
-            // Notify the world, that a block has been removed/placed
-            /*int chunkPosX = TeraMath.calcChunkPosX(blockPos.x);
-            int chunkPosZ = TeraMath.calcChunkPosZ(blockPos.z);
-
-            if (type == 0) {
-                _player.notifyObserversBlockRemoved(worldProvider.getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos, update);
-            } else {
-                _player.notifyObserversBlockPlaced(worldProvider.getChunkProvider().loadOrCreateChunk(chunkPosX, chunkPosZ), blockPos, update);
-            } */
         }
         return false;
     }

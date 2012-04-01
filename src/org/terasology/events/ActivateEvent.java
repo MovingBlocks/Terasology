@@ -4,6 +4,7 @@ import org.terasology.components.BlockComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.common.NullEntityRef;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
@@ -40,7 +41,7 @@ public class ActivateEvent implements Event {
     // For InDirection
     public ActivateEvent(Vector3f location, Vector3f direction, EntityRef instigator) {
         this.instigator = instigator;
-        this.target = null;
+        this.target = EntityRef.NULL;
         this.location = location;
         this.direction = direction;
     }

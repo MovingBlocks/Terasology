@@ -12,14 +12,18 @@ import javax.vecmath.Vector3f;
  */
 public class LocalPlayer {
     
-    private EntityRef entity;
+    private EntityRef entity = EntityRef.NULL;
     
     public LocalPlayer(EntityRef playerEntity) {
         this.entity = playerEntity;
     }
 
+    public void setEntity(EntityRef newEntity) {
+        this.entity = (newEntity == null) ? EntityRef.NULL : newEntity;
+    }
+
     public boolean isValid() {
-        return entity.hasComponent(LocationComponent.class) && entity.hasComponent(LocalPlayerComponent.class) && entity.hasComponent(PlayerComponent.class);
+        return entity.exists() && entity.hasComponent(LocationComponent.class) && entity.hasComponent(LocalPlayerComponent.class) && entity.hasComponent(PlayerComponent.class);
     }
     
     public Vector3f getPosition() {
@@ -45,11 +49,7 @@ public class LocalPlayer {
         if (inventory == null || localPlayer == null)
             return false;
         
-        if (inventory.itemSlots.get(localPlayer.selectedTool) != null) {
-            EntityRef item = inventory.itemSlots.get(localPlayer.selectedTool);
-            return item.getComponent(LightComponent.class) != null;
-        }
-        return false;
+        return inventory.itemSlots.get(localPlayer.selectedTool).hasComponent(LightComponent.class);
     }
     
     public EntityRef getEntity() {

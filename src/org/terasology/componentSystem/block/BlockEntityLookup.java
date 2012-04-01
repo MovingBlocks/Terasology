@@ -41,12 +41,13 @@ public class BlockEntityLookup implements EventHandlerSystem {
     }
     
     public EntityRef getEntityAt(Vector3i blockPosition) {
-        return blockComponentLookup.get(blockPosition);
+        EntityRef result = blockComponentLookup.get(blockPosition);
+        return (result == null) ? EntityRef.NULL : result;
     }
     
     public EntityRef getOrCreateEntityAt(Vector3i blockPosition) {
         EntityRef blockEntity = blockComponentLookup.get(blockPosition);
-        if (blockEntity.isNull()) {
+        if (blockEntity == null || !blockEntity.exists()) {
             Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPosition));
             blockEntity = entityManager.create();
             blockEntity.addComponent(new BlockComponent(blockPosition, true));

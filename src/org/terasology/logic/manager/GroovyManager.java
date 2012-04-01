@@ -207,6 +207,17 @@ public class GroovyManager {
         public void dumpEntities() throws IOException {
             CoreRegistry.get(EntityManager.class).save(Helper.fixSavePath(new File("entityDump.txt")), EntityManager.SaveFormat.JSON);
         }
+
+        public void testSave() throws IOException {
+            CoreRegistry.get(EntityManager.class).save(Helper.fixSavePath(new File("testsave.sav")), EntityManager.SaveFormat.Binary);
+        }
+
+        public void testLoad() throws IOException {
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+            entityManager.load(Helper.fixSavePath(new File("testsave.sav")), EntityManager.SaveFormat.Binary);
+            CoreRegistry.get(LocalPlayer.class).setEntity(entityManager.iteratorEntities(LocalPlayerComponent.class).iterator().next());
+
+        }
         
         public void debugCollision() {
             Config.getInstance().setDebugCollision(!Config.getInstance().isDebugCollision());

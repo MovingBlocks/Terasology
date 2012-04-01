@@ -3,6 +3,7 @@ package org.terasology.entitySystem;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,7 +15,7 @@ public abstract class AbstractComponent implements Component {
     private static Logger logger = Logger.getLogger(AbstractComponent.class.getName());
 
     public String getName() {
-        String className = getClass().getSimpleName().toLowerCase();
+        String className = getClass().getSimpleName().toLowerCase(Locale.ENGLISH);
 
         if (className.endsWith("component")) {
             return className.substring(0, className.lastIndexOf("component"));

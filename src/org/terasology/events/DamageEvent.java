@@ -12,7 +12,7 @@ public class DamageEvent implements Event {
 
     public DamageEvent(int amount) {
         this.amount = amount;
-        this.instigator = null;
+        this.instigator = EntityRef.NULL;
     }
 
     public DamageEvent(int amount, EntityRef instigator) {

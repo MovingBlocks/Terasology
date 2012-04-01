@@ -1,12 +1,13 @@
 package org.terasology.entitySystem.pojo;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.protobuf.TextFormat;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -17,6 +18,7 @@ import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.entitySystem.pojo.persistence.EntityDataJSONFormat;
+import org.terasology.entitySystem.pojo.persistence.SerializationInfo;
 import org.terasology.entitySystem.pojo.persistence.core.*;
 import org.terasology.entitySystem.pojo.persistence.FieldInfo;
 import org.terasology.entitySystem.pojo.persistence.TypeHandler;
@@ -28,10 +30,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,7 +42,7 @@ public class PojoEntityManager implements EntityManager {
     public static final int NULL_ID = 0;
     private static final int MAX_SERIALIZATION_DEPTH = 1;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static Logger logger = Logger.getLogger(PojoEntityManager.class.getName());
 
     // TODO: Need to recycle freed ids.
     private int nextEntityId = 1;
@@ -53,12 +52,11 @@ public class PojoEntityManager implements EntityManager {
     // TODO: Invalidate entity ref when destroyed
 
     private Map<Class<? extends Component>, SerializationInfo> componentSerializationLookup = Maps.newHashMap();
-
+    private Map<String, Class<? extends Component>> componentTypeLookup = Maps.newHashMap();
     private Map<Class<?>, TypeHandler<?>> typeHandlers = Maps.newHashMap();
 
-    private static class SerializationInfo {
-        public List<FieldInfo> fields = Lists.newArrayList();
-    }
+    // Temporary list of valid ids used during loading.
+    private TIntSet validIds;
 
     public PojoEntityManager() {
         typeHandlers.put(Boolean.class, new BooleanTypeHandler());
@@ -83,7 +81,16 @@ public class PojoEntityManager implements EntityManager {
 
     // TODO: Check for empty constructors
     public void registerComponentClass(Class<? extends Component> componentClass) {
-        SerializationInfo info = new SerializationInfo();
+
+        try {
+            // Check if constructor exists
+            componentClass.getConstructor();
+        } catch (NoSuchMethodException e) {
+            logger.log(Level.SEVERE, String.format("Unable to register component class %s: Default Constructor Required", componentClass.getSimpleName()));
+            return;
+        }
+
+        SerializationInfo info = new SerializationInfo(componentClass);
         for (Field field : componentClass.getDeclaredFields()) {
             if (Modifier.isTransient(field.getModifiers()))
                 continue;
@@ -92,15 +99,19 @@ public class PojoEntityManager implements EntityManager {
             if (typeHandler == null) {
                 logger.log(Level.SEVERE, "Unsupported field type in component type " + componentClass.getSimpleName() + ", " + field.getName() + " : " + field.getGenericType());
             } else {
-                info.fields.add(new FieldInfo(field, typeHandler));
+                info.addField(new FieldInfo(field, typeHandler));
             }
         }
         componentSerializationLookup.put(componentClass, info);
+        componentTypeLookup.put(getComponentClassName(componentClass), componentClass);
     }
 
     // TODO: Implement for loading
     public EntityRef getEntityRef(int id) {
-        return NullEntityRef.getInstance();
+        if (validIds.contains(id)) {
+            return new PojoEntityRef(this, id);
+        }
+        return EntityRef.NULL;
     }
 
     public void save(File file, SaveFormat format) throws IOException {
@@ -113,24 +124,11 @@ public class PojoEntityManager implements EntityManager {
             EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
             entity.setId(id);
             for (Component component : iterateComponents(id)) {
-                try {
-                    EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
-                    componentMessage.setType(component.getName());
-                    SerializationInfo serializationInfo = componentSerializationLookup.get(component.getClass());
-                    if (serializationInfo != null) {
-                        for (FieldInfo field : serializationInfo.fields) {
-                            Object rawValue = field.getValue(component);
-                            if (rawValue == null) continue;
-                            EntityData.Value value = field.getSerializationHandler().serialize(rawValue);
-                            if (value == null) continue;
-                            componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
-                        }
-                    } else {
-                        logger.log(Level.SEVERE, "Unregistered component type: " + component.getClass());
-                    }
-                    entity.addComponent(componentMessage.build());
-                } catch (IllegalAccessException e) {
-                    logger.log(Level.SEVERE, "Exception during serializing component type: " + component.getClass(), e);
+                SerializationInfo serializationInfo = componentSerializationLookup.get(component.getClass());
+                if (serializationInfo != null) {
+                    entity.addComponent(serializationInfo.serialize(component));
+                } else {
+                    logger.log(Level.SEVERE, "Unregistered component type: " + component.getClass());
                 }
             }
             world.addEntity(entity.build());
@@ -141,7 +139,7 @@ public class PojoEntityManager implements EntityManager {
         try {
             switch (format) {
                 case Binary:
-                    // TODO: Do we need to buffer this output stream, or is it buffered in google's code
+                    // TODO: Do we need to buffer this output stream, or is it buffered in google's code?
                     world.build().writeTo(out);
                     out.flush();
                     break;
@@ -165,7 +163,58 @@ public class PojoEntityManager implements EntityManager {
     }
 
     public void load(File file, SaveFormat format) throws IOException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        clear();
+
+        FileInputStream in = new FileInputStream(file);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+
+        EntityData.World world = null;
+        try {
+            switch (format) {
+                case Binary:
+                    world = EntityData.World.parseFrom(in);
+                    break;
+                case Text:
+                    EntityData.World.Builder builder = EntityData.World.newBuilder();
+                    TextFormat.merge(bufferedReader, builder);
+                    world = builder.build();
+                    break;
+                case JSON:
+                    throw new IOException("Reading JSON format not supported yet");
+            }
+        }
+        finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to close file", e);
+            }
+        }
+
+        if (world != null) {
+            nextEntityId = world.getNextEntityId();
+            // TODO: handle more stuff
+
+            // TODO: just persist a list of used ids?
+            validIds = new TIntHashSet(world.getEntityCount());
+            for (EntityData.Entity entityData : world.getEntityList()) {
+                validIds.add(entityData.getId());
+            }
+
+            for (EntityData.Entity entityData : world.getEntityList()) {
+                int entityId = entityData.getId();
+                for (EntityData.Component componentData : entityData.getComponentList()) {
+                    Class<? extends Component> componentClass = componentTypeLookup.get(componentData.getType().toLowerCase(Locale.ENGLISH));
+                    if (componentClass != null) {
+                        SerializationInfo serializationInfo = componentSerializationLookup.get(componentClass);
+                        Component component = serializationInfo.deserialize(componentData);
+                        store.put(entityId, component);
+                    }
+                }
+            }
+
+            validIds = null;
+        }
     }
 
     public void clear() {
@@ -178,9 +227,10 @@ public class PojoEntityManager implements EntityManager {
         return new PojoEntityRef(this, nextEntityId++);
     }
 
+    // TODO: Clean up this + getEntityRef + other POJOEntityRef instantiation
     private EntityRef get(int entityId) {
         if (entityId == NULL_ID) {
-            return NullEntityRef.getInstance();
+            return EntityRef.NULL;
         }
         return new PojoEntityRef(this, entityId);
     }
@@ -405,5 +455,14 @@ public class PojoEntityManager implements EntityManager {
         }
 
         return null;
+    }
+
+    private String getComponentClassName(Class<? extends Component> componentClass) {
+        String name = componentClass.getSimpleName().toLowerCase(Locale.ENGLISH);
+        int index = name.lastIndexOf("component");
+        if (index != -1) {
+            return name.substring(0, index);
+        }
+        return name;
     }
 }

@@ -71,10 +71,6 @@ public class FirstPersonRenderer implements RenderSystem {
 
         int invSlotIndex = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).selectedTool;
         EntityRef heldItem = localPlayer.getEntity().getComponent(InventoryComponent.class).itemSlots.get(invSlotIndex);
-        if (heldItem == null) {
-            renderHand(bobOffset, handMovementAnimationOffset);
-            return;
-        }
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);
         if (blockItem != null) {

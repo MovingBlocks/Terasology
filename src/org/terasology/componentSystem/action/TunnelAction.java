@@ -71,9 +71,7 @@ public class TunnelAction implements EventHandlerSystem {
                         worldProvider.setBlock(blockPos, (byte)0x0, true, true);
 
                         EntityRef blockEntity = blockEntityLookup.getEntityAt(blockPos);
-                        if (blockEntity != null) {
-                            blockEntity.destroy();
-                        }
+                        blockEntity.destroy();
                         physicsRenderer.addTemporaryBlock(target, currentBlockType, impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
                     }
                 }

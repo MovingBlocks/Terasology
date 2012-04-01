@@ -7,7 +7,7 @@ import org.terasology.entitySystem.Event;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class PojoEntityRef implements EntityRef{
+public class PojoEntityRef extends EntityRef{
     int id;
     PojoEntityManager entityManager;
 
@@ -20,38 +20,47 @@ public class PojoEntityRef implements EntityRef{
         return id;
     }
 
-    public boolean isNull() {
-        return id == PojoEntityManager.NULL_ID;
+    @Override
+    public boolean exists() {
+        return id != PojoEntityManager.NULL_ID;
     }
 
+    @Override
     public <T extends Component> T getComponent(Class<T> componentClass) {
         return entityManager.getComponent(id, componentClass);
     }
 
+    @Override
     public <T extends Component> T addComponent(T component) {
         return entityManager.addComponent(id, component);
     }
 
+    @Override
     public void removeComponent(Class<? extends Component> componentClass) {
         entityManager.removeComponent(id, componentClass);
     }
 
+    @Override
     public void saveComponent(Component component) {
         entityManager.saveComponent(id, component);
     }
 
+    @Override
     public Iterable<Component> iterateComponents() {
         return entityManager.iterateComponents(id);
     }
 
+    @Override
     public void destroy() {
         entityManager.destroy(id);
     }
 
+    @Override
     public void send(Event event) {
         entityManager.getEventSystem().send(this, event);
     }
 
+    @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return entityManager.hasComponent(id, component);
     }
@@ -60,7 +69,7 @@ public class PojoEntityRef implements EntityRef{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof EntityRef) {
-            if (isNull() && ((EntityRef) o).isNull()) return true;
+            if (!exists() && !((EntityRef) o).exists()) return true;
         }
         if (o instanceof PojoEntityRef) {
             return id == ((PojoEntityRef) o).id;
@@ -70,6 +79,6 @@ public class PojoEntityRef implements EntityRef{
 
     @Override
     public int hashCode() {
-        return isNull() ? 0 : (int) (id ^ (id >>> 32));
+        return !exists() ? 0 : (int) (id ^ (id >>> 32));
     }
 }

@@ -23,7 +23,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     }
 
     public EntityData.Value serialize(EntityRef value) {
-        if (!value.isNull()) {
+        if (value.exists()) {
             return EntityData.Value.newBuilder().addInteger(((PojoEntityRef)value).getId()).build();
         }
         return null;
@@ -33,13 +33,13 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
         if (value.getIntegerCount() > 0) {
             return entityManager.getEntityRef(value.getInteger(0));
         }
-        return null;
+        return EntityRef.NULL;
     }
 
     public EntityData.Value serialize(Iterable<EntityRef> value) {
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
         for (EntityRef ref : value) {
-            if (ref == null || ref.isNull()) {
+            if (!ref.exists()) {
                 result.addInteger(0);
             }
             else {

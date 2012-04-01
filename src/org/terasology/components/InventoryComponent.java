@@ -17,7 +17,7 @@ public final class InventoryComponent extends AbstractComponent {
 
     public InventoryComponent(int numSlots) {
         for (int i = 0; i < numSlots; ++i) {
-            itemSlots.add(null);
+            itemSlots.add(EntityRef.NULL);
         }
     }
 }

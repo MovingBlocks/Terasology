@@ -3,6 +3,7 @@ package org.terasology.entitySystem.persist;
 
 import com.google.gson.*;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
@@ -31,6 +32,7 @@ public class JsonPersister implements PrefabPersister {
         builder.registerTypeAdapter(Prefab.class, new PrefabAdapter());
         builder.registerTypeAdapter(PrefabManager.class, new PrefabManagerAdapter());
         builder.registerTypeAdapter(Component.class, new ComponentAdapter());
+        builder.registerTypeAdapter(EntityRef.class, new EntityRefAdapter());
 
         this.gson = builder.create();
     }
@@ -193,6 +195,17 @@ public class JsonPersister implements PrefabPersister {
                 }
             }
             return object;
+        }
+    }
+
+    // Basically don't serialize entity references on prototypes
+    private class EntityRefAdapter implements JsonDeserializer<EntityRef>, JsonSerializer<EntityRef> {
+        public EntityRef deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return EntityRef.NULL;
+        }
+
+        public JsonElement serialize(EntityRef src, Type typeOfSrc, JsonSerializationContext context) {
+            return JsonNull.INSTANCE;
         }
     }
 }

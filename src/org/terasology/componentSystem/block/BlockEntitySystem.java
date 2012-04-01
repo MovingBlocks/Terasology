@@ -56,7 +56,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
         AudioManager.play("RemoveBlock", 0.6f);
 
-        if (oldBlock.isStraightToInventory() && event.getInstigator() != null) {
+        if (oldBlock.isStraightToInventory() && event.getInstigator().exists()) {
             EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockGroup(), (byte)1);
             if (!inventorySystem.addItem(event.getInstigator(), item))
             {

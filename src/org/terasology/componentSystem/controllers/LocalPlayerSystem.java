@@ -92,7 +92,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
     public void update(float delta) {
+        if (!localPlayer.isValid())
+            return;
+
         float deltaSeconds = delta / 1000;
+
         EntityRef entity = localPlayer.getEntity();
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
@@ -305,8 +309,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
         if (Mouse.isButtonDown(0) || button == 0) {
-            if (selectedItemEntity != null) {
-                ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
+            ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
+            if (item != null) {
                 switch (item.usage) {
                     case OnBlock:
                         useItemOnBlock(entity, selectedItemEntity);
@@ -360,10 +364,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     // TODO: Move this somewhere more central, for use by all creatures.
     private void attack(EntityRef player, EntityRef withItem) {
         RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
-        ItemComponent item = null;
-        if (withItem != null) {
-            item = withItem.getComponent(ItemComponent.class);
-        }
+        ItemComponent item = withItem.getComponent(ItemComponent.class);
 
         if (selectedBlock != null) {
 

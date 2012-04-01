@@ -3,6 +3,7 @@ package org.terasology.components;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.AbstractComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.common.NullEntityRef;
 
 import java.util.Map;
 
@@ -16,7 +17,7 @@ public final class ItemComponent extends AbstractComponent {
     public byte stackCount = 1;
     public boolean renderWithIcon = false;
 
-    public EntityRef container;
+    public EntityRef container = EntityRef.NULL;
     public UsageType usage = UsageType.None;
     public boolean consumedOnUse = false;
     

@@ -30,8 +30,8 @@ public class InventorySystem implements ComponentSystem {
 
         // First check for existing stacks
         for (EntityRef itemStack : inventory.itemSlots) {
-            if (itemStack != null) {
-                ItemComponent stackComp = itemStack.getComponent(ItemComponent.class);
+            ItemComponent stackComp = itemStack.getComponent(ItemComponent.class);
+            if (stackComp != null) {
                 if (item.stackId.equals(stackComp.stackId)) {
                     int stackSpace = MAX_STACK - stackComp.stackCount;
                     int amountToTransfer = Math.min(stackSpace, item.stackCount);
@@ -47,7 +47,7 @@ public class InventorySystem implements ComponentSystem {
         }
 
         // Then free spaces
-        int freeSlot = inventory.itemSlots.indexOf(null);
+        int freeSlot = inventory.itemSlots.indexOf(EntityRef.NULL);
         if (freeSlot != -1) {
             inventory.itemSlots.set(freeSlot, itemEntity);
             item.container = inventoryEntity;

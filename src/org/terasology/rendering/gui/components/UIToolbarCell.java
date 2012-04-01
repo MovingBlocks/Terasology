@@ -71,6 +71,8 @@ public class UIToolbarCell extends UIDisplayElement {
         setPosition(new Vector2f((getSize().x - 8f) * _id - 2f, 2f));
 
         InventoryComponent inventory = Terasology.getInstance().getActivePlayer().getEntity().getComponent(InventoryComponent.class);
+        if (inventory == null)
+            return;
         if (inventory.itemSlots.size() > _id) {
             LocalPlayerComponent localPlayer = Terasology.getInstance().getActivePlayer().getEntity().getComponent(LocalPlayerComponent.class);
             if (localPlayer != null) {
@@ -78,10 +80,8 @@ public class UIToolbarCell extends UIDisplayElement {
             }
 
             EntityRef itemStack = inventory.itemSlots.get(_id);
-            ItemComponent item = null;
-            if (itemStack != null) {
-                item = itemStack.getComponent(ItemComponent.class);
-            }
+            ItemComponent item = itemStack.getComponent(ItemComponent.class);
+
             if (item == null || item.stackCount < 2) {
                 getLabel().setVisible(false);
             } else {
@@ -103,9 +103,6 @@ public class UIToolbarCell extends UIDisplayElement {
             return;
         
         EntityRef itemEntity = inventory.itemSlots.get(_id);
-        if (itemEntity == null)
-            return;
-        
         ItemComponent item = itemEntity.getComponent(ItemComponent.class);
         if (item == null)
             return;

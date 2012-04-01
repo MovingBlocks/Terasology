@@ -3,6 +3,7 @@ package org.terasology.components;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.AbstractComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.common.NullEntityRef;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -13,12 +14,13 @@ import javax.vecmath.Vector3f;
  */
 public final class LocationComponent extends AbstractComponent {
     // Standard position/rotation
+    // TODO: Store world position (easier for indexing), derive local position?
     private Vector3f position = new Vector3f();
     private Quat4f rotation = new Quat4f(0,0,0,1);
     private float scale = 1.0f;
 
     // Relative to
-    public EntityRef parent = null;
+    public EntityRef parent = EntityRef.NULL;
 
     public LocationComponent() {}
 
@@ -59,12 +61,12 @@ public final class LocationComponent extends AbstractComponent {
 
     public Vector3f getWorldPosition(Vector3f output) {
         output.set(position);
-        LocationComponent parentLoc = getParentLocationComponent();
+        LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
             output.scale(parentLoc.scale);
             QuaternionUtil.quatRotate(parentLoc.getLocalRotation(), output, output);
             output.add(parentLoc.position);
-            parentLoc = parentLoc.getParentLocationComponent();
+            parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return output;
     }
@@ -75,27 +77,27 @@ public final class LocationComponent extends AbstractComponent {
     
     public Quat4f getWorldRotation(Quat4f output) {
         output.set(rotation);
-        LocationComponent parentLoc = getParentLocationComponent();
+        LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
             output.mul(parentLoc.rotation, output);
-            parentLoc = parentLoc.getParentLocationComponent();
+            parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return output;
     }
 
     public float getWorldScale() {
         float result = scale;
-        LocationComponent parentLoc = getParentLocationComponent();
+        LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
             result *= parentLoc.getLocalScale();
-            parentLoc = parentLoc.getParentLocationComponent();
+            parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return result;
     }
     
     public void setWorldPosition(Vector3f position) {
         this.position.set(position);
-        LocationComponent parentLoc = getParentLocationComponent();
+        LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             this.position.sub(parentLoc.getWorldPosition());
             this.position.scale(1f / parentLoc.getWorldScale());
@@ -107,7 +109,7 @@ public final class LocationComponent extends AbstractComponent {
     
     public void setWorldRotation(Quat4f rotation) {
         this.rotation.set(rotation);
-        LocationComponent parentLoc = getParentLocationComponent();
+        LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             Quat4f worldRot = parentLoc.getWorldRotation();
             worldRot.inverse();
@@ -117,17 +119,10 @@ public final class LocationComponent extends AbstractComponent {
 
     public void setWorldScale(float scale) {
         this.scale = scale;
-        LocationComponent parentLoc = getParentLocationComponent();
+        LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             this.scale /= parentLoc.getWorldScale();
         }
-    }
-
-    private LocationComponent getParentLocationComponent() {
-        if (parent != null) {
-            return parent.getComponent(LocationComponent.class);
-        }
-        return null;
     }
 
     @Override
