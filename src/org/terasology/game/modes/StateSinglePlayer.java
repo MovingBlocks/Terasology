@@ -20,7 +20,22 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.audio.Sound;
 import org.terasology.componentSystem.BlockParticleEmitterSystem;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.componentSystem.action.ExplosionAction;
+import org.terasology.componentSystem.action.PlaySoundAction;
+import org.terasology.componentSystem.action.TunnelAction;
+import org.terasology.componentSystem.block.BlockEntityLookup;
+import org.terasology.componentSystem.block.BlockEntitySystem;
+import org.terasology.componentSystem.characters.CharacterMovementSystem;
+import org.terasology.componentSystem.characters.CharacterSoundSystem;
 import org.terasology.componentSystem.common.HealthSystem;
+import org.terasology.componentSystem.controllers.LocalPlayerSystem;
+import org.terasology.componentSystem.controllers.SimpleAISystem;
+import org.terasology.componentSystem.items.InventorySystem;
+import org.terasology.componentSystem.items.ItemSystem;
+import org.terasology.componentSystem.rendering.BlockDamageRenderer;
+import org.terasology.componentSystem.rendering.FirstPersonRenderer;
+import org.terasology.componentSystem.rendering.MeshRenderer;
 import org.terasology.components.*;
 import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.components.actions.PlaySoundActionComponent;
@@ -29,7 +44,6 @@ import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.persistence.extension.*;
@@ -39,20 +53,6 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
-import org.terasology.componentSystem.action.ExplosionAction;
-import org.terasology.componentSystem.action.PlaySoundAction;
-import org.terasology.componentSystem.action.TunnelAction;
-import org.terasology.componentSystem.characters.CharacterMovementSystem;
-import org.terasology.componentSystem.characters.CharacterSoundSystem;
-import org.terasology.componentSystem.controllers.LocalPlayerSystem;
-import org.terasology.componentSystem.controllers.SimpleAISystem;
-import org.terasology.componentSystem.rendering.BlockDamageRenderer;
-import org.terasology.componentSystem.block.BlockEntityLookup;
-import org.terasology.componentSystem.block.BlockEntitySystem;
-import org.terasology.componentSystem.items.InventorySystem;
-import org.terasology.componentSystem.items.ItemSystem;
-import org.terasology.componentSystem.rendering.FirstPersonRenderer;
-import org.terasology.componentSystem.rendering.MeshRenderer;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.BlockGroup;
@@ -68,8 +68,12 @@ import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -81,6 +85,9 @@ import static org.lwjgl.opengl.GL11.*;
  * @version 0.1
  */
 public class StateSinglePlayer implements IGameState {
+
+    public static final String ENTITY_DATA_FILE = "entity.dat";
+    private Logger _logger = Logger.getLogger(getClass().getName());
 
     /* GUI */
     private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
@@ -189,7 +196,13 @@ public class StateSinglePlayer implements IGameState {
     }
 
     public void deactivate() {
+        try {
+            _entityManager.save(new File(Terasology.getInstance().getWorldSavePath(getActiveWorldProvider().getTitle()), ENTITY_DATA_FILE), EntityManager.SaveFormat.Binary);
+        } catch (IOException e) {
+            _logger.log(Level.SEVERE, "Failed to save entities", e);
+        }
         dispose();
+        _entityManager.clear();
     }
 
     public void dispose() {
@@ -264,8 +277,24 @@ public class StateSinglePlayer implements IGameState {
         // Init. a new world
         _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys);
 
-        PlayerFactory playerFactory = new PlayerFactory(_entityManager);
-        LocalPlayer localPlayer = new LocalPlayer(playerFactory.newInstance(new Vector3f(_worldRenderer.getWorldProvider().nextSpawningPoint())));
+        File entityDataFile = new File(Terasology.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
+        _entityManager.clear();
+        if (entityDataFile.exists()) {
+            try {
+                _entityManager.load(entityDataFile, EntityManager.SaveFormat.Binary);
+            } catch (IOException e) {
+                _logger.log(Level.SEVERE, "Failed to load entity data", e);
+            }
+        }
+
+        LocalPlayer localPlayer = null;
+        Iterator<EntityRef> iterator = _entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
+        if (iterator.hasNext()) {
+            localPlayer = new LocalPlayer(iterator.next());
+        } else {
+            PlayerFactory playerFactory = new PlayerFactory(_entityManager);
+            localPlayer = new LocalPlayer(playerFactory.newInstance(new Vector3f(_worldRenderer.getWorldProvider().nextSpawningPoint())));
+        }
         _worldRenderer.setPlayer(localPlayer);
 
         // Create the first Portal if it doesn't exist yet
