@@ -53,7 +53,6 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         _overlay.setVisible(true);
 
         _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 256f));
-        _window.setVisible(false);
         _window.center();
 
         _list = new UIList(new Vector2f(512f, 256f));
@@ -84,6 +83,9 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
             }
         }
 
+        _list.addItem("worldTitle1", "worldSeed");
+        _list.addItem("worldTitle2", "worldSeed");
+
         _goToBack = new UIButton(new Vector2f(256f, 32f));
         _goToBack.getLabel().setText("Go to back");
         _goToBack.setVisible(true);
@@ -102,7 +104,7 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
 
         _createNewWorld.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                _window.setVisible(true);
+                _window.show();
             }
         });
 
@@ -120,6 +122,22 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         addDisplayElement(_deleteFromList);
         addDisplayElement(_window);
         update();
+    }
+
+    public void processKeyboardInput(int key) {
+        if(_window.isVisible()){
+            _window.processKeyboardInput(key);
+        }else{
+            super.processKeyboardInput(key);
+        }
+    }
+
+    public void processMouseInput(int button, boolean state, int wheelMoved) {
+        if(_window.isVisible()){
+            _window.processMouseInput(button, state, wheelMoved);
+        }else{
+            super.processMouseInput(button, state, wheelMoved);
+        }
     }
 
     @Override
