@@ -88,7 +88,9 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     private void renderHand(float bobOffset, float handMovementAnimationOffset) {
-        ShaderManager.getInstance().enableShader("block");
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
+        shader.enable();
+        shader.setFloat("light", Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValue());
         TextureManager.getInstance().bindTexture("char");
 
         glPushMatrix();

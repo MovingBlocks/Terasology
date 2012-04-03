@@ -49,6 +49,6 @@ message World {
     repeated Entity entity = 1;
     repeated string component_class = 15; // Table of component classes, the index of which corresponds to ComponentTypeIndex.
     optional sint32 next_entity_id = 16;
-    repeated sint32 dead_entity_ids = 17 [packed=true];
+    repeated sint32 freed_entity_id = 17 [packed=true];
     extensions 1000 to 1999;
 }

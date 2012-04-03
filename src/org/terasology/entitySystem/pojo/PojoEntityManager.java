@@ -6,13 +6,13 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventSystem;
-import org.terasology.entitySystem.common.NullEntityRef;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
@@ -44,18 +44,19 @@ public class PojoEntityManager implements EntityManager {
 
     private static Logger logger = Logger.getLogger(PojoEntityManager.class.getName());
 
-    // TODO: Need to recycle freed ids.
     private int nextEntityId = 1;
+    private TIntList freedIds = new TIntArrayList();
+    private Map<EntityRef, PojoEntityRef> entityCache = new WeakHashMap<EntityRef, PojoEntityRef>();
+
     ComponentTable store = new ComponentTable();
     private EventSystem eventSystem;
-    // TODO: Weak hash map cache of entityRefs
-    // TODO: Invalidate entity ref when destroyed
 
     private Map<Class<? extends Component>, SerializationInfo> componentSerializationLookup = Maps.newHashMap();
     private Map<String, Class<? extends Component>> componentTypeLookup = Maps.newHashMap();
     private Map<Class<?>, TypeHandler<?>> typeHandlers = Maps.newHashMap();
 
     // Temporary list of valid ids used during loading.
+    // TODO: Store in EntityRefTypeHandler?
     private TIntSet validIds;
 
     public PojoEntityManager() {
@@ -79,7 +80,6 @@ public class PojoEntityManager implements EntityManager {
         typeHandlers.put(forClass, handler);
     }
 
-    // TODO: Check for empty constructors
     public void registerComponentClass(Class<? extends Component> componentClass) {
 
         try {
@@ -106,17 +106,22 @@ public class PojoEntityManager implements EntityManager {
         componentTypeLookup.put(getComponentClassName(componentClass), componentClass);
     }
 
-    // TODO: Implement for loading
-    public EntityRef getEntityRef(int id) {
-        if (validIds.contains(id)) {
-            return new PojoEntityRef(this, id);
+    public EntityRef loadEntityRef(int id) {
+        if (!validIds.contains(id)) {
+            return EntityRef.NULL;
         }
-        return EntityRef.NULL;
+        return createEntityRef(id);
     }
 
     public void save(File file, SaveFormat format) throws IOException {
-        EntityData.World.Builder world = EntityData.World.newBuilder();
+        final EntityData.World.Builder world = EntityData.World.newBuilder();
         world.setNextEntityId(nextEntityId);
+        freedIds.forEach(new TIntProcedure() {
+            public boolean execute(int i) {
+                world.addFreedEntityId(i);
+                return true;
+            }
+        });
 
         TIntIterator idIterator = store.entityIdIterator();
         while (idIterator.hasNext()) {
@@ -134,6 +139,7 @@ public class PojoEntityManager implements EntityManager {
             world.addEntity(entity.build());
         }
 
+        file.getParentFile().mkdirs();
         FileOutputStream out = new FileOutputStream(file);
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(out));
         try {
@@ -193,9 +199,11 @@ public class PojoEntityManager implements EntityManager {
 
         if (world != null) {
             nextEntityId = world.getNextEntityId();
-            // TODO: handle more stuff
+            for (Integer deadId : world.getFreedEntityIdList()) {
+                freedIds.add(deadId);
+            }
 
-            // TODO: just persist a list of used ids?
+            // Gather valid ids
             validIds = new TIntHashSet(world.getEntityCount());
             for (EntityData.Entity entityData : world.getEntityList()) {
                 validIds.add(entityData.getId());
@@ -220,19 +228,29 @@ public class PojoEntityManager implements EntityManager {
     public void clear() {
         store.clear();
         nextEntityId = 1;
+        freedIds.clear();
+        entityCache.clear();
     }
 
     public EntityRef create() {
+        if (!freedIds.isEmpty()) {
+            createEntityRef(freedIds.removeAt(freedIds.size() - 1));
+        }
         if (nextEntityId == NULL_ID) nextEntityId++;
-        return new PojoEntityRef(this, nextEntityId++);
+        return createEntityRef(nextEntityId++);
     }
 
-    // TODO: Clean up this + getEntityRef + other POJOEntityRef instantiation
-    private EntityRef get(int entityId) {
+    private EntityRef createEntityRef(int entityId) {
         if (entityId == NULL_ID) {
             return EntityRef.NULL;
         }
-        return new PojoEntityRef(this, entityId);
+        PojoEntityRef newRef = new PojoEntityRef(this, entityId);
+        PojoEntityRef existing = entityCache.get(newRef);
+        if (existing != null) {
+            return existing;
+        }
+        entityCache.put(newRef, newRef);
+        return newRef;
     }
 
     public int getComponentCount(Class<? extends Component> componentClass) {
@@ -253,7 +271,7 @@ public class PojoEntityManager implements EntityManager {
             List<Map.Entry<EntityRef, T>> list = new ArrayList<Map.Entry<EntityRef, T>>();
             while (iterator.hasNext()) {
                 iterator.advance();
-                list.add(new EntityEntry<T>(new PojoEntityRef(this, iterator.key()), iterator.value()));
+                list.add(new EntityEntry<T>(createEntityRef(iterator.key()), iterator.value()));
             }
             return list;
         }
@@ -296,8 +314,14 @@ public class PojoEntityManager implements EntityManager {
     }
 
     void destroy(int entityId) {
+        EntityRef ref = createEntityRef(entityId);
         if (eventSystem != null) {
-            eventSystem.send(new PojoEntityRef(this, entityId), RemovedComponentEvent.newInstance());
+            eventSystem.send(ref, RemovedComponentEvent.newInstance());
+        }
+        entityCache.remove(ref);
+        freedIds.add(entityId);
+        if (ref instanceof PojoEntityRef) {
+            ((PojoEntityRef)ref).invalidate();
         }
         store.remove(entityId);
     }
@@ -310,9 +334,9 @@ public class PojoEntityManager implements EntityManager {
         Component oldComponent = store.put(entityId, component);
         if (eventSystem != null) {
             if (oldComponent == null) {
-                eventSystem.send(new PojoEntityRef(this, entityId), AddComponentEvent.newInstance(), component);
+                eventSystem.send(createEntityRef(entityId), AddComponentEvent.newInstance(), component);
             } else {
-                eventSystem.send(new PojoEntityRef(this, entityId), ChangedComponentEvent.newInstance(), component);
+                eventSystem.send(createEntityRef(entityId), ChangedComponentEvent.newInstance(), component);
             }
         }
         return component;
@@ -322,7 +346,7 @@ public class PojoEntityManager implements EntityManager {
         Component component = store.get(entityId, componentClass);
         if (component != null) {
             if (eventSystem != null) {
-                eventSystem.send(new PojoEntityRef(this, entityId), RemovedComponentEvent.newInstance(), component);
+                eventSystem.send(createEntityRef(entityId), RemovedComponentEvent.newInstance(), component);
             }
             store.remove(entityId, componentClass);
         }
@@ -330,7 +354,7 @@ public class PojoEntityManager implements EntityManager {
 
     void saveComponent(int entityId, Component component) {
         if (eventSystem != null) {
-            eventSystem.send(new PojoEntityRef(this, entityId), ChangedComponentEvent.newInstance(), component);
+            eventSystem.send(createEntityRef(entityId), ChangedComponentEvent.newInstance(), component);
         }
     }
 
@@ -384,7 +408,7 @@ public class PojoEntityManager implements EntityManager {
         }
 
         public EntityRef next() {
-            return get(idIterator.next());
+            return createEntityRef(idIterator.next());
         }
 
         public void remove() {
@@ -404,7 +428,7 @@ public class PojoEntityManager implements EntityManager {
         if (Enum.class.isAssignableFrom(typeClass)) {
             return new EnumTypeHandler(typeClass);
         }
-        // For lists, get the handler for the contained type and wrap in a list type handler
+        // For lists, createEntityRef the handler for the contained type and wrap in a list type handler
         else if (List.class.isAssignableFrom(typeClass)) {
             // TODO - Improve parameter lookup
             if (type instanceof ParameterizedType && ((ParameterizedType) type).getActualTypeArguments().length > 0)
@@ -417,7 +441,7 @@ public class PojoEntityManager implements EntityManager {
             logger.log(Level.SEVERE, "List field is not parameterized, or holds unsupported type");
             return null;
         }
-        // For Maps, get the handler for the value type (and maybe key too?)
+        // For Maps, createEntityRef the handler for the value type (and maybe key too?)
         else if (Map.class.isAssignableFrom(typeClass)) {
             if (type instanceof ParameterizedType) {
                 // TODO - Improve parameter lookup

@@ -1,13 +1,10 @@
 package org.terasology.entitySystem.pojo.persistence.extension;
 
 import com.google.common.collect.Lists;
-import gnu.trove.list.TIntList;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEntityRef;
 import org.terasology.entitySystem.pojo.persistence.TypeHandler;
-import org.terasology.model.blocks.BlockGroup;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.protobuf.EntityData;
 
 import java.util.List;
@@ -31,7 +28,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
 
     public EntityRef deserialize(EntityData.Value value) {
         if (value.getIntegerCount() > 0) {
-            return entityManager.getEntityRef(value.getInteger(0));
+            return entityManager.loadEntityRef(value.getInteger(0));
         }
         return EntityRef.NULL;
     }
@@ -52,7 +49,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     public List<EntityRef> deserializeList(EntityData.Value value) {
         List<EntityRef> result = Lists.newArrayListWithCapacity(value.getIntegerCount());
         for (Integer item : value.getIntegerList()) {
-            result.add(entityManager.getEntityRef(item));
+            result.add(entityManager.loadEntityRef(item));
         }
         return result;
     }

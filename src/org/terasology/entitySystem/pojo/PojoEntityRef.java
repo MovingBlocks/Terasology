@@ -81,4 +81,8 @@ public class PojoEntityRef extends EntityRef{
     public int hashCode() {
         return !exists() ? 0 : (int) (id ^ (id >>> 32));
     }
+
+    void invalidate() {
+        id = PojoEntityManager.NULL_ID;
+    }
 }

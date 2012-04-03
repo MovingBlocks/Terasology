@@ -3528,10 +3528,10 @@ public final class EntityData {
     boolean hasNextEntityId();
     int getNextEntityId();
     
-    // repeated sint32 dead_entity_ids = 17 [packed = true];
-    java.util.List<java.lang.Integer> getDeadEntityIdsList();
-    int getDeadEntityIdsCount();
-    int getDeadEntityIds(int index);
+    // repeated sint32 freed_entity_id = 17 [packed = true];
+    java.util.List<java.lang.Integer> getFreedEntityIdList();
+    int getFreedEntityIdCount();
+    int getFreedEntityId(int index);
   }
   public static final class World extends
       com.google.protobuf.GeneratedMessage.ExtendableMessage<
@@ -3607,26 +3607,26 @@ public final class EntityData {
       return nextEntityId_;
     }
     
-    // repeated sint32 dead_entity_ids = 17 [packed = true];
-    public static final int DEAD_ENTITY_IDS_FIELD_NUMBER = 17;
-    private java.util.List<java.lang.Integer> deadEntityIds_;
+    // repeated sint32 freed_entity_id = 17 [packed = true];
+    public static final int FREED_ENTITY_ID_FIELD_NUMBER = 17;
+    private java.util.List<java.lang.Integer> freedEntityId_;
     public java.util.List<java.lang.Integer>
-        getDeadEntityIdsList() {
-      return deadEntityIds_;
+        getFreedEntityIdList() {
+      return freedEntityId_;
     }
-    public int getDeadEntityIdsCount() {
-      return deadEntityIds_.size();
+    public int getFreedEntityIdCount() {
+      return freedEntityId_.size();
     }
-    public int getDeadEntityIds(int index) {
-      return deadEntityIds_.get(index);
+    public int getFreedEntityId(int index) {
+      return freedEntityId_.get(index);
     }
-    private int deadEntityIdsMemoizedSerializedSize = -1;
+    private int freedEntityIdMemoizedSerializedSize = -1;
     
     private void initFields() {
       entity_ = java.util.Collections.emptyList();
       componentClass_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       nextEntityId_ = 0;
-      deadEntityIds_ = java.util.Collections.emptyList();;
+      freedEntityId_ = java.util.Collections.emptyList();;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3662,12 +3662,12 @@ public final class EntityData {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeSInt32(16, nextEntityId_);
       }
-      if (getDeadEntityIdsList().size() > 0) {
+      if (getFreedEntityIdList().size() > 0) {
         output.writeRawVarint32(138);
-        output.writeRawVarint32(deadEntityIdsMemoizedSerializedSize);
+        output.writeRawVarint32(freedEntityIdMemoizedSerializedSize);
       }
-      for (int i = 0; i < deadEntityIds_.size(); i++) {
-        output.writeSInt32NoTag(deadEntityIds_.get(i));
+      for (int i = 0; i < freedEntityId_.size(); i++) {
+        output.writeSInt32NoTag(freedEntityId_.get(i));
       }
       extensionWriter.writeUntil(2000, output);
       getUnknownFields().writeTo(output);
@@ -3698,17 +3698,17 @@ public final class EntityData {
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < deadEntityIds_.size(); i++) {
+        for (int i = 0; i < freedEntityId_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeSInt32SizeNoTag(deadEntityIds_.get(i));
+            .computeSInt32SizeNoTag(freedEntityId_.get(i));
         }
         size += dataSize;
-        if (!getDeadEntityIdsList().isEmpty()) {
+        if (!getFreedEntityIdList().isEmpty()) {
           size += 2;
           size += com.google.protobuf.CodedOutputStream
               .computeInt32SizeNoTag(dataSize);
         }
-        deadEntityIdsMemoizedSerializedSize = dataSize;
+        freedEntityIdMemoizedSerializedSize = dataSize;
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -3846,7 +3846,7 @@ public final class EntityData {
         bitField0_ = (bitField0_ & ~0x00000002);
         nextEntityId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        deadEntityIds_ = java.util.Collections.emptyList();;
+        freedEntityId_ = java.util.Collections.emptyList();;
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
@@ -3906,10 +3906,10 @@ public final class EntityData {
         }
         result.nextEntityId_ = nextEntityId_;
         if (((bitField0_ & 0x00000008) == 0x00000008)) {
-          deadEntityIds_ = java.util.Collections.unmodifiableList(deadEntityIds_);
+          freedEntityId_ = java.util.Collections.unmodifiableList(freedEntityId_);
           bitField0_ = (bitField0_ & ~0x00000008);
         }
-        result.deadEntityIds_ = deadEntityIds_;
+        result.freedEntityId_ = freedEntityId_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3965,13 +3965,13 @@ public final class EntityData {
         if (other.hasNextEntityId()) {
           setNextEntityId(other.getNextEntityId());
         }
-        if (!other.deadEntityIds_.isEmpty()) {
-          if (deadEntityIds_.isEmpty()) {
-            deadEntityIds_ = other.deadEntityIds_;
+        if (!other.freedEntityId_.isEmpty()) {
+          if (freedEntityId_.isEmpty()) {
+            freedEntityId_ = other.freedEntityId_;
             bitField0_ = (bitField0_ & ~0x00000008);
           } else {
-            ensureDeadEntityIdsIsMutable();
-            deadEntityIds_.addAll(other.deadEntityIds_);
+            ensureFreedEntityIdIsMutable();
+            freedEntityId_.addAll(other.freedEntityId_);
           }
           onChanged();
         }
@@ -4034,15 +4034,15 @@ public final class EntityData {
               break;
             }
             case 136: {
-              ensureDeadEntityIdsIsMutable();
-              deadEntityIds_.add(input.readSInt32());
+              ensureFreedEntityIdIsMutable();
+              freedEntityId_.add(input.readSInt32());
               break;
             }
             case 138: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               while (input.getBytesUntilLimit() > 0) {
-                addDeadEntityIds(input.readSInt32());
+                addFreedEntityId(input.readSInt32());
               }
               input.popLimit(limit);
               break;
@@ -4316,46 +4316,46 @@ public final class EntityData {
         return this;
       }
       
-      // repeated sint32 dead_entity_ids = 17 [packed = true];
-      private java.util.List<java.lang.Integer> deadEntityIds_ = java.util.Collections.emptyList();;
-      private void ensureDeadEntityIdsIsMutable() {
+      // repeated sint32 freed_entity_id = 17 [packed = true];
+      private java.util.List<java.lang.Integer> freedEntityId_ = java.util.Collections.emptyList();;
+      private void ensureFreedEntityIdIsMutable() {
         if (!((bitField0_ & 0x00000008) == 0x00000008)) {
-          deadEntityIds_ = new java.util.ArrayList<java.lang.Integer>(deadEntityIds_);
+          freedEntityId_ = new java.util.ArrayList<java.lang.Integer>(freedEntityId_);
           bitField0_ |= 0x00000008;
          }
       }
       public java.util.List<java.lang.Integer>
-          getDeadEntityIdsList() {
-        return java.util.Collections.unmodifiableList(deadEntityIds_);
+          getFreedEntityIdList() {
+        return java.util.Collections.unmodifiableList(freedEntityId_);
       }
-      public int getDeadEntityIdsCount() {
-        return deadEntityIds_.size();
+      public int getFreedEntityIdCount() {
+        return freedEntityId_.size();
       }
-      public int getDeadEntityIds(int index) {
-        return deadEntityIds_.get(index);
+      public int getFreedEntityId(int index) {
+        return freedEntityId_.get(index);
       }
-      public Builder setDeadEntityIds(
+      public Builder setFreedEntityId(
           int index, int value) {
-        ensureDeadEntityIdsIsMutable();
-        deadEntityIds_.set(index, value);
+        ensureFreedEntityIdIsMutable();
+        freedEntityId_.set(index, value);
         onChanged();
         return this;
       }
-      public Builder addDeadEntityIds(int value) {
-        ensureDeadEntityIdsIsMutable();
-        deadEntityIds_.add(value);
+      public Builder addFreedEntityId(int value) {
+        ensureFreedEntityIdIsMutable();
+        freedEntityId_.add(value);
         onChanged();
         return this;
       }
-      public Builder addAllDeadEntityIds(
+      public Builder addAllFreedEntityId(
           java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureDeadEntityIdsIsMutable();
-        super.addAll(values, deadEntityIds_);
+        ensureFreedEntityIdIsMutable();
+        super.addAll(values, freedEntityId_);
         onChanged();
         return this;
       }
-      public Builder clearDeadEntityIds() {
-        deadEntityIds_ = java.util.Collections.emptyList();;
+      public Builder clearFreedEntityId() {
+        freedEntityId_ = java.util.Collections.emptyList();;
         bitField0_ = (bitField0_ & ~0x00000008);
         onChanged();
         return this;
@@ -4418,7 +4418,7 @@ public final class EntityData {
       "\030\001 \001(\021\022\035\n\tcomponent\030\002 \003(\0132\n.Component*\006\010",
       "\350\007\020\320\017\"v\n\005World\022\027\n\006entity\030\001 \003(\0132\007.Entity\022" +
       "\027\n\017component_class\030\017 \003(\t\022\026\n\016next_entity_" +
-      "id\030\020 \001(\021\022\033\n\017dead_entity_ids\030\021 \003(\021B\002\020\001*\006\010" +
+      "id\030\020 \001(\021\022\033\n\017freed_entity_id\030\021 \003(\021B\002\020\001*\006\010" +
       "\350\007\020\320\017B\'\n\027org.terasology.protobufB\nEntity" +
       "DataH\001"
     };
@@ -4464,7 +4464,7 @@ public final class EntityData {
           internal_static_World_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_World_descriptor,
-              new java.lang.String[] { "Entity", "ComponentClass", "NextEntityId", "DeadEntityIds", },
+              new java.lang.String[] { "Entity", "ComponentClass", "NextEntityId", "FreedEntityId", },
               org.terasology.protobuf.EntityData.World.class,
               org.terasology.protobuf.EntityData.World.Builder.class);
           return null;

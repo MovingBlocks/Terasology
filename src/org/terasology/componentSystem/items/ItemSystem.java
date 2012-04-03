@@ -35,24 +35,6 @@ public class ItemSystem implements EventHandlerSystem {
         blockEntityLookup = CoreRegistry.get(ComponentSystemManager.class).get(BlockEntityLookup.class);
     }
 
-    /**
-     * When an item is destroyed, remove it from its container.
-     * @param event
-     * @param itemEntity
-     */
-    @ReceiveEvent(components=ItemComponent.class)
-    public void onDestroy(RemovedComponentEvent event, EntityRef itemEntity) {
-        ItemComponent item = itemEntity.getComponent(ItemComponent.class);
-
-        InventoryComponent inventory = item.container.getComponent(InventoryComponent.class);
-        if (inventory != null) {
-            int index = inventory.itemSlots.indexOf(itemEntity);
-            if (index != -1) {
-                inventory.itemSlots.set(index, EntityRef.NULL);
-            }
-        }
-    }
-    
     public void useItemOnBlock(EntityRef item, EntityRef user, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection) {
 
         ItemComponent itemComp = item.getComponent(ItemComponent.class);

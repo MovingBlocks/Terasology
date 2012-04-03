@@ -7,6 +7,7 @@ import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
+import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 
@@ -213,6 +214,23 @@ public class PojoEntityManagerTest {
         entityManager.create().addComponent(new StringComponent());
         entityManager.create().addComponent(new StringComponent());
         assertEquals(2, entityManager.getComponentCount(StringComponent.class));
+    }
+
+    @Test
+    public void destroyingEntityInvalidatesEntityRefs() {
+        EntityRef main = entityManager.create();
+        main.addComponent(new StringComponent());
+
+        EntityRef reference = entityManager.create();
+        EntityRefComponent refComp = reference.addComponent(new EntityRefComponent());
+        refComp.entityRef = entityManager.iteratorEntities(StringComponent.class).iterator().next();
+
+        assertTrue(main.exists());
+        entityManager.iteratorEntities(StringComponent.class).iterator().next().destroy();
+
+        assertFalse(main.exists());
+        assertFalse(refComp.entityRef.exists());
+
     }
 
 }
