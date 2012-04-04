@@ -19,10 +19,7 @@ import org.terasology.game.Terasology;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.IClickListener;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.*;
 
 import javax.vecmath.Vector2f;
 
@@ -31,7 +28,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UIMainMenu extends UIDisplayRenderer {
+public class UIMainMenu extends UIDisplayWindow {
 
     private final UIImageOverlay _overlay;
     private final UIGraphicsElement _title;
@@ -44,6 +41,7 @@ public class UIMainMenu extends UIDisplayRenderer {
     final UIText _version;
                                                                   
     public UIMainMenu() {
+        maximaze();
         _title = new UIGraphicsElement("terasology");
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
@@ -65,7 +63,7 @@ public class UIMainMenu extends UIDisplayRenderer {
         _singlePlayer.setVisible(true);
 
         _overlay = new UIImageOverlay("menuBackground");
-        _overlay.setVisible(true);
+       // _overlay.setVisible(true);
 
         addDisplayElement(_overlay);
         addDisplayElement(_title);
@@ -79,6 +77,7 @@ public class UIMainMenu extends UIDisplayRenderer {
 
     @Override
     public void update() {
+        //System.out.println("update");
         super.update();
 
         _version.centerHorizontally();

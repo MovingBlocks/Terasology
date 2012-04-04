@@ -1,10 +1,15 @@
 package org.terasology.rendering.gui.framework;
 
+import org.lwjgl.opengl.Display;
+
 import javax.vecmath.Vector2f;
 
-public class UIDisplayWindow extends UIScrollableDisplayContainer implements Comparable<UIDisplayWindow> {
+public class UIDisplayWindow extends UIScrollableDisplayContainer{
     
-    private Integer _zIndex = 0;
+    private boolean _maximized = false;
+    private boolean _modal      = false;
+    public String name         = "";
+
 
     protected void drag(Vector2f value){
         getPosition().x -=value.x;
@@ -33,17 +38,23 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer implements Com
             }
         }
     }
-    
-    public Integer getZindex(){
-        return _zIndex;
-    }
-    
-    public void setZindex(int index){
-        _zIndex = index;
+
+    public void maximaze(){
+        setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
+        _maximized = true;
     }
 
-    public int compareTo(UIDisplayWindow ts) {
-        return _zIndex.compareTo(ts.getZindex());
+    public boolean isMaximized(){
+        return _maximized;
     }
+
+    public boolean isModal(){
+        return _modal;
+    }
+
+    public void setModal(boolean modal){
+        _modal = modal;
+    }
+
 
 }

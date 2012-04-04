@@ -20,6 +20,7 @@ import groovy.util.ConfigSlurper;
 import org.lwjgl.opengl.Display;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.*;
@@ -38,7 +39,7 @@ import java.util.logging.Level;
  * @author Anton Kireev <adeon.k87@gmail.com>
  *
  */
-public class UISelectWorldMenu extends UIDisplayRenderer {
+public class UISelectWorldMenu extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIList _list;
@@ -49,11 +50,16 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
     final UIDialogCreateNewWorld _window;
 
     public UISelectWorldMenu() {
+        maximaze();
         _overlay = new UIImageOverlay("menuBackground");
-        _overlay.setVisible(true);
+        //_overlay.setVisible(true);
 
         _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 256f));
-        _window.center();
+        //_window.center();
+
+        _window.setModal(true);
+
+        GUIManager.getInstance().addWindow(_window);
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
@@ -120,24 +126,8 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         addDisplayElement(_goToBack);
         addDisplayElement(_createNewWorld);
         addDisplayElement(_deleteFromList);
-        addDisplayElement(_window);
+        //addDisplayElement(_window);
         update();
-    }
-
-    public void processKeyboardInput(int key) {
-        if(_window.isVisible()){
-            _window.processKeyboardInput(key);
-        }else{
-            super.processKeyboardInput(key);
-        }
-    }
-
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
-        if(_window.isVisible()){
-            _window.processMouseInput(button, state, wheelMoved);
-        }else{
-            super.processMouseInput(button, state, wheelMoved);
-        }
     }
 
     @Override

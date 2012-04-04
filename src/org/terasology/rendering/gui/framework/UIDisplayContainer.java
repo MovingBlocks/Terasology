@@ -134,8 +134,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         element.setParent(this);
     }
 
-    public void addFirstDisplayElement(UIDisplayElement element) {
-        _displayElements.add(0,element);
+    public void addtDisplayElementToPosition(int position, UIDisplayElement element) {
+        _displayElements.add(position,element);
         element.setParent(this);
     }
 
@@ -165,7 +165,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             _style.setPosition(new Vector2f(0f,0f));
             _style.setVisible(true);
             _style.setCroped(false);
-            addFirstDisplayElement(_style);
+            addtDisplayElementToPosition(0,_style);
         }
         _style.parse(property, value);
     }
@@ -185,7 +185,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
                 removeDisplayElement(_style);
             }
             _style = _styleClasses.get(className);
-            addFirstDisplayElement(_style);
+            addtDisplayElementToPosition(0,_style);
         }
     }
 

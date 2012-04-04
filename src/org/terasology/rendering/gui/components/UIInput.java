@@ -169,7 +169,10 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
   }
 
     public void clearData() {
-        _inputValue.delete(0,_inputValue.length()-1);
+        if(_inputValue.length() > 0){
+            _inputValue.delete(0,_inputValue.length()-1);
+        }
+
         _inputText.setText("");
     }
 

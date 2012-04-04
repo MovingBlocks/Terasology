@@ -20,6 +20,7 @@ import org.lwjgl.input.Mouse;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -46,7 +47,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class StateMainMenu implements IGameState {
 
     /* GUI */
-    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
+   // private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
 
     /* SCREENS */
     private UIMainMenu        _mainMenu;
@@ -61,9 +62,9 @@ public class StateMainMenu implements IGameState {
         setupMainMenu();
         setupConfigMenu();
 
-        _guiScreens.add(_mainMenu);
-        _guiScreens.add(_configMenu);
-        _guiScreens.add(_selectWorldMenu);
+        GUIManager.getInstance().addWindow(_mainMenu);
+        GUIManager.getInstance().addWindow(_configMenu);
+        GUIManager.getInstance().addWindow(_selectWorldMenu);
     }
 
     private void setupMainMenu() {
@@ -222,15 +223,11 @@ public class StateMainMenu implements IGameState {
     }
 
     public void renderUserInterface() {
-        for (UIDisplayElement screen : _guiScreens) {
-            screen.render();
-        }
+        GUIManager.getInstance().render();
     }
 
     private void updateUserInterface() {
-        for (UIDisplayElement screen : _guiScreens) {
-            screen.update();
-        }
+        GUIManager.getInstance().update();
     }
 
     /**
@@ -245,13 +242,8 @@ public class StateMainMenu implements IGameState {
                     _gameInstance.exit();
                     return;
                 }
-                // Pass input to focused GUI element
-                for (UIDisplayElement screen : _guiScreens) {
-                    if (screenCanFocus(screen)) {
-                        screen.processKeyboardInput(key);
-                    }
-                }
             }
+            GUIManager.getInstance().processKeyboardInput(key);
         }
     }
 
@@ -263,32 +255,7 @@ public class StateMainMenu implements IGameState {
             int button = Mouse.getEventButton();
             int wheelMoved = Mouse.getEventDWheel();
 
-            for (UIDisplayElement screen : _guiScreens) {
-                if (screenCanFocus(screen)) {
-                    screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-                }
-            }
+            GUIManager.getInstance().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
         }
-    }
-
-    private boolean screenCanFocus(UIDisplayElement s) {
-        boolean result = true;
-
-        for (UIDisplayElement screen : _guiScreens) {
-            if (screen.isVisible() && !screen.isOverlay() && screen != s)
-                result = false;
-        }
-
-        return result;
-    }
-
-    private boolean screenHasFocus() {
-        for (UIDisplayElement screen : _guiScreens) {
-            if (screen.isVisible() && !screen.isOverlay()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

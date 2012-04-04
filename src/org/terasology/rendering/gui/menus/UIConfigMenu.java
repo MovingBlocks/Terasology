@@ -19,6 +19,7 @@ import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -28,7 +29,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UIConfigMenu extends UIDisplayRenderer {
+public class UIConfigMenu extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
