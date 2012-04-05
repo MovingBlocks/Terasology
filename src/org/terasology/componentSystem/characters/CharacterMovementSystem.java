@@ -13,6 +13,7 @@ import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.logic.world.WorldUtil;
+import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
@@ -34,7 +35,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
     public static final float TerminalVelocity = 64.0f;
     public static final float UnderwaterInertia = 2.0f;
     public static final float WaterTerminalVelocity = 4.0f;
-    public static final float GhostInertia = 8.0f;
+    public static final float GhostInertia = 4f;
 
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
@@ -125,10 +126,8 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(movementComp.getVelocity());
 
-        float changeMag = velocityDiff.length();
-        if (changeMag > GhostInertia * delta) {
-            velocityDiff.scale(GhostInertia * delta / changeMag);
-        }
+        velocityDiff.scale(Math.min(GhostInertia * delta, 1.0f));
+
         movementComp.getVelocity().add(velocityDiff);
         
         // No collision, so just do the move
@@ -168,10 +167,8 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         velocityDiff.sub(movementComp.getVelocity());
         velocityDiff.y = 0;
 
-        float changeMag = velocityDiff.length();
-        if (changeMag > movementComp.groundFriction * delta) {
-            velocityDiff.scale(movementComp.groundFriction * delta / changeMag);
-        }
+        velocityDiff.scale(Math.min(movementComp.groundFriction * delta, 1.0f));
+
         movementComp.getVelocity().x += velocityDiff.x;
         movementComp.getVelocity().z += velocityDiff.z;
         movementComp.getVelocity().y = Math.max(-TerminalVelocity, (float)(movementComp.getVelocity().y - Gravity * delta));
@@ -252,10 +249,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(movementComp.getVelocity());
-        float changeMag = velocityDiff.length();
-        if (changeMag > UnderwaterInertia * delta) {
-            velocityDiff.scale(UnderwaterInertia * delta / changeMag);
-        }
+        velocityDiff.scale(Math.min(UnderwaterInertia * delta,1.0f));
 
         movementComp.getVelocity().x += velocityDiff.x;
         movementComp.getVelocity().y += velocityDiff.y;

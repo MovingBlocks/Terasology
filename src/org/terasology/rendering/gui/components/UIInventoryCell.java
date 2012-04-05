@@ -17,10 +17,23 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.terasology.components.BlockItemComponent;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.TextureManager;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * A single cell of the toolbar with a small text label and a selection
@@ -28,6 +41,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
+// TODO: Combine with UIToolbarCell?
 public class UIInventoryCell extends UIDisplayElement {
 
     private final UIGraphicsElement _selectionRectangle;
@@ -69,18 +83,23 @@ public class UIInventoryCell extends UIDisplayElement {
     public void update() {
         setPosition(findPosition());
 
-        // TODO: Fix inventory
-        //Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
         processMouseInput();
 
-        /*Item item = inventory.getItemAt(_id);
+        InventoryComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(InventoryComponent.class);
+        if (inventory == null || inventory.itemSlots.size() < _id) {
+            getLabel().setVisible(false);
+            return;
+        }
 
-        if (item != null) {
+        EntityRef itemEntity = inventory.itemSlots.get(_id);
+        ItemComponent item = itemEntity.getComponent(ItemComponent.class);
+
+        if (item != null && item.stackCount > 1) {
             getLabel().setVisible(true);
-            getLabel().setText(Integer.toString(inventory.getItemCountAt(_id)));
+            getLabel().setText(Integer.toString(item.stackCount));
         } else {
             getLabel().setVisible(false);
-        } */
+        }
     }
 
     private void processMouseInput() {
@@ -100,24 +119,30 @@ public class UIInventoryCell extends UIDisplayElement {
     public void render() {
         _selectionRectangle.renderTransformed();
 
-        // TODO: Fix inventory
-        /*Inventory inventory = Terasology.getInstance().getActiveWorldRenderer().getPlayer().getInventory();
-        Item item = inventory.getItemAt(_id);
-
-        glEnable(GL11.GL_DEPTH_TEST);
-
-        if (item != null) {
-            glClear(GL_DEPTH_BUFFER_BIT);
-            glPushMatrix();
-            glTranslatef(20f, 20f, 0f);
-            Icon.get(item).render();
-            glPopMatrix();
+        InventoryComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(InventoryComponent.class);
+        if (inventory == null || inventory.itemSlots.size() < _id) {
+            return;
         }
 
-        glDisable(GL11.GL_DEPTH_TEST);
+        EntityRef itemEntity = inventory.itemSlots.get(_id);
+        ItemComponent item = itemEntity.getComponent(ItemComponent.class);
+
+        if (item == null) return;
+
+        if (item.icon.isEmpty()) {
+            BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
+            if (blockItem != null) {
+                renderBlockIcon(blockItem.blockGroup);
+            }
+        } else {
+            Icon icon = Icon.get(item.icon);
+            if (icon != null)
+            {
+                renderIcon(icon);
+            }
+        }
 
         _label.renderTransformed();
-        */
     }
 
     public void setSelected(boolean selected) {
@@ -130,5 +155,41 @@ public class UIInventoryCell extends UIDisplayElement {
 
     public UIText getLabel() {
         return _label;
+    }
+
+    private void renderIcon(Icon icon) {
+        glEnable(GL11.GL_DEPTH_TEST);
+        glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        glPushMatrix();
+        glTranslatef(20f, 20f, 0f);
+        icon.render();
+        glPopMatrix();
+        glDisable(GL11.GL_DEPTH_TEST);
+    }
+
+    private void renderBlockIcon(BlockGroup blockGroup) {
+        if (blockGroup == null) return;
+
+        glEnable(GL11.GL_DEPTH_TEST);
+        glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        glPushMatrix();
+        glTranslatef(20f, 20f, 0f);
+
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glPushMatrix();
+        glTranslatef(4f, 0f, 0f);
+        GL11.glScalef(20f, 20f, 20f);
+        GL11.glRotatef(170f, 1f, 0f, 0f);
+        GL11.glRotatef(-16f, 0f, 1f, 0f);
+        TextureManager.getInstance().bindTexture("terrain");
+
+        Block block = blockGroup.getArchetypeBlock();
+        block.render();
+
+        GL11.glPopMatrix();
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        glPopMatrix();
+        glDisable(GL11.GL_DEPTH_TEST);
     }
 }

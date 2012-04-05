@@ -116,6 +116,10 @@ public final class TeraMath {
         return x1 * (1.0 - p) + x2 * p;
     }
 
+    public static float lerpf(float x1, float x2, float p) {
+        return x1 * (1.0f - p) + x2 * p;
+    }
+
     /**
      * Trilinear interpolation.
      */
