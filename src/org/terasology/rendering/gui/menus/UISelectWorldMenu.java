@@ -20,6 +20,7 @@ import groovy.util.ConfigSlurper;
 import org.lwjgl.opengl.Display;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.*;
@@ -63,9 +64,9 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
 
         String path          = Terasology.getInstance().getWorldSavePath("");
 
-        File f = new File(path);
+        File worldCatalog = new File(path);
 
-        for(File file : f.listFiles(new FileFilter() {
+        for(File file : worldCatalog.listFiles(new FileFilter() {
             public boolean accept(File file) {
                 if(file.isDirectory()){
                     return true;
@@ -74,8 +75,10 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
                 }
             }
         })){
+            File worldManifest = new File(file.getPath() + "\\WorldManifest.groovy");
+            System.out.println(file.getPath() + "WorldManifest.groovy");
             try {
-                config = new ConfigSlurper().parse(file.toURI().toURL());
+                config = new ConfigSlurper().parse(worldManifest.toURI().toURL());
                 if(config.get("worldTitle")!=null&&config.get("worldSeed")!=null){
                     _list.addItem((String) config.get("worldTitle"), (String)config.get("worldSeed"));
                 }
@@ -109,6 +112,12 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         _deleteFromList.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 _list.removeSelectedItem();
+            }
+        });
+
+        _loadFromList.addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+              // Config.getInstance().setDefaultSeed(_list.);
             }
         });
 

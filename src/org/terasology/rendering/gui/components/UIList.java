@@ -35,10 +35,6 @@ public class UIList extends UIScrollableDisplayContainer {
         setStyle("border-corner-bottomleft",  "gui_menu 256/512 81/512");
 
         setStyle("background-image","gui_menu 159/512 63/512 264/512 18/512");
-        //setStyle("border-image",     "gui_menu 256/512 4/512 0 150/512 4");
-       //
-        //setStyle("border", "5 #FF3333");
-        //setStyle("background-color", "#ffffff 0.8");
     }
 
     public void update(){
@@ -129,6 +125,10 @@ public class UIList extends UIScrollableDisplayContainer {
             _selectedItem.setSelected(true);
         }
 
+    }
+
+    public UIListItem getSelectedItem(){
+        return _selectedItem;
     }
 
     public void removeAll(){
