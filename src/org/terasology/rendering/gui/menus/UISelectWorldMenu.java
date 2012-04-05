@@ -55,11 +55,11 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         //_overlay.setVisible(true);
 
         _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 256f));
-        //_window.center();
+        _window.center();
 
         _window.setModal(true);
 
-        GUIManager.getInstance().addWindow(_window);
+        GUIManager.getInstance().addWindow(_window, "generate_world ");
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
@@ -121,12 +121,11 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         });
 
         addDisplayElement(_overlay);
-        addDisplayElement(_list);
-        addDisplayElement(_loadFromList);
-        addDisplayElement(_goToBack);
-        addDisplayElement(_createNewWorld);
-        addDisplayElement(_deleteFromList);
-        //addDisplayElement(_window);
+        addDisplayElement(_list, "list");
+        addDisplayElement(_loadFromList, "loadFromListButton");
+        addDisplayElement(_goToBack, "goToBackButton");
+        addDisplayElement(_createNewWorld, "createWorldButton");
+        addDisplayElement(_deleteFromList, "deleteFromListButton");
         update();
     }
 
@@ -150,9 +149,5 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
         _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
 
-    }
-
-    public UIButton getGoToBackButton(){
-        return _goToBack;
     }
 }

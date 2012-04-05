@@ -60,41 +60,54 @@ public class StateMainMenu implements IGameState {
         _gameInstance = Terasology.getInstance();
 
         setupMainMenu();
+        setupSelectWorldMenu();
         setupConfigMenu();
 
-        GUIManager.getInstance().addWindow(_mainMenu);
-        GUIManager.getInstance().addWindow(_configMenu);
-        GUIManager.getInstance().addWindow(_selectWorldMenu);
+        _mainMenu.name = "main";
+        _configMenu.name = "config";
+        _selectWorldMenu.name = "select";
+        GUIManager.getInstance().addWindow(_mainMenu, "main");
+        GUIManager.getInstance().addWindow(_configMenu, "config");
+        GUIManager.getInstance().addWindow(_selectWorldMenu, "selectWorld");
     }
 
     private void setupMainMenu() {
         _mainMenu = new UIMainMenu();
         _mainMenu.setVisible(true);
 
-        _selectWorldMenu = new UISelectWorldMenu();
-        _selectWorldMenu.setVisible(false);
+        UIButton singlePlayerButton = (UIButton)_mainMenu.getElementById("singlePlayerButton");
+        UIButton configButton = (UIButton)_mainMenu.getElementById("configButton");
+        UIButton exitButton   = (UIButton)_mainMenu.getElementById("exitButton");
 
-        _mainMenu.getSinglePlayerButton().addClickListener(new IClickListener() {
+
+        singlePlayerButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 _mainMenu.setVisible(false);
                 _selectWorldMenu.setVisible(true);
             }
         });
 
-        _mainMenu.getExitButton().addClickListener(new IClickListener() {
+        exitButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 Terasology.getInstance().exit();
             }
         });
 
-        _mainMenu.getConfigButton().addClickListener(new IClickListener() {
+        configButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 _mainMenu.setVisible(false);
                 _configMenu.setVisible(true);
             }
         });
+    }
 
-        _selectWorldMenu.getGoToBackButton().addClickListener(new IClickListener() {
+    private void setupSelectWorldMenu(){
+        _selectWorldMenu = new UISelectWorldMenu();
+        _selectWorldMenu.setVisible(false);
+
+        UIButton goToBack = (UIButton)_selectWorldMenu.getElementById("goToBackButton");
+
+        goToBack.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 _selectWorldMenu.setVisible(false);
                 _mainMenu.setVisible(true);
@@ -104,15 +117,21 @@ public class StateMainMenu implements IGameState {
 
     private void setupConfigMenu() {
         _configMenu = new UIConfigMenu();
+        _configMenu.setVisible(false);
 
-        _configMenu.getBackToMainMenuButton().addClickListener(new IClickListener() {
+        UIButton backToMainMenuButton  = (UIButton)_configMenu.getElementById("backToMainMenuButton");
+        UIButton graphicsQualityButton = (UIButton)_configMenu.getElementById("graphicsQualityButton");
+        UIButton FOVButton             = (UIButton)_configMenu.getElementById("fovButton");
+        UIButton viewingDistanceButton = (UIButton)_configMenu.getElementById("viewingDistanceButton");
+        
+        backToMainMenuButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 _mainMenu.setVisible(true);
                 _configMenu.setVisible(false);
             }
         });
 
-        _configMenu.getGraphicsQualityButton().addClickListener(new IClickListener() {
+        graphicsQualityButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 UIButton button = (UIButton) element;
 
@@ -129,7 +148,7 @@ public class StateMainMenu implements IGameState {
             }
         });
 
-        _configMenu.getFOVButton().addClickListener(new IClickListener() {
+        FOVButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 UIButton button = (UIButton) element;
 
@@ -150,7 +169,7 @@ public class StateMainMenu implements IGameState {
             }
         });
 
-        _configMenu.getViewingDistanceButton().addClickListener(new IClickListener() {
+        viewingDistanceButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 UIButton button = (UIButton) element;
 
@@ -175,24 +194,28 @@ public class StateMainMenu implements IGameState {
         Mouse.setGrabbed(false);
         playBackgroundMusic();
 
+        UIButton graphicsQualityButton = (UIButton)_configMenu.getElementById("graphicsQualityButton");
+        UIButton FOVButton             = (UIButton)_configMenu.getElementById("fovButton");
+        UIButton viewingDistanceButton = (UIButton)_configMenu.getElementById("viewingDistanceButton");
+
         if (Config.getInstance().getActiveViewingDistanceId() == 3)
-            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Ultra");
+            viewingDistanceButton.getLabel().setText("Viewing Distance: Ultra");
         else if (Config.getInstance().getActiveViewingDistanceId() == 1)
-            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Moderate");
+            viewingDistanceButton.getLabel().setText("Viewing Distance: Moderate");
         else if (Config.getInstance().getActiveViewingDistanceId() == 2)
-            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Far");
+            viewingDistanceButton.getLabel().setText("Viewing Distance: Far");
         else
-            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Near");
+            viewingDistanceButton.getLabel().setText("Viewing Distance: Near");
 
         if (Config.getInstance().getGraphicsQuality() == 1)
-            _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Nice");
+            graphicsQualityButton.getLabel().setText("Graphics Quality: Nice");
         else if (Config.getInstance().getGraphicsQuality() == 2)
-            _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Epic");
+            graphicsQualityButton.getLabel().setText("Graphics Quality: Epic");
         else
-            _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Ugly");
+            graphicsQualityButton.getLabel().setText("Graphics Quality: Ugly");
 
         // TODO: Replace with a slider later on
-        _configMenu.getFOVButton().getLabel().setText("Field of View: " + (int) Config.getInstance().getFov());
+        FOVButton.getLabel().setText("Field of View: " + (int) Config.getInstance().getFov());
     }
 
     public void deactivate() {

@@ -7,12 +7,13 @@ import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 import javax.vecmath.Vector2f;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GUIManager {
-    private static GUIManager _instance      = null;
+    private static GUIManager _instance;
     private UIDisplayRenderer _renderer;
-    private UIDisplayWindow   _focusedWindow = null;
+    private UIDisplayWindow   _focusedWindow;
+    private HashMap<String, UIDisplayWindow> _windowsById = new HashMap<String, UIDisplayWindow>();
 
     public GUIManager(){
         _renderer = new UIDisplayRenderer();
@@ -40,16 +41,35 @@ public class GUIManager {
         _renderer.update();
     }
 
-    public void addWindow(UIDisplayWindow window){
+    public void addWindow(UIDisplayWindow window, String windowId){
         if(window.isMaximized()){
             _renderer.addtDisplayElementToPosition(0,window);
         }else{
             _renderer.addDisplayElement(window);
         }
+
+        _windowsById.put(windowId, window);
     }
 
     public void removeWindow(UIDisplayWindow window){
         _renderer.removeDisplayElement(window);
+
+        if(_windowsById.containsValue(window)){
+            for(String key : _windowsById.keySet()){
+                if( _windowsById.get(key).equals(window) ){
+                    _windowsById.remove(key);
+                    break;
+                }
+            }
+        }
+    }
+
+    public UIDisplayWindow getWindowById(String windowId){
+        if( _windowsById.containsKey(windowId) ){
+            return _windowsById.get(windowId);
+        }else{
+            return null;
+        }
     }
 
     /**
@@ -57,7 +77,7 @@ public class GUIManager {
      */
     public void processKeyboardInput(int key) {
         for (UIDisplayElement screen : _renderer.getDisplayElements()) {
-            if (screenCanFocus(screen)) {
+            if (screen.isVisible() && !screen.isOverlay()) {
                 screen.processKeyboardInput(key);
             }
         }
@@ -70,8 +90,33 @@ public class GUIManager {
             checkTopWindow();
         }
 
-        if(_focusedWindow!=null){
+        if(_focusedWindow != null){
             _focusedWindow.processMouseInput(button, state, wheelMoved);
+        }
+    }
+
+    public void setFocusedWindow(UIDisplayWindow window){
+        int size = _renderer.getDisplayElements().size();
+
+        for(int i = 0; i < size; i++){
+            if( window.equals( _renderer.getDisplayElements().get(i) ) ){
+                setTopWindow(i);
+                break;
+            }
+        }
+    }
+
+    public void setFocusedWindow(String windowId){
+        if(_windowsById == null || _windowsById.size()<1 || !_windowsById.containsKey(windowId)){
+            return;
+        }
+        setFocusedWindow(_windowsById.get(windowId));
+    }
+
+    private void setTopWindow(int windowPosition){
+        _focusedWindow = (UIDisplayWindow)_renderer.getDisplayElements().get(windowPosition);
+        if( !_focusedWindow.isMaximized() ){
+            _renderer.changeElementDepth(windowPosition, _renderer.getDisplayElements().size()-1);
         }
     }
 
@@ -88,16 +133,13 @@ public class GUIManager {
         for(int i = size - 1; i>=0; i--){
             UIDisplayWindow window = (UIDisplayWindow)_renderer.getDisplayElements().get(i);
             if(window.isVisible() && window.intersects(mousePos)){
-                if(!window.isMaximized()){
-                    _renderer.changeElementDepth(i, size-1);
-                }
-                _focusedWindow = window;
+                setTopWindow(i);
                 break;
             };
         }
     }
 
-    private boolean screenCanFocus(UIDisplayElement s) {
+    /*private boolean screenCanFocus(UIDisplayElement s) {
         boolean result = true;
 
         for (UIDisplayElement screen : _renderer.getDisplayElements()) {
@@ -105,5 +147,5 @@ public class GUIManager {
                 result = false;
         }
         return result;
-    }
+    } */
 }

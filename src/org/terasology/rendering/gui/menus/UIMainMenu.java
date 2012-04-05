@@ -35,7 +35,7 @@ public class UIMainMenu extends UIDisplayWindow {
 
 
     private final UIButton _exitButton;
-    private final UIButton _singlePlayer;
+    private final UIButton _singlePlayerButton;
     private final UIButton _configButton;
 
     final UIText _version;
@@ -58,9 +58,9 @@ public class UIMainMenu extends UIDisplayWindow {
         _configButton.getLabel().setText("Settings");
         _configButton.setVisible(true);
 
-        _singlePlayer = new UIButton(new Vector2f(256f, 32f));
-        _singlePlayer.getLabel().setText("Single player");
-        _singlePlayer.setVisible(true);
+        _singlePlayerButton = new UIButton(new Vector2f(256f, 32f));
+        _singlePlayerButton.getLabel().setText("Single player");
+        _singlePlayerButton.setVisible(true);
 
         _overlay = new UIImageOverlay("menuBackground");
        // _overlay.setVisible(true);
@@ -68,23 +68,22 @@ public class UIMainMenu extends UIDisplayWindow {
         addDisplayElement(_overlay);
         addDisplayElement(_title);
         addDisplayElement(_version);
-        addDisplayElement(_configButton);
-        addDisplayElement(_exitButton);
-        addDisplayElement(_singlePlayer);
+        addDisplayElement(_configButton, "configButton");
+        addDisplayElement(_exitButton,   "exitButton");
+        addDisplayElement(_singlePlayerButton, "singlePlayerButton");
 
         update();
     }
 
     @Override
     public void update() {
-        //System.out.println("update");
         super.update();
 
         _version.centerHorizontally();
         _version.getPosition().y = 230f;
 
-        _singlePlayer.centerHorizontally();
-        _singlePlayer.getPosition().y = 300f + 40f;
+        _singlePlayerButton.centerHorizontally();
+        _singlePlayerButton.getPosition().y = 300f + 40f;
 
         _exitButton.centerHorizontally();
         _exitButton.getPosition().y = 300f + 3 * 32f + 64f;
@@ -96,17 +95,5 @@ public class UIMainMenu extends UIDisplayWindow {
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;
-    }
-
-    public UIButton getExitButton() {
-        return _exitButton;
-    }
-
-    public UIButton getSinglePlayerButton() {
-        return _singlePlayer;
-    }
-
-    public UIButton getConfigButton() {
-        return _configButton;
     }
 }

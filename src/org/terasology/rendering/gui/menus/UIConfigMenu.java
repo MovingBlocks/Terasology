@@ -42,6 +42,7 @@ public class UIConfigMenu extends UIDisplayWindow {
     final UIText _version;
 
     public UIConfigMenu() {
+        maximaze();
         _title = new UIGraphicsElement("terasology");
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
@@ -69,15 +70,16 @@ public class UIConfigMenu extends UIDisplayWindow {
         _backToMainMenuButton.getLabel().setText("Return to Main Menu");
         _backToMainMenuButton.setVisible(true);
 
-        addDisplayElement(_overlay);
+     //   addDisplayElement(_overlay);
 
-        addDisplayElement(_title);
-        addDisplayElement(_version);
+  //      addDisplayElement(_title);
+    //    addDisplayElement(_version);
 
-        addDisplayElement(_graphicsQualityButton);
-        addDisplayElement(_fovButton);
-        addDisplayElement(_backToMainMenuButton);
-        addDisplayElement(_viewingDistanceButton);
+        addDisplayElement(_graphicsQualityButton, "graphicsQualityButton");
+        addDisplayElement(_fovButton, "fovButton");
+        addDisplayElement(_backToMainMenuButton, "backToMainMenuButton");
+        addDisplayElement(_viewingDistanceButton, "viewingDistanceButton");
+        update();
     }
 
     @Override
@@ -101,21 +103,5 @@ public class UIConfigMenu extends UIDisplayWindow {
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;
-    }
-
-    public UIButton getGraphicsQualityButton() {
-        return _graphicsQualityButton;
-    }
-
-    public UIButton getBackToMainMenuButton() {
-        return _backToMainMenuButton;
-    }
-
-    public UIButton getViewingDistanceButton() {
-        return _viewingDistanceButton;
-    }
-
-    public UIButton getFOVButton() {
-        return _fovButton;
     }
 }

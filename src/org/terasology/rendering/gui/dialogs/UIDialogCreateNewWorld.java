@@ -81,11 +81,11 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
             }
         });
 
-        addDisplayElement(_okButton);
-        addDisplayElement(_cancelButton);
-        addDisplayElement(_inputSeed);
-        addDisplayElement(_inputSeedLabel);
-        addDisplayElement(_inputWorldTitleLabel);
-        addDisplayElement(_inputWorldTitle);
+        addDisplayElement(_okButton,      "okButton");
+        addDisplayElement(_cancelButton,  "cancelButton");
+        addDisplayElement(_inputSeed,     "inputSeed");
+        addDisplayElement(_inputSeedLabel,"inputSeedLabel" );
+        addDisplayElement(_inputWorldTitleLabel, "inputWorldTitleLabel");
+        addDisplayElement(_inputWorldTitle, "inputWorldTitle");
     }
 }
