@@ -61,7 +61,7 @@ class BlockManifestor {
     /** Smaller version of _blockIndex only used for loading IDs */
     protected static Map<String, Byte> _blockStringIndex = [:]
 
-    protected static List<BlockGroup> _blockGroups = []
+    protected static List<BlockFamily> _blockFamilies = []
 
     /** Holds the Byte value for the next Block ID - starts at 1 since Air is always 0 */
     protected static byte _nextByte = (byte) 1
@@ -151,7 +151,7 @@ class BlockManifestor {
         }
 
         _bm.addAllBlocks(_blockIndex)
-        _bm.addAllBlockGroups(_blockGroups);
+        _bm.addAllBlockFamilies(_blockFamilies);
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
     }
 
@@ -227,7 +227,7 @@ class BlockManifestor {
             // TODO: default, load shape and rotate to all sides
         }
 
-        _blockGroups.add(new AlignToSurfaceGroup(blockConfig.name, blockMap))
+        _blockFamilies.add(new AlignToSurfaceFamily(blockConfig.name, blockMap))
     }
 
     public loadHorizontalBlock(ConfigObject blockConfig, BlockLoader loader) {
@@ -243,7 +243,7 @@ class BlockManifestor {
             registerBlock(blockConfig.name + rot.rotate(Side.FRONT), block)
             blockMap.put(rot.rotate(Side.FRONT), block)
         }
-        _blockGroups.add(new HorizontalBlockGroup(blockConfig.name, blockMap))
+        _blockFamilies.add(new HorizontalBlockFamily(blockConfig.name, blockMap))
     }
 
     public loadSymmetricBlock(ConfigObject blockConfig, BlockLoader loader) {
@@ -260,7 +260,7 @@ class BlockManifestor {
         }
 
         registerBlock(blockConfig.name, b)
-        _blockGroups.add(new SymmetricGroup(b))
+        _blockFamilies.add(new SymmetricFamily(b))
     }
 
     private BlockShape loadBlockShape(ConfigObject config) {

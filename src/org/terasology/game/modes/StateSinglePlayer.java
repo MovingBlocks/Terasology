@@ -56,7 +56,7 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.BlockFamily;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -133,7 +133,7 @@ public class StateSinglePlayer implements IGameState {
 
         PojoEntityManager entityManager = new PojoEntityManager();
 
-        entityManager.registerTypeHandler(BlockGroup.class, new BlockGroupTypeHandler());
+        entityManager.registerTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler());
         entityManager.registerTypeHandler(Color4f.class, new Color4fTypeHandler());
         entityManager.registerTypeHandler(Quat4f.class, new Quat4fTypeHandler());
         entityManager.registerTypeHandler(Sound.class, new SoundTypeHandler(AudioManager.getInstance()));

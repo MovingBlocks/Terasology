@@ -24,7 +24,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
@@ -134,8 +134,8 @@ public class UIToolbarCell extends UIDisplayElement {
         glDisable(GL11.GL_DEPTH_TEST);
     }
     
-    private void renderBlockIcon(BlockGroup blockGroup) {
-        if (blockGroup == null) return;
+    private void renderBlockIcon(BlockFamily blockFamily) {
+        if (blockFamily == null) return;
 
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -150,7 +150,7 @@ public class UIToolbarCell extends UIDisplayElement {
         GL11.glRotatef(-16f, 0f, 1f, 0f);
         TextureManager.getInstance().bindTexture("terrain");
 
-        Block block = blockGroup.getArchetypeBlock();
+        Block block = blockFamily.getArchetypeBlock();
         block.render();
 
         GL11.glPopMatrix();

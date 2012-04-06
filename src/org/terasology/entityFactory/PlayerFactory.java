@@ -47,8 +47,8 @@ public class PlayerFactory {
         player.addComponent(new LocalPlayerComponent());
         
         InventoryComponent inventory = player.addComponent(new InventoryComponent(36));
-        inventory.itemSlots.set(0, blockFactory.newInstance(BlockManager.getInstance().getBlockGroup("Companion"), 16));
-        inventory.itemSlots.set(1, blockFactory.newInstance(BlockManager.getInstance().getBlockGroup("Torch"), 99));
+        inventory.itemSlots.set(0, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Companion"), 16));
+        inventory.itemSlots.set(1, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Torch"), 99));
         inventory.itemSlots.set(2, itemFactory.createAxe());
         inventory.itemSlots.set(3, itemFactory.createPickAxe());
         inventory.itemSlots.set(4, itemFactory.createDynamite());

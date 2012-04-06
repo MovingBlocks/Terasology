@@ -2,18 +2,18 @@ package org.terasology.components;
 
 import org.terasology.entitySystem.AbstractComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.BlockFamily;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public final class BlockItemComponent extends AbstractComponent {
-    public BlockGroup blockGroup;
+    public BlockFamily blockGroup;
     public EntityRef placedEntity = EntityRef.NULL;
 
     public BlockItemComponent() {}
 
-    public BlockItemComponent(BlockGroup blockGroup) {
-        this.blockGroup = blockGroup;
+    public BlockItemComponent(BlockFamily blockFamily) {
+        this.blockGroup = blockFamily;
     }
 }

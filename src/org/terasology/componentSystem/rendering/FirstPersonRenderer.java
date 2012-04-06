@@ -14,7 +14,7 @@ import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
@@ -131,8 +131,8 @@ public class FirstPersonRenderer implements RenderSystem {
         glPopMatrix();
     }
     
-    private void renderBlock(BlockGroup blockGroup, float bobOffset, float handMovementAnimationOffset) {
-        Block activeBlock = blockGroup.getArchetypeBlock();
+    private void renderBlock(BlockFamily blockFamily, float bobOffset, float handMovementAnimationOffset) {
+        Block activeBlock = blockFamily.getArchetypeBlock();
         Vector3f playerPos = localPlayer.getPosition();
 
         // Adjust the brightness of the block according to the current position of the player

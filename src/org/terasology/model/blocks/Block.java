@@ -102,7 +102,7 @@ public class Block implements IGameObject {
     /* PROPERTIES */
     private byte _id = 0x0;
     private String _title = "Untitled block";
-    private BlockGroup _group = null;
+    private BlockFamily _family = null;
 
     private boolean _translucent;
     private boolean _invisible;
@@ -302,8 +302,8 @@ public class Block implements IGameObject {
         return this;
     }
 
-    Block withBlockGroup(BlockGroup group) {
-        _group = group;
+    Block withBlockFamily(BlockFamily family) {
+        _family = family;
         return this;
     }
 
@@ -482,8 +482,8 @@ public class Block implements IGameObject {
         return _lootAmount;
     }
 
-    public BlockGroup getBlockGroup() {
-        return _group;
+    public BlockFamily getBlockFamily() {
+        return _family;
     }
 
     public boolean isBlockingSide(Side side) {

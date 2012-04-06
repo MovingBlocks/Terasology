@@ -416,8 +416,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             int damage = 1;
             if (item != null) {
                 damage = item.baseDamage;
-                if (item.getPerBlockDamageBonus().containsKey(block.getBlockGroup().getTitle())) {
-                    damage += item.getPerBlockDamageBonus().get(block.getBlockGroup().getTitle());
+                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getTitle())) {
+                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
                 }
             }
 

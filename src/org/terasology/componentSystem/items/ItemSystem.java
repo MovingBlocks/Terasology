@@ -13,7 +13,7 @@ import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 
@@ -93,7 +93,7 @@ public class ItemSystem implements EventHandlerSystem {
      * @param type The type of the block
      * @return True if a block was placed
      */
-    private boolean placeBlock(BlockGroup type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem) {
+    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem) {
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceDirection.getVector3i());
 

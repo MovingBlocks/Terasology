@@ -3,7 +3,7 @@ package org.terasology.model.inventory;
 import org.lwjgl.opengl.GL11;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.BlockFamily;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -21,27 +21,27 @@ public class Icon {
 	private static Map<String, Icon> icons;
 
 	private UIGraphicsElement _element;
-	private BlockGroup _blockGroup;
+	private BlockFamily _blockFamily;
 	private int _x;
 	private int _y;
 
 	/**
-	 * Creates Icon for BlockGroup class.
+	 * Creates Icon for BlockFamily class.
 	 *
-	 * @param blockGroup
+	 * @param blockFamily
 	 */
-	public Icon(BlockGroup blockGroup) {
+	public Icon(BlockFamily blockFamily) {
 		_element = null;
-		_blockGroup = blockGroup;
+		_blockFamily = blockFamily;
 		setAtlasPosition(0, 0);
 	}
 
 	/**
-	 * Creates an Icon for a non-BlockGroup class
+	 * Creates an Icon for a non-BlockFamily class
 	 */
 	public Icon() {
 		_element = new UIGraphicsElement("items");
-		_blockGroup = null;
+		_blockFamily = null;
 
         _element.setSize(new Vector2f(32, 32));
         _element.getTextureSize().set(new Vector2f(0.0624f, 0.0624f));
@@ -95,7 +95,7 @@ public class Icon {
 	 * Draw the icon.
 	 */
 	public void render() {
-		if (_blockGroup == null) {
+		if (_blockFamily == null) {
 			_element.renderTransformed();
 		} else {
 	        GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -107,7 +107,7 @@ public class Icon {
 	        GL11.glRotatef(-16f, 0f, 1f, 0f);
 	        TextureManager.getInstance().bindTexture("terrain");
 
-	        Block block = _blockGroup.getArchetypeBlock();
+	        Block block = _blockFamily.getArchetypeBlock();
 	        block.render();
 
 	        GL11.glPopMatrix();

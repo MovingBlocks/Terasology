@@ -364,7 +364,7 @@ public class BulletPhysicsRenderer implements IGameObject {
                     // TODO: Loot blocks should be entities
                     // Block was looted (and reached the player)
                     Block block = BlockManager.getInstance().getBlock(b.getType());
-                    EntityRef blockItem = _blockItemFactory.newInstance(block.getBlockGroup());
+                    EntityRef blockItem = _blockItemFactory.newInstance(block.getBlockFamily());
 
                     if (!CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class).addItem(player.getEntity(), blockItem)) {
                         blockItem.destroy();

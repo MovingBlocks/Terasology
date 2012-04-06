@@ -34,7 +34,7 @@ import org.terasology.game.Terasology;
 import org.terasology.game.modes.IGameState;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.Helper;
 
@@ -138,8 +138,8 @@ public class GroovyManager {
         }
 
         public void giveBlock(int blockId, int quantity) {
-            BlockGroup blockGroup = BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup();
-            giveBlock(blockGroup, quantity);
+            BlockFamily blockFamily = BlockManager.getInstance().getBlock((byte) blockId).getBlockFamily();
+            giveBlock(blockFamily, quantity);
         }
 
         public void giveBlock(String title) {
@@ -147,15 +147,15 @@ public class GroovyManager {
         }
 
         public void giveBlock(String title, int quantity) {
-            BlockGroup blockGroup = BlockManager.getInstance().getBlockGroup(title);
-            giveBlock(blockGroup, quantity);
+            BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(title);
+            giveBlock(blockFamily, quantity);
         }
 
-        private void giveBlock(BlockGroup blockGroup, int quantity) {
+        private void giveBlock(BlockFamily blockFamily, int quantity) {
             if (quantity < 1) return;
 
             BlockItemFactory factory = new BlockItemFactory(Terasology.getInstance().getCurrentGameState().getEntityManager(), CoreRegistry.get(PrefabManager.class));
-            EntityRef item = factory.newInstance(blockGroup, quantity);
+            EntityRef item = factory.newInstance(blockFamily, quantity);
 
             InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
             if (!inventorySystem.addItem(Terasology.getInstance().getActivePlayer().getEntity(), item)) {
