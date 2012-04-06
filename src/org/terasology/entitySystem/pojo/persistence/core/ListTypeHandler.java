@@ -1,6 +1,5 @@
 package org.terasology.entitySystem.pojo.persistence.core;
 
-import com.google.common.collect.Lists;
 import org.terasology.entitySystem.pojo.persistence.AbstractTypeHandler;
 import org.terasology.entitySystem.pojo.persistence.TypeHandler;
 import org.terasology.protobuf.EntityData;

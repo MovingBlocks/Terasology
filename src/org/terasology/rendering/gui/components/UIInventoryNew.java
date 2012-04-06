@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import org.terasology.components.InventoryComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
 import java.util.List;

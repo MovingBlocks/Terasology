@@ -3,12 +3,12 @@ package org.terasology.rendering.gui.components;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.logic.manager.AudioManager;
 import org.newdawn.slick.Color;
+import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.IInputListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.game.Terasology;
+
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 

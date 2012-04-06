@@ -1,8 +1,10 @@
 package org.terasology.entitySystem.pojo;
 
-import com.google.common.collect.*;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.EventHandlerSystem;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

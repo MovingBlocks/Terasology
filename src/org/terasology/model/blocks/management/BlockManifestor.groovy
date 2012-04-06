@@ -16,28 +16,23 @@ package org.terasology.model.blocks.management
  * limitations under the License.
  */
 
+import groovy.util.logging.Log
+import org.terasology.logic.manager.TextureManager
+import org.terasology.math.Rotation
+import org.terasology.math.Side
+import org.terasology.model.shapes.BlockShape
+import org.terasology.model.shapes.BlockShapeManager
+import org.terasology.model.structures.AABB
+import org.terasology.utilities.ClasspathResourceLoader
+import org.terasology.utilities.Helper
+
 import java.awt.Graphics
 import java.awt.Image
 import java.awt.image.BufferedImage
-
 import javax.imageio.ImageIO
 import javax.vecmath.Vector2f
 
-import org.terasology.logic.manager.TextureManager
-import org.terasology.utilities.ClasspathResourceLoader
-
-import groovy.util.logging.Log
-import org.terasology.model.blocks.Block
-import org.terasology.model.blocks.BlockGroup
-import org.terasology.model.blocks.SymmetricGroup
-import org.terasology.math.Side
-import org.terasology.model.blocks.HorizontalBlockGroup
-import org.terasology.model.shapes.BlockShape
-import org.terasology.model.shapes.BlockShapeManager
-import org.terasology.model.blocks.AlignToSurfaceGroup
-import org.terasology.math.Rotation
-import org.terasology.model.structures.AABB
-import org.terasology.utilities.Helper
+import org.terasology.model.blocks.*
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between

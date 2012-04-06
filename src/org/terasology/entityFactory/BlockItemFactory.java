@@ -1,9 +1,9 @@
 package org.terasology.entityFactory;
 
+import org.terasology.components.BlockItemComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LightComponent;
-import org.terasology.components.BlockItemComponent;
 import org.terasology.components.actions.AccessInventoryActionComponent;
 import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.entitySystem.*;

@@ -1,7 +1,6 @@
 package org.terasology.entitySystem.pojo.persistence.extension;
 
 import org.terasology.entitySystem.pojo.persistence.AbstractTypeHandler;
-import org.terasology.entitySystem.pojo.persistence.TypeHandler;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.EntityData;
 

@@ -2,7 +2,6 @@ package org.terasology.components;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.AbstractComponent;
-import org.terasology.math.TeraMath;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;

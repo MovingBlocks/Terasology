@@ -18,10 +18,10 @@ import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.entitySystem.pojo.persistence.EntityDataJSONFormat;
-import org.terasology.entitySystem.pojo.persistence.SerializationInfo;
-import org.terasology.entitySystem.pojo.persistence.core.*;
 import org.terasology.entitySystem.pojo.persistence.FieldInfo;
+import org.terasology.entitySystem.pojo.persistence.SerializationInfo;
 import org.terasology.entitySystem.pojo.persistence.TypeHandler;
+import org.terasology.entitySystem.pojo.persistence.core.*;
 import org.terasology.entitySystem.pojo.persistence.extension.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
 

@@ -16,10 +16,10 @@
 package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.components.BlockItemComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.TextureManager;

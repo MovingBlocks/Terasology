@@ -1,7 +1,5 @@
 package org.terasology.entitySystem.event;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 
 /**

@@ -1,12 +1,7 @@
 package org.terasology.entitySystem;
 
-import org.terasology.components.LocationComponent;
-import org.terasology.components.MeshComponent;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
 import java.util.Map;
 
 /**

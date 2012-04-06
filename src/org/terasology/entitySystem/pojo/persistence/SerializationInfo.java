@@ -2,7 +2,6 @@ package org.terasology.entitySystem.pojo.persistence;
 
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Locale;

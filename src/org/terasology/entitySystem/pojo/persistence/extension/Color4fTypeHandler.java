@@ -1,7 +1,6 @@
 package org.terasology.entitySystem.pojo.persistence.extension;
 
 import org.terasology.entitySystem.pojo.persistence.AbstractTypeHandler;
-import org.terasology.entitySystem.pojo.persistence.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import javax.vecmath.Color4f;

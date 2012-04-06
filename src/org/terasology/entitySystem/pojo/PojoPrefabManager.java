@@ -5,8 +5,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Observable;

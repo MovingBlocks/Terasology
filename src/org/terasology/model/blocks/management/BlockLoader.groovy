@@ -1,7 +1,7 @@
 package org.terasology.model.blocks.management
 
-import org.terasology.model.blocks.Block
 import org.terasology.math.Rotation
+import org.terasology.model.blocks.Block
 
 /**
  * @author Immortius <immortius@gmail.com>

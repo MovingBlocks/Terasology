@@ -23,8 +23,6 @@ import org.terasology.components.BlockItemComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockGroup;
@@ -33,7 +31,6 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
-
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;

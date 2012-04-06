@@ -2,9 +2,9 @@ package org.terasology.componentSystem.rendering;
 
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
+import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.componentSystem.RenderSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
@@ -26,7 +26,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;

@@ -3,7 +3,6 @@ package org.terasology.components;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.AbstractComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.common.NullEntityRef;
 
 import java.util.Map;
 

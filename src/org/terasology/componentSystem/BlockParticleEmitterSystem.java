@@ -7,8 +7,6 @@ import org.terasology.components.BlockParticleEffectComponent.Particle;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.componentSystem.RenderSystem;
-import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;

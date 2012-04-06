@@ -24,7 +24,6 @@ import org.terasology.components.BlockComponent;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.model.structures.BlockPosition;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;

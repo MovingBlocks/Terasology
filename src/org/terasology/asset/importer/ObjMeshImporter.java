@@ -11,8 +11,8 @@ import org.terasology.rendering.primitives.Mesh;
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import java.io.*;
-import java.nio.channels.FileChannel;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 

@@ -1,7 +1,6 @@
 package org.terasology.entitySystem.pojo.persistence;
 
 import java.lang.reflect.Field;
-import java.util.Locale;
 
 /**
  * @author Immortius <immortius@gmail.com>

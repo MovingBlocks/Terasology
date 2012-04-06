@@ -1,8 +1,6 @@
 package org.terasology.componentSystem.block;
 
 import com.google.common.collect.Maps;
-import gnu.trove.map.TObjectLongMap;
-import gnu.trove.map.hash.TObjectLongHashMap;
 import org.terasology.components.BlockComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.*;

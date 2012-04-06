@@ -1,15 +1,10 @@
 package org.terasology.model.blocks.management
 
-import javax.vecmath.Vector2f
-import org.terasology.math.Side
-import org.terasology.model.shapes.BlockShape
-import org.terasology.model.shapes.BlockShapeManager
-import javax.vecmath.Vector4f
 import groovy.util.logging.Log
-import org.terasology.model.blocks.Block
-import javax.vecmath.Vector3d
-import org.terasology.model.structures.AABB
 import org.terasology.math.Rotation
+import org.terasology.model.blocks.Block
+
+import javax.vecmath.Vector4f
 
 /**
  * @author Immortius <immortius@gmail.com>

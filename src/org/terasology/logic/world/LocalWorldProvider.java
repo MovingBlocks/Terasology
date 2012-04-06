@@ -23,7 +23,6 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.persistence.PersistableObject;

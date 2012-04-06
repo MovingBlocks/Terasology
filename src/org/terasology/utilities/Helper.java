@@ -16,12 +16,10 @@
 package org.terasology.utilities;
 
 import org.lwjgl.BufferUtils;
-import org.terasology.game.Terasology;
 
 import javax.vecmath.Matrix4f;
 import java.io.File;
 import java.nio.FloatBuffer;
-import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.glGetFloat;
 

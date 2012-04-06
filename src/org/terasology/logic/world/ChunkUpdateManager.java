@@ -17,7 +17,6 @@ package org.terasology.logic.world;
 
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
-import org.terasology.model.structures.BlockPosition;
 
 import java.util.HashSet;
 

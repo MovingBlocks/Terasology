@@ -8,8 +8,6 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.manager.AudioManager;
 
-import java.util.Arrays;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */

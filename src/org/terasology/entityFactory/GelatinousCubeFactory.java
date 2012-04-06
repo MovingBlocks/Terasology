@@ -1,6 +1,5 @@
 package org.terasology.entityFactory;
 
-import com.google.common.collect.Lists;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

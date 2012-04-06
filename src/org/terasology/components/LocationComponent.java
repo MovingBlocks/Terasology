@@ -3,7 +3,6 @@ package org.terasology.components;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.AbstractComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.common.NullEntityRef;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;

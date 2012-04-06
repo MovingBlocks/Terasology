@@ -15,12 +15,9 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import org.terasology.game.Terasology;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.IClickListener;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 

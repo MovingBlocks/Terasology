@@ -15,10 +15,12 @@
  */
 package org.terasology.rendering.gui.framework;
 
+import org.lwjgl.opengl.Display;
+
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
+
 import static org.lwjgl.opengl.GL11.*;
-import org.lwjgl.opengl.Display;
 /**
  * Composition of multiple display elements.
  *

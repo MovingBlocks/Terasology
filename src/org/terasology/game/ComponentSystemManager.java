@@ -2,11 +2,11 @@ package org.terasology.game;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.terasology.componentSystem.RenderSystem;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.componentSystem.RenderSystem;
-import org.terasology.componentSystem.UpdateSubscriberSystem;
 
 import java.util.List;
 import java.util.Map;

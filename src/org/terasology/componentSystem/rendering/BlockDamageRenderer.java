@@ -1,11 +1,11 @@
 package org.terasology.componentSystem.rendering;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.BlockComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.componentSystem.RenderSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;

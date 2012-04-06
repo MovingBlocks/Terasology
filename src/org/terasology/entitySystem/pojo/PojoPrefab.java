@@ -6,7 +6,9 @@ import org.terasology.entitySystem.AbstractPrefab;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Prefab;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>

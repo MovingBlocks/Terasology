@@ -4,8 +4,6 @@ import org.terasology.components.BlockComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
-import org.terasology.entitySystem.common.NullEntityRef;
-import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
 
