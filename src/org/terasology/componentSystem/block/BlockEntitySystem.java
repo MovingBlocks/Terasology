@@ -44,8 +44,6 @@ public class BlockEntitySystem implements EventHandlerSystem {
         Block oldBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockComp.getPosition()));
         worldProvider.setBlock(blockComp.getPosition(), EmptyBlockId, true, true);
 
-        // TODO: A bunch of notification?
-
         // TODO: This should be driven by block attachment info, and not be billboard specific
         // Remove the upper block if it's a billboard
         byte upperBlockType = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
@@ -53,6 +51,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
             worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, (byte) 0x0, true, true);
         }
 
+        // TODO: Configurable via block definition
         AudioManager.play("RemoveBlock", 0.6f);
 
         if ((oldBlock.isStraightToInventory() || oldBlock.isEntityRetainedWhenItem()) && event.getInstigator().exists()) {
@@ -63,6 +62,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
             }
             if (!inventorySystem.addItem(event.getInstigator(), item))
             {
+                // TODO: Fix this - entity needs to be added to lootable block or destroyed
                 item.destroy();
                 CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
             }
@@ -107,7 +107,8 @@ public class BlockEntitySystem implements EventHandlerSystem {
         particleEffect.collideWithBlocks = true;
         particlesEntity.addComponent(particleEffect);
 
-        // TODO: Don't play this if destroyed
+        // TODO: Don't play this if destroyed?
+        // TODO: Configurable via block definition
         AudioManager.play("Dig", 1.0f);
     }
 

@@ -14,10 +14,11 @@ public final class HealthComponent extends AbstractComponent {
     public float fallingDamageSpeedThreshold = 20;
     public float excessSpeedDamageMultiplier = 10f;
 
-    //
+    public int currentHealth = 20;
+
+    // Regen info
     public float timeSinceLastDamage = 0.0f;
     public float partialRegen = 0.0f;
-    public int currentHealth = 20;
 
     public HealthComponent() {}
 

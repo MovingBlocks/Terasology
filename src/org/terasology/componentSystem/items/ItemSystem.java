@@ -20,6 +20,7 @@ import org.terasology.model.structures.AABB;
 import javax.vecmath.Vector3f;
 
 /**
+ * TODO: Refactor use methods into events? Usage should become a separate component
  * @author Immortius <immortius@gmail.com>
  */
 public class ItemSystem implements EventHandlerSystem {

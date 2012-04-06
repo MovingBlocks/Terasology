@@ -5,6 +5,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.model.blocks.BlockFamily;
 
 /**
+ * Combined with ItemComponent, represents an
  * @author Immortius <immortius@gmail.com>
  */
 public final class BlockItemComponent extends AbstractComponent {

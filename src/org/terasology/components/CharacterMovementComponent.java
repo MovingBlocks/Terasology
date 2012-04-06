@@ -19,7 +19,11 @@ public final class CharacterMovementComponent extends AbstractComponent {
     // Determines how easily the play can change direction
     // TODO: Separate player agiliy from environmental friction, and ground from air control
     public float groundFriction = 8.0f;
+    public float distanceBetweenFootsteps = 1f;
+    public boolean faceMovementDirection = false;
 
+    // Current movement mode
+    // TODO: Use enum?
     public boolean isGhosting = false;
     public boolean isSwimming = false;
     public boolean isGrounded = false;
@@ -33,9 +37,8 @@ public final class CharacterMovementComponent extends AbstractComponent {
     // The direction and strength of movement desired
     // Should have a length between 0 and 1
     private Vector3f drive = new Vector3f();
-    public boolean faceMovementDirection = false;
 
-    public float distanceBetweenFootsteps = 1f;
+    // Distance since last footstep
     public float footstepDelta = 0.0f;
     
     public Vector3f getVelocity() {

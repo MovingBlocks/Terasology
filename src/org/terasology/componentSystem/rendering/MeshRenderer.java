@@ -25,7 +25,7 @@ import javax.vecmath.Vector4f;
 import static org.lwjgl.opengl.GL11.*;
 
 /**
- * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer
+ * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer?
  * @author Immortius <immortius@gmail.com>
  */
 public class MeshRenderer implements RenderSystem {

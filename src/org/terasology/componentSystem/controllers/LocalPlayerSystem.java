@@ -47,7 +47,6 @@ import java.util.List;
 // TODO: This needs a really good cleanup
 // TODO: Move more input stuff to a specific input system?
 // TODO: Camera should become an entity/component, so it can follow the player naturally
-// TODO:
 public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, EventHandlerSystem {
 
     private static TIntIntMap inventorySlotBindMap = new TIntIntHashMap();

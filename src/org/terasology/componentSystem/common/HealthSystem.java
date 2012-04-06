@@ -30,20 +30,21 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
             HealthComponent health = entity.getComponent(HealthComponent.class);
             if (health.currentHealth <= 0) continue;
 
-            if (health.currentHealth < health.maxHealth && health.regenRate > 0) {
-                health.timeSinceLastDamage += deltaSeconds;
-                if (health.timeSinceLastDamage >= health.waitBeforeRegen) {
-                    health.partialRegen += deltaSeconds * health.regenRate;
-                    if (health.partialRegen >= 1) {
-                        health.currentHealth = Math.min(health.maxHealth, health.currentHealth + (int)health.partialRegen);
-                        health.partialRegen %= 1f;
-                        if (health.currentHealth == health.maxHealth) {
-                            entity.send(new FullHealthEvent());
-                        }
+            if (health.currentHealth == health.maxHealth || health.regenRate == 0)
+                continue;
+
+            health.timeSinceLastDamage += deltaSeconds;
+            if (health.timeSinceLastDamage >= health.waitBeforeRegen) {
+                health.partialRegen += deltaSeconds * health.regenRate;
+                if (health.partialRegen >= 1) {
+                    health.currentHealth = Math.min(health.maxHealth, health.currentHealth + (int)health.partialRegen);
+                    health.partialRegen %= 1f;
+                    if (health.currentHealth == health.maxHealth) {
+                        entity.send(new FullHealthEvent());
                     }
                 }
-                entity.saveComponent(health);
             }
+            entity.saveComponent(health);
         }
     }
     

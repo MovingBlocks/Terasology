@@ -6,6 +6,7 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 
 /**
+ * TODO: Not much of system - make helper class? Or leave as system so it can be overridden?
  * @author Immortius <immortius@gmail.com>
  */
 public class InventorySystem implements ComponentSystem {

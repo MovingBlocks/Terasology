@@ -6,6 +6,7 @@ import org.terasology.math.Vector3i;
 import javax.vecmath.Tuple3i;
 
 /**
+ * Used for entities representing a block in the world
  * @author Immortius <immortius@gmail.com>
  */
 public final class BlockComponent extends AbstractComponent {

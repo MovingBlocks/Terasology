@@ -72,19 +72,4 @@ public class BlockItemFactory {
         return entity;
     }
 
-    // TODO: Link blocks to prefabs for this
-    public EntityRef newChest(BlockFamily blockFamily) {
-        EntityRef entity = newInstance(blockFamily);
-        EntityRef placedEntity = entityManager.create();
-        InventoryComponent inventory = new InventoryComponent(16);
-        inventory.itemSlots.set(0, newInstance(BlockManager.getInstance().getBlockFamily("Torch"), 3));
-        placedEntity.addComponent(inventory);
-        placedEntity.addComponent(new AccessInventoryActionComponent());
-        placedEntity.addComponent(new PlaySoundActionComponent(AudioManager.sound("Click")));
-        BlockItemComponent blockItem = entity.getComponent(BlockItemComponent.class);
-        blockItem.placedEntity = placedEntity;
-
-        return entity;
-    }
-    
 }
