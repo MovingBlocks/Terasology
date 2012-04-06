@@ -5,10 +5,7 @@ import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
 import org.terasology.components.BlockComponent;
 import org.terasology.components.HealthComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
@@ -24,6 +21,7 @@ import java.util.Map;
  */
 public class BlockEntityLookup implements EventHandlerSystem {
 
+    private PrefabManager prefabManager;
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
 
@@ -33,6 +31,7 @@ public class BlockEntityLookup implements EventHandlerSystem {
 
     public void initialise() {
         this.entityManager = CoreRegistry.get(EntityManager.class);
+        this.prefabManager = CoreRegistry.get(PrefabManager.class);
         this.worldProvider = CoreRegistry.get(IWorldProvider.class);
         for (EntityRef blockComp : entityManager.iteratorEntities(BlockComponent.class)) {
             BlockComponent comp = blockComp.getComponent(BlockComponent.class);
@@ -50,9 +49,17 @@ public class BlockEntityLookup implements EventHandlerSystem {
         if (blockEntity == null || !blockEntity.exists()) {
             Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPosition));
             blockEntity = entityManager.create();
-            blockEntity.addComponent(new BlockComponent(blockPosition, true));
+            blockEntity.addComponent(new BlockComponent(blockPosition, block.isEntityRetainedWhenItem() || !block.getEntityPrefab().isEmpty()));
             // TODO: Get regen and wait from block config?
             blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
+            if (!block.getEntityPrefab().isEmpty()) {
+                Prefab prefab = prefabManager.getPrefab(block.getEntityPrefab());
+                if (prefab != null) {
+                    for (Component component : prefab.listComponents()) {
+                        blockEntity.addComponent(entityManager.copyComponent(component));
+                    }
+                }
+            }
         }
         return blockEntity;
     }

@@ -3,6 +3,8 @@ package org.terasology.entityFactory;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PrefabManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.model.blocks.management.BlockManager;
 
@@ -20,7 +22,7 @@ public class PlayerFactory {
     
     public PlayerFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
-        blockFactory = new BlockItemFactory(entityManager);
+        blockFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
         itemFactory = new ItemFactory(entityManager);
     }
     

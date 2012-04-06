@@ -2,10 +2,8 @@ package org.terasology.componentSystem.block;
 
 import org.terasology.components.*;
 import org.terasology.entityFactory.BlockItemFactory;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
@@ -33,7 +31,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
-        blockItemFactory = new BlockItemFactory(entityManager);
+        blockItemFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
     }
 
     @ReceiveEvent(components={BlockComponent.class})
@@ -56,13 +54,10 @@ public class BlockEntitySystem implements EventHandlerSystem {
         AudioManager.play("RemoveBlock", 0.6f);
 
         if ((oldBlock.isStraightToInventory() || oldBlock.isEntityRetainedWhenItem()) && event.getInstigator().exists()) {
-            EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockGroup(), (byte)1);
+            EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockGroup(), entity);
             if (oldBlock.isEntityRetainedWhenItem()) {
                 entity.removeComponent(HealthComponent.class);
                 entity.removeComponent(BlockComponent.class);
-                BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
-                blockItem.placedEntity = entity;
-                item.saveComponent(blockItem);
             }
             if (!inventorySystem.addItem(event.getInstigator(), item))
             {

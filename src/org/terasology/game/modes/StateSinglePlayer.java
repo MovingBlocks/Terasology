@@ -43,11 +43,10 @@ import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.components.actions.TunnelActionComponent;
 import org.terasology.entityFactory.PlayerFactory;
-import org.terasology.entitySystem.ComponentSystem;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
+import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.pojo.persistence.extension.*;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
@@ -169,6 +168,13 @@ public class StateSinglePlayer implements IGameState {
         CoreRegistry.put(EntityManager.class, _entityManager);
         _componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, _componentSystemManager);
+
+        PrefabManager prefabManager = new PojoPrefabManager();
+        Prefab prefab = prefabManager.createPrefab("Chest");
+        prefab.setComponent(new InventoryComponent(16));
+        prefab.setComponent(new PlaySoundActionComponent(AudioManager.sound("click")));
+        prefab.setComponent(new AccessInventoryActionComponent());
+        CoreRegistry.put(PrefabManager.class, prefabManager);
 
         _componentSystemManager.register(new BlockEntityLookup());
         _componentSystemManager.register(new CharacterMovementSystem());

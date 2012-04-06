@@ -32,6 +32,7 @@ public abstract class AbstractComponent implements Component {
                 Class fieldClass = field.getType();
 
                 if (!Cloneable.class.isAssignableFrom(fieldClass)) { // field is not cloneable
+                    logger.log(Level.SEVERE, "Failed to clone component field: " + fieldClass);
                      continue;
                 }
 

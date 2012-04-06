@@ -26,6 +26,7 @@ import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
@@ -153,10 +154,8 @@ public class GroovyManager {
         private void giveBlock(BlockGroup blockGroup, int quantity) {
             if (quantity < 1) return;
 
-            BlockItemFactory factory = new BlockItemFactory(Terasology.getInstance().getCurrentGameState().getEntityManager());
-            EntityRef item = factory.newInstance(blockGroup);
-            ItemComponent itemComp = item.getComponent(ItemComponent.class);
-            itemComp.stackCount = (byte)quantity;
+            BlockItemFactory factory = new BlockItemFactory(Terasology.getInstance().getCurrentGameState().getEntityManager(), CoreRegistry.get(PrefabManager.class));
+            EntityRef item = factory.newInstance(blockGroup, quantity);
 
             InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
             if (!inventorySystem.addItem(Terasology.getInstance().getActivePlayer().getEntity(), item)) {
@@ -207,16 +206,6 @@ public class GroovyManager {
             Config.getInstance().setDebugCollision(!Config.getInstance().isDebugCollision());
         }
 
-        public void giveChest() {
-            BlockItemFactory factory = new BlockItemFactory(Terasology.getInstance().getCurrentGameState().getEntityManager());
-            EntityRef item = factory.newChest(BlockManager.getInstance().getBlockGroup("Chest"));
-
-            InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
-            if (!inventorySystem.addItem(Terasology.getInstance().getActivePlayer().getEntity(), item)) {
-                item.destroy();
-            }
-        }
-        
         public void exit() {
             Terasology.getInstance().exit();
         }

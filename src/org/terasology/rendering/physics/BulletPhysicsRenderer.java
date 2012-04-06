@@ -32,6 +32,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
@@ -147,7 +148,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -10f, 0f));
         _parent = parent;
-        _blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
+        _blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
     }
 
     public BlockRigidBody[] addLootableBlocks(Vector3f position, Block block) {

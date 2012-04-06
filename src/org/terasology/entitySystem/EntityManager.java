@@ -26,6 +26,9 @@ public interface EntityManager {
     void load(File file, SaveFormat format) throws IOException;
     void clear();
 
+    // TODO: Move elsewhere
+    Component copyComponent(Component component);
+
     // Entity Management
 
     /**

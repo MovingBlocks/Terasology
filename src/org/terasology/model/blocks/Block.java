@@ -118,6 +118,8 @@ public class Block implements IGameObject {
     private boolean _straightToInventory;
     private boolean _stackable = true;
     private boolean _entityRetainedWhenItem = false;
+    private String _entityPrefab = "";
+
 
     private int _lootAmount;
 
@@ -430,6 +432,11 @@ public class Block implements IGameObject {
         return this;
     }
 
+    public Block withEntityPrefab(String entityPrefab) {
+        _entityPrefab = entityPrefab;
+        return this;
+    }
+
     public Block withUsable(boolean usable) {
         _usable = usable;
         return this;
@@ -555,6 +562,10 @@ public class Block implements IGameObject {
 
     public boolean isUsable() {
         return _usable;
+    }
+
+    public String getEntityPrefab() {
+        return _entityPrefab;
     }
 
     /**

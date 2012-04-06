@@ -57,7 +57,7 @@ public class PojoEntityManager implements EntityManager {
 
     // Temporary list of valid ids used during loading.
     // TODO: Store in EntityRefTypeHandler?
-    private TIntSet validIds;
+    private TIntSet validIds = new TIntHashSet();
 
     public PojoEntityManager() {
         typeHandlers.put(Boolean.class, new BooleanTypeHandler());
@@ -227,7 +227,7 @@ public class PojoEntityManager implements EntityManager {
                 }
             }
 
-            validIds = null;
+            validIds = new TIntHashSet();
         }
     }
 
@@ -236,6 +236,17 @@ public class PojoEntityManager implements EntityManager {
         nextEntityId = 1;
         freedIds.clear();
         entityCache.clear();
+    }
+
+    public Component copyComponent(Component component) {
+        SerializationInfo serializationInfo = componentSerializationLookup.get(component.getClass());
+        if (serializationInfo == null) {
+            logger.log(Level.SEVERE, "Unable to clone component: " + component.getClass() + ", not registered");
+        } else {
+            EntityData.Component data = serializationInfo.serialize(component);
+            return serializationInfo.deserialize(data);
+        }
+        return null;
     }
 
     public EntityRef create() {

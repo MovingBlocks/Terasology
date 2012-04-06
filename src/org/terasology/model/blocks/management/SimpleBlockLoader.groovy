@@ -118,6 +118,10 @@ public class SimpleBlockLoader implements BlockLoader {
             log.fine "Setting usable to: " + c.usable
             b.withUsable(c.usable)
         }
+        if (c.entityPrefab != [:]) {
+            log.fine "Setting entityPrefab to: " + c.entityPrefab
+            b.withEntityPrefab(c.entityPrefab)
+        }
 
         // *** COLOR OFFSET (4 values) - this might need error handling
         if (c.colorOffset != [:]) {
