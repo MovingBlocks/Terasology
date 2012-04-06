@@ -24,8 +24,6 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     }
 
     public void update(float delta) {
-        float deltaSeconds = delta / 1000;
-        
         for (EntityRef entity : entityManager.iteratorEntities(HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
             if (health.currentHealth <= 0) continue;
@@ -33,9 +31,9 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
             if (health.currentHealth == health.maxHealth || health.regenRate == 0)
                 continue;
 
-            health.timeSinceLastDamage += deltaSeconds;
+            health.timeSinceLastDamage += delta;
             if (health.timeSinceLastDamage >= health.waitBeforeRegen) {
-                health.partialRegen += deltaSeconds * health.regenRate;
+                health.partialRegen += delta * health.regenRate;
                 if (health.partialRegen >= 1) {
                     health.currentHealth = Math.min(health.maxHealth, health.currentHealth + (int)health.partialRegen);
                     health.partialRegen %= 1f;

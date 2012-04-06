@@ -222,13 +222,13 @@ public class StateSinglePlayer implements IGameState {
         _worldRenderer = null;
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         /* GUI */
         updateUserInterface();
         
         for (UpdateSubscriberSystem updater : _componentSystemManager.iterateUpdateSubscribers()) {
             PerformanceMonitor.startActivity(updater.getClass().getSimpleName());
-            updater.update((float) delta);
+            updater.update(delta);
         }
 
         if (_worldRenderer != null && shouldUpdateWorld())

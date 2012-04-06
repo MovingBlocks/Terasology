@@ -30,7 +30,7 @@ public interface IGameState {
     public void activate();
     public void deactivate();
 
-    public void update(double delta);
+    public void update(float delta);
     public void render();
 
     public void processKeyboardInput();

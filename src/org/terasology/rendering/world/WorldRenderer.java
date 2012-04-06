@@ -106,7 +106,7 @@ public final class WorldRenderer implements IGameObject {
     private final Skysphere _skysphere;
 
     /* TICKING */
-    private double _tick = 0;
+    private float _tick = 0;
     private int _tickTock = 0;
     private long _lastTick;
 
@@ -463,7 +463,7 @@ public final class WorldRenderer implements IGameObject {
         return (float) TeraMath.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         PerformanceMonitor.startActivity("Cameras");
         animateSpawnCamera(delta);
         _spawnCamera.update(delta);
@@ -584,9 +584,9 @@ public final class WorldRenderer implements IGameObject {
      * Secondary effect: Trigger spawning (via PortalManager) once every second
      * Tertiary effect: Trigger socializing (via MobManager) once every 10 seconds
      */
-    private void updateTick(double delta) {
+    private void updateTick(float delta) {
         // Update the animation tick
-        _tick += delta;
+        _tick += delta * 1000;
 
         // This block is based on seconds or less frequent timings
         if (Terasology.getInstance().getTimeInMs() - _lastTick >= 1000) {

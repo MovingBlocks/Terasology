@@ -58,7 +58,7 @@ public abstract class ParticleEmitter implements IGameObject {
         glEnable(GL11.GL_CULL_FACE);
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         removeDeadParticles();
         emitParticles();
 

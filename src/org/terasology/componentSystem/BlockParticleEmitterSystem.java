@@ -48,8 +48,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
     }
     
-    public void update(float deltaMS) {
-        float delta = deltaMS / 1000;
+    public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(BlockParticleEffectComponent.class, LocationComponent.class)) {
             BlockParticleEffectComponent particleEffect = entity.getComponent(BlockParticleEffectComponent.class);
             Iterator<Particle> iterator = particleEffect.particles.iterator();

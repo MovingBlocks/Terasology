@@ -48,8 +48,6 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
     }
     
     public void update(float delta) {
-        float deltaSeconds = (delta / 1000f);
-
         for (EntityRef entity : entityManager.iteratorEntities(CharacterMovementComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
@@ -57,7 +55,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
             if (!worldProvider.isChunkAvailableAt(location.getWorldPosition())) continue;
 
-            updatePosition(deltaSeconds, entity, location, collision, movementComp);
+            updatePosition(delta, entity, location, collision, movementComp);
             updateSwimStatus(location, collision, movementComp);
             
             entity.saveComponent(location);

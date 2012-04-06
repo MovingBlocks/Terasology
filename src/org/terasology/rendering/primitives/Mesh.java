@@ -180,7 +180,7 @@ public class Mesh implements IGameObject {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
     }
 
 }

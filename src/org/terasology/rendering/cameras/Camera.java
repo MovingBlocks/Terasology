@@ -81,7 +81,7 @@ public abstract class Camera {
         return _viewFrustum;
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         double diff = Math.abs(_activeFov - _targetFov);
 
         if (diff < 1.0) {
@@ -89,10 +89,11 @@ public abstract class Camera {
             return;
         }
 
+        // TODO: Clamp this
         if (_activeFov < _targetFov) {
-            _activeFov += 0.05 * delta;
+            _activeFov += 50 * delta;
         } else if (_activeFov > _targetFov) {
-            _activeFov -= 0.05 * delta;
+            _activeFov -= 50 * delta;
         }
     }
 

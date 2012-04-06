@@ -23,7 +23,14 @@ public final class Timer {
         _avgDelta = _avgDelta * _decayRate + _delta * _oneMinusDecayRate;
     }
 
-    public double getDelta() {
+    public float getDelta() {
+        if (_delta >= 100)
+            return 0.1f;
+
+        return _delta / 1000f;
+    }
+
+    public double getDeltaInMS() {
         if (_delta >= 100)
             return 100;
 

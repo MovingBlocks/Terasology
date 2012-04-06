@@ -96,7 +96,7 @@ public class BlockGrid implements IGameObject {
         _gridPositions.clear();
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         // Nothing to do.
     }
 }

@@ -197,7 +197,7 @@ public class StateMainMenu implements IGameState {
         AudioManager.getInstance().stopAllSounds();
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         updateUserInterface();
     }
 

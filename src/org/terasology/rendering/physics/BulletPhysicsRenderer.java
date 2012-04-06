@@ -302,11 +302,11 @@ public class BulletPhysicsRenderer implements IGameObject {
         GL11.glPopMatrix();
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         addQueuedBodies();
 
         try {
-            _discreteDynamicsWorld.stepSimulation((float) (delta / 1000.0), 3);
+            _discreteDynamicsWorld.stepSimulation(delta, 3);
         } catch (Exception e) {
             Terasology.getInstance().getLogger().log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again. Go along: " + e.toString());
         }

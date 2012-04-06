@@ -109,8 +109,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (!localPlayer.isValid())
             return;
 
-        float deltaSeconds = delta / 1000;
-
         EntityRef entity = localPlayer.getEntity();
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
@@ -118,7 +116,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
 
         if (localPlayerComponent.isDead) {
-            if (!checkRespawn(deltaSeconds, entity, localPlayerComponent, characterMovementComponent, location, playerComponent))
+            if (!checkRespawn(delta, entity, localPlayerComponent, characterMovementComponent, location, playerComponent))
                 return;
         }
 
@@ -131,7 +129,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         updateCamera(location.getWorldPosition(), lookRotation);
 
         // Hand animation update
-        localPlayerComponent.handAnimation = Math.max(0, localPlayerComponent.handAnimation - 2.5f * deltaSeconds);
+        localPlayerComponent.handAnimation = Math.max(0, localPlayerComponent.handAnimation - 2.5f * delta);
         
         resetInput();
     }
