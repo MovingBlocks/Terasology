@@ -91,6 +91,22 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
         _list.addItem("worldTitle1", "worldSeed");
         _list.addItem("worldTitle2", "worldSeed");
+        _list.addItem("worldTitle1", "worldSeed");
+        _list.addItem("worldTitle2", "worldSeed");
+        _list.addItem("worldTitle1", "worldSeed");
+        _list.addItem("worldTitle2", "worldSeed");
+        _list.addItem("worldTitle1", "worldSeed");
+        _list.addItem("worldTitle2", "worldSeed");
+        _list.addItem("worldTitle1", "worldSeed");
+        _list.addItem("worldTitlaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaae1", "worldSeed");
+        _list.addItem("worldTitle2", "worldSeed");
+        _list.addItem("worldTitle1", "worldSeed");
+        _list.addItem("worldTitle2", "worldSeed");
+        _list.addItem("worldTitle1", "worldSeed");
+        _list.addItem("worldTitle2", "worldSeed");
+        _list.addItem("worldTitle1", "worldSeed");
+        _list.addItem("worldTitle2", "worldSeed");
+
 
         _goToBack = new UIButton(new Vector2f(256f, 32f));
         _goToBack.getLabel().setText("Go to back");

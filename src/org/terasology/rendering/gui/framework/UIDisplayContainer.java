@@ -37,10 +37,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     private UIStyle _style       = null;
     private final HashMap<String, UIStyle> _styleClasses = new HashMap<String, UIStyle>();
 
-    private Vector4f _cropMargin = new Vector4f(/*TOP*/    0.0f,
-                                                /*RIGHT*/  0.0f,
-                                                /*BOTTOM*/ 0.0f,
-                                                /*LEFT*/   0.0f
+    protected Vector4f _cropMargin = new Vector4f(/*TOP*/    0.0f,
+            /*RIGHT*/  0.0f,
+            /*BOTTOM*/ 0.0f,
+            /*LEFT*/   0.0f
     );
 
     public UIDisplayContainer() {
@@ -68,9 +68,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         //Cut the elements
         if(_crop){
             cropX      = (int)calcAbsolutePosition().x - (int)(_cropMargin.w);
-            cropY      = Display.getHeight()-((int)calcAbsolutePosition().y + (int)getSize().y + (int)_cropMargin.z);
-            cropWidth  = (int)calcAbsolutePosition().x + (int)getSize().x + (int)_cropMargin.y;
-            cropHeight = (int)calcAbsolutePosition().y + (int)getSize().y + (int)_cropMargin.x + (int)_cropMargin.z;
+            cropY      = Display.getHeight() - (int)calcAbsolutePosition().y - (int)getSize().y - (int)_cropMargin.x;
+            cropWidth  = (int)getSize().x + (int)_cropMargin.y;
+            cropHeight = (int)getSize().y + (int)_cropMargin.z;
             glEnable(GL_SCISSOR_TEST);
             glScissor(cropX, cropY, cropWidth, cropHeight);
         }
@@ -171,12 +171,12 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     }
 
     public void setClassStyle(String className, String value){
-       UIStyle style = new UIStyle(getSize());
-       style.setPosition(new Vector2f(0f,0f));
-       style.setVisible(true);
-       style.setCroped(false);
-       style.parse(value);
-       _styleClasses.put(className,style);
+        UIStyle style = new UIStyle(getSize());
+        style.setPosition(new Vector2f(0f,0f));
+        style.setVisible(true);
+        style.setCroped(false);
+        style.parse(value);
+        _styleClasses.put(className,style);
     }
 
     public void setClassStyle(String className){
@@ -188,8 +188,4 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             addtDisplayElementToPosition(0,_style);
         }
     }
-
-    
-
-
 }

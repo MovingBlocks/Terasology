@@ -41,7 +41,7 @@ public class UIScrollBarThumb extends UIDisplayContainer {
 
         _header.getTextureOrigin().set(0f, 155f / 512f);
         _body.getTextureOrigin().set(7f/512f, 155f / 512f);
-        _footer.getTextureOrigin().set(0f, 155f / 512f);
+        _footer.getTextureOrigin().set(18f/512f, 155f / 512f);
     }
 
     private void setVerticalOptions(){
@@ -49,7 +49,7 @@ public class UIScrollBarThumb extends UIDisplayContainer {
         _header.setRotateAngle(90);
         _header.setPosition(getPosition());
         _header.getPosition().x += 15f;
-        _header.setSize(new Vector2f(7f, 15f));
+        _header.setSize(new Vector2f(8f, 15f));
         _header.getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
 
         /*SET POS FOR BODY*/
@@ -59,10 +59,11 @@ public class UIScrollBarThumb extends UIDisplayContainer {
         _body.getTextureSize().set(new Vector2f(10f/512f, 15f / 512f));
 
         /*SET POS FOR FOOTER*/
-        _footer.setRotateAngle(270);
+        _footer.setRotateAngle(90);
         _footer.setPosition(new Vector2f(getPosition().x, getPosition().y +  2*_header.getTextureSize().y + _body.getSize().y));
-        _footer.setSize(new Vector2f(7f, 15f));
-        _footer.getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
+        _footer.getPosition().x += 15f;
+        _footer.setSize(new Vector2f(8f, 15f));
+        _footer.getTextureSize().set(new Vector2f(8f/512f, 15f / 512f));
     }
 
     private void setHorizontalPositions(){
@@ -76,11 +77,11 @@ public class UIScrollBarThumb extends UIDisplayContainer {
         _body.getTextureSize().set(new Vector2f(10f/512f, 15f / 512f));
 
         /*SET POS FOR FOOTER*/
-        _footer.setRotateAngle(180);
+        //_footer.setRotateAngle(180);
         _footer.setPosition(new Vector2f((getPosition().x +  2*_header.getTextureSize().x + _body.getSize().x), getPosition().y));
-        _footer.setSize(new Vector2f(7f, 15f));
-        _footer.getPosition().y += 15f;
-        _footer.getTextureSize().set(new Vector2f(7f/512f, 15f / 512f));
+        _footer.setSize(new Vector2f(8f, 15f));
+        //_footer.getPosition().y += 15f;
+        _footer.getTextureSize().set(new Vector2f(8f/512f, 15f / 512f));
     }
 
     public void resize(float newScrollSize){
@@ -91,14 +92,12 @@ public class UIScrollBarThumb extends UIDisplayContainer {
 
             _body.setSize(new Vector2f(newBodyScrollSize, 15f));
             _footer.getPosition().y = _body.getPosition().y +
-                    _header.getSize().x     +
-                    _body.getSize().x;
+                                      _body.getSize().x;
         }else{
             setSize(new Vector2f(newScrollSize, 15f));
 
             _body.setSize(new Vector2f(newBodyScrollSize, 15f));
             _footer.getPosition().x = _body.getPosition().x +
-                                      _header.getSize().x   +
                                       _body.getSize().x;
         }
     }
