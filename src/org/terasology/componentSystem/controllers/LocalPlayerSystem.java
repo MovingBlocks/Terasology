@@ -11,8 +11,10 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.NoHealthEvent;
+import org.terasology.events.OpenInventoryEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
@@ -29,6 +31,7 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
+import org.terasology.rendering.gui.menus.UIContainerScreen;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
@@ -41,6 +44,10 @@ import java.util.List;
 /**
  * @author Immortius <immortius@gmail.com>
  */
+// TODO: This needs a really good cleanup
+// TODO: Move more input stuff to a specific input system?
+// TODO: Camera should become an entity/component, so it can follow the player naturally
+// TODO:
 public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, EventHandlerSystem {
 
     private static TIntIntMap inventorySlotBindMap = new TIntIntHashMap();
@@ -89,6 +96,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     public void setPlayerCamera(DefaultCamera camera) {
         this.playerCamera = camera;
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
+    public void onOpenContainer(OpenInventoryEvent event, EntityRef entity) {
+        if (event.getContainer().hasComponent(InventoryComponent.class)) {
+            // TODO: better way to open UI screen?
+            Terasology.getInstance().getCurrentGameState().openScreen(new UIContainerScreen(event.getContainer(), entity));
+        }
     }
 
     public void update(float delta) {
@@ -256,6 +271,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                     localPlayer.getEntity().send(new DamageEvent(9999, null));
                 }
                 break;
+            case Keyboard.KEY_E:
+                if (!repeatEvent && state) {
+                    processFrob();
+                }
+                break;
             case Keyboard.KEY_SPACE:
                 if (!repeatEvent && state) {
                     jump = true;
@@ -336,6 +356,27 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             localPlayerComp.handAnimation = 0.5f;
         }
 
+    }
+
+    private void processFrob() {
+        EntityRef entity = localPlayer.getEntity();
+        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
+
+        if (localPlayerComp.isDead) return;
+
+        // For now, just use blocks
+        RayBlockIntersection.Intersection blockIntersection = calcSelectedBlock();
+        if (blockIntersection != null) {
+            Vector3i centerPos = blockIntersection.getBlockPosition();
+
+            Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(centerPos));
+            if (block.isUsable()) {
+                EntityRef blockEntity = blockEntityLookup.getOrCreateEntityAt(centerPos);
+                // TODO: Shouldn't activate directly, should send use event - same as item?
+                // Maybe break out a usable component.
+                blockEntity.send(new ActivateEvent(entity, entity));
+            }
+        }
     }
     
     private void useItemOnBlock(EntityRef player, EntityRef item) {

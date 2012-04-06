@@ -21,6 +21,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.audio.Sound;
 import org.terasology.componentSystem.BlockParticleEmitterSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.componentSystem.action.AccessInventoryAction;
 import org.terasology.componentSystem.action.ExplosionAction;
 import org.terasology.componentSystem.action.PlaySoundAction;
 import org.terasology.componentSystem.action.TunnelAction;
@@ -37,6 +38,7 @@ import org.terasology.componentSystem.rendering.BlockDamageRenderer;
 import org.terasology.componentSystem.rendering.FirstPersonRenderer;
 import org.terasology.componentSystem.rendering.MeshRenderer;
 import org.terasology.components.*;
+import org.terasology.components.actions.AccessInventoryActionComponent;
 import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.components.actions.TunnelActionComponent;
@@ -98,6 +100,8 @@ public class StateSinglePlayer implements IGameState {
     private UIStatusScreen _statusScreen;
     private UIInventoryScreen _inventoryScreen;
 
+    private UIDisplayElement _openDisplay;
+
     /* RENDERING */
     private WorldRenderer _worldRenderer;
 
@@ -158,6 +162,7 @@ public class StateSinglePlayer implements IGameState {
         entityManager.registerComponentClass(MeshComponent.class);
         entityManager.registerComponentClass(PlayerComponent.class);
         entityManager.registerComponentClass(SimpleAIComponent.class);
+        entityManager.registerComponentClass(AccessInventoryActionComponent.class);
         _entityManager = entityManager;
 
         _entityManager.setEventSystem(new PojoEventSystem(_entityManager));
@@ -182,6 +187,7 @@ public class StateSinglePlayer implements IGameState {
         _componentSystemManager.register(new ExplosionAction());
         _componentSystemManager.register(new PlaySoundAction());
         _componentSystemManager.register(new TunnelAction());
+        _componentSystemManager.register(new AccessInventoryAction());
 
     }
 
@@ -320,6 +326,9 @@ public class StateSinglePlayer implements IGameState {
                 return true;
             }
         }
+        if (_openDisplay != null && !_openDisplay.isOverlay()) {
+            return true;
+        }
 
         return false;
     }
@@ -370,11 +379,17 @@ public class StateSinglePlayer implements IGameState {
         for (UIDisplayElement screen : _guiScreens) {
             screen.render();
         }
+        if (_openDisplay != null) {
+            _openDisplay.render();
+        }
     }
 
     private void updateUserInterface() {
         for (UIDisplayElement screen : _guiScreens) {
             screen.update();
+        }
+        if (_openDisplay != null) {
+            _openDisplay.update();
         }
     }
 
@@ -384,6 +399,14 @@ public class StateSinglePlayer implements IGameState {
 
     public EntityManager getEntityManager() {
         return _entityManager;
+    }
+
+    public void openScreen(UIDisplayElement screen) {
+        _openDisplay = screen;
+    }
+
+    public void closeScreen() {
+        _openDisplay = null;
     }
 
     /**
@@ -399,9 +422,14 @@ public class StateSinglePlayer implements IGameState {
 
             if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                 if (key == Keyboard.KEY_ESCAPE) {
-                    togglePauseMenu();
+                    if (_openDisplay != null) {
+                        closeScreen();
+                    } else {
+                        togglePauseMenu();
+                    }
                 }
 
+                //Should this be here?
                 if (key == Keyboard.KEY_I) {
                     toggleInventory();
                 }
@@ -419,15 +447,20 @@ public class StateSinglePlayer implements IGameState {
                 }
 
                 // Pass input to focused GUI element
-                for (UIDisplayElement screen : _guiScreens) {
-                    if (screenCanFocus(screen)) {
-                        screen.processKeyboardInput(key);
+                if (_openDisplay != null && !_openDisplay.isOverlay()) {
+                    _openDisplay.processKeyboardInput(key);
+                } else {
+                    for (UIDisplayElement screen : _guiScreens) {
+                        if (screenCanFocus(screen)) {
+                            screen.processKeyboardInput(key);
+                        }
                     }
                 }
+
             }
 
             // Features for debug mode only
-            if (debugEnabled && !screenHasFocus() && Keyboard.getEventKeyState()) {
+            if (debugEnabled && !screenHasFocus && Keyboard.getEventKeyState()) {
                 if (key == Keyboard.KEY_UP) {
                     getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.005);
                 }
@@ -458,7 +491,7 @@ public class StateSinglePlayer implements IGameState {
             }
 
             // Pass input to the current player
-            if (!screenHasFocus())
+            if (!screenHasFocus)
                 _localPlayerSys.processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
         }
     }
@@ -468,17 +501,22 @@ public class StateSinglePlayer implements IGameState {
     * Process mouse input - nothing system-y, so just passing it to the Player class
     */
     public void processMouseInput() {
+        boolean screenHasFocus = screenHasFocus();
         while (Mouse.next()) {
             int button = Mouse.getEventButton();
             int wheelMoved = Mouse.getEventDWheel();
 
-            for (UIDisplayElement screen : _guiScreens) {
-                if (screenCanFocus(screen)) {
-                    screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+            if (_openDisplay != null && !_openDisplay.isOverlay()) {
+                _openDisplay.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+            } else {
+                for (UIDisplayElement screen : _guiScreens) {
+                    if (screenCanFocus(screen)) {
+                        screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+                    }
                 }
             }
 
-            if (!screenHasFocus())
+            if (!screenHasFocus)
                 _localPlayerSys.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
         }
     }

@@ -106,6 +106,18 @@ public class SimpleBlockLoader implements BlockLoader {
             log.fine "Setting straightToInventory to: " + c.straightToInventory
             b.withStraightToInventory(c.straightToInventory)
         }
+        if (c.stackable != [:]) {
+            log.fine "Setting stackable to: " + c.stackable
+            b.withStackable(c.stackable)
+        }
+        if (c.entityRetainedWhenItem != [:]) {
+            log.fine "Setting entityRetainedWhenItem to: " + c.entityRetainedWhenItem
+            b.withEntityRetainedWhenItem(c.entityRetainedWhenItem)
+        }
+        if (c.usable != [:]) {
+            log.fine "Setting usable to: " + c.usable
+            b.withUsable(c.usable)
+        }
 
         // *** COLOR OFFSET (4 values) - this might need error handling
         if (c.colorOffset != [:]) {

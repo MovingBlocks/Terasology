@@ -1,8 +1,6 @@
 package org.terasology.componentSystem.block;
 
-import org.terasology.components.BlockComponent;
-import org.terasology.components.BlockParticleEffectComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.*;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -48,6 +46,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
         // TODO: A bunch of notification?
 
+        // TODO: This should be driven by block attachment info, and not be billboard specific
         // Remove the upper block if it's a billboard
         byte upperBlockType = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
         if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
@@ -56,8 +55,15 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
         AudioManager.play("RemoveBlock", 0.6f);
 
-        if (oldBlock.isStraightToInventory() && event.getInstigator().exists()) {
+        if ((oldBlock.isStraightToInventory() || oldBlock.isEntityRetainedWhenItem()) && event.getInstigator().exists()) {
             EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockGroup(), (byte)1);
+            if (oldBlock.isEntityRetainedWhenItem()) {
+                entity.removeComponent(HealthComponent.class);
+                entity.removeComponent(BlockComponent.class);
+                BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
+                blockItem.placedEntity = entity;
+                item.saveComponent(blockItem);
+            }
             if (!inventorySystem.addItem(event.getInstigator(), item))
             {
                 item.destroy();
@@ -68,7 +74,9 @@ public class BlockEntitySystem implements EventHandlerSystem {
             CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
         }
 
-        entity.destroy();
+        if (!oldBlock.isEntityRetainedWhenItem()) {
+            entity.destroy();
+        }
     }
 
     // TODO: Need a occasionally scan for and remove temporary block entities that were never damaged

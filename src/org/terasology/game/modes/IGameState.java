@@ -17,6 +17,7 @@
 package org.terasology.game.modes;
 
 import org.terasology.entitySystem.EntityManager;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 /**
  * @author Anton Kireev <adeon.k87@gmail.com>
@@ -36,5 +37,10 @@ public interface IGameState {
     public void processMouseInput();
     
     public EntityManager getEntityManager();
+
+    // Ability to open an extra screen on top
+    // TODO: This doesn't seem like the right place
+    public void openScreen(UIDisplayElement screen);
+    public void closeScreen();
 
 }

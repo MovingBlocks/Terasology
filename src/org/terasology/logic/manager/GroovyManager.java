@@ -165,8 +165,10 @@ public class GroovyManager {
         }
 
         public void fullHealth() {
-            /*Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.heal(player.getMaxHealthPoints() - player.getHealthPoints());*/
+            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+            HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+            health.currentHealth = health.maxHealth;
+            localPlayer.getEntity().saveComponent(health);
         }
 
         public void teleport(float x, float y, float z) {
@@ -179,13 +181,6 @@ public class GroovyManager {
             }
         }
 
-        public void spawnTest() {
-            LocalPlayer player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            GelatinousCubeFactory factory = new GelatinousCubeFactory();
-            factory.setEntityManager(Terasology.getInstance().getCurrentGameState().getEntityManager());
-            factory.setRandom(Terasology.getInstance().getActiveWorldRenderer().getWorldProvider().getRandom());
-            factory.generateGelatinousCube(new Vector3f((float)player.getPosition().x, (float)player.getPosition().y, (float)player.getPosition().z));
-        }
         public void gotoWorld(String title) {
             IGameState state = Terasology.getInstance().getCurrentGameState();
 
@@ -207,20 +202,19 @@ public class GroovyManager {
         public void dumpEntities() throws IOException {
             CoreRegistry.get(EntityManager.class).save(Helper.fixSavePath(new File("entityDump.txt")), EntityManager.SaveFormat.JSON);
         }
-
-        public void testSave() throws IOException {
-            CoreRegistry.get(EntityManager.class).save(Helper.fixSavePath(new File("testsave.sav")), EntityManager.SaveFormat.Binary);
-        }
-
-        public void testLoad() throws IOException {
-            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-            entityManager.load(Helper.fixSavePath(new File("testsave.sav")), EntityManager.SaveFormat.Binary);
-            CoreRegistry.get(LocalPlayer.class).setEntity(entityManager.iteratorEntities(LocalPlayerComponent.class).iterator().next());
-
-        }
         
         public void debugCollision() {
             Config.getInstance().setDebugCollision(!Config.getInstance().isDebugCollision());
+        }
+
+        public void giveChest() {
+            BlockItemFactory factory = new BlockItemFactory(Terasology.getInstance().getCurrentGameState().getEntityManager());
+            EntityRef item = factory.newChest(BlockManager.getInstance().getBlockGroup("Chest"));
+
+            InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
+            if (!inventorySystem.addItem(Terasology.getInstance().getActivePlayer().getEntity(), item)) {
+                item.destroy();
+            }
         }
         
         public void exit() {

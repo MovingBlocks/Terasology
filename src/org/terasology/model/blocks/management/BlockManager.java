@@ -79,7 +79,10 @@ public class BlockManager {
     }
 
     public Block getBlock(byte id) {
-        return _blocksById.get(id);
+        Block result = _blocksById.get(id);
+        if (result == null)
+            return _blocksById.get((byte)0);
+        return result;
     }
 
     public int availableBlocksSize() {

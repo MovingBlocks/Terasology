@@ -224,6 +224,12 @@ public class StateMainMenu implements IGameState {
         return null;
     }
 
+    public void openScreen(UIDisplayElement screen) {
+    }
+
+    public void closeScreen() {
+    }
+
     /**
      * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */

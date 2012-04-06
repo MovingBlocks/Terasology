@@ -42,7 +42,8 @@ public class ItemSystem implements EventHandlerSystem {
 
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
         if (blockItem != null) {
-            if (placeBlock(blockItem.blockGroup, targetBlock, surfaceDirection, secondaryDirection)) {
+            if (placeBlock(blockItem.blockGroup, targetBlock, surfaceDirection, secondaryDirection, blockItem)) {
+
                 itemComp.stackCount--;
                 if (itemComp.stackCount == 0) {
                     item.destroy();
@@ -94,7 +95,7 @@ public class ItemSystem implements EventHandlerSystem {
      * @param type The type of the block
      * @return True if a block was placed
      */
-    private boolean placeBlock(BlockGroup type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection) {
+    private boolean placeBlock(BlockGroup type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem) {
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceDirection.getVector3i());
 
@@ -105,6 +106,12 @@ public class ItemSystem implements EventHandlerSystem {
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             worldProvider.setBlock(placementPos.x, placementPos.y, placementPos.z, block.getId(), true, true);
             AudioManager.play("PlaceBlock", 0.5f);
+            if (blockItem.placedEntity.exists()) {
+                // Establish a block entity
+                blockItem.placedEntity.addComponent(new BlockComponent(placementPos, false));
+                // TODO: Get regen and wait from block config?
+                blockItem.placedEntity.addComponent(new HealthComponent(type.getArchetypeBlock().getHardness(), 2.0f,1.0f));
+            }
             return true;
         }
         return false;

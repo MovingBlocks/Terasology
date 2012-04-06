@@ -10,6 +10,7 @@ import org.terasology.entitySystem.EntityRef;
  */
 public class InventorySystem implements ComponentSystem {
 
+    // TODO: differ per item?
     public static final byte MAX_STACK = (byte)99;
 
     public void initialise() {
@@ -28,19 +29,21 @@ public class InventorySystem implements ComponentSystem {
         if (inventory == null || item == null)
             return false;
 
-        // First check for existing stacks
-        for (EntityRef itemStack : inventory.itemSlots) {
-            ItemComponent stackComp = itemStack.getComponent(ItemComponent.class);
-            if (stackComp != null) {
-                if (item.stackId.equals(stackComp.stackId)) {
-                    int stackSpace = MAX_STACK - stackComp.stackCount;
-                    int amountToTransfer = Math.min(stackSpace, item.stackCount);
-                    stackComp.stackCount += amountToTransfer;
-                    item.stackCount -= amountToTransfer;
+        if (!item.stackId.isEmpty()) {
+            // First check for existing stacks
+            for (EntityRef itemStack : inventory.itemSlots) {
+                ItemComponent stackComp = itemStack.getComponent(ItemComponent.class);
+                if (stackComp != null) {
+                    if (item.stackId.equals(stackComp.stackId)) {
+                        int stackSpace = MAX_STACK - stackComp.stackCount;
+                        int amountToTransfer = Math.min(stackSpace, item.stackCount);
+                        stackComp.stackCount += amountToTransfer;
+                        item.stackCount -= amountToTransfer;
 
-                    if (item.stackCount == 0) {
-                        itemEntity.destroy();
-                        return true;
+                        if (item.stackCount == 0) {
+                            itemEntity.destroy();
+                            return true;
+                        }
                     }
                 }
             }

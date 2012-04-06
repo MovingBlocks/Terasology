@@ -51,6 +51,7 @@ public class BlockEntityLookup implements EventHandlerSystem {
             Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPosition));
             blockEntity = entityManager.create();
             blockEntity.addComponent(new BlockComponent(blockPosition, true));
+            // TODO: Get regen and wait from block config?
             blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
         }
         return blockEntity;

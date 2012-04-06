@@ -130,16 +130,22 @@ public class PojoEntityManager implements EntityManager {
             entity.setId(id);
             for (Component component : iterateComponents(id)) {
                 SerializationInfo serializationInfo = componentSerializationLookup.get(component.getClass());
+                if (serializationInfo == null) {
+                    logger.log(Level.SEVERE, "Unregistered component type: " + component.getClass());
+                    registerComponentClass(component.getClass());
+                    serializationInfo = componentSerializationLookup.get(component.getClass());
+                }
                 if (serializationInfo != null) {
                     entity.addComponent(serializationInfo.serialize(component));
-                } else {
-                    logger.log(Level.SEVERE, "Unregistered component type: " + component.getClass());
                 }
             }
             world.addEntity(entity.build());
         }
 
-        file.getParentFile().mkdirs();
+        File parentFile = file.getParentFile();
+        if (parentFile != null) {
+            parentFile.mkdirs();
+        }
         FileOutputStream out = new FileOutputStream(file);
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(out));
         try {

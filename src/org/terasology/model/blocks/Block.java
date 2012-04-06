@@ -111,7 +111,13 @@ public class Block implements IGameObject {
     private boolean _bypassSelectionRay;
     private boolean _liquid;
     private boolean _waving;
+
+    private boolean _usable;
+
+    // Inventory settings
     private boolean _straightToInventory;
+    private boolean _stackable = true;
+    private boolean _entityRetainedWhenItem = false;
 
     private int _lootAmount;
 
@@ -280,6 +286,8 @@ public class Block implements IGameObject {
         // Do nothing
     }
 
+
+    // TODO: Change all of these to setters
     public Block withId(byte id) {
         _id = id;
         return this;
@@ -412,6 +420,21 @@ public class Block implements IGameObject {
         return this;
     }
 
+    public Block withStackable(boolean stackable) {
+        _stackable = stackable;
+        return this;
+    }
+
+    public Block withEntityRetainedWhenItem(boolean entityRetainedWhenItem) {
+        _entityRetainedWhenItem = entityRetainedWhenItem;
+        return this;
+    }
+
+    public Block withUsable(boolean usable) {
+        _usable = usable;
+        return this;
+    }
+
     public void setColliders(List<AABB> colliders) {
         _colliders = new ArrayList<AABB>(colliders);
 
@@ -520,6 +543,18 @@ public class Block implements IGameObject {
 
     public boolean isStraightToInventory() {
         return _straightToInventory;
+    }
+
+    public boolean isStackable() {
+        return _stackable;
+    }
+
+    public boolean isEntityRetainedWhenItem() {
+        return _entityRetainedWhenItem;
+    }
+
+    public boolean isUsable() {
+        return _usable;
     }
 
     /**

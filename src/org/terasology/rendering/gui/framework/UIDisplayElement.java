@@ -29,6 +29,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public abstract class UIDisplayElement {
 
+    // TODO: Default this to true
     private boolean _visible = false;
 
     private final Vector2f _position = new Vector2f(0, 0);

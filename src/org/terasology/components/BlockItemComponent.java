@@ -1,6 +1,7 @@
 package org.terasology.components;
 
 import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.model.blocks.BlockGroup;
 
 /**
@@ -8,6 +9,7 @@ import org.terasology.model.blocks.BlockGroup;
  */
 public final class BlockItemComponent extends AbstractComponent {
     public BlockGroup blockGroup;
+    public EntityRef placedEntity = EntityRef.NULL;
 
     public BlockItemComponent() {}
 
