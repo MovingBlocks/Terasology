@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
 import org.terasology.protobuf.EntityData;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -41,6 +42,8 @@ public class SerializationInfo {
                 componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
             } catch (IllegalAccessException e) {
                 logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
+            } catch (InvocationTargetException e) {
+                logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
             }
         }
         return componentMessage.build();
@@ -61,6 +64,8 @@ public class SerializationInfo {
             }
             return component;
         } catch (InstantiationException e) {
+            logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
+        } catch (InvocationTargetException e) {
             logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
         } catch (IllegalAccessException e) {
             logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);

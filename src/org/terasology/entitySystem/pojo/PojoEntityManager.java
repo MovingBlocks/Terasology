@@ -99,7 +99,7 @@ public class PojoEntityManager implements EntityManager {
             if (typeHandler == null) {
                 logger.log(Level.SEVERE, "Unsupported field type in component type " + componentClass.getSimpleName() + ", " + field.getName() + " : " + field.getGenericType());
             } else {
-                info.addField(new FieldInfo(field, typeHandler));
+                info.addField(new FieldInfo(field, componentClass, typeHandler));
             }
         }
         componentSerializationLookup.put(componentClass, info);
@@ -489,7 +489,7 @@ public class PojoEntityManager implements EntityManager {
                 if (handler == null) {
                     logger.log(Level.SEVERE, "Unsupported field type in component type " + typeClass.getSimpleName() + ", " + field.getName() + " : " + field.getGenericType());
                 } else {
-                    mappedHandler.addField(new FieldInfo(field, handler));
+                    mappedHandler.addField(new FieldInfo(field, typeClass, handler));
                 }
             }
             return mappedHandler;

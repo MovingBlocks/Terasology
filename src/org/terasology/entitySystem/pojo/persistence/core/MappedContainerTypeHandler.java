@@ -5,6 +5,7 @@ import org.terasology.entitySystem.pojo.persistence.AbstractTypeHandler;
 import org.terasology.entitySystem.pojo.persistence.FieldInfo;
 import org.terasology.protobuf.EntityData;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -45,6 +46,8 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
                 }
             }
         } catch (IllegalAccessException e) {
+            logger.log(Level.SEVERE, "Unable to serialize field of " + value.getClass(), e);
+        } catch (InvocationTargetException e) {
             logger.log(Level.SEVERE, "Unable to serialize field of " + value.getClass(), e);
         }
         return result.build();
