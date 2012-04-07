@@ -74,20 +74,19 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
     }
 
     public void setScrollBarsPosition(Vector2f position, Vector2f size){
-        _containerPosVertical = new Vector2f(position.x + size.x, position.y);
+        _containerPosVertical = new Vector2f(position.x + size.x - 15f, position.y);
         _scrollBarVertical.setPosition(_containerPosVertical);
-        _scrollBarVertical.setMaxMin(0.0f, getSize().y);
+        _scrollBarVertical.setMaxMin(0.0f, getSize().y - 15f);
 
-        _containerPosHorizontal = new Vector2f(position.x, position.y + size.y);
+        _containerPosHorizontal = new Vector2f(position.x, position.y + size.y - 15f);
         _scrollBarHorizontal.setPosition(_containerPosHorizontal);
-        _scrollBarHorizontal.setMaxMin(0.0f, getSize().x);
+        _scrollBarHorizontal.setMaxMin(0.0f, getSize().x - 15f);
     }
 
     public void render(){
         super.render();
     }
 
-    //ToDo Refator this
     public void update(){
 
         boolean verticalScrollIsScrolled   = _scrollBarVertical.isScrolled();
@@ -159,9 +158,9 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
             }
         }
 
-        _scrollBarVertical.setStep(_contentHeight, getSize().y);
+        _scrollBarVertical.setStep(_contentHeight, getSize().y  - 15f);
 
-        _scrollBarHorizontal.setStep(_contentWidth, getSize().x);
+        _scrollBarHorizontal.setStep(_contentWidth, getSize().x - 15f);
 
         super.update();
     }

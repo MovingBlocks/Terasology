@@ -71,7 +71,6 @@ public class UIScrollBar extends UIDisplayContainer {
                     }
                 }
             }
-
         }
 
         if(_scrolled){

@@ -6,6 +6,7 @@ import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
         setStyle("border-corner-bottomleft",  "gui_menu 256/512 81/512");
 
         setStyle("background-image","gui_menu 159/512 63/512 264/512 18/512");
+        setCropMargin(new Vector4f(-15f, -15f, 0, 0));
     }
 
     public void update(){
