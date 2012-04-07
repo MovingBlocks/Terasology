@@ -175,6 +175,7 @@ public class StateSinglePlayer implements IGameState {
         prefab.setComponent(new PlaySoundActionComponent(AudioManager.sound("click")));
         prefab.setComponent(new AccessInventoryActionComponent());
         CoreRegistry.put(PrefabManager.class, prefabManager);
+        entityManager.setPrefabManager(prefabManager);
 
         _componentSystemManager.register(new BlockEntityRegistry());
         _componentSystemManager.register(new CharacterMovementSystem());

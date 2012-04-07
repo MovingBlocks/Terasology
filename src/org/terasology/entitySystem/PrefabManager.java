@@ -19,11 +19,4 @@ public interface PrefabManager {
 
     public void removePrefab(String name);
 
-    public <T extends Component> T getComponent(String name, Class<T> componentClass);
-
-    public <T extends Component> T setComponent(String name, T component);
-
-
-    public <T extends Component> void removeComponent(String name, Class<T> componentClass);
-
 }

@@ -21,15 +21,24 @@ public interface EntityManager {
     void load(File file, SaveFormat format) throws IOException;
     void clear();
 
-    // TODO: Move elsewhere
-    Component copyComponent(Component component);
-
     // Entity Management
 
     /**
      * @return A references to a new, unused entity
      */
     EntityRef create();
+
+    /**
+     * @param prefabName The name of the prefab to create.
+     * @return A new entity, based on the the prefab of the given name. If the prefab doesn't exist, just a new entity.
+     */
+    EntityRef create(String prefabName);
+
+    /**
+     * @param prefab
+     * @return A new entity, based on the given prefab
+     */
+    EntityRef create(Prefab prefab);
 
     /**
      * @param componentClass
@@ -41,7 +50,16 @@ public interface EntityManager {
 
     <T extends Component> Iterable<Map.Entry<EntityRef,T>> iterateComponents(Class<T> componentClass);
 
+
+    /**
+     * @return The event system being used by the entity manager
+     */
     EventSystem getEventSystem();
+
     void setEventSystem(EventSystem system);
+
+    PrefabManager getPrefabManager();
+
+    void setPrefabManager(PrefabManager prefabManager);
 
 }

@@ -53,18 +53,10 @@ public class BlockItemFactory {
         BlockItemComponent blockItem = new BlockItemComponent(blockFamily);
 
         if (blockFamily.getArchetypeBlock().isEntityRetainedWhenItem()) {
-            if (placedEntity != null) {
-                blockItem.placedEntity = placedEntity;
-            } else {
-                Prefab prefab = prefabManager.getPrefab(blockFamily.getArchetypeBlock().getEntityPrefab());
-                if (prefab != null) {
-                    placedEntity = entityManager.create();
-                    for (Component component : prefab.listComponents()) {
-                        placedEntity.addComponent(entityManager.copyComponent(component));
-                    }
-                    blockItem.placedEntity = placedEntity;
-                }
+            if (placedEntity == null || !placedEntity.exists()) {
+                placedEntity = entityManager.create(blockFamily.getArchetypeBlock().getEntityPrefab());
             }
+            blockItem.placedEntity = placedEntity;
         }
 
         entity.addComponent(blockItem);

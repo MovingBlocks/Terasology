@@ -9,10 +9,7 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
@@ -50,6 +47,7 @@ public class PojoEntityManager implements EntityManager {
 
     ComponentTable store = new ComponentTable();
     private EventSystem eventSystem;
+    private PrefabManager prefabManager;
 
     private Map<Class<? extends Component>, SerializationInfo> componentSerializationLookup = Maps.newHashMap();
     private Map<String, Class<? extends Component>> componentTypeLookup = Maps.newHashMap();
@@ -60,20 +58,21 @@ public class PojoEntityManager implements EntityManager {
     private TIntSet validIds = new TIntHashSet();
 
     public PojoEntityManager() {
-        typeHandlers.put(Boolean.class, new BooleanTypeHandler());
-        typeHandlers.put(Boolean.TYPE, new BooleanTypeHandler());
-        typeHandlers.put(Byte.class, new ByteTypeHandler());
-        typeHandlers.put(Byte.TYPE, new ByteTypeHandler());
-        typeHandlers.put(Double.class, new DoubleTypeHandler());
-        typeHandlers.put(Double.TYPE, new DoubleTypeHandler());
-        typeHandlers.put(Float.class, new FloatTypeHandler());
-        typeHandlers.put(Float.TYPE, new FloatTypeHandler());
-        typeHandlers.put(Integer.class, new IntTypeHandler());
-        typeHandlers.put(Integer.TYPE, new IntTypeHandler());
-        typeHandlers.put(Long.class, new LongTypeHandler());
-        typeHandlers.put(Long.TYPE, new LongTypeHandler());
-        typeHandlers.put(String.class, new StringTypeHandler());
-        typeHandlers.put(EntityRef.class, new EntityRefTypeHandler(this));
+        registerTypeHandler(Boolean.class, new BooleanTypeHandler());
+        registerTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
+        registerTypeHandler(Byte.class, new ByteTypeHandler());
+        registerTypeHandler(Byte.TYPE, new ByteTypeHandler());
+        registerTypeHandler(Double.class, new DoubleTypeHandler());
+        registerTypeHandler(Double.TYPE, new DoubleTypeHandler());
+        registerTypeHandler(Float.class, new FloatTypeHandler());
+        registerTypeHandler(Float.TYPE, new FloatTypeHandler());
+        registerTypeHandler(Integer.class, new IntTypeHandler());
+        registerTypeHandler(Integer.TYPE, new IntTypeHandler());
+        registerTypeHandler(Long.class, new LongTypeHandler());
+        registerTypeHandler(Long.TYPE, new LongTypeHandler());
+        registerTypeHandler(String.class, new StringTypeHandler());
+        registerTypeHandler(EntityRef.class, new EntityRefTypeHandler(this));
+        registerComponentClass(EntityInfoComponent.class);
     }
 
     public <T> void registerTypeHandler(Class<? extends T> forClass, TypeHandler<T> handler) {
@@ -114,33 +113,7 @@ public class PojoEntityManager implements EntityManager {
     }
 
     public void save(File file, SaveFormat format) throws IOException {
-        final EntityData.World.Builder world = EntityData.World.newBuilder();
-        world.setNextEntityId(nextEntityId);
-        freedIds.forEach(new TIntProcedure() {
-            public boolean execute(int i) {
-                world.addFreedEntityId(i);
-                return true;
-            }
-        });
-
-        TIntIterator idIterator = store.entityIdIterator();
-        while (idIterator.hasNext()) {
-            int id = idIterator.next();
-            EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
-            entity.setId(id);
-            for (Component component : iterateComponents(id)) {
-                SerializationInfo serializationInfo = componentSerializationLookup.get(component.getClass());
-                if (serializationInfo == null) {
-                    logger.log(Level.SEVERE, "Unregistered component type: " + component.getClass());
-                    registerComponentClass(component.getClass());
-                    serializationInfo = componentSerializationLookup.get(component.getClass());
-                }
-                if (serializationInfo != null) {
-                    entity.addComponent(serializationInfo.serialize(component));
-                }
-            }
-            world.addEntity(entity.build());
-        }
+        final EntityData.World.Builder world = serializeWorld();
 
         File parentFile = file.getParentFile();
         if (parentFile != null) {
@@ -174,6 +147,65 @@ public class PojoEntityManager implements EntityManager {
         }
     }
 
+    private EntityData.World.Builder serializeWorld() {
+        final EntityData.World.Builder world = EntityData.World.newBuilder();
+        world.setNextEntityId(nextEntityId);
+        freedIds.forEach(new TIntProcedure() {
+            public boolean execute(int i) {
+                world.addFreedEntityId(i);
+                return true;
+            }
+        });
+
+        for (Prefab prefab : prefabManager.listPrefabs()) {
+            EntityData.Prefab.Builder prefabData = EntityData.Prefab.newBuilder();
+            prefabData.setName(prefab.getName());
+            for (Prefab parent : prefab.getParents()) {
+                prefabData.addParentName(parent.getName());
+            }
+
+            for (Component component : prefab.listOwnComponents()) {
+                EntityData.Component componentData = serializeComponent(component);
+                if (componentData != null) {
+                    prefabData.addComponent(componentData);
+                }
+            }
+            world.addPrefab(prefabData.build());
+        }
+
+        TIntIterator idIterator = store.entityIdIterator();
+        while (idIterator.hasNext()) {
+            world.addEntity(serialzieEntity(idIterator));
+        }
+        return world;
+    }
+
+    private EntityData.Entity serialzieEntity(TIntIterator idIterator) {
+        int id = idIterator.next();
+        EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
+        entity.setId(id);
+        for (Component component : iterateComponents(id)) {
+            EntityData.Component componentData = serializeComponent(component);
+            if (componentData != null) {
+                entity.addComponent(componentData);
+            }
+        }
+        return entity.build();
+    }
+
+    private EntityData.Component serializeComponent(Component component) {
+        SerializationInfo serializationInfo = componentSerializationLookup.get(component.getClass());
+        if (serializationInfo == null) {
+            logger.log(Level.SEVERE, "Unregistered component type: " + component.getClass());
+            registerComponentClass(component.getClass());
+            serializationInfo = componentSerializationLookup.get(component.getClass());
+        }
+        if (serializationInfo != null) {
+            return serializationInfo.serialize(component);
+        }
+        return null;
+    }
+
     public void load(File file, SaveFormat format) throws IOException {
         clear();
 
@@ -204,31 +236,62 @@ public class PojoEntityManager implements EntityManager {
         }
 
         if (world != null) {
-            nextEntityId = world.getNextEntityId();
-            for (Integer deadId : world.getFreedEntityIdList()) {
-                freedIds.add(deadId);
-            }
+            deserializeWorld(world);
+        }
+    }
 
-            // Gather valid ids
-            validIds = new TIntHashSet(world.getEntityCount());
-            for (EntityData.Entity entityData : world.getEntityList()) {
-                validIds.add(entityData.getId());
-            }
+    private void deserializeWorld(EntityData.World world) {
+        nextEntityId = world.getNextEntityId();
+        for (Integer deadId : world.getFreedEntityIdList()) {
+            freedIds.add(deadId);
+        }
 
-            for (EntityData.Entity entityData : world.getEntityList()) {
-                int entityId = entityData.getId();
-                for (EntityData.Component componentData : entityData.getComponentList()) {
-                    Class<? extends Component> componentClass = componentTypeLookup.get(componentData.getType().toLowerCase(Locale.ENGLISH));
-                    if (componentClass != null) {
-                        SerializationInfo serializationInfo = componentSerializationLookup.get(componentClass);
-                        Component component = serializationInfo.deserialize(componentData);
-                        store.put(entityId, component);
+        for (EntityData.Prefab prefabData : world.getPrefabList()) {
+            if (!prefabManager.exists(prefabData.getName())) {
+                Prefab prefab = prefabManager.createPrefab(prefabData.getName());
+                for (String parentName : prefabData.getParentNameList()) {
+                    Prefab parent = prefabManager.getPrefab(parentName);
+                    if (parent == null) {
+                        logger.log(Level.SEVERE, "Missing parent prefab (need to fix parent serialization)");
+                    } else {
+                        prefab.addParent(parent);
+                    }
+                }
+                for (EntityData.Component componentData : prefabData.getComponentList()) {
+                    Component component = deserializeComponent(componentData);
+                    if (component != null) {
+                        prefab.setComponent(component);
                     }
                 }
             }
-
-            validIds = new TIntHashSet();
         }
+
+        // Gather valid ids
+        validIds = new TIntHashSet(world.getEntityCount());
+        for (EntityData.Entity entityData : world.getEntityList()) {
+            validIds.add(entityData.getId());
+        }
+
+        for (EntityData.Entity entityData : world.getEntityList()) {
+            int entityId = entityData.getId();
+            for (EntityData.Component componentData : entityData.getComponentList()) {
+                Component component = deserializeComponent(componentData);
+                if (component != null) {
+                    store.put(entityId, component);
+                }
+            }
+        }
+
+        validIds = new TIntHashSet();
+    }
+
+    private Component deserializeComponent(EntityData.Component componentData) {
+        Class<? extends Component> componentClass = componentTypeLookup.get(componentData.getType().toLowerCase(Locale.ENGLISH));
+        if (componentClass != null) {
+            SerializationInfo serializationInfo = componentSerializationLookup.get(componentClass);
+            return serializationInfo.deserialize(componentData);
+        }
+        return null;
     }
 
     public void clear() {
@@ -238,7 +301,7 @@ public class PojoEntityManager implements EntityManager {
         entityCache.clear();
     }
 
-    public Component copyComponent(Component component) {
+    private Component copyComponent(Component component) {
         SerializationInfo serializationInfo = componentSerializationLookup.get(component.getClass());
         if (serializationInfo == null) {
             logger.log(Level.SEVERE, "Unable to clone component: " + component.getClass() + ", not registered");
@@ -255,6 +318,25 @@ public class PojoEntityManager implements EntityManager {
         }
         if (nextEntityId == NULL_ID) nextEntityId++;
         return createEntityRef(nextEntityId++);
+    }
+
+    public EntityRef create(String prefabName) {
+        Prefab prefab = prefabManager.getPrefab(prefabName);
+        if (prefab == null) {
+            logger.log(Level.WARNING, "Unable to instantiate unknown prefab: \"" + prefabName + "\"");
+        }
+        return create(prefab);
+    }
+
+    public EntityRef create(Prefab prefab) {
+        EntityRef result = create();
+        if (prefab != null) {
+            for (Component component : prefab.listComponents()) {
+                result.addComponent(copyComponent(component));
+            }
+            result.addComponent(new EntityInfoComponent(prefab.getName()));
+        }
+        return result;
     }
 
     private EntityRef createEntityRef(int entityId) {
@@ -280,6 +362,14 @@ public class PojoEntityManager implements EntityManager {
 
     public void setEventSystem(EventSystem eventSystem) {
         this.eventSystem = eventSystem;
+    }
+
+    public PrefabManager getPrefabManager() {
+        return prefabManager;
+    }
+
+    public void setPrefabManager(PrefabManager prefabManager) {
+        this.prefabManager = prefabManager;
     }
 
     public <T extends Component> Iterable<Map.Entry<EntityRef,T>> iterateComponents(Class<T> componentClass) {

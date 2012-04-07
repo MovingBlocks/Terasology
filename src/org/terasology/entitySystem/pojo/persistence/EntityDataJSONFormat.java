@@ -27,19 +27,14 @@ public class EntityDataJSONFormat {
                 .setPrettyPrinting()
                 .registerTypeAdapter(EntityData.World.class, new GenericMessageHandler())
                 .registerTypeAdapter(EntityData.Entity.class, new EntityHandler())
+                .registerTypeAdapter(EntityData.Prefab.class, new PrefabHandler())
                 .registerTypeAdapter(EntityData.Component.class, new ComponentHandler())
                 .registerTypeAdapter(EntityData.Value.class, new ValueHandler())
                 .create();
     }
 
     String write(EntityData.World world) {
-        JsonObject result = new JsonObject();
-        /*for (Map.Entry<Descriptors.FieldDescriptor, Object> field : world.getAllFields().entrySet()) {
-            if (!field.getKey().getName().equalsIgnoreCase("entity")) {
-                result.add(field.getKey().getName(), gson.toJsonTree(field.getValue()));
-            }
-        } */
-        return gson.toJson(world);
+         return gson.toJson(world);
     }
 
     private static class GenericMessageHandler implements JsonSerializer<com.google.protobuf.Message> {
@@ -69,6 +64,19 @@ public class EntityDataJSONFormat {
         public JsonElement serialize(EntityData.Entity src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
             result.addProperty("id", src.getId());
+            for (EntityData.Component component : src.getComponentList()) {
+                result.add(component.getType(), context.serialize(component));
+            }
+            return result;
+        }
+    }
+
+    private static class PrefabHandler implements JsonSerializer<EntityData.Prefab> {
+
+        public JsonElement serialize(EntityData.Prefab src, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject result = new JsonObject();
+            result.addProperty("name", src.getName());
+            result.add("parents", context.serialize(src.getParentNameList()));
             for (EntityData.Component component : src.getComponentList()) {
                 result.add(component.getType(), context.serialize(component));
             }
@@ -139,8 +147,6 @@ public class EntityDataJSONFormat {
                 return obj;
             }
             return JsonNull.INSTANCE;
-
-            // TODO: Support byte
         }
     }
 

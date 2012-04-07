@@ -2884,6 +2884,16 @@ public final class EntityData {
         getComponentOrBuilderList();
     org.terasology.protobuf.EntityData.ComponentOrBuilder getComponentOrBuilder(
         int index);
+    
+    // repeated sint32 removed_component_index = 3 [packed = true];
+    java.util.List<java.lang.Integer> getRemovedComponentIndexList();
+    int getRemovedComponentIndexCount();
+    int getRemovedComponentIndex(int index);
+    
+    // repeated string removed_component = 15;
+    java.util.List<String> getRemovedComponentList();
+    int getRemovedComponentCount();
+    String getRemovedComponent(int index);
   }
   public static final class Entity extends
       com.google.protobuf.GeneratedMessage.ExtendableMessage<
@@ -2945,9 +2955,40 @@ public final class EntityData {
       return component_.get(index);
     }
     
+    // repeated sint32 removed_component_index = 3 [packed = true];
+    public static final int REMOVED_COMPONENT_INDEX_FIELD_NUMBER = 3;
+    private java.util.List<java.lang.Integer> removedComponentIndex_;
+    public java.util.List<java.lang.Integer>
+        getRemovedComponentIndexList() {
+      return removedComponentIndex_;
+    }
+    public int getRemovedComponentIndexCount() {
+      return removedComponentIndex_.size();
+    }
+    public int getRemovedComponentIndex(int index) {
+      return removedComponentIndex_.get(index);
+    }
+    private int removedComponentIndexMemoizedSerializedSize = -1;
+    
+    // repeated string removed_component = 15;
+    public static final int REMOVED_COMPONENT_FIELD_NUMBER = 15;
+    private com.google.protobuf.LazyStringList removedComponent_;
+    public java.util.List<String>
+        getRemovedComponentList() {
+      return removedComponent_;
+    }
+    public int getRemovedComponentCount() {
+      return removedComponent_.size();
+    }
+    public String getRemovedComponent(int index) {
+      return removedComponent_.get(index);
+    }
+    
     private void initFields() {
       id_ = 0;
       component_ = java.util.Collections.emptyList();
+      removedComponentIndex_ = java.util.Collections.emptyList();;
+      removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2980,6 +3021,16 @@ public final class EntityData {
       for (int i = 0; i < component_.size(); i++) {
         output.writeMessage(2, component_.get(i));
       }
+      if (getRemovedComponentIndexList().size() > 0) {
+        output.writeRawVarint32(26);
+        output.writeRawVarint32(removedComponentIndexMemoizedSerializedSize);
+      }
+      for (int i = 0; i < removedComponentIndex_.size(); i++) {
+        output.writeSInt32NoTag(removedComponentIndex_.get(i));
+      }
+      for (int i = 0; i < removedComponent_.size(); i++) {
+        output.writeBytes(15, removedComponent_.getByteString(i));
+      }
       extensionWriter.writeUntil(2000, output);
       getUnknownFields().writeTo(output);
     }
@@ -2997,6 +3048,29 @@ public final class EntityData {
       for (int i = 0; i < component_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, component_.get(i));
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < removedComponentIndex_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeSInt32SizeNoTag(removedComponentIndex_.get(i));
+        }
+        size += dataSize;
+        if (!getRemovedComponentIndexList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        removedComponentIndexMemoizedSerializedSize = dataSize;
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < removedComponent_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(removedComponent_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getRemovedComponentList().size();
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -3132,6 +3206,10 @@ public final class EntityData {
         } else {
           componentBuilder_.clear();
         }
+        removedComponentIndex_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
       
@@ -3183,6 +3261,17 @@ public final class EntityData {
         } else {
           result.component_ = componentBuilder_.build();
         }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          removedComponentIndex_ = java.util.Collections.unmodifiableList(removedComponentIndex_);
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.removedComponentIndex_ = removedComponentIndex_;
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          removedComponent_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              removedComponent_);
+          bitField0_ = (bitField0_ & ~0x00000008);
+        }
+        result.removedComponent_ = removedComponent_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3227,6 +3316,26 @@ public final class EntityData {
               componentBuilder_.addAllMessages(other.component_);
             }
           }
+        }
+        if (!other.removedComponentIndex_.isEmpty()) {
+          if (removedComponentIndex_.isEmpty()) {
+            removedComponentIndex_ = other.removedComponentIndex_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureRemovedComponentIndexIsMutable();
+            removedComponentIndex_.addAll(other.removedComponentIndex_);
+          }
+          onChanged();
+        }
+        if (!other.removedComponent_.isEmpty()) {
+          if (removedComponent_.isEmpty()) {
+            removedComponent_ = other.removedComponent_;
+            bitField0_ = (bitField0_ & ~0x00000008);
+          } else {
+            ensureRemovedComponentIsMutable();
+            removedComponent_.addAll(other.removedComponent_);
+          }
+          onChanged();
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -3279,6 +3388,25 @@ public final class EntityData {
               org.terasology.protobuf.EntityData.Component.Builder subBuilder = org.terasology.protobuf.EntityData.Component.newBuilder();
               input.readMessage(subBuilder, extensionRegistry);
               addComponent(subBuilder.buildPartial());
+              break;
+            }
+            case 24: {
+              ensureRemovedComponentIndexIsMutable();
+              removedComponentIndex_.add(input.readSInt32());
+              break;
+            }
+            case 26: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              while (input.getBytesUntilLimit() > 0) {
+                addRemovedComponentIndex(input.readSInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 122: {
+              ensureRemovedComponentIsMutable();
+              removedComponent_.add(input.readBytes());
               break;
             }
           }
@@ -3494,6 +3622,107 @@ public final class EntityData {
         return componentBuilder_;
       }
       
+      // repeated sint32 removed_component_index = 3 [packed = true];
+      private java.util.List<java.lang.Integer> removedComponentIndex_ = java.util.Collections.emptyList();;
+      private void ensureRemovedComponentIndexIsMutable() {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+          removedComponentIndex_ = new java.util.ArrayList<java.lang.Integer>(removedComponentIndex_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+      public java.util.List<java.lang.Integer>
+          getRemovedComponentIndexList() {
+        return java.util.Collections.unmodifiableList(removedComponentIndex_);
+      }
+      public int getRemovedComponentIndexCount() {
+        return removedComponentIndex_.size();
+      }
+      public int getRemovedComponentIndex(int index) {
+        return removedComponentIndex_.get(index);
+      }
+      public Builder setRemovedComponentIndex(
+          int index, int value) {
+        ensureRemovedComponentIndexIsMutable();
+        removedComponentIndex_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addRemovedComponentIndex(int value) {
+        ensureRemovedComponentIndexIsMutable();
+        removedComponentIndex_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllRemovedComponentIndex(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureRemovedComponentIndexIsMutable();
+        super.addAll(values, removedComponentIndex_);
+        onChanged();
+        return this;
+      }
+      public Builder clearRemovedComponentIndex() {
+        removedComponentIndex_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      
+      // repeated string removed_component = 15;
+      private com.google.protobuf.LazyStringList removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureRemovedComponentIsMutable() {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+          removedComponent_ = new com.google.protobuf.LazyStringArrayList(removedComponent_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+      public java.util.List<String>
+          getRemovedComponentList() {
+        return java.util.Collections.unmodifiableList(removedComponent_);
+      }
+      public int getRemovedComponentCount() {
+        return removedComponent_.size();
+      }
+      public String getRemovedComponent(int index) {
+        return removedComponent_.get(index);
+      }
+      public Builder setRemovedComponent(
+          int index, String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureRemovedComponentIsMutable();
+        removedComponent_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addRemovedComponent(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureRemovedComponentIsMutable();
+        removedComponent_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllRemovedComponent(
+          java.lang.Iterable<String> values) {
+        ensureRemovedComponentIsMutable();
+        super.addAll(values, removedComponent_);
+        onChanged();
+        return this;
+      }
+      public Builder clearRemovedComponent() {
+        removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      void addRemovedComponent(com.google.protobuf.ByteString value) {
+        ensureRemovedComponentIsMutable();
+        removedComponent_.add(value);
+        onChanged();
+      }
+      
       // @@protoc_insertion_point(builder_scope:Entity)
     }
     
@@ -3503,6 +3732,967 @@ public final class EntityData {
     }
     
     // @@protoc_insertion_point(class_scope:Entity)
+  }
+  
+  public interface PrefabOrBuilder extends
+      com.google.protobuf.GeneratedMessage.
+          ExtendableMessageOrBuilder<Prefab> {
+    
+    // optional sint32 type_index = 1;
+    boolean hasTypeIndex();
+    int getTypeIndex();
+    
+    // repeated .Component component = 2;
+    java.util.List<org.terasology.protobuf.EntityData.Component> 
+        getComponentList();
+    org.terasology.protobuf.EntityData.Component getComponent(int index);
+    int getComponentCount();
+    java.util.List<? extends org.terasology.protobuf.EntityData.ComponentOrBuilder> 
+        getComponentOrBuilderList();
+    org.terasology.protobuf.EntityData.ComponentOrBuilder getComponentOrBuilder(
+        int index);
+    
+    // repeated sint32 parent_index = 3 [packed = true];
+    java.util.List<java.lang.Integer> getParentIndexList();
+    int getParentIndexCount();
+    int getParentIndex(int index);
+    
+    // optional string name = 15;
+    boolean hasName();
+    String getName();
+    
+    // repeated string parent_name = 16;
+    java.util.List<String> getParentNameList();
+    int getParentNameCount();
+    String getParentName(int index);
+  }
+  public static final class Prefab extends
+      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+        Prefab> implements PrefabOrBuilder {
+    // Use Prefab.newBuilder() to construct.
+    private Prefab(Builder builder) {
+      super(builder);
+    }
+    private Prefab(boolean noInit) {}
+    
+    private static final Prefab defaultInstance;
+    public static Prefab getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public Prefab getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.terasology.protobuf.EntityData.internal_static_Prefab_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.terasology.protobuf.EntityData.internal_static_Prefab_fieldAccessorTable;
+    }
+    
+    private int bitField0_;
+    // optional sint32 type_index = 1;
+    public static final int TYPE_INDEX_FIELD_NUMBER = 1;
+    private int typeIndex_;
+    public boolean hasTypeIndex() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public int getTypeIndex() {
+      return typeIndex_;
+    }
+    
+    // repeated .Component component = 2;
+    public static final int COMPONENT_FIELD_NUMBER = 2;
+    private java.util.List<org.terasology.protobuf.EntityData.Component> component_;
+    public java.util.List<org.terasology.protobuf.EntityData.Component> getComponentList() {
+      return component_;
+    }
+    public java.util.List<? extends org.terasology.protobuf.EntityData.ComponentOrBuilder> 
+        getComponentOrBuilderList() {
+      return component_;
+    }
+    public int getComponentCount() {
+      return component_.size();
+    }
+    public org.terasology.protobuf.EntityData.Component getComponent(int index) {
+      return component_.get(index);
+    }
+    public org.terasology.protobuf.EntityData.ComponentOrBuilder getComponentOrBuilder(
+        int index) {
+      return component_.get(index);
+    }
+    
+    // repeated sint32 parent_index = 3 [packed = true];
+    public static final int PARENT_INDEX_FIELD_NUMBER = 3;
+    private java.util.List<java.lang.Integer> parentIndex_;
+    public java.util.List<java.lang.Integer>
+        getParentIndexList() {
+      return parentIndex_;
+    }
+    public int getParentIndexCount() {
+      return parentIndex_.size();
+    }
+    public int getParentIndex(int index) {
+      return parentIndex_.get(index);
+    }
+    private int parentIndexMemoizedSerializedSize = -1;
+    
+    // optional string name = 15;
+    public static final int NAME_FIELD_NUMBER = 15;
+    private java.lang.Object name_;
+    public boolean hasName() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          name_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // repeated string parent_name = 16;
+    public static final int PARENT_NAME_FIELD_NUMBER = 16;
+    private com.google.protobuf.LazyStringList parentName_;
+    public java.util.List<String>
+        getParentNameList() {
+      return parentName_;
+    }
+    public int getParentNameCount() {
+      return parentName_.size();
+    }
+    public String getParentName(int index) {
+      return parentName_.get(index);
+    }
+    
+    private void initFields() {
+      typeIndex_ = 0;
+      component_ = java.util.Collections.emptyList();
+      parentIndex_ = java.util.Collections.emptyList();;
+      name_ = "";
+      parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      for (int i = 0; i < getComponentCount(); i++) {
+        if (!getComponent(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      if (!extensionsAreInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      com.google.protobuf.GeneratedMessage
+        .ExtendableMessage<org.terasology.protobuf.EntityData.Prefab>.ExtensionWriter extensionWriter =
+          newExtensionWriter();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeSInt32(1, typeIndex_);
+      }
+      for (int i = 0; i < component_.size(); i++) {
+        output.writeMessage(2, component_.get(i));
+      }
+      if (getParentIndexList().size() > 0) {
+        output.writeRawVarint32(26);
+        output.writeRawVarint32(parentIndexMemoizedSerializedSize);
+      }
+      for (int i = 0; i < parentIndex_.size(); i++) {
+        output.writeSInt32NoTag(parentIndex_.get(i));
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(15, getNameBytes());
+      }
+      for (int i = 0; i < parentName_.size(); i++) {
+        output.writeBytes(16, parentName_.getByteString(i));
+      }
+      extensionWriter.writeUntil(2000, output);
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(1, typeIndex_);
+      }
+      for (int i = 0; i < component_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, component_.get(i));
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < parentIndex_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeSInt32SizeNoTag(parentIndex_.get(i));
+        }
+        size += dataSize;
+        if (!getParentIndexList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        parentIndexMemoizedSerializedSize = dataSize;
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(15, getNameBytes());
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < parentName_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(parentName_.getByteString(i));
+        }
+        size += dataSize;
+        size += 2 * getParentNameList().size();
+      }
+      size += extensionsSerializedSize();
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static org.terasology.protobuf.EntityData.Prefab parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static org.terasology.protobuf.EntityData.Prefab parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.terasology.protobuf.EntityData.Prefab parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static org.terasology.protobuf.EntityData.Prefab parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.terasology.protobuf.EntityData.Prefab parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static org.terasology.protobuf.EntityData.Prefab parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.terasology.protobuf.EntityData.Prefab parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static org.terasology.protobuf.EntityData.Prefab parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static org.terasology.protobuf.EntityData.Prefab parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static org.terasology.protobuf.EntityData.Prefab parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.terasology.protobuf.EntityData.Prefab prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+          org.terasology.protobuf.EntityData.Prefab, Builder> implements org.terasology.protobuf.EntityData.PrefabOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.terasology.protobuf.EntityData.internal_static_Prefab_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.terasology.protobuf.EntityData.internal_static_Prefab_fieldAccessorTable;
+      }
+      
+      // Construct using org.terasology.protobuf.EntityData.Prefab.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getComponentFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        typeIndex_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        if (componentBuilder_ == null) {
+          component_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+        } else {
+          componentBuilder_.clear();
+        }
+        parentIndex_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        name_ = "";
+        bitField0_ = (bitField0_ & ~0x00000008);
+        parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.terasology.protobuf.EntityData.Prefab.getDescriptor();
+      }
+      
+      public org.terasology.protobuf.EntityData.Prefab getDefaultInstanceForType() {
+        return org.terasology.protobuf.EntityData.Prefab.getDefaultInstance();
+      }
+      
+      public org.terasology.protobuf.EntityData.Prefab build() {
+        org.terasology.protobuf.EntityData.Prefab result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private org.terasology.protobuf.EntityData.Prefab buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        org.terasology.protobuf.EntityData.Prefab result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public org.terasology.protobuf.EntityData.Prefab buildPartial() {
+        org.terasology.protobuf.EntityData.Prefab result = new org.terasology.protobuf.EntityData.Prefab(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.typeIndex_ = typeIndex_;
+        if (componentBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) == 0x00000002)) {
+            component_ = java.util.Collections.unmodifiableList(component_);
+            bitField0_ = (bitField0_ & ~0x00000002);
+          }
+          result.component_ = component_;
+        } else {
+          result.component_ = componentBuilder_.build();
+        }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          parentIndex_ = java.util.Collections.unmodifiableList(parentIndex_);
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.parentIndex_ = parentIndex_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.name_ = name_;
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          parentName_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              parentName_);
+          bitField0_ = (bitField0_ & ~0x00000010);
+        }
+        result.parentName_ = parentName_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.terasology.protobuf.EntityData.Prefab) {
+          return mergeFrom((org.terasology.protobuf.EntityData.Prefab)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(org.terasology.protobuf.EntityData.Prefab other) {
+        if (other == org.terasology.protobuf.EntityData.Prefab.getDefaultInstance()) return this;
+        if (other.hasTypeIndex()) {
+          setTypeIndex(other.getTypeIndex());
+        }
+        if (componentBuilder_ == null) {
+          if (!other.component_.isEmpty()) {
+            if (component_.isEmpty()) {
+              component_ = other.component_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+            } else {
+              ensureComponentIsMutable();
+              component_.addAll(other.component_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.component_.isEmpty()) {
+            if (componentBuilder_.isEmpty()) {
+              componentBuilder_.dispose();
+              componentBuilder_ = null;
+              component_ = other.component_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+              componentBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getComponentFieldBuilder() : null;
+            } else {
+              componentBuilder_.addAllMessages(other.component_);
+            }
+          }
+        }
+        if (!other.parentIndex_.isEmpty()) {
+          if (parentIndex_.isEmpty()) {
+            parentIndex_ = other.parentIndex_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureParentIndexIsMutable();
+            parentIndex_.addAll(other.parentIndex_);
+          }
+          onChanged();
+        }
+        if (other.hasName()) {
+          setName(other.getName());
+        }
+        if (!other.parentName_.isEmpty()) {
+          if (parentName_.isEmpty()) {
+            parentName_ = other.parentName_;
+            bitField0_ = (bitField0_ & ~0x00000010);
+          } else {
+            ensureParentNameIsMutable();
+            parentName_.addAll(other.parentName_);
+          }
+          onChanged();
+        }
+        this.mergeExtensionFields(other);
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        for (int i = 0; i < getComponentCount(); i++) {
+          if (!getComponent(i).isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (!extensionsAreInitialized()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              typeIndex_ = input.readSInt32();
+              break;
+            }
+            case 18: {
+              org.terasology.protobuf.EntityData.Component.Builder subBuilder = org.terasology.protobuf.EntityData.Component.newBuilder();
+              input.readMessage(subBuilder, extensionRegistry);
+              addComponent(subBuilder.buildPartial());
+              break;
+            }
+            case 24: {
+              ensureParentIndexIsMutable();
+              parentIndex_.add(input.readSInt32());
+              break;
+            }
+            case 26: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              while (input.getBytesUntilLimit() > 0) {
+                addParentIndex(input.readSInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 122: {
+              bitField0_ |= 0x00000008;
+              name_ = input.readBytes();
+              break;
+            }
+            case 130: {
+              ensureParentNameIsMutable();
+              parentName_.add(input.readBytes());
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // optional sint32 type_index = 1;
+      private int typeIndex_ ;
+      public boolean hasTypeIndex() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public int getTypeIndex() {
+        return typeIndex_;
+      }
+      public Builder setTypeIndex(int value) {
+        bitField0_ |= 0x00000001;
+        typeIndex_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearTypeIndex() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        typeIndex_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // repeated .Component component = 2;
+      private java.util.List<org.terasology.protobuf.EntityData.Component> component_ =
+        java.util.Collections.emptyList();
+      private void ensureComponentIsMutable() {
+        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+          component_ = new java.util.ArrayList<org.terasology.protobuf.EntityData.Component>(component_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+      
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.terasology.protobuf.EntityData.Component, org.terasology.protobuf.EntityData.Component.Builder, org.terasology.protobuf.EntityData.ComponentOrBuilder> componentBuilder_;
+      
+      public java.util.List<org.terasology.protobuf.EntityData.Component> getComponentList() {
+        if (componentBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(component_);
+        } else {
+          return componentBuilder_.getMessageList();
+        }
+      }
+      public int getComponentCount() {
+        if (componentBuilder_ == null) {
+          return component_.size();
+        } else {
+          return componentBuilder_.getCount();
+        }
+      }
+      public org.terasology.protobuf.EntityData.Component getComponent(int index) {
+        if (componentBuilder_ == null) {
+          return component_.get(index);
+        } else {
+          return componentBuilder_.getMessage(index);
+        }
+      }
+      public Builder setComponent(
+          int index, org.terasology.protobuf.EntityData.Component value) {
+        if (componentBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureComponentIsMutable();
+          component_.set(index, value);
+          onChanged();
+        } else {
+          componentBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      public Builder setComponent(
+          int index, org.terasology.protobuf.EntityData.Component.Builder builderForValue) {
+        if (componentBuilder_ == null) {
+          ensureComponentIsMutable();
+          component_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          componentBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addComponent(org.terasology.protobuf.EntityData.Component value) {
+        if (componentBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureComponentIsMutable();
+          component_.add(value);
+          onChanged();
+        } else {
+          componentBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      public Builder addComponent(
+          int index, org.terasology.protobuf.EntityData.Component value) {
+        if (componentBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureComponentIsMutable();
+          component_.add(index, value);
+          onChanged();
+        } else {
+          componentBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      public Builder addComponent(
+          org.terasology.protobuf.EntityData.Component.Builder builderForValue) {
+        if (componentBuilder_ == null) {
+          ensureComponentIsMutable();
+          component_.add(builderForValue.build());
+          onChanged();
+        } else {
+          componentBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addComponent(
+          int index, org.terasology.protobuf.EntityData.Component.Builder builderForValue) {
+        if (componentBuilder_ == null) {
+          ensureComponentIsMutable();
+          component_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          componentBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addAllComponent(
+          java.lang.Iterable<? extends org.terasology.protobuf.EntityData.Component> values) {
+        if (componentBuilder_ == null) {
+          ensureComponentIsMutable();
+          super.addAll(values, component_);
+          onChanged();
+        } else {
+          componentBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      public Builder clearComponent() {
+        if (componentBuilder_ == null) {
+          component_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+          onChanged();
+        } else {
+          componentBuilder_.clear();
+        }
+        return this;
+      }
+      public Builder removeComponent(int index) {
+        if (componentBuilder_ == null) {
+          ensureComponentIsMutable();
+          component_.remove(index);
+          onChanged();
+        } else {
+          componentBuilder_.remove(index);
+        }
+        return this;
+      }
+      public org.terasology.protobuf.EntityData.Component.Builder getComponentBuilder(
+          int index) {
+        return getComponentFieldBuilder().getBuilder(index);
+      }
+      public org.terasology.protobuf.EntityData.ComponentOrBuilder getComponentOrBuilder(
+          int index) {
+        if (componentBuilder_ == null) {
+          return component_.get(index);  } else {
+          return componentBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      public java.util.List<? extends org.terasology.protobuf.EntityData.ComponentOrBuilder> 
+           getComponentOrBuilderList() {
+        if (componentBuilder_ != null) {
+          return componentBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(component_);
+        }
+      }
+      public org.terasology.protobuf.EntityData.Component.Builder addComponentBuilder() {
+        return getComponentFieldBuilder().addBuilder(
+            org.terasology.protobuf.EntityData.Component.getDefaultInstance());
+      }
+      public org.terasology.protobuf.EntityData.Component.Builder addComponentBuilder(
+          int index) {
+        return getComponentFieldBuilder().addBuilder(
+            index, org.terasology.protobuf.EntityData.Component.getDefaultInstance());
+      }
+      public java.util.List<org.terasology.protobuf.EntityData.Component.Builder> 
+           getComponentBuilderList() {
+        return getComponentFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.terasology.protobuf.EntityData.Component, org.terasology.protobuf.EntityData.Component.Builder, org.terasology.protobuf.EntityData.ComponentOrBuilder> 
+          getComponentFieldBuilder() {
+        if (componentBuilder_ == null) {
+          componentBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.terasology.protobuf.EntityData.Component, org.terasology.protobuf.EntityData.Component.Builder, org.terasology.protobuf.EntityData.ComponentOrBuilder>(
+                  component_,
+                  ((bitField0_ & 0x00000002) == 0x00000002),
+                  getParentForChildren(),
+                  isClean());
+          component_ = null;
+        }
+        return componentBuilder_;
+      }
+      
+      // repeated sint32 parent_index = 3 [packed = true];
+      private java.util.List<java.lang.Integer> parentIndex_ = java.util.Collections.emptyList();;
+      private void ensureParentIndexIsMutable() {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+          parentIndex_ = new java.util.ArrayList<java.lang.Integer>(parentIndex_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+      public java.util.List<java.lang.Integer>
+          getParentIndexList() {
+        return java.util.Collections.unmodifiableList(parentIndex_);
+      }
+      public int getParentIndexCount() {
+        return parentIndex_.size();
+      }
+      public int getParentIndex(int index) {
+        return parentIndex_.get(index);
+      }
+      public Builder setParentIndex(
+          int index, int value) {
+        ensureParentIndexIsMutable();
+        parentIndex_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addParentIndex(int value) {
+        ensureParentIndexIsMutable();
+        parentIndex_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllParentIndex(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureParentIndexIsMutable();
+        super.addAll(values, parentIndex_);
+        onChanged();
+        return this;
+      }
+      public Builder clearParentIndex() {
+        parentIndex_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      
+      // optional string name = 15;
+      private java.lang.Object name_ = "";
+      public boolean hasName() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          name_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setName(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        name_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearName() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        name_ = getDefaultInstance().getName();
+        onChanged();
+        return this;
+      }
+      void setName(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000008;
+        name_ = value;
+        onChanged();
+      }
+      
+      // repeated string parent_name = 16;
+      private com.google.protobuf.LazyStringList parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureParentNameIsMutable() {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+          parentName_ = new com.google.protobuf.LazyStringArrayList(parentName_);
+          bitField0_ |= 0x00000010;
+         }
+      }
+      public java.util.List<String>
+          getParentNameList() {
+        return java.util.Collections.unmodifiableList(parentName_);
+      }
+      public int getParentNameCount() {
+        return parentName_.size();
+      }
+      public String getParentName(int index) {
+        return parentName_.get(index);
+      }
+      public Builder setParentName(
+          int index, String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureParentNameIsMutable();
+        parentName_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addParentName(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureParentNameIsMutable();
+        parentName_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllParentName(
+          java.lang.Iterable<String> values) {
+        ensureParentNameIsMutable();
+        super.addAll(values, parentName_);
+        onChanged();
+        return this;
+      }
+      public Builder clearParentName() {
+        parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
+        return this;
+      }
+      void addParentName(com.google.protobuf.ByteString value) {
+        ensureParentNameIsMutable();
+        parentName_.add(value);
+        onChanged();
+      }
+      
+      // @@protoc_insertion_point(builder_scope:Prefab)
+    }
+    
+    static {
+      defaultInstance = new Prefab(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:Prefab)
   }
   
   public interface WorldOrBuilder extends
@@ -3519,6 +4709,16 @@ public final class EntityData {
     org.terasology.protobuf.EntityData.EntityOrBuilder getEntityOrBuilder(
         int index);
     
+    // repeated .Prefab prefab = 2;
+    java.util.List<org.terasology.protobuf.EntityData.Prefab> 
+        getPrefabList();
+    org.terasology.protobuf.EntityData.Prefab getPrefab(int index);
+    int getPrefabCount();
+    java.util.List<? extends org.terasology.protobuf.EntityData.PrefabOrBuilder> 
+        getPrefabOrBuilderList();
+    org.terasology.protobuf.EntityData.PrefabOrBuilder getPrefabOrBuilder(
+        int index);
+    
     // repeated string component_class = 15;
     java.util.List<String> getComponentClassList();
     int getComponentClassCount();
@@ -3532,6 +4732,11 @@ public final class EntityData {
     java.util.List<java.lang.Integer> getFreedEntityIdList();
     int getFreedEntityIdCount();
     int getFreedEntityId(int index);
+    
+    // repeated string prefab_name = 18;
+    java.util.List<String> getPrefabNameList();
+    int getPrefabNameCount();
+    String getPrefabName(int index);
   }
   public static final class World extends
       com.google.protobuf.GeneratedMessage.ExtendableMessage<
@@ -3583,6 +4788,27 @@ public final class EntityData {
       return entity_.get(index);
     }
     
+    // repeated .Prefab prefab = 2;
+    public static final int PREFAB_FIELD_NUMBER = 2;
+    private java.util.List<org.terasology.protobuf.EntityData.Prefab> prefab_;
+    public java.util.List<org.terasology.protobuf.EntityData.Prefab> getPrefabList() {
+      return prefab_;
+    }
+    public java.util.List<? extends org.terasology.protobuf.EntityData.PrefabOrBuilder> 
+        getPrefabOrBuilderList() {
+      return prefab_;
+    }
+    public int getPrefabCount() {
+      return prefab_.size();
+    }
+    public org.terasology.protobuf.EntityData.Prefab getPrefab(int index) {
+      return prefab_.get(index);
+    }
+    public org.terasology.protobuf.EntityData.PrefabOrBuilder getPrefabOrBuilder(
+        int index) {
+      return prefab_.get(index);
+    }
+    
     // repeated string component_class = 15;
     public static final int COMPONENT_CLASS_FIELD_NUMBER = 15;
     private com.google.protobuf.LazyStringList componentClass_;
@@ -3622,11 +4848,27 @@ public final class EntityData {
     }
     private int freedEntityIdMemoizedSerializedSize = -1;
     
+    // repeated string prefab_name = 18;
+    public static final int PREFAB_NAME_FIELD_NUMBER = 18;
+    private com.google.protobuf.LazyStringList prefabName_;
+    public java.util.List<String>
+        getPrefabNameList() {
+      return prefabName_;
+    }
+    public int getPrefabNameCount() {
+      return prefabName_.size();
+    }
+    public String getPrefabName(int index) {
+      return prefabName_.get(index);
+    }
+    
     private void initFields() {
       entity_ = java.util.Collections.emptyList();
+      prefab_ = java.util.Collections.emptyList();
       componentClass_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       nextEntityId_ = 0;
       freedEntityId_ = java.util.Collections.emptyList();;
+      prefabName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3635,6 +4877,12 @@ public final class EntityData {
       
       for (int i = 0; i < getEntityCount(); i++) {
         if (!getEntity(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      for (int i = 0; i < getPrefabCount(); i++) {
+        if (!getPrefab(i).isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -3656,6 +4904,9 @@ public final class EntityData {
       for (int i = 0; i < entity_.size(); i++) {
         output.writeMessage(1, entity_.get(i));
       }
+      for (int i = 0; i < prefab_.size(); i++) {
+        output.writeMessage(2, prefab_.get(i));
+      }
       for (int i = 0; i < componentClass_.size(); i++) {
         output.writeBytes(15, componentClass_.getByteString(i));
       }
@@ -3668,6 +4919,9 @@ public final class EntityData {
       }
       for (int i = 0; i < freedEntityId_.size(); i++) {
         output.writeSInt32NoTag(freedEntityId_.get(i));
+      }
+      for (int i = 0; i < prefabName_.size(); i++) {
+        output.writeBytes(18, prefabName_.getByteString(i));
       }
       extensionWriter.writeUntil(2000, output);
       getUnknownFields().writeTo(output);
@@ -3682,6 +4936,10 @@ public final class EntityData {
       for (int i = 0; i < entity_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, entity_.get(i));
+      }
+      for (int i = 0; i < prefab_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, prefab_.get(i));
       }
       {
         int dataSize = 0;
@@ -3709,6 +4967,15 @@ public final class EntityData {
               .computeInt32SizeNoTag(dataSize);
         }
         freedEntityIdMemoizedSerializedSize = dataSize;
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < prefabName_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(prefabName_.getByteString(i));
+        }
+        size += dataSize;
+        size += 2 * getPrefabNameList().size();
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -3828,6 +5095,7 @@ public final class EntityData {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getEntityFieldBuilder();
+          getPrefabFieldBuilder();
         }
       }
       private static Builder create() {
@@ -3842,12 +5110,20 @@ public final class EntityData {
         } else {
           entityBuilder_.clear();
         }
+        if (prefabBuilder_ == null) {
+          prefab_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+        } else {
+          prefabBuilder_.clear();
+        }
         componentClass_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        nextEntityId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        freedEntityId_ = java.util.Collections.emptyList();;
+        nextEntityId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
+        freedEntityId_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        prefabName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
       
@@ -3895,21 +5171,36 @@ public final class EntityData {
         } else {
           result.entity_ = entityBuilder_.build();
         }
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        if (prefabBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) == 0x00000002)) {
+            prefab_ = java.util.Collections.unmodifiableList(prefab_);
+            bitField0_ = (bitField0_ & ~0x00000002);
+          }
+          result.prefab_ = prefab_;
+        } else {
+          result.prefab_ = prefabBuilder_.build();
+        }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
           componentClass_ = new com.google.protobuf.UnmodifiableLazyStringList(
               componentClass_);
-          bitField0_ = (bitField0_ & ~0x00000002);
+          bitField0_ = (bitField0_ & ~0x00000004);
         }
         result.componentClass_ = componentClass_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000001;
         }
         result.nextEntityId_ = nextEntityId_;
-        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
           freedEntityId_ = java.util.Collections.unmodifiableList(freedEntityId_);
-          bitField0_ = (bitField0_ & ~0x00000008);
+          bitField0_ = (bitField0_ & ~0x00000010);
         }
         result.freedEntityId_ = freedEntityId_;
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          prefabName_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              prefabName_);
+          bitField0_ = (bitField0_ & ~0x00000020);
+        }
+        result.prefabName_ = prefabName_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3952,10 +5243,36 @@ public final class EntityData {
             }
           }
         }
+        if (prefabBuilder_ == null) {
+          if (!other.prefab_.isEmpty()) {
+            if (prefab_.isEmpty()) {
+              prefab_ = other.prefab_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+            } else {
+              ensurePrefabIsMutable();
+              prefab_.addAll(other.prefab_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.prefab_.isEmpty()) {
+            if (prefabBuilder_.isEmpty()) {
+              prefabBuilder_.dispose();
+              prefabBuilder_ = null;
+              prefab_ = other.prefab_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+              prefabBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getPrefabFieldBuilder() : null;
+            } else {
+              prefabBuilder_.addAllMessages(other.prefab_);
+            }
+          }
+        }
         if (!other.componentClass_.isEmpty()) {
           if (componentClass_.isEmpty()) {
             componentClass_ = other.componentClass_;
-            bitField0_ = (bitField0_ & ~0x00000002);
+            bitField0_ = (bitField0_ & ~0x00000004);
           } else {
             ensureComponentClassIsMutable();
             componentClass_.addAll(other.componentClass_);
@@ -3968,10 +5285,20 @@ public final class EntityData {
         if (!other.freedEntityId_.isEmpty()) {
           if (freedEntityId_.isEmpty()) {
             freedEntityId_ = other.freedEntityId_;
-            bitField0_ = (bitField0_ & ~0x00000008);
+            bitField0_ = (bitField0_ & ~0x00000010);
           } else {
             ensureFreedEntityIdIsMutable();
             freedEntityId_.addAll(other.freedEntityId_);
+          }
+          onChanged();
+        }
+        if (!other.prefabName_.isEmpty()) {
+          if (prefabName_.isEmpty()) {
+            prefabName_ = other.prefabName_;
+            bitField0_ = (bitField0_ & ~0x00000020);
+          } else {
+            ensurePrefabNameIsMutable();
+            prefabName_.addAll(other.prefabName_);
           }
           onChanged();
         }
@@ -3983,6 +5310,12 @@ public final class EntityData {
       public final boolean isInitialized() {
         for (int i = 0; i < getEntityCount(); i++) {
           if (!getEntity(i).isInitialized()) {
+            
+            return false;
+          }
+        }
+        for (int i = 0; i < getPrefabCount(); i++) {
+          if (!getPrefab(i).isInitialized()) {
             
             return false;
           }
@@ -4023,13 +5356,19 @@ public final class EntityData {
               addEntity(subBuilder.buildPartial());
               break;
             }
+            case 18: {
+              org.terasology.protobuf.EntityData.Prefab.Builder subBuilder = org.terasology.protobuf.EntityData.Prefab.newBuilder();
+              input.readMessage(subBuilder, extensionRegistry);
+              addPrefab(subBuilder.buildPartial());
+              break;
+            }
             case 122: {
               ensureComponentClassIsMutable();
               componentClass_.add(input.readBytes());
               break;
             }
             case 128: {
-              bitField0_ |= 0x00000004;
+              bitField0_ |= 0x00000008;
               nextEntityId_ = input.readSInt32();
               break;
             }
@@ -4045,6 +5384,11 @@ public final class EntityData {
                 addFreedEntityId(input.readSInt32());
               }
               input.popLimit(limit);
+              break;
+            }
+            case 146: {
+              ensurePrefabNameIsMutable();
+              prefabName_.add(input.readBytes());
               break;
             }
           }
@@ -4239,12 +5583,198 @@ public final class EntityData {
         return entityBuilder_;
       }
       
+      // repeated .Prefab prefab = 2;
+      private java.util.List<org.terasology.protobuf.EntityData.Prefab> prefab_ =
+        java.util.Collections.emptyList();
+      private void ensurePrefabIsMutable() {
+        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+          prefab_ = new java.util.ArrayList<org.terasology.protobuf.EntityData.Prefab>(prefab_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+      
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.terasology.protobuf.EntityData.Prefab, org.terasology.protobuf.EntityData.Prefab.Builder, org.terasology.protobuf.EntityData.PrefabOrBuilder> prefabBuilder_;
+      
+      public java.util.List<org.terasology.protobuf.EntityData.Prefab> getPrefabList() {
+        if (prefabBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(prefab_);
+        } else {
+          return prefabBuilder_.getMessageList();
+        }
+      }
+      public int getPrefabCount() {
+        if (prefabBuilder_ == null) {
+          return prefab_.size();
+        } else {
+          return prefabBuilder_.getCount();
+        }
+      }
+      public org.terasology.protobuf.EntityData.Prefab getPrefab(int index) {
+        if (prefabBuilder_ == null) {
+          return prefab_.get(index);
+        } else {
+          return prefabBuilder_.getMessage(index);
+        }
+      }
+      public Builder setPrefab(
+          int index, org.terasology.protobuf.EntityData.Prefab value) {
+        if (prefabBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePrefabIsMutable();
+          prefab_.set(index, value);
+          onChanged();
+        } else {
+          prefabBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      public Builder setPrefab(
+          int index, org.terasology.protobuf.EntityData.Prefab.Builder builderForValue) {
+        if (prefabBuilder_ == null) {
+          ensurePrefabIsMutable();
+          prefab_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          prefabBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addPrefab(org.terasology.protobuf.EntityData.Prefab value) {
+        if (prefabBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePrefabIsMutable();
+          prefab_.add(value);
+          onChanged();
+        } else {
+          prefabBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      public Builder addPrefab(
+          int index, org.terasology.protobuf.EntityData.Prefab value) {
+        if (prefabBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePrefabIsMutable();
+          prefab_.add(index, value);
+          onChanged();
+        } else {
+          prefabBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      public Builder addPrefab(
+          org.terasology.protobuf.EntityData.Prefab.Builder builderForValue) {
+        if (prefabBuilder_ == null) {
+          ensurePrefabIsMutable();
+          prefab_.add(builderForValue.build());
+          onChanged();
+        } else {
+          prefabBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addPrefab(
+          int index, org.terasology.protobuf.EntityData.Prefab.Builder builderForValue) {
+        if (prefabBuilder_ == null) {
+          ensurePrefabIsMutable();
+          prefab_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          prefabBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addAllPrefab(
+          java.lang.Iterable<? extends org.terasology.protobuf.EntityData.Prefab> values) {
+        if (prefabBuilder_ == null) {
+          ensurePrefabIsMutable();
+          super.addAll(values, prefab_);
+          onChanged();
+        } else {
+          prefabBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      public Builder clearPrefab() {
+        if (prefabBuilder_ == null) {
+          prefab_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+          onChanged();
+        } else {
+          prefabBuilder_.clear();
+        }
+        return this;
+      }
+      public Builder removePrefab(int index) {
+        if (prefabBuilder_ == null) {
+          ensurePrefabIsMutable();
+          prefab_.remove(index);
+          onChanged();
+        } else {
+          prefabBuilder_.remove(index);
+        }
+        return this;
+      }
+      public org.terasology.protobuf.EntityData.Prefab.Builder getPrefabBuilder(
+          int index) {
+        return getPrefabFieldBuilder().getBuilder(index);
+      }
+      public org.terasology.protobuf.EntityData.PrefabOrBuilder getPrefabOrBuilder(
+          int index) {
+        if (prefabBuilder_ == null) {
+          return prefab_.get(index);  } else {
+          return prefabBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      public java.util.List<? extends org.terasology.protobuf.EntityData.PrefabOrBuilder> 
+           getPrefabOrBuilderList() {
+        if (prefabBuilder_ != null) {
+          return prefabBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(prefab_);
+        }
+      }
+      public org.terasology.protobuf.EntityData.Prefab.Builder addPrefabBuilder() {
+        return getPrefabFieldBuilder().addBuilder(
+            org.terasology.protobuf.EntityData.Prefab.getDefaultInstance());
+      }
+      public org.terasology.protobuf.EntityData.Prefab.Builder addPrefabBuilder(
+          int index) {
+        return getPrefabFieldBuilder().addBuilder(
+            index, org.terasology.protobuf.EntityData.Prefab.getDefaultInstance());
+      }
+      public java.util.List<org.terasology.protobuf.EntityData.Prefab.Builder> 
+           getPrefabBuilderList() {
+        return getPrefabFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.terasology.protobuf.EntityData.Prefab, org.terasology.protobuf.EntityData.Prefab.Builder, org.terasology.protobuf.EntityData.PrefabOrBuilder> 
+          getPrefabFieldBuilder() {
+        if (prefabBuilder_ == null) {
+          prefabBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.terasology.protobuf.EntityData.Prefab, org.terasology.protobuf.EntityData.Prefab.Builder, org.terasology.protobuf.EntityData.PrefabOrBuilder>(
+                  prefab_,
+                  ((bitField0_ & 0x00000002) == 0x00000002),
+                  getParentForChildren(),
+                  isClean());
+          prefab_ = null;
+        }
+        return prefabBuilder_;
+      }
+      
       // repeated string component_class = 15;
       private com.google.protobuf.LazyStringList componentClass_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureComponentClassIsMutable() {
-        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
           componentClass_ = new com.google.protobuf.LazyStringArrayList(componentClass_);
-          bitField0_ |= 0x00000002;
+          bitField0_ |= 0x00000004;
          }
       }
       public java.util.List<String>
@@ -4285,7 +5815,7 @@ public final class EntityData {
       }
       public Builder clearComponentClass() {
         componentClass_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
         return this;
       }
@@ -4298,19 +5828,19 @@ public final class EntityData {
       // optional sint32 next_entity_id = 16;
       private int nextEntityId_ ;
       public boolean hasNextEntityId() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       public int getNextEntityId() {
         return nextEntityId_;
       }
       public Builder setNextEntityId(int value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         nextEntityId_ = value;
         onChanged();
         return this;
       }
       public Builder clearNextEntityId() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         nextEntityId_ = 0;
         onChanged();
         return this;
@@ -4319,9 +5849,9 @@ public final class EntityData {
       // repeated sint32 freed_entity_id = 17 [packed = true];
       private java.util.List<java.lang.Integer> freedEntityId_ = java.util.Collections.emptyList();;
       private void ensureFreedEntityIdIsMutable() {
-        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
           freedEntityId_ = new java.util.ArrayList<java.lang.Integer>(freedEntityId_);
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000010;
          }
       }
       public java.util.List<java.lang.Integer>
@@ -4356,9 +5886,65 @@ public final class EntityData {
       }
       public Builder clearFreedEntityId() {
         freedEntityId_ = java.util.Collections.emptyList();;
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
+      }
+      
+      // repeated string prefab_name = 18;
+      private com.google.protobuf.LazyStringList prefabName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensurePrefabNameIsMutable() {
+        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+          prefabName_ = new com.google.protobuf.LazyStringArrayList(prefabName_);
+          bitField0_ |= 0x00000020;
+         }
+      }
+      public java.util.List<String>
+          getPrefabNameList() {
+        return java.util.Collections.unmodifiableList(prefabName_);
+      }
+      public int getPrefabNameCount() {
+        return prefabName_.size();
+      }
+      public String getPrefabName(int index) {
+        return prefabName_.get(index);
+      }
+      public Builder setPrefabName(
+          int index, String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensurePrefabNameIsMutable();
+        prefabName_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addPrefabName(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensurePrefabNameIsMutable();
+        prefabName_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllPrefabName(
+          java.lang.Iterable<String> values) {
+        ensurePrefabNameIsMutable();
+        super.addAll(values, prefabName_);
+        onChanged();
+        return this;
+      }
+      public Builder clearPrefabName() {
+        prefabName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        onChanged();
+        return this;
+      }
+      void addPrefabName(com.google.protobuf.ByteString value) {
+        ensurePrefabNameIsMutable();
+        prefabName_.add(value);
+        onChanged();
       }
       
       // @@protoc_insertion_point(builder_scope:World)
@@ -4393,6 +5979,11 @@ public final class EntityData {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Entity_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_Prefab_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_Prefab_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_World_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -4414,13 +6005,19 @@ public final class EntityData {
       "2\n.NameValue\"0\n\tNameValue\022\014\n\004name\030\001 \001(\t\022" +
       "\025\n\005value\030\002 \001(\0132\006.Value\"P\n\tComponent\022\022\n\nt" +
       "ype_index\030\001 \001(\005\022\014\n\004type\030\017 \001(\t\022\031\n\005field\030\002" +
-      " \003(\0132\n.NameValue*\006\010\350\007\020\320\017\";\n\006Entity\022\n\n\002id" +
-      "\030\001 \001(\021\022\035\n\tcomponent\030\002 \003(\0132\n.Component*\006\010",
-      "\350\007\020\320\017\"v\n\005World\022\027\n\006entity\030\001 \003(\0132\007.Entity\022" +
-      "\027\n\017component_class\030\017 \003(\t\022\026\n\016next_entity_" +
-      "id\030\020 \001(\021\022\033\n\017freed_entity_id\030\021 \003(\021B\002\020\001*\006\010" +
-      "\350\007\020\320\017B\'\n\027org.terasology.protobufB\nEntity" +
-      "DataH\001"
+      " \003(\0132\n.NameValue*\006\010\350\007\020\320\017\"{\n\006Entity\022\n\n\002id" +
+      "\030\001 \001(\021\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#\n",
+      "\027removed_component_index\030\003 \003(\021B\002\020\001\022\031\n\021re" +
+      "moved_component\030\017 \003(\t*\006\010\350\007\020\320\017\"\200\001\n\006Prefab" +
+      "\022\022\n\ntype_index\030\001 \001(\021\022\035\n\tcomponent\030\002 \003(\0132" +
+      "\n.Component\022\030\n\014parent_index\030\003 \003(\021B\002\020\001\022\014\n" +
+      "\004name\030\017 \001(\t\022\023\n\013parent_name\030\020 \003(\t*\006\010\350\007\020\320\017" +
+      "\"\244\001\n\005World\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\006p" +
+      "refab\030\002 \003(\0132\007.Prefab\022\027\n\017component_class\030" +
+      "\017 \003(\t\022\026\n\016next_entity_id\030\020 \001(\021\022\033\n\017freed_e" +
+      "ntity_id\030\021 \003(\021B\002\020\001\022\023\n\013prefab_name\030\022 \003(\t*" +
+      "\006\010\350\007\020\320\017B\'\n\027org.terasology.protobufB\nEnti",
+      "tyDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -4456,15 +6053,23 @@ public final class EntityData {
           internal_static_Entity_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Entity_descriptor,
-              new java.lang.String[] { "Id", "Component", },
+              new java.lang.String[] { "Id", "Component", "RemovedComponentIndex", "RemovedComponent", },
               org.terasology.protobuf.EntityData.Entity.class,
               org.terasology.protobuf.EntityData.Entity.Builder.class);
-          internal_static_World_descriptor =
+          internal_static_Prefab_descriptor =
             getDescriptor().getMessageTypes().get(4);
+          internal_static_Prefab_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_Prefab_descriptor,
+              new java.lang.String[] { "TypeIndex", "Component", "ParentIndex", "Name", "ParentName", },
+              org.terasology.protobuf.EntityData.Prefab.class,
+              org.terasology.protobuf.EntityData.Prefab.Builder.class);
+          internal_static_World_descriptor =
+            getDescriptor().getMessageTypes().get(5);
           internal_static_World_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_World_descriptor,
-              new java.lang.String[] { "Entity", "ComponentClass", "NextEntityId", "FreedEntityId", },
+              new java.lang.String[] { "Entity", "Prefab", "ComponentClass", "NextEntityId", "FreedEntityId", "PrefabName", },
               org.terasology.protobuf.EntityData.World.class,
               org.terasology.protobuf.EntityData.World.Builder.class);
           return null;

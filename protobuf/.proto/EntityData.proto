@@ -42,13 +42,29 @@ message Component {
 message Entity {
     optional sint32 id = 1;
     repeated Component component = 2;
+    repeated sint32 removed_component_index = 3 [packed=true];
+    repeated string removed_component = 15;
+
+    extensions 1000 to 1999;
+}
+
+message Prefab {
+    optional sint32 type_index = 1;
+    repeated Component component = 2;
+    repeated sint32 parent_index = 3 [packed=true];
+    optional string name = 15;
+    repeated string parent_name = 16;
+
     extensions 1000 to 1999;
 }
 
 message World {
     repeated Entity entity = 1;
-    repeated string component_class = 15; // Table of component classes, the index of which corresponds to ComponentTypeIndex.
+    repeated Prefab prefab = 2;
+    repeated string component_class = 15; // Table of component classes, the index of which corresponds to Component's type_index.
     optional sint32 next_entity_id = 16;
     repeated sint32 freed_entity_id = 17 [packed=true];
+    repeated string prefab_name = 18; // Table of prefabs, the index of which corresponds to Prefab's type_index;
+
     extensions 1000 to 1999;
 }
