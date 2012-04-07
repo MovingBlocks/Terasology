@@ -1,40 +1,91 @@
 package org.terasology.rendering.gui.components;
 
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.terasology.rendering.gui.framework.IClickListener;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
 
 import javax.tools.DiagnosticListener;
 import javax.vecmath.Vector2f;
 
 
-public class UIDialogBox extends UIScrollableDisplayContainer{
+public class UIDialogBox extends UIDisplayWindow{
+    private UIWindowTitle _title;
+    private UIButton _close;
+    private Vector2f _prevMousePos = null;
+    private boolean _dragged = false;
 
-    public static enum DialogType {
-        MODAL
-    }
-
-    private DialogType _type  = DialogType.MODAL;
-    private  String    _title = "";
-
-    public UIDialogBox(Vector2f size){
-        this(size, "", DialogType.MODAL);
-    }
-
-    public UIDialogBox(Vector2f size, String title){
-        this(size, title, DialogType.MODAL);
-    }
-
-    public UIDialogBox(Vector2f size, String title, DialogType type){
+    public UIDialogBox(String title, Vector2f size){
+        super();
         setSize(size);
-        setTitle(title);
-        setDialogType(type);
-    }
-    
-    public void setTitle(String title){
-        _title = title;
+        setStyle("border-image-top",    "gui_menu 168/512 5/512 260/512 89/512 5");
+        setStyle("border-image-right",  "gui_menu 4/512 81/512 428/512 94/512 4");
+        setStyle("border-image-bottom", "gui_menu 168/512 4/512 260/512 175/512 4");
+        setStyle("border-image-left",   "gui_menu 4/512 81/512 256/512 94/512 4");
+
+        setStyle("border-corner-topleft",     "gui_menu 256/512 89/512");
+        setStyle("border-corner-topright",    "gui_menu 428/512 89/512");
+        setStyle("border-corner-bottomright", "gui_menu 428/512 175/512");
+        setStyle("border-corner-bottomleft",  "gui_menu 256/512 175/512");
+
+        setStyle("background-image","gui_menu 168/512 76/512 260/512 94/512");
+
+        _title = new UIWindowTitle(new Vector2f(getSize().x*0.85f, 19f), title);
+        _title.setVisible(true);
+        _title.getPosition().x = (getPosition().x + size.x/2f) - _title.getSize().x/2;
+        _title.setTitle(title);
+
+
+        _close = new UIButton(new Vector2f(19f, 19f));
+
+        _close.setClassStyle("button",            "background-image: gui_menu 19/512 19/512 73/512 155/512");
+        _close.setClassStyle("button-mouseover",  "background-image: gui_menu 19/512 19/512 54/512 155/512");
+        _close.setClassStyle("button-mouseclick", "background-image: gui_menu 19/512 19/512 92/512 155/512");
+
+        _close.getPosition().x = getSize().x-25f;
+        _close.setVisible(true);
+        _close.getLabel().setText("");
+
+        _close.addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                close(true);
+            }
+        });
+
+        addDisplayElement(_close);
+        addDisplayElement(_title);
     }
 
-    public void setDialogType(DialogType type){
-        _type = type;
+    public void update(){
+        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+        if(intersects(mousePos)){
+            if(_mouseDown){
+                _focused = true;
+                if(_title.intersects(mousePos)){
+                    _dragged = true;
+                    if(_prevMousePos==null){
+                        _prevMousePos =  new Vector2f(mousePos);
+                    }
+                }
+            }
+        }
+
+        if(_dragged){
+            drag(new Vector2f(_prevMousePos.x - mousePos.x, _prevMousePos.y-mousePos.y));
+            _prevMousePos =  new Vector2f(mousePos);
+        }
+
+        if(!_mouseDown||!_dragged || _mouseUp){
+            _dragged     = false;
+            _mouseDown    = false;
+            _prevMousePos = null;
+            _mouseUp      = false;
+            _focused = false;
+        }
+
+        super.update();
     }
 
 }

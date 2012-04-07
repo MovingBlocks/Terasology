@@ -19,6 +19,7 @@ import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -28,7 +29,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UIConfigMenu extends UIDisplayRenderer {
+public class UIConfigMenu extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
@@ -41,6 +42,7 @@ public class UIConfigMenu extends UIDisplayRenderer {
     final UIText _version;
 
     public UIConfigMenu() {
+        maximaze();
         _title = new UIGraphicsElement("terasology");
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
@@ -69,14 +71,14 @@ public class UIConfigMenu extends UIDisplayRenderer {
         _backToMainMenuButton.setVisible(true);
 
         addDisplayElement(_overlay);
-
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-        addDisplayElement(_graphicsQualityButton);
-        addDisplayElement(_fovButton);
-        addDisplayElement(_backToMainMenuButton);
-        addDisplayElement(_viewingDistanceButton);
+        addDisplayElement(_graphicsQualityButton, "graphicsQualityButton");
+        addDisplayElement(_fovButton, "fovButton");
+        addDisplayElement(_backToMainMenuButton, "backToMainMenuButton");
+        addDisplayElement(_viewingDistanceButton, "viewingDistanceButton");
+        update();
     }
 
     @Override
@@ -100,21 +102,5 @@ public class UIConfigMenu extends UIDisplayRenderer {
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;
-    }
-
-    public UIButton getGraphicsQualityButton() {
-        return _graphicsQualityButton;
-    }
-
-    public UIButton getBackToMainMenuButton() {
-        return _backToMainMenuButton;
-    }
-
-    public UIButton getViewingDistanceButton() {
-        return _viewingDistanceButton;
-    }
-
-    public UIButton getFOVButton() {
-        return _fovButton;
     }
 }

@@ -2,18 +2,15 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.newdawn.slick.Color;
+import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.*;
+public class UIList extends UIScrollableDisplayContainer implements IInputDataElement {
 
-public class UIList extends UIScrollableDisplayContainer {
-
-    private UIListItem _selectedItem        = null;
     private int        _selectedItemIndex   = -1;
 
     //List items
@@ -54,7 +51,6 @@ public class UIList extends UIScrollableDisplayContainer {
                                 _items.get(_selectedItemIndex).setSelected(false);
                             }
                             item.setSelected(true);
-                            _selectedItem      = item;
                             _selectedItemIndex = i;
                             _mouseDown         = false;
                             itemClicked = true;
@@ -99,13 +95,12 @@ public class UIList extends UIScrollableDisplayContainer {
 
     public void removeSelectedItem(){
 
-        if(_selectedItemIndex<0 || _selectedItem == null){
+        if(_selectedItemIndex<0){
             return;
         }
 
-        removeDisplayElement(_selectedItem);
+        removeDisplayElement(_items.get(_selectedItemIndex));
         _items.remove(_selectedItemIndex);
-        _selectedItem = null;
 
         for(int i=_selectedItemIndex; i<_items.size(); i++){
             _items.get(i).getPosition().y -= 32f;
@@ -121,14 +116,13 @@ public class UIList extends UIScrollableDisplayContainer {
         }
 
         if(_selectedItemIndex>=0){
-            _selectedItem = _items.get(_selectedItemIndex);
-            _selectedItem.setSelected(true);
+            _items.get(_selectedItemIndex).setSelected(true);
         }
 
     }
 
     public UIListItem getSelectedItem(){
-        return _selectedItem;
+        return _items.get(_selectedItemIndex);
     }
 
     public void removeAll(){
@@ -142,5 +136,14 @@ public class UIList extends UIScrollableDisplayContainer {
     public void removeItem(int index){
         removeDisplayElement(_items.get(index));
         _items.remove(index);
+    }
+
+    public Object getValue() {
+        return _items.get(_selectedItemIndex).getValue();  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void clearData(){
+        _selectedItemIndex = -1;
+        _items.get(_selectedItemIndex).setSelected(false);
     }
 }

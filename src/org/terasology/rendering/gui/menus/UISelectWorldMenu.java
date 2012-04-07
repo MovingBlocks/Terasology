@@ -19,8 +19,8 @@ import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
 import org.lwjgl.opengl.Display;
 import org.terasology.game.Terasology;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.*;
@@ -39,7 +39,7 @@ import java.util.logging.Level;
  * @author Anton Kireev <adeon.k87@gmail.com>
  *
  */
-public class UISelectWorldMenu extends UIDisplayRenderer {
+public class UISelectWorldMenu extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIList _list;
@@ -50,12 +50,16 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
     final UIDialogCreateNewWorld _window;
 
     public UISelectWorldMenu() {
+        maximaze();
         _overlay = new UIImageOverlay("menuBackground");
         _overlay.setVisible(true);
 
         _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 256f));
-        _window.setVisible(false);
         _window.center();
+
+        _window.setModal(true);
+
+        GUIManager.getInstance().addWindow(_window, "generate_world ");
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
@@ -87,6 +91,9 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
             }
         }
 
+        _list.addItem("worldTitle1", "worldSeed");
+        _list.addItem("worldTitle2", "worldSeed");
+
         _goToBack = new UIButton(new Vector2f(256f, 32f));
         _goToBack.getLabel().setText("Go to back");
         _goToBack.setVisible(true);
@@ -105,7 +112,7 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
 
         _createNewWorld.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                _window.setVisible(true);
+                _window.show();
             }
         });
 
@@ -122,12 +129,11 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
         });
 
         addDisplayElement(_overlay);
-        addDisplayElement(_list);
-        addDisplayElement(_loadFromList);
-        addDisplayElement(_goToBack);
-        addDisplayElement(_createNewWorld);
-        addDisplayElement(_deleteFromList);
-        addDisplayElement(_window);
+        addDisplayElement(_list, "list");
+        addDisplayElement(_loadFromList, "loadFromListButton");
+        addDisplayElement(_goToBack, "goToBackButton");
+        addDisplayElement(_createNewWorld, "createWorldButton");
+        addDisplayElement(_deleteFromList, "deleteFromListButton");
         update();
     }
 
@@ -151,9 +157,5 @@ public class UISelectWorldMenu extends UIDisplayRenderer {
 
         _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
 
-    }
-
-    public UIButton getGoToBackButton(){
-        return _goToBack;
     }
 }

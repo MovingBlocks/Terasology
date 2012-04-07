@@ -4,6 +4,7 @@ import org.newdawn.slick.Color;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.components.UIDialogBox;
 import org.terasology.rendering.gui.components.UIInput;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.IClickListener;
@@ -12,7 +13,7 @@ import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 import javax.vecmath.Vector2f;
 
-public class UIDialogCreateNewWorld extends UIDisplayWindow{
+public class UIDialogCreateNewWorld extends UIDialogBox {
     private UIButton _okButton;
     private UIButton _cancelButton;
 
@@ -80,11 +81,11 @@ public class UIDialogCreateNewWorld extends UIDisplayWindow{
             }
         });
 
-        addDisplayElement(_okButton);
-        addDisplayElement(_cancelButton);
-        addDisplayElement(_inputSeed);
-        addDisplayElement(_inputSeedLabel);
-        addDisplayElement(_inputWorldTitleLabel);
-        addDisplayElement(_inputWorldTitle);
+        addDisplayElement(_okButton,      "okButton");
+        addDisplayElement(_cancelButton,  "cancelButton");
+        addDisplayElement(_inputSeed,     "inputSeed");
+        addDisplayElement(_inputSeedLabel,"inputSeedLabel" );
+        addDisplayElement(_inputWorldTitleLabel, "inputWorldTitleLabel");
+        addDisplayElement(_inputWorldTitle, "inputWorldTitle");
     }
 }

@@ -5,6 +5,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.AudioManager;
 import org.newdawn.slick.Color;
+import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.IInputListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
@@ -16,9 +17,9 @@ import java.util.ArrayList;
  * A simple graphical input
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
- * @version 0.1
+ * @version 0.23
  */
-public class UIInput extends UIDisplayContainer {
+public class UIInput extends UIDisplayContainer implements IInputDataElement {
 //	TODO: Add text selection and paste from clipboard
   private final ArrayList<IInputListener> _inputListeners = new ArrayList<IInputListener>();
 
@@ -167,9 +168,17 @@ public class UIInput extends UIDisplayContainer {
       return _inputValue.toString();
   }
 
-  /*
-   * Set current input value
-   */
+    public void clearData() {
+        if(_inputValue.length() > 0){
+            _inputValue.delete(0,_inputValue.length()-1);
+        }
+
+        _inputText.setText("");
+    }
+
+    /*
+    * Set current input value
+    */
   public void setValue(String value){
       _inputValue.setLength(0);
       _inputValue.append(value);

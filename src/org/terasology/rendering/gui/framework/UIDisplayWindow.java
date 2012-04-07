@@ -1,97 +1,95 @@
 package org.terasology.rendering.gui.framework;
 
-import org.lwjgl.input.Cursor;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIWindowTitle;
-
 import javax.vecmath.Vector2f;
+import java.util.HashMap;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class UIDisplayWindow extends UIScrollableDisplayContainer{
-    private UIButton _close;
-    private Vector2f _prevMousePos = null;
-    private UIWindowTitle _title;
-    private boolean _dragged = false;
-
-    public UIDisplayWindow(String title, Vector2f size){
-        super();
-        setSize(size);
-        setStyle("border-image-top", "gui_menu 168/512 5/512 260/512 89/512 5");
-        setStyle("border-image-right",  "gui_menu 4/512 81/512 428/512 94/512 4");
-        setStyle("border-image-bottom", "gui_menu 168/512 4/512 260/512 175/512 4");
-        setStyle("border-image-left",   "gui_menu 4/512 81/512 256/512 94/512 4");
-
-        setStyle("border-corner-topleft",     "gui_menu 256/512 89/512");
-        setStyle("border-corner-topright",    "gui_menu 428/512 89/512");
-        setStyle("border-corner-bottomright", "gui_menu 428/512 175/512");
-        setStyle("border-corner-bottomleft",  "gui_menu 256/512 175/512");
-
-        setStyle("background-image","gui_menu 168/512 76/512 260/512 94/512");
-
-        _title = new UIWindowTitle(new Vector2f(getSize().x*0.85f, 19f), title);
-        _title.setVisible(true);
-        _title.getPosition().x = (getPosition().x + size.x/2f) - _title.getSize().x/2;
-        _title.setTitle(title);
+    
+    private boolean _maximized = false;
+    private boolean _modal     = false;
+    public String name         = "";
+    private HashMap<String, UIDisplayElement> _displayElementsById = new HashMap<String, UIDisplayElement>();
 
 
-        _close = new UIButton(new Vector2f(19f, 19f));
-
-        _close.setClassStyle("button","background-image: gui_menu 19/512 19/512 73/512 155/512");
-        _close.setClassStyle("button-mouseover","background-image: gui_menu 19/512 19/512 54/512 155/512");
-        _close.setClassStyle("button-mouseclick","background-image: gui_menu 19/512 19/512 92/512 155/512");
-
-        _close.getPosition().x = getSize().x-25f;
-        _close.setVisible(true);
-        _close.getLabel().setText("");
-
-        _close.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                close();
-            }
-        });
-
-       addDisplayElement(_close);
-       addDisplayElement(_title);
-    }
-
-    public void update(){
-        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-            if(intersects(mousePos)){
-                if(_mouseDown){
-                    _focused = true;
-                    if(_title.intersects(mousePos)){
-                        _dragged = true;
-                        if(_prevMousePos==null){
-                           _prevMousePos =  new Vector2f(mousePos);
-                        }
-                    }
-                }
-            }
-
-            if(_dragged){
-                drag(new Vector2f(_prevMousePos.x - mousePos.x, _prevMousePos.y-mousePos.y));
-                _prevMousePos =  new Vector2f(mousePos);
-            }
-
-            if(!_mouseDown||!_dragged || _mouseUp){
-                _dragged     = false;
-                _mouseDown    = false;
-                _prevMousePos = null;
-                _mouseUp      = false;
-                _focused = false;
-            }
-
-        super.update();
-    }
-
-    private void drag(Vector2f value){
+    protected void drag(Vector2f value){
         getPosition().x -=value.x;
         getPosition().y -=value.y;
     }
 
-    public void close(){
+    public void close(boolean clearInputControls){
         setVisible(false);
         setFocus(false);
+        
+        if(clearInputControls){
+            clearInputControls();
+        }
+    }
+
+    public void show(){
+        setVisible(true);
+        setFocus(true);
+    }
+
+    public void clearInputControls(){
+        for (UIDisplayElement element: _displayElements) {
+            if(IInputDataElement.class.isInstance(element)){
+                IInputDataElement inputControl = (IInputDataElement)element;
+                inputControl.clearData();
+            }
+        }
+    }
+
+    public void render(){
+       if(isModal()){
+           renderOverlay();
+       }
+       super.render();
+    }
+
+    public void renderOverlay(){
+        glPushMatrix();
+        glLoadIdentity();
+        glColor4f(0, 0, 0, 0.75f);
+        glBegin(GL_QUADS);
+        glVertex2f(0f, 0f);
+        glVertex2f((float) Display.getWidth(), 0f);
+        glVertex2f((float) Display.getWidth(), (float) Display.getHeight());
+        glVertex2f(0f, (float) Display.getHeight());
+        glEnd();
+        glPopMatrix();
+    }
+
+    public void maximaze(){
+        setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
+        _maximized = true;
+    }
+
+    public boolean isMaximized(){
+        return _maximized;
+    }
+
+    public boolean isModal(){
+        return _modal;
+    }
+
+    public void setModal(boolean modal){
+        _modal = modal;
+    }
+
+    public void addDisplayElement(UIDisplayElement element, String elementId) {
+        _displayElements.add(element);
+        _displayElementsById.put(elementId, element);
+        element.setParent(this);
+    }
+
+    public UIDisplayElement getElementById(String elementId){
+        if(!_displayElementsById.containsKey(elementId)){
+            return null;
+        }
+
+        return _displayElementsById.get(elementId);
     }
 }

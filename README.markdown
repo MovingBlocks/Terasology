@@ -50,7 +50,9 @@ Examples tools (may move slot or disappear)
 * Torch - shiny! Place with left click
 * Pickaxe / shovel - faster right-click removal of some blocks
 * Blueprint - left click one block, then another, then somewhere else to "clone" your selection (right-click resets)
-* Lighter - big bada boom!
+* Explosion tool - big bada boom!
+* Railgun - bigger bada boom, in a straight line!
+* Debug tool - experimental
 
 Example console commands
 ------------------------

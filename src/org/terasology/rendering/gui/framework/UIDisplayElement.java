@@ -73,6 +73,7 @@ public abstract class UIDisplayElement {
     }
 
     public void processMouseInput(int button, boolean state, int wheelMoved) {
+
         if (button == 0 && state && !_mouseUp) {
             _mouseDown = true;
             _mouseUp = false;
