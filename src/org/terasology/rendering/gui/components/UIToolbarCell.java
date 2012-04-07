@@ -110,7 +110,7 @@ public class UIToolbarCell extends UIDisplayElement {
         if (item.icon.isEmpty()) {
             BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
             if (blockItem != null) {
-                renderBlockIcon(blockItem.blockGroup);
+                renderBlockIcon(blockItem.blockFamily);
             }
         } else {
             Icon icon = Icon.get(item.icon);

@@ -41,12 +41,8 @@ public class ItemSystem implements EventHandlerSystem {
 
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
         if (blockItem != null) {
-            if (placeBlock(blockItem.blockGroup, targetBlock, surfaceDirection, secondaryDirection, blockItem)) {
-
-                itemComp.stackCount--;
-                if (itemComp.stackCount == 0) {
-                    item.destroy();
-                }
+            if (placeBlock(blockItem.blockFamily, targetBlock, surfaceDirection, secondaryDirection, blockItem)) {
+                checkConsumeItem(item, itemComp);
             }
         } else {
             EntityRef targetEntity = blockEntityLookup.getOrCreateEntityAt(targetBlock);
@@ -84,6 +80,9 @@ public class ItemSystem implements EventHandlerSystem {
             itemComp.stackCount--;
             if (itemComp.stackCount == 0) {
                 item.destroy();
+            }
+            else {
+                item.saveComponent(itemComp);
             }
         }
     }

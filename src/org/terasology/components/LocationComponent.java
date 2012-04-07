@@ -13,7 +13,6 @@ import javax.vecmath.Vector3f;
  */
 public final class LocationComponent extends AbstractComponent {
     // Standard position/rotation
-    // TODO: Store world position (easier for indexing), derive local position?
     private Vector3f position = new Vector3f();
     private Quat4f rotation = new Quat4f(0,0,0,1);
     private float scale = 1.0f;

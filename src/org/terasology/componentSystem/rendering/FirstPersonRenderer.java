@@ -73,7 +73,7 @@ public class FirstPersonRenderer implements RenderSystem {
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);
         if (blockItem != null) {
-            renderBlock(blockItem.blockGroup, bobOffset, handMovementAnimationOffset);
+            renderBlock(blockItem.blockFamily, bobOffset, handMovementAnimationOffset);
         } else if (heldItemComp != null && heldItemComp.renderWithIcon) {
             renderIcon(heldItemComp.icon, bobOffset, handMovementAnimationOffset);
         } else {

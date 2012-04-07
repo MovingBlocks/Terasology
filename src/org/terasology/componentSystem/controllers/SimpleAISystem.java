@@ -49,12 +49,14 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
                     // Head to player
                     ai.movementTarget.set(localPlayer.getPosition());
                     ai.followingPlayer = true;
+                    entity.saveComponent(ai);
                 } else {
                     // Random walk
                     if (Terasology.getInstance().getTimeInMs() - ai.lastChangeOfDirectionAt > 12000 || ai.followingPlayer) {
                         ai.movementTarget.set(worldPos.x + random.randomFloat() * 500, worldPos.y, worldPos.z + random.randomFloat() * 500);
                         ai.lastChangeOfDirectionAt = Terasology.getInstance().getTimeInMs();
                         ai.followingPlayer = false;
+                        entity.saveComponent(ai);
                     }
                 }
 
@@ -66,6 +68,8 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
                 float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
                 AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
                 location.getLocalRotation().set(axisAngle);
+                entity.saveComponent(moveComp);
+                entity.saveComponent(location);
             }
         }
     }
@@ -75,6 +79,7 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
         CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
         if (moveComp != null && moveComp.isGrounded) {
             moveComp.jump = true;
+            entity.saveComponent(moveComp);
         }
     }
 }

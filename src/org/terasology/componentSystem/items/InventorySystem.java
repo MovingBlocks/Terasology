@@ -6,7 +6,7 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 
 /**
- * TODO: Not much of system - make helper class? Or leave as system so it can be overridden?
+ * System providing inventory related functionality
  * @author Immortius <immortius@gmail.com>
  */
 public class InventorySystem implements ComponentSystem {
@@ -30,6 +30,8 @@ public class InventorySystem implements ComponentSystem {
         if (inventory == null || item == null)
             return false;
 
+        boolean itemChanged = false;
+
         if (!item.stackId.isEmpty()) {
             // First check for existing stacks
             for (EntityRef itemStack : inventory.itemSlots) {
@@ -40,6 +42,8 @@ public class InventorySystem implements ComponentSystem {
                         int amountToTransfer = Math.min(stackSpace, item.stackCount);
                         stackComp.stackCount += amountToTransfer;
                         item.stackCount -= amountToTransfer;
+                        itemStack.saveComponent(stackComp);
+                        itemChanged = true;
 
                         if (item.stackCount == 0) {
                             itemEntity.destroy();
@@ -55,7 +59,12 @@ public class InventorySystem implements ComponentSystem {
         if (freeSlot != -1) {
             inventory.itemSlots.set(freeSlot, itemEntity);
             item.container = inventoryEntity;
+            itemEntity.saveComponent(item);
+            inventoryEntity.saveComponent(inventory);
             return true;
+        }
+        if (itemChanged) {
+            itemEntity.saveComponent(item);
         }
         return false;
     }

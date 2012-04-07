@@ -126,11 +126,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         // TODO: Remove, use component camera, breaks spawn camera anyway
         Quat4f lookRotation = new Quat4f();
         QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
-        updateCamera(location.getWorldPosition(), lookRotation);
+        updateCamera(characterMovementComponent, location.getWorldPosition(), lookRotation);
 
         // Hand animation update
         localPlayerComponent.handAnimation = Math.max(0, localPlayerComponent.handAnimation - 2.5f * delta);
-        
+
+        entity.saveComponent(location);
+        entity.saveComponent(characterMovementComponent);
+        entity.saveComponent(localPlayerComponent);
         resetInput();
     }
 
@@ -183,12 +186,13 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         HealthComponent health = entity.getComponent(HealthComponent.class);
         if (health != null) {
             health.currentHealth = health.maxHealth;
+            entity.saveComponent(health);
         }
         location.setWorldPosition(playerComponent.spawnPosition);
         return true;
     }
 
-    private void updateCamera(Vector3f position, Quat4f rotation) {
+    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
         // The camera position is the player's position plus the eye offset
         Vector3d cameraPosition = new Vector3d();
         // TODO: don't hardset eye position
@@ -199,7 +203,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         QuaternionUtil.quatRotate(rotation, viewDir, viewDir);
         playerCamera.getViewingDirection().set(viewDir);
 
-        CharacterMovementComponent charMovementComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) stepDelta += charMovementComp.distanceBetweenFootsteps;
         bobFactor += stepDelta;
@@ -247,6 +250,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
         localPlayer.isDead = true;
         localPlayer.respawnWait = 1.0f;
+        entity.saveComponent(localPlayer);
     }
 
     /**
@@ -260,6 +264,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (inventorySlotBindMap.containsKey(key)) {
             LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
             localPlayerComp.selectedTool = inventorySlotBindMap.get(key);
+            localPlayer.getEntity().saveComponent(localPlayerComp);
             return;
         }
         switch (key) {
@@ -302,6 +307,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             while (localPlayerComp.selectedTool < 0) {
                 localPlayerComp.selectedTool = 9 + localPlayerComp.selectedTool;
             }
+            localPlayer.getEntity().saveComponent(localPlayerComp);
         } else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
         }
@@ -347,10 +353,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             }
             lastInteraction = Terasology.getInstance().getTimeInMs();
             localPlayerComp.handAnimation = 0.5f;
+            entity.saveComponent(localPlayerComp);
         } else if (Mouse.isButtonDown(1) || button == 1) {
             attack(entity, selectedItemEntity);
             lastInteraction = Terasology.getInstance().getTimeInMs();
             localPlayerComp.handAnimation = 0.5f;
+            entity.saveComponent(localPlayerComp);
         }
 
     }

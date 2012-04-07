@@ -9,12 +9,12 @@ import org.terasology.model.blocks.BlockFamily;
  * @author Immortius <immortius@gmail.com>
  */
 public final class BlockItemComponent extends AbstractComponent {
-    public BlockFamily blockGroup;
+    public BlockFamily blockFamily;
     public EntityRef placedEntity = EntityRef.NULL;
 
     public BlockItemComponent() {}
 
     public BlockItemComponent(BlockFamily blockFamily) {
-        this.blockGroup = blockFamily;
+        this.blockFamily = blockFamily;
     }
 }
