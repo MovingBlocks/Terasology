@@ -7,7 +7,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.componentSystem.block.BlockEntityLookup;
+import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.componentSystem.items.ItemSystem;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
@@ -67,7 +67,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     private IWorldProvider worldProvider;
     private DefaultCamera playerCamera;
-    private BlockEntityLookup blockEntityLookup;
+    private BlockEntityRegistry blockEntityRegistry;
     private ItemSystem itemSystem;
     
     private boolean jump = false;
@@ -89,7 +89,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         localPlayer = CoreRegistry.get(LocalPlayer.class);
 
         ComponentSystemManager systemManager = CoreRegistry.get(ComponentSystemManager.class);
-        blockEntityLookup = systemManager.get(BlockEntityLookup.class);
+        blockEntityRegistry = systemManager.get(BlockEntityRegistry.class);
         itemSystem = systemManager.get(ItemSystem.class);
     }
 
@@ -376,7 +376,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
             Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(centerPos));
             if (block.isUsable()) {
-                EntityRef blockEntity = blockEntityLookup.getOrCreateEntityAt(centerPos);
+                EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(centerPos);
                 // TODO: Shouldn't activate directly, should send use event - same as item?
                 // Maybe break out a usable component.
                 blockEntity.send(new ActivateEvent(entity, entity));
@@ -427,7 +427,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             }
 
             if (block.isDestructible()) {
-                EntityRef blockEntity = blockEntityLookup.getOrCreateEntityAt(blockPos);
+                EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(blockPos);
                 blockEntity.send(new DamageEvent(damage, player));
             }
         }

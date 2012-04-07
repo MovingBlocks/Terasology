@@ -19,6 +19,7 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 
 /**
+ * Event handler for events affecting block entities
  * @author Immortius <immortius@gmail.com>
  */
 public class BlockEntitySystem implements EventHandlerSystem {
@@ -76,7 +77,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
         }
     }
 
-    // TODO: Need a occasionally scan for and remove temporary block entities that were never damaged
+    // TODO: Need a occasionally scan for and remove temporary block entities that were never damaged?
     @ReceiveEvent(components={BlockComponent.class})
     public void onRepaired(FullHealthEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);

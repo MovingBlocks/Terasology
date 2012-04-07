@@ -15,9 +15,10 @@ import org.terasology.model.blocks.management.BlockManager;
 import java.util.Map;
 
 /**
+ * Manages creation and lookup of entities linked to blocks
  * @author Immortius <immortius@gmail.com>
  */
-public class BlockEntityLookup implements EventHandlerSystem {
+public class BlockEntityRegistry implements EventHandlerSystem {
 
     private PrefabManager prefabManager;
     private EntityManager entityManager;

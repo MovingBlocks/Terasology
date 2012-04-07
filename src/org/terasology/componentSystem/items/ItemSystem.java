@@ -1,10 +1,12 @@
 package org.terasology.componentSystem.items;
 
-import org.terasology.componentSystem.block.BlockEntityLookup;
+import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
@@ -26,12 +28,17 @@ import javax.vecmath.Vector3f;
 public class ItemSystem implements EventHandlerSystem {
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
-    private BlockEntityLookup blockEntityLookup;
+    private BlockEntityRegistry blockEntityRegistry;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
-        blockEntityLookup = CoreRegistry.get(ComponentSystemManager.class).get(BlockEntityLookup.class);
+        blockEntityRegistry = CoreRegistry.get(ComponentSystemManager.class).get(BlockEntityRegistry.class);
+    }
+
+    @ReceiveEvent(components=BlockItemComponent.class)
+    private void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
+        entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
     }
 
     public void useItemOnBlock(EntityRef item, EntityRef user, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection) {
@@ -45,7 +52,7 @@ public class ItemSystem implements EventHandlerSystem {
                 checkConsumeItem(item, itemComp);
             }
         } else {
-            EntityRef targetEntity = blockEntityLookup.getOrCreateEntityAt(targetBlock);
+            EntityRef targetEntity = blockEntityRegistry.getOrCreateEntityAt(targetBlock);
             item.send(new ActivateEvent(targetEntity, user));
             checkConsumeItem(item, itemComp);
         }
@@ -109,6 +116,7 @@ public class ItemSystem implements EventHandlerSystem {
                 blockItem.placedEntity.addComponent(new BlockComponent(placementPos, false));
                 // TODO: Get regen and wait from block config?
                 blockItem.placedEntity.addComponent(new HealthComponent(type.getArchetypeBlock().getHardness(), 2.0f,1.0f));
+                blockItem.placedEntity = EntityRef.NULL;
             }
             return true;
         }

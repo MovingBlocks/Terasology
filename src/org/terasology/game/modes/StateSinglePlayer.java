@@ -25,7 +25,7 @@ import org.terasology.componentSystem.action.AccessInventoryAction;
 import org.terasology.componentSystem.action.ExplosionAction;
 import org.terasology.componentSystem.action.PlaySoundAction;
 import org.terasology.componentSystem.action.TunnelAction;
-import org.terasology.componentSystem.block.BlockEntityLookup;
+import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.componentSystem.block.BlockEntitySystem;
 import org.terasology.componentSystem.characters.CharacterMovementSystem;
 import org.terasology.componentSystem.characters.CharacterSoundSystem;
@@ -176,7 +176,7 @@ public class StateSinglePlayer implements IGameState {
         prefab.setComponent(new AccessInventoryActionComponent());
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
-        _componentSystemManager.register(new BlockEntityLookup());
+        _componentSystemManager.register(new BlockEntityRegistry());
         _componentSystemManager.register(new CharacterMovementSystem());
         _componentSystemManager.register(new SimpleAISystem());
         _componentSystemManager.register(new ItemSystem());

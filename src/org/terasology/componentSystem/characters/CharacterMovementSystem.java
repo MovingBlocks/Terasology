@@ -50,10 +50,10 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(CharacterMovementComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
+            if (!worldProvider.isChunkAvailableAt(location.getWorldPosition())) continue;
+
             AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
             CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
-
-            if (!worldProvider.isChunkAvailableAt(location.getWorldPosition())) continue;
 
             updatePosition(delta, entity, location, collision, movementComp);
             updateSwimStatus(location, collision, movementComp);
@@ -63,6 +63,13 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         }
     }
 
+    /**
+     * Updates whether a character is underwater. A higher and lower point of the character is tested for being in water,
+     * only if both points are in water does the character count as swimming.
+     * @param location
+     * @param aabb
+     * @param movementComp
+     */
     private void updateSwimStatus(LocationComponent location, AABBCollisionComponent aabb, CharacterMovementComponent movementComp) {
         Vector3f worldPos = location.getWorldPosition();
         List<BlockPosition> blockPositions = WorldUtil.gatherAdjacentBlockPositions(worldPos);

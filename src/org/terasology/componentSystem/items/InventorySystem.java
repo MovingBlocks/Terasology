@@ -4,18 +4,30 @@ import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
 
 /**
  * System providing inventory related functionality
  * @author Immortius <immortius@gmail.com>
  */
-public class InventorySystem implements ComponentSystem {
+public class InventorySystem implements EventHandlerSystem {
 
     // TODO: differ per item?
     public static final byte MAX_STACK = (byte)99;
 
     public void initialise() {
 
+    }
+
+
+    @ReceiveEvent(components=InventoryComponent.class)
+    public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+        for (EntityRef content : inventory.itemSlots) {
+            content.destroy();
+        }
     }
 
     /**

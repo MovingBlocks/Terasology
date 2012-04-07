@@ -1,6 +1,6 @@
 package org.terasology.componentSystem.action;
 
-import org.terasology.componentSystem.block.BlockEntityLookup;
+import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -25,12 +25,12 @@ public class ExplosionAction implements EventHandlerSystem {
     private IWorldProvider worldProvider;
     private FastRandom random = new FastRandom();
     private BulletPhysicsRenderer physicsRenderer;
-    private BlockEntityLookup blockEntityLookup; 
+    private BlockEntityRegistry blockEntityRegistry;
 
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
-        blockEntityLookup = CoreRegistry.get(ComponentSystemManager.class).get(BlockEntityLookup.class);
+        blockEntityRegistry = CoreRegistry.get(ComponentSystemManager.class).get(BlockEntityRegistry.class);
     }
 
     @ReceiveEvent(components = {ExplosionActionComponent.class})
@@ -66,7 +66,7 @@ public class ExplosionAction implements EventHandlerSystem {
                     // like what happens when a block is destroyed.
                     worldProvider.setBlock(blockPos, (byte)0x0, true, true);
                     
-                    EntityRef blockEntity = blockEntityLookup.getEntityAt(blockPos);
+                    EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                     blockEntity.destroy();
                     physicsRenderer.addTemporaryBlock(target, currentBlockType, impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
                 }
