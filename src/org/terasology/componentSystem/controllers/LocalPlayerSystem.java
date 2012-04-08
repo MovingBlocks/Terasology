@@ -76,7 +76,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private boolean running = false;
 
     private double mouseSensititivy = Config.getInstance().getMouseSens();
-    private float lastTimeSpacePressed;
+    private long lastTimeSpacePressed;
     private float lastInteraction;
     private boolean toggleGodMode;
 
