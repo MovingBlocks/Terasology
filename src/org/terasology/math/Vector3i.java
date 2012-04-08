@@ -1,5 +1,6 @@
 package org.terasology.math;
 
+import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.io.Serializable;
 
@@ -8,7 +9,7 @@ import java.io.Serializable;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public final class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
+public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
     private static final long serialVersionUID = -1965792038041767639L;
 
     public static Vector3i zero() {
@@ -89,9 +90,9 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
      * @param other
      */
     public Vector3i(Vector3f other) {
-        this.x = IntMath.floorToInt(other.x);
-        this.y = IntMath.floorToInt(other.y);
-        this.z = IntMath.floorToInt(other.z);
+        this.x = TeraMath.floorToInt(other.x);
+        this.y = TeraMath.floorToInt(other.y);
+        this.z = TeraMath.floorToInt(other.z);
     }
 
     /**
@@ -345,5 +346,12 @@ public final class Vector3i extends javax.vecmath.Tuple3i implements Serializabl
      */
     public Vector3f toVector3f() {
         return new Vector3f(x, y, z);
+    }
+
+    /**
+     * @return The equivalent Vector3d
+     */
+    public Vector3d toVector3d() {
+        return new Vector3d(x, y, z);
     }
 }

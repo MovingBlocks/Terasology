@@ -15,11 +15,12 @@
  */
 package org.terasology.model.blueprints;
 
-import org.terasology.model.structures.BlockSelection;
-//import org.terasology.es.PortalComponent;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
+import org.terasology.model.structures.BlockSelection;
+
+//import org.terasology.es.PortalComponent;
 
 /**
  * This blueprint is specific to Portals and linked to its meta object / component.

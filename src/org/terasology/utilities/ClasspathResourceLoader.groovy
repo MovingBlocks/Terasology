@@ -16,10 +16,11 @@
 package org.terasology.utilities
 
 import groovy.util.logging.Log
+import org.newdawn.slick.util.ResourceLoader
+
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import javax.imageio.ImageIO
-import org.newdawn.slick.util.ResourceLoader
 
 /**
  * Helper class for accessing resources from the classpath, whether it is

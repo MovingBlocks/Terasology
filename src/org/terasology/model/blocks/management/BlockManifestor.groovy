@@ -16,28 +16,23 @@ package org.terasology.model.blocks.management
  * limitations under the License.
  */
 
+import groovy.util.logging.Log
+import org.terasology.logic.manager.TextureManager
+import org.terasology.math.Rotation
+import org.terasology.math.Side
+import org.terasology.model.shapes.BlockShape
+import org.terasology.model.shapes.BlockShapeManager
+import org.terasology.model.structures.AABB
+import org.terasology.utilities.ClasspathResourceLoader
+import org.terasology.utilities.Helper
+
 import java.awt.Graphics
 import java.awt.Image
 import java.awt.image.BufferedImage
-
 import javax.imageio.ImageIO
 import javax.vecmath.Vector2f
 
-import org.terasology.logic.manager.TextureManager
-import org.terasology.utilities.ClasspathResourceLoader
-
-import groovy.util.logging.Log
-import org.terasology.model.blocks.Block
-import org.terasology.model.blocks.BlockGroup
-import org.terasology.model.blocks.SymmetricGroup
-import org.terasology.math.Side
-import org.terasology.model.blocks.HorizontalBlockGroup
-import org.terasology.model.shapes.BlockShape
-import org.terasology.model.shapes.BlockShapeManager
-import org.terasology.model.blocks.AlignToSurfaceGroup
-import org.terasology.math.Rotation
-import org.terasology.model.structures.AABB
-import org.terasology.utilities.Helper
+import org.terasology.model.blocks.*
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -66,7 +61,7 @@ class BlockManifestor {
     /** Smaller version of _blockIndex only used for loading IDs */
     protected static Map<String, Byte> _blockStringIndex = [:]
 
-    protected static List<BlockGroup> _blockGroups = []
+    protected static List<BlockFamily> _blockFamilies = []
 
     /** Holds the Byte value for the next Block ID - starts at 1 since Air is always 0 */
     protected static byte _nextByte = (byte) 1
@@ -156,7 +151,7 @@ class BlockManifestor {
         }
 
         _bm.addAllBlocks(_blockIndex)
-        _bm.addAllBlockGroups(_blockGroups);
+        _bm.addAllBlockFamilies(_blockFamilies);
         TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
     }
 
@@ -232,7 +227,7 @@ class BlockManifestor {
             // TODO: default, load shape and rotate to all sides
         }
 
-        _blockGroups.add(new AlignToSurfaceGroup(blockConfig.name, blockMap))
+        _blockFamilies.add(new AlignToSurfaceFamily(blockConfig.name, blockMap))
     }
 
     public loadHorizontalBlock(ConfigObject blockConfig, BlockLoader loader) {
@@ -248,7 +243,7 @@ class BlockManifestor {
             registerBlock(blockConfig.name + rot.rotate(Side.FRONT), block)
             blockMap.put(rot.rotate(Side.FRONT), block)
         }
-        _blockGroups.add(new HorizontalBlockGroup(blockConfig.name, blockMap))
+        _blockFamilies.add(new HorizontalBlockFamily(blockConfig.name, blockMap))
     }
 
     public loadSymmetricBlock(ConfigObject blockConfig, BlockLoader loader) {
@@ -265,7 +260,7 @@ class BlockManifestor {
         }
 
         registerBlock(blockConfig.name, b)
-        _blockGroups.add(new SymmetricGroup(b))
+        _blockFamilies.add(new SymmetricFamily(b))
     }
 
     private BlockShape loadBlockShape(ConfigObject config) {

@@ -3,12 +3,13 @@ package org.terasology.model.shapes
 import gnu.trove.list.TIntList
 import gnu.trove.list.array.TIntArrayList
 import groovy.util.logging.Log
-import javax.vecmath.Vector2f
-import javax.vecmath.Vector3f
 import org.terasology.math.Side
-import org.terasology.utilities.ClasspathResourceLoader
 import org.terasology.model.structures.AABB
+import org.terasology.utilities.ClasspathResourceLoader
+
+import javax.vecmath.Vector2f
 import javax.vecmath.Vector3d
+import javax.vecmath.Vector3f
 
 /**
  * @author Immortius <immortius@gmail.com>

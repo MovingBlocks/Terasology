@@ -51,8 +51,10 @@ public class ShaderParametersPost implements IShaderParameters {
         
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
-        if (tera.getActivePlayer() != null)
-            program.setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
+        if (tera.getActivePlayer() != null) {
+            // TODO: This should use active camera
+            //program.setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
+        }
     }
 
 }

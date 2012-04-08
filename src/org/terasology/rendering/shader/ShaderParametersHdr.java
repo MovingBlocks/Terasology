@@ -16,9 +16,7 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.logic.manager.TextureManager;
 
 /**
  * Shader parameters for the Post-processing shader program.

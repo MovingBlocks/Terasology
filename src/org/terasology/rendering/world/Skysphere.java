@@ -166,7 +166,7 @@ public class Skysphere implements IGameObject {
         return new Vector3d(Y, x, y);
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         if (_cloudByteBuffer == null && Terasology.getInstance().getTimeInMs() - _lastCloudUpdate >= CLOUD_UPDATE_INTERVAL) {
             _lastCloudUpdate = Terasology.getInstance().getTimeInMs();
 

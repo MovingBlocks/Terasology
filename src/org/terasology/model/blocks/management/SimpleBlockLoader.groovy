@@ -1,15 +1,10 @@
 package org.terasology.model.blocks.management
 
-import javax.vecmath.Vector2f
-import org.terasology.math.Side
-import org.terasology.model.shapes.BlockShape
-import org.terasology.model.shapes.BlockShapeManager
-import javax.vecmath.Vector4f
 import groovy.util.logging.Log
-import org.terasology.model.blocks.Block
-import javax.vecmath.Vector3d
-import org.terasology.model.structures.AABB
 import org.terasology.math.Rotation
+import org.terasology.model.blocks.Block
+
+import javax.vecmath.Vector4f
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -101,6 +96,26 @@ public class SimpleBlockLoader implements BlockLoader {
         if (c.hardness != [:]) {
             log.fine "Setting hardness to: " + c.hardness
             b.withHardness((byte) c.hardness)
+        }
+        if (c.straightToInventory != [:]) {
+            log.fine "Setting straightToInventory to: " + c.straightToInventory
+            b.withStraightToInventory(c.straightToInventory)
+        }
+        if (c.stackable != [:]) {
+            log.fine "Setting stackable to: " + c.stackable
+            b.withStackable(c.stackable)
+        }
+        if (c.entityRetainedWhenItem != [:]) {
+            log.fine "Setting entityRetainedWhenItem to: " + c.entityRetainedWhenItem
+            b.withEntityRetainedWhenItem(c.entityRetainedWhenItem)
+        }
+        if (c.usable != [:]) {
+            log.fine "Setting usable to: " + c.usable
+            b.withUsable(c.usable)
+        }
+        if (c.entityPrefab != [:]) {
+            log.fine "Setting entityPrefab to: " + c.entityPrefab
+            b.withEntityPrefab(c.entityPrefab)
         }
 
         // *** COLOR OFFSET (4 values) - this might need error handling

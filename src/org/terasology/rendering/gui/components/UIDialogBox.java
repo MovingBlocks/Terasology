@@ -20,29 +20,14 @@ public class UIDialogBox extends UIDisplayWindow{
     public UIDialogBox(String title, Vector2f size){
         super();
         setSize(size);
-        setStyle("border-image-top",    "gui_menu 168/512 5/512 260/512 89/512 5");
-        setStyle("border-image-right",  "gui_menu 4/512 81/512 428/512 94/512 4");
-        setStyle("border-image-bottom", "gui_menu 168/512 4/512 260/512 175/512 4");
-        setStyle("border-image-left",   "gui_menu 4/512 81/512 256/512 94/512 4");
 
-        setStyle("border-corner-topleft",     "gui_menu 256/512 89/512");
-        setStyle("border-corner-topright",    "gui_menu 428/512 89/512");
-        setStyle("border-corner-bottomright", "gui_menu 428/512 175/512");
-        setStyle("border-corner-bottomleft",  "gui_menu 256/512 175/512");
-
-        setStyle("background-image","gui_menu 168/512 76/512 260/512 94/512");
-
-        _title = new UIWindowTitle(new Vector2f(getSize().x*0.85f, 19f), title);
+        _title = new UIWindowTitle(new Vector2f(getSize().x*0.55f, 19f), title);
         _title.setVisible(true);
         _title.getPosition().x = (getPosition().x + size.x/2f) - _title.getSize().x/2;
         _title.setTitle(title);
 
 
         _close = new UIButton(new Vector2f(19f, 19f));
-
-        _close.setClassStyle("button",            "background-image: gui_menu 19/512 19/512 73/512 155/512");
-        _close.setClassStyle("button-mouseover",  "background-image: gui_menu 19/512 19/512 54/512 155/512");
-        _close.setClassStyle("button-mouseclick", "background-image: gui_menu 19/512 19/512 92/512 155/512");
 
         _close.getPosition().x = getSize().x-25f;
         _close.setVisible(true);
@@ -53,6 +38,8 @@ public class UIDialogBox extends UIDisplayWindow{
                 close(true);
             }
         });
+
+        windowStyleSetup();
 
         addDisplayElement(_close);
         addDisplayElement(_title);
@@ -86,6 +73,33 @@ public class UIDialogBox extends UIDisplayWindow{
         }
 
         super.update();
+    }
+
+    public void resize(){
+        _title.setSize(new Vector2f(getSize().x*0.85f, 19f));
+        _title.getPosition().x = (getPosition().x + getSize().x/2f) - _title.getSize().x/2;
+        _title.resize();
+        _style = null;
+        _close.getPosition().x = getSize().x-25f;
+        windowStyleSetup();
+    }
+
+    public void windowStyleSetup(){
+        setStyle("border-image-top",    "gui_menu 168/512 5/512 260/512 89/512 5");
+        setStyle("border-image-right",  "gui_menu 4/512 81/512 428/512 94/512 4");
+        setStyle("border-image-bottom", "gui_menu 168/512 4/512 260/512 175/512 4");
+        setStyle("border-image-left",   "gui_menu 4/512 81/512 256/512 94/512 4");
+
+        setStyle("border-corner-topleft",     "gui_menu 256/512 89/512");
+        setStyle("border-corner-topright",    "gui_menu 428/512 89/512");
+        setStyle("border-corner-bottomright", "gui_menu 428/512 175/512");
+        setStyle("border-corner-bottomleft",  "gui_menu 256/512 175/512");
+
+        setStyle("background-image","gui_menu 168/512 76/512 260/512 94/512");
+
+        _close.setClassStyle("button",            "background-image: gui_menu 19/512 19/512 73/512 155/512");
+        _close.setClassStyle("button-mouseover",  "background-image: gui_menu 19/512 19/512 54/512 155/512");
+        _close.setClassStyle("button-mouseclick", "background-image: gui_menu 19/512 19/512 92/512 155/512");
     }
 
 }

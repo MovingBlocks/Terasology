@@ -2,6 +2,7 @@ package org.terasology.logic.manager;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.rendering.gui.components.UIMessageBox;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
@@ -13,6 +14,7 @@ public class GUIManager {
     private static GUIManager _instance;
     private UIDisplayRenderer _renderer;
     private UIDisplayWindow   _focusedWindow;
+    private UIDisplayWindow   _lastFocused;
     private HashMap<String, UIDisplayWindow> _windowsById = new HashMap<String, UIDisplayWindow>();
 
     public GUIManager(){
@@ -52,6 +54,21 @@ public class GUIManager {
     }
 
     public void removeWindow(UIDisplayWindow window){
+        _renderer.removeDisplayElement(window);
+
+        if(_windowsById.containsValue(window)){
+            for(String key : _windowsById.keySet()){
+                if( _windowsById.get(key).equals(window) ){
+                    _windowsById.remove(key);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void removeWindow(String windowId){
+        UIDisplayWindow window = getWindowById(windowId);
+
         _renderer.removeDisplayElement(window);
 
         if(_windowsById.containsValue(window)){
@@ -114,6 +131,7 @@ public class GUIManager {
     }
 
     private void setTopWindow(int windowPosition){
+        _lastFocused = _focusedWindow;
         _focusedWindow = (UIDisplayWindow)_renderer.getDisplayElements().get(windowPosition);
         if( !_focusedWindow.isMaximized() ){
             _renderer.changeElementDepth(windowPosition, _renderer.getDisplayElements().size()-1);
@@ -137,6 +155,18 @@ public class GUIManager {
                 break;
             };
         }
+    }
+
+    public void showMessage(String title, String text){
+        UIDisplayWindow messageWindow = new UIMessageBox(title, text);
+        messageWindow.setVisible(true);
+        messageWindow.center();
+        addWindow(messageWindow, "messageBox");
+        setFocusedWindow(messageWindow);
+    }
+
+    public void setLasFocused(){
+        _focusedWindow = _lastFocused;
     }
 
     /*private boolean screenCanFocus(UIDisplayElement s) {

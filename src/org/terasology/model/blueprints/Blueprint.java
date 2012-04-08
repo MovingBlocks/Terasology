@@ -15,13 +15,11 @@
  */
 package org.terasology.model.blueprints;
 
-import org.terasology.model.structures.BlockCollection;
-import org.terasology.model.structures.BlockSelection;
-import org.terasology.model.structures.BlockPosition;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
-
-import java.util.Set;
+import org.terasology.model.structures.BlockCollection;
+import org.terasology.model.structures.BlockPosition;
+import org.terasology.model.structures.BlockSelection;
 
 /**
  * Blueprints are instructions for creating specific block structures in the world - relative positions of set blocks

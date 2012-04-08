@@ -2,7 +2,6 @@ package org.terasology.rendering.gui.components;
 
 import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -50,6 +49,14 @@ public class UIWindowTitle extends UIDisplayContainer{
     public void setTitle(String title){
         _text.setText(title);
         _text.getPosition().x = getSize().x/2 - _text.getTextWidth()/2;
+    }
+
+    public void resize(){
+      //_leftBackground.setPosition(getPosition());
+      _centerBackground.setSize(new Vector2f(getSize().x-19f, 19f));
+      _centerBackground.getPosition().x += _leftBackground.getSize().x;
+      _rightBackground.getPosition().x = _centerBackground.getPosition().x + _centerBackground.getSize().x;
+      _text.getPosition().x = getSize().x/2 - _text.getTextWidth()/2;
     }
 
 }

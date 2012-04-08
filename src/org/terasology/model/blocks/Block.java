@@ -30,7 +30,9 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.imageio.ImageIO;
-import javax.vecmath.*;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4f;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -100,7 +102,7 @@ public class Block implements IGameObject {
     /* PROPERTIES */
     private byte _id = 0x0;
     private String _title = "Untitled block";
-    private BlockGroup _group = null;
+    private BlockFamily _family = null;
 
     private boolean _translucent;
     private boolean _invisible;
@@ -111,6 +113,15 @@ public class Block implements IGameObject {
     private boolean _bypassSelectionRay;
     private boolean _liquid;
     private boolean _waving;
+
+    private boolean _usable;
+
+    // Inventory settings
+    private boolean _straightToInventory;
+    private boolean _stackable = true;
+    private boolean _entityRetainedWhenItem = false;
+    private String _entityPrefab = "";
+
 
     private int _lootAmount;
 
@@ -275,10 +286,12 @@ public class Block implements IGameObject {
         renderWithLightValue(1.0f);
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         // Do nothing
     }
 
+
+    // TODO: Change all of these to setters
     public Block withId(byte id) {
         _id = id;
         return this;
@@ -289,8 +302,8 @@ public class Block implements IGameObject {
         return this;
     }
 
-    Block withBlockGroup(BlockGroup group) {
-        _group = group;
+    Block withBlockFamily(BlockFamily family) {
+        _family = family;
         return this;
     }
 
@@ -405,6 +418,31 @@ public class Block implements IGameObject {
         _fullSide.put(side, full);
         return this;
     }
+    
+    public Block withStraightToInventory(boolean straightToInventory) {
+        _straightToInventory = straightToInventory;
+        return this;
+    }
+
+    public Block withStackable(boolean stackable) {
+        _stackable = stackable;
+        return this;
+    }
+
+    public Block withEntityRetainedWhenItem(boolean entityRetainedWhenItem) {
+        _entityRetainedWhenItem = entityRetainedWhenItem;
+        return this;
+    }
+
+    public Block withEntityPrefab(String entityPrefab) {
+        _entityPrefab = entityPrefab;
+        return this;
+    }
+
+    public Block withUsable(boolean usable) {
+        _usable = usable;
+        return this;
+    }
 
     public void setColliders(List<AABB> colliders) {
         _colliders = new ArrayList<AABB>(colliders);
@@ -444,8 +482,8 @@ public class Block implements IGameObject {
         return _lootAmount;
     }
 
-    public BlockGroup getBlockGroup() {
-        return _group;
+    public BlockFamily getBlockFamily() {
+        return _family;
     }
 
     public boolean isBlockingSide(Side side) {
@@ -510,6 +548,26 @@ public class Block implements IGameObject {
 
     public boolean isTranslucent() {
         return _translucent;
+    }
+
+    public boolean isStraightToInventory() {
+        return _straightToInventory;
+    }
+
+    public boolean isStackable() {
+        return _stackable;
+    }
+
+    public boolean isEntityRetainedWhenItem() {
+        return _entityRetainedWhenItem;
+    }
+
+    public boolean isUsable() {
+        return _usable;
+    }
+
+    public String getEntityPrefab() {
+        return _entityPrefab;
     }
 
     /**

@@ -1,9 +1,7 @@
 package org.terasology.logic.world;
 
 import org.terasology.game.Terasology;
-import org.terasology.math.Vector3i;
 
-import javax.vecmath.Vector3d;
 import java.io.*;
 import java.util.logging.Level;
 

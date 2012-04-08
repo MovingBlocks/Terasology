@@ -21,6 +21,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.world.WorldUtil;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.*;
@@ -80,35 +81,15 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             }
         })){
             File worldManifest = new File(file.getPath() + "\\WorldManifest.groovy");
-            System.out.println(file.getPath() + "WorldManifest.groovy");
             try {
                 config = new ConfigSlurper().parse(worldManifest.toURI().toURL());
                 if(config.get("worldTitle")!=null&&config.get("worldSeed")!=null){
-                    _list.addItem((String) config.get("worldTitle"), (String)config.get("worldSeed"));
+                    _list.addItem((String) config.get("worldTitle"), config);
                 }
             } catch (MalformedURLException e) {
                 Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
             }
         }
-
-        _list.addItem("worldTitle1", "worldSeed");
-        _list.addItem("worldTitle2", "worldSeed");
-        _list.addItem("worldTitle1", "worldSeed");
-        _list.addItem("worldTitle2", "worldSeed");
-        _list.addItem("worldTitle1", "worldSeed");
-        _list.addItem("worldTitle2", "worldSeed");
-        _list.addItem("worldTitle1", "worldSeed");
-        _list.addItem("worldTitle2", "worldSeed");
-        _list.addItem("worldTitle1", "worldSeed");
-        _list.addItem("worldTitlaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaae1", "worldSeed");
-        _list.addItem("worldTitle2", "worldSeed");
-        _list.addItem("worldTitle1", "worldSeed");
-        _list.addItem("worldTitle2", "worldSeed");
-        _list.addItem("worldTitle1", "worldSeed");
-        _list.addItem("worldTitle2", "worldSeed");
-        _list.addItem("worldTitle1", "worldSeed");
-        _list.addItem("worldTitle2", "worldSeed");
-
 
         _goToBack = new UIButton(new Vector2f(256f, 32f));
         _goToBack.getLabel().setText("Go to back");
@@ -134,13 +115,20 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
         _deleteFromList.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
+                ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
+                String path = Terasology.getInstance().getWorldSavePath((String)config.get("worldTitle"));
+                File world = new File(path);
+                WorldUtil.deleteWorld(world);
                 _list.removeSelectedItem();
             }
         });
 
         _loadFromList.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-              // Config.getInstance().setDefaultSeed(_list.);
+                ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
+                Config.getInstance().setDefaultSeed((String)config.get("worldSeed"));
+                Config.getInstance().setWorldTitle((String) config.get("worldTitle"));
+                Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
             }
         });
 
@@ -151,6 +139,8 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         addDisplayElement(_createNewWorld, "createWorldButton");
         addDisplayElement(_deleteFromList, "deleteFromListButton");
         update();
+
+        GUIManager.getInstance().showMessage("Test", "Yes! It\'s works!! ");
     }
 
     @Override

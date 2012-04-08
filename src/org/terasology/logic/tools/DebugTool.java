@@ -15,21 +15,11 @@
  */
 package org.terasology.logic.tools;
 
-import org.terasology.game.Terasology;
-import org.terasology.logic.characters.Player;
-import org.terasology.math.Side;
-import org.terasology.model.blueprints.PortalBlueprint;
-import org.terasology.model.structures.BlockPosition;
-import org.terasology.model.structures.BlockSelection;
-import org.terasology.model.structures.RayBlockIntersection;
-
-import javax.vecmath.Vector3d;
-import java.util.logging.Level;
-
 /**
  * Debug tool for tinkering. Can be enabled / disabled whenever, not meant to be part of normal gameplay in this shape
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
+/*
 public class DebugTool implements ITool {
 
     private final Player _player;
@@ -84,4 +74,6 @@ public class DebugTool implements ITool {
     }
 
 
+
 }
+    */

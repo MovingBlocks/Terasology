@@ -17,10 +17,8 @@ package org.terasology.logic.world;
 
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 
-import javax.vecmath.Vector3d;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +61,12 @@ public final class ChunkProvider implements IChunkProvider {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isChunkAvailable(int x, int y, int z) {
+        int id = new Vector3i(x,y,z).hashCode();
+        Chunk c = _nearChunkCache.get(id);
+        return c != null;
     }
 
     public Chunk getChunk(int x, int y, int z) {

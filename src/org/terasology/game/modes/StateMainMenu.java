@@ -17,6 +17,7 @@ package org.terasology.game.modes;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
@@ -234,7 +235,7 @@ public class StateMainMenu implements IGameState {
         AudioManager.getInstance().stopAllSounds();
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         updateUserInterface();
     }
 
@@ -251,6 +252,16 @@ public class StateMainMenu implements IGameState {
 
     private void updateUserInterface() {
         GUIManager.getInstance().update();
+    }
+
+    public EntityManager getEntityManager() {
+        return null;
+    }
+
+    public void openScreen(UIDisplayElement screen) {
+    }
+
+    public void closeScreen() {
     }
 
     /**

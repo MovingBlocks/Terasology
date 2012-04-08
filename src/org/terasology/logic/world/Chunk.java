@@ -27,7 +27,6 @@ import org.terasology.game.Terasology;
 import org.terasology.logic.generators.ChunkGenerator;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;

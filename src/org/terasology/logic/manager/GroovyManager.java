@@ -21,18 +21,28 @@ import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
+import org.terasology.componentSystem.items.InventorySystem;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.LocationComponent;
+import org.terasology.entityFactory.BlockItemFactory;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PrefabManager;
+import org.terasology.game.ComponentSystemManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.game.modes.IGameState;
 import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.logic.characters.Player;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockGroup;
+import org.terasology.logic.LocalPlayer;
+import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.inventory.Item;
-import org.terasology.model.inventory.ItemBlock;
+import org.terasology.utilities.Helper;
 
+import javax.vecmath.Vector3f;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages everything related to using Groovy from within Java.
@@ -49,6 +59,8 @@ public class GroovyManager {
      * Directory where we keep "plugin" files (Groovy scripts we'll run - prolly move this setting elsewhere sometime)
      */
     private static final String PLUGINS_PATH = "groovy/plugins";
+    
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     /**
      * Initialize the GroovyManager and "share" the given World variable via the Binding
@@ -70,7 +82,6 @@ public class GroovyManager {
             gse = new GroovyScriptEngine(PLUGINS_PATH);
         } catch (IOException ioe) {
             Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to initialize plugin (IOException): " + pluginName + ", reason: " + ioe.toString(), ioe);
-            ioe.printStackTrace();
         }
 
         if (gse != null) {
@@ -80,10 +91,8 @@ public class GroovyManager {
                 gse.run(pluginName, _bind);
             } catch (ResourceException re) {
                 Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to execute plugin (ResourceException): " + pluginName + ", reason: " + re.toString(), re);
-                re.printStackTrace();
             } catch (ScriptException se) {
                 Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to execute plugin (ScriptException): " + pluginName + ", reason: " + se.toString(), se);
-                se.printStackTrace();
             }
         }
     }
@@ -101,10 +110,21 @@ public class GroovyManager {
      */
     public boolean runGroovyShell(String consoleString) {
         Terasology.getInstance().getLogger().log(Level.INFO, "Groovy console about to execute command: " + consoleString);
+        // Lets mess with the consoleString!
+        consoleString = consoleString.trim();
+        if (!(consoleString.startsWith("cmd.") || consoleString.startsWith("cfg."))) {
+            consoleString = "cmd." + consoleString;
+        }
+        if (!consoleString.endsWith(")") && !consoleString.contains(" ") && !consoleString.contains(",")) {
+            consoleString += "()";
+        }
         updateBinding();
         GroovyShell shell = new GroovyShell(_bind);
         try {
-            shell.evaluate(consoleString);
+            Object result = shell.evaluate(consoleString);
+            if (result != null) {
+                logger.log(Level.INFO, "Result [" + result + "] from '" + consoleString + "'");
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,9 +138,8 @@ public class GroovyManager {
         }
 
         public void giveBlock(int blockId, int quantity) {
-            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            Item block = new ItemBlock(BlockManager.getInstance().getBlock((byte) blockId).getBlockGroup());
-            player.getInventory().addItem(block, quantity);
+            BlockFamily blockFamily = BlockManager.getInstance().getBlock((byte) blockId).getBlockFamily();
+            giveBlock(blockFamily, quantity);
         }
 
         public void giveBlock(String title) {
@@ -128,27 +147,37 @@ public class GroovyManager {
         }
 
         public void giveBlock(String title, int quantity) {
-            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            BlockGroup group = BlockManager.getInstance().getBlockGroup(title);
-            if (group == null) {
-                Block block = BlockManager.getInstance().getBlock(title);
-                if (block != null) {
-                    group = block.getBlockGroup();
-                }
-            }
-            if (group != null) {
-                player.getInventory().addItem(new ItemBlock(group), quantity);
+            BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(title);
+            giveBlock(blockFamily, quantity);
+        }
+
+        private void giveBlock(BlockFamily blockFamily, int quantity) {
+            if (quantity < 1) return;
+
+            BlockItemFactory factory = new BlockItemFactory(Terasology.getInstance().getCurrentGameState().getEntityManager(), CoreRegistry.get(PrefabManager.class));
+            EntityRef item = factory.newInstance(blockFamily, quantity);
+
+            InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
+            if (!inventorySystem.addItem(Terasology.getInstance().getActivePlayer().getEntity(), item)) {
+                item.destroy();
             }
         }
 
         public void fullHealth() {
-            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.heal(player.getMaxHealthPoints() - player.getHealthPoints());
+            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+            HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+            health.currentHealth = health.maxHealth;
+            localPlayer.getEntity().saveComponent(health);
         }
 
-        public void teleport(double x, double y, double z) {
-            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.setPosition(x, y, z);
+        public void teleport(float x, float y, float z) {
+            LocalPlayer player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            if (player != null) {
+                LocationComponent location = player.getEntity().getComponent(LocationComponent.class);
+                if (location != null) {
+                    location.setWorldPosition(new Vector3f(x, y, z));
+                }
+            }
         }
 
         public void gotoWorld(String title) {
@@ -169,9 +198,16 @@ public class GroovyManager {
             }
         }
 
-        public void resetInventory() {
-            Player player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
-            player.resetInventory();
+        public void dumpEntities() throws IOException {
+            CoreRegistry.get(EntityManager.class).save(Helper.fixSavePath(new File("entityDump.txt")), EntityManager.SaveFormat.JSON);
+        }
+        
+        public void debugCollision() {
+            Config.getInstance().setDebugCollision(!Config.getInstance().isDebugCollision());
+        }
+
+        public void exit() {
+            Terasology.getInstance().exit();
         }
     }
 }

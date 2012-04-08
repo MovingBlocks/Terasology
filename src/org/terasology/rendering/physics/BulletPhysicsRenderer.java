@@ -29,13 +29,19 @@ import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.terasology.componentSystem.items.InventorySystem;
+import org.terasology.entityFactory.BlockItemFactory;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PrefabManager;
+import org.terasology.game.ComponentSystemManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
-import org.terasology.logic.characters.Player;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.inventory.ItemBlock;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
@@ -77,7 +83,7 @@ public class BulletPhysicsRenderer implements IGameObject {
             Matrix4f tMatrix = new Matrix4f();
             t.getMatrix(tMatrix);
 
-            Player player = Terasology.getInstance().getActivePlayer();
+            LocalPlayer player = Terasology.getInstance().getActivePlayer();
 
             Vector3f blockPlayer = new Vector3f();
             tMatrix.get(blockPlayer);
@@ -130,6 +136,8 @@ public class BulletPhysicsRenderer implements IGameObject {
     private final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     private final DiscreteDynamicsWorld _discreteDynamicsWorld;
 
+    private final BlockItemFactory _blockItemFactory;
+
     private final WorldRenderer _parent;
 
     public BulletPhysicsRenderer(WorldRenderer parent) {
@@ -140,6 +148,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -10f, 0f));
         _parent = parent;
+        _blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
     }
 
     public BlockRigidBody[] addLootableBlocks(Vector3f position, Block block) {
@@ -253,7 +262,6 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     public void render() {
-        Player player = _parent.getPlayer();
 
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
         float[] mFloat = new float[16];
@@ -294,11 +302,11 @@ public class BulletPhysicsRenderer implements IGameObject {
         GL11.glPopMatrix();
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         addQueuedBodies();
 
         try {
-            _discreteDynamicsWorld.stepSimulation((float) (delta / 1000.0), 3);
+            _discreteDynamicsWorld.stepSimulation(delta, 3);
         } catch (Exception e) {
             Terasology.getInstance().getLogger().log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again. Go along: " + e.toString());
         }
@@ -320,7 +328,7 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     private void checkForLootedBlocks() {
-        Player player = Terasology.getInstance().getActivePlayer();
+        LocalPlayer player = Terasology.getInstance().getActivePlayer();
 
         for (int i = _blocks.size() - 1; i >= 0; i--) {
             BlockRigidBody b = _blocks.get(i);
@@ -352,9 +360,15 @@ public class BulletPhysicsRenderer implements IGameObject {
 
                     b.applyCentralImpulse(blockPlayer);
                 } else {
+                    // TODO: Handle full inventories
+                    // TODO: Loot blocks should be entities
                     // Block was looted (and reached the player)
                     Block block = BlockManager.getInstance().getBlock(b.getType());
-                    player.getInventory().addItem(new ItemBlock(block.getBlockGroup()), 1);
+                    EntityRef blockItem = _blockItemFactory.newInstance(block.getBlockFamily());
+
+                    if (!CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class).addItem(player.getEntity(), blockItem)) {
+                        blockItem.destroy();
+                    }
                     AudioManager.play("Loot");
 
                     _blocks.remove(i);

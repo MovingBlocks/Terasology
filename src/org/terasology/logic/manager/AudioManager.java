@@ -15,13 +15,19 @@
  */
 package org.terasology.logic.manager;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.audio.OpenALManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.SoundPool;
 import org.terasology.audio.SoundSource;
-import org.terasology.logic.entities.MovableEntity;
+import org.terasology.components.BlockComponent;
+import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.LocationComponent;
+import org.terasology.entitySystem.EntityRef;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -34,16 +40,7 @@ import java.util.logging.Logger;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author t3hk0d3 <contact@tehkode.ru>
  */
-public abstract class AudioManager {
-
-    public final static float MAX_DISTANCE = 50.0f;
-
-    public final static int PRIORITY_LOCKED = Integer.MAX_VALUE;
-    public final static int PRIORITY_HIGHEST = 100;
-    public final static int PRIORITY_HIGH = 10;
-    public final static int PRIORITY_NORMAL = 5;
-    public final static int PRIORITY_LOW = 3;
-    public final static int PRIORITY_LOWEST = 1;
+public abstract class AudioManager implements SoundManager {
 
     protected Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
 
@@ -151,23 +148,6 @@ public abstract class AudioManager {
 
         return sound;
     }
-
-    /**
-     * Initializes AudioManager
-     */
-    public abstract void initialize();
-
-    /**
-     * Update AudioManager sound sources
-     * <p/>
-     * Should be called in main game loop
-     */
-    public abstract void update();
-
-    /**
-     * Gracefully destroy audio subsystem
-     */
-    public abstract void destroy();
 
     protected abstract boolean checkDistance(Vector3d soundSource);
 
@@ -391,6 +371,24 @@ public abstract class AudioManager {
     }
 
     /**
+     * Plays specified sound at specified position and with specified gain
+     *
+     * @param sound Sound object
+     * @param pos   Sound source position
+     * @param gain  Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
+    public static SoundSource play(Sound sound, Vector3f pos, float gain, int priority) {
+        SoundSource source = source(sound, new Vector3d(pos), gain, priority);
+
+        if (source == null) {
+            return null;
+        }
+
+        return source.setGain(gain).play();
+    }
+
+    /**
      * Plays specified sound tuned for specified entity
      *
      * @param sound    Sound object
@@ -399,15 +397,49 @@ public abstract class AudioManager {
      * @param priority Sound priority
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
-    public static SoundSource play(Sound sound, MovableEntity entity, float gain, int priority) {
-        SoundSource source = source(sound, entity.getPosition(), gain, priority);
+    public static SoundSource play(Sound sound, EntityRef entity, float gain, int priority) {
+        Vector3f pos = getEntityPosition(entity);
+        if (pos == null) return null;
+        
+        SoundSource source = source(sound, new Vector3d(pos), gain, priority);
 
         if (source == null) {
             // Nof free sound sources
             return null;
         }
 
-        return source.setVelocity(entity.getVelocity()).setDirection(entity.getViewingDirection()).play();
+        return source.setVelocity(new Vector3d(getEntityVelocity(entity))).setDirection(new Vector3d(getEntityDirection(entity))).play();
+    }
+    
+    private static Vector3f getEntityPosition(EntityRef entity) {
+        LocationComponent loc = entity.getComponent(LocationComponent.class);
+        if (loc != null) {
+            return loc.getWorldPosition();
+        }
+        BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+        if (blockComp != null) {
+            return blockComp.getPosition().toVector3f();
+        }
+        return null;
+    }
+
+    private static Vector3f getEntityDirection(EntityRef entity) {
+        LocationComponent loc = entity.getComponent(LocationComponent.class);
+        if (loc != null) {
+            Quat4f rot = loc.getWorldRotation();
+            Vector3f dir = new Vector3f(0,0,-1);
+            QuaternionUtil.quatRotate(rot, dir, dir);
+            return dir;
+        }
+        return new Vector3f();
+    }
+    
+    private static Vector3f getEntityVelocity(EntityRef entity) {
+        CharacterMovementComponent charMove = entity.getComponent(CharacterMovementComponent.class);
+        if (charMove != null) {
+            return charMove.getVelocity();
+        }
+        return new Vector3f();
     }
 
     /**

@@ -17,7 +17,6 @@ package org.terasology.logic.world;
 
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
-import org.terasology.model.structures.BlockPosition;
 
 import java.util.HashSet;
 
@@ -26,7 +25,7 @@ import java.util.HashSet;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class ChunkUpdateManager implements IBlockObserver {
+public final class ChunkUpdateManager {
 
     public enum UPDATE_TYPE {
         DEFAULT, PLAYER_TRIGGERED
@@ -69,16 +68,6 @@ public final class ChunkUpdateManager implements IBlockObserver {
         };
 
         Terasology.getInstance().submitTask("Chunk Update", r);
-    }
-
-    public void blockPlaced(Chunk chunk, BlockPosition pos, boolean update) {
-        if (update)
-            queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_TRIGGERED);
-    }
-
-    public void blockRemoved(Chunk chunk, BlockPosition pos, boolean update) {
-        if (update)
-            queueChunkUpdate(chunk, UPDATE_TYPE.PLAYER_TRIGGERED);
     }
 
 }

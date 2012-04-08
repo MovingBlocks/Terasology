@@ -30,6 +30,7 @@ block {
     penetrable = true
     allowBlockAttachment = false
     castsShadows = false
+    straightToInventory = true
 
     luminance = 15
     hardness = 1

@@ -18,15 +18,24 @@ package org.terasology.rendering.world;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.terasology.componentSystem.RenderSystem;
+import org.terasology.componentSystem.controllers.LocalPlayerSystem;
+import org.terasology.componentSystem.rendering.FirstPersonRenderer;
+import org.terasology.components.AABBCollisionComponent;
+import org.terasology.components.PlayerComponent;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.game.ComponentSystemManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
-import org.terasology.logic.characters.Player;
-import org.terasology.logic.entities.Entity;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.*;
 import org.terasology.math.TeraMath;
+import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
+import org.terasology.model.structures.BlockPosition;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.DefaultCamera;
@@ -37,6 +46,7 @@ import org.terasology.rendering.primitives.ChunkMesh;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -57,12 +67,12 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class WorldRenderer implements IGameObject {
-
     /* WORLD PROVIDER */
     private final IWorldProvider _worldProvider;
+    private FirstPersonRenderer _firstPersonRenderer;
 
     /* PLAYER */
-    private Player _player;
+    private LocalPlayer _player;
 
     /* CAMERA */
     public enum CAMERA_MODE {
@@ -72,6 +82,8 @@ public final class WorldRenderer implements IGameObject {
 
     private CAMERA_MODE _cameraMode = CAMERA_MODE.PLAYER;
     private Camera _spawnCamera = new DefaultCamera();
+    private DefaultCamera _defaultCamera = new DefaultCamera();
+    private Camera _activeCamera = _defaultCamera;
 
     /* CHUNKS */
     private final ArrayList<Chunk> _chunksInProximity = new ArrayList<Chunk>();
@@ -86,7 +98,6 @@ public final class WorldRenderer implements IGameObject {
 
     /* CORE GAME OBJECTS */
     private final PortalManager _portalManager;
-    private final MobManager _mobManager;
 
     /* PARTICLE EMITTERS */
     private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
@@ -95,7 +106,7 @@ public final class WorldRenderer implements IGameObject {
     private final Skysphere _skysphere;
 
     /* TICKING */
-    private double _tick = 0;
+    private float _tick = 0;
     private int _tickTock = 0;
     private long _lastTick;
 
@@ -117,21 +128,27 @@ public final class WorldRenderer implements IGameObject {
     /* OTHER SETTINGS */
     private boolean _wireframe;
 
+    private ComponentSystemManager _systemManager;
+
     /**
      * Initializes a new (local) world for the single player mode.
      *
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
-    public WorldRenderer(String title, String seed) {
+    public WorldRenderer(String title, String seed, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
         _worldProvider = new LocalWorldProvider(title, seed);
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager();
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
-        _portalManager = new PortalManager(this);
-        _mobManager = new MobManager(this);
+        _portalManager = new PortalManager(manager);
         _blockGrid = new BlockGrid();
         _bulletRenderer = new BulletPhysicsRenderer(this);
+
+        // TODO: won't need localPlayerSystem here once camera is in the ES proper
+        localPlayerSystem.setPlayerCamera(_defaultCamera);
+        _systemManager = CoreRegistry.get(ComponentSystemManager.class);
+
 
         initTimeEvents();
     }
@@ -169,13 +186,20 @@ public final class WorldRenderer implements IGameObject {
         return false;
     }
 
-    public boolean isInRange(Vector3d pos) {
-        Vector3d dist = new Vector3d();
-        dist.sub(_player.getPosition(), pos);
+    /*public boolean isInRange(Vector3f pos) {
+        Vector3f dist = new Vector3f();
+        dist.sub(getPlayerPosition(), pos);
 
         double distLength = dist.length();
 
         return distLength < (Config.getInstance().getActiveViewingDistance() * 8);
+    }*/
+    
+    private Vector3f getPlayerPosition() {
+        if (_player != null) {
+            return _player.getPosition();
+        }
+        return new Vector3f();
     }
 
     /**
@@ -280,7 +304,6 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.endActivity();
 
         _renderQueueTransparent.add(_bulletRenderer);
-        _renderQueueTransparent.add(_mobManager);
         _renderQueueTransparent.add(_blockParticleEmitter);
         _renderQueueTransparent.add(_blockGrid);
 
@@ -305,14 +328,15 @@ public final class WorldRenderer implements IGameObject {
         /* WORLD RENDERING */
         PerformanceMonitor.startActivity("Render World");
         getActiveCamera().lookThrough();
-        _player.render();
+        if (Config.getInstance().isDebugCollision()) {
+            renderDebugCollision();
+        };
 
         glEnable(GL_LIGHT0);
 
         boolean headUnderWater = false;
 
-        if (_cameraMode == CAMERA_MODE.PLAYER)
-            headUnderWater = _player.isHeadUnderWater();
+        headUnderWater = (_cameraMode == CAMERA_MODE.PLAYER && isUnderwater(getActiveCamera().getPosition()));
 
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -321,6 +345,10 @@ public final class WorldRenderer implements IGameObject {
 
         while (_renderQueueOpaque.size() > 0)
             _renderQueueOpaque.poll().render();
+        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+            renderer.renderOpaque();
+        }
+
 
         PerformanceMonitor.endActivity();
 
@@ -351,6 +379,9 @@ public final class WorldRenderer implements IGameObject {
 
         while (_renderQueueTransparent.size() > 0)
             _renderQueueTransparent.poll().render();
+        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+            renderer.renderTransparent();
+        }
 
         PerformanceMonitor.endActivity();
 
@@ -379,8 +410,9 @@ public final class WorldRenderer implements IGameObject {
             }
         }
 
-        /* EXTRACTION OVERLAY */
-        _player.renderExtractionOverlay();
+        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+            renderer.renderOverlay();
+        }
 
         glDisable(GL_BLEND);
 
@@ -401,13 +433,24 @@ public final class WorldRenderer implements IGameObject {
         PostProcessingRenderer.getInstance().renderScene();
         PerformanceMonitor.endActivity();
 
-        /* FIRST PERSON VIEW ELEMENTS */
-        if (_cameraMode == CAMERA_MODE.PLAYER)
-            _player.renderFirstPersonViewElements();
+        if (_cameraMode == CAMERA_MODE.PLAYER) {
+            glClear(GL_DEPTH_BUFFER_BIT);
+            glPushMatrix();
+            glLoadIdentity();
+            _activeCamera.loadProjectionMatrix(80f);
+
+            PerformanceMonitor.startActivity("Render First Person");
+            for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+                renderer.renderFirstPerson();
+            }
+            PerformanceMonitor.endActivity();
+
+            glPopMatrix();
+        }
     }
 
     public float getRenderingLightValue() {
-        return getRenderingLightValueAt(_player.getPosition());
+        return getRenderingLightValueAt(getActiveCamera().getPosition());
     }
 
     public float getRenderingLightValueAt(Vector3d pos) {
@@ -420,7 +463,7 @@ public final class WorldRenderer implements IGameObject {
         return (float) TeraMath.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
     }
 
-    public void update(double delta) {
+    public void update(float delta) {
         PerformanceMonitor.startActivity("Cameras");
         animateSpawnCamera(delta);
         _spawnCamera.update(delta);
@@ -438,13 +481,9 @@ public final class WorldRenderer implements IGameObject {
         _skysphere.update(delta);
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Player");
-        _player.update(delta);
-        PerformanceMonitor.endActivity();
-
-        PerformanceMonitor.startActivity("Mob Manager");
-        _mobManager.update(delta);
-        PerformanceMonitor.endActivity();
+        if (_activeCamera != null) {
+            _activeCamera.update(delta);
+        }
 
         // Update the particle emitters
         PerformanceMonitor.startActivity("Block Particle Emitter");
@@ -474,20 +513,61 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.endActivity();
     }
 
+    private void renderDebugCollision() {
+        if (_player != null && _player.isValid()) {
+            AABBCollisionComponent collision = _player.getEntity().getComponent(AABBCollisionComponent.class);
+            if (collision != null) {
+                Vector3f worldLoc = _player.getPosition();
+                AABB aabb = new AABB(new Vector3d(worldLoc), new Vector3d(collision.getExtents()));
+                aabb.render(1f);
+            }
+        }
+
+        List<BlockPosition> blocks = WorldUtil.gatherAdjacentBlockPositions(new Vector3f(getActiveCamera().getPosition()));
+
+        for (int i = 0; i < blocks.size(); i++) {
+            BlockPosition p = blocks.get(i);
+            byte blockType = getWorldProvider().getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
+            Block block = BlockManager.getInstance().getBlock(blockType);
+            for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
+                blockAABB.render(1f);
+            }
+        }
+    }
+    
+    private boolean isUnderwater(Vector3d pos) {
+
+        BlockPosition p = new BlockPosition(pos);
+        byte blockType = getWorldProvider().getBlockAtPosition(pos);
+        Block block = BlockManager.getInstance().getBlock(blockType);
+        if (block.isLiquid()) {
+            for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
+                if (blockAABB.contains(pos)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
     private void animateSpawnCamera(double delta) {
-        Vector3d cameraPosition = new Vector3d(_player.getSpawningPoint());
+        if (_player == null || !_player.isValid())
+            return;
+        PlayerComponent player = _player.getEntity().getComponent(PlayerComponent.class);
+        Vector3f cameraPosition = new Vector3f(player.spawnPosition);
         cameraPosition.y += 32;
         cameraPosition.x += Math.sin(getTick() * 0.0005f) * 32f;
         cameraPosition.z += Math.cos(getTick() * 0.0005f) * 32f;
 
-        Vector3d playerToCamera = new Vector3d();
-        playerToCamera.sub(_player.getPosition(), cameraPosition);
+        Vector3f playerToCamera = new Vector3f();
+        playerToCamera.sub(getPlayerPosition(), cameraPosition);
         double distanceToPlayer = playerToCamera.length();
 
-        Vector3d cameraDirection = new Vector3d();
+        Vector3f cameraDirection = new Vector3f();
 
         if (distanceToPlayer > 64.0) {
-            cameraDirection.sub(_player.getSpawningPoint(), cameraPosition);
+            cameraDirection.sub(player.spawnPosition, cameraPosition);
         } else {
             cameraDirection.set(playerToCamera);
         }
@@ -504,9 +584,9 @@ public final class WorldRenderer implements IGameObject {
      * Secondary effect: Trigger spawning (via PortalManager) once every second
      * Tertiary effect: Trigger socializing (via MobManager) once every 10 seconds
      */
-    private void updateTick(double delta) {
+    private void updateTick(float delta) {
         // Update the animation tick
-        _tick += delta;
+        _tick += delta * 1000;
 
         // This block is based on seconds or less frequent timings
         if (Terasology.getInstance().getTimeInMs() - _lastTick >= 1000) {
@@ -515,12 +595,6 @@ public final class WorldRenderer implements IGameObject {
 
             // PortalManager ticks for spawning once a second
             _portalManager.tickSpawn();
-
-
-            // MobManager ticks for AI every 10 seconds
-            if (_tickTock % 10 == 0) {
-                _mobManager.tickAI();
-            }
         }
     }
 
@@ -563,28 +637,28 @@ public final class WorldRenderer implements IGameObject {
      *
      * @param p The player
      */
-    public void setPlayer(Player p) {
-        if (_player != null) {
+    public void setPlayer(LocalPlayer p) {
+        /*if (_player != null) {
             _player.unregisterObserver(_chunkUpdateManager);
             _player.unregisterObserver(_worldProvider.getGrowthSimulator());
             _player.unregisterObserver(_worldProvider.getLiquidSimulator());
-        }
+        } */
 
         _player = p;
-        _player.registerObserver(_chunkUpdateManager);
+        /*_player.registerObserver(_chunkUpdateManager);
         _player.registerObserver(_worldProvider.getGrowthSimulator());
         _player.registerObserver(_worldProvider.getLiquidSimulator());
 
         _player.load();
-        _player.setSpawningPoint(_worldProvider.nextSpawningPoint());
+        _player.setSpawningPoint(_worldProvider.nextSpawningPoint());*/
         updateChunksInProximity(true);
 
-        _player.reset();
+        /*_player.reset();
 
         // Only respawn the player if no position was loaded
         if (_player.getPosition().equals(new Vector3d(0.0, 0.0, 0.0))) {
             _player.respawn();
-        }
+        } */
     }
 
     /**
@@ -592,7 +666,7 @@ public final class WorldRenderer implements IGameObject {
      */
     public void initPortal() {
         if (!_portalManager.hasPortal()) {
-            Vector3d loc = new Vector3d(_player.getPosition().x, _player.getPosition().y + 4, _player.getPosition().z);
+            Vector3d loc = new Vector3d(getPlayerPosition().x, getPlayerPosition().y + 4, getPlayerPosition().z);
             Terasology.getInstance().getLogger().log(Level.INFO, "Portal location is" + loc);
             _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, BlockManager.getInstance().getBlock("PortalBlock").getId(), false, true);
             _portalManager.addPortal(loc);
@@ -604,7 +678,6 @@ public final class WorldRenderer implements IGameObject {
      */
     public void dispose() {
         _worldProvider.dispose();
-        _player.dispose();
         AudioManager.getInstance().stopAllSounds();
     }
 
@@ -666,10 +739,10 @@ public final class WorldRenderer implements IGameObject {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", getActiveBiome(), _worldProvider.getTime(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", getPlayerBiome(), _worldProvider.getTime(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _worldProvider.getChunkProvider().size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, Chunk._statRenderedTriangles, Chunk._statChunkMeshEmpty, Chunk._statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
-    public Player getPlayer() {
+    public LocalPlayer getPlayer() {
         return _player;
     }
 
@@ -681,10 +754,6 @@ public final class WorldRenderer implements IGameObject {
         return getActiveCamera().getViewFrustum().intersects(c.getAABB());
     }
 
-    public boolean isEntityVisible(Entity e) {
-        return getActiveCamera().getViewFrustum().intersects(e.getAABB());
-    }
-
     public double getDaylight() {
         return _skysphere.getDaylight();
     }
@@ -693,16 +762,21 @@ public final class WorldRenderer implements IGameObject {
         return _blockParticleEmitter;
     }
 
-    public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome() {
-        return _worldProvider.getActiveBiome((int) _player.getPosition().x, (int) _player.getPosition().z);
+    public ChunkGeneratorTerrain.BIOME_TYPE getPlayerBiome() {
+        Vector3f pos = getPlayerPosition();
+        return _worldProvider.getActiveBiome((int) pos.x, (int) pos.z);
     }
 
-    public double getActiveHumidity() {
-        return _worldProvider.getHumidityAt((int) _player.getPosition().x, (int) _player.getPosition().z);
+    public double getActiveHumidity(Vector3d pos) {
+        return _worldProvider.getHumidityAt((int) pos.x, (int) pos.z);
     }
 
-    public double getActiveTemperature() {
-        return _worldProvider.getTemperatureAt((int) _player.getPosition().x, (int) _player.getPosition().z);
+    public double getActiveTemperature(Vector3d pos) {
+        return _worldProvider.getTemperatureAt((int) pos.x, (int) pos.z);
+    }
+
+    public double getActiveTemperature(Vector3f pos) {
+        return _worldProvider.getTemperatureAt((int) pos.x, (int) pos.z);
     }
 
     public IWorldProvider getWorldProvider() {
@@ -711,10 +785,6 @@ public final class WorldRenderer implements IGameObject {
 
     public BlockGrid getBlockGrid() {
         return _blockGrid;
-    }
-
-    public MobManager getMobManager() {
-        return _mobManager;
     }
 
     public Skysphere getSkysphere() {
@@ -742,22 +812,19 @@ public final class WorldRenderer implements IGameObject {
     }
 
     public Camera getActiveCamera() {
-        if (_player != null && _cameraMode == CAMERA_MODE.PLAYER) {
-            return _player.getActiveCamera();
-        } else if (_cameraMode == CAMERA_MODE.SPAWN) {
-            return _spawnCamera;
-        }
-
-        return _spawnCamera;
+        return _activeCamera;
     }
 
+    //TODO: Review
     public void setCameraMode(CAMERA_MODE mode) {
-        if (mode == CAMERA_MODE.PLAYER && _player != null) {
-            _player.setRenderPlayerModel(false);
-        } else if (mode == CAMERA_MODE.SPAWN) {
-            _player.setRenderPlayerModel(true);
-        }
-
         _cameraMode = mode;
+        switch (mode) {
+            case PLAYER:
+                _activeCamera = _defaultCamera;
+                break;
+            default:
+                _activeCamera = _spawnCamera;
+                break;
+        }
     }
 }

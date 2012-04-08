@@ -153,6 +153,8 @@ public class TessellatorHelper {
     public static void addGUIQuadMesh(Tessellator tessellator, Vector4f color, float sizeX, float sizeY) {
         tessellator.resetParams();
         tessellator.setColor(new Vector4f(color.x, color.y, color.z, color.w));
+        tessellator.setUseLighting(false);
+        tessellator.setUseNormals(false);
 
         tessellator.addPoly(
                 new Vector3f[]{
@@ -168,6 +170,8 @@ public class TessellatorHelper {
                         new Vector2f(0, 1)
                 }
         );
+        tessellator.setUseLighting(true);
+        tessellator.setUseNormals(true);
     }
 
 }

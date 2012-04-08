@@ -1,8 +1,6 @@
 package org.terasology.logic.world;
 
 
-import org.terasology.math.Vector3i;
-
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ChunkCacheUncompressed implements IChunkCache {

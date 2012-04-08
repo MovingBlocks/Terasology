@@ -70,6 +70,7 @@ public class ShaderManager {
         createAndStoreShaderProgram("block", new ShaderParametersBlock());
         createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
         createAndStoreShaderProgram("clouds", new ShaderParametersDefault());
+        createAndStoreShaderProgram("genericMesh", new ShaderParametersGenericMesh());
     }
 
     public void recompileAllShaders() {

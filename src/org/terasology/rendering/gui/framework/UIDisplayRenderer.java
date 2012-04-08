@@ -16,7 +16,6 @@
 package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
-
 import java.util.Collections;
 
 import static org.lwjgl.opengl.GL11.*;

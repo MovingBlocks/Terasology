@@ -29,6 +29,9 @@ block {
         topbottom = "ChestTopBottom"
     }
 
-    // MetaBlock assignment - where to look for more info on a specific instance of this block
-    meta = Chest
+    entityPrefab = "Chest"
+    stackable = false
+    straightToInventory = true
+    entityRetainedWhenItem = true
+    usable = true
 }

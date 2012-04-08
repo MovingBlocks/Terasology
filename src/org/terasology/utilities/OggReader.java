@@ -2,7 +2,7 @@ package org.terasology.utilities;
 
 import com.jcraft.jogg.Packet;
 import com.jcraft.jogg.Page;
-import com.jcraft.jogg.StreamState ;
+import com.jcraft.jogg.StreamState;
 import com.jcraft.jogg.SyncState;
 import com.jcraft.jorbis.Block;
 import com.jcraft.jorbis.Comment;

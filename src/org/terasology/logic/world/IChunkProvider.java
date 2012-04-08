@@ -23,6 +23,13 @@ package org.terasology.logic.world;
 public interface IChunkProvider {
 
     /**
+     * @param x
+     * @param z
+     * @return Whether this chunk is immediately available
+     */
+    public boolean isChunkAvailable(int x, int y, int z);
+
+    /**
      * Returns the chunk at the given position.
      *
      * @param x The chunk position on the x-axis

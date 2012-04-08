@@ -1,47 +1,47 @@
 package org.terasology.model.inventory;
 
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.vecmath.Vector2f;
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockGroup;
+import org.terasology.model.blocks.BlockFamily;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+
+import javax.vecmath.Vector2f;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * Icon for rendering items in inventory.
  */
 @SuppressWarnings("rawtypes")
 public class Icon {
-	private static Map<Class, Icon> icons;
+	private static Map<String, Icon> icons;
 
 	private UIGraphicsElement _element;
-	private BlockGroup _blockGroup;
+	private BlockFamily _blockFamily;
 	private int _x;
 	private int _y;
 
 	/**
-	 * Creates Icon for BlockGroup class.
+	 * Creates Icon for BlockFamily class.
 	 *
-	 * @param blockGroup
+	 * @param blockFamily
 	 */
-	public Icon(BlockGroup blockGroup) {
+	public Icon(BlockFamily blockFamily) {
 		_element = null;
-		_blockGroup = blockGroup;
+		_blockFamily = blockFamily;
 		setAtlasPosition(0, 0);
 	}
 
 	/**
-	 * Creates an Icon for a non-BlockGroup class
+	 * Creates an Icon for a non-BlockFamily class
 	 */
 	public Icon() {
 		_element = new UIGraphicsElement("items");
-		_blockGroup = null;
+		_blockFamily = null;
 
         _element.setSize(new Vector2f(32, 32));
         _element.getTextureSize().set(new Vector2f(0.0624f, 0.0624f));
@@ -52,25 +52,21 @@ public class Icon {
 	}
 
 	/**
-	 * Returns the icon for <code>item</code>.
+	 * Returns the icon for <code>name</code>.
 	 *
-	 * @param item the Item to check
+	 * @param name the name of the icon
 	 * @return the Icon for item
 	 */
-	public static Icon get(Item item) {
+	public static Icon get(String name) {
 		if (icons == null) {
 			loadIcons();
 		}
 
-		if (item instanceof ItemBlock) {
-			return new Icon(((ItemBlock) item).getBlockGroup());
-		}
-
-		return icons.get(item.getClass());
+		return icons.get(name.toLowerCase(Locale.ENGLISH));
 	}
 
 	private static void loadIcons() {
-		icons = new HashMap<Class, Icon>();
+		icons = new HashMap<String, Icon>();
 
         //TODO: Hmm, does this mean we have hard coded our tool displays? Should try to move this to ToolManager in that case?
 		Icon axeIcon = new Icon();
@@ -87,19 +83,19 @@ public class Icon {
 		noteIcon.setAtlasPosition(10, 3);
         greenOrbIcon.setAtlasPosition(14, 1);
 
-		icons.put(ItemAxe.class, axeIcon);
-		icons.put(ItemPickAxe.class, pickAxeIcon);
-		icons.put(ItemDynamite.class, redPowderIcon);
-		icons.put(ItemBlueprint.class, noteIcon);
-        icons.put(ItemDebug.class, greenOrbIcon);
-        icons.put(ItemRailgun.class, testTubeIcon);
+		icons.put("axe", axeIcon);
+		icons.put("pickaxe", pickAxeIcon);
+		icons.put("dynamite", redPowderIcon);
+		icons.put("blueprint", noteIcon);
+        icons.put("debug", greenOrbIcon);
+        icons.put("railgun", testTubeIcon);
 	}
 
 	/**
 	 * Draw the icon.
 	 */
 	public void render() {
-		if (_blockGroup == null) {
+		if (_blockFamily == null) {
 			_element.renderTransformed();
 		} else {
 	        GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -111,7 +107,7 @@ public class Icon {
 	        GL11.glRotatef(-16f, 0f, 1f, 0f);
 	        TextureManager.getInstance().bindTexture("terrain");
 
-	        Block block = _blockGroup.getArchetypeBlock();
+	        Block block = _blockFamily.getArchetypeBlock();
 	        block.render();
 
 	        GL11.glPopMatrix();

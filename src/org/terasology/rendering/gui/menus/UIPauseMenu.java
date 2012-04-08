@@ -68,7 +68,8 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _respawnButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
-                Terasology.getInstance().getActiveWorldRenderer().getPlayer().respawn();
+                // TODO: Respawning
+                //Terasology.getInstance().getActiveWorldRenderer().getPlayer().respawn();
             }
         });
 
