@@ -1,5 +1,7 @@
 package org.terasology.entitySystem;
 
+import org.terasology.entitySystem.pojo.persistence.PersistenceUtil;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Locale;
@@ -14,13 +16,7 @@ public abstract class AbstractComponent implements Component {
     private static Logger logger = Logger.getLogger(AbstractComponent.class.getName());
 
     public String getName() {
-        String className = getClass().getSimpleName().toLowerCase(Locale.ENGLISH);
-
-        if (className.endsWith("component")) {
-            return className.substring(0, className.lastIndexOf("component"));
-        }
-
-        return className;
+        return PersistenceUtil.getComponentClassName(getClass());
     }
 
     public Component clone() {

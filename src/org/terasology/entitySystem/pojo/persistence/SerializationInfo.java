@@ -1,5 +1,6 @@
 package org.terasology.entitySystem.pojo.persistence;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
 import org.terasology.protobuf.EntityData;
@@ -47,6 +48,35 @@ public class SerializationInfo {
             }
         }
         return componentMessage.build();
+    }
+
+    public EntityData.Component serialize(Component base, Component delta) {
+        EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
+        componentMessage.setType(delta.getName());
+        boolean changed = false;
+        for (FieldInfo field : fields.values()) {
+            try {
+                Object origValue = null;
+                origValue = field.getValue(base);
+
+                Object deltaValue = null;
+                deltaValue = field.getValue(delta);
+
+                if (Objects.equal(origValue, deltaValue)) continue;
+
+                EntityData.Value value = field.getSerializationHandler().serialize(deltaValue);
+                componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
+                changed = true;
+            } catch (IllegalAccessException e) {
+                logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
+            } catch (InvocationTargetException e) {
+                logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
+            }
+        }
+        if (changed) {
+            return componentMessage.build();
+        }
+        return null;
     }
 
     public Component deserialize(EntityData.Component componentData) {

@@ -1,6 +1,5 @@
 package org.terasology.entitySystem.pojo;
 
-import com.google.common.collect.Maps;
 import com.google.protobuf.TextFormat;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
@@ -14,19 +13,11 @@ import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.entitySystem.pojo.persistence.EntityDataJSONFormat;
-import org.terasology.entitySystem.pojo.persistence.FieldInfo;
-import org.terasology.entitySystem.pojo.persistence.SerializationInfo;
-import org.terasology.entitySystem.pojo.persistence.TypeHandler;
-import org.terasology.entitySystem.pojo.persistence.core.*;
+import org.terasology.entitySystem.pojo.persistence.*;
 import org.terasology.entitySystem.pojo.persistence.extension.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +28,6 @@ import java.util.logging.Logger;
  */
 public class PojoEntityManager implements EntityManager {
     public static final int NULL_ID = 0;
-    private static final int MAX_SERIALIZATION_DEPTH = 1;
 
     private static Logger logger = Logger.getLogger(PojoEntityManager.class.getName());
 
@@ -48,61 +38,24 @@ public class PojoEntityManager implements EntityManager {
     ComponentTable store = new ComponentTable();
     private EventSystem eventSystem;
     private PrefabManager prefabManager;
-
-    private Map<Class<? extends Component>, SerializationInfo> componentSerializationLookup = Maps.newHashMap();
-    private Map<String, Class<? extends Component>> componentTypeLookup = Maps.newHashMap();
-    private Map<Class<?>, TypeHandler<?>> typeHandlers = Maps.newHashMap();
+    private EntityPersister entityPersister = new EntityPersisterImpl();
 
     // Temporary list of valid ids used during loading.
     // TODO: Store in EntityRefTypeHandler?
     private TIntSet validIds = new TIntHashSet();
 
     public PojoEntityManager() {
-        registerTypeHandler(Boolean.class, new BooleanTypeHandler());
-        registerTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
-        registerTypeHandler(Byte.class, new ByteTypeHandler());
-        registerTypeHandler(Byte.TYPE, new ByteTypeHandler());
-        registerTypeHandler(Double.class, new DoubleTypeHandler());
-        registerTypeHandler(Double.TYPE, new DoubleTypeHandler());
-        registerTypeHandler(Float.class, new FloatTypeHandler());
-        registerTypeHandler(Float.TYPE, new FloatTypeHandler());
-        registerTypeHandler(Integer.class, new IntTypeHandler());
-        registerTypeHandler(Integer.TYPE, new IntTypeHandler());
-        registerTypeHandler(Long.class, new LongTypeHandler());
-        registerTypeHandler(Long.TYPE, new LongTypeHandler());
-        registerTypeHandler(String.class, new StringTypeHandler());
         registerTypeHandler(EntityRef.class, new EntityRefTypeHandler(this));
         registerComponentClass(EntityInfoComponent.class);
     }
 
     public <T> void registerTypeHandler(Class<? extends T> forClass, TypeHandler<T> handler) {
-        typeHandlers.put(forClass, handler);
+        entityPersister.registerTypeHandler(forClass, handler);
+
     }
 
     public void registerComponentClass(Class<? extends Component> componentClass) {
-
-        try {
-            // Check if constructor exists
-            componentClass.getConstructor();
-        } catch (NoSuchMethodException e) {
-            logger.log(Level.SEVERE, String.format("Unable to register component class %s: Default Constructor Required", componentClass.getSimpleName()));
-            return;
-        }
-
-        SerializationInfo info = new SerializationInfo(componentClass);
-        for (Field field : componentClass.getDeclaredFields()) {
-            if (Modifier.isTransient(field.getModifiers()))
-                continue;
-            field.setAccessible(true);
-            TypeHandler typeHandler = getHandlerFor(field.getGenericType(), 0);
-            if (typeHandler == null) {
-                logger.log(Level.SEVERE, "Unsupported field type in component type " + componentClass.getSimpleName() + ", " + field.getName() + " : " + field.getGenericType());
-            } else {
-                info.addField(new FieldInfo(field, componentClass, typeHandler));
-            }
-        }
-        componentSerializationLookup.put(componentClass, info);
-        componentTypeLookup.put(getComponentClassName(componentClass), componentClass);
+        entityPersister.registerComponentClass(componentClass);
     }
 
     public EntityRef loadEntityRef(int id) {
@@ -165,7 +118,7 @@ public class PojoEntityManager implements EntityManager {
             }
 
             for (Component component : prefab.listOwnComponents()) {
-                EntityData.Component componentData = serializeComponent(component);
+                EntityData.Component componentData = entityPersister.serializeComponent(component);
                 if (componentData != null) {
                     prefabData.addComponent(componentData);
                 }
@@ -175,35 +128,15 @@ public class PojoEntityManager implements EntityManager {
 
         TIntIterator idIterator = store.entityIdIterator();
         while (idIterator.hasNext()) {
-            world.addEntity(serialzieEntity(idIterator));
-        }
-        return world;
-    }
-
-    private EntityData.Entity serialzieEntity(TIntIterator idIterator) {
-        int id = idIterator.next();
-        EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
-        entity.setId(id);
-        for (Component component : iterateComponents(id)) {
-            EntityData.Component componentData = serializeComponent(component);
-            if (componentData != null) {
-                entity.addComponent(componentData);
+            int id = idIterator.next();
+            EntityInfoComponent entityInfo = getComponent(id, EntityInfoComponent.class);
+            if (entityInfo != null && prefabManager.exists(entityInfo.parentPrefab)) {
+                world.addEntity(entityPersister.serializeEntity(id, createEntityRef(id), prefabManager.getPrefab(entityInfo.parentPrefab)));
+            } else {
+                world.addEntity(entityPersister.serializeEntity(id, createEntityRef(id)));
             }
         }
-        return entity.build();
-    }
-
-    private EntityData.Component serializeComponent(Component component) {
-        SerializationInfo serializationInfo = componentSerializationLookup.get(component.getClass());
-        if (serializationInfo == null) {
-            logger.log(Level.SEVERE, "Unregistered component type: " + component.getClass());
-            registerComponentClass(component.getClass());
-            serializationInfo = componentSerializationLookup.get(component.getClass());
-        }
-        if (serializationInfo != null) {
-            return serializationInfo.serialize(component);
-        }
-        return null;
+        return world;
     }
 
     public void load(File file, SaveFormat format) throws IOException {
@@ -258,7 +191,7 @@ public class PojoEntityManager implements EntityManager {
                     }
                 }
                 for (EntityData.Component componentData : prefabData.getComponentList()) {
-                    Component component = deserializeComponent(componentData);
+                    Component component = entityPersister.deserializeComponent(componentData);
                     if (component != null) {
                         prefab.setComponent(component);
                     }
@@ -275,7 +208,7 @@ public class PojoEntityManager implements EntityManager {
         for (EntityData.Entity entityData : world.getEntityList()) {
             int entityId = entityData.getId();
             for (EntityData.Component componentData : entityData.getComponentList()) {
-                Component component = deserializeComponent(componentData);
+                Component component = entityPersister.deserializeComponent(componentData);
                 if (component != null) {
                     store.put(entityId, component);
                 }
@@ -285,31 +218,11 @@ public class PojoEntityManager implements EntityManager {
         validIds = new TIntHashSet();
     }
 
-    private Component deserializeComponent(EntityData.Component componentData) {
-        Class<? extends Component> componentClass = componentTypeLookup.get(componentData.getType().toLowerCase(Locale.ENGLISH));
-        if (componentClass != null) {
-            SerializationInfo serializationInfo = componentSerializationLookup.get(componentClass);
-            return serializationInfo.deserialize(componentData);
-        }
-        return null;
-    }
-
     public void clear() {
         store.clear();
         nextEntityId = 1;
         freedIds.clear();
         entityCache.clear();
-    }
-
-    private Component copyComponent(Component component) {
-        SerializationInfo serializationInfo = componentSerializationLookup.get(component.getClass());
-        if (serializationInfo == null) {
-            logger.log(Level.SEVERE, "Unable to clone component: " + component.getClass() + ", not registered");
-        } else {
-            EntityData.Component data = serializationInfo.serialize(component);
-            return serializationInfo.deserialize(data);
-        }
-        return null;
     }
 
     public EntityRef create() {
@@ -321,18 +234,21 @@ public class PojoEntityManager implements EntityManager {
     }
 
     public EntityRef create(String prefabName) {
-        Prefab prefab = prefabManager.getPrefab(prefabName);
-        if (prefab == null) {
-            logger.log(Level.WARNING, "Unable to instantiate unknown prefab: \"" + prefabName + "\"");
+        if (prefabName != null && !prefabName.isEmpty()) {
+            Prefab prefab = prefabManager.getPrefab(prefabName);
+            if (prefab == null) {
+                logger.log(Level.WARNING, "Unable to instantiate unknown prefab: \"" + prefabName + "\"");
+            }
+            return create(prefab);
         }
-        return create(prefab);
+        return create();
     }
 
     public EntityRef create(Prefab prefab) {
         EntityRef result = create();
         if (prefab != null) {
             for (Component component : prefab.listComponents()) {
-                result.addComponent(copyComponent(component));
+                result.addComponent(entityPersister.copyComponent(component));
             }
             result.addComponent(new EntityInfoComponent(prefab.getName()));
         }
@@ -521,79 +437,5 @@ public class PojoEntityManager implements EntityManager {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-    }
-
-    // TODO: Refactor
-    private TypeHandler getHandlerFor(Type type, int depth) {
-        Class typeClass = null;
-        if (type instanceof Class) {
-            typeClass = (Class) type;
-        } else if (type instanceof ParameterizedType) {
-            typeClass = (Class) ((ParameterizedType) type).getRawType();
-        }
-
-        if (Enum.class.isAssignableFrom(typeClass)) {
-            return new EnumTypeHandler(typeClass);
-        }
-        // For lists, createEntityRef the handler for the contained type and wrap in a list type handler
-        else if (List.class.isAssignableFrom(typeClass)) {
-            // TODO - Improve parameter lookup
-            if (type instanceof ParameterizedType && ((ParameterizedType) type).getActualTypeArguments().length > 0)
-            {
-                TypeHandler innerHandler = getHandlerFor(((ParameterizedType)type).getActualTypeArguments()[0], depth);
-                if (innerHandler != null) {
-                    return new ListTypeHandler(innerHandler);
-                }
-            }
-            logger.log(Level.SEVERE, "List field is not parameterized, or holds unsupported type");
-            return null;
-        }
-        // For Maps, createEntityRef the handler for the value type (and maybe key too?)
-        else if (Map.class.isAssignableFrom(typeClass)) {
-            if (type instanceof ParameterizedType) {
-                // TODO - Improve parameter lookup
-                Type[] types = ((ParameterizedType)type).getActualTypeArguments();
-                if (types.length > 1 && String.class.equals(types[0])) {
-                    TypeHandler valueHandler = getHandlerFor(types[1], depth);
-                    if (valueHandler != null) {
-                        return new StringMapTypeHandler(valueHandler);
-                    }
-                }
-            }
-            logger.log(Level.SEVERE, "Map field is not parameterized, does not have a String key, or holds unsupported values");
-        }
-        // For know types, just use the handler
-        else if (typeHandlers.containsKey(typeClass)) {
-            return typeHandlers.get(typeClass);
-        }
-        // For unknown types of a limited depth, assume they are data holders and use them
-        else if (depth <= MAX_SERIALIZATION_DEPTH && !typeClass.isLocalClass() && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
-            logger.log(Level.WARNING, "Handling serialization of type " + typeClass + " via MappedContainer");
-            MappedContainerTypeHandler mappedHandler = new MappedContainerTypeHandler(typeClass);
-            for (Field field : typeClass.getDeclaredFields()) {
-                if (Modifier.isTransient(field.getModifiers()))
-                    continue;
-
-                field.setAccessible(true);
-                TypeHandler handler = getHandlerFor(field.getGenericType(), depth + 1);
-                if (handler == null) {
-                    logger.log(Level.SEVERE, "Unsupported field type in component type " + typeClass.getSimpleName() + ", " + field.getName() + " : " + field.getGenericType());
-                } else {
-                    mappedHandler.addField(new FieldInfo(field, typeClass, handler));
-                }
-            }
-            return mappedHandler;
-        }
-
-        return null;
-    }
-
-    private String getComponentClassName(Class<? extends Component> componentClass) {
-        String name = componentClass.getSimpleName().toLowerCase(Locale.ENGLISH);
-        int index = name.lastIndexOf("component");
-        if (index != -1) {
-            return name.substring(0, index);
-        }
-        return name;
     }
 }

@@ -8,6 +8,12 @@ import org.terasology.entitySystem.AbstractComponent;
 public final class IntegerComponent extends AbstractComponent {
     int value;
 
+    public IntegerComponent() {}
+
+    public IntegerComponent(int value) {
+        this.value = value;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
