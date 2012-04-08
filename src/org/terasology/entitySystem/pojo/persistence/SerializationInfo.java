@@ -82,6 +82,17 @@ public class SerializationInfo {
     public Component deserialize(EntityData.Component componentData) {
         try {
             Component component = clazz.newInstance();
+            return deserializeOnto(component, componentData);
+        } catch (InstantiationException e) {
+            logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
+        } catch (IllegalAccessException e) {
+            logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
+        }
+        return null;
+    }
+
+    public Component deserializeOnto(Component component, EntityData.Component componentData) {
+        try {
             for (EntityData.NameValue field : componentData.getFieldList()) {
                 FieldInfo fieldInfo = fields.get(field.getName().toLowerCase(Locale.ENGLISH));
                 if (fieldInfo == null)
@@ -93,8 +104,6 @@ public class SerializationInfo {
                 fieldInfo.setValue(component, value);
             }
             return component;
-        } catch (InstantiationException e) {
-            logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
         } catch (InvocationTargetException e) {
             logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
         } catch (IllegalAccessException e) {

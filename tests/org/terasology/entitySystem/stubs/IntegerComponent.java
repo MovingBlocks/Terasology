@@ -6,7 +6,7 @@ import org.terasology.entitySystem.AbstractComponent;
  * @author Immortius <immortius@gmail.com>
  */
 public final class IntegerComponent extends AbstractComponent {
-    int value;
+    public int value;
 
     public IntegerComponent() {}
 

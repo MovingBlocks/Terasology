@@ -2890,6 +2890,10 @@ public final class EntityData {
     int getRemovedComponentIndexCount();
     int getRemovedComponentIndex(int index);
     
+    // optional string parent_prefab = 4;
+    boolean hasParentPrefab();
+    String getParentPrefab();
+    
     // repeated string removed_component = 15;
     java.util.List<String> getRemovedComponentList();
     int getRemovedComponentCount();
@@ -2970,6 +2974,38 @@ public final class EntityData {
     }
     private int removedComponentIndexMemoizedSerializedSize = -1;
     
+    // optional string parent_prefab = 4;
+    public static final int PARENT_PREFAB_FIELD_NUMBER = 4;
+    private java.lang.Object parentPrefab_;
+    public boolean hasParentPrefab() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public String getParentPrefab() {
+      java.lang.Object ref = parentPrefab_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          parentPrefab_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getParentPrefabBytes() {
+      java.lang.Object ref = parentPrefab_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        parentPrefab_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
     // repeated string removed_component = 15;
     public static final int REMOVED_COMPONENT_FIELD_NUMBER = 15;
     private com.google.protobuf.LazyStringList removedComponent_;
@@ -2988,6 +3024,7 @@ public final class EntityData {
       id_ = 0;
       component_ = java.util.Collections.emptyList();
       removedComponentIndex_ = java.util.Collections.emptyList();;
+      parentPrefab_ = "";
       removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
@@ -3028,6 +3065,9 @@ public final class EntityData {
       for (int i = 0; i < removedComponentIndex_.size(); i++) {
         output.writeSInt32NoTag(removedComponentIndex_.get(i));
       }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(4, getParentPrefabBytes());
+      }
       for (int i = 0; i < removedComponent_.size(); i++) {
         output.writeBytes(15, removedComponent_.getByteString(i));
       }
@@ -3062,6 +3102,10 @@ public final class EntityData {
               .computeInt32SizeNoTag(dataSize);
         }
         removedComponentIndexMemoizedSerializedSize = dataSize;
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(4, getParentPrefabBytes());
       }
       {
         int dataSize = 0;
@@ -3208,8 +3252,10 @@ public final class EntityData {
         }
         removedComponentIndex_ = java.util.Collections.emptyList();;
         bitField0_ = (bitField0_ & ~0x00000004);
-        removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        parentPrefab_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
+        removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
       
@@ -3266,10 +3312,14 @@ public final class EntityData {
           bitField0_ = (bitField0_ & ~0x00000004);
         }
         result.removedComponentIndex_ = removedComponentIndex_;
-        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.parentPrefab_ = parentPrefab_;
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
           removedComponent_ = new com.google.protobuf.UnmodifiableLazyStringList(
               removedComponent_);
-          bitField0_ = (bitField0_ & ~0x00000008);
+          bitField0_ = (bitField0_ & ~0x00000010);
         }
         result.removedComponent_ = removedComponent_;
         result.bitField0_ = to_bitField0_;
@@ -3327,10 +3377,13 @@ public final class EntityData {
           }
           onChanged();
         }
+        if (other.hasParentPrefab()) {
+          setParentPrefab(other.getParentPrefab());
+        }
         if (!other.removedComponent_.isEmpty()) {
           if (removedComponent_.isEmpty()) {
             removedComponent_ = other.removedComponent_;
-            bitField0_ = (bitField0_ & ~0x00000008);
+            bitField0_ = (bitField0_ & ~0x00000010);
           } else {
             ensureRemovedComponentIsMutable();
             removedComponent_.addAll(other.removedComponent_);
@@ -3402,6 +3455,11 @@ public final class EntityData {
                 addRemovedComponentIndex(input.readSInt32());
               }
               input.popLimit(limit);
+              break;
+            }
+            case 34: {
+              bitField0_ |= 0x00000008;
+              parentPrefab_ = input.readBytes();
               break;
             }
             case 122: {
@@ -3667,12 +3725,48 @@ public final class EntityData {
         return this;
       }
       
+      // optional string parent_prefab = 4;
+      private java.lang.Object parentPrefab_ = "";
+      public boolean hasParentPrefab() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public String getParentPrefab() {
+        java.lang.Object ref = parentPrefab_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          parentPrefab_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setParentPrefab(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        parentPrefab_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearParentPrefab() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        parentPrefab_ = getDefaultInstance().getParentPrefab();
+        onChanged();
+        return this;
+      }
+      void setParentPrefab(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000008;
+        parentPrefab_ = value;
+        onChanged();
+      }
+      
       // repeated string removed_component = 15;
       private com.google.protobuf.LazyStringList removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureRemovedComponentIsMutable() {
-        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
           removedComponent_ = new com.google.protobuf.LazyStringArrayList(removedComponent_);
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000010;
          }
       }
       public java.util.List<String>
@@ -3713,7 +3807,7 @@ public final class EntityData {
       }
       public Builder clearRemovedComponent() {
         removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
       }
@@ -6005,19 +6099,19 @@ public final class EntityData {
       "2\n.NameValue\"0\n\tNameValue\022\014\n\004name\030\001 \001(\t\022" +
       "\025\n\005value\030\002 \001(\0132\006.Value\"P\n\tComponent\022\022\n\nt" +
       "ype_index\030\001 \001(\005\022\014\n\004type\030\017 \001(\t\022\031\n\005field\030\002" +
-      " \003(\0132\n.NameValue*\006\010\350\007\020\320\017\"{\n\006Entity\022\n\n\002id" +
-      "\030\001 \001(\021\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#\n",
-      "\027removed_component_index\030\003 \003(\021B\002\020\001\022\031\n\021re" +
-      "moved_component\030\017 \003(\t*\006\010\350\007\020\320\017\"\200\001\n\006Prefab" +
-      "\022\022\n\ntype_index\030\001 \001(\021\022\035\n\tcomponent\030\002 \003(\0132" +
-      "\n.Component\022\030\n\014parent_index\030\003 \003(\021B\002\020\001\022\014\n" +
-      "\004name\030\017 \001(\t\022\023\n\013parent_name\030\020 \003(\t*\006\010\350\007\020\320\017" +
-      "\"\244\001\n\005World\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\006p" +
-      "refab\030\002 \003(\0132\007.Prefab\022\027\n\017component_class\030" +
-      "\017 \003(\t\022\026\n\016next_entity_id\030\020 \001(\021\022\033\n\017freed_e" +
-      "ntity_id\030\021 \003(\021B\002\020\001\022\023\n\013prefab_name\030\022 \003(\t*" +
-      "\006\010\350\007\020\320\017B\'\n\027org.terasology.protobufB\nEnti",
-      "tyDataH\001"
+      " \003(\0132\n.NameValue*\006\010\350\007\020\320\017\"\222\001\n\006Entity\022\n\n\002i" +
+      "d\030\001 \001(\021\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#",
+      "\n\027removed_component_index\030\003 \003(\021B\002\020\001\022\025\n\rp" +
+      "arent_prefab\030\004 \001(\t\022\031\n\021removed_component\030" +
+      "\017 \003(\t*\006\010\350\007\020\320\017\"\200\001\n\006Prefab\022\022\n\ntype_index\030\001" +
+      " \001(\021\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022\030\n\014p" +
+      "arent_index\030\003 \003(\021B\002\020\001\022\014\n\004name\030\017 \001(\t\022\023\n\013p" +
+      "arent_name\030\020 \003(\t*\006\010\350\007\020\320\017\"\244\001\n\005World\022\027\n\006en" +
+      "tity\030\001 \003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.Pr" +
+      "efab\022\027\n\017component_class\030\017 \003(\t\022\026\n\016next_en" +
+      "tity_id\030\020 \001(\021\022\033\n\017freed_entity_id\030\021 \003(\021B\002" +
+      "\020\001\022\023\n\013prefab_name\030\022 \003(\t*\006\010\350\007\020\320\017B\'\n\027org.t",
+      "erasology.protobufB\nEntityDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6053,7 +6147,7 @@ public final class EntityData {
           internal_static_Entity_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Entity_descriptor,
-              new java.lang.String[] { "Id", "Component", "RemovedComponentIndex", "RemovedComponent", },
+              new java.lang.String[] { "Id", "Component", "RemovedComponentIndex", "ParentPrefab", "RemovedComponent", },
               org.terasology.protobuf.EntityData.Entity.class,
               org.terasology.protobuf.EntityData.Entity.Builder.class);
           internal_static_Prefab_descriptor =

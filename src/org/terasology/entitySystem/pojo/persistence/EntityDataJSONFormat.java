@@ -64,6 +64,9 @@ public class EntityDataJSONFormat {
         public JsonElement serialize(EntityData.Entity src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
             result.addProperty("id", src.getId());
+            if (src.hasParentPrefab() && !src.getParentPrefab().isEmpty()) {
+                result.addProperty("parentPrefab", src.getParentPrefab());
+            }
             for (EntityData.Component component : src.getComponentList()) {
                 result.add(component.getType(), context.serialize(component));
             }

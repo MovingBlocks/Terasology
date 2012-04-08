@@ -1,5 +1,6 @@
 package org.terasology.entitySystem.pojo;
 
+import com.google.common.collect.Lists;
 import com.google.protobuf.TextFormat;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
@@ -26,7 +27,7 @@ import java.util.logging.Logger;
  * Prototype entity manager. Not intended for final use, but a stand in for experimentation.
  * @author Immortius <immortius@gmail.com>
  */
-public class PojoEntityManager implements EntityManager {
+public class PojoEntityManager implements EntityManager, PersistableEntityManager {
     public static final int NULL_ID = 0;
 
     private static Logger logger = Logger.getLogger(PojoEntityManager.class.getName());
@@ -35,23 +36,23 @@ public class PojoEntityManager implements EntityManager {
     private TIntList freedIds = new TIntArrayList();
     private Map<EntityRef, PojoEntityRef> entityCache = new WeakHashMap<EntityRef, PojoEntityRef>();
 
-    ComponentTable store = new ComponentTable();
+    private ComponentTable store = new ComponentTable();
     private EventSystem eventSystem;
     private PrefabManager prefabManager;
-    private EntityPersister entityPersister = new EntityPersisterImpl();
+    private EntityPersister entityPersister;
 
     // Temporary list of valid ids used during loading.
     // TODO: Store in EntityRefTypeHandler?
     private TIntSet validIds = new TIntHashSet();
 
     public PojoEntityManager() {
+        entityPersister = new EntityPersisterImpl();
+        entityPersister.setPersistableEntityManager(this);
         registerTypeHandler(EntityRef.class, new EntityRefTypeHandler(this));
-        registerComponentClass(EntityInfoComponent.class);
     }
 
     public <T> void registerTypeHandler(Class<? extends T> forClass, TypeHandler<T> handler) {
         entityPersister.registerTypeHandler(forClass, handler);
-
     }
 
     public void registerComponentClass(Class<? extends Component> componentClass) {
@@ -129,12 +130,7 @@ public class PojoEntityManager implements EntityManager {
         TIntIterator idIterator = store.entityIdIterator();
         while (idIterator.hasNext()) {
             int id = idIterator.next();
-            EntityInfoComponent entityInfo = getComponent(id, EntityInfoComponent.class);
-            if (entityInfo != null && prefabManager.exists(entityInfo.parentPrefab)) {
-                world.addEntity(entityPersister.serializeEntity(id, createEntityRef(id), prefabManager.getPrefab(entityInfo.parentPrefab)));
-            } else {
-                world.addEntity(entityPersister.serializeEntity(id, createEntityRef(id)));
-            }
+            world.addEntity(entityPersister.serializeEntity(id, createEntityRef(id)));
         }
         return world;
     }
@@ -206,13 +202,7 @@ public class PojoEntityManager implements EntityManager {
         }
 
         for (EntityData.Entity entityData : world.getEntityList()) {
-            int entityId = entityData.getId();
-            for (EntityData.Component componentData : entityData.getComponentList()) {
-                Component component = entityPersister.deserializeComponent(componentData);
-                if (component != null) {
-                    store.put(entityId, component);
-                }
-            }
+            entityPersister.deserializeEntity(entityData);
         }
 
         validIds = new TIntHashSet();
@@ -286,6 +276,12 @@ public class PojoEntityManager implements EntityManager {
 
     public void setPrefabManager(PrefabManager prefabManager) {
         this.prefabManager = prefabManager;
+        entityPersister.setPrefabManager(prefabManager);
+    }
+
+    // Used for testing, for now
+    public EntityPersister getEntityPersister() {
+        return entityPersister;
     }
 
     public <T extends Component> Iterable<Map.Entry<EntityRef,T>> iterateComponents(Class<T> componentClass) {
@@ -381,6 +377,9 @@ public class PojoEntityManager implements EntityManager {
         }
     }
 
+    public EntityRef createEntityWithId(int id) {
+        return createEntityRef(id);
+    }
 
     private static class EntityEntry<T> implements Map.Entry<EntityRef, T>
     {

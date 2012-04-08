@@ -1,8 +1,6 @@
 package org.terasology.entitySystem.pojo.persistence;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.pojo.PojoEntityRef;
 import org.terasology.protobuf.EntityData;
 
@@ -16,11 +14,14 @@ public interface EntityPersister {
 
     EntityData.Entity serializeEntity(int id, EntityRef entity);
 
-    EntityData.Entity serializeEntity(int id, EntityRef entity, Prefab prefab);
-
     EntityData.Component serializeComponent(Component component);
 
     Component deserializeComponent(EntityData.Component componentData);
 
+    EntityRef deserializeEntity(EntityData.Entity entity);
+
     Component copyComponent(Component component);
+
+    void setPrefabManager(PrefabManager prefabManager);
+    void setPersistableEntityManager(PersistableEntityManager persistableEntityManager);
 }

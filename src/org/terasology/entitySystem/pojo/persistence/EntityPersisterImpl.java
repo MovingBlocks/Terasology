@@ -2,9 +2,7 @@ package org.terasology.entitySystem.pojo.persistence;
 
 import com.google.common.collect.Maps;
 import gnu.trove.iterator.TIntIterator;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.pojo.persistence.core.*;
 import org.terasology.protobuf.EntityData;
 
@@ -18,6 +16,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Immortius <immortius@gmail.com>
  */
@@ -28,6 +28,9 @@ public class EntityPersisterImpl implements EntityPersister {
     private Map<Class<? extends Component>, SerializationInfo> componentSerializationLookup = Maps.newHashMap();
     private Map<String, Class<? extends Component>> componentTypeLookup = Maps.newHashMap();
     private Map<Class<?>, TypeHandler<?>> typeHandlers = Maps.newHashMap();
+
+    private PrefabManager prefabManager;
+    private PersistableEntityManager entityManager;
 
     public EntityPersisterImpl() {
         registerTypeHandler(Boolean.class, new BooleanTypeHandler());
@@ -77,7 +80,16 @@ public class EntityPersisterImpl implements EntityPersister {
     public EntityData.Entity serializeEntity(int id, EntityRef entityRef) {
         EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
         entity.setId(id);
+        EntityInfoComponent entityInfo = entityRef.getComponent(EntityInfoComponent.class);
+        if (entityInfo != null) {
+            if (entityInfo.parentPrefab != null && prefabManager.exists(entityInfo.parentPrefab)) {
+                return serializeEntity(id, entityRef, prefabManager.getPrefab(entityInfo.parentPrefab));
+            }
+        }
         for (Component component : entityRef.iterateComponents()) {
+            if (component.getClass().equals(EntityInfoComponent.class))
+                continue;
+
             EntityData.Component componentData = serializeComponent(component);
             if (componentData != null) {
                 entity.addComponent(componentData);
@@ -86,10 +98,14 @@ public class EntityPersisterImpl implements EntityPersister {
         return entity.build();
     }
 
-    public EntityData.Entity serializeEntity(int id, EntityRef entityRef, Prefab prefab) {
+    private EntityData.Entity serializeEntity(int id, EntityRef entityRef, Prefab prefab) {
         EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
         entity.setId(id);
+        entity.setParentPrefab(prefab.getName());
         for (Component component : entityRef.iterateComponents()) {
+            if (component.getClass().equals(EntityInfoComponent.class))
+                continue;
+
             Component prefabComponent = prefab.getComponent(component.getClass());
             EntityData.Component componentData;
             if (prefabComponent == null) {
@@ -141,8 +157,57 @@ public class EntityPersisterImpl implements EntityPersister {
         if (componentClass != null) {
             SerializationInfo serializationInfo = componentSerializationLookup.get(componentClass);
             return serializationInfo.deserialize(componentData);
+        } else {
+            logger.log(Level.WARNING, "Unable to deserialise unknown component type: " + componentData.getType());
         }
         return null;
+    }
+
+    public Component deserializeComponentOnto(Component component, EntityData.Component componentData) {
+        Class<? extends Component> componentClass = componentTypeLookup.get(componentData.getType().toLowerCase(Locale.ENGLISH));
+        if (componentClass != null) {
+            SerializationInfo serializationInfo = componentSerializationLookup.get(componentClass);
+            return serializationInfo.deserializeOnto(component, componentData);
+        } else {
+            logger.log(Level.WARNING, "Unable to deserialise unknown component type: " + componentData.getType());
+        }
+        return null;
+    }
+
+    public EntityRef deserializeEntity(EntityData.Entity entityData) {
+        EntityRef entity = entityManager.createEntityWithId(entityData.getId());
+        if (entityData.hasParentPrefab() && !entityData.getParentPrefab().isEmpty() && prefabManager.exists(entityData.getParentPrefab())) {
+            Prefab prefab = prefabManager.getPrefab(entityData.getParentPrefab());
+            for (Component component : prefab.listComponents()) {
+                String componentName = PersistenceUtil.getComponentClassName(component.getClass());
+                if (!containsIgnoreCase(componentName, entityData.getRemovedComponentList())) {
+                    entity.addComponent(copyComponent(component));
+                }
+            }
+        }
+        for (EntityData.Component componentData : entityData.getComponentList()) {
+            Class<? extends Component> componentClass = componentTypeLookup.get(componentData.getType().toLowerCase(Locale.ENGLISH));
+            if (componentClass == null) {
+                logger.log(Level.WARNING, "Unable to deserialise unknown component type: " + componentData.getType());
+                continue;
+            }
+            if (!entity.hasComponent(componentClass)) {
+                entity.addComponent(deserializeComponent(componentData));
+            } else {
+                deserializeComponentOnto(entity.getComponent(componentClass), componentData);
+            }
+        }
+        return entity;
+    }
+
+    private boolean containsIgnoreCase(String componentName, List<String> removedComponentList) {
+        String lowerCaseName = componentName.toLowerCase(Locale.ENGLISH);
+        for (String removed : removedComponentList) {
+            if (lowerCaseName.equals(removed.toLowerCase(Locale.ENGLISH))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Component copyComponent(Component component) {
@@ -155,6 +220,14 @@ public class EntityPersisterImpl implements EntityPersister {
             return serializationInfo.deserialize(data);
         }
         return null;
+    }
+
+    public void setPrefabManager(PrefabManager prefabManager) {
+        this.prefabManager = prefabManager;
+    }
+
+    public void setPersistableEntityManager(PersistableEntityManager persistableEntityManager) {
+        this.entityManager = persistableEntityManager;
     }
 
     // TODO: Refactor

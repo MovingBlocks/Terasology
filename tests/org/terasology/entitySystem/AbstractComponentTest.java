@@ -13,6 +13,6 @@ public class AbstractComponentTest {
     @Test
     public void getName() {
         StringComponent comp = new StringComponent();
-        assertEquals("string", comp.getName());
+        assertEquals("String", comp.getName());
     }
 }

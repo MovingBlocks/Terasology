@@ -43,6 +43,7 @@ message Entity {
     optional sint32 id = 1;
     repeated Component component = 2;
     repeated sint32 removed_component_index = 3 [packed=true];
+    optional string parent_prefab = 4;
     repeated string removed_component = 15;
 
     extensions 1000 to 1999;
