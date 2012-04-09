@@ -20,4 +20,11 @@ public class Quat4fTypeHandler extends AbstractTypeHandler<Quat4f> {
         }
         return null;
     }
+
+    public Quat4f copy(Quat4f value) {
+        if (value != null) {
+            return new Quat4f(value);
+        }
+        return null;
+    }
 }

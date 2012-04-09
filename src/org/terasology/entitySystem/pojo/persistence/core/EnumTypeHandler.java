@@ -27,6 +27,10 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
         return null;
     }
 
+    public T copy(T value) {
+        return value;
+    }
+
     public EntityData.Value serialize(Iterable<T> value) {
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
         for (T item : value) {

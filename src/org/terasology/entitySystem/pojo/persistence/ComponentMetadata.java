@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
 import org.terasology.protobuf.EntityData;
+import sun.reflect.FieldInfo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
@@ -14,18 +15,35 @@ import java.util.logging.Logger;
 /**
 * @author Immortius <immortius@gmail.com>
 */
-public class ComponentMetadata {
+public class ComponentMetadata<T extends Component> {
     private static final Logger logger = Logger.getLogger(ComponentMetadata.class.getName());
 
     private Map<String, FieldMetadata> fields = Maps.newHashMap();
-    private Class<? extends Component> clazz;
+    private Class<T> clazz;
 
-    public ComponentMetadata(Class<? extends Component> componentClass) {
+    public ComponentMetadata(Class<T> componentClass) {
         this.clazz = componentClass;
     }
 
     public void addField(FieldMetadata fieldInfo) {
         fields.put(fieldInfo.getName().toLowerCase(Locale.ENGLISH), fieldInfo);
+    }
+
+    public T clone(T component) {
+        try {
+            T result = clazz.newInstance();
+            for (FieldMetadata field : fields.values()) {
+                field.setValue(result, field.getSerializationHandler().copy(field.getValue(component)));
+            }
+            return result;
+        } catch (InstantiationException e) {
+            logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
+        } catch (IllegalAccessException e) {
+            logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
+        } catch (InvocationTargetException e) {
+            logger.log(Level.SEVERE, "Exception during serializing component type: " + clazz, e);
+        }
+        return null;
     }
 
     public EntityData.Component serialize(Component component) {

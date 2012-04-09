@@ -33,4 +33,15 @@ public class StringMapTypeHandler<T> extends AbstractTypeHandler<Map<String, T>>
         }
         return result;
     }
+
+    public Map<String, T> copy(Map<String, T> value) {
+        if (value != null) {
+            Map<String, T> result = Maps.newHashMap();
+            for (Map.Entry<String, T> entry : result.entrySet()) {
+                result.put(entry.getKey(), contentsHandler.copy(entry.getValue()));
+            }
+            return result;
+        }
+        return null;
+    }
 }

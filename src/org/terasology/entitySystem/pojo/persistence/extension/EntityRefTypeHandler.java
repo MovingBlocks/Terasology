@@ -30,10 +30,14 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     }
 
     public EntityRef deserialize(EntityData.Value value) {
-        if (value.getIntegerCount() > 0) {
+        if (value.getIntegerCount() > 0 && validIds.contains(value.getInteger(0))) {
             return entityManager.createEntityRefWithId(value.getInteger(0));
         }
         return EntityRef.NULL;
+    }
+
+    public EntityRef copy(EntityRef value) {
+        return value;
     }
 
     public EntityData.Value serialize(Iterable<EntityRef> value) {
@@ -52,7 +56,11 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     public List<EntityRef> deserializeList(EntityData.Value value) {
         List<EntityRef> result = Lists.newArrayListWithCapacity(value.getIntegerCount());
         for (Integer item : value.getIntegerList()) {
-            result.add(entityManager.createEntityRefWithId(item));
+            if (validIds.contains(item)) {
+                result.add(entityManager.createEntityRefWithId(item));
+            } else {
+                result.add(EntityRef.NULL);
+            }
         }
         return result;
     }

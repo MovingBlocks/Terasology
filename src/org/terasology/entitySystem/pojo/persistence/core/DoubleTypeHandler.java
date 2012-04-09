@@ -22,6 +22,10 @@ public class DoubleTypeHandler implements TypeHandler<Double> {
         return null;
     }
 
+    public Double copy(Double value) {
+        return value;
+    }
+
     public EntityData.Value serialize(Iterable<Double> value) {
         return EntityData.Value.newBuilder().addAllDouble(value).build();
     }

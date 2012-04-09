@@ -32,6 +32,10 @@ public class ByteTypeHandler implements TypeHandler<Byte> {
         return EntityData.Value.newBuilder().addByte(byteString).build();
     }
 
+    public Byte copy(Byte value) {
+        return value;
+    }
+
     public List<Byte> deserializeList(EntityData.Value value) {
         if (value.getByteCount() > 0) {
             List<Byte> result = Lists.newArrayListWithCapacity(value.getByte(0).size());

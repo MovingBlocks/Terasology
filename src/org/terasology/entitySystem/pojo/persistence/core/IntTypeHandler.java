@@ -22,6 +22,10 @@ public class IntTypeHandler implements TypeHandler<Integer> {
         return null;
     }
 
+    public Integer copy(Integer value) {
+        return value;
+    }
+
     public EntityData.Value serialize(Iterable<Integer> value) {
         return EntityData.Value.newBuilder().addAllInteger(value).build();
     }

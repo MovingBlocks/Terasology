@@ -19,4 +19,11 @@ public class Vector3iTypeHandler extends AbstractTypeHandler<Vector3i> {
         }
         return null;
     }
+
+    public Vector3i copy(Vector3i value) {
+        if (value != null) {
+            return new Vector3i(value);
+        }
+        return null;
+    }
 }

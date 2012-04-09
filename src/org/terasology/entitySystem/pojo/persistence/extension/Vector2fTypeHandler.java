@@ -20,4 +20,11 @@ public class Vector2fTypeHandler extends AbstractTypeHandler<Vector2f> {
         }
         return null;
     }
+
+    public Vector2f copy(Vector2f value) {
+        if (value != null) {
+            return new Vector2f(value);
+        }
+        return null;
+    }
 }

@@ -22,6 +22,10 @@ public class LongTypeHandler implements TypeHandler<Long> {
         return null;
     }
 
+    public Long copy(Long value) {
+        return value;
+    }
+
     public EntityData.Value serialize(Iterable<Long> value) {
         return EntityData.Value.newBuilder().addAllLong(value).build();
     }

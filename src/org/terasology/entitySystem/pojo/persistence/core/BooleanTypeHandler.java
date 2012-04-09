@@ -22,6 +22,10 @@ public class BooleanTypeHandler implements TypeHandler<Boolean> {
         return null;
     }
 
+    public Boolean copy(Boolean value) {
+        return value;
+    }
+
     public EntityData.Value serialize(Iterable<Boolean> value) {
         return EntityData.Value.newBuilder().addAllBoolean(value).build();
     }

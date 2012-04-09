@@ -30,6 +30,10 @@ public class SoundTypeHandler implements TypeHandler<Sound> {
         return null;
     }
 
+    public Sound copy(Sound value) {
+        return value;
+    }
+
     public EntityData.Value serialize(Iterable<Sound> value) {
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
         for (Sound item : value) {

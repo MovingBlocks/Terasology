@@ -22,6 +22,10 @@ public class StringTypeHandler implements TypeHandler<String> {
         return null;
     }
 
+    public String copy(String value) {
+        return value;
+    }
+
     public EntityData.Value serialize(Iterable<String> value) {
         return EntityData.Value.newBuilder().addAllString(value).build();
     }

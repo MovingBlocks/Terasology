@@ -20,4 +20,11 @@ public class Color4fTypeHandler extends AbstractTypeHandler<Color4f> {
         }
         return null;
     }
+
+    public Color4f copy(Color4f value) {
+        if (value != null) {
+            return new Color4f(value);
+        }
+        return null;
+    }
 }

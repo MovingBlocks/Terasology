@@ -22,6 +22,10 @@ public class FloatTypeHandler implements TypeHandler<Float> {
         return null;
     }
 
+    public Float copy(Float value) {
+        return value;
+    }
+
     public EntityData.Value serialize(Iterable<Float> value) {
         return EntityData.Value.newBuilder().addAllFloat(value).build();
     }

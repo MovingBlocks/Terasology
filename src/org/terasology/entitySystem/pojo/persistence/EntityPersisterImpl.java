@@ -253,8 +253,7 @@ public class EntityPersisterImpl implements EntityPersister {
         if (componentMetadata == null) {
             logger.log(Level.SEVERE, "Unable to clone component: " + component.getClass() + ", not registered");
         } else {
-            EntityData.Component data = componentMetadata.serialize(component);
-            return componentMetadata.deserialize(data);
+            return componentMetadata.clone(component);
         }
         return null;
     }

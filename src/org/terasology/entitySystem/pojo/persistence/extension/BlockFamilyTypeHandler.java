@@ -32,6 +32,10 @@ public class BlockFamilyTypeHandler implements TypeHandler<BlockFamily> {
         return result.build();
     }
 
+    public BlockFamily copy(BlockFamily value) {
+        return value;
+    }
+
     public List<BlockFamily> deserializeList(EntityData.Value value) {
         List<BlockFamily> result = Lists.newArrayListWithCapacity(value.getStringCount());
         for (String item : value.getStringList()) {

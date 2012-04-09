@@ -72,4 +72,23 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
         return null;
     }
 
+    public T copy(T value) {
+        if (value != null) {
+            try {
+                T result = clazz.newInstance();
+                for (FieldMetadata field : fields.values()) {
+                    field.setValue(result, field.getSerializationHandler().copy(field.getValue(value)));
+                }
+                return result;
+            } catch (InstantiationException e) {
+                logger.log(Level.SEVERE, "Unable to clone " + value.getClass(), e);
+            } catch (IllegalAccessException e) {
+                logger.log(Level.SEVERE, "Unable to clone " + value.getClass(), e);
+            } catch (InvocationTargetException e) {
+                logger.log(Level.SEVERE, "Unable to clone " + value.getClass(), e);
+            }
+        }
+        return null;
+    }
+
 }
