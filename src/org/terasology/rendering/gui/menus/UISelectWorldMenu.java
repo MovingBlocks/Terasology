@@ -69,29 +69,6 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             }
         });
 
-        ConfigObject config = null;
-        String path          = Terasology.getInstance().getWorldSavePath("");
-        File worldCatalog = new File(path);
-
-        for(File file : worldCatalog.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                if(file.isDirectory()){
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-        })){
-            File worldManifest = new File(file.getPath() + "\\WorldManifest.groovy");
-            try {
-                config = new ConfigSlurper().parse(worldManifest.toURI().toURL());
-                if(config.get("worldTitle")!=null&&config.get("worldSeed")!=null){
-                    _list.addItem((String) config.get("worldTitle"), config);
-                }
-            } catch (MalformedURLException e) {
-                Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
-            }
-        }
 
         _goToBack = new UIButton(new Vector2f(256f, 32f));
         _goToBack.getLabel().setText("Go to back");
@@ -140,6 +117,8 @@ public class UISelectWorldMenu extends UIDisplayWindow {
                 loadSelectedWorld();
             }
         });
+
+        fillList();
 
         addDisplayElement(_overlay);
         addDisplayElement(_list, "list");
@@ -191,6 +170,34 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
         }catch (Exception e){
             GUIManager.getInstance().showMessage("Loading error", "Failed reading world data object. Sorry.");
+        }
+    }
+
+    public void fillList(){
+        _list.removeAll();
+
+        ConfigObject config = null;
+        String path          = Terasology.getInstance().getWorldSavePath("");
+        File worldCatalog = new File(path);
+
+        for(File file : worldCatalog.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                if(file.isDirectory()){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        })){
+            File worldManifest = new File(file.getPath() + "\\WorldManifest.groovy");
+            try {
+                config = new ConfigSlurper().parse(worldManifest.toURI().toURL());
+                if(config.get("worldTitle")!=null&&config.get("worldSeed")!=null){
+                    _list.addItem((String) config.get("worldTitle"), config);
+                }
+            } catch (MalformedURLException e) {
+                Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
+            }
         }
     }
 }

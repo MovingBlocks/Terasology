@@ -172,6 +172,7 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
      * Remove all items
      */
     public void removeAll(){
+        clearData();
         for (int i = (_items.size() - 1); i >= 0; i--)
         {
             removeDisplayElement(_items.get(i));
@@ -198,8 +199,11 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
      * Reset to selected element
      */
     public void clearData(){
-        _selectedItemIndex = -1;
+        if( _selectedItemIndex<0 ){
+            return;
+        }
         _items.get(_selectedItemIndex).setSelected(false);
+        _selectedItemIndex = -1;
     }
 
     public void addDoubleClickListener(IClickListener listener) {

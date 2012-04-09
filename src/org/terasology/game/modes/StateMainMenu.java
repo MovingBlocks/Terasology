@@ -60,9 +60,6 @@ public class StateMainMenu implements IGameState {
         setupSelectWorldMenu();
         setupConfigMenu();
 
-        _mainMenu.name = "main";
-        _configMenu.name = "config";
-        _selectWorldMenu.name = "select";
         GUIManager.getInstance().addWindow(_mainMenu, "main");
         GUIManager.getInstance().addWindow(_configMenu, "config");
         GUIManager.getInstance().addWindow(_selectWorldMenu, "selectWorld");
@@ -81,6 +78,7 @@ public class StateMainMenu implements IGameState {
             public void clicked(UIDisplayElement element) {
               //  _mainMenu.setVisible(false);
               //  _selectWorldMenu.setVisible(true);
+              _selectWorldMenu.fillList();
               GUIManager.getInstance().setFocusedWindow(_selectWorldMenu);
             }
         });

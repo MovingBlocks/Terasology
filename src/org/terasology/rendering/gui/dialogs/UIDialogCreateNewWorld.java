@@ -97,7 +97,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
     }
     
     private String getWorldName(){
-        UIList list = (UIList)GUIManager.getInstance().getWindowById("select").getElementById("list");
+        UIList list = (UIList)GUIManager.getInstance().getWindowById("selectWorld").getElementById("list");
         return "World" + list.size();
     }
 }

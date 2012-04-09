@@ -12,7 +12,6 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer{
     
     private boolean _maximized = false;
     private boolean _modal     = false;
-    public String name         = "";
     private HashMap<String, UIDisplayElement> _displayElementsById = new HashMap<String, UIDisplayElement>();
 
 
