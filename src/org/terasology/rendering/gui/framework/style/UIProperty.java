@@ -6,13 +6,6 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import javax.vecmath.Vector4f;
 import java.util.logging.Level;
 
-/**
- * Created by IntelliJ IDEA.
- * User: kireev
- * Date: 26.03.12
- * Time: 12:30
- * To change this template use File | Settings | File Templates.
- */
 public abstract class UIProperty extends UIDisplayElement{
     public void render(){};
     public void update(){};

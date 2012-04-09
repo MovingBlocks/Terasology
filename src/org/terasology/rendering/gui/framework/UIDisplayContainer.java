@@ -156,10 +156,22 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         _crop = crop;
     }
 
+    /*
+     * set crop margin for container where
+     * x - top
+     * y - right
+     * z - bottom
+     * w - left
+     */
     public void setCropMargin(Vector4f margin){
         _cropMargin = margin;
     }
 
+
+    /*
+     * Set styles for current element
+     *
+     */
     public void setStyle(String property, String value){
         if(_style==null){
             _style = new UIStyle(getSize());
@@ -171,6 +183,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         _style.parse(property, value);
     }
 
+    /*
+     * Set style with tag(style class)
+     */
     public void setClassStyle(String className, String value){
         UIStyle style = new UIStyle(getSize());
         style.setPosition(new Vector2f(0f,0f));
@@ -180,6 +195,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         _styleClasses.put(className,style);
     }
 
+    /*
+     * If the style was marked by class, apply the class
+     */
     public void setClassStyle(String className){
         if(_styleClasses.containsKey(className)){
             if(_style!=null){
@@ -190,6 +208,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         }
     }
 
+    /*
+     * Get Style variable
+     */
     public UIStyle getStyle(){
         if(_style==null){
             _style = new UIStyle(getSize());

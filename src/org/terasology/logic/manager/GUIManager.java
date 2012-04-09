@@ -10,6 +10,14 @@ import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import javax.vecmath.Vector2f;
 import java.util.HashMap;
 
+/**
+ * First version of simple GUI manager.
+ * ToDo Init styles here
+ * ToDo Add GUI manager to single player
+ *
+ * @author Kireev Anton <adeon.k87@gmail.com>
+ */
+
 public class GUIManager {
     private static GUIManager _instance;
     private UIDisplayRenderer _renderer;

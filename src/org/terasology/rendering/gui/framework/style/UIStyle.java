@@ -1,18 +1,13 @@
 package org.terasology.rendering.gui.framework.style;
 
-import org.lwjgl.opengl.GL11;
-import org.terasology.game.Terasology;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector4f;
 import javax.vecmath.Vector2f;
-import java.util.HashMap;
-import java.util.logging.Level;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
+/*
+ * Styles for elements
+ * ToDo Create manager of styles
+ * ToDo Load styles from an external file
+ */
 
 public class UIStyle extends UIDisplayContainer {
 
