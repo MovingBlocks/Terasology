@@ -14,24 +14,24 @@ import java.util.logging.Logger;
 /**
 * @author Immortius <immortius@gmail.com>
 */
-public class SerializationInfo {
-    private static final Logger logger = Logger.getLogger(SerializationInfo.class.getName());
+public class ComponentMetadata {
+    private static final Logger logger = Logger.getLogger(ComponentMetadata.class.getName());
 
-    private Map<String, FieldInfo> fields = Maps.newHashMap();
+    private Map<String, FieldMetadata> fields = Maps.newHashMap();
     private Class<? extends Component> clazz;
 
-    public SerializationInfo(Class<? extends Component> componentClass) {
+    public ComponentMetadata(Class<? extends Component> componentClass) {
         this.clazz = componentClass;
     }
 
-    public void addField(FieldInfo fieldInfo) {
+    public void addField(FieldMetadata fieldInfo) {
         fields.put(fieldInfo.getName().toLowerCase(Locale.ENGLISH), fieldInfo);
     }
 
     public EntityData.Component serialize(Component component) {
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
         componentMessage.setType(component.getName());
-        for (FieldInfo field : fields.values()) {
+        for (FieldMetadata field : fields.values()) {
             try {
                 Object rawValue = null;
                 rawValue = field.getValue(component);
@@ -54,7 +54,7 @@ public class SerializationInfo {
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
         componentMessage.setType(delta.getName());
         boolean changed = false;
-        for (FieldInfo field : fields.values()) {
+        for (FieldMetadata field : fields.values()) {
             try {
                 Object origValue = null;
                 origValue = field.getValue(base);
@@ -94,7 +94,7 @@ public class SerializationInfo {
     public Component deserializeOnto(Component component, EntityData.Component componentData) {
         try {
             for (EntityData.NameValue field : componentData.getFieldList()) {
-                FieldInfo fieldInfo = fields.get(field.getName().toLowerCase(Locale.ENGLISH));
+                FieldMetadata fieldInfo = fields.get(field.getName().toLowerCase(Locale.ENGLISH));
                 if (fieldInfo == null)
                     continue;
 

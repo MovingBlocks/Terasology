@@ -1,8 +1,10 @@
 package org.terasology.entitySystem.common;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.pojo.PojoEntityManager;
 
 /**
  * Null entity implementation - acts the same as an empty entity, except you cannot add anything to it.
@@ -60,8 +62,15 @@ public class NullEntityRef extends EntityRef {
     }
 
     @Override
+    public int getId() {
+        return PojoEntityManager.NULL_ID;
+    }
+
+    @Override
     public String toString() {
-        return "Entity(Null)";
+        return "EntityRef{" +
+                "id=" + PojoEntityManager.NULL_ID +
+                '}';
     }
 
     @Override

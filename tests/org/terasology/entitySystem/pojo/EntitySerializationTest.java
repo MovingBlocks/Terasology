@@ -5,9 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.pojo.persistence.EntityPersister;
-import org.terasology.entitySystem.pojo.persistence.EntityPersisterImpl;
-import org.terasology.entitySystem.pojo.persistence.FieldInfo;
-import org.terasology.entitySystem.pojo.persistence.SerializationInfo;
+import org.terasology.entitySystem.pojo.persistence.FieldMetadata;
+import org.terasology.entitySystem.pojo.persistence.ComponentMetadata;
 import org.terasology.entitySystem.pojo.persistence.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
@@ -15,8 +14,6 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.protobuf.EntityData;
 
 import javax.vecmath.Vector3f;
-
-import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -44,8 +41,8 @@ public class EntitySerializationTest {
 
     @Test
     public void testGetterSetterUtilization() throws Exception {
-        SerializationInfo info = new SerializationInfo(GetterSetterComponent.class);
-        info.addField(new FieldInfo(GetterSetterComponent.class.getDeclaredField("value"), GetterSetterComponent.class, new Vector3fTypeHandler()));
+        ComponentMetadata info = new ComponentMetadata(GetterSetterComponent.class);
+        info.addField(new FieldMetadata(GetterSetterComponent.class.getDeclaredField("value"), GetterSetterComponent.class, new Vector3fTypeHandler()));
 
         GetterSetterComponent comp = new GetterSetterComponent();
         GetterSetterComponent newComp = (GetterSetterComponent) info.deserialize(info.serialize(comp));
@@ -60,9 +57,9 @@ public class EntitySerializationTest {
 
         EntityRef entity = entityManager.create(prefab);
 
-        EntityData.Entity entityData = entityPersister.serializeEntity(1, entity);
+        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
 
-        assertEquals(1, entityData.getId());
+        assertEquals(entity.getId(), entityData.getId());
         assertEquals(prefab.getName(), entityData.getParentPrefab());
         assertEquals(0, entityData.getComponentCount());
         assertEquals(0, entityData.getRemovedComponentCount());
@@ -76,9 +73,9 @@ public class EntitySerializationTest {
         EntityRef entity = entityManager.create(prefab);
         entity.addComponent(new IntegerComponent(1));
 
-        EntityData.Entity entityData = entityPersister.serializeEntity(1, entity);
+        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
 
-        assertEquals(1, entityData.getId());
+        assertEquals(entity.getId(), entityData.getId());
         assertEquals(prefab.getName(), entityData.getParentPrefab());
         assertEquals(1, entityData.getComponentCount());
         assertEquals(0, entityData.getRemovedComponentCount());
@@ -98,9 +95,9 @@ public class EntitySerializationTest {
         EntityRef entity = entityManager.create(prefab);
         entity.removeComponent(StringComponent.class);
 
-        EntityData.Entity entityData = entityPersister.serializeEntity(1, entity);
+        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
 
-        assertEquals(1, entityData.getId());
+        assertEquals(entity.getId(), entityData.getId());
         assertEquals(prefab.getName(), entityData.getParentPrefab());
         assertEquals(0, entityData.getComponentCount());
         assertEquals(Lists.newArrayList("String"), entityData.getRemovedComponentList());
@@ -113,9 +110,9 @@ public class EntitySerializationTest {
 
         EntityRef entity = entityManager.create(prefab);
         entity.getComponent(StringComponent.class).value = "Delta";
-        EntityData.Entity entityData = entityPersister.serializeEntity(1, entity);
+        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
 
-        assertEquals(1, entityData.getId());
+        assertEquals(entity.getId(), entityData.getId());
         assertEquals(prefab.getName(), entityData.getParentPrefab());
         assertEquals(1, entityData.getComponentCount());
         assertEquals(0, entityData.getRemovedComponentCount());
@@ -130,7 +127,7 @@ public class EntitySerializationTest {
         prefab.setComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create("Test");
-        EntityData.Entity entityData = entityPersister.serializeEntity(1, entity);
+        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
         EntityRef loadedEntity = entityPersister.deserializeEntity(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -145,7 +142,7 @@ public class EntitySerializationTest {
 
         EntityRef entity = entityManager.create("Test");
         entity.addComponent(new IntegerComponent(2));
-        EntityData.Entity entityData = entityPersister.serializeEntity(1, entity);
+        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
         EntityRef loadedEntity = entityPersister.deserializeEntity(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -162,7 +159,7 @@ public class EntitySerializationTest {
 
         EntityRef entity = entityManager.create("Test");
         entity.removeComponent(StringComponent.class);
-        EntityData.Entity entityData = entityPersister.serializeEntity(1, entity);
+        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
         EntityRef loadedEntity = entityPersister.deserializeEntity(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -176,7 +173,7 @@ public class EntitySerializationTest {
 
         EntityRef entity = entityManager.create("Test");
         entity.getComponent(StringComponent.class).value = "Delta";
-        EntityData.Entity entityData = entityPersister.serializeEntity(1, entity);
+        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
         EntityRef loadedEntity = entityPersister.deserializeEntity(entityData);
 
         assertTrue(loadedEntity.exists());

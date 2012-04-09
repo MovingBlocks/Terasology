@@ -16,6 +16,7 @@ public class PojoEntityRef extends EntityRef{
         this.entityManager = manager;
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -80,6 +81,13 @@ public class PojoEntityRef extends EntityRef{
     @Override
     public int hashCode() {
         return !exists() ? 0 : (int) (id ^ (id >>> 32));
+    }
+
+    @Override
+    public String toString() {
+        return "EntityRef{" +
+                "id=" + id +
+                '}';
     }
 
     void invalidate() {

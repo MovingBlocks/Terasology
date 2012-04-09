@@ -9,13 +9,13 @@ import java.util.Locale;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class FieldInfo {
+public class FieldMetadata {
     private Field field;
     private Method getter;
     private Method setter;
     private TypeHandler serializationHandler;
 
-    public FieldInfo(Field field, Class type, TypeHandler handler) {
+    public FieldMetadata(Field field, Class type, TypeHandler handler) {
         this.field = field;
         this.serializationHandler = handler;
         getter = findGetter(type, field);

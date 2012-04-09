@@ -2,7 +2,7 @@ package org.terasology.entitySystem.pojo.persistence.core;
 
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.pojo.persistence.AbstractTypeHandler;
-import org.terasology.entitySystem.pojo.persistence.FieldInfo;
+import org.terasology.entitySystem.pojo.persistence.FieldMetadata;
 import org.terasology.protobuf.EntityData;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,13 +19,13 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
     private static Logger logger = Logger.getLogger(MappedContainerTypeHandler.class.getName());
 
     private Class<T> clazz;
-    private Map<String, FieldInfo> fields = Maps.newHashMap();
+    private Map<String, FieldMetadata> fields = Maps.newHashMap();
 
     public MappedContainerTypeHandler(Class<T> clazz) {
         this.clazz = clazz;
     }
 
-    public void addField(FieldInfo info) {
+    public void addField(FieldMetadata info) {
         fields.put(info.getName().toLowerCase(Locale.ENGLISH), info);
     }
     
@@ -35,7 +35,7 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
 
         try {
-            for (FieldInfo fieldInfo : fields.values()) {
+            for (FieldMetadata fieldInfo : fields.values()) {
                 Object rawValue = fieldInfo.getValue(value);
                 if (rawValue == null)
                     continue;
@@ -57,7 +57,7 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
         try {
             T result = clazz.newInstance();
             for (EntityData.NameValue entry : value.getNameValueList()) {
-                FieldInfo fieldInfo = fields.get(entry.getName().toLowerCase(Locale.ENGLISH));
+                FieldMetadata fieldInfo = fields.get(entry.getName().toLowerCase(Locale.ENGLISH));
                 if (fieldInfo != null) {
                     Object content = fieldInfo.getSerializationHandler().deserialize(entry.getValue());
                     if (content != null) {

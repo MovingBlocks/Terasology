@@ -48,7 +48,6 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     public PojoEntityManager() {
         entityPersister = new EntityPersisterImpl();
         entityPersister.setPersistableEntityManager(this);
-        registerTypeHandler(EntityRef.class, new EntityRefTypeHandler(this));
     }
 
     public <T> void registerTypeHandler(Class<? extends T> forClass, TypeHandler<T> handler) {
@@ -59,15 +58,8 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         entityPersister.registerComponentClass(componentClass);
     }
 
-    public EntityRef loadEntityRef(int id) {
-        if (!validIds.contains(id)) {
-            return EntityRef.NULL;
-        }
-        return createEntityRef(id);
-    }
-
     public void save(File file, SaveFormat format) throws IOException {
-        final EntityData.World.Builder world = serializeWorld();
+        final EntityData.World world = entityPersister.serializeWorld();
 
         File parentFile = file.getParentFile();
         if (parentFile != null) {
@@ -78,16 +70,15 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         try {
             switch (format) {
                 case Binary:
-                    // TODO: Do we need to buffer this output stream, or is it buffered in google's code?
-                    world.build().writeTo(out);
+                    world.writeTo(out);
                     out.flush();
                     break;
                 case Text:
-                    TextFormat.print(world.build(), bufferedWriter);
+                    TextFormat.print(world, bufferedWriter);
                     bufferedWriter.flush();
                     break;
                 case JSON:
-                    EntityDataJSONFormat.write(bufferedWriter, world.build());
+                    EntityDataJSONFormat.write(bufferedWriter, world);
                     bufferedWriter.flush();
                     break;
             }
@@ -99,40 +90,6 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                 logger.log(Level.SEVERE, "Failed to close file", e);
             }
         }
-    }
-
-    private EntityData.World.Builder serializeWorld() {
-        final EntityData.World.Builder world = EntityData.World.newBuilder();
-        world.setNextEntityId(nextEntityId);
-        freedIds.forEach(new TIntProcedure() {
-            public boolean execute(int i) {
-                world.addFreedEntityId(i);
-                return true;
-            }
-        });
-
-        for (Prefab prefab : prefabManager.listPrefabs()) {
-            EntityData.Prefab.Builder prefabData = EntityData.Prefab.newBuilder();
-            prefabData.setName(prefab.getName());
-            for (Prefab parent : prefab.getParents()) {
-                prefabData.addParentName(parent.getName());
-            }
-
-            for (Component component : prefab.listOwnComponents()) {
-                EntityData.Component componentData = entityPersister.serializeComponent(component);
-                if (componentData != null) {
-                    prefabData.addComponent(componentData);
-                }
-            }
-            world.addPrefab(prefabData.build());
-        }
-
-        TIntIterator idIterator = store.entityIdIterator();
-        while (idIterator.hasNext()) {
-            int id = idIterator.next();
-            world.addEntity(entityPersister.serializeEntity(id, createEntityRef(id)));
-        }
-        return world;
     }
 
     public void load(File file, SaveFormat format) throws IOException {
@@ -165,47 +122,8 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         }
 
         if (world != null) {
-            deserializeWorld(world);
+            entityPersister.deserializeWorld(world);
         }
-    }
-
-    private void deserializeWorld(EntityData.World world) {
-        nextEntityId = world.getNextEntityId();
-        for (Integer deadId : world.getFreedEntityIdList()) {
-            freedIds.add(deadId);
-        }
-
-        for (EntityData.Prefab prefabData : world.getPrefabList()) {
-            if (!prefabManager.exists(prefabData.getName())) {
-                Prefab prefab = prefabManager.createPrefab(prefabData.getName());
-                for (String parentName : prefabData.getParentNameList()) {
-                    Prefab parent = prefabManager.getPrefab(parentName);
-                    if (parent == null) {
-                        logger.log(Level.SEVERE, "Missing parent prefab (need to fix parent serialization)");
-                    } else {
-                        prefab.addParent(parent);
-                    }
-                }
-                for (EntityData.Component componentData : prefabData.getComponentList()) {
-                    Component component = entityPersister.deserializeComponent(componentData);
-                    if (component != null) {
-                        prefab.setComponent(component);
-                    }
-                }
-            }
-        }
-
-        // Gather valid ids
-        validIds = new TIntHashSet(world.getEntityCount());
-        for (EntityData.Entity entityData : world.getEntityList()) {
-            validIds.add(entityData.getId());
-        }
-
-        for (EntityData.Entity entityData : world.getEntityList()) {
-            entityPersister.deserializeEntity(entityData);
-        }
-
-        validIds = new TIntHashSet();
     }
 
     public void clear() {
@@ -299,7 +217,11 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
 
     public Iterable<EntityRef> iteratorEntities(Class<? extends Component>... componentClasses) {
         if (componentClasses.length == 0) {
-            return NullIterator.newInstance();
+            return new Iterable<EntityRef>() {
+                public Iterator<EntityRef> iterator() {
+                    return new EntityIterator(store.entityIdIterator());
+                }
+            };
         }
         TIntList idList = new TIntArrayList();
         TIntObjectIterator<? extends Component> primeIterator = store.componentIterator(componentClasses[0]);
@@ -377,8 +299,20 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         }
     }
 
-    public EntityRef createEntityWithId(int id) {
+    public EntityRef createEntityRefWithId(int id) {
         return createEntityRef(id);
+    }
+
+    public int getNextId() {
+        return nextEntityId;
+    }
+
+    public void setNextId(int id) {
+        nextEntityId = id;
+    }
+
+    public TIntList getFreedIds() {
+        return freedIds;
     }
 
     private static class EntityEntry<T> implements Map.Entry<EntityRef, T>
@@ -403,7 +337,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
             throw new UnsupportedOperationException();
         }
     }
-    
+
     private class EntityIterable implements Iterable<EntityRef>
     {
         private TIntList list;
@@ -422,7 +356,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         private TIntIterator idIterator;
         
         public EntityIterator(TIntIterator idIterator) {
-            this.idIterator = idIterator;        
+            this.idIterator = idIterator;
         }
 
         public boolean hasNext() {
@@ -437,4 +371,5 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
             throw new UnsupportedOperationException();
         }
     }
+
 }

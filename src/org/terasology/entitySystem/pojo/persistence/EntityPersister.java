@@ -12,13 +12,21 @@ public interface EntityPersister {
 
     void registerComponentClass(Class<? extends Component> componentClass);
 
-    EntityData.Entity serializeEntity(int id, EntityRef entity);
+    EntityData.World serializeWorld();
+
+    EntityData.Entity serializeEntity(EntityRef entity);
+
+    EntityData.Prefab serializePrefab(Prefab prefab);
 
     EntityData.Component serializeComponent(Component component);
 
-    Component deserializeComponent(EntityData.Component componentData);
+    void deserializeWorld(EntityData.World world);
 
-    EntityRef deserializeEntity(EntityData.Entity entity);
+    EntityRef deserializeEntity(EntityData.Entity entityData);
+
+    Prefab deserializePrefab(EntityData.Prefab prefabData);
+
+    Component deserializeComponent(EntityData.Component componentData);
 
     Component copyComponent(Component component);
 
