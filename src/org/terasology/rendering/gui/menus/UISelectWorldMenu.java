@@ -25,13 +25,11 @@ import org.terasology.logic.world.WorldUtil;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.*;
-import org.terasology.game.Terasology;
 
 import javax.vecmath.Vector2f;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 
 /**
@@ -60,15 +58,19 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
         _window.setModal(true);
 
-        GUIManager.getInstance().addWindow(_window, "generate_world ");
+        GUIManager.getInstance().addWindow(_window, "generate_world");
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
 
+        _list.addDoubleClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                loadSelectedWorld();
+            }
+        });
+
         ConfigObject config = null;
-
         String path          = Terasology.getInstance().getWorldSavePath("");
-
         File worldCatalog = new File(path);
 
         for(File file : worldCatalog.listFiles(new FileFilter() {
@@ -109,26 +111,33 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
         _createNewWorld.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                _window.show();
+                GUIManager.getInstance().setFocusedWindow(_window);
             }
         });
 
         _deleteFromList.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
-                String path = Terasology.getInstance().getWorldSavePath((String)config.get("worldTitle"));
-                File world = new File(path);
-                WorldUtil.deleteWorld(world);
-                _list.removeSelectedItem();
+                
+                if(_list.getSelectedItem() == null){
+                    GUIManager.getInstance().showMessage("Deleting error", "Please choose the world.");
+                    return;
+                }
+
+                try{
+                    ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
+                    String path = Terasology.getInstance().getWorldSavePath((String)config.get("worldTitle"));
+                    File world = new File(path);
+                    WorldUtil.deleteWorld(world);
+                    _list.removeSelectedItem();
+                }catch(Exception e){
+                    GUIManager.getInstance().showMessage("Deleting error", "Failed deleting world data object. Sorry.");
+                }
             }
         });
 
         _loadFromList.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
-                Config.getInstance().setDefaultSeed((String)config.get("worldSeed"));
-                Config.getInstance().setWorldTitle((String) config.get("worldTitle"));
-                Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
+                loadSelectedWorld();
             }
         });
 
@@ -139,8 +148,6 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         addDisplayElement(_createNewWorld, "createWorldButton");
         addDisplayElement(_deleteFromList, "deleteFromListButton");
         update();
-
-        GUIManager.getInstance().showMessage("Test", "Yes! It\'s works!! ");
     }
 
     @Override
@@ -163,5 +170,27 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
         _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
 
+    }
+
+    private void loadSelectedWorld(){
+
+        if(_list.size()<1){
+            GUIManager.getInstance().showMessage("Loading error", "You haven't worlds. Please create new.");
+            return;
+        }
+
+        if(_list.getSelectedItem() == null){
+            GUIManager.getInstance().showMessage("Loading error", "Please choose the world.");
+            return;
+        }
+
+        try{
+            ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
+            Config.getInstance().setDefaultSeed((String)config.get("worldSeed"));
+            Config.getInstance().setWorldTitle((String) config.get("worldTitle"));
+            Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
+        }catch (Exception e){
+            GUIManager.getInstance().showMessage("Loading error", "Failed reading world data object. Sorry.");
+        }
     }
 }

@@ -122,6 +122,23 @@ public class GUIManager {
             }
         }
     }
+    
+    public void setFocusedFromLast(){
+
+        if(_lastFocused == null || _lastFocused.equals(_focusedWindow)){
+            return;
+        }
+
+        if( _focusedWindow.isMaximized() && _lastFocused.isMaximized() ){
+            _focusedWindow.setVisible(false);
+        }
+
+        _focusedWindow = _lastFocused;
+
+        if(!_focusedWindow.isVisible()){
+            _focusedWindow.setVisible(true);
+        }
+    }
 
     public void setFocusedWindow(String windowId){
         if(_windowsById == null || _windowsById.size()<1 || !_windowsById.containsKey(windowId)){
@@ -131,10 +148,35 @@ public class GUIManager {
     }
 
     private void setTopWindow(int windowPosition){
+
+        if(_renderer.getDisplayElements().size()-1 < windowPosition || windowPosition < 0){
+            return;
+        }
+
+        UIDisplayWindow setTopWindow = (UIDisplayWindow)_renderer.getDisplayElements().get(windowPosition);
+
+        if(setTopWindow == null){
+            return;
+        }
+
+        if(_lastFocused!=null&&_lastFocused.equals(setTopWindow)){
+            return;
+        }
+
         _lastFocused = _focusedWindow;
-        _focusedWindow = (UIDisplayWindow)_renderer.getDisplayElements().get(windowPosition);
+
+        if(_lastFocused!=null && _lastFocused.isMaximized() && setTopWindow.isMaximized()){
+            _lastFocused.setVisible(false);
+        }
+
+        _focusedWindow = setTopWindow;
+
         if( !_focusedWindow.isMaximized() ){
             _renderer.changeElementDepth(windowPosition, _renderer.getDisplayElements().size()-1);
+        }
+
+        if(!_focusedWindow.isVisible()){
+            _focusedWindow.setVisible(true);
         }
     }
 

@@ -85,7 +85,7 @@ public abstract class UIDisplayElement {
         }
         
         if(wheelMoved!=0){
-            _wheelMoved = _wheelMoved;
+            _wheelMoved = wheelMoved;
         }else{
             _wheelMoved = 0;
         }

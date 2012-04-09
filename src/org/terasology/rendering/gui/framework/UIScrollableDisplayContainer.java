@@ -1,5 +1,7 @@
 package org.terasology.rendering.gui.framework;
 
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.components.UIScrollBar;
 
 import javax.vecmath.Vector2f;
@@ -16,8 +18,8 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
     /*
      * ScrollBars
      */
-    private UIScrollBar _scrollBarVertical   = null;
-    private UIScrollBar _scrollBarHorizontal = null;
+    protected UIScrollBar _scrollBarVertical   = null;
+    protected UIScrollBar _scrollBarHorizontal = null;
 
     private float      _contentHeight         = 1.0f;
     private float      _contentWidth          = 1.0f;
@@ -88,6 +90,14 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
     }
 
     public void update(){
+
+        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+
+        if (intersects(mousePos)) {
+            _scrollBarVertical.setWheelled(true);
+        }else{
+            _scrollBarVertical.setWheelled(false);
+        }
 
         boolean verticalScrollIsScrolled   = _scrollBarVertical.isScrolled();
         boolean horizontalScrollIsScrolled = _scrollBarHorizontal.isScrolled();

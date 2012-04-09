@@ -46,10 +46,6 @@ import static org.lwjgl.opengl.GL11.*;
  * @version 0.1
  */
 public class StateMainMenu implements IGameState {
-
-    /* GUI */
-   // private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
-
     /* SCREENS */
     private UIMainMenu        _mainMenu;
     private UIConfigMenu      _configMenu;
@@ -83,8 +79,9 @@ public class StateMainMenu implements IGameState {
 
         singlePlayerButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                _mainMenu.setVisible(false);
-                _selectWorldMenu.setVisible(true);
+              //  _mainMenu.setVisible(false);
+              //  _selectWorldMenu.setVisible(true);
+              GUIManager.getInstance().setFocusedWindow(_selectWorldMenu);
             }
         });
 
@@ -96,8 +93,7 @@ public class StateMainMenu implements IGameState {
 
         configButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                _mainMenu.setVisible(false);
-                _configMenu.setVisible(true);
+                GUIManager.getInstance().setFocusedWindow(_configMenu);
             }
         });
     }
@@ -110,8 +106,7 @@ public class StateMainMenu implements IGameState {
 
         goToBack.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                _selectWorldMenu.setVisible(false);
-                _mainMenu.setVisible(true);
+                GUIManager.getInstance().setFocusedWindow(_mainMenu);
             }
         });
     }
@@ -194,6 +189,12 @@ public class StateMainMenu implements IGameState {
     public void activate() {
         Mouse.setGrabbed(false);
         playBackgroundMusic();
+
+        GUIManager.getInstance().getWindowById("main").setVisible(true);
+        GUIManager.getInstance().getWindowById("config").setVisible(false);
+        GUIManager.getInstance().getWindowById("selectWorld").setVisible(false);
+        GUIManager.getInstance().getWindowById("generate_world").setVisible(false);
+        GUIManager.getInstance().setFocusedWindow("main");
 
         UIButton graphicsQualityButton = (UIButton)_configMenu.getElementById("graphicsQualityButton");
         UIButton FOVButton             = (UIButton)_configMenu.getElementById("fovButton");

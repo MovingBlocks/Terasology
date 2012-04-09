@@ -5,9 +5,6 @@ import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
-
-import javax.tools.DiagnosticListener;
 import javax.vecmath.Vector2f;
 
 
@@ -76,8 +73,8 @@ public class UIDialogBox extends UIDisplayWindow{
     }
 
     public void resize(){
-        _title.setSize(new Vector2f(getSize().x*0.85f, 19f));
-        _title.getPosition().x = (getPosition().x + getSize().x/2f) - _title.getSize().x/2;
+        _title.setSize(new Vector2f(getSize().x*0.55f, 19f));
+        _title.getPosition().x = getSize().x/2f - _title.getSize().x/2;
         _title.resize();
         _style = null;
         _close.getPosition().x = getSize().x-25f;

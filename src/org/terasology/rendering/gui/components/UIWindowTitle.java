@@ -52,9 +52,8 @@ public class UIWindowTitle extends UIDisplayContainer{
     }
 
     public void resize(){
-      //_leftBackground.setPosition(getPosition());
       _centerBackground.setSize(new Vector2f(getSize().x-19f, 19f));
-      _centerBackground.getPosition().x += _leftBackground.getSize().x;
+      _centerBackground.getPosition().x = _leftBackground.getPosition().x +  _leftBackground.getSize().x;
       _rightBackground.getPosition().x = _centerBackground.getPosition().x + _centerBackground.getSize().x;
       _text.getPosition().x = getSize().x/2 - _text.getTextWidth()/2;
     }

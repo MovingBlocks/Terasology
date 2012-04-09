@@ -3,15 +3,19 @@ package org.terasology.rendering.gui.dialogs;
 import org.newdawn.slick.Color;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
-import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIDialogBox;
-import org.terasology.rendering.gui.components.UIInput;
-import org.terasology.rendering.gui.components.UIText;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
-
+import org.terasology.utilities.FastRandom;
 import javax.vecmath.Vector2f;
+
+/*
+ * Dialog for generate new world
+ *
+ * @author Anton Kireev <adeon.k87@gmail.com>
+ * @version 0.1
+ */
 
 public class UIDialogCreateNewWorld extends UIDialogBox {
     private UIButton _okButton;
@@ -58,12 +62,15 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
             public void clicked(UIDisplayElement element) {
                 if(_inputSeed.getValue().length()>0){
                     Config.getInstance().setDefaultSeed(_inputSeed.getValue());
+                }else{
+                    FastRandom random = new FastRandom();
+                    Config.getInstance().setDefaultSeed(random.randomCharacterString(32));
                 }
 
                 if(_inputWorldTitle.getValue().length()>0){
                     Config.getInstance().setWorldTitle(_inputWorldTitle.getValue());
                 }else{
-                    Config.getInstance().setWorldTitle("World1");
+                    Config.getInstance().setWorldTitle(getWorldName());
                 }
                 Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
             }
@@ -77,7 +84,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
 
         _cancelButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                setVisible(false);
+                close(true);
             }
         });
 
@@ -87,5 +94,10 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         addDisplayElement(_inputSeedLabel,"inputSeedLabel" );
         addDisplayElement(_inputWorldTitleLabel, "inputWorldTitleLabel");
         addDisplayElement(_inputWorldTitle, "inputWorldTitle");
+    }
+    
+    private String getWorldName(){
+        UIList list = (UIList)GUIManager.getInstance().getWindowById("select").getElementById("list");
+        return "World" + list.size();
     }
 }

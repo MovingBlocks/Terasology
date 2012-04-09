@@ -168,17 +168,20 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
       return _inputValue.toString();
   }
 
-    public void clearData() {
-        if(_inputValue.length() > 0){
-            _inputValue.delete(0,_inputValue.length()-1);
-        }
+  /*
+   * Clear _inputValue; set cursor position to "0"; set input text to "";
+   */
+  public void clearData() {
+      if(_inputValue.length() > 0){
+         _inputValue.delete(0,_inputValue.length()-1);
+      }
+      _cursorPosition = 0;
+      _inputText.setText("");
+  }
 
-        _inputText.setText("");
-    }
-
-    /*
-    * Set current input value
-    */
+  /*
+   * Set current input value
+   */
   public void setValue(String value){
       _inputValue.setLength(0);
       _inputValue.append(value);
@@ -190,7 +193,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
    * Set color text into input field
    */
   public void setTextColor(Color color){
-    _inputText.setColor(color);
+      _inputText.setColor(color);
   }
 
   /*

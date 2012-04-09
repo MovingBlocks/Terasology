@@ -1,6 +1,8 @@
 package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.logic.manager.GUIManager;
+
 import javax.vecmath.Vector2f;
 import java.util.HashMap;
 
@@ -22,7 +24,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer{
     public void close(boolean clearInputControls){
         setVisible(false);
         setFocus(false);
-        
+        GUIManager.getInstance().setFocusedFromLast();
         if(clearInputControls){
             clearInputControls();
         }

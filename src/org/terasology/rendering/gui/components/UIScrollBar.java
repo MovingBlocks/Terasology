@@ -6,8 +6,14 @@ import org.terasology.rendering.gui.framework.IScrollListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 import javax.vecmath.Vector2f;
-
 import java.util.ArrayList;
+
+/*
+ * A simple graphical ScrollBar
+ *
+ * @author Anton Kireev <adeon.k87@gmail.com>
+ * @version 0.1
+ */
 
 public class UIScrollBar extends UIDisplayContainer {
 
@@ -28,12 +34,12 @@ public class UIScrollBar extends UIDisplayContainer {
     private ScrollType _scrollType = ScrollType.vertical;
 
     private boolean _scrolled = false;
+    private boolean _wheelled  = false;
 
     private float _containerLength     = 0.0f;
     private float _contentLength       = 0.0f;
     private float _value               = 0.0f;
     private float _oldValue            = 0.0f;
-
 
     public static enum ScrollType {
         vertical, horizontal
@@ -74,7 +80,11 @@ public class UIScrollBar extends UIDisplayContainer {
         }
 
         if(_scrolled){
-            scrolled(_scrollType==ScrollType.vertical?mousePos.y:mousePos.x);
+            scrolled( calculateScrollFromMouse( _scrollType==ScrollType.vertical?mousePos.y:mousePos.x ) );
+        }
+
+        if(_wheelMoved!=0&&_wheelled){
+            scrolled(calculateScrollFromWheel( ((-1)*_wheelMoved/120)/_step) );
         }
 
         if(!_mouseDown||!_scrolled || _mouseUp){
@@ -86,7 +96,16 @@ public class UIScrollBar extends UIDisplayContainer {
         super.update();
     }
 
-    private void scrolled(float mousePos){
+    public void scrolled(float scrollTo){
+       _scrolBarThumb.setThumbPosition((_scrolBarThumb.getThumbPosition() + scrollTo ));
+        calculateValue();
+        for (int i = 0; i < _scrollListeners.size(); i++) {
+            _scrollListeners.get(i).scrolled(this);
+        }
+    }
+
+    private float calculateScrollFromMouse(float mousePos){
+        float scrollValue = 0;
 
         if(_max<(_scrolBarThumb.getThumbPosition() +  mousePos - _prevMousePos  + _scrolBarThumb.getThumbSize())){
             mousePos = _max - _scrolBarThumb.getThumbSize() + _prevMousePos - _scrolBarThumb.getThumbPosition();
@@ -94,16 +113,23 @@ public class UIScrollBar extends UIDisplayContainer {
             mousePos = _min + _prevMousePos - _scrolBarThumb.getThumbPosition();
         }
 
-          
-        _scrolBarThumb.setThumbPosition((_scrolBarThumb.getThumbPosition() +  mousePos - _prevMousePos));
-
-        calculateValue();
+        scrollValue =  mousePos - _prevMousePos;
 
         _prevMousePos   = mousePos;
 
-        for (int i = 0; i < _scrollListeners.size(); i++) {
-            _scrollListeners.get(i).scrolled(this);
+        return scrollValue;
+    }
+
+    public float calculateScrollFromWheel(float wheelValue){
+        float scrollValue = wheelValue;
+
+        if(_max<(_scrolBarThumb.getThumbPosition() +  wheelValue  + _scrolBarThumb.getThumbSize())){
+            scrollValue = _max - _scrolBarThumb.getThumbSize() - _scrolBarThumb.getThumbPosition();
+        }else if(_min>(_scrolBarThumb.getThumbPosition() +  wheelValue)){
+            scrollValue = _min - _scrolBarThumb.getThumbPosition();
         }
+
+        return scrollValue;
     }
 
     public void addScrollListener(IScrollListener listener) {
@@ -179,5 +205,9 @@ public class UIScrollBar extends UIDisplayContainer {
 
     public float getStep(){
         return _step;
+    }
+
+    public void setWheelled(boolean wheelled){
+        _wheelled = wheelled;
     }
 }

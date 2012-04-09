@@ -4,17 +4,13 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.newdawn.slick.Color;
-
-
 import javax.vecmath.Vector2f;
-
-
 
 public class UIMessageBox extends UIDialogBox{
     private UIText   _text;
     private UIButton _buttonOk;
 
-    private Vector2f _minSize = new Vector2f(384f, 256f);
+    private Vector2f _minSize = new Vector2f(384f, 128f);
 
     public UIMessageBox(String title, String text){
         super(title, new Vector2f());
