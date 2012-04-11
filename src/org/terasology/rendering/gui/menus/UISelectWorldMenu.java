@@ -89,6 +89,10 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _createNewWorld.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 GUIManager.getInstance().setFocusedWindow(_window);
+                _window.clearInputControls();
+                UIInput inputWorldName = (UIInput)_window.getElementById("inputWorldTitle");
+                inputWorldName.setValue(_window.getWorldName());
+
             }
         });
 
