@@ -152,13 +152,17 @@ public class ChunkMesh {
     private void generateVBO(int id) {
         if (_lock.tryLock()) {
             try {
-                if (!_disposed) {
+                if (!_disposed && _vertexElements[id].finalIndices.limit() > 0 && _vertexElements[id].finalVertices.limit() > 0) {
                     _vertexBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
                     _idxBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
                     _vertexCount[id] = _vertexElements[id].finalIndices.limit();
 
                     VertexBufferObjectManager.getInstance().bufferVboElementData(_idxBuffers[id], _vertexElements[id].finalIndices, GL15.GL_STATIC_DRAW);
                     VertexBufferObjectManager.getInstance().bufferVboData(_vertexBuffers[id], _vertexElements[id].finalVertices, GL15.GL_STATIC_DRAW);
+                } else {
+                    _vertexBuffers[id] = 0;
+                    _idxBuffers[id] = 0;
+                    _vertexCount[id] = 0;
                 }
             } finally {
                 _lock.unlock();
