@@ -13,7 +13,7 @@ message Value {
     repeated sint64 long = 4 [packed=true];
     repeated bool boolean = 5 [packed=true];
     repeated string string = 6;
-    repeated bytes byte = 7;
+    optional bytes bytes = 7;
     repeated Value value = 8;
     repeated NameValue name_value = 9; // For string maps
     // repeated ValuePair value_value = 10; // For other maps
@@ -51,7 +51,7 @@ message Entity {
 }
 
 message Prefab {
-    optional sint32 type_index = 1;
+    optional sint32 name_index = 1;
     repeated Component component = 2;
     repeated sint32 parent_index = 3 [packed=true];
     optional string name = 15;

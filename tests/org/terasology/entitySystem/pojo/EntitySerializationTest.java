@@ -5,10 +5,7 @@ import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.pojo.persistence.EntityPersister;
-import org.terasology.entitySystem.pojo.persistence.FieldMetadata;
-import org.terasology.entitySystem.pojo.persistence.ComponentMetadata;
-import org.terasology.entitySystem.pojo.persistence.PersistenceUtil;
+import org.terasology.entitySystem.pojo.persistence.*;
 import org.terasology.entitySystem.pojo.persistence.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
@@ -17,6 +14,7 @@ import org.terasology.protobuf.EntityData;
 
 import javax.vecmath.Vector3f;
 
+import java.io.*;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -234,7 +232,7 @@ public class EntitySerializationTest {
     }
 
     @Test
-    public void testDetlaComponentTypeIdDeserializes() throws Exception {
+    public void testDeltaComponentTypeIdDeserializes() throws Exception {
         entityPersister.setUsingLookupTables(true);
         Map<Integer, Class<? extends Component>> componentIdTable = Maps.newHashMap();
         componentIdTable.put(413, StringComponent.class);
