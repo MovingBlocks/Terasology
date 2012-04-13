@@ -1,8 +1,10 @@
 package org.terasology.logic.world;
 
+import org.terasology.game.Terasology;
 import org.terasology.model.structures.BlockPosition;
 
 import javax.vecmath.Vector3f;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,5 +39,16 @@ public final class WorldUtil {
         // Sort the block positions
         Collections.sort(blockPositions);
         return blockPositions;
+    }
+
+    public static void deleteWorld(File world) {
+        if (world.isDirectory()) {
+            String[] children = world.list();
+            for (int i=0; i<children.length; i++) {
+                File f = new File(world, children[i]);
+                deleteWorld(f);
+            }
+            world.delete();
+        } else world.delete();
     }
 }
