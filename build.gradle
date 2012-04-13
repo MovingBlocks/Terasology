@@ -34,6 +34,14 @@ sourceSets {
 	}
 }
 
+test {
+  //makes the standard streams (err and out) visible at console when running tests
+  testLogging.showStandardStreams = true
+
+  //tweaking memory settings for the forked vm that runs tests
+  jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+}
+
 repositories {
 	mavenCentral()
 }
