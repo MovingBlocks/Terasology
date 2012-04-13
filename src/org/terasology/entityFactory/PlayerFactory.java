@@ -33,7 +33,10 @@ public class PlayerFactory {
         PlayerComponent playerComponent = new PlayerComponent();
         playerComponent.spawnPosition.set(spawnPosition);
         player.addComponent(playerComponent);
-        player.addComponent(new HealthComponent(255, 5, 2f));
+        HealthComponent healthComponent = new HealthComponent(255, 5, 2f);
+        healthComponent.excessSpeedDamageMultiplier = 20f;
+        healthComponent.fallingDamageSpeedThreshold = 15f;
+        player.addComponent(healthComponent);
 
         AABBCollisionComponent collision = player.addComponent(new AABBCollisionComponent());
         collision.setExtents(new Vector3f(.3f, 0.8f, .3f));

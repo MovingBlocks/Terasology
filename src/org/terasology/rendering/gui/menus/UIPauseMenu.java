@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.menus;
 
+import org.terasology.components.*;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.Terasology;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
@@ -25,6 +27,7 @@ import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 
 /**
  * Simple pause menu providing buttons for respawning the player and creating a new world.
@@ -60,7 +63,6 @@ public class UIPauseMenu extends UIDisplayRenderer {
             }
         });
 
-
         _respawnButton = new UIButton(new Vector2f(256f, 32f));
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.setVisible(true);
@@ -68,8 +70,32 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _respawnButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
-                // TODO: Respawning
-                //Terasology.getInstance().getActiveWorldRenderer().getPlayer().respawn();
+                EntityRef playerEntity = Terasology.getInstance().getActivePlayer().getEntity();
+
+                LocalPlayerComponent localPlayerComponent = playerEntity.getComponent(LocalPlayerComponent.class);
+                if (localPlayerComponent.isDead) {
+                    localPlayerComponent.isDead = false;
+                    playerEntity.saveComponent(localPlayerComponent);
+                }
+
+                LocationComponent locationComponent = playerEntity.getComponent(LocationComponent.class);
+                PlayerComponent playerComponent = playerEntity.getComponent(PlayerComponent.class);
+                if (playerComponent != null && locationComponent != null) {
+                    locationComponent.setWorldPosition(playerComponent.spawnPosition);
+                    playerEntity.saveComponent(locationComponent);
+                }
+
+                HealthComponent healthComponent = playerEntity.getComponent(HealthComponent.class);
+                if (healthComponent != null) {
+                    healthComponent.currentHealth = healthComponent.maxHealth;
+                    playerEntity.saveComponent(healthComponent);
+                }
+
+                CharacterMovementComponent characterMovementComponent = playerEntity.getComponent(CharacterMovementComponent.class);
+                if (characterMovementComponent != null) {
+                    characterMovementComponent.setVelocity(new Vector3f(0,0,0));
+                    playerEntity.saveComponent(characterMovementComponent);
+                }
             }
         });
 
