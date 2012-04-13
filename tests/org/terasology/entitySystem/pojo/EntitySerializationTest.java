@@ -1,12 +1,14 @@
 package org.terasology.entitySystem.pojo;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.pojo.persistence.EntityPersister;
 import org.terasology.entitySystem.pojo.persistence.FieldMetadata;
 import org.terasology.entitySystem.pojo.persistence.ComponentMetadata;
+import org.terasology.entitySystem.pojo.persistence.PersistenceUtil;
 import org.terasology.entitySystem.pojo.persistence.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
@@ -15,9 +17,9 @@ import org.terasology.protobuf.EntityData;
 
 import javax.vecmath.Vector3f;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -34,6 +36,7 @@ public class EntitySerializationTest {
         entityManager.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         entityManager.registerComponentClass(IntegerComponent.class);
         entityManager.registerComponentClass(StringComponent.class);
+        entityManager.registerComponentClass(GetterSetterComponent.class);
         prefabManager = new PojoPrefabManager();
         entityManager.setPrefabManager(prefabManager);
         entityPersister = entityManager.getEntityPersister();
@@ -45,7 +48,7 @@ public class EntitySerializationTest {
         info.addField(new FieldMetadata(GetterSetterComponent.class.getDeclaredField("value"), GetterSetterComponent.class, new Vector3fTypeHandler()));
 
         GetterSetterComponent comp = new GetterSetterComponent();
-        GetterSetterComponent newComp = (GetterSetterComponent) info.deserialize(info.serialize(comp));
+        GetterSetterComponent newComp = (GetterSetterComponent) entityPersister.deserializeComponent(entityPersister.serializeComponent(comp));
         assertTrue(comp.getterUsed);
         assertTrue(newComp.setterUsed);
     }
@@ -179,6 +182,76 @@ public class EntitySerializationTest {
         assertTrue(loadedEntity.exists());
         assertTrue(loadedEntity.hasComponent(StringComponent.class));
         assertEquals("Delta", loadedEntity.getComponent(StringComponent.class).value);
+    }
+
+    @Test
+    public void testComponentTypeIdUsedWhenLookupTableEnabled() throws Exception {
+        entityPersister.setUsingLookupTables(true);
+        EntityRef entity = entityManager.create();
+        entity.addComponent(new StringComponent("Test"));
+        EntityData.World world = entityPersister.serializeWorld();
+        int typeId = world.getComponentClassList().indexOf(PersistenceUtil.getComponentClassName(StringComponent.class));
+        assertFalse(typeId == -1);
+        boolean found = false;
+        for (EntityData.Component component : world.getEntity(0).getComponentList()) {
+            assertTrue(component.hasTypeIndex());
+            assertFalse(component.hasType());
+            if (component.getTypeIndex() == typeId) {
+                found = true;
+            }
+        }
+        assertTrue(found);
+    }
+
+    @Test
+    public void testComponentTypeIdUsedWhenLookupTableEnabledForComponentDeltas() throws Exception {
+        entityPersister.setUsingLookupTables(true);
+        Map<Integer, Class<? extends Component>> componentIdTable = Maps.newHashMap();
+        componentIdTable.put(413, StringComponent.class);
+        entityPersister.setComponentTypeIdTable(componentIdTable);
+
+        Prefab prefab = prefabManager.createPrefab("Test");
+        prefab.setComponent(new StringComponent("Value"));
+
+        EntityRef entity = entityManager.create(prefab);
+        entity.getComponent(StringComponent.class).value = "New";
+
+        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
+
+        assertEquals(413, entityData.getComponent(0).getTypeIndex());
+    }
+
+    @Test
+    public void testComponentTypeIdDeserializes() throws Exception {
+        entityPersister.setUsingLookupTables(true);
+        EntityRef entity = entityManager.create();
+        entity.addComponent(new StringComponent("Test"));
+        EntityData.World world = entityPersister.serializeWorld();
+
+        entityManager.clear();
+        entityPersister.deserializeWorld(world);
+        assertNotNull(entity.getComponent(StringComponent.class));
+    }
+
+    @Test
+    public void testDetlaComponentTypeIdDeserializes() throws Exception {
+        entityPersister.setUsingLookupTables(true);
+        Map<Integer, Class<? extends Component>> componentIdTable = Maps.newHashMap();
+        componentIdTable.put(413, StringComponent.class);
+        entityPersister.setComponentTypeIdTable(componentIdTable);
+
+        Prefab prefab = prefabManager.createPrefab("Test");
+        prefab.setComponent(new StringComponent("Value"));
+
+        EntityRef entity = entityManager.create(prefab);
+        entity.getComponent(StringComponent.class).value = "New";
+
+        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
+        entityManager.clear();
+        EntityRef result = entityPersister.deserializeEntity(entityData);
+
+        assertTrue(result.hasComponent(StringComponent.class));
+        assertEquals("New", result.getComponent(StringComponent.class).value);
     }
 
 }

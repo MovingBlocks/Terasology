@@ -40,7 +40,7 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
                 if (rawValue == null)
                     continue;
 
-                EntityData.Value fieldValue = fieldInfo.getSerializationHandler().serialize(rawValue);
+                EntityData.Value fieldValue = fieldInfo.serialize(rawValue);
                 if (fieldValue != null) {
                     result.addNameValue(EntityData.NameValue.newBuilder().setName(fieldInfo.getName()).setValue(fieldValue).build());
                 }
@@ -59,7 +59,7 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
             for (EntityData.NameValue entry : value.getNameValueList()) {
                 FieldMetadata fieldInfo = fields.get(entry.getName().toLowerCase(Locale.ENGLISH));
                 if (fieldInfo != null) {
-                    Object content = fieldInfo.getSerializationHandler().deserialize(entry.getValue());
+                    Object content = fieldInfo.deserialize(entry.getValue());
                     if (content != null) {
                         fieldInfo.setValue(result, content);
                     }
@@ -77,7 +77,7 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
             try {
                 T result = clazz.newInstance();
                 for (FieldMetadata field : fields.values()) {
-                    field.setValue(result, field.getSerializationHandler().copy(field.getValue(value)));
+                    field.setValue(result, field.copy(field.getValue(value)));
                 }
                 return result;
             } catch (InstantiationException e) {

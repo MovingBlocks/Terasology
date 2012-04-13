@@ -17,6 +17,7 @@ public interface EntityManager {
         JSON
     }
 
+    //TODO: Remove save/load from here, should be external to Entity Manager
     void save(File file, SaveFormat format) throws IOException;
     void load(File file, SaveFormat format) throws IOException;
     void clear();
@@ -45,6 +46,8 @@ public interface EntityManager {
      * @return The number of entities with this component class
      */
     int getComponentCount(Class<? extends Component> componentClass);
+
+    Iterable<EntityRef> iteratorEntities();
 
     Iterable<EntityRef> iteratorEntities(Class<? extends Component> ...  componentClasses);
 

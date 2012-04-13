@@ -29,6 +29,7 @@ message ValuePair {
 message NameValue {
     optional string name = 1;
     optional Value value = 2;
+    optional sint32 name_index = 3;
 }
 
 message Component {

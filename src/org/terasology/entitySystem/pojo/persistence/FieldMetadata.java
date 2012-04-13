@@ -1,5 +1,7 @@
 package org.terasology.entitySystem.pojo.persistence;
 
+import org.terasology.protobuf.EntityData;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,8 +24,16 @@ public class FieldMetadata {
         setter = findSetter(type, field);
     }
 
-    public TypeHandler getSerializationHandler() {
-        return serializationHandler;
+    public EntityData.Value serialize(Object field) {
+        return serializationHandler.serialize(field);
+    }
+
+    public Object deserialize(EntityData.Value value) {
+        return serializationHandler.deserialize(value);
+    }
+
+    public Object copy(Object field) {
+        return serializationHandler.copy(field);
     }
 
     public String getName() {

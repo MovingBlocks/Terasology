@@ -1,5 +1,8 @@
 package org.terasology.entitySystem.pojo.persistence;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import gnu.trove.procedure.TIntProcedure;
 import org.terasology.entitySystem.*;
@@ -7,17 +10,12 @@ import org.terasology.entitySystem.pojo.persistence.core.*;
 import org.terasology.entitySystem.pojo.persistence.extension.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -35,6 +33,9 @@ public class EntityPersisterImpl implements EntityPersister {
 
     private EntityRefTypeHandler entityRefTypeHandler;
 
+    private boolean useLookupTables = false;
+
+    BiMap<Integer, Class<? extends Component>> componentIdTable = HashBiMap.create();
 
     public EntityPersisterImpl() {
         registerTypeHandler(Boolean.class, new BooleanTypeHandler());
@@ -59,7 +60,7 @@ public class EntityPersisterImpl implements EntityPersister {
         typeHandlers.put(forClass, handler);
     }
 
-    public void registerComponentClass(Class<? extends Component> componentClass) {
+    public <T extends Component> void registerComponentClass(Class<T> componentClass) {
         try {
             // Check if constructor exists
             componentClass.getConstructor();
@@ -68,7 +69,7 @@ public class EntityPersisterImpl implements EntityPersister {
             return;
         }
 
-        ComponentMetadata info = new ComponentMetadata(componentClass);
+        ComponentMetadata<T> info = new ComponentMetadata<T>(componentClass);
         for (Field field : componentClass.getDeclaredFields()) {
             if (Modifier.isTransient(field.getModifiers()))
                 continue;
@@ -86,13 +87,11 @@ public class EntityPersisterImpl implements EntityPersister {
 
     public EntityData.World serializeWorld() {
         final EntityData.World.Builder world = EntityData.World.newBuilder();
-        world.setNextEntityId(entityManager.getNextId());
-        entityManager.getFreedIds().forEach(new TIntProcedure() {
-            public boolean execute(int i) {
-                world.addFreedEntityId(i);
-                return true;
-            }
-        });
+        writeIdInfo(world);
+
+        if (isUsingLookupTables()) {
+            writeComponentTypeTable(world);
+        }
 
         for (Prefab prefab : prefabManager.listPrefabs()) {
             world.addPrefab(serializePrefab(prefab));
@@ -111,18 +110,7 @@ public class EntityPersisterImpl implements EntityPersister {
                 return serializeEntityDelta(entityRef, prefabManager.getPrefab(entityInfo.parentPrefab));
             }
         }
-        EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
-        entity.setId(entityRef.getId());
-        for (Component component : entityRef.iterateComponents()) {
-            if (component.getClass().equals(EntityInfoComponent.class))
-                continue;
-
-            EntityData.Component componentData = serializeComponent(component);
-            if (componentData != null) {
-                entity.addComponent(componentData);
-            }
-        }
-        return entity.build();
+        return serializeEntityFull(entityRef);
     }
 
     public EntityData.Prefab serializePrefab(Prefab prefab) {
@@ -142,29 +130,35 @@ public class EntityPersisterImpl implements EntityPersister {
     }
 
     public EntityData.Component serializeComponent(Component component) {
-        ComponentMetadata componentMetadata = componentSerializationLookup.get(component.getClass());
+        ComponentMetadata<?> componentMetadata = componentSerializationLookup.get(component.getClass());
         if (componentMetadata == null) {
             logger.log(Level.SEVERE, "Unregistered component type: " + component.getClass());
-            registerComponentClass(component.getClass());
-            componentMetadata = componentSerializationLookup.get(component.getClass());
+            return null;
         }
-        if (componentMetadata != null) {
-            return componentMetadata.serialize(component);
+        EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
+        if (useLookupTables) {
+            componentMessage.setTypeIndex(componentIdTable.inverse().get(component.getClass()));
+        } else {
+            componentMessage.setType(component.getName());
         }
-        return null;
-    }
 
-    public EntityData.Component serializeComponent(Component base, Component delta) {
-        ComponentMetadata componentMetadata = componentSerializationLookup.get(base.getClass());
-        if (componentMetadata == null) {
-            logger.log(Level.SEVERE, "Unregistered component type: " + base.getClass());
-            registerComponentClass(base.getClass());
-            componentMetadata = componentSerializationLookup.get(base.getClass());
+        for (FieldMetadata field : componentMetadata.iterateFields()) {
+            try {
+                Object rawValue = field.getValue(component);
+                if (rawValue == null) continue;
+
+                EntityData.Value value = field.serialize(rawValue);
+                if (value == null) continue;
+
+                componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
+            } catch (IllegalAccessException e) {
+                logger.log(Level.SEVERE, "Exception during serializing component type: " + component.getClass(), e);
+            } catch (InvocationTargetException e) {
+                logger.log(Level.SEVERE, "Exception during serializing component type: " + component.getClass(), e);
+            }
         }
-        if (componentMetadata != null) {
-            return componentMetadata.serialize(base, delta);
-        }
-        return null;
+
+        return componentMessage.build();
     }
 
     public void deserializeWorld(EntityData.World world) {
@@ -176,6 +170,13 @@ public class EntityPersisterImpl implements EntityPersister {
         for (EntityData.Prefab prefabData : world.getPrefabList()) {
             if (!prefabManager.exists(prefabData.getName())) {
                 deserializePrefab(prefabData);
+            }
+        }
+
+        for (int index = 0; index < world.getComponentClassCount(); ++index) {
+            Class<? extends Component> componentClass = componentTypeLookup.get(world.getComponentClass(index));
+            if (componentClass != null) {
+                componentIdTable.put(index, componentClass);
             }
         }
 
@@ -203,11 +204,9 @@ public class EntityPersisterImpl implements EntityPersister {
             }
         }
         for (EntityData.Component componentData : entityData.getComponentList()) {
-            Class<? extends Component> componentClass = componentTypeLookup.get(componentData.getType().toLowerCase(Locale.ENGLISH));
-            if (componentClass == null) {
-                logger.log(Level.WARNING, "Unable to deserialise unknown component type: " + componentData.getType());
-                continue;
-            }
+            Class<? extends Component> componentClass = getComponentClass(componentData);
+            if (componentClass == null) continue;
+
             if (!entity.hasComponent(componentClass)) {
                 entity.addComponent(deserializeComponent(componentData));
             } else {
@@ -237,25 +236,33 @@ public class EntityPersisterImpl implements EntityPersister {
     }
 
     public Component deserializeComponent(EntityData.Component componentData) {
-        Class<? extends Component> componentClass = componentTypeLookup.get(componentData.getType().toLowerCase(Locale.ENGLISH));
+        Class<? extends Component> componentClass = getComponentClass(componentData);
         if (componentClass != null) {
             ComponentMetadata componentMetadata = componentSerializationLookup.get(componentClass);
-            return componentMetadata.deserialize(componentData);
+            Component component = componentMetadata.newInstance();
+            return deserializeOnto(component, componentData, componentMetadata);
         } else {
             logger.log(Level.WARNING, "Unable to deserialise unknown component type: " + componentData.getType());
         }
         return null;
     }
 
-    public Component copyComponent(Component component) {
-        // TODO: Be more efficient
-        ComponentMetadata componentMetadata = componentSerializationLookup.get(component.getClass());
+    public <T extends Component> T copyComponent(T component) {
+        @SuppressWarnings("unchecked") ComponentMetadata<T> componentMetadata = (ComponentMetadata<T>) componentSerializationLookup.get(component.getClass());
         if (componentMetadata == null) {
             logger.log(Level.SEVERE, "Unable to clone component: " + component.getClass() + ", not registered");
         } else {
             return componentMetadata.clone(component);
         }
         return null;
+    }
+
+    public void setEntityManager(PersistableEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    public PersistableEntityManager getEntityManager() {
+        return entityManager;
     }
 
     public void setPrefabManager(PrefabManager prefabManager) {
@@ -267,13 +274,33 @@ public class EntityPersisterImpl implements EntityPersister {
         this.entityRefTypeHandler.setEntityManager(persistableEntityManager);
     }
 
+    public boolean isUsingLookupTables() {
+        return useLookupTables;
+    }
+
+    public void setUsingLookupTables(boolean enabled) {
+        useLookupTables = enabled;
+    }
+
+    public void setComponentTypeIdTable(Map<Integer, Class<? extends Component>> componentIdTable) {
+        this.componentIdTable.clear();
+        this.componentIdTable.putAll(componentIdTable);
+    }
+
+    public void clearComponentTypeIdTable() {
+        this.componentIdTable.clear();
+    }
+
     // TODO: Refactor
     private TypeHandler getHandlerFor(Type type, int depth) {
-        Class typeClass = null;
+        Class typeClass;
         if (type instanceof Class) {
             typeClass = (Class) type;
         } else if (type instanceof ParameterizedType) {
             typeClass = (Class) ((ParameterizedType) type).getRawType();
+        } else {
+            logger.log(Level.SEVERE, "Cannot obtain class for type " + type);
+            return null;
         }
 
         if (Enum.class.isAssignableFrom(typeClass)) {
@@ -332,6 +359,39 @@ public class EntityPersisterImpl implements EntityPersister {
         return null;
     }
 
+    private void writeComponentTypeTable(EntityData.World.Builder world) {
+        for (Class<? extends Component> componentClass : componentSerializationLookup.keySet()) {
+            int index = componentIdTable.size();
+            componentIdTable.put(index, componentClass);
+            world.addComponentClass(PersistenceUtil.getComponentClassName(componentClass));
+        }
+    }
+
+    private void writeIdInfo(final EntityData.World.Builder world) {
+        world.setNextEntityId(entityManager.getNextId());
+        entityManager.getFreedIds().forEach(new TIntProcedure() {
+            public boolean execute(int i) {
+                world.addFreedEntityId(i);
+                return true;
+            }
+        });
+    }
+
+    private EntityData.Entity serializeEntityFull(EntityRef entityRef) {
+        EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
+        entity.setId(entityRef.getId());
+        for (Component component : entityRef.iterateComponents()) {
+            if (component.getClass().equals(EntityInfoComponent.class))
+                continue;
+
+            EntityData.Component componentData = serializeComponent(component);
+            if (componentData != null) {
+                entity.addComponent(componentData);
+            }
+        }
+        return entity.build();
+    }
+
     private EntityData.Entity serializeEntityDelta(EntityRef entityRef, Prefab prefab) {
         EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
         entity.setId(entityRef.getId());
@@ -360,13 +420,91 @@ public class EntityPersisterImpl implements EntityPersister {
         return entity.build();
     }
 
+    private EntityData.Component serializeComponent(Component base, Component delta) {
+        ComponentMetadata<?> componentMetadata = componentSerializationLookup.get(base.getClass());
+        if (componentMetadata == null) {
+            logger.log(Level.SEVERE, "Unregistered component type: " + base.getClass());
+            return null;
+        }
+
+        EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
+        if (useLookupTables) {
+            componentMessage.setTypeIndex(componentIdTable.inverse().get(base.getClass()));
+        } else {
+            componentMessage.setType(delta.getName());
+        }
+
+        boolean changed = false;
+        for (FieldMetadata field : componentMetadata.iterateFields()) {
+            try {
+                Object origValue = field.getValue(base);
+                Object deltaValue = field.getValue(delta);
+
+                if (!Objects.equal(origValue, deltaValue)) {
+                    EntityData.Value value = field.serialize(deltaValue);
+                    componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
+                    changed = true;
+                }
+            } catch (IllegalAccessException e) {
+                logger.log(Level.SEVERE, "Exception during serializing component type: " + base.getClass(), e);
+            } catch (InvocationTargetException e) {
+                logger.log(Level.SEVERE, "Exception during serializing component type: " + base.getClass(), e);
+            }
+        }
+        if (changed) {
+            return componentMessage.build();
+        }
+        return null;
+    }
+
+    private Class<? extends Component> getComponentClass(EntityData.Component componentData) {
+        Class<? extends Component> result = null;
+        if (componentData.hasTypeIndex()) {
+            result = componentIdTable.get(componentData.getTypeIndex());
+            if (result == null) {
+                logger.log(Level.WARNING, "Unable to deserialise unknown component with id: " + componentData.getTypeIndex());
+            }
+            return result;
+        } else if (componentData.hasType()) {
+            result = componentTypeLookup.get(componentData.getType().toLowerCase(Locale.ENGLISH));
+            if (result == null) {
+                logger.log(Level.WARNING, "Unable to deserialise unknown component type: " + componentData.getType());
+            }
+            return result;
+        }
+        logger.log(Level.WARNING, "Unable to deserialise component, no type provided.");
+
+        return result;
+    }
+
     private Component deserializeComponentOnto(Component component, EntityData.Component componentData) {
-        Class<? extends Component> componentClass = componentTypeLookup.get(componentData.getType().toLowerCase(Locale.ENGLISH));
+        Class<? extends Component> componentClass = getComponentClass(componentData);
         if (componentClass != null) {
             ComponentMetadata componentMetadata = componentSerializationLookup.get(componentClass);
-            return componentMetadata.deserializeOnto(component, componentData);
+            return deserializeOnto(component, componentData, componentMetadata);
         } else {
             logger.log(Level.WARNING, "Unable to deserialise unknown component type: " + componentData.getType());
+        }
+        return null;
+    }
+
+    private Component deserializeOnto(Component component, EntityData.Component componentData, ComponentMetadata componentMetadata) {
+        try {
+            for (EntityData.NameValue field : componentData.getFieldList()) {
+                FieldMetadata fieldInfo = componentMetadata.getField(field.getName());
+                if (fieldInfo == null)
+                    continue;
+
+                Object value = fieldInfo.deserialize(field.getValue());
+                if (value == null)
+                    continue;
+                fieldInfo.setValue(component, value);
+            }
+            return component;
+        } catch (InvocationTargetException e) {
+            logger.log(Level.SEVERE, "Exception during serializing component type: " + component.getClass(), e);
+        } catch (IllegalAccessException e) {
+            logger.log(Level.SEVERE, "Exception during serializing component type: " + component.getClass(), e);
         }
         return null;
     }

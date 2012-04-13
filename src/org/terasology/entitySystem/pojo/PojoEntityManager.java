@@ -215,13 +215,17 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         return NullIterator.newInstance();
     }
 
+    public Iterable<EntityRef> iteratorEntities() {
+        return new Iterable<EntityRef>() {
+            public Iterator<EntityRef> iterator() {
+                return new EntityIterator(store.entityIdIterator());
+            }
+        };
+    }
+
     public Iterable<EntityRef> iteratorEntities(Class<? extends Component>... componentClasses) {
         if (componentClasses.length == 0) {
-            return new Iterable<EntityRef>() {
-                public Iterator<EntityRef> iterator() {
-                    return new EntityIterator(store.entityIdIterator());
-                }
-            };
+            return iteratorEntities();
         }
         TIntList idList = new TIntArrayList();
         TIntObjectIterator<? extends Component> primeIterator = store.componentIterator(componentClasses[0]);
