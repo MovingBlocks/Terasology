@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.menus;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.*;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -28,18 +28,20 @@ import javax.vecmath.Vector2f;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UIMainMenu extends UIDisplayRenderer {
+public class UIMainMenu extends UIDisplayWindow {
 
     private final UIImageOverlay _overlay;
     private final UIGraphicsElement _title;
 
+
     private final UIButton _exitButton;
-    private final UIButton _startButton;
+    private final UIButton _singlePlayerButton;
     private final UIButton _configButton;
 
     final UIText _version;
-
+                                                                  
     public UIMainMenu() {
+        maximaze();
         _title = new UIGraphicsElement("terasology");
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
@@ -51,25 +53,24 @@ public class UIMainMenu extends UIDisplayRenderer {
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
+
         _configButton = new UIButton(new Vector2f(256f, 32f));
         _configButton.getLabel().setText("Settings");
         _configButton.setVisible(true);
 
-        _startButton = new UIButton(new Vector2f(256f, 32f));
-        _startButton.getLabel().setText("Play!");
-        _startButton.setVisible(true);
+        _singlePlayerButton = new UIButton(new Vector2f(256f, 32f));
+        _singlePlayerButton.getLabel().setText("Single player");
+        _singlePlayerButton.setVisible(true);
 
         _overlay = new UIImageOverlay("menuBackground");
         _overlay.setVisible(true);
 
         addDisplayElement(_overlay);
-
         addDisplayElement(_title);
         addDisplayElement(_version);
-
-        addDisplayElement(_configButton);
-        addDisplayElement(_exitButton);
-        addDisplayElement(_startButton);
+        addDisplayElement(_configButton, "configButton");
+        addDisplayElement(_exitButton,   "exitButton");
+        addDisplayElement(_singlePlayerButton, "singlePlayerButton");
 
         update();
     }
@@ -81,9 +82,11 @@ public class UIMainMenu extends UIDisplayRenderer {
         _version.centerHorizontally();
         _version.getPosition().y = 230f;
 
-        _startButton.centerHorizontally();
-        _startButton.getPosition().y = 300f + 40f;
+        _singlePlayerButton.centerHorizontally();
+        _singlePlayerButton.getPosition().y = 300f + 40f;
 
+        _exitButton.centerHorizontally();
+        _exitButton.getPosition().y = 300f + 3 * 32f + 64f;
         _configButton.centerHorizontally();
         _configButton.getPosition().y = 300f + 2 * 40f;
 
@@ -92,17 +95,5 @@ public class UIMainMenu extends UIDisplayRenderer {
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;
-    }
-
-    public UIButton getExitButton() {
-        return _exitButton;
-    }
-
-    public UIButton getStartButton() {
-        return _startButton;
-    }
-
-    public UIButton getConfigButton() {
-        return _configButton;
     }
 }

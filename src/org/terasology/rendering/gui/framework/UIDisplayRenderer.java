@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
+import java.util.Collections;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -24,7 +25,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class UIDisplayRenderer extends UIDisplayContainer {
+public class UIDisplayRenderer extends UIDisplayContainer{
 
     @Override
     public void renderTransformed() {
@@ -58,5 +59,9 @@ public abstract class UIDisplayRenderer extends UIDisplayContainer {
             glPopMatrix();
             glMatrixMode(GL_MODELVIEW);
         }
+    }
+
+    public void changeElementDepth(int elementPosition, int forwardToPosistion){
+        Collections.rotate(_displayElements.subList(elementPosition, forwardToPosistion+1), -1);
     }
 }

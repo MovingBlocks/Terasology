@@ -21,11 +21,13 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.UIConfigMenu;
 import org.terasology.rendering.gui.menus.UIMainMenu;
+import org.terasology.rendering.gui.menus.UISelectWorldMenu;
 
 import java.util.ArrayList;
 
@@ -44,13 +46,10 @@ import static org.lwjgl.opengl.GL11.*;
  * @version 0.1
  */
 public class StateMainMenu implements IGameState {
-
-    /* GUI */
-    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
-
     /* SCREENS */
-    private UIMainMenu _mainMenu;
-    private UIConfigMenu _configMenu;
+    private UIMainMenu        _mainMenu;
+    private UIConfigMenu      _configMenu;
+    private UISelectWorldMenu _selectWorldMenu;
 
     private Terasology _gameInstance = null;
 
@@ -58,47 +57,75 @@ public class StateMainMenu implements IGameState {
         _gameInstance = Terasology.getInstance();
 
         setupMainMenu();
+        setupSelectWorldMenu();
         setupConfigMenu();
 
-        _guiScreens.add(_mainMenu);
-        _guiScreens.add(_configMenu);
+        GUIManager.getInstance().addWindow(_mainMenu, "main");
+        GUIManager.getInstance().addWindow(_configMenu, "config");
+        GUIManager.getInstance().addWindow(_selectWorldMenu, "selectWorld");
     }
 
     private void setupMainMenu() {
         _mainMenu = new UIMainMenu();
         _mainMenu.setVisible(true);
 
-        _mainMenu.getStartButton().addClickListener(new IClickListener() {
+        UIButton singlePlayerButton = (UIButton)_mainMenu.getElementById("singlePlayerButton");
+        UIButton configButton = (UIButton)_mainMenu.getElementById("configButton");
+        UIButton exitButton   = (UIButton)_mainMenu.getElementById("exitButton");
+
+
+        singlePlayerButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
-    }
+              //  _mainMenu.setVisible(false);
+              //  _selectWorldMenu.setVisible(true);
+              _selectWorldMenu.fillList();
+              GUIManager.getInstance().setFocusedWindow(_selectWorldMenu);
+            }
         });
 
-        _mainMenu.getExitButton().addClickListener(new IClickListener() {
+        exitButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 Terasology.getInstance().exit();
             }
         });
 
-        _mainMenu.getConfigButton().addClickListener(new IClickListener() {
+        configButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                _mainMenu.setVisible(false);
-                _configMenu.setVisible(true);
+                GUIManager.getInstance().setFocusedWindow(_configMenu);
+            }
+        });
+    }
+
+    private void setupSelectWorldMenu(){
+        _selectWorldMenu = new UISelectWorldMenu();
+        _selectWorldMenu.setVisible(false);
+
+        UIButton goToBack = (UIButton)_selectWorldMenu.getElementById("goToBackButton");
+
+        goToBack.addClickListener(new IClickListener() {
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().setFocusedWindow(_mainMenu);
             }
         });
     }
 
     private void setupConfigMenu() {
         _configMenu = new UIConfigMenu();
+        _configMenu.setVisible(false);
 
-        _configMenu.getBackToMainMenuButton().addClickListener(new IClickListener() {
+        UIButton backToMainMenuButton  = (UIButton)_configMenu.getElementById("backToMainMenuButton");
+        UIButton graphicsQualityButton = (UIButton)_configMenu.getElementById("graphicsQualityButton");
+        UIButton FOVButton             = (UIButton)_configMenu.getElementById("fovButton");
+        UIButton viewingDistanceButton = (UIButton)_configMenu.getElementById("viewingDistanceButton");
+        
+        backToMainMenuButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 _mainMenu.setVisible(true);
                 _configMenu.setVisible(false);
             }
         });
 
-        _configMenu.getGraphicsQualityButton().addClickListener(new IClickListener() {
+        graphicsQualityButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 UIButton button = (UIButton) element;
 
@@ -115,7 +142,7 @@ public class StateMainMenu implements IGameState {
             }
         });
 
-        _configMenu.getFOVButton().addClickListener(new IClickListener() {
+        FOVButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 UIButton button = (UIButton) element;
 
@@ -136,7 +163,7 @@ public class StateMainMenu implements IGameState {
             }
         });
 
-        _configMenu.getViewingDistanceButton().addClickListener(new IClickListener() {
+        viewingDistanceButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 UIButton button = (UIButton) element;
 
@@ -161,24 +188,34 @@ public class StateMainMenu implements IGameState {
         Mouse.setGrabbed(false);
         playBackgroundMusic();
 
+        GUIManager.getInstance().getWindowById("main").setVisible(true);
+        GUIManager.getInstance().getWindowById("config").setVisible(false);
+        GUIManager.getInstance().getWindowById("selectWorld").setVisible(false);
+        GUIManager.getInstance().getWindowById("generate_world").setVisible(false);
+        GUIManager.getInstance().setFocusedWindow("main");
+
+        UIButton graphicsQualityButton = (UIButton)_configMenu.getElementById("graphicsQualityButton");
+        UIButton FOVButton             = (UIButton)_configMenu.getElementById("fovButton");
+        UIButton viewingDistanceButton = (UIButton)_configMenu.getElementById("viewingDistanceButton");
+
         if (Config.getInstance().getActiveViewingDistanceId() == 3)
-            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Ultra");
+            viewingDistanceButton.getLabel().setText("Viewing Distance: Ultra");
         else if (Config.getInstance().getActiveViewingDistanceId() == 1)
-            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Moderate");
+            viewingDistanceButton.getLabel().setText("Viewing Distance: Moderate");
         else if (Config.getInstance().getActiveViewingDistanceId() == 2)
-            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Far");
+            viewingDistanceButton.getLabel().setText("Viewing Distance: Far");
         else
-            _configMenu.getViewingDistanceButton().getLabel().setText("Viewing Distance: Near");
+            viewingDistanceButton.getLabel().setText("Viewing Distance: Near");
 
         if (Config.getInstance().getGraphicsQuality() == 1)
-            _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Nice");
+            graphicsQualityButton.getLabel().setText("Graphics Quality: Nice");
         else if (Config.getInstance().getGraphicsQuality() == 2)
-            _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Epic");
+            graphicsQualityButton.getLabel().setText("Graphics Quality: Epic");
         else
-            _configMenu.getGraphicsQualityButton().getLabel().setText("Graphics Quality: Ugly");
+            graphicsQualityButton.getLabel().setText("Graphics Quality: Ugly");
 
         // TODO: Replace with a slider later on
-        _configMenu.getFOVButton().getLabel().setText("Field of View: " + (int) Config.getInstance().getFov());
+        FOVButton.getLabel().setText("Field of View: " + (int) Config.getInstance().getFov());
     }
 
     public void deactivate() {
@@ -209,15 +246,11 @@ public class StateMainMenu implements IGameState {
     }
 
     public void renderUserInterface() {
-        for (UIDisplayElement screen : _guiScreens) {
-            screen.render();
-        }
+        GUIManager.getInstance().render();
     }
 
     private void updateUserInterface() {
-        for (UIDisplayElement screen : _guiScreens) {
-            screen.update();
-        }
+        GUIManager.getInstance().update();
     }
 
     public EntityManager getEntityManager() {
@@ -242,13 +275,8 @@ public class StateMainMenu implements IGameState {
                     _gameInstance.exit();
                     return;
                 }
-                // Pass input to focused GUI element
-                for (UIDisplayElement screen : _guiScreens) {
-                    if (screenCanFocus(screen)) {
-                        screen.processKeyboardInput(key);
-                    }
-                }
             }
+            GUIManager.getInstance().processKeyboardInput(key);
         }
     }
 
@@ -260,32 +288,7 @@ public class StateMainMenu implements IGameState {
             int button = Mouse.getEventButton();
             int wheelMoved = Mouse.getEventDWheel();
 
-            for (UIDisplayElement screen : _guiScreens) {
-                if (screenCanFocus(screen)) {
-                    screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-                }
-            }
+            GUIManager.getInstance().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
         }
-    }
-
-    private boolean screenCanFocus(UIDisplayElement s) {
-        boolean result = true;
-
-        for (UIDisplayElement screen : _guiScreens) {
-            if (screen.isVisible() && !screen.isOverlay() && screen != s)
-                result = false;
-        }
-
-        return result;
-    }
-
-    private boolean screenHasFocus() {
-        for (UIDisplayElement screen : _guiScreens) {
-            if (screen.isVisible() && !screen.isOverlay()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
