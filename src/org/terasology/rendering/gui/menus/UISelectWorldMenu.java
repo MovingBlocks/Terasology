@@ -194,6 +194,8 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             }
         })){
             File worldManifest = new File(file.getPath() + "\\WorldManifest.groovy");
+            if (!worldManifest.exists())
+                continue;
             try {
                 config = new ConfigSlurper().parse(worldManifest.toURI().toURL());
                 if(config.get("worldTitle")!=null&&config.get("worldSeed")!=null){
