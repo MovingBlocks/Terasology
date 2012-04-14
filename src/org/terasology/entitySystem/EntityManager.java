@@ -1,5 +1,7 @@
 package org.terasology.entitySystem;
 
+import org.terasology.entitySystem.pojo.persistence.EntityPersister;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -64,5 +66,7 @@ public interface EntityManager {
     PrefabManager getPrefabManager();
 
     void setPrefabManager(PrefabManager prefabManager);
+
+    EntityPersister getPersister();
 
 }

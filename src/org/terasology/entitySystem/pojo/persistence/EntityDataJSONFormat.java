@@ -20,18 +20,32 @@ import java.util.Map;
  */
 public class EntityDataJSONFormat {
 
-    public static void write(BufferedWriter writer, EntityData.World world) throws IOException {
-        new EntityDataJSONFormat().write(world, writer);
+    public static void write(EntityData.World world, BufferedWriter writer) throws IOException {
+        newGson().toJson(world, writer);
     }
 
-    public static EntityData.World readWorld(BufferedReader reader) {
-        return new EntityDataJSONFormat().read(reader);
+    public static void write(EntityData.Prefab prefab, BufferedWriter writer) throws IOException {
+        newGson().toJson(prefab, writer);
     }
 
-    Gson gson;
+    public static EntityData.World readWorld(BufferedReader reader) throws IOException {
+        try {
+            return newGson().fromJson(reader, EntityData.World.class);
+        } catch (JsonSyntaxException e) {
+            throw new IOException("Failed to load world", e);
+        }
+    }
 
-    EntityDataJSONFormat() {
-        gson = new GsonBuilder()
+    public static EntityData.Prefab readPrefab(BufferedReader reader) throws IOException {
+        try {
+            return newGson().fromJson(reader, EntityData.Prefab.class);
+        } catch (JsonSyntaxException e) {
+            throw new IOException("Failed to load world", e);
+        }
+    }
+
+    private static Gson newGson() {
+        return new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(EntityData.World.class, new WorldHandler())
                 .registerTypeAdapter(EntityData.Entity.class, new EntityHandler())
@@ -40,14 +54,6 @@ public class EntityDataJSONFormat {
                 .registerTypeAdapter(EntityData.Component.Builder.class, new ComponentBuilderHandler())
                 .registerTypeAdapter(EntityData.Value.class, new ValueHandler())
                 .create();
-    }
-
-    void write(EntityData.World world, BufferedWriter writer) {
-        gson.toJson(world, writer);
-    }
-
-    EntityData.World read(BufferedReader reader) {
-         return gson.fromJson(reader, EntityData.World.class);
     }
 
     private static class WorldHandler implements JsonSerializer<EntityData.World>, JsonDeserializer<EntityData.World> {

@@ -4,6 +4,13 @@ import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.actions.AccessInventoryActionComponent;
+import org.terasology.components.actions.PlaySoundActionComponent;
+import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.pojo.PojoPrefabManager;
+import org.terasology.logic.manager.AudioManager;
 import org.terasology.protobuf.EntityData;
 
 import java.io.*;
@@ -268,6 +275,26 @@ public class EntityDataJSONFormatTest {
         assertPersist(worldBuilder);
     }
 
+    @Test
+    public void tempTest() throws Exception {
+        PrefabManager prefabManager = new PojoPrefabManager();
+        Prefab prefab = prefabManager.createPrefab("Chest");
+        prefab.setComponent(new InventoryComponent(16));
+        //prefab.setComponent(new PlaySoundActionComponent(AudioManager.sound("click")));
+        prefab.setComponent(new AccessInventoryActionComponent());
+
+        EntityPersisterImpl persister = new EntityPersisterImpl();
+        persister.registerComponentClass(InventoryComponent.class);
+        persister.registerComponentClass(AccessInventoryActionComponent.class);
+        EntityData.Prefab prefabData = persister.serializePrefab(prefab);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(bos));
+        EntityDataJSONFormat.write(prefabData, writer);
+        writer.flush();
+        String result = new String(bos.toByteArray());
+        System.out.println(result);
+    }
+
     private void assertPersist(EntityData.World.Builder worldBuilder) throws IOException{
         EntityData.World world = worldBuilder.build();
         EntityData.World newWorld = persistAndRetrieve(world);
@@ -277,7 +304,7 @@ public class EntityDataJSONFormatTest {
     private EntityData.World persistAndRetrieve(EntityData.World world) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(baos));
-        EntityDataJSONFormat.write(writer, world);
+        EntityDataJSONFormat.write(world, writer);
         writer.flush();
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         return EntityDataJSONFormat.readWorld(new BufferedReader(new InputStreamReader(bais)));

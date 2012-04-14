@@ -55,9 +55,9 @@ public class BlockEntitySystem implements EventHandlerSystem {
         // TODO: Configurable via block definition
         AudioManager.play("RemoveBlock", 0.6f);
 
-        if ((oldBlock.isStraightToInventory() || oldBlock.isEntityRetainedWhenItem()) && event.getInstigator().exists()) {
+        if ((oldBlock.isStraightToInventory() || !oldBlock.isEntityTemporary()) && event.getInstigator().exists()) {
             EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockFamily(), entity);
-            if (oldBlock.isEntityRetainedWhenItem()) {
+            if (!oldBlock.isEntityTemporary()) {
                 entity.removeComponent(HealthComponent.class);
                 entity.removeComponent(BlockComponent.class);
             }
@@ -72,7 +72,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
             CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
         }
 
-        if (!oldBlock.isEntityRetainedWhenItem()) {
+        if (oldBlock.isEntityTemporary()) {
             entity.destroy();
         }
     }

@@ -27,4 +27,8 @@ block {
         top = "TntTop"
         bottom = "TntBottom"
     }
+
+    entityPrefab = "TNT"
+    entityTemporary = true
+    usable = true
 }
