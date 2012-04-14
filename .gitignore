@@ -1,6 +1,7 @@
 SAVED_WORLDS
 logs
 out
+target
 .DS_Store
 Terasology.iml
 Terasology.ipr

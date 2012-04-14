@@ -13,33 +13,50 @@ apply plugin: 'idea'
 idea {
   project {
     jdkName = '1.6'
+	languageLevel = '1.6'
+  }
+  module { 
+    inheritOutputDirs = false
+	outputDir = file('target/classes/main')
+    testOutputDir = file('target/classes/test')
+	testSourceDirs += file('src/perfTest/java')
+	excludeDirs += file('protobuf')
+	excludeDirs += file('blender_addons')
+	excludeDirs += file('gradle')
+	excludeDirs += file('rawAssets')
+	excludeDirs += file('logs')
+	excludeDirs += file('SAVED_WORLDS')
   }
 }
 
-sourceCompatibility = 1.5
+sourceCompatibility = 1.6
 //version = '0.5.0' //TODO: Disabled version tagging until we actually have something solid to do with it (was breaking old artifact links)
-buildDir = 'out'
+buildDir = 'target'
 
 task wrapper(type: Wrapper) {
     gradleVersion = '1.0-milestone-8a'
 }
 
+// Compiles everything as groovy, due to java<->groovy interdependencies
 sourceSets {
 	main {
 		java { srcDirs = [] }
-		groovy { srcDir 'src' }
+		groovy { srcDirs = ['src/main/java','src/main/groovy'] }
+		resources { srcDir = 'src/main/resources' }
 	}
-	test {
-		java { srcDir 'tests' }
-	}
+	perfTest
 }
 
 test {
-  //makes the standard streams (err and out) visible at console when running tests
-  testLogging.showStandardStreams = true
-
-  //tweaking memory settings for the forked vm that runs tests
+  //Uncomment to makes the standard streams (err and out) visible at console when running tests
+  //testLogging.showStandardStreams = true
   jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+}
+
+task perfTests(type: Test) {
+	testClassesDir = sourceSets.perfTest.output.classesDir
+	classpath = sourceSets.perfTest.runtimeClasspath
+	jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
 }
 
 repositories {
@@ -50,23 +67,17 @@ dependencies{
 	groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.2'
     compile group: 'com.google.guava', name: 'guava', version: '11.0.1'
 	compile group: 'com.google.code.gson', name: 'gson', version: '2.1'
-	compile fileTree(dir: 'libs', include: '*.jar', exclude: 'mockito-all-1.9.0.jar')	
+	compile fileTree(dir: 'libs', include: '*.jar')	
 	testCompile 'junit:junit:4.10'
 	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
-}
-
-task copyResources(type:Copy) {
-	description = 'Copies resources into build directory.'
-	from('src') {
-		exclude '**/*.java'
-		exclude '**/*.groovy'
-	}
-	into('out/classes/main')
+	perfTestCompile sourceSets.main.output
+	perfTestCompile configurations.testCompile
+    perfTestCompile sourceSets.test.output
+    perfTestRuntime configurations.testRuntime
 }
 
 jar {
 	dependsOn compileGroovy
-	dependsOn copyResources
 	from { 
 		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 	}
@@ -90,17 +101,17 @@ task dist(type:Copy) {
 		include 'README.markdown'
 		include 'LICENSE.txt'
 	}
-	from('scripts') {
+	from('launchScripts') {
 		exclude('Launcher.xml')
 	}
 	from(jar.archivePath)
-	into('out/dist')
+	into('target/dist')
 }
 
 task zip(type:Zip) {
 	description = 'Creates a fully-functionional game archive.'
 	dependsOn dist
-	from('out/dist')
+	from('target/dist')
 	into('Terasology')
 	destinationDir = buildDir
 }
@@ -113,13 +124,12 @@ task applet(type:Copy) {
 		exclude '*.keystore'		
 	}
     from(jar.archivePath)
-    into('out/applet')
+    into('target/applet')
 }
 
 task run(type:JavaExec) {
 	description = 'Run Terasology'
-	dependsOn compileGroovy
-	dependsOn copyResources
+	dependsOn jar
 	main = 'org.terasology.game.Terasology'
-	classpath = sourceSets.main.runtimeClasspath
+	classpath jar.archivePath
 }
