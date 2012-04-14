@@ -379,7 +379,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(centerPos);
                 // TODO: Shouldn't activate directly, should send use event - same as item?
                 // Maybe break out a usable component.
-                blockEntity.send(new ActivateEvent(entity, entity));
+                blockEntity.send(new ActivateEvent(blockEntity, entity));
             }
         }
     }

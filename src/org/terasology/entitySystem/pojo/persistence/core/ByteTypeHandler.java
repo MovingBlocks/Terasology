@@ -29,7 +29,7 @@ public class ByteTypeHandler implements TypeHandler<Byte> {
         TByteArrayList bytes = new TByteArrayList();
         bytes.addAll(Lists.newArrayList(value));
         ByteString byteString = ByteString.copyFrom(bytes.toArray(new byte[bytes.size()]));
-        return EntityData.Value.newBuilder().addByte(byteString).build();
+        return EntityData.Value.newBuilder().setBytes(byteString).build();
     }
 
     public Byte copy(Byte value) {
@@ -37,9 +37,9 @@ public class ByteTypeHandler implements TypeHandler<Byte> {
     }
 
     public List<Byte> deserializeList(EntityData.Value value) {
-        if (value.getByteCount() > 0) {
-            List<Byte> result = Lists.newArrayListWithCapacity(value.getByte(0).size());
-            for (byte b : value.getByte(0).toByteArray()) {
+        if (value.hasBytes()) {
+            List<Byte> result = Lists.newArrayListWithCapacity(value.getBytes().size());
+            for (byte b : value.getBytes().toByteArray()){
                 result.add(b);
             }
             return result;

@@ -52,7 +52,7 @@ public class BlockItemFactory {
 
         BlockItemComponent blockItem = new BlockItemComponent(blockFamily);
 
-        if (blockFamily.getArchetypeBlock().isEntityRetainedWhenItem()) {
+        if (!blockFamily.getArchetypeBlock().isEntityTemporary()) {
             if (placedEntity == null || !placedEntity.exists()) {
                 placedEntity = entityManager.create(blockFamily.getArchetypeBlock().getEntityPrefab());
             }

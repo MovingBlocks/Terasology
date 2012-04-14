@@ -32,6 +32,5 @@ block {
     entityPrefab = "Chest"
     stackable = false
     straightToInventory = true
-    entityRetainedWhenItem = true
     usable = true
 }

@@ -47,17 +47,21 @@ import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
+import org.terasology.entitySystem.pojo.persistence.EntityDataJSONFormat;
+import org.terasology.entitySystem.pojo.persistence.EntityPersister;
 import org.terasology.entitySystem.pojo.persistence.extension.*;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
@@ -69,8 +73,10 @@ import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -170,12 +176,10 @@ public class StateSinglePlayer implements IGameState {
         CoreRegistry.put(ComponentSystemManager.class, _componentSystemManager);
 
         PrefabManager prefabManager = new PojoPrefabManager();
-        Prefab prefab = prefabManager.createPrefab("Chest");
-        prefab.setComponent(new InventoryComponent(16));
-        prefab.setComponent(new PlaySoundActionComponent(AudioManager.sound("click")));
-        prefab.setComponent(new AccessInventoryActionComponent());
         CoreRegistry.put(PrefabManager.class, prefabManager);
         entityManager.setPrefabManager(prefabManager);
+
+        loadPrefabs();
 
         _componentSystemManager.register(new BlockEntityRegistry());
         _componentSystemManager.register(new CharacterMovementSystem());
@@ -196,6 +200,25 @@ public class StateSinglePlayer implements IGameState {
         _componentSystemManager.register(new TunnelAction());
         _componentSystemManager.register(new AccessInventoryAction());
 
+    }
+
+    private void loadPrefabs() {
+        EntityPersister persister = _entityManager.getPersister();
+        for (String prefabURI : AssetManager.list("prefab")) {
+            _logger.info("Loading prefab " + prefabURI);
+            try {
+                if (!prefabURI.endsWith(".prefab")) {
+                    continue;
+                }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(AssetManager.assetStream(prefabURI)));
+                EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
+                if (prefabData != null) {
+                    persister.deserializePrefab(prefabData);
+                }
+            } catch (IOException e) {
+                _logger.log(Level.WARNING, "Failed to load prefab '" + prefabURI + "'", e);
+            }
+        }
     }
 
     public void activate() {

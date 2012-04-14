@@ -1,0 +1,27 @@
+{
+  "name": "Chest",
+  "Inventory": {
+    "itemSlots": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "PlaySoundAction" : {
+    sounds = "click"
+  },
+  "AccessInventoryAction": {}
+}

@@ -49,7 +49,8 @@ public class BlockEntityRegistry implements EventHandlerSystem {
             Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPosition));
 
             blockEntity = entityManager.create(block.getEntityPrefab());
-            blockEntity.addComponent(new BlockComponent(blockPosition, block.isEntityRetainedWhenItem() || !block.getEntityPrefab().isEmpty()));
+            // TODO: Better cleanup of temporary block entities
+            blockEntity.addComponent(new BlockComponent(blockPosition, block.isEntityTemporary()));
             // TODO: Get regen and wait from block config?
             blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
         }

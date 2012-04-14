@@ -78,7 +78,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                     bufferedWriter.flush();
                     break;
                 case JSON:
-                    EntityDataJSONFormat.write(bufferedWriter, world);
+                    EntityDataJSONFormat.write(world, bufferedWriter);
                     bufferedWriter.flush();
                     break;
             }
@@ -195,6 +195,10 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     public void setPrefabManager(PrefabManager prefabManager) {
         this.prefabManager = prefabManager;
         entityPersister.setPrefabManager(prefabManager);
+    }
+
+    public EntityPersister getPersister() {
+        return entityPersister;
     }
 
     // Used for testing, for now

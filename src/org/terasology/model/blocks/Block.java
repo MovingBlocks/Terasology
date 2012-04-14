@@ -119,9 +119,8 @@ public class Block implements IGameObject {
     // Inventory settings
     private boolean _straightToInventory;
     private boolean _stackable = true;
-    private boolean _entityRetainedWhenItem = false;
+    private boolean _entityTemporary = false;
     private String _entityPrefab = "";
-
 
     private int _lootAmount;
 
@@ -429,8 +428,8 @@ public class Block implements IGameObject {
         return this;
     }
 
-    public Block withEntityRetainedWhenItem(boolean entityRetainedWhenItem) {
-        _entityRetainedWhenItem = entityRetainedWhenItem;
+    public Block withEntityTemporary(boolean entityTemporary) {
+        _entityTemporary = entityTemporary;
         return this;
     }
 
@@ -558,8 +557,8 @@ public class Block implements IGameObject {
         return _stackable;
     }
 
-    public boolean isEntityRetainedWhenItem() {
-        return _entityRetainedWhenItem;
+    public boolean isEntityTemporary() {
+        return _entityTemporary || _entityPrefab.isEmpty();
     }
 
     public boolean isUsable() {
