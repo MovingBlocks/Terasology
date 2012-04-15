@@ -112,16 +112,17 @@ dependencies{
 	perfTestCompile configurations.testCompile
     perfTestCompile sourceSets.test.output
     perfTestRuntime configurations.testRuntime
+
 }
 
 jar {
 	dependsOn compileGroovy
 	from { 
-		configurations.compile.collect { it.isDirectory() ? it : (!it.getName().contains('-natives-')) ? zipTree(it) : [] }
+		configurations.compile.collect { it.isDirectory() ? it : [] }
 	}
-	excludes = ['*-natives-*.jar']
 	manifest {
-		attributes("Main-Class": "org.terasology.game.Terasology", "Manifest-Version": "1.0")
+		def manifestClasspath = 'libs/'+configurations.runtime.collect { it.getName() }.join(' libs/') 
+		attributes("Main-Class": "org.terasology.game.Terasology", "Manifest-Version": "1.0", "Class-Path" : manifestClasspath)
 	}
 	archiveName('Terasology.jar')
 }
@@ -130,10 +131,18 @@ jar.doLast {
 	ant.signjar(jar: jar.archivePath, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
 }
 
+task distLibs(type:Copy) {
+	from {
+		configurations.compile.collect { !it.isDirectory() && !it.getName().contains('-natives-') ? it : [] }
+	}
+	into('target/dist/libs')
+}
+
 task dist(type:Copy) {
 	description = 'Creates a fully-functional game folder.'
 	dependsOn jar
 	dependsOn extractNatives
+	dependsOn distLibs
 	
 	from('.') {
 		include 'README.markdown'
@@ -155,15 +164,30 @@ task zip(type:Zip) {
 	destinationDir = buildDir
 }
 
+task appletLibs(type:Copy) {
+	from {
+		configurations.compile.collect { !it.isDirectory() ? it : [] }
+	}
+	into('target/applet/libs')
+	exclude { details -> details.file.name.contains("lwjgl") || details.file.name.contains("jinput") }
+}
+
 task applet(type:Copy) {
 	description = 'Creates a game distribution playable through a browser.'
 	dependsOn jar
+	dependsOn appletLibs
 
     from('applet') {
 		exclude '*.keystore'		
 	}
-    from(jar.archivePath)
+	from (jar.archivePath)
     into('target/applet')
+}
+applet.doLast {
+	file('target/applet/libs').listFiles().each {
+		if (it.getName().endsWith(".jar"))
+			ant.signjar(jar: it, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
+    }
 }
 
 task run(type:JavaExec) {
