@@ -196,4 +196,5 @@ task run(type:JavaExec) {
 	dependsOn extractNatives
 	main = 'org.terasology.game.Terasology'
 	classpath jar.archivePath
+	classpath configurations.runtime
 }
