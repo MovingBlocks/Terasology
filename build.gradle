@@ -44,6 +44,11 @@ idea {
   project {
     jdkName = '1.6'
 	languageLevel = '1.6'
+	ipr {
+		withXml { provider ->
+			provider.node.component.find { it.@name == 'ProjectRootManager' }.output.@url = 'file://$PROJECT_DIR$/target'
+		}
+	}
   }
   module { 
     inheritOutputDirs = false
