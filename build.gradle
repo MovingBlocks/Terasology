@@ -67,6 +67,8 @@ idea {
 }
 ideaModule.dependsOn extractNatives
 
+eclipseClasspath.dependsOn extractNatives
+
 sourceCompatibility = 1.6
 //version = '0.5.0' //TODO: Disabled version tagging until we actually have something solid to do with it (was breaking old artifact links)
 buildDir = 'target'
