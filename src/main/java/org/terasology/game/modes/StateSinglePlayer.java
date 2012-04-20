@@ -44,12 +44,16 @@ import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.components.actions.TunnelActionComponent;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
+import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
-import org.terasology.entitySystem.pojo.persistence.EntityDataJSONFormat;
-import org.terasology.entitySystem.pojo.persistence.EntityPersister;
-import org.terasology.entitySystem.pojo.persistence.extension.*;
+import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
+import org.terasology.entitySystem.persistence.EntityPersisterHelper;
+import org.terasology.entitySystem.metadata.extension.*;
+import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
@@ -110,7 +114,7 @@ public class StateSinglePlayer implements IGameState {
     /* RENDERING */
     private WorldRenderer _worldRenderer;
 
-
+    private ComponentLibrary componentLibrary;
     private EntityManager _entityManager;
     private ComponentSystemManager _componentSystemManager;
     private LocalPlayerSystem _localPlayerSys;
@@ -137,38 +141,18 @@ public class StateSinglePlayer implements IGameState {
         _guiScreens.add(_inventoryScreen);
         _guiScreens.add(_statusScreen);
 
-        PojoEntityManager entityManager = new PojoEntityManager();
-
-        entityManager.registerTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler());
-        entityManager.registerTypeHandler(Color4f.class, new Color4fTypeHandler());
-        entityManager.registerTypeHandler(Quat4f.class, new Quat4fTypeHandler());
-        entityManager.registerTypeHandler(Sound.class, new SoundTypeHandler(AudioManager.getInstance()));
-        entityManager.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
-        entityManager.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
-        entityManager.registerTypeHandler(Vector3i.class, new Vector3iTypeHandler());
+        componentLibrary = new ComponentLibraryImpl();
 
         // TODO: Use reflection pending mod support
-        entityManager.registerComponentClass(ExplosionActionComponent.class);
-        entityManager.registerComponentClass(PlaySoundActionComponent.class);
-        entityManager.registerComponentClass(TunnelActionComponent.class);
-        entityManager.registerComponentClass(AABBCollisionComponent.class);
-        entityManager.registerComponentClass(BlockComponent.class);
-        entityManager.registerComponentClass(BlockItemComponent.class);
-        entityManager.registerComponentClass(BlockParticleEffectComponent.class);
-        entityManager.registerComponentClass(CameraComponent.class);
-        entityManager.registerComponentClass(CharacterMovementComponent.class);
-        entityManager.registerComponentClass(CharacterSoundComponent.class);
-        entityManager.registerComponentClass(HealthComponent.class);
-        entityManager.registerComponentClass(InventoryComponent.class);
-        entityManager.registerComponentClass(ItemComponent.class);
-        entityManager.registerComponentClass(LightComponent.class);
-        entityManager.registerComponentClass(LocalPlayerComponent.class);
-        entityManager.registerComponentClass(LocationComponent.class);
-        entityManager.registerComponentClass(MeshComponent.class);
-        entityManager.registerComponentClass(PlayerComponent.class);
-        entityManager.registerComponentClass(SimpleAIComponent.class);
-        entityManager.registerComponentClass(AccessInventoryActionComponent.class);
-        _entityManager = entityManager;
+        componentLibrary.registerTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler());
+        componentLibrary.registerTypeHandler(Color4f.class, new Color4fTypeHandler());
+        componentLibrary.registerTypeHandler(Quat4f.class, new Quat4fTypeHandler());
+        componentLibrary.registerTypeHandler(Sound.class, new SoundTypeHandler(AudioManager.getInstance()));
+        componentLibrary.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
+        componentLibrary.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
+        componentLibrary.registerTypeHandler(Vector3i.class, new Vector3iTypeHandler());
+
+        _entityManager = new PojoEntityManager(componentLibrary);
 
         _entityManager.setEventSystem(new PojoEventSystem(_entityManager));
         CoreRegistry.put(EntityManager.class, _entityManager);
@@ -177,7 +161,30 @@ public class StateSinglePlayer implements IGameState {
 
         PrefabManager prefabManager = new PojoPrefabManager();
         CoreRegistry.put(PrefabManager.class, prefabManager);
-        entityManager.setPrefabManager(prefabManager);
+        _entityManager.setPrefabManager(prefabManager);
+
+        CoreRegistry.put(WorldPersister.class, new WorldPersister(componentLibrary,_entityManager));
+        // TODO: Use reflection pending mod support
+        componentLibrary.registerComponentClass(ExplosionActionComponent.class);
+        componentLibrary.registerComponentClass(PlaySoundActionComponent.class);
+        componentLibrary.registerComponentClass(TunnelActionComponent.class);
+        componentLibrary.registerComponentClass(AABBCollisionComponent.class);
+        componentLibrary.registerComponentClass(BlockComponent.class);
+        componentLibrary.registerComponentClass(BlockItemComponent.class);
+        componentLibrary.registerComponentClass(BlockParticleEffectComponent.class);
+        componentLibrary.registerComponentClass(CameraComponent.class);
+        componentLibrary.registerComponentClass(CharacterMovementComponent.class);
+        componentLibrary.registerComponentClass(CharacterSoundComponent.class);
+        componentLibrary.registerComponentClass(HealthComponent.class);
+        componentLibrary.registerComponentClass(InventoryComponent.class);
+        componentLibrary.registerComponentClass(ItemComponent.class);
+        componentLibrary.registerComponentClass(LightComponent.class);
+        componentLibrary.registerComponentClass(LocalPlayerComponent.class);
+        componentLibrary.registerComponentClass(LocationComponent.class);
+        componentLibrary.registerComponentClass(MeshComponent.class);
+        componentLibrary.registerComponentClass(PlayerComponent.class);
+        componentLibrary.registerComponentClass(SimpleAIComponent.class);
+        componentLibrary.registerComponentClass(AccessInventoryActionComponent.class);
 
         loadPrefabs();
 
@@ -203,7 +210,7 @@ public class StateSinglePlayer implements IGameState {
     }
 
     private void loadPrefabs() {
-        EntityPersister persister = _entityManager.getPersister();
+        EntityPersisterHelper persisterHelper = new EntityPersisterHelperImpl(componentLibrary, (PersistableEntityManager)_entityManager);
         for (String prefabURI : AssetManager.list("prefab")) {
             _logger.info("Loading prefab " + prefabURI);
             try {
@@ -213,7 +220,7 @@ public class StateSinglePlayer implements IGameState {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(AssetManager.assetStream(prefabURI)));
                 EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
                 if (prefabData != null) {
-                    persister.deserializePrefab(prefabData);
+                    persisterHelper.deserializePrefab(prefabData);
                 }
             } catch (IOException e) {
                 _logger.log(Level.WARNING, "Failed to load prefab '" + prefabURI + "'", e);
@@ -233,7 +240,7 @@ public class StateSinglePlayer implements IGameState {
 
     public void deactivate() {
         try {
-            _entityManager.save(new File(Terasology.getInstance().getWorldSavePath(getActiveWorldProvider().getTitle()), ENTITY_DATA_FILE), EntityManager.SaveFormat.Binary);
+            CoreRegistry.get(WorldPersister.class).save(new File(Terasology.getInstance().getWorldSavePath(getActiveWorldProvider().getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
             _logger.log(Level.SEVERE, "Failed to save entities", e);
         }
@@ -317,7 +324,7 @@ public class StateSinglePlayer implements IGameState {
         _entityManager.clear();
         if (entityDataFile.exists()) {
             try {
-                _entityManager.load(entityDataFile, EntityManager.SaveFormat.Binary);
+                CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
             } catch (IOException e) {
                 _logger.log(Level.SEVERE, "Failed to load entity data", e);
             }

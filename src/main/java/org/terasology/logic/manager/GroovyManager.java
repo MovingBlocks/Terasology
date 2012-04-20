@@ -28,6 +28,7 @@ import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
@@ -199,7 +200,7 @@ public class GroovyManager {
         }
 
         public void dumpEntities() throws IOException {
-            CoreRegistry.get(EntityManager.class).save(Helper.fixSavePath(new File("entityDump.txt")), EntityManager.SaveFormat.JSON);
+            CoreRegistry.get(WorldPersister.class).save(Helper.fixSavePath(new File("entityDump.txt")), WorldPersister.SaveFormat.JSON);
         }
         
         public void debugCollision() {

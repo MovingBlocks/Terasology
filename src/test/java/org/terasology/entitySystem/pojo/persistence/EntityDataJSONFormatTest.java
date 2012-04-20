@@ -275,26 +275,6 @@ public class EntityDataJSONFormatTest {
         assertPersist(worldBuilder);
     }
 
-    @Test
-    public void tempTest() throws Exception {
-        PrefabManager prefabManager = new PojoPrefabManager();
-        Prefab prefab = prefabManager.createPrefab("Chest");
-        prefab.setComponent(new InventoryComponent(16));
-        //prefab.setComponent(new PlaySoundActionComponent(AudioManager.sound("click")));
-        prefab.setComponent(new AccessInventoryActionComponent());
-
-        EntityPersisterImpl persister = new EntityPersisterImpl();
-        persister.registerComponentClass(InventoryComponent.class);
-        persister.registerComponentClass(AccessInventoryActionComponent.class);
-        EntityData.Prefab prefabData = persister.serializePrefab(prefab);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(bos));
-        EntityDataJSONFormat.write(prefabData, writer);
-        writer.flush();
-        String result = new String(bos.toByteArray());
-        System.out.println(result);
-    }
-
     private void assertPersist(EntityData.World.Builder worldBuilder) throws IOException{
         EntityData.World world = worldBuilder.build();
         EntityData.World newWorld = persistAndRetrieve(world);

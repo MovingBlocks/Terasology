@@ -1,10 +1,9 @@
 package org.terasology.entitySystem;
 
-import org.terasology.entitySystem.pojo.persistence.PersistenceUtil;
+import org.terasology.entitySystem.persistence.PersistenceUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

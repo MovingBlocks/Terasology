@@ -28,7 +28,8 @@ public class PojoEntityManagerTest {
     
     @Before
     public void setup() {
-        entityManager = new PojoEntityManager();
+        ComponentLibrary componentLibrary = new ComponentLibraryImpl();
+        entityManager = new PojoEntityManager(componentLibrary);
     }
     
     @Test
