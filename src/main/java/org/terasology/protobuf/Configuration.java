@@ -2091,7 +2091,7 @@ public final class Configuration {
     public interface PlayerOrBuilder
         extends com.google.protobuf.MessageOrBuilder {
       
-      // optional float fov = 1 [default = 80];
+      // optional float fov = 1 [default = 100];
       boolean hasFov();
       float getFov();
       
@@ -2140,7 +2140,7 @@ public final class Configuration {
       }
       
       private int bitField0_;
-      // optional float fov = 1 [default = 80];
+      // optional float fov = 1 [default = 100];
       public static final int FOV_FIELD_NUMBER = 1;
       private float fov_;
       public boolean hasFov() {
@@ -2191,7 +2191,7 @@ public final class Configuration {
       }
       
       private void initFields() {
-        fov_ = 80F;
+        fov_ = 100F;
         mouseSens_ = 0.075F;
         cameraBobbing_ = true;
         renderFirstPersonView_ = true;
@@ -2377,7 +2377,7 @@ public final class Configuration {
         
         public Builder clear() {
           super.clear();
-          fov_ = 80F;
+          fov_ = 100F;
           bitField0_ = (bitField0_ & ~0x00000001);
           mouseSens_ = 0.075F;
           bitField0_ = (bitField0_ & ~0x00000002);
@@ -2538,8 +2538,8 @@ public final class Configuration {
         
         private int bitField0_;
         
-        // optional float fov = 1 [default = 80];
-        private float fov_ = 80F;
+        // optional float fov = 1 [default = 100];
+        private float fov_ = 100F;
         public boolean hasFov() {
           return ((bitField0_ & 0x00000001) == 0x00000001);
         }
@@ -2554,7 +2554,7 @@ public final class Configuration {
         }
         public Builder clearFov() {
           bitField0_ = (bitField0_ & ~0x00000001);
-          fov_ = 80F;
+          fov_ = 100F;
           onChanged();
           return this;
         }
@@ -5888,7 +5888,7 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\211\016\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\212\016\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
@@ -5909,32 +5909,32 @@ public final class Configuration {
       "\022*\n\033render_chunk_bounding_boxes\030\003 \001(\010:\005f" +
       "alse\022\032\n\013demo_flight\030\004 \001(\010:\005false\022\037\n\021demo",
       "_flight_speed\030\005 \001(\002:\0040.08\022\027\n\010god_mode\030\006 " +
-      "\001(\010:\005false\032\225\001\n\006Player\022\017\n\003fov\030\001 \001(\002:\00280\022\031" +
-      "\n\nmouse_sens\030\002 \001(\002:\0050.075\022\034\n\016camera_bobb" +
-      "ing\030\003 \001(\010:\004true\022&\n\030render_first_person_v" +
-      "iew\030\004 \001(\010:\004true\022\031\n\013placing_box\030\005 \001(\010:\004tr" +
-      "ue\032\270\006\n\006System\022\032\n\rmax_particles\030\001 \001(\005:\00325" +
-      "6\022;\n\020cloud_resolution\030\002 \001(\0132!.protobuf.S" +
-      "etting.System.CloudRes\022#\n\025cloud_update_i" +
-      "nterval\030\003 \001(\005:\0048000\022\026\n\013max_threads\030\004 \001(\005" +
-      ":\0012\022\031\n\013save_chunks\030\005 \001(\010:\004true\022\036\n\020chunk_",
-      "cache_size\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBOs" +
-      "\030\007 \001(\005:\003512\022\022\n\005gamma\030\010 \001(\002:\0032.2\022\030\n\014pixel" +
-      "_format\030\t \001(\005:\00224\022:\n\014display_mode\030\n \001(\0132" +
-      "$.protobuf.Setting.System.DisplayMode\022\031\n" +
-      "\nfullscreen\030\013 \001(\010:\005false\022%\n\032active_viewi" +
-      "ng_distance_id\030\014 \001(\005:\0010\022 \n\025viewing_dista" +
-      "nce_near\030\r \001(\005:\0018\022%\n\031viewing_distance_mo" +
-      "derate\030\016 \001(\005:\00216\022 \n\024viewing_distance_far" +
-      "\030\017 \001(\005:\00226\022\"\n\026viewing_distance_ultra\030\020 \001" +
-      "(\005:\00232\022\037\n\020flickering_light\030\021 \001(\010:\005false\022",
-      "-\n\036enable_post_processing_effects\030\022 \001(\010:" +
-      "\005false\022\'\n\030animated_water_and_grass\030\023 \001(\010" +
-      ":\005false\022\'\n\034vertical_chunk_mesh_segments\030" +
-      "\024 \001(\005:\0011\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003128\022\016\n\001" +
-      "y\030\002 \001(\002:\003128\0327\n\013DisplayMode\022\023\n\005width\030\001 \001" +
-      "(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.ter" +
-      "asology.protobufB\rConfigurationH\001"
+      "\001(\010:\005false\032\226\001\n\006Player\022\020\n\003fov\030\001 \001(\002:\003100\022" +
+      "\031\n\nmouse_sens\030\002 \001(\002:\0050.075\022\034\n\016camera_bob" +
+      "bing\030\003 \001(\010:\004true\022&\n\030render_first_person_" +
+      "view\030\004 \001(\010:\004true\022\031\n\013placing_box\030\005 \001(\010:\004t" +
+      "rue\032\270\006\n\006System\022\032\n\rmax_particles\030\001 \001(\005:\0032" +
+      "56\022;\n\020cloud_resolution\030\002 \001(\0132!.protobuf." +
+      "Setting.System.CloudRes\022#\n\025cloud_update_" +
+      "interval\030\003 \001(\005:\0048000\022\026\n\013max_threads\030\004 \001(" +
+      "\005:\0012\022\031\n\013save_chunks\030\005 \001(\010:\004true\022\036\n\020chunk",
+      "_cache_size\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBO" +
+      "s\030\007 \001(\005:\003512\022\022\n\005gamma\030\010 \001(\002:\0032.2\022\030\n\014pixe" +
+      "l_format\030\t \001(\005:\00224\022:\n\014display_mode\030\n \001(\013" +
+      "2$.protobuf.Setting.System.DisplayMode\022\031" +
+      "\n\nfullscreen\030\013 \001(\010:\005false\022%\n\032active_view" +
+      "ing_distance_id\030\014 \001(\005:\0010\022 \n\025viewing_dist" +
+      "ance_near\030\r \001(\005:\0018\022%\n\031viewing_distance_m" +
+      "oderate\030\016 \001(\005:\00216\022 \n\024viewing_distance_fa" +
+      "r\030\017 \001(\005:\00226\022\"\n\026viewing_distance_ultra\030\020 " +
+      "\001(\005:\00232\022\037\n\020flickering_light\030\021 \001(\010:\005false",
+      "\022-\n\036enable_post_processing_effects\030\022 \001(\010" +
+      ":\005false\022\'\n\030animated_water_and_grass\030\023 \001(" +
+      "\010:\005false\022\'\n\034vertical_chunk_mesh_segments" +
+      "\030\024 \001(\005:\0011\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003128\022\016\n" +
+      "\001y\030\002 \001(\002:\003128\0327\n\013DisplayMode\022\023\n\005width\030\001 " +
+      "\001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.te" +
+      "rasology.protobufB\rConfigurationH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

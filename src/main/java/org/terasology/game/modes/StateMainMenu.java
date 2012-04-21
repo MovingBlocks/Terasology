@@ -157,6 +157,24 @@ public class StateMainMenu implements IGameState {
                     button.getLabel().setText("Field of View: 90");
                     Config.getInstance().setFov(90);
                 } else if (button.getLabel().getText().equals("Field of View: 90")) {
+                    button.getLabel().setText("Field of View: 95");
+                    Config.getInstance().setFov(95);
+                } else if (button.getLabel().getText().equals("Field of View: 95")) {
+                    button.getLabel().setText("Field of View: 100");
+                    Config.getInstance().setFov(100);
+                } else if (button.getLabel().getText().equals("Field of View: 100")) {
+                    button.getLabel().setText("Field of View: 105");
+                    Config.getInstance().setFov(105);
+                } else if (button.getLabel().getText().equals("Field of View: 105")) {
+                    button.getLabel().setText("Field of View: 110");
+                    Config.getInstance().setFov(110);
+                } else if (button.getLabel().getText().equals("Field of View: 110")) {
+                    button.getLabel().setText("Field of View: 115");
+                    Config.getInstance().setFov(115);
+                } else if (button.getLabel().getText().equals("Field of View: 115")) {
+                    button.getLabel().setText("Field of View: 120");
+                    Config.getInstance().setFov(120);
+                } else if (button.getLabel().getText().equals("Field of View: 120")) {
                     button.getLabel().setText("Field of View: 75");
                     Config.getInstance().setFov(75);
                 }

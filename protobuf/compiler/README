@@ -1,2 +1,2 @@
 To update all generated files run this command from the Terasology root folder:
-protobuf/compiler/protoc --proto_path=protobuf/.proto --java_out src protobuf/.proto/*
+protobuf/compiler/protoc --proto_path=src/main/protobuf --java_out src/main/java src/main/protobuf/*

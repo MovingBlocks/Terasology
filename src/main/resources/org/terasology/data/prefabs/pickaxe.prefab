@@ -1,0 +1,11 @@
+{
+    "name" : "pickaxe",
+    "Item" : {
+        "name" : "Pick Axe",
+        "icon" : "PickAxe",
+        "perBlockDamageBonus" : {
+            "Stone" : 1
+        },
+        "renderWithIcon" : true
+    }
+}

@@ -21,27 +21,20 @@ public class GelatinousCubeFactory {
     private EntityManager entityManager;
     
     public EntityRef generateGelatinousCube(Vector3f position) {
-        // TODO: Replace a lot of this with prefab instantiation
-        EntityRef entity = Terasology.getInstance().getCurrentGameState().getEntityManager().create();
+        EntityRef entity = entityManager.create("gelatinousCube");
+        LocationComponent loc = entity.getComponent(LocationComponent.class);
+        if (loc != null) {
+            loc.setWorldPosition(position);
+            loc.setLocalScale(((random.randomFloat() + 1.0f) / 2.0f) * 0.8f + 0.2f);
+            entity.saveComponent(loc);
+        }
 
-        LocationComponent loc = entity.addComponent(new LocationComponent());
-        loc.setLocalPosition(position);
-        loc.setLocalScale((float) (((random.randomDouble() + 1.0) / 2.0) * 0.8 + 0.2));
-
-        MeshComponent mesh = entity.addComponent(new MeshComponent());
-        int colorId = Math.abs(random.randomInt()) % COLORS.length;
-        mesh.color.set(COLORS[colorId].x, COLORS[colorId].y, COLORS[colorId].z, 1.0f);
-
-        CharacterMovementComponent moveComp = entity.addComponent(new CharacterMovementComponent());
-        moveComp.faceMovementDirection = true;
-
-        entity.addComponent(new SimpleAIComponent());
-        AABBCollisionComponent comp = entity.addComponent(new AABBCollisionComponent());
-        comp.getExtents().set(0.5f, 0.5f, 0.5f);
-        
-        CharacterSoundComponent soundComp = entity.addComponent(new CharacterSoundComponent());
-        soundComp.footstepSounds.addAll(Arrays.asList(AudioManager.sounds("Slime1", "Slime2", "Slime3", "Slime4", "Slime5")));
-        soundComp.footstepVolume = 0.7f;
+        MeshComponent mesh = entity.getComponent(MeshComponent.class);
+        if (mesh != null) {
+            int colorId = Math.abs(random.randomInt()) % COLORS.length;
+            mesh.color.set(COLORS[colorId].x, COLORS[colorId].y, COLORS[colorId].z, 1.0f);
+            entity.saveComponent(mesh);
+        }
 
         return entity;
     }

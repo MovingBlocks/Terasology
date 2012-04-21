@@ -1,0 +1,16 @@
+{
+  "name": "gelatinousCube",
+  "Location" : {},
+  "Mesh" : {},
+  "CharacterMovement" : {
+    "faceMovementDirection" : true
+  },
+  "SimpleAIComponent" : {},
+  "AABBCollisionComponent" : {
+    "extents" : [0.5, 0.5, 0.5]
+  },
+  "CharacterSound" : {
+    "footstepSounds" : ["Slime1", "Slime2", "Slime3", "Slime4", "Slime5"],
+    "footstepVolume" : 0.7
+  }
+}

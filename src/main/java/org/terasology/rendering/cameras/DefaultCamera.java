@@ -18,6 +18,7 @@ package org.terasology.rendering.cameras;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+import org.terasology.math.TeraMath;
 
 import javax.vecmath.Vector3d;
 
@@ -37,7 +38,9 @@ public class DefaultCamera extends Camera {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        gluPerspective(fov, (float) Display.getWidth() / Display.getHeight(), 0.1f, 512f);
+        float aspectRatio = (float) Display.getWidth() / Display.getHeight();
+        float fovy = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio)) * TeraMath.RAD_TO_DEG;
+        gluPerspective(fovy, aspectRatio, 0.1f, 512f);
 
         glMatrixMode(GL11.GL_MODELVIEW);
     }

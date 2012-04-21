@@ -1,0 +1,12 @@
+{
+    "name" : "railgunTool",
+    "Item" : {
+        "name" : "Railgun",
+        "icon" : "Railgun",
+        "usage" : "InDirection"
+    },
+    "TunnelAction" : {},
+    "PlaySoundAction" : {
+        "sounds" : ["Explode1", "Explode2", "Explode3", "Explode4", "Explode5"]
+    }
+}

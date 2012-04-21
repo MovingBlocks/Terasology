@@ -9,6 +9,7 @@ import org.terasology.components.actions.AccessInventoryActionComponent;
 import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.protobuf.EntityData;

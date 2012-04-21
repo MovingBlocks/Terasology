@@ -1,0 +1,12 @@
+{
+    "name" : "explodeTool",
+    "Item" : {
+        "name" : "Explode Tool",
+        "icon" : "Dynamite",
+        "usage" : "OnBlock"
+    },
+    "ExplosionAction" : {},
+    "PlaySoundAction" : {
+        "sounds" : ["Explode1", "Explode2", "Explode3", "Explode4", "Explode5"]
+    }
+}

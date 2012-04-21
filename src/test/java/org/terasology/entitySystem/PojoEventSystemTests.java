@@ -3,6 +3,8 @@ package org.terasology.entitySystem;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.stubs.IntegerComponent;
@@ -18,6 +20,7 @@ import static org.junit.Assert.*;
  */
 public class PojoEventSystemTests {
 
+    ComponentLibrary compLibrary;
     PojoEventSystem eventSystem;
     PojoEntityManager entityManager;
     EntityRef entity;
@@ -25,7 +28,8 @@ public class PojoEventSystemTests {
     @Before
     public void setup() {
 
-        entityManager = new PojoEntityManager();
+        compLibrary = new ComponentLibraryImpl();
+        entityManager = new PojoEntityManager(compLibrary);
         eventSystem = new PojoEventSystem(entityManager);
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();

@@ -5,8 +5,14 @@ import com.google.common.collect.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.pojo.persistence.*;
-import org.terasology.entitySystem.pojo.persistence.extension.Vector3fTypeHandler;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
+import org.terasology.entitySystem.persistence.EntityPersisterHelper;
+import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
+import org.terasology.entitySystem.persistence.PersistenceUtil;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -31,16 +37,16 @@ public class EntitySerializationTest {
 
     @Before
     public void setup() {
-+
-+        componentLibrary = new ComponentLibraryImpl();
-+        componentLibrary.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
-+        componentLibrary.registerComponentClass(IntegerComponent.class);
-+        componentLibrary.registerComponentClass(StringComponent.class);
-+        componentLibrary.registerComponentClass(GetterSetterComponent.class);
-+        entityManager = new PojoEntityManager(componentLibrary);
+
+        componentLibrary = new ComponentLibraryImpl();
+        componentLibrary.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
+        componentLibrary.registerComponentClass(IntegerComponent.class);
+        componentLibrary.registerComponentClass(StringComponent.class);
+        componentLibrary.registerComponentClass(GetterSetterComponent.class);
+        entityManager = new PojoEntityManager(componentLibrary);
         prefabManager = new PojoPrefabManager();
         entityManager.setPrefabManager(prefabManager);
-+        entityPersisterHelper = new EntityPersisterHelperImpl(componentLibrary,entityManager);
+        entityPersisterHelper = new EntityPersisterHelperImpl(componentLibrary,entityManager);
     }
 
     @Test
@@ -49,7 +55,7 @@ public class EntitySerializationTest {
         info.addField(new FieldMetadata(GetterSetterComponent.class.getDeclaredField("value"), GetterSetterComponent.class, new Vector3fTypeHandler()));
 
         GetterSetterComponent comp = new GetterSetterComponent();
-+        GetterSetterComponent newComp = (GetterSetterComponent) entityPersisterHelper.deserializeComponent(entityPersisterHelper.serializeComponent(comp));
+        GetterSetterComponent newComp = (GetterSetterComponent) entityPersisterHelper.deserializeComponent(entityPersisterHelper.serializeComponent(comp));
         assertTrue(comp.getterUsed);
         assertTrue(newComp.setterUsed);
     }
@@ -61,7 +67,7 @@ public class EntitySerializationTest {
 
         EntityRef entity = entityManager.create(prefab);
 
-+        EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
+        EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
 
         assertEquals(entity.getId(), entityData.getId());
         assertEquals(prefab.getName(), entityData.getParentPrefab());
@@ -187,7 +193,7 @@ public class EntitySerializationTest {
 
     @Test
     public void testComponentTypeIdUsedWhenLookupTableEnabled() throws Exception {
-        entityPersister.setUsingLookupTables(true);
+        entityPersisterHelper.setUsingLookupTables(true);
         EntityRef entity = entityManager.create();
         entity.addComponent(new StringComponent("Test"));
         EntityData.World world = entityPersisterHelper.serializeWorld();
@@ -206,10 +212,10 @@ public class EntitySerializationTest {
 
     @Test
     public void testComponentTypeIdUsedWhenLookupTableEnabledForComponentDeltas() throws Exception {
-        entityPersister.setUsingLookupTables(true);
+        entityPersisterHelper.setUsingLookupTables(true);
         Map<Integer, Class<? extends Component>> componentIdTable = Maps.newHashMap();
         componentIdTable.put(413, StringComponent.class);
-        entityPersister.setComponentTypeIdTable(componentIdTable);
+        entityPersisterHelper.setComponentTypeIdTable(componentIdTable);
 
         Prefab prefab = prefabManager.createPrefab("Test");
         prefab.setComponent(new StringComponent("Value"));
@@ -224,22 +230,22 @@ public class EntitySerializationTest {
 
     @Test
     public void testComponentTypeIdDeserializes() throws Exception {
-        entityPersister.setUsingLookupTables(true);
+        entityPersisterHelper.setUsingLookupTables(true);
         EntityRef entity = entityManager.create();
         entity.addComponent(new StringComponent("Test"));
         EntityData.World world = entityPersisterHelper.serializeWorld();
 
         entityManager.clear();
-        entityPersister.deserializeWorld(world);
+        entityPersisterHelper.deserializeWorld(world);
         assertNotNull(entity.getComponent(StringComponent.class));
     }
 
     @Test
     public void testDeltaComponentTypeIdDeserializes() throws Exception {
-        entityPersister.setUsingLookupTables(true);
+        entityPersisterHelper.setUsingLookupTables(true);
         Map<Integer, Class<? extends Component>> componentIdTable = Maps.newHashMap();
         componentIdTable.put(413, StringComponent.class);
-        entityPersister.setComponentTypeIdTable(componentIdTable);
+        entityPersisterHelper.setComponentTypeIdTable(componentIdTable);
 
         Prefab prefab = prefabManager.createPrefab("Test");
         prefab.setComponent(new StringComponent("Value"));
@@ -247,7 +253,7 @@ public class EntitySerializationTest {
         EntityRef entity = entityManager.create(prefab);
         entity.getComponent(StringComponent.class).value = "New";
 
-        EntityData.Entity entityData = entityPersister.serializeEntity(entity);
+        EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
         entityManager.clear();
         EntityRef result = entityPersisterHelper.deserializeEntity(entityData);
 

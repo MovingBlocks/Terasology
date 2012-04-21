@@ -18,12 +18,10 @@ public class PlayerFactory {
 
     private EntityManager entityManager;
     private BlockItemFactory blockFactory;
-    private ItemFactory itemFactory;
     
     public PlayerFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
         blockFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
-        itemFactory = new ItemFactory(entityManager);
     }
     
     public EntityRef newInstance(Vector3f spawnPosition) {
@@ -52,10 +50,10 @@ public class PlayerFactory {
         InventoryComponent inventory = player.addComponent(new InventoryComponent(36));
         inventory.itemSlots.set(0, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Companion"), 16));
         inventory.itemSlots.set(1, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Torch"), 99));
-        inventory.itemSlots.set(2, itemFactory.createAxe());
-        inventory.itemSlots.set(3, itemFactory.createPickAxe());
-        inventory.itemSlots.set(4, itemFactory.createDynamite());
-        inventory.itemSlots.set(5, itemFactory.createRailgun());
+        inventory.itemSlots.set(2, entityManager.create("axe"));
+        inventory.itemSlots.set(3, entityManager.create("pickaxe"));
+        inventory.itemSlots.set(4, entityManager.create("explodeTool"));
+        inventory.itemSlots.set(5, entityManager.create("railgunTool"));
 
         return player;
     } 
