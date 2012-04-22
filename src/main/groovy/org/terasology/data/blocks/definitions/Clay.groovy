@@ -17,7 +17,10 @@
 package org.terasology.data.blocks.definitions
 
 /**
- * Clay
+ * Clay is not a single mineral, but a number of minerals. When most clays are
+ * wet, they become "plastic" meaning they can be formed and molded into shapes.
+ * When they are "fired" (exposed to very high temperatures), the water is driven
+ * off and they become as hard as stone.
  */
 block {
     version = 1
