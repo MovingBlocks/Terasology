@@ -21,57 +21,76 @@ You can use one of the default launch scripts to start the game. The scripts wil
 Controls
 --------
 
-* [W,A,S,D]               Walking
-* [Space]                 Jump
-* [Shift]                 Hold for running
-* [Left click]            Activate left click action (default = place block)
-* [Right click]           Activate right click action (default = remove block)
-* [Mouse wheel up/down]   Cycle through toolbar slots
-* [1,..,0]                Change the active toolbar slot
-* [I]                     Toggle inventory screen
-* [F]                     Toggle viewing distance (near, moderate, far, ultra)
-* [Tab]                   Toggle developer console
-* [F3]                    Toggle debug mode and information
-* [F4]                    Different debug metrics
-* [2*Space]               God mode
-* [K]                     Don't try this :-)
-* [Escape]                Show/hide the game menu screen
+* [W,A,S,D]               - Movement
+* [E]                     - Activate (Chest, TNT, etc)
+* [Space]                 - Jump
+* [Double Space]          - God mode (fly / no-clip)
+* [Shift]                 - Hold to run
+* [Left click]            - Activate left click action (default = place block)
+* [Right click]           - Activate right click action (default = remove block)
+* [Mouse wheel up/down]   - Cycle through toolbar slots
+* [1,..,0]                - Change the active toolbar slot
+* [I]                     - Toggle inventory screen
+* [F]                     - Toggle viewing distance (near, moderate, far, ultra)
+* [Tab]                   - Toggle developer console
+* [F3]                    - Toggle debug mode and information
+* [F4]                    - Different debug metrics
+* [K]                     - Don't try this :-)
+* [Escape]                - Show/hide the game menu screen
 
-Debug features (only works when debug mode is enabled
+Debug features 
 ------------------------
 
-* [Arrow up/down]         Adjust the current time in small steps
-* [P]                     Activate first-person player camera
-* [O]                     Activate animated spawning point camera
+Only works when the F3 debug mode is enabled (and may come and go)
 
-Examples tools (may move slot or disappear)
+* [Arrow up/down]         - Adjust the current time in small steps
+* [P]                     - Activate first-person player camera
+* [O]                     - Activate animated spawning point camera
+
+Examples tools 
 ------------------------
 
-* Torch - shiny! Place with left click
-* Pickaxe / shovel - faster right-click removal of some blocks
-* Blueprint - left click one block, then another, then somewhere else to "clone" your selection (right-click resets)
-* Explosion tool - big bada boom!
-* Railgun - bigger bada boom, in a straight line!
-* Debug tool - experimental
+May move slot or disappear as development continues
 
-Example console commands
+* Companion Cube          - Poorly hidden easter egg almost guaranteed to never talk with or attempt to stab you
+* Torch                   - Shiny! Place with left click
+* Pickaxe / shovel        - Faster right-click removal of some blocks
+* Blueprint               - Left click one block, then another, then somewhere else to "clone" your selection (right-click resets)
+* Explosion tool          - Big bada boom!
+* Railgun                 - Bigger bada boom, in a straight line!
+* Debug tool              - Experimental
+
+Example console commands 
 ------------------------
 
-* cmd.giveBlock "Water"                 Gives 16 water blocks
-* cmd.giveBlock "Water", 42             Gives 42 water blocks
-* cmd.teleport 42, 42, 42               Warps the player to x = 42, y = 42, z = 42
-* cmd.fullHealth                        Fully restores the player's health
-* cmd.gotoWorld "GhostTown"             Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with a randomized seed value
-* cmd.gotoWorld "GhostTown", "Pie!"     Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with the seed value "Pie!"
+Press Tab to toggle the in-game console (all you'll see is a tiny underscore cursor when active, just start typing!)
+
+* giveBlock "Water"                 - Gives 16 water blocks
+* giveBlock "IronPyrites", 42       - Gives 42 Iron Pyrite (Fool's Gold) blocks
+* giveBlock "Chest"                 - Gives you a Chest block you can place, activate ('E'), put stuff in, destroy, pick up, place elsewhere, find same stuff in it!
+* giveBlock "Tnt"                   - Gives you 16 TNT blocks you can place and activate ('E') to blow up
+* teleport 42, 42, 42               - Warps the player to x = 42, y = 42, z = 42
+* fullHealth                        - Fully restores the player's health
+* gotoWorld "GhostTown"             - Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with a randomized seed value
+* gotoWorld "GhostTown", "Pie!"     - Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with the seed value "Pie!"
+
+Options
+------------------------
+
+* Graphics Quality        - Defaults to support somewhat low-end computers, can be bumped up for very snazzy effects (possibly even _too_ shiny!)
+* Viewing Distance        - How many chunks to load around the player for display
+* Field of View           - Special effect related to distance and visual warping (more distant with greater value)
+
+Many more options are available via config file but not yet exposed in the GUI
 
 Building and running source
 ------------------------
 
-1.  Install Gradle from http://gradle.org/
-2.  To import into Eclipse: $ gradle eclipse
-3.  To import into IntelliJ: $ gradle idea
-4.  To run from the command line: $ gradle run
-5.  For more tasks: $ gradle tasks
+*  Download / clone the source from GitHub
+*  To prepare for IntelliJ run: $ gradlew idea
+*  To prepare for Eclipse run: $ gradlew eclipse
+*  To run from the command line: $ gradlew run
+*  For more tasks: $ gradlew tasks
 
 You may also need to tweak IDE settings further for your convenience. See [Dev Setup](http://wiki.movingblocks.net/bin/view/Main/DevSetup) in our wiki for more details.
 
