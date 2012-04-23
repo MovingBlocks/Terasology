@@ -39,8 +39,8 @@ public class PersistableObject {
 
     public void load() {
         if (getObjectFileName() != null && getObjectSavePath() != null) {
-            _file = new File(getObjectSavePath() + "/" + getObjectFileName());
-            _path = new File(getObjectSavePath());
+            _file = new File(getObjectSavePath(), getObjectFileName());
+            _path = getObjectSavePath();
 
             if (_file.exists())
                 readPropertiesFromConfigObject(readPropertiesFromFile());
@@ -77,7 +77,7 @@ public class PersistableObject {
         return new ConfigObject();
     }
 
-    public String getObjectSavePath() {
+    public File getObjectSavePath() {
         return null;
     }
 

@@ -17,6 +17,7 @@ package org.terasology.game;
 
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.PathManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,12 +44,11 @@ public final class Terasology {
 
     public static void main(String[] args) {
         try {
+            PathManager.getInstance().determineRootPath(true);
             initLogger();
             engine.init();
             engine.run(new StateMainMenu());
             engine.dispose();
-            // TODO: Move
-            Config.getInstance().saveConfig("SAVED_WORLDS/last.cfg");
         } catch (Throwable t) {
             Logger.getLogger(Terasology.class.getName()).log(Level.SEVERE, "Uncaught Exception", t);
         }
@@ -56,7 +56,7 @@ public final class Terasology {
     }
 
     private static void initLogger() {
-        File dirPath = new File("logs");
+        File dirPath = PathManager.getInstance().getLogPath();
 
         if (!dirPath.exists()) {
             if (!dirPath.mkdirs()) {
@@ -64,7 +64,7 @@ public final class Terasology {
             }
         }
 
-        addLogFileHandler("logs/Terasology.log", Level.INFO);
+        addLogFileHandler(new File(dirPath, "Terasology.log").getAbsolutePath(), Level.INFO);
     }
 
     private static void addLogFileHandler(String s, Level logLevel) {

@@ -52,7 +52,7 @@ public final class ChunkProvider implements IChunkProvider {
     }
 
     public void initFarChunkCache(){
-        File f = new File(_parent.getObjectSavePath() + "/" + _parent.getTitle());
+        File f = new File(_parent.getObjectSavePath(), _parent.getTitle());
         if (!f.exists()) {
             _farChunkCache = new ChunkCacheGZip();
             return;
@@ -130,7 +130,7 @@ public final class ChunkProvider implements IChunkProvider {
                     c.dispose();
                 }
                 _nearChunkCache.clear();
-                File dirPath = new File(_parent.getObjectSavePath());
+                File dirPath = _parent.getObjectSavePath();
                 if (!dirPath.exists()) {
                     if (!dirPath.mkdirs()) {
                         logger.log(Level.SEVERE, "Could not create save directory.");
@@ -138,7 +138,7 @@ public final class ChunkProvider implements IChunkProvider {
                     }
                 }
 
-                File f = new File(_parent.getObjectSavePath() + '/' + _parent.getTitle());
+                File f = new File(_parent.getObjectSavePath(), _parent.getTitle());
 
                 try {
                     FileOutputStream fileOut = new FileOutputStream(f);

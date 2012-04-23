@@ -242,7 +242,7 @@ public class StateSinglePlayer implements GameState {
 
     public void deactivate() {
         try {
-            CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getWorldSavePath(getActiveWorldProvider().getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
+            CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(getActiveWorldProvider().getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
             _logger.log(Level.SEVERE, "Failed to save entities", e);
         }
@@ -331,7 +331,7 @@ public class StateSinglePlayer implements GameState {
         _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, _worldRenderer);
 
-        File entityDataFile = new File(PathManager.getWorldSavePath(title), ENTITY_DATA_FILE);
+        File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
         _entityManager.clear();
         if (entityDataFile.exists()) {
             try {

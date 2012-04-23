@@ -38,7 +38,7 @@ public class ChunkCacheFileSystem implements IChunkCache {
     }
 
     public void put(Chunk c) {
-        File dirPath = new File(_parent.getObjectSavePath());
+        File dirPath = _parent.getObjectSavePath();
         if (!dirPath.exists()) {
             if (!dirPath.mkdirs()) {
                 logger.log(Level.SEVERE, "Could not create save directory.");
@@ -46,7 +46,7 @@ public class ChunkCacheFileSystem implements IChunkCache {
             }
         }
 
-        File f = new File(_parent.getObjectSavePath() + '/' + c.getChunkFileName());
+        File f = new File(_parent.getObjectSavePath(), c.getChunkFileName());
 
         try {
             FileOutputStream fileOut = new FileOutputStream(f);

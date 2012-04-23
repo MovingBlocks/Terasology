@@ -113,8 +113,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
                 try{
                     ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
-                    String path = PathManager.getWorldSavePath((String) config.get("worldTitle"));
-                    File world = new File(path);
+                    File world = PathManager.getInstance().getWorldSavePath((String) config.get("worldTitle"));
                     WorldUtil.deleteWorld(world);
                     _list.removeSelectedItem();
                 }catch(Exception e){
@@ -188,8 +187,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _list.removeAll();
 
         ConfigObject config = null;
-        String path          = PathManager.getWorldSavePath("");
-        File worldCatalog = new File(path);
+        File worldCatalog = PathManager.getInstance().getWorldPath();
 
         for(File file : worldCatalog.listFiles(new FileFilter() {
             public boolean accept(File file) {

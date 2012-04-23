@@ -112,6 +112,7 @@ dependencies{
 	compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
 	compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.3'
 	compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.8.3'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.1'
 	compile fileTree(dir: 'libs', include: '*.jar')	
 	testCompile group: 'junit', name: 'junit', version: '4.10'
 	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
@@ -122,11 +123,18 @@ dependencies{
 
 }
 
+task copyResources (type : Copy) {
+	from sourceSets.main.output.resourcesDir
+	into sourceSets.main.output.classesDir
+}
+copyResources.doLast {
+	delete sourceSets.main.output.resourcesDir
+}
+
 jar {
 	dependsOn compileGroovy
-	from { 
-		configurations.compile.collect { it.isDirectory() ? it : [] }
-	}
+	dependsOn copyResources
+	from configurations.compile
 	manifest {
 		def manifestClasspath = 'libs/'+configurations.runtime.collect { it.getName() }.join(' libs/') 
 		attributes("Main-Class": "org.terasology.game.Terasology", "Manifest-Version": "1.0", "Class-Path" : manifestClasspath)
@@ -199,9 +207,10 @@ applet.doLast {
 
 task run(type:JavaExec) {
 	description = 'Run Terasology'
-	dependsOn jar
+	dependsOn compileGroovy
+	dependsOn copyResources
 	dependsOn extractNatives
 	main = 'org.terasology.game.Terasology'
-	classpath jar.archivePath
+	classpath sourceSets.main.output.classesDir
 	classpath configurations.runtime
 }

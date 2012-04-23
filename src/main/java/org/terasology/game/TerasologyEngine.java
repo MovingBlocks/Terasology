@@ -17,6 +17,7 @@
 package org.terasology.game;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.SystemUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -28,6 +29,7 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -169,17 +171,34 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initNativeLibs() {
-        if (System.getProperty("os.name").equals("Mac OS X"))
+        if (SystemUtils.IS_OS_MAC) {
             addLibraryPath("natives/macosx");
-        else if (System.getProperty("os.name").equals("Linux"))
+        }
+        else if (SystemUtils.IS_OS_LINUX) {
             addLibraryPath("natives/linux");
-        else {
+            if (System.getProperty("os.arch").contains("64"))
+                System.loadLibrary("libopenal64");
+            else
+                System.loadLibrary("libopenal");
+        }
+        else if (SystemUtils.IS_OS_SOLARIS) {
+            addLibraryPath("natives/solaris");
+            if (System.getProperty("os.arch").contains("64"))
+                System.loadLibrary("libopenal64");
+            else
+                System.loadLibrary("libopenal");
+        }
+        else if (SystemUtils.IS_OS_WINDOWS) {
             addLibraryPath("natives/windows");
 
             if (System.getProperty("os.arch").contains("64"))
                 System.loadLibrary("OpenAL64");
             else
                 System.loadLibrary("OpenAL32");
+        }
+        else {
+            logger.log(Level.SEVERE, "Unsupported operating system: " + SystemUtils.OS_NAME);
+            System.exit(1);
         }
     }
 
@@ -284,6 +303,7 @@ public class TerasologyEngine implements GameEngine {
 
     private void cleanup() {
         logger.log(Level.INFO, "Shutting down Terasology...");
+        Config.getInstance().saveConfig(new File(PathManager.getInstance().getWorldPath(), "last.cfg"));
         doPurgeStates();
         terminateThreads();
     }

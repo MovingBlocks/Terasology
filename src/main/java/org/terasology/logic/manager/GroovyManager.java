@@ -191,7 +191,7 @@ public class GroovyManager {
         }
 
         public void dumpEntities() throws IOException {
-            CoreRegistry.get(WorldPersister.class).save(Helper.fixSavePath(new File("entityDump.txt")), WorldPersister.SaveFormat.JSON);
+            CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getDataPath(), "entityDump.txt"), WorldPersister.SaveFormat.JSON);
         }
         
         public void debugCollision() {

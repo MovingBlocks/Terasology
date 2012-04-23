@@ -33,6 +33,7 @@ import javax.imageio.ImageIO
 import javax.vecmath.Vector2f
 
 import org.terasology.model.blocks.*
+import org.terasology.logic.manager.PathManager
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -67,27 +68,17 @@ class BlockManifestor {
     protected static byte _nextByte = (byte) 1
 
     /** Temp Manifest references - need to tie these to each saved world instead (or fail to find any, then create) */
-    File _blockManifest = new File('SAVED_WORLDS/BlockManifest.groovy')
-    File _imageManifest = new File('SAVED_WORLDS/ImageManifest.png')
-    File _imageManifestMipMap1 = new File('SAVED_WORLDS/ImageManifest1.png')
-    File _imageManifestMipMap2 = new File('SAVED_WORLDS/ImageManifest2.png')
-    File _imageManifestMipMap3 = new File('SAVED_WORLDS/ImageManifest3.png')
+    File _blockManifest = new File(PathManager.getInstance().getWorldPath(), 'BlockManifest.groovy')
+    File _imageManifest = new File(PathManager.getInstance().getWorldPath(), 'ImageManifest.png')
+    File _imageManifestMipMap1 = new File(PathManager.getInstance().getWorldPath(), 'ImageManifest1.png')
+    File _imageManifestMipMap2 = new File(PathManager.getInstance().getWorldPath(), 'ImageManifest2.png')
+    File _imageManifestMipMap3 = new File(PathManager.getInstance().getWorldPath(), 'ImageManifest3.png')
 
     // Empty default constructor for child classes
     public BlockManifestor() {}
 
     public BlockManifestor(BlockManager bm) {
         _bm = bm
-        fixSavePaths()
-    }
-
-    // Temp helper methods until we can correctly use WorldProvider.getWorldSavePath - tries to detect and fix screwy applet paths
-    protected fixSavePaths() {
-        _blockManifest = Helper.fixSavePath(_blockManifest)
-        _imageManifest = Helper.fixSavePath(_imageManifest)
-        _imageManifestMipMap1 = Helper.fixSavePath(_imageManifestMipMap1)
-        _imageManifestMipMap2 = Helper.fixSavePath(_imageManifestMipMap2)
-        _imageManifestMipMap3 = Helper.fixSavePath(_imageManifestMipMap3)
     }
 
     /**

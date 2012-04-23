@@ -35,6 +35,7 @@ import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -518,8 +519,8 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @return path to save stuff at
      */
     @Override
-    public String getObjectSavePath() {
-        return PathManager.getWorldSavePath(_title);
+    public File getObjectSavePath() {
+        return PathManager.getInstance().getWorldSavePath(_title);
     }
 
     @Override

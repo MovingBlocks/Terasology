@@ -17,8 +17,10 @@ package org.terasology.game;
 
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.PathManager;
 
 import java.applet.Applet;
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,8 +47,6 @@ public final class TerasologyApplet extends Applet {
                     engine = new TerasologyEngine();
                     engine.run(new StateMainMenu());
                     engine.dispose();
-                    // TODO: Move
-                    Config.getInstance().saveConfig("SAVED_WORLDS/last.cfg");
                 } catch (Exception e) {
                     Logger.getLogger(TerasologyApplet.class.getName()).log(Level.SEVERE, e.toString(), e);
                 }

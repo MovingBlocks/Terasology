@@ -50,40 +50,42 @@ public final class Config {
     }
 
     private boolean loadLastConfig() {
-        return loadConfig("SAVED_WORLDS/last.cfg");
+        return loadConfig(new File(PathManager.getInstance().getWorldPath(), "last.cfg"));
     }
 
     private void loadDefaultConfig() {
         _setting = Configuration.Setting.newBuilder();
     }
 
-    public boolean loadConfig(String filename) {
-        filename = Helper.fixSavePath(new File(filename)).getAbsolutePath();
-        logger.log(Level.INFO, "Using config file: " + filename);
+    public boolean loadConfig(File file) {
+
+
         Configuration.Setting.Builder setting = Configuration.Setting.newBuilder();
-        try {
-            FileInputStream fis = new FileInputStream(filename);
-            InputStreamReader isr = new InputStreamReader(fis);
-            TextFormat.merge(isr, setting);
-            isr.close();
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not load config file, that's OK if this is the first execution. " + filename);
-            return false;
+        if (file.exists()) {
+            logger.log(Level.INFO, "Using config file: " + file);
+            try {
+                FileInputStream fis = new FileInputStream(file);
+                InputStreamReader isr = new InputStreamReader(fis);
+                TextFormat.merge(isr, setting);
+                isr.close();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Could not load config file " + file, e);
+                return false;
+            }
         }
         _setting = setting;
         return true;
     }
 
-    public void saveConfig(String filename) {
+    public void saveConfig(File file) {
         try {
-            filename = Helper.fixSavePath(new File(filename)).getAbsolutePath();
-            logger.log(Level.INFO, "Using config file: " + filename);
-            FileOutputStream fos = new FileOutputStream(filename);
+            logger.log(Level.INFO, "Using config file: " + file);
+            FileOutputStream fos = new FileOutputStream(file);
             OutputStreamWriter osw = new OutputStreamWriter(fos);
             TextFormat.print(_setting.build(), osw);
             osw.close();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not write " + filename, e);
+            logger.log(Level.WARNING, "Could not write " + file, e);
         }
     }
 
