@@ -17,13 +17,16 @@ package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.GroovyManager;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The debug console of Terasology.
@@ -32,6 +35,7 @@ import java.util.logging.Level;
  */
 public final class UIDebugConsole extends UIDisplayContainer {
 
+    private Logger logger = Logger.getLogger(getClass().getName());
     private final UIText _consoleText;
 
     private final StringBuffer _consoleInput = new StringBuffer();
@@ -116,20 +120,19 @@ public final class UIDebugConsole extends UIDisplayContainer {
         boolean success = false;
 
         try {
-            success = Terasology.getInstance().getGroovyManager().runGroovyShell(_consoleInput.toString());
+            success = CoreRegistry.get(GroovyManager.class).runGroovyShell(_consoleInput.toString());
         } catch (Exception e) {
-            Terasology.getInstance().getLogger().log(Level.INFO, e.getMessage());
+            logger.log(Level.INFO, e.getMessage());
         }
 
         if (success) {
-            Terasology.getInstance().initOpenGLParams();
-            Terasology.getInstance().getLogger().log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
+            logger.log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
 
             addToRingBuffer();
             resetDebugConsole();
             setVisible(false);
         } else {
-            Terasology.getInstance().getLogger().log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
+            logger.log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
         }
     }
 

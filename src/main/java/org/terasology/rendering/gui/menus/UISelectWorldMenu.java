@@ -18,9 +18,14 @@ package org.terasology.rendering.gui.menus;
 import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
 import org.lwjgl.opengl.Display;
+import org.newdawn.slick.Game;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
+import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.world.WorldUtil;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
@@ -31,6 +36,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Select world menu screen.
@@ -39,6 +45,7 @@ import java.util.logging.Level;
  *
  */
 public class UISelectWorldMenu extends UIDisplayWindow {
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     final UIImageOverlay _overlay;
     final UIList _list;
@@ -106,7 +113,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
                 try{
                     ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
-                    String path = Terasology.getInstance().getWorldSavePath((String)config.get("worldTitle"));
+                    String path = PathManager.getWorldSavePath((String) config.get("worldTitle"));
                     File world = new File(path);
                     WorldUtil.deleteWorld(world);
                     _list.removeSelectedItem();
@@ -171,7 +178,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
             Config.getInstance().setDefaultSeed((String)config.get("worldSeed"));
             Config.getInstance().setWorldTitle((String) config.get("worldTitle"));
-            Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
+            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(config.get("worldTitle").toString(), config.get("worldSeed").toString()));
         }catch (Exception e){
             GUIManager.getInstance().showMessage("Loading error", "Failed reading world data object. Sorry.");
         }
@@ -181,7 +188,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _list.removeAll();
 
         ConfigObject config = null;
-        String path          = Terasology.getInstance().getWorldSavePath("");
+        String path          = PathManager.getWorldSavePath("");
         File worldCatalog = new File(path);
 
         for(File file : worldCatalog.listFiles(new FileFilter() {
@@ -202,7 +209,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
                     _list.addItem((String) config.get("worldTitle"), config);
                 }
             } catch (MalformedURLException e) {
-                Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
+                logger.log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
             }
         }
     }

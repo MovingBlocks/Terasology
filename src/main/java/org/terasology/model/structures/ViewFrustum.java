@@ -17,7 +17,9 @@ package org.terasology.model.structures;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3d;
 import java.nio.FloatBuffer;
@@ -131,7 +133,8 @@ public class ViewFrustum {
     public boolean intersects(AABB aabb) {
 
         Vector3d[] aabbVertices = aabb.getVertices();
-        Vector3d cp = Terasology.getInstance().getActiveCamera().getPosition();
+
+        Vector3d cp = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
         for (int i = 0; i < 6; i++) {
             if (_planes[i].getA() * (aabbVertices[0].x - cp.x) + _planes[i].getB() * (aabbVertices[0].y - cp.y) + _planes[i].getC() * (aabbVertices[0].z - cp.z) + _planes[i].getD() > 0)

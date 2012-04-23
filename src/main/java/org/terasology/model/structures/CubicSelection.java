@@ -18,6 +18,7 @@ package org.terasology.model.structures;
 import org.terasology.game.Terasology;
 
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A specialized version of a BlockSelection, specifically a rectangular cuboid made up by exactly two BlockPositions
@@ -27,6 +28,7 @@ import java.util.logging.Level;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class CubicSelection extends BlockSelection {
+    private static Logger logger = Logger.getLogger(CubicSelection.class.getName());
 
     //TODO: Make factory methods instead of public constructors - that way Cubic can be more picky and not allow default ctor
     //TODO: Add more validation to make sure _positions contains exactly 2 BlockPositions
@@ -53,8 +55,8 @@ public class CubicSelection extends BlockSelection {
     public CubicSelection(BlockPosition anchor, int width, int height, int depth) {
         BlockPosition topLeftFront = new BlockPosition(anchor.x - width / 2, anchor.y - height / 2, anchor.z - depth / 2);
         BlockPosition bottomRightBack = new BlockPosition(anchor.x + width, anchor.y + height, anchor.z + depth);
-        Terasology.getInstance().getLogger().log(Level.INFO, "Creating CubicSelection around anchor " + anchor + " with width " + width + ", height " + height + ", depth " + depth);
-        Terasology.getInstance().getLogger().log(Level.INFO, "Calculated topLeftFront is " + topLeftFront + ", bottomRightBack is " + bottomRightBack);
+        logger.log(Level.INFO, "Creating CubicSelection around anchor " + anchor + " with width " + width + ", height " + height + ", depth " + depth);
+        logger.log(Level.INFO, "Calculated topLeftFront is " + topLeftFront + ", bottomRightBack is " + bottomRightBack);
         _positions.add(topLeftFront);
         _positions.add(bottomRightBack);
     }
@@ -86,7 +88,7 @@ public class CubicSelection extends BlockSelection {
                     && targetPos.y >= minY
                     && targetPos.z <= maxZ
                     && targetPos.z >= minZ) {
-                Terasology.getInstance().getLogger().log(Level.INFO, "Selections overlap at " + targetPos + ", maybe more, returning true");
+                logger.log(Level.INFO, "Selections overlap at " + targetPos + ", maybe more, returning true");
                 return true;
             }
         }

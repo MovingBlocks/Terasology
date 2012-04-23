@@ -17,7 +17,11 @@ package org.terasology.rendering.gui.menus;
 
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
+import org.terasology.game.modes.StateMainMenu;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
@@ -59,7 +63,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
 
         _exitButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                Terasology.getInstance().exit();
+                CoreRegistry.get(GameEngine.class).shutdown();
             }
         });
 
@@ -70,7 +74,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _respawnButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
-                EntityRef playerEntity = Terasology.getInstance().getActivePlayer().getEntity();
+                EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
 
                 LocalPlayerComponent localPlayerComponent = playerEntity.getComponent(LocalPlayerComponent.class);
                 if (localPlayerComponent.isDead) {
@@ -106,7 +110,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         _mainMenuButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
                 setVisible(false);
-                Terasology.getInstance().setGameState(Terasology.GAME_STATE.MAIN_MENU);
+                CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
             }
         });
 

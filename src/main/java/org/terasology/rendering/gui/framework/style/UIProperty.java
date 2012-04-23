@@ -5,8 +5,11 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 import javax.vecmath.Vector4f;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class UIProperty extends UIDisplayElement{
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     public void render(){};
     public void update(){};
     public void parse(String property, String value){};
@@ -17,7 +20,7 @@ public abstract class UIProperty extends UIDisplayElement{
             try{
                 return  Float.parseFloat(value);
             }catch(NumberFormatException e){
-                Terasology.getInstance().getLogger().log(Level.WARNING, "Bad float value - " + value);
+                logger.log(Level.WARNING, "Bad float value - " + value);
                 return 0f;
             }
         }else{
@@ -26,7 +29,7 @@ public abstract class UIProperty extends UIDisplayElement{
                 float arg2 = Float.parseFloat(value.split("/")[1]);
                 return arg1/arg2;
             }catch(Exception e){
-                Terasology.getInstance().getLogger().log(Level.WARNING, e.getMessage());
+                logger.log(Level.WARNING, e.getMessage());
                 return 0f;
             }
         }
@@ -39,7 +42,7 @@ public abstract class UIProperty extends UIDisplayElement{
                     (float)Integer.parseInt(checkHex(hexColor).substring(4,6),16)/255f,
                     1.0f);
         }catch (NumberFormatException e){
-            Terasology.getInstance().getLogger().log(Level.WARNING, "Bad Hex color value - " + hexColor);
+            logger.log(Level.WARNING, "Bad Hex color value - " + hexColor);
             return new Vector4f();
         }
     }

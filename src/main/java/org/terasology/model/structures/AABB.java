@@ -16,8 +16,10 @@
 package org.terasology.model.structures;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -289,7 +291,7 @@ public class AABB {
         ShaderManager.getInstance().enableDefault();
 
         glPushMatrix();
-        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+        Vector3d cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
         glTranslated(getPosition().x - cameraPosition.x, -cameraPosition.y, getPosition().z - cameraPosition.z);
 
         renderLocally(lineThickness);

@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.world;
 
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.Vector3i;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides chunks from cache if possible (in memory or hdd).
@@ -36,6 +39,8 @@ public final class ChunkProvider implements IChunkProvider {
     private static final int CACHE_SIZE = Config.getInstance().getChunkCacheSize();
 
     private static boolean _running = false;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     private final ConcurrentHashMap<Integer, Chunk> _nearChunkCache = new ConcurrentHashMap<Integer, Chunk>();
     private IChunkCache _farChunkCache;
@@ -111,7 +116,7 @@ public final class ChunkProvider implements IChunkProvider {
             }
         };
 
-        Terasology.getInstance().submitTask("Flush Chunk Cache", r);
+        CoreRegistry.get(GameEngine.class).submitTask("Flush Chunk Cache", r);
     }
 
     public void dispose() {
@@ -128,7 +133,7 @@ public final class ChunkProvider implements IChunkProvider {
                 File dirPath = new File(_parent.getObjectSavePath());
                 if (!dirPath.exists()) {
                     if (!dirPath.mkdirs()) {
-                        Terasology.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
+                        logger.log(Level.SEVERE, "Could not create save directory.");
                         return;
                     }
                 }
@@ -147,7 +152,7 @@ public final class ChunkProvider implements IChunkProvider {
             }
         };
 
-        Terasology.getInstance().submitTask("Dispose Chunk", r);
+        CoreRegistry.get(GameEngine.class).submitTask("Dispose Chunk", r);
     }
 
     public float size() {

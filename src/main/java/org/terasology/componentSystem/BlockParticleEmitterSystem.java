@@ -113,7 +113,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         ShaderManager.getInstance().enableShader("particle");
         glDisable(GL11.GL_CULL_FACE);
 
-        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+        Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         for (EntityRef entity : entityManager.iteratorEntities(BlockParticleEffectComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);

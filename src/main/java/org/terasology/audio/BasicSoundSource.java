@@ -2,8 +2,11 @@ package org.terasology.audio;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.SoundManager;
+import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3d;
 
@@ -339,7 +342,7 @@ public class BasicSoundSource implements SoundSource {
     }
 
     private Vector3d getCameraPosition() {
-        return Terasology.getInstance().getActiveCamera().getPosition();
+        return CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
     }
 
     @Override

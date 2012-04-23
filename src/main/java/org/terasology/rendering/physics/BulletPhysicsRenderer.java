@@ -37,6 +37,7 @@ import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.Chunk;
@@ -56,6 +57,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Renders blocks using the Bullet physics library.
@@ -74,26 +76,25 @@ public class BulletPhysicsRenderer implements IGameObject {
         public BlockRigidBody(RigidBodyConstructionInfo constructionInfo, byte type) {
             super(constructionInfo);
             _type = type;
-            _createdAt = Terasology.getInstance().getTimeInMs();
+            _createdAt = _timer.getTimeInMs();
         }
 
+        // TODO: This won't work in multiplayer
         public float distanceToPlayer() {
             Transform t = new Transform();
             getMotionState().getWorldTransform(t);
             Matrix4f tMatrix = new Matrix4f();
             t.getMatrix(tMatrix);
 
-            LocalPlayer player = Terasology.getInstance().getActivePlayer();
-
             Vector3f blockPlayer = new Vector3f();
             tMatrix.get(blockPlayer);
-            blockPlayer.sub(new Vector3f(player.getPosition()));
+            blockPlayer.sub(new Vector3f(CoreRegistry.get(LocalPlayer.class).getPosition()));
 
             return blockPlayer.length();
         }
 
         public long calcAgeInMs() {
-            return Terasology.getInstance().getTimeInMs() - _createdAt;
+            return _timer.getTimeInMs() - _createdAt;
         }
 
         public byte getType() {
@@ -120,6 +121,7 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     private static final int MAX_TEMP_BLOCKS = 128;
+    private Logger _logger = Logger.getLogger(getClass().getName());
 
     private final LinkedList<RigidBody> _insertionQueue = new LinkedList<RigidBody>();
     private final ArrayList<BlockRigidBody> _blocks = new ArrayList<BlockRigidBody>();
@@ -138,6 +140,8 @@ public class BulletPhysicsRenderer implements IGameObject {
 
     private final BlockItemFactory _blockItemFactory;
 
+    private Timer _timer;
+    private FastRandom _random = new FastRandom();
     private final WorldRenderer _parent;
 
     public BulletPhysicsRenderer(WorldRenderer parent) {
@@ -149,15 +153,15 @@ public class BulletPhysicsRenderer implements IGameObject {
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -10f, 0f));
         _parent = parent;
         _blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
+        _timer = CoreRegistry.get(Timer.class);
     }
 
     public BlockRigidBody[] addLootableBlocks(Vector3f position, Block block) {
-        FastRandom rand = Terasology.getInstance().getActiveWorldProvider().getRandom();
         BlockRigidBody result[] = new BlockRigidBody[8];
 
         for (int i = 0; i < block.getLootAmount(); i++) {
             // Position the smaller blocks
-            Vector3f offsetPossition = new Vector3f((float) rand.randomDouble() * 0.5f, (float) rand.randomDouble() * 0.5f, (float) rand.randomDouble() * 0.5f);
+            Vector3f offsetPossition = new Vector3f((float) _random.randomDouble() * 0.5f, (float) _random.randomDouble() * 0.5f, (float) _random.randomDouble() * 0.5f);
             offsetPossition.add(position);
 
             result[i] = addBlock(offsetPossition, block.getId(), new Vector3f(0.0f, 4000f, 0.0f), BLOCK_SIZE.QUARTER_SIZE, false);
@@ -231,7 +235,7 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     public void updateChunks() {
-        ArrayList<Chunk> chunks = Terasology.getInstance().getActiveWorldRenderer().getChunksInProximity();
+        ArrayList<Chunk> chunks = CoreRegistry.get(WorldRenderer.class).getChunksInProximity();
         HashSet<RigidBody> newBodies = new HashSet<RigidBody>();
 
         for (int i = 0; i < 32 && i < chunks.size(); i++) {
@@ -268,7 +272,7 @@ public class BulletPhysicsRenderer implements IGameObject {
 
         GL11.glPushMatrix();
 
-        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+        Vector3d cameraPosition = _parent.getActiveCamera().getPosition();
         GL11.glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
         List<CollisionObject> collisionObjects = _discreteDynamicsWorld.getCollisionObjectArray();
@@ -293,7 +297,7 @@ public class BulletPhysicsRenderer implements IGameObject {
                 else if (br.getCollisionShape() == _blockShapeQuarter)
                     GL11.glScalef(0.25f, 0.25f, 0.25f);
 
-                block.renderWithLightValue(Terasology.getInstance().getActiveWorldRenderer().getRenderingLightValueAt(new Vector3d(t.origin)));
+                block.renderWithLightValue(_parent.getRenderingLightValueAt(new Vector3d(t.origin)));
 
                 GL11.glPopMatrix();
             }
@@ -308,7 +312,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         try {
             _discreteDynamicsWorld.stepSimulation(delta, 3);
         } catch (Exception e) {
-            Terasology.getInstance().getLogger().log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again. Go along: " + e.toString());
+            _logger.log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again. Go along: " + e.toString());
         }
 
         updateChunks();
@@ -328,7 +332,7 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     private void checkForLootedBlocks() {
-        LocalPlayer player = Terasology.getInstance().getActivePlayer();
+        LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
 
         for (int i = _blocks.size() - 1; i >= 0; i--) {
             BlockRigidBody b = _blocks.get(i);

@@ -16,9 +16,13 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.TextureManager;
+import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * Shader parameters for the Chunk shader program.
@@ -28,7 +32,9 @@ import org.terasology.model.blocks.management.BlockManager;
 public class ShaderParametersChunk implements IShaderParameters {
 
     public void applyParameters(ShaderProgram program) {
-        Terasology tera = Terasology.getInstance();
+        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        IWorldProvider worldProvider = CoreRegistry.get(IWorldProvider.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         TextureManager.getInstance().bindTexture("custom_lava_still");
@@ -44,17 +50,18 @@ public class ShaderParametersChunk implements IShaderParameters {
         program.setInt("textureEffects", 3);
         program.setInt("textureAtlas", 0);
 
-        if (tera.getActiveWorldRenderer() != null)
-            program.setFloat("daylight", (float) tera.getActiveWorldRenderer().getDaylight());
+        if (worldRenderer != null)
+            program.setFloat("daylight", (float) worldRenderer.getDaylight());
 
-        if (tera.getActivePlayer() != null) {
+        if (localPlayer != null) {
             // TODO: This should be whether the camera is underwater I think?
             //program.setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
-            program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+            // TODO: Should be a camera setting?
+            program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
         }
 
-        if (tera.getActiveWorldProvider() != null) {
-            program.setFloat("time", (float) tera.getActiveWorldProvider().getTime());
+        if (worldProvider != null) {
+            program.setFloat("time", (float) worldProvider.getTime());
         }
 
         program.setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());

@@ -23,6 +23,8 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.opengl.GL11;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
 import org.terasology.logic.generators.ChunkGenerator;
 import org.terasology.logic.manager.Config;
@@ -36,6 +38,7 @@ import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.Helper;
 
@@ -50,6 +53,7 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -62,11 +66,15 @@ import java.util.logging.Level;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Chunk implements Comparable<Chunk>, Externalizable {
+    public static final long serialVersionUID = 79881925217704826L;
+
     /* PUBLIC CONSTANT VALUES */
     public static final int CHUNK_DIMENSION_X = 16;
     public static final int CHUNK_DIMENSION_Y = 256;
     public static final int CHUNK_DIMENSION_Z = 16;
     public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
+
+    private static final Logger logger = Logger.getLogger(Chunk.class.getName());
 
     private static final Vector3d[] LIGHT_DIRECTIONS = {
             new Vector3d(1, 0, 0), new Vector3d(-1, 0, 0),
@@ -75,6 +83,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     };
 
     public static int _statChunkMeshEmpty, _statChunkNotReady, _statRenderedTriangles;
+
     private int _id = 0;
     private final Vector3i _pos = new Vector3i();
 
@@ -396,7 +405,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     public double distanceToCamera() {
         Vector3d result = new Vector3d(_pos.x * CHUNK_DIMENSION_X, _pos.y * CHUNK_DIMENSION_Y, _pos.z * CHUNK_DIMENSION_Z);
 
-        Vector3d cameraPos = Terasology.getInstance().getActiveCamera().getPosition();
+        Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
         result.x -= cameraPos.x;
         result.z -= cameraPos.z;
 
@@ -562,7 +571,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
             GL11.glPushMatrix();
 
-            Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+            Vector3d cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
             GL11.glTranslated(_pos.x * Chunk.CHUNK_DIMENSION_X - cameraPosition.x, _pos.y * Chunk.CHUNK_DIMENSION_Y - cameraPosition.y, _pos.z * Chunk.CHUNK_DIMENSION_Z - cameraPosition.z);
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
@@ -792,7 +801,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         if (_rigidBody != null || meshes == null || meshes.length < VERTICAL_SEGMENTS)
             return;
 
-        Terasology.getInstance().submitTask("Update Chunk Collision", new Runnable() {
+        CoreRegistry.get(GameEngine.class).submitTask("Update Chunk Collision", new Runnable() {
             public void run() {
                 try {
                     _lockRigidBody.lock();
@@ -828,7 +837,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
                             _rigidBody = new RigidBody(blockConsInf);
 
                         } catch (Exception e) {
-                            Terasology.getInstance().getLogger().log(Level.WARNING, "Chunk failed to create rigid body.", e);
+                            logger.log(Level.WARNING, "Chunk failed to create rigid body.", e);
                         }
                     }
                 } finally {

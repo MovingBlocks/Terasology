@@ -8,8 +8,10 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIInventoryNew;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -18,7 +20,7 @@ import javax.vecmath.Vector2f;
  * Displays two inventories, and allows moving items between them
  * @author Immortius <immortius@gmail.com>
  */
-public class UIContainerScreen  extends UIDisplayRenderer implements UIInventoryNew.InventorySubscriber{
+public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNew.InventorySubscriber{
     private static final int CENTER_BORDER = 100;
     private static final int OUTER_BORDER = 50;
     private final InventorySystem inventorySystem;
@@ -31,6 +33,7 @@ public class UIContainerScreen  extends UIDisplayRenderer implements UIInventory
     private final UIGraphicsElement background;
 
     public UIContainerScreen(EntityRef container, EntityRef creature) {
+        maximaze();
         this.container = container;
         this.creature = creature;
         inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
@@ -73,7 +76,7 @@ public class UIContainerScreen  extends UIDisplayRenderer implements UIInventory
 
         super.processKeyboardInput(key);
         if (key == Keyboard.KEY_E) {
-            Terasology.getInstance().getCurrentGameState().closeScreen();
+            GUIManager.getInstance().removeWindow(this);
         }
     }
 

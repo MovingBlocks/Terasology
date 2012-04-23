@@ -18,6 +18,7 @@ package org.terasology.game.modes;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.entitySystem.EntityManager;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
@@ -28,8 +29,6 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.UIConfigMenu;
 import org.terasology.rendering.gui.menus.UIMainMenu;
 import org.terasology.rendering.gui.menus.UISelectWorldMenu;
-
-import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -45,16 +44,17 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
  */
-public class StateMainMenu implements IGameState {
+public class StateMainMenu implements GameState {
     /* SCREENS */
     private UIMainMenu        _mainMenu;
     private UIConfigMenu      _configMenu;
     private UISelectWorldMenu _selectWorldMenu;
 
-    private Terasology _gameInstance = null;
+    private GameEngine _gameInstance = null;
 
-    public void init() {
-        _gameInstance = Terasology.getInstance();
+    @Override
+    public void init(GameEngine gameEngine) {
+        _gameInstance = gameEngine;
 
         setupMainMenu();
         setupSelectWorldMenu();
@@ -85,7 +85,7 @@ public class StateMainMenu implements IGameState {
 
         exitButton.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                Terasology.getInstance().exit();
+                _gameInstance.shutdown();
             }
         });
 
@@ -202,6 +202,7 @@ public class StateMainMenu implements IGameState {
         });
     }
 
+    @Override
     public void activate() {
         Mouse.setGrabbed(false);
         playBackgroundMusic();
@@ -236,10 +237,13 @@ public class StateMainMenu implements IGameState {
         FOVButton.getLabel().setText("Field of View: " + (int) Config.getInstance().getFov());
     }
 
+    @Override
     public void deactivate() {
         stopBackgroundMusic();
+        GUIManager.getInstance().closeWindows();
     }
 
+    @Override
     public void dispose() {
         // Nothing to do here.
     }
@@ -252,10 +256,18 @@ public class StateMainMenu implements IGameState {
         AudioManager.getInstance().stopAllSounds();
     }
 
+    @Override
+    public void handleInput(float delta) {
+        processKeyboardInput();
+        processMouseInput();
+    }
+
+    @Override
     public void update(float delta) {
         updateUserInterface();
     }
 
+    @Override
     public void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
@@ -271,26 +283,16 @@ public class StateMainMenu implements IGameState {
         GUIManager.getInstance().update();
     }
 
-    public EntityManager getEntityManager() {
-        return null;
-    }
-
-    public void openScreen(UIDisplayElement screen) {
-    }
-
-    public void closeScreen() {
-    }
-
     /**
      * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
-    public void processKeyboardInput() {
+    private void processKeyboardInput() {
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
 
             if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                 if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                    _gameInstance.exit();
+                    _gameInstance.shutdown();
                     return;
                 }
             }
@@ -301,7 +303,7 @@ public class StateMainMenu implements IGameState {
     /*
     * Process mouse input - nothing system-y, so just passing it to the Player class
     */
-    public void processMouseInput() {
+    private void processMouseInput() {
         while (Mouse.next()) {
             int button = Mouse.getEventButton();
             int wheelMoved = Mouse.getEventDWheel();

@@ -1,7 +1,7 @@
 package org.terasology.world;
 
 import org.lwjgl.Sys;
-import org.terasology.game.Terasology;
+import org.terasology.game.TerasologyEngine;
 import org.terasology.logic.world.*;
 
 import javax.vecmath.Vector3d;
@@ -12,9 +12,10 @@ public class ChunkCachePerformanceTest extends junit.framework.TestCase{
     private final Chunk[] chunks = new Chunk[SIZE];
     private long timerTicksPerSecond;
     LocalWorldProvider lwp;
+    TerasologyEngine engine = new TerasologyEngine();
 
     void init(){
-        Terasology.getInstance().init();
+        engine.init();
         timerTicksPerSecond = Sys.getTimerResolution();
         lwp = new LocalWorldProvider("test", "Blockmaina42");
         for(int k = 0; k < SIZE; ++k){
@@ -22,7 +23,7 @@ public class ChunkCachePerformanceTest extends junit.framework.TestCase{
         }
     }
     void shutdown(){
-        Terasology.getInstance().shutdown();
+        engine.dispose();
     }
 
     public void testChunkCash() {

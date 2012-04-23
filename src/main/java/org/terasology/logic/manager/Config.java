@@ -18,20 +18,24 @@ package org.terasology.logic.manager;
 import com.google.protobuf.TextFormat;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.protobuf.Configuration;
+import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Helper;
 
 import javax.vecmath.Vector2f;
 import java.io.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>,
  * @author Kai Kratz <kaikratz@googlemail.com>
  */
 public final class Config {
+    private Logger logger = Logger.getLogger(getClass().getName());
     private final static Config _instance = new Config();
     private Configuration.Setting.Builder _setting;
 
@@ -55,7 +59,7 @@ public final class Config {
 
     public boolean loadConfig(String filename) {
         filename = Helper.fixSavePath(new File(filename)).getAbsolutePath();
-        Terasology.getInstance().getLogger().log(Level.INFO, "Using config file: " + filename);
+        logger.log(Level.INFO, "Using config file: " + filename);
         Configuration.Setting.Builder setting = Configuration.Setting.newBuilder();
         try {
             FileInputStream fis = new FileInputStream(filename);
@@ -63,7 +67,7 @@ public final class Config {
             TextFormat.merge(isr, setting);
             isr.close();
         } catch (Exception e) {
-            Terasology.getInstance().getLogger().log(Level.WARNING, "Could not load config file, that's OK if this is the first execution. " + filename);
+            logger.log(Level.WARNING, "Could not load config file, that's OK if this is the first execution. " + filename);
             return false;
         }
         _setting = setting;
@@ -73,13 +77,13 @@ public final class Config {
     public void saveConfig(String filename) {
         try {
             filename = Helper.fixSavePath(new File(filename)).getAbsolutePath();
-            Terasology.getInstance().getLogger().log(Level.INFO, "Using config file: " + filename);
+            logger.log(Level.INFO, "Using config file: " + filename);
             FileOutputStream fos = new FileOutputStream(filename);
             OutputStreamWriter osw = new OutputStreamWriter(fos);
             TextFormat.print(_setting.build(), osw);
             osw.close();
         } catch (Exception e) {
-            Terasology.getInstance().getLogger().log(Level.WARNING, "Could not write " + filename, e);
+            logger.log(Level.WARNING, "Could not write " + filename, e);
         }
     }
 
@@ -436,9 +440,11 @@ public final class Config {
     public void setViewingDistanceById(int viewingDistance) {
         _setting.getSystemBuilder().setActiveViewingDistanceId(viewingDistance);
 
+        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+
         // Make sure to update the chunks "around" the player
-        if (Terasology.getInstance().getCurrentGameState() instanceof StateSinglePlayer)
-            Terasology.getInstance().getActiveWorldRenderer().updateChunksInProximity(true);
+        if (worldRenderer != null)
+            worldRenderer.updateChunksInProximity(true);
     }
 
     //todo remove this from the config

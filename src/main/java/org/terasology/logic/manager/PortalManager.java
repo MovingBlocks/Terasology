@@ -26,6 +26,7 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.util.HashSet;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages Portals - a core game feature anchoring parts of the world, allowing spawning within a certain radius,
@@ -43,6 +44,7 @@ public class PortalManager {
     private final FastRandom _random = new FastRandom();
     private EntityManager _entityManager;
     private GelatinousCubeFactory factory;
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     public PortalManager(EntityManager entityManager) {
         this._entityManager = entityManager;
@@ -77,7 +79,7 @@ public class PortalManager {
         if (spawn) {
             Vector3f pos = new Vector3f((float)p.getBlockLocation().x, (float)p.getBlockLocation().y - 1, (float)p.getBlockLocation().z);
             factory.generateGelatinousCube(pos);
-            Terasology.getInstance().getLogger().log(Level.INFO, "Spawning local GelatinousCube at " + pos);
+            logger.log(Level.INFO, "Spawning local GelatinousCube at " + pos);
         }
         return spawn;
     }
@@ -98,7 +100,7 @@ public class PortalManager {
             Vector3f pos = new Vector3f(_random.randomFloat(), 0, _random.randomFloat());
             pos.scale(256);
             factory.generateGelatinousCube(pos);
-            Terasology.getInstance().getLogger().log(Level.INFO, "Spawning wild GelatinousCube at " + pos);
+            logger.log(Level.INFO, "Spawning wild GelatinousCube at " + pos);
         }
         return spawn;
     }

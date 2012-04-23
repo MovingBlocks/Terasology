@@ -16,6 +16,7 @@
 package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.model.structures.BlockPosition;
@@ -61,7 +62,7 @@ public class BlockGrid implements IGameObject {
             for (BlockPosition gp : _gridPositions) {
                 GL11.glPushMatrix();
 
-                Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+                Vector3d cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
                 GL11.glTranslated(gp.x - cameraPosition.x, gp.y - cameraPosition.y, gp.z - cameraPosition.z);
 
                 _mesh.render();

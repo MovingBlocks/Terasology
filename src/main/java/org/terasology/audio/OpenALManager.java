@@ -4,10 +4,12 @@ package org.terasology.audio;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.*;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -73,7 +75,7 @@ public class OpenALManager extends AudioManager {
     }
 
     public void update() {
-        LocalPlayer player = Terasology.getInstance().getActivePlayer();
+        LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
 
         if (player != null) {
             Vector3f velocity = player.getVelocity();
@@ -109,7 +111,7 @@ public class OpenALManager extends AudioManager {
 
     @Override
     protected boolean checkDistance(Vector3d soundSource) {
-        Camera camera = Terasology.getInstance().getActiveCamera();
+        Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
 
         if (camera == null) {
             return false;

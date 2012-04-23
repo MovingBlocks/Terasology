@@ -31,6 +31,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Wraps a OpenGL shader program. Provides convenience methods for setting
@@ -47,6 +48,8 @@ public class ShaderProgram {
     private static String _includedFunctionsVertex = "", _includedFunctionsFragment = "";
 
     private IShaderParameters _parameters;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     public ShaderProgram(String title) {
         this(title, null);
@@ -77,14 +80,14 @@ public class ShaderProgram {
     }
 
     public void recompile() {
-        Terasology.getInstance().getLogger().log(Level.INFO, "Recompiling shader {0}.", new String[]{_title});
+        logger.log(Level.INFO, "Recompiling shader {0}.", new String[]{_title});
 
         dispose();
         compileShaderProgram();
     }
 
     public void dispose() {
-        Terasology.getInstance().getLogger().log(Level.INFO, "Disposing shader {0}.", new String[]{_title});
+        logger.log(Level.INFO, "Disposing shader {0}.", new String[]{_title});
 
         GL20.glDeleteShader(_shaderProgram);
         _shaderProgram = 0;
@@ -114,7 +117,7 @@ public class ShaderProgram {
             filename += "_vert.glsl";
         }
 
-        Terasology.getInstance().getLogger().log(Level.INFO, "Loading shader {0} ({1}, type = {2})", new String[]{_title, filename, String.valueOf(type)});
+        logger.log(Level.INFO, "Loading shader {0} ({1}, type = {2})", new String[]{_title, filename, String.valueOf(type)});
 
         // Read in the shader code
         code += readShader(filename);
@@ -139,7 +142,7 @@ public class ShaderProgram {
                 code += line + "\n";
             }
         } catch (Exception e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to read shader.");
+            logger.log(Level.SEVERE, "Failed to read shader.");
         }
 
         return code;
@@ -164,7 +167,7 @@ public class ShaderProgram {
         byte[] infoBytes = new byte[actualLength];
         infoBuffer.get(infoBytes);
 
-        Terasology.getInstance().getLogger().log(Level.INFO, "{0}", new String(infoBytes));
+        logger.log(Level.INFO, "{0}", new String(infoBytes));
     }
 
     private String getCustomPreprocessorPreamble() {

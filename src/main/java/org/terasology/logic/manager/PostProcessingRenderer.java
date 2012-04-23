@@ -17,9 +17,11 @@ package org.terasology.logic.manager;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.world.WorldRenderer;
 
 import java.nio.FloatBuffer;
 import java.util.HashMap;
@@ -206,7 +208,7 @@ public class PostProcessingRenderer {
 
         float maxExposure = MAX_EXPOSURE;
 
-        if (Terasology.getInstance().getActiveWorldRenderer().getSkysphere().getDaylight() == 0.0)
+        if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0)
             maxExposure = MAX_EXPOSURE_NIGHT;
 
         if (_exposure > maxExposure)

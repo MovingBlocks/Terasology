@@ -21,7 +21,10 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Sphere;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
+import org.terasology.game.Timer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.TextureManager;
@@ -61,7 +64,8 @@ public class Skysphere implements IGameObject {
     private static IntBuffer _textureIds;
 
     private final PerlinNoise _noiseGenerator;
-    private long _lastCloudUpdate = Terasology.getInstance().getTimeInMs() - CLOUD_UPDATE_INTERVAL;
+    private Timer _timer = CoreRegistry.get(Timer.class);
+    private long _lastCloudUpdate = _timer.getTimeInMs() - CLOUD_UPDATE_INTERVAL;
     ByteBuffer _cloudByteBuffer = null;
 
     private final WorldRenderer _parent;
@@ -167,10 +171,10 @@ public class Skysphere implements IGameObject {
     }
 
     public void update(float delta) {
-        if (_cloudByteBuffer == null && Terasology.getInstance().getTimeInMs() - _lastCloudUpdate >= CLOUD_UPDATE_INTERVAL) {
-            _lastCloudUpdate = Terasology.getInstance().getTimeInMs();
+        if (_cloudByteBuffer == null && _timer.getTimeInMs() - _lastCloudUpdate >= CLOUD_UPDATE_INTERVAL) {
+            _lastCloudUpdate = _timer.getTimeInMs();
 
-            Terasology.getInstance().submitTask("Generate Clouds", new Runnable() {
+            CoreRegistry.get(GameEngine.class).submitTask("Generate Clouds", new Runnable() {
                 public void run() {
                     generateNewClouds();
                 }

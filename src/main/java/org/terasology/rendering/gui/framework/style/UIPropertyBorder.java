@@ -9,10 +9,13 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.HashMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class UIPropertyBorder extends UIProperty{
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     //Textured borders
     private final HashMap<String, Vector4f>          _colors = new HashMap<String, Vector4f>();
     private final HashMap<String, UIGraphicsElement> _images = new HashMap<String, UIGraphicsElement>();
@@ -63,7 +66,7 @@ public class UIPropertyBorder extends UIProperty{
 
                         setVisible(true);
                     }catch(NumberFormatException e){
-                        Terasology.getInstance().getLogger().log(Level.WARNING, "Bad value for border width: " + values[0]);
+                        logger.log(Level.WARNING, "Bad value for border width: " + values[0]);
                     }
                 }
             }
@@ -82,7 +85,7 @@ public class UIPropertyBorder extends UIProperty{
         String[] subProperty = property.split("-");
         String[] values = value.split(" ");
         if(values.length<6){
-            Terasology.getInstance().getLogger().log(Level.WARNING, "Bad value in border-" + subProperty[1] + "image: " + value);
+            logger.log(Level.WARNING, "Bad value in border-" + subProperty[1] + "image: " + value);
             return;
         }else{
             String borderType  = subProperty[2];
@@ -130,13 +133,13 @@ public class UIPropertyBorder extends UIProperty{
         String[] subProperty = property.split("-");
         String[] values = value.split(" ");
         if(values.length<3){
-            Terasology.getInstance().getLogger().log(Level.WARNING, "Bad value in border-corner-" + subProperty[1] + ": " + value);
+            logger.log(Level.WARNING, "Bad value in border-corner-" + subProperty[1] + ": " + value);
             return;
         }else{
             String cornerType  = subProperty[2];
 
             if(_images.size()<4||_width.size()<4){
-                Terasology.getInstance().getLogger().log(Level.WARNING, "You must initialize all border image first!");
+                logger.log(Level.WARNING, "You must initialize all border image first!");
                 return;
             }
 

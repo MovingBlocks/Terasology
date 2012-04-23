@@ -1,7 +1,10 @@
 package org.terasology.rendering.gui.dialogs;
 
 import org.newdawn.slick.Color;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
+import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.*;
@@ -72,7 +75,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
                 }else{
                     Config.getInstance().setWorldTitle(getWorldName());
                 }
-                Terasology.getInstance().setGameState(Terasology.GAME_STATE.SINGLE_PLAYER);
+                CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed()));
             }
         });
 

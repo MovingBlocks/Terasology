@@ -16,7 +16,9 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.TextureManager;
 
 /**
@@ -27,13 +29,13 @@ import org.terasology.logic.manager.TextureManager;
 public class ShaderParametersParticle implements IShaderParameters {
 
     public void applyParameters(ShaderProgram program) {
-        Terasology tera = Terasology.getInstance();
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         TextureManager.getInstance().bindTexture("terrain");
 
-        if (tera.getActivePlayer() != null)
-            program.setInt("carryingTorch", tera.getActivePlayer().isCarryingTorch() ? 1 : 0);
+        if (localPlayer != null)
+            program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
     }
 
 }

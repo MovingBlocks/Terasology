@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.world;
 
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 
@@ -67,7 +69,7 @@ public final class ChunkUpdateManager {
             }
         };
 
-        Terasology.getInstance().submitTask("Chunk Update", r);
+        CoreRegistry.get(GameEngine.class).submitTask("Chunk Update", r);
     }
 
 }

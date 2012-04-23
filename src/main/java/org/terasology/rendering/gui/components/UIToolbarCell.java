@@ -21,7 +21,9 @@ import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
@@ -64,19 +66,18 @@ public class UIToolbarCell extends UIDisplayElement {
 
     @Override
     public void update() {
-        if (Terasology.getInstance().getActiveWorldRenderer() == null)
-            return;
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
         _selectionRectangle.setVisible(_selected);
         setPosition(new Vector2f((getSize().x - 8f) * _id - 2f, 2f));
 
-        InventoryComponent inventory = Terasology.getInstance().getActivePlayer().getEntity().getComponent(InventoryComponent.class);
+        InventoryComponent inventory = localPlayer.getEntity().getComponent(InventoryComponent.class);
         if (inventory == null)
             return;
         if (inventory.itemSlots.size() > _id) {
-            LocalPlayerComponent localPlayer = Terasology.getInstance().getActivePlayer().getEntity().getComponent(LocalPlayerComponent.class);
-            if (localPlayer != null) {
-                setSelected(localPlayer.selectedTool == _id);
+            LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+            if (localPlayerComp != null) {
+                setSelected(localPlayerComp.selectedTool == _id);
             }
 
             EntityRef itemStack = inventory.itemSlots.get(_id);
@@ -93,12 +94,9 @@ public class UIToolbarCell extends UIDisplayElement {
 
     @Override
     public void render() {
-        if (Terasology.getInstance().getActiveWorldRenderer() == null)
-            return;
-
         _selectionRectangle.renderTransformed();
 
-        InventoryComponent inventory = Terasology.getInstance().getActivePlayer().getEntity().getComponent(InventoryComponent.class);
+        InventoryComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(InventoryComponent.class);
         if (inventory.itemSlots.size() <= _id) 
             return;
         

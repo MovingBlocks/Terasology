@@ -31,9 +31,11 @@ import static org.lwjgl.opengl.GL11.*;
 public class MeshRenderer implements RenderSystem {
     private EntityManager manager;
     private Mesh mesh;
+    private WorldRenderer worldRenderer;
 
     public void initialise() {
         manager = CoreRegistry.get(EntityManager.class);
+        worldRenderer = CoreRegistry.get(WorldRenderer.class);
 
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 0.8f, 0.8f, 0.6f, 0f, 0f, 0f);
@@ -42,10 +44,8 @@ public class MeshRenderer implements RenderSystem {
     }
 
     public void renderTransparent() {
-        WorldRenderer worldRenderer = Terasology.getInstance().getActiveWorldRenderer();
-        if (worldRenderer == null) return;
 
-        Vector3d cameraPosition = Terasology.getInstance().getActiveCamera().getPosition();
+        Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
         for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
             // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
             AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
@@ -81,14 +81,11 @@ public class MeshRenderer implements RenderSystem {
     }
 
     public void renderOpaque() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void renderOverlay() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void renderFirstPerson() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

@@ -4,9 +4,11 @@ import org.terasology.game.Terasology;
 
 import java.io.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ChunkCacheFileSystem implements IChunkCache {
     private final LocalWorldProvider _parent;
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     public ChunkCacheFileSystem(LocalWorldProvider parent) {
         _parent = parent;
@@ -39,7 +41,7 @@ public class ChunkCacheFileSystem implements IChunkCache {
         File dirPath = new File(_parent.getObjectSavePath());
         if (!dirPath.exists()) {
             if (!dirPath.mkdirs()) {
-                Terasology.getInstance().getLogger().log(Level.SEVERE, "Could not create save directory.");
+                logger.log(Level.SEVERE, "Could not create save directory.");
                 return;
             }
         }

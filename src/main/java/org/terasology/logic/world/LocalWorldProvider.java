@@ -16,10 +16,13 @@
 package org.terasology.logic.world;
 
 import groovy.util.ConfigObject;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.game.Timer;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.generators.GeneratorManager;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.math.TeraMath;
@@ -35,6 +38,7 @@ import javax.vecmath.Vector3f;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides basic support for generating worlds.
@@ -42,6 +46,8 @@ import java.util.logging.Level;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class LocalWorldProvider extends PersistableObject implements IWorldProvider {
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     /* OBSERVERS */
     private final ArrayList<IBlockObserver> _observers = new ArrayList<IBlockObserver>();
@@ -58,7 +64,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
     /* PROPERTIES */
     protected String _title, _seed;
-    protected long _creationTime = Terasology.getInstance().getTimeInMs() - Config.getInstance().getInitialTimeOffsetInMs();
+    protected long _creationTime = CoreRegistry.get(Timer.class).getTimeInMs() - Config.getInstance().getInitialTimeOffsetInMs();
 
     /* SIMULATORS */
     private final LiquidSimulator _liquidSimulator;
@@ -362,7 +368,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     public Vector3d nextSpawningPoint() {
         ChunkGeneratorTerrain tGen = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0));
 
-        FastRandom nRandom = new FastRandom(Terasology.getInstance().getTimeInMs());
+        FastRandom nRandom = new FastRandom(CoreRegistry.get(Timer.class).getTimeInMs());
 
         for (; ; ) {
             int randX = (int) (nRandom.randomDouble() * 128f);
@@ -381,7 +387,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     }
 
     public void dispose() {
-        Terasology.getInstance().getLogger().log(Level.INFO, "Disposing local world \"{0}\" and saving all chunks.", getTitle());
+        logger.log(Level.INFO, "Disposing local world \"{0}\" and saving all chunks.", getTitle());
         super.dispose();
         getChunkProvider().dispose();
     }
@@ -470,11 +476,11 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
     public void setTime(double time) {
         if (time >= 0.0)
-            _creationTime = Terasology.getInstance().getTimeInMs() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
+            _creationTime = CoreRegistry.get(Timer.class).getTimeInMs() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
     }
 
     public double getTime() {
-        long msSinceCreation = Terasology.getInstance().getTimeInMs() - _creationTime;
+        long msSinceCreation = CoreRegistry.get(Timer.class).getTimeInMs() - _creationTime;
         return (double) msSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
     }
 
@@ -513,7 +519,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      */
     @Override
     public String getObjectSavePath() {
-        return Terasology.getInstance().getWorldSavePath(_title);
+        return PathManager.getWorldSavePath(_title);
     }
 
     @Override

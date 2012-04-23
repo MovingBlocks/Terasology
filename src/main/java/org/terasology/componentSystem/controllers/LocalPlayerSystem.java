@@ -20,8 +20,10 @@ import org.terasology.events.OpenInventoryEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -64,6 +66,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
     private LocalPlayer localPlayer;
+    private Timer timer;
 
     private IWorldProvider worldProvider;
     private DefaultCamera playerCamera;
@@ -87,6 +90,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
+        timer = CoreRegistry.get(Timer.class);
 
         ComponentSystemManager systemManager = CoreRegistry.get(ComponentSystemManager.class);
         blockEntityRegistry = systemManager.get(BlockEntityRegistry.class);
@@ -101,7 +105,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     public void onOpenContainer(OpenInventoryEvent event, EntityRef entity) {
         if (event.getContainer().hasComponent(InventoryComponent.class)) {
             // TODO: better way to open UI screen?
-            Terasology.getInstance().getCurrentGameState().openScreen(new UIContainerScreen(event.getContainer(), entity));
+            GUIManager.getInstance().addWindow(new UIContainerScreen(event.getContainer(), entity), "container");
         }
     }
 
@@ -283,11 +287,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                     jump = true;
 
                     // TODO: handle time better
-                    if (Terasology.getInstance().getTimeInMs() - lastTimeSpacePressed < 200) {
+                    if (timer.getTimeInMs() - lastTimeSpacePressed < 200) {
                         toggleGodMode = true;
                     }
 
-                    lastTimeSpacePressed = Terasology.getInstance().getTimeInMs();
+                    lastTimeSpacePressed = timer.getTimeInMs();
                 }
                 break;
         }
@@ -320,7 +324,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
      */
     private void processInteractions(int button) {
         // Throttle interactions
-        if (Terasology.getInstance().getTimeInMs() - lastInteraction < 200) {
+        if (timer.getTimeInMs() - lastInteraction < 200) {
             return;
         }
 
@@ -351,12 +355,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             } else {
                 attack(entity, selectedItemEntity);
             }
-            lastInteraction = Terasology.getInstance().getTimeInMs();
+            lastInteraction = timer.getTimeInMs();
             localPlayerComp.handAnimation = 0.5f;
             entity.saveComponent(localPlayerComp);
         } else if (Mouse.isButtonDown(1) || button == 1) {
             attack(entity, selectedItemEntity);
-            lastInteraction = Terasology.getInstance().getTimeInMs();
+            lastInteraction = timer.getTimeInMs();
             localPlayerComp.handAnimation = 0.5f;
             entity.saveComponent(localPlayerComp);
         }

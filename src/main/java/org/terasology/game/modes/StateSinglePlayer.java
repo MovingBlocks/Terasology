@@ -56,11 +56,10 @@ import org.terasology.entitySystem.metadata.extension.*;
 import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.AssetManager;
-import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.*;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.BlockFamily;
@@ -95,10 +94,13 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
  */
-public class StateSinglePlayer implements IGameState {
+public class StateSinglePlayer implements GameState {
 
     public static final String ENTITY_DATA_FILE = "entity.dat";
     private Logger _logger = Logger.getLogger(getClass().getName());
+
+    private String currentWorldName;
+    private String currentWorldSeed;
 
     /* GUI */
     private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
@@ -108,8 +110,6 @@ public class StateSinglePlayer implements IGameState {
     private UILoadingScreen _loadingScreen;
     private UIStatusScreen _statusScreen;
     private UIInventoryScreen _inventoryScreen;
-
-    private UIDisplayElement _openDisplay;
 
     /* RENDERING */
     private WorldRenderer _worldRenderer;
@@ -122,25 +122,16 @@ public class StateSinglePlayer implements IGameState {
     /* GAME LOOP */
     private boolean _pauseGame = false;
 
-    public void init() {
-        _hud = new UIHeadsUpDisplay();
-        _hud.setVisible(true);
+    public StateSinglePlayer(String worldName) {
+        this(worldName, null);
+    }
 
-        _pauseMenu = new UIPauseMenu();
-        _loadingScreen = new UILoadingScreen();
-        _statusScreen = new UIStatusScreen();
-        _inventoryScreen = new UIInventoryScreen();
-        _metrics = new UIMetrics();
+    public StateSinglePlayer(String worldName, String seed) {
+        this.currentWorldName = worldName;
+        this.currentWorldSeed = seed;
+    }
 
-        _metrics.setVisible(true);
-
-        _guiScreens.add(_metrics);
-        _guiScreens.add(_hud);
-        _guiScreens.add(_pauseMenu);
-        _guiScreens.add(_loadingScreen);
-        _guiScreens.add(_inventoryScreen);
-        _guiScreens.add(_statusScreen);
-
+    public void init(GameEngine engine) {
         componentLibrary = new ComponentLibraryImpl();
 
         // TODO: Use reflection pending mod support
@@ -207,6 +198,23 @@ public class StateSinglePlayer implements IGameState {
         _componentSystemManager.register(new TunnelAction());
         _componentSystemManager.register(new AccessInventoryAction());
 
+        _hud = new UIHeadsUpDisplay();
+        _hud.setVisible(true);
+
+        _pauseMenu = new UIPauseMenu();
+        _loadingScreen = new UILoadingScreen();
+        _statusScreen = new UIStatusScreen();
+        _inventoryScreen = new UIInventoryScreen();
+        _metrics = new UIMetrics();
+
+        _metrics.setVisible(true);
+
+        _guiScreens.add(_metrics);
+        _guiScreens.add(_hud);
+        _guiScreens.add(_pauseMenu);
+        _guiScreens.add(_loadingScreen);
+        _guiScreens.add(_inventoryScreen);
+        _guiScreens.add(_statusScreen);
     }
 
     private void loadPrefabs() {
@@ -229,18 +237,12 @@ public class StateSinglePlayer implements IGameState {
     }
 
     public void activate() {
-        String worldSeed = Config.getInstance().getDefaultSeed();
-        String worldTitle = Config.getInstance().getWorldTitle();
-        if (worldSeed.isEmpty()) {
-            worldSeed = null;
-        }
-
-        initWorld(worldTitle, worldSeed);
+        initWorld(currentWorldName, currentWorldSeed);
     }
 
     public void deactivate() {
         try {
-            CoreRegistry.get(WorldPersister.class).save(new File(Terasology.getInstance().getWorldSavePath(getActiveWorldProvider().getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
+            CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getWorldSavePath(getActiveWorldProvider().getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
             _logger.log(Level.SEVERE, "Failed to save entities", e);
         }
@@ -248,9 +250,17 @@ public class StateSinglePlayer implements IGameState {
         _entityManager.clear();
     }
 
+    @Override
+    public void handleInput(float delta) {
+        processKeyboardInput();
+        processMouseInput();
+    }
+
     public void dispose() {
-        _worldRenderer.dispose();
-        _worldRenderer = null;
+        if (_worldRenderer != null) {
+            _worldRenderer.dispose();
+            _worldRenderer = null;
+        }
     }
 
     public void update(float delta) {
@@ -315,12 +325,13 @@ public class StateSinglePlayer implements IGameState {
             seed = random.randomCharacterString(16);
         }
 
-        Terasology.getInstance().getLogger().log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+        _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
         _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys);
+        CoreRegistry.put(WorldRenderer.class, _worldRenderer);
 
-        File entityDataFile = new File(Terasology.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
+        File entityDataFile = new File(PathManager.getWorldSavePath(title), ENTITY_DATA_FILE);
         _entityManager.clear();
         if (entityDataFile.exists()) {
             try {
@@ -363,11 +374,7 @@ public class StateSinglePlayer implements IGameState {
                 return true;
             }
         }
-        if (_openDisplay != null && !_openDisplay.isOverlay()) {
-            return true;
-        }
-
-        return false;
+        return GUIManager.getInstance().getFocusedWindow() != null;
     }
 
     private boolean shouldUpdateWorld() {
@@ -416,40 +423,24 @@ public class StateSinglePlayer implements IGameState {
         for (UIDisplayElement screen : _guiScreens) {
             screen.render();
         }
-        if (_openDisplay != null) {
-            _openDisplay.render();
-        }
+        GUIManager.getInstance().render();
     }
 
     private void updateUserInterface() {
         for (UIDisplayElement screen : _guiScreens) {
             screen.update();
         }
-        if (_openDisplay != null) {
-            _openDisplay.update();
-        }
+        GUIManager.getInstance().update();
     }
 
     public WorldRenderer getWorldRenderer() {
         return _worldRenderer;
     }
 
-    public EntityManager getEntityManager() {
-        return _entityManager;
-    }
-
-    public void openScreen(UIDisplayElement screen) {
-        _openDisplay = screen;
-    }
-
-    public void closeScreen() {
-        _openDisplay = null;
-    }
-
     /**
      * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
-    public void processKeyboardInput() {
+    private void processKeyboardInput() {
         boolean debugEnabled = Config.getInstance().isDebug();
 
         boolean screenHasFocus = screenHasFocus();
@@ -459,8 +450,8 @@ public class StateSinglePlayer implements IGameState {
 
             if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
                 if (key == Keyboard.KEY_ESCAPE) {
-                    if (_openDisplay != null) {
-                        closeScreen();
+                    if (GUIManager.getInstance().getFocusedWindow() != null) {
+                        GUIManager.getInstance().removeWindow(GUIManager.getInstance().getFocusedWindow());
                     } else {
                         togglePauseMenu();
                     }
@@ -480,12 +471,12 @@ public class StateSinglePlayer implements IGameState {
                 }
 
                 if (key == Keyboard.KEY_F12) {
-                    Terasology.getInstance().getActiveWorldRenderer().printScreen();
+                    _worldRenderer.printScreen();
                 }
 
                 // Pass input to focused GUI element
-                if (_openDisplay != null && !_openDisplay.isOverlay()) {
-                    _openDisplay.processKeyboardInput(key);
+                if (GUIManager.getInstance().getFocusedWindow() != null) {
+                    GUIManager.getInstance().processKeyboardInput(key);
                 } else {
                     for (UIDisplayElement screen : _guiScreens) {
                         if (screenCanFocus(screen)) {
@@ -537,14 +528,14 @@ public class StateSinglePlayer implements IGameState {
     /*
     * Process mouse input - nothing system-y, so just passing it to the Player class
     */
-    public void processMouseInput() {
+    private void processMouseInput() {
         boolean screenHasFocus = screenHasFocus();
         while (Mouse.next()) {
             int button = Mouse.getEventButton();
             int wheelMoved = Mouse.getEventDWheel();
 
-            if (_openDisplay != null && !_openDisplay.isOverlay()) {
-                _openDisplay.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+            if (GUIManager.getInstance().getFocusedWindow() != null) {
+                GUIManager.getInstance().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
             } else {
                 for (UIDisplayElement screen : _guiScreens) {
                     if (screenCanFocus(screen)) {

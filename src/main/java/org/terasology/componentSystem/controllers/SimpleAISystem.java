@@ -11,6 +11,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.utilities.FastRandom;
 
@@ -24,9 +25,11 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
 
     private EntityManager entityManager;
     private FastRandom random = new FastRandom();
+    private Timer timer;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
+        timer = CoreRegistry.get(Timer.class);
     }
 
     public void update(float delta) {
@@ -52,9 +55,9 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
                     entity.saveComponent(ai);
                 } else {
                     // Random walk
-                    if (Terasology.getInstance().getTimeInMs() - ai.lastChangeOfDirectionAt > 12000 || ai.followingPlayer) {
+                    if (CoreRegistry.get(Timer.class).getTimeInMs() - ai.lastChangeOfDirectionAt > 12000 || ai.followingPlayer) {
                         ai.movementTarget.set(worldPos.x + random.randomFloat() * 500, worldPos.y, worldPos.z + random.randomFloat() * 500);
-                        ai.lastChangeOfDirectionAt = Terasology.getInstance().getTimeInMs();
+                        ai.lastChangeOfDirectionAt = timer.getTimeInMs();
                         ai.followingPlayer = false;
                         entity.saveComponent(ai);
                     }

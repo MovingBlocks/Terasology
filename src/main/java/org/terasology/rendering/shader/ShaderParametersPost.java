@@ -16,7 +16,9 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.TextureManager;
@@ -29,7 +31,6 @@ import org.terasology.logic.manager.TextureManager;
 public class ShaderParametersPost implements IShaderParameters {
 
     public void applyParameters(ShaderProgram program) {
-        Terasology tera = Terasology.getInstance();
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
@@ -51,7 +52,7 @@ public class ShaderParametersPost implements IShaderParameters {
         
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
-        if (tera.getActivePlayer() != null) {
+        if (CoreRegistry.get(LocalPlayer.class).isValid()) {
             // TODO: This should use active camera
             //program.setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
         }

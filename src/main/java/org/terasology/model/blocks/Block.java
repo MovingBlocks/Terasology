@@ -95,7 +95,7 @@ public class Block implements IGameObject {
             _colorLut = ImageIO.read(ResourceLoader.getResource("org/terasology/data/textures/grasscolor.png").openStream());
             _foliageLut = ImageIO.read(ResourceLoader.getResource("org/terasology/data/textures/foliagecolor.png").openStream());
         } catch (IOException e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+            logger.log(Level.SEVERE, e.toString(), e);
         }
     }
 

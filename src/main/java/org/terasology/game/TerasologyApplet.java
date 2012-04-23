@@ -15,10 +15,12 @@
 */
 package org.terasology.game;
 
+import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.manager.Config;
 
 import java.applet.Applet;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -26,32 +28,32 @@ import java.util.logging.Level;
  */
 @SuppressWarnings("serial")
 public final class TerasologyApplet extends Applet {
-    private Terasology _terasology;
-    private Thread _gameThread;
+    private TerasologyEngine engine;
+    private Thread gameThread;
 
     @Override
     public void init() {
-        startGame();
         super.init();
+        startGame();
     }
 
     private void startGame() {
-        _gameThread = new Thread() {
+        gameThread = new Thread() {
             @Override
             public void run() {
                 try {
-                    _terasology = Terasology.getInstance();
-                    _terasology.init();
-                    _terasology.run();
-                    _terasology.shutdown();
+                    engine = new TerasologyEngine();
+                    engine.run(new StateMainMenu());
+                    engine.dispose();
+                    // TODO: Move
                     Config.getInstance().saveConfig("SAVED_WORLDS/last.cfg");
                 } catch (Exception e) {
-                    Terasology.getInstance().getLogger().log(Level.SEVERE, e.toString(), e);
+                    Logger.getLogger(TerasologyApplet.class.getName()).log(Level.SEVERE, e.toString(), e);
                 }
             }
         };
 
-        _gameThread.start();
+        gameThread.start();
     }
 
     @Override
@@ -66,8 +68,13 @@ public final class TerasologyApplet extends Applet {
 
     @Override
     public void destroy() {
-        if (_terasology != null)
-            _terasology.exit();
+        if (engine != null)
+            engine.shutdown();
+        try {
+            gameThread.join();
+        } catch (InterruptedException e) {
+            Logger.getLogger(getClass().getName()).severe("Failed to cleanly shut down engine");
+        }
 
         super.destroy();
     }

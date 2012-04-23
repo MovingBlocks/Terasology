@@ -17,7 +17,11 @@ package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
+import org.terasology.game.Timer;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.components.UICrosshair;
 import org.terasology.rendering.gui.components.UIHealthBar;
@@ -25,6 +29,7 @@ import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UIToolbar;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.primitives.ChunkTessellator;
+import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector2f;
 
@@ -99,10 +104,11 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
 
         if (enableDebug) {
             double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-            _debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f", Terasology.getInstance().getAverageFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
-            _debugLine2.setText(String.format("%s", Terasology.getInstance().getActivePlayer()));
-            _debugLine3.setText(String.format("%s", Terasology.getInstance().getActiveWorldRenderer()));
-            _debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), Terasology.getInstance().activeTasks()));
+            Timer timer = CoreRegistry.get(Timer.class);
+            _debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f", timer.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
+            _debugLine2.setText(String.format("%s", CoreRegistry.get(LocalPlayer.class)));
+            _debugLine3.setText(String.format("%s", CoreRegistry.get(WorldRenderer.class)));
+            _debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
         }
     }
 

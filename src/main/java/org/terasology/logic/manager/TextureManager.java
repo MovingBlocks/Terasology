@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -44,6 +45,7 @@ public class TextureManager {
     }
 
     private static TextureManager _instance;
+    private Logger logger = Logger.getLogger(getClass().getName());
     private final HashMap<String, Texture> _textures = new HashMap<String, Texture>();
 
     public static TextureManager getInstance() {
@@ -54,11 +56,11 @@ public class TextureManager {
     }
 
     public TextureManager() {
-        Terasology.getInstance().getLogger().log(Level.FINE, "Loading textures...");
+        logger.log(Level.FINE, "Loading textures...");
 
         loadDefaultTextures();
 
-        Terasology.getInstance().getLogger().log(Level.FINE, "Finished loading textures!");
+        logger.log(Level.FINE, "Finished loading textures!");
     }
 
     public void loadDefaultTextures() {
@@ -96,7 +98,7 @@ public class TextureManager {
         try {
             addTexture(title, "org/terasology/data/textures/" + title + ".png");
         } catch (IOException ex) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -104,7 +106,7 @@ public class TextureManager {
         try {
             addTexture(title, "org/terasology/data/textures/" + title + ".png", null, addressingMode, interpolationMode);
         } catch (IOException ex) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

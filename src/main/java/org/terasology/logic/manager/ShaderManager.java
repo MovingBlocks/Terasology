@@ -22,6 +22,7 @@ import org.terasology.rendering.shader.*;
 
 import java.util.HashMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides support for loading and applying shaders.
@@ -31,6 +32,8 @@ import java.util.logging.Level;
 public class ShaderManager {
 
     private static ShaderManager _instance = null;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     private final HashMap<String, ShaderProgram> _shaderPrograms = new HashMap<String, ShaderProgram>(16);
 
@@ -47,10 +50,10 @@ public class ShaderManager {
     }
 
     private ShaderManager() {
-        Terasology.getInstance().getLogger().log(Level.INFO, "Loading Terasology shader manager...");
-        Terasology.getInstance().getLogger().log(Level.INFO, "GL_VERSION: {0}", GL11.glGetString(GL11.GL_VERSION));
-        Terasology.getInstance().getLogger().log(Level.INFO, "SHADING_LANGUAGE VERSION: {0}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
-        Terasology.getInstance().getLogger().log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
+        logger.log(Level.INFO, "Loading Terasology shader manager...");
+        logger.log(Level.INFO, "GL_VERSION: {0}", GL11.glGetString(GL11.GL_VERSION));
+        logger.log(Level.INFO, "SHADING_LANGUAGE VERSION: {0}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
+        logger.log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
 
         initShaders();
     }

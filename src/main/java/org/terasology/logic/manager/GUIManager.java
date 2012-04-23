@@ -1,5 +1,6 @@
 package org.terasology.logic.manager;
 
+import com.google.common.collect.Lists;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.components.UIMessageBox;
@@ -9,6 +10,7 @@ import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 import javax.vecmath.Vector2f;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * First version of simple GUI manager.
@@ -61,6 +63,13 @@ public class GUIManager {
         _windowsById.put(windowId, window);
     }
 
+    public void closeWindows() {
+        List<String> windowIds = Lists.newArrayList(_windowsById.keySet());
+        for (String windowId : windowIds) {
+            removeWindow(windowId);
+        }
+    }
+
     public void removeWindow(UIDisplayWindow window){
         _renderer.removeDisplayElement(window);
 
@@ -71,6 +80,15 @@ public class GUIManager {
                     break;
                 }
             }
+        }
+
+        if (_focusedWindow == window) {
+            _focusedWindow = null;
+        }
+        if (_lastFocused == window) {
+            _lastFocused = null;
+        } else {
+            _focusedWindow = _lastFocused;
         }
     }
 
@@ -87,6 +105,15 @@ public class GUIManager {
                 }
             }
         }
+
+        if (_focusedWindow == window) {
+            _focusedWindow = null;
+        }
+        if (_lastFocused == window) {
+            _lastFocused = null;
+        } else {
+            _focusedWindow = _lastFocused;
+        }
     }
 
     public UIDisplayWindow getWindowById(String windowId){
@@ -97,11 +124,16 @@ public class GUIManager {
         }
     }
 
+    public UIDisplayWindow getFocusedWindow() {
+        return _focusedWindow;
+    }
+
     /**
      * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
     public void processKeyboardInput(int key) {
-        for (UIDisplayElement screen : _renderer.getDisplayElements()) {
+        List<UIDisplayElement> screens = Lists.newArrayList(_renderer.getDisplayElements());
+        for (UIDisplayElement screen : screens) {
             if (screen.isVisible() && !screen.isOverlay()) {
                 screen.processKeyboardInput(key);
             }

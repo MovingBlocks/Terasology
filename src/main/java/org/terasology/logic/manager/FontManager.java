@@ -23,6 +23,7 @@ import org.terasology.game.Terasology;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides global access to fonts.
@@ -31,6 +32,7 @@ import java.util.logging.Level;
  */
 public class FontManager {
 
+    private Logger logger = Logger.getLogger(getClass().getName());
     private final HashMap<String, AngelCodeFont> _fonts = new HashMap<String, AngelCodeFont>();
     private static FontManager _instance = null;
 
@@ -50,9 +52,9 @@ public class FontManager {
         try {
             _fonts.put("default", new AngelCodeFont("Font", ResourceLoader.getResource("org/terasology/data/fonts/default.fnt").openStream(), ResourceLoader.getResource("org/terasology/data/fonts/default_0.png").openStream()));
         } catch (SlickException e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, "Couldn't load fonts. Sorry. " + e.toString(), e);
+            logger.log(Level.SEVERE, "Couldn't load fonts. Sorry. " + e.toString(), e);
         } catch (IOException e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, "Couldn't load fonts. Sorry. " + e.toString(), e);
+            logger.log(Level.SEVERE, "Couldn't load fonts. Sorry. " + e.toString(), e);
         }
     }
 

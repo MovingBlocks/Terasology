@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides some basic functionality for primitively persisting objects via Config Slurper.
@@ -32,6 +33,7 @@ import java.util.logging.Level;
  */
 public class PersistableObject {
 
+    private Logger logger = Logger.getLogger(getClass().getName());
     private File _file;
     private File _path;
 
@@ -61,7 +63,7 @@ public class PersistableObject {
             co.writeTo(writer);
             writer.close();
         } catch (IOException e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed writing config object. Sorry.", e);
+            logger.log(Level.SEVERE, "Failed writing config object. Sorry.", e);
         }
     }
 
@@ -69,7 +71,7 @@ public class PersistableObject {
         try {
             return new ConfigSlurper().parse(_file.toURI().toURL());
         } catch (MalformedURLException e) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed reading config object. Sorry.", e);
+            logger.log(Level.SEVERE, "Failed reading config object. Sorry.", e);
         }
 
         return new ConfigObject();

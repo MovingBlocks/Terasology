@@ -15,7 +15,10 @@
  */
 package org.terasology.logic.simulators;
 
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
+import org.terasology.game.Timer;
 import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.structures.BlockPosition;
@@ -36,10 +39,11 @@ public abstract class Simulator implements IBlockObserver {
     private boolean _running = false;
 
     protected final long _updateInterval;
-    protected long _lastUpdate = Terasology.getInstance().getTimeInMs();
+    protected long _lastUpdate;
 
     protected final IWorldProvider _parent;
     protected final Set<BlockPosition> _activeBlocks = new HashSet<BlockPosition>();
+    protected Timer _timer;
 
     protected final ReentrantLock _lock = new ReentrantLock();
 
@@ -47,6 +51,8 @@ public abstract class Simulator implements IBlockObserver {
         _updateInterval = updateInterval;
         _parent = parent;
         _name = name;
+        _timer = CoreRegistry.get(Timer.class);
+        _lastUpdate = _timer.getTimeInMs();
     }
 
     public Simulator(String name, IWorldProvider parent) {
@@ -113,14 +119,14 @@ public abstract class Simulator implements IBlockObserver {
             }
         };
 
-        Terasology.getInstance().submitTask(_name + "Complete", r);
+        CoreRegistry.get(GameEngine.class).submitTask(_name + "Complete", r);
     }
 
     public boolean simulate(boolean force) {
         if (_running)
             return false;
 
-        long currentTime = Terasology.getInstance().getTimeInMs();
+        long currentTime = _timer.getTimeInMs();
 
         if ((currentTime > _lastUpdate + _updateInterval || force)) {
 
@@ -134,7 +140,7 @@ public abstract class Simulator implements IBlockObserver {
                 }
             };
 
-            Terasology.getInstance().submitTask(_name, r);
+            CoreRegistry.get(GameEngine.class).submitTask(_name, r);
 
             _lastUpdate = currentTime;
             return true;

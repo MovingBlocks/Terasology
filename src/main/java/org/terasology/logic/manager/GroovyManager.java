@@ -31,8 +31,9 @@ import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
-import org.terasology.game.modes.IGameState;
+import org.terasology.game.modes.GameState;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.model.blocks.BlockFamily;
@@ -82,7 +83,7 @@ public class GroovyManager {
             // Create an engine tied to the dir we keep plugins in
             gse = new GroovyScriptEngine(PLUGINS_PATH);
         } catch (IOException ioe) {
-            Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to initialize plugin (IOException): " + pluginName + ", reason: " + ioe.toString(), ioe);
+            logger.log(Level.SEVERE, "Failed to initialize plugin (IOException): " + pluginName + ", reason: " + ioe.toString(), ioe);
         }
 
         if (gse != null) {
@@ -91,9 +92,9 @@ public class GroovyManager {
                 // Run the specified plugin
                 gse.run(pluginName, _bind);
             } catch (ResourceException re) {
-                Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to execute plugin (ResourceException): " + pluginName + ", reason: " + re.toString(), re);
+                logger.log(Level.SEVERE, "Failed to execute plugin (ResourceException): " + pluginName + ", reason: " + re.toString(), re);
             } catch (ScriptException se) {
-                Terasology.getInstance().getLogger().log(Level.SEVERE, "Failed to execute plugin (ScriptException): " + pluginName + ", reason: " + se.toString(), se);
+                logger.log(Level.SEVERE, "Failed to execute plugin (ScriptException): " + pluginName + ", reason: " + se.toString(), se);
             }
         }
     }
@@ -110,7 +111,7 @@ public class GroovyManager {
      * @return boolean indicating command success or not
      */
     public boolean runGroovyShell(String consoleString) {
-        Terasology.getInstance().getLogger().log(Level.INFO, "Groovy console about to execute command: " + consoleString);
+        logger.log(Level.INFO, "Groovy console about to execute command: " + consoleString);
         // Lets mess with the consoleString!
         consoleString = consoleString.trim();
         if (!(consoleString.startsWith("cmd.") || consoleString.startsWith("cfg."))) {
@@ -155,11 +156,11 @@ public class GroovyManager {
         private void giveBlock(BlockFamily blockFamily, int quantity) {
             if (quantity < 1) return;
 
-            BlockItemFactory factory = new BlockItemFactory(Terasology.getInstance().getCurrentGameState().getEntityManager(), CoreRegistry.get(PrefabManager.class));
+            BlockItemFactory factory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
             EntityRef item = factory.newInstance(blockFamily, quantity);
 
             InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
-            if (!inventorySystem.addItem(Terasology.getInstance().getActivePlayer().getEntity(), item)) {
+            if (!inventorySystem.addItem(CoreRegistry.get(LocalPlayer.class).getEntity(), item)) {
                 item.destroy();
             }
         }
@@ -172,7 +173,7 @@ public class GroovyManager {
         }
 
         public void teleport(float x, float y, float z) {
-            LocalPlayer player = Terasology.getInstance().getActiveWorldRenderer().getPlayer();
+            LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
             if (player != null) {
                 LocationComponent location = player.getEntity().getComponent(LocationComponent.class);
                 if (location != null) {
@@ -182,21 +183,11 @@ public class GroovyManager {
         }
 
         public void gotoWorld(String title) {
-            IGameState state = Terasology.getInstance().getCurrentGameState();
-
-            if (state instanceof StateSinglePlayer) {
-                StateSinglePlayer spState = (StateSinglePlayer) state;
-                spState.initWorld(title);
-            }
+            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(title));
         }
 
         public void gotoWorld(String title, String seed) {
-            IGameState state = Terasology.getInstance().getCurrentGameState();
-
-            if (state instanceof StateSinglePlayer) {
-                StateSinglePlayer spState = (StateSinglePlayer) state;
-                spState.initWorld(title, seed);
-            }
+            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(title, seed));
         }
 
         public void dumpEntities() throws IOException {
@@ -208,7 +199,7 @@ public class GroovyManager {
         }
 
         public void exit() {
-            Terasology.getInstance().exit();
+            CoreRegistry.get(GameEngine.class).shutdown();
         }
     }
 }

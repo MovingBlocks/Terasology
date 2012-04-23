@@ -24,9 +24,8 @@ import org.terasology.componentSystem.rendering.FirstPersonRenderer;
 import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityManager;
-import org.terasology.game.ComponentSystemManager;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
+import org.terasology.game.*;
+import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.manager.*;
@@ -40,7 +39,6 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.interfaces.IGameObject;
-import org.terasology.rendering.particles.BlockParticleEmitter;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 
@@ -54,6 +52,7 @@ import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -69,7 +68,7 @@ import static org.lwjgl.opengl.GL11.*;
 public final class WorldRenderer implements IGameObject {
     /* WORLD PROVIDER */
     private final IWorldProvider _worldProvider;
-    private FirstPersonRenderer _firstPersonRenderer;
+    private Logger _logger = Logger.getLogger(getClass().getName());
 
     /* PLAYER */
     private LocalPlayer _player;
@@ -99,13 +98,11 @@ public final class WorldRenderer implements IGameObject {
     /* CORE GAME OBJECTS */
     private final PortalManager _portalManager;
 
-    /* PARTICLE EMITTERS */
-    private final BlockParticleEmitter _blockParticleEmitter = new BlockParticleEmitter(this);
-
     /* HORIZON */
     private final Skysphere _skysphere;
 
     /* TICKING */
+    private Timer _timer = CoreRegistry.get(Timer.class);
     private float _tick = 0;
     private int _tickTock = 0;
     private long _lastTick;
@@ -304,7 +301,6 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.endActivity();
 
         _renderQueueTransparent.add(_bulletRenderer);
-        _renderQueueTransparent.add(_blockParticleEmitter);
         _renderQueueTransparent.add(_blockGrid);
 
         Chunk.resetStats();
@@ -485,11 +481,6 @@ public final class WorldRenderer implements IGameObject {
             _activeCamera.update(delta);
         }
 
-        // Update the particle emitters
-        PerformanceMonitor.startActivity("Block Particle Emitter");
-        _blockParticleEmitter.update(delta);
-        PerformanceMonitor.endActivity();
-
         // Free unused space
         PerformanceMonitor.startActivity("Flush World Cache");
         _worldProvider.getChunkProvider().flushCache();
@@ -589,9 +580,9 @@ public final class WorldRenderer implements IGameObject {
         _tick += delta * 1000;
 
         // This block is based on seconds or less frequent timings
-        if (Terasology.getInstance().getTimeInMs() - _lastTick >= 1000) {
+        if (_timer.getTimeInMs() - _lastTick >= 1000) {
             _tickTock++;
-            _lastTick = Terasology.getInstance().getTimeInMs();
+            _lastTick = _timer.getTimeInMs();
 
             // PortalManager ticks for spawning once a second
             _portalManager.tickSpawn();
@@ -667,7 +658,7 @@ public final class WorldRenderer implements IGameObject {
     public void initPortal() {
         if (!_portalManager.hasPortal()) {
             Vector3d loc = new Vector3d(getPlayerPosition().x, getPlayerPosition().y + 4, getPlayerPosition().z);
-            Terasology.getInstance().getLogger().log(Level.INFO, "Portal location is" + loc);
+            _logger.log(Level.INFO, "Portal location is" + loc);
             _worldProvider.setBlock((int) loc.x - 1, (int) loc.y, (int) loc.z, BlockManager.getInstance().getBlock("PortalBlock").getId(), false, true);
             _portalManager.addPortal(loc);
         }
@@ -728,12 +719,12 @@ public final class WorldRenderer implements IGameObject {
                 try {
                     ImageIO.write(image, "png", file);
                 } catch (IOException e) {
-                    Terasology.getInstance().getLogger().log(Level.WARNING, "Could not save image!", e);
+                    _logger.log(Level.WARNING, "Could not save image!", e);
                 }
             }
         };
 
-        Terasology.getInstance().submitTask("Write screenshot", r);
+        CoreRegistry.get(GameEngine.class).submitTask("Write screenshot", r);
     }
 
 
@@ -756,10 +747,6 @@ public final class WorldRenderer implements IGameObject {
 
     public double getDaylight() {
         return _skysphere.getDaylight();
-    }
-
-    public BlockParticleEmitter getBlockParticleEmitter() {
-        return _blockParticleEmitter;
     }
 
     public ChunkGeneratorTerrain.BIOME_TYPE getPlayerBiome() {
