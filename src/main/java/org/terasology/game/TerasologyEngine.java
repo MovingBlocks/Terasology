@@ -179,16 +179,16 @@ public class TerasologyEngine implements GameEngine {
         else if (SystemUtils.IS_OS_LINUX) {
             addLibraryPath("natives/linux");
             if (System.getProperty("os.arch").contains("64"))
-                System.loadLibrary("libopenal64");
+                System.loadLibrary("openal64");
             else
-                System.loadLibrary("libopenal");
+                System.loadLibrary("openal");
         }
         else if (SystemUtils.IS_OS_SOLARIS) {
             addLibraryPath("natives/solaris");
             if (System.getProperty("os.arch").contains("64"))
-                System.loadLibrary("libopenal64");
+                System.loadLibrary("openal64");
             else
-                System.loadLibrary("libopenal");
+                System.loadLibrary("openal");
         }
         else if (SystemUtils.IS_OS_WINDOWS) {
             addLibraryPath("natives/windows");
