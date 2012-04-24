@@ -1,0 +1,4 @@
+{
+    "id" : "TestMod",
+    "displayName" : "Example Mod"
+}

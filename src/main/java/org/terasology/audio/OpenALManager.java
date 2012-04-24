@@ -101,7 +101,10 @@ public class OpenALManager extends AudioManager {
 
     @Override
     protected Sound createAudio(String name, URL source) {
-        return new OggSound(name, source);
+        if (source != null) {
+            return new OggSound(name, source);
+        }
+        return null;
     }
 
     @Override

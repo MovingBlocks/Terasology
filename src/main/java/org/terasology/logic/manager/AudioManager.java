@@ -16,6 +16,8 @@
 package org.terasology.logic.manager;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.audio.OpenALManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.SoundPool;
@@ -64,10 +66,10 @@ public abstract class AudioManager implements SoundManager {
     }
 
     private void loadSoundAssets() {
-        for (String sound : AssetManager.list("sounds")) {
+        for (AssetUri sound : AssetManager.list(AssetType.SOUND)) {
             logger.info("Loading sound " + sound);
             try {
-                String name = sound.substring(sound.lastIndexOf('/') + 1);
+                String name = sound.getAssetName().substring(sound.getAssetName().lastIndexOf('/') + 1);
 
                 if (!name.endsWith(".ogg")) {
                     continue;
@@ -83,10 +85,10 @@ public abstract class AudioManager implements SoundManager {
     }
 
     private void loadMusicAssets() {
-        for (String sound : AssetManager.list("music")) {
+        for (AssetUri sound : AssetManager.list(AssetType.MUSIC)) {
             logger.info("Loading music " + sound);
             try {
-                String name = sound.substring(sound.lastIndexOf('/') + 1);
+                String name = sound.getAssetName().substring(sound.getAssetName().lastIndexOf('/') + 1);
 
                 if (!name.endsWith(".ogg")) {
                     continue;
@@ -101,7 +103,7 @@ public abstract class AudioManager implements SoundManager {
         }
     }
 
-    private URL getSoundAsset(String fileName) throws IOException {
+    private URL getSoundAsset(AssetUri fileName) throws IOException {
         return AssetManager.asset(fileName);
     }
 
@@ -117,7 +119,8 @@ public abstract class AudioManager implements SoundManager {
         if (sound == null) {
             try {
                 logger.info("Loading sound 'sounds/" + name + ".ogg'");
-                sound = this.createAudio(name, getSoundAsset("sounds/" + name + ".ogg"));
+                // TODO: Remove hardcoded engine package name
+                sound = this.createAudio(name, getSoundAsset(new AssetUri(AssetType.SOUND, "engine", name)));
                 _audio.put(name.toLowerCase(), sound);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to load sound " + name + " - " + e.getMessage(), e);
@@ -139,7 +142,8 @@ public abstract class AudioManager implements SoundManager {
         if (sound == null) {
             try {
                 logger.info("Loading sound 'music/" + name + ".ogg'");
-                sound = this.createStreamingAudio(name, getSoundAsset("music/" + name + ".ogg"));
+                // TODO: Remove hardcoded engine package name
+                sound = this.createStreamingAudio(name, getSoundAsset(new AssetUri(AssetType.MUSIC, "engine", name)));
                 _audio.put(name.toLowerCase(), sound);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to load sound " + name + " - " + e.getMessage(), e);
@@ -209,6 +213,17 @@ public abstract class AudioManager implements SoundManager {
      */
     public static Sound sound(String name) {
         return getInstance().getSound(name);
+    }
+
+    /**
+     * Returns sound with specified name
+     * Method will return null if sound is not found
+     *
+     * @param name
+     * @return
+     */
+    public static Sound music(String name) {
+        return getInstance().getMusic(name);
     }
 
     /**
@@ -453,7 +468,7 @@ public abstract class AudioManager implements SoundManager {
 
         pool.stopAll();
 
-        SoundSource source = pool.getSource(AudioManager.sound(name));
+        SoundSource source = pool.getSource(AudioManager.music(name));
 
         if (source == null) { // no free music slots
             return null;

@@ -30,6 +30,11 @@ public final class Configuration {
     boolean hasDebugInfo();
     org.terasology.protobuf.Configuration.Setting.DebugInfo getDebugInfo();
     org.terasology.protobuf.Configuration.Setting.DebugInfoOrBuilder getDebugInfoOrBuilder();
+    
+    // repeated string active_mod = 5;
+    java.util.List<String> getActiveModList();
+    int getActiveModCount();
+    String getActiveMod(int index);
   }
   public static final class Setting extends
       com.google.protobuf.GeneratedMessage
@@ -66,9 +71,9 @@ public final class Configuration {
       boolean hasWorldTitle();
       String getWorldTitle();
       
-      // optional float forrest_grass_density = 2 [default = 0.3];
-      boolean hasForrestGrassDensity();
-      float getForrestGrassDensity();
+      // optional float forest_grass_density = 2 [default = 0.3];
+      boolean hasForestGrassDensity();
+      float getForestGrassDensity();
       
       // optional float plains_grass_density = 3 [default = 0.2];
       boolean hasPlainsGrassDensity();
@@ -559,14 +564,14 @@ public final class Configuration {
         }
       }
       
-      // optional float forrest_grass_density = 2 [default = 0.3];
-      public static final int FORREST_GRASS_DENSITY_FIELD_NUMBER = 2;
-      private float forrestGrassDensity_;
-      public boolean hasForrestGrassDensity() {
+      // optional float forest_grass_density = 2 [default = 0.3];
+      public static final int FOREST_GRASS_DENSITY_FIELD_NUMBER = 2;
+      private float forestGrassDensity_;
+      public boolean hasForestGrassDensity() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
-      public float getForrestGrassDensity() {
-        return forrestGrassDensity_;
+      public float getForestGrassDensity() {
+        return forestGrassDensity_;
       }
       
       // optional float plains_grass_density = 3 [default = 0.2];
@@ -676,7 +681,7 @@ public final class Configuration {
       
       private void initFields() {
         worldTitle_ = "New World";
-        forrestGrassDensity_ = 0.3F;
+        forestGrassDensity_ = 0.3F;
         plainsGrassDensity_ = 0.2F;
         snowGrassDensity_ = 0.001F;
         mountainGrassDensity_ = 0.2F;
@@ -702,7 +707,7 @@ public final class Configuration {
           output.writeBytes(1, getWorldTitleBytes());
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          output.writeFloat(2, forrestGrassDensity_);
+          output.writeFloat(2, forestGrassDensity_);
         }
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
           output.writeFloat(3, plainsGrassDensity_);
@@ -743,7 +748,7 @@ public final class Configuration {
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeFloatSize(2, forrestGrassDensity_);
+            .computeFloatSize(2, forestGrassDensity_);
         }
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
           size += com.google.protobuf.CodedOutputStream
@@ -904,7 +909,7 @@ public final class Configuration {
           super.clear();
           worldTitle_ = "New World";
           bitField0_ = (bitField0_ & ~0x00000001);
-          forrestGrassDensity_ = 0.3F;
+          forestGrassDensity_ = 0.3F;
           bitField0_ = (bitField0_ & ~0x00000002);
           plainsGrassDensity_ = 0.2F;
           bitField0_ = (bitField0_ & ~0x00000004);
@@ -971,7 +976,7 @@ public final class Configuration {
           if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
             to_bitField0_ |= 0x00000002;
           }
-          result.forrestGrassDensity_ = forrestGrassDensity_;
+          result.forestGrassDensity_ = forestGrassDensity_;
           if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
             to_bitField0_ |= 0x00000004;
           }
@@ -1027,8 +1032,8 @@ public final class Configuration {
           if (other.hasWorldTitle()) {
             setWorldTitle(other.getWorldTitle());
           }
-          if (other.hasForrestGrassDensity()) {
-            setForrestGrassDensity(other.getForrestGrassDensity());
+          if (other.hasForestGrassDensity()) {
+            setForestGrassDensity(other.getForestGrassDensity());
           }
           if (other.hasPlainsGrassDensity()) {
             setPlainsGrassDensity(other.getPlainsGrassDensity());
@@ -1092,7 +1097,7 @@ public final class Configuration {
               }
               case 21: {
                 bitField0_ |= 0x00000002;
-                forrestGrassDensity_ = input.readFloat();
+                forestGrassDensity_ = input.readFloat();
                 break;
               }
               case 29: {
@@ -1181,23 +1186,23 @@ public final class Configuration {
           onChanged();
         }
         
-        // optional float forrest_grass_density = 2 [default = 0.3];
-        private float forrestGrassDensity_ = 0.3F;
-        public boolean hasForrestGrassDensity() {
+        // optional float forest_grass_density = 2 [default = 0.3];
+        private float forestGrassDensity_ = 0.3F;
+        public boolean hasForestGrassDensity() {
           return ((bitField0_ & 0x00000002) == 0x00000002);
         }
-        public float getForrestGrassDensity() {
-          return forrestGrassDensity_;
+        public float getForestGrassDensity() {
+          return forestGrassDensity_;
         }
-        public Builder setForrestGrassDensity(float value) {
+        public Builder setForestGrassDensity(float value) {
           bitField0_ |= 0x00000002;
-          forrestGrassDensity_ = value;
+          forestGrassDensity_ = value;
           onChanged();
           return this;
         }
-        public Builder clearForrestGrassDensity() {
+        public Builder clearForestGrassDensity() {
           bitField0_ = (bitField0_ & ~0x00000002);
-          forrestGrassDensity_ = 0.3F;
+          forestGrassDensity_ = 0.3F;
           onChanged();
           return this;
         }
@@ -1488,9 +1493,9 @@ public final class Configuration {
       boolean hasDemoFlightSpeed();
       float getDemoFlightSpeed();
       
-      // optional bool god_mode = 6 [default = false];
-      boolean hasGodMode();
-      boolean getGodMode();
+      // optional bool DEPRECATED_god_mode = 6 [default = false];
+      boolean hasDEPRECATEDGodMode();
+      boolean getDEPRECATEDGodMode();
     }
     public static final class DebugInfo extends
         com.google.protobuf.GeneratedMessage
@@ -1571,14 +1576,14 @@ public final class Configuration {
         return demoFlightSpeed_;
       }
       
-      // optional bool god_mode = 6 [default = false];
-      public static final int GOD_MODE_FIELD_NUMBER = 6;
-      private boolean godMode_;
-      public boolean hasGodMode() {
+      // optional bool DEPRECATED_god_mode = 6 [default = false];
+      public static final int DEPRECATED_GOD_MODE_FIELD_NUMBER = 6;
+      private boolean dEPRECATEDGodMode_;
+      public boolean hasDEPRECATEDGodMode() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
-      public boolean getGodMode() {
-        return godMode_;
+      public boolean getDEPRECATEDGodMode() {
+        return dEPRECATEDGodMode_;
       }
       
       private void initFields() {
@@ -1587,7 +1592,7 @@ public final class Configuration {
         renderChunkBoundingBoxes_ = false;
         demoFlight_ = false;
         demoFlightSpeed_ = 0.08F;
-        godMode_ = false;
+        dEPRECATEDGodMode_ = false;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -1617,7 +1622,7 @@ public final class Configuration {
           output.writeFloat(5, demoFlightSpeed_);
         }
         if (((bitField0_ & 0x00000020) == 0x00000020)) {
-          output.writeBool(6, godMode_);
+          output.writeBool(6, dEPRECATEDGodMode_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -1650,7 +1655,7 @@ public final class Configuration {
         }
         if (((bitField0_ & 0x00000020) == 0x00000020)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(6, godMode_);
+            .computeBoolSize(6, dEPRECATEDGodMode_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -1786,7 +1791,7 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x00000008);
           demoFlightSpeed_ = 0.08F;
           bitField0_ = (bitField0_ & ~0x00000010);
-          godMode_ = false;
+          dEPRECATEDGodMode_ = false;
           bitField0_ = (bitField0_ & ~0x00000020);
           return this;
         }
@@ -1849,7 +1854,7 @@ public final class Configuration {
           if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
             to_bitField0_ |= 0x00000020;
           }
-          result.godMode_ = godMode_;
+          result.dEPRECATEDGodMode_ = dEPRECATEDGodMode_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -1881,8 +1886,8 @@ public final class Configuration {
           if (other.hasDemoFlightSpeed()) {
             setDemoFlightSpeed(other.getDemoFlightSpeed());
           }
-          if (other.hasGodMode()) {
-            setGodMode(other.getGodMode());
+          if (other.hasDEPRECATEDGodMode()) {
+            setDEPRECATEDGodMode(other.getDEPRECATEDGodMode());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -1942,7 +1947,7 @@ public final class Configuration {
               }
               case 48: {
                 bitField0_ |= 0x00000020;
-                godMode_ = input.readBool();
+                dEPRECATEDGodMode_ = input.readBool();
                 break;
               }
             }
@@ -2056,23 +2061,23 @@ public final class Configuration {
           return this;
         }
         
-        // optional bool god_mode = 6 [default = false];
-        private boolean godMode_ ;
-        public boolean hasGodMode() {
+        // optional bool DEPRECATED_god_mode = 6 [default = false];
+        private boolean dEPRECATEDGodMode_ ;
+        public boolean hasDEPRECATEDGodMode() {
           return ((bitField0_ & 0x00000020) == 0x00000020);
         }
-        public boolean getGodMode() {
-          return godMode_;
+        public boolean getDEPRECATEDGodMode() {
+          return dEPRECATEDGodMode_;
         }
-        public Builder setGodMode(boolean value) {
+        public Builder setDEPRECATEDGodMode(boolean value) {
           bitField0_ |= 0x00000020;
-          godMode_ = value;
+          dEPRECATEDGodMode_ = value;
           onChanged();
           return this;
         }
-        public Builder clearGodMode() {
+        public Builder clearDEPRECATEDGodMode() {
           bitField0_ = (bitField0_ & ~0x00000020);
-          godMode_ = false;
+          dEPRECATEDGodMode_ = false;
           onChanged();
           return this;
         }
@@ -5090,11 +5095,26 @@ public final class Configuration {
       return debugInfo_;
     }
     
+    // repeated string active_mod = 5;
+    public static final int ACTIVE_MOD_FIELD_NUMBER = 5;
+    private com.google.protobuf.LazyStringList activeMod_;
+    public java.util.List<String>
+        getActiveModList() {
+      return activeMod_;
+    }
+    public int getActiveModCount() {
+      return activeMod_.size();
+    }
+    public String getActiveMod(int index) {
+      return activeMod_.get(index);
+    }
+    
     private void initFields() {
       world_ = org.terasology.protobuf.Configuration.Setting.World.getDefaultInstance();
       player_ = org.terasology.protobuf.Configuration.Setting.Player.getDefaultInstance();
       system_ = org.terasology.protobuf.Configuration.Setting.System.getDefaultInstance();
       debugInfo_ = org.terasology.protobuf.Configuration.Setting.DebugInfo.getDefaultInstance();
+      activeMod_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -5120,6 +5140,9 @@ public final class Configuration {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeMessage(4, debugInfo_);
       }
+      for (int i = 0; i < activeMod_.size(); i++) {
+        output.writeBytes(5, activeMod_.getByteString(i));
+      }
       getUnknownFields().writeTo(output);
     }
     
@@ -5144,6 +5167,15 @@ public final class Configuration {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, debugInfo_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < activeMod_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(activeMod_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getActiveModList().size();
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -5297,6 +5329,8 @@ public final class Configuration {
           debugInfoBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000008);
+        activeMod_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
       
@@ -5367,6 +5401,12 @@ public final class Configuration {
         } else {
           result.debugInfo_ = debugInfoBuilder_.build();
         }
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          activeMod_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              activeMod_);
+          bitField0_ = (bitField0_ & ~0x00000010);
+        }
+        result.activeMod_ = activeMod_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -5394,6 +5434,16 @@ public final class Configuration {
         }
         if (other.hasDebugInfo()) {
           mergeDebugInfo(other.getDebugInfo());
+        }
+        if (!other.activeMod_.isEmpty()) {
+          if (activeMod_.isEmpty()) {
+            activeMod_ = other.activeMod_;
+            bitField0_ = (bitField0_ & ~0x00000010);
+          } else {
+            ensureActiveModIsMutable();
+            activeMod_.addAll(other.activeMod_);
+          }
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -5460,6 +5510,11 @@ public final class Configuration {
               }
               input.readMessage(subBuilder, extensionRegistry);
               setDebugInfo(subBuilder.buildPartial());
+              break;
+            }
+            case 42: {
+              ensureActiveModIsMutable();
+              activeMod_.add(input.readBytes());
               break;
             }
           }
@@ -5828,6 +5883,62 @@ public final class Configuration {
         return debugInfoBuilder_;
       }
       
+      // repeated string active_mod = 5;
+      private com.google.protobuf.LazyStringList activeMod_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureActiveModIsMutable() {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+          activeMod_ = new com.google.protobuf.LazyStringArrayList(activeMod_);
+          bitField0_ |= 0x00000010;
+         }
+      }
+      public java.util.List<String>
+          getActiveModList() {
+        return java.util.Collections.unmodifiableList(activeMod_);
+      }
+      public int getActiveModCount() {
+        return activeMod_.size();
+      }
+      public String getActiveMod(int index) {
+        return activeMod_.get(index);
+      }
+      public Builder setActiveMod(
+          int index, String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureActiveModIsMutable();
+        activeMod_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addActiveMod(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureActiveModIsMutable();
+        activeMod_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllActiveMod(
+          java.lang.Iterable<String> values) {
+        ensureActiveModIsMutable();
+        super.addAll(values, activeMod_);
+        onChanged();
+        return this;
+      }
+      public Builder clearActiveMod() {
+        activeMod_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
+        return this;
+      }
+      void addActiveMod(com.google.protobuf.ByteString value) {
+        ensureActiveModIsMutable();
+        activeMod_.add(value);
+        onChanged();
+      }
+      
       // @@protoc_insertion_point(builder_scope:protobuf.Setting)
     }
     
@@ -5888,53 +5999,54 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\212\016\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\250\016\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
       "m\022/\n\ndebug_info\030\004 \001(\0132\033.protobuf.Setting" +
-      ".DebugInfo\032\267\003\n\005World\022\036\n\013world_title\030\001 \001(" +
-      "\t:\tNew World\022\"\n\025forrest_grass_density\030\002 " +
-      "\001(\002:\0030.3\022!\n\024plains_grass_density\030\003 \001(\002:\003" +
-      "0.2\022!\n\022snow_grass_density\030\004 \001(\002:\0050.001\022#" +
-      "\n\026mountain_grass_density\030\005 \001(\002:\0030.2\022#\n\024d",
-      "esert_grass_density\030\006 \001(\002:\0050.001\022\'\n\026day_" +
-      "night_length_in_ms\030\007 \001(\022:\0071800000\022(\n\031ini" +
-      "tial_time_offset_in_ms\030\t \001(\022:\00560000\0224\n\014s" +
-      "pawn_origin\030\n \001(\0132\036.protobuf.Setting.Wor" +
-      "ld.Origin\022\"\n\014default_seed\030\013 \001(\t:\014Blockma" +
-      "ina42\032-\n\006Origin\022\021\n\001x\030\001 \001(\002:\006-24429\022\020\n\001y\030" +
-      "\002 \001(\002:\00520547\032\303\001\n\tDebugInfo\022\024\n\005debug\030\001 \001(" +
-      "\010:\005false\022\036\n\017debug_collision\030\002 \001(\010:\005false" +
-      "\022*\n\033render_chunk_bounding_boxes\030\003 \001(\010:\005f" +
-      "alse\022\032\n\013demo_flight\030\004 \001(\010:\005false\022\037\n\021demo",
-      "_flight_speed\030\005 \001(\002:\0040.08\022\027\n\010god_mode\030\006 " +
-      "\001(\010:\005false\032\226\001\n\006Player\022\020\n\003fov\030\001 \001(\002:\003100\022" +
-      "\031\n\nmouse_sens\030\002 \001(\002:\0050.075\022\034\n\016camera_bob" +
-      "bing\030\003 \001(\010:\004true\022&\n\030render_first_person_" +
-      "view\030\004 \001(\010:\004true\022\031\n\013placing_box\030\005 \001(\010:\004t" +
-      "rue\032\270\006\n\006System\022\032\n\rmax_particles\030\001 \001(\005:\0032" +
-      "56\022;\n\020cloud_resolution\030\002 \001(\0132!.protobuf." +
-      "Setting.System.CloudRes\022#\n\025cloud_update_" +
-      "interval\030\003 \001(\005:\0048000\022\026\n\013max_threads\030\004 \001(" +
-      "\005:\0012\022\031\n\013save_chunks\030\005 \001(\010:\004true\022\036\n\020chunk",
-      "_cache_size\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBO" +
-      "s\030\007 \001(\005:\003512\022\022\n\005gamma\030\010 \001(\002:\0032.2\022\030\n\014pixe" +
-      "l_format\030\t \001(\005:\00224\022:\n\014display_mode\030\n \001(\013" +
-      "2$.protobuf.Setting.System.DisplayMode\022\031" +
-      "\n\nfullscreen\030\013 \001(\010:\005false\022%\n\032active_view" +
-      "ing_distance_id\030\014 \001(\005:\0010\022 \n\025viewing_dist" +
-      "ance_near\030\r \001(\005:\0018\022%\n\031viewing_distance_m" +
-      "oderate\030\016 \001(\005:\00216\022 \n\024viewing_distance_fa" +
-      "r\030\017 \001(\005:\00226\022\"\n\026viewing_distance_ultra\030\020 " +
-      "\001(\005:\00232\022\037\n\020flickering_light\030\021 \001(\010:\005false",
-      "\022-\n\036enable_post_processing_effects\030\022 \001(\010" +
-      ":\005false\022\'\n\030animated_water_and_grass\030\023 \001(" +
-      "\010:\005false\022\'\n\034vertical_chunk_mesh_segments" +
-      "\030\024 \001(\005:\0011\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003128\022\016\n" +
-      "\001y\030\002 \001(\002:\003128\0327\n\013DisplayMode\022\023\n\005width\030\001 " +
-      "\001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.te" +
-      "rasology.protobufB\rConfigurationH\001"
+      ".DebugInfo\022\022\n\nactive_mod\030\005 \003(\t\032\266\003\n\005World" +
+      "\022\036\n\013world_title\030\001 \001(\t:\tNew World\022!\n\024fore" +
+      "st_grass_density\030\002 \001(\002:\0030.3\022!\n\024plains_gr" +
+      "ass_density\030\003 \001(\002:\0030.2\022!\n\022snow_grass_den" +
+      "sity\030\004 \001(\002:\0050.001\022#\n\026mountain_grass_dens",
+      "ity\030\005 \001(\002:\0030.2\022#\n\024desert_grass_density\030\006" +
+      " \001(\002:\0050.001\022\'\n\026day_night_length_in_ms\030\007 " +
+      "\001(\022:\0071800000\022(\n\031initial_time_offset_in_m" +
+      "s\030\t \001(\022:\00560000\0224\n\014spawn_origin\030\n \001(\0132\036.p" +
+      "rotobuf.Setting.World.Origin\022\"\n\014default_" +
+      "seed\030\013 \001(\t:\014Blockmaina42\032-\n\006Origin\022\021\n\001x\030" +
+      "\001 \001(\002:\006-24429\022\020\n\001y\030\002 \001(\002:\00520547\032\316\001\n\tDebu" +
+      "gInfo\022\024\n\005debug\030\001 \001(\010:\005false\022\036\n\017debug_col" +
+      "lision\030\002 \001(\010:\005false\022*\n\033render_chunk_boun" +
+      "ding_boxes\030\003 \001(\010:\005false\022\032\n\013demo_flight\030\004",
+      " \001(\010:\005false\022\037\n\021demo_flight_speed\030\005 \001(\002:\004" +
+      "0.08\022\"\n\023DEPRECATED_god_mode\030\006 \001(\010:\005false" +
+      "\032\226\001\n\006Player\022\020\n\003fov\030\001 \001(\002:\003100\022\031\n\nmouse_s" +
+      "ens\030\002 \001(\002:\0050.075\022\034\n\016camera_bobbing\030\003 \001(\010" +
+      ":\004true\022&\n\030render_first_person_view\030\004 \001(\010" +
+      ":\004true\022\031\n\013placing_box\030\005 \001(\010:\004true\032\270\006\n\006Sy" +
+      "stem\022\032\n\rmax_particles\030\001 \001(\005:\003256\022;\n\020clou" +
+      "d_resolution\030\002 \001(\0132!.protobuf.Setting.Sy" +
+      "stem.CloudRes\022#\n\025cloud_update_interval\030\003" +
+      " \001(\005:\0048000\022\026\n\013max_threads\030\004 \001(\005:\0012\022\031\n\013sa",
+      "ve_chunks\030\005 \001(\010:\004true\022\036\n\020chunk_cache_siz" +
+      "e\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBOs\030\007 \001(\005:\0035" +
+      "12\022\022\n\005gamma\030\010 \001(\002:\0032.2\022\030\n\014pixel_format\030\t" +
+      " \001(\005:\00224\022:\n\014display_mode\030\n \001(\0132$.protobu" +
+      "f.Setting.System.DisplayMode\022\031\n\nfullscre" +
+      "en\030\013 \001(\010:\005false\022%\n\032active_viewing_distan" +
+      "ce_id\030\014 \001(\005:\0010\022 \n\025viewing_distance_near\030" +
+      "\r \001(\005:\0018\022%\n\031viewing_distance_moderate\030\016 " +
+      "\001(\005:\00216\022 \n\024viewing_distance_far\030\017 \001(\005:\0022" +
+      "6\022\"\n\026viewing_distance_ultra\030\020 \001(\005:\00232\022\037\n",
+      "\020flickering_light\030\021 \001(\010:\005false\022-\n\036enable" +
+      "_post_processing_effects\030\022 \001(\010:\005false\022\'\n" +
+      "\030animated_water_and_grass\030\023 \001(\010:\005false\022\'" +
+      "\n\034vertical_chunk_mesh_segments\030\024 \001(\005:\0011\032" +
+      "*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003128\022\016\n\001y\030\002 \001(\002:\003" +
+      "128\0327\n\013DisplayMode\022\023\n\005width\030\001 \001(\005:\0041280\022" +
+      "\023\n\006height\030\002 \001(\005:\003720B*\n\027org.terasology.p" +
+      "rotobufB\rConfigurationH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -5946,7 +6058,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_descriptor,
-              new java.lang.String[] { "World", "Player", "System", "DebugInfo", },
+              new java.lang.String[] { "World", "Player", "System", "DebugInfo", "ActiveMod", },
               org.terasology.protobuf.Configuration.Setting.class,
               org.terasology.protobuf.Configuration.Setting.Builder.class);
           internal_static_protobuf_Setting_World_descriptor =
@@ -5954,7 +6066,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_World_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_World_descriptor,
-              new java.lang.String[] { "WorldTitle", "ForrestGrassDensity", "PlainsGrassDensity", "SnowGrassDensity", "MountainGrassDensity", "DesertGrassDensity", "DayNightLengthInMs", "InitialTimeOffsetInMs", "SpawnOrigin", "DefaultSeed", },
+              new java.lang.String[] { "WorldTitle", "ForestGrassDensity", "PlainsGrassDensity", "SnowGrassDensity", "MountainGrassDensity", "DesertGrassDensity", "DayNightLengthInMs", "InitialTimeOffsetInMs", "SpawnOrigin", "DefaultSeed", },
               org.terasology.protobuf.Configuration.Setting.World.class,
               org.terasology.protobuf.Configuration.Setting.World.Builder.class);
           internal_static_protobuf_Setting_World_Origin_descriptor =
@@ -5970,7 +6082,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_DebugInfo_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_DebugInfo_descriptor,
-              new java.lang.String[] { "Debug", "DebugCollision", "RenderChunkBoundingBoxes", "DemoFlight", "DemoFlightSpeed", "GodMode", },
+              new java.lang.String[] { "Debug", "DebugCollision", "RenderChunkBoundingBoxes", "DemoFlight", "DemoFlightSpeed", "DEPRECATEDGodMode", },
               org.terasology.protobuf.Configuration.Setting.DebugInfo.class,
               org.terasology.protobuf.Configuration.Setting.DebugInfo.Builder.class);
           internal_static_protobuf_Setting_Player_descriptor =

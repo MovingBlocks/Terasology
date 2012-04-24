@@ -93,7 +93,7 @@ public class FirstPersonRenderer implements RenderSystem {
         TextureManager.getInstance().bindTexture("char");
 
         glPushMatrix();
-        glTranslatef(0.8f, -1.1f + bobOffset - handMovementAnimationOffset * 0.5f, -1.0f - handMovementAnimationOffset * 0.5f);
+        glTranslatef(0.8f, -0.8f + bobOffset - handMovementAnimationOffset * 0.5f, -1.0f - handMovementAnimationOffset * 0.5f);
         glRotatef(-45f - handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
         glTranslatef(0f, 0.25f, 0f);
@@ -113,7 +113,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPushMatrix();
 
-        glTranslatef(1.0f, -1.3f + bobOffset - handMovementAnimationOffset * 0.5f, -1.5f - handMovementAnimationOffset * 0.5f);
+        glTranslatef(1.0f, -0.7f + bobOffset - handMovementAnimationOffset * 0.5f, -1.5f - handMovementAnimationOffset * 0.5f);
         glRotatef(-handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(-20f, 1.0f, 0.0f, 0.0f);
         glRotatef(-80f, 0.0f, 1.0f, 0.0f);
@@ -154,7 +154,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPushMatrix();
 
-        glTranslatef(1.0f, -1.3f + bobOffset - handMovementAnimationOffset * 0.5f, -1.5f - handMovementAnimationOffset * 0.5f);
+        glTranslatef(1.0f, -0.7f + bobOffset - handMovementAnimationOffset * 0.5f, -1.5f - handMovementAnimationOffset * 0.5f);
         glRotatef(-25f - handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
         glTranslatef(0f, 0.25f, 0f);

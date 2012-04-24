@@ -35,8 +35,11 @@ public class BasicSoundPool implements SoundPool {
     }
 
     public SoundSource getSource(Sound sound, int priority) {
-        // @todo should be optimized (performance crucial)
+        if (sound == null) {
+            return null;
+        }
 
+        // @todo should be optimized (performance crucial)
         for (SoundSource source : _soundSources.keySet()) {
             if (!isActive(source)) {
                 _soundSources.put(source, priority);

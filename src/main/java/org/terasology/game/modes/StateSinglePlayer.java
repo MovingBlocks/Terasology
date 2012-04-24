@@ -18,6 +18,8 @@ package org.terasology.game.modes;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.audio.Sound;
 import org.terasology.componentSystem.BlockParticleEmitterSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
@@ -60,6 +62,8 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.*;
+import org.terasology.logic.mod.Mod;
+import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.BlockFamily;
@@ -132,6 +136,15 @@ public class StateSinglePlayer implements GameState {
     }
 
     public void init(GameEngine engine) {
+        ModManager modManager = new ModManager();
+        for (Mod mod : modManager.getMods()) {
+             mod.setEnabled(true);
+        }
+        modManager.saveModSelectionToConfig();
+        for (Mod mod : modManager.getActiveMods()) {
+            //AssetManager.getInstance().
+        }
+
         componentLibrary = new ComponentLibraryImpl();
 
         // TODO: Use reflection pending mod support
@@ -219,10 +232,10 @@ public class StateSinglePlayer implements GameState {
 
     private void loadPrefabs() {
         EntityPersisterHelper persisterHelper = new EntityPersisterHelperImpl(componentLibrary, (PersistableEntityManager)_entityManager);
-        for (String prefabURI : AssetManager.list("prefab")) {
+        for (AssetUri prefabURI : AssetManager.list(AssetType.PREFAB)) {
             _logger.info("Loading prefab " + prefabURI);
             try {
-                if (!prefabURI.endsWith(".prefab")) {
+                if (!prefabURI.getAssetName().endsWith(".prefab")) {
                     continue;
                 }
                 BufferedReader reader = new BufferedReader(new InputStreamReader(AssetManager.assetStream(prefabURI)));

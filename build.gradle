@@ -83,6 +83,7 @@ sourceSets {
 		java { srcDirs = [] }
 		groovy { srcDirs = ['src/main/java','src/main/groovy'] }
 		resources { srcDir = 'src/main/resources' }
+		output.resourcesDir = 'target/classes/main'
 	}
 	perfTest
 }
@@ -123,27 +124,20 @@ dependencies{
 
 }
 
-task copyResources (type : Copy) {
-	from sourceSets.main.output.resourcesDir
-	into sourceSets.main.output.classesDir
-}
-copyResources.doLast {
-	delete sourceSets.main.output.resourcesDir
-}
-
 jar {
-	dependsOn compileGroovy
-	dependsOn copyResources
-	from configurations.compile
 	manifest {
 		def manifestClasspath = 'libs/'+configurations.runtime.collect { it.getName() }.join(' libs/') 
 		attributes("Main-Class": "org.terasology.game.Terasology", "Manifest-Version": "1.0", "Class-Path" : manifestClasspath)
 	}
 	archiveName('Terasology.jar')
 }
-
+jar.doFirst {
+	// Work around for duplicate entries in jar bug
+	sourceSets.main.output.resourcesDir = '/dev/null'
+}
 jar.doLast {
 	ant.signjar(jar: jar.archivePath, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
+	sourceSets.main.output.resourcesDir = 'target/classes/main'
 }
 
 task distLibs(type:Copy) {
@@ -208,7 +202,6 @@ applet.doLast {
 task run(type:JavaExec) {
 	description = 'Run Terasology'
 	dependsOn compileGroovy
-	dependsOn copyResources
 	dependsOn extractNatives
 	main = 'org.terasology.game.Terasology'
 	classpath sourceSets.main.output.classesDir

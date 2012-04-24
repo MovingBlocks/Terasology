@@ -1,5 +1,11 @@
 package org.terasology.logic.manager;
 
+import com.google.common.collect.Maps;
+import org.terasology.asset.AssetSource;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.entitySystem.common.NullIterator;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,13 +19,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class AssetManager {
-    private final static String ASSETS_BASE_PATH = "org/terasology/data";
 
-    private Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
 
     private static AssetManager _instance = null;
-
-    protected Map<String, URL> assets = new HashMap<String, URL>();
 
     public static AssetManager getInstance() {
         if (_instance == null) {
@@ -29,59 +31,50 @@ public class AssetManager {
         return _instance;
     }
 
+    private Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
+    private Map<String, AssetSource> assetSources = Maps.newHashMap();
+
     protected AssetManager() {
-        this.initialize();
     }
 
-    private void initialize() {
-        logger.info("Loading assets...");
-        CodeSource cs = this.getClass().getProtectionDomain().getCodeSource();
-
-        if (cs == null) {
-            throw new IllegalStateException("Can't access assets: CodeSource is null");
-        }
-
-        URL url = cs.getLocation();
-
-        try {
-            File codePath = new File(url.toURI());
-            logger.info("Loading assets from " + codePath);
-            this.loadAssetsFrom(codePath, ASSETS_BASE_PATH);
-        } catch (Throwable e) {
-            throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
-        }
-
-        logger.info("Loaded " + assets.size() + " assets");
-    }
-    
-    public Set<String> listAssets() {
-        return listAssets(null);
+    public void addAssetSource(AssetSource source) {
+        assetSources.put(source.getSourceId(), source);
     }
 
-    public Set<String> listAssets(String key) {
-        // @todo make more optimal all assets listing (just return assets.keySet()?)
-        Set<String> result = new LinkedHashSet<String>();
+    public void removeAssetSource(AssetSource source) {
+        assetSources.remove(source.getSourceId());
+    }
 
-        for (String asset : this.assets.keySet()) {
+    public Iterable<AssetUri> listAssets() {
+        return new Iterable<AssetUri>() {
 
-            if (key == null || asset.startsWith(key)) {
-                result.add(asset);
+            @Override
+            public Iterator<AssetUri> iterator() {
+                return new AllAssetIterator();
             }
+        };
+    }
+
+    public Iterable<AssetUri> listAssets(final AssetType type) {
+        return new Iterable<AssetUri>() {
+
+            @Override
+            public Iterator<AssetUri> iterator() {
+                return new TypedAssetIterator(type);
+            }
+        };
+    }
+
+    public URL getAsset(AssetUri uri) {
+        AssetSource source = assetSources.get(uri.getPackage());
+        if (source != null) {
+            return source.get(uri);
         }
-        
-        return result;
+        return null;
     }
     
-    public void addAsset(String name, URL url) {
-        this.assets.put(name, url);
-    }
-    
-    public URL getAsset(String name) {
-        return this.assets.get(name);
-    }
-    
-    public InputStream getAssetStream(String name) throws IOException {
-        URL assetURL = this.getAsset(name);
+    public InputStream getAssetStream(AssetUri uri) throws IOException {
+        URL assetURL = this.getAsset(uri);
 
         if (assetURL == null) {
             return null;
@@ -91,81 +84,112 @@ public class AssetManager {
     }
 
     // Static syntax sugar
-    public static InputStream assetStream(String name) throws IOException {
-        return getInstance().getAssetStream(name);
+    public static InputStream assetStream(AssetUri uri) throws IOException {
+        return getInstance().getAssetStream(uri);
     }
     
-    public static URL asset(String name) {
-        return getInstance().getAsset(name);
+    public static URL asset(AssetUri uri) {
+        return getInstance().getAsset(uri);
     }
     
-    public static Set<String> list() {
+    public static Iterable<AssetUri> list() {
         return getInstance().listAssets();
     }
     
-    public static Set<String> list(String key) {
-        return getInstance().listAssets(key);
+    public static Iterable<AssetUri> list(AssetType type) {
+        return getInstance().listAssets(type);
     }
 
-    public void loadAssetsFrom(File file, String basePath) throws IOException {
-        try {
-            if (file.isFile()) { // assets stored in archive
-                this.scanArchive(file, basePath);
-            } else if (file.isDirectory()) { // unpacked
-                File dataDirectory = new File(file, basePath);
-                scanFiles(dataDirectory, dataDirectory.getAbsolutePath());
+    private class AllAssetIterator implements Iterator<AssetUri> {
+        Iterator<AssetSource> sourceIterator;
+        Iterator<AssetUri> currentUriIterator;
+        AssetUri next = null;
+
+        public AllAssetIterator() {
+            sourceIterator = assetSources.values().iterator();
+            if (sourceIterator.hasNext()) {
+                currentUriIterator = sourceIterator.next().list().iterator();
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e); // just rethrow as runtime exception
-        }
-    }
-
-    private void scanArchive(File file, String basePath) throws IOException {
-        ZipFile archive;
-        String archiveType = "zip";
-        
-        if (file.getName().endsWith(".jar")) {
-            archive = new JarFile(file, false);
-            archiveType = "jar";
-        } else {
-            archive = new ZipFile(file);
-        }
-        
-        
-        Enumeration<? extends ZipEntry> lister = archive.entries();
-
-        while (lister.hasMoreElements()) {
-            ZipEntry entry = lister.nextElement();
-            String entryPath = entry.getName();
-
-            if (entryPath.startsWith(basePath)) {
-                String key = (basePath != null) ? entryPath.substring(basePath.length() + 1) : entryPath;
-
-                // @todo avoid this risky approach
-                URL url = new URL(archiveType + ":file:" + file.getAbsolutePath() + "!/" + entryPath );
-
-                this.addAsset(key, url);
+            else {
+                currentUriIterator = NullIterator.newInstance();
             }
+            iterate();
         }
-    }
 
-    private void scanFiles(File file, String basePath) {
-        for (File child : file.listFiles()) {
-            if (child.isDirectory()) {
-                this.scanFiles(child, basePath);
-            } else if (child.isFile()) {
-                String key = child.getAbsolutePath().replace(File.separatorChar, '/');
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
 
-                if(basePath != null) { //strip down basepath
-                    key = key.substring(basePath.length() + 1);
-                }
+        @Override
+        public AssetUri next() {
+            AssetUri result = next;
+            iterate();
+            return result;
+        }
 
-                try {
-                    this.addAsset(key, child.toURI().toURL());
-                } catch (MalformedURLException e) {
-                    logger.warning("Failed to load asset " + key + " - " + e.getMessage());
-                }
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        private void iterate() {
+            while (!currentUriIterator.hasNext() && sourceIterator.hasNext()) {
+                currentUriIterator = sourceIterator.next().list().iterator();
+            }
+            if (currentUriIterator.hasNext()) {
+                next = currentUriIterator.next();
+            } else {
+                next = null;
             }
         }
     }
+
+    private class TypedAssetIterator implements Iterator<AssetUri> {
+        AssetType type;
+        Iterator<AssetSource> sourceIterator;
+        Iterator<AssetUri> currentUriIterator;
+        AssetUri next = null;
+
+        public TypedAssetIterator(AssetType type) {
+            this.type = type;
+            sourceIterator = assetSources.values().iterator();
+            if (sourceIterator.hasNext()) {
+                currentUriIterator = sourceIterator.next().list(type).iterator();
+            }
+            else {
+                currentUriIterator = NullIterator.newInstance();
+            }
+            iterate();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        @Override
+        public AssetUri next() {
+            AssetUri result = next;
+            iterate();
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        private void iterate() {
+            while (!currentUriIterator.hasNext() && sourceIterator.hasNext()) {
+                currentUriIterator = sourceIterator.next().list(type).iterator();
+            }
+            if (currentUriIterator.hasNext()) {
+                next = currentUriIterator.next();
+            } else {
+                next = null;
+            }
+        }
+    }
+
 }

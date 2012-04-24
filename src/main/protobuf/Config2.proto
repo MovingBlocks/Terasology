@@ -11,7 +11,7 @@ message Setting {
             optional float y = 2 [default = 20547];
         }
         optional string world_title = 1 [default = "New World"];
-        optional float forrest_grass_density = 2 [default = 0.3];
+        optional float forest_grass_density = 2 [default = 0.3];
         optional float plains_grass_density = 3 [default = 0.2];
         optional float snow_grass_density = 4 [default = 0.001];
         optional float mountain_grass_density = 5 [default = 0.2];
@@ -28,7 +28,7 @@ message Setting {
         optional bool render_chunk_bounding_boxes = 3 [default = false];
         optional bool demo_flight = 4 [default = false];
         optional float demo_flight_speed = 5 [default = 0.08];
-        optional bool god_mode = 6 [default = false];
+        optional bool DEPRECATED_god_mode = 6 [default = false];
     }
 
     message Player {
@@ -74,4 +74,5 @@ message Setting {
     optional Player player = 2;
     optional System system = 3;
     optional DebugInfo debug_info = 4;
+    repeated string active_mod = 5;
 }

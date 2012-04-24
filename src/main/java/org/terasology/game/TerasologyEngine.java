@@ -23,8 +23,10 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
+import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.game.modes.GameState;
 import org.terasology.logic.manager.*;
+import org.terasology.logic.mod.ModManager;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -294,6 +296,7 @@ public class TerasologyEngine implements GameEngine {
         FontManager.getInstance();
         BlockShapeManager.getInstance();
         BlockManager.getInstance();
+        AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "org/terasology/data"));
     }
 
     private void initTimer() {

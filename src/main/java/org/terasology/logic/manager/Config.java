@@ -27,6 +27,7 @@ import org.terasology.utilities.Helper;
 
 import javax.vecmath.Vector2f;
 import java.io.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -100,12 +101,12 @@ public final class Config {
         _setting.getWorldBuilder().setWorldTitle(_worldTitle);
     }
 
-    public float getForrestGrassDensity() {
-        return _setting.getWorldBuilder().getForrestGrassDensity();
+    public float getForestGrassDensity() {
+        return _setting.getWorldBuilder().getForestGrassDensity();
     }
 
-    public void setForrestGrassDensity(float _forrestGrassDensity) {
-        _setting.getWorldBuilder().setForrestGrassDensity(_forrestGrassDensity);
+    public void setForestGrassDensity(float _forrestGrassDensity) {
+        _setting.getWorldBuilder().setForestGrassDensity(_forrestGrassDensity);
     }
 
     public float getPlainsGrassDensity() {
@@ -213,14 +214,6 @@ public final class Config {
 
     public void setDemoFlightSpeed(float demoFlightSpeed) {
         _setting.getDebugInfoBuilder().setDemoFlightSpeed(demoFlightSpeed);
-    }
-
-    public boolean isGodMode() {
-        return _setting.getDebugInfoBuilder().getGodMode();
-    }
-
-    public void setGodMode(boolean godMode) {
-        _setting.getDebugInfoBuilder().setGodMode(godMode);
     }
 
     public int getMaxParticles() {
@@ -420,6 +413,17 @@ public final class Config {
 
     public void setPlacingBox(boolean placingBox) {
         _setting.getPlayerBuilder().setPlacingBox(placingBox);
+    }
+
+    /* MODS */
+
+    public List<String> getActiveMods() {
+        return _setting.getActiveModList();
+    }
+
+    public void setActiveMods(List<String> activeMods) {
+        _setting.getActiveModList().clear();
+        _setting.getActiveModList().addAll(activeMods);
     }
 
     /* SPECIAL STUFF */
