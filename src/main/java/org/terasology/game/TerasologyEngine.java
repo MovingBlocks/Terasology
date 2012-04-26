@@ -17,8 +17,8 @@
 package org.terasology.game;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.SystemUtils;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -26,7 +26,6 @@ import org.lwjgl.opengl.GLContext;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.game.modes.GameState;
 import org.terasology.logic.manager.*;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -173,34 +172,27 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initNativeLibs() {
-        if (SystemUtils.IS_OS_MAC) {
-            addLibraryPath("natives/macosx");
-        }
-        else if (SystemUtils.IS_OS_LINUX) {
-            addLibraryPath("natives/linux");
-            if (System.getProperty("os.arch").contains("64"))
-                System.loadLibrary("openal64");
-            else
-                System.loadLibrary("openal");
-        }
-        else if (SystemUtils.IS_OS_SOLARIS) {
-            addLibraryPath("natives/solaris");
-            if (System.getProperty("os.arch").contains("64"))
-                System.loadLibrary("openal64");
-            else
-                System.loadLibrary("openal");
-        }
-        else if (SystemUtils.IS_OS_WINDOWS) {
-            addLibraryPath("natives/windows");
+        switch (LWJGLUtil.getPlatform()) {
+            case LWJGLUtil.PLATFORM_MACOSX:
+                addLibraryPath("natives/macosx");
+                break;
+            case LWJGLUtil.PLATFORM_LINUX:
+                addLibraryPath("natives/linux");
+                if (System.getProperty("os.arch").contains("64"))
+                    System.loadLibrary("openal64");
+                else
+                    System.loadLibrary("openal");
+                break;
+            case LWJGLUtil.PLATFORM_WINDOWS:
+                addLibraryPath("natives/windows");
 
-            if (System.getProperty("os.arch").contains("64"))
-                System.loadLibrary("OpenAL64");
-            else
-                System.loadLibrary("OpenAL32");
-        }
-        else {
-            logger.log(Level.SEVERE, "Unsupported operating system: " + SystemUtils.OS_NAME);
-            System.exit(1);
+                if (System.getProperty("os.arch").contains("64"))
+                    System.loadLibrary("OpenAL64");
+                else
+                    System.loadLibrary("OpenAL32");
+            default:
+                logger.log(Level.SEVERE, "Unsupported operating system: " + LWJGLUtil.getPlatformName());
+                System.exit(1);
         }
     }
 
@@ -262,7 +254,7 @@ public class TerasologyEngine implements GameEngine {
 
         if (!canRunGame) {
             logger.log(Level.SEVERE, "Your GPU driver is not supporting the mandatory versions of OpenGL. Considered updating your GPU drivers?");
-            System.exit(1);;
+            System.exit(1);
         }
 
     }

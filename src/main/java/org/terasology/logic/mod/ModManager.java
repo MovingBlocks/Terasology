@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
+import org.terasology.asset.sources.DirectorySource;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 
@@ -56,7 +57,7 @@ public class ModManager {
                 if (modInfoFile.exists()) {
                     try {
                         ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
-                        mods.put(modInfo.getId(), new Mod(modFile, modInfo));
+                        mods.put(modInfo.getId(), new Mod(modFile, modInfo, new DirectorySource(modInfo.getId(), modFile)));
                         logger.info("Discovered mod: " + modInfo.getDisplayName());
                     } catch (FileNotFoundException e) {
                         logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);

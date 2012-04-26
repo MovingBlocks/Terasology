@@ -17,7 +17,7 @@
 package org.terasology.logic.manager;
 
 import com.google.common.io.Files;
-import org.apache.commons.lang3.SystemUtils;
+import org.lwjgl.LWJGLUtil;
 
 import java.io.File;
 
@@ -48,14 +48,18 @@ public final class PathManager {
 
     public void determineRootPath(boolean useAppDir) {
         if (!useAppDir) {
-            if (SystemUtils.IS_OS_WINDOWS) {
-                rootPath = new File(System.getenv("APPDATA") + "\\.terasology");
-            } else if (SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_SOLARIS) {
-                rootPath = new File("~/.terasology");
-            } else if (SystemUtils.IS_OS_MAC) {
-                rootPath = new File(SystemUtils.getUserHome() + "/Library/" + "terasology");
-            } else {
-                rootPath = new File(SystemUtils.getUserHome() + "/.terasology");
+            switch (LWJGLUtil.getPlatform()) {
+                case LWJGLUtil.PLATFORM_LINUX:
+                    rootPath = new File("~/.terasology");
+                    break;
+                case LWJGLUtil.PLATFORM_MACOSX:
+                    rootPath = new File(System.getProperty("user.home") + "/Library/" + "terasology");
+                    break;
+                case LWJGLUtil.PLATFORM_WINDOWS:
+                    rootPath = new File(System.getenv("APPDATA") + "\\.terasology");
+                    break;
+                default:
+                    rootPath = new File(System.getProperty("user.home") + "/.terasology");
             }
         } else {
             rootPath = new File(".").getAbsoluteFile();

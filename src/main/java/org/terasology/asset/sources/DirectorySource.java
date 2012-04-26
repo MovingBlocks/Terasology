@@ -16,41 +16,25 @@
 
 package org.terasology.asset.sources;
 
-import com.google.common.collect.*;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.CodeSource;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.jar.JarFile;
-import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * @author Immortius
  */
-public class ClasspathSource extends AbstractSource {
+public class DirectorySource extends AbstractSource {
 
-    public ClasspathSource(String id, CodeSource cs, String basePath) {
+    public DirectorySource(String id, File rootDirectory) {
         super(id);
 
-        if (cs == null) {
-            throw new IllegalStateException("Can't access assets: CodeSource is null");
-        }
-
-        URL url = cs.getLocation();
-
         try {
-            File codePath = new File(url.toURI());
-            this.loadAssetsFrom(codePath, basePath);
-        } catch (Throwable e) {
+            loadAssetsFrom(rootDirectory, "");
+        } catch (IOException e) {
             throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
         }
     }

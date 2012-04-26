@@ -141,9 +141,6 @@ public class StateSinglePlayer implements GameState {
              mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
-        for (Mod mod : modManager.getActiveMods()) {
-            //AssetManager.getInstance().
-        }
 
         componentLibrary = new ComponentLibraryImpl();
 
@@ -235,9 +232,6 @@ public class StateSinglePlayer implements GameState {
         for (AssetUri prefabURI : AssetManager.list(AssetType.PREFAB)) {
             _logger.info("Loading prefab " + prefabURI);
             try {
-                if (!prefabURI.getAssetName().endsWith(".prefab")) {
-                    continue;
-                }
                 BufferedReader reader = new BufferedReader(new InputStreamReader(AssetManager.assetStream(prefabURI)));
                 EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
                 if (prefabData != null) {

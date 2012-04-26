@@ -16,6 +16,9 @@
 
 package org.terasology.logic.mod;
 
+import org.terasology.asset.AssetSource;
+import org.terasology.logic.manager.AssetManager;
+
 import java.io.File;
 
 /**
@@ -24,11 +27,13 @@ import java.io.File;
 public class Mod {
     private ModInfo modInfo;
     private File modRoot;
+    private AssetSource modSource;
     private boolean enabled;
 
-    public Mod(File modRoot, ModInfo info) {
+    public Mod(File modRoot, ModInfo info, AssetSource modSource) {
         this.modInfo = info;
         this.modRoot = modRoot;
+        this.modSource = modSource;
     }
 
     public boolean isEnabled() {
@@ -36,7 +41,15 @@ public class Mod {
     }
 
     public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+        if (this.enabled != enabled) {
+            this.enabled = enabled;
+            if (enabled) {
+                AssetManager.getInstance().addAssetSource(modSource);
+            }
+            else {
+                AssetManager.getInstance().removeAssetSource(modSource);
+            }
+        }
     }
 
     public File getModRoot() {
