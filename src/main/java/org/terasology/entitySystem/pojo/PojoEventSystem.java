@@ -1,16 +1,12 @@
 package org.terasology.entitySystem.pojo;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import org.terasology.entitySystem.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,6 +19,7 @@ public class PojoEventSystem implements EventSystem {
     
     private EntityManager entitySystem;
     private Map<Class<? extends Event>, Multimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
+    private Comparator<EventHandlerInfo> priorityComparator = new EventHandlerPriorityComparator();
 
     public PojoEventSystem(EntityManager entitySystem) {
         this.entitySystem = entitySystem;
@@ -49,7 +46,7 @@ public class PojoEventSystem implements EventSystem {
                 if (types.length == 2 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1]))
                 {
                     logger.info("Found method: " + method.toString());
-                    EventHandlerInfo handlerInfo = new EventHandlerInfo(handler, method, receiveEventAnnotation.components());
+                    EventHandlerInfo handlerInfo = new EventHandlerInfo(handler, method, receiveEventAnnotation.components(), receiveEventAnnotation.priority());
                     for (Class<? extends Component> c : receiveEventAnnotation.components()) {
                         Multimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get((Class<? extends Event>) types[0]);
                         if (componentMap == null) {
@@ -71,18 +68,25 @@ public class PojoEventSystem implements EventSystem {
         Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
         if (handlers == null) return;
 
-        Set<EventHandlerInfo> processedHandlers = Sets.newHashSet();
+        Set<EventHandlerInfo> selectedHandlersSet = Sets.newHashSet();
         
         for (Class<? extends Component> compClass : handlers.keySet()) {
             if (entity.hasComponent(compClass)) {
                 for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
                     if (eventHandler.isValidFor(entity)) {
-                        if (processedHandlers.add(eventHandler)) {
-                            eventHandler.invoke(entity, event);
-                        }
+                        selectedHandlersSet.add(eventHandler);
                     }
                 }
             }
+        }
+
+        List<EventHandlerInfo> selectedHandlers = Lists.newArrayList(selectedHandlersSet);
+        Collections.sort(selectedHandlers, priorityComparator);
+
+        for (EventHandlerInfo handler : selectedHandlers) {
+            handler.invoke(entity, event);
+            if (event.isCancelled())
+                return;
         }
     }
 
@@ -97,17 +101,27 @@ public class PojoEventSystem implements EventSystem {
         }
     }
 
+    private static class EventHandlerPriorityComparator implements Comparator<EventHandlerInfo> {
+
+        @Override
+        public int compare(EventHandlerInfo o1, EventHandlerInfo o2) {
+            return o2.getPriority() - o1.getPriority();
+        }
+    }
+
     private class EventHandlerInfo
     {
         private EventHandlerSystem handler;
         private Method method;
         private Class<? extends Component>[] components;
+        private int priority;
 
-        public EventHandlerInfo(EventHandlerSystem handler, Method method, Class<? extends Component>[] components)
+        public EventHandlerInfo(EventHandlerSystem handler, Method method, Class<? extends Component>[] components, int priority)
         {
             this.handler = handler;
             this.method = method;
             this.components = components;
+            this.priority = priority;
         }
         
         public boolean isValidFor(EntityRef entity) {
@@ -130,6 +144,10 @@ public class PojoEventSystem implements EventSystem {
             } catch (InvocationTargetException ex) {
                 logger.log(Level.SEVERE, "Failed to invoke event", ex);
             }
+        }
+
+        public int getPriority() {
+            return priority;
         }
     }
 }

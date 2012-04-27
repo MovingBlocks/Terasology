@@ -2,6 +2,7 @@ package org.terasology.events;
 
 import org.terasology.components.BlockComponent;
 import org.terasology.components.LocationComponent;
+import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 
@@ -10,7 +11,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class ActivateEvent implements Event {
+public class ActivateEvent extends AbstractEvent {
     private EntityRef instigator;
     private EntityRef target;
     private Vector3f location;

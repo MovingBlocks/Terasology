@@ -1,12 +1,13 @@
 package org.terasology.events;
 
+import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class DamageEvent implements Event {
+public class DamageEvent extends AbstractEvent {
     private int amount;
     private EntityRef instigator;
 

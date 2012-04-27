@@ -190,6 +190,7 @@ public class TerasologyEngine implements GameEngine {
                     System.loadLibrary("OpenAL64");
                 else
                     System.loadLibrary("OpenAL32");
+                break;
             default:
                 logger.log(Level.SEVERE, "Unsupported operating system: " + LWJGLUtil.getPlatformName());
                 System.exit(1);

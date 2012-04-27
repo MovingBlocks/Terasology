@@ -6,4 +6,6 @@ package org.terasology.entitySystem;
  * @author Immortius <immortius@gmail.com>
  */
 public interface Event {
+    public void cancel();
+    public boolean isCancelled();
 }

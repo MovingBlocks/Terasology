@@ -1,11 +1,12 @@
 package org.terasology.entitySystem.event;
 
+import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.Event;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class ChangedComponentEvent implements Event {
+public class ChangedComponentEvent extends AbstractEvent {
 
     private static ChangedComponentEvent instance = new ChangedComponentEvent();
 

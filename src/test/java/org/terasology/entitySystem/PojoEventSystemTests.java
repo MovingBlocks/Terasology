@@ -114,8 +114,24 @@ public class PojoEventSystemTests {
         assertEquals(event, handler.receivedList.get(0).event);
         assertEquals(entity, handler.receivedList.get(0).entity);
     }
+
+    @Test
+    public void testPriorityAndCancel() {
+        StringComponent stringComponent = entity.addComponent(new StringComponent());
+
+        TestEventHandler handlerNormal = new TestEventHandler();
+        TestHighPriorityEventHandler handlerHigh = new TestHighPriorityEventHandler();
+        handlerHigh.cancel = true;
+        eventSystem.registerEventHandler(handlerNormal);
+        eventSystem.registerEventHandler(handlerHigh);
+
+        TestEvent event = new TestEvent();
+        eventSystem.send(entity, event);
+        assertEquals(1, handlerHigh.receivedList.size());
+        assertEquals(0, handlerNormal.receivedList.size());
+    }
     
-    private static class TestEvent implements Event {
+    private static class TestEvent extends AbstractEvent {
         
     }
     
@@ -148,6 +164,40 @@ public class PojoEventSystemTests {
         }
     }
 
+
+    public static class TestHighPriorityEventHandler implements EventHandlerSystem {
+
+        List<Received> receivedList = Lists.newArrayList();
+        public boolean cancel = false;
+
+        @ReceiveEvent(components = StringComponent.class, priority = ReceiveEvent.PRIORITY_HIGH)
+        public void handleStringEvent(TestEvent event, EntityRef entity) {
+            receivedList.add(new Received(event, entity));
+            if (cancel) {
+                event.cancel();
+            }
+        }
+
+        @ReceiveEvent(components = IntegerComponent.class, priority = ReceiveEvent.PRIORITY_HIGH)
+        public void handleIntegerEvent(TestEvent event, EntityRef entity) {
+            receivedList.add(new Received(event, entity));
+        }
+
+        public void initialise() {
+
+        }
+
+        public static class Received {
+            TestEvent event;
+            EntityRef entity;
+
+            public Received(TestEvent event, EntityRef entity) {
+                this.event = event;
+                this.entity = entity;
+            }
+        }
+    }
+
     public static class TestCompoundComponentEventHandler implements EventHandlerSystem {
 
         List<Received> receivedList = Lists.newArrayList();
@@ -171,4 +221,6 @@ public class PojoEventSystemTests {
             }
         }
     }
+
+
 }

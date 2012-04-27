@@ -165,6 +165,15 @@ public class GroovyManager {
             }
         }
 
+        private void giveItem(String itemPrefabName) {
+            EntityRef item = CoreRegistry.get(EntityManager.class).create(itemPrefabName);
+
+            InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
+            if (!inventorySystem.addItem(CoreRegistry.get(LocalPlayer.class).getEntity(), item)) {
+                item.destroy();
+            }
+        }
+
         public void fullHealth() {
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
             HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
