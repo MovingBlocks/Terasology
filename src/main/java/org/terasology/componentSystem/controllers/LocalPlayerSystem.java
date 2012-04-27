@@ -17,6 +17,9 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.OpenInventoryEvent;
+import org.terasology.events.item.UseItemEvent;
+import org.terasology.events.item.UseItemInDirectionEvent;
+import org.terasology.events.item.UseItemOnBlockEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
@@ -71,7 +74,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private IWorldProvider worldProvider;
     private DefaultCamera playerCamera;
     private BlockEntityRegistry blockEntityRegistry;
-    private ItemSystem itemSystem;
+    //private ItemSystem itemSystem;
     
     private boolean jump = false;
     private Vector3f movementInput = new Vector3f();
@@ -94,7 +97,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         ComponentSystemManager systemManager = CoreRegistry.get(ComponentSystemManager.class);
         blockEntityRegistry = systemManager.get(BlockEntityRegistry.class);
-        itemSystem = systemManager.get(ItemSystem.class);
     }
 
     public void setPlayerCamera(DefaultCamera camera) {
@@ -343,10 +345,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                         useItemOnBlock(entity, selectedItemEntity);
                         break;
                     case OnUser:
-                        itemSystem.useItem(selectedItemEntity, entity);
+                        selectedItemEntity.send(new UseItemEvent(entity));
                         break;
                     case InDirection:
-                        itemSystem.useItemInDirection(selectedItemEntity, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), entity);
+                        selectedItemEntity.send(new UseItemInDirectionEvent(entity, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection())));
                         break;
                     default:
                         attack(entity, selectedItemEntity);
@@ -404,7 +406,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
             Side direction = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z);
 
-            itemSystem.useItemOnBlock(item, player, centerPos, attachmentSide, direction);
+            item.send(new UseItemOnBlockEvent(player, centerPos, attachmentSide, direction));
         }
     }
 

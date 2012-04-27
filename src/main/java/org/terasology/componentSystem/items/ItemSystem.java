@@ -8,6 +8,10 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
+import org.terasology.events.item.UseItemEvent;
+import org.terasology.events.item.UseItemInDirectionEvent;
+import org.terasology.events.item.UseItemOnBlockEvent;
+import org.terasology.events.item.UseItemOnEntityEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
@@ -37,48 +41,51 @@ public class ItemSystem implements EventHandlerSystem {
     }
 
     @ReceiveEvent(components=BlockItemComponent.class)
-    private void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
+    public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
         entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
     }
 
-    public void useItemOnBlock(EntityRef item, EntityRef user, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection) {
-
+    @ReceiveEvent(components=ItemComponent.class)
+    public void useItemOnBlock(UseItemOnBlockEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
-        if (itemComp == null) return;
+        if (itemComp == null || itemComp.usage != ItemComponent.UsageType.OnBlock) return;
 
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
         if (blockItem != null) {
-            if (placeBlock(blockItem.blockFamily, targetBlock, surfaceDirection, secondaryDirection, blockItem)) {
+            if (placeBlock(blockItem.blockFamily, event.getTargetBlock(), event.getSurfaceDirection(), event.getSecondaryDirection(), blockItem)) {
                 checkConsumeItem(item, itemComp);
             }
         } else {
-            EntityRef targetEntity = blockEntityRegistry.getOrCreateEntityAt(targetBlock);
-            item.send(new ActivateEvent(targetEntity, user));
+            EntityRef targetEntity = blockEntityRegistry.getOrCreateEntityAt(event.getTargetBlock());
+            item.send(new ActivateEvent(targetEntity, event.getInstigator()));
             checkConsumeItem(item, itemComp);
         }
     }
 
-    public void useItem(EntityRef item, EntityRef user) {
+    @ReceiveEvent(components=ItemComponent.class)
+    public void useItem(UseItemEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
-        if (itemComp == null) return;
+        if (itemComp == null || itemComp.usage != ItemComponent.UsageType.OnUser) return;
 
-        item.send(new ActivateEvent(user, user));
+        item.send(new ActivateEvent(event.getInstigator(), event.getInstigator()));
         checkConsumeItem(item, itemComp);
     }
 
-    public void useItemOnEntity(EntityRef item, EntityRef target, EntityRef user) {
+    @ReceiveEvent(components = ItemComponent.class)
+    public void useItemOnEntity(UseItemOnEntityEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp == null) return;
 
-        item.send(new ActivateEvent(target, user));
+        item.send(new ActivateEvent(event.getTarget(), event.getInstigator()));
         checkConsumeItem(item, itemComp);
     }
 
-    public void useItemInDirection(EntityRef item, Vector3f location, Vector3f direction, EntityRef user) {
+    @ReceiveEvent(components = ItemComponent.class)
+    public void useItemInDirection(UseItemInDirectionEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp == null) return;
 
-        item.send(new ActivateEvent(location, direction, user));
+        item.send(new ActivateEvent(event.getLocation(), event.getDirection(), event.getInstigator()));
         checkConsumeItem(item, itemComp);
     }
 

@@ -58,7 +58,8 @@ public class BlockEntitySystem implements EventHandlerSystem {
                 entity.removeComponent(BlockComponent.class);
             }
             event.getInstigator().send(new ReceiveItemEvent(item));
-            if (!item.getComponent(ItemComponent.class).container.exists())
+            ItemComponent itemComp = item.getComponent(ItemComponent.class);
+            if (itemComp != null && !itemComp.container.exists())
             {
                 // TODO: Fix this - entity needs to be added to lootable block or destroyed
                 item.destroy();
@@ -83,7 +84,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
         }
     }
     
-    @ReceiveEvent(components={BlockComponent.class})
+    @ReceiveEvent(components={BlockComponent.class},priority = ReceiveEvent.PRIORITY_HIGH)
     public void onDamaged(DamageEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
 

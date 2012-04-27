@@ -373,7 +373,8 @@ public class BulletPhysicsRenderer implements IGameObject {
                     EntityRef blockItem = _blockItemFactory.newInstance(block.getBlockFamily());
 
                     player.getEntity().send(new ReceiveItemEvent(blockItem));
-                    if (!blockItem.getComponent(ItemComponent.class).container.exists()) {
+                    ItemComponent itemComp = blockItem.getComponent(ItemComponent.class);
+                    if (itemComp != null && !itemComp.container.exists()) {
                         blockItem.destroy();
                     }
                     AudioManager.play("Loot");

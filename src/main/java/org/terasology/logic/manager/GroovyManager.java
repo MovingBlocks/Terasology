@@ -164,7 +164,8 @@ public class GroovyManager {
 
             EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
             playerEntity.send(new ReceiveItemEvent(item));
-            if (!item.getComponent(ItemComponent.class).container.exists()) {
+            ItemComponent itemComp = item.getComponent(ItemComponent.class);
+            if (itemComp != null && !itemComp.container.exists()) {
                 item.destroy();
             }
         }
@@ -175,7 +176,8 @@ public class GroovyManager {
                 EntityRef item = CoreRegistry.get(EntityManager.class).create(prefab);
                 EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
                 playerEntity.send(new ReceiveItemEvent(item));
-                if (!item.getComponent(ItemComponent.class).container.exists()) {
+                ItemComponent itemComp = item.getComponent(ItemComponent.class);
+                if (itemComp != null && !itemComp.container.exists()) {
                     item.destroy();
                 }
             } else {
