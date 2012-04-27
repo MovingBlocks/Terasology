@@ -7,6 +7,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.events.inventory.ReceiveItemEvent;
 
 /**
  * System providing inventory related functionality
@@ -36,14 +37,14 @@ public class InventorySystem implements EventHandlerSystem {
      * @param itemEntity
      * @return Whether the item was successfully added to the container in full
      */
-    public boolean addItem(EntityRef inventoryEntity, EntityRef itemEntity) {
-        InventoryComponent inventory = inventoryEntity.getComponent(InventoryComponent.class);
-        ItemComponent item = itemEntity.getComponent(ItemComponent.class);
+    @ReceiveEvent(components=InventoryComponent.class)
+    public void onReceiveItem(ReceiveItemEvent event, EntityRef entity) {
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+        ItemComponent item = event.getItem().getComponent(ItemComponent.class);
         if (inventory == null || item == null)
-            return false;
+            return;
 
         boolean itemChanged = false;
-
         if (!item.stackId.isEmpty()) {
             // First check for existing stacks
             for (EntityRef itemStack : inventory.itemSlots) {
@@ -58,8 +59,8 @@ public class InventorySystem implements EventHandlerSystem {
                         itemChanged = true;
 
                         if (item.stackCount == 0) {
-                            itemEntity.destroy();
-                            return true;
+                            event.getItem().destroy();
+                            return;
                         }
                     }
                 }
@@ -69,15 +70,22 @@ public class InventorySystem implements EventHandlerSystem {
         // Then free spaces
         int freeSlot = inventory.itemSlots.indexOf(EntityRef.NULL);
         if (freeSlot != -1) {
-            inventory.itemSlots.set(freeSlot, itemEntity);
-            item.container = inventoryEntity;
-            itemEntity.saveComponent(item);
-            inventoryEntity.saveComponent(inventory);
-            return true;
+            inventory.itemSlots.set(freeSlot, event.getItem());
+            InventoryComponent otherInventory = item.container.getComponent(InventoryComponent.class);
+            if (otherInventory != null) {
+                int heldSlot = otherInventory.itemSlots.indexOf(event.getItem());
+                if (heldSlot != -1) {
+                    otherInventory.itemSlots.set(heldSlot, EntityRef.NULL);
+                    item.container.saveComponent(otherInventory);
+                }
+            }
+            item.container = entity;
+            event.getItem().saveComponent(item);
+            entity.saveComponent(inventory);
+            return;
         }
         if (itemChanged) {
-            itemEntity.saveComponent(item);
+            event.getItem().saveComponent(item);
         }
-        return false;
     }
 }

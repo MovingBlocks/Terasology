@@ -4,6 +4,7 @@ import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
+import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.model.blocks.management.BlockManager;
@@ -46,14 +47,14 @@ public class PlayerFactory {
         CharacterSoundComponent sounds = player.addComponent(new CharacterSoundComponent());
         sounds.footstepSounds.addAll(Arrays.asList(AudioManager.sounds("FootGrass1", "FootGrass2", "FootGrass3", "FootGrass4", "FootGrass5")));
         player.addComponent(new LocalPlayerComponent());
-        
-        InventoryComponent inventory = player.addComponent(new InventoryComponent(36));
-        inventory.itemSlots.set(0, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Companion"), 16));
-        inventory.itemSlots.set(1, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Torch"), 99));
-        inventory.itemSlots.set(2, entityManager.create("axe"));
-        inventory.itemSlots.set(3, entityManager.create("pickaxe"));
-        inventory.itemSlots.set(4, entityManager.create("explodeTool"));
-        inventory.itemSlots.set(5, entityManager.create("railgunTool"));
+        player.addComponent(new InventoryComponent(36));
+
+        player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Companion"), 16)));
+        player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Torch"), 99)));
+        player.send(new ReceiveItemEvent(entityManager.create("axe")));
+        player.send(new ReceiveItemEvent(entityManager.create("pickaxe")));
+        player.send(new ReceiveItemEvent(entityManager.create("explodeTool")));
+        player.send(new ReceiveItemEvent(entityManager.create("railgunTool")));
 
         return player;
     } 

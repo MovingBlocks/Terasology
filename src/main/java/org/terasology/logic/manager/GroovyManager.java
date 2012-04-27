@@ -23,12 +23,15 @@ import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.HealthComponent;
+import org.terasology.components.ItemComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.persistence.WorldPersister;
+import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -159,18 +162,24 @@ public class GroovyManager {
             BlockItemFactory factory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
             EntityRef item = factory.newInstance(blockFamily, quantity);
 
-            InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
-            if (!inventorySystem.addItem(CoreRegistry.get(LocalPlayer.class).getEntity(), item)) {
+            EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+            playerEntity.send(new ReceiveItemEvent(item));
+            if (!item.getComponent(ItemComponent.class).container.exists()) {
                 item.destroy();
             }
         }
 
         private void giveItem(String itemPrefabName) {
-            EntityRef item = CoreRegistry.get(EntityManager.class).create(itemPrefabName);
-
-            InventorySystem inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
-            if (!inventorySystem.addItem(CoreRegistry.get(LocalPlayer.class).getEntity(), item)) {
-                item.destroy();
+            Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(itemPrefabName);
+            if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
+                EntityRef item = CoreRegistry.get(EntityManager.class).create(prefab);
+                EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+                playerEntity.send(new ReceiveItemEvent(item));
+                if (!item.getComponent(ItemComponent.class).container.exists()) {
+                    item.destroy();
+                }
+            } else {
+                giveBlock(itemPrefabName);
             }
         }
 

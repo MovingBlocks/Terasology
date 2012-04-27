@@ -1,15 +1,13 @@
 package org.terasology.componentSystem.block;
 
 import org.terasology.componentSystem.items.InventorySystem;
-import org.terasology.components.BlockComponent;
-import org.terasology.components.BlockParticleEffectComponent;
-import org.terasology.components.HealthComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.*;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
+import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
@@ -27,13 +25,11 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
     private IWorldProvider worldProvider;
     private EntityManager entityManager;
-    private InventorySystem inventorySystem;
     private BlockItemFactory blockItemFactory;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
-        inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
         blockItemFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
     }
 
@@ -61,7 +57,8 @@ public class BlockEntitySystem implements EventHandlerSystem {
                 entity.removeComponent(HealthComponent.class);
                 entity.removeComponent(BlockComponent.class);
             }
-            if (!inventorySystem.addItem(event.getInstigator(), item))
+            event.getInstigator().send(new ReceiveItemEvent(item));
+            if (!item.getComponent(ItemComponent.class).container.exists())
             {
                 // TODO: Fix this - entity needs to be added to lootable block or destroyed
                 item.destroy();

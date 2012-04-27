@@ -5,6 +5,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
@@ -23,7 +24,6 @@ import javax.vecmath.Vector2f;
 public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNew.InventorySubscriber{
     private static final int CENTER_BORDER = 100;
     private static final int OUTER_BORDER = 50;
-    private final InventorySystem inventorySystem;
 
     EntityRef container;
     EntityRef creature;
@@ -36,7 +36,6 @@ public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNe
         maximaze();
         this.container = container;
         this.creature = creature;
-        inventorySystem = CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class);
         background = new UIGraphicsElement("containerWindow");
         background.getTextureSize().set(new Vector2f(256f / 256f, 231f / 256f));
         background.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
@@ -87,8 +86,6 @@ public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNe
         if (fromInventory == null)
             return;
         EntityRef itemEntity = fromInventory.itemSlots.get(slot);
-        if (inventorySystem.addItem(toEntity, itemEntity)) {
-            fromInventory.itemSlots.set(slot, EntityRef.NULL);
-        }
+        toEntity.send(new ReceiveItemEvent(itemEntity));
     }
 }

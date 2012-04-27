@@ -62,6 +62,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
             Prefab prefab = prefabManager.getPrefab(prefabName);
             if (prefab == null) {
                 logger.log(Level.WARNING, "Unable to instantiate unknown prefab: \"" + prefabName + "\"");
+                return EntityRef.NULL;
             }
             return create(prefab);
         }

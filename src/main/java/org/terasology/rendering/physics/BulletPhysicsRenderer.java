@@ -30,10 +30,12 @@ import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.items.InventorySystem;
+import org.terasology.components.ItemComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
+import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
@@ -370,7 +372,8 @@ public class BulletPhysicsRenderer implements IGameObject {
                     Block block = BlockManager.getInstance().getBlock(b.getType());
                     EntityRef blockItem = _blockItemFactory.newInstance(block.getBlockFamily());
 
-                    if (!CoreRegistry.get(ComponentSystemManager.class).get(InventorySystem.class).addItem(player.getEntity(), blockItem)) {
+                    player.getEntity().send(new ReceiveItemEvent(blockItem));
+                    if (!blockItem.getComponent(ItemComponent.class).container.exists()) {
                         blockItem.destroy();
                     }
                     AudioManager.play("Loot");
