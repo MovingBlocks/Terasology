@@ -200,8 +200,8 @@ applet.doLast {
 
 task run(type:JavaExec) {
 	description = 'Run Terasology'
-	dependsOn compileGroovy
 	dependsOn extractNatives
+	dependsOn classes
 	main = 'org.terasology.game.Terasology'
 	classpath sourceSets.main.output.classesDir
 	classpath configurations.runtime

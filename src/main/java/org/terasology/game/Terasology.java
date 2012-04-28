@@ -72,7 +72,7 @@ public final class Terasology {
             FileHandler fh = new FileHandler(s, true);
             fh.setLevel(logLevel);
             fh.setFormatter(new SimpleFormatter());
-            logger.addHandler(fh);
+            Logger.getLogger("").addHandler(fh);
         } catch (IOException ex) {
             logger.log(Level.WARNING, ex.toString(), ex);
         }
