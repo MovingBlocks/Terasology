@@ -36,11 +36,13 @@ import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.rendering.gui.menus.UIDebugConsole;
 import org.terasology.utilities.Helper;
 
 import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -108,10 +110,22 @@ public class GroovyManager {
      * @param consoleString Contains what the user entered into the console
      * @return boolean indicating command success or not
      */
-    public boolean runGroovyShell(String consoleString) {
+    public int runGroovyShell(String consoleString) {
         Terasology.getInstance().getLogger().log(Level.INFO, "Groovy console about to execute command: " + consoleString);
         // Lets mess with the consoleString!
         consoleString = consoleString.trim();
+        if(consoleString.startsWith("help"))
+        {
+            try
+            {
+                getHelp(consoleString);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            return 2;
+        }
         if (!(consoleString.startsWith("cmd.") || consoleString.startsWith("cfg."))) {
             consoleString = "cmd." + consoleString;
         }
@@ -125,10 +139,54 @@ public class GroovyManager {
             if (result != null) {
                 logger.log(Level.INFO, "Result [" + result + "] from '" + consoleString + "'");
             }
-            return true;
+            if(consoleString.contains("writeHelp"))
+            {
+                return 2;
+            }
+            return 1;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return 0;
+        }
+    }
+
+    private void getHelp(String commandstring) throws IOException
+    {
+        String[] split = commandstring.split(" ");
+        IGameState state = Terasology.getInstance().getCurrentGameState();
+        UIDebugConsole _console;
+        if (state instanceof StateSinglePlayer) {
+            StateSinglePlayer spState = (StateSinglePlayer) state;
+            _console = spState.getHud().getDebugConsole();
+        }
+        else
+        {
+            return;
+        }
+        if(split.length > 1)
+        {
+            if(split[1].equals("commandList"))
+            {
+                GroovyHelpManager groovyhelpmanager = new GroovyHelpManager();
+                Object[] commandlist = groovyhelpmanager.getCommandList().toArray();
+                String retval = "Available commands :\n";
+                for(int i=0;i<commandlist.length;i++)
+                {
+                    retval+= "     " + commandlist[i].toString();
+                }
+                _console.setHelpText(retval);
+            }
+            GroovyHelpManager groovyhelpmanager = new GroovyHelpManager();
+            if(groovyhelpmanager.getCommandList().contains(split[1]))
+            {
+                GroovyHelp groovyhelp = groovyhelpmanager.readCommandHelp(split[1]);
+                _console.setHelpText(groovyhelp);
+            }
+
+        }
+        else
+        {
+            _console.setHelpText("Type 'help commandList' to see a list of commands\nType 'help <command>' to see command specific help");
         }
     }
 
@@ -209,5 +267,19 @@ public class GroovyManager {
         public void exit() {
             Terasology.getInstance().exit();
         }
+
+        //used for testing purposes
+
+        public void writeHelp() {
+            GroovyHelpManager groovyhelpmanager = new GroovyHelpManager();
+            IGameState state = Terasology.getInstance().getCurrentGameState();
+
+            if (state instanceof StateSinglePlayer) {
+                StateSinglePlayer spState = (StateSinglePlayer) state;
+                groovyhelpmanager.writeHelp(spState);
+            }
+
+        }
+
     }
 }
