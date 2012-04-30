@@ -21,24 +21,31 @@ import org.newdawn.slick.Color;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.GroovyHelp;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.components.UITextWrap;
+import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
 
 import javax.vecmath.Vector2f;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
 
 /**
  * The debug console of Terasology.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class UIDebugConsole extends UIDisplayWindow {
+public final class UIDebugConsole extends UIScrollableDisplayContainer {
 
     private final UIText _consoleText;
-    private final UIText _helpText;
+    private final UITextWrap _helpText;
+    public final String newLine = System.getProperty("line.separator");
 
     private final StringBuffer _consoleInput = new StringBuffer();
     private final ArrayList<String> _ringBuffer = new ArrayList<String>();
+    private final int border = 70;
     private int _ringBufferPos = -1;
     private String _helpContent = "";
 
@@ -46,17 +53,20 @@ public final class UIDebugConsole extends UIDisplayWindow {
      * Init. a new Terasology console.
      */
     public UIDebugConsole() {
-        setModal(true);
+        //setModal(true);
         //setOverlay(true);
         setPosition(new Vector2f(0, 0));
         setSize(new Vector2f(Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight()));
+
+        //setScrollBarsPosition(new Vector2f(Display.getWidth() / 2,Display.getHeight() / 2),new Vector2f(0.5f,0.5f));
 
         _consoleText = new UIText();
         _consoleText.setVisible(true);
         addDisplayElement(_consoleText);
 
-        _helpText = new UIText();
+        _helpText = new UITextWrap();
         _helpText.setColor(Color.green);
+        //_helpText.setSize(new Vector2f(0.5f,0.5f));
         _helpText.setVisible(true);
         addDisplayElement(_helpText);
     }
@@ -127,14 +137,14 @@ public final class UIDebugConsole extends UIDisplayWindow {
      */
     public void processConsoleString() {
         int success = 0;
-
+        _helpText.resetScroll();
         try {
             success = Terasology.getInstance().getGroovyManager().runGroovyShell(_consoleInput.toString());
         } catch (Exception e) {
             Terasology.getInstance().getLogger().log(Level.INFO, e.getMessage());
         }
         if (success > 1) {
-            resetDebugConsole();
+            _consoleText.setText("");
             return;
         }
         if (success > 0) {
@@ -145,7 +155,7 @@ public final class UIDebugConsole extends UIDisplayWindow {
             resetDebugConsole();
             setVisible(false);
         } else {
-            _helpContent = "error : Type help for a list of commands, help <command> for command specific help";
+            _helpContent = "error : Type help for help, help <command> for command specific help";
             Terasology.getInstance().getLogger().log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
         }
     }
@@ -161,33 +171,46 @@ public final class UIDebugConsole extends UIDisplayWindow {
         _consoleInput.setLength(0);
     }
 
-    public void setHelpText(String helptekst)
+    public void setHelpText(String helptekst) throws IOException
     {
-        _helpContent = helptekst;
+        //_helpContent = helptekst;
+        _helpText.addText(helptekst);
+        _helpText.loadText();
     }
 
-    public void setHelpText(GroovyHelp groovyhelp)
+    public void setHelpText(GroovyHelp groovyhelp) throws IOException
     {
-        _helpContent = groovyhelp.getCommandName() + " : " + groovyhelp.getCommandDesc() + "\n";
+        String tempstring = "";
+        //_helpContent = groovyhelp.getCommandName() + " : " + groovyhelp.getCommandDesc() + newLine;
+        tempstring += groovyhelp.getCommandName() + " : " + groovyhelp.getCommandDesc() + newLine;
         if (groovyhelp.getParameters().length > 0)
         {
-            String parameters = "accepted parameters :\n";
+            String parameters = "accepted parameters :" + newLine;
             for(int i=0; i<groovyhelp.getParameters().length;i++)
             {
-                parameters += groovyhelp.getParameters()[i] + "\n";
+                parameters += groovyhelp.getParameters()[i] + newLine;
             }
-            _helpContent += parameters + "\n";
+            //_helpContent += parameters  + newLine;
+            tempstring += parameters  + newLine;
         }
-        _helpContent += "detailed help : " + groovyhelp.getCommandHelp() + "\n";
+        //_helpContent += "detailed help : " + groovyhelp.getCommandHelp()  + newLine;
+        tempstring += "detailed help : " + groovyhelp.getCommandHelp()  + newLine;
         if (groovyhelp.getExamples().length > 0)
         {
-            String examples = "Example(s) : \n";
+            String examples = "Example(s) :" + newLine;
             for(int i=0; i<groovyhelp.getExamples().length;i++)
             {
-                examples += groovyhelp.getExamples()[i] + "\n";
+                examples += groovyhelp.getExamples()[i] + newLine;
             }
-            _helpContent += examples + "\n";
+            //_helpContent += examples + newLine;
+            tempstring += examples + newLine;
+            _helpText.addText(tempstring);
+            _helpText.loadText();
         }
+    }
+
+    public void showHelp()throws IOException{
+        _helpText.loadHelp();
     }
 
     @Override
@@ -195,8 +218,32 @@ public final class UIDebugConsole extends UIDisplayWindow {
         super.update();
 
         _consoleText.setText(String.format("%s_", this));
-        _consoleText.setPosition(new Vector2f(4, Display.getDisplayMode().getHeight() - 16 - 4));
-        _helpText.setText(String.format("%s", _helpContent));
-        _helpText.setPosition(new Vector2f(4, 16));
+        _consoleText.setPosition(new Vector2f(4, Display.getHeight() - 16 - 4));
+        //_helpText.setText(String.format("%s", _helpContent));
+        _helpText.setPosition(new Vector2f(4, 12));
+    }
+
+    public void render(){
+        renderOverlay();
+        super.render();
+    }
+
+    public void renderOverlay(){
+        glPushMatrix();
+        glLoadIdentity();
+        glColor4f(0, 0, 0, 0.75f);
+        glBegin(GL_QUADS);
+        glVertex2f(0f, 0f);
+        glVertex2f((float) Display.getWidth()-border, 0f);
+        glVertex2f((float) Display.getWidth()-border, (float) Display.getHeight()-border);
+        glVertex2f(0f, (float) Display.getHeight()-border);
+        glEnd();
+        glBegin(GL_QUADS);
+        glVertex2f(0f, Display.getHeight()-24);
+        glVertex2f((float) 300, Display.getHeight()-24);
+        glVertex2f((float) 300, (float) Display.getHeight());
+        glVertex2f(0f, (float) Display.getHeight());
+        glEnd();
+        glPopMatrix();
     }
 }

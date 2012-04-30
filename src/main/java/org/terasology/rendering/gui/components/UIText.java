@@ -37,7 +37,7 @@ import static org.lwjgl.opengl.GL11.glDisable;
  */
 public class UIText extends UIDisplayElement {
 
-    private String _text = "";
+    protected String _text = "";
 
     private Color _shadowColor = new Color(Color.black);
     private Color _color = new Color(Color.white);

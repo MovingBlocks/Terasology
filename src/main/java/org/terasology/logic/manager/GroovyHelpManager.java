@@ -36,7 +36,7 @@ public class GroovyHelpManager {
         reader.beginArray();
         while (reader.hasNext()) {
             groovyhelp = gson.fromJson(reader,GroovyHelp.class);
-            commandlist.add(groovyhelp.getCommandName());
+            commandlist.add(groovyhelp.getCommandName() + "\t\t: " + groovyhelp.getCommandDesc());
         }
         reader.endArray();
         reader.close();

@@ -42,7 +42,6 @@ import org.terasology.utilities.Helper;
 import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,6 +51,8 @@ import java.util.logging.Logger;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class GroovyManager {
+
+    public final String newLine = System.getProperty("line.separator");
     /**
      * The Binding allows us to keep variable references around where Groovy can play with them
      */
@@ -169,10 +170,10 @@ public class GroovyManager {
             {
                 GroovyHelpManager groovyhelpmanager = new GroovyHelpManager();
                 Object[] commandlist = groovyhelpmanager.getCommandList().toArray();
-                String retval = "Available commands :\n";
+                String retval = "Available commands :" + newLine+ newLine;
                 for(int i=0;i<commandlist.length;i++)
                 {
-                    retval+= "     " + commandlist[i].toString();
+                    retval+= commandlist[i].toString() + newLine;
                 }
                 _console.setHelpText(retval);
             }
@@ -186,7 +187,7 @@ public class GroovyManager {
         }
         else
         {
-            _console.setHelpText("Type 'help commandList' to see a list of commands\nType 'help <command>' to see command specific help");
+            _console.showHelp();
         }
     }
 
