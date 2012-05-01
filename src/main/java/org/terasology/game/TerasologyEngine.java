@@ -32,6 +32,7 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -84,6 +85,18 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initLogger() {
+        if (LWJGLUtil.DEBUG) {
+            System.setOut(new PrintStream(System.out) {
+                public void print(final String message) {
+                    Logger.getLogger("").info(message);
+                }
+            });
+            System.setErr(new PrintStream(System.err) {
+                public void print(final String message) {
+                    Logger.getLogger("").severe(message);
+                }
+            });
+        }
         File dirPath = PathManager.getInstance().getLogPath();
 
         if (!dirPath.exists()) {
