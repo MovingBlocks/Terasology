@@ -43,12 +43,10 @@ public class ArchiveSource extends AbstractSource {
 
     protected void scanArchive(File file) throws IOException {
         ZipFile archive;
-        String archiveType = "zip";
         String basePath = "";
 
         if (file.getName().endsWith(".jar")) {
             archive = new JarFile(file, false);
-            archiveType = "jar";
             basePath = "org/terasology/data/";
         } else {
             archive = new ZipFile(file);
@@ -64,7 +62,8 @@ public class ArchiveSource extends AbstractSource {
                 String key = entryPath.substring(basePath.length());
 
                 // @todo avoid this risky approach
-                URL url = new URL(archiveType + ":file:" + file.getAbsolutePath() + "!/" + entryPath );
+                // Using a jar protocol for zip files, because cannot register new protocols for the applet
+                URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath );
                 AssetUri uri = getUri(key);
                 if (uri != null) {
                     addItem(uri, url);

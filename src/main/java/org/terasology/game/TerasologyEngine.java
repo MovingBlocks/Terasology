@@ -73,7 +73,6 @@ public class TerasologyEngine implements GameEngine {
         initLogger();
         logger.log(Level.INFO, "Initializing Terasology...");
 
-        registerUrlHandlers();
         initNativeLibs();
         initDisplay();
         initOpenGL();
@@ -100,15 +99,6 @@ public class TerasologyEngine implements GameEngine {
             Logger.getLogger("").addHandler(fh);
         } catch (IOException ex) {
             logger.log(Level.WARNING, ex.toString(), ex);
-        }
-    }
-
-    private void registerUrlHandlers() {
-        String existing = System.getProperty("java.protocol.handler.pkgs");
-        if (existing != null && !existing.isEmpty()) {
-            System.setProperty("java.protocol.handler.pkgs", existing + "|org.terasology.asset.protocol");
-        } else {
-            System.setProperty("java.protocol.handler.pkgs", "org.terasology.asset.protocol");
         }
     }
 

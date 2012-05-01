@@ -146,11 +146,26 @@ task distLibs(type:Copy) {
 	into('target/dist/libs')
 }
 
+task distMods {
+	mkdir('target/dist/mods')
+	file('mods').listFiles().each { File mod ->
+		if (mod.isDirectory() ) {
+		    task('distMod-' + mod.getName(), type: Zip) {
+				from (mod)
+				archiveName = mod.getName() + '.zip'
+				destinationDir = file('target/dist/mods/')
+			}
+			distMods.dependsOn tasks['distMod-' + mod.getName()]
+		}
+	}
+}
+
 task dist(type:Copy) {
 	description = 'Creates a fully-functional game folder.'
 	dependsOn jar
 	dependsOn extractNatives
 	dependsOn distLibs
+	dependsOn distMods
 	
 	from('.') {
 		include 'README.markdown'
@@ -172,6 +187,20 @@ task zip(type:Zip) {
 	destinationDir = buildDir
 }
 
+task appletMods {
+	mkdir('target/applet/mods')
+	file('mods').listFiles().each { File mod ->
+		if (mod.isDirectory() ) {
+		    task('appletMod-' + mod.getName(), type: Zip) {
+				from (mod)
+				archiveName = mod.getName() + '.zip'
+				destinationDir = file('target/applet/mods/')
+			}
+			appletMods.dependsOn tasks['appletMod-' + mod.getName()]
+		}
+	}
+}
+
 task appletLibs(type:Copy) {
 	from {
 		configurations.compile.collect { !it.isDirectory() ? it : [] }
@@ -184,6 +213,7 @@ task applet(type:Copy) {
 	description = 'Creates a game distribution playable through a browser.'
 	dependsOn jar
 	dependsOn appletLibs
+	dependsOn appletMods
 
     from('applet') {
 		exclude '*.keystore'		

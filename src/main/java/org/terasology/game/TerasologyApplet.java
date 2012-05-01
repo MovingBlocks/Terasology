@@ -21,6 +21,13 @@ import org.terasology.logic.manager.PathManager;
 
 import java.applet.Applet;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +43,32 @@ public final class TerasologyApplet extends Applet {
     @Override
     public void init() {
         super.init();
+        obtainMods();
         startGame();
+    }
+
+    private void obtainMods() {
+        String[] mods = getParameter("mods").split(",");
+        int rootPathIndex = getDocumentBase().toString().lastIndexOf('/');
+        String path = getDocumentBase().toString().substring(0, rootPathIndex + 1) + "mods/";
+        for (String mod : mods) {
+            try {
+                URL url = new URL(path + mod);
+                ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+                FileOutputStream fos = new FileOutputStream(new File(PathManager.getInstance().getModPath(), mod));
+                long readBytes = fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+                while (readBytes == 1 << 24) {
+                    readBytes = fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+                }
+                fos.close();
+            } catch (MalformedURLException e) {
+                Logger.getLogger(TerasologyApplet.class.getName()).log(Level.SEVERE, "Unable to obtain mod '" + mod + "'", e);
+            } catch (FileNotFoundException e) {
+                Logger.getLogger(TerasologyApplet.class.getName()).log(Level.SEVERE, "Unable to obtain mod '" + mod + "'", e);
+            } catch (IOException e) {
+                Logger.getLogger(TerasologyApplet.class.getName()).log(Level.SEVERE, "Unable to obtain mod '" + mod + "'", e);
+            }
+        }
     }
 
     private void startGame() {
