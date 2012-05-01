@@ -45,7 +45,6 @@ public final class Terasology {
     public static void main(String[] args) {
         try {
             PathManager.getInstance().determineRootPath(true);
-            initLogger();
             engine.init();
             engine.run(new StateMainMenu());
             engine.dispose();
@@ -53,29 +52,6 @@ public final class Terasology {
             Logger.getLogger(Terasology.class.getName()).log(Level.SEVERE, "Uncaught Exception", t);
         }
         System.exit(0);
-    }
-
-    private static void initLogger() {
-        File dirPath = PathManager.getInstance().getLogPath();
-
-        if (!dirPath.exists()) {
-            if (!dirPath.mkdirs()) {
-                return;
-            }
-        }
-
-        addLogFileHandler(new File(dirPath, "Terasology.log").getAbsolutePath(), Level.INFO);
-    }
-
-    private static void addLogFileHandler(String s, Level logLevel) {
-        try {
-            FileHandler fh = new FileHandler(s, true);
-            fh.setLevel(logLevel);
-            fh.setFormatter(new SimpleFormatter());
-            Logger.getLogger("").addHandler(fh);
-        } catch (IOException ex) {
-            logger.log(Level.WARNING, ex.toString(), ex);
-        }
     }
 
 }

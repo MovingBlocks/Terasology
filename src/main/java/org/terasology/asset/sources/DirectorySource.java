@@ -16,27 +16,63 @@
 
 package org.terasology.asset.sources;
 
+import com.google.common.io.Files;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius
  */
 public class DirectorySource extends AbstractSource {
 
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     public DirectorySource(String id, File rootDirectory) {
         super(id);
 
+        assert rootDirectory.isDirectory();
+
         try {
-            loadAssetsFrom(rootDirectory, "");
+            loadAssetsFrom(rootDirectory);
         } catch (IOException e) {
             throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
         }
     }
 
+    private void loadAssetsFrom(File directory) throws IOException {
+        clear();
+        scanFiles(directory, directory.getAbsolutePath());
+    }
+
+    private void scanFiles(File file, String basePath) {
+        for (File child : file.listFiles()) {
+            if (child.isDirectory()) {
+                this.scanFiles(child, basePath);
+            } else if (child.isFile()) {
+                String key = child.getAbsolutePath();
+
+                if (key.startsWith(basePath)) { //strip down basepath
+                    key = key.substring(basePath.length() + 1);
+                    key = key.replace(File.separatorChar, '/');
+
+                    AssetUri uri = getUri(key);
+
+                    if (uri != null) {
+                        try {
+                            addItem(uri, child.toURI().toURL());
+                        } catch (MalformedURLException e) {
+                            logger.warning("Failed to load asset " + key + " - " + e.getMessage());
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

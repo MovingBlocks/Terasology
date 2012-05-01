@@ -16,8 +16,15 @@
 
 package org.terasology.asset.sources;
 
+import org.terasology.asset.AssetUri;
+
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * @author Immortius
@@ -28,9 +35,41 @@ public class ArchiveSource extends AbstractSource {
         super(sourceId);
 
         try {
-            this.scanArchive(archive, "");
+            scanArchive(archive);
         } catch (IOException e) {
             throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
+        }
+    }
+
+    protected void scanArchive(File file) throws IOException {
+        ZipFile archive;
+        String archiveType = "zip";
+        String basePath = "";
+
+        if (file.getName().endsWith(".jar")) {
+            archive = new JarFile(file, false);
+            archiveType = "jar";
+            basePath = "org/terasology/data/";
+        } else {
+            archive = new ZipFile(file);
+        }
+
+        Enumeration<? extends ZipEntry> lister = archive.entries();
+
+        while (lister.hasMoreElements()) {
+            ZipEntry entry = lister.nextElement();
+            String entryPath = entry.getName();
+
+            if (entryPath.startsWith(basePath)) {
+                String key = entryPath.substring(basePath.length());
+
+                // @todo avoid this risky approach
+                URL url = new URL(archiveType + ":file:" + file.getAbsolutePath() + "!/" + entryPath );
+                AssetUri uri = getUri(key);
+                if (uri != null) {
+                    addItem(uri, url);
+                }
+            }
         }
     }
 }

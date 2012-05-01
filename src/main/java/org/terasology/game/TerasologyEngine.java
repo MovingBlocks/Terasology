@@ -31,14 +31,17 @@ import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
@@ -49,7 +52,7 @@ import static org.lwjgl.opengl.GL11.glDepthFunc;
  */
 public class TerasologyEngine implements GameEngine {
 
-    private Logger logger = Logger.getLogger("Engine");
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     private Deque<GameState> stateStack = new ArrayDeque<GameState>();
     private boolean initialised;
@@ -67,8 +70,10 @@ public class TerasologyEngine implements GameEngine {
     public void init() {
         if (initialised)
             return;
+        initLogger();
         logger.log(Level.INFO, "Initializing Terasology...");
 
+        registerUrlHandlers();
         initNativeLibs();
         initDisplay();
         initOpenGL();
@@ -77,6 +82,34 @@ public class TerasologyEngine implements GameEngine {
         initManagers();
         initTimer(); // Dependant on LWJGL
         initialised = true;
+    }
+
+    private void initLogger() {
+        File dirPath = PathManager.getInstance().getLogPath();
+
+        if (!dirPath.exists()) {
+            if (!dirPath.mkdirs()) {
+                return;
+            }
+        }
+
+        try {
+            FileHandler fh = new FileHandler(new File(dirPath, "Terasology.log").getAbsolutePath(), true);
+            fh.setLevel(Level.INFO);
+            fh.setFormatter(new SimpleFormatter());
+            Logger.getLogger("").addHandler(fh);
+        } catch (IOException ex) {
+            logger.log(Level.WARNING, ex.toString(), ex);
+        }
+    }
+
+    private void registerUrlHandlers() {
+        String existing = System.getProperty("java.protocol.handler.pkgs");
+        if (existing != null && !existing.isEmpty()) {
+            System.setProperty("java.protocol.handler.pkgs", existing + "|org.terasology.asset.protocol");
+        } else {
+            System.setProperty("java.protocol.handler.pkgs", "org.terasology.asset.protocol");
+        }
     }
 
     @Override

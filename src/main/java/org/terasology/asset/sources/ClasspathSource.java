@@ -36,11 +36,11 @@ import java.util.zip.ZipFile;
 /**
  * @author Immortius
  */
-public class ClasspathSource extends AbstractSource {
+public class ClasspathSource implements AssetSource {
+
+    private AssetSource source;
 
     public ClasspathSource(String id, CodeSource cs, String basePath) {
-        super(id);
-
         if (cs == null) {
             throw new IllegalStateException("Can't access assets: CodeSource is null");
         }
@@ -49,10 +49,33 @@ public class ClasspathSource extends AbstractSource {
 
         try {
             File codePath = new File(url.toURI());
-            this.loadAssetsFrom(codePath, basePath);
+            if (codePath.isFile()) {
+                source = new ArchiveSource(id, codePath);
+            } else {
+                source = new DirectorySource(id, new File(codePath, "org/terasology/data"));
+            }
         } catch (Throwable e) {
             throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
         }
     }
 
+    @Override
+    public String getSourceId() {
+        return source.getSourceId();
+    }
+
+    @Override
+    public URL get(AssetUri uri) {
+        return source.get(uri);
+    }
+
+    @Override
+    public Iterable<AssetUri> list() {
+        return source.list();
+    }
+
+    @Override
+    public Iterable<AssetUri> list(AssetType type) {
+        return source.list(type);
+    }
 }

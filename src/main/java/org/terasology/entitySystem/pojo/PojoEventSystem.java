@@ -46,7 +46,7 @@ public class PojoEventSystem implements EventSystem {
                 if (types.length == 2 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1]))
                 {
                     logger.info("Found method: " + method.toString());
-                    EventHandlerInfo handlerInfo = new EventHandlerInfo(handler, method, receiveEventAnnotation.components(), receiveEventAnnotation.priority());
+                    ReflectedEventHandlerInfo handlerInfo = new ReflectedEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), receiveEventAnnotation.components());
                     for (Class<? extends Component> c : receiveEventAnnotation.components()) {
                         Multimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get((Class<? extends Event>) types[0]);
                         if (componentMap == null) {
@@ -62,6 +62,25 @@ public class PojoEventSystem implements EventSystem {
                 }
             }
         }
+    }
+
+    @Override
+    public <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes) {
+        registerEventReceiver(eventReceiver, eventClass, ReceiveEvent.PRIORITY_NORMAL, componentTypes);
+    }
+
+    @Override
+    public <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, int priority, Class<? extends Component>... componentTypes) {
+        EventHandlerInfo info = new ReceiverEventHandlerInfo<T>(eventReceiver, priority, componentTypes);
+        for (Class<? extends Component> c : componentTypes) {
+            Multimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get(eventClass);
+            if (componentMap == null) {
+                componentMap = HashMultimap.create();
+                componentSpecificHandlers.put(eventClass, componentMap);
+            }
+            componentMap.put(c, info);
+        }
+
     }
 
     public void send(EntityRef entity, Event event) {
@@ -84,9 +103,12 @@ public class PojoEventSystem implements EventSystem {
         Collections.sort(selectedHandlers, priorityComparator);
 
         for (EventHandlerInfo handler : selectedHandlers) {
-            handler.invoke(entity, event);
-            if (event.isCancelled())
-                return;
+            // Check isValid at each stage in case components were removed.
+            if (handler.isValidFor(entity)) {
+                handler.invoke(entity, event);
+                if (event.isCancelled())
+                    return;
+            }
         }
     }
 
@@ -109,18 +131,25 @@ public class PojoEventSystem implements EventSystem {
         }
     }
 
-    private class EventHandlerInfo
+    private interface EventHandlerInfo {
+        public boolean isValidFor(EntityRef entity);
+        public void invoke(EntityRef entity, Event event);
+        public int getPriority();
+    }
+
+
+    private class ReflectedEventHandlerInfo implements EventHandlerInfo
     {
         private EventHandlerSystem handler;
         private Method method;
         private Class<? extends Component>[] components;
         private int priority;
 
-        public EventHandlerInfo(EventHandlerSystem handler, Method method, Class<? extends Component>[] components, int priority)
+        public ReflectedEventHandlerInfo(EventHandlerSystem handler, Method method, int priority, Class<? extends Component> ... components)
         {
             this.handler = handler;
             this.method = method;
-            this.components = components;
+            this.components = Arrays.copyOf(components, components.length);
             this.priority = priority;
         }
         
@@ -146,6 +175,39 @@ public class PojoEventSystem implements EventSystem {
             }
         }
 
+        public int getPriority() {
+            return priority;
+        }
+    }
+
+    private class ReceiverEventHandlerInfo<T extends Event> implements EventHandlerInfo
+    {
+        private EventReceiver<T> receiver;
+        private Class<? extends Component>[] components;
+        private int priority;
+
+        public ReceiverEventHandlerInfo(EventReceiver<T> receiver, int priority, Class<? extends Component> ... components) {
+            this.receiver = receiver;
+            this.priority = priority;
+            this.components = Arrays.copyOf(components, components.length);
+        }
+
+        @Override
+        public boolean isValidFor(EntityRef entity) {
+            for (Class<? extends Component> component : components) {
+                if (!entity.hasComponent(component)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public void invoke(EntityRef entity, Event event) {
+            receiver.onEvent((T)event, entity);
+        }
+
+        @Override
         public int getPriority() {
             return priority;
         }

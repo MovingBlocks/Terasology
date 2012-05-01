@@ -13,6 +13,25 @@ public interface EventSystem {
     void registerEventHandler(EventHandlerSystem handler);
 
     /**
+     * Registers an event receiver object
+     * @param eventReceiver
+     * @param eventClass
+     * @param componentTypes
+     * @param <T>
+     */
+    <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component> ... componentTypes);
+
+    /**
+     *
+     * @param eventReceiver
+     * @param eventClass
+     * @param priority
+     * @param componentTypes
+     * @param <T>
+     */
+    <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, int priority, Class<? extends Component>... componentTypes);
+
+    /**
      * Sends an event to all handlers for an entity's components
      * @param entity
      * @param event

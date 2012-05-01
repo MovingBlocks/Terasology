@@ -21,18 +21,19 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
+import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.DirectorySource;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * @author Immortius
@@ -65,8 +66,24 @@ public class ModManager {
                         logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
                     }
                 }
-            } else {
-                // TODO: Packaged mod
+            } else if (modFile.isFile() && modFile.getName().endsWith(".zip")) {
+                try {
+                    ZipFile zipFile = new ZipFile(modFile);
+                    ZipEntry modInfoEntry = zipFile.getEntry("mod.txt");
+                    if (modInfoEntry != null) {
+                        try {
+                            ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
+                            mods.put(modInfo.getId(), new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile)));
+                            logger.info("Discovered mod: " + modInfo.getDisplayName());
+                        } catch (FileNotFoundException e) {
+                            logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
+                        } catch (JsonIOException e) {
+                            logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
+                        }
+                    }
+                } catch (IOException e) {
+                    logger.log(Level.SEVERE, "Invalid mod file: " + modFile, e);
+                }
             }
         }
         for (String activeModId : Config.getInstance().getActiveMods()) {

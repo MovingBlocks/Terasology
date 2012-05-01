@@ -68,7 +68,7 @@ public final class PathManager {
     }
 
     public File getWorldSavePath(String worldTitle) {
-        // TODO: remove special characters from world title
+        // TODO: remove special characters from world title?
         File result = new File(worldPath, worldTitle);
         result.mkdirs();
         return result;
