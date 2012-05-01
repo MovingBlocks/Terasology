@@ -2,7 +2,7 @@
 {"commandName":"giveBlock",
 "parameters":["blockNbr","blockName","quantity"],
 "commandDesc":"Adds blocks of the given blockNbr or blockName to your inventory",
-"commandHelp":"Accepts different parameters, list of parameters will be added shortly",
+"commandHelp":"Accepts different parameters, type 'help blockList for a list of blocks'",
 "examples":[
 "\u0027giveBlock Water\u0027 Gives 16 water blocks",
 "\u0027giveBlock IronPyrites, 42\u0027 Gives 42 Iron Pyrite (Fool\u0027s Gold) blocks",

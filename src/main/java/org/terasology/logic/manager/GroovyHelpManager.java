@@ -1,17 +1,14 @@
 package org.terasology.logic.manager;
 
-import java.util.ArrayList;
+import java.util.*;
+import java.lang.reflect.*;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import org.terasology.game.Terasology;
-import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.rendering.gui.menus.UIDebugConsole;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.utilities.ClasspathResourceLoader;
 
-import java.awt.*;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.io.IOException;
 
 /**
@@ -28,19 +25,32 @@ public class GroovyHelpManager {
     public GroovyHelpManager()
     {}
 
-    public ArrayList<String> getCommandList() throws IOException
+    public HashMap<String,String> getHelpCommands() throws IOException
     {
-        ArrayList<String> commandlist = new ArrayList<String>();
+        HashMap<String,String> commandlist = new HashMap<String, String>();
         Gson gson = new Gson();
         JsonReader reader = new JsonReader(new FileReader(".\\data\\help\\commands\\commands.json"));
         reader.beginArray();
         while (reader.hasNext()) {
             groovyhelp = gson.fromJson(reader,GroovyHelp.class);
-            commandlist.add(groovyhelp.getCommandName() + "\t\t: " + groovyhelp.getCommandDesc());
+            commandlist.put(groovyhelp.getCommandName(), groovyhelp.getCommandDesc());
         }
         reader.endArray();
         reader.close();
         return commandlist;
+    }
+
+    public String[] getGroovyCommands(){
+        Method[] methods = GroovyManager.CommandHelper.class.getDeclaredMethods();
+        String[] tempval = new String[methods.length];
+        for (int i=0;i<methods.length;i++)
+        {
+            tempval[i] = methods[i].getName();
+        }
+        Set<String> set = new HashSet<String>(Arrays.asList(tempval));
+        String[] retval = new String[set.size()];
+        set.toArray(retval);
+        return retval;
     }
 
     public GroovyHelp readCommandHelp(String commandname)
@@ -66,32 +76,17 @@ public class GroovyHelpManager {
         return null;
     }
 
-    public void writeHelp(StateSinglePlayer singlePlayer)
+    public HashMap<Byte,String> getGroovyBlocks()
     {
-        try
-        {
-            groovyhelp.setCommandName("giveBlock");
-            String[] strings = {"blockNbr","blockName","quantity"};
-            groovyhelp.setParameters(strings);
-            groovyhelp.setCommandDesc("Adds blocks of the given blockNbr or blockName to your inventory");
-            groovyhelp.setCommandHelp("test");
-            String[] strings2 = {"'giveBlock Water' Gives 16 water blocks","'giveBlock IronPyrites, 42' Gives 42 Iron Pyrite (Fool's Gold) blocks", "'giveBlock Chest' Gives you a Chest block you can place, activate ('E'), put stuff in, destroy, pick up, place elsewhere, find same stuff in it!"};
-            groovyhelp.setExamples(strings2);
-            Gson gson = new Gson();
-            String test = gson.toJson(groovyhelp, groovyhelp.getClass());
-            UIDebugConsole _console = singlePlayer.getHud().getDebugConsole();
-            _console.setHelpText(groovyhelp);
-            JsonWriter writer = new JsonWriter(new FileWriter(".\\data\\help\\commands\\commands.json"));
-            writer.beginArray();
-            gson.toJson(groovyhelp,groovyhelp.getClass(),writer);
-            writer.endArray();
-            writer.close();
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
+        HashMap<Byte,String> retval = new HashMap<Byte, String>();
+        for(byte i = -127;i<128;i++){
+            Block b = BlockManager.getInstance().getBlock(i);
+            if(b.getId() != 0){
+                retval.put(b.getId(),b.getTitle());
+            }
+            if(i == 117){break;}
         }
 
-        //return true;
+        return retval;
     }
 }

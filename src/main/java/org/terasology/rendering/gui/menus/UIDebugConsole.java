@@ -20,6 +20,7 @@ import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.GroovyHelp;
+import org.terasology.logic.manager.GroovyHelpManager;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITextWrap;
 import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
@@ -27,6 +28,7 @@ import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
 import javax.vecmath.Vector2f;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -47,14 +49,11 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
     private final ArrayList<String> _ringBuffer = new ArrayList<String>();
     private final int border = 70;
     private int _ringBufferPos = -1;
-    private String _helpContent = "";
 
     /**
      * Init. a new Terasology console.
      */
     public UIDebugConsole() {
-        //setModal(true);
-        //setOverlay(true);
         setPosition(new Vector2f(0, 0));
         setSize(new Vector2f(Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight()));
 
@@ -136,18 +135,20 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
      * Parses the console string and executes the command.
      */
     public void processConsoleString() {
-        int success = 0;
+        boolean success = false;
         _helpText.resetScroll();
         try {
-            success = Terasology.getInstance().getGroovyManager().runGroovyShell(_consoleInput.toString());
+            if(_consoleInput.toString().startsWith("help")){
+                getHelp(_consoleInput.toString());
+                return;
+            }
+            else{
+                success = Terasology.getInstance().getGroovyManager().runGroovyShell(_consoleInput.toString());
+            }
         } catch (Exception e) {
             Terasology.getInstance().getLogger().log(Level.INFO, e.getMessage());
         }
-        if (success > 1) {
-            _consoleText.setText("");
-            return;
-        }
-        if (success > 0) {
+        if (success) {
             Terasology.getInstance().initOpenGLParams();
             Terasology.getInstance().getLogger().log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
 
@@ -155,8 +156,60 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
             resetDebugConsole();
             setVisible(false);
         } else {
-            _helpContent = "error : Type help for help, help <command> for command specific help";
+            try{
+                _helpText.loadError();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
             Terasology.getInstance().getLogger().log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
+        }
+    }
+
+    private void getHelp(String commandstring) throws IOException
+    {
+        String[] split = commandstring.split(" ");
+        if(split.length > 1)
+        {
+            if(split[1].equals("commandList"))
+            {
+                GroovyHelpManager groovyhelpmanager = new GroovyHelpManager();
+                HashMap<String,String> commandhelp = groovyhelpmanager.getHelpCommands();
+                String[] commandlist = groovyhelpmanager.getGroovyCommands();
+                String retval = "Available commands :" + newLine+ newLine;
+                for(int i=0;i<commandlist.length;i++)
+                {
+                    if(commandhelp.containsKey(commandlist[i])){
+                        retval+= commandlist[i].toString() + " \t: " + commandhelp.get(commandlist[i]).toString() + newLine;
+                    }
+                    else{
+                        retval+= commandlist[i].toString() + " : undocumented" + newLine;
+                    }
+                }
+                setHelpText(retval);
+                return;
+            }
+            GroovyHelpManager groovyhelpmanager = new GroovyHelpManager();
+            if(groovyhelpmanager.getHelpCommands().containsKey(split[1]))
+            {
+                GroovyHelp groovyhelp = groovyhelpmanager.readCommandHelp(split[1]);
+                setHelpText(groovyhelp);
+                return;
+            }
+            if(split[1].equals("blockList")){
+                String tempval = "";
+                HashMap<Byte,String> blocks = groovyhelpmanager.getGroovyBlocks();
+                for(byte i = 0;i<blocks.size();i++){
+                    tempval+= "blockName = " + blocks.get(i) + ", blockNbr = " + i + newLine;
+                }
+                setHelpText(tempval);
+                return;
+            }
+            showError();
+        }
+        else
+        {
+            showHelp();
         }
     }
 
@@ -173,15 +226,13 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
 
     public void setHelpText(String helptekst) throws IOException
     {
-        //_helpContent = helptekst;
         _helpText.addText(helptekst);
-        _helpText.loadText();
+        _helpText.showFromJson();
     }
 
     public void setHelpText(GroovyHelp groovyhelp) throws IOException
     {
         String tempstring = "";
-        //_helpContent = groovyhelp.getCommandName() + " : " + groovyhelp.getCommandDesc() + newLine;
         tempstring += groovyhelp.getCommandName() + " : " + groovyhelp.getCommandDesc() + newLine;
         if (groovyhelp.getParameters().length > 0)
         {
@@ -190,10 +241,8 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
             {
                 parameters += groovyhelp.getParameters()[i] + newLine;
             }
-            //_helpContent += parameters  + newLine;
             tempstring += parameters  + newLine;
         }
-        //_helpContent += "detailed help : " + groovyhelp.getCommandHelp()  + newLine;
         tempstring += "detailed help : " + groovyhelp.getCommandHelp()  + newLine;
         if (groovyhelp.getExamples().length > 0)
         {
@@ -202,15 +251,18 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
             {
                 examples += groovyhelp.getExamples()[i] + newLine;
             }
-            //_helpContent += examples + newLine;
             tempstring += examples + newLine;
             _helpText.addText(tempstring);
-            _helpText.loadText();
+            _helpText.showFromJson();
         }
     }
 
     public void showHelp()throws IOException{
         _helpText.loadHelp();
+    }
+
+    public void showError()throws IOException{
+        _helpText.loadError();
     }
 
     @Override
@@ -219,7 +271,6 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
 
         _consoleText.setText(String.format("%s_", this));
         _consoleText.setPosition(new Vector2f(4, Display.getHeight() - 16 - 4));
-        //_helpText.setText(String.format("%s", _helpContent));
         _helpText.setPosition(new Vector2f(4, 12));
     }
 
