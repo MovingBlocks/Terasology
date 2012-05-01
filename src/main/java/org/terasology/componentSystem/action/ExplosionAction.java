@@ -30,7 +30,7 @@ public class ExplosionAction implements EventHandlerSystem {
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
-        blockEntityRegistry = CoreRegistry.get(ComponentSystemManager.class).get(BlockEntityRegistry.class);
+        blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
     @ReceiveEvent(components = {ExplosionActionComponent.class})

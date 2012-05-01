@@ -95,8 +95,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         timer = CoreRegistry.get(Timer.class);
 
-        ComponentSystemManager systemManager = CoreRegistry.get(ComponentSystemManager.class);
-        blockEntityRegistry = systemManager.get(BlockEntityRegistry.class);
+        blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
     public void setPlayerCamera(DefaultCamera camera) {

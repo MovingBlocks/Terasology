@@ -37,7 +37,7 @@ public class ItemSystem implements EventHandlerSystem {
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
-        blockEntityRegistry = CoreRegistry.get(ComponentSystemManager.class).get(BlockEntityRegistry.class);
+        blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
     @ReceiveEvent(components=BlockItemComponent.class)

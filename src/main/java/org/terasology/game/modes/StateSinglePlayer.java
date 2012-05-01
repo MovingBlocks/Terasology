@@ -189,7 +189,9 @@ public class StateSinglePlayer implements GameState {
 
         loadPrefabs();
 
-        _componentSystemManager.register(new BlockEntityRegistry());
+        BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
+        _componentSystemManager.register(blockEntityRegistry);
+        CoreRegistry.put(BlockEntityRegistry.class, blockEntityRegistry);
         _componentSystemManager.register(new CharacterMovementSystem());
         _componentSystemManager.register(new SimpleAISystem());
         _componentSystemManager.register(new ItemSystem());

@@ -17,18 +17,15 @@ import java.util.Map;
  * @author Immortius <immortius@gmail.com>
  */
 public class ComponentSystemManager {
-    private Map<Class<? extends ComponentSystem>, ComponentSystem> store = Maps.newHashMap();
+    private Map<String, ComponentSystem> namedLookup = Maps.newHashMap();
     private List<UpdateSubscriberSystem> updateSubscribers = Lists.newArrayList();
     private List<RenderSystem> renderSubscribers = Lists.newArrayList();
+    private List<ComponentSystem> store = Lists.newArrayList();
 
     public ComponentSystemManager() {}
 
-    public <T extends ComponentSystem> void register(T object) {
-        register(object, (Class<T>)object.getClass());
-    }
-    
-    public <T extends ComponentSystem> void register(T object, Class<T> asType) {
-        store.put(asType, object);
+    public void register(ComponentSystem object) {
+        store.add(object);
         if (object instanceof UpdateSubscriberSystem) {
             updateSubscribers.add((UpdateSubscriberSystem)object);
         }
@@ -40,18 +37,24 @@ public class ComponentSystemManager {
         }
     }
     
-    public <T> T get(Class<T> type) {
-        return type.cast(store.get(type));
+    public <T extends ComponentSystem> void register(ComponentSystem object, String name) {
+        register(object);
+        namedLookup.put(name, object);
+    }
+    
+    public ComponentSystem get(String name) {
+        return namedLookup.get(name);
     }
 
     public void clear() {
+        namedLookup.clear();
         store.clear();
         updateSubscribers.clear();
         renderSubscribers.clear();
     }
 
     public Iterable<ComponentSystem> iterateAll() {
-        return store.values();
+        return store;
     }
 
     public Iterable<UpdateSubscriberSystem> iterateUpdateSubscribers() {
