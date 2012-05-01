@@ -17,17 +17,8 @@ package org.terasology.rendering.gui.components;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.AngelCodeFont;
-import org.newdawn.slick.Color;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureImpl;
-import org.terasology.logic.manager.FontManager;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.Vector2f;
 
@@ -36,8 +27,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import static org.lwjgl.opengl.GL11.glDisable;
 
 /**
  * Simple text element supporting text shadowing.
@@ -70,7 +59,7 @@ public class UITextWrap extends UIText {
             else{currentpos--;}
             _wheelMoved = 0;
             try{
-            loadText();}
+            showFromJson();}
             catch (Exception e){
                 e.printStackTrace();
             }
@@ -81,61 +70,8 @@ public class UITextWrap extends UIText {
         _text = text;
     }
 
-    private String wraptext(String towrap)
-    {
-        String wrappedtext = "";
-        int linecounter = 0;
-        String[] parts = towrap.split(newLine);
-        int width = Display.getWidth()- 8;
-        int charCount = (int)(width /7);
-        for(int i = 0;i<parts.length;i++){
-            if(parts[i].length() > charCount){
-                int endpoint = charCount;
-                int beginpoint = 0;
-                while(endpoint > beginpoint) {
-                    for(int j=endpoint;j>beginpoint;j--){
-                        Character ch =  parts[i].charAt(j);
-                        if(Character.isSpaceChar(ch))
-                        {endpoint = j; break;}
-                        else {
-                            switch(ch){
-                                case '.' :
-                                case '?' :
-                                case ';' :
-                                case ':' :
-                                case '\t' :
-                                case '!' : endpoint = j; break;
-                            }
-                        }
-                    }
-                    wrappedtext += parts[i].substring(beginpoint,endpoint) + newLine;
-                    linecounter++;
-                    beginpoint = endpoint + 1;
-                    endpoint = beginpoint + charCount ;
-                    if(endpoint > parts[i].length() -1)
-                    {
-                        wrappedtext += parts[i].substring(beginpoint,parts[i].length() -1) + newLine;
-                        linecounter++;
-                        endpoint = -1;
-                    }
-                    if(linecounter == 40){
-                        return wrappedtext;
-                    }
-                }
-            }
-            else{
-                wrappedtext += parts[i] + newLine;
-                linecounter++;
-                if(linecounter == 40){
-                    return wrappedtext;
-                }
-            }
-        }
-        return wrappedtext;
-    }
-
-    public void loadText()throws IOException{
-        int maxlines = totalCount();
+    public void showFromJson()throws IOException{
+        int maxlines = getLineCount();
         int screenlines = getScreenLines();
         long beginpos, endpos,counter;
         if(screenlines + currentpos > maxlines){
@@ -175,6 +111,18 @@ public class UITextWrap extends UIText {
         _text ="";
         while (reader.hasNext()) {
                 _text += gson.fromJson(reader,String.class) + newLine;
+        }
+        reader.endArray();
+        reader.close();
+    }
+
+    public void loadError() throws IOException{
+        Gson gson = new Gson();
+        JsonReader reader = new JsonReader(new FileReader(".\\data\\console\\error.json"));
+        reader.beginArray();
+        _text ="";
+        while (reader.hasNext()) {
+            _text += gson.fromJson(reader,String.class) + newLine;
         }
         reader.endArray();
         reader.close();
@@ -240,7 +188,7 @@ public class UITextWrap extends UIText {
         writer.close();
     }
 
-    public int totalCount()throws IOException{
+    public int getLineCount()throws IOException{
         Gson gson = new Gson();
         JsonReader reader = new JsonReader(new FileReader(".\\data\\console\\consolelog.json"));
         int counter = 0;
@@ -258,23 +206,5 @@ public class UITextWrap extends UIText {
         int disp = Display.getHeight() -8 -70;
         return disp/16;
     }
-
-    /*public void processMouseInput(int button, boolean state, int wheelMoved) {
-
-        if (button == 0 && state && !_mouseUp) {
-            _mouseDown = true;
-            _mouseUp = false;
-            _clickSoundPlayed = false;
-        } else if (button == 0 && !state && _mouseDown) {
-            _mouseUp = true;
-            _mouseDown = false;
-        }
-
-        if(wheelMoved!=0){
-            _wheelMoved = wheelMoved;
-        }else{
-            _wheelMoved = 0;
-        }
-    } */
 
 }

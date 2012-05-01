@@ -7,7 +7,7 @@
 "Note! : if the text is larger then the console, scroll your mousewheel up or down.",
 "",
 "Type 'help commandList' to see a list of available commands",
-"Type 'help <command>' to see command specific help",
+"Type 'help <command>' to see command specific help if documented",
 "",
 "to close the console, simply press the same key again you used to open it (tab by default) ",
 "",
