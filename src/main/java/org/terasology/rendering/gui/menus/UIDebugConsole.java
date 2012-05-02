@@ -199,8 +199,10 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
             if(split[1].equals("blockList")){
                 String tempval = "";
                 HashMap<Byte,String> blocks = groovyhelpmanager.getGroovyBlocks();
-                for(byte i = 0;i<blocks.size();i++){
-                    tempval+= "blockName = " + blocks.get(i) + ", blockNbr = " + i + newLine;
+                for(byte i = 0;i<Byte.MAX_VALUE;i++){
+                    if(blocks.containsKey(i)){
+                        tempval+= "blockName = " + blocks.get(i) + ", blockNbr = " + i + newLine;
+                    }
                 }
                 setHelpText(tempval);
                 return;
