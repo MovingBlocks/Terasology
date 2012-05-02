@@ -172,6 +172,42 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
     }
 
     @Override
+    public Prefab deserializePrefab(EntityData.Prefab prefabData, String packageContext) {
+        String name = prefabData.getName();
+        if (!prefabData.getName().startsWith(packageContext + ":")) {
+            int existingPackageName = name.lastIndexOf(':');
+            if (existingPackageName != -1) {
+                name = name.substring(existingPackageName + 1);
+            }
+            name = packageContext + ":" + name;
+        }
+
+        Prefab prefab = prefabManager.createPrefab(name);
+        for (String parentName : prefabData.getParentNameList()) {
+            int packageSplit = parentName.indexOf(':');
+            if (packageSplit == -1) {
+                parentName = packageContext + ":" + parentName;
+            }
+            Prefab parent = prefabManager.getPrefab(parentName);
+
+            if (parent == null) {
+                logger.log(Level.SEVERE, "Missing parent prefab (need to fix parent serialization)");
+            } else {
+                prefab.addParent(parent);
+            }
+        }
+
+        for (EntityData.Component componentData : prefabData.getComponentList()) {
+            Component component = deserializeComponent(componentData);
+            if (component != null) {
+                prefab.setComponent(component);
+            }
+        }
+
+        return prefab;
+    }
+
+    @Override
     public Prefab deserializePrefab(EntityData.Prefab prefabData) {
         Prefab prefab = prefabManager.createPrefab(prefabData.getName());
         for (String parentName : prefabData.getParentNameList()) {

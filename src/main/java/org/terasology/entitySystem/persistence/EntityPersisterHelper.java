@@ -45,6 +45,15 @@ public interface EntityPersisterHelper {
 
     Prefab deserializePrefab(EntityData.Prefab prefabData);
 
+    /**
+     * Deserializes a prefab, adjusting the prefab's name (and parent's names) to be within the supplied
+     * package context if necessary.
+     * @param prefabData
+     * @param packageContext
+     * @return The deserialized prefab
+     */
+    Prefab deserializePrefab(EntityData.Prefab prefabData, String packageContext);
+
     Component deserializeComponent(EntityData.Component componentData);
 
     /**

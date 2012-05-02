@@ -1,5 +1,5 @@
 {
-  "name": "Chest",
+  "name": "core:chest",
   "Inventory": {
     "itemSlots": [
       0,

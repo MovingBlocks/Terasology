@@ -29,7 +29,7 @@ block {
         topbottom = "ChestTopBottom"
     }
 
-    entityPrefab = "Chest"
+    entityPrefab = "core:chest"
     stackable = false
     straightToInventory = true
     usable = true

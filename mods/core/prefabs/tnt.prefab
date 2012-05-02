@@ -1,5 +1,5 @@
 {
-  "name": "TNT",
+  "name": "core:tnt",
   "PlaySoundAction" : {
     sounds = ["Explode1","Explode2","Explode3","Explode4","Explode5"]
   },

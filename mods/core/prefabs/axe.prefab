@@ -1,5 +1,5 @@
 {
-    "name" : "axe",
+    "name" : "core:axe",
     "Item" : {
         "name" : "Axe",
         "icon" : "Axe",

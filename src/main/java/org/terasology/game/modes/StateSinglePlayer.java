@@ -190,25 +190,25 @@ public class StateSinglePlayer implements GameState {
         loadPrefabs();
 
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
-        _componentSystemManager.register(blockEntityRegistry);
+        _componentSystemManager.register(blockEntityRegistry, "engine:BlockEntityRegistry");
         CoreRegistry.put(BlockEntityRegistry.class, blockEntityRegistry);
-        _componentSystemManager.register(new CharacterMovementSystem());
-        _componentSystemManager.register(new SimpleAISystem());
-        _componentSystemManager.register(new ItemSystem());
-        _componentSystemManager.register(new CharacterSoundSystem());
+        _componentSystemManager.register(new CharacterMovementSystem(), "engine:CharacterMovementSystem");
+        _componentSystemManager.register(new SimpleAISystem(), "engine:SimpleAISystem");
+        _componentSystemManager.register(new ItemSystem(), "engine:ItemSystem");
+        _componentSystemManager.register(new CharacterSoundSystem(), "engine:CharacterSoundSystem");
         _localPlayerSys = new LocalPlayerSystem();
-        _componentSystemManager.register(_localPlayerSys);
-        _componentSystemManager.register(new FirstPersonRenderer());
-        _componentSystemManager.register(new HealthSystem());
-        _componentSystemManager.register(new BlockEntitySystem());
-        _componentSystemManager.register(new BlockParticleEmitterSystem());
-        _componentSystemManager.register(new BlockDamageRenderer());
-        _componentSystemManager.register(new InventorySystem());
-        _componentSystemManager.register(new MeshRenderer());
-        _componentSystemManager.register(new ExplosionAction());
-        _componentSystemManager.register(new PlaySoundAction());
-        _componentSystemManager.register(new TunnelAction());
-        _componentSystemManager.register(new AccessInventoryAction());
+        _componentSystemManager.register(_localPlayerSys, "engine:LocalPlayerSystem");
+        _componentSystemManager.register(new FirstPersonRenderer(), "engine:FirstPersonRenderer");
+        _componentSystemManager.register(new HealthSystem(), "engine:HealthSystem");
+        _componentSystemManager.register(new BlockEntitySystem(), "engine:BlockEntitySystem");
+        _componentSystemManager.register(new BlockParticleEmitterSystem(), "engine:BlockParticleSystem");
+        _componentSystemManager.register(new BlockDamageRenderer(), "engine:BlockDamageRenderer");
+        _componentSystemManager.register(new InventorySystem(), "engine:InventorySystem");
+        _componentSystemManager.register(new MeshRenderer(), "engine:MeshRenderer");
+        _componentSystemManager.register(new ExplosionAction(), "engine:ExplosionAction");
+        _componentSystemManager.register(new PlaySoundAction(), "engine:PlaySoundAction");
+        _componentSystemManager.register(new TunnelAction(), "engine:TunnelAction");
+        _componentSystemManager.register(new AccessInventoryAction(), "engine:AccessInventoryAction");
 
         _hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
@@ -237,7 +237,7 @@ public class StateSinglePlayer implements GameState {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(AssetManager.assetStream(prefabURI)));
                 EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
                 if (prefabData != null) {
-                    persisterHelper.deserializePrefab(prefabData);
+                    persisterHelper.deserializePrefab(prefabData, prefabURI.getPackage());
                 }
             } catch (IOException e) {
                 _logger.log(Level.WARNING, "Failed to load prefab '" + prefabURI + "'", e);
@@ -245,10 +245,12 @@ public class StateSinglePlayer implements GameState {
         }
     }
 
+    @Override
     public void activate() {
         initWorld(currentWorldName, currentWorldSeed);
     }
 
+    @Override
     public void deactivate() {
         try {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(getActiveWorldProvider().getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
@@ -265,6 +267,7 @@ public class StateSinglePlayer implements GameState {
         processMouseInput();
     }
 
+    @Override
     public void dispose() {
         if (_worldRenderer != null) {
             _worldRenderer.dispose();
@@ -272,6 +275,7 @@ public class StateSinglePlayer implements GameState {
         }
     }
 
+    @Override
     public void update(float delta) {
         /* GUI */
         updateUserInterface();

@@ -51,10 +51,10 @@ public class PlayerFactory {
 
         player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Companion"), 16)));
         player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Torch"), 99)));
-        player.send(new ReceiveItemEvent(entityManager.create("axe")));
-        player.send(new ReceiveItemEvent(entityManager.create("pickaxe")));
-        player.send(new ReceiveItemEvent(entityManager.create("explodeTool")));
-        player.send(new ReceiveItemEvent(entityManager.create("railgunTool")));
+        player.send(new ReceiveItemEvent(entityManager.create("core:axe")));
+        player.send(new ReceiveItemEvent(entityManager.create("core:pickaxe")));
+        player.send(new ReceiveItemEvent(entityManager.create("core:explodeTool")));
+        player.send(new ReceiveItemEvent(entityManager.create("core:railgunTool")));
 
         return player;
     } 

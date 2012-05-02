@@ -21,7 +21,7 @@ public class GelatinousCubeFactory {
     private EntityManager entityManager;
     
     public EntityRef generateGelatinousCube(Vector3f position) {
-        EntityRef entity = entityManager.create("gelatinousCube");
+        EntityRef entity = entityManager.create("core:gelatinousCube");
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(position);

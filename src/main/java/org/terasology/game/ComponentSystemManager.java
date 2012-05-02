@@ -24,7 +24,7 @@ public class ComponentSystemManager {
 
     public ComponentSystemManager() {}
 
-    public void register(ComponentSystem object) {
+    public <T extends ComponentSystem> void register(ComponentSystem object, String name) {
         store.add(object);
         if (object instanceof UpdateSubscriberSystem) {
             updateSubscribers.add((UpdateSubscriberSystem)object);
@@ -35,10 +35,6 @@ public class ComponentSystemManager {
         if (object instanceof EventHandlerSystem) {
             CoreRegistry.get(EntityManager.class).getEventSystem().registerEventHandler((EventHandlerSystem)object);
         }
-    }
-    
-    public <T extends ComponentSystem> void register(ComponentSystem object, String name) {
-        register(object);
         namedLookup.put(name, object);
     }
     

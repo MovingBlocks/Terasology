@@ -25,6 +25,9 @@ import java.util.Locale;
  * @author Immortius
  */
 public class AssetUri {
+    private static final String TYPE_SPLIT = ":";
+    private static final String PACKAGE_SPLIT = ":";
+
     private AssetType type;
     private String packageName;
     private String assetName;
@@ -37,10 +40,10 @@ public class AssetUri {
 
     public AssetUri(String uri) {
         // TODO: handle incomplete/relative uris?
-        String[] typeSplit = uri.split(":", 2);
+        String[] typeSplit = uri.split(TYPE_SPLIT, 2);
         if (typeSplit.length > 1) {
             type = AssetType.getTypeForId(typeSplit[0]);
-            String[] packageSplit = typeSplit[1].split("/",2);
+            String[] packageSplit = typeSplit[1].split(PACKAGE_SPLIT,2);
             if (packageSplit.length > 1) {
                 packageName = packageSplit[0];
                 assetName = packageSplit[1];
@@ -66,7 +69,7 @@ public class AssetUri {
 
     @Override
     public String toString() {
-        return type.getTypeId() + ":" + packageName + "/" + assetName;
+        return type.getTypeId() + TYPE_SPLIT + packageName + PACKAGE_SPLIT + assetName;
     }
 
     @Override

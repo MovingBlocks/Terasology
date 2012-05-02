@@ -1,5 +1,5 @@
 {
-    "name" : "pickaxe",
+    "name" : "core:pickaxe",
     "Item" : {
         "name" : "Pick Axe",
         "icon" : "PickAxe",

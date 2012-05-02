@@ -28,12 +28,14 @@ public final class PathManager {
     private static final String WORLD_DIR = "SAVED_WORLDS";
     private static final String LOG_DIR = "logs";
     private static final String MOD_DIR = "mods";
+    private static final String SCREENS_DIR = "screens";
 
     private static PathManager instance;
     private File rootPath;
     private File worldPath;
     private File logPath;
     private File modPath;
+    private File screenPath;
 
     private PathManager() {
         determineRootPath(false);
@@ -90,6 +92,10 @@ public final class PathManager {
         return modPath;
     }
 
+    public File getScreensPath() {
+        return screenPath;
+    }
+
 
     private void updateDirs() {
         rootPath.mkdirs();
@@ -99,5 +105,7 @@ public final class PathManager {
         logPath.mkdirs();
         modPath = new File(rootPath, MOD_DIR);
         modPath.mkdirs();
+        screenPath = new File(rootPath, SCREENS_DIR);
+        screenPath.mkdirs();
     }
 }

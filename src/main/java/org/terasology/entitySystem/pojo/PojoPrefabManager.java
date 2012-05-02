@@ -5,10 +5,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -21,27 +18,31 @@ public class PojoPrefabManager implements PrefabManager {
     Map<String, Prefab> prefabTable = Maps.newHashMap();
 
     public Prefab createPrefab(String name) {
-        if (exists(name)) {
-            return getPrefab(name);
+        String normalisedName = normalizeName(name);
+        if (exists(normalisedName)) {
+            return getPrefab(normalisedName);
         }
 
         return this.registerPrefab(new PojoPrefab(name));
     }
 
     public Prefab getPrefab(String name) {
-        return exists(name) ? prefabTable.get(name) : null;
+        String normalisedName = normalizeName(name);
+        return exists(normalisedName) ? prefabTable.get(normalisedName) : null;
     }
 
     public boolean exists(String name) {
-        return prefabTable.containsKey(name);
+        String normalisedName = normalizeName(name);
+        return prefabTable.containsKey(normalisedName);
     }
 
     public Prefab registerPrefab(Prefab prefab) {
-        if (prefabTable.containsKey(prefab.getName())) {
+        String normalisedName = normalizeName(prefab.getName());
+        if (prefabTable.containsKey(normalisedName)) {
             throw new IllegalArgumentException("Prefab '" + prefab.getName() + "' already registered!");
         }
 
-        prefabTable.put(prefab.getName(), prefab);
+        prefabTable.put(normalisedName, prefab);
 
         return prefab;
     }
@@ -51,7 +52,8 @@ public class PojoPrefabManager implements PrefabManager {
     }
 
     public void removePrefab(String name) {
-        prefabTable.remove(name);
+        String normalisedName = normalizeName(name);
+        prefabTable.remove(normalisedName);
     }
 
     public <T extends Component> T getComponent(String name, Class<T> componentClass) {
@@ -59,7 +61,8 @@ public class PojoPrefabManager implements PrefabManager {
             return null;
         }
 
-        return getPrefab(name).getComponent(componentClass);
+        String normalisedName = normalizeName(name);
+        return getPrefab(normalisedName).getComponent(componentClass);
     }
 
     public <T extends Component> T setComponent(String name, T component) {
@@ -67,7 +70,8 @@ public class PojoPrefabManager implements PrefabManager {
             throw new IllegalArgumentException("No prefab exists with name: " + name);
         }
 
-        return getPrefab(name).setComponent(component);
+        String normalisedName = normalizeName(name);
+        return getPrefab(normalisedName).setComponent(component);
     }
 
     public <T extends Component> void removeComponent(String name, Class<T> componentClass) {
@@ -75,7 +79,8 @@ public class PojoPrefabManager implements PrefabManager {
             throw new IllegalArgumentException("No prefab exists with name: " + name);
         }
 
-        getPrefab(name).removeComponent(componentClass);
+        String normalisedName = normalizeName(name);
+        getPrefab(normalisedName).removeComponent(componentClass);
     }
 
     protected class PrefabObserver implements Observer {
@@ -83,5 +88,9 @@ public class PojoPrefabManager implements PrefabManager {
         public void update(Observable o, Object arg) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
+    }
+
+    private String normalizeName(String name) {
+        return name.toLowerCase(Locale.ENGLISH);
     }
 }
