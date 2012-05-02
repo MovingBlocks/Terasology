@@ -2,7 +2,7 @@
 {"commandName":"giveBlock",
 "parameters":["blockNbr","blockName","quantity"],
 "commandDesc":"Adds blocks of the given blockNbr or blockName to your inventory",
-"commandHelp":"Accepts different parameters, omitting quantity will give you 16 blocks by default, or a special quantity like 1 in case of a chest.\nType <help blockList> for a list of blocks'\nPossible parameter switches :\ngiveBlock blockNbr\ngiveBlock blockNbr, quantity\ngiveBlock blockName\ngiveBlock blockName, quantity",
+"commandHelp":"Accepts different parameters, omitting quantity will give you 16 blocks by default, or a special quantity like 1 in case of a chest.Type <help blockList> for a list of blocks. Possible parameter switches : \"giveBlock blockNbr\" \"giveBlock blockNbr, quantity\" \"giveBlock blockName\" \"giveBlock blockName, quantity\"",
 "examples":[
 "<giveBlock \"Water\"> Gives 16 water blocks",
 "<giveBlock \"IronPyrites\">, 42\u0027 Gives 42 Iron Pyrite (Fool\u0027s Gold) blocks",
