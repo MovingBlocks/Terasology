@@ -38,12 +38,12 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _inputWorldTitle = new UIInput(new Vector2f(256f, 30f));
         _inputWorldTitle.setVisible(true);
 
-        _inputWorldTitleLabel = new UIText("Enter the world name:");
+        _inputWorldTitleLabel = new UIText("Enter a world name:");
         _inputWorldTitleLabel.setColor(Color.darkGray);
         _inputWorldTitleLabel.getSize().y = 16f;
         _inputWorldTitleLabel.setVisible(true);
 
-        _inputSeedLabel      =  new UIText("Enter the seed:");
+        _inputSeedLabel      =  new UIText("Enter a seed (optional):");
         _inputSeedLabel.setColor(Color.darkGray);
         _inputSeedLabel.getSize().y = 16f;
         _inputSeedLabel.setVisible(true);

@@ -65,7 +65,8 @@ public class BlockManager {
         } catch (Exception e) {
             // TODO: Totally placeholder error handling, needs to be fancier
             // System.out.println("Exception loading blocks. Sad :-(");
-            // e.printStackTrace();
+             e.printStackTrace();
+
             System.exit(-1);
         }
     }

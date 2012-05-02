@@ -171,6 +171,7 @@ task dist(type:Copy) {
 		include 'README.markdown'
 		include 'LICENSE.txt'
 		include 'natives/**'
+        include 'data/**'
 	}
 	from('launchScripts') {
 		exclude('Launcher.xml')

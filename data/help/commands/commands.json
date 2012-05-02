@@ -1,0 +1,62 @@
+[
+{"commandName":"giveBlock",
+"parameters":["blockNbr","blockName","quantity"],
+"commandDesc":"Adds blocks of the given blockNbr or blockName to your inventory",
+"commandHelp":"Accepts different parameters, type 'help blockList for a list of blocks'",
+"examples":[
+"\u0027giveBlock Water\u0027 Gives 16 water blocks",
+"\u0027giveBlock IronPyrites, 42\u0027 Gives 42 Iron Pyrite (Fool\u0027s Gold) blocks",
+"\u0027giveBlock Chest\u0027 Gives you a Chest block you can place, activate (\u0027E\u0027), put stuff in, destroy, pick up, place elsewhere, find same stuff in it!"
+]},
+{"commandName":"fullHealth",
+"parameters":[],
+"commandDesc":"Restores player to full health",
+"commandHelp":"Usefull to immediatly regain full health",
+"examples":[
+"fullHealth"
+]},
+{"commandName":"teleport",
+"parameters":["xcoord","ycoord","zcoord"],
+"commandDesc":"teleports to the specified coordinates",
+"commandHelp":"parameters are mandatory, and should be whole numbers",
+"examples":[
+"teleport 42,42,42"
+]},
+{"commandName":"gotoWorld",
+"parameters":["worldName","seed"],
+"commandDesc":"Moves the player to another world",
+"commandHelp":"",
+"examples":[
+"gotoWorld GhostTown",
+"gotoWorld GhostTown,<seed>"
+]},
+{"commandName":"dumpEntities",
+"parameters":[],
+"commandDesc":"I dunno",
+"commandHelp":"",
+"examples":[
+"dumpEntities"
+]},
+{"commandName":"debugCollision",
+"parameters":[],
+"commandDesc":"I dunno",
+"commandHelp":"",
+"examples":[
+"debugCollision"
+]},
+{"commandName":"exit",
+"parameters":[],
+"commandDesc":"exits the game",
+"commandHelp":"",
+"examples":[
+"exit"
+]},
+{"commandName":"help",
+"parameters":["commandName","paramName"],
+"commandDesc":"Shows help about a subject, currently only commands",
+"commandHelp":"",
+"examples":[
+"help giveBlocks",
+"help commandList"
+]}
+]

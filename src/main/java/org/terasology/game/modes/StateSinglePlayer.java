@@ -611,6 +611,11 @@ public class StateSinglePlayer implements GameState {
         return _pauseGame;
     }
 
+    public UIHeadsUpDisplay getHud()
+    {
+        return _hud;
+    }
+
     public IWorldProvider getActiveWorldProvider() {
         return _worldRenderer.getWorldProvider();
     }
