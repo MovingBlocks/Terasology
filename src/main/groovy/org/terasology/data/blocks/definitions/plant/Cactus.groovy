@@ -22,7 +22,7 @@ package org.terasology.data.blocks.definitions.plant
  */
 block {
     version = 1
-    shape = "Cactus"
+    shape = "engine:cactus"
     faces {
         top = "CactusTop"
         bottom = "CactusBottom"

@@ -403,7 +403,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             Vector3f rawDirection = new Vector3f(playerCamera.getViewingDirection());
             float dot = rawDirection.dot(attachDir);
             rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
-            Side direction = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z);
+            Side direction = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
 
             item.send(new UseItemOnBlockEvent(player, centerPos, attachmentSide, direction));
         }

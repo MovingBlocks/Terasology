@@ -17,7 +17,7 @@ public interface BlockFamily {
 
     /**
      * Get the block id that is appropriate for placement in the given situation
-     * @param attachmentSide The side of the block which is being attached to the world. i.e. Bottom if the block is being placed on the ground
+     * @param attachmentSide The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
      * @param direction A secondary direction after the attachment side that determines the facing of the block.
      * @return The id of the appropriate block
      */
@@ -25,7 +25,7 @@ public interface BlockFamily {
 
     /**
      * Get the block that is appropriate for placement in the given situation
-     * @param attachmentSide The side of the block which is being attached to the world. i.e. Bottom if the block is being placed on the ground
+     * @param attachmentSide The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
      * @param direction A secondary direction after the attachment side that determines the facing of the block.
      * @return The appropriate block
      */

@@ -25,8 +25,8 @@ public class AlignToSurfaceFamily implements BlockFamily {
                 block.withBlockFamily(this);
             }
         }
-        if (_blocks.containsKey(Side.BOTTOM)) {
-            _archetype = _blocks.get(Side.BOTTOM);
+        if (_blocks.containsKey(Side.TOP)) {
+            _archetype = _blocks.get(Side.TOP);
         } else {
             _archetype = _blocks.get(Side.FRONT);
         }

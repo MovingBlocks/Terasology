@@ -25,30 +25,45 @@ import java.util.Map;
  * @author Immortius
  */
 public enum AssetType {
-    PREFAB("prefabs"),
-    SOUND("sounds"),
-    MUSIC("music");
+    PREFAB("prefab", "prefabs"),
+    SOUND("sound", "sounds"),
+    MUSIC("music", "music"),
+    SHAPE("shape", "shapes");
 
     private String typeId;
+    private String subDir;
 
     private static Map<String, AssetType> typeIdLookup;
+    private static Map<String, AssetType> subDirLookup;
 
     static {
         typeIdLookup = Maps.newHashMap();
+        subDirLookup = Maps.newHashMap();
         for (AssetType type : AssetType.values()) {
             typeIdLookup.put(type.getTypeId(), type);
+            subDirLookup.put(type.getSubDir(), type);
         }
+
     }
 
-    private AssetType(String typeId) {
+    private AssetType(String typeId, String subDir) {
         this.typeId = typeId;
+        this.subDir = subDir;
     }
 
     public String getTypeId() {
         return typeId;
     }
 
+    public String getSubDir() {
+        return subDir;
+    }
+
     public static AssetType getTypeForId(String id) {
         return typeIdLookup.get(id);
+    }
+
+    public static AssetType getTypeForSubDir(String dir) {
+        return subDirLookup.get(dir);
     }
 }

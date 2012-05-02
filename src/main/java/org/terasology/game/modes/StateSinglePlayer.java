@@ -67,6 +67,7 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.BlockFamily;
+import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
@@ -141,6 +142,7 @@ public class StateSinglePlayer implements GameState {
              mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
+        BlockShapeManager.getInstance().reload();
 
         componentLibrary = new ComponentLibraryImpl();
 

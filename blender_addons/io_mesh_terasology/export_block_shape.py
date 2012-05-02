@@ -50,12 +50,12 @@ def writeAutoCollider(
 	for i in range(3):
 		pos[i] = 0.5 * (max[i] + min[i])
 		dim[i] = 0.5 * (max[i] - min[i])
-	fw("	Colliders = [\n")	
-	fw("		[\n")
-	fw("			position : [%.6f, %.6f, %.6f],\n" % convertVec3d(pos))
-	fw("			extents : [%.6f, %.6f, %.6f]\n" % convertVec3dAbs(dim))
-	fw("		]\n")	
-	fw("	]\n")
+	fw(',\n	"colliders" : [\n')	
+	fw("		{\n")
+	fw('			"position" : [%.6f, %.6f, %.6f],\n' % convertVec3d(pos))
+	fw('			"extents" : [%.6f, %.6f, %.6f]\n' % convertVec3dAbs(dim))
+	fw("		}\n")	
+	fw("	]")
 		
 def writeCollider( 
 		obj, 
@@ -87,10 +87,10 @@ def writeCollider(
 		pos[i] = 0.5 * (max[i] + min[i])
 		dim[i] = 0.5 * (max[i] - min[i])
 		
-	fw("		[\n")
-	fw("			position : [%.6f, %.6f, %.6f],\n" % convertVec3d(pos))
-	fw("			extents : [%.6f, %.6f, %.6f]\n" % convertVec3dAbs(dim))
-	fw("		]")	
+	fw("		{\n")
+	fw('			"position" : [%.6f, %.6f, %.6f],\n' % convertVec3d(pos))
+	fw('			"extents" : [%.6f, %.6f, %.6f]\n' % convertVec3dAbs(dim))
+	fw("		}")	
 
 def writeMeshPart(name, 
 		obj, 
@@ -132,36 +132,36 @@ def writeMeshPart(name,
 			processedVerts.append((vert, normal, uvs))
 		
 	
-	fw("	%s {\n" % name)
+	fw(',\n	"%s" : {\n' % name.lower())
 	
-	fw("		vertices = [")
+	fw('		"vertices" : [')
 	first = True
 	for i, v in enumerate(processedVerts):
 		if not first:
 			fw(", ")
 		fw("[%.6f, %.6f, %.6f]" % convertVec3d(v[0].co))
 		first = False
-	fw("]\n")
+	fw("],\n")
 	
-	fw("		normals = [")
+	fw('		"normals" : [')
 	first = True
 	for i, v in enumerate(processedVerts):
 		if not first:
 			fw(", ")
 		fw("[%.6f, %.6f, %.6f]" % convertVec3d(v[1]))
 		first = False
-	fw("]\n")
+	fw("],\n")
 	
-	fw("		texcoords = [")
+	fw('		"texcoords" : [')
 	first = True
 	for i, v in enumerate(processedVerts):
 		if not first:
 			fw(", ")
 		fw("[%.6f, %.6f]" % v[2])
 		first = False
-	fw("]\n")
+	fw("],\n")
 	
-	fw("		faces = [\n")
+	fw('		"faces" : [\n')
 	firstFace = True
 	for face in processedFaces:
 		if not firstFace:
@@ -176,16 +176,16 @@ def writeMeshPart(name,
 			first = False
 		fw("]")
 		firstFace = False
-	fw("\n		]\n")
+	fw("\n		],\n")
 	if "teraFullSide" in obj:
 		if obj.teraFullSide:
-			fw("		fullSide = true\n");
+			fw('		"fullSide" : true\n');
 		else:
-			fw("		fullSide = false\n");
+			fw('		"fullSide" : false\n');
 	else:
-		fw("		fullSide = false\n");
+		fw('		"fullSide" : false\n');
 	
-	fw("	}\n")
+	fw("	}")
 	
 	if apply_modifiers:
 		bpy.data.meshes.remove(mesh)
@@ -193,23 +193,20 @@ def writeMeshPart(name,
 def save(operator,
 		 context,
 		 filepath="",
-		 apply_modifiers=True,
-		 for_embed=False
+		 apply_modifiers=True
 		 ):
 
 	scene = context.scene
 
 	file = open(filepath, "w", encoding="utf8", newline="\n")
 	fw = file.write
-	if for_embed:
-		fw("package org.terasology.data.shapes\n\n")
-	fw("shape {\n")
+	fw("{\n")
 	
-	fw('	author = "%s"\n' % scene.teraAuthor)
+	fw('	"author" : "%s",\n' % scene.teraAuthor)
 	
 	now = datetime.datetime.now()
 	
-	fw('	exportDate = "%s"\n' % '{:%Y-%m-%d %H:%M:%S}'.format(now))
+	fw('	"exportDate" : "%s"' % '{:%Y-%m-%d %H:%M:%S}'.format(now))
 	
 	bpy.ops.object.mode_set(mode='OBJECT')
 	
@@ -225,15 +222,15 @@ def save(operator,
 		for object in bpy.data.objects:
 			if object.teraAABB:
 				if first:
-					fw("	Colliders = [\n")
+					fw(',\n	"colliders" : [\n')
 					first = False
 				else:
 					fw(",\n")
 				writeCollider(object, fw, scene)
 		if not first:
-			fw("\n	]\n")
+			fw("\n	]")
 	
-	fw("}\n")
+	fw("\n}\n")
 	file.close()
 	print("saving complete: %r " % filepath)
 

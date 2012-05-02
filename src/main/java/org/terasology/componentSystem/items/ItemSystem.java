@@ -111,7 +111,7 @@ public class ItemSystem implements EventHandlerSystem {
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceDirection.getVector3i());
 
-        Block block = type.getBlockFor(surfaceDirection.reverse(), secondaryDirection);
+        Block block = type.getBlockFor(surfaceDirection, secondaryDirection);
         if (block == null)
             return false;
 

@@ -36,9 +36,9 @@ block {
     hardness = 1
 
     sides {
-        shape = "TorchWall"
+        shape = "engine:TorchWall"
     }
-    bottom {
-        shape = "TorchGrounded"
+    top {
+        shape = "engine:TorchGrounded"
     }
 }

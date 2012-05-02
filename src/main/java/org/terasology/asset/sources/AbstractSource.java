@@ -81,7 +81,7 @@ public abstract class AbstractSource implements AssetSource {
     protected AssetUri getUri(String relativePath) {
         String[] parts = relativePath.split("/", 2);
         if (parts.length > 1) {
-            AssetType assetType = AssetType.getTypeForId(parts[0]);
+            AssetType assetType = AssetType.getTypeForSubDir(parts[0]);
             if (assetType != null) {
                 if (parts[1].contains(".")) {
                     parts[1] = parts[1].substring(0, parts[1].lastIndexOf('.'));

@@ -16,88 +16,88 @@ import java.util.Arrays;
  * @author Immortius <immortius@gmail.com>
  */
 public class BlockMeshPart {
-    private Vector3f[] _vertices;
-    private Vector3f[] _normals;
-    private Vector2f[] _texCoords;
-    private int[] _indices;
+    private Vector3f[] vertices;
+    private Vector3f[] normals;
+    private Vector2f[] texCoords;
+    private int[] indices;
 
     public BlockMeshPart(Vector3f[] vertices, Vector3f[] normals, Vector2f[] texCoords, int[] indices) {
-        _vertices = Arrays.copyOf(vertices, vertices.length);
-        _normals = Arrays.copyOf(normals, normals.length);
-        _texCoords = Arrays.copyOf(texCoords, texCoords.length);
-        _indices = Arrays.copyOf(indices, indices.length);
+        this.vertices = Arrays.copyOf(vertices, vertices.length);
+        this.normals = Arrays.copyOf(normals, normals.length);
+        this.texCoords = Arrays.copyOf(texCoords, texCoords.length);
+        this.indices = Arrays.copyOf(indices, indices.length);
     }
 
     public int size() {
-        return _vertices.length;
+        return vertices.length;
     }
 
     public int indicesSize() {
-        return _indices.length;
+        return indices.length;
     }
 
     public Vector3f getVertex(int i) {
-        return _vertices[i];
+        return vertices[i];
     }
 
     public Vector3f getNormal(int i) {
-        return _normals[i];
+        return normals[i];
     }
 
     public Vector2f getTexCoord(int i) {
-        return _texCoords[i];
+        return texCoords[i];
     }
 
     public int getIndex(int i) {
-        return _indices[i];
+        return indices[i];
     }
 
     public BlockMeshPart mapTexCoords(Vector2f offset, float width) {
-        Vector2f[] newTexCoords = new Vector2f[_texCoords.length];
+        Vector2f[] newTexCoords = new Vector2f[texCoords.length];
         for (int i = 0; i < newTexCoords.length; ++i) {
-            newTexCoords[i] = new Vector2f(offset.x + _texCoords[i].x * width, offset.y + _texCoords[i].y * width);
+            newTexCoords[i] = new Vector2f(offset.x + texCoords[i].x * width, offset.y + texCoords[i].y * width);
         }
-        return new BlockMeshPart(_vertices, _normals, newTexCoords, _indices);
+        return new BlockMeshPart(vertices, normals, newTexCoords, indices);
     }
 
     public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, Vector4f colorOffset, int meshBit) {
-        for (Vector2f texCoord : _texCoords) {
+        for (Vector2f texCoord : texCoords) {
             chunk._vertexElements[meshBit].tex.add(texCoord.x);
             chunk._vertexElements[meshBit].tex.add(texCoord.y);
             chunk._vertexElements[meshBit].tex.add(1.0f);
         }
 
         int nextIndex = chunk._vertexElements[meshBit].vertCount;
-        for (int vIdx = 0; vIdx < _vertices.length; ++vIdx) {
+        for (int vIdx = 0; vIdx < vertices.length; ++vIdx) {
             chunk._vertexElements[meshBit].color.add(colorOffset.x);
             chunk._vertexElements[meshBit].color.add(colorOffset.y);
             chunk._vertexElements[meshBit].color.add(colorOffset.z);
             chunk._vertexElements[meshBit].color.add(colorOffset.w);
-            chunk._vertexElements[meshBit].vertices.add(_vertices[vIdx].x + offsetX);
-            chunk._vertexElements[meshBit].vertices.add(_vertices[vIdx].y + offsetY);
-            chunk._vertexElements[meshBit].vertices.add(_vertices[vIdx].z + offsetZ);
-            chunk._vertexElements[meshBit].normals.add(_normals[vIdx].x);
-            chunk._vertexElements[meshBit].normals.add(_normals[vIdx].y);
-            chunk._vertexElements[meshBit].normals.add(_normals[vIdx].z);
+            chunk._vertexElements[meshBit].vertices.add(vertices[vIdx].x + offsetX);
+            chunk._vertexElements[meshBit].vertices.add(vertices[vIdx].y + offsetY);
+            chunk._vertexElements[meshBit].vertices.add(vertices[vIdx].z + offsetZ);
+            chunk._vertexElements[meshBit].normals.add(normals[vIdx].x);
+            chunk._vertexElements[meshBit].normals.add(normals[vIdx].y);
+            chunk._vertexElements[meshBit].normals.add(normals[vIdx].z);
         }
-        chunk._vertexElements[meshBit].vertCount += _vertices.length;
+        chunk._vertexElements[meshBit].vertCount += vertices.length;
 
-        for (int i = 0; i < _indices.length; ++i) {
-            chunk._vertexElements[meshBit].indices.add(_indices[i] + nextIndex);
+        for (int i = 0; i < indices.length; ++i) {
+            chunk._vertexElements[meshBit].indices.add(indices[i] + nextIndex);
         }
     }
     
     public BlockMeshPart rotate(Quat4f rotation)
     {
-        Vector3f[] newVertices = new Vector3f[_vertices.length];
-        Vector3f[] newNormals = new Vector3f[_normals.length];
+        Vector3f[] newVertices = new Vector3f[vertices.length];
+        Vector3f[] newNormals = new Vector3f[normals.length];
         
         for (int i = 0; i < newVertices.length; ++i)
         {
-            newVertices[i] = QuaternionUtil.quatRotate(rotation, _vertices[i], new Vector3f());
-            newNormals[i] = QuaternionUtil.quatRotate(rotation, _normals[i], new Vector3f());
+            newVertices[i] = QuaternionUtil.quatRotate(rotation, vertices[i], new Vector3f());
+            newNormals[i] = QuaternionUtil.quatRotate(rotation, normals[i], new Vector3f());
         }
         
-        return new BlockMeshPart(newVertices, newNormals, _texCoords, _indices);
+        return new BlockMeshPart(newVertices, newNormals, texCoords, indices);
     }
 }

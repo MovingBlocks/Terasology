@@ -85,6 +85,10 @@ public class BlockManager {
         return result;
     }
 
+    public int getBlockFamilyCount() {
+        return _blockFamiliesByTitle.size();
+    }
+
     public int availableBlocksSize() {
         return _blocksById.size();
     }

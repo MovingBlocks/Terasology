@@ -25,7 +25,7 @@ block {
     faces {
         all = "Brick"
     }
-    shape = "Stair"
+    shape = "engine:stair"
 
     hardness = 8
 

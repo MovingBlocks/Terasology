@@ -196,6 +196,20 @@ class BlockManifestor {
             registerBlock(blockConfig.name + Side.BOTTOM, b)
             blockMap.put(Side.BOTTOM, b)
         }
+        if (blockConfig.block.top != [:]) {
+            ConfigObject combined = new ConfigObject();
+            combined.merge(blockConfig.block)
+            combined.merge(blockConfig.block.top)
+
+            Block b = loader.loadBlock(combined)
+            BlockShape shape = loadBlockShape(combined);
+            if (shape != null) {
+                FacesInfo facesInfo = loadFaces(combined.faces, blockConfig.name)
+                applyBlockShape(b, shape, facesInfo)
+            }
+            registerBlock(blockConfig.name + Side.TOP, b)
+            blockMap.put(Side.TOP, b)
+        }
         if (blockConfig.block.sides != [:]) {
             ConfigObject combined = new ConfigObject();
             combined.merge(blockConfig.block)

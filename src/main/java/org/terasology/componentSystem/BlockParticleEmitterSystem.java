@@ -1,5 +1,8 @@
 package org.terasology.componentSystem;
 
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.components.BlockParticleEffectComponent;
@@ -13,6 +16,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
@@ -23,6 +27,7 @@ import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
 import java.util.Iterator;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -40,12 +45,13 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     private WorldRenderer worldRenderer;
 
     private FastRandom random = new FastRandom();
-    private final int[] _displayLists = new int[BlockManager.getInstance().availableBlocksSize()];
+    private TObjectIntMap displayLists;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        displayLists = new TObjectIntHashMap(BlockManager.getInstance().getBlockFamilyCount());
     }
     
     public void update(float delta) {
@@ -164,11 +170,13 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     protected void renderParticle(Particle particle, byte blockType, double temperature, double humidity, float light) {
-        if (_displayLists[blockType] == 0) {
-            _displayLists[blockType] = glGenLists(1);
-            glNewList(_displayLists[blockType], GL11.GL_COMPILE);
+        int displayList = displayLists.get(BlockManager.getInstance().getBlock(blockType).getBlockFamily());
+        if (displayList == 0) {
+            displayList = glGenLists(1);
+            glNewList(displayList, GL11.GL_COMPILE);
             drawParticle(blockType);
             glEndList();
+            displayLists.put(BlockManager.getInstance().getBlock(blockType).getBlockFamily(), displayList);
         }
 
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("particle");
@@ -179,7 +187,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         shader.setFloat("texOffsetY", particle.texOffset.y);
         shader.setFloat("light", light);
 
-        glCallList(_displayLists[blockType]);
+        glCallList(displayList);
     }
 
     private void drawParticle(byte blockType) {

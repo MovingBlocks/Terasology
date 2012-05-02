@@ -323,9 +323,11 @@ public class TerasologyEngine implements GameEngine {
         ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();
         FontManager.getInstance();
-        BlockShapeManager.getInstance();
-        BlockManager.getInstance();
         AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "org/terasology/data"));
+        // TODO: Shouldn't be setting up the block/block shape managers here (do on transition to StateSinglePlayer)
+        BlockShapeManager.getInstance().reload();
+        BlockManager.getInstance();
+
     }
 
     private void initTimer() {
