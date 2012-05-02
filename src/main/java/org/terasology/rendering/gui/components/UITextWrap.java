@@ -181,7 +181,7 @@ public class UITextWrap extends UIText {
                     endpoint = beginpoint + charCount ;
                     if(endpoint > parts[i].length() -1)
                     {
-                        finaltext.add(parts[i].substring(beginpoint,parts[i].length() -1) + newLine);
+                        finaltext.add(parts[i].substring(beginpoint,parts[i].length()) + newLine);
                         linecounter++;
                         endpoint = -1;
                     }
