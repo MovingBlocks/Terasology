@@ -36,7 +36,7 @@ import java.util.Iterator;
 public class UITextWrap extends UIText {
 
     public final String newLine = System.getProperty("line.separator");
-    private long currentpos=0;
+    private long currentpos=0,wheelycount = 0;
 
     public UITextWrap() {
         super();
@@ -53,16 +53,26 @@ public class UITextWrap extends UIText {
 
     @Override
     public void update() {
-        if(_wheelMoved !=0)
+        if(wheelycount !=0)
         {
-            if (_wheelMoved == 120){currentpos++;}
-            else{currentpos--;}
-            _wheelMoved = 0;
+            currentpos += wheelycount;
+            wheelycount = 0;
             try{
             showFromJson();}
             catch (Exception e){
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    public void processMouseInput(int button, boolean state, int wheelMoved) {
+        super.processMouseInput(button,state,wheelMoved);
+        if(_wheelMoved !=0)
+        {
+            if (_wheelMoved > 0){wheelycount++;}
+            else{wheelycount--;}
+            _wheelMoved = 0;
         }
     }
 
@@ -74,15 +84,21 @@ public class UITextWrap extends UIText {
         int maxlines = getLineCount();
         int screenlines = getScreenLines();
         long beginpos, endpos,counter;
-        if(screenlines + currentpos > maxlines){
+        if(screenlines > maxlines){
             beginpos = -1;
         }
         else
         {
-            beginpos = maxlines - (screenlines + currentpos) +1;
+            if(currentpos < 0){
+                currentpos = 0;
+            }
+            if(currentpos > maxlines - screenlines){
+                currentpos = maxlines - screenlines;
+            }
+            beginpos = maxlines - (screenlines + currentpos) -1;
         }
-        endpos = beginpos + screenlines;
-        if(endpos >maxlines){endpos = maxlines +1;}
+        endpos = beginpos + screenlines +1;
+        //if(endpos >maxlines){endpos = maxlines +1;}
         counter = 0;
         Gson gson = new Gson();
         JsonReader reader = new JsonReader(new FileReader(".\\data\\console\\consolelog.json"));
@@ -165,7 +181,7 @@ public class UITextWrap extends UIText {
                     endpoint = beginpoint + charCount ;
                     if(endpoint > parts[i].length() -1)
                     {
-                        finaltext.add(parts[i].substring(beginpoint,parts[i].length() -1) + newLine);
+                        finaltext.add(parts[i].substring(beginpoint,parts[i].length()) + newLine);
                         linecounter++;
                         endpoint = -1;
                     }
@@ -206,5 +222,7 @@ public class UITextWrap extends UIText {
         int disp = Display.getHeight() -8 -70;
         return disp/16;
     }
+
+    //private String getGsonString(Path path)
 
 }

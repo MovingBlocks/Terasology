@@ -79,12 +79,44 @@ public class GroovyHelpManager {
     public HashMap<Byte,String> getGroovyBlocks()
     {
         HashMap<Byte,String> retval = new HashMap<Byte, String>();
-        for(byte i = -127;i<128;i++){
+        String[] endfilter = {"FRONT","BACK","TOP","BOTTOM","LEFT","RIGHT"};
+        String fampref = "org.terasology.model.blocks.";
+        String tempval = "";
+        boolean nodup = true;
+        for(byte i = -127;i<127;i++){
             Block b = BlockManager.getInstance().getBlock(i);
             if(b.getId() != 0){
-                retval.put(b.getId(),b.getTitle());
+                if(tempval.length() > 0)
+                {
+                    if(b.getTitle().startsWith(tempval)){
+                        nodup = false;
+                    }
+                    else{
+                        nodup = true;
+                        tempval = "";
+                    }
+                }
+                else{
+                    for(int j = 0;j<endfilter.length;j++){
+                        if(b.getTitle().endsWith(endfilter[j])){
+                            tempval = b.getTitle().substring(0,b.getTitle().length() - endfilter[j].length());
+                        }
+                    }
+                }
+                if(nodup){
+                    String tempfam = b.getBlockFamily().toString().split("@")[0];
+                    if(tempfam.startsWith(fampref)){
+                        tempfam = tempfam.substring(fampref.length(), tempfam.length());
+                    }
+                    if(tempval.length() < 1){
+                        retval.put(b.getId(),b.getTitle() + " and belongs to " + tempfam);
+                    }
+                    else{
+                        retval.put(b.getId(),tempval + " and belongs to " + tempfam);
+                    }
+                }
             }
-            if(i == 117){break;}
+            if(i == 127){break;}
         }
 
         return retval;
