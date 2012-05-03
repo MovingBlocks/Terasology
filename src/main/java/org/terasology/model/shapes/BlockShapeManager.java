@@ -42,6 +42,7 @@ public class BlockShapeManager {
         blockShapeByTitle.clear();
         for (AssetUri shapeUri : AssetManager.getInstance().listAssets(AssetType.SHAPE)) {
             try {
+                logger.log(Level.FINE, "Loading " + shapeUri.toString());
                 BlockShape shape = persister.load(shapeUri.getPackage() + SEPARATOR_CHAR + shapeUri.getAssetName(), AssetManager.assetStream(shapeUri));
                 blockShapeByTitle.put(shape.getTitle().toLowerCase(Locale.ENGLISH), shape);
             } catch (IOException ioe) {

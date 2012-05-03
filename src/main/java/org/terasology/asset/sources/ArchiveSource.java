@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarFile;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -30,6 +31,8 @@ import java.util.zip.ZipFile;
  * @author Immortius
  */
 public class ArchiveSource extends AbstractSource {
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     public ArchiveSource(String sourceId, File archive) {
         super(sourceId);
@@ -60,14 +63,15 @@ public class ArchiveSource extends AbstractSource {
 
             if (entryPath.startsWith(basePath)) {
                 String key = entryPath.substring(basePath.length());
+                AssetUri uri = getUri(key);
+                if (uri == null || !uri.isValid()) continue;
+
+                logger.info("Discovered resource " + uri);
 
                 // @todo avoid this risky approach
                 // Using a jar protocol for zip files, because cannot register new protocols for the applet
                 URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath );
-                AssetUri uri = getUri(key);
-                if (uri != null) {
-                    addItem(uri, url);
-                }
+                addItem(uri, url);
             }
         }
     }
