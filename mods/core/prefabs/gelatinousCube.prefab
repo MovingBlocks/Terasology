@@ -5,8 +5,8 @@
   "CharacterMovement" : {
     "faceMovementDirection" : true
   },
-  "SimpleAIComponent" : {},
-  "AABBCollisionComponent" : {
+  "SimpleAI" : {},
+  "AABBCollision" : {
     "extents" : [0.5, 0.5, 0.5]
   },
   "CharacterSound" : {

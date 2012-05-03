@@ -38,11 +38,11 @@ public class AssetManager {
     }
 
     public void addAssetSource(AssetSource source) {
-        assetSources.put(source.getSourceId(), source);
+        assetSources.put(source.getSourceId().toLowerCase(Locale.ENGLISH), source);
     }
 
     public void removeAssetSource(AssetSource source) {
-        assetSources.remove(source.getSourceId());
+        assetSources.remove(source.getSourceId().toLowerCase(Locale.ENGLISH));
     }
 
     public Iterable<AssetUri> listAssets() {

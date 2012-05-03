@@ -288,15 +288,17 @@ public class StateMainMenu implements GameState {
      */
     private void processKeyboardInput() {
         while (Keyboard.next()) {
-            int key = Keyboard.getEventKey();
+            if (Keyboard.getEventKeyState()) {
+                int key = Keyboard.getEventKey();
 
-            if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                    _gameInstance.shutdown();
-                    return;
+                if (!Keyboard.isRepeatEvent()) {
+                    if (key == Keyboard.KEY_ESCAPE && !Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
+                        _gameInstance.shutdown();
+                        return;
+                    }
                 }
+                GUIManager.getInstance().processKeyboardInput(key);
             }
-            GUIManager.getInstance().processKeyboardInput(key);
         }
     }
 

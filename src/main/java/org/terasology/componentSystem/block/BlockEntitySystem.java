@@ -93,7 +93,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
         BlockParticleEffectComponent particleEffect = new BlockParticleEffectComponent();
         particleEffect.spawnCount = 64;
-        particleEffect.blockType = worldProvider.getBlock(blockComp.getPosition());
+        particleEffect.blockType = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockComp.getPosition())).getBlockFamily();
         particleEffect.initialVelocityRange.set(4, 4, 4);
         particleEffect.spawnRange.set(0.3f, 0.3f, 0.3f);
         particleEffect.destroyEntityOnCompletion = true;

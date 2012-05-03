@@ -2,6 +2,7 @@ package org.terasology.components;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.model.blocks.BlockFamily;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -11,9 +12,9 @@ import java.util.List;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-// TODO: Generalise for non-block particles
+// TODO: Generalise for non-block particles?
 public final class BlockParticleEffectComponent extends AbstractComponent {
-    public byte blockType;
+    public BlockFamily blockType;
     public int spawnCount = 16;
     public boolean destroyEntityOnCompletion;
 

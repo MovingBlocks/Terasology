@@ -7,6 +7,7 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
+import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 
@@ -29,7 +30,7 @@ public class PojoEventSystemTests {
     public void setup() {
 
         compLibrary = new ComponentLibraryImpl();
-        entityManager = new PojoEntityManager(compLibrary);
+        entityManager = new PojoEntityManager(compLibrary, new PojoPrefabManager());
         eventSystem = new PojoEventSystem(entityManager);
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();

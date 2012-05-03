@@ -23,10 +23,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.audio.Sound;
 import org.terasology.componentSystem.BlockParticleEmitterSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.componentSystem.action.AccessInventoryAction;
-import org.terasology.componentSystem.action.ExplosionAction;
-import org.terasology.componentSystem.action.PlaySoundAction;
-import org.terasology.componentSystem.action.TunnelAction;
+import org.terasology.componentSystem.action.*;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.componentSystem.block.BlockEntitySystem;
 import org.terasology.componentSystem.characters.CharacterMovementSystem;
@@ -40,10 +37,7 @@ import org.terasology.componentSystem.rendering.BlockDamageRenderer;
 import org.terasology.componentSystem.rendering.FirstPersonRenderer;
 import org.terasology.componentSystem.rendering.MeshRenderer;
 import org.terasology.components.*;
-import org.terasology.components.actions.AccessInventoryActionComponent;
-import org.terasology.components.actions.ExplosionActionComponent;
-import org.terasology.components.actions.PlaySoundActionComponent;
-import org.terasology.components.actions.TunnelActionComponent;
+import org.terasology.components.actions.*;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
@@ -81,10 +75,7 @@ import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -155,16 +146,14 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
         componentLibrary.registerTypeHandler(Vector3i.class, new Vector3iTypeHandler());
 
-        _entityManager = new PojoEntityManager(componentLibrary);
+        PrefabManager prefabManager = new PojoPrefabManager();
+        CoreRegistry.put(PrefabManager.class, prefabManager);
 
+        _entityManager = new PojoEntityManager(componentLibrary, prefabManager);
         _entityManager.setEventSystem(new PojoEventSystem(_entityManager));
         CoreRegistry.put(EntityManager.class, _entityManager);
         _componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, _componentSystemManager);
-
-        PrefabManager prefabManager = new PojoPrefabManager();
-        CoreRegistry.put(PrefabManager.class, prefabManager);
-        _entityManager.setPrefabManager(prefabManager);
 
         CoreRegistry.put(WorldPersister.class, new WorldPersister(componentLibrary,_entityManager));
         // TODO: Use reflection pending mod support
@@ -188,6 +177,7 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerComponentClass(PlayerComponent.class);
         componentLibrary.registerComponentClass(SimpleAIComponent.class);
         componentLibrary.registerComponentClass(AccessInventoryActionComponent.class);
+        componentLibrary.registerComponentClass(SpawnPrefabActionComponent.class);
 
         loadPrefabs();
 
@@ -211,6 +201,7 @@ public class StateSinglePlayer implements GameState {
         _componentSystemManager.register(new PlaySoundAction(), "engine:PlaySoundAction");
         _componentSystemManager.register(new TunnelAction(), "engine:TunnelAction");
         _componentSystemManager.register(new AccessInventoryAction(), "engine:AccessInventoryAction");
+        _componentSystemManager.register(new SpawnPrefabAction(), "engine:SpawnPrefabAction");
 
         _hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
@@ -236,10 +227,16 @@ public class StateSinglePlayer implements GameState {
         for (AssetUri prefabURI : AssetManager.list(AssetType.PREFAB)) {
             _logger.info("Loading prefab " + prefabURI);
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(AssetManager.assetStream(prefabURI)));
-                EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
-                if (prefabData != null) {
-                    persisterHelper.deserializePrefab(prefabData, prefabURI.getPackage());
+                InputStream stream = AssetManager.assetStream(prefabURI);
+                if (stream != null) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                    EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
+                    stream.close();
+                    if (prefabData != null) {
+                        persisterHelper.deserializePrefab(prefabData, prefabURI.getPackage());
+                    }
+                } else {
+                    _logger.severe("Failed to load prefab '" + prefabURI + "'");
                 }
             } catch (IOException e) {
                 _logger.log(Level.WARNING, "Failed to load prefab '" + prefabURI + "'", e);
@@ -463,30 +460,32 @@ public class StateSinglePlayer implements GameState {
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
 
-            if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
-                if (key == Keyboard.KEY_ESCAPE) {
-                    if (GUIManager.getInstance().getFocusedWindow() != null) {
-                        GUIManager.getInstance().removeWindow(GUIManager.getInstance().getFocusedWindow());
-                    } else {
-                        togglePauseMenu();
+            if (Keyboard.getEventKeyState()) {
+                if (!Keyboard.isRepeatEvent()) {
+                    if (key == Keyboard.KEY_ESCAPE) {
+                        if (GUIManager.getInstance().getFocusedWindow() != null) {
+                            GUIManager.getInstance().removeWindow(GUIManager.getInstance().getFocusedWindow());
+                        } else {
+                            togglePauseMenu();
+                        }
                     }
-                }
 
-                //Should this be here?
-                if (key == Keyboard.KEY_I) {
-                    toggleInventory();
-                }
+                    //Should this be here?
+                    if (key == Keyboard.KEY_I) {
+                        toggleInventory();
+                    }
 
-                if (key == Keyboard.KEY_F3) {
-                    Config.getInstance().setDebug(!Config.getInstance().isDebug());
-                }
+                    if (key == Keyboard.KEY_F3) {
+                        Config.getInstance().setDebug(!Config.getInstance().isDebug());
+                    }
 
-                if (key == Keyboard.KEY_F && !screenHasFocus) {
-                    toggleViewingDistance();
-                }
+                    if (key == Keyboard.KEY_F && !screenHasFocus) {
+                        toggleViewingDistance();
+                    }
 
-                if (key == Keyboard.KEY_F12) {
-                    _worldRenderer.printScreen();
+                    if (key == Keyboard.KEY_F12) {
+                        _worldRenderer.printScreen();
+                    }
                 }
 
                 // Pass input to focused GUI element

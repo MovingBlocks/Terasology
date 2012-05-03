@@ -11,6 +11,7 @@ import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
+import org.terasology.entitySystem.metadata.extension.PrefabTypeHandler;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -34,9 +35,11 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
 
-    public PojoEntityManager(ComponentLibrary componentLibrary) {
+    public PojoEntityManager(ComponentLibrary componentLibrary, PrefabManager prefabManager) {
         this.componentLibrary = componentLibrary;
+        this.prefabManager = prefabManager;
         componentLibrary.registerTypeHandler(EntityRef.class, new EntityRefTypeHandler(this));
+        componentLibrary.registerTypeHandler(Prefab.class, new PrefabTypeHandler(prefabManager));
     }
 
     @Override
@@ -99,11 +102,6 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
 	@Override
     public PrefabManager getPrefabManager() {
         return prefabManager;
-    }
-
-	@Override
-    public void setPrefabManager(PrefabManager prefabManager) {
-        this.prefabManager = prefabManager;
     }
 
 	@Override

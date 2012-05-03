@@ -50,6 +50,4 @@ public interface EntityManager {
 
     PrefabManager getPrefabManager();
 
-    void setPrefabManager(PrefabManager prefabManager);
-
 }

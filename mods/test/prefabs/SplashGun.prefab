@@ -1,0 +1,12 @@
+{
+    "name" : "testmod:splashgun",
+    "item" : {
+        "name" : "Splash Gun",
+        "renderWithIcon" : false,
+        "icon" : "railgun",
+        "usage" : "OnUser"
+    },
+    "spawnPrefabAction" : {
+        "prefab" : "testmod:lavasplash"
+    }
+}

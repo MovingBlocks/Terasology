@@ -9,6 +9,7 @@ import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
+import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -31,7 +32,7 @@ public class PojoEntityManagerTest {
     @Before
     public void setup() {
         ComponentLibrary componentLibrary = new ComponentLibraryImpl();
-        entityManager = new PojoEntityManager(componentLibrary);
+        entityManager = new PojoEntityManager(componentLibrary, new PojoPrefabManager());
     }
     
     @Test
