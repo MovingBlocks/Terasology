@@ -1,0 +1,14 @@
+{
+    "name" : "core:book",
+    "Item" : {
+        "name" : "Book",
+        "icon" : "Book",
+        "usage" : "OnUser",
+        "renderWithIcon" : true
+    },
+    "Book" : {
+        "type" : "WContents",
+        "page1" : "Hello",
+        "page2" : "World!"
+    }
+}

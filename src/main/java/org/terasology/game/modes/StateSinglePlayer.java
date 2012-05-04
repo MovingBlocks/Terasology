@@ -106,6 +106,7 @@ public class StateSinglePlayer implements GameState {
     private UILoadingScreen _loadingScreen;
     private UIStatusScreen _statusScreen;
     private UIInventoryScreen _inventoryScreen;
+    private UIOpenBookScreen _openbook;
 
     /* RENDERING */
     private WorldRenderer _worldRenderer;
@@ -178,6 +179,7 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerComponentClass(SimpleAIComponent.class);
         componentLibrary.registerComponentClass(AccessInventoryActionComponent.class);
         componentLibrary.registerComponentClass(SpawnPrefabActionComponent.class);
+        componentLibrary.registerComponentClass(BookComponent.class);
 
         loadPrefabs();
 
@@ -202,6 +204,7 @@ public class StateSinglePlayer implements GameState {
         _componentSystemManager.register(new TunnelAction(), "engine:TunnelAction");
         _componentSystemManager.register(new AccessInventoryAction(), "engine:AccessInventoryAction");
         _componentSystemManager.register(new SpawnPrefabAction(), "engine:SpawnPrefabAction");
+        _componentSystemManager.register(new ReadBookAction(), "engine: ReadBookAction");
 
         _hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
@@ -210,6 +213,7 @@ public class StateSinglePlayer implements GameState {
         _loadingScreen = new UILoadingScreen();
         _statusScreen = new UIStatusScreen();
         _inventoryScreen = new UIInventoryScreen();
+        _openbook = new UIOpenBookScreen();
         _metrics = new UIMetrics();
 
         _metrics.setVisible(true);
@@ -219,6 +223,7 @@ public class StateSinglePlayer implements GameState {
         _guiScreens.add(_pauseMenu);
         _guiScreens.add(_loadingScreen);
         _guiScreens.add(_inventoryScreen);
+        _guiScreens.add(_openbook);
         _guiScreens.add(_statusScreen);
     }
 

@@ -79,6 +79,7 @@ public class TextureManager {
         addTexture("menuBackground", GL11.GL_CLAMP, GL_LINEAR);
         addTexture("inventory");
         addTexture("containerWindow");
+        addTexture("openbook");
 
         /* MOBS */
         addTexture("slime");

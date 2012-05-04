@@ -1,0 +1,14 @@
+{
+    "name" : "core:bluebook",
+    "Item" : {
+        "name" : "BlueBook",
+        "icon" : "BlueBook",
+        "usage" : "OnUser",
+        "renderWithIcon" : true
+    },
+    "Book" : {
+        "type" : "WContents",
+        "page1" : "The",
+        "page2" : "BLUE!"
+    }
+}
