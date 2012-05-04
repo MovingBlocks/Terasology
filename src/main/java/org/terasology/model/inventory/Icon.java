@@ -245,7 +245,7 @@ public class Icon {
 
         icons.put("woodshaft", woodshaftIcon);
 
-       //From old system
+       //From old system, no specific icon:
         icons.put("blueprint", palebluePowderIcon);
         icons.put("debug", greenPowderIcon);
     }
