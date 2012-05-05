@@ -7,18 +7,29 @@ import org.terasology.entitySystem.EntityRef;
 import java.util.Map;
 
 /**
+ * Item data is stored using this component
  * @author Immortius <immortius@gmail.com>
  */
 public final class ItemComponent extends AbstractComponent {
+    /** The name of this item - TODO: Do we also need stackId? Could base stackable off stackCount > 1 ? */
     public String name = "";
+
+    /** Should this item be rendered? TODO: Can this be merged with icon and null == don't render? Or are null checks evil? */
     public boolean renderWithIcon = false;
+
+    /** Name of the icon this item should be rendered with */
     public String icon = "";
+
+    /** If this item is stackable, it should have a unique ID (so alike stacks can be merged) */
     public String stackId = "";
 
+    /** How many of said item are there in this stack */
     public byte stackCount = 1;
+
+    /** The entity that contains this one (if appropriate, defaults to this item not being contained by anything) */
     public EntityRef container = EntityRef.NULL;
 
-    // Usage settings
+    /** Enum to hold item usage possibilities */
     public enum UsageType {
         None,
         OnUser,
@@ -27,13 +38,18 @@ public final class ItemComponent extends AbstractComponent {
         InDirection
     }
 
+    /** Usage setting for this item */
     public UsageType usage = UsageType.None;
+
+    /** Does this item drop in quantity on usage (stacks of things would, tools would not) */
     public boolean consumedOnUse = false;
 
 
-    // Attack related settings
+    /** Setting for how much damage would be inflicted on attack (for instance to damage a block) */
     public int baseDamage = 1;
+
     // TODO: Should use block categories, rather than specific block names (or support both)
+    /** Map for what this item would have a bonus against (shovels dig faster than hammers) */
     private Map<String, Integer> perBlockDamageBonus = Maps.newHashMap();
 
     public Map<String, Integer> getPerBlockDamageBonus() {
