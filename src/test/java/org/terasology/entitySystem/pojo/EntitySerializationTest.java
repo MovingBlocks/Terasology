@@ -260,4 +260,19 @@ public class EntitySerializationTest {
         assertEquals("New", result.getComponent(StringComponent.class).value);
     }
 
+    @Test
+    public void testPrefabMaintainedOverSerialization() throws Exception {
+        Prefab prefab = prefabManager.createPrefab("Test");
+        prefab.setComponent(new StringComponent("Value"));
+
+        EntityRef entity = entityManager.create(prefab);
+
+        EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
+        entityManager.clear();
+        EntityRef newEntity = entityPersisterHelper.deserializeEntity(entityData);
+        assertTrue(newEntity.hasComponent(EntityInfoComponent.class));
+        EntityInfoComponent comp = newEntity.getComponent(EntityInfoComponent.class);
+        assertEquals(prefab.getName(), comp.parentPrefab);
+    }
+
 }

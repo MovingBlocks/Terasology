@@ -24,6 +24,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
 import org.terasology.asset.AssetType;
+import org.terasology.asset.loaders.ObjMeshLoader;
 import org.terasology.asset.loaders.OggSoundLoader;
 import org.terasology.asset.loaders.OggStreamingSoundLoader;
 import org.terasology.asset.sources.ClasspathSource;
@@ -326,6 +327,7 @@ public class TerasologyEngine implements GameEngine {
         ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();
         FontManager.getInstance();
+        AssetManager.getInstance().register(AssetType.MESH, "obj", new ObjMeshLoader());
         AssetManager.getInstance().register(AssetType.MUSIC, "ogg", new OggStreamingSoundLoader());
         AssetManager.getInstance().register(AssetType.SOUND, "ogg", new OggSoundLoader());
         AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "org/terasology/data"));

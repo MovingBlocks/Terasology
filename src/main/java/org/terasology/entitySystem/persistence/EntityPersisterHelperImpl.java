@@ -157,6 +157,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
                     entity.addComponent(componentLibrary.copy(component));
                 }
             }
+            entity.addComponent(new EntityInfoComponent(entityData.getParentPrefab()));
         }
         for (EntityData.Component componentData : entityData.getComponentList()) {
             Class<? extends Component> componentClass = getComponentClass(componentData);

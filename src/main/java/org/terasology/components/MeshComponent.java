@@ -1,6 +1,7 @@
 package org.terasology.components;
 
 import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.rendering.primitives.Mesh;
 
 import javax.vecmath.Color4f;
 
@@ -12,13 +13,13 @@ public final class MeshComponent extends AbstractComponent {
 
     // Temporary render details
     public enum RenderType {
+        Normal,
         GelatinousCube
     }
     
-    public RenderType renderType = RenderType.GelatinousCube;
+    public RenderType renderType = RenderType.Normal;
+    public Mesh mesh;
     
-    // TODO: Use some sort of mesh ref, that stores a direct reference to the mesh (flyweight pattern?)
-    //public String mesh;
     // TODO: Some sort of Texture + Shader type?
     //public String material;
     
