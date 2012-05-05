@@ -1,5 +1,7 @@
 package org.terasology.audio;
 
+import org.terasology.asset.AssetUri;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,46 +11,20 @@ import static org.lwjgl.openal.AL10.*;
 
 public abstract class AbstractSound implements Sound {
 
+    // TODO: Do we have proper support for unloading sounds (as mods are changed?)
     private static int bufferAmount = 0;
 
-    private String name = null;
-
+    private AssetUri uri;
     private int bufferId = 0;
-
     protected int length = 0;
 
-    public AbstractSound(String name, URL source) {
-        this(name);
-        this.load(source);
-    }
+    public AbstractSound(AssetUri uri, int bufferId) {
+        this.uri = uri;
+        this.bufferId = bufferId;
 
-    public AbstractSound(String name) {
-        this.name = name;
-
-        bufferId = alGenBuffers();
         OpenALException.checkState("Allocating sound buffer");
 
         bufferAmount++;
-    }
-
-    public void load(File file) {
-        if (file == null || !file.exists()) {
-            throw new IllegalArgumentException("File " + file.getName() + " not exists");
-        }
-
-        try {
-            this.load(new FileInputStream(file));
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to load sound: " + e.getMessage(), e);
-        }
-    }
-
-    public void load(URL source) {
-        try {
-            this.load(source.openStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public int getLength() {
@@ -64,10 +40,6 @@ public abstract class AbstractSound implements Sound {
         return length;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public int getChannels() {
         return alGetBufferi(bufferId, AL_CHANNELS);
     }
@@ -76,6 +48,7 @@ public abstract class AbstractSound implements Sound {
         return alGetBufferi(bufferId, AL_FREQUENCY);
     }
 
+    @Override
     public int getBufferId() {
         return bufferId;
     }
@@ -84,12 +57,17 @@ public abstract class AbstractSound implements Sound {
         return alGetBufferi(bufferId, AL_BITS);
     }
 
+    @Override
     public int getBufferSize() {
         return alGetBufferi(bufferId, AL_SIZE);
     }
 
-    public Sound reset() {
-        return this;
+    @Override
+    public AssetUri getURI() {
+        return uri;
+    }
+
+    public void reset() {
     }
 
     @Override

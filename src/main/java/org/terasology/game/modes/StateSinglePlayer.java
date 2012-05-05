@@ -136,12 +136,13 @@ public class StateSinglePlayer implements GameState {
         BlockShapeManager.getInstance().reload();
 
         componentLibrary = new ComponentLibraryImpl();
+        CoreRegistry.put(ComponentLibrary.class, componentLibrary);
 
         // TODO: Use reflection pending mod support
         componentLibrary.registerTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler());
         componentLibrary.registerTypeHandler(Color4f.class, new Color4fTypeHandler());
         componentLibrary.registerTypeHandler(Quat4f.class, new Quat4fTypeHandler());
-        componentLibrary.registerTypeHandler(Sound.class, new SoundTypeHandler(AudioManager.getInstance()));
+        componentLibrary.registerTypeHandler(Sound.class, new AssetTypeHandler(AssetType.SOUND, Sound.class));
         componentLibrary.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         componentLibrary.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
         componentLibrary.registerTypeHandler(Vector3i.class, new Vector3iTypeHandler());

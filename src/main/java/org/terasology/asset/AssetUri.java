@@ -38,6 +38,15 @@ public class AssetUri {
         this.assetName = assetName.toLowerCase(Locale.ENGLISH);
     }
 
+    public AssetUri(AssetType type, String simpleUri) {
+        this.type = type;
+        String[] split = simpleUri.toLowerCase(Locale.ENGLISH).split(PACKAGE_SPLIT, 2);
+        if (split.length > 1) {
+            packageName = split[0];
+            assetName = split[1];
+        }
+    }
+
     public AssetUri(String uri) {
         // TODO: handle incomplete/relative uris?
         String[] typeSplit = uri.split(TYPE_SPLIT, 2);
@@ -70,6 +79,13 @@ public class AssetUri {
     @Override
     public String toString() {
         return type.getTypeId() + TYPE_SPLIT + packageName + PACKAGE_SPLIT + assetName;
+    }
+
+    /**
+     * @return The asset uri, minus the type
+     */
+    public String getSimpleString() {
+        return packageName + PACKAGE_SPLIT + assetName;
     }
 
     @Override

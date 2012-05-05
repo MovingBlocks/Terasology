@@ -14,7 +14,7 @@ import static org.lwjgl.openal.AL10.*;
 
 public class BasicSoundSource implements SoundSource {
 
-    protected AbstractSound audio;
+    protected Sound audio;
     protected int sourceId;
 
     protected float srcGain = 1.0f;
@@ -36,7 +36,7 @@ public class BasicSoundSource implements SoundSource {
         this.reset();
     }
 
-    public BasicSoundSource(AbstractSound audio) {
+    public BasicSoundSource(Sound audio) {
         this();
 
         this.setAudio(audio);

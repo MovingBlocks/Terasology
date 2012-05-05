@@ -28,7 +28,8 @@ public enum AssetType {
     PREFAB("prefab", "prefabs"),
     SOUND("sound", "sounds"),
     MUSIC("music", "music"),
-    SHAPE("shape", "shapes");
+    SHAPE("shape", "shapes"),
+    MESH("mesh", "mesh");
 
     private String typeId;
     private String subDir;

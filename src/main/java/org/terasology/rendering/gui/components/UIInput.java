@@ -4,6 +4,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.IInputListener;
@@ -58,7 +60,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
     if (intersects(mousePos)) {
 
         if (!_clickSoundPlayed) {
-            AudioManager.play("PlaceBlock");
+            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"));
             _clickSoundPlayed = true;
         }
 

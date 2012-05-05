@@ -1,5 +1,7 @@
 package org.terasology.componentSystem.items;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
@@ -117,7 +119,7 @@ public class ItemSystem implements EventHandlerSystem {
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             worldProvider.setBlock(placementPos.x, placementPos.y, placementPos.z, block.getId(), true, true);
-            AudioManager.play("PlaceBlock", 0.5f);
+            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
             if (blockItem.placedEntity.exists()) {
                 // Establish a block entity
                 blockItem.placedEntity.addComponent(new BlockComponent(placementPos, false));

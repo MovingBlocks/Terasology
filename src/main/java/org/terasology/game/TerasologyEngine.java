@@ -23,6 +23,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.loaders.OggSoundLoader;
+import org.terasology.asset.loaders.OggStreamingSoundLoader;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.game.modes.GameState;
 import org.terasology.logic.manager.*;
@@ -323,6 +326,8 @@ public class TerasologyEngine implements GameEngine {
         ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();
         FontManager.getInstance();
+        AssetManager.getInstance().register(AssetType.MUSIC, "ogg", new OggStreamingSoundLoader());
+        AssetManager.getInstance().register(AssetType.SOUND, "ogg", new OggSoundLoader());
         AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "org/terasology/data"));
         // TODO: Shouldn't be setting up the block/block shape managers here (do on transition to StateSinglePlayer)
         BlockShapeManager.getInstance().reload();

@@ -1,5 +1,7 @@
 package org.terasology.componentSystem.block;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.*;
 import org.terasology.entityFactory.BlockItemFactory;
@@ -49,7 +51,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
         }
 
         // TODO: Configurable via block definition
-        AudioManager.play("RemoveBlock", 0.6f);
+        AudioManager.play(new AssetUri(AssetType.SOUND, "engine:RemoveBlock"), 0.6f);
 
         if ((oldBlock.isStraightToInventory() || !oldBlock.isEntityTemporary()) && event.getInstigator().exists()) {
             EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockFamily(), entity);
@@ -108,7 +110,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
         // TODO: Don't play this if destroyed?
         // TODO: Configurable via block definition
-        AudioManager.play("Dig", 1.0f);
+        AudioManager.play(new AssetUri(AssetType.SOUND, "engine:Dig"), 1.0f);
     }
 
 }

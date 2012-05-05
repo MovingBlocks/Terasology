@@ -21,7 +21,7 @@
     ]
   },
   "PlaySoundAction" : {
-    sounds = "click"
+    sounds = "engine:click"
   },
   "AccessInventoryAction": {}
 }

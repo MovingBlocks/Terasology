@@ -17,6 +17,8 @@ package org.terasology.game.modes;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
@@ -249,7 +251,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void playBackgroundMusic() {
-        AudioManager.playMusic("Resurface");
+        AudioManager.playMusic("engine:resurface");
     }
 
     private void stopBackgroundMusic() {
