@@ -58,7 +58,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
 
         ComponentMetadata<T> info = new ComponentMetadata<T>(componentClass);
         for (Field field : componentClass.getDeclaredFields()) {
-            if (Modifier.isTransient(field.getModifiers()))
+            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))
                 continue;
             field.setAccessible(true);
             TypeHandler typeHandler = getHandlerFor(field.getGenericType(), 0);

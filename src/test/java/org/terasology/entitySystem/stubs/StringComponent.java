@@ -8,6 +8,7 @@ import org.terasology.entitySystem.Component;
  */
 public final class StringComponent extends AbstractComponent {
     public String value;
+    public static String staticValue = "Test";
 
     public StringComponent() {}
 
