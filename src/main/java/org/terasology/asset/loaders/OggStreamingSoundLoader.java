@@ -24,13 +24,14 @@ import org.terasology.audio.Sound;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 /**
  * @author Immortius
  */
 public class OggStreamingSoundLoader implements AssetLoader<Sound> {
     @Override
-    public Sound load(InputStream stream, AssetUri uri, URL url) throws IOException {
-        return new OggStreamingSound(uri, url);
+    public Sound load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+        return new OggStreamingSound(uri, urls.get(0));
     }
 }

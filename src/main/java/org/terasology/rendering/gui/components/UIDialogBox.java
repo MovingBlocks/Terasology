@@ -82,21 +82,21 @@ public class UIDialogBox extends UIDisplayWindow{
     }
 
     public void windowStyleSetup(){
-        setStyle("border-image-top",    "gui_menu 168/512 5/512 260/512 89/512 5");
-        setStyle("border-image-right",  "gui_menu 4/512 81/512 428/512 94/512 4");
-        setStyle("border-image-bottom", "gui_menu 168/512 4/512 260/512 175/512 4");
-        setStyle("border-image-left",   "gui_menu 4/512 81/512 256/512 94/512 4");
+        setStyle("border-image-top",    "engine:gui_menu 168/512 5/512 260/512 89/512 5");
+        setStyle("border-image-right",  "engine:gui_menu 4/512 81/512 428/512 94/512 4");
+        setStyle("border-image-bottom", "engine:gui_menu 168/512 4/512 260/512 175/512 4");
+        setStyle("border-image-left",   "engine:gui_menu 4/512 81/512 256/512 94/512 4");
 
-        setStyle("border-corner-topleft",     "gui_menu 256/512 89/512");
-        setStyle("border-corner-topright",    "gui_menu 428/512 89/512");
-        setStyle("border-corner-bottomright", "gui_menu 428/512 175/512");
-        setStyle("border-corner-bottomleft",  "gui_menu 256/512 175/512");
+        setStyle("border-corner-topleft",     "engine:gui_menu 256/512 89/512");
+        setStyle("border-corner-topright",    "engine:gui_menu 428/512 89/512");
+        setStyle("border-corner-bottomright", "engine:gui_menu 428/512 175/512");
+        setStyle("border-corner-bottomleft",  "engine:gui_menu 256/512 175/512");
 
-        setStyle("background-image","gui_menu 168/512 76/512 260/512 94/512");
+        setStyle("background-image","engine:gui_menu 168/512 76/512 260/512 94/512");
 
-        _close.setClassStyle("button",            "background-image: gui_menu 19/512 19/512 73/512 155/512");
-        _close.setClassStyle("button-mouseover",  "background-image: gui_menu 19/512 19/512 54/512 155/512");
-        _close.setClassStyle("button-mouseclick", "background-image: gui_menu 19/512 19/512 92/512 155/512");
+        _close.setClassStyle("button",            "background-image: engine:gui_menu 19/512 19/512 73/512 155/512");
+        _close.setClassStyle("button-mouseover",  "background-image: engine:gui_menu 19/512 19/512 54/512 155/512");
+        _close.setClassStyle("button-mouseclick", "background-image: engine:gui_menu 19/512 19/512 92/512 155/512");
     }
 
 }

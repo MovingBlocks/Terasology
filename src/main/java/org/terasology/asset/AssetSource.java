@@ -17,6 +17,7 @@
 package org.terasology.asset;
 
 import java.net.URL;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -33,7 +34,7 @@ public interface AssetSource {
      * @param uri
      * @return The url equivalent of this uri
      */
-    URL[] get(AssetUri uri);
+    List<URL> get(AssetUri uri);
     Iterable<AssetUri> list();
     Iterable<AssetUri> list(AssetType type);
 

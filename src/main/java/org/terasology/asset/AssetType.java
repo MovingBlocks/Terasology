@@ -29,7 +29,8 @@ public enum AssetType {
     SOUND("sound", "sounds"),
     MUSIC("music", "music"),
     SHAPE("shape", "shapes"),
-    MESH("mesh", "mesh");
+    MESH("mesh", "mesh"),
+    TEXTURE("texture", "textures");
 
     private String typeId;
     private String subDir;

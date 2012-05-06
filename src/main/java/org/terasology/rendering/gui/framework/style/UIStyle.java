@@ -34,7 +34,7 @@ public class UIStyle extends UIDisplayContainer {
     }
 
     public void parse(String value){
-        String[] parseData = value.split(":");
+        String[] parseData = value.split(":",2);
         parseData[1] = validateString(parseData[1].trim());
         parse(parseData[0], parseData[1]);
     }

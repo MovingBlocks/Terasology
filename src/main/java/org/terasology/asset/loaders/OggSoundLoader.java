@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import static org.lwjgl.openal.AL10.alGenBuffers;
 
@@ -39,7 +40,7 @@ import static org.lwjgl.openal.AL10.alGenBuffers;
 public class OggSoundLoader implements AssetLoader<Sound> {
 
     @Override
-    public Sound load(InputStream stream, AssetUri uri, URL url) throws IOException {
+    public Sound load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             OggReader reader = new OggReader(stream);

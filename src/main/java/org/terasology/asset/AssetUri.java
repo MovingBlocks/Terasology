@@ -29,8 +29,11 @@ public class AssetUri {
     private static final String PACKAGE_SPLIT = ":";
 
     private AssetType type;
-    private String packageName;
-    private String assetName;
+    private String packageName = "";
+    private String assetName = "";
+
+    public AssetUri() {
+    }
 
     public AssetUri(AssetType type, String packageName, String assetName) {
         this.type = type;
@@ -78,6 +81,9 @@ public class AssetUri {
 
     @Override
     public String toString() {
+        if (!isValid()) {
+            return "";
+        }
         return type.getTypeId() + TYPE_SPLIT + packageName + PACKAGE_SPLIT + assetName;
     }
 
@@ -85,6 +91,9 @@ public class AssetUri {
      * @return The asset uri, minus the type
      */
     public String getSimpleString() {
+        if (!isValid()) {
+            return "";
+        }
         return packageName + PACKAGE_SPLIT + assetName;
     }
 

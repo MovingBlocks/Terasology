@@ -1,9 +1,12 @@
 package org.terasology.model.inventory;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.logic.manager.TextureManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -11,6 +14,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
@@ -24,6 +28,7 @@ public class Icon {
 	private BlockFamily _blockFamily;
 	private int _x;
 	private int _y;
+    private Texture terrainTex;
 
 	/**
 	 * Creates Icon for BlockFamily class.
@@ -34,13 +39,14 @@ public class Icon {
 		_element = null;
 		_blockFamily = blockFamily;
 		setAtlasPosition(0, 0);
+        terrainTex = AssetManager.loadTexture("engine:terrain");
 	}
 
 	/**
 	 * Creates an Icon for a non-BlockFamily class
 	 */
 	public Icon() {
-		_element = new UIGraphicsElement("items");
+		_element = new UIGraphicsElement(AssetManager.loadTexture("engine:items"));
 		_blockFamily = null;
 
         _element.setSize(new Vector2f(32, 32));
@@ -105,7 +111,7 @@ public class Icon {
 	        GL11.glScalef(20f, 20f, 20f);
 	        GL11.glRotatef(170f, 1f, 0f, 0f);
 	        GL11.glRotatef(-16f, 0f, 1f, 0f);
-	        TextureManager.getInstance().bindTexture("terrain");
+            glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
 	        Block block = _blockFamily.getArchetypeBlock();
 	        block.render();

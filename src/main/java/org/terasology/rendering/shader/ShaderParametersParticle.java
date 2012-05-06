@@ -15,11 +15,16 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.TextureManager;
+import org.terasology.logic.manager.AssetManager;
+import org.terasology.rendering.assets.Texture;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Particle shader program.
@@ -28,11 +33,13 @@ import org.terasology.logic.manager.TextureManager;
  */
 public class ShaderParametersParticle implements IShaderParameters {
 
+    private Texture terrainTex = AssetManager.loadTexture("engine:terrain");
+
     public void applyParameters(ShaderProgram program) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        TextureManager.getInstance().bindTexture("terrain");
+        glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
         if (localPlayer != null)
             program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);

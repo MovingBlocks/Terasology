@@ -15,12 +15,17 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.TextureManager;
+import org.terasology.logic.manager.AssetManager;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Gel. Cube shader program.
@@ -29,12 +34,14 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class ShaderParametersGelCube implements IShaderParameters {
 
+    private Texture slimeTex = AssetManager.loadTexture("engine:slime");
+
     public void applyParameters(ShaderProgram program) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         WorldRenderer worldRendererd = CoreRegistry.get(WorldRenderer.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        TextureManager.getInstance().bindTexture("slime");
+        glBindTexture(GL11.GL_TEXTURE_2D, slimeTex.getId());
 
         if (localPlayer != null) {
             program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);

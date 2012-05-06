@@ -15,10 +15,14 @@
  */
 package org.terasology.rendering.gui.components;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.components.HealthComponent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.AssetManager;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -40,7 +44,7 @@ public class UIHealthBar extends UIDisplayContainer {
 
         // Create hearts
         for (int i = 0; i < 10; i++) {
-            _hearts[i] = new UIGraphicsElement("icons");
+            _hearts[i] = new UIGraphicsElement(AssetManager.loadTexture("engine:icons"));
             _hearts[i].setVisible(true);
             _hearts[i].getTextureSize().set(new Vector2f(9f / 256f, 9f / 256f));
             _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));

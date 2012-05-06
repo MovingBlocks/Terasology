@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gui.menus;
 
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
@@ -42,7 +43,7 @@ public class UIMainMenu extends UIDisplayWindow {
                                                                   
     public UIMainMenu() {
         maximaze();
-        _title = new UIGraphicsElement("terasology");
+        _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
@@ -62,7 +63,7 @@ public class UIMainMenu extends UIDisplayWindow {
         _singlePlayerButton.getLabel().setText("Single player");
         _singlePlayerButton.setVisible(true);
 
-        _overlay = new UIImageOverlay("menuBackground");
+        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
         _overlay.setVisible(true);
 
         addDisplayElement(_overlay);

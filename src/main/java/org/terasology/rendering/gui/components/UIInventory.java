@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gui.components;
 
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -34,7 +35,7 @@ public class UIInventory extends UIDisplayContainer {
     public UIInventory() {
         setSize(new Vector2f(176.0f * 2.5f, 167.0f * 2.5f));
 
-        _background = new UIGraphicsElement("inventory");
+        _background = new UIGraphicsElement(AssetManager.loadTexture("engine:inventory"));
         _background.setSize(getSize());
         _background.getTextureSize().set(new Vector2f(176.0f / 256.0f, 167.0f / 256.0f));
         _background.setVisible(true);
