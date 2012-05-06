@@ -22,7 +22,6 @@ public class InventorySystem implements EventHandlerSystem {
 
     }
 
-
     @ReceiveEvent(components=InventoryComponent.class)
     public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
@@ -76,7 +75,6 @@ public class InventorySystem implements EventHandlerSystem {
             // If the item came from another inventory we need to explicitly blank it out there (we "moved" the entity)
             InventoryComponent sourceInventory = item.container.getComponent(InventoryComponent.class);
             if (sourceInventory != null) {
-                //TODO: Any chance to catch the wrong stack if the source inventory has multiple alike items?
                 int matchedSlot = sourceInventory.itemSlots.indexOf(event.getItem());
                 if (matchedSlot != -1) {
                     sourceInventory.itemSlots.set(matchedSlot, EntityRef.NULL);

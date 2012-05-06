@@ -11,10 +11,10 @@ import java.util.Map;
  * @author Immortius <immortius@gmail.com>
  */
 public final class ItemComponent extends AbstractComponent {
-    /** The name of this item - TODO: Do we also need stackId? Could base stackable off stackCount > 1 ? */
+    /** The display name of this item */
     public String name = "";
 
-    /** Should this item be rendered? TODO: Can this be merged with icon and null == don't render? Or are null checks evil? */
+    /** Should this item be rendered? Some items have an inventory icon but no "held" representation */
     public boolean renderWithIcon = false;
 
     /** Name of the icon this item should be rendered with */
@@ -43,7 +43,6 @@ public final class ItemComponent extends AbstractComponent {
 
     /** Does this item drop in quantity on usage (stacks of things would, tools would not) */
     public boolean consumedOnUse = false;
-
 
     /** Setting for how much damage would be inflicted on attack (for instance to damage a block) */
     public int baseDamage = 1;
