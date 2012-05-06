@@ -17,6 +17,7 @@ package org.terasology.logic.manager;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.Util;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.game.Terasology;
@@ -139,10 +140,11 @@ public class TextureManager {
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, texture.width, texture.height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, texture.data);
 
+
         if (mipMapPaths != null) {
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, mipMapPaths.length);
             GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+            GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
             for (int i = 0; i < mipMapPaths.length; i++) {
                 Texture t = new Texture();
@@ -151,6 +153,7 @@ public class TextureManager {
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i + 1, GL11.GL_RGBA, t.width, t.height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, t.data);
             }
         }
+
 
         return texture;
     }

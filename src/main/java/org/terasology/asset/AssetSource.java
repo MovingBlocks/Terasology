@@ -23,9 +23,17 @@ import java.net.URL;
  */
 public interface AssetSource {
 
+    /**
+     * @return The identifier for this asset source
+     */
     String getSourceId();
-    // TODO: Return asset object rather than URL (as per t3hk0d3's wip)
-    URL get(AssetUri uri);
+
+    /**
+     * The URL(s) related to a URI. There may be multiple
+     * @param uri
+     * @return The url equivalent of this uri
+     */
+    URL[] get(AssetUri uri);
     Iterable<AssetUri> list();
     Iterable<AssetUri> list(AssetType type);
 
