@@ -13,20 +13,16 @@ import java.util.logging.Logger;
  *
  */
 public class UIOpenBook extends UIDisplayContainer {
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     private final UIGraphicsElement background;
 
     public UIOpenBook() {
-        background = new UIGraphicsElement("containerWindow");
-        background.getTextureSize().set(new Vector2f(256f / 256f, 231f / 256f));
-        background.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
+        background = new UIGraphicsElement("openbook");
+        background.setSize(new Vector2f(500, 300));
+        //background.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
         addDisplayElement(background);
-
         background.setVisible(true);
 
-
-        logger.log(Level.WARNING, "The Action calls the UIOpenBook");
         update();
     }
 }
