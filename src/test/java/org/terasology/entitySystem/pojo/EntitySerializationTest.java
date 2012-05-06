@@ -15,12 +15,12 @@ import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.entitySystem.persistence.PersistenceUtil;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
+import org.terasology.entitySystem.stubs.MappedTypeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.protobuf.EntityData;
 
 import javax.vecmath.Vector3f;
 
-import java.io.*;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -137,6 +137,7 @@ public class EntitySerializationTest {
 
         EntityRef entity = entityManager.create("Test");
         EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
+        entityManager.clear();
         EntityRef loadedEntity = entityPersisterHelper.deserializeEntity(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -152,6 +153,7 @@ public class EntitySerializationTest {
         EntityRef entity = entityManager.create("Test");
         entity.addComponent(new IntegerComponent(2));
         EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
+        entityManager.clear();
         EntityRef loadedEntity = entityPersisterHelper.deserializeEntity(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -169,6 +171,7 @@ public class EntitySerializationTest {
         EntityRef entity = entityManager.create("Test");
         entity.removeComponent(StringComponent.class);
         EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
+        entityManager.clear();
         EntityRef loadedEntity = entityPersisterHelper.deserializeEntity(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -183,6 +186,7 @@ public class EntitySerializationTest {
         EntityRef entity = entityManager.create("Test");
         entity.getComponent(StringComponent.class).value = "Delta";
         EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
+        entityManager.clear();
         EntityRef loadedEntity = entityPersisterHelper.deserializeEntity(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -273,6 +277,20 @@ public class EntitySerializationTest {
         assertTrue(newEntity.hasComponent(EntityInfoComponent.class));
         EntityInfoComponent comp = newEntity.getComponent(EntityInfoComponent.class);
         assertEquals(prefab.getName(), comp.parentPrefab);
+    }
+
+    @Test
+    public void testMappedTypeHandling() throws Exception {
+        componentLibrary.registerComponentClass(MappedTypeComponent.class);
+
+        EntityRef entity = entityManager.create();
+        entity.addComponent(new MappedTypeComponent());
+        EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
+        entityManager.clear();
+        EntityRef loadedEntity = entityPersisterHelper.deserializeEntity(entityData);
+
+        assertTrue(loadedEntity.exists());
+        assertTrue(loadedEntity.hasComponent(MappedTypeComponent.class));
     }
 
 }
