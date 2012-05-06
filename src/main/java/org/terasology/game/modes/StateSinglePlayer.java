@@ -53,7 +53,6 @@ import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.mod.Mod;
@@ -106,7 +105,6 @@ public class StateSinglePlayer implements GameState {
     private UILoadingScreen _loadingScreen;
     private UIStatusScreen _statusScreen;
     private UIInventoryScreen _inventoryScreen;
-    private UIOpenBookScreen _openbook;
 
     /* RENDERING */
     private WorldRenderer _worldRenderer;
@@ -180,7 +178,7 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerComponentClass(AccessInventoryActionComponent.class);
         componentLibrary.registerComponentClass(SpawnPrefabActionComponent.class);
         componentLibrary.registerComponentClass(BookComponent.class);
-
+        componentLibrary.registerComponentClass(BookshelfComponent.class);
         loadPrefabs();
 
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
@@ -205,7 +203,7 @@ public class StateSinglePlayer implements GameState {
         _componentSystemManager.register(new AccessInventoryAction(), "engine:AccessInventoryAction");
         _componentSystemManager.register(new SpawnPrefabAction(), "engine:SpawnPrefabAction");
         _componentSystemManager.register(new ReadBookAction(), "engine: ReadBookAction");
-
+        _componentSystemManager.register(new BookshelfHandler(), "engine: BookshelfHandler");
         _hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
 
@@ -213,7 +211,6 @@ public class StateSinglePlayer implements GameState {
         _loadingScreen = new UILoadingScreen();
         _statusScreen = new UIStatusScreen();
         _inventoryScreen = new UIInventoryScreen();
-        _openbook = new UIOpenBookScreen();
         _metrics = new UIMetrics();
 
         _metrics.setVisible(true);
@@ -223,7 +220,6 @@ public class StateSinglePlayer implements GameState {
         _guiScreens.add(_pauseMenu);
         _guiScreens.add(_loadingScreen);
         _guiScreens.add(_inventoryScreen);
-        _guiScreens.add(_openbook);
         _guiScreens.add(_statusScreen);
     }
 
