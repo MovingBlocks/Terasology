@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -33,7 +34,7 @@ public class UIToolbar extends UIDisplayContainer {
     public UIToolbar() {
         setSize(new Vector2f(364f, 44f));
 
-        _backgroundTexture = new UIGraphicsElement("gui");
+        _backgroundTexture = new UIGraphicsElement(AssetManager.loadTexture("engine:gui"));
         _backgroundTexture.setVisible(true);
         _backgroundTexture.getTextureSize().set(new Vector2f(182f / 256f, 22f / 256f));
         _backgroundTexture.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));

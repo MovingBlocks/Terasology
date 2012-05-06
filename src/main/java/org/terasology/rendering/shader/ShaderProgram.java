@@ -16,13 +16,12 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
 import org.terasology.model.blocks.Block;
 
 import java.io.BufferedReader;
@@ -32,6 +31,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Wraps a OpenGL shader program. Provides convenience methods for setting
@@ -182,7 +183,7 @@ public class ShaderProgram {
 
         if (activeProgram != this) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            TextureManager.getInstance().bindTexture(null);
+            glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
             GL20.glUseProgram(_shaderProgram);
 

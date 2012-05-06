@@ -1,10 +1,13 @@
 package org.terasology.logic.manager;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.terasology.asset.*;
 import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.rendering.assets.Texture;
 
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,54 +50,65 @@ public class AssetManager {
         assetTypeMap.put(extension.toLowerCase(Locale.ENGLISH), loader);
     }
 
+    public void addAssetTemporary(AssetUri uri, Asset asset) {
+        assetCache.put(uri,  asset);
+    }
+
     public Asset loadAsset(AssetUri uri) {
         if (!uri.isValid()) return null;
 
         Asset asset = assetCache.get(uri);
         if (asset != null) return asset;
 
-        URL url = getAsset(uri);
-        if (url == null) {
+        List<URL> urls = getAssetURLs(uri);
+        if (urls.size() == 0) {
             logger.log(Level.WARNING, "Unable to resolve asset: " + uri);
             return null;
         }
 
-        int extensionIndex = url.toString().lastIndexOf('.');
-        if (extensionIndex == -1) return null;
+        for (URL url : urls) {
+            int extensionIndex = url.toString().lastIndexOf('.');
+            if (extensionIndex == -1) continue;
 
-        String extension = url.toString().substring(extensionIndex + 1).toLowerCase(Locale.ENGLISH);
-        Map<String, AssetLoader> extensionMap = assetLoaders.get(uri.getAssetType());
-        if (extensionMap == null) return null;
+            String extension = url.toString().substring(extensionIndex + 1).toLowerCase(Locale.ENGLISH);
+            Map<String, AssetLoader> extensionMap = assetLoaders.get(uri.getAssetType());
+            if (extensionMap == null) continue;
 
-        AssetLoader loader = extensionMap.get(extension);
-        if (loader == null) return null;
+            AssetLoader loader = extensionMap.get(extension);
+            if (loader == null) continue;
 
-        InputStream stream = null;
-        try {
-            stream = url.openStream();
-            asset = loader.load(stream, uri, url);
-            if (asset != null) {
-                assetCache.put(uri, asset);
+            InputStream stream = null;
+            try {
+                stream = url.openStream();
+                urls.remove(url);
+                urls.add(0, url);
+                asset = loader.load(stream, uri, urls);
+                if (asset != null) {
+                    assetCache.put(uri, asset);
+                }
+                logger.log(Level.INFO, "Loaded " + uri);
+                return asset;
+            } catch (IOException ioe) {
+                logger.log(Level.SEVERE, "Error reading asset " + uri, ioe);
+                return null;
             }
-            return asset;
-        } catch (IOException ioe) {
-            logger.log(Level.SEVERE, "Error reading asset " + uri, ioe);
-            return null;
-        }
-        finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException innerException) {
-                    logger.log(Level.SEVERE, "Error closing stream for " + uri, innerException);
+            finally {
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (IOException innerException) {
+                        logger.log(Level.SEVERE, "Error closing stream for " + uri, innerException);
+                    }
                 }
             }
         }
+        logger.log(Level.WARNING, "Unable to resolve asset: " + uri);
+        return null;
     }
 
     public void clear() {
         // TODO: Unload assets
-        assetCache.clear();
+        //assetCache.clear();
     }
 
     public void addAssetSource(AssetSource source) {
@@ -125,33 +139,29 @@ public class AssetManager {
         };
     }
 
-    public URL getAsset(AssetUri uri) {
+    public List<URL> getAssetURLs(AssetUri uri) {
         AssetSource source = assetSources.get(uri.getPackage());
         if (source != null) {
             return source.get(uri);
         }
-        return null;
+        return Lists.newArrayList();
     }
     
     public InputStream getAssetStream(AssetUri uri) throws IOException {
-        URL assetURL = this.getAsset(uri);
+        List<URL> assetURLs = this.getAssetURLs(uri);
 
-        if (assetURL == null) {
+        if (assetURLs.isEmpty()) {
             return null;
         }
         
-        return assetURL.openStream();
+        return assetURLs.get(0).openStream();
     }
 
     // Static syntax sugar
     public static InputStream assetStream(AssetUri uri) throws IOException {
         return getInstance().getAssetStream(uri);
     }
-    
-    public static URL asset(AssetUri uri) {
-        return getInstance().getAsset(uri);
-    }
-    
+
     public static Iterable<AssetUri> list() {
         return getInstance().listAssets();
     }
@@ -170,6 +180,12 @@ public class AssetManager {
             return assetClass.cast(result);
         }
         return null;
+    }
+
+    // Some ease-of-use helper methods
+
+    public static Texture loadTexture(String simpleUri) {
+        return load(new AssetUri(AssetType.TEXTURE, simpleUri), Texture.class);
     }
 
     private class AllAssetIterator implements Iterator<AssetUri> {

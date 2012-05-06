@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
@@ -36,7 +37,7 @@ public class UILoadingScreen extends UIDisplayRenderer {
         _status = new UIText("Loading...");
         _status.setVisible(true);
 
-        _overlay = new UIImageOverlay("loadingBackground");
+        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 
         addDisplayElement(_overlay);

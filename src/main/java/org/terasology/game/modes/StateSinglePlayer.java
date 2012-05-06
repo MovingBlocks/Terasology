@@ -134,6 +134,7 @@ public class StateSinglePlayer implements GameState {
              mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
+        cacheTextures();
         BlockShapeManager.getInstance().reload();
 
         componentLibrary = new ComponentLibraryImpl();
@@ -244,6 +245,12 @@ public class StateSinglePlayer implements GameState {
             } catch (IOException e) {
                 _logger.log(Level.WARNING, "Failed to load prefab '" + prefabURI + "'", e);
             }
+        }
+    }
+
+    private void cacheTextures() {
+        for (AssetUri textureURI : AssetManager.list(AssetType.TEXTURE)) {
+            AssetManager.load(textureURI);
         }
     }
 

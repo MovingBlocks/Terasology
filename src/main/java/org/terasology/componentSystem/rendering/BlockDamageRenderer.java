@@ -1,16 +1,18 @@
 package org.terasology.componentSystem.rendering;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.BlockComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.world.IWorldProvider;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -30,10 +32,12 @@ public class BlockDamageRenderer implements RenderSystem {
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
     private Mesh overlayMesh;
+    private Texture effectsTexture;
 
     public void initialise() {
         this.entityManager = CoreRegistry.get(EntityManager.class);
         this.worldProvider = CoreRegistry.get(IWorldProvider.class);
+        this.effectsTexture = AssetManager.loadTexture("engine:effects");
         Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
 
@@ -43,9 +47,10 @@ public class BlockDamageRenderer implements RenderSystem {
     }
 
     public void renderOverlay() {
+        if (effectsTexture == null) return;
 
         ShaderManager.getInstance().enableDefaultTextured();
-        TextureManager.getInstance().bindTexture("effects");
+        glBindTexture(GL11.GL_TEXTURE_2D, effectsTexture.getId());
         glEnable(GL11.GL_BLEND);
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
         Vector3d cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();

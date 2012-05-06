@@ -9,6 +9,7 @@ import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIInventoryNew;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
@@ -36,7 +37,7 @@ public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNe
         maximaze();
         this.container = container;
         this.creature = creature;
-        background = new UIGraphicsElement("containerWindow");
+        background = new UIGraphicsElement(AssetManager.loadTexture("engine:containerWindow"));
         background.getTextureSize().set(new Vector2f(256f / 256f, 231f / 256f));
         background.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
         addDisplayElement(background);

@@ -23,6 +23,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
 import org.terasology.game.modes.StateSinglePlayer;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
@@ -57,7 +58,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
     public UISelectWorldMenu() {
         maximaze();
-        _overlay = new UIImageOverlay("menuBackground");
+        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
         _overlay.setVisible(true);
 
         _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 256f));

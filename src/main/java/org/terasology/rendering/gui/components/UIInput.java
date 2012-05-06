@@ -39,7 +39,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
   public UIInput(Vector2f size) {
       setSize(size);
       setCrop(true);
-      setStyle("background-image","gui_menu 256/512 30/512 0 90/512");
+      setStyle("background-image","engine:gui_menu 256/512 30/512 0 90/512");
 
       _inputText = new UIText();
       _inputText.setVisible(true);

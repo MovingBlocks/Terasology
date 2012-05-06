@@ -3,6 +3,7 @@ package org.terasology.rendering.gui.framework.style;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.Terasology;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -97,7 +98,7 @@ public class UIPropertyBorder extends UIProperty{
             float    borderWidth        = parseFloat(values[5]);
 
             _width.put(borderType, borderWidth);
-            _images.put(borderType, new UIGraphicsElement(textureName));
+            _images.put(borderType, new UIGraphicsElement(AssetManager.loadTexture(textureName)));
             _images.get(borderType).setVisible(true);
             _images.get(borderType).setCroped(false);
             setBorderPosition(borderType);
@@ -163,7 +164,7 @@ public class UIPropertyBorder extends UIProperty{
                                            _images.get("bottom").getTextureSize().y);
             }
 
-            _corners.put(cornerType, new UIGraphicsElement(textureName));
+            _corners.put(cornerType, new UIGraphicsElement(AssetManager.loadTexture(textureName)));
             _corners.get(cornerType).setVisible(true);
             _corners.get(cornerType).setCroped(false);
             setCornerPosition(cornerType);
