@@ -23,5 +23,5 @@ block {
     version = 1
     shape = "cube"
 
-    hardness = 2
+
 }

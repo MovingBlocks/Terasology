@@ -25,6 +25,5 @@ block {
     version = 1
     shape = "cube"
 
-    hardness = 3.5 - 4
-    gravity = 2.6 - 2.8
+
 }

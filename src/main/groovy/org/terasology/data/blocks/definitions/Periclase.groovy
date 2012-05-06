@@ -23,8 +23,5 @@ block {
     version = 1
     shape = "cube"
 
-    faces {
-        sides = "SnowSide"
-        bottom = "Dirt"
+
     }
-}
