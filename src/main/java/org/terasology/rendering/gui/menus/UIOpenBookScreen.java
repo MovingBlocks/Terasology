@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UIOpenBookScreen extends UIDisplayWindow {
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     private final UIOpenBook _openbook;
 
@@ -17,13 +16,15 @@ public class UIOpenBookScreen extends UIDisplayWindow {
         _openbook = new UIOpenBook();
         _openbook.setVisible(true);
         addDisplayElement(_openbook);
-        logger.log(Level.WARNING, "It even calls UIOpenBookScreen");
         update();
+        setVisible(true);
     }
 
     @Override
     public void update() {
         super.update();
+        setVisible(true);
+        _openbook.isVisible();
         _openbook.center();
     }
 }
