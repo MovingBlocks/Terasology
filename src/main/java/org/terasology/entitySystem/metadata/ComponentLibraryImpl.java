@@ -5,10 +5,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.core.*;
 import org.terasology.entitySystem.persistence.PersistenceUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +38,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
         registerTypeHandler(Long.class, new LongTypeHandler());
         registerTypeHandler(Long.TYPE, new LongTypeHandler());
         registerTypeHandler(String.class, new StringTypeHandler());
+        registerTypeHandler(Number.class, new NumberTypeHandler());
     }
 
     public <T> void registerTypeHandler(Class<? extends T> forClass, TypeHandler<T> handler) {
@@ -148,11 +146,20 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
             return typeHandlers.get(typeClass);
         }
         // For unknown types of a limited depth, assume they are data holders and use them
-        else if (depth <= MAX_SERIALIZATION_DEPTH && !typeClass.isLocalClass() && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
+        else if (depth <= MAX_SERIALIZATION_DEPTH && !Modifier.isAbstract(typeClass.getModifiers()) && !typeClass.isLocalClass() && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
+            try {
+                // Check if constructor exists
+                Constructor constructor = typeClass.getConstructor();
+
+            } catch (NoSuchMethodException e) {
+                logger.log(Level.SEVERE, String.format("Unable to register field of type %s: no publicly accessible default constructor", typeClass.getSimpleName()));
+                return null;
+            }
+
             logger.log(Level.WARNING, "Handling serialization of type " + typeClass + " via MappedContainer");
             MappedContainerTypeHandler mappedHandler = new MappedContainerTypeHandler(typeClass);
             for (Field field : typeClass.getDeclaredFields()) {
-                if (Modifier.isTransient(field.getModifiers()))
+                if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))
                     continue;
 
                 field.setAccessible(true);
