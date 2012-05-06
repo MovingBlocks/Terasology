@@ -1,26 +1,29 @@
 package org.terasology.rendering.gui.menus;
 
-import org.terasology.entitySystem.EntityRef;        //for Contents in a future?
 import org.terasology.rendering.gui.components.UIOpenBook;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer; //Not sure if it should be a Renderer instead of Window
+import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
-public class UIOpenBookScreen extends UIDisplayWindow{
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-    private final UIOpenBook _openBook;
+public class UIOpenBookScreen extends UIDisplayWindow {
+    private Logger logger = Logger.getLogger(getClass().getName());
+
+    private final UIOpenBook _openbook;
 
     public UIOpenBookScreen() {
-
-        _openBook = new UIOpenBook();
-        _openBook.setVisible(true);
-        addDisplayElement(_openBook);
+        maximaze();
+        _openbook = new UIOpenBook();
+        _openbook.setVisible(true);
+        addDisplayElement(_openbook);
+        logger.log(Level.WARNING, "It even calls UIOpenBookScreen");
         update();
     }
 
     @Override
     public void update() {
         super.update();
-        _openBook.center();
-        _openBook.setVisible(true);
+        _openbook.center();
     }
 }

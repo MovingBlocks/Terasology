@@ -10,5 +10,6 @@
         "type" : "WContents",
         "page1" : "Hello",
         "page2" : "World!"
-    }
+    },
+    "ReadBookAction" : {}
 }

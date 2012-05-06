@@ -105,7 +105,6 @@ public class StateSinglePlayer implements GameState {
     private UILoadingScreen _loadingScreen;
     private UIStatusScreen _statusScreen;
     private UIInventoryScreen _inventoryScreen;
-    private UIOpenBookScreen _openbook;
 
     /* RENDERING */
     private WorldRenderer _worldRenderer;
@@ -212,7 +211,6 @@ public class StateSinglePlayer implements GameState {
         _loadingScreen = new UILoadingScreen();
         _statusScreen = new UIStatusScreen();
         _inventoryScreen = new UIInventoryScreen();
-        _openbook = new UIOpenBookScreen();
         _metrics = new UIMetrics();
 
         _metrics.setVisible(true);
@@ -222,7 +220,6 @@ public class StateSinglePlayer implements GameState {
         _guiScreens.add(_pauseMenu);
         _guiScreens.add(_loadingScreen);
         _guiScreens.add(_inventoryScreen);
-        _guiScreens.add(_openbook);
         _guiScreens.add(_statusScreen);
     }
 
