@@ -27,6 +27,5 @@ public class ReadBookAction implements EventHandlerSystem {
     @ReceiveEvent(components = {BookComponent.class})
     public void onActivate(ActivateEvent event, EntityRef book) {
         GUIManager.getInstance().addWindow(new UIOpenBookScreen(), "openbook");
-        logger.log(Level.WARNING, "ReadBookAction : This is being called and still doesn't work in game...");
     }
 }
