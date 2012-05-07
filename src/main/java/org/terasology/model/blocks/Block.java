@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glIsEnabled;
 
 /**
  * Stores all information for a specific block type.
@@ -272,7 +273,7 @@ public class Block implements IGameObject {
             _mesh = tessellator.generateMesh();
         }
 
-        if (getBlockForm() != BLOCK_FORM.BILLBOARD) {
+        if (getBlockForm() != BLOCK_FORM.BILLBOARD || !glIsEnabled(GL11.GL_CULL_FACE)) {
             _mesh.render();
         } else {
             glDisable(GL11.GL_CULL_FACE);
