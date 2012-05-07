@@ -32,17 +32,22 @@ public class DrinkPotionAction implements EventHandlerSystem {
         EntityManager entityManager = CoreRegister.get(EntityManager.class);
         EntityRef item = entityManager.create("core:emptyVial");
         HealthComponent health = event.getTarget().getComponent(HealthComponent.class);
-        if (potion.type.equals(PotionComponent.PotionType.Red) && health != null) {
-            //Restores HP
-            health.currentHealth = health.maxHealth;
-            event.getTarget().saveComponent(health);
-            //Receive empty vial
-            event.getTarget().send(new ReceiveItemEvent(item));
-           //Get Rid of the vial if inventory is full
-            ItemComponent itemComp = item.getComponent(ItemComponent.class);
-            if (itemComp != null && !itemComp.container.exists()) {
-                item.destroy();
-            }
+        switch (potion.type) {
+            case Red:
+                //Set HP to Max HP
+                health.currentHealth = health.maxHealth;
+                event.getTarget().saveComponent(health);
+                //Receive an Empty Vial
+                event.getTarget().send(new ReceiveItemEvent(item));
+                ItemComponent itemComp = item.getComponent(ItemComponent.class);
+                //Destroy Vial if no space in players inventory
+                if (itemComp != null && !itemComp.container.exists()) {
+                    item.destroy();
+                }
+                break;
+            //Add more cases
+            default:
+                break;//nothing happens
+             }
         }
     }
-}
