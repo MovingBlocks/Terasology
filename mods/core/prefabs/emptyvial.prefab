@@ -1,0 +1,11 @@
+{
+    "name" : "core:emptyvial",
+    "Item" : {
+        "name" : "EmptyVial",
+        "icon" : "EmptyVial",
+        "renderWithIcon" : true
+    },
+    "Potion" : {
+        "type" : "Empty"
+    }
+}

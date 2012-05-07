@@ -7,7 +7,8 @@ import org.terasology.entitySystem.AbstractComponent;
  */
 public class PotionComponent extends AbstractComponent {
     public enum PotionType {      //Actual potions
-        Red,    //The only one so far
+        Empty,
+        Red,
         Orange,
         Green,
         Purple,

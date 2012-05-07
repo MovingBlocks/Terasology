@@ -4,6 +4,7 @@
         "name" : "RedPotion",
         "icon" : "RedVial",
         "usage" : "OnUser",
+        "consumedOnUse" : true,
         "renderWithIcon" : true
     },
     "Potion" : {
