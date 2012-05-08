@@ -135,6 +135,9 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
             
             BlockParticleEffectComponent particleEffect = entity.getComponent(BlockParticleEffectComponent.class);
+            if (particleEffect.blockType == null) {
+                return;
+            }
             for (Particle particle : particleEffect.particles) {
                 glPushMatrix();
                 glTranslatef(particle.position.x, particle.position.y, particle.position.z);
@@ -142,7 +145,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
                 glScalef(particle.size, particle.size, particle.size);
 
                 float light = worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos.x + particle.position.x, worldPos.y + particle.position.y, worldPos.z + particle.position.z));
-                renderParticle(particle, particleEffect.blockType, temperature, humidity, light);
+                renderParticle(particle, particleEffect.blockType.getArchetypeBlock().getId(), temperature, humidity, light);
                 glPopMatrix();
             }
             glPopMatrix();

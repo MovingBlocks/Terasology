@@ -331,11 +331,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         EntityRef entity = localPlayer.getEntity();
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        InventoryComponent inventory = localPlayer.getEntity().getComponent(InventoryComponent.class);
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
 
         if (localPlayerComp.isDead) return;
 
         EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+        // Process primary button actions, which depends on the selected item (if any)
         if (Mouse.isButtonDown(0) || button == 0) {
             ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
             if (item != null) {
@@ -359,6 +360,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             lastInteraction = timer.getTimeInMs();
             localPlayerComp.handAnimation = 0.5f;
             entity.saveComponent(localPlayerComp);
+        // Process secondary button action, which currently is always "attack" (break blocks)
         } else if (Mouse.isButtonDown(1) || button == 1) {
             attack(entity, selectedItemEntity);
             lastInteraction = timer.getTimeInMs();

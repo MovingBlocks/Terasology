@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions.furniture
+package org.terasology.components.actions;
+
+import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Prefab;
 
 /**
- * A bookcase only has books on the front. Well, at least this one does, for now
+ * @author Immortius
  */
-block {
-    version = 1
-
-    // Graphics
-    faces {
-        topbottom = "ChestTopBottom"
-        left = "ChestTopBottom"
-        right = "ChestTopBottom"
-        back = "ChestTopBottom"
-    }
-
-    entityPrefab = "core:bookcase"
-    stackable = false
-    straightToInventory = true
-    usable = true
+public class SpawnPrefabActionComponent extends AbstractComponent
+{
+    public String prefab;
 }

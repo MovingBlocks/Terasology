@@ -102,7 +102,7 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
 
         char c = Keyboard.getEventCharacter();
 
-        if (c >= 'a' && c < 'z' + 1 || c >= '0' && c < '9' + 1 || c >= 'A' && c < 'Z' + 1 || c == ' ' || c == '_' || c == '.' || c == ',' || c == '!' || c == '-' || c == '(' || c == ')' || c == '"' || c == '\'' || c == ';' || c == '+') {
+        if (!Character.isISOControl(c)) {
             _consoleInput.append(c);
         }
     }
