@@ -14,10 +14,12 @@ public final class LocalPlayerComponent extends AbstractComponent {
     // Should this be in another component? Player probably.
     public boolean isDead = false;
     public float respawnWait = 0;
+    public boolean minionMode = false;
 
     // Should be here I think (only the local player needs to know the slot),
     // but equipped item will need to be reflected elsewhere so it can
     // be replicated to all players
     public int selectedTool = 0;
+    public int selectedMinion = 0;
     public float handAnimation = 0;
 }

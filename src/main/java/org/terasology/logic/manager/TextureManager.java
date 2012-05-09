@@ -72,6 +72,7 @@ public class TextureManager {
         /* UI */
         addTexture("gui_menu");
         addTexture("gui");
+        addTexture("guiMinion");
         addTexture("icons");
         addTexture("items");
         addTexture("terasology");

@@ -127,6 +127,9 @@ public class Icon {
         //* BOWCRAFTING & FLETCHING *//
         Icon woodshaftIcon = new Icon();
 
+        //* Minion bar *//
+        Icon gelcubeIcon = new Icon();
+
         //Tool Atlas
         pickAxeIcon.setAtlasPosition(0, 0);
         axeIcon.setAtlasPosition(0, 1);
@@ -184,8 +187,8 @@ public class Icon {
         shadowingotIcon.setAtlasPosition(8, 3);
         //Resources for Bowcraft-&-Fletching Atlas
         woodshaftIcon.setAtlasPosition(9, 1);
-
-
+       //gel icon
+        gelcubeIcon.setAtlasPosition(6,6);
 
         icons.put("pickaxe", pickAxeIcon);
         icons.put("axe", axeIcon);
@@ -248,6 +251,8 @@ public class Icon {
        //From old system, no specific icon:
         icons.put("blueprint", palebluePowderIcon);
         icons.put("debug", greenPowderIcon);
+
+        icons.put("gelcube",gelcubeIcon);
     }
 
     /**
