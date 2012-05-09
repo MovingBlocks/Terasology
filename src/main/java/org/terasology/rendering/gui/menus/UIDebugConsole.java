@@ -18,6 +18,7 @@ package org.terasology.rendering.gui.menus;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
+import org.terasology.entitySystem.Prefab;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.GroovyManager;
@@ -31,6 +32,7 @@ import javax.vecmath.Vector2f;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -144,6 +146,8 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
         try {
             if(_consoleInput.toString().startsWith("help")){
                 getHelp(_consoleInput.toString());
+                addToRingBuffer();
+                resetDebugConsole();
                 return;
             }
             else{
@@ -172,11 +176,11 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
     private void getHelp(String commandstring) throws IOException
     {
         String[] split = commandstring.split(" ");
+        GroovyHelpManager groovyhelpmanager = new GroovyHelpManager();
         if(split.length > 1)
         {
             if(split[1].equals("commandList"))
             {
-                GroovyHelpManager groovyhelpmanager = new GroovyHelpManager();
                 HashMap<String,String> commandhelp = groovyhelpmanager.getHelpCommands();
                 String[] commandlist = groovyhelpmanager.getGroovyCommands();
                 String retval = "Available commands :" + newLine+ newLine;
@@ -192,11 +196,21 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
                 setHelpText(retval);
                 return;
             }
-            GroovyHelpManager groovyhelpmanager = new GroovyHelpManager();
+
             if(groovyhelpmanager.getHelpCommands().containsKey(split[1]))
             {
                 GroovyHelp groovyhelp = groovyhelpmanager.readCommandHelp(split[1]);
                 setHelpText(groovyhelp);
+                return;
+            }
+            if(split[1].equals("itemList")){
+                String tempval = "";
+                ArrayList<Prefab> prefabs = groovyhelpmanager.getItems();
+                Iterator<Prefab> it = prefabs.iterator();
+                while (it.hasNext()){
+                    tempval += "item = " + it.next().getName() + newLine;
+                }
+                setHelpText(tempval);
                 return;
             }
             if(split[1].equals("blockList")){

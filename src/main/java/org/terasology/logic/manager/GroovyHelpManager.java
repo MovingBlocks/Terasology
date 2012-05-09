@@ -4,6 +4,10 @@ import java.util.*;
 import java.lang.reflect.*;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import org.terasology.components.ItemComponent;
+import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.PrefabManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.ClasspathResourceLoader;
@@ -120,5 +124,17 @@ public class GroovyHelpManager {
         }
 
         return retval;
+    }
+
+    public  ArrayList<Prefab> getItems(){
+        PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
+        ArrayList<Prefab> prefabs = new ArrayList<Prefab>();
+        Iterator<Prefab> it =  prefMan.listPrefabs().iterator();
+        while(it.hasNext()){
+            Prefab prefab = it.next();
+            //grabb all
+            prefabs.add(prefab);
+        }
+        return prefabs;
     }
 }
