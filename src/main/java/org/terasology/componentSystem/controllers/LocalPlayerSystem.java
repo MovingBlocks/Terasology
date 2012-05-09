@@ -98,7 +98,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         timer = CoreRegistry.get(Timer.class);
-
+        miniongui.setVisible(false);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
@@ -251,7 +251,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 }
             }
         }
-
+        miniongui.update();
+        if(miniongui.isVisible()){
+            miniongui.render();
+        }
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
@@ -334,7 +337,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 }
                 localPlayer.getEntity().saveComponent(localPlayerComp);
             }
-        } else if (state && (button == 0 || button == 1)) {
+        }
+        else if (button == 1 && !state){
+                    miniongui.setVisible(false);
+        }
+        else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
         }
     }
@@ -353,7 +360,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         EntityRef entity = localPlayer.getEntity();
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        MinionComponent minion = localPlayer.getEntity().getComponent(MinionComponent.class);
+        MinionBarComponent minion = localPlayer.getEntity().getComponent(MinionBarComponent.class);
 
         if (localPlayerComp.isDead) return;
 
@@ -361,11 +368,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         {
             EntityRef selectedMinionEntity = minion.MinionSlots.get(localPlayerComp.selectedMinion);
 
-            if (Mouse.isButtonDown(1) ) {
+            if (button == 1 ) {
                 if(selectedMinionEntity != EntityRef.NULL){
-                    //miniongui.setVisible(true);
-                    selectedMinionEntity.destroy();
-                    minion.MinionSlots.set(localPlayerComp.selectedMinion,EntityRef.NULL);
+                    miniongui.setVisible(true);
                 }
             }
             else{

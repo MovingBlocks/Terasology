@@ -68,7 +68,7 @@ public class UIMinionbarCell extends UIDisplayElement {
         _selectionRectangle.setVisible(_selected);
         setPosition(new Vector2f(2f, (getSize().y - 8f) * _id - 2f));
 
-        MinionComponent inventory = localPlayer.getEntity().getComponent(MinionComponent.class);
+        MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
         if (inventory == null)
             return;
         if (inventory.MinionSlots.size() > _id) {
@@ -94,7 +94,7 @@ public class UIMinionbarCell extends UIDisplayElement {
 
         _selectionRectangle.renderTransformed();
 
-        MinionComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(MinionComponent.class);
+        MinionBarComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(MinionBarComponent.class);
         if (inventory.MinionSlots.size() <= _id)
             return;
         

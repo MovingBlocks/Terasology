@@ -177,6 +177,7 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerComponentClass(PlayerComponent.class);
         componentLibrary.registerComponentClass(SimpleAIComponent.class);
         componentLibrary.registerComponentClass(SimpleMinionAIComponent.class);
+        componentLibrary.registerComponentClass(MinionBarComponent.class);
         componentLibrary.registerComponentClass(MinionComponent.class);
         componentLibrary.registerComponentClass(AccessInventoryActionComponent.class);
         componentLibrary.registerComponentClass(SpawnPrefabActionComponent.class);

@@ -48,7 +48,7 @@ public class PlayerFactory {
         sounds.footstepSounds.addAll(Arrays.asList(AudioManager.sounds("FootGrass1", "FootGrass2", "FootGrass3", "FootGrass4", "FootGrass5")));
         player.addComponent(new LocalPlayerComponent());
         player.addComponent(new InventoryComponent(36));
-        player.addComponent(new MinionComponent(9));
+        player.addComponent(new MinionBarComponent(9));
 
         player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Companion"), 16)));
         player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Torch"), 99)));

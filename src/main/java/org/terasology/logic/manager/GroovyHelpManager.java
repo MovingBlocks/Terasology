@@ -5,7 +5,7 @@ import java.lang.reflect.*;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.MinionComponent;
+import org.terasology.components.MinionBarComponent;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -145,7 +145,7 @@ public class GroovyHelpManager {
             factory.setEntityManager(entMan);
 
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-            MinionComponent inventory = localPlayer.getEntity().getComponent(MinionComponent.class);
+            MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
             int freeSlot = inventory.MinionSlots.indexOf(EntityRef.NULL);
             if(freeSlot != -1) {
                 RayBlockIntersection.Intersection blockIntersection = calcSelectedBlock();
@@ -167,7 +167,7 @@ public class GroovyHelpManager {
             factory.setEntityManager(entMan);
 
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-            MinionComponent inventory = localPlayer.getEntity().getComponent(MinionComponent.class);
+            MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
             int freeSlot = inventory.MinionSlots.indexOf(EntityRef.NULL);
             if(freeSlot != -1) {
                 RayBlockIntersection.Intersection blockIntersection = calcSelectedBlock();
@@ -176,6 +176,7 @@ public class GroovyHelpManager {
                     //Vector3i blockPos = blockIntersection.calcAdjacentBlockPos();
                     factory.setRandom(new FastRandom());
                     inventory.MinionSlots.set(slot, factory.generateGelatinousMinion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z)));
+                    localPlayer.getEntity().saveComponent(inventory);
                 }
             }
 

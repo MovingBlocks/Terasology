@@ -1,6 +1,11 @@
 package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.MinionBarComponent;
+import org.terasology.components.MinionComponent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.*;
@@ -20,17 +25,26 @@ public class UIMinion extends UIDisplayRenderer{
 
     private UIButton buttonMove;
     private final UIGraphicsElement _background;
+    private final UIGraphicsElement _selectionRectangle;
+
+    private MinionComponent.MinionBehaviour _Ohbehave;
+    private int _selectedMinion;
 
     public UIMinion(){
 
-        setSize(new Vector2f(60f,60f));
+        setSize(new Vector2f(60f,80f));
         _background = new UIGraphicsElement("guiMinion");
-        _background.setVisible(true);
-        _background.getTextureSize().set(new Vector2f(60f / 256f, 60f / 256f));
-        _background.getTextureOrigin().set(new Vector2f(30.0f, 20.0f));
+        _background.getTextureSize().set(new Vector2f(60f / 256f, 80f / 256f));
+        _background.getTextureOrigin().set(new Vector2f(30.0f / 256f, 20.0f / 256f));
         _background.setSize(getSize());
-        _background.setPosition(new Vector2f(0f,0f));
         addDisplayElement(_background);
+        _background.setVisible(true);
+
+        _selectionRectangle = new UIGraphicsElement("guiMinion");
+        _selectionRectangle.getTextureSize().set(new Vector2f(60f / 256f, 20f / 256f));
+        _selectionRectangle.getTextureOrigin().set(new Vector2f(30f / 256, 0.0f));
+        _selectionRectangle.setSize(new Vector2f(60f, 20f));
+        _selectionRectangle.setVisible(true);
 
         UITransparentOverlay overlay = new UITransparentOverlay();
         overlay.setSize(new Vector2f(60,60));
@@ -39,6 +53,7 @@ public class UIMinion extends UIDisplayRenderer{
         buttonMove = new UIButton(new Vector2f(100,24));
         buttonMove.getLabel().setText("Move");
         buttonMove.setVisible(true);
+        buttonMove.setFocus(true);
         buttonMove.setPosition(new Vector2f(Display.getWidth() - 150,(Display.getHeight()/2) - 96));
         buttonMove.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
@@ -54,9 +69,22 @@ public class UIMinion extends UIDisplayRenderer{
 
     @Override
     public void update() {
-        setPosition(new Vector2f(0,0));
+        //setPosition(new Vector2f(0,0));
         //setPosition(new Vector2f(Display.getWidth()-150,(Display.getHeight()/2) -96));
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
+
+
+        MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
+        if (inventory == null)
+            return;
+        LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+        if (localPlayerComp != null) {
+            _selectedMinion = localPlayerComp.selectedMinion;
+        }
+
+        //setPosition(new Vector2f(2f, (getSize().y - 8f) * _selectedMinion - 2f));
+        _background.setPosition(new Vector2f(Display.getWidth()-(100),(Display.getHeight()/2) - (25 *(6-(_selectedMinion+1))))); //(25 *(6-(_selectedMinion+1)))
         super.update();
     }
 
@@ -82,5 +110,10 @@ public class UIMinion extends UIDisplayRenderer{
         glVertex2f((float)Display.getWidth()-150, (float)(Display.getHeight() / 2) +96);
         glEnd();
         glPopMatrix();
+    }
+
+    public void setParams(MinionComponent.MinionBehaviour behaviour, int selectedminion){
+        _Ohbehave = behaviour;
+        _selectedMinion = selectedminion;
     }
 }

@@ -1,9 +1,6 @@
 package org.terasology.components;
 
-import com.google.common.collect.Lists;
 import org.terasology.entitySystem.AbstractComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.model.inventory.Icon;
 
 import java.util.List;
 
@@ -13,7 +10,6 @@ import java.util.List;
  */
 public final class MinionComponent extends AbstractComponent {
 
-    public List<EntityRef> MinionSlots = Lists.newArrayList();
     public String icon = "";
     public MinionBehaviour minionBehaviour = MinionBehaviour.Follow;
 
@@ -26,9 +22,4 @@ public final class MinionComponent extends AbstractComponent {
 
     public MinionComponent() {}
 
-    public MinionComponent(int numSlots) {
-        for (int i = 0; i < numSlots; ++i) {
-            MinionSlots.add(EntityRef.NULL);
-        }
-    }
 }
