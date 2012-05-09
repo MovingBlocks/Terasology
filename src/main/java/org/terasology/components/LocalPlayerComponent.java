@@ -15,6 +15,7 @@ public final class LocalPlayerComponent extends AbstractComponent {
     public boolean isDead = false;
     public float respawnWait = 0;
     public boolean minionMode = false;
+    public boolean minionSelect = false;
 
     // Should be here I think (only the local player needs to know the slot),
     // but equipped item will need to be reflected elsewhere so it can

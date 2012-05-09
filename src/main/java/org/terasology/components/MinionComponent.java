@@ -14,8 +14,8 @@ public final class MinionComponent extends AbstractComponent {
     public MinionBehaviour minionBehaviour = MinionBehaviour.Follow;
 
     public enum MinionBehaviour{
-        Move,
         Follow,
+        Move,
         Gather,
         Disappear
     }

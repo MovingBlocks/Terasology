@@ -4,6 +4,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.MinionBarComponent;
 import org.terasology.components.MinionComponent;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.components.UIButton;
@@ -45,6 +46,7 @@ public class UIMinion extends UIDisplayRenderer{
         _selectionRectangle.getTextureOrigin().set(new Vector2f(30f / 256, 0.0f));
         _selectionRectangle.setSize(new Vector2f(60f, 20f));
         _selectionRectangle.setVisible(true);
+        addDisplayElement(_selectionRectangle);
 
         UITransparentOverlay overlay = new UITransparentOverlay();
         overlay.setSize(new Vector2f(60,60));
@@ -75,16 +77,26 @@ public class UIMinion extends UIDisplayRenderer{
 
 
 
-        MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
-        if (inventory == null)
-            return;
+
         LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
         if (localPlayerComp != null) {
             _selectedMinion = localPlayerComp.selectedMinion;
         }
 
-        //setPosition(new Vector2f(2f, (getSize().y - 8f) * _selectedMinion - 2f));
-        _background.setPosition(new Vector2f(Display.getWidth()-(100),(Display.getHeight()/2) - (25 *(6-(_selectedMinion+1))))); //(25 *(6-(_selectedMinion+1)))
+        MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
+        if (inventory == null)
+            return;
+        EntityRef minion = inventory.MinionSlots.get(_selectedMinion);
+        if(minion != null){
+            MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
+            if(minioncomp != null){
+                int selection = 20 * (minioncomp.minionBehaviour.ordinal());
+                int startpos = (44 *(6-(_selectedMinion+1)));
+                _selectionRectangle.setPosition(new Vector2f(Display.getWidth()-(100),(Display.getHeight()/2) - startpos + selection));
+                //setPosition(new Vector2f(2f, (getSize().y - 8f) * _selectedMinion - 2f));
+                _background.setPosition(new Vector2f(Display.getWidth()-(100),(Display.getHeight()/2) - startpos)); //(25 *(6-(_selectedMinion+1)))
+            }
+        }
         super.update();
     }
 

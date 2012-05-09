@@ -321,11 +321,33 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     public void processMouseInput(int button, boolean state, int wheelMoved) {
         if (wheelMoved != 0) {
             LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-            if(localPlayerComp.minionMode)
-            {
-                localPlayerComp.selectedMinion = (localPlayerComp.selectedMinion + wheelMoved / 120) % 9;
-                while (localPlayerComp.selectedMinion < 0) {
-                    localPlayerComp.selectedMinion = 9 + localPlayerComp.selectedMinion;
+            if(localPlayerComp.minionMode){
+                if(localPlayerComp.minionSelect){
+                    MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
+                    if (inventory == null)
+                        return;
+                    EntityRef minion = inventory.MinionSlots.get(localPlayerComp.selectedMinion);
+                    if(minion != null){
+                        MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
+                        if(minioncomp != null){
+                            int ordinal = ((minioncomp.minionBehaviour.ordinal() - wheelMoved / 120) % 4);
+                            while (ordinal < 0) ordinal+= 4;
+                            minioncomp.minionBehaviour =  MinionComponent.MinionBehaviour.values()[ordinal];
+                            minion.saveComponent(minioncomp);
+                            if(minioncomp.minionBehaviour == MinionComponent.MinionBehaviour.Disappear){
+                                minion.destroy();
+                                inventory.MinionSlots.set(localPlayerComp.selectedMinion,EntityRef.NULL);
+                                miniongui.setVisible(false);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    localPlayerComp.selectedMinion = (localPlayerComp.selectedMinion - wheelMoved / 120) % 9;
+                    while (localPlayerComp.selectedMinion < 0) {
+                        localPlayerComp.selectedMinion = 9 + localPlayerComp.selectedMinion;
+                    }
                 }
                 localPlayer.getEntity().saveComponent(localPlayerComp);
             }
@@ -339,7 +361,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             }
         }
         else if (button == 1 && !state){
-                    miniongui.setVisible(false);
+            miniongui.setVisible(false);
+            LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+            localPlayerComp.minionSelect = false;
+            localPlayer.getEntity().saveComponent(localPlayerComp);
         }
         else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
@@ -371,6 +396,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             if (button == 1 ) {
                 if(selectedMinionEntity != EntityRef.NULL){
                     miniongui.setVisible(true);
+                    localPlayerComp.minionSelect = true;
+                    entity.saveComponent(localPlayerComp);
                 }
             }
             else{
@@ -393,15 +420,15 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                         }
                     }
                 }
-                if (button == 1) {
+                /*if (button == 1) {
                     if(selectedMinionEntity != EntityRef.NULL){
                         //miniongui.setVisible(false);
-                        /*PojoEntityManager entMan =  CoreRegistry.get(PojoEntityManager.class);
+                        PojoEntityManager entMan =  CoreRegistry.get(PojoEntityManager.class);
 
                         selectedMinionEntity.destroy();
-                        minion.MinionSlots.set(localPlayerComp.selectedMinion,EntityRef.NULL);*/
+                        minion.MinionSlots.set(localPlayerComp.selectedMinion,EntityRef.NULL);
                     }
-                }
+                }*/
             }
 
         }

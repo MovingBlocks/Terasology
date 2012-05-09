@@ -17,6 +17,8 @@ public class MinionBarComponent extends AbstractComponent {
 
     public List<EntityRef> MinionSlots = Lists.newArrayList();
 
+    public MinionBarComponent(){}
+
     public MinionBarComponent(int numSlots) {
         for (int i = 0; i < numSlots; ++i) {
             MinionSlots.add(EntityRef.NULL);

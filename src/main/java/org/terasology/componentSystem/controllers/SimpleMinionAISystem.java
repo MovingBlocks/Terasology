@@ -1,10 +1,7 @@
 package org.terasology.componentSystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.LocationComponent;
-import org.terasology.components.SimpleAIComponent;
-import org.terasology.components.SimpleMinionAIComponent;
+import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -41,6 +38,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             LocationComponent location = entity.getComponent(LocationComponent.class);
             SimpleMinionAIComponent ai = entity.getComponent(SimpleMinionAIComponent.class);
             CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
+            MinionComponent minion = entity.getComponent(MinionComponent.class);
 
             Vector3f worldPos = location.getWorldPosition();
             moveComp.getDrive().set(0,0,0);
@@ -48,45 +46,63 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
             if (localPlayer != null)
             {
-                if(ai.followingPlayer)
-                {
-                    Vector3f dist = new Vector3f(worldPos);
-                    dist.sub(localPlayer.getPosition());
-                    double distanceToPlayer = dist.lengthSquared();
+                switch(minion.minionBehaviour){
+                    case Follow: {
+                        Vector3f dist = new Vector3f(worldPos);
+                        dist.sub(localPlayer.getPosition());
+                        double distanceToPlayer = dist.lengthSquared();
 
 
-                    if (distanceToPlayer > 8) {
-                        // Head to player
-                        Vector3f target = localPlayer.getPosition();
-                        target.x -= 2;
-                        ai.movementTarget.set(target);
-                        ai.followingPlayer = true;
-                        entity.saveComponent(ai);
+                        if (distanceToPlayer > 8) {
+                            // Head to player
+                            Vector3f target = localPlayer.getPosition();
+                            target.x -= 2;
+                            ai.movementTarget.set(target);
+                            ai.followingPlayer = true;
+                            entity.saveComponent(ai);
+                        }
+
+                        Vector3f targetDirection = new Vector3f();
+                        targetDirection.sub(ai.movementTarget, worldPos);
+                        targetDirection.normalize();
+                        moveComp.setDrive(targetDirection);
+
+                        float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
+                        AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+                        location.getLocalRotation().set(axisAngle);
+                        entity.saveComponent(moveComp);
+                        entity.saveComponent(location);
                     }
+                    case Gather:{
 
-                    Vector3f targetDirection = new Vector3f();
-                    targetDirection.sub(ai.movementTarget, worldPos);
-                    targetDirection.normalize();
-                    moveComp.setDrive(targetDirection);
 
-                    float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                    AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                    location.getLocalRotation().set(axisAngle);
-                    entity.saveComponent(moveComp);
-                    entity.saveComponent(location);
+                        Vector3f targetDirection = new Vector3f();
+                        targetDirection.sub(ai.movementTarget, worldPos);
+                        targetDirection.normalize();
+                        moveComp.setDrive(targetDirection);
+
+                        float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
+                        AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+                        location.getLocalRotation().set(axisAngle);
+                        entity.saveComponent(moveComp);
+                        entity.saveComponent(location);
+                    }
+                    case Move:{
+                        ai.followingPlayer = false;
+                        entity.saveComponent(ai);
+                        Vector3f targetDirection = new Vector3f();
+                        targetDirection.sub(ai.movementTarget, worldPos);
+                        targetDirection.normalize();
+                        moveComp.setDrive(targetDirection);
+
+                        float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
+                        AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+                        location.getLocalRotation().set(axisAngle);
+                        entity.saveComponent(moveComp);
+                        entity.saveComponent(location);
+                    }
                 }
-                else{
-                    Vector3f targetDirection = new Vector3f();
-                    targetDirection.sub(ai.movementTarget, worldPos);
-                    targetDirection.normalize();
-                    moveComp.setDrive(targetDirection);
 
-                    float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                    AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                    location.getLocalRotation().set(axisAngle);
-                    entity.saveComponent(moveComp);
-                    entity.saveComponent(location);
-                }
             }
         }
     }
