@@ -8,7 +8,6 @@ import org.lwjgl.input.Mouse;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
-import org.terasology.componentSystem.items.ItemSystem;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -20,9 +19,7 @@ import org.terasology.events.OpenInventoryEvent;
 import org.terasology.events.item.UseItemEvent;
 import org.terasology.events.item.UseItemInDirectionEvent;
 import org.terasology.events.item.UseItemOnBlockEvent;
-import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
@@ -292,8 +289,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 break;
             case Keyboard.KEY_X:
                 if (!repeatEvent && state) {
-                    LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-                    localPlayerComp.minionMode = ! localPlayerComp.minionMode;
+                    MinionSystem minionSystem = new MinionSystem();
+                    minionSystem.switchMinionMode();
                 }
                 break;
             case Keyboard.KEY_SPACE:
@@ -319,36 +316,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
      * @param wheelMoved Distance the mouse wheel moved since last
      */
     public void processMouseInput(int button, boolean state, int wheelMoved) {
+        MinionSystem minionsys = new MinionSystem();
         if (wheelMoved != 0) {
-            LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-            if(localPlayerComp.minionMode){
-                if(localPlayerComp.minionSelect){
-                    MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
-                    if (inventory == null)
-                        return;
-                    EntityRef minion = inventory.MinionSlots.get(localPlayerComp.selectedMinion);
-                    if(minion != null){
-                        MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
-                        if(minioncomp != null){
-                            int ordinal = ((minioncomp.minionBehaviour.ordinal() - wheelMoved / 120) % 5);
-                            while (ordinal < 0) ordinal+= 5;
-                            minioncomp.minionBehaviour =  MinionComponent.MinionBehaviour.values()[ordinal];
-                            minion.saveComponent(minioncomp);
-
-                        }
-                    }
-                }
-                else
-                {
-                    localPlayerComp.selectedMinion = (localPlayerComp.selectedMinion - wheelMoved / 120) % 9;
-                    while (localPlayerComp.selectedMinion < 0) {
-                        localPlayerComp.selectedMinion = 9 + localPlayerComp.selectedMinion;
-                    }
-                }
-                localPlayer.getEntity().saveComponent(localPlayerComp);
-            }
+            if(minionsys.MinionMode())
+                if(minionsys.MinionSelect()) minionsys.menuScroll(wheelMoved);
+                else minionsys.barScroll(wheelMoved);
             else
             {
+                LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
                 localPlayerComp.selectedTool = (localPlayerComp.selectedTool + wheelMoved / 120) % 9;
                 while (localPlayerComp.selectedTool < 0) {
                     localPlayerComp.selectedTool = 9 + localPlayerComp.selectedTool;
@@ -358,25 +333,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
         else if (button == 1 && !state){
             miniongui.setVisible(false);
-            LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-            localPlayerComp.minionSelect = false;
-            localPlayer.getEntity().saveComponent(localPlayerComp);
-            MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
-            if (inventory == null)
-                return;
-            EntityRef minion = inventory.MinionSlots.get(localPlayerComp.selectedMinion);
-            if(minion != null){
-                MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
-                if(minioncomp != null){
-                    if(minioncomp.minionBehaviour == MinionComponent.MinionBehaviour.Disappear){
-                        minion.destroy();
-                        inventory.MinionSlots.set(localPlayerComp.selectedMinion,EntityRef.NULL);
-                    }
-                    else if (minioncomp.minionBehaviour == MinionComponent.MinionBehaviour.Inventory){
-                        minion.send(new ActivateEvent(minion, localPlayer.getEntity()));
-                    }
-                }
-            }
+            minionsys.RightMouseReleased();
+
         }
         else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
@@ -389,6 +347,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
      * @param button The pressed mouse button
      */
     private void processInteractions(int button) {
+        MinionSystem minionsys = new MinionSystem();
         // Throttle interactions
         if (timer.getTimeInMs() - lastInteraction < 200) {
             return;
@@ -397,56 +356,23 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         EntityRef entity = localPlayer.getEntity();
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        MinionBarComponent minion = localPlayer.getEntity().getComponent(MinionBarComponent.class);
 
         if (localPlayerComp.isDead) return;
 
-        if(localPlayerComp.minionMode)
-        {
-            EntityRef selectedMinionEntity = minion.MinionSlots.get(localPlayerComp.selectedMinion);
-
+        if(minionsys.MinionMode()){
             if (button == 1 ) {
-                if(selectedMinionEntity != EntityRef.NULL){
+                if(minionsys.isMinionSelected()){
                     miniongui.setVisible(true);
-                    localPlayerComp.minionSelect = true;
-                    entity.saveComponent(localPlayerComp);
+                    minionsys.setMinionSelectMode(true);
                 }
             }
             else{
                 if (Mouse.isButtonDown(0) || button == 0) {
-                    GroovyHelpManager helpMan = new GroovyHelpManager();
-                    if(selectedMinionEntity == EntityRef.NULL)
-                    {
-                        helpMan.spawnCube(localPlayerComp.selectedMinion);
-                    }
-                    else
-                    {
-                        SimpleMinionAIComponent minionai = selectedMinionEntity.getComponent(SimpleMinionAIComponent.class);
-                        if(minionai != null){
-                            if(helpMan.calcSelectedBlock() != null)
-                            {
-                                Vector3i centerPos = helpMan.calcSelectedBlock().getBlockPosition();
-                                minionai.followingPlayer = false;
-                                minionai.movementTarget = new Vector3f(centerPos.x, centerPos.y, centerPos.z);
-
-                            }
-                        }
-                    }
+                    minionsys.setTarget();
                 }
-                /*if (button == 1) {
-                    if(selectedMinionEntity != EntityRef.NULL){
-                        //miniongui.setVisible(false);
-                        PojoEntityManager entMan =  CoreRegistry.get(PojoEntityManager.class);
-
-                        selectedMinionEntity.destroy();
-                        minion.MinionSlots.set(localPlayerComp.selectedMinion,EntityRef.NULL);
-                    }
-                }*/
             }
-
         }
-        else
-        {
+        else{
             EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
             // Process primary button actions, which depends on the selected item (if any)
             if (Mouse.isButtonDown(0) || button == 0) {
@@ -466,7 +392,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                             attack(entity, selectedItemEntity);
                             break;
                     }
-                } else {
+                }
+                else {
                     attack(entity, selectedItemEntity);
                 }
                 lastInteraction = timer.getTimeInMs();

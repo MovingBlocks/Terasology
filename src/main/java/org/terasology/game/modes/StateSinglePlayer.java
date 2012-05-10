@@ -208,6 +208,7 @@ public class StateSinglePlayer implements GameState {
         _componentSystemManager.register(new AccessInventoryAction(), "engine:AccessInventoryAction");
         _componentSystemManager.register(new SpawnPrefabAction(), "engine:SpawnPrefabAction");
         _componentSystemManager.register(new ReadBookAction(), "engine: ReadBookAction");
+        _componentSystemManager.register(new DestroyMinion(), "engine: DestroyMinionAction");
         _componentSystemManager.register(new BookshelfHandler(), "engine: BookshelfHandler");
         _hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
