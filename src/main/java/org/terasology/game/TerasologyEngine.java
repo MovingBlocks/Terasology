@@ -24,10 +24,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
 import org.terasology.asset.AssetType;
-import org.terasology.asset.loaders.ObjMeshLoader;
-import org.terasology.asset.loaders.OggSoundLoader;
-import org.terasology.asset.loaders.OggStreamingSoundLoader;
-import org.terasology.asset.loaders.PNGTextureLoader;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.loaders.*;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.game.modes.GameState;
 import org.terasology.logic.manager.*;
@@ -215,17 +213,17 @@ public class TerasologyEngine implements GameEngine {
     private void initNativeLibs() {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_MACOSX:
-                addLibraryPath("natives/macosx");
+                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/macosx"));
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                addLibraryPath("natives/linux");
+                addLibraryPath(new File(PathManager.getInstance().getDataPath(),"natives/linux"));
                 if (System.getProperty("os.arch").contains("64"))
                     System.loadLibrary("openal64");
                 else
                     System.loadLibrary("openal");
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                addLibraryPath("natives/windows");
+                addLibraryPath(new File(PathManager.getInstance().getDataPath(),"natives/windows"));
 
                 if (System.getProperty("os.arch").contains("64"))
                     System.loadLibrary("OpenAL64");
@@ -238,7 +236,7 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
-    private void addLibraryPath(String libPath) {
+    private void addLibraryPath(File libPath) {
         try {
             final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
             usrPathsField.setAccessible(true);
@@ -249,7 +247,7 @@ public class TerasologyEngine implements GameEngine {
                 return;
             }
 
-            paths.add(0, libPath);  // Add to beginning, to override system libraries
+            paths.add(0, libPath.getAbsolutePath());  // Add to beginning, to override system libraries
 
             usrPathsField.set(null, paths.toArray(new String[paths.size()]));
         } catch (Exception e) {
@@ -329,10 +327,15 @@ public class TerasologyEngine implements GameEngine {
         AssetManager.getInstance().register(AssetType.MUSIC, "ogg", new OggStreamingSoundLoader());
         AssetManager.getInstance().register(AssetType.SOUND, "ogg", new OggSoundLoader());
         AssetManager.getInstance().register(AssetType.TEXTURE, "png", new PNGTextureLoader());
+        AssetManager.getInstance().register(AssetType.SHADER, "glsl", new GLSLShaderLoader());
         AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "org/terasology/data"));
         // TODO: Shouldn't be setting up the block/block shape managers here (do on transition to StateSinglePlayer)
         BlockShapeManager.getInstance().reload();
         BlockManager.getInstance();
+
+        for (AssetUri uri : AssetManager.list(AssetType.SHADER)) {
+            AssetManager.load(uri);
+        }
 
         // TODO: This has to occur after the BlockManager has been created, so that texture:engine:terrain exists. Fix this.
         ShaderManager.getInstance();

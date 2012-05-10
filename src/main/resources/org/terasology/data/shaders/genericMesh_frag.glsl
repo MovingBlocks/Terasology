@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-uniform sampler2D textureAtlas;
+uniform sampler2D diffuse;
 
 uniform float light;
 uniform vec3 colorOffset;
@@ -28,7 +28,7 @@ void main(){
     vec4 color;
 
     if (textured) {
-        color = srgbToLinear(texture2D(textureAtlas, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y)));
+        color = srgbToLinear(texture2D(diffuse, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y)));
     } else {
         color = vec4(1,1,1,1);
     }
