@@ -29,6 +29,7 @@ import org.terasology.componentSystem.block.BlockEntitySystem;
 import org.terasology.componentSystem.characters.CharacterMovementSystem;
 import org.terasology.componentSystem.characters.CharacterSoundSystem;
 import org.terasology.componentSystem.common.HealthSystem;
+import org.terasology.componentSystem.common.StatusAffectorSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.componentSystem.controllers.SimpleAISystem;
 import org.terasology.componentSystem.items.InventorySystem;
@@ -180,6 +181,7 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerComponentClass(BookComponent.class);
         componentLibrary.registerComponentClass(BookshelfComponent.class);
         componentLibrary.registerComponentClass(PotionComponent.class);
+        componentLibrary.registerComponentClass(SpeedBoostComponent.class);
         loadPrefabs();
 
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
@@ -206,6 +208,7 @@ public class StateSinglePlayer implements GameState {
         _componentSystemManager.register(new ReadBookAction(), "engine: ReadBookAction");
         _componentSystemManager.register(new BookshelfHandler(), "engine: BookshelfHandler");
         _componentSystemManager.register(new DrinkPotionAction(), "engine : DrinkPotionAction");
+        _componentSystemManager.register(new StatusAffectorSystem(), "engine : StatusAffectorSystem");
         _hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
 

@@ -1,0 +1,13 @@
+{
+    "name" : "core:speedpotion",
+    "Item" : {
+        "name" : "SpeedPotion",
+        "icon" : "BlackVial",
+        "usage" : "OnUser",
+        "consumedOnUse" : true,
+        "renderWithIcon" : true
+    },
+    "Potion" : {
+        "type" : "Black"
+    }
+}
