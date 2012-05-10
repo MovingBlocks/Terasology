@@ -100,9 +100,9 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
                         if (distanceToTarget < 4) {
                             // gather the block
-                            if(timer.getTimeInMs() - time > 1000){
+                            if(timer.getTimeInMs() - time > 500){
                                 time = timer.getTimeInMs();
-                                attack(localPlayer.getEntity(),null,ai.movementTarget,moveComp); //entity
+                                attack(entity,ai.movementTarget);
                             }
                         }
 
@@ -139,14 +139,13 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         }
     }
 
-    private void attack(EntityRef player, EntityRef withItem, Vector3f position, CharacterMovementComponent moveCompn) {
+    private void attack(EntityRef player, Vector3f position) {
         //RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock(position, moveCompn);
         //ItemComponent item = withItem.getComponent(ItemComponent.class);
 
         //if (selectedBlock != null) {
-
             //BlockPosition blockPos = selectedBlock.getBlockPosition();
-            byte currentBlockType = worldProvider.getBlock((int)position.x, (int)position.y - 1, (int)position.z);
+            byte currentBlockType = worldProvider.getBlock((int)position.x, (int)position.y, (int)position.z);
             Block block = BlockManager.getInstance().getBlock(currentBlockType);
 
             int damage = 1;

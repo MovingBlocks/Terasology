@@ -415,7 +415,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                             {
                                 Vector3i centerPos = helpMan.calcSelectedBlock().getBlockPosition();
                                 minionai.followingPlayer = false;
-                                minionai.movementTarget = new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z);
+                                minionai.movementTarget = new Vector3f(centerPos.x, centerPos.y, centerPos.z);
+
                             }
                         }
                     }
