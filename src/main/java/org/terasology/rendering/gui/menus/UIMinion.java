@@ -24,7 +24,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class UIMinion extends UIDisplayRenderer{
 
-    private UIButton buttonMove;
+    //private UIButton buttonMove;
     private final UIGraphicsElement _background;
     private final UIGraphicsElement _selectionRectangle;
 
@@ -33,9 +33,9 @@ public class UIMinion extends UIDisplayRenderer{
 
     public UIMinion(){
 
-        setSize(new Vector2f(60f,80f));
+        setSize(new Vector2f(60f,100f));
         _background = new UIGraphicsElement("guiMinion");
-        _background.getTextureSize().set(new Vector2f(60f / 256f, 80f / 256f));
+        _background.getTextureSize().set(new Vector2f(60f / 256f, 100f / 256f));
         _background.getTextureOrigin().set(new Vector2f(30.0f / 256f, 20.0f / 256f));
         _background.setSize(getSize());
         addDisplayElement(_background);
@@ -48,11 +48,11 @@ public class UIMinion extends UIDisplayRenderer{
         _selectionRectangle.setVisible(true);
         addDisplayElement(_selectionRectangle);
 
-        UITransparentOverlay overlay = new UITransparentOverlay();
+        /*UITransparentOverlay overlay = new UITransparentOverlay();
         overlay.setSize(new Vector2f(60,60));
-        overlay.setVisible(true);
+        overlay.setVisible(true);*/
 
-        buttonMove = new UIButton(new Vector2f(100,24));
+        /*buttonMove = new UIButton(new Vector2f(100,24));
         buttonMove.getLabel().setText("Move");
         buttonMove.setVisible(true);
         buttonMove.setFocus(true);
@@ -62,9 +62,8 @@ public class UIMinion extends UIDisplayRenderer{
                 setMinionMoveBehaviour();
             }
         });
-        addDisplayElement(buttonMove);
+        addDisplayElement(buttonMove);*/
         //
-        setVisible(true);
     }
 
     private void setMinionMoveBehaviour(){}
@@ -104,14 +103,14 @@ public class UIMinion extends UIDisplayRenderer{
     public void render(){
 
         super.render();
-        renderOverlay();
+        //renderOverlay();
     }
 
-    private void test(){
+    /*private void test(){
         buttonMove.setFocus(true);
-    }
+    }*/
 
-    public void renderOverlay(){
+    /*public void renderOverlay(){
         glPushMatrix();
         glLoadIdentity();
         glColor4f(0, 0, 0, 0.75f);
@@ -122,10 +121,10 @@ public class UIMinion extends UIDisplayRenderer{
         glVertex2f((float)Display.getWidth()-150, (float)(Display.getHeight() / 2) +96);
         glEnd();
         glPopMatrix();
-    }
+    }*/
 
-    public void setParams(MinionComponent.MinionBehaviour behaviour, int selectedminion){
+    /*public void setParams(MinionComponent.MinionBehaviour behaviour, int selectedminion){
         _Ohbehave = behaviour;
         _selectedMinion = selectedminion;
-    }
+    }*/
 }

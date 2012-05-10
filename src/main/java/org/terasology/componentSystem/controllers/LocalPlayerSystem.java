@@ -330,15 +330,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                     if(minion != null){
                         MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
                         if(minioncomp != null){
-                            int ordinal = ((minioncomp.minionBehaviour.ordinal() - wheelMoved / 120) % 4);
-                            while (ordinal < 0) ordinal+= 4;
+                            int ordinal = ((minioncomp.minionBehaviour.ordinal() - wheelMoved / 120) % 5);
+                            while (ordinal < 0) ordinal+= 5;
                             minioncomp.minionBehaviour =  MinionComponent.MinionBehaviour.values()[ordinal];
                             minion.saveComponent(minioncomp);
-                            if(minioncomp.minionBehaviour == MinionComponent.MinionBehaviour.Disappear){
-                                minion.destroy();
-                                inventory.MinionSlots.set(localPlayerComp.selectedMinion,EntityRef.NULL);
-                                miniongui.setVisible(false);
-                            }
+
                         }
                     }
                 }
@@ -365,6 +361,22 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
             localPlayerComp.minionSelect = false;
             localPlayer.getEntity().saveComponent(localPlayerComp);
+            MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
+            if (inventory == null)
+                return;
+            EntityRef minion = inventory.MinionSlots.get(localPlayerComp.selectedMinion);
+            if(minion != null){
+                MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
+                if(minioncomp != null){
+                    if(minioncomp.minionBehaviour == MinionComponent.MinionBehaviour.Disappear){
+                        minion.destroy();
+                        inventory.MinionSlots.set(localPlayerComp.selectedMinion,EntityRef.NULL);
+                    }
+                    else if (minioncomp.minionBehaviour == MinionComponent.MinionBehaviour.Inventory){
+                        minion.send(new ActivateEvent(minion, localPlayer.getEntity()));
+                    }
+                }
+            }
         }
         else if (state && (button == 0 || button == 1)) {
             processInteractions(button);

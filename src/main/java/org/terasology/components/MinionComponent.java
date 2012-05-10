@@ -17,6 +17,7 @@ public final class MinionComponent extends AbstractComponent {
         Follow,
         Move,
         Gather,
+        Inventory,
         Disappear
     }
 
