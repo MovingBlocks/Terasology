@@ -1,0 +1,6 @@
+{
+    "params" : [
+        { "name" : "texScene",
+          "type" : "sampler2D" }
+    ]
+}

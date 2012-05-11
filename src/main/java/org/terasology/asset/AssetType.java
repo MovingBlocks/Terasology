@@ -39,6 +39,9 @@ public enum AssetType {
             if (index == -1) {
                 index = item.lastIndexOf("_vert.glsl");
             }
+            if (index == -1) {
+                index = item.lastIndexOf(".");
+            }
             if (index != -1) {
                 return new AssetUri(this, sourceId, item.substring(0, index));
             }

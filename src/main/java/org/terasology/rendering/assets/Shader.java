@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.assets;
 
+import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -24,12 +25,17 @@ import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.Config;
 import org.terasology.model.blocks.Block;
+import org.terasology.rendering.assets.metadata.ParamMetadata;
+import org.terasology.rendering.assets.metadata.ParamType;
+import org.terasology.rendering.assets.metadata.ShaderMetadata;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,18 +50,22 @@ public class Shader implements Asset {
     private String vertShader;
     private String fragShader;
 
-    private int shaderProgram = 0;
     private int fragmentProgram = 0;
     private int vertexProgram = 0;
     private boolean valid = false;
+    private Map<String,ParamType> params = Maps.newHashMap();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    public Shader(AssetUri uri, String vertShader, String fragShader) {
+    public Shader(AssetUri uri, String vertShader, String fragShader, ShaderMetadata metadata) {
         this.uri = uri;
 
         this.vertShader = vertShader;
         this.fragShader = fragShader;
+
+        for (ParamMetadata paramData : metadata.getParameters()) {
+            params.put(paramData.getName(), paramData.getType());
+        }
 
         compileShaderProgram();
     }
@@ -63,32 +73,6 @@ public class Shader implements Asset {
     @Override
     public AssetUri getURI() {
         return uri;
-    }
-
-    private void compileShaderProgram() {
-        String finalVert = createShaderBuilder().append(IncludedFunctionsVertex).append('\n').append(vertShader).toString();
-        String finalFrag = createShaderBuilder().append(IncludedFunctionsFragment).append('\n').append(fragShader).toString();
-
-        compileShader(GL20.GL_FRAGMENT_SHADER, finalFrag);
-        compileShader(GL20.GL_VERTEX_SHADER, finalVert);
-
-        shaderProgram = GL20.glCreateProgram();
-
-        GL20.glAttachShader(shaderProgram, fragmentProgram);
-        GL20.glAttachShader(shaderProgram, vertexProgram);
-        GL20.glLinkProgram(shaderProgram);
-        if (GL20.glGetProgram(shaderProgram, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
-            valid = false;
-            logger.log(Level.WARNING, "Failed to link shader {0}.", GL20.glGetProgramInfoLog(shaderProgram, GL20.GL_LINK_STATUS));
-            return;
-        }
-        GL20.glValidateProgram(shaderProgram);
-        if (GL20.glGetProgram(shaderProgram, GL20.GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
-            valid = false;
-            logger.log(Level.WARNING, "Failed to validate shader {0}.", GL20.glGetProgramInfoLog(shaderProgram, GL20.GL_VALIDATE_STATUS));
-            return;
-        }
-        valid = true;
     }
 
     public void recompile() {
@@ -101,9 +85,6 @@ public class Shader implements Asset {
     public void dispose() {
         logger.log(Level.INFO, "Disposing shader {0}.", uri);
 
-        GL20.glDeleteShader(shaderProgram);
-        shaderProgram = 0;
-
         GL20.glDeleteProgram(fragmentProgram);
         fragmentProgram = 0;
 
@@ -112,7 +93,74 @@ public class Shader implements Asset {
     }
 
     public boolean isDisposed() {
-        return shaderProgram == 0;
+        return fragmentProgram == 0 && vertexProgram == 0;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public ParamMetadata getParameter(String desc) {
+        if (params.containsKey(desc)) {
+            return new ParamMetadata(desc, params.get(desc));
+        }
+        return null;
+    }
+
+    public Iterable<ParamMetadata> listParameters() {
+        return new Iterable<ParamMetadata>() {
+            @Override
+            public Iterator<ParamMetadata> iterator() {
+                return new Iterator<ParamMetadata>() {
+                    Iterator<Map.Entry<String,ParamType>> internal = params.entrySet().iterator();
+
+                    @Override
+                    public boolean hasNext() {
+                        return internal.hasNext();
+                    }
+
+                    @Override
+                    public ParamMetadata next() {
+                        Map.Entry<String,ParamType> entry = internal.next();
+                        return new ParamMetadata(entry.getKey(), entry.getValue());
+                    }
+
+                    @Override
+                    public void remove() {
+                        throw new UnsupportedOperationException("Remove not supported");
+                    }
+                };
+            }
+        };
+    }
+
+    int generateShaderInstance() {
+        int shaderProgram = GL20.glCreateProgram();
+
+        GL20.glAttachShader(shaderProgram, fragmentProgram);
+        GL20.glAttachShader(shaderProgram, vertexProgram);
+        GL20.glLinkProgram(shaderProgram);
+        if (GL20.glGetProgram(shaderProgram, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
+            logger.log(Level.WARNING, "Failed to link shader {0}.", GL20.glGetProgramInfoLog(shaderProgram, GL20.GL_LINK_STATUS));
+            GL20.glDeleteProgram(shaderProgram);
+            return 0;
+        }
+        GL20.glValidateProgram(shaderProgram);
+        if (GL20.glGetProgram(shaderProgram, GL20.GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
+            logger.log(Level.WARNING, "Failed to validate shader {0}.", GL20.glGetProgramInfoLog(shaderProgram, GL20.GL_VALIDATE_STATUS));
+            GL20.glDeleteProgram(shaderProgram);
+            return 0;
+        }
+        return shaderProgram;
+    }
+
+    private void compileShaderProgram() {
+        String finalVert = createShaderBuilder().append(IncludedFunctionsVertex).append('\n').append(vertShader).toString();
+        String finalFrag = createShaderBuilder().append(IncludedFunctionsFragment).append('\n').append(fragShader).toString();
+
+        valid = true;
+        compileShader(GL20.GL_FRAGMENT_SHADER, finalFrag);
+        compileShader(GL20.GL_VERTEX_SHADER, finalVert);
     }
 
     private void compileShader(int type, String shaderCode) {
@@ -141,6 +189,8 @@ public class Shader implements Asset {
             return;
         }
 
+        valid = false;
+
         ByteBuffer infoBuffer = BufferUtils.createByteBuffer(length);
         intBuffer.flip();
 
@@ -165,14 +215,6 @@ public class Shader implements Asset {
         return builder;
     }
 
-    public int getShaderId() {
-        return shaderProgram;
-    }
-
-    public boolean isValid() {
-        return valid;
-    }
-
     static {
         InputStream vertStream = Shader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsVertIncl.glsl");
         InputStream fragStream = Shader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsFragIncl.glsl");
@@ -195,4 +237,5 @@ public class Shader implements Asset {
             }
         }
     }
+
 }

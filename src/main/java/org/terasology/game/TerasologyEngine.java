@@ -32,6 +32,8 @@ import org.terasology.logic.manager.*;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.rendering.assets.Shader;
+import org.terasology.rendering.assets.metadata.ParamMetadata;
 
 import java.io.File;
 import java.io.IOException;
@@ -328,12 +330,17 @@ public class TerasologyEngine implements GameEngine {
         AssetManager.getInstance().register(AssetType.SOUND, "ogg", new OggSoundLoader());
         AssetManager.getInstance().register(AssetType.TEXTURE, "png", new PNGTextureLoader());
         AssetManager.getInstance().register(AssetType.SHADER, "glsl", new GLSLShaderLoader());
+        AssetManager.getInstance().register(AssetType.MATERIAL, "mat", new MaterialLoader());
         AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "org/terasology/data"));
         // TODO: Shouldn't be setting up the block/block shape managers here (do on transition to StateSinglePlayer)
         BlockShapeManager.getInstance().reload();
         BlockManager.getInstance();
 
         for (AssetUri uri : AssetManager.list(AssetType.SHADER)) {
+            AssetManager.load(uri);
+        }
+
+        for (AssetUri uri : AssetManager.list(AssetType.MATERIAL)) {
             AssetManager.load(uri);
         }
 

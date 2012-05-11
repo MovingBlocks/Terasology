@@ -8,6 +8,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.model.structures.AABB;
@@ -83,6 +84,7 @@ public class MeshRenderer implements RenderSystem {
     }
 
     public void renderOpaque() {
+        boolean carryingTorch = CoreRegistry.get(LocalPlayer.class).isCarryingTorch();
         Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
         for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
             // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
@@ -107,12 +109,10 @@ public class MeshRenderer implements RenderSystem {
                 glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
                 glScalef(worldScale, worldScale, worldScale);
 
-                ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("genericMesh");
-
-                shader.enable();
-                shader.setFloat4("colorOffset", meshComp.color.x, meshComp.color.y, meshComp.color.z, meshComp.color.w);
-                shader.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos)));
-
+                meshComp.material.enable();
+                meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos)));
+                meshComp.material.setInt("carryingTorch",carryingTorch ? 1 : 0);
+                meshComp.material.bindTextures();
                 meshComp.mesh.render();
 
                 glPopMatrix();
