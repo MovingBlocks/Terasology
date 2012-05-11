@@ -10,7 +10,6 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.GroovyHelpManager;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.gui.components.UIMinion;
-import org.terasology.rendering.gui.menus.UIMinionMenu;
 
 import javax.vecmath.Vector3f;
 import java.util.HashSet;
@@ -28,7 +27,7 @@ public class MinionSystem implements EventHandlerSystem {
     private final int popupentries = 5;
     private HashSet<String> Names = new HashSet<String>();
     private final String behaviourmenu = "minionbehaviour";
-    private UIMinionMenu minionbehaviourmenu;
+    private UIMinion minionbehaviourmenu;
 
     public void initialise() {
         Names.add("Begla");
@@ -103,20 +102,21 @@ public class MinionSystem implements EventHandlerSystem {
     }
 
     public void RightMouseDown(){
-        minionbehaviourmenu = (UIMinionMenu)GUIManager.getInstance().getWindowById(behaviourmenu);
+        minionbehaviourmenu = (UIMinion)GUIManager.getInstance().getWindowById(behaviourmenu);
         if(minionbehaviourmenu == null) {
-            minionbehaviourmenu = new UIMinionMenu();
+            minionbehaviourmenu = new UIMinion();
             GUIManager.getInstance().addWindow(minionbehaviourmenu,behaviourmenu);
-            minionbehaviourmenu = (UIMinionMenu)GUIManager.getInstance().getWindowById(behaviourmenu);
         }
-        //minionbehaviourmenu.setVisible(true);
         minionbehaviourmenu.setVisible(true);
     }
 
     public void RightMouseReleased(){
-        UIMinionMenu minionbehaviourmenu = (UIMinionMenu)GUIManager.getInstance().getWindowById(behaviourmenu);
+        UIMinion minionbehaviourmenu = (UIMinion)GUIManager.getInstance().getWindowById(behaviourmenu);
         if(minionbehaviourmenu != null){
-            minionbehaviourmenu.close(true);
+            GUIManager.getInstance().removeWindow(minionbehaviourmenu);
+            if(GUIManager.getInstance().getWindowById("container") != null){
+                GUIManager.getInstance().setFocusedWindow("container");
+            }
         }
         setMinionSelectMode(false);
         if(getSelectedBehaviour() == MinionComponent.MinionBehaviour.Disappear){

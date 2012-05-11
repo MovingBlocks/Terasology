@@ -7,13 +7,9 @@ import org.terasology.components.MinionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.*;
 
 import javax.vecmath.Vector2f;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,7 +18,7 @@ import static org.lwjgl.opengl.GL11.*;
  * Time: 20:25
  * To change this template use File | Settings | File Templates.
  */
-public class UIMinion extends UIDisplayContainer{
+public class UIMinion extends UIDisplayWindow{
 
     //private UIButton buttonMove;
     private final UIGraphicsElement _background;
@@ -48,34 +44,11 @@ public class UIMinion extends UIDisplayContainer{
         _selectionRectangle.setVisible(true);
         addDisplayElement(_selectionRectangle);
 
-        /*UITransparentOverlay overlay = new UITransparentOverlay();
-        overlay.setSize(new Vector2f(60,60));
-        overlay.setVisible(true);*/
-
-        /*buttonMove = new UIButton(new Vector2f(100,24));
-        buttonMove.getLabel().setText("Move");
-        buttonMove.setVisible(true);
-        buttonMove.setFocus(true);
-        buttonMove.setPosition(new Vector2f(Display.getWidth() - 150,(Display.getHeight()/2) - 96));
-        buttonMove.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                setMinionMoveBehaviour();
-            }
-        });
-        addDisplayElement(buttonMove);*/
-        //
     }
-
-    private void setMinionMoveBehaviour(){}
 
     @Override
     public void update() {
-        //setPosition(new Vector2f(0,0));
-        //setPosition(new Vector2f(Display.getWidth()-150,(Display.getHeight()/2) -96));
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-
-
-
         if(localPlayer != null){
             LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
             if (localPlayerComp != null) {
@@ -100,32 +73,4 @@ public class UIMinion extends UIDisplayContainer{
         super.update();
     }
 
-    @Override
-    public void render(){
-
-        super.render();
-        //renderOverlay();
-    }
-
-    /*private void test(){
-        buttonMove.setFocus(true);
-    }*/
-
-    /*public void renderOverlay(){
-        glPushMatrix();
-        glLoadIdentity();
-        glColor4f(0, 0, 0, 0.75f);
-        glBegin(GL_QUADS);
-        glVertex2f((float)Display.getWidth()-150, (float)(Display.getHeight() / 2) -96);
-        glVertex2f((float) Display.getWidth()-50, (float)(Display.getHeight() / 2) -96);
-        glVertex2f((float) Display.getWidth()-50, (float)(Display.getHeight() / 2) +96);
-        glVertex2f((float)Display.getWidth()-150, (float)(Display.getHeight() / 2) +96);
-        glEnd();
-        glPopMatrix();
-    }*/
-
-    /*public void setParams(MinionComponent.MinionBehaviour behaviour, int selectedminion){
-        _Ohbehave = behaviour;
-        _selectedMinion = selectedminion;
-    }*/
 }

@@ -4,10 +4,10 @@ import com.google.common.collect.Lists;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.components.UIMessageBox;
+import org.terasology.rendering.gui.components.UIMinion;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.menus.UIMinionMenu;
 
 import javax.vecmath.Vector2f;
 import java.util.HashMap;
@@ -49,14 +49,17 @@ public class GUIManager {
             int size = _renderer.getDisplayElements().size();
             if(size>0){
                 UIDisplayWindow tempwindow = (UIDisplayWindow)_renderer.getDisplayElements().get(size-1);
-                if(!UIMinionMenu.class.isInstance(tempwindow))
+                if(!(tempwindow instanceof UIMinion)){
                     _focusedWindow = tempwindow;
+                }
             }
         }
         _renderer.update();
     }
 
     public void addWindow(UIDisplayWindow window, String windowId){
+        if(! (window instanceof UIMinion)){
+            int i = 0;}
         if(window.isMaximized()){
             _renderer.addtDisplayElementToPosition(0,window);
         }else{
