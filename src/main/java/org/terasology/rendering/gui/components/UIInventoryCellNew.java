@@ -45,6 +45,7 @@ public class UIInventoryCellNew extends UIDisplayElement {
 
     private final UIGraphicsElement selectionRectangle;
     private final UIText label;
+    private final UIText label2;
     private final UIGraphicsElement background;
 
     private EntityRef entity;
@@ -77,6 +78,10 @@ public class UIInventoryCellNew extends UIDisplayElement {
         label = new UIText();
         label.setVisible(true);
         label.setPosition(new Vector2f(30f, 20f));
+
+        label2 = new UIText();
+        label2.setVisible(true);
+        label2.setPosition(new Vector2f(0f, -14f));
     }
 
     public void subscribe(CellSubscriber subscriber) {
@@ -103,11 +108,21 @@ public class UIInventoryCellNew extends UIDisplayElement {
 
         EntityRef itemEntity = inventory.itemSlots.get(slot);
         ItemComponent item = itemEntity.getComponent(ItemComponent.class);
-
+        BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
         if (item != null && item.stackCount > 1) {
             getLabel().setVisible(true);
             getLabel().setText(Integer.toString(item.stackCount));
-        } else {
+            if (blockItem != null) {
+                label2.setText(blockItem.blockFamily.getTitle());
+            }
+        } else if (item != null){
+            if (blockItem != null) {
+                label2.setText(blockItem.blockFamily.getTitle());
+            }else{
+                label2.setText(item.icon);
+            }
+        }
+            else {
             getLabel().setVisible(false);
         }
     }
@@ -127,6 +142,7 @@ public class UIInventoryCellNew extends UIDisplayElement {
 
         if (intersects(mousePos)) {
             selectionRectangle.setVisible(true);
+            label2.setVisible(true);
             if (_mouseUp) {
                 _mouseUp = false;
                 for (CellSubscriber subscriber : subscribers) {
@@ -138,6 +154,7 @@ public class UIInventoryCellNew extends UIDisplayElement {
             _mouseUp = false;
             _mouseDown = false;
             selectionRectangle.setVisible(false);
+            label2.setVisible(false);
         }
     }
 
@@ -170,7 +187,7 @@ public class UIInventoryCellNew extends UIDisplayElement {
 
         selectionRectangle.renderTransformed();
         label.renderTransformed();
-
+        label2.renderTransformed();
     }
 
     public void setSelected(boolean selected) {

@@ -46,6 +46,7 @@ public class UIInventoryCell extends UIDisplayElement {
 
     private final UIGraphicsElement _selectionRectangle;
     private final UIText _label;
+    private final UIText _label2;
 
     private int _id;
     private boolean _selected = false;
@@ -63,6 +64,10 @@ public class UIInventoryCell extends UIDisplayElement {
         _label = new UIText();
         _label.setVisible(true);
         _label.setPosition(new Vector2f(30f, 20f));
+
+        _label2 = new UIText();
+        _label2.setVisible(false);
+        _label2.setPosition(new Vector2f(0f, -14f));
     }
 
     private Vector2f findPosition() {
@@ -93,11 +98,23 @@ public class UIInventoryCell extends UIDisplayElement {
 
         EntityRef itemEntity = inventory.itemSlots.get(_id);
         ItemComponent item = itemEntity.getComponent(ItemComponent.class);
-
+        BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
         if (item != null && item.stackCount > 1) {
             getLabel().setVisible(true);
             getLabel().setText(Integer.toString(item.stackCount));
-        } else {
+            if (blockItem != null) {
+                _label2.setText(blockItem.blockFamily.getTitle());
+            }
+        }else if (item != null){
+            if (blockItem != null) {
+                _label2.setText(blockItem.blockFamily.getTitle());
+            }
+
+            else{
+                _label2.setText(item.icon);
+            }
+        }
+        else {
             getLabel().setVisible(false);
         }
     }
@@ -107,11 +124,13 @@ public class UIInventoryCell extends UIDisplayElement {
 
         if (intersects(mousePos)) {
             _selectionRectangle.setVisible(true);
+            _label2.setVisible(true);
         } else {
             _clickSoundPlayed = false;
             _mouseUp = false;
             _mouseDown = false;
             _selectionRectangle.setVisible(false);
+            _label2.setVisible(false);
         }
     }
 
@@ -143,6 +162,7 @@ public class UIInventoryCell extends UIDisplayElement {
         }
 
         _label.renderTransformed();
+        _label2.renderTransformed();
     }
 
     public void setSelected(boolean selected) {
