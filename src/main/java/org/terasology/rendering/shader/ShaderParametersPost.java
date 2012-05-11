@@ -22,6 +22,13 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.TextureManager;
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.LocalWorldProvider;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.rendering.world.WorldRenderer;
+
+import javax.vecmath.Vector3d;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -53,8 +60,10 @@ public class ShaderParametersPost implements IShaderParameters {
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
         if (CoreRegistry.get(LocalPlayer.class).isValid()) {
-            // TODO: This should use active camera
-            //program.setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
+            Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+            byte blockId = CoreRegistry.get(IWorldProvider.class).getBlockAtPosition(cameraPos);
+            Block block = BlockManager.getInstance().getBlock(blockId);
+            program.setInt("swimming", block.isLiquid() ? 1 : 0);
         }
     }
 
