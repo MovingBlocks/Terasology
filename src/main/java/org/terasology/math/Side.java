@@ -15,6 +15,7 @@
  */
 package org.terasology.math;
 
+import javax.vecmath.Vector3f;
 import java.util.EnumMap;
 
 /**
@@ -81,6 +82,10 @@ public enum Side {
             return (y > 0) ? TOP : BOTTOM;
         }
         return (z > 0) ? BACK : FRONT;
+    }
+
+    public static Side inDirection(Vector3f dir) {
+        return inDirection(dir.x, dir.y, dir.z);
     }
 
     /**

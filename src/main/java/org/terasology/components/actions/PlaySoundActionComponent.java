@@ -14,6 +14,7 @@ import java.util.List;
 public class PlaySoundActionComponent extends AbstractComponent {
     public List<Sound> sounds = Lists.newArrayList();
     public float volume = 1.0f;
+    public ActionTarget relativeTo = ActionTarget.Instigator;
     
     public PlaySoundActionComponent() {}
     

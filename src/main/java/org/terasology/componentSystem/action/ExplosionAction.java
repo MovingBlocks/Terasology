@@ -35,7 +35,7 @@ public class ExplosionAction implements EventHandlerSystem {
 
     @ReceiveEvent(components = {ExplosionActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
-        Vector3f origin = event.getLocation();
+        Vector3f origin = event.getTargetLocation();
         if (origin == null) return;
 
         Vector3i blockPos = new Vector3i();

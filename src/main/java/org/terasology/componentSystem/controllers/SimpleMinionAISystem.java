@@ -145,8 +145,6 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
         //if (selectedBlock != null) {
             //BlockPosition blockPos = selectedBlock.getBlockPosition();
-            byte currentBlockType = worldProvider.getBlock((int)position.x, (int)position.y, (int)position.z);
-            Block block = BlockManager.getInstance().getBlock(currentBlockType);
 
             int damage = 1;
             /*if (item != null) {
@@ -155,11 +153,8 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                     damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
                 }
             }*/
-
-            if (block.isDestructible()) {
-                EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
-                blockEntity.send(new DamageEvent(damage, player));
-            }
+            EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
+            blockEntity.send(new DamageEvent(damage, player));
         //}
 
 

@@ -37,7 +37,7 @@ public class TunnelAction implements EventHandlerSystem {
     public void onActivate(ActivateEvent event, EntityRef entity) {
 
         Vector3f dir = new Vector3f(event.getDirection());
-        Vector3f origin = new Vector3f(event.getLocation());
+        Vector3f origin = new Vector3f(event.getOrigin());
         Vector3i blockPos = new Vector3i();
         for (int s = 4; s <= 10000; s += 30) {
             origin.add(dir);

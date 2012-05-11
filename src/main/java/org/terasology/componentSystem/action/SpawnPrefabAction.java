@@ -26,6 +26,7 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 
 import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -46,7 +47,17 @@ public class SpawnPrefabAction implements EventHandlerSystem{
             EntityRef newEntity = entityManager.create(spawnInfo.prefab);
             LocationComponent loc = newEntity.getComponent(LocationComponent.class);
             if (loc != null) {
-                loc.setWorldPosition(event.getLocation());
+                switch (spawnInfo.spawnLocationRelativeTo) {
+                    case Instigator:
+                        loc.setWorldPosition(event.getInstigatorLocation());
+                        break;
+                    case Target:
+                        Vector3f pos = event.getTargetLocation();
+                        if (pos != null) {
+                            loc.setWorldPosition(pos);
+                        }
+                        break;
+                }
                 // TODO: Set rotation
                 newEntity.saveComponent(loc);
             }
