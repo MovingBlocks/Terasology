@@ -16,9 +16,6 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.OpenInventoryEvent;
-import org.terasology.events.item.UseItemEvent;
-import org.terasology.events.item.UseItemInDirectionEvent;
-import org.terasology.events.item.UseItemOnBlockEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
@@ -377,21 +374,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             // Process primary button actions, which depends on the selected item (if any)
             if (Mouse.isButtonDown(0) || button == 0) {
                 ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
-                if (item != null) {
-                    switch (item.usage) {
-                        case OnBlock:
-                            useItemOnBlock(entity, selectedItemEntity);
-                            break;
-                        case OnUser:
-                            selectedItemEntity.send(new UseItemEvent(entity));
-                            break;
-                        case InDirection:
-                            selectedItemEntity.send(new UseItemInDirectionEvent(entity, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection())));
-                            break;
-                        default:
-                            attack(entity, selectedItemEntity);
-                            break;
-                    }
+                if (item != null && item.usage != ItemComponent.UsageType.None) {
+                    useItem(entity, selectedItemEntity);
                 }
                 else {
                     attack(entity, selectedItemEntity);
@@ -431,30 +415,22 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
     }
     
-    private void useItemOnBlock(EntityRef player, EntityRef item) {
+    private void useItem(EntityRef player, EntityRef item) {
+        // TODO: Raytrace against entities too
         RayBlockIntersection.Intersection blockIntersection = calcSelectedBlock();
         if (blockIntersection != null) {
             Vector3i centerPos = blockIntersection.getBlockPosition();
-            Vector3i blockPos = blockIntersection.calcAdjacentBlockPos();
 
-            // Need two things:
-            // 1. The Side of attachment
-            Side attachmentSide = Side.inDirection(blockPos.x - centerPos.x, blockPos.y - centerPos.y, blockPos.z - centerPos.z);
-            // 2. The secondary direction
-            Vector3f attachDir = new Vector3f(centerPos.x - blockPos.x, centerPos.y - blockPos.y, centerPos.z - blockPos.z);
-            Vector3f rawDirection = new Vector3f(playerCamera.getViewingDirection());
-            float dot = rawDirection.dot(attachDir);
-            rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
-            Side direction = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
-
-            item.send(new UseItemOnBlockEvent(player, centerPos, attachmentSide, direction));
+            item.send(new ActivateEvent(CoreRegistry.get(BlockEntityRegistry.class).getOrCreateEntityAt(centerPos), player, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), blockIntersection.getSurfaceNormal()));
+        } else {
+            item.send(new ActivateEvent(player, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection())));
         }
     }
 
     /**
      * Attacks with currently held item
      */
-    // TODO: Move this somewhere more central, for use by all creatures.
+    // TODO: Move this somewhere more central, for use by all creatures. And activate with event
     private void attack(EntityRef player, EntityRef withItem) {
         RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
         ItemComponent item = withItem.getComponent(ItemComponent.class);
@@ -473,10 +449,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 }
             }
 
-            if (block.isDestructible()) {
-                EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(blockPos);
-                blockEntity.send(new DamageEvent(damage, player));
-            }
+            EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(blockPos);
+            blockEntity.send(new DamageEvent(damage, player));
         }
 
 

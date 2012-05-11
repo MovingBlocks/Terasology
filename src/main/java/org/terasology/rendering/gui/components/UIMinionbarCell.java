@@ -95,6 +95,9 @@ public class UIMinionbarCell extends UIDisplayElement {
         _selectionRectangle.renderTransformed();
 
         MinionBarComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(MinionBarComponent.class);
+        if (inventory == null) {
+            return;
+        }
         if (inventory.MinionSlots.size() <= _id)
             return;
         

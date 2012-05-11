@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.events.item;
-
-import org.terasology.entitySystem.AbstractEvent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+package org.terasology.components.actions;
 
 /**
  * @author Immortius
  */
-public class UseItemEvent extends AbstractEvent {
-    private EntityRef instigator;
-
-
-    public UseItemEvent(EntityRef instigator) {
-        this.instigator = instigator;
-
-    }
-
-    public EntityRef getInstigator() {
-        return instigator;
-    }
+public enum ActionTarget {
+    Instigator,
+    Target;
 }

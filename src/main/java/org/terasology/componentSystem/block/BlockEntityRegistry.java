@@ -52,7 +52,9 @@ public class BlockEntityRegistry implements EventHandlerSystem {
             // TODO: Better cleanup of temporary block entities
             blockEntity.addComponent(new BlockComponent(blockPosition, block.isEntityTemporary()));
             // TODO: Get regen and wait from block config?
-            blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
+            if (block.isDestructible()) {
+                blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
+            }
         }
         return blockEntity;
     }

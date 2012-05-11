@@ -25,4 +25,5 @@ import org.terasology.entitySystem.Prefab;
 public class SpawnPrefabActionComponent extends AbstractComponent
 {
     public String prefab;
+    public ActionTarget spawnLocationRelativeTo = ActionTarget.Target;
 }
