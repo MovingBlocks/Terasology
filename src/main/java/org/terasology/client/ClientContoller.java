@@ -3,9 +3,17 @@ package org.terasology.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.input.Keyboard;
+import org.terasology.components.BlockComponent;
+import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.LocalPlayer;
 
 
 public class ClientContoller {
@@ -18,8 +26,11 @@ public class ClientContoller {
 	private final Map<Integer, BindTarget> keybinds = new HashMap<Integer, BindTarget>();
 	private EventSystem eventSystem;
 	
+    private EntityRef localPlayerRef;
+	
     public void initialise() {
     	eventSystem = CoreRegistry.get(EventSystem.class);
+    	localPlayerRef = CoreRegistry.get(LocalPlayer.class).getEntity();
     	
 //    	eventSystem.registerEventReceiver(new KeyBindEventReceiver(), KeyEvent.class);
     	
@@ -43,7 +54,7 @@ public class ClientContoller {
 		}
 		e.key = Keyboard.getEventKey();
 		
-		eventSystem.send(null, e); /* not sure which entity ref here, not sure what the "client" is*/
+		eventSystem.send(localPlayerRef, e); /* not sure which entity ref here, not sure what the "client" is*/
 		return true;
 	}
 	
@@ -101,6 +112,104 @@ public class ClientContoller {
 		bind(Keyboard.KEY_F3, debugToggleBT);
 
 	}
+	
+    @ReceiveEvent(components={BlockComponent.class})
+    public void onDestroyed(NoHealthEvent event, EntityRef entity) {
+    	
+    }
+    
+    
+
+    private boolean isForward;
+    private boolean isBackward;
+    private boolean isLeft;
+    private boolean isRight;
+	private Vector3f vector = new Vector3f();
+    private MovementEvent movementEvent = new MovementEvent();
+    BindTarget moveForward = new BindTarget() {
+		public String getDescription() {
+			return "MoveForward";
+		}
+
+		public String getCategory() {
+			return "engine";
+		}
+		public void start() {
+			isForward = true;
+			vector.z = isBackward ? 0 : 1;
+			eventSystem.send(localPlayerRef, movementEvent);
+			
+		}
+		public void end() {
+			isForward = false;
+			vector.z = isBackward ? -1 : 0;
+			eventSystem.send(localPlayerRef, movementEvent);
+		}
+    };
+    BindTarget moveReverse = new BindTarget() {
+		public String getDescription() {
+			return "MoveForward";
+		}
+		public String getCategory() {
+			return "engine";
+		}
+		public void start() {
+			isBackward = true;
+			vector.z = isForward ? 0 : -1;
+			eventSystem.send(localPlayerRef, movementEvent);
+			
+		}
+		public void end() {
+			isBackward = false;
+			vector.z = isForward ? 1 : 0;
+			eventSystem.send(localPlayerRef, movementEvent);
+		}
+    };
+    BindTarget moveLeft = new BindTarget() {
+		public String getDescription() {
+			return "MoveLeft";
+		}
+
+		public String getCategory() {
+			return "engine";
+		}
+		public void start() {
+			isLeft = true;
+			vector.x = isRight ? 0 : 1;
+			eventSystem.send(localPlayerRef, movementEvent);
+			
+		}
+		public void end() {
+			isLeft = false;
+			vector.x = isRight ? -1 : 0;
+			eventSystem.send(localPlayerRef, movementEvent);
+		}
+    };
+    BindTarget moveRight = new BindTarget() {
+		public String getDescription() {
+			return "MoveForward";
+		}
+		public String getCategory() {
+			return "engine";
+		}
+		public void start() {
+			isRight = true;
+			vector.x = isLeft ? 0 : -1;
+			eventSystem.send(localPlayerRef, movementEvent);
+			
+		}
+		public void end() {
+			isRight = false;
+			vector.x = isLeft ? 1 : 0;
+			eventSystem.send(localPlayerRef, movementEvent);
+		}
+    };
+    
+    public class MovementEvent extends AbstractEvent {
+    	public Vector3f getMovementInput() {
+    		return vector;
+    	}
+    }
 }
 
 
