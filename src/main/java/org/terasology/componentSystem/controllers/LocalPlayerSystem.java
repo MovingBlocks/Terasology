@@ -24,7 +24,6 @@ import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.GroovyHelpManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -35,7 +34,7 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.menus.UIContainerScreen;
-import org.terasology.rendering.gui.menus.UIMinion;
+import org.terasology.rendering.gui.components.UIMinion;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
@@ -89,13 +88,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float bobFactor = 0;
     private float lastStepDelta = 0;
 
-    private UIMinion miniongui = new UIMinion();
-
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         timer = CoreRegistry.get(Timer.class);
-        miniongui.setVisible(false);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
@@ -248,10 +244,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 }
             }
         }
-        miniongui.update();
-        if(miniongui.isVisible()){
-            miniongui.render();
-        }
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
@@ -332,7 +324,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             }
         }
         else if (button == 1 && !state){
-            miniongui.setVisible(false);
             minionsys.RightMouseReleased();
 
         }
@@ -362,7 +353,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if(minionsys.MinionMode()){
             if (button == 1 ) {
                 if(minionsys.isMinionSelected()){
-                    miniongui.setVisible(true);
+                    minionsys.RightMouseDown();
                     minionsys.setMinionSelectMode(true);
                 }
             }

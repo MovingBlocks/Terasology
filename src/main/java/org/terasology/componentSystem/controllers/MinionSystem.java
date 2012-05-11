@@ -6,8 +6,11 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.GroovyHelpManager;
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.gui.components.UIMinion;
+import org.terasology.rendering.gui.menus.UIMinionMenu;
 
 import javax.vecmath.Vector3f;
 import java.util.HashSet;
@@ -24,7 +27,8 @@ public class MinionSystem implements EventHandlerSystem {
 
     private final int popupentries = 5;
     private HashSet<String> Names = new HashSet<String>();
-    //private LocalPlayerComponent localPlayerComponent;
+    private final String behaviourmenu = "minionbehaviour";
+    private UIMinionMenu minionbehaviourmenu;
 
     public void initialise() {
         Names.add("Begla");
@@ -98,7 +102,22 @@ public class MinionSystem implements EventHandlerSystem {
         return minioncomp.minionBehaviour;
     }
 
+    public void RightMouseDown(){
+        minionbehaviourmenu = (UIMinionMenu)GUIManager.getInstance().getWindowById(behaviourmenu);
+        if(minionbehaviourmenu == null) {
+            minionbehaviourmenu = new UIMinionMenu();
+            GUIManager.getInstance().addWindow(minionbehaviourmenu,behaviourmenu);
+            minionbehaviourmenu = (UIMinionMenu)GUIManager.getInstance().getWindowById(behaviourmenu);
+        }
+        //minionbehaviourmenu.setVisible(true);
+        minionbehaviourmenu.setVisible(true);
+    }
+
     public void RightMouseReleased(){
+        UIMinionMenu minionbehaviourmenu = (UIMinionMenu)GUIManager.getInstance().getWindowById(behaviourmenu);
+        if(minionbehaviourmenu != null){
+            minionbehaviourmenu.close(true);
+        }
         setMinionSelectMode(false);
         if(getSelectedBehaviour() == MinionComponent.MinionBehaviour.Disappear){
             //UIConfirm confirm = new UIConfirm("Confirm minion dismissal", "Are you sure you want to dispose of your cure little cube? You will lose it's inventory content if you click yes.");
@@ -110,9 +129,10 @@ public class MinionSystem implements EventHandlerSystem {
             if(localPlayer == null) return;
             getSelectedMinion().send(new ActivateEvent(getSelectedMinion(), localPlayer.getEntity()));
         }
-        MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
-        getSelectedMinion().saveComponent(minioncomp);
-
+        if(getSelectedMinion() != null){
+                MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
+            getSelectedMinion().saveComponent(minioncomp);
+        }
     }
 
     public void setTarget(){

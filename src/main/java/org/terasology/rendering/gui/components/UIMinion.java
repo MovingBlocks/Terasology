@@ -1,4 +1,4 @@
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.components.LocalPlayerComponent;
@@ -22,7 +22,7 @@ import static org.lwjgl.opengl.GL11.*;
  * Time: 20:25
  * To change this template use File | Settings | File Templates.
  */
-public class UIMinion extends UIDisplayRenderer{
+public class UIMinion extends UIDisplayContainer{
 
     //private UIButton buttonMove;
     private final UIGraphicsElement _background;
@@ -76,24 +76,25 @@ public class UIMinion extends UIDisplayRenderer{
 
 
 
+        if(localPlayer != null){
+            LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+            if (localPlayerComp != null) {
+                _selectedMinion = localPlayerComp.selectedMinion;
+            }
 
-        LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-        if (localPlayerComp != null) {
-            _selectedMinion = localPlayerComp.selectedMinion;
-        }
-
-        MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
-        if (inventory == null)
-            return;
-        EntityRef minion = inventory.MinionSlots.get(_selectedMinion);
-        if(minion != null){
-            MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
-            if(minioncomp != null){
-                int selection = 20 * (minioncomp.minionBehaviour.ordinal());
-                int startpos = (44 *(6-(_selectedMinion+1)));
-                _selectionRectangle.setPosition(new Vector2f(Display.getWidth()-(100),(Display.getHeight()/2) - startpos + selection));
-                //setPosition(new Vector2f(2f, (getSize().y - 8f) * _selectedMinion - 2f));
-                _background.setPosition(new Vector2f(Display.getWidth()-(100),(Display.getHeight()/2) - startpos)); //(25 *(6-(_selectedMinion+1)))
+            MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
+            if (inventory == null)
+                return;
+            EntityRef minion = inventory.MinionSlots.get(_selectedMinion);
+            if(minion != null){
+                MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
+                if(minioncomp != null){
+                    int selection = 20 * (minioncomp.minionBehaviour.ordinal());
+                    int startpos = (44 *(6-(_selectedMinion+1)));
+                    _selectionRectangle.setPosition(new Vector2f(Display.getWidth()-(100),(Display.getHeight()/2) - startpos + selection));
+                    //setPosition(new Vector2f(2f, (getSize().y - 8f) * _selectedMinion - 2f));
+                    _background.setPosition(new Vector2f(Display.getWidth()-(100),(Display.getHeight()/2) - startpos)); //(25 *(6-(_selectedMinion+1)))
+                }
             }
         }
         super.update();

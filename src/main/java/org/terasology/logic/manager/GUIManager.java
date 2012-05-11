@@ -7,6 +7,7 @@ import org.terasology.rendering.gui.components.UIMessageBox;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.menus.UIMinionMenu;
 
 import javax.vecmath.Vector2f;
 import java.util.HashMap;
@@ -47,7 +48,9 @@ public class GUIManager {
         if(_focusedWindow==null){
             int size = _renderer.getDisplayElements().size();
             if(size>0){
-                _focusedWindow = (UIDisplayWindow)_renderer.getDisplayElements().get(size-1);
+                UIDisplayWindow tempwindow = (UIDisplayWindow)_renderer.getDisplayElements().get(size-1);
+                if(!UIMinionMenu.class.isInstance(tempwindow))
+                    _focusedWindow = tempwindow;
             }
         }
         _renderer.update();
