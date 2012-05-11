@@ -7,6 +7,7 @@ import gnu.trove.procedure.TIntProcedure;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.entitySystem.metadata.ComponentUtil;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.protobuf.EntityData;
 
@@ -99,7 +100,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         if (useLookupTables) {
             componentMessage.setTypeIndex(componentIdTable.inverse().get(component.getClass()));
         } else {
-            componentMessage.setType(component.getName());
+            componentMessage.setType(ComponentUtil.getComponentClassName(component));
         }
 
         for (FieldMetadata field : componentMetadata.iterateFields()) {
@@ -152,7 +153,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         if (entityData.hasParentPrefab() && !entityData.getParentPrefab().isEmpty() && prefabManager.exists(entityData.getParentPrefab())) {
             Prefab prefab = prefabManager.getPrefab(entityData.getParentPrefab());
             for (Component component : prefab.listComponents()) {
-                String componentName = PersistenceUtil.getComponentClassName(component.getClass());
+                String componentName = ComponentUtil.getComponentClassName(component.getClass());
                 if (!containsIgnoreCase(componentName, entityData.getRemovedComponentList())) {
                     entity.addComponent(componentLibrary.copy(component));
                 }
@@ -296,7 +297,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         for (ComponentMetadata<?> componentMetadata : componentLibrary) {
             int index = componentIdTable.size();
             componentIdTable.put(index, componentMetadata.getType());
-            world.addComponentClass(PersistenceUtil.getComponentClassName(componentMetadata.getType()));
+            world.addComponentClass(ComponentUtil.getComponentClassName(componentMetadata.getType()));
         }
     }
 
@@ -368,7 +369,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         }
         for (Component prefabComponent : prefab.listComponents()) {
             if (!entityRef.hasComponent(prefabComponent.getClass())) {
-                entity.addRemovedComponent(PersistenceUtil.getComponentClassName(prefabComponent.getClass()));
+                entity.addRemovedComponent(ComponentUtil.getComponentClassName(prefabComponent.getClass()));
             }
         }
         return entity.build();
@@ -385,7 +386,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         if (useLookupTables) {
             componentMessage.setTypeIndex(componentIdTable.inverse().get(base.getClass()));
         } else {
-            componentMessage.setType(delta.getName());
+            componentMessage.setType(ComponentUtil.getComponentClassName(delta));
         }
 
         boolean changed = false;

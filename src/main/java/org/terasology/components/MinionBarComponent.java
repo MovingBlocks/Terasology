@@ -1,7 +1,7 @@
 package org.terasology.components;
 
 import com.google.common.collect.Lists;
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  * Time: 17:50
  * To change this template use File | Settings | File Templates.
  */
-public class MinionBarComponent extends AbstractComponent {
+public class MinionBarComponent implements Component {
 
     public List<EntityRef> MinionSlots = Lists.newArrayList();
 

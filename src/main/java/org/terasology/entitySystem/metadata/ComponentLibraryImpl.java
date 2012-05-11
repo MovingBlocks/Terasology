@@ -3,7 +3,6 @@ package org.terasology.entitySystem.metadata;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.core.*;
-import org.terasology.entitySystem.persistence.PersistenceUtil;
 
 import java.lang.reflect.*;
 import java.util.Iterator;
@@ -67,7 +66,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
             }
         }
         componentSerializationLookup.put(componentClass, info);
-        componentTypeLookup.put(PersistenceUtil.getComponentClassName(componentClass).toLowerCase(Locale.ENGLISH), componentClass);
+        componentTypeLookup.put(ComponentUtil.getComponentClassName(componentClass).toLowerCase(Locale.ENGLISH), componentClass);
     }
 
     public <T extends Component> ComponentMetadata<T> getMetadata(Class<T> componentClass) {

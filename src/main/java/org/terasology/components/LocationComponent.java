@@ -1,7 +1,7 @@
 package org.terasology.components;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
 import javax.vecmath.Quat4f;
@@ -11,7 +11,7 @@ import javax.vecmath.Vector3f;
  * Component represent the location and facing of an entity in the world
  * @author Immortius <immortius@gmail.com>
  */
-public final class LocationComponent extends AbstractComponent {
+public final class LocationComponent implements Component {
     // Standard position/rotation
     private Vector3f position = new Vector3f();
     private Quat4f rotation = new Quat4f(0,0,0,1);

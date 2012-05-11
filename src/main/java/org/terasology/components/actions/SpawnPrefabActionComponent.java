@@ -16,13 +16,12 @@
 
 package org.terasology.components.actions;
 
-import org.terasology.entitySystem.AbstractComponent;
-import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.Component;
 
 /**
  * @author Immortius
  */
-public class SpawnPrefabActionComponent extends AbstractComponent
+public class SpawnPrefabActionComponent implements Component
 {
     public String prefab;
     public ActionTarget spawnLocationRelativeTo = ActionTarget.Target;

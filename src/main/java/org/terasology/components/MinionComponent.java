@@ -1,14 +1,12 @@
 package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractComponent;
-
-import java.util.List;
+import org.terasology.entitySystem.Component;
 
 /**
  * Allows an entity to store items
  * @author Immortius <immortius@gmail.com>
  */
-public final class MinionComponent extends AbstractComponent {
+public final class MinionComponent implements Component {
 
     public String icon = "";
     public MinionBehaviour minionBehaviour = MinionBehaviour.Follow;

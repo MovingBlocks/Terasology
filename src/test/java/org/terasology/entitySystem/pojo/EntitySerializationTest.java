@@ -10,9 +10,9 @@ import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
+import org.terasology.entitySystem.metadata.ComponentUtil;
 import org.terasology.entitySystem.persistence.EntityPersisterHelper;
 import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
-import org.terasology.entitySystem.persistence.PersistenceUtil;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.MappedTypeComponent;
@@ -43,7 +43,7 @@ public class EntitySerializationTest {
         componentLibrary.registerComponentClass(IntegerComponent.class);
         componentLibrary.registerComponentClass(StringComponent.class);
         componentLibrary.registerComponentClass(GetterSetterComponent.class);
-        prefabManager = new PojoPrefabManager();
+        prefabManager = new PojoPrefabManager(componentLibrary);
         entityManager = new PojoEntityManager(componentLibrary, prefabManager);
         entityPersisterHelper = new EntityPersisterHelperImpl(componentLibrary,entityManager);
     }
@@ -200,7 +200,7 @@ public class EntitySerializationTest {
         EntityRef entity = entityManager.create();
         entity.addComponent(new StringComponent("Test"));
         EntityData.World world = entityPersisterHelper.serializeWorld();
-        int typeId = world.getComponentClassList().indexOf(PersistenceUtil.getComponentClassName(StringComponent.class));
+        int typeId = world.getComponentClassList().indexOf(ComponentUtil.getComponentClassName(StringComponent.class));
         assertFalse(typeId == -1);
         boolean found = false;
         for (EntityData.Component component : world.getEntity(0).getComponentList()) {

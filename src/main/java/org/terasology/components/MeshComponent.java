@@ -1,6 +1,6 @@
 package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.primitives.Mesh;
 
@@ -10,7 +10,7 @@ import javax.vecmath.Color4f;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public final class MeshComponent extends AbstractComponent {
+public final class MeshComponent implements Component {
 
     // Temporary render details
     public enum RenderType {

@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 
 import java.util.*;
 
@@ -15,7 +16,12 @@ public class PojoPrefabManager implements PrefabManager {
     protected final static String OBSERVER_EVENT_DESTROYED = "destroyed";
     protected final static String OBSERVER_EVENT_RENAMED = "rename";
 
+    ComponentLibrary componentLibrary;
     Map<String, Prefab> prefabTable = Maps.newHashMap();
+
+    public PojoPrefabManager(ComponentLibrary componentLibrary) {
+        this.componentLibrary = componentLibrary;
+    }
 
     public Prefab createPrefab(String name) {
         String normalisedName = normalizeName(name);
@@ -23,7 +29,7 @@ public class PojoPrefabManager implements PrefabManager {
             return getPrefab(normalisedName);
         }
 
-        return this.registerPrefab(new PojoPrefab(name));
+        return this.registerPrefab(new PojoPrefab(name, componentLibrary));
     }
 
     public Prefab getPrefab(String name) {

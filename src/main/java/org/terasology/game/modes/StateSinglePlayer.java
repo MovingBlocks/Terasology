@@ -151,7 +151,7 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
         componentLibrary.registerTypeHandler(Vector3i.class, new Vector3iTypeHandler());
 
-        PrefabManager prefabManager = new PojoPrefabManager();
+        PrefabManager prefabManager = new PojoPrefabManager(componentLibrary);
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
         _entityManager = new PojoEntityManager(componentLibrary, prefabManager);
