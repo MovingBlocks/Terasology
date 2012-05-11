@@ -23,7 +23,6 @@ import java.util.Map;
  */
 public class BlockEntityRegistry implements EventHandlerSystem, UpdateSubscriberSystem {
 
-    private PrefabManager prefabManager;
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
 
@@ -35,7 +34,6 @@ public class BlockEntityRegistry implements EventHandlerSystem, UpdateSubscriber
 
     public void initialise() {
         this.entityManager = CoreRegistry.get(EntityManager.class);
-        this.prefabManager = CoreRegistry.get(PrefabManager.class);
         this.worldProvider = CoreRegistry.get(IWorldProvider.class);
         for (EntityRef blockComp : entityManager.iteratorEntities(BlockComponent.class)) {
             BlockComponent comp = blockComp.getComponent(BlockComponent.class);
@@ -61,8 +59,11 @@ public class BlockEntityRegistry implements EventHandlerSystem, UpdateSubscriber
     public EntityRef getOrCreateEntityAt(Vector3i blockPosition) {
         EntityRef blockEntity = blockComponentLookup.get(blockPosition);
         if (blockEntity == null || !blockEntity.exists()) {
-            Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPosition));
+            byte id = worldProvider.getBlock(blockPosition);
+            if (id == 0)
+                return EntityRef.NULL;
 
+            Block block = BlockManager.getInstance().getBlock(id);
             blockEntity = entityManager.create(block.getEntityPrefab());
             if (block.isEntityTemporary()) {
                 tempBlocks.add(blockEntity);
