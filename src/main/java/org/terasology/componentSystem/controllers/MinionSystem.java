@@ -71,7 +71,6 @@ public class MinionSystem implements EventHandlerSystem {
         int ordinal = ((minioncomp.minionBehaviour.ordinal() - wheelMoved / 120) % popupentries);
         while (ordinal < 0) ordinal+= popupentries;
         minioncomp.minionBehaviour =  MinionComponent.MinionBehaviour.values()[ordinal];
-        minion.saveComponent(minioncomp);
     }
 
     public void barScroll(int wheelMoved){
@@ -107,6 +106,9 @@ public class MinionSystem implements EventHandlerSystem {
             if(localPlayer == null) return;
             getSelectedMinion().send(new ActivateEvent(getSelectedMinion(), localPlayer.getEntity()));
         }
+        MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
+        getSelectedMinion().saveComponent(minioncomp);
+
     }
 
     public void setTarget(){
