@@ -25,6 +25,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +46,7 @@ public final class ChunkProvider implements IChunkProvider {
     private final ConcurrentHashMap<Integer, Chunk> _nearChunkCache = new ConcurrentHashMap<Integer, Chunk>();
     private IChunkCache _farChunkCache;
     private final LocalWorldProvider _parent;
+    private ReentrantLock _lockChunkCreation = new ReentrantLock();
 
     public ChunkProvider(LocalWorldProvider parent) {
         _parent = parent;
@@ -80,15 +82,31 @@ public final class ChunkProvider implements IChunkProvider {
         if (c != null) {
             return c;
         }
-        c = _farChunkCache.get(id);
-        if (c == null) {
-            c = new Chunk(_parent, x, y, z);
-        }
 
-        _nearChunkCache.put(id, c);
-        //HACK! move local world provider out of chunk!
-        c.setParent(_parent);
-        return c;
+        _lockChunkCreation.lock();
+        try {
+            c = _nearChunkCache.get(id);
+            if (c != null) {
+                return c;
+            }
+
+            c = _farChunkCache.get(id);
+            if (c == null) {
+                c = new Chunk(_parent, x, y, z);
+            }
+
+            if (_nearChunkCache.containsKey(id))
+            {
+                Logger.getLogger("CP").log(Level.SEVERE, "duplicate id " + id + " found");
+            }
+            _nearChunkCache.put(id, c);
+            //HACK! move local world provider out of chunk!
+            c.setParent(_parent);
+            return c;
+        }
+        finally {
+            _lockChunkCreation.unlock();
+        }
     }
 
     public void flushCache() {
