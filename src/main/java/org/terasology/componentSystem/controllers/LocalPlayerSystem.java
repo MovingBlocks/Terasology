@@ -70,8 +70,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private IWorldProvider worldProvider;
     private DefaultCamera playerCamera;
     private BlockEntityRegistry blockEntityRegistry;
-    //private ItemSystem itemSystem;
-    
+
     private boolean jump = false;
     private Vector3f movementInput = new Vector3f();
     private Vector2f lookInput = new Vector2f();
