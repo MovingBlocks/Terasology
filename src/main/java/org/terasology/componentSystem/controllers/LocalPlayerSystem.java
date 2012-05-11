@@ -8,7 +8,6 @@ import org.lwjgl.input.Mouse;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
-import org.terasology.componentSystem.items.ItemSystem;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -20,13 +19,12 @@ import org.terasology.events.OpenInventoryEvent;
 import org.terasology.events.item.UseItemEvent;
 import org.terasology.events.item.UseItemInDirectionEvent;
 import org.terasology.events.item.UseItemOnBlockEvent;
-import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.GroovyHelpManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -37,6 +35,7 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.menus.UIContainerScreen;
+import org.terasology.rendering.gui.menus.UIMinion;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
@@ -90,11 +89,13 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float bobFactor = 0;
     private float lastStepDelta = 0;
 
+    private UIMinion miniongui = new UIMinion();
+
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         timer = CoreRegistry.get(Timer.class);
-
+        miniongui.setVisible(false);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
@@ -247,7 +248,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 }
             }
         }
-
+        miniongui.update();
+        if(miniongui.isVisible()){
+            miniongui.render();
+        }
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
@@ -283,6 +287,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                     processFrob();
                 }
                 break;
+            case Keyboard.KEY_X:
+                if (!repeatEvent && state) {
+                    MinionSystem minionSystem = new MinionSystem();
+                    minionSystem.switchMinionMode();
+                }
+                break;
             case Keyboard.KEY_SPACE:
                 if (!repeatEvent && state) {
                     jump = true;
@@ -306,14 +316,27 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
      * @param wheelMoved Distance the mouse wheel moved since last
      */
     public void processMouseInput(int button, boolean state, int wheelMoved) {
+        MinionSystem minionsys = new MinionSystem();
         if (wheelMoved != 0) {
-            LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-            localPlayerComp.selectedTool = (localPlayerComp.selectedTool + wheelMoved / 120) % 9;
-            while (localPlayerComp.selectedTool < 0) {
-                localPlayerComp.selectedTool = 9 + localPlayerComp.selectedTool;
+            if(minionsys.MinionMode())
+                if(minionsys.MinionSelect()) minionsys.menuScroll(wheelMoved);
+                else minionsys.barScroll(wheelMoved);
+            else
+            {
+                LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+                localPlayerComp.selectedTool = (localPlayerComp.selectedTool + wheelMoved / 120) % 9;
+                while (localPlayerComp.selectedTool < 0) {
+                    localPlayerComp.selectedTool = 9 + localPlayerComp.selectedTool;
+                }
+                localPlayer.getEntity().saveComponent(localPlayerComp);
             }
-            localPlayer.getEntity().saveComponent(localPlayerComp);
-        } else if (state && (button == 0 || button == 1)) {
+        }
+        else if (button == 1 && !state){
+            miniongui.setVisible(false);
+            minionsys.RightMouseReleased();
+
+        }
+        else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
         }
     }
@@ -324,6 +347,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
      * @param button The pressed mouse button
      */
     private void processInteractions(int button) {
+        MinionSystem minionsys = new MinionSystem();
         // Throttle interactions
         if (timer.getTimeInMs() - lastInteraction < 200) {
             return;
@@ -331,39 +355,57 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         EntityRef entity = localPlayer.getEntity();
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        InventoryComponent inventory = localPlayer.getEntity().getComponent(InventoryComponent.class);
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
 
         if (localPlayerComp.isDead) return;
 
-        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
-        if (Mouse.isButtonDown(0) || button == 0) {
-            ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
-            if (item != null) {
-                switch (item.usage) {
-                    case OnBlock:
-                        useItemOnBlock(entity, selectedItemEntity);
-                        break;
-                    case OnUser:
-                        selectedItemEntity.send(new UseItemEvent(entity));
-                        break;
-                    case InDirection:
-                        selectedItemEntity.send(new UseItemInDirectionEvent(entity, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection())));
-                        break;
-                    default:
-                        attack(entity, selectedItemEntity);
-                        break;
+        if(minionsys.MinionMode()){
+            if (button == 1 ) {
+                if(minionsys.isMinionSelected()){
+                    miniongui.setVisible(true);
+                    minionsys.setMinionSelectMode(true);
                 }
-            } else {
-                attack(entity, selectedItemEntity);
             }
-            lastInteraction = timer.getTimeInMs();
-            localPlayerComp.handAnimation = 0.5f;
-            entity.saveComponent(localPlayerComp);
-        } else if (Mouse.isButtonDown(1) || button == 1) {
-            attack(entity, selectedItemEntity);
-            lastInteraction = timer.getTimeInMs();
-            localPlayerComp.handAnimation = 0.5f;
-            entity.saveComponent(localPlayerComp);
+            else{
+                if (Mouse.isButtonDown(0) || button == 0) {
+                    minionsys.setTarget();
+                }
+            }
+        }
+        else{
+            EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+            // Process primary button actions, which depends on the selected item (if any)
+            if (Mouse.isButtonDown(0) || button == 0) {
+                ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
+                if (item != null) {
+                    switch (item.usage) {
+                        case OnBlock:
+                            useItemOnBlock(entity, selectedItemEntity);
+                            break;
+                        case OnUser:
+                            selectedItemEntity.send(new UseItemEvent(entity));
+                            break;
+                        case InDirection:
+                            selectedItemEntity.send(new UseItemInDirectionEvent(entity, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection())));
+                            break;
+                        default:
+                            attack(entity, selectedItemEntity);
+                            break;
+                    }
+                }
+                else {
+                    attack(entity, selectedItemEntity);
+                }
+                lastInteraction = timer.getTimeInMs();
+                localPlayerComp.handAnimation = 0.5f;
+                entity.saveComponent(localPlayerComp);
+            // Process secondary button action, which currently is always "attack" (break blocks)
+            } else if (Mouse.isButtonDown(1) || button == 1) {
+                attack(entity, selectedItemEntity);
+                lastInteraction = timer.getTimeInMs();
+                localPlayerComp.handAnimation = 0.5f;
+                entity.saveComponent(localPlayerComp);
+            }
         }
 
     }

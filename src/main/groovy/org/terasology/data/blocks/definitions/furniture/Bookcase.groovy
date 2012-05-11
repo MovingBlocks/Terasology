@@ -30,6 +30,8 @@ block {
         back = "ChestTopBottom"
     }
 
-    // MetaBlock assignment - where to look for more info on a specific instance of this block
-    meta = Bookcase // Prolly will need a generic Container, of which Chests can hold some things, Bookcases others
+    entityPrefab = "core:bookcase"
+    stackable = false
+    straightToInventory = true
+    usable = true
 }

@@ -33,6 +33,9 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.LocationComponent;
+import org.terasology.components.MinionBarComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -56,10 +59,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -93,6 +93,22 @@ public class BulletPhysicsRenderer implements IGameObject {
             Vector3f blockPlayer = new Vector3f();
             tMatrix.get(blockPlayer);
             blockPlayer.sub(new Vector3f(CoreRegistry.get(LocalPlayer.class).getPosition()));
+
+            return blockPlayer.length();
+        }
+
+        public float distanceToEntity(EntityRef target) {
+            Transform t = new Transform();
+            getMotionState().getWorldTransform(t);
+            Matrix4f tMatrix = new Matrix4f();
+            t.getMatrix(tMatrix);
+
+            Vector3f blockPlayer = new Vector3f();
+            tMatrix.get(blockPlayer);
+
+            LocationComponent loc = target.getComponent(LocationComponent.class);
+            if(loc != null) blockPlayer.sub(loc.getWorldPosition());
+            else blockPlayer.sub(new Vector3f());
 
             return blockPlayer.length();
         }
@@ -338,22 +354,56 @@ public class BulletPhysicsRenderer implements IGameObject {
     private void checkForLootedBlocks() {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
 
+        // to send blocks to minions, some needed classes
+        EntityRef playerent = player.getEntity();
+        LocalPlayerComponent localPlayerComp = playerent.getComponent(LocalPlayerComponent.class);
+        MinionBarComponent inventory = null;
+        EntityRef closestminion = null;
+        if(localPlayerComp.minionMode){
+            inventory = playerent.getComponent(MinionBarComponent.class);
+            if (inventory == null)
+                return;
+            //EntityRef minion = inventory.MinionSlots.get(localPlayerComp.selectedMinion);
+            //if(minion != null){
+        }
+
         for (int i = _blocks.size() - 1; i >= 0; i--) {
             BlockRigidBody b = _blocks.get(i);
 
             if (b._temporary)
                 continue;
 
-            // Check if the block is close enough to the player
-            if (b.distanceToPlayer() < 8.0f && !b._picked) {
-                // Mark it as picked and remove it from the simulation
-                b._picked = true;
+            float closestDist = 99999;
+            if(inventory != null){
+            //check for the closest minion
+                Iterator<EntityRef> it = inventory.MinionSlots.iterator();
+                while(it.hasNext()){
+                    EntityRef minion = it.next();
+                    if(b.distanceToEntity(minion) < closestDist){
+                        closestDist = b.distanceToEntity(minion);
+                        closestminion = minion;
+                    }
+                }
+            }
+
+            if(localPlayerComp.minionMode){
+                if(closestDist < 8 && !b._picked){
+                    b._picked = true;
+                }
+            }
+            else{
+                closestDist = b.distanceToPlayer();
+                // Check if the block is close enough to the player
+                if (b.distanceToPlayer() < 8.0f && !b._picked) {
+                    // Mark it as picked and remove it from the simulation
+                    b._picked = true;
+                }
             }
 
             // Block was marked as being picked
-            if (b._picked && b.distanceToPlayer() < 32.0f) {
+            if (b._picked && closestDist < 32.0f) {
                 // Animate the movement in direction of the player
-                if (b.distanceToPlayer() > 1.0) {
+                if (closestDist > 1.0) {
                     Transform t = new Transform();
                     b.getMotionState().getWorldTransform(t);
 
@@ -362,7 +412,14 @@ public class BulletPhysicsRenderer implements IGameObject {
 
                     Vector3f blockPlayer = new Vector3f();
                     tMatrix.get(blockPlayer);
-                    blockPlayer.sub(new Vector3f(player.getPosition()));
+                    if(localPlayerComp.minionMode && closestminion != null){
+                        LocationComponent minionloc = closestminion.getComponent(LocationComponent.class);
+                        if(minionloc != null) blockPlayer.sub(minionloc.getWorldPosition());
+                        else blockPlayer.sub(new Vector3f());
+                    }
+                    else{
+                        blockPlayer.sub(new Vector3f(player.getPosition()));
+                    }
                     blockPlayer.normalize();
                     blockPlayer.scale(-16000f);
 
@@ -374,7 +431,15 @@ public class BulletPhysicsRenderer implements IGameObject {
                     Block block = BlockManager.getInstance().getBlock(b.getType());
                     EntityRef blockItem = _blockItemFactory.newInstance(block.getBlockFamily());
 
-                    player.getEntity().send(new ReceiveItemEvent(blockItem));
+                    if(localPlayerComp.minionMode){
+                        if(closestminion != null){
+                            closestminion.send(new ReceiveItemEvent(blockItem));
+                        }
+                    }
+                    else
+                    {
+                        playerent.send(new ReceiveItemEvent(blockItem));
+                    }
                     ItemComponent itemComp = blockItem.getComponent(ItemComponent.class);
                     if (itemComp != null && !itemComp.container.exists()) {
                         blockItem.destroy();

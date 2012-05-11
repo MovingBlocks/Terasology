@@ -2,8 +2,7 @@
   "name": "core:gelatinousCube",
   "Location" : {},
   "Mesh" : {
-    "mesh" : "engine:testmonkey",
-    "material" : "engine:monkeyHead"
+    "renderType" : "GelatinousCube"
   },
   "CharacterMovement" : {
     "faceMovementDirection" : true

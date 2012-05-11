@@ -31,6 +31,7 @@ import org.terasology.componentSystem.characters.CharacterSoundSystem;
 import org.terasology.componentSystem.common.HealthSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.componentSystem.controllers.SimpleAISystem;
+import org.terasology.componentSystem.controllers.SimpleMinionAISystem;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.componentSystem.items.ItemSystem;
 import org.terasology.componentSystem.rendering.BlockDamageRenderer;
@@ -53,7 +54,6 @@ import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.mod.Mod;
@@ -181,9 +181,13 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerComponentClass(MeshComponent.class);
         componentLibrary.registerComponentClass(PlayerComponent.class);
         componentLibrary.registerComponentClass(SimpleAIComponent.class);
+        componentLibrary.registerComponentClass(SimpleMinionAIComponent.class);
+        componentLibrary.registerComponentClass(MinionBarComponent.class);
+        componentLibrary.registerComponentClass(MinionComponent.class);
         componentLibrary.registerComponentClass(AccessInventoryActionComponent.class);
         componentLibrary.registerComponentClass(SpawnPrefabActionComponent.class);
-
+        componentLibrary.registerComponentClass(BookComponent.class);
+        componentLibrary.registerComponentClass(BookshelfComponent.class);
         loadPrefabs();
 
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
@@ -191,6 +195,7 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(BlockEntityRegistry.class, blockEntityRegistry);
         _componentSystemManager.register(new CharacterMovementSystem(), "engine:CharacterMovementSystem");
         _componentSystemManager.register(new SimpleAISystem(), "engine:SimpleAISystem");
+        _componentSystemManager.register(new SimpleMinionAISystem(), "engine:SimpleMinionAISystem");
         _componentSystemManager.register(new ItemSystem(), "engine:ItemSystem");
         _componentSystemManager.register(new CharacterSoundSystem(), "engine:CharacterSoundSystem");
         _localPlayerSys = new LocalPlayerSystem();
@@ -207,7 +212,9 @@ public class StateSinglePlayer implements GameState {
         _componentSystemManager.register(new TunnelAction(), "engine:TunnelAction");
         _componentSystemManager.register(new AccessInventoryAction(), "engine:AccessInventoryAction");
         _componentSystemManager.register(new SpawnPrefabAction(), "engine:SpawnPrefabAction");
-
+        _componentSystemManager.register(new ReadBookAction(), "engine: ReadBookAction");
+        //_componentSystemManager.register(new DestroyMinion(), "engine: DestroyMinionAction");
+        _componentSystemManager.register(new BookshelfHandler(), "engine: BookshelfHandler");
         _hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
 
