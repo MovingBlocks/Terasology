@@ -14,7 +14,10 @@ public final class MeshComponent extends AbstractComponent {
     public enum RenderType {
         GelatinousCube
     }
-    
+
+    public String Name;
+    public int ID;
+
     public RenderType renderType = RenderType.GelatinousCube;
     
     // TODO: Use some sort of mesh ref, that stores a direct reference to the mesh (flyweight pattern?)

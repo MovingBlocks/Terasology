@@ -10,6 +10,7 @@ import org.terasology.logic.manager.GroovyHelpManager;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
+import java.util.HashSet;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,9 +23,12 @@ import javax.vecmath.Vector3f;
 public class MinionSystem implements EventHandlerSystem {
 
     private final int popupentries = 5;
+    private HashSet<String> Names = new HashSet<String>();
     //private LocalPlayerComponent localPlayerComponent;
 
-    public void initialise() {}
+    public void initialise() {
+        Names.add("Begla");
+    }
 
     public MinionBarComponent getMinionBar(){
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -119,6 +123,11 @@ public class MinionSystem implements EventHandlerSystem {
         if(!isMinionSelected())
         {
             helpMan.spawnCube(localPlayerComponent.selectedMinion);
+            EntityRef minion = getSelectedMinion();
+            MeshComponent meshComponent = minion.getComponent(MeshComponent.class);
+            meshComponent.Name = "Begla";
+            meshComponent.ID = localPlayerComponent.selectedMinion;
+            minion.saveComponent(meshComponent);
         }
         else
         {

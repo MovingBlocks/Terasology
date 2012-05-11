@@ -1,6 +1,7 @@
 package org.terasology.componentSystem.rendering;
 
 import org.terasology.componentSystem.RenderSystem;
+import org.terasology.componentSystem.controllers.MinionSystem;
 import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.components.MeshComponent;
@@ -59,6 +60,15 @@ public class MeshRenderer implements RenderSystem {
             AABB aabb = new AABB(new Vector3d(worldPos), new Vector3d(collision.getExtents()));
 
             if (worldRenderer.isAABBVisible(aabb)) {
+
+                //hack to light up the cube
+                MinionSystem minionSystem = new MinionSystem();
+                EntityRef minion =  minionSystem.getSelectedMinion();
+                MeshComponent meshComponent = null;
+                if(minion != null){
+                    meshComponent = minion.getComponent(MeshComponent.class);
+                }
+
                 glPushMatrix();
 
                 glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
@@ -72,6 +82,11 @@ public class MeshRenderer implements RenderSystem {
                 shader.enable();
                 shader.setFloat4("colorOffset", meshComp.color.x, meshComp.color.y, meshComp.color.z, meshComp.color.w);
                 shader.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos)));
+                if(meshComponent != null){
+                    if(meshComp.ID == meshComponent.ID){
+                        shader.setFloat("light", 1.0f);
+                    }
+                }
 
                 mesh.render();
 
