@@ -5,7 +5,8 @@ import org.terasology.entitySystem.AbstractComponent;
 import javax.vecmath.Vector3f;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Overdhose
+ * copied from SimpleAIComponent, only movementtarget is really used
  */
 public final class SimpleMinionAIComponent extends AbstractComponent {
 

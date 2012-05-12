@@ -15,6 +15,7 @@ public final class MeshComponent extends AbstractComponent {
         GelatinousCube
     }
 
+    // used by minion toolbar, might become obsolete soon
     public String Name;
     public int ID;
 

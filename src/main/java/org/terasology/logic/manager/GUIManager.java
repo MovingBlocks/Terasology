@@ -48,6 +48,8 @@ public class GUIManager {
         if(_focusedWindow==null){
             int size = _renderer.getDisplayElements().size();
             if(size>0){
+                //added this check to prevent the manager from ungrabbing the mouse when the minion behaviour menu pops up
+                // TODO : better way to handle this? not link focus with grabbing / ungrabbing?
                 UIDisplayWindow tempwindow = (UIDisplayWindow)_renderer.getDisplayElements().get(size-1);
                 if(!(tempwindow instanceof UIMinion)){
                     _focusedWindow = tempwindow;
@@ -58,8 +60,6 @@ public class GUIManager {
     }
 
     public void addWindow(UIDisplayWindow window, String windowId){
-        if(! (window instanceof UIMinion)){
-            int i = 0;}
         if(window.isMaximized()){
             _renderer.addtDisplayElementToPosition(0,window);
         }else{

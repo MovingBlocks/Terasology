@@ -11,7 +11,8 @@ import java.util.List;
  * User: Overdhose
  * Date: 9/05/12
  * Time: 17:50
- * To change this template use File | Settings | File Templates.
+ * Similar to toolbar, represents 9 slots that hold the active miniions instead of items
+ *
  */
 public class MinionBarComponent extends AbstractComponent {
 

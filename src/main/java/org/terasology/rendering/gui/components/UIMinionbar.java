@@ -22,9 +22,9 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import javax.vecmath.Vector2f;
 
 /**
- * A small toolbar placed on the bottom of the screen.
+ * A small toolbar placed at the right of the screen.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Overdhose copied from toolbar
  */
 public class UIMinionbar extends UIDisplayContainer {
     private final UIGraphicsElement _backgroundTexture;

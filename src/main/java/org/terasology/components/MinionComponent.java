@@ -2,11 +2,9 @@ package org.terasology.components;
 
 import org.terasology.entitySystem.AbstractComponent;
 
-import java.util.List;
-
 /**
- * Allows an entity to store items
- * @author Immortius <immortius@gmail.com>
+ * Main minion component, mostly used for behaviour
+ * @author Overdhose>
  */
 public final class MinionComponent extends AbstractComponent {
 

@@ -308,8 +308,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
      * @param wheelMoved Distance the mouse wheel moved since last
      */
     public void processMouseInput(int button, boolean state, int wheelMoved) {
+        // needed for the minion toolbar
         MinionSystem minionsys = new MinionSystem();
         if (wheelMoved != 0) {
+            //check mode, act according TODO? use events?
             if(minionsys.MinionMode())
                 if(minionsys.MinionSelect()) minionsys.menuScroll(wheelMoved);
                 else minionsys.barScroll(wheelMoved);
@@ -324,6 +326,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             }
         }
         else if (button == 1 && !state){
+            // triggers the selected behaviour of a minion
             minionsys.RightMouseReleased();
 
         }
@@ -353,12 +356,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if(minionsys.MinionMode()){
             if (button == 1 ) {
                 if(minionsys.isMinionSelected()){
+                    // opens the minion behaviour menu
                     minionsys.RightMouseDown();
                     minionsys.setMinionSelectMode(true);
                 }
             }
             else{
                 if (Mouse.isButtonDown(0) || button == 0) {
+                    // used to set targets for the minion
                     minionsys.setTarget();
                 }
             }

@@ -16,7 +16,8 @@ import javax.vecmath.Vector2f;
  * User: Overdhose
  * Date: 8/05/12
  * Time: 20:25
- * To change this template use File | Settings | File Templates.
+ * Should actually be renamed minionBehaviourMenu for consistency
+ * used as a dial menu without ungrabbing the mouse
  */
 public class UIMinion extends UIDisplayWindow{
 
