@@ -51,6 +51,7 @@ import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
 import org.terasology.entitySystem.persistence.EntityPersisterHelper;
 import org.terasology.entitySystem.metadata.extension.*;
 import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
+import org.terasology.components.PoisonedComponent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -182,6 +183,7 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerComponentClass(BookshelfComponent.class);
         componentLibrary.registerComponentClass(PotionComponent.class);
         componentLibrary.registerComponentClass(SpeedBoostComponent.class);
+        componentLibrary.registerComponentClass(PoisonedComponent.class);
         loadPrefabs();
 
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
