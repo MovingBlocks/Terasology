@@ -36,7 +36,7 @@ import static org.lwjgl.opengl.GL11.*;
  * A single cell of the toolbar with a small text label and a selection
  * rectangle.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Overdhose, copied from toolbar
  */
 public class UIMinionbarCell extends UIDisplayElement {
 
@@ -76,16 +76,6 @@ public class UIMinionbarCell extends UIDisplayElement {
             if (localPlayerComp != null) {
                 setSelected(localPlayerComp.selectedMinion == _id);
             }
-
-            /*EntityRef itemStack = inventory.MinionSlots.get(_id);
-            ItemComponent item = itemStack.getComponent(ItemComponent.class);
-
-            if (item == null || item.stackCount < 2) {
-                getLabel().setVisible(false);
-            } else {
-                getLabel().setVisible(true);
-                getLabel().setText(Integer.toString(item.stackCount));
-            }*/
         }
     }
 

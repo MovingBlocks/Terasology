@@ -116,7 +116,7 @@ public class UIInventoryCell extends UIDisplayElement {
             }
 
             else{
-                _label2.setText(item.icon);
+                _label2.setText(item.name);
             }
         }
         else {

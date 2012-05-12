@@ -6,8 +6,10 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.GroovyHelpManager;
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.gui.components.UIMinion;
 
 import javax.vecmath.Vector3f;
 
@@ -22,7 +24,8 @@ import javax.vecmath.Vector3f;
 public class MinionSystem implements EventHandlerSystem {
 
     private final int popupentries = 5;
-    //private LocalPlayerComponent localPlayerComponent;
+    private final String behaviourmenu = "minionbehaviour";
+    private UIMinion minionbehaviourmenu;
 
     public void initialise() {}
 
@@ -70,7 +73,7 @@ public class MinionSystem implements EventHandlerSystem {
         MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
         int ordinal = ((minioncomp.minionBehaviour.ordinal() - wheelMoved / 120) % popupentries);
         while (ordinal < 0) ordinal+= popupentries;
-        minioncomp.minionBehaviour =  MinionComponent.MinionBehaviour.values()[ordinal];
+        minioncomp.minionBehaviour = MinionComponent.MinionBehaviour.values()[ordinal];
     }
 
     public void barScroll(int wheelMoved){
@@ -94,7 +97,23 @@ public class MinionSystem implements EventHandlerSystem {
         return minioncomp.minionBehaviour;
     }
 
+    public void RightMouseDown(){
+        minionbehaviourmenu = (UIMinion)GUIManager.getInstance().getWindowById(behaviourmenu);
+        if(minionbehaviourmenu == null) {
+            minionbehaviourmenu = new UIMinion();
+            GUIManager.getInstance().addWindow(minionbehaviourmenu,behaviourmenu);
+        }
+        minionbehaviourmenu.setVisible(true);
+    }
+
     public void RightMouseReleased(){
+        UIMinion minionbehaviourmenu = (UIMinion)GUIManager.getInstance().getWindowById(behaviourmenu);
+        if(minionbehaviourmenu != null){
+            GUIManager.getInstance().removeWindow(minionbehaviourmenu);
+            if(GUIManager.getInstance().getWindowById("container") != null){
+                GUIManager.getInstance().setFocusedWindow("container");
+            }
+        }
         setMinionSelectMode(false);
         if(getSelectedBehaviour() == MinionComponent.MinionBehaviour.Disappear){
             //UIConfirm confirm = new UIConfirm("Confirm minion dismissal", "Are you sure you want to dispose of your cure little cube? You will lose it's inventory content if you click yes.");

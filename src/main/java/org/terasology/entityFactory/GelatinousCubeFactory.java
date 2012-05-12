@@ -39,6 +39,7 @@ public class GelatinousCubeFactory {
         return entity;
     }
 
+    // generates minion cubes for minion toolbar
     public EntityRef generateGelatinousMinion(Vector3f position) {
         EntityRef entity = entityManager.create("core:gelatinousMinion");
         LocationComponent loc = entity.getComponent(LocationComponent.class);
