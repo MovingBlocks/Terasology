@@ -20,22 +20,9 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.componentSystem.BlockParticleEmitterSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.componentSystem.action.*;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
-import org.terasology.componentSystem.block.BlockEntitySystem;
-import org.terasology.componentSystem.characters.CharacterMovementSystem;
-import org.terasology.componentSystem.characters.CharacterSoundSystem;
-import org.terasology.componentSystem.common.HealthSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
-import org.terasology.componentSystem.controllers.SimpleAISystem;
-import org.terasology.componentSystem.controllers.SimpleMinionAISystem;
-import org.terasology.componentSystem.items.InventorySystem;
-import org.terasology.componentSystem.items.ItemSystem;
-import org.terasology.componentSystem.rendering.BlockDamageRenderer;
-import org.terasology.componentSystem.rendering.FirstPersonRenderer;
-import org.terasology.componentSystem.rendering.MeshRenderer;
 import org.terasology.components.*;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.*;
@@ -100,7 +87,7 @@ public class StateSinglePlayer implements GameState {
     private WorldRenderer _worldRenderer;
 
     private ComponentSystemManager componentSystemManager;
-    private LocalPlayerSystem _localPlayerSys;
+    private LocalPlayerSystem localPlayerSys;
 
     /* GAME LOOP */
     private boolean _pauseGame = false;
@@ -129,8 +116,8 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
         CoreRegistry.put(BlockEntityRegistry.class, blockEntityRegistry);
-        _localPlayerSys = new LocalPlayerSystem();
-        componentSystemManager.register(_localPlayerSys, "engine:LocalPlayerSystem");
+        localPlayerSys = new LocalPlayerSystem();
+        componentSystemManager.register(localPlayerSys, "engine:LocalPlayerSystem");
         componentSystemManager.register(blockEntityRegistry, "engine:BlockEntityRegistry");
 
         componentSystemManager.loadEngineSystems();
@@ -229,7 +216,7 @@ public class StateSinglePlayer implements GameState {
             _worldRenderer.update(delta);
 
         if (!screenHasFocus())
-            _localPlayerSys.updateInput();
+            localPlayerSys.updateInput();
 
             if (screenHasFocus() || !shouldUpdateWorld()) {
                 if (Mouse.isGrabbed()) {
@@ -281,7 +268,7 @@ public class StateSinglePlayer implements GameState {
         logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        _worldRenderer = new WorldRenderer(title, seed, entityManager, _localPlayerSys);
+        _worldRenderer = new WorldRenderer(title, seed, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, _worldRenderer);
 
         File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
@@ -475,7 +462,7 @@ public class StateSinglePlayer implements GameState {
 
             // Pass input to the current player
             if (!screenHasFocus)
-                _localPlayerSys.processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
+                localPlayerSys.processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
         }
     }
 
@@ -500,7 +487,7 @@ public class StateSinglePlayer implements GameState {
             }
 
             if (!screenHasFocus)
-                _localPlayerSys.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
+                localPlayerSys.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
         }
     }
 

@@ -18,8 +18,13 @@ package org.terasology.game.modes;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.componentSystem.block.BlockEntityRegistry;
+import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.persistence.WorldPersister;
+import org.terasology.game.ComponentSystemManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.manager.AssetManager;
@@ -31,70 +36,21 @@ import java.util.logging.Logger;
 /**
  * @author Immortius
  */
-public class StateListenServer implements GameState {
-
-    private Logger logger = Logger.getLogger(getClass().getName());
-
-    private String worldName;
-    private String worldSeed;
-
-    private PersistableEntityManager entityManager;
+// TODO: Don't extend StateSinglePlayer
+public class StateListenServer extends StateSinglePlayer {
 
     public StateListenServer(String worldName) {
-        this(worldName, null);
+        super(worldName);
     }
 
     public StateListenServer(String worldName, String seed) {
-        this.worldName = worldName;
-        this.worldSeed = worldSeed;
+        super(worldName, seed);
     }
 
     @Override
     public void init(GameEngine engine) {
-        // TODO: Change to better mod support, should be enabled via config
-        ModManager modManager = new ModManager();
-        for (Mod mod : modManager.getMods()) {
-            mod.setEnabled(true);
-        }
-        modManager.saveModSelectionToConfig();
-        cacheTextures();
+        super.init(engine);
 
-        entityManager = new EntitySystemBuilder().build();
-    }
 
-    private void cacheTextures() {
-        for (AssetUri textureURI : AssetManager.list(AssetType.TEXTURE)) {
-            AssetManager.load(textureURI);
-        }
-    }
-
-    @Override
-    public void dispose() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void activate() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void deactivate() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void handleInput(float delta) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void update(float delta) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void render() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }
