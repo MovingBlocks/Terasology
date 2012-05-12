@@ -125,7 +125,7 @@ public class UIInventoryCellNew extends UIDisplayElement {
             if (blockItem != null) {
                 label2.setText(blockItem.blockFamily.getTitle());
             }else{
-                label2.setText(item.icon);
+                label2.setText(item.name);
             }
         }
             else {
