@@ -29,13 +29,25 @@ public class AssetUri {
     private static final String PACKAGE_SPLIT = ":";
 
     private AssetType type;
-    private String packageName;
-    private String assetName;
+    private String packageName = "";
+    private String assetName = "";
+
+    public AssetUri() {
+    }
 
     public AssetUri(AssetType type, String packageName, String assetName) {
         this.type = type;
         this.packageName = packageName.toLowerCase(Locale.ENGLISH);
         this.assetName = assetName.toLowerCase(Locale.ENGLISH);
+    }
+
+    public AssetUri(AssetType type, String simpleUri) {
+        this.type = type;
+        String[] split = simpleUri.toLowerCase(Locale.ENGLISH).split(PACKAGE_SPLIT, 2);
+        if (split.length > 1) {
+            packageName = split[0];
+            assetName = split[1];
+        }
     }
 
     public AssetUri(String uri) {
@@ -69,7 +81,20 @@ public class AssetUri {
 
     @Override
     public String toString() {
+        if (!isValid()) {
+            return "";
+        }
         return type.getTypeId() + TYPE_SPLIT + packageName + PACKAGE_SPLIT + assetName;
+    }
+
+    /**
+     * @return The asset uri, minus the type
+     */
+    public String getSimpleString() {
+        if (!isValid()) {
+            return "";
+        }
+        return packageName + PACKAGE_SPLIT + assetName;
     }
 
     @Override

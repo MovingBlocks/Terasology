@@ -64,10 +64,12 @@ import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.protobuf.EntityData;
+import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
+import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
@@ -133,20 +135,23 @@ public class StateSinglePlayer implements GameState {
              mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
+        cacheTextures();
         BlockShapeManager.getInstance().reload();
 
         componentLibrary = new ComponentLibraryImpl();
+        CoreRegistry.put(ComponentLibrary.class, componentLibrary);
 
-        // TODO: Use reflection pending mod support
         componentLibrary.registerTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler());
         componentLibrary.registerTypeHandler(Color4f.class, new Color4fTypeHandler());
         componentLibrary.registerTypeHandler(Quat4f.class, new Quat4fTypeHandler());
-        componentLibrary.registerTypeHandler(Sound.class, new SoundTypeHandler(AudioManager.getInstance()));
+        componentLibrary.registerTypeHandler(Mesh.class, new AssetTypeHandler(AssetType.MESH, Mesh.class));
+        componentLibrary.registerTypeHandler(Sound.class, new AssetTypeHandler(AssetType.SOUND, Sound.class));
+        componentLibrary.registerTypeHandler(Material.class, new AssetTypeHandler(AssetType.MATERIAL, Material.class));
         componentLibrary.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         componentLibrary.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
         componentLibrary.registerTypeHandler(Vector3i.class, new Vector3iTypeHandler());
 
-        PrefabManager prefabManager = new PojoPrefabManager();
+        PrefabManager prefabManager = new PojoPrefabManager(componentLibrary);
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
         _entityManager = new PojoEntityManager(componentLibrary, prefabManager);
@@ -248,6 +253,12 @@ public class StateSinglePlayer implements GameState {
             } catch (IOException e) {
                 _logger.log(Level.WARNING, "Failed to load prefab '" + prefabURI + "'", e);
             }
+        }
+    }
+
+    private void cacheTextures() {
+        for (AssetUri textureURI : AssetManager.list(AssetType.TEXTURE)) {
+            AssetManager.load(textureURI);
         }
     }
 

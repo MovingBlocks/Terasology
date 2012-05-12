@@ -1,6 +1,8 @@
 package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
+import org.terasology.rendering.assets.Material;
+import org.terasology.rendering.primitives.Mesh;
 
 import javax.vecmath.Color4f;
 
@@ -8,21 +10,18 @@ import javax.vecmath.Color4f;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public final class MeshComponent extends AbstractComponent {
+public final class MeshComponent implements Component {
 
     // Temporary render details
     public enum RenderType {
+        Normal,
         GelatinousCube
     }
-
-    // used by minion toolbar, might become obsolete soon
-    public String Name;
-    public int ID;
-
-    public RenderType renderType = RenderType.GelatinousCube;
     
-    // TODO: Use some sort of mesh ref, that stores a direct reference to the mesh (flyweight pattern?)
-    //public String mesh;
+    public RenderType renderType = RenderType.Normal;
+    public Mesh mesh;
+    public Material material;
+    
     // TODO: Some sort of Texture + Shader type?
     //public String material;
     

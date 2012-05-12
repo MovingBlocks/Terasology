@@ -1,12 +1,13 @@
 package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
+
 /**
  * Books are Knowledge
  * @author bi0hax
  *
  */
-public class BookComponent extends AbstractComponent {
+public class BookComponent implements Component {
     public enum BookType {
         Blank,
         WContents,

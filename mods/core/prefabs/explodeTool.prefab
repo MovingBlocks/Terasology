@@ -7,6 +7,6 @@
     },
     "ExplosionAction" : {},
     "PlaySoundAction" : {
-        "sounds" : ["Explode1", "Explode2", "Explode3", "Explode4", "Explode5"]
+        "sounds" : ["engine:Explode1", "engine:Explode2", "engine:Explode3", "engine:Explode4", "engine:Explode5"]
     }
 }

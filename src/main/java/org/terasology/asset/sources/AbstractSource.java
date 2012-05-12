@@ -17,6 +17,7 @@
 package org.terasology.asset.sources;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import org.terasology.asset.AssetSource;
@@ -29,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
@@ -41,7 +43,7 @@ import java.util.zip.ZipFile;
 public abstract class AbstractSource implements AssetSource {
     private Logger logger = Logger.getLogger(getClass().getName());
     private String sourceId;
-    private Map<AssetUri, URL> assets = Maps.newHashMap();
+    private Multimap<AssetUri, URL> assets = HashMultimap.create();
     private Multimap<AssetType, AssetUri> assetsByType = HashMultimap.create();
 
     public AbstractSource(String id) {
@@ -54,8 +56,8 @@ public abstract class AbstractSource implements AssetSource {
     }
 
     @Override
-    public URL get(AssetUri uri) {
-        return assets.get(uri);
+    public List<URL> get(AssetUri uri) {
+        return Lists.newArrayList(assets.get(uri));
     }
 
     @Override
@@ -83,10 +85,7 @@ public abstract class AbstractSource implements AssetSource {
         if (parts.length > 1) {
             AssetType assetType = AssetType.getTypeForSubDir(parts[0]);
             if (assetType != null) {
-                if (parts[1].contains(".")) {
-                    parts[1] = parts[1].substring(0, parts[1].lastIndexOf('.'));
-                }
-                return new AssetUri(assetType, sourceId, parts[1]);
+                return assetType.getUri(sourceId, parts[1]);
             }
         }
         return null;

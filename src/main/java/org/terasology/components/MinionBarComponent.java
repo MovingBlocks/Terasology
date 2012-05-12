@@ -1,7 +1,7 @@
 package org.terasology.components;
 
 import com.google.common.collect.Lists;
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  * Similar to toolbar, represents 9 slots that hold the active miniions instead of items
  *
  */
-public class MinionBarComponent extends AbstractComponent {
+public class MinionBarComponent implements Component {
 
     public List<EntityRef> MinionSlots = Lists.newArrayList();
 

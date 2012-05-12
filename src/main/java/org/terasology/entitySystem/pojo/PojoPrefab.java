@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import org.terasology.entitySystem.AbstractPrefab;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,18 +16,20 @@ import java.util.Map;
  */
 public class PojoPrefab extends AbstractPrefab implements Prefab {
 
+    private ComponentLibrary componentLibrary;
     private Map<Class<? extends Component>, Component> components;
 
     private List<Prefab> parents;
 
     private transient Map<Class<? extends Component>, Component> componentCache;
 
-    protected PojoPrefab(String name) {
-        this(name, Maps.<Class<? extends Component>, Component>newHashMap(), Lists.<Prefab>newLinkedList());
+    protected PojoPrefab(String name, ComponentLibrary componentLibrary) {
+        this(name, componentLibrary, Maps.<Class<? extends Component>, Component>newHashMap(), Lists.<Prefab>newLinkedList());
     }
 
-    protected PojoPrefab(String name, Map<Class<? extends Component>, Component> components, List<Prefab> parents) {
+    protected PojoPrefab(String name, ComponentLibrary componentLibrary, Map<Class<? extends Component>, Component> components, List<Prefab> parents) {
         super(name);
+        this.componentLibrary = componentLibrary;
 
         this.components = components;
         this.parents = parents;
@@ -106,7 +109,7 @@ public class PojoPrefab extends AbstractPrefab implements Prefab {
         // 1) Fill inherited components
         for (Prefab ref : this.getParents()) {
             for (Component component : ref.listComponents()) {
-                componentCache.put(component.getClass(), component.clone());
+                componentCache.put(component.getClass(), componentLibrary.copy(component));
             }
         }
 

@@ -1,7 +1,7 @@
 package org.terasology.components;
 
 import com.google.common.collect.Maps;
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Map;
  * Item data is stored using this component
  * @author Immortius <immortius@gmail.com>
  */
-public final class ItemComponent extends AbstractComponent {
+public final class ItemComponent implements Component {
     /** The display name of this item */
     public String name = "";
 

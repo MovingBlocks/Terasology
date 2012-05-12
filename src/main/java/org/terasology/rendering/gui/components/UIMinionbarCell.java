@@ -21,7 +21,7 @@ import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.TextureManager;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.inventory.Icon;
@@ -51,7 +51,7 @@ public class UIMinionbarCell extends UIDisplayElement {
 
         setSize(new Vector2f(48f, 48f));
 
-        _selectionRectangle = new UIGraphicsElement("gui");
+        _selectionRectangle = new UIGraphicsElement(AssetManager.loadTexture("engine:gui"));
         _selectionRectangle.getTextureSize().set(new Vector2f(24f / 256f, 24f / 256f));
         _selectionRectangle.getTextureOrigin().set(new Vector2f(0.0f, 24f / 256f));
         _selectionRectangle.setSize(new Vector2f(48f, 48f));
@@ -85,6 +85,9 @@ public class UIMinionbarCell extends UIDisplayElement {
         _selectionRectangle.renderTransformed();
 
         MinionBarComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(MinionBarComponent.class);
+        if (inventory == null) {
+            return;
+        }
         if (inventory.MinionSlots.size() <= _id)
             return;
         
@@ -117,32 +120,6 @@ public class UIMinionbarCell extends UIDisplayElement {
         glPushMatrix();
         glTranslatef(20f, 20f, 0f);
         icon.render();
-        glPopMatrix();
-        glDisable(GL11.GL_DEPTH_TEST);
-    }
-    
-    private void renderBlockIcon(BlockFamily blockFamily) {
-        if (blockFamily == null) return;
-
-        glEnable(GL11.GL_DEPTH_TEST);
-        glClear(GL11.GL_DEPTH_BUFFER_BIT);
-        glPushMatrix();
-        glTranslatef(20f, 20f, 0f);
-
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glPushMatrix();
-        glTranslatef(4f, 0f, 0f);
-        GL11.glScalef(20f, 20f, 20f);
-        GL11.glRotatef(170f, 1f, 0f, 0f);
-        GL11.glRotatef(-16f, 0f, 1f, 0f);
-        TextureManager.getInstance().bindTexture("terrain");
-
-        Block block = blockFamily.getArchetypeBlock();
-        block.render();
-
-        GL11.glPopMatrix();
-
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
         glPopMatrix();
         glDisable(GL11.GL_DEPTH_TEST);
     }

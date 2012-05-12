@@ -1,0 +1,6 @@
+{
+    "params" : [
+        { "name" : "texCube",
+          "type" : "samplerCube" }
+    ]
+}

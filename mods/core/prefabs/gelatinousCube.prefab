@@ -1,7 +1,9 @@
 {
   "name": "core:gelatinousCube",
   "Location" : {},
-  "Mesh" : {},
+  "Mesh" : {
+    "renderType" : "GelatinousCube"
+  },
   "CharacterMovement" : {
     "faceMovementDirection" : true
   },
@@ -10,7 +12,7 @@
     "extents" : [0.5, 0.5, 0.5]
   },
   "CharacterSound" : {
-    "footstepSounds" : ["Slime1", "Slime2", "Slime3", "Slime4", "Slime5"],
+    "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
     "footstepVolume" : 0.7
   }
 }

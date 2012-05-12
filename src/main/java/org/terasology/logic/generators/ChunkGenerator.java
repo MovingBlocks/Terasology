@@ -57,7 +57,5 @@ public abstract class ChunkGenerator {
      *
      * @param c The chunk to generate/populate
      */
-    public void generate(Chunk c) {
-        throw new UnsupportedOperationException();
-    }
+    public abstract void generate(Chunk c);
 }

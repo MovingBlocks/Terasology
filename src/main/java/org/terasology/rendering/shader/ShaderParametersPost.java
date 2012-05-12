@@ -15,13 +15,25 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.logic.manager.TextureManager;
+import org.terasology.rendering.assets.Texture;
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.LocalWorldProvider;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import javax.vecmath.Vector3d;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -29,6 +41,8 @@ import org.terasology.logic.manager.TextureManager;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersPost implements IShaderParameters {
+
+    Texture texture = AssetManager.loadTexture("engine:vignette");
 
     public void applyParameters(ShaderProgram program) {
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
@@ -38,7 +52,7 @@ public class ShaderParametersPost implements IShaderParameters {
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
         PostProcessingRenderer.getInstance().getFBO("sceneBlur2").bindTexture();
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        TextureManager.getInstance().bindTexture("vignette");
+        glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
         GL13.glActiveTexture(GL13.GL_TEXTURE4);
         scene.bindDepthTexture();
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -53,8 +67,10 @@ public class ShaderParametersPost implements IShaderParameters {
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
         if (CoreRegistry.get(LocalPlayer.class).isValid()) {
-            // TODO: This should use active camera
-            //program.setInt("swimming", tera.getActivePlayer().isHeadUnderWater() ? 1 : 0);
+            Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+            byte blockId = CoreRegistry.get(IWorldProvider.class).getBlockAtPosition(cameraPos);
+            Block block = BlockManager.getInstance().getBlock(blockId);
+            program.setInt("swimming", block.isLiquid() ? 1 : 0);
         }
     }
 

@@ -5,10 +5,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
-import org.terasology.events.item.UseItemEvent;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.components.UIOpenBook;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.menus.UIOpenBookScreen;
 
 import java.util.logging.Level;

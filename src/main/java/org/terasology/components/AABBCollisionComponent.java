@@ -1,6 +1,6 @@
 package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 
 import javax.vecmath.Tuple3f;
 import javax.vecmath.Vector3f;
@@ -11,7 +11,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  */
 // TODO: Actually should support something better than just AABB collision for entities, via JBullet.
-public final class AABBCollisionComponent extends AbstractComponent {
+public final class AABBCollisionComponent implements Component {
 
     private Vector3f extents = new Vector3f();
 

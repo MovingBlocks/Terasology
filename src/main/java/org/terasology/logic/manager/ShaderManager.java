@@ -15,9 +15,14 @@
  */
 package org.terasology.logic.manager;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.terasology.game.Terasology;
+import org.terasology.rendering.assets.Material;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.shader.*;
 
 import java.util.HashMap;
@@ -40,6 +45,10 @@ public class ShaderManager {
     private ShaderProgram _activeShaderProgram = null;
 
     private ShaderProgram _defaultShaderProgram, _defaultTexturedShaderProgram;
+
+    private Material activateMaterial = null;
+
+    private TIntObjectMap<Texture> boundTextures = new TIntObjectHashMap<Texture>();
 
     public static ShaderManager getInstance() {
         if (_instance == null) {
@@ -73,7 +82,34 @@ public class ShaderManager {
         createAndStoreShaderProgram("block", new ShaderParametersBlock());
         createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
         createAndStoreShaderProgram("clouds", new ShaderParametersDefault());
-        createAndStoreShaderProgram("genericMesh", new ShaderParametersGenericMesh());
+        //createAndStoreShaderProgram("genericMesh", new ShaderParametersGenericMesh());
+    }
+
+    public void enableMaterial(Material material) {
+        if (material.isDisposed()) {
+            // TODO: Fallback on default material
+            return;
+        }
+
+        if (!material.equals(activateMaterial)) {
+            GL20.glUseProgram(material.getShaderId());
+            activateMaterial = material;
+            _activeShaderProgram = null;
+        }
+    }
+
+    public void bindTexture(int slot, Texture texture) {
+        if (activateMaterial != null && !activateMaterial.isDisposed()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + slot);
+            // TODO: Need to be cubemap aware, only need to clear bind when switching from cubemap to 2D and vice versa,
+            // don't bind if already bound to the same
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
+        }
+    }
+
+    public Material getActiveMaterial() {
+        return activateMaterial;
     }
 
     public void recompileAllShaders() {
@@ -121,6 +157,7 @@ public class ShaderManager {
 
     public void setActiveShaderProgram(ShaderProgram program) {
         _activeShaderProgram = program;
+        activateMaterial = null;
     }
 
     /**

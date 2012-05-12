@@ -3,6 +3,8 @@ package org.terasology.entitySystem;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.components.LocationComponent;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
 
@@ -16,11 +18,12 @@ import static org.junit.Assert.*;
 public class PojoPrefabManagerTest {
 
     public static final String PrefabName = "Test";
+    ComponentLibrary componentLibrary = new ComponentLibraryImpl();
     PojoPrefabManager prefabManager;
 
     @Before
     public void setup() {
-        prefabManager = new PojoPrefabManager();
+        prefabManager = new PojoPrefabManager(componentLibrary);
     }
 
     @Test
@@ -35,7 +38,7 @@ public class PojoPrefabManagerTest {
         assertEquals(PrefabName, ref.getName());
         assertTrue(prefabManager.exists(PrefabName));
     }
-    
+
     @Test
     public void retrievePrefab() {
         prefabManager.createPrefab(PrefabName);
@@ -55,7 +58,7 @@ public class PojoPrefabManagerTest {
 
         assertEquals(prefabManager.getPrefab(PrefabName), prefabManager.getPrefab(PrefabName));
     }
-    
+
     @Test
     public void addAndRetrieveComponent() {
         Prefab prefab = prefabManager.createPrefab(PrefabName);

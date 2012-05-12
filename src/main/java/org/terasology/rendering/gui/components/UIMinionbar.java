@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -33,7 +34,7 @@ public class UIMinionbar extends UIDisplayContainer {
     public UIMinionbar() {
         setSize(new Vector2f(44f, 364f));
 
-        _backgroundTexture = new UIGraphicsElement("guiMinion");
+        _backgroundTexture = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
         _backgroundTexture.setVisible(true);
         _backgroundTexture.getTextureSize().set(new Vector2f(22f / 256f, 182f / 256f));
         _backgroundTexture.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));

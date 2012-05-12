@@ -7,6 +7,7 @@ import org.terasology.components.MinionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.*;
 
 import javax.vecmath.Vector2f;
@@ -31,14 +32,14 @@ public class UIMinion extends UIDisplayWindow{
     public UIMinion(){
 
         setSize(new Vector2f(60f,100f));
-        _background = new UIGraphicsElement("guiMinion");
+        _background = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
         _background.getTextureSize().set(new Vector2f(60f / 256f, 100f / 256f));
         _background.getTextureOrigin().set(new Vector2f(30.0f / 256f, 20.0f / 256f));
         _background.setSize(getSize());
         addDisplayElement(_background);
         _background.setVisible(true);
 
-        _selectionRectangle = new UIGraphicsElement("guiMinion");
+        _selectionRectangle = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
         _selectionRectangle.getTextureSize().set(new Vector2f(60f / 256f, 20f / 256f));
         _selectionRectangle.getTextureOrigin().set(new Vector2f(30f / 256, 0.0f));
         _selectionRectangle.setSize(new Vector2f(60f, 20f));

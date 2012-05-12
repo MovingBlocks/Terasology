@@ -1,11 +1,15 @@
 package org.terasology.entityFactory;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.audio.Sound;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.model.blocks.management.BlockManager;
 
@@ -45,7 +49,11 @@ public class PlayerFactory {
         movementComp.maxGroundSpeed = 3f;
         movementComp.distanceBetweenFootsteps = 1.5f;
         CharacterSoundComponent sounds = player.addComponent(new CharacterSoundComponent());
-        sounds.footstepSounds.addAll(Arrays.asList(AudioManager.sounds("FootGrass1", "FootGrass2", "FootGrass3", "FootGrass4", "FootGrass5")));
+        sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass1"), Sound.class));
+        sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass2"), Sound.class));
+        sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass3"), Sound.class));
+        sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass4"), Sound.class));
+        sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass5"), Sound.class));
         player.addComponent(new LocalPlayerComponent());
         player.addComponent(new InventoryComponent(36));
         player.addComponent(new MinionBarComponent(9));

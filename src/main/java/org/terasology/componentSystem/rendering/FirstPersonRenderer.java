@@ -2,20 +2,22 @@ package org.terasology.componentSystem.rendering;
 
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.inventory.Icon;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
 import org.terasology.rendering.primitives.Tessellator;
@@ -39,6 +41,7 @@ public class FirstPersonRenderer implements RenderSystem {
     private LocalPlayer localPlayer;
     private WorldRenderer worldRenderer;
     private Mesh handMesh;
+    private Texture handTex;
     
     private Map<String, Mesh> iconMeshes = Maps.newHashMap();
     
@@ -53,6 +56,7 @@ public class FirstPersonRenderer implements RenderSystem {
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
         handMesh = tessellator.generateMesh();
+        handTex = AssetManager.loadTexture("engine:char");
     }
 
     public void renderOpaque() {
@@ -90,7 +94,7 @@ public class FirstPersonRenderer implements RenderSystem {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
         shader.enable();
         shader.setFloat("light", worldRenderer.getRenderingLightValue());
-        TextureManager.getInstance().bindTexture("char");
+        glBindTexture(GL11.GL_TEXTURE_2D, handTex.getId());
 
         glPushMatrix();
         glTranslatef(0.8f, -0.8f + bobOffset - handMovementAnimationOffset * 0.5f, -1.0f - handMovementAnimationOffset * 0.5f);

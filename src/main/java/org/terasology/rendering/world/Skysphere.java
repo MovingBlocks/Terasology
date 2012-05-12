@@ -23,11 +23,10 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.game.Timer;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.shader.ShaderProgram;
@@ -98,7 +97,7 @@ public class Skysphere implements IGameObject {
 
         for (int i = 0; i < 6; i++) {
 
-            ByteBuffer data = TextureManager.getInstance().getTexture("stars" + (i + 1)).data;
+            ByteBuffer data = AssetManager.loadTexture("engine:stars" + (i + 1)).getImageData(0);
 
             GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, 256, 256,
                     0, format, GL11.GL_UNSIGNED_BYTE, data);

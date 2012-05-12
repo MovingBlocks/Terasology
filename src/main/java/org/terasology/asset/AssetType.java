@@ -18,6 +18,7 @@ package org.terasology.asset;
 
 import com.google.common.collect.Maps;
 
+import java.net.URL;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -28,7 +29,26 @@ public enum AssetType {
     PREFAB("prefab", "prefabs"),
     SOUND("sound", "sounds"),
     MUSIC("music", "music"),
-    SHAPE("shape", "shapes");
+    SHAPE("shape", "shapes"),
+    MESH("mesh", "mesh"),
+    TEXTURE("texture", "textures"),
+    SHADER("shader", "shaders") {
+        @Override
+        public AssetUri getUri(String sourceId, String item) {
+            int index = item.lastIndexOf("_frag.glsl");
+            if (index == -1) {
+                index = item.lastIndexOf("_vert.glsl");
+            }
+            if (index == -1) {
+                index = item.lastIndexOf(".");
+            }
+            if (index != -1) {
+                return new AssetUri(this, sourceId, item.substring(0, index));
+            }
+            return null;
+        }
+    },
+    MATERIAL("material", "materials");
 
     private String typeId;
     private String subDir;
@@ -66,4 +86,12 @@ public enum AssetType {
     public static AssetType getTypeForSubDir(String dir) {
         return subDirLookup.get(dir);
     }
+
+    public AssetUri getUri(String sourceId, String item) {
+        if (item.contains(".")) {
+            return new AssetUri(this, sourceId, item.substring(0, item.lastIndexOf('.')));
+        }
+        return null;
+    }
+
 }

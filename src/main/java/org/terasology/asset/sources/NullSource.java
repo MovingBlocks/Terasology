@@ -16,12 +16,14 @@
 
 package org.terasology.asset.sources;
 
+import com.google.common.collect.Lists;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.common.NullIterator;
 
 import java.net.URL;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -39,8 +41,8 @@ public class NullSource implements AssetSource {
     }
 
     @Override
-    public URL get(AssetUri uri) {
-        return null;
+    public List<URL> get(AssetUri uri) {
+        return Lists.newArrayList();
     }
 
     @Override

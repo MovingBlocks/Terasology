@@ -15,14 +15,17 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.TextureManager;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Chunk shader program.
@@ -30,6 +33,10 @@ import org.terasology.rendering.world.WorldRenderer;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersChunk implements IShaderParameters {
+    private Texture lava = AssetManager.loadTexture("engine:custom_lava_still");
+    private Texture water = AssetManager.loadTexture("engine:water_normal");
+    private Texture effects = AssetManager.loadTexture("engine:effects");
+    private Texture terrain = AssetManager.loadTexture("engine:terrain");
 
     public void applyParameters(ShaderProgram program) {
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
@@ -37,13 +44,13 @@ public class ShaderParametersChunk implements IShaderParameters {
         IWorldProvider worldProvider = CoreRegistry.get(IWorldProvider.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        TextureManager.getInstance().bindTexture("custom_lava_still");
+        glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        TextureManager.getInstance().bindTexture("water_normal");
+        glBindTexture(GL11.GL_TEXTURE_2D, water.getId());
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        TextureManager.getInstance().bindTexture("effects");
+        glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        TextureManager.getInstance().bindTexture("terrain");
+        glBindTexture(GL11.GL_TEXTURE_2D, terrain.getId());
 
         program.setInt("textureLava", 1);
         program.setInt("textureWaterNormal", 2);

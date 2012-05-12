@@ -82,12 +82,16 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
                         Vector3f targetDirection = new Vector3f();
                         targetDirection.sub(ai.movementTarget, worldPos);
-                        targetDirection.normalize();
-                        moveComp.setDrive(targetDirection);
+                        if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
+                            targetDirection.normalize();
+                            moveComp.setDrive(targetDirection);
 
-                        float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                        AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                        location.getLocalRotation().set(axisAngle);
+                            float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
+                            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+                            location.getLocalRotation().set(axisAngle);
+                        } else {
+                            moveComp.getDrive().set(0,0,0);
+                        }
                         entity.saveComponent(moveComp);
                         entity.saveComponent(location);
                         break;
@@ -108,12 +112,17 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
                         Vector3f targetDirection = new Vector3f();
                         targetDirection.sub(ai.movementTarget, worldPos);
-                        targetDirection.normalize();
-                        moveComp.setDrive(targetDirection);
+                        if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f)  {
+                            targetDirection.normalize();
+                            moveComp.setDrive(targetDirection);
 
-                        float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                        AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                        location.getLocalRotation().set(axisAngle);
+                            float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
+                            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+                            location.getLocalRotation().set(axisAngle);
+                        }
+                        else {
+                            moveComp.setDrive(new Vector3f());
+                        }
                         entity.saveComponent(moveComp);
                         entity.saveComponent(location);
                         break;
@@ -123,12 +132,16 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         entity.saveComponent(ai);
                         Vector3f targetDirection = new Vector3f();
                         targetDirection.sub(ai.movementTarget, worldPos);
-                        targetDirection.normalize();
-                        moveComp.setDrive(targetDirection);
+                        if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
+                            targetDirection.normalize();
+                            moveComp.setDrive(targetDirection);
 
-                        float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                        AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                        location.getLocalRotation().set(axisAngle);
+                            float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
+                            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+                            location.getLocalRotation().set(axisAngle);
+                        } else {
+                            moveComp.setDrive(new Vector3f());
+                        }
                         entity.saveComponent(moveComp);
                         entity.saveComponent(location);
                         break;
@@ -145,8 +158,6 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
         //if (selectedBlock != null) {
             //BlockPosition blockPos = selectedBlock.getBlockPosition();
-            byte currentBlockType = worldProvider.getBlock((int)position.x, (int)position.y, (int)position.z);
-            Block block = BlockManager.getInstance().getBlock(currentBlockType);
 
             int damage = 1;
             /*if (item != null) {
@@ -155,11 +166,8 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                     damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
                 }
             }*/
-
-            if (block.isDestructible()) {
-                EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
-                blockEntity.send(new DamageEvent(damage, player));
-            }
+            EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
+            blockEntity.send(new DamageEvent(damage, player));
         //}
 
 

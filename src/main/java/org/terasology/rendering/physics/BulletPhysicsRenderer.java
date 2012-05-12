@@ -29,6 +29,8 @@ import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
@@ -442,7 +444,7 @@ public class BulletPhysicsRenderer implements IGameObject {
                     if (itemComp != null && !itemComp.container.exists()) {
                         blockItem.destroy();
                     }
-                    AudioManager.play("Loot");
+                    AudioManager.play(new AssetUri(AssetType.SOUND, "engine:Loot"));
 
                     _blocks.remove(i);
                     _discreteDynamicsWorld.removeRigidBody(b);

@@ -1,9 +1,12 @@
 package org.terasology.model.inventory;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.logic.manager.TextureManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -11,6 +14,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
@@ -18,30 +22,32 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  */
 @SuppressWarnings("rawtypes")
 public class Icon {
-    private static Map<String, Icon> icons;
+	private static Map<String, Icon> icons;
 
-    private UIGraphicsElement _element;
-    private BlockFamily _blockFamily;
-    private int _x;
-    private int _y;
+	private UIGraphicsElement _element;
+	private BlockFamily _blockFamily;
+	private int _x;
+	private int _y;
+    private Texture terrainTex;
 
-    /**
-     * Creates Icon for BlockFamily class.
-     *
-     * @param blockFamily
-     */
-    public Icon(BlockFamily blockFamily) {
-        _element = null;
-        _blockFamily = blockFamily;
-        setAtlasPosition(0, 0);
-    }
+	/**
+	 * Creates Icon for BlockFamily class.
+	 *
+	 * @param blockFamily
+	 */
+	public Icon(BlockFamily blockFamily) {
+		_element = null;
+		_blockFamily = blockFamily;
+		setAtlasPosition(0, 0);
+        terrainTex = AssetManager.loadTexture("engine:terrain");
+	}
 
-    /**
-     * Creates an Icon for a non-BlockFamily class
-     */
-    public Icon() {
-        _element = new UIGraphicsElement("items");
-        _blockFamily = null;
+	/**
+	 * Creates an Icon for a non-BlockFamily class
+	 */
+	public Icon() {
+		_element = new UIGraphicsElement(AssetManager.loadTexture("engine:items"));
+		_blockFamily = null;
 
         _element.setSize(new Vector2f(32, 32));
         _element.getTextureSize().set(new Vector2f(0.0624f, 0.0624f));
@@ -49,29 +55,29 @@ public class Icon {
         _element.setPosition(new Vector2f(-10f, -16f));
 
         setAtlasPosition(0, 0);
-    }
+	}
 
-    /**
-     * Returns the icon for <code>name</code>.
-     *
-     * @param name the name of the icon
-     * @return the Icon for item
-     */
-    public static Icon get(String name) {
-        if (icons == null) {
-            loadIcons();
-        }
+	/**
+	 * Returns the icon for <code>name</code>.
+	 *
+	 * @param name the name of the icon
+	 * @return the Icon for item
+	 */
+	public static Icon get(String name) {
+		if (icons == null) {
+			loadIcons();
+		}
 
-        return icons.get(name.toLowerCase(Locale.ENGLISH));
-    }
+		return icons.get(name.toLowerCase(Locale.ENGLISH));
+	}
 
-    private static void loadIcons() {
-        icons = new HashMap<String, Icon>();
+	private static void loadIcons() {
+		icons = new HashMap<String, Icon>();
 
         //TODO: Hmm, does this mean we have hard coded our tool displays? Should try to move this to ToolManager in that case?
         //* TOOLS *//
         Icon pickAxeIcon = new Icon();
-        Icon axeIcon = new Icon();
+		Icon axeIcon = new Icon();
         Icon sickleIcon = new Icon();
         Icon hammerIcon = new Icon();
         Icon knifeIcon = new Icon();
@@ -93,7 +99,7 @@ public class Icon {
         Icon palebluePowderIcon = new Icon();
         Icon greenPowderIcon = new Icon();
         Icon brownPowderIcon = new Icon();
-        Icon redPowderIcon = new Icon();
+		Icon redPowderIcon = new Icon();
         Icon bluePowderIcon = new Icon();
         Icon purplePowderIcon = new Icon();
         //* PLANTS *//
@@ -191,7 +197,7 @@ public class Icon {
         gelcubeIcon.setAtlasPosition(6,6);
 
         icons.put("pickaxe", pickAxeIcon);
-        icons.put("axe", axeIcon);
+		icons.put("axe", axeIcon);
         icons.put("sickle", sickleIcon);
         icons.put("hammer", hammerIcon);
         icons.put("knife", knifeIcon);
@@ -253,57 +259,57 @@ public class Icon {
         icons.put("debug", greenPowderIcon);
 
         icons.put("gelcube",gelcubeIcon);
-    }
+	}
 
-    /**
-     * Draw the icon.
-     */
-    public void render() {
-        if (_blockFamily == null) {
-            _element.renderTransformed();
-        } else {
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
+	/**
+	 * Draw the icon.
+	 */
+	public void render() {
+		if (_blockFamily == null) {
+			_element.renderTransformed();
+		} else {
+	        GL11.glEnable(GL11.GL_TEXTURE_2D);
 
-            GL11.glPushMatrix();
-            glTranslatef(4f, 0f, 0f);
-            GL11.glScalef(20f, 20f, 20f);
-            GL11.glRotatef(170f, 1f, 0f, 0f);
-            GL11.glRotatef(-16f, 0f, 1f, 0f);
-            TextureManager.getInstance().bindTexture("terrain");
+	        GL11.glPushMatrix();
+	        glTranslatef(4f, 0f, 0f);
+	        GL11.glScalef(20f, 20f, 20f);
+	        GL11.glRotatef(170f, 1f, 0f, 0f);
+	        GL11.glRotatef(-16f, 0f, 1f, 0f);
+            glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
-            Block block = _blockFamily.getArchetypeBlock();
-            block.render();
+	        Block block = _blockFamily.getArchetypeBlock();
+	        block.render();
 
-            GL11.glPopMatrix();
+	        GL11.glPopMatrix();
 
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
-        }
-    }
+	        GL11.glDisable(GL11.GL_TEXTURE_2D);
+		}
+	}
 
-    /**
-     * @return x-offset in icon sheet
-     */
-    public int getX() {
-        return _x;
-    }
+	/**
+	 * @return x-offset in icon sheet
+	 */
+	public int getX() {
+		return _x;
+	}
 
-    /**
-     *
-     * @return y-offset in icon sheet
-     */
-    public int getY() {
-        return _y;
-    }
+	/**
+	 *
+	 * @return y-offset in icon sheet
+	 */
+	public int getY() {
+		return _y;
+	}
 
-    private void setAtlasPosition(int x, int y) {
-        _x = x;
-        _y = y;
+	private void setAtlasPosition(int x, int y) {
+		_x = x;
+		_y = y;
 
-        if (_element == null) {
-            return;
-        }
+		if (_element == null) {
+			return;
+		}
 
-        _element.getTextureOrigin().set(new Vector2f(x * 0.0625f, y * 0.0625f));
-    }
+		_element.getTextureOrigin().set(new Vector2f(x * 0.0625f, y * 0.0625f));
+	}
 }
 

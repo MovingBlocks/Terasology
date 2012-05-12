@@ -1,5 +1,6 @@
 package org.terasology.logic.manager;
 
+import org.terasology.asset.AssetUri;
 import org.terasology.audio.Sound;
 import org.terasology.audio.SoundPool;
 import org.terasology.audio.SoundSource;
@@ -16,10 +17,6 @@ public interface SoundManager {
     int PRIORITY_NORMAL = 5;
     int PRIORITY_LOW = 3;
     int PRIORITY_LOWEST = 1;
-
-    Sound getSound(String name);
-
-    Sound getMusic(String name);
 
     /**
      * Initializes AudioManager
@@ -40,7 +37,7 @@ public interface SoundManager {
 
     SoundPool getSoundPool(String pool);
 
-    SoundSource getSoundSource(String pool, String sound, int priority);
+    SoundSource getSoundSource(String pool, AssetUri sound, int priority);
 
     SoundSource getSoundSource(String pool, Sound sound, int priority);
 

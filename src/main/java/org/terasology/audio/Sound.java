@@ -1,31 +1,12 @@
 package org.terasology.audio;
 
+import org.terasology.asset.Asset;
+
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 
-public interface Sound {
-
-    /**
-     * Load sound from input stream
-     *
-     * @param stream
-     */
-    public void load(InputStream stream);
-
-    /**
-     * Loads sound from file
-     *
-     * @param file
-     */
-    public void load(File file);
-
-    /**
-     * Loads sound from specified URL
-     *
-     * @param source
-     */
-    public void load(URL source);
+public interface Sound extends Asset {
 
     /**
      * Returns sound sample length in seconds
@@ -34,13 +15,6 @@ public interface Sound {
      * @return
      */
     public int getLength();
-
-    /**
-     * Returns sound associated name (example: Explosion1)
-     *
-     * @return
-     */
-    public String getName();
 
     /**
      * Return channels amount of sound (1 - mono, 2 - stereo)
@@ -56,12 +30,22 @@ public interface Sound {
      */
     public int getSamplingRate();
 
-
     /**
      * Reset sound state (clears buffers, reset cached info)
      *
      * @return
      */
-    public Sound reset();
+    public void reset();
+
+    // TODO: Have these here?
+    /**
+     * @return the size of the sound buffer
+     */
+    public int getBufferSize();
+
+    /**
+     * @return the id of the sound buffer
+     */
+    public int getBufferId();
 
 }

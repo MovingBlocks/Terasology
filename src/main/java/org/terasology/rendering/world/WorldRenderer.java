@@ -18,6 +18,8 @@ package org.terasology.rendering.world;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.componentSystem.rendering.FirstPersonRenderer;
@@ -207,7 +209,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.1, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("Sunrise");
+                AudioManager.playMusic("engine:Sunrise");
             }
         });
 
@@ -215,7 +217,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.25, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("Afternoon");
+                AudioManager.playMusic("engine:Afternoon");
             }
         });
 
@@ -223,7 +225,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.4, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("Sunset");
+                AudioManager.playMusic("engine:Sunset");
             }
         });
 
@@ -231,7 +233,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("Dimlight");
+                AudioManager.playMusic("engine:Dimlight");
             }
         });
 
@@ -239,7 +241,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.75, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("OtherSide");
+                AudioManager.playMusic("engine:OtherSide");
             }
         });
 
@@ -247,7 +249,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("Resurface");
+                AudioManager.playMusic("engine:Resurface");
             }
         });
     }

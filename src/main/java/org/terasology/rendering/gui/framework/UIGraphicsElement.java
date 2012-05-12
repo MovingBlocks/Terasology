@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.TextureManager;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -34,7 +34,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class UIGraphicsElement extends UIDisplayElement {
-    private final String _textureName;
+    private final Texture texture;
 
     private final Vector2f _textureOrigin = new Vector2f(0.0f, 0.0f);
     private final Vector2f _textureSize = new Vector2f(1.0f, 1.0f);
@@ -42,8 +42,8 @@ public class UIGraphicsElement extends UIDisplayElement {
     private float _rotate = 0f;
     private Mesh _mesh;
 
-    public UIGraphicsElement(String textureName) {
-        _textureName = textureName;
+    public UIGraphicsElement(Texture texture) {
+        this.texture = texture;
 
         if (_mesh == null) {
             Tessellator tessellator = new Tessellator();
@@ -58,7 +58,7 @@ public class UIGraphicsElement extends UIDisplayElement {
             return;
 
         ShaderManager.getInstance().enableDefaultTextured();
-        TextureManager.getInstance().bindTexture(_textureName);
+        glBindTexture(GL11.GL_TEXTURE_2D, texture != null ? texture.getId() : 0);
 
         glMatrixMode(GL_TEXTURE);
         glPushMatrix();

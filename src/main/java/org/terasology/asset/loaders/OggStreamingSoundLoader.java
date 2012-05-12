@@ -14,32 +14,24 @@
  * limitations under the License.
  */
 
-package org.terasology.events.item;
+package org.terasology.asset.loaders;
 
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
+import org.terasology.audio.OggStreamingSound;
+import org.terasology.audio.Sound;
 
-import javax.vecmath.Vector3f;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
 
 /**
  * @author Immortius
  */
-public class UseItemInDirectionEvent extends UseItemEvent {
-    Vector3f location;
-    Vector3f direction;
-
-    public UseItemInDirectionEvent(EntityRef instigator, Vector3f location, Vector3f direction) {
-        super(instigator);
-        this.location = location;
-        this.direction = direction;
-    }
-
-    public Vector3f getLocation() {
-        return location;
-    }
-
-    public Vector3f getDirection() {
-        return direction;
+public class OggStreamingSoundLoader implements AssetLoader<Sound> {
+    @Override
+    public Sound load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+        return new OggStreamingSound(uri, urls.get(0));
     }
 }
