@@ -5,9 +5,12 @@ import org.junit.Test;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
+import org.terasology.entitySystem.metadata.extension.Quat4fTypeHandler;
+import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 import static org.junit.Assert.*;
@@ -23,6 +26,9 @@ public class PojoPrefabManagerTest {
 
     @Before
     public void setup() {
+        componentLibrary.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
+        componentLibrary.registerTypeHandler(Quat4f.class, new Quat4fTypeHandler());
+        componentLibrary.registerComponentClass(LocationComponent.class);
         prefabManager = new PojoPrefabManager(componentLibrary);
     }
 

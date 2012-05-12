@@ -166,8 +166,11 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                     damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
                 }
             }*/
-            EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
-            blockEntity.send(new DamageEvent(damage, player));
+            Block block = BlockManager.getInstance().getBlock(worldProvider.getBlockAtPosition(new Vector3d(position.x, position.y, position.z)));
+            if (block.isDestructible() && !block.isSelectionRayThrough()) {
+                EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
+                blockEntity.send(new DamageEvent(damage, player));
+            }
         //}
 
 
