@@ -65,7 +65,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
                     item.destroy();
              */
 
-            case Black:
+            case Purple:
                 //This activates the Speed Boost effect through the StatusAffectorSystem
                 event.getInstigator().send(new BoostSpeedEvent());
                 //Receive an Empty Vial (Destroy it if no inventory space available)
