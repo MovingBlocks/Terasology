@@ -17,7 +17,6 @@ package org.terasology.logic.world;
 
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.Vector3i;
 
@@ -71,13 +70,18 @@ public final class ChunkProvider implements IChunkProvider {
     }
 
     public boolean isChunkAvailable(int x, int y, int z) {
-        int id = new Vector3i(x,y,z).hashCode();
+        int id = getNearCacheChunkId(x, y, z);
         Chunk c = _nearChunkCache.get(id);
         return c != null;
     }
 
-    public Chunk getChunk(int x, int y, int z) {
+    private int getNearCacheChunkId(int x, int y, int z) {
         int id = new Vector3i(x,y,z).hashCode();
+        return id;
+    }
+
+    public Chunk getChunk(int x, int y, int z) {
+        int id = getNearCacheChunkId(x, y, z);
         Chunk c = _nearChunkCache.get(id);
         if (c != null) {
             return c;
@@ -102,6 +106,7 @@ public final class ChunkProvider implements IChunkProvider {
             _nearChunkCache.put(id, c);
             //HACK! move local world provider out of chunk!
             c.setParent(_parent);
+
             return c;
         }
         finally {
@@ -125,7 +130,16 @@ public final class ChunkProvider implements IChunkProvider {
                     // Write the chunk to disk (but do not remove it from the cache just jet)
                     _farChunkCache.put(chunkToDelete);
                     // When the chunk is written, finally remove it from the cache
-                    _nearChunkCache.values().remove(chunkToDelete);
+
+                    _lockChunkCreation.lock();
+                    try {
+                        Vector3i pos = chunkToDelete.getPos();
+                        int id = getNearCacheChunkId(pos.x, pos.y, pos.z);
+                        _nearChunkCache.remove(id);
+                    }
+                    finally {
+                        _lockChunkCreation.unlock();
+                    }
 
                     chunkToDelete.dispose();
                 }
