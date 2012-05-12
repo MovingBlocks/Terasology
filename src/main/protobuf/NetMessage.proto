@@ -1,0 +1,19 @@
+/**
+ * @author Immortius <immortius@gmail.com>
+ */
+
+option java_package = "org.terasology.protobuf";
+option java_outer_classname = "NetData";
+option optimize_for = SPEED;
+
+message NetMessage {
+    optional ConnectMessage connection = 15; // Index of the type, if contained in a world with component_classes table
+
+    extensions 1000 to 1999;
+}
+
+message ConnectMessage {
+    optional string name = 1;
+
+    extensions 1000 to 1999;
+}
