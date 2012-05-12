@@ -1,5 +1,7 @@
 package org.terasology.entitySystem;
 
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+
 import java.util.Map;
 
 /**
@@ -49,5 +51,7 @@ public interface EntityManager {
     void setEventSystem(EventSystem system);
 
     PrefabManager getPrefabManager();
+
+    ComponentLibrary getComponentLibrary();
 
 }

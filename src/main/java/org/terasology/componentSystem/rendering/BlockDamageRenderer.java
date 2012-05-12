@@ -8,6 +8,7 @@ import org.terasology.components.BlockComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
@@ -27,6 +28,7 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(headedOnly = true)
 public class BlockDamageRenderer implements RenderSystem {
     
     private EntityManager entityManager;

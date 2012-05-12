@@ -22,6 +22,7 @@ import org.terasology.rendering.physics.BulletPhysicsRenderer;
  * Event handler for events affecting block entities
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem
 public class BlockEntitySystem implements EventHandlerSystem {
     private static byte EmptyBlockId = 0x0;
 

@@ -3,6 +3,7 @@ package org.terasology.componentSystem.controllers;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
@@ -19,6 +20,7 @@ import javax.vecmath.Vector3f;
  * Minionsystem gives you some control over the minions.
  * this is the home of the minionbar.
  */
+@RegisterComponentSystem
 public class MinionSystem implements EventHandlerSystem {
 
     private final int popupentries = 5;

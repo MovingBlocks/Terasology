@@ -6,6 +6,7 @@ import org.terasology.components.LocationComponent;
 import org.terasology.components.MeshComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
@@ -29,6 +30,7 @@ import static org.lwjgl.opengl.GL11.*;
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer?
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(headedOnly = true)
 public class MeshRenderer implements RenderSystem {
     private EntityManager manager;
     private Mesh mesh;

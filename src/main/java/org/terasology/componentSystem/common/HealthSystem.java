@@ -2,10 +2,7 @@ package org.terasology.componentSystem.common;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
@@ -15,6 +12,7 @@ import org.terasology.game.CoreRegistry;
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(authorativeOnly = true)
 public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem {
 
     private EntityManager entityManager;

@@ -4,6 +4,7 @@ import org.terasology.components.BookComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.menus.UIOpenBookScreen;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
  * @author bi0hax
  *
  */
+@RegisterComponentSystem
 public class ReadBookAction implements EventHandlerSystem {
     private Logger logger = Logger.getLogger(getClass().getName());
     public void initialise() {

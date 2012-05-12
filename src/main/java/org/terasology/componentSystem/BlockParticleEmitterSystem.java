@@ -10,6 +10,7 @@ import org.terasology.components.BlockParticleEffectComponent.Particle;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
@@ -35,6 +36,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Immortius <immortius@gmail.com>
  */
 // TODO: Generalise for non-block particles
+@RegisterComponentSystem(headedOnly = true)
 public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem {
     private static final int PARTICLES_PER_UPDATE = 32;
     private static final float TEX_SIZE = Block.TEXTURE_OFFSET / 4f;

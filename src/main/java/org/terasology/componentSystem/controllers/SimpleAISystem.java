@@ -4,10 +4,7 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.components.SimpleAIComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
@@ -21,6 +18,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(authorativeOnly = true)
 public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSystem {
 
     private EntityManager entityManager;

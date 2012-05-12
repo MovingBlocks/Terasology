@@ -2,10 +2,7 @@ package org.terasology.componentSystem.items;
 
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.entitySystem.ComponentSystem;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 
@@ -13,6 +10,7 @@ import org.terasology.events.inventory.ReceiveItemEvent;
  * System providing inventory related functionality
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem
 public class InventorySystem implements EventHandlerSystem {
 
     // TODO: differ per item?

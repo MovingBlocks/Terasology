@@ -5,6 +5,7 @@ import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
@@ -20,6 +21,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(authorativeOnly = true)
 public class ExplosionAction implements EventHandlerSystem {
 
     private IWorldProvider worldProvider;

@@ -89,6 +89,11 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         return store.getComponentCount(componentClass);
     }
 
+    @Override
+    public ComponentLibrary getComponentLibrary() {
+        return componentLibrary;
+    }
+
 	@Override
     public EventSystem getEventSystem() {
         return eventSystem;

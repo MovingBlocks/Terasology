@@ -45,7 +45,7 @@ public class EntitySerializationTest {
         componentLibrary.registerComponentClass(GetterSetterComponent.class);
         prefabManager = new PojoPrefabManager(componentLibrary);
         entityManager = new PojoEntityManager(componentLibrary, prefabManager);
-        entityPersisterHelper = new EntityPersisterHelperImpl(componentLibrary,entityManager);
+        entityPersisterHelper = new EntityPersisterHelperImpl(entityManager);
     }
 
     @Test

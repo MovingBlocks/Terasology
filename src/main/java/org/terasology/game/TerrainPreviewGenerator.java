@@ -47,6 +47,7 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
     }
 
     public static void main(String[] args) {
+        CoreRegistry.put(Timer.class, new Timer());
         GeneratorManager manager = new GeneratorManager(new LocalWorldProvider("World1", "Terasology42"));
         TerrainPreviewGenerator gen = new TerrainPreviewGenerator(manager);
 

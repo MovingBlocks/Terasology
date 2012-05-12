@@ -20,7 +20,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.audio.Sound;
 import org.terasology.componentSystem.BlockParticleEmitterSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.action.*;
@@ -38,44 +37,30 @@ import org.terasology.componentSystem.rendering.BlockDamageRenderer;
 import org.terasology.componentSystem.rendering.FirstPersonRenderer;
 import org.terasology.componentSystem.rendering.MeshRenderer;
 import org.terasology.components.*;
-import org.terasology.components.actions.*;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
 import org.terasology.entitySystem.persistence.WorldPersister;
-import org.terasology.entitySystem.pojo.PojoEntityManager;
-import org.terasology.entitySystem.pojo.PojoEventSystem;
-import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
 import org.terasology.entitySystem.persistence.EntityPersisterHelper;
-import org.terasology.entitySystem.metadata.extension.*;
 import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
+import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.world.IWorldProvider;
-import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.BlockFamily;
-import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.protobuf.EntityData;
-import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.*;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
-import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Color4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import java.io.*;
 import java.util.ArrayList;
@@ -95,10 +80,12 @@ import static org.lwjgl.opengl.GL11.*;
 public class StateSinglePlayer implements GameState {
 
     public static final String ENTITY_DATA_FILE = "entity.dat";
-    private Logger _logger = Logger.getLogger(getClass().getName());
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     private String currentWorldName;
     private String currentWorldSeed;
+
+    private PersistableEntityManager entityManager;
 
     /* GUI */
     private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
@@ -112,9 +99,7 @@ public class StateSinglePlayer implements GameState {
     /* RENDERING */
     private WorldRenderer _worldRenderer;
 
-    private ComponentLibrary componentLibrary;
-    private EntityManager _entityManager;
-    private ComponentSystemManager _componentSystemManager;
+    private ComponentSystemManager componentSystemManager;
     private LocalPlayerSystem _localPlayerSys;
 
     /* GAME LOOP */
@@ -130,91 +115,29 @@ public class StateSinglePlayer implements GameState {
     }
 
     public void init(GameEngine engine) {
+        // TODO: Change to better mod support, should be enabled via config
         ModManager modManager = new ModManager();
         for (Mod mod : modManager.getMods()) {
              mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
         cacheTextures();
-        BlockShapeManager.getInstance().reload();
 
-        componentLibrary = new ComponentLibraryImpl();
-        CoreRegistry.put(ComponentLibrary.class, componentLibrary);
+        entityManager = new EntitySystemBuilder().build();
 
-        componentLibrary.registerTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler());
-        componentLibrary.registerTypeHandler(Color4f.class, new Color4fTypeHandler());
-        componentLibrary.registerTypeHandler(Quat4f.class, new Quat4fTypeHandler());
-        componentLibrary.registerTypeHandler(Mesh.class, new AssetTypeHandler(AssetType.MESH, Mesh.class));
-        componentLibrary.registerTypeHandler(Sound.class, new AssetTypeHandler(AssetType.SOUND, Sound.class));
-        componentLibrary.registerTypeHandler(Material.class, new AssetTypeHandler(AssetType.MATERIAL, Material.class));
-        componentLibrary.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
-        componentLibrary.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
-        componentLibrary.registerTypeHandler(Vector3i.class, new Vector3iTypeHandler());
+        componentSystemManager = new ComponentSystemManager();
+        CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
+        BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
+        CoreRegistry.put(BlockEntityRegistry.class, blockEntityRegistry);
+        _localPlayerSys = new LocalPlayerSystem();
+        componentSystemManager.register(_localPlayerSys, "engine:LocalPlayerSystem");
+        componentSystemManager.register(blockEntityRegistry, "engine:BlockEntityRegistry");
 
-        PrefabManager prefabManager = new PojoPrefabManager(componentLibrary);
-        CoreRegistry.put(PrefabManager.class, prefabManager);
+        componentSystemManager.loadEngineSystems();
 
-        _entityManager = new PojoEntityManager(componentLibrary, prefabManager);
-        _entityManager.setEventSystem(new PojoEventSystem(_entityManager));
-        CoreRegistry.put(EntityManager.class, _entityManager);
-        _componentSystemManager = new ComponentSystemManager();
-        CoreRegistry.put(ComponentSystemManager.class, _componentSystemManager);
-
-        CoreRegistry.put(WorldPersister.class, new WorldPersister(componentLibrary,_entityManager));
-        // TODO: Use reflection pending mod support
-        componentLibrary.registerComponentClass(ExplosionActionComponent.class);
-        componentLibrary.registerComponentClass(PlaySoundActionComponent.class);
-        componentLibrary.registerComponentClass(TunnelActionComponent.class);
-        componentLibrary.registerComponentClass(AABBCollisionComponent.class);
-        componentLibrary.registerComponentClass(BlockComponent.class);
-        componentLibrary.registerComponentClass(BlockItemComponent.class);
-        componentLibrary.registerComponentClass(BlockParticleEffectComponent.class);
-        componentLibrary.registerComponentClass(CameraComponent.class);
-        componentLibrary.registerComponentClass(CharacterMovementComponent.class);
-        componentLibrary.registerComponentClass(CharacterSoundComponent.class);
-        componentLibrary.registerComponentClass(HealthComponent.class);
-        componentLibrary.registerComponentClass(InventoryComponent.class);
-        componentLibrary.registerComponentClass(ItemComponent.class);
-        componentLibrary.registerComponentClass(LightComponent.class);
-        componentLibrary.registerComponentClass(LocalPlayerComponent.class);
-        componentLibrary.registerComponentClass(LocationComponent.class);
-        componentLibrary.registerComponentClass(MeshComponent.class);
-        componentLibrary.registerComponentClass(PlayerComponent.class);
-        componentLibrary.registerComponentClass(SimpleAIComponent.class);
-        componentLibrary.registerComponentClass(SimpleMinionAIComponent.class);
-        componentLibrary.registerComponentClass(MinionBarComponent.class);
-        componentLibrary.registerComponentClass(MinionComponent.class);
-        componentLibrary.registerComponentClass(AccessInventoryActionComponent.class);
-        componentLibrary.registerComponentClass(SpawnPrefabActionComponent.class);
-        componentLibrary.registerComponentClass(BookComponent.class);
-        componentLibrary.registerComponentClass(BookshelfComponent.class);
+        CoreRegistry.put(WorldPersister.class, new WorldPersister(entityManager));
         loadPrefabs();
 
-        BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
-        _componentSystemManager.register(blockEntityRegistry, "engine:BlockEntityRegistry");
-        CoreRegistry.put(BlockEntityRegistry.class, blockEntityRegistry);
-        _componentSystemManager.register(new CharacterMovementSystem(), "engine:CharacterMovementSystem");
-        _componentSystemManager.register(new SimpleAISystem(), "engine:SimpleAISystem");
-        _componentSystemManager.register(new SimpleMinionAISystem(), "engine:SimpleMinionAISystem");
-        _componentSystemManager.register(new ItemSystem(), "engine:ItemSystem");
-        _componentSystemManager.register(new CharacterSoundSystem(), "engine:CharacterSoundSystem");
-        _localPlayerSys = new LocalPlayerSystem();
-        _componentSystemManager.register(_localPlayerSys, "engine:LocalPlayerSystem");
-        _componentSystemManager.register(new FirstPersonRenderer(), "engine:FirstPersonRenderer");
-        _componentSystemManager.register(new HealthSystem(), "engine:HealthSystem");
-        _componentSystemManager.register(new BlockEntitySystem(), "engine:BlockEntitySystem");
-        _componentSystemManager.register(new BlockParticleEmitterSystem(), "engine:BlockParticleSystem");
-        _componentSystemManager.register(new BlockDamageRenderer(), "engine:BlockDamageRenderer");
-        _componentSystemManager.register(new InventorySystem(), "engine:InventorySystem");
-        _componentSystemManager.register(new MeshRenderer(), "engine:MeshRenderer");
-        _componentSystemManager.register(new ExplosionAction(), "engine:ExplosionAction");
-        _componentSystemManager.register(new PlaySoundAction(), "engine:PlaySoundAction");
-        _componentSystemManager.register(new TunnelAction(), "engine:TunnelAction");
-        _componentSystemManager.register(new AccessInventoryAction(), "engine:AccessInventoryAction");
-        _componentSystemManager.register(new SpawnPrefabAction(), "engine:SpawnPrefabAction");
-        _componentSystemManager.register(new ReadBookAction(), "engine: ReadBookAction");
-        //_componentSystemManager.register(new DestroyMinion(), "engine: DestroyMinionAction");
-        _componentSystemManager.register(new BookshelfHandler(), "engine: BookshelfHandler");
         _hud = new UIHeadsUpDisplay();
         _hud.setVisible(true);
 
@@ -235,9 +158,9 @@ public class StateSinglePlayer implements GameState {
     }
 
     private void loadPrefabs() {
-        EntityPersisterHelper persisterHelper = new EntityPersisterHelperImpl(componentLibrary, (PersistableEntityManager)_entityManager);
+        EntityPersisterHelper persisterHelper = new EntityPersisterHelperImpl(entityManager);
         for (AssetUri prefabURI : AssetManager.list(AssetType.PREFAB)) {
-            _logger.info("Loading prefab " + prefabURI);
+            logger.info("Loading prefab " + prefabURI);
             try {
                 InputStream stream = AssetManager.assetStream(prefabURI);
                 if (stream != null) {
@@ -248,10 +171,10 @@ public class StateSinglePlayer implements GameState {
                         persisterHelper.deserializePrefab(prefabData, prefabURI.getPackage());
                     }
                 } else {
-                    _logger.severe("Failed to load prefab '" + prefabURI + "'");
+                    logger.severe("Failed to load prefab '" + prefabURI + "'");
                 }
             } catch (IOException e) {
-                _logger.log(Level.WARNING, "Failed to load prefab '" + prefabURI + "'", e);
+                logger.log(Level.WARNING, "Failed to load prefab '" + prefabURI + "'", e);
             }
         }
     }
@@ -272,10 +195,10 @@ public class StateSinglePlayer implements GameState {
         try {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(getActiveWorldProvider().getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
-            _logger.log(Level.SEVERE, "Failed to save entities", e);
+            logger.log(Level.SEVERE, "Failed to save entities", e);
         }
         dispose();
-        _entityManager.clear();
+        entityManager.clear();
     }
 
     @Override
@@ -297,7 +220,7 @@ public class StateSinglePlayer implements GameState {
         /* GUI */
         updateUserInterface();
         
-        for (UpdateSubscriberSystem updater : _componentSystemManager.iterateUpdateSubscribers()) {
+        for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
             PerformanceMonitor.startActivity(updater.getClass().getSimpleName());
             updater.update(delta);
         }
@@ -321,7 +244,7 @@ public class StateSinglePlayer implements GameState {
         // TODO: This seems a little off - plus is more of a UI than single player game state concern. Move somewhere
         // more appropriate?
         boolean dead = true;
-        for (EntityRef entity : _entityManager.iteratorEntities(LocalPlayerComponent.class))
+        for (EntityRef entity : entityManager.iteratorEntities(LocalPlayerComponent.class))
         {
             dead = entity.getComponent(LocalPlayerComponent.class).isDead;
         }
@@ -355,28 +278,28 @@ public class StateSinglePlayer implements GameState {
             seed = random.randomCharacterString(16);
         }
 
-        _logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+        logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        _worldRenderer = new WorldRenderer(title, seed, _entityManager, _localPlayerSys);
+        _worldRenderer = new WorldRenderer(title, seed, entityManager, _localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, _worldRenderer);
 
         File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
-        _entityManager.clear();
+        entityManager.clear();
         if (entityDataFile.exists()) {
             try {
                 CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
             } catch (IOException e) {
-                _logger.log(Level.SEVERE, "Failed to load entity data", e);
+                logger.log(Level.SEVERE, "Failed to load entity data", e);
             }
         }
 
         LocalPlayer localPlayer = null;
-        Iterator<EntityRef> iterator = _entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
+        Iterator<EntityRef> iterator = entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
         if (iterator.hasNext()) {
             localPlayer = new LocalPlayer(iterator.next());
         } else {
-            PlayerFactory playerFactory = new PlayerFactory(_entityManager);
+            PlayerFactory playerFactory = new PlayerFactory(entityManager);
             localPlayer = new LocalPlayer(playerFactory.newInstance(new Vector3f(_worldRenderer.getWorldProvider().nextSpawningPoint())));
         }
         _worldRenderer.setPlayer(localPlayer);
@@ -391,7 +314,7 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(Camera.class, _worldRenderer.getActiveCamera());
         CoreRegistry.put(BulletPhysicsRenderer.class, _worldRenderer.getBulletRenderer());
 
-        for (ComponentSystem system : _componentSystemManager.iterateAll()) {
+        for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.initialise();
         }
 

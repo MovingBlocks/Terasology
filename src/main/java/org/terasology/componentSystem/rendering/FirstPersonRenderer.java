@@ -7,6 +7,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
@@ -35,6 +36,7 @@ import static org.lwjgl.opengl.GL11.*;
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(headedOnly = true)
 public class FirstPersonRenderer implements RenderSystem {
 
     private IWorldProvider worldProvider;

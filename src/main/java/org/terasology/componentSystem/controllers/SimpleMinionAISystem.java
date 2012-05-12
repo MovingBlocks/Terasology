@@ -3,10 +3,7 @@ package org.terasology.componentSystem.controllers;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.*;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
@@ -34,6 +31,7 @@ import java.util.List;
  * Time: 18:25
  * To change this template use File | Settings | File Templates.
  */
+@RegisterComponentSystem(authorativeOnly = true)
 public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscriberSystem {
 
     private EntityManager entityManager;

@@ -6,6 +6,7 @@ import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.JumpEvent;
@@ -27,6 +28,7 @@ import java.util.List;
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem
 public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
     public static final float UnderwaterGravity = 0.25f;

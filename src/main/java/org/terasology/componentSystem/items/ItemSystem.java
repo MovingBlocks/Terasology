@@ -4,10 +4,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.*;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.ComponentSystemManager;
@@ -28,6 +25,7 @@ import javax.vecmath.Vector3f;
  * TODO: Refactor use methods into events? Usage should become a separate component
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem
 public class ItemSystem implements EventHandlerSystem {
     private EntityManager entityManager;
     private IWorldProvider worldProvider;

@@ -18,10 +18,7 @@ package org.terasology.componentSystem.action;
 
 import org.terasology.components.LocationComponent;
 import org.terasology.components.actions.SpawnPrefabActionComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 
@@ -31,6 +28,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius
  */
+@RegisterComponentSystem
 public class SpawnPrefabAction implements EventHandlerSystem{
 
     private EntityManager entityManager;

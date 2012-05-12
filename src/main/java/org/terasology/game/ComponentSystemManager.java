@@ -2,14 +2,24 @@ package org.terasology.game;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.RegisterComponentSystem;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Simple manager for component systems.
@@ -17,12 +27,40 @@ import java.util.Map;
  * @author Immortius <immortius@gmail.com>
  */
 public class ComponentSystemManager {
+
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     private Map<String, ComponentSystem> namedLookup = Maps.newHashMap();
     private List<UpdateSubscriberSystem> updateSubscribers = Lists.newArrayList();
     private List<RenderSystem> renderSubscribers = Lists.newArrayList();
     private List<ComponentSystem> store = Lists.newArrayList();
 
-    public ComponentSystemManager() {}
+    public ComponentSystemManager() {
+    }
+
+    // TODO: Mod support
+    public void loadEngineSystems() {
+        Reflections reflections = new Reflections("org.terasology.componentSystem");
+        Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterComponentSystem.class);
+        for (Class<?> system : systems) {
+            if (!ComponentSystem.class.isAssignableFrom(system)) {
+                logger.log(Level.WARNING, String.format("Cannot load %s, must be a subclass of ComponentSystem",system.getSimpleName()));
+                continue;
+            }
+
+            RegisterComponentSystem registerInfo = system.getAnnotation(RegisterComponentSystem.class);
+            // TODO: filter registrations
+            try {
+                ComponentSystem newSystem = (ComponentSystem)system.newInstance();
+                register(newSystem, "engine:" + system.getSimpleName());
+                logger.log(Level.INFO, "Loaded engine:" + system.getSimpleName());
+            } catch (InstantiationException e) {
+                logger.log(Level.SEVERE, "Failed to load system engine:" + system.getSimpleName(), e);
+            } catch (IllegalAccessException e) {
+                logger.log(Level.SEVERE, "Failed to load system engine:" + system.getSimpleName(), e);
+            }
+        }
+    }
 
     public <T extends ComponentSystem> void register(ComponentSystem object, String name) {
         store.add(object);
@@ -37,6 +75,8 @@ public class ComponentSystemManager {
         }
         namedLookup.put(name, object);
     }
+
+    // TODO: unregister?
     
     public ComponentSystem get(String name) {
         return namedLookup.get(name);

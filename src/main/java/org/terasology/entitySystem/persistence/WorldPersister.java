@@ -68,9 +68,9 @@ public class WorldPersister {
     private EntityManager entityManager;
     private EntityPersisterHelper persisterHelper;
 
-    public WorldPersister(ComponentLibrary componentLibrary, EntityManager entityManager) {
+    public WorldPersister( EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.persisterHelper = new EntityPersisterHelperImpl(componentLibrary, (PersistableEntityManager) entityManager);
+        this.persisterHelper = new EntityPersisterHelperImpl((PersistableEntityManager) entityManager);
     }
 
     public void save(File file, SaveFormat format) throws IOException {
