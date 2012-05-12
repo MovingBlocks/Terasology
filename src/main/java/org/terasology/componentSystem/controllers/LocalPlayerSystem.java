@@ -353,7 +353,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             if (button == 1 ) {
                 if(minionsys.isMinionSelected()){
                     // opens the minion behaviour menu
-                    minionsys.RightMouseReleased();
+                    minionsys.RightMouseDown();
                     minionsys.setMinionSelectMode(true);
                 }
             }
