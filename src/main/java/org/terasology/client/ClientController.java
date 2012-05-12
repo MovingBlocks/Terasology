@@ -3,9 +3,11 @@ package org.terasology.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.terasology.components.BlockComponent;
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
@@ -14,18 +16,22 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.Config;
 
 
-public class ClientContoller {
+public class ClientController {
+    private double mouseSensititivy = Config.getInstance().getMouseSens();
+    private Vector2f lookInput = new Vector2f();
 
 	// pre-allocate the events that will be fired to reduce object allocation
 	private final KeyDownEvent KEY_DOWN_EVENT = new KeyDownEvent();
 	private final KeyUpEvent KEY_UP_EVENT = new KeyUpEvent();
 	private final KeyRepeatEvent KEY_REPEAT_EVENT = new KeyRepeatEvent();
+	private final MouseOverEvent MOUSE_OVER_EVENT = new MouseOverEvent();
+	private final MouseOutEvent MOUSE_OUT_EVENT = new MouseOutEvent();
 	
 	private final Map<Integer, BindTarget> keybinds = new HashMap<Integer, BindTarget>();
 	private EventSystem eventSystem;
-	
     private EntityRef localPlayerRef;
 	
     public void initialise() {
@@ -37,6 +43,48 @@ public class ClientContoller {
     	REPLACE_THIS_WITH_CONFIG();
     }
 		
+    private EntityRef lastMouseTarget;
+    
+	public boolean processMouseInput() {
+
+		// get from the ui manager if we are in mouse cursor or look mode
+		boolean cursorMode = false;
+		EntityRef mouseTarget = null;
+		
+		if (cursorMode) {
+			// update the mouse position
+			// figure out what ui element the mouse is over
+			mouseTarget = null;
+
+		} else { // look mode
+//			update camera
+			lookInput.set((float)(mouseSensititivy * Mouse.getDX()), (float)(mouseSensititivy * Mouse.getDY()));
+
+			// figure out what block is in the center of the screen
+			mouseTarget = null;
+		}
+		
+		// if the current mouseover reference isn't the same as the last mouseover reference, throw events
+		if (mouseTarget != lastMouseTarget) {
+			if (lastMouseTarget != null) {
+				MOUSE_OUT_EVENT.reset();
+				MOUSE_OUT_EVENT.target = lastMouseTarget;
+				eventSystem.send(localPlayerRef, MOUSE_OUT_EVENT); 
+			}
+			if (mouseTarget != null) {
+				MOUSE_OVER_EVENT.reset();
+				MOUSE_OVER_EVENT.target = mouseTarget;
+				eventSystem.send(localPlayerRef, MOUSE_OVER_EVENT); 
+			}
+			lastMouseTarget = mouseTarget;
+		}
+		
+		// iterate through the mouse events to determine if any buttons were pressed or released.
+		
+		return false;
+	}
+	
+	
 	
 	public boolean processKeyboardInput() {
 		if (!Keyboard.next()) {
@@ -52,9 +100,10 @@ public class ClientContoller {
 		} else {
 			e = KEY_UP_EVENT;
 		}
+		e.reset();
 		e.key = Keyboard.getEventKey();
 		
-		eventSystem.send(localPlayerRef, e); /* not sure which entity ref here, not sure what the "client" is*/
+		eventSystem.send(localPlayerRef, e); 
 		return true;
 	}
 	
@@ -68,13 +117,7 @@ public class ClientContoller {
 	}
 
 	private BindTarget makeEventTarget(final String category, final String description, final StaticEvent downEvent, final StaticEvent upEvent, final StaticEvent repeatEvent) {
-		return new BindTarget() {
-			public String getDescription() {
-				return description;
-			}
-			public String getCategory() {
-				return category;
-			}
+		return new BindTarget(category, description) {
 			public void start() {
 				if (downEvent != null) {
 					downEvent.reset();
@@ -120,96 +163,7 @@ public class ClientContoller {
     
     
 
-    private boolean isForward;
-    private boolean isBackward;
-    private boolean isLeft;
-    private boolean isRight;
-	private Vector3f vector = new Vector3f();
-    private MovementEvent movementEvent = new MovementEvent();
-    BindTarget moveForward = new BindTarget() {
-		public String getDescription() {
-			return "MoveForward";
-		}
 
-		public String getCategory() {
-			return "engine";
-		}
-		public void start() {
-			isForward = true;
-			vector.z = isBackward ? 0 : 1;
-			eventSystem.send(localPlayerRef, movementEvent);
-			
-		}
-		public void end() {
-			isForward = false;
-			vector.z = isBackward ? -1 : 0;
-			eventSystem.send(localPlayerRef, movementEvent);
-		}
-    };
-    BindTarget moveReverse = new BindTarget() {
-		public String getDescription() {
-			return "MoveForward";
-		}
-		public String getCategory() {
-			return "engine";
-		}
-		public void start() {
-			isBackward = true;
-			vector.z = isForward ? 0 : -1;
-			eventSystem.send(localPlayerRef, movementEvent);
-			
-		}
-		public void end() {
-			isBackward = false;
-			vector.z = isForward ? 1 : 0;
-			eventSystem.send(localPlayerRef, movementEvent);
-		}
-    };
-    BindTarget moveLeft = new BindTarget() {
-		public String getDescription() {
-			return "MoveLeft";
-		}
-
-		public String getCategory() {
-			return "engine";
-		}
-		public void start() {
-			isLeft = true;
-			vector.x = isRight ? 0 : 1;
-			eventSystem.send(localPlayerRef, movementEvent);
-			
-		}
-		public void end() {
-			isLeft = false;
-			vector.x = isRight ? -1 : 0;
-			eventSystem.send(localPlayerRef, movementEvent);
-		}
-    };
-    BindTarget moveRight = new BindTarget() {
-		public String getDescription() {
-			return "MoveForward";
-		}
-		public String getCategory() {
-			return "engine";
-		}
-		public void start() {
-			isRight = true;
-			vector.x = isLeft ? 0 : -1;
-			eventSystem.send(localPlayerRef, movementEvent);
-			
-		}
-		public void end() {
-			isRight = false;
-			vector.x = isLeft ? 1 : 0;
-			eventSystem.send(localPlayerRef, movementEvent);
-		}
-    };
-    
-    public class MovementEvent extends AbstractEvent {
-    	public Vector3f getMovementInput() {
-    		return vector;
-    	}
-    }
 }
 
 

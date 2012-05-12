@@ -5,12 +5,15 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.terasology.client.BindTarget;
+import org.terasology.client.ClientController;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
@@ -70,10 +73,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private DefaultCamera playerCamera;
     private BlockEntityRegistry blockEntityRegistry;
 
-    private boolean jump = false;
-    private Vector3f movementInput = new Vector3f();
+
     private Vector2f lookInput = new Vector2f();
-    private boolean running = false;
 
     private double mouseSensititivy = Config.getInstance().getMouseSens();
     private long lastTimeSpacePressed;
@@ -84,12 +85,39 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float bobFactor = 0;
     private float lastStepDelta = 0;
 
+
+    private boolean jump = false;
+    private boolean running = false;
+    
+    private boolean goForward;
+    private boolean goBackward;
+    private boolean goLeft;
+    private boolean goRight;
+    private boolean goUp;
+    private boolean goDown;
+	private Vector3f movementVector = new Vector3f();
+    private MovementControlEvent movementContolEvent = new MovementControlEvent() {
+    	public Vector3f getMovementInput() {
+    		return movementVector;
+    	}
+    };
+	private EventSystem eventSystem;
+    private EntityRef localPlayerRef;
+    private ClientController clientController;
+
+    
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
+        localPlayerRef = localPlayer.getEntity();
         timer = CoreRegistry.get(Timer.class);
+        eventSystem = CoreRegistry.get(EventSystem.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
+
+        registerBindTargets();
     }
+
+
 
     public void setPlayerCamera(DefaultCamera camera) {
         this.playerCamera = camera;
@@ -136,20 +164,23 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
     private void resetInput() {
-        jump = false;
         toggleGodMode = false;
-        movementInput.set(0,0,0);
         lookInput.set(0,0);
+        
+        jump = running = false;
+        goForward = goBackward = goLeft = goRight = goUp = goDown = false;
+        movementVector.set(0, 0, 0); 
+        
     }
 
     private void updateMovement(LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location) {
-        Vector3f relMove = new Vector3f(movementInput);
+        Vector3f relMove = new Vector3f(movementVector);
         relMove.y = 0;
         if (characterMovementComponent.isGhosting || characterMovementComponent.isSwimming) {
             Quat4f viewRot = new Quat4f();
             QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
             QuaternionUtil.quatRotate(viewRot, relMove, relMove);
-            relMove.y += movementInput.y;
+            relMove.y += movementVector.y;
         } else {
             QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
         }
@@ -548,4 +579,116 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     public void renderFirstPerson() {
     }
+    
+    
+    private void registerBindTargets() {
+		clientController = CoreRegistry.get(ClientController.class);
+
+		clientController.bind(Keyboard.KEY_W, 
+				new BindTarget("engine", "MoveForward") {
+			public void start() {
+				goForward = true;
+				movementVector.z = goBackward ? 0 : 1;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+}
+
+			public void end() {
+				goForward = false;
+				movementVector.z = goBackward ? -1 : 0;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+		});
+		
+		clientController.bind(Keyboard.KEY_S, 
+				new BindTarget("engine", "MoveReverse") {
+			public void start() {
+				goBackward = true;
+				movementVector.z = goForward ? 0 : -1;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+			public void end() {
+				goBackward = false;
+				movementVector.z = goForward ? 1 : 0;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+	    });
+		
+		clientController.bind(Keyboard.KEY_A, 
+				new BindTarget("engine", "MoveLeft") {
+			public void start() {
+				goLeft = true;
+				movementVector.x = goRight ? 0 : 1;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+			public void end() {
+				goLeft = false;
+				movementVector.x = goRight ? -1 : 0;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+	    });
+		
+		clientController.bind(Keyboard.KEY_D, 
+				new BindTarget("engine", "MoveRight") {
+			public void start() {
+				goRight = true;
+				movementVector.x = goLeft ? 0 : -1;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+			public void end() {
+				goRight = false;
+				movementVector.x = goLeft ? 1 : 0;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+	    });
+		
+		clientController.bind(Keyboard.KEY_SPACE, 
+				new BindTarget("engine", "MoveUp") {
+			public void start() {
+				goUp = jump = true;
+				movementVector.y = goDown ? 0 : 1;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+			public void end() {
+				goUp = jump = false;
+				movementVector.y = goDown ? -1 : 0;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+	    });
+		
+		clientController.bind(Keyboard.KEY_C, 
+				new BindTarget("engine", "MoveDown") {
+			public void start() {
+				goDown = true;
+				movementVector.y = goUp ? 0 : -1;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+			public void end() {
+				goDown = false;
+				movementVector.y = goUp ? 1 : 0;
+				movementContolEvent.reset();
+				eventSystem.send(localPlayerRef, movementContolEvent);
+			}
+	    });
+		
+		clientController.bind(Keyboard.KEY_LSHIFT, 
+				new BindTarget("engine", "MoveRun") {
+			public void start() {
+				running = true;
+			}
+			public void end() {
+				running = false;
+			}
+	    });
+	}
 }
