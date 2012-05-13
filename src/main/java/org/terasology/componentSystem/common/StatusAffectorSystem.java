@@ -10,6 +10,8 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.BoostSpeedEvent;
 import org.terasology.components.PoisonedComponent;
+import org.terasology.events.CurePoisonEvent;
+import org.terasology.events.NoHealthEvent;
 import org.terasology.events.PoisonedEvent;
 import org.terasology.game.CoreRegistry;
 
@@ -36,10 +38,21 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
       }
 
     @ReceiveEvent(components = {HealthComponent.class})
-    public  void isPoisoned(PoisonedEvent poisonEvent, EntityRef entity) {
+    public void isPoisoned(PoisonedEvent poisonEvent, EntityRef entity){
         PoisonedComponent poisonedEffect = new PoisonedComponent();
         HealthComponent health = entity.getComponent(HealthComponent.class);
+        entity.addComponent(poisonedEffect);
+            /*health.currentHealth -= 0.25;
+            entity.saveComponent(health);   */
+
     }
+
+    @ReceiveEvent(components = {PoisonedComponent.class})
+    public void curePoisoned(CurePoisonEvent cureEvent, EntityRef entity){
+        PoisonedComponent poisondEffect = entity.getComponent(PoisonedComponent.class);
+        entity.removeComponent(PoisonedComponent.class);
+    }
+
     /*
      * The Effects Duration Countdown "timer"
      */
@@ -62,8 +75,10 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
             poisonedEffect.poisonDuration = poisonedEffect.poisonDuration - delta;
             //While POISONED:
             if (poisonedEffect.poisonDuration >=1) {
-                health.currentHealth -= 1;
-                entity.saveComponent(health);
+                health.currentHealth = Math.min(health.maxHealth, health.currentHealth - (int)poisonedEffect.poisonRate);                entity.saveComponent(health);
+                if (health.currentHealth <= 0){
+                    entity.send(new NoHealthEvent(entity));
+                }
             }
             //Remove POISONED Status
             if (poisonedEffect.poisonDuration <= 0) {

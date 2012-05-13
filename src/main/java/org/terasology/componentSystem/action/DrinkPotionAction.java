@@ -8,6 +8,7 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.BoostSpeedEvent;
+import org.terasology.events.CurePoisonEvent;
 import org.terasology.events.PoisonedEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
@@ -58,8 +59,17 @@ public class DrinkPotionAction implements EventHandlerSystem {
                     item.destroy();
                 }
                 //Poison time!
-                event.getTarget().send(new PoisonedEvent());//Receive an Empty Vial
+                event.getTarget().send(new PoisonedEvent());
                break;
+
+            case Orange: //Cures the Poison.
+                event.getInstigator().send(new CurePoisonEvent());
+                //Receive an Empty Vial (Destroy it if no inventory space available)
+                event.getTarget().send(new ReceiveItemEvent(item));
+                if (itemComp != null && !itemComp.container.exists()) {
+                    item.destroy();
+                }
+                break;
 
             case Purple:
                 //Receive an Empty Vial (Destroy it if no inventory space available)
