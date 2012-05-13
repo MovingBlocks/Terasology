@@ -124,6 +124,8 @@ public class MinionSystem implements EventHandlerSystem {
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
             if(localPlayer == null) return;
             getSelectedMinion().send(new ActivateEvent(getSelectedMinion(), localPlayer.getEntity()));
+            MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
+            minioncomp.minionBehaviour = MinionComponent.MinionBehaviour.Move;
         }
         MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
         getSelectedMinion().saveComponent(minioncomp);
@@ -148,7 +150,6 @@ public class MinionSystem implements EventHandlerSystem {
                     Vector3i centerPos = helpMan.calcSelectedBlock().getBlockPosition();
                     minionai.followingPlayer = false;
                     minionai.movementTarget = new Vector3f(centerPos.x, centerPos.y, centerPos.z);
-
                 }
             }
         }
