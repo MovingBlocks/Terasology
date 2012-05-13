@@ -11,4 +11,8 @@ public class StaticEvent extends AbstractEvent {
 	public EntityRef getEntity() {
 		return null;
 	}
+	public static StaticEvent makeEvent(String mod, String eventName) {
+		StaticEvent event = new StaticEvent() {{}};
+		return event;
+	}
 }

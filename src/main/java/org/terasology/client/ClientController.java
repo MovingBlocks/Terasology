@@ -45,7 +45,7 @@ public class ClientController {
 		
     private EntityRef lastMouseTarget;
     
-	public boolean processMouseInput() {
+	public void processMouseInput() {
 
 		// get from the ui manager if we are in mouse cursor or look mode
 		boolean cursorMode = false;
@@ -80,31 +80,29 @@ public class ClientController {
 		}
 		
 		// iterate through the mouse events to determine if any buttons were pressed or released.
+		// generate mouse up and down events.
 		
-		return false;
 	}
 	
 	
 	
-	public boolean processKeyboardInput() {
-		if (!Keyboard.next()) {
-			return false; // returning false means that there were no keyboard events processed.
-		}
-		KeyEvent e; 
-		if (Keyboard.getEventKeyState()) {
-			if (Keyboard.isRepeatEvent()) {
-				e = KEY_REPEAT_EVENT;
+	public void processKeyboardInput() {
+		while (Keyboard.next()) {
+			KeyEvent e; 
+			if (Keyboard.getEventKeyState()) {
+				if (Keyboard.isRepeatEvent()) {
+					e = KEY_REPEAT_EVENT;
+				} else {
+					e = KEY_DOWN_EVENT;
+				}
 			} else {
-				e = KEY_DOWN_EVENT;
+				e = KEY_UP_EVENT;
 			}
-		} else {
-			e = KEY_UP_EVENT;
+			e.reset();
+			e.key = Keyboard.getEventKey();
+			
+			eventSystem.send(localPlayerRef, e); 
 		}
-		e.reset();
-		e.key = Keyboard.getEventKey();
-		
-		eventSystem.send(localPlayerRef, e); 
-		return true;
 	}
 	
 	// returns the *previously* bound target, or null if none was previously bound.
