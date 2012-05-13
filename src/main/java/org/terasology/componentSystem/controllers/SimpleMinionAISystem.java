@@ -29,7 +29,7 @@ import java.util.List;
  * User: Overdhose
  * Date: 7/05/12
  * Time: 18:25
- * To change this template use File | Settings | File Templates.
+ * first evolution of the minion AI, could probably use a lot of improvements
  */
 @RegisterComponentSystem(authorativeOnly = true)
 public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscriberSystem {

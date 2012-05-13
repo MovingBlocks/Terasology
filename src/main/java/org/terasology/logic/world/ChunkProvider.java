@@ -17,7 +17,6 @@ package org.terasology.logic.world;
 
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.Vector3i;
 
@@ -25,6 +24,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +45,7 @@ public final class ChunkProvider implements IChunkProvider {
     private final ConcurrentHashMap<Integer, Chunk> _nearChunkCache = new ConcurrentHashMap<Integer, Chunk>();
     private IChunkCache _farChunkCache;
     private final LocalWorldProvider _parent;
+    private ReentrantLock _lockChunkCreation = new ReentrantLock();
 
     public ChunkProvider(LocalWorldProvider parent) {
         _parent = parent;
@@ -69,26 +70,48 @@ public final class ChunkProvider implements IChunkProvider {
     }
 
     public boolean isChunkAvailable(int x, int y, int z) {
-        int id = new Vector3i(x,y,z).hashCode();
+        int id = getNearCacheChunkId(x, y, z);
         Chunk c = _nearChunkCache.get(id);
         return c != null;
     }
 
-    public Chunk getChunk(int x, int y, int z) {
+    private int getNearCacheChunkId(int x, int y, int z) {
         int id = new Vector3i(x,y,z).hashCode();
+        return id;
+    }
+
+    public Chunk getChunk(int x, int y, int z) {
+        int id = getNearCacheChunkId(x, y, z);
         Chunk c = _nearChunkCache.get(id);
         if (c != null) {
             return c;
         }
-        c = _farChunkCache.get(id);
-        if (c == null) {
-            c = new Chunk(_parent, x, y, z);
-        }
 
-        _nearChunkCache.put(id, c);
-        //HACK! move local world provider out of chunk!
-        c.setParent(_parent);
-        return c;
+        _lockChunkCreation.lock();
+        try {
+            c = _nearChunkCache.get(id);
+            if (c != null) {
+                return c;
+            }
+
+            c = _farChunkCache.get(id);
+            if (c == null) {
+                c = new Chunk(_parent, x, y, z);
+            }
+
+            if (_nearChunkCache.containsKey(id))
+            {
+                Logger.getLogger("CP").log(Level.SEVERE, "duplicate id " + id + " found");
+            }
+            _nearChunkCache.put(id, c);
+            //HACK! move local world provider out of chunk!
+            c.setParent(_parent);
+
+            return c;
+        }
+        finally {
+            _lockChunkCreation.unlock();
+        }
     }
 
     public void flushCache() {
@@ -107,7 +130,16 @@ public final class ChunkProvider implements IChunkProvider {
                     // Write the chunk to disk (but do not remove it from the cache just jet)
                     _farChunkCache.put(chunkToDelete);
                     // When the chunk is written, finally remove it from the cache
-                    _nearChunkCache.values().remove(chunkToDelete);
+
+                    _lockChunkCreation.lock();
+                    try {
+                        Vector3i pos = chunkToDelete.getPos();
+                        int id = getNearCacheChunkId(pos.x, pos.y, pos.z);
+                        _nearChunkCache.remove(id);
+                    }
+                    finally {
+                        _lockChunkCreation.unlock();
+                    }
 
                     chunkToDelete.dispose();
                 }

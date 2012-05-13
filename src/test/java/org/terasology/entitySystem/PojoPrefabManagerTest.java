@@ -44,7 +44,7 @@ public class PojoPrefabManagerTest {
         assertEquals(PrefabName, ref.getName());
         assertTrue(prefabManager.exists(PrefabName));
     }
-    
+
     @Test
     public void retrievePrefab() {
         prefabManager.createPrefab(PrefabName);
@@ -64,7 +64,7 @@ public class PojoPrefabManagerTest {
 
         assertEquals(prefabManager.getPrefab(PrefabName), prefabManager.getPrefab(PrefabName));
     }
-    
+
     @Test
     public void addAndRetrieveComponent() {
         Prefab prefab = prefabManager.createPrefab(PrefabName);

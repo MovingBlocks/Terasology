@@ -175,4 +175,23 @@ public class Vector3iTest {
         assertEquals(3, Vector3i.one().gridMagnitude());
         assertEquals(3, new Vector3i(1,-1,1).gridMagnitude());
     }
+
+    @Test
+    public void testHash()
+    {
+        // k = 59
+        // j = k+1 = 60
+        // i = (k+k^2)(1+k)^2 = not important for collision
+        // hash = (k+k^2)(1+k)^2 + x(1+k)^2 + (1+k)y + z
+        // hash = i + xj^2 + jy + z
+        // with x := 0
+        // hash = i + jy + z
+        // set i + jy + z = i + jy' + z'
+        // jy + z = jy' + z'
+        // set z' := z + j -> z'-z = j
+        // jy = jy' + j -> y' = y - 1
+        Vector3i a = new Vector3i(0,10,10);
+        Vector3i b = new Vector3i(0,9,70);
+        assertFalse(a.hashCode() == b.hashCode());
+    }
 }
