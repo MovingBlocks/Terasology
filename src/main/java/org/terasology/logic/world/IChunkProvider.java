@@ -38,6 +38,8 @@ public interface IChunkProvider {
      */
     public Chunk getChunk(int x, int y, int z);
 
+    // TODO: Need some flavour of blocking, non-blocking, etc getChunk, for different circumstances
+
     /**
      * Frees obsolete chunks.
      */

@@ -20,6 +20,7 @@ import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
+import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ public class LiquidSimulator extends Simulator {
     private static final Vector3d[] NEIGHBORS4 = {new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
     private static final Vector3d[] NEIGHBORS6 = {new Vector3d(0, -1, 0), new Vector3d(0, 1, 0), new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
 
+    private FastRandom random = new FastRandom();
+
     public LiquidSimulator(IWorldProvider parent) {
         super("Liquid", parent, 1000);
     }
@@ -48,7 +51,7 @@ public class LiquidSimulator extends Simulator {
             while (currentActiveBlocks.size() > 0) {
                 simulated = true;
 
-                int randomBlock = Math.abs(_parent.getRandom().randomInt()) % currentActiveBlocks.size();
+                int randomBlock = Math.abs(random.randomInt()) % currentActiveBlocks.size();
 
                 BlockPosition bp = currentActiveBlocks.get(randomBlock);
                 BlockPosition bpd = new BlockPosition(bp.x, bp.y - 1, bp.z);

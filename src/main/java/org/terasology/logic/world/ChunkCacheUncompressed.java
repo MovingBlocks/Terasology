@@ -1,22 +1,24 @@
 package org.terasology.logic.world;
 
 
+import org.terasology.math.Vector3i;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ChunkCacheUncompressed implements IChunkCache {
-    ConcurrentHashMap<Integer, Chunk> _map = new ConcurrentHashMap<Integer, Chunk>();
+    ConcurrentHashMap<Vector3i, Chunk> _map = new ConcurrentHashMap<Vector3i, Chunk>();
     int _sizeInByte = 0;
 
     public ChunkCacheUncompressed(){
 
     }
 
-    public Chunk get(int id) {
+    public Chunk get(Vector3i id) {
         return _map.get(id);
     }
 
     public void put(Chunk c) {
-        _map.put(c.getId(), c);
+        _map.put(c.getPos(), c);
     }
 
     public float size() {

@@ -35,7 +35,7 @@ public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = pipeline();
         p.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
-        p.addLast("protobufDecoder", new ProtobufDecoder(NetData.NetMessage.getDefaultInstance()));
+        p.addLast("protobufDecoder", new ProtobufDecoder(NetData.ServerMessage.getDefaultInstance()));
         p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
         p.addLast("handler", new TerasologyClientHandler());

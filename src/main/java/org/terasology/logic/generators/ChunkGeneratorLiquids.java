@@ -19,6 +19,9 @@ import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
+import org.terasology.utilities.FastRandom;
+
+import java.util.Random;
 
 /**
  * First draft to generate procedurally generated liquid streams. The source blocks are currently
@@ -28,8 +31,11 @@ import org.terasology.model.structures.BlockPosition;
  */
 public class ChunkGeneratorLiquids extends ChunkGeneratorTerrain {
 
-    public ChunkGeneratorLiquids(GeneratorManager generatorManager) {
+    private FastRandom random;
+
+    public ChunkGeneratorLiquids(GeneratorManager generatorManager, FastRandom random) {
         super(generatorManager);
+        this.random = random;
     }
 
     @Override
@@ -40,7 +46,7 @@ public class ChunkGeneratorLiquids extends ChunkGeneratorTerrain {
             BlockPosition blockWorldPos = new BlockPosition(c.getBlockWorldPosX(8), y, c.getBlockWorldPosZ(8));
 
             boolean set = false;
-            if ((title.equals("Grass") || title.equals("Snow")) && !grassGenerated && y >= 32 && _parent.getParent().getRandom().randomDouble() > 0.8) {
+            if ((title.equals("Grass") || title.equals("Snow")) && !grassGenerated && y >= 32 && random.randomDouble() > 0.8) {
                 _parent.getParent().setBlock(blockWorldPos.x, blockWorldPos.y, blockWorldPos.z, BlockManager.getInstance().getBlock("Water").getId(), true, true, true);
                 set = true;
                 grassGenerated = true;

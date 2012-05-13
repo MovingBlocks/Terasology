@@ -43,7 +43,9 @@ public interface IWorldProvider {
      * @return Whether this chunk is immediately available
      */
     public boolean isChunkAvailableAt(Tuple3i position);
-    
+
+    // TODO: Need some flavour of blocking, non-blocking, etc getBlock/etc, for different circumstances
+
     /**
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.
@@ -264,13 +266,6 @@ public interface IWorldProvider {
      * @return A new random spawning point
      */
     public Vector3d nextSpawningPoint();
-
-    /**
-     * Returns the RNG for this world provider.
-     *
-     * @return The RNG
-     */
-    public FastRandom getRandom();
 
     /**
      * Disposes this world provider.

@@ -1,6 +1,7 @@
 package org.terasology.logic.world;
 
 import org.terasology.game.Terasology;
+import org.terasology.math.Vector3i;
 
 import java.io.*;
 import java.util.logging.Level;
@@ -13,8 +14,13 @@ public class ChunkCacheFileSystem implements IChunkCache {
     public ChunkCacheFileSystem(LocalWorldProvider parent) {
         _parent = parent;
     }
-    public Chunk get(int id) {
-        File f = new File(_parent.getObjectSavePath() + "/" + Chunk.getChunkFileNameFromId(id));
+
+    private String getFileNameFor(Vector3i pos) {
+        return pos.x + "." + pos.y + "." + pos.z + ".chunk";
+    }
+
+    public Chunk get(Vector3i id) {
+        File f = new File(_parent.getObjectSavePath(), getFileNameFor(id));
 
         if (!f.exists())
             return null;
@@ -46,7 +52,7 @@ public class ChunkCacheFileSystem implements IChunkCache {
             }
         }
 
-        File f = new File(_parent.getObjectSavePath(), c.getChunkFileName());
+        File f = new File(_parent.getObjectSavePath(), getFileNameFor(c.getPos()));
 
         try {
             FileOutputStream fileOut = new FileOutputStream(f);

@@ -16,6 +16,7 @@
 package org.terasology.logic.generators;
 
 import org.terasology.logic.world.IWorldProvider;
+import org.terasology.utilities.FastRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +27,8 @@ import java.util.HashMap;
 public class GeneratorManager {
 
     private final IWorldProvider _parent;
+    // TODO: Improve random handling
+    private FastRandom random;
 
     /* WORLD GENERATION */
     protected final ArrayList<ChunkGenerator> _chunkGenerators = new ArrayList<ChunkGenerator>(8);
@@ -33,11 +36,13 @@ public class GeneratorManager {
 
     public GeneratorManager(IWorldProvider parent) {
         _parent = parent;
+        random = new FastRandom(parent.getSeed().hashCode());
+
 
         // Init. static generators
         _chunkGenerators.add(new ChunkGeneratorTerrain(this));
-        _chunkGenerators.add(new ChunkGeneratorFlora(this));
-        _chunkGenerators.add(new ChunkGeneratorLiquids(this));
+        _chunkGenerators.add(new ChunkGeneratorFlora(this, parent.getSeed().hashCode()));
+        _chunkGenerators.add(new ChunkGeneratorLiquids(this, random));
 
         loadTrees();
     }

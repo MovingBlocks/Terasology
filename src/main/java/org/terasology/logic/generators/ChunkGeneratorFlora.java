@@ -18,6 +18,7 @@ package org.terasology.logic.generators;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.utilities.FastRandom;
 
 /**
  * Generates some trees, flowers and high grass.
@@ -32,21 +33,25 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
     private static final double SNOW_GRASS_DENSITY = Config.getInstance().getSnowGrassDensity();
     private static final double MOUNTAINS_GRASS_DENSITY = Config.getInstance().getMountainGrassDensity();
 
-    public ChunkGeneratorFlora(GeneratorManager generatorManager) {
+    private int worldSeed;
+
+    public ChunkGeneratorFlora(GeneratorManager generatorManager, int worldSeed) {
         super(generatorManager);
+        this.worldSeed = worldSeed;
     }
 
     @Override
     public void generate(Chunk c) {
+        FastRandom random = new FastRandom(worldSeed + c.getPos().hashCode());
         for (int y = 0; y < Chunk.CHUNK_DIMENSION_Y; y++) {
             for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
                 for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z++) {
-                    generateGrassAndFlowers(c, x, y, z);
+                    generateGrassAndFlowers(c, x, y, z, random);
                 }
             }
         }
 
-        generateTrees(c);
+        generateTrees(c, random);
     }
 
     /**
@@ -54,28 +59,29 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
      *
      * @param c The chunk
      */
-    private void generateTrees(Chunk c) {
+    private void generateTrees(Chunk c, FastRandom random) {
+
         for (int y = 32; y < Chunk.CHUNK_DIMENSION_Y; y++) {
             for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x += 4) {
                 for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z += 4) {
                     BIOME_TYPE biome = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
-                    int randX = x + c.getRandom().randomInt() % 12 + 6;
-                    int randZ = z + c.getRandom().randomInt() % 12 + 6;
+                    int randX = x + random.randomInt() % 12 + 6;
+                    int randZ = z + random.randomInt() % 12 + 6;
 
                     if (c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Snow").getId() || c.getBlock(randX, y, randZ) == BlockManager.getInstance().getBlock("Sand").getId()) {
-                        double rand = Math.abs(c.getRandom().randomDouble());
+                        double rand = Math.abs(random.randomDouble());
 
                         int randomGeneratorId;
                         int size = _parent.getTreeGenerators(biome).size();
 
                         if (size > 0) {
-                            randomGeneratorId = Math.abs(c.getRandom().randomInt()) % size;
+                            randomGeneratorId = Math.abs(random.randomInt()) % size;
 
                             TreeGenerator treeGen = _parent.getTreeGenerator(biome, randomGeneratorId);
 
                             if (rand < treeGen.getGenProbability()) {
-                                generateTree(c, treeGen, randX, y, randZ);
+                                generateTree(c, treeGen, randX, y, randZ, random);
                             }
                         }
                     }
@@ -92,10 +98,10 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
      * @param y Position on the y-axis
      * @param z Position on the z-axis
      */
-    private void generateGrassAndFlowers(Chunk c, int x, int y, int z) {
+    private void generateGrassAndFlowers(Chunk c, int x, int y, int z, FastRandom random) {
         if ((c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Grass").getId() || c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Sand").getId() || c.getBlock(x, y, z) == BlockManager.getInstance().getBlock("Snow").getId()) && c.getBlock(x, y + 1, z) == 0x0) {
 
-            double grassRand = (c.getRandom().randomDouble() + 1.0) / 2.0;
+            double grassRand = (random.randomDouble() + 1.0) / 2.0;
             double grassProb = 1.0;
 
             BIOME_TYPE biome = calcBiomeTypeForGlobalPosition(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
@@ -122,7 +128,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                 /*
                  * Generate tall grass.
                  */
-                double rand = c.getRandom().standNormalDistrDouble();
+                double rand = random.standNormalDistrDouble();
 
                 if (rand > -0.4 && rand < 0.4) {
                     c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass1").getId());
@@ -132,12 +138,12 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
                     c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass3").getId());
                 }
 
-                double flowerRand = c.getRandom().randomDouble();
+                double flowerRand = random.randomDouble();
 
                 /*
                  * Generate flowers.
                  */
-                if (c.getRandom().standNormalDistrDouble() < -2) {
+                if (random.standNormalDistrDouble() < -2) {
                     if (flowerRand >= -1.0 && flowerRand < 0.2) {
                         c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("RedFlower").getId());
                     } else if (flowerRand >= 0.2 && flowerRand < 0.6) {
@@ -161,10 +167,10 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
      * @param y       Position on the y-axis
      * @param z       Position on the z-axis
      */
-    private void generateTree(Chunk c, TreeGenerator treeGen, int x, int y, int z) {
+    private void generateTree(Chunk c, TreeGenerator treeGen, int x, int y, int z, FastRandom random) {
         if (!c.canBlockSeeTheSky(x, y + 1, z))
             return;
 
-        treeGen.generate(c.getRandom(), c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
+        treeGen.generate(random, c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
     }
 }

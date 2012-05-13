@@ -36,13 +36,13 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        NetData.NetMessage message = NetData.NetMessage.newBuilder().setConnection(NetData.ConnectMessage.newBuilder().setName("Test Send To Client")).build();
+        NetData.ClientMessage message = NetData.ClientMessage.newBuilder().setConnection(NetData.ConnectMessage.newBuilder().setName("Test Send To Client")).build();
         e.getChannel().write(message);
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+        NetData.ClientMessage message = (NetData.ClientMessage) e.getMessage();
         logger.log(Level.INFO, "Received message: " + message.getConnection().getName());
     }
 

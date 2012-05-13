@@ -42,7 +42,7 @@ public class ChunkCachePerformanceTest extends junit.framework.TestCase{
         }
         long t2 = Sys.getTime();
         for(int k = 0; k < SIZE; ++k){
-            assertTrue(cc.get(chunks[k].getId()) != null);
+            assertTrue(cc.get(chunks[k].getPos()) != null);
         }
         long t3 = Sys.getTime();
 

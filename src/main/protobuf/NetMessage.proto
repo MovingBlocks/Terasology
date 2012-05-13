@@ -6,7 +6,13 @@ option java_package = "org.terasology.protobuf";
 option java_outer_classname = "NetData";
 option optimize_for = SPEED;
 
-message NetMessage {
+message ServerMessage {
+    optional ConnectMessage connection = 15; // Index of the type, if contained in a world with component_classes table
+
+    extensions 1000 to 1999;
+}
+
+message ClientMessage {
     optional ConnectMessage connection = 15; // Index of the type, if contained in a world with component_classes table
 
     extensions 1000 to 1999;

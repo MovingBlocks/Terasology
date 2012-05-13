@@ -42,7 +42,7 @@ public final class ChunkProvider implements IChunkProvider {
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    private final ConcurrentHashMap<Integer, Chunk> _nearChunkCache = new ConcurrentHashMap<Integer, Chunk>();
+    private final ConcurrentHashMap<Vector3i, Chunk> _nearChunkCache = new ConcurrentHashMap<Vector3i, Chunk>();
     private IChunkCache _farChunkCache;
     private final LocalWorldProvider _parent;
     private ReentrantLock _lockChunkCreation = new ReentrantLock();
@@ -70,40 +70,34 @@ public final class ChunkProvider implements IChunkProvider {
     }
 
     public boolean isChunkAvailable(int x, int y, int z) {
-        int id = getNearCacheChunkId(x, y, z);
-        Chunk c = _nearChunkCache.get(id);
+        Chunk c = _nearChunkCache.get(new Vector3i(x,y,z));
         return c != null;
     }
 
-    private int getNearCacheChunkId(int x, int y, int z) {
-        int id = new Vector3i(x,y,z).hashCode();
-        return id;
-    }
-
     public Chunk getChunk(int x, int y, int z) {
-        int id = getNearCacheChunkId(x, y, z);
-        Chunk c = _nearChunkCache.get(id);
+        Vector3i pos = new Vector3i(x,y,z);
+        Chunk c = _nearChunkCache.get(pos);
         if (c != null) {
             return c;
         }
 
         _lockChunkCreation.lock();
         try {
-            c = _nearChunkCache.get(id);
+            c = _nearChunkCache.get(pos);
             if (c != null) {
                 return c;
             }
 
-            c = _farChunkCache.get(id);
+            c = _farChunkCache.get(pos);
             if (c == null) {
                 c = new Chunk(_parent, x, y, z);
             }
 
-            if (_nearChunkCache.containsKey(id))
+            if (_nearChunkCache.containsKey(pos))
             {
-                Logger.getLogger("CP").log(Level.SEVERE, "duplicate id " + id + " found");
+                Logger.getLogger("CP").log(Level.SEVERE, "duplicate id " + pos + " found");
             }
-            _nearChunkCache.put(id, c);
+            _nearChunkCache.put(pos, c);
             //HACK! move local world provider out of chunk!
             c.setParent(_parent);
 
@@ -134,8 +128,7 @@ public final class ChunkProvider implements IChunkProvider {
                     _lockChunkCreation.lock();
                     try {
                         Vector3i pos = chunkToDelete.getPos();
-                        int id = getNearCacheChunkId(pos.x, pos.y, pos.z);
-                        _nearChunkCache.remove(id);
+                        _nearChunkCache.remove(pos);
                     }
                     finally {
                         _lockChunkCreation.unlock();

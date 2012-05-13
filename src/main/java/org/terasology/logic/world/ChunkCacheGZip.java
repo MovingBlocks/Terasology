@@ -1,19 +1,21 @@
 package org.terasology.logic.world;
 
+import org.terasology.math.Vector3i;
+
 import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class ChunkCacheGZip implements IChunkCache, Serializable {
-    ConcurrentHashMap<Integer, byte[]> _map = new ConcurrentHashMap<Integer, byte[]>();
+    ConcurrentHashMap<Vector3i, byte[]> _map = new ConcurrentHashMap<Vector3i, byte[]>();
     int _sizeInByte = 0;
 
     public ChunkCacheGZip(){
 
     }
 
-    public Chunk get(int id) {
+    public Chunk get(Vector3i id) {
         Chunk c = null;
         try {
             byte[] b = _map.get(id);
@@ -41,7 +43,7 @@ public class ChunkCacheGZip implements IChunkCache, Serializable {
             objectOut.close();
             byte[] b = baos.toByteArray();
             _sizeInByte += b.length;
-            _map.put(c.getId(), b);
+            _map.put(c.getPos(), b);
         } catch (IOException e) {
             e.printStackTrace();
         }

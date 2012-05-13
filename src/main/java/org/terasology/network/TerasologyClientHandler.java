@@ -34,7 +34,7 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+        NetData.ServerMessage message = (NetData.ServerMessage) e.getMessage();
         logger.log(Level.INFO, "Received message: " + message.getConnection().getName());
     }
 

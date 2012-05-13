@@ -1,6 +1,8 @@
 package org.terasology.logic.world;
 
 
+import org.terasology.math.Vector3i;
+
 import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -8,14 +10,14 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 public class ChunkCacheDeflate implements IChunkCache, Serializable {
-    ConcurrentMap<Integer, byte[]> _map = new ConcurrentHashMap<Integer, byte[]>();
+    ConcurrentMap<Vector3i, byte[]> _map = new ConcurrentHashMap<Vector3i, byte[]>();
     int _sizeInByte = 0;
 
     public ChunkCacheDeflate(){
 
     }
 
-    public Chunk get(int id) {
+    public Chunk get(Vector3i id) {
         Chunk c = null;
         try {
             byte[] b = _map.get(id);
@@ -43,7 +45,7 @@ public class ChunkCacheDeflate implements IChunkCache, Serializable {
             objectOut.close();
             byte[] b = baos.toByteArray();
             _sizeInByte += b.length;
-            _map.put(c.getId(), b);
+            _map.put(c.getPos(), b);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

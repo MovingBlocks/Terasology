@@ -22,6 +22,7 @@ import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
+import com.google.common.base.Ascii;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -84,40 +85,35 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
     public static int _statChunkMeshEmpty, _statChunkNotReady, _statRenderedTriangles;
 
-    private int _id = 0;
     private final Vector3i _pos = new Vector3i();
 
     private final TeraArray _blocks;
     private final TeraSmartArray _sunlight, _light, _states;
+
+    // TODO: Remove tessellator?
     private final ChunkTessellator _tessellator;
 
     private boolean _dirty, _lightDirty, _fresh;
     private boolean _disposed = false;
 
-    private FastRandom _random;
+    // TODO: Remove parent
     private LocalWorldProvider _parent;
+
+    // TODO: Check this out
     private ChunkMesh _activeMeshes[];
     private ChunkMesh _newMeshes[];
 
     private AABB _aabb = null;
     private AABB[] _subMeshAABB = null;
     private RigidBody _rigidBody = null;
+
+    // TODO: Review
     private ReentrantLock _lock = new ReentrantLock();
     private ReentrantLock _lockRigidBody = new ReentrantLock();
-
-    public boolean isAprox = false;
 
     public enum LIGHT_TYPE {
         BLOCK,
         SUN
-    }
-
-    public static String getChunkFileName(Vector3i v) {
-        return Integer.toString(v.hashCode(),36);
-    }
-
-    public static String getChunkFileNameFromId(int id) {
-        return Integer.toString(id,36);
     }
 
     public Chunk() {
@@ -130,8 +126,6 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         setLightDirty(true);
         setDirty(true);
         setFresh(true);
-
-        _random = new FastRandom();
     }
 
     public Chunk(LocalWorldProvider p, int x, int y, int z) {
@@ -139,9 +133,8 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         _pos.x = x;
         _pos.y = y;
         _pos.z = z;
-        _id = _pos.hashCode();
+
         _parent = p;
-        _random = new FastRandom((_parent.getSeed()).hashCode() + _pos.hashCode());
     }
 
     public boolean generate() {
@@ -724,14 +717,6 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         _parent = parent;
     }
 
-    public String getChunkFileName() {
-        return getChunkFileName(_pos);
-    }
-
-    public FastRandom getRandom() {
-        return _random;
-    }
-
     public void clearMeshes() {
         _lock.lock();
 
@@ -863,10 +848,6 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         return _rigidBody;
     }
 
-    public int getId() {
-        return _id;
-    }
-
     public Vector3i getPos() {
         return _pos;
     }
@@ -879,7 +860,6 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
     //Externalizable Interface
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeInt(_id);
         out.writeInt(_pos.x);
         out.writeInt(_pos.y);
         out.writeInt(_pos.z);
@@ -910,7 +890,6 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        _id = in.readInt();
         _pos.x = in.readInt();
         _pos.y = in.readInt();
         _pos.z = in.readInt();
@@ -947,4 +926,5 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         Chunk comp = (Chunk) o;
         return getPos().equals(comp.getPos());
     }
+
 }
