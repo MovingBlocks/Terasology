@@ -61,7 +61,11 @@ public class BlockEntityRegistry implements EventHandlerSystem, UpdateSubscriber
     public EntityRef getOrCreateEntityAt(Vector3i blockPosition) {
         EntityRef blockEntity = blockComponentLookup.get(blockPosition);
         if (blockEntity == null || !blockEntity.exists()) {
-            Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPosition));
+            byte id = worldProvider.getBlock(blockPosition);
+            if (id == 0)
+                return EntityRef.NULL;
+
+            Block block = BlockManager.getInstance().getBlock(id);
 
             blockEntity = entityManager.create(block.getEntityPrefab());
             if (block.isEntityTemporary()) {

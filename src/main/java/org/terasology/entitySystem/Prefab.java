@@ -6,7 +6,7 @@ package org.terasology.entitySystem;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public interface Prefab extends Cloneable{
+public interface Prefab{
 
     /**
      * @return The identifier for this prefab
@@ -56,7 +56,5 @@ public interface Prefab extends Cloneable{
     public void addParent(Prefab parent);
 
     public void removeParent(Prefab parent);
-
-    public Prefab clone();
 
 }

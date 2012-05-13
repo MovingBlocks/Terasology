@@ -12,6 +12,7 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.pathfinder.AStarPathfinder;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -40,15 +41,24 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     private IWorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
     private FastRandom random = new FastRandom();
+    private AStarPathfinder aStarPathfinder;
     private Timer timer;
-    private long time;
+    private long attacktime, pathtime;
+    private List<Vector3d> paths = null;
+    private Vector3f lastaiTarget = null;
+    private Vector3f lastTarget = null;
+    private Vector3f currentTarget = null;
+    private Vector3f tempTarget = null;
+    private double lastDistance;
+    private int patrolCounter;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         timer = CoreRegistry.get(Timer.class);
-        time = timer.getTimeInMs();
+        attacktime = timer.getTimeInMs();
+        aStarPathfinder = new AStarPathfinder(worldProvider);
     }
 
     public void update(float delta) {
@@ -98,20 +108,27 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                     }
                     case Gather:{
 
+                        List<Vector3f> targets = ai.gatherTargets;
+                        if(targets == null || targets.size() < 1) return;
+                        currentTarget = targets.get(0);
+
                         Vector3f dist = new Vector3f(worldPos);
-                        dist.sub(ai.movementTarget);
+                        dist.sub(currentTarget);
                         double distanceToTarget = dist.lengthSquared();
 
                         if (distanceToTarget < 4) {
                             // gather the block
-                            if(timer.getTimeInMs() - time > 500){
-                                time = timer.getTimeInMs();
-                                attack(entity,ai.movementTarget);
+                            if(timer.getTimeInMs() - attacktime > 500){
+                                attacktime = timer.getTimeInMs();
+                                boolean attacked = attack(entity,currentTarget);
+                                if(!attacked) {
+                                    ai.gatherTargets.remove(currentTarget);
+                                }
                             }
                         }
 
                         Vector3f targetDirection = new Vector3f();
-                        targetDirection.sub(ai.movementTarget, worldPos);
+                        targetDirection.sub(currentTarget, worldPos);
                         if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f)  {
                             targetDirection.normalize();
                             moveComp.setDrive(targetDirection);
@@ -128,10 +145,81 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         break;
                     }
                     case Move:{
+                        //get targets, return if none
+                        List<Vector3f> targets = ai.movementTargets;
+                        if(targets == null || targets.size() < 1) return;
+
+                        //prob useless now, old artifact
                         ai.followingPlayer = false;
                         entity.saveComponent(ai);
+
+                        //init if no targets
+                        currentTarget = targets.get(0);
+                        if(lastTarget == null) lastTarget = targets.get(0);
+
+                        //calc distance to current Target
+                        Vector3f dist = new Vector3f(worldPos);
+                        dist.sub(currentTarget);
+                        double distanceToTarget = dist.lengthSquared();
+
+                        if(distanceToTarget < 1.0d){
+                            ai.movementTargets.remove(0);
+                            currentTarget = null;
+                            lastTarget = null;
+                            break;
+                            //if(ai.movementTargets.size() > 0)
+                            //currentTarget = ai.movementTargets.get(0);
+                        }
+
                         Vector3f targetDirection = new Vector3f();
-                        targetDirection.sub(ai.movementTarget, worldPos);
+                        targetDirection.sub(currentTarget, worldPos);
+                        if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
+                            targetDirection.normalize();
+                            moveComp.setDrive(targetDirection);
+
+                            float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
+                            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+                            location.getLocalRotation().set(axisAngle);
+                        } else {
+                            moveComp.setDrive(new Vector3f());
+                        }
+                        entity.saveComponent(moveComp);
+                        entity.saveComponent(location);
+                        break;
+
+                    }
+                    case Patrol:{
+                        //get targets, return if none
+                        List<Vector3f> targets = ai.patrolTargets;
+                        if(targets == null || targets.size() < 1) return;
+
+                        //prob useless now, old artifact
+                        ai.followingPlayer = false;
+                        entity.saveComponent(ai);
+
+                        //init if no targets
+                        if(patrolCounter < targets.size()){
+                            currentTarget = targets.get(patrolCounter);
+                            if(lastTarget == null) lastTarget = targets.get(0);
+                        }
+
+                        //calc distance to current Target
+                        Vector3f dist = new Vector3f(worldPos);
+                        dist.sub(currentTarget);
+                        double distanceToTarget = dist.length();
+
+                        if(distanceToTarget < 1.0d){
+                            patrolCounter++;
+                            if(!(patrolCounter < targets.size())) patrolCounter = 0;
+                            currentTarget = null;
+                            lastTarget = null;
+                            break;
+                            //if(ai.movementTargets.size() > 0)
+                            //currentTarget = ai.movementTargets.get(0);
+                        }
+
+                        Vector3f targetDirection = new Vector3f();
+                        targetDirection.sub(currentTarget, worldPos);
                         if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
                             targetDirection.normalize();
                             moveComp.setDrive(targetDirection);
@@ -146,31 +234,70 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         entity.saveComponent(location);
                         break;
                     }
+                    case Test:{
+                        /*List<Vector3f> targets = ai.movementTargets;
+                        if(targets == null || targets.size() < 1) return;
+
+                        if(timer.getTimeInMs() - pathtime > 3000){
+                            aStarPathfinder.setVis(false);
+                            ai.followingPlayer = false;
+                            entity.saveComponent(ai);
+
+                            if(currentTarget == null) currentTarget = targets.get(0);
+                            if(lastTarget == null) lastTarget = targets.get(0);
+                            if(lastaiTarget == null) lastaiTarget = targets.get(0);
+                            Vector3f dist = new Vector3f(worldPos);
+                            dist.sub(lastTarget);
+                            double distanceToTarget = dist.lengthSquared();
+
+                            if(lastTarget == currentTarget && distanceToTarget - lastDistance < 0.1){
+                                //if(paths.size() > 0)
+                                currentTarget = new Vector3f(paths.remove(0));
+                            }
+                            else{
+                                lastDistance = distanceToTarget;
+                                Vector3f tmpvec = currentTarget;
+                                tmpvec.sub(ai.movementTargets.get(0));
+                                double distrem = tmpvec.length();
+                                if(distrem < 0.1) ai.movementTargets.remove(0);
+                            }
+
+                            Vector3f targetDirection = new Vector3f();
+                            targetDirection.sub(currentTarget, worldPos);
+                            if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
+                                targetDirection.normalize();
+                                moveComp.setDrive(targetDirection);
+
+                                float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
+                                AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+                                location.getLocalRotation().set(axisAngle);
+                            } else {
+                                moveComp.setDrive(new Vector3f());
+                            }
+                            entity.saveComponent(moveComp);
+                            entity.saveComponent(location);
+                            break;
+                        }*/
+                    }
+                    default: {
+                        break;
+                    }
                 }
 
             }
         }
     }
 
-    private void attack(EntityRef player, Vector3f position) {
-        //RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock(position, moveCompn);
-        //ItemComponent item = withItem.getComponent(ItemComponent.class);
+    private boolean attack(EntityRef player, Vector3f position) {
 
-        //if (selectedBlock != null) {
-            //BlockPosition blockPos = selectedBlock.getBlockPosition();
-
-            int damage = 1;
-            /*if (item != null) {
-                damage = item.baseDamage;
-                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getTitle())) {
-                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
-                }
-            }*/
+        int damage = 1;
+        Block block = BlockManager.getInstance().getBlock(worldProvider.getBlockAtPosition(new Vector3d(position.x, position.y, position.z)));
+        if (block.isDestructible() && !block.isSelectionRayThrough()) {
             EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
             blockEntity.send(new DamageEvent(damage, player));
-        //}
-
-
+            return true;
+        }
+            return false;
     }
 
     /*private RayBlockIntersection.Intersection calcSelectedBlock(Vector3f position,CharacterMovementComponent moveCompn) {
