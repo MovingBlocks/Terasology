@@ -240,6 +240,13 @@ public class TerasologyEngine implements GameEngine {
 
     private void addLibraryPath(File libPath) {
         try {
+            String envPath = System.getProperty("java.library.path");
+            if (envPath == null || envPath.isEmpty()) {
+                System.setProperty("java.library.path", libPath.getAbsolutePath());
+            } else {
+                System.setProperty("java.library.path", envPath + File.pathSeparator + libPath.getAbsolutePath());
+            }
+
             final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
             usrPathsField.setAccessible(true);
 
