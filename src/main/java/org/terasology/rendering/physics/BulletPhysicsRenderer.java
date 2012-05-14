@@ -358,7 +358,6 @@ public class BulletPhysicsRenderer implements IGameObject {
         EntityRef playerent = player.getEntity();
         LocalPlayerComponent localPlayerComp = playerent.getComponent(LocalPlayerComponent.class);
         MinionBarComponent inventory = null;
-        boolean minionbarpresent;
         EntityRef closestminion = null;
         if(localPlayerComp.minionMode){
             inventory = playerent.getComponent(MinionBarComponent.class);
