@@ -1,11 +1,11 @@
 package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 
 /**
  *
  */
-public class PotionComponent extends AbstractComponent {
+public class PotionComponent implements Component {
     public enum PotionType {      //Actual potions
         Empty,
         Red,

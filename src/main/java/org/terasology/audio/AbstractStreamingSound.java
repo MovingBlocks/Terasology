@@ -1,22 +1,26 @@
 package org.terasology.audio;
 
 import org.lwjgl.openal.AL10;
+import org.terasology.asset.AssetUri;
 
 import java.net.URL;
 import java.nio.ByteBuffer;
 
-public abstract class AbstractStreamingSound extends AbstractSound {
+import static org.lwjgl.openal.AL10.AL_SIZE;
+import static org.lwjgl.openal.AL10.alGetBufferi;
+
+public abstract class AbstractStreamingSound implements Sound {
     private final static int BUFFER_POOL_SIZE = 3;
 
-    protected URL audioSource = null;
+    private final AssetUri uri;
+    protected final URL audioSource;
 
     protected int[] buffers;
 
     protected int lastUpdatedBuffer;
 
-    public AbstractStreamingSound(String name, URL source) {
-        super(name);
-
+    public AbstractStreamingSound(AssetUri uri, URL source) {
+        this.uri = uri;
         this.audioSource = source;
 
         this.initializeBuffers();
@@ -24,16 +28,16 @@ public abstract class AbstractStreamingSound extends AbstractSound {
         this.reset();
     }
 
-    protected abstract ByteBuffer fetchData();
-
-    public URL getAudioSource() {
-        return audioSource;
+    @Override
+    public AssetUri getURI() {
+        return uri;
     }
+
+    protected abstract ByteBuffer fetchData();
 
     public int[] getBuffers() {
         return this.buffers;
     }
-
 
     public boolean updateBuffer(int buffer) {
         ByteBuffer bufferData = this.fetchData();
@@ -62,15 +66,16 @@ public abstract class AbstractStreamingSound extends AbstractSound {
     }
 
     @Override
+    public int getBufferSize() {
+        return alGetBufferi(lastUpdatedBuffer, AL_SIZE);
+    }
+
+    @Override
     public int getBufferId() {
         return lastUpdatedBuffer;
     }
 
-    @Override
-    public Sound reset() {
-        this.load(this.audioSource);
-        return super.reset();
-    }
+    public abstract int getBufferBits();
 
     @Override
     protected void finalize() throws Throwable {

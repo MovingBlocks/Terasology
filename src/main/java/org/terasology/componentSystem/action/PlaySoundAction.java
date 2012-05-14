@@ -10,6 +10,8 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.SoundManager;
 import org.terasology.utilities.FastRandom;
 
+import javax.vecmath.Vector3f;
+
 /**
  * @author Immortius <immortius@gmail.com>
  */
@@ -26,7 +28,19 @@ public class PlaySoundAction implements EventHandlerSystem {
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
         if (playSound.sounds.size() > 0) {
             Sound sound = playSound.sounds.get(random.randomIntAbs(playSound.sounds.size()));
-            AudioManager.play(sound, event.getLocation(), playSound.volume, SoundManager.PRIORITY_NORMAL);
+            Vector3f pos = null;
+            switch (playSound.relativeTo) {
+                case Instigator:
+                    pos = event.getInstigatorLocation();
+                    break;
+                case Target:
+                    pos = event.getTargetLocation();
+                    break;
+            }
+            if (pos == null) {
+                pos = event.getOrigin();
+            }
+            AudioManager.play(sound, pos, playSound.volume, SoundManager.PRIORITY_NORMAL);
         }
     }
 }

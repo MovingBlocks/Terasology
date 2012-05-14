@@ -1,5 +1,7 @@
 package org.terasology.componentSystem.items;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
@@ -8,10 +10,6 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
-import org.terasology.events.item.UseItemEvent;
-import org.terasology.events.item.UseItemInDirectionEvent;
-import org.terasology.events.item.UseItemOnBlockEvent;
-import org.terasology.events.item.UseItemOnEntityEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
@@ -23,6 +21,7 @@ import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 
+import javax.print.attribute.standard.Sides;
 import javax.vecmath.Vector3f;
 
 /**
@@ -45,51 +44,48 @@ public class ItemSystem implements EventHandlerSystem {
         entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
     }
 
-    @ReceiveEvent(components=ItemComponent.class)
-    public void useItemOnBlock(UseItemOnBlockEvent event, EntityRef item) {
+    @ReceiveEvent(components={BlockItemComponent.class, ItemComponent.class})
+    public void onPlaceBlock(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
-        if (itemComp == null || itemComp.usage != ItemComponent.UsageType.OnBlock) return;
-
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
-        if (blockItem != null) {
-            if (placeBlock(blockItem.blockFamily, event.getTargetBlock(), event.getSurfaceDirection(), event.getSecondaryDirection(), blockItem)) {
-                checkConsumeItem(item, itemComp);
-            }
-        } else {
-            EntityRef targetEntity = blockEntityRegistry.getOrCreateEntityAt(event.getTargetBlock());
-            item.send(new ActivateEvent(targetEntity, event.getInstigator()));
-            checkConsumeItem(item, itemComp);
+
+
+        Side surfaceDir = Side.inDirection(event.getNormal());
+
+        Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
+        Vector3f rawDirection = new Vector3f(event.getDirection());
+        float dot = rawDirection.dot(attachDir);
+        rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
+        Side secondaryDirection = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
+
+        if (!placeBlock(blockItem.blockFamily, event.getTarget().getComponent(BlockComponent.class).getPosition(), surfaceDir, secondaryDirection, blockItem)) {
+            event.cancel();
         }
     }
 
-    @ReceiveEvent(components=ItemComponent.class)
-    public void useItem(UseItemEvent event, EntityRef item) {
+    @ReceiveEvent(components=ItemComponent.class,priority = ReceiveEvent.PRIORITY_CRITICAL)
+    public void checkCanUseItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
-        if (itemComp == null || itemComp.usage != ItemComponent.UsageType.OnUser) return;
-
-        item.send(new ActivateEvent(event.getInstigator(), event.getInstigator()));
-        checkConsumeItem(item, itemComp);
+        switch (itemComp.usage) {
+            case None:
+                event.cancel();
+                break;
+            case OnBlock:
+                if (event.getTarget().getComponent(BlockComponent.class) == null) {
+                    event.cancel();
+                }
+                break;
+            case OnEntity:
+                if (event.getTarget().getComponent(BlockComponent.class) != null) {
+                    event.cancel();
+                }
+                break;
+        }
     }
 
-    @ReceiveEvent(components = ItemComponent.class)
-    public void useItemOnEntity(UseItemOnEntityEvent event, EntityRef item) {
+    @ReceiveEvent(components=ItemComponent.class,priority = ReceiveEvent.PRIORITY_TRIVIAL)
+    public void usedItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
-        if (itemComp == null) return;
-
-        item.send(new ActivateEvent(event.getTarget(), event.getInstigator()));
-        checkConsumeItem(item, itemComp);
-    }
-
-    @ReceiveEvent(components = ItemComponent.class)
-    public void useItemInDirection(UseItemInDirectionEvent event, EntityRef item) {
-        ItemComponent itemComp = item.getComponent(ItemComponent.class);
-        if (itemComp == null) return;
-
-        item.send(new ActivateEvent(event.getLocation(), event.getDirection(), event.getInstigator()));
-        checkConsumeItem(item, itemComp);
-    }
-
-    private void checkConsumeItem(EntityRef item, ItemComponent itemComp) {
         if (itemComp.consumedOnUse) {
             itemComp.stackCount--;
             if (itemComp.stackCount == 0) {
@@ -100,7 +96,6 @@ public class ItemSystem implements EventHandlerSystem {
             }
         }
     }
-
     /**
      * Places a block of a given type in front of the player.
      *
@@ -117,7 +112,7 @@ public class ItemSystem implements EventHandlerSystem {
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             worldProvider.setBlock(placementPos.x, placementPos.y, placementPos.z, block.getId(), true, true);
-            AudioManager.play("PlaceBlock", 0.5f);
+            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
             if (blockItem.placedEntity.exists()) {
                 // Establish a block entity
                 blockItem.placedEntity.addComponent(new BlockComponent(placementPos, false));

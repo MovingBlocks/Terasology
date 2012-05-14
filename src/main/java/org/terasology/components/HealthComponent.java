@@ -1,11 +1,11 @@
 package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public final class HealthComponent extends AbstractComponent {
+public final class HealthComponent implements Component {
     // Configuration options
     public int maxHealth = 20;
     public float regenRate = 0.0f;

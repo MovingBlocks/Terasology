@@ -21,6 +21,7 @@ import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -70,13 +71,13 @@ public class RayBlockIntersection {
             return this._blockPosition.equals(i.getBlockPosition());
         }
 
-        Vector3d getSurfaceNormal() {
-            return _surfaceNormal;
+        public Vector3f getSurfaceNormal() {
+            return new Vector3f(_surfaceNormal);
         }
 
         public BlockPosition calcAdjacentBlockPos() {
             Vector3d pos = getBlockPosition().toVector3d();
-            pos.add(getSurfaceNormal());
+            pos.add(_surfaceNormal);
 
             return new BlockPosition(pos);
         }

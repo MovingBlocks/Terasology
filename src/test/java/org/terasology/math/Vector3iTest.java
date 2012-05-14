@@ -20,6 +20,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.HashSet;
+
 import static org.junit.Assert.*;
 
 /**
@@ -174,5 +177,55 @@ public class Vector3iTest {
         assertEquals(1, Vector3i.unitZ().gridMagnitude());
         assertEquals(3, Vector3i.one().gridMagnitude());
         assertEquals(3, new Vector3i(1,-1,1).gridMagnitude());
+    }
+
+    @Test
+    public void testHash()
+    {
+        // k = 59
+        // j = k+1 = 60
+        // i = (k+k^2)(1+k)^2 = not important for collision
+        // hash = (k+k^2)(1+k)^2 + x(1+k)^2 + (1+k)y + z
+        // hash = i + xj^2 + jy + z
+        // with x := 0
+        // hash = i + jy + z
+        // set i + jy + z = i + jy' + z'
+        // jy + z = jy' + z'
+        // set z' := z + j -> z'-z = j
+        // jy = jy' + j -> y' = y - 1
+        Vector3i a = new Vector3i(0,10,10);
+        Vector3i b = new Vector3i(0,9,70);
+        assertFalse(a.hashCode() == b.hashCode());
+
+        assertTrue(new Vector3i(0,10,10).hashCode() == new Vector3i(0,10,10).hashCode());
+        assertTrue(new Vector3i(-100,10,10).hashCode() == new Vector3i(-100,10,10).hashCode());
+        assertTrue(new Vector3i(0,-5,-5).hashCode() == new Vector3i(0,-5,-5).hashCode());
+
+        assertFalse(new Vector3i(1, 10, 10).hashCode() == new Vector3i(0, 10, 10).hashCode());
+        assertFalse(new Vector3i(-101, 10, 10).hashCode() == new Vector3i(-100, 10, 10).hashCode());
+        assertFalse(new Vector3i(0, -1, -5).hashCode() == new Vector3i(0, -5, -5).hashCode());
+    }
+
+    @Test
+    public void testHashCollisions()
+    {
+        int range = 50;
+
+        HashSet<Integer> alreadyUsedHashes = new HashSet<Integer>();
+
+        for(int x = -range; x < range; ++x) {
+            for (int y = -range; y < range; ++y) {
+                for(int z = -range; z < range; ++z) {
+                    int hash = new Vector3i(x,y,z).hashCode();
+                    if (alreadyUsedHashes.contains(hash))
+                    {
+                        fail(String.format("duplicate hash %d at: %d,%d,%d", hash, x,y,z));
+                    }
+                    else {
+                        alreadyUsedHashes.add(hash);
+                    }
+                }
+            }
+        }
     }
 }

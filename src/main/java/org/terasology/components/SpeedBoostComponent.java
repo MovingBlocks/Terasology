@@ -1,10 +1,10 @@
 package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 
 /**
  *  Details on the effects properties:
  */
-public class SpeedBoostComponent extends AbstractComponent {
+public class SpeedBoostComponent implements Component {
     public float speedBoostDuration = 10;
 }

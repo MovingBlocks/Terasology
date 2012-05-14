@@ -17,15 +17,6 @@ public abstract class AbstractPrefab implements Prefab {
         return name;
     }
 
-    public Prefab clone() {
-        try {
-            return (Prefab) super.clone();
-        } catch (CloneNotSupportedException e) {
-            // this shouldn't happen
-            throw new InternalError();
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

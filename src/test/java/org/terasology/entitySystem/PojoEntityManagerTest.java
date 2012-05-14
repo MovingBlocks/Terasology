@@ -32,7 +32,7 @@ public class PojoEntityManagerTest {
     @Before
     public void setup() {
         ComponentLibrary componentLibrary = new ComponentLibraryImpl();
-        entityManager = new PojoEntityManager(componentLibrary, new PojoPrefabManager());
+        entityManager = new PojoEntityManager(componentLibrary, new PojoPrefabManager(componentLibrary));
     }
     
     @Test

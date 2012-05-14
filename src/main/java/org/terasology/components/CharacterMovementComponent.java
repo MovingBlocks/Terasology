@@ -1,13 +1,13 @@
 package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 
 import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public final class CharacterMovementComponent extends AbstractComponent {
+public final class CharacterMovementComponent implements Component {
 
     // Speed settings
     public float maxGroundSpeed = 5.0f;

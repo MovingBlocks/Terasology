@@ -23,10 +23,7 @@ import org.terasology.game.Terasology;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
-import org.terasology.rendering.gui.components.UICrosshair;
-import org.terasology.rendering.gui.components.UIHealthBar;
-import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.components.UIToolbar;
+import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
@@ -49,6 +46,8 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
     private final UIDebugConsole _console;
 
     private final UIToolbar _toolbar;
+    private final UIMinionbar _minionbar;
+    //private final UIMinion _miniongui;
     private final UIHealthBar _healthBar;
 
     /**
@@ -75,6 +74,14 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _toolbar = new UIToolbar();
         _toolbar.setVisible(true);
         addDisplayElement(_toolbar);
+
+        _minionbar = new UIMinionbar();
+        _minionbar.setVisible(true);
+        addDisplayElement(_minionbar);
+        /*
+        _miniongui = new UIMinion();
+        _miniongui.setVisible(true);
+        addDisplayElement(_miniongui);*/
 
         _healthBar = new UIHealthBar();
         _healthBar.setVisible(true);

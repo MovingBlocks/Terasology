@@ -18,6 +18,8 @@ package org.terasology.rendering.world;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.componentSystem.rendering.FirstPersonRenderer;
@@ -30,6 +32,7 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.*;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -41,6 +44,7 @@ import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
+import org.terasology.utilities.Sorting;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector3d;
@@ -163,20 +167,51 @@ public final class WorldRenderer implements IGameObject {
         int viewingDistance = Config.getInstance().getActiveViewingDistance();
 
         if (_chunkPosX != newChunkPosX || _chunkPosZ != newChunkPosZ || force) {
+            // just add all visible chunks
+            if (_chunksInProximity.size() == 0 || force) {
+                _chunksInProximity.clear();
+                for (int x = -(viewingDistance / 2); x < (viewingDistance / 2); x++) {
+                    for (int z = -(viewingDistance / 2); z < (viewingDistance / 2); z++) {
+                        Chunk c = _worldProvider.getChunkProvider().getChunk(newChunkPosX + x, 0, newChunkPosZ + z);
+                        _chunksInProximity.add(c);
+                    }
+                }
+            }
+            // adjust proximity chunk list
+            else {
+                int vd2 = viewingDistance / 2;
 
-            _chunksInProximity.clear();
+                Rect2i oldView = new Rect2i(_chunkPosX - vd2, _chunkPosZ - vd2, viewingDistance, viewingDistance);
+                Rect2i newView = new Rect2i(newChunkPosX - vd2, newChunkPosZ - vd2, viewingDistance, viewingDistance);
 
-            for (int x = -(viewingDistance / 2); x < (viewingDistance / 2); x++) {
-                for (int z = -(viewingDistance / 2); z < (viewingDistance / 2); z++) {
-                    Chunk c = _worldProvider.getChunkProvider().getChunk(calcCamChunkOffsetX() + x, 0, calcCamChunkOffsetZ() + z);
-                    _chunksInProximity.add(c);
+                // remove
+                List<Rect2i> removeRects = Rect2i.subtractEqualsSized(oldView, newView);
+                for(Rect2i r : removeRects) {
+                    for(int x = r.minX(); x < r.maxX(); ++x) {
+                        for(int y = r.minY(); y < r.maxY(); ++y) {
+                            Chunk c = _worldProvider.getChunkProvider().getChunk(x, 0, y);
+                            _chunksInProximity.remove(c);
+                        }
+                    }
+                }
+
+                // add
+                List<Rect2i> addRects = Rect2i.subtractEqualsSized(newView, oldView);
+                for(Rect2i r : addRects) {
+                    for(int x = r.minX(); x < r.maxX(); ++x) {
+                        for(int y = r.minY(); y < r.maxY(); ++y) {
+                            Chunk c = _worldProvider.getChunkProvider().getChunk(x, 0, y);
+                            _chunksInProximity.add(c);
+                        }
+                    }
                 }
             }
 
             _chunkPosX = newChunkPosX;
             _chunkPosZ = newChunkPosZ;
 
-            Collections.sort(_chunksInProximity);
+            Sorting.smoothSort(_chunksInProximity);
+
             return true;
         }
 
@@ -207,7 +242,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.1, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("Sunrise");
+                AudioManager.playMusic("engine:Sunrise");
             }
         });
 
@@ -215,7 +250,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.25, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("Afternoon");
+                AudioManager.playMusic("engine:Afternoon");
             }
         });
 
@@ -223,7 +258,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.4, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("Sunset");
+                AudioManager.playMusic("engine:Sunset");
             }
         });
 
@@ -231,7 +266,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("Dimlight");
+                AudioManager.playMusic("engine:Dimlight");
             }
         });
 
@@ -239,7 +274,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.75, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("OtherSide");
+                AudioManager.playMusic("engine:OtherSide");
             }
         });
 
@@ -247,7 +282,7 @@ public final class WorldRenderer implements IGameObject {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("Resurface");
+                AudioManager.playMusic("engine:Resurface");
             }
         });
     }

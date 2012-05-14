@@ -18,16 +18,19 @@ package org.terasology.rendering.gui.components;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.components.BlockItemComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.TextureManager;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.inventory.Icon;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -46,16 +49,19 @@ public class UIInventoryCell extends UIDisplayElement {
 
     private final UIGraphicsElement _selectionRectangle;
     private final UIText _label;
+    private final UIText _label2;
 
     private int _id;
     private boolean _selected = false;
+    private Texture terrainTex;
 
     public UIInventoryCell(int id) {
         _id = id;
 
         setSize(new Vector2f(48f, 48f));
+        terrainTex = AssetManager.loadTexture("engine:terrain");
 
-        _selectionRectangle = new UIGraphicsElement("gui");
+        _selectionRectangle = new UIGraphicsElement(AssetManager.loadTexture("engine:gui"));
         _selectionRectangle.getTextureSize().set(new Vector2f(24f / 256f, 24f / 256f));
         _selectionRectangle.getTextureOrigin().set(new Vector2f(0.0f, 23f / 256f));
         _selectionRectangle.setSize(getSize());
@@ -63,6 +69,10 @@ public class UIInventoryCell extends UIDisplayElement {
         _label = new UIText();
         _label.setVisible(true);
         _label.setPosition(new Vector2f(30f, 20f));
+
+        _label2 = new UIText();
+        _label2.setVisible(false);
+        _label2.setPosition(new Vector2f(0f, -14f));
     }
 
     private Vector2f findPosition() {
@@ -93,11 +103,23 @@ public class UIInventoryCell extends UIDisplayElement {
 
         EntityRef itemEntity = inventory.itemSlots.get(_id);
         ItemComponent item = itemEntity.getComponent(ItemComponent.class);
-
+        BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
         if (item != null && item.stackCount > 1) {
             getLabel().setVisible(true);
             getLabel().setText(Integer.toString(item.stackCount));
-        } else {
+            if (blockItem != null) {
+                _label2.setText(blockItem.blockFamily.getTitle());
+            }
+        }else if (item != null){
+            if (blockItem != null) {
+                _label2.setText(blockItem.blockFamily.getTitle());
+            }
+
+            else{
+                _label2.setText(item.name);
+            }
+        }
+        else {
             getLabel().setVisible(false);
         }
     }
@@ -107,11 +129,13 @@ public class UIInventoryCell extends UIDisplayElement {
 
         if (intersects(mousePos)) {
             _selectionRectangle.setVisible(true);
+            _label2.setVisible(true);
         } else {
             _clickSoundPlayed = false;
             _mouseUp = false;
             _mouseDown = false;
             _selectionRectangle.setVisible(false);
+            _label2.setVisible(false);
         }
     }
 
@@ -143,6 +167,7 @@ public class UIInventoryCell extends UIDisplayElement {
         }
 
         _label.renderTransformed();
+        _label2.renderTransformed();
     }
 
     public void setSelected(boolean selected) {
@@ -181,7 +206,7 @@ public class UIInventoryCell extends UIDisplayElement {
         GL11.glScalef(20f, 20f, 20f);
         GL11.glRotatef(170f, 1f, 0f, 0f);
         GL11.glRotatef(-16f, 0f, 1f, 0f);
-        TextureManager.getInstance().bindTexture("terrain");
+        glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());;
 
         Block block = blockFamily.getArchetypeBlock();
         block.render();

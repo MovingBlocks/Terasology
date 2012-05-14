@@ -8,6 +8,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.model.structures.AABB;
@@ -48,9 +49,11 @@ public class MeshRenderer implements RenderSystem {
         Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
         for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
             // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
+            MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+            if (meshComp.renderType == MeshComponent.RenderType.Normal) continue;
+
             AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
             LocationComponent location = entity.getComponent(LocationComponent.class);
-            MeshComponent meshComp = entity.getComponent(MeshComponent.class);
 
             Vector3f worldPos = location.getWorldPosition();
             Vector3d extents = new Vector3d(collision.getExtents());
@@ -81,6 +84,40 @@ public class MeshRenderer implements RenderSystem {
     }
 
     public void renderOpaque() {
+        boolean carryingTorch = CoreRegistry.get(LocalPlayer.class).isCarryingTorch();
+        Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
+        for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
+            // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
+            MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+            if (meshComp.renderType != MeshComponent.RenderType.Normal || meshComp.mesh == null) continue;
+
+            AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
+            LocationComponent location = entity.getComponent(LocationComponent.class);
+
+            Vector3f worldPos = location.getWorldPosition();
+            Vector3d extents = new Vector3d(collision.getExtents());
+            float worldScale = location.getWorldScale();
+            extents.scale(worldScale);
+            AABB aabb = new AABB(new Vector3d(worldPos), new Vector3d(collision.getExtents()));
+
+            if (worldRenderer.isAABBVisible(aabb)) {
+                glPushMatrix();
+
+                glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
+                AxisAngle4f rot = new AxisAngle4f();
+                rot.set(location.getWorldRotation());
+                glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
+                glScalef(worldScale, worldScale, worldScale);
+
+                meshComp.material.enable();
+                meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos)));
+                meshComp.material.setInt("carryingTorch",carryingTorch ? 1 : 0);
+                meshComp.material.bindTextures();
+                meshComp.mesh.render();
+
+                glPopMatrix();
+            }
+        }
     }
 
     public void renderOverlay() {

@@ -1,6 +1,6 @@
 package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.model.blocks.BlockFamily;
 
@@ -8,7 +8,7 @@ import org.terasology.model.blocks.BlockFamily;
  * Combined with ItemComponent, represents an
  * @author Immortius <immortius@gmail.com>
  */
-public final class BlockItemComponent extends AbstractComponent {
+public final class BlockItemComponent implements Component {
     public BlockFamily blockFamily;
     public EntityRef placedEntity = EntityRef.NULL;
 

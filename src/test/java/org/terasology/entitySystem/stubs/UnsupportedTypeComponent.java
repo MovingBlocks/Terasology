@@ -16,12 +16,12 @@
 
 package org.terasology.entitySystem.stubs;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 
 /**
  * @author Immortius
  */
-public class UnsupportedTypeComponent extends AbstractComponent {
+public class UnsupportedTypeComponent implements Component {
     public static class UnsupportedType {
         private UnsupportedType() {};
     }

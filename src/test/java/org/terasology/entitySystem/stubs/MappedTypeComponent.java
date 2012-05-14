@@ -16,12 +16,12 @@
 
 package org.terasology.entitySystem.stubs;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 
 /**
  * @author Immortius
  */
-public class MappedTypeComponent extends AbstractComponent {
+public class MappedTypeComponent implements Component {
     public static class InnerType {
         public static final int staticValue = 2;
     }

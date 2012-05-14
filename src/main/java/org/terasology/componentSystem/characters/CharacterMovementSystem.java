@@ -141,7 +141,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         worldPos.add(deltaPos);
         location.setWorldPosition(worldPos);
 
-        if (movementComp.faceMovementDirection) {
+        if (movementComp.faceMovementDirection && movementComp.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float)Math.atan2(movementComp.getVelocity().x, movementComp.getVelocity().z);
             AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
             location.getLocalRotation().set(axisAngle);
@@ -233,7 +233,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         }
         location.setWorldPosition(worldPos);
 
-        if (movementComp.faceMovementDirection) {
+        if (movementComp.faceMovementDirection && movementComp.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float)Math.atan2(movementComp.getVelocity().x, movementComp.getVelocity().z);
             AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
             location.getLocalRotation().set(axisAngle);
@@ -298,7 +298,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
         location.setWorldPosition(worldPos);
 
-        if (movementComp.faceMovementDirection) {
+        if (movementComp.faceMovementDirection && movementComp.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float)Math.atan2(movementComp.getVelocity().x, movementComp.getVelocity().z);
             AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
             location.getLocalRotation().set(axisAngle);

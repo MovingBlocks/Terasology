@@ -1,0 +1,12 @@
+{
+    "params" : [
+        { "name" : "textureAtlas",
+          "type" : "sampler2D" },
+        { "name" : "textureWaterNormal",
+          "type" : "sampler2D" },
+        { "name" : "textureLava",
+          "type" : "sampler2D" },
+        { "name" : "textureEffects",
+          "type" : "sampler2D" }
+    ]
+}

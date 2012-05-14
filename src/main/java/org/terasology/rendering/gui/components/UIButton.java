@@ -17,6 +17,8 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
@@ -38,9 +40,9 @@ public class UIButton extends UIDisplayContainer {
 
     public UIButton(Vector2f size) {
         setSize(size);
-        setClassStyle("button","background-image: gui_menu 256/512 30/512 0 0");
-        setClassStyle("button-mouseover","background-image: gui_menu 256/512 30/512 0 30/512");
-        setClassStyle("button-mouseclick","background-image: gui_menu 256/512 30/512 0 60/512");
+        setClassStyle("button","background-image: engine:gui_menu 256/512 30/512 0 0");
+        setClassStyle("button-mouseover","background-image: engine:gui_menu 256/512 30/512 0 30/512");
+        setClassStyle("button-mouseclick","background-image: engine:gui_menu 256/512 30/512 0 60/512");
         setClassStyle("button");
         _label = new UIText("Untitled");
         _label.setVisible(true);
@@ -54,7 +56,7 @@ public class UIButton extends UIDisplayContainer {
         if (intersects(mousePos)) {
 
             if (!_clickSoundPlayed) {
-                AudioManager.play("Click", 1.0f);
+                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
                 _clickSoundPlayed = true;
             }
 

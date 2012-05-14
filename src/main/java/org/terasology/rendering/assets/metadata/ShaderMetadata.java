@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package org.terasology.events.item;
+package org.terasology.rendering.assets.metadata;
 
-import org.terasology.entitySystem.EntityRef;
+import com.google.common.collect.Lists;
+
+import java.util.List;
 
 /**
  * @author Immortius
  */
-public class UseItemOnEntityEvent extends UseItemEvent
-{
-    private EntityRef target;
+public class ShaderMetadata {
+    List<ParamMetadata> parameters = Lists.newArrayList();
 
-    public UseItemOnEntityEvent(EntityRef instigator, EntityRef target) {
-        super(instigator);
-        this.target = target;
+    public List<ParamMetadata> getParameters() {
+        return parameters;
     }
 
-    public EntityRef getTarget() {
-        return target;
+    public void setParameters(List<ParamMetadata> parameters) {
+        this.parameters = parameters;
     }
 }

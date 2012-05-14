@@ -105,6 +105,8 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     private ReentrantLock _lock = new ReentrantLock();
     private ReentrantLock _lockRigidBody = new ReentrantLock();
 
+    public boolean isAprox = false;
+
     public enum LIGHT_TYPE {
         BLOCK,
         SUN
@@ -930,5 +932,19 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
         for (int i = 0; i < _states.sizePacked(); i++)
             _states.setRawByte(i, in.readByte());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Chunk)) {
+            return false;
+        }
+
+        if (this == o) {
+            return true;
+        }
+
+        Chunk comp = (Chunk) o;
+        return getPos().equals(comp.getPos());
     }
 }

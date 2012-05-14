@@ -22,6 +22,7 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
@@ -50,7 +51,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
     final UIText _version;
 
     public UIPauseMenu() {
-        _title = new UIGraphicsElement("terasology");
+        _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 

@@ -1,4 +1,4 @@
-package org.terasology.entitySystem.persistence;
+package org.terasology.entitySystem.metadata;
 
 import org.terasology.entitySystem.Component;
 
@@ -7,9 +7,13 @@ import java.util.Locale;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class PersistenceUtil {
+public class ComponentUtil {
 
-    private PersistenceUtil() {}
+    private ComponentUtil() {}
+
+    public static String getComponentClassName(Component component) {
+        return getComponentClassName(component.getClass());
+    }
 
     public static String getComponentClassName(Class<? extends Component> componentClass) {
         String name = componentClass.getSimpleName();

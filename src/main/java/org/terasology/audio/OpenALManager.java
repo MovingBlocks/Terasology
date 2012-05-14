@@ -66,8 +66,6 @@ public class OpenALManager extends AudioManager {
         // Initialize sound pools
         this._pools.put("sfx", new BasicSoundPool(30)); // effects pool
         this._pools.put("music", new BasicStreamingSoundPool(2)); // music pool
-
-        this.loadAssets();
     }
 
     public void destroy() {
@@ -99,7 +97,7 @@ public class OpenALManager extends AudioManager {
         }
     }
 
-    @Override
+   /* @Override
     protected Sound createAudio(String name, URL source) {
         if (source != null) {
             return new OggSound(name, source);
@@ -110,7 +108,7 @@ public class OpenALManager extends AudioManager {
     @Override
     protected Sound createStreamingAudio(String name, URL source) {
         return new OggStreamingSound(name, source);
-    }
+    }       */
 
     @Override
     protected boolean checkDistance(Vector3d soundSource) {

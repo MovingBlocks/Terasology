@@ -1,11 +1,11 @@
 package org.terasology.entitySystem.stubs;
 
-import org.terasology.entitySystem.AbstractComponent;
+import org.terasology.entitySystem.Component;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public final class IntegerComponent extends AbstractComponent {
+public final class IntegerComponent implements Component {
     public int value;
 
     public IntegerComponent() {}

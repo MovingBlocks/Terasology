@@ -17,7 +17,6 @@ package org.terasology.model.blocks.management
  */
 
 import groovy.util.logging.Log
-import org.terasology.logic.manager.TextureManager
 import org.terasology.math.Rotation
 import org.terasology.math.Side
 import org.terasology.model.shapes.BlockShape
@@ -34,6 +33,13 @@ import javax.vecmath.Vector2f
 
 import org.terasology.model.blocks.*
 import org.terasology.logic.manager.PathManager
+import org.terasology.logic.manager.AssetManager
+import org.terasology.asset.AssetUri
+import org.terasology.asset.AssetType
+import org.terasology.rendering.assets.Texture
+import org.terasology.asset.loaders.PNGTextureLoader
+import org.newdawn.slick.opengl.PNGDecoder
+import java.nio.ByteBuffer
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -143,7 +149,26 @@ class BlockManifestor {
 
         _bm.addAllBlocks(_blockIndex)
         _bm.addAllBlockFamilies(_blockFamilies);
-        TextureManager.getInstance().addTexture("terrain", _imageManifest.getAbsolutePath(), [_imageManifestMipMap1.getAbsolutePath(), _imageManifestMipMap2.getAbsolutePath(), _imageManifestMipMap3.getAbsolutePath()].toArray(new String[0]))
+
+        // TODO: Why even bother saving and loading image manifests anyway? Create them in memory and use them instead
+
+        ByteBuffer[] data = new ByteBuffer[4];
+        File[] files = [_imageManifest, _imageManifestMipMap1, _imageManifestMipMap2, _imageManifestMipMap3];
+        int width = Block.ATLAS_SIZE_IN_PX;
+        int height = Block.ATLAS_SIZE_IN_PX;
+        for (int i = 0; i < files.length; ++i) {
+            PNGDecoder decoder = new PNGDecoder(new FileInputStream(files[i]));
+            if (i == 0) {
+                width = decoder.getWidth();
+                height = decoder.getHeight()
+            }
+            ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
+            decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.RGBA);
+            buf.flip();
+            data[i] = buf;
+        }
+
+        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), new Texture(data, width, height, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest));
     }
 
     /**

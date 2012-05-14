@@ -4,7 +4,7 @@ package org.terasology.entitySystem;
  * Component for storing entity system information on an entity
  * @author Immortius <immortius@gmail.com>
  */
-public class EntityInfoComponent extends AbstractComponent {
+public class EntityInfoComponent implements Component {
     public String parentPrefab;
 
     public EntityInfoComponent() {}

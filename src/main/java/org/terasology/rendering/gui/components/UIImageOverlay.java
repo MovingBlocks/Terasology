@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -27,8 +28,8 @@ import javax.vecmath.Vector2f;
  */
 public class UIImageOverlay extends UIGraphicsElement {
 
-    public UIImageOverlay(String textureName) {
-        super(textureName);
+    public UIImageOverlay(Texture texture) {
+        super(texture);
     }
 
     @Override

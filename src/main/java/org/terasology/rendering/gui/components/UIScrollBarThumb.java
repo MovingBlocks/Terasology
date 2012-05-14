@@ -1,6 +1,7 @@
 package org.terasology.rendering.gui.components;
 
 
+import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import javax.vecmath.Vector2f;
@@ -18,9 +19,9 @@ public class UIScrollBarThumb extends UIDisplayContainer {
         setSize(size);
         _scrollType =  scrollType;
 
-        _header = new UIGraphicsElement("gui_menu");
-        _body   = new UIGraphicsElement("gui_menu");
-        _footer = new UIGraphicsElement("gui_menu");
+        _header = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
+        _body   = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
+        _footer = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
 
         _header.setVisible(true);
         _body.setVisible(true);

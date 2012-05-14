@@ -23,6 +23,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
+import org.terasology.asset.Asset;
+import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.rendering.interfaces.IGameObject;
 
@@ -32,13 +34,19 @@ import java.nio.IntBuffer;
 import static org.lwjgl.opengl.GL11.*;
 
 // TODO: Store mesh information in Mesh class in a usable format, for
-public class Mesh implements IGameObject {
+public class Mesh implements Asset {
 
     private static final int VERTEX_SIZE = 3;
     private static final int TEX_COORD_0_SIZE = 2;
     private static final int TEX_COORD_1_SIZE = 3;
     private static final int COLOR_SIZE = 4;
     private static final int NORMAL_SIZE = 3;
+
+    public static Mesh buildMesh(AssetUri uri, TFloatList vertices, TFloatList texCoord0, TFloatList texCoord1, TFloatList normals, TFloatList colors, TIntList indices) {
+        Mesh mesh = buildMesh(vertices, texCoord0, texCoord1, normals, colors, indices);
+        mesh.uri = uri;
+        return mesh;
+    }
 
     public static Mesh buildMesh(TFloatList vertices, TFloatList texCoord0, TFloatList texCoord1, TFloatList normals, TFloatList colors, TIntList indices) {
         
@@ -129,6 +137,8 @@ public class Mesh implements IGameObject {
 
     private Mesh() {}
 
+    private AssetUri uri = new AssetUri("");
+
     private int stride;
     private int vertexOffset;
     private int texCoord0Offset;
@@ -144,6 +154,11 @@ public class Mesh implements IGameObject {
     private int vboVertexBuffer;
     private int vboIndexBuffer;
     private int indexCount;
+
+    @Override
+    public AssetUri getURI() {
+        return uri;
+    }
 
     public void render() {
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -178,9 +193,6 @@ public class Mesh implements IGameObject {
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-    }
-
-    public void update(float delta) {
     }
 
 }

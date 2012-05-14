@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
@@ -65,7 +66,7 @@ public class ClasspathSource implements AssetSource {
     }
 
     @Override
-    public URL get(AssetUri uri) {
+    public List<URL> get(AssetUri uri) {
         return source.get(uri);
     }
 
