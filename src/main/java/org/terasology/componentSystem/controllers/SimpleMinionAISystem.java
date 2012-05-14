@@ -43,21 +43,12 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     private FastRandom random = new FastRandom();
     private AStarPathfinder aStarPathfinder;
     private Timer timer;
-    private long attacktime, pathtime;
-    private List<Vector3d> paths = null;
-    private Vector3f lastaiTarget = null;
-    private Vector3f lastTarget = null;
-    private Vector3f currentTarget = null;
-    private Vector3f tempTarget = null;
-    private double lastDistance;
-    private int patrolCounter;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         timer = CoreRegistry.get(Timer.class);
-        attacktime = timer.getTimeInMs();
         aStarPathfinder = new AStarPathfinder(worldProvider);
     }
 
@@ -110,7 +101,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
                         List<Vector3f> targets = ai.gatherTargets;
                         if(targets == null || targets.size() < 1) return;
-                        currentTarget = targets.get(0);
+                        Vector3f currentTarget = targets.get(0);
 
                         Vector3f dist = new Vector3f(worldPos);
                         dist.sub(currentTarget);
@@ -118,8 +109,8 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
                         if (distanceToTarget < 4) {
                             // gather the block
-                            if(timer.getTimeInMs() - attacktime > 500){
-                                attacktime = timer.getTimeInMs();
+                            if(timer.getTimeInMs() - ai.lastAttacktime > 500){
+                                ai.lastAttacktime = timer.getTimeInMs();
                                 boolean attacked = attack(entity,currentTarget);
                                 if(!attacked) {
                                     ai.gatherTargets.remove(currentTarget);
@@ -140,6 +131,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         else {
                             moveComp.setDrive(new Vector3f());
                         }
+                        entity.saveComponent(ai);
                         entity.saveComponent(moveComp);
                         entity.saveComponent(location);
                         break;
@@ -148,27 +140,20 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         //get targets, return if none
                         List<Vector3f> targets = ai.movementTargets;
                         if(targets == null || targets.size() < 1) return;
-
-                        //prob useless now, old artifact
-                        ai.followingPlayer = false;
-                        entity.saveComponent(ai);
-
-                        //init if no targets
-                        currentTarget = targets.get(0);
-                        if(lastTarget == null) lastTarget = targets.get(0);
+                        Vector3f currentTarget = targets.get(0);
 
                         //calc distance to current Target
                         Vector3f dist = new Vector3f(worldPos);
                         dist.sub(currentTarget);
-                        double distanceToTarget = dist.lengthSquared();
+                        double distanceToTarget = dist.length();
 
+
+                        // used 1.0 here as a check, should be lower to have the minion jump on the last block, TODO need to calc middle of block
                         if(distanceToTarget < 1.0d){
                             ai.movementTargets.remove(0);
+                            entity.saveComponent(ai);
                             currentTarget = null;
-                            lastTarget = null;
                             break;
-                            //if(ai.movementTargets.size() > 0)
-                            //currentTarget = ai.movementTargets.get(0);
                         }
 
                         Vector3f targetDirection = new Vector3f();
@@ -192,15 +177,16 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         //get targets, return if none
                         List<Vector3f> targets = ai.patrolTargets;
                         if(targets == null || targets.size() < 1) return;
+                        int patrolCounter = ai.patrolCounter;
+                        Vector3f currentTarget = null;
 
-                        //prob useless now, old artifact
-                        ai.followingPlayer = false;
-                        entity.saveComponent(ai);
-
-                        //init if no targets
+                        //get the patrol point
                         if(patrolCounter < targets.size()){
                             currentTarget = targets.get(patrolCounter);
-                            if(lastTarget == null) lastTarget = targets.get(0);
+                        }
+
+                        if(currentTarget == null){
+                            return;
                         }
 
                         //calc distance to current Target
@@ -211,11 +197,9 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         if(distanceToTarget < 1.0d){
                             patrolCounter++;
                             if(!(patrolCounter < targets.size())) patrolCounter = 0;
-                            currentTarget = null;
-                            lastTarget = null;
+                            ai.patrolCounter = patrolCounter;
+                            entity.saveComponent(ai);
                             break;
-                            //if(ai.movementTargets.size() > 0)
-                            //currentTarget = ai.movementTargets.get(0);
                         }
 
                         Vector3f targetDirection = new Vector3f();
@@ -299,50 +283,6 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         }
             return false;
     }
-
-    /*private RayBlockIntersection.Intersection calcSelectedBlock(Vector3f position,CharacterMovementComponent moveCompn) {
-        //  Proper and centralised ray tracing support though world
-        List<RayBlockIntersection.Intersection> inters = new ArrayList<RayBlockIntersection.Intersection>();
-
-        Vector3f pos = new Vector3f(position.x, position.y -1, position.z);
-
-        int blockPosX, blockPosY, blockPosZ;
-
-        for (int x = -3; x <= 3; x++) {
-            for (int y = -3; y <= 3; y++) {
-                for (int z = -3; z <= 3; z++) {
-                    // Make sure the correct block positions are calculated relatively to the position of the player
-                    blockPosX = (int) (pos.x + (pos.x >= 0 ? 0.5f : -0.5f)) + x;
-                    blockPosY = (int) (pos.y + (pos.y >= 0 ? 0.5f : -0.5f)) + y;
-                    blockPosZ = (int) (pos.z + (pos.z >= 0 ? 0.5f : -0.5f)) + z;
-
-                    byte blockType = worldProvider.getBlock(blockPosX, blockPosY, blockPosZ);
-
-                    // Ignore special blocks
-                    if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
-                        continue;
-                    }
-
-                    // The ray originates from the "player's eye"
-                    List<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(worldProvider, blockPosX, blockPosY, blockPosZ, new Vector3d(position), new Vector3d(moveCompn.getDrive()));
-
-                    if (iss != null) {
-                        inters.addAll(iss);
-                    }
-                }
-            }
-        }
-
-        /**
-         * Calculated the closest intersection.
-         */
-        /*if (inters.size() > 0) {
-            Collections.sort(inters);
-            return inters.get(0);
-        }
-
-        return null;
-    }*/
 
     @ReceiveEvent(components = {SimpleMinionAIComponent.class})
     public void onBump(HorizontalCollisionEvent event, EntityRef entity) {

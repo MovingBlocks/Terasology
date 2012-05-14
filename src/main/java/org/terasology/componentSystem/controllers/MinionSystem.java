@@ -74,6 +74,7 @@ public class MinionSystem implements EventHandlerSystem {
         int ordinal = ((minioncomp.minionBehaviour.ordinal() - wheelMoved / 120) % popupentries);
         while (ordinal < 0) ordinal+= popupentries;
         minioncomp.minionBehaviour = MinionComponent.MinionBehaviour.values()[ordinal];
+        minion.saveComponent(minioncomp);
     }
 
     public void barScroll(int wheelMoved){
@@ -93,7 +94,7 @@ public class MinionSystem implements EventHandlerSystem {
     public MinionComponent.MinionBehaviour getSelectedBehaviour(){
         EntityRef minion = getSelectedMinion();
         MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
-        if(minioncomp == null) return MinionComponent.MinionBehaviour.Move;
+        if(minioncomp == null) return MinionComponent.MinionBehaviour.Stay;
         return minioncomp.minionBehaviour;
     }
 
@@ -122,6 +123,7 @@ public class MinionSystem implements EventHandlerSystem {
                 getSelectedMinion().saveComponent(minionai);
                 MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
                 minioncomp.minionBehaviour = MinionComponent.MinionBehaviour.Stay;
+                getSelectedMinion().saveComponent(minioncomp);
                 break;
             }
             case Inventory:{
@@ -130,6 +132,7 @@ public class MinionSystem implements EventHandlerSystem {
                 getSelectedMinion().send(new ActivateEvent(getSelectedMinion(), localPlayer.getEntity()));
                 MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
                 minioncomp.minionBehaviour = MinionComponent.MinionBehaviour.Stay;
+                getSelectedMinion().saveComponent(minioncomp);
                 break;
             }
             case Test:{
@@ -141,8 +144,6 @@ public class MinionSystem implements EventHandlerSystem {
             }
 
         }
-        MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
-        getSelectedMinion().saveComponent(minioncomp);
     }
 
     public void setTarget(){
@@ -166,23 +167,26 @@ public class MinionSystem implements EventHandlerSystem {
                     {
                         case Follow: {
                             minionai.movementTarget = new Vector3f(centerPos.x, centerPos.y, centerPos.z);
+                            getSelectedMinion().saveComponent(minionai);
                             break;
                         }
                         case Move: {
                             minionai.movementTargets.add(new Vector3f(centerPos.x, centerPos.y, centerPos.z));
+                            getSelectedMinion().saveComponent(minionai);
                             break;
                         }
                         case Gather: {
                             minionai.gatherTargets.add(new Vector3f(centerPos.x, centerPos.y, centerPos.z));
+                            getSelectedMinion().saveComponent(minionai);
                             break;
                         }
                         case Patrol: {
                             minionai.patrolTargets.add(new Vector3f(centerPos.x, centerPos.y, centerPos.z));
+                            getSelectedMinion().saveComponent(minionai);
                             break;
                         }
                     }
                 }
-                getSelectedMinion().saveComponent(minionai);
             }
         }
     }

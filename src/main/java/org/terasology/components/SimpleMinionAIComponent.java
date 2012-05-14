@@ -14,10 +14,18 @@ import java.util.List;
 public final class SimpleMinionAIComponent implements Component {
 
     public long lastChangeOfDirectionAt = 0;
+
+    public long lastAttacktime = 0;
+    public long lastPathtime = 0;
+    public int patrolCounter = 0;
+
     public Vector3f movementTarget = new Vector3f();
+    public Vector3f previousTarget = new Vector3f();
+
     public List<Vector3f> movementTargets = new ArrayList<Vector3f>();
     public List<Vector3f> gatherTargets = new ArrayList<Vector3f>();
     public List<Vector3f> patrolTargets = new ArrayList<Vector3f>();
+
     public boolean followingPlayer = true;
 
     public void ClearCommands(){
