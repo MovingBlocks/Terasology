@@ -9,14 +9,18 @@ import org.terasology.entitySystem.Component;
 public final class MinionComponent implements Component {
 
     public String icon = "";
-    public MinionBehaviour minionBehaviour = MinionBehaviour.Follow;
+    public MinionBehaviour minionBehaviour = MinionBehaviour.Stay;
 
     public enum MinionBehaviour{
+        Stay,
         Follow,
         Move,
         Gather,
+        Patrol,
+        Test,
         Inventory,
-        Disappear
+        Disappear,
+        Clear
     }
 
     public MinionComponent() {}

@@ -31,9 +31,9 @@ public class UIMinion extends UIDisplayWindow{
 
     public UIMinion(){
 
-        setSize(new Vector2f(60f,100f));
+        setSize(new Vector2f(60f,180f));
         _background = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
-        _background.getTextureSize().set(new Vector2f(60f / 256f, 100f / 256f));
+        _background.getTextureSize().set(new Vector2f(60f / 256f, 180f / 256f));
         _background.getTextureOrigin().set(new Vector2f(30.0f / 256f, 20.0f / 256f));
         _background.setSize(getSize());
         addDisplayElement(_background);
