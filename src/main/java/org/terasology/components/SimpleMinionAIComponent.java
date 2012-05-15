@@ -1,7 +1,6 @@
 package org.terasology.components;
 
 import org.terasology.entitySystem.Component;
-import sun.org.mozilla.javascript.internal.ast.NewExpression;
 
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
