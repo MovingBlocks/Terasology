@@ -1,5 +1,6 @@
 package org.terasology.componentSystem.common;
 
+import com.sun.tools.example.debug.gui.GUI;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
@@ -14,6 +15,8 @@ import org.terasology.events.CurePoisonEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.PoisonedEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.model.BuffIcon;
 
 import java.util.logging.Logger;
 
@@ -22,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscriberSystem {
     protected EntityManager entityManager;
-    private Logger logger = Logger.getLogger(getClass().getName());
+    protected BuffIcon bufficon;
 
 
     public void initialise() {
@@ -42,6 +45,8 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
         PoisonedComponent poisonedEffect = new PoisonedComponent();
         HealthComponent health = entity.getComponent(HealthComponent.class);
         entity.addComponent(poisonedEffect);
+        entity.saveComponent(poisonedEffect);
+
             /*health.currentHealth -= 0.25;
             entity.saveComponent(health);   */
 
@@ -51,6 +56,8 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
     public void curePoisoned(CurePoisonEvent cureEvent, EntityRef entity){
         PoisonedComponent poisondEffect = entity.getComponent(PoisonedComponent.class);
         entity.removeComponent(PoisonedComponent.class);
+
+
     }
 
     /*
@@ -75,7 +82,8 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
             poisonedEffect.poisonDuration = poisonedEffect.poisonDuration - delta;
             //While POISONED:
             if (poisonedEffect.poisonDuration >=1) {
-                health.currentHealth = Math.min(health.maxHealth, health.currentHealth - (int)poisonedEffect.poisonRate);                entity.saveComponent(health);
+                health.currentHealth = Math.min(health.maxHealth, health.currentHealth - (int)poisonedEffect.poisonRate);
+                entity.saveComponent(health);
                 if (health.currentHealth <= 0){
                     entity.send(new NoHealthEvent(entity));
                 }

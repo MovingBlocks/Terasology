@@ -1,6 +1,5 @@
 package org.terasology.componentSystem.action;
 
-import org.terasology.componentSystem.common.StatusAffectorSystem;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -25,7 +24,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
         }
         public EntityRef entity;
         public PotionComponent potion;
-        //public EntityRef item;
+        public EntityRef item;
         public CoreRegistry CoreRegister;
 
 
@@ -43,29 +42,29 @@ public class DrinkPotionAction implements EventHandlerSystem {
         switch (potion.type) {
             case Red:
                 //Receive an Empty Vial (Destroy it if no inventory space available)
-                event.getTarget().send(new ReceiveItemEvent(item));
+                event.getInstigator().send(new ReceiveItemEvent(item));
                 if (itemComp != null && !itemComp.container.exists()) {
                     item.destroy();
                 }
                 //Max HP
                 health.currentHealth = health.maxHealth;
-                event.getTarget().saveComponent(health);
+                event.getInstigator().saveComponent(health);
                 break;
 
             case Green:
                 //Receive an Empty Vial (Destroy it if no inventory space available)
-                event.getTarget().send(new ReceiveItemEvent(item));
+                event.getInstigator().send(new ReceiveItemEvent(item));
                 if (itemComp != null && !itemComp.container.exists()) {
                     item.destroy();
                 }
                 //Poison time!
-                event.getTarget().send(new PoisonedEvent());
+                event.getInstigator().send(new PoisonedEvent());
                break;
 
             case Orange: //Cures the Poison.
                 event.getInstigator().send(new CurePoisonEvent());
                 //Receive an Empty Vial (Destroy it if no inventory space available)
-                event.getTarget().send(new ReceiveItemEvent(item));
+                event.getInstigator().send(new ReceiveItemEvent(item));
                 if (itemComp != null && !itemComp.container.exists()) {
                     item.destroy();
                 }
@@ -73,7 +72,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
 
             case Purple:
                 //Receive an Empty Vial (Destroy it if no inventory space available)
-                event.getTarget().send(new ReceiveItemEvent(item));
+                event.getInstigator().send(new ReceiveItemEvent(item));
                 if (itemComp != null && !itemComp.container.exists()) {
                     item.destroy();
                 }
