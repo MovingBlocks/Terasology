@@ -3,31 +3,32 @@ package org.terasology.componentSystem.common;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
+import org.terasology.components.PoisonedComponent;
 import org.terasology.components.SpeedBoostComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.events.BoostSpeedEvent;
-import org.terasology.components.PoisonedComponent;
-import org.terasology.events.CurePoisonEvent;
-import org.terasology.events.NoHealthEvent;
-import org.terasology.events.PoisonedEvent;
-import org.terasology.game.CoreRegistry;
+import org.terasology.events.*;
 
-import java.util.logging.Logger;
+import org.terasology.game.CoreRegistry;
 
 /**
  * Status Affector System : Different Effect Handling [Affecting the player]
  */
 public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscriberSystem {
     protected EntityManager entityManager;
-    private Logger logger = Logger.getLogger(getClass().getName());
-
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
     }
+    @ReceiveEvent(components = {HealthComponent.class})
+    public void giveHealth(BoostHpEvent boosthpEvent, EntityRef entity){
+        HealthComponent health = entity.getComponent(HealthComponent.class);
+        health.currentHealth = health.maxHealth;
+        entity.saveComponent(health);
+    }
+
     @ReceiveEvent(components = {CharacterMovementComponent.class})
     public void onSpeed(BoostSpeedEvent speedEvent, EntityRef entity) {
         SpeedBoostComponent speedEffect = new SpeedBoostComponent();
@@ -42,6 +43,8 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
         PoisonedComponent poisonedEffect = new PoisonedComponent();
         HealthComponent health = entity.getComponent(HealthComponent.class);
         entity.addComponent(poisonedEffect);
+        entity.saveComponent(poisonedEffect);
+
             /*health.currentHealth -= 0.25;
             entity.saveComponent(health);   */
 
@@ -51,6 +54,8 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
     public void curePoisoned(CurePoisonEvent cureEvent, EntityRef entity){
         PoisonedComponent poisondEffect = entity.getComponent(PoisonedComponent.class);
         entity.removeComponent(PoisonedComponent.class);
+
+
     }
 
     /*
@@ -75,7 +80,8 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
             poisonedEffect.poisonDuration = poisonedEffect.poisonDuration - delta;
             //While POISONED:
             if (poisonedEffect.poisonDuration >=1) {
-                health.currentHealth = Math.min(health.maxHealth, health.currentHealth - (int)poisonedEffect.poisonRate);                entity.saveComponent(health);
+                health.currentHealth = Math.min(health.maxHealth, health.currentHealth - (int)poisonedEffect.poisonRate);
+                entity.saveComponent(health);
                 if (health.currentHealth <= 0){
                     entity.send(new NoHealthEvent(entity));
                 }
