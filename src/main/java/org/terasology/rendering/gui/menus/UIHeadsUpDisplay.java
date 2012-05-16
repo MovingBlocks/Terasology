@@ -91,6 +91,7 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _buffBar = new UIBuff();
         _buffBar.setVisible(true);
         addDisplayElement(_buffBar);
+
     }
 
 

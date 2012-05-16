@@ -14,7 +14,7 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
 /*
- *
+ *   For Status Effects that don't affect the hearts
  */
 public class UIBuff extends UIDisplayContainer {
     private final UIGraphicsElement _buff;
