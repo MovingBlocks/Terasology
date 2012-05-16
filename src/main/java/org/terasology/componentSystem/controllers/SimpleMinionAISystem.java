@@ -96,7 +96,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                     case Gather:{
 
                         List<Vector3f> targets = ai.gatherTargets;
-                        if(targets == null || targets.size() < 1) return;
+                        if(targets == null || targets.size() < 1) break;
                         Vector3f currentTarget = targets.get(0);
 
                         Vector3f dist = new Vector3f(worldPos);
@@ -133,9 +133,9 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         break;
                     }
                     case Move:{
-                        //get targets, return if none
+                        //get targets, break if none
                         List<Vector3f> targets = ai.movementTargets;
-                        if(targets == null || targets.size() < 1) return;
+                        if(targets == null || targets.size() < 1) break;
                         Vector3f currentTarget = targets.get(0);
 
                         //calc distance to current Target
@@ -170,9 +170,9 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
                     }
                     case Patrol:{
-                        //get targets, return if none
+                        //get targets, break if none
                         List<Vector3f> targets = ai.patrolTargets;
-                        if(targets == null || targets.size() < 1) return;
+                        if(targets == null || targets.size() < 1) break;
                         int patrolCounter = ai.patrolCounter;
                         Vector3f currentTarget = null;
 
@@ -182,7 +182,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         }
 
                         if(currentTarget == null){
-                            return;
+                            break;
                         }
 
                         //calc distance to current Target
@@ -216,7 +216,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                     }
                     case Test:{
                         /*List<Vector3f> targets = ai.movementTargets;
-                        if(targets == null || targets.size() < 1) return;
+                        if(targets == null || targets.size() < 1) break;
 
                         if(timer.getTimeInMs() - pathtime > 3000){
                             aStarPathfinder.setVis(false);
