@@ -80,16 +80,18 @@ public class UIHealthBar extends UIDisplayContainer {
             else
                 _hearts[i].setVisible(false);
 
-        // Show Poisoned Hearts:
+        //Show Poisoned Status with Green Hearts:
             PoisonedComponent poisoned = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PoisonedComponent.class);
             entityManager = CoreRegistry.get(EntityManager.class);
             for (EntityRef entity : entityManager.iteratorEntities(PoisonedComponent.class)) {
                 if (poisoned.poisonDuration >=1){
                     _hearts[i].getTextureOrigin().set(new Vector2f(106f / 256f, 0.0f));
-                    addDisplayElement(_hearts[i]);
                 }
                 else _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
 
+        /*Blue Hearts:
+                    _hearts[i].getTextureOrigin().set(new Vector2f(70f / 256f, 0.0f));
+        */
 
 
         }

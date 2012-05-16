@@ -49,6 +49,7 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
     private final UIMinionbar _minionbar;
     //private final UIMinion _miniongui;
     private final UIHealthBar _healthBar;
+    private final UIBuff _buffBar;
 
     /**
      * Init. the HUD.
@@ -86,6 +87,11 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _healthBar = new UIHealthBar();
         _healthBar.setVisible(true);
         addDisplayElement(_healthBar);
+
+        _buffBar = new UIBuff();
+        _buffBar.setVisible(true);
+        addDisplayElement(_buffBar);
+
     }
 
 

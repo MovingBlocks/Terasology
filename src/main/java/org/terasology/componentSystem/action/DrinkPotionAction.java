@@ -1,16 +1,16 @@
 package org.terasology.componentSystem.action;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.events.ActivateEvent;
-import org.terasology.events.BoostSpeedEvent;
-import org.terasology.events.CurePoisonEvent;
-import org.terasology.events.PoisonedEvent;
+import org.terasology.events.*;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.AudioManager;
 
 
 /**
@@ -24,6 +24,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
         }
         public EntityRef entity;
         public PotionComponent potion;
+        public PoisonedComponent poisoned;
         public EntityRef item;
         public CoreRegistry CoreRegister;
 
@@ -31,6 +32,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
     @ReceiveEvent(components = {PotionComponent.class})
         public void onActivate(ActivateEvent event, EntityRef entity) {
         potion = entity.getComponent(PotionComponent.class);
+        poisoned = entity.getComponent(PoisonedComponent.class);
         EntityManager entityManager = CoreRegister.get(EntityManager.class);
 
         HealthComponent health = event.getTarget().getComponent(HealthComponent.class);
@@ -41,15 +43,16 @@ public class DrinkPotionAction implements EventHandlerSystem {
 
         switch (potion.type) {
             case Red:
+                //Max HP
+                event.getInstigator().send(new BoostHpEvent());
                 //Receive an Empty Vial (Destroy it if no inventory space available)
                 event.getInstigator().send(new ReceiveItemEvent(item));
                 if (itemComp != null && !itemComp.container.exists()) {
                     item.destroy();
                 }
-                //Max HP
-                health.currentHealth = health.maxHealth;
-                event.getInstigator().saveComponent(health);
-                break;
+
+
+            break;
 
             case Green:
                 //Receive an Empty Vial (Destroy it if no inventory space available)
@@ -83,6 +86,8 @@ public class DrinkPotionAction implements EventHandlerSystem {
             default:
                 break;
              }
+        AudioManager.play(new AssetUri(AssetType.SOUND, "engine:drink"), 1.0f);
 
-        }
+
+    }
     }
