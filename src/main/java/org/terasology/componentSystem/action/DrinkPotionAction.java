@@ -1,5 +1,7 @@
 package org.terasology.componentSystem.action;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -8,6 +10,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.*;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.AudioManager;
 
 
 /**
@@ -83,6 +86,8 @@ public class DrinkPotionAction implements EventHandlerSystem {
             default:
                 break;
              }
+        AudioManager.play(new AssetUri(AssetType.SOUND, "engine:drink"), 1.0f);
 
-        }
+
+    }
     }
