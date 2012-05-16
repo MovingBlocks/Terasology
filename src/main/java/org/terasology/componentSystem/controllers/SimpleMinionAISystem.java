@@ -12,20 +12,16 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.pathfinder.AStarPathfinder;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.BlockPosition;
-import org.terasology.model.structures.RayBlockIntersection;
+
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,7 +37,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     private IWorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
     private FastRandom random = new FastRandom();
-    private AStarPathfinder aStarPathfinder;
+    //private AStarPathfinder aStarPathfinder;
     private Timer timer;
 
     public void initialise() {
@@ -49,7 +45,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         timer = CoreRegistry.get(Timer.class);
-        aStarPathfinder = new AStarPathfinder(worldProvider);
+        //aStarPathfinder = new AStarPathfinder(worldProvider);
     }
 
     public void update(float delta) {
