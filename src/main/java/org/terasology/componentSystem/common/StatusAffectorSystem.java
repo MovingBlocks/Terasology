@@ -1,6 +1,5 @@
 package org.terasology.componentSystem.common;
 
-import com.sun.tools.example.debug.gui.GUI;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
