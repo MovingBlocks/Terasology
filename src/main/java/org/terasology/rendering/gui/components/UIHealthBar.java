@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.components;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.components.CuredComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.PoisonedComponent;
 import org.terasology.components.SpeedBoostComponent;
@@ -88,15 +89,24 @@ public class UIHealthBar extends UIDisplayContainer {
                     _hearts[i].getTextureOrigin().set(new Vector2f(106f / 256f, 0.0f));
                 }
                 else _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
+            }
+            for (EntityRef entity : entityManager.iteratorEntities(CuredComponent.class)) {
+                //For fixing the Green > Red hearts when cured:
+                CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(CuredComponent.class);
+                entityManager = CoreRegistry.get(EntityManager.class);
+                    if (cured.cureDuration >=1){
+                        _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
+                    }
+                    else _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
 
-        /*Blue Hearts:
-                    _hearts[i].getTextureOrigin().set(new Vector2f(70f / 256f, 0.0f));
-        */
 
+
+                }
+
+            }
 
         }
-
     }
 
-}
-}
+/*Blue Hearts:
+_hearts[i].getTextureOrigin().set(new Vector2f(70f / 256f, 0.0f)); */

@@ -193,6 +193,8 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerComponentClass(PotionComponent.class);
         componentLibrary.registerComponentClass(SpeedBoostComponent.class);
         componentLibrary.registerComponentClass(PoisonedComponent.class);
+        componentLibrary.registerComponentClass(CuredComponent.class);
+
         loadPrefabs();
 
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();

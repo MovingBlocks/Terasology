@@ -1,10 +1,7 @@
 package org.terasology.componentSystem.common;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.HealthComponent;
-import org.terasology.components.PoisonedComponent;
-import org.terasology.components.SpeedBoostComponent;
+import org.terasology.components.*;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -44,18 +41,15 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
         HealthComponent health = entity.getComponent(HealthComponent.class);
         entity.addComponent(poisonedEffect);
         entity.saveComponent(poisonedEffect);
-
-            /*health.currentHealth -= 0.25;
-            entity.saveComponent(health);   */
-
     }
 
     @ReceiveEvent(components = {PoisonedComponent.class})
     public void curePoisoned(CurePoisonEvent cureEvent, EntityRef entity){
-        PoisonedComponent poisondEffect = entity.getComponent(PoisonedComponent.class);
+        CuredComponent curedEffect = new CuredComponent();
+        PoisonedComponent poisoned = entity.getComponent(PoisonedComponent.class);
         entity.removeComponent(PoisonedComponent.class);
-
-
+        entity.addComponent(curedEffect);
+        entity.saveComponent(curedEffect);
     }
 
     /*
@@ -91,6 +85,18 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
                 entity.removeComponent(PoisonedComponent.class);
             }
         }
+        for (EntityRef entity : entityManager.iteratorEntities(CuredComponent.class)) {
+            CuredComponent curedEffect = entity.getComponent(CuredComponent.class);
+            PoisonedComponent poisonedEffect = entity.getComponent(PoisonedComponent.class);
+            curedEffect.cureDuration = curedEffect.cureDuration - delta;
+            //While Immune:
+            if (curedEffect.cureDuration >= 1) {
+                entity.saveComponent(curedEffect);
+            }
+            //Remove Poison Immunity Status
+            else entity.removeComponent(CuredComponent.class);
+            }
+        }
     }
-}
+
 
