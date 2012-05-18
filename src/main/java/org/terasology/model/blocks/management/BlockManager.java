@@ -86,6 +86,10 @@ public class BlockManager {
         return result;
     }
 
+    public Block getAir() {
+        return _blocksById.get((byte)0);
+    }
+
     public int getBlockFamilyCount() {
         return _blockFamiliesByTitle.size();
     }

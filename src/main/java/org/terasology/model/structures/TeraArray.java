@@ -53,14 +53,45 @@ public class TeraArray {
 
     /**
      * Sets the byte value for the given position.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @param b
+     * @return The old value at the given position
      */
-    public void set(int x, int y, int z, byte b) {
+    public byte set(int x, int y, int z, byte b) {
         int pos = (x * _lX * _lY) + (y * _lX) + z;
 
         if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0)
-            return;
+            return 0;
 
+        byte old = _array[pos];
         _array[pos] = b;
+        return old;
+    }
+
+    /**
+     * Sets the byte value for the given position.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @param b
+     * @return The old value at the given position
+     */
+    public boolean set(int x, int y, int z, byte b, byte expected) {
+        int pos = (x * _lX * _lY) + (y * _lX) + z;
+
+        if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0)
+            return false;
+
+        byte old = _array[pos];
+        if (old == expected) {
+            _array[pos] = b;
+            return true;
+        }
+        return false;
     }
 
     /**

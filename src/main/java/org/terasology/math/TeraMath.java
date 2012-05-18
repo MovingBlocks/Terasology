@@ -202,6 +202,17 @@ public final class TeraMath {
     }
 
     /**
+     * Returns the chunk position of a given coordinate
+     *
+     * @param y
+     * @return The Y-coordinate of the chunk
+     */
+    public static int calcChunkPosY(int y) {
+        // If we ever have multiple vertical chunks, change this
+        return 0;
+    }
+
+    /**
      * Returns the chunk position of a given coordinate.
      *
      * @param z The Z-coordinate of the block
@@ -215,26 +226,38 @@ public final class TeraMath {
         return (z / Chunk.CHUNK_DIMENSION_Z);
     }
 
-    /**
-     * Returns the internal position of a block within a chunk.
-     *
-     * @param x1 The X-coordinate of the block in the world
-     * @param x2 The X-coordinate of the chunk in the world
-     * @return The X-coordinate of the block within the chunk
-     */
-    public static int calcBlockPosX(int x1, int x2) {
-        return TeraMath.fastAbs(x1 - (x2 * Chunk.CHUNK_DIMENSION_X));
+    public static Vector3i calcChunkPos(int x, int y, int z) {
+        return new Vector3i(calcChunkPosX(x), calcChunkPosY(y), calcChunkPosZ(z));
     }
 
     /**
      * Returns the internal position of a block within a chunk.
      *
-     * @param z1 The Z-coordinate of the block in the world
-     * @param z2 The Z-coordinate of the chunk in the world
+     * @param blockX The X-coordinate of the block in the world
+     * @param chunkX The X-coordinate of the chunk in the world
+     * @return The X-coordinate of the block within the chunk
+     */
+    public static int calcBlockPosX(int blockX, int chunkX) {
+        return TeraMath.fastAbs(blockX - (chunkX * Chunk.CHUNK_DIMENSION_X));
+    }
+
+    public static int calcBlockPosY(int blockY, int chunkY) {
+        return blockY;
+    }
+
+    /**
+     * Returns the internal position of a block within a chunk.
+     *
+     * @param blockZ The Z-coordinate of the block in the world
+     * @param chunkZ The Z-coordinate of the chunk in the world
      * @return The Z-coordinate of the block within the chunk
      */
-    public static int calcBlockPosZ(int z1, int z2) {
-        return TeraMath.fastAbs(z1 - (z2 * Chunk.CHUNK_DIMENSION_Z));
+    public static int calcBlockPosZ(int blockZ, int chunkZ) {
+        return TeraMath.fastAbs(blockZ - (chunkZ * Chunk.CHUNK_DIMENSION_Z));
+    }
+
+    public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkPos) {
+        return new Vector3i(calcBlockPosX(x, chunkPos.x), calcBlockPosY(y, chunkPos.y), calcBlockPosZ(z, chunkPos.z));
     }
 
     /**
