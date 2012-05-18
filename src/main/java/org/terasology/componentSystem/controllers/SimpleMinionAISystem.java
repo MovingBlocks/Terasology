@@ -12,6 +12,7 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.pathfinder.AStarPathing;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -37,7 +38,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     private IWorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
     private FastRandom random = new FastRandom();
-    //private AStarPathfinder aStarPathfinder;
+    private AStarPathing aStarPathing;
     private Timer timer;
 
     public void initialise() {
@@ -45,7 +46,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         timer = CoreRegistry.get(Timer.class);
-        //aStarPathfinder = new AStarPathfinder(worldProvider);
+        aStarPathing = new AStarPathing(worldProvider);
     }
 
     public void update(float delta) {
@@ -77,20 +78,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                             entity.saveComponent(ai);
                         }
 
-                        Vector3f targetDirection = new Vector3f();
-                        targetDirection.sub(ai.movementTarget, worldPos);
-                        if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
-                            targetDirection.normalize();
-                            moveComp.setDrive(targetDirection);
-
-                            float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                            location.getLocalRotation().set(axisAngle);
-                        } else {
-                            moveComp.getDrive().set(0,0,0);
-                        }
-                        entity.saveComponent(moveComp);
-                        entity.saveComponent(location);
+                        setMovement(ai.movementTarget, worldPos, entity, moveComp, location);
                         break;
                     }
                     case Gather:{
@@ -114,22 +102,8 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                             }
                         }
 
-                        Vector3f targetDirection = new Vector3f();
-                        targetDirection.sub(currentTarget, worldPos);
-                        if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f)  {
-                            targetDirection.normalize();
-                            moveComp.setDrive(targetDirection);
-
-                            float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                            location.getLocalRotation().set(axisAngle);
-                        }
-                        else {
-                            moveComp.setDrive(new Vector3f());
-                        }
                         entity.saveComponent(ai);
-                        entity.saveComponent(moveComp);
-                        entity.saveComponent(location);
+                        setMovement(currentTarget, worldPos, entity, moveComp, location);
                         break;
                     }
                     case Move:{
@@ -137,35 +111,23 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         List<Vector3f> targets = ai.movementTargets;
                         if(targets == null || targets.size() < 1) break;
                         Vector3f currentTarget = targets.get(0);
+                        // trying to solve distance calculation with some simple trick of reducing the height to a round int, might not work for taller entities
+                        worldPos.y = worldPos.y - (worldPos.y % 1);
 
                         //calc distance to current Target
                         Vector3f dist = new Vector3f(worldPos);
                         dist.sub(currentTarget);
                         double distanceToTarget = dist.length();
 
-
                         // used 1.0 here as a check, should be lower to have the minion jump on the last block, TODO need to calc middle of block
-                        if(distanceToTarget < 1.0d){
+                        if(distanceToTarget < 0.1d){
                             ai.movementTargets.remove(0);
                             entity.saveComponent(ai);
                             currentTarget = null;
                             break;
                         }
 
-                        Vector3f targetDirection = new Vector3f();
-                        targetDirection.sub(currentTarget, worldPos);
-                        if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
-                            targetDirection.normalize();
-                            moveComp.setDrive(targetDirection);
-
-                            float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                            location.getLocalRotation().set(axisAngle);
-                        } else {
-                            moveComp.setDrive(new Vector3f());
-                        }
-                        entity.saveComponent(moveComp);
-                        entity.saveComponent(location);
+                        setMovement(currentTarget, worldPos, entity, moveComp, location);
                         break;
 
                     }
@@ -190,7 +152,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         dist.sub(currentTarget);
                         double distanceToTarget = dist.length();
 
-                        if(distanceToTarget < 1.0d){
+                        if(distanceToTarget < 0.1d){
                             patrolCounter++;
                             if(!(patrolCounter < targets.size())) patrolCounter = 0;
                             ai.patrolCounter = patrolCounter;
@@ -198,66 +160,62 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                             break;
                         }
 
-                        Vector3f targetDirection = new Vector3f();
-                        targetDirection.sub(currentTarget, worldPos);
-                        if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
-                            targetDirection.normalize();
-                            moveComp.setDrive(targetDirection);
+                        setMovement(currentTarget,worldPos,entity,moveComp,location);
 
-                            float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                            location.getLocalRotation().set(axisAngle);
-                        } else {
-                            moveComp.setDrive(new Vector3f());
-                        }
-                        entity.saveComponent(moveComp);
-                        entity.saveComponent(location);
                         break;
                     }
                     case Test:{
-                        /*List<Vector3f> targets = ai.movementTargets;
-                        if(targets == null || targets.size() < 1) break;
+                        if(!ai.locked){
+                            //get targets, break if none
+                            List<Vector3f> targets = ai.movementTargets;
+                            List<Vector3f> pathTargets = ai.pathTargets;
+                            if(targets == null || targets.size() < 1) break;
 
-                        if(timer.getTimeInMs() - pathtime > 3000){
-                            aStarPathfinder.setVis(false);
-                            ai.followingPlayer = false;
-                            entity.saveComponent(ai);
+                            Vector3f currentTarget; // check if currentTarget target is a path or not
+                            if(pathTargets != null && pathTargets.size() > 0)
+                            {
+                                currentTarget = pathTargets.get(0);
+                            }
+                            else
+                            {
+                                currentTarget = targets.get(0);
+                            }
+                            if(ai.previousTarget != ai.movementTargets.get(0)){
+                                ai.locked = true;
+                                ai.pathTargets = aStarPathing.findPath(worldPos,currentTarget);
+                            }
+                            ai.locked = false;
+                            if(ai.pathTargets != null && ai.pathTargets.size() > 0){
+                                pathTargets = ai.pathTargets;
+                                pathTargets.get(0);
+                                ai.previousTarget = targets.get(0); // used to check if the final target changed
+                                currentTarget = pathTargets.get(0);
+                            }
 
-                            if(currentTarget == null) currentTarget = targets.get(0);
-                            if(lastTarget == null) lastTarget = targets.get(0);
-                            if(lastaiTarget == null) lastaiTarget = targets.get(0);
+                            // trying to solve distance calculation with some simple trick of reducing the height to a round int, might not work for taller entities
+                            worldPos.y = worldPos.y - (worldPos.y % 1);
+                            //calc distance to current Target
                             Vector3f dist = new Vector3f(worldPos);
-                            dist.sub(lastTarget);
-                            double distanceToTarget = dist.lengthSquared();
+                            dist.sub(currentTarget);
+                            double distanceToTarget = dist.length();
 
-                            if(lastTarget == currentTarget && distanceToTarget - lastDistance < 0.1){
-                                //if(paths.size() > 0)
-                                currentTarget = new Vector3f(paths.remove(0));
-                            }
-                            else{
-                                lastDistance = distanceToTarget;
-                                Vector3f tmpvec = currentTarget;
-                                tmpvec.sub(ai.movementTargets.get(0));
-                                double distrem = tmpvec.length();
-                                if(distrem < 0.1) ai.movementTargets.remove(0);
+                            // used 1.0 here as a check, should be lower to have the minion jump on the last block, TODO need to calc middle of block
+                            if(distanceToTarget < 1.5d){
+                                if(ai.pathTargets != null && ai.pathTargets.size() > 0){
+                                    ai.pathTargets.remove(0);
+                                    entity.saveComponent(ai);
+                                }
+                                else{
+                                    ai.movementTargets.remove(0);
+                                    ai.previousTarget = null;
+                                    entity.saveComponent(ai);
+                                }
+                                break;
                             }
 
-                            Vector3f targetDirection = new Vector3f();
-                            targetDirection.sub(currentTarget, worldPos);
-                            if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
-                                targetDirection.normalize();
-                                moveComp.setDrive(targetDirection);
-
-                                float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                                AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
-                                location.getLocalRotation().set(axisAngle);
-                            } else {
-                                moveComp.setDrive(new Vector3f());
-                            }
-                            entity.saveComponent(moveComp);
-                            entity.saveComponent(location);
+                            setMovement(currentTarget, worldPos, entity, moveComp, location);
                             break;
-                        }*/
+                        }
                     }
                     default: {
                         break;
@@ -266,6 +224,23 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
             }
         }
+    }
+
+    private void setMovement(Vector3f currentTarget, Vector3f worldPos, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location){
+        Vector3f targetDirection = new Vector3f();
+        targetDirection.sub(currentTarget, worldPos);
+        if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
+            targetDirection.normalize();
+            moveComp.setDrive(targetDirection);
+
+            float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
+            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+            location.getLocalRotation().set(axisAngle);
+        } else {
+            moveComp.setDrive(new Vector3f());
+        }
+        entity.saveComponent(moveComp);
+        entity.saveComponent(location);
     }
 
     private boolean attack(EntityRef player, Vector3f position) {
