@@ -5,8 +5,6 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.terasology.client.BindTarget;
-import org.terasology.client.ClientController;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
@@ -21,6 +19,8 @@ import org.terasology.events.NoHealthEvent;
 import org.terasology.events.OpenInventoryEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
+import org.terasology.game.client.BindTarget;
+import org.terasology.game.client.ClientController;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
@@ -484,36 +484,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     }
 
-    public void updateInput() {
 
-        // Process interactions even if the mouse button is pressed down
-        // and not fired by a repeated event
-        processInteractions(-1);
-
-        movementInput.set(0, 0, 0);
-        lookInput.set((float)(mouseSensititivy * Mouse.getDX()), (float)(mouseSensititivy * Mouse.getDY()));
-        
-        if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-            movementInput.z -= 1.0f;
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-            movementInput.z += 1.0f;
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-            movementInput.x -= 1.0f;
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-            movementInput.x += 1.0f;
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-            movementInput.y += 1.0f;
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
-            movementInput.y -= 1.0f;
-        }
-
-        running = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
-    }
 
     /**
      * Calculates the currently targeted block in front of the player.
