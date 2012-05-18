@@ -30,6 +30,7 @@ import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.game.modes.GameState;
 import org.terasology.logic.manager.*;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.blocks.management.BlockManifestor;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.assets.Shader;
@@ -341,7 +342,15 @@ public class TerasologyEngine implements GameEngine {
         AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "org/terasology/data"));
         // TODO: Shouldn't be setting up the block/block shape managers here (do on transition to StateSinglePlayer)
         BlockShapeManager.getInstance().reload();
-        BlockManager.getInstance();
+        BlockManifestor manifestor = new BlockManifestor(BlockManager.getInstance());
+
+        try
+        {
+            manifestor.loadConfig();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to load block definitions", e);
+            System.exit(-1);
+        }
 
         for (AssetUri uri : AssetManager.list(AssetType.SHADER)) {
             AssetManager.load(uri);
