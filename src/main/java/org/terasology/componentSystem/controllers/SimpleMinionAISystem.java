@@ -182,12 +182,11 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                             }
                             if(ai.previousTarget != ai.movementTargets.get(0)){
                                 ai.locked = true;
-                                ai.pathTargets = aStarPathing.findPath(worldPos,currentTarget);
+                                ai.pathTargets = aStarPathing.findPath(worldPos, new Vector3f(currentTarget));
                             }
                             ai.locked = false;
                             if(ai.pathTargets != null && ai.pathTargets.size() > 0){
                                 pathTargets = ai.pathTargets;
-                                pathTargets.get(0);
                                 ai.previousTarget = targets.get(0); // used to check if the final target changed
                                 currentTarget = pathTargets.get(0);
                             }
@@ -199,8 +198,8 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                             dist.sub(currentTarget);
                             double distanceToTarget = dist.length();
 
-                            // used 1.0 here as a check, should be lower to have the minion jump on the last block, TODO need to calc middle of block
-                            if(distanceToTarget < 1.5d){
+                            // TODO need a good way to deal with distance calculation
+                            if(distanceToTarget < 0.1d){
                                 if(ai.pathTargets != null && ai.pathTargets.size() > 0){
                                     ai.pathTargets.remove(0);
                                     entity.saveComponent(ai);
