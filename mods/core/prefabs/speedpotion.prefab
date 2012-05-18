@@ -1,0 +1,13 @@
+{
+    "name" : "core:purplepotion",
+    "Item" : {
+        "name" : "PurplePotion",
+        "icon" : "PurpleVial",
+        "usage" : "OnUser",
+        "consumedOnUse" : true,
+        "renderWithIcon" : true
+    },
+    "Potion" : {
+        "type" : "Purple"
+    }
+}

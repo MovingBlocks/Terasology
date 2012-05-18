@@ -25,7 +25,7 @@ import javax.vecmath.Vector3f;
 @RegisterComponentSystem
 public class MinionSystem implements EventHandlerSystem {
 
-    private final int popupentries = 5;
+    private final int popupentries = 9;
     private final String behaviourmenu = "minionbehaviour";
     private UIMinion minionbehaviourmenu;
 
@@ -76,6 +76,7 @@ public class MinionSystem implements EventHandlerSystem {
         int ordinal = ((minioncomp.minionBehaviour.ordinal() - wheelMoved / 120) % popupentries);
         while (ordinal < 0) ordinal+= popupentries;
         minioncomp.minionBehaviour = MinionComponent.MinionBehaviour.values()[ordinal];
+        minion.saveComponent(minioncomp);
     }
 
     public void barScroll(int wheelMoved){
@@ -95,7 +96,7 @@ public class MinionSystem implements EventHandlerSystem {
     public MinionComponent.MinionBehaviour getSelectedBehaviour(){
         EntityRef minion = getSelectedMinion();
         MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
-        if(minioncomp == null) return MinionComponent.MinionBehaviour.Move;
+        if(minioncomp == null) return MinionComponent.MinionBehaviour.Stay;
         return minioncomp.minionBehaviour;
     }
 
@@ -117,19 +118,34 @@ public class MinionSystem implements EventHandlerSystem {
             }
         }
         setMinionSelectMode(false);
-        if(getSelectedBehaviour() == MinionComponent.MinionBehaviour.Disappear){
-            //UIConfirm confirm = new UIConfirm("Confirm minion dismissal", "Are you sure you want to dispose of your cure little cube? You will lose it's inventory content if you click yes.");
-            //GUIManager.getInstance().addWindow(confirm,"confirm");
-            DestroyActiveMinion();
-        }
-        else if (getSelectedBehaviour() == MinionComponent.MinionBehaviour.Inventory){
-            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-            if(localPlayer == null) return;
-            getSelectedMinion().send(new ActivateEvent(getSelectedMinion(), localPlayer.getEntity()));
-        }
-        MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
-        getSelectedMinion().saveComponent(minioncomp);
+        switch (getSelectedBehaviour()){
+            case Clear:{
+                SimpleMinionAIComponent minionai = getSelectedMinion().getComponent(SimpleMinionAIComponent.class);
+                minionai.ClearCommands();
+                getSelectedMinion().saveComponent(minionai);
+                MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
+                minioncomp.minionBehaviour = MinionComponent.MinionBehaviour.Stay;
+                getSelectedMinion().saveComponent(minioncomp);
+                break;
+            }
+            case Inventory:{
+                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+                if(localPlayer == null) return;
+                getSelectedMinion().send(new ActivateEvent(getSelectedMinion(), localPlayer.getEntity()));
+                MinionComponent minioncomp = getSelectedMinion().getComponent(MinionComponent.class);
+                minioncomp.minionBehaviour = MinionComponent.MinionBehaviour.Stay;
+                getSelectedMinion().saveComponent(minioncomp);
+                break;
+            }
+            case Test:{
+                break;
+            }
+            case Disappear:{
+                DestroyActiveMinion();
+                break;
+            }
 
+        }
     }
 
     public void setTarget(){
@@ -149,8 +165,29 @@ public class MinionSystem implements EventHandlerSystem {
                 {
                     Vector3i centerPos = helpMan.calcSelectedBlock().getBlockPosition();
                     minionai.followingPlayer = false;
-                    minionai.movementTarget = new Vector3f(centerPos.x, centerPos.y, centerPos.z);
-
+                    switch (getSelectedBehaviour())
+                    {
+                        case Follow: {
+                            minionai.movementTarget = new Vector3f(centerPos.x, centerPos.y, centerPos.z);
+                            getSelectedMinion().saveComponent(minionai);
+                            break;
+                        }
+                        case Move: {
+                            minionai.movementTargets.add(new Vector3f(centerPos.x, centerPos.y, centerPos.z));
+                            getSelectedMinion().saveComponent(minionai);
+                            break;
+                        }
+                        case Gather: {
+                            minionai.gatherTargets.add(new Vector3f(centerPos.x, centerPos.y, centerPos.z));
+                            getSelectedMinion().saveComponent(minionai);
+                            break;
+                        }
+                        case Patrol: {
+                            minionai.patrolTargets.add(new Vector3f(centerPos.x, centerPos.y, centerPos.z));
+                            getSelectedMinion().saveComponent(minionai);
+                            break;
+                        }
+                    }
                 }
             }
         }

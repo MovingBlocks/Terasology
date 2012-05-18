@@ -52,25 +52,6 @@ public class BlockManager {
         return _instance;
     }
 
-    private BlockManager() {
-        _manifestor = new BlockManifestor(this);
-        loadBlocks();
-    }
-
-    private void loadBlocks() {
-        try {
-            _manifestor.loadConfig(); // Might have to catch plain Exception also for this step
-            // System.out.println("Blocks by title: " + _blocksByTitle);
-            // System.out.println("Blocks by id: " + _blocksById);
-        } catch (Exception e) {
-            // TODO: Totally placeholder error handling, needs to be fancier
-            // System.out.println("Exception loading blocks. Sad :-(");
-             e.printStackTrace();
-
-            System.exit(-1);
-        }
-    }
-    
     public BlockFamily getBlockFamily(String title) {
         return _blockFamiliesByTitle.get(title);
     }

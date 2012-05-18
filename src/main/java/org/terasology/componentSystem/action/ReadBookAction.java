@@ -9,8 +9,6 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.menus.UIOpenBookScreen;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Reading the Book calls the UI + Contents.
@@ -19,12 +17,13 @@ import java.util.logging.Logger;
  */
 @RegisterComponentSystem
 public class ReadBookAction implements EventHandlerSystem {
-    private Logger logger = Logger.getLogger(getClass().getName());
-    public void initialise() {
-    }
-    public EntityRef book;
+    public void initialise() {}
+
+    public EntityRef entity;
+
     @ReceiveEvent(components = {BookComponent.class})
-    public void onActivate(ActivateEvent event, EntityRef book) {
+    public void onActivate(ActivateEvent event, EntityRef entity) {
         GUIManager.getInstance().addWindow(new UIOpenBookScreen(), "openbook");
+
     }
 }

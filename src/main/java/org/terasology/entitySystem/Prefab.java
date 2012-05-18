@@ -1,14 +1,12 @@
 package org.terasology.entitySystem;
 
-import org.terasology.asset.Asset;
-
 /**
  * An entity prefab describes the recipe for creating an entity.
  * Like an entity it groups a collection of components.
  *
  * @author Immortius <immortius@gmail.com>
  */
-public interface Prefab {
+public interface Prefab{
 
     /**
      * @return The identifier for this prefab

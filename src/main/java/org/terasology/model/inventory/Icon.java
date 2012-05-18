@@ -193,8 +193,8 @@ public class Icon {
         shadowingotIcon.setAtlasPosition(8, 3);
         //Resources for Bowcraft-&-Fletching Atlas
         woodshaftIcon.setAtlasPosition(9, 1);
-       //gel icon
-        gelcubeIcon.setAtlasPosition(6,6);
+       //gel icon (Will be moved to a Minion Icon Atlas)
+        gelcubeIcon.setAtlasPosition(13,0);
 
         icons.put("pickaxe", pickAxeIcon);
 		icons.put("axe", axeIcon);

@@ -14,8 +14,6 @@ public class BookComponent implements Component {
         Recipe         // Not yet implemented
     }
     public BookType type;
-    //Book Contents in Array?
-    public String page1 = "";
-    public String page2 = "";
+
 
 }

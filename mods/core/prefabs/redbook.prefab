@@ -7,8 +7,6 @@
         "renderWithIcon" : true
     },
     "Book" : {
-        "type" : "WContents",
-        "page1" : "The",
-        "page2" : "RED!"
+        "type" : "WContents"
     }
 }

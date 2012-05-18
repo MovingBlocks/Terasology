@@ -332,13 +332,14 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
         // idea: use the 10 least significant bits of each dimension and merge
         // them next to each other into one 32 bit
         // its less likely that the cache contains chunks that are far away from
+        // x and z use 11 instead of 10 bits
         int hash = 0;
 
-        hash += (x - Integer.MIN_VALUE) & 0x03FF;
+        hash += (x - Integer.MIN_VALUE) & 0x07FF;
         hash <<= 10;
         hash += (y - Integer.MIN_VALUE) & 0x03FF;
-        hash <<= 10;
-        hash += (z - Integer.MIN_VALUE) & 0x03FF;
+        hash <<= 11;
+        hash += (z - Integer.MIN_VALUE) & 0x07FF;
 
         return hash;
     }

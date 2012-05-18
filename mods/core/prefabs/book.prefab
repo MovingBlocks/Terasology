@@ -7,9 +7,6 @@
         "renderWithIcon" : true
     },
     "Book" : {
-        "type" : "WContents",
-        "page1" : "Hello",
-        "page2" : "World!"
-    },
-    "ReadBookAction" : {}
+        "type" : "WContents"
+    }
 }

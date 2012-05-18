@@ -18,6 +18,10 @@ package org.terasology.rendering.gui.components;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.HealthComponent;
+import org.terasology.components.PoisonedComponent;
+import org.terasology.components.SpeedBoostComponent;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
@@ -36,6 +40,8 @@ import javax.vecmath.Vector2f;
  */
 public class UIHealthBar extends UIDisplayContainer {
     private final UIGraphicsElement[] _hearts;
+    protected EntityManager entityManager;
+
 
     public UIHealthBar() {
         setSize(new Vector2f(180f, 18f));
@@ -47,7 +53,7 @@ public class UIHealthBar extends UIDisplayContainer {
             _hearts[i] = new UIGraphicsElement(AssetManager.loadTexture("engine:icons"));
             _hearts[i].setVisible(true);
             _hearts[i].getTextureSize().set(new Vector2f(9f / 256f, 9f / 256f));
-            _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
+            _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f)); //106f for poison
             _hearts[i].setSize(new Vector2f(18f, 18f));
             _hearts[i].setPosition(new Vector2f(18f * i, 18f));
 
@@ -57,6 +63,7 @@ public class UIHealthBar extends UIDisplayContainer {
 
     @Override
     public void update() {
+
         super.update();
 
         float healthRatio = 0;
@@ -72,6 +79,24 @@ public class UIHealthBar extends UIDisplayContainer {
                 _hearts[i].setVisible(true);
             else
                 _hearts[i].setVisible(false);
+
+        //Show Poisoned Status with Green Hearts:
+            PoisonedComponent poisoned = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PoisonedComponent.class);
+            entityManager = CoreRegistry.get(EntityManager.class);
+            for (EntityRef entity : entityManager.iteratorEntities(PoisonedComponent.class)) {
+                if (poisoned.poisonDuration >=1){
+                    _hearts[i].getTextureOrigin().set(new Vector2f(106f / 256f, 0.0f));
+                }
+                else _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
+
+        /*Blue Hearts:
+                    _hearts[i].getTextureOrigin().set(new Vector2f(70f / 256f, 0.0f));
+        */
+
+
         }
+
     }
+
+}
 }

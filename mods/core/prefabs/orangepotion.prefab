@@ -1,0 +1,13 @@
+{
+    "name" : "core:orangepotion",
+    "Item" : {
+        "name" : "OrangePotion",
+        "icon" : "OrangeVial",
+        "usage" : "OnUser",
+        "consumedOnUse" : true,
+        "renderWithIcon" : true
+    },
+    "Potion" : {
+        "type" : "Orange"
+    }
+}

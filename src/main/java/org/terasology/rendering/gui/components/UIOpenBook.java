@@ -1,5 +1,8 @@
 package org.terasology.rendering.gui.components;
 
+import org.newdawn.slick.AngelCodeFont;
+import org.newdawn.slick.Color;
+import org.terasology.components.BookComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
@@ -7,8 +10,6 @@ import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -19,11 +20,10 @@ public class UIOpenBook extends UIDisplayContainer {
 
     public UIOpenBook() {
         background = new UIGraphicsElement(AssetManager.loadTexture("engine:openbook"));
+        background.setPosition(new Vector2f(-250, -200));
         background.setSize(new Vector2f(500, 300));
-        //background.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
         addDisplayElement(background);
         background.setVisible(true);
-
         update();
     }
 }

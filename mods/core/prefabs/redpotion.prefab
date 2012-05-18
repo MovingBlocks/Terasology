@@ -1,0 +1,13 @@
+{
+    "name" : "core:redpotion",
+    "Item" : {
+        "name" : "RedPotion",
+        "icon" : "RedVial",
+        "usage" : "OnUser",
+        "consumedOnUse" : true,
+        "renderWithIcon" : true
+    },
+    "Potion" : {
+        "type" : "Red"
+    }
+}

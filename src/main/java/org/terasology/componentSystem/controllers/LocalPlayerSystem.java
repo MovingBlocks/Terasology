@@ -351,9 +351,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (localPlayerComp.isDead) return;
 
         if(minionsys.MinionMode()){
-            if (button == 1 ) {
+            if (button == 1  ) {
                 if(minionsys.isMinionSelected()){
                     // opens the minion behaviour menu
+                    lastInteraction = timer.getTimeInMs();
                     minionsys.RightMouseDown();
                     minionsys.setMinionSelectMode(true);
                 }
@@ -361,6 +362,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             else{
                 if (Mouse.isButtonDown(0) || button == 0) {
                     // used to set targets for the minion
+                    lastInteraction = timer.getTimeInMs();
                     minionsys.setTarget();
                 }
             }
